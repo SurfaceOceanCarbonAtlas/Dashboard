@@ -28,7 +28,7 @@
 #    If the Source (above) is M, this contains the name of the metadata
 #    field where the field value will be found.
 #
-# Calc_Method
+# Calc_Class
 #    If the Source (above) is C, this gives the name of the class that
 #    contains the method for calculating this field value. The class must
 #    be in the package socat.sanitychecker.data.calculate, and implement the
@@ -70,7 +70,7 @@
 #    The flag to set if a numeric field value falls outside the specified
 #    range. Values are the same as for the Missing_Flag above.
 
-#Field,Required,RequiredGroup,Source,Metadata_Name,Calc_Method,Numeric,Range_Min,Range_Max,Flag,MissingFlag,RangeFlag
+#Field,Required,RequiredGroup,Source,Metadata_Name,Calc_Class,Numeric,Range_Min,Range_Max,Flag,MissingFlag,RangeFlag
 cruise_id,Y,,C,,ExpoCode,N,,,C,B,
 cruise_name,N,,M,CruiseName,,N,,,N,,
 yr,Y,,D,,,Y,,,C,B,B
