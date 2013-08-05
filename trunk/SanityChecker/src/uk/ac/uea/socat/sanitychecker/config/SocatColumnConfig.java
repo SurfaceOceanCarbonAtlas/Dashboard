@@ -87,7 +87,7 @@ public class SocatColumnConfig {
 	/**
 	 * The name of the package in which classes and methods for calculating data values are defined 
 	 */
-	private static final String CALCULATOR_PACKAGE = "socat.sanitychecker.data.calculate";
+	private static final String CALCULATOR_PACKAGE = "uk.ac.uea.socat.sanitychecker.data.calculate";
 	
 	/**
 	 * The name of the data calculator method
@@ -97,7 +97,7 @@ public class SocatColumnConfig {
 	/**
 	 * The name of the interface that all calculator classes must implement
 	 */
-	private static final String CALCULATOR_INTERFACE_NAME = "socat.sanitychecker.data.calculate.DataCalculator";
+	private static final String CALCULATOR_INTERFACE_NAME = "uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator";
 	
 	/**
 	 * The list of SOCAT columns in the order in which they appear in the config file

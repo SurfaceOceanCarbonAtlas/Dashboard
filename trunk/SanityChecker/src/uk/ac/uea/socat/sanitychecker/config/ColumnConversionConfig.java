@@ -29,7 +29,7 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	/**
 	 * The name of the package that contains all the converter classes
 	 */
-	private static final String CONVERTER_CLASS_PREFIX = "socat.sanitychecker.data.conversion.";
+	private static final String CONVERTER_CLASS_PREFIX = "uk.ac.uea.socat.sanitychecker.data.conversion.";
 	
 	/**
 	 * The name of the configuration file

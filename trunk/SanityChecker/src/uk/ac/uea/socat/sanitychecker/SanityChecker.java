@@ -206,8 +206,12 @@ public class SanityChecker {
 	public static void main(String[] args) {
 		
 		try {
-			System.out.print("ENTER when ready... ");
-			new Scanner(System.in).nextLine();
+			
+			// These lines should be uncommented when profiling.
+			// Start the program, start & attach the profiler, then press ENTER.
+			//
+			// System.out.print("ENTER when ready... ");
+			// new Scanner(System.in).nextLine();
 			
 			boolean ok = true;
 
