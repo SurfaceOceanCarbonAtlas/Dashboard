@@ -72,7 +72,7 @@ public class MetadataConfig {
 	/**
 	 * The root of all metadata item class names
 	 */
-	private static final String ITEM_CLASS_ROOT = "socat.sanitychecker.metadata";
+	private static final String ITEM_CLASS_ROOT = "uk.ac.uea.socat.sanitychecker.metadata";
 	
 	/**
 	 * The default metadata item class to use if it's not specified
