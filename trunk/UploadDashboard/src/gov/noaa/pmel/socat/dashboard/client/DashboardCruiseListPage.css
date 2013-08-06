@@ -1,0 +1,32 @@
+@CHARSET "UTF-8";
+
+body {
+	width: 100%;
+	background-color: #EEE;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.header-div {
+	width: 100%;
+}
+.welcome-label {
+	margin: 1em;
+	height: 1.5em;
+}
+.logout-button {
+	font-weight: bold;
+	font-size: 100%;
+	margin: 1em;
+	height: 1.5em;
+	width: 7em;
+}
+
+.contents {
+	clear: both;
+	width: 100%;
+}
+.dummy-label {
+	margin: 1em;
+}

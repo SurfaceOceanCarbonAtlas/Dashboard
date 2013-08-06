@@ -1,0 +1,51 @@
+@CHARSET "UTF-8";
+
+body {
+	width: 35em;
+	background-color: #EEE;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.intro-div {
+	width: 100%;
+}
+.intro-label {
+	padding: 1em;
+	text-align: justify;
+}
+
+.labeledtext-div {
+	width: 100%;
+}
+.labeledtext-label {
+	font-family: monospace;
+	font-weight: bold;
+	font-size: 120%;
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+	margin-left: 7em;
+	margin-right: 2px;
+	font-weight: bold;
+}
+.labeledtext-textbox {
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+	margin-left: 2px;
+	margin-right: 10em;
+}
+
+.buttons-div {
+	width: 100%;
+}
+.login-button {
+	font-weight: bold;
+	font-size: 100%;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 13em;
+	height: 2.5em;
+	width: 9em;
+}
+

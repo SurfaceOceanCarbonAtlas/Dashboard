@@ -1,0 +1,16 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+	<ui:style src="DashboardLogout.css" />
+		
+	<g:HTMLPanel>
+		<div styleName="{style.intro-div}">
+			<g:Label styleName="{style.intro-label}" ui:field="goodbyeLabel" />
+		</div>
+		<div styleName="{style.buttons-div}">
+			<g:Button styleName="{style.socatinfo-button}" ui:field="socatInfoButton" />
+			<g:Button styleName="{style.relogin-button}" ui:field="reloginButton" />
+		</div>
+	</g:HTMLPanel>
+</ui:UiBinder> 
