@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+              http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
+
+	<context-param>
+		<param-name>gwt.xsrf.session_cookie_name</param-name>
+		<param-value>JSESSIONID</param-value>
+	</context-param>
+
+	<!--  the following filter and filter-mapping is only for debugging -->
+	<filter>
+		<filter-name>createSessionFilter</filter-name>
+		<filter-class>gov.noaa.pmel.socat.dashboard.server.ForceSessionCreationFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>createSessionFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>dashboardLoginServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardLoginServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dashboardLoginServlet</servlet-name>
+		<url-pattern>/socatuploaddashboard/service</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>xsrf</servlet-name>
+		<servlet-class>com.google.gwt.user.server.rpc.XsrfTokenServiceServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>xsrf</servlet-name>
+		<url-pattern>/socatuploaddashboard/xsrf</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>SocatUploadDashboard.html</welcome-file>
+	</welcome-file-list>
+
+</web-app>

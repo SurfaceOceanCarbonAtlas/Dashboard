@@ -1,0 +1,41 @@
+@CHARSET "UTF-8";
+
+body {
+	width: 35em;
+	background-color: #EEE;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.intro-div {
+	width: 100%;
+}
+.intro-label {
+	padding: 1em;
+	text-align: justify;
+}
+
+.buttons-div {
+	width: 100%;
+}
+.socatinfo-button {
+	font-weight: bold;
+	font-size: 100%;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 3.75em;
+	margin-right: 1.75em;
+	height: 2.5em;
+	width: 12em;
+}
+.relogin-button {
+	font-weight: bold;
+	font-size: 100%;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 1.75em;
+	margin-right: 3.75em;
+	height: 2.5em;
+	width: 12em;
+}
