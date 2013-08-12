@@ -8,34 +8,31 @@ body {
 	padding: 0;
 }
 
-.intro-div {
-	width: 100%;
+.intro-panel {
+	width: 35em;
 }
 .intro-label {
+	font-size: 120%;
 	padding: 1em;
 	text-align: justify;
 }
 
-.buttons-div {
-	width: 100%;
-}
-.socatinfo-button {
-	font-weight: bold;
-	font-size: 100%;
-	margin-top: 1em;
-	margin-bottom: 1em;
-	margin-left: 3.75em;
-	margin-right: 1.75em;
-	height: 2.5em;
-	width: 12em;
+.relogin-panel {
+	width: 35em;
 }
 .relogin-button {
 	font-weight: bold;
 	font-size: 100%;
-	margin-top: 1em;
-	margin-bottom: 1em;
-	margin-left: 1.75em;
-	margin-right: 3.75em;
 	height: 2.5em;
-	width: 12em;
+	width: 11em;
+	margin: 1em 5em;
+}
+
+.socat-info-panel {
+	width: 33em;
+	margin: 3em 1em;
+}
+.socat-info-anchor {
+	font-weight: bold;
+	font-size: 120%;
 }

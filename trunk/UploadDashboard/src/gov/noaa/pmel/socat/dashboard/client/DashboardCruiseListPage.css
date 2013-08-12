@@ -8,25 +8,21 @@ body {
 	padding: 0;
 }
 
-.header-div {
-	width: 100%;
-}
-.welcome-label {
+.userinfo-div {
 	margin: 1em;
+}
+.userinfo-label {
+	font-size: 120%;
 	height: 1.5em;
 }
 .logout-button {
 	font-weight: bold;
 	font-size: 100%;
-	margin: 1em;
 	height: 1.5em;
 	width: 7em;
+	margin-left: 5em;
 }
 
 .contents {
-	clear: both;
-	width: 100%;
-}
-.dummy-label {
-	margin: 1em;
+	padding: 1em;
 }

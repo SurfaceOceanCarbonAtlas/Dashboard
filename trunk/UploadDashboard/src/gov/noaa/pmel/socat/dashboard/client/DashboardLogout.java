@@ -12,10 +12,11 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.HasRpcToken;
-import com.google.gwt.user.client.rpc.XsrfToken;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
@@ -29,9 +30,9 @@ import com.google.gwt.user.client.ui.Widget;
 public class DashboardLogout extends Composite {
 
 	protected static String goodbyeMsg = "Thank you for contributing to SOCAT.  Goodbye.";
-	protected static String socatInfoButtonText = "Go to www.socat.info";
-	protected static String loginButtonText = "Log in again";
-	protected static String socatInfoLink = "http://www.socat.info/";
+	protected static String reloginText = "Log in again";
+	protected static String socatInfoText = "Return to socat.info";
+	protected static String socatInfoLink = "http://www.socat.info";
 	protected static String requestFailedMsg = "Sorry, an error occurred";
 
 	interface DashboardLogoutUiBinder extends UiBinder<Widget, DashboardLogout> {
@@ -41,30 +42,30 @@ public class DashboardLogout extends Composite {
 			.create(DashboardLogoutUiBinder.class);
 
 	@UiField Label goodbyeLabel;
-	@UiField Button socatInfoButton;
 	@UiField Button reloginButton;
+	@UiField Anchor socatInfoAnchor;
 
 	public DashboardLogout() {
 		initWidget(uiBinder.createAndBindUi(this));
 		goodbyeLabel.setText(goodbyeMsg);
-		socatInfoButton.setText(socatInfoButtonText);
-		reloginButton.setText(loginButtonText);
+		reloginButton.setText(reloginText);
+		socatInfoAnchor.setText(socatInfoText);
+		socatInfoAnchor.setHref(socatInfoLink);
 	}
 
 	/**
-	 * Tell the server, using the given token, to invalidate this session.
-	 *  
-	 * @param token
-	 * 		token to use, returned by a previous call to getNewXsrfToken
+	 * Tell the server to invalidate this session.
 	 */
-	void doLogout(XsrfToken token) {
+	void doLogout() {
 		DashboardLogoutServiceAsync service = 
 				GWT.create(DashboardLogoutService.class);
-		((HasRpcToken) service).setRpcToken(token);
+		((HasRpcToken) service).setRpcToken(
+				DashboardPageFactory.getToken());
 		service.logoutUser(new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				;
+				Cookies.removeCookie("JSESSIONID");
+				DashboardPageFactory.setToken(null);
 			}
 			@Override
 			public void onFailure(Throwable ex) {
@@ -74,15 +75,11 @@ public class DashboardLogout extends Composite {
 		});
 	}
 
-	@UiHandler("socatInfoButton")
-	void socatInfoOnClick(ClickEvent event) {
-	}
-
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
 		RootPanel.get().remove(this);
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
-		loginPage.clearLogin();
+		loginPage.clearLoginData(true);
 		RootPanel.get().add(loginPage);
 	}
 

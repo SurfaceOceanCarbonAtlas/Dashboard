@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.XsrfProtectedService;
  * 
  * @author Karl Smith
  */
-@RemoteServiceRelativePath("service")
+@RemoteServiceRelativePath("loginService")
 public interface DashboardLoginService extends XsrfProtectedService {
 
 	/**

@@ -5,13 +5,19 @@
 	<ui:style src="DashboardCruiseListPage.css" />
 		
 	<g:HTMLPanel>
-		<div styleName="{style.header-div}">
-			<g:InlineLabel styleName="{style.welcome-label}" ui:field="welcomeLabel" />
-			<g:Button styleName="{style.logout-button}" ui:field="logoutButton" />
-		</div>
-		<div styleName="{style.contents}">
-			<g:Label styleName="{style.dummy-label}">Hi There!</g:Label>
-		</div>
+		<g:VerticalPanel>
+			<g:HorizontalPanel styleName="{style.userinfo-div}">
+				<g:InlineLabel styleName="{style.userinfo-label}" ui:field="userInfoLabel" />
+				<g:Button styleName="{style.logout-button}" ui:field="logoutButton" />
+			</g:HorizontalPanel>
+		</g:VerticalPanel>
+		<g:HTMLPanel styleName="{style.contents}">
+			<p>
+				Weif wenwh <b>ELIU ARW EOTN YA EB I NNOI AN OIY</b> bp9'uati ae wru 
+				inaore g0a8ner argjn am 9ru na'rep9u'n efij  JIOH 08 JHE 0 
+				IOJHWFN ioj aoij oaijs ISJ-09243i0n <i>(Sni 09swefn Oiasejpj)</i>
+			</p>
+		</g:HTMLPanel>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 
