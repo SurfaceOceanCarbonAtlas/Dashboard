@@ -74,12 +74,14 @@ public class DashboardLogin extends Composite {
 	}
 
 	/**
-	 * Clears the contents of the username and password text boxes
+	 * Clears the contents of the username and password text boxes.
+	 * If clearUsername is true, then also clear the username field.
 	 */
-	void clearLogin() {
+	void clearLoginData(boolean clearUsername) {
 		nameText.setText("");
 		passText.setText("");
-		username = "";
+		if ( clearUsername )
+			username = "";
 	}
 
 	@UiHandler("loginButton")
@@ -93,6 +95,7 @@ public class DashboardLogin extends Composite {
 			xsrf.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
 				@Override
 				public void onSuccess(XsrfToken token) {
+					DashboardPageFactory.setToken(token);
 					DashboardLoginServiceAsync service = 
 							GWT.create(DashboardLoginService.class);
 					((HasRpcToken) service).setRpcToken(token);
@@ -100,6 +103,7 @@ public class DashboardLogin extends Composite {
 					// the plain-text password is not passed over the wire.
 					String[] hashes = DashboardUtils.hashesFromPlainText(
 							username, passText.getValue());
+					clearLoginData(false);
 					service.authenticateUser(hashes[0], hashes[1], 
 							createDashboardForUser);
 				}
@@ -120,7 +124,7 @@ public class DashboardLogin extends Composite {
 		@Override
 		public void onSuccess(DashboardCruiseListing cruises) {
 			if ( username.equals(cruises.getUsername()) ) {
-				clearLogin();
+				clearLoginData(true);
 				DashboardCruiseListPage cruiseListPage = 
 						DashboardPageFactory.getPage(DashboardCruiseListPage.class);
 				cruiseListPage.updateCruises(cruises);
@@ -128,11 +132,13 @@ public class DashboardLogin extends Composite {
 				RootPanel.get().add(cruiseListPage);
 			}
 			else {
+				clearLoginData(true);
 				Window.alert(loginErrorMsg);
 			}
 		}
 		@Override
 		public void onFailure(Throwable ex) {
+			clearLoginData(true);
 			Window.alert(SafeHtmlUtils.htmlEscape(
 					loginErrorMsg + " (" + ex.getMessage() + ")"));
 		}

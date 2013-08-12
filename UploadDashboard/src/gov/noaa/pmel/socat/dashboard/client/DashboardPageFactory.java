@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 import java.util.HashMap;
 
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.rpc.XsrfToken;
 import com.google.gwt.user.client.ui.Composite;
 
 
@@ -19,12 +20,29 @@ import com.google.gwt.user.client.ui.Composite;
 public class DashboardPageFactory {
 
 	protected static HashMap<Class<?>,Composite> pagesMap = null;
+	protected static XsrfToken token;
 
 	/**
 	 * Do not create an instance of this factory.
 	 * Use the static method getPage to obtain desired page.
 	 */
 	protected DashboardPageFactory() {
+	}
+
+	/**
+	 * @return 
+	 * 		the previously set XSRF token to use when communicating with the server
+	 */
+	public static XsrfToken getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token 
+	 * 		the XSRF token to use when communicating with the server
+	 */
+	public static void setToken(XsrfToken token) {
+		DashboardPageFactory.token = token;
 	}
 
 	/**
@@ -39,7 +57,7 @@ public class DashboardPageFactory {
 	 */
 	@SuppressWarnings("unchecked")
 	static <T extends Composite> T getPage(Class<T> clazz) {
-		// TODO: remove this code used for debugging
+		/*
 		// Start of code only for running directly from eclipse
 		if ( clazz == DashboardLogin.class ) {
 			if ( Cookies.getCookie("JSESSIONID") == null ) {
@@ -47,6 +65,7 @@ public class DashboardPageFactory {
 			}
 		}
 		// End of code only for running directly from eclipse
+		 */
 
 		// When first called, create a hash map with just the login and logout pages
 		if ( pagesMap == null ) {

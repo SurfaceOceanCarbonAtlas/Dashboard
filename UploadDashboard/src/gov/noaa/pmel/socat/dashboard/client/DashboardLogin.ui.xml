@@ -3,22 +3,20 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
 	<ui:style src="DashboardLogin.css" />
-		
+
 	<g:HTMLPanel>
-		<div styleName="{style.intro-div}">
+		<g:VerticalPanel>
 			<g:Label styleName="{style.intro-label}" ui:field="welcomeLabel" />
-		</div>
-		<div styleName="{style.labeledtext-div}">
-			<g:InlineLabel styleName="{style.labeledtext-label}" ui:field="nameLabel" />
-			<g:TextBox styleName="{style.labeledtext-textbox}" ui:field="nameText" />
-		</div>
-		<div styleName="{style.labeledtext-div">
-			<g:InlineLabel styleName="{style.labeledtext-label}" ui:field="passLabel" />
-			<g:PasswordTextBox styleName="{style.labeledtext-textbox}" ui:field="passText" />
-		</div>
-		<div styleName="{style.buttons-div}">
+			<g:HorizontalPanel styleName="{style.labeledtext-panel}">
+				<g:InlineLabel styleName="{style.labeledtext-label}" ui:field="nameLabel" />
+				<g:TextBox styleName="{style.labeledtext-textbox}" ui:field="nameText" />
+			</g:HorizontalPanel>
+			<g:HorizontalPanel styleName="{style.labeledtext-panel}">
+				<g:InlineLabel styleName="{style.labeledtext-label}" ui:field="passLabel" />
+				<g:PasswordTextBox styleName="{style.labeledtext-textbox}" ui:field="passText" />
+			</g:HorizontalPanel>
 			<g:Button styleName="{style.login-button}" ui:field="loginButton" />
-		</div>
+		</g:VerticalPanel>
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

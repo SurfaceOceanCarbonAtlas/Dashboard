@@ -10,7 +10,7 @@ public class SocatUploadDashboard implements EntryPoint {
 	 */
 	public void onModuleLoad() {
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
-		loginPage.clearLogin();
+		loginPage.clearLoginData(true);
 		RootPanel.get().add(loginPage);
 	}
 

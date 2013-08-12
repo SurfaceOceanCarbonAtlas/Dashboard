@@ -13,12 +13,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-// TODO: remove this class used for debugging
-
 /**
- * Class to allow debugging with a XsrfProtectedServiceServlet 
+ * Filter that always creates a session 
  */
-public class ForceSessionCreationFilter implements Filter {
+public class DashboardSessionFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
@@ -26,7 +24,7 @@ public class ForceSessionCreationFilter implements Filter {
 		// This will force the creation of a session instance for the user, 
 		// if one doesn't already exist.  Part of the creation includes the 
 		// creation of a session variable name "JSESSIONID".
-		((HttpServletRequest) servletRequest).getSession(true);
+		((HttpServletRequest) servletRequest).getSession();
 		filterChain.doFilter(servletRequest, servletResponse);
 	}
 
