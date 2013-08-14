@@ -6,14 +6,14 @@
 
 	<g:HTMLPanel>
 		<g:VerticalPanel>
-			<g:HorizontalPanel styleName="{style.intro-panel}">
-				<g:Label styleName="{style.intro-label}" ui:field="goodbyeLabel" />
+			<g:HorizontalPanel addStyleNames="{style.intro-panel}">
+				<g:Label addStyleNames="{style.intro-label}" ui:field="goodbyeLabel" />
 			</g:HorizontalPanel>
-			<g:HorizontalPanel styleName="{style.relogin-panel}">
-				<g:Button styleName="{style.relogin-button}" ui:field="reloginButton" />
+			<g:HorizontalPanel addStyleNames="{style.relogin-panel}">
+				<g:Button addStyleNames="{style.relogin-button}" ui:field="reloginButton" />
 			</g:HorizontalPanel>
-			<g:HorizontalPanel styleName="{style.socat-info-panel}">
-				<g:Anchor styleName="{style.socat-info-anchor}" ui:field="socatInfoAnchor" />
+			<g:HorizontalPanel addStyleNames="{style.socat-info-panel}">
+				<g:Anchor addStyleNames="{style.socat-info-anchor}" ui:field="socatInfoAnchor" />
 			</g:HorizontalPanel>
 		</g:VerticalPanel>
 	</g:HTMLPanel>

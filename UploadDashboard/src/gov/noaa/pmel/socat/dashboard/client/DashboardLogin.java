@@ -10,6 +10,8 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -23,7 +25,6 @@ import com.google.gwt.user.client.rpc.XsrfTokenService;
 import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -56,9 +57,9 @@ public class DashboardLogin extends Composite {
 			GWT.create(DashboardLoginUiBinder.class);
 
 	@UiField Label welcomeLabel;
-	@UiField InlineLabel nameLabel;
+	@UiField Label nameLabel;
 	@UiField TextBox nameText;
-	@UiField InlineLabel passLabel;
+	@UiField Label passLabel;
 	@UiField PasswordTextBox passText;
 	@UiField Button loginButton;
 	private String username;
@@ -69,7 +70,6 @@ public class DashboardLogin extends Composite {
 		nameLabel.setText(usernamePrompt);
 		passLabel.setText(passwordPrompt);
 		loginButton.setText(loginText);
-		nameText.setFocus(true);
 		username = "";
 	}
 
@@ -82,6 +82,25 @@ public class DashboardLogin extends Composite {
 		passText.setText("");
 		if ( clearUsername )
 			username = "";
+		nameText.setFocus(true);
+		nameText.selectAll();
+	}
+
+	@UiHandler("nameText")
+	void nameTextOnKeyDown(KeyDownEvent event) {
+		// Pressing enter from nameText takes you to passText
+		if ( (event != null) && (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) ) {
+			passText.setFocus(true);
+			passText.selectAll();
+		}
+	}
+	
+	@UiHandler("passText")
+	void passTextOnKeyDown(KeyDownEvent event) {
+		// Pressing enter from passText pressing the login button
+		if ( (event != null) && (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) ) {
+			loginButton.click();
+		}
 	}
 
 	@UiHandler("loginButton")
@@ -125,11 +144,11 @@ public class DashboardLogin extends Composite {
 		public void onSuccess(DashboardCruiseListing cruises) {
 			if ( username.equals(cruises.getUsername()) ) {
 				clearLoginData(true);
+				RootPanel.get().remove(DashboardLogin.this);
 				DashboardCruiseListPage cruiseListPage = 
 						DashboardPageFactory.getPage(DashboardCruiseListPage.class);
-				cruiseListPage.updateCruises(cruises);
-				RootPanel.get().remove(DashboardLogin.this);
 				RootPanel.get().add(cruiseListPage);
+				cruiseListPage.updateCruises(cruises);
 			}
 			else {
 				clearLoginData(true);
