@@ -1,23 +1,44 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
 	<ui:style src="DashboardCruiseListPage.css" />
-		
-	<g:HTMLPanel>
-		<g:VerticalPanel>
-			<g:HorizontalPanel styleName="{style.userinfo-div}">
-				<g:InlineLabel styleName="{style.userinfo-label}" ui:field="userInfoLabel" />
-				<g:Button styleName="{style.logout-button}" ui:field="logoutButton" />
-			</g:HorizontalPanel>
-		</g:VerticalPanel>
-		<g:HTMLPanel styleName="{style.contents}">
-			<p>
-				Weif wenwh <b>ELIU ARW EOTN YA EB I NNOI AN OIY</b> bp9'uati ae wru 
-				inaore g0a8ner argjn am 9ru na'rep9u'n efij  JIOH 08 JHE 0 
-				IOJHWFN ioj aoij oaijs ISJ-09243i0n <i>(Sni 09swefn Oiasejpj)</i>
-			</p>
-		</g:HTMLPanel>
-	</g:HTMLPanel>
+
+	<g:DockLayoutPanel unit="EM" addStyleNames="{style.contents-panel}">
+		<g:north size="12">
+			<g:VerticalPanel>
+				<g:HorizontalPanel addStyleNames="{style.userinfo-div}">
+					<g:Label addStyleNames="{style.userinfo-label}" ui:field="userInfoLabel" />
+					<g:Button addStyleNames="{style.logout-button}" ui:field="logoutButton" />
+				</g:HorizontalPanel>
+				<g:HorizontalPanel addStyleNames="{style.upload-panel}">
+					<g:Button addStyleNames="{style.upload-button}" ui:field="uploadButton" />
+				</g:HorizontalPanel>
+				<g:HorizontalPanel addStyleNames="{style.agree-panel}">
+					<g:CheckBox addStyleNames="{style.agree-checkbox}" ui:field="agreeShareCheckBox" />
+					<g:Button addStyleNames="{style.agreeinfo-button}" ui:field="agreeShareInfoButton" />
+				</g:HorizontalPanel>
+				<g:HorizontalPanel addStyleNames="{style.agree-panel}">
+					<g:CheckBox addStyleNames="{style.agree-checkbox}" ui:field="agreeArchiveCheckBox" />
+					<g:Button addStyleNames="{style.agreeinfo-button}" ui:field="agreeArchiveInfoButton" />
+				</g:HorizontalPanel>
+			</g:VerticalPanel>
+		</g:north>
+		<g:west size="6">
+			<g:VerticalPanel addStyleNames="{style.submit-panel}">
+				<g:Button addStyleNames="{style.submit-button}" ui:field="reviewButton" />
+				<g:Button addStyleNames="{style.submit-button}" ui:field="qcSubmitButton" />
+				<g:Button addStyleNames="{style.submit-button}" ui:field="archiveSubmitButton" />
+			</g:VerticalPanel>
+		</g:west>
+		<g:south size="4">
+			<cell:SimplePager addStyleNames="{style.pager}" ui:field="pager" />
+		</g:south>
+		<g:center>
+			<g:ResizeLayoutPanel addStyleNames="{style.uploads-panel}">
+				<cell:DataGrid addStyleNames="{style.uploads-grid}" ui:field="uploadsGrid" />
+			</g:ResizeLayoutPanel>
+		</g:center>
+	</g:DockLayoutPanel>
 
 </ui:UiBinder> 

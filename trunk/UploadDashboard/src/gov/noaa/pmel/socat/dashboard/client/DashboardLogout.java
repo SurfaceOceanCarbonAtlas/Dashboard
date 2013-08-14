@@ -79,8 +79,8 @@ public class DashboardLogout extends Composite {
 	void loginOnClick(ClickEvent event) {
 		RootPanel.get().remove(this);
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
-		loginPage.clearLoginData(true);
 		RootPanel.get().add(loginPage);
+		loginPage.clearLoginData(true);
 	}
 
 }

@@ -6,16 +6,16 @@
 
 	<g:HTMLPanel>
 		<g:VerticalPanel>
-			<g:Label styleName="{style.intro-label}" ui:field="welcomeLabel" />
-			<g:HorizontalPanel styleName="{style.labeledtext-panel}">
-				<g:InlineLabel styleName="{style.labeledtext-label}" ui:field="nameLabel" />
-				<g:TextBox styleName="{style.labeledtext-textbox}" ui:field="nameText" />
+			<g:Label addStyleNames="{style.intro-label}" ui:field="welcomeLabel" />
+			<g:HorizontalPanel addStyleNames="{style.labeledtext-panel}">
+				<g:Label addStyleNames="{style.labeledtext-label}" ui:field="nameLabel" />
+				<g:TextBox addStyleNames="{style.labeledtext-textbox}" ui:field="nameText" />
 			</g:HorizontalPanel>
-			<g:HorizontalPanel styleName="{style.labeledtext-panel}">
-				<g:InlineLabel styleName="{style.labeledtext-label}" ui:field="passLabel" />
-				<g:PasswordTextBox styleName="{style.labeledtext-textbox}" ui:field="passText" />
+			<g:HorizontalPanel addStyleNames="{style.labeledtext-panel}">
+				<g:Label addStyleNames="{style.labeledtext-label}" ui:field="passLabel" />
+				<g:PasswordTextBox addStyleNames="{style.labeledtext-textbox}" ui:field="passText" />
 			</g:HorizontalPanel>
-			<g:Button styleName="{style.login-button}" ui:field="loginButton" />
+			<g:Button addStyleNames="{style.login-button}" ui:field="loginButton" />
 		</g:VerticalPanel>
 	</g:HTMLPanel>
 

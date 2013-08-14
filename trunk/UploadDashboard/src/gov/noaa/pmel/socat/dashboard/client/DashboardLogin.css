@@ -14,26 +14,29 @@ body {
 }
 
 .labeledtext-panel {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
+	width: 35em;
 }
 .labeledtext-label {
 	font-family: monospace;
 	font-weight: bold;
-	font-size: 120%;
+	font-size: 125%;
+	margin-top: 0.75em;
+	margin-bottom: 0.75em;
 	margin-left: 6em;
 	margin-right: 0.25em;
 }
 .labeledtext-textbox {
-	visible-lenth: 15em;
+	visible-length: 15em;
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
 	margin-left: 0.25em;
+	margin-right: 6em;
 }
 
 .login-button {
 	font-weight: bold;
-	font-size: 100%;
-	height: 2.5em;
 	width: 9em;
+	height: 2.5em;
 	margin: 1em 13em;
 }
 
