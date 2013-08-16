@@ -2,41 +2,49 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
-	<ui:style src="DashboardCruiseListPage.css" />
+	<ui:style src="CommonFullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.contents-panel}">
-		<g:north size="12">
-			<g:VerticalPanel>
-				<g:HorizontalPanel addStyleNames="{style.userinfo-div}">
-					<g:Label addStyleNames="{style.userinfo-label}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.logout-button}" ui:field="logoutButton" />
-				</g:HorizontalPanel>
-				<g:HorizontalPanel addStyleNames="{style.upload-panel}">
-					<g:Button addStyleNames="{style.upload-button}" ui:field="uploadButton" />
-				</g:HorizontalPanel>
-				<g:HorizontalPanel addStyleNames="{style.agree-panel}">
-					<g:CheckBox addStyleNames="{style.agree-checkbox}" ui:field="agreeShareCheckBox" />
-					<g:Button addStyleNames="{style.agreeinfo-button}" ui:field="agreeShareInfoButton" />
-				</g:HorizontalPanel>
-				<g:HorizontalPanel addStyleNames="{style.agree-panel}">
-					<g:CheckBox addStyleNames="{style.agree-checkbox}" ui:field="agreeArchiveCheckBox" />
-					<g:Button addStyleNames="{style.agreeinfo-button}" ui:field="agreeArchiveInfoButton" />
-				</g:HorizontalPanel>
-			</g:VerticalPanel>
-		</g:north>
-		<g:west size="6">
-			<g:VerticalPanel addStyleNames="{style.submit-panel}">
-				<g:Button addStyleNames="{style.submit-button}" ui:field="reviewButton" />
-				<g:Button addStyleNames="{style.submit-button}" ui:field="qcSubmitButton" />
-				<g:Button addStyleNames="{style.submit-button}" ui:field="archiveSubmitButton" />
-			</g:VerticalPanel>
-		</g:west>
-		<g:south size="4">
-			<cell:SimplePager addStyleNames="{style.pager}" ui:field="pager" />
+	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
+		<g:east size="0.5">
+			<!-- Just to give a margin -->
+			<g:Label />
+		</g:east>
+		<g:south size="0.5">
+			<!-- Just to give a margin -->
+			<g:Label />
 		</g:south>
+		<g:north size="9">
+			<g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.userinfopanel}">
+					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.agreepanel}">
+					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
+					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.agreepanel}">
+					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeArchiveCheckBox" />
+					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeArchiveInfoButton" />
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:north>
+		<g:west size="8">
+			<g:ScrollPanel addStyleNames="{style.submitscrollpanel}">
+				<g:VerticalPanel addStyleNames="{style.submitpanel}">
+					<g:Button addStyleNames="{style.submitbuttonmain}" ui:field="uploadButton" />
+					<g:Button addStyleNames="{style.submitbutton}" ui:field="deleteButton" />
+					<g:Button addStyleNames="{style.submitbutton}" ui:field="dataCheckButton" />
+					<g:Button addStyleNames="{style.submitbutton}" ui:field="metaCheckButton" />
+					<g:Button addStyleNames="{style.submitbutton}" ui:field="reviewButton" />
+					<g:Button addStyleNames="{style.submitbutton}" ui:field="qcSubmitButton" />
+					<g:Button addStyleNames="{style.submitbutton}" ui:field="archiveSubmitButton" />
+				</g:VerticalPanel>
+			</g:ScrollPanel>
+		</g:west>
 		<g:center>
-			<g:ResizeLayoutPanel addStyleNames="{style.uploads-panel}">
-				<cell:DataGrid addStyleNames="{style.uploads-grid}" ui:field="uploadsGrid" />
+			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
+				<cell:DataGrid addStyleNames="{style.gridtable}" ui:field="uploadsGrid" />
 			</g:ResizeLayoutPanel>
 		</g:center>
 	</g:DockLayoutPanel>

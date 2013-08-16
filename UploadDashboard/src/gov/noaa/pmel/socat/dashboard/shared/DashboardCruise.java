@@ -15,6 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements IsSerializable {
 
+	boolean selected;
 	String expocode;
 	String uploadFilename;
 	Date dataCheckDate;
@@ -23,12 +24,29 @@ public class DashboardCruise implements IsSerializable {
 	String archiveStatus;
 
 	public DashboardCruise() {
+		selected = false;
 		expocode = "";
 		uploadFilename = "";
 		dataCheckDate = null;
 		metaCheckDate = null;
 		qcStatus = "";
 		archiveStatus = "";
+	}
+
+	/**
+	 * @return
+	 * 		if the cruise is selected
+	 */
+	public boolean isSelected() {
+		return selected;
+	}
+
+	/**
+	 * @param selected
+	 * 		set if the cruise is selected
+	 */
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 
 	/**
@@ -142,6 +160,21 @@ public class DashboardCruise implements IsSerializable {
 		else
 			this.archiveStatus = "";
 	}
+
+	public static Comparator<DashboardCruise> selectedComparator =
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			Boolean s1 = c1.isSelected();
+			return s1.compareTo(c2.isSelected());
+		}
+	};
 
 	/**
 	 * Comparator using the expocodes of the cruises

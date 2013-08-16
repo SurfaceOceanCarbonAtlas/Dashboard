@@ -2,21 +2,19 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-	<ui:style src="DashboardLogin.css" />
+	<ui:style src="CommonFixedWidth.css" />
 
-	<g:HTMLPanel>
-		<g:VerticalPanel>
-			<g:Label addStyleNames="{style.intro-label}" ui:field="welcomeLabel" />
-			<g:HorizontalPanel addStyleNames="{style.labeledtext-panel}">
-				<g:Label addStyleNames="{style.labeledtext-label}" ui:field="nameLabel" />
-				<g:TextBox addStyleNames="{style.labeledtext-textbox}" ui:field="nameText" />
-			</g:HorizontalPanel>
-			<g:HorizontalPanel addStyleNames="{style.labeledtext-panel}">
-				<g:Label addStyleNames="{style.labeledtext-label}" ui:field="passLabel" />
-				<g:PasswordTextBox addStyleNames="{style.labeledtext-textbox}" ui:field="passText" />
-			</g:HorizontalPanel>
-			<g:Button addStyleNames="{style.login-button}" ui:field="loginButton" />
-		</g:VerticalPanel>
-	</g:HTMLPanel>
+	<g:VerticalPanel addStyleNames="{style.fixedwidthcontainer}" horizontalAlignment="ALIGN_CENTER">
+		<g:HTML addStyleNames="{style.introhtml}" ui:field="welcomeHTML" />
+		<g:HorizontalPanel addStyleNames="{style.labeledtextpanel}" verticalAlignment="ALIGN_MIDDLE">
+			<g:Label addStyleNames="{style.labeledtextlabel}" ui:field="nameLabel" />
+			<g:TextBox addStyleNames="{style.labeledtextbox}" ui:field="nameText" />
+		</g:HorizontalPanel>
+		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
+			<g:Label addStyleNames="{style.labeledtextlabel}" ui:field="passLabel" />
+			<g:PasswordTextBox addStyleNames="{style.labeledtextbox}" ui:field="passText" />
+		</g:HorizontalPanel>
+		<g:Button addStyleNames="{style.loginbutton}" ui:field="loginButton" />
+	</g:VerticalPanel>
 
 </ui:UiBinder> 

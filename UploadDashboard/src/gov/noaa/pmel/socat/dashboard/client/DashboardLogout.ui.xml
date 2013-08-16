@@ -2,20 +2,14 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-	<ui:style src="DashboardLogout.css"/>
+	<ui:style src="CommonFixedWidth.css"/>
 
-	<g:HTMLPanel>
-		<g:VerticalPanel>
-			<g:HorizontalPanel addStyleNames="{style.intro-panel}">
-				<g:Label addStyleNames="{style.intro-label}" ui:field="goodbyeLabel" />
-			</g:HorizontalPanel>
-			<g:HorizontalPanel addStyleNames="{style.relogin-panel}">
-				<g:Button addStyleNames="{style.relogin-button}" ui:field="reloginButton" />
-			</g:HorizontalPanel>
-			<g:HorizontalPanel addStyleNames="{style.socat-info-panel}">
-				<g:Anchor addStyleNames="{style.socat-info-anchor}" ui:field="socatInfoAnchor" />
-			</g:HorizontalPanel>
-		</g:VerticalPanel>
-	</g:HTMLPanel>
+	<g:VerticalPanel addStyleNames="{style.fixedwidthcontainer}" horizontalAlignment="ALIGN_CENTER">
+		<g:HTML addStyleNames="{style.introhtml}" ui:field="goodbyeHTML" />
+		<g:Button addStyleNames="{style.loginbutton}" ui:field="reloginButton" />
+		<g:HorizontalPanel addStyleNames="{style.socatinfopanel}">
+			<g:Anchor addStyleNames="{style.socatinfoanchor}" ui:field="socatInfoAnchor" />
+		</g:HorizontalPanel>
+	</g:VerticalPanel>
 
 </ui:UiBinder> 
