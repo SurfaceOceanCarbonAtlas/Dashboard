@@ -1,0 +1,62 @@
+@CHARSET "UTF-8";
+
+body {
+	background-color: #DEF;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.fixedwidthcontainer {
+	width: 35em;
+}
+
+.introhtml {
+	text-align: justify;
+	padding: 2em;
+}
+
+.labeledtextpanel {
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+}
+.labeledtextlabel {
+	font-family: monospace;
+	font-weight: bold;
+	font-size: large;
+	margin-right: 0.25em;
+}
+.labeledtextbox {
+	width: 20em;
+	margin-left: 0.25em;
+}
+
+.loginbutton {
+	display: block;
+	font-weight: bold;
+	font-size: large;
+	width: 10em;
+	margin-top: 2em;
+	margin-bottom: 2em;
+}
+
+.socatinfopanel {
+	margin: 2em;
+}
+.socatinfoanchor {
+	font-weight: bold;
+	font-size: large;
+}
+
+.infopanel {
+	width: 25em;
+	background-color: lightgray;
+}
+.infohtml {
+	text-align: justify;
+	padding: 1em;
+}
+.dismissbutton {
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+}

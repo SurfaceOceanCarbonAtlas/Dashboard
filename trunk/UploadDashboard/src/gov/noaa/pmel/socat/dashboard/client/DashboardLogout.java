@@ -19,8 +19,8 @@ import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -29,7 +29,17 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardLogout extends Composite {
 
-	protected static String goodbyeMsg = "Thank you for contributing to SOCAT.  Goodbye.";
+	protected static String goodbyeMsg = 
+			"Thank you for contributing cruise data to SOCAT.  Please consider, " +
+			"if you are not already a member, joining our group of reviewers as " +
+			"well as joining the SOCAT E-mail list (Google group).  Contact " +
+			"socat.support@noaa.gov for more information on joining these groups. " +
+			"<br /><br />" +
+			"If you experienced problems working with this product, please contact " +
+			"socat.support@noaa.gov with details explaining what you were trying to " +
+			"accomplish and the problem you encountered. " +
+			"<br /><br />" +
+			"Goodbye.";
 	protected static String reloginText = "Log in again";
 	protected static String socatInfoText = "Return to socat.info";
 	protected static String socatInfoLink = "http://www.socat.info";
@@ -41,13 +51,13 @@ public class DashboardLogout extends Composite {
 	private static DashboardLogoutUiBinder uiBinder = GWT
 			.create(DashboardLogoutUiBinder.class);
 
-	@UiField Label goodbyeLabel;
+	@UiField HTML goodbyeHTML;
 	@UiField Button reloginButton;
 	@UiField Anchor socatInfoAnchor;
 
 	public DashboardLogout() {
 		initWidget(uiBinder.createAndBindUi(this));
-		goodbyeLabel.setText(goodbyeMsg);
+		goodbyeHTML.setHTML(goodbyeMsg);
 		reloginButton.setText(reloginText);
 		socatInfoAnchor.setText(socatInfoText);
 		socatInfoAnchor.setHref(socatInfoLink);
@@ -77,9 +87,9 @@ public class DashboardLogout extends Composite {
 
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
-		RootPanel.get().remove(this);
+		RootLayoutPanel.get().remove(this);
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
-		RootPanel.get().add(loginPage);
+		RootLayoutPanel.get().add(loginPage);
 		loginPage.clearLoginData(true);
 	}
 

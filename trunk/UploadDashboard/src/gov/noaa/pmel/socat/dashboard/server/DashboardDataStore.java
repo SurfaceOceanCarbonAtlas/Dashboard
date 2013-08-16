@@ -47,19 +47,21 @@ public class DashboardDataStore {
 		hashesStore.put(spicedHash(hashes[0], hashes[1]), "socatuser");
 		userCruisesStore = new HashMap<String,ArrayList<DashboardCruise>>();
 		ArrayList<DashboardCruise> cruiseList = new ArrayList<DashboardCruise>();
-		for (int k = 12; k < 28; k++) {
+		for (int k = 10; k < 31; k++) {
 			DashboardCruise cruise = new DashboardCruise();
-			cruise.setExpocode("XXXX201307" + k);
+			cruise.setExpocode("XXXX201306" + k);
 			cruise.setUploadFilename("/home/socatuser/data" + k + ".tsv");
 			cruise.setDataCheckDate(new Date(System.currentTimeMillis() 
-					- (long) (100000.0 * Math.random())));
+					- (long) (1000000.0 * Math.random())));
 			cruise.setMetaCheckDate(new Date(System.currentTimeMillis() 
-					- (long) (100000.0 * Math.random())));
-			cruise.setQCStatus("N/A");
-			cruise.setArchiveStatus("NO");
+					- (long) (1000000.0 * Math.random())));
+			cruise.setQCStatus("No");
+			cruise.setArchiveStatus("No");
 			cruiseList.add(cruise);
 		}
 		userCruisesStore.put("socatuser", cruiseList);
+		hashes = DashboardUtils.hashesFromPlainText("neweruser", "newerpass");
+		hashesStore.put(spicedHash(hashes[0], hashes[1]), "neweruser");
 	}
 
 	/**

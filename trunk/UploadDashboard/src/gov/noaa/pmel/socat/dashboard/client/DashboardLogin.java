@@ -25,9 +25,10 @@ import com.google.gwt.user.client.rpc.XsrfTokenService;
 import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,7 +47,7 @@ public class DashboardLogin extends Composite {
 			"authorization credentials.";
 	protected static String usernamePrompt = "Username:";
 	protected static String passwordPrompt = "Password:";
-	protected static String loginText = "Log In";
+	protected static String loginText = "Login";
 	protected static String noCredErrorMsg = "You must provide a username and password";
 	protected static String loginErrorMsg = "Sorry, your login failed.";
 
@@ -56,7 +57,7 @@ public class DashboardLogin extends Composite {
 	private static DashboardLoginUiBinder uiBinder = 
 			GWT.create(DashboardLoginUiBinder.class);
 
-	@UiField Label welcomeLabel;
+	@UiField HTML welcomeHTML;
 	@UiField Label nameLabel;
 	@UiField TextBox nameText;
 	@UiField Label passLabel;
@@ -66,7 +67,7 @@ public class DashboardLogin extends Composite {
 
 	public DashboardLogin() {
 		initWidget(uiBinder.createAndBindUi(this));
-		welcomeLabel.setText(welcomeMsg);
+		welcomeHTML.setHTML(welcomeMsg);
 		nameLabel.setText(usernamePrompt);
 		passLabel.setText(passwordPrompt);
 		loginButton.setText(loginText);
@@ -144,10 +145,10 @@ public class DashboardLogin extends Composite {
 		public void onSuccess(DashboardCruiseListing cruises) {
 			if ( username.equals(cruises.getUsername()) ) {
 				clearLoginData(true);
-				RootPanel.get().remove(DashboardLogin.this);
+				RootLayoutPanel.get().remove(DashboardLogin.this);
 				DashboardCruiseListPage cruiseListPage = 
 						DashboardPageFactory.getPage(DashboardCruiseListPage.class);
-				RootPanel.get().add(cruiseListPage);
+				RootLayoutPanel.get().add(cruiseListPage);
 				cruiseListPage.updateCruises(cruises);
 			}
 			else {

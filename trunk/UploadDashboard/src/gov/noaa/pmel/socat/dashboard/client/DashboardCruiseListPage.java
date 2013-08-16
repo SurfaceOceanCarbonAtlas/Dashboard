@@ -9,28 +9,24 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
-import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -44,38 +40,43 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class DashboardCruiseListPage extends Composite {
 
+	final static String COLUMN_NAME_SELECTED = "Selected";
 	final static String COLUMN_NAME_EXPOCODE = "Expocode";
 	final static String COLUMN_NAME_FILENAME = "Filename";
 	final static String COLUMN_NAME_DATA_CHECK = "Data check";
 	final static String COLUMN_NAME_META_CHECK = "Meta check";
-	final static String COLUMN_NAME_QC_STATUS = "QC";
-	final static String COLUMN_NAME_ARCHIVED = "CDIAC";
-	final static int MAX_UPLOADS_SHOWN = 10;
+	final static String COLUMN_NAME_QC_STATUS = "Submitted";
+	final static String COLUMN_NAME_ARCHIVED = "Archived";
 
 	protected static String logoutText = "Log out";
 	protected static String welcomeIntro = "Logged in as: ";
-	protected static String uploadText = "Upload Data";
-	protected static String moreInfoText = "-- more explanation --";
 	protected static String agreeShareText = 
-			"I give permission for my cruises to be shared for policy assessment.";
+			"I give permission for my cruises to be shared for policy (QC) assessment.";
 	protected static String agreeShareInfoHtml =
 			"By checking this box I am giving permission for my uploaded cruise files " +
-			"to be shared for purposes of policy assessment.  I understand that data " +
-			"so-released will be used only for that narrow purpose and will not be " +
-			"further distributed until the next official publication of SOCAT.";
+			"to be shared for purposes of policy (QC) assessment.  I understand that " +
+			"data so-released will be used only for that narrow purpose and will not " +
+			"be further distributed until the next official publication of SOCAT if " +
+			"the cruise was deemed acceptable. ";
 	protected static String agreeArchiveText = 
-			"I give permission for my cruises to be archived at CDIAC";
+			"I give permission for my cruises to be automatically archived at CDIAC.  ";
 	protected static String agreeArchiveInfoHtml = 
 			"By checking this box I am giving permission for my uploaded cruise files " +
-			"and metadata to be archived at CDIAC.  This will occur at the time of the " +
-			"next SOCAT public release, after which the files will be made accessible " +
-			"to the public through the CDIAC Web site. <br /> " +
+			"and metadata to be archived at CDIAC.  This will occur, if the cruise was " +
+			"deemed acceptable, at the time of the next SOCAT public release, after " +
+			"which the files will be made accessible to the public through the CDIAC " +
+			"Web site. " +
+			"<br /><br /> " +
 			"<em>Note that declining permission here implies an obligation on my part to " +
 			"ensure that these data will be made accessible via another data center.</em>";
-	protected static String dismissText = "Dismiss";
+	protected static String moreInfoText = "more explanation";
+	protected static String uploadText = "Upload New Cruise";
+	protected static String deleteText = "Delete Cruise";
+	protected static String dataCheckText = "Check Data";
+	protected static String metaCheckText = "Check Metadata";
 	protected static String reviewText = "Review with LAS";
 	protected static String qcSubmitText = "Submit for QC";
-	protected static String archiveSubmitText = "Submit to CDIAC";
+	protected static String archiveSubmitText = "Archive Now";
 	protected static String emptyTableText = "No uploaded cruises";
 
 	interface DashboardCruiseListPageUiBinder extends
@@ -92,38 +93,26 @@ public class DashboardCruiseListPage extends Composite {
 	@UiField Button agreeShareInfoButton;
 	@UiField CheckBox agreeArchiveCheckBox;
 	@UiField Button agreeArchiveInfoButton;
+	@UiField Button deleteButton;
+	@UiField Button dataCheckButton;
+	@UiField Button metaCheckButton;
 	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
 	@UiField Button archiveSubmitButton;
-	@UiField(provided=true) SimplePager pager;
-	@UiField(provided=true) DataGrid<DashboardCruise> uploadsGrid;
+	@UiField DataGrid<DashboardCruise> uploadsGrid;
 
-	TextColumn<DashboardCruise> expocodeColumn;
-	TextColumn<DashboardCruise> filenameColumn;
-	TextColumn<DashboardCruise> dataCheckColumn;
-	TextColumn<DashboardCruise> metaCheckColumn;
-	TextColumn<DashboardCruise> qcStatusColumn;
-	TextColumn<DashboardCruise> archiveStatusColumn;
-
-	ListDataProvider<DashboardCruise> listProvider;
-
-	PopupPanel agreeSharePopupPanel;
-	PopupPanel agreeArchivePopupPanel;
+	private ListDataProvider<DashboardCruise> listProvider;
+	private DashboardInfoPopup agreeSharePopup;
+	private DashboardInfoPopup agreeArchivePopup;
 
 	/**
 	 * Creates an empty cruise list page.  
-	 * Use {@link #updateCruises(DashboardCruiseListing)}
+	 * Call {@link #updateCruises(DashboardCruiseListing)}
 	 * to update the cruises displayed on this page.
 	 */
 	public DashboardCruiseListPage() {
-		Label emptyTableLabel = new Label(emptyTableText);
-		emptyTableLabel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-		uploadsGrid = new DataGrid<DashboardCruise>();
-		uploadsGrid.setEmptyTableWidget(emptyTableLabel);
-		pager = new SimplePager();
-		pager.setDisplay(uploadsGrid);
-		
 		initWidget(uiBinder.createAndBindUi(this));
+		buildCruiseListTable();
 
 		logoutButton.setText(logoutText);
 
@@ -131,24 +120,21 @@ public class DashboardCruiseListPage extends Composite {
 		agreeShareCheckBox.setText(agreeShareText);
 		agreeShareCheckBox.setValue(true);
 		agreeShareInfoButton.setText(moreInfoText);
-		agreeSharePopupPanel = null;
+		agreeSharePopup = null;
 
 		agreeArchiveCheckBox.setText(agreeArchiveText);
 		agreeArchiveCheckBox.setValue(true);
 		agreeArchiveInfoButton.setText(moreInfoText);
-		agreeArchivePopupPanel = null;
+		agreeArchivePopup = null;
 
+		deleteButton.setText(deleteText);
+		dataCheckButton.setText(dataCheckText);
+		metaCheckButton.setText(metaCheckText);
 		reviewButton.setText(reviewText);
 		qcSubmitButton.setText(qcSubmitText);
 		archiveSubmitButton.setText(archiveSubmitText);
 
-		// Following recommended to improve efficiency for IE
-		uploadsGrid.setSkipRowHoverCheck(false);
-		uploadsGrid.setSkipRowHoverFloatElementCheck(false);
-		uploadsGrid.setSkipRowHoverStyleUpdate(false);
-
-		// Build the table and the data provider for the table
-		buildCruiseListTable();
+		uploadButton.setFocus(true);
 	}
 
 	/**
@@ -159,118 +145,76 @@ public class DashboardCruiseListPage extends Composite {
 	 * 		username and cruises to display
 	 */
 	public void updateCruises(DashboardCruiseListing cruises) {
-		// Update the username
-		userInfoLabel.setText(
-				SafeHtmlUtils.htmlEscape(welcomeIntro + cruises.getUsername()));
+		if ( (cruises != null) && (cruises.getUsername() != null) ) {
+			userInfoLabel.setText(
+					SafeHtmlUtils.htmlEscape(welcomeIntro + cruises.getUsername()));
+		}
+		else {
+			userInfoLabel.setText(
+					SafeHtmlUtils.htmlEscape(welcomeIntro));
+		}
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();
-		if ( cruises != null ) {
+		// Update the username
+		if ( (cruises != null) && (cruises.getCruises() != null) ) {
 			cruiseList.addAll(cruises.getCruises());
 		}
 		uploadsGrid.setRowCount(cruiseList.size());
-		uploadsGrid.setPageSize(MAX_UPLOADS_SHOWN);
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogout logoutPage = 
 				DashboardPageFactory.getPage(DashboardLogout.class);
-		RootPanel.get().remove(this);
-		RootPanel.get().add(logoutPage);
+		RootLayoutPanel.get().remove(this);
+		RootLayoutPanel.get().add(logoutPage);
 		logoutPage.doLogout();
 	}
 
 	@UiHandler("agreeShareInfoButton")
 	void agreeShareInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
-		if ( agreeSharePopupPanel == null ) {
-			// Create the message
-			HTML message = new HTML(agreeShareInfoHtml);
-			message.setWidth("20em");
-			message.setWordWrap(true);
-			message.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_JUSTIFY);
-			// Create the dismiss button
-			Button dismissButton = new Button(dismissText);
-			dismissButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					agreeSharePopupPanel.hide();
-				}
-			});
-			// Vertical panel to contain the label and button
-			VerticalPanel vpanel = new VerticalPanel();
-			vpanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-			vpanel.add(message);
-			vpanel.add(dismissButton);
-			// Create the popup panel with its one widget
-			agreeSharePopupPanel = new PopupPanel();
-			agreeSharePopupPanel.add(vpanel);
-			agreeSharePopupPanel.setAutoHideEnabled(true);
+		if ( agreeSharePopup == null ) {
+			agreeSharePopup = new DashboardInfoPopup();
+			agreeSharePopup.setInfoMessage(agreeShareInfoHtml);
 		}
 		// Show the popup over the info button
-		agreeSharePopupPanel.setPopupPositionAndShow(new PositionCallback() {
-			@Override
-			public void setPosition(int offsetWidth, int offsetHeight) {
-				int infoButtonLeft = agreeShareInfoButton.getAbsoluteLeft();
-				int infoButtonTop = agreeShareInfoButton.getAbsoluteTop();
-				agreeSharePopupPanel.setPopupPosition(infoButtonLeft, infoButtonTop);
-			}
-		});
+		agreeSharePopup.showAtPosition(
+				agreeShareInfoButton.getAbsoluteLeft(),
+				agreeShareInfoButton.getAbsoluteTop());
 	}
 
 	@UiHandler("agreeArchiveInfoButton")
 	void agreeArchiveInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
-		if ( agreeArchivePopupPanel == null ) {
-			// Create the message
-			HTML message = new HTML(agreeArchiveInfoHtml);
-			message.setWidth("20em");
-			message.setWordWrap(true);
-			message.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_JUSTIFY);
-			// Create the dismiss button
-			Button dismissButton = new Button(dismissText);
-			dismissButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					agreeArchivePopupPanel.hide();
-				}
-			});
-			// Vertical panel to contain the label and button
-			VerticalPanel vpanel = new VerticalPanel();
-			vpanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-			vpanel.add(message);
-			vpanel.add(dismissButton);
-			// Create the popup panel with its one widget
-			agreeArchivePopupPanel = new PopupPanel();
-			agreeArchivePopupPanel.add(vpanel);
-			agreeArchivePopupPanel.setAutoHideEnabled(true);
+		if ( agreeArchivePopup == null ) {
+			agreeArchivePopup = new DashboardInfoPopup();
+			agreeArchivePopup.setInfoMessage(agreeArchiveInfoHtml);
 		}
 		// Show the popup over the info button
-		agreeArchivePopupPanel.setPopupPositionAndShow(new PositionCallback() {
-			@Override
-			public void setPosition(int offsetWidth, int offsetHeight) {
-				int infoButtonLeft = agreeArchiveInfoButton.getAbsoluteLeft();
-				int infoButtonTop = agreeArchiveInfoButton.getAbsoluteTop();
-				agreeArchivePopupPanel.setPopupPosition(infoButtonLeft, infoButtonTop);
-			}
-		});
+		agreeArchivePopup.showAtPosition(
+				agreeArchiveInfoButton.getAbsoluteLeft(),
+				agreeArchiveInfoButton.getAbsoluteTop());
 	}
 
 	/**
-	 * Create the cruise data table.  The table will need to be populated
-	 * using {@link #updateCruises(DashboardCruiseListing)}
+	 * Creates the cruise data table columns.  The table will still need 
+	 * to be populated using {@link #updateCruises(DashboardCruiseListing)}.
 	 */
 	void buildCruiseListTable() {
+		
 		// Create the columns for this table
-		buildExpocodeColumn();
-		buildFilenameColumn();
-		buildDataCheckColumn();
-		buildMetaCheckColumn();
-		buildQCStatusColumn();
-		buildArchiveStatusColumn();
+		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
+		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
+		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
+		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
+		TextColumn<DashboardCruise> metaCheckColumn = buildMetaCheckColumn();
+		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
+		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
 
 		// Add the columns, with headers, to the table
+		uploadsGrid.addColumn(selectedColumn, "");
 		uploadsGrid.addColumn(expocodeColumn, COLUMN_NAME_EXPOCODE);
 		uploadsGrid.addColumn(filenameColumn, COLUMN_NAME_FILENAME);
 		uploadsGrid.addColumn(dataCheckColumn, COLUMN_NAME_DATA_CHECK);
@@ -279,18 +223,20 @@ public class DashboardCruiseListPage extends Composite {
 		uploadsGrid.addColumn(archiveStatusColumn, COLUMN_NAME_ARCHIVED);
 
 		// Set the widths of the columns
-		uploadsGrid.setColumnWidth(expocodeColumn, 6.0, Unit.EM);
+		uploadsGrid.setColumnWidth(selectedColumn, 2.0, Unit.EM);
+		uploadsGrid.setColumnWidth(expocodeColumn, 5.0, Unit.EM);
 		uploadsGrid.setColumnWidth(filenameColumn, 10.0, Unit.EM);
 		uploadsGrid.setColumnWidth(dataCheckColumn, 5.0, Unit.EM);
 		uploadsGrid.setColumnWidth(metaCheckColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(qcStatusColumn, 3.0, Unit.EM);
-		uploadsGrid.setColumnWidth(archiveStatusColumn, 3.0, Unit.EM);
+		uploadsGrid.setColumnWidth(qcStatusColumn, 5.0, Unit.EM);
+		uploadsGrid.setColumnWidth(archiveStatusColumn, 5.0, Unit.EM);
 
 		// Create the data provider for this table
 		listProvider = new ListDataProvider<DashboardCruise>();
 		listProvider.addDataDisplay(uploadsGrid);
 
 		// Make some of the columns sortable
+		selectedColumn.setSortable(true);
 		expocodeColumn.setSortable(true);
 		filenameColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
@@ -301,6 +247,8 @@ public class DashboardCruiseListPage extends Composite {
 		// Add a column sorting handler for these columns
 		ListHandler<DashboardCruise> columnSortHandler = 
 				new ListHandler<DashboardCruise>(listProvider.getList());
+		columnSortHandler.setComparator(selectedColumn,
+				DashboardCruise.selectedComparator);
 		columnSortHandler.setComparator(expocodeColumn, 
 				DashboardCruise.expocodeComparator);
 		columnSortHandler.setComparator(filenameColumn, 
@@ -317,39 +265,73 @@ public class DashboardCruiseListPage extends Composite {
 		// Add the sort handler to the table, and sort by expocode by default
 		uploadsGrid.addColumnSortHandler(columnSortHandler);
 		uploadsGrid.getColumnSortList().push(expocodeColumn);
+
+		// Set the contents if there are no rows
+		uploadsGrid.setEmptyTableWidget(new Label(emptyTableText));
+
+		// Following recommended to improve efficiency with IE
+		uploadsGrid.setSkipRowHoverCheck(false);
+		uploadsGrid.setSkipRowHoverFloatElementCheck(false);
+		uploadsGrid.setSkipRowHoverStyleUpdate(false);
+	}
+
+	/**
+	 * Creates the selection column for the table
+	 */
+	Column<DashboardCruise,Boolean> buildSelectedColumn() {
+		Column<DashboardCruise,Boolean> selectedColumn = 
+				new Column<DashboardCruise,Boolean>(new CheckboxCell()) {
+			@Override
+			public Boolean getValue(DashboardCruise cruise) {
+				return cruise.isSelected();
+			}
+		};
+		selectedColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,Boolean>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, Boolean value) {
+				cruise.setSelected(value);
+			}
+		});
+		selectedColumn.setDataStoreName(COLUMN_NAME_SELECTED);
+		return selectedColumn;
 	}
 
 	/**
 	 * Creates the expocode column for the table
 	 */
-	void buildExpocodeColumn() {
-		expocodeColumn = new TextColumn<DashboardCruise> () {
+	TextColumn<DashboardCruise> buildExpocodeColumn() {
+		TextColumn<DashboardCruise> expocodeColumn = 
+				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				return cruise.getExpocode();
 			}
 		};
 		expocodeColumn.setDataStoreName(COLUMN_NAME_EXPOCODE);
+		return expocodeColumn;
 	}
 
 	/**
 	 * Creates the filename column for the table
 	 */
-	void buildFilenameColumn() {
-		filenameColumn = new TextColumn<DashboardCruise> () {
+	TextColumn<DashboardCruise> buildFilenameColumn() {
+		TextColumn<DashboardCruise> filenameColumn = 
+				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				return cruise.getUploadFilename();
 			}
 		};
 		filenameColumn.setDataStoreName(COLUMN_NAME_FILENAME);
+		return filenameColumn;
 	}
 
 	/**
 	 * Creates the data-check date-string column for the table
 	 */
-	void buildDataCheckColumn() {
-		dataCheckColumn = new TextColumn<DashboardCruise> () {
+	TextColumn<DashboardCruise> buildDataCheckColumn() {
+		TextColumn<DashboardCruise> dataCheckColumn = 
+				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				Date checkDate = cruise.getDataCheckDate();
@@ -359,13 +341,15 @@ public class DashboardCruiseListPage extends Composite {
 			}
 		};
 		dataCheckColumn.setDataStoreName(COLUMN_NAME_DATA_CHECK);
+		return dataCheckColumn;
 	}
 
 	/**
 	 * Creates the metadata-check date-string column for the table
 	 */
-	void buildMetaCheckColumn() {
-		metaCheckColumn = new TextColumn<DashboardCruise> () {
+	TextColumn<DashboardCruise> buildMetaCheckColumn() {
+		TextColumn<DashboardCruise> metaCheckColumn = 
+				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				Date checkDate = cruise.getMetaCheckDate();
@@ -375,32 +359,37 @@ public class DashboardCruiseListPage extends Composite {
 			}
 		};
 		metaCheckColumn.setDataStoreName(COLUMN_NAME_META_CHECK);
+		return metaCheckColumn;
 	}
 
 	/**
 	 * Creates the QC submission status column for the table
 	 */
-	void buildQCStatusColumn() {
-		qcStatusColumn = new TextColumn<DashboardCruise> () {
+	TextColumn<DashboardCruise> buildQCStatusColumn() {
+		TextColumn<DashboardCruise> qcStatusColumn = 
+				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				return cruise.getQCStatus();
 			}
 		};
 		qcStatusColumn.setDataStoreName(COLUMN_NAME_QC_STATUS);
+		return qcStatusColumn;
 	}
 
 	/**
 	 * Creates the archive submission status column for the table
 	 */
-	void buildArchiveStatusColumn() {
-		archiveStatusColumn = new TextColumn<DashboardCruise> () {
+	TextColumn<DashboardCruise> buildArchiveStatusColumn() {
+		TextColumn<DashboardCruise> archiveStatusColumn = 
+				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				return cruise.getArchiveStatus();
 			}
 		};
 		archiveStatusColumn.setDataStoreName(COLUMN_NAME_QC_STATUS);
+		return archiveStatusColumn;
 	}
 
 }
