@@ -55,7 +55,7 @@ public class DashboardLogout extends Composite {
 	@UiField Button reloginButton;
 	@UiField Anchor socatInfoAnchor;
 
-	public DashboardLogout() {
+	DashboardLogout() {
 		initWidget(uiBinder.createAndBindUi(this));
 		goodbyeHTML.setHTML(goodbyeMsg);
 		reloginButton.setText(reloginText);
@@ -75,7 +75,7 @@ public class DashboardLogout extends Composite {
 			@Override
 			public void onSuccess(Void result) {
 				Cookies.removeCookie("JSESSIONID");
-				DashboardPageFactory.setToken(null);
+				DashboardPageFactory.clearAuthentication();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
@@ -87,10 +87,11 @@ public class DashboardLogout extends Composite {
 
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
+		DashboardPageFactory.clearAuthentication();
 		RootLayoutPanel.get().remove(this);
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
 		RootLayoutPanel.get().add(loginPage);
-		loginPage.clearLoginData(true);
+		loginPage.clearLoginData();
 	}
 
 }

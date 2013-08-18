@@ -22,46 +22,80 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  * @author Karl Smith
  */
 public class DashboardDataStore {
-	
-	protected File storeFile;
-	protected byte[] storeKey;
-	protected String storeSalt;
-	protected HashMap<String,String> hashesStore;
-	protected HashMap<String,ArrayList<DashboardCruise>> userCruisesStore;
+
+	private static DashboardDataStore singleton;
+	private byte[] storeKey;
+	private String storeSalt;
+	private HashMap<String,String> hashesStore;
+	private HashMap<String,ArrayList<DashboardCruise>> userCruisesStore;
 
 	/**
-	 * Creates a Dashboard store with the the data in the given store file.
+	 * Do not create an instance of this class; 
+	 * instead use {@link #get()} to retrieve the singleton instance
+	 */
+	private DashboardDataStore() {
+	}
+
+	/**
+	 * @return
+	 * 		the singleton instance of the DashboardDataStore;
+	 * 		will be null if {@link #setStoreFile(File)} was
+	 * 		not last called with a valid store file. 
+	 */
+	static DashboardDataStore get() {
+		return singleton;
+	}
+
+	/**
+	 * Creates or reassigns the dashboard data store 
+	 * with the the data in the given store file.
 	 * 
 	 * @param storeFile
-	 * 		Name of the data store file
+	 * 		name of the data store file, or null to clear the data store
 	 * @throws IOException
-	 * 		If one is thrown while reading the data store
+	 * 		if one is thrown while reading the data store
 	 */
-	public DashboardDataStore(File storeFile) throws IOException {
-		this.storeFile = storeFile;
-		// TODO: read data from an actual data store
-		storeKey = "a0U4N[2Uj;sfWzP(T+t9!d#i".getBytes();
-		storeSalt = "a0U4N[2Uj;sfWzP(T+t9!d#i";
-		hashesStore = new HashMap<String,String>();
-		String[] hashes = DashboardUtils.hashesFromPlainText("socatuser", "socatpass");
-		hashesStore.put(spicedHash(hashes[0], hashes[1]), "socatuser");
-		userCruisesStore = new HashMap<String,ArrayList<DashboardCruise>>();
-		ArrayList<DashboardCruise> cruiseList = new ArrayList<DashboardCruise>();
-		for (int k = 10; k < 31; k++) {
-			DashboardCruise cruise = new DashboardCruise();
-			cruise.setExpocode("XXXX201306" + k);
-			cruise.setUploadFilename("/home/socatuser/data" + k + ".tsv");
-			cruise.setDataCheckDate(new Date(System.currentTimeMillis() 
-					- (long) (1000000.0 * Math.random())));
-			cruise.setMetaCheckDate(new Date(System.currentTimeMillis() 
-					- (long) (1000000.0 * Math.random())));
-			cruise.setQCStatus("No");
-			cruise.setArchiveStatus("No");
-			cruiseList.add(cruise);
+	static void setStoreFile(File storeFile) throws IOException {
+		if ( singleton == null )
+			singleton = new DashboardDataStore();
+		if ( storeFile != null ) {
+			// TODO: read data from an actual data store
+			singleton.storeKey = "a0U4N[2Uj;sfWzP(T+t9!d#i".getBytes();
+			singleton.storeSalt = "a0U4N[2Uj;sfWzP(T+t9!d#i";
+			singleton.hashesStore = new HashMap<String,String>();
+			String[] hashes = DashboardUtils.hashesFromPlainText("socatuser", "socatpass");
+			singleton.hashesStore.put(singleton.spicedHash(hashes[0], hashes[1]), "socatuser");
+			singleton.userCruisesStore = new HashMap<String,ArrayList<DashboardCruise>>();
+			ArrayList<DashboardCruise> cruiseList = new ArrayList<DashboardCruise>();
+			String[] qcStatuses = new String[] { "No", "Yes", "Yes", "Suspended", 
+					"Accepted QC-B", "Accepted QC-B", "Accepted QC-C", "Accepted QC-D" };
+			String[] archiveStatuses = new String[] { "No", "Submitted to CDIAC", "Submitted to XXXXXX", 
+					"doi:xx.xxxx/XXXXXXX.xxxxxx", "Submit with SOCAT", "Submit with SOCAT", "Submit with SOCAT" };
+			for (int k = 10; k < 23; k++) {
+				DashboardCruise cruise = new DashboardCruise();
+				cruise.setExpocode("XXXX201306" + k);
+				cruise.setUploadFilename("/home/socatuser/data" + k + ".tsv");
+				cruise.setDataCheckDate(new Date(System.currentTimeMillis() 
+						- (long) (1.0E8 * Math.random())));
+				cruise.setMetaCheckDate(new Date(System.currentTimeMillis() 
+						- (long) (1.0E8 * Math.random())));
+				String qcStat = qcStatuses[(int) (qcStatuses.length * Math.random())];
+				cruise.setQCStatus(qcStat);
+				int archiveNum;
+				if ( qcStat.startsWith("Accepted") )
+					archiveNum = (int) ((archiveStatuses.length - 1) * Math.random()) + 1;
+				else
+					archiveNum = 0;
+				cruise.setArchiveStatus(archiveStatuses[archiveNum]);
+				cruiseList.add(cruise);
+			}
+			singleton.userCruisesStore.put("socatuser", cruiseList);
+			hashes = DashboardUtils.hashesFromPlainText("neweruser", "newerpass");
+			singleton.hashesStore.put(singleton.spicedHash(hashes[0], hashes[1]), "neweruser");
 		}
-		userCruisesStore.put("socatuser", cruiseList);
-		hashes = DashboardUtils.hashesFromPlainText("neweruser", "newerpass");
-		hashesStore.put(spicedHash(hashes[0], hashes[1]), "neweruser");
+		else {
+			singleton = null;
+		}
 	}
 
 	/**
@@ -74,7 +108,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		plaintext username if successful; otherwise null
 	 */
-	public String getUsernameFromHashes(String userhash, String passhash) {
+	String getUsernameFromHashes(String userhash, String passhash) {
 		if ( (userhash == null) || (passhash == null) ||
 			 userhash.isEmpty() || passhash.isEmpty() )
 			return null;
@@ -85,14 +119,14 @@ public class DashboardDataStore {
 	}
 
 	/**
-	 * Gest the list of cruises for a user
+	 * Gets the list of cruises for a user
 	 * 
 	 * @param username
 	 * 		get cruises for this user
 	 * @return
 	 * 		the list of cruises for the user
 	 */
-	public ArrayList<DashboardCruise> getCruisesForUser(String username) {
+	ArrayList<DashboardCruise> getCruisesForUser(String username) {
 		if ( (username == null) || username.isEmpty() )
 			return null;
 		return userCruisesStore.get(username);
@@ -141,11 +175,11 @@ public class DashboardDataStore {
 		String username = args[0];
 		String password = args[1];
 		String[] hashes = DashboardUtils.hashesFromPlainText(username, password);
-		DashboardDataStore store;
 		try {
-			// TODO: user actual data store file
-			store = new DashboardDataStore(new File("fake"));
-			System.out.println(username + "    " + store.spicedHash(hashes[0], hashes[1]));
+			// TODO: use actual data store file
+			DashboardDataStore.setStoreFile(new File("fake"));
+			System.out.println(username + "    " + 
+					DashboardDataStore.get().spicedHash(hashes[0], hashes[1]));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

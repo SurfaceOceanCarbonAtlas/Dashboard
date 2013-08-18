@@ -63,26 +63,21 @@ public class DashboardLogin extends Composite {
 	@UiField Label passLabel;
 	@UiField PasswordTextBox passText;
 	@UiField Button loginButton;
-	private String username;
 
-	public DashboardLogin() {
+	DashboardLogin() {
 		initWidget(uiBinder.createAndBindUi(this));
 		welcomeHTML.setHTML(welcomeMsg);
 		nameLabel.setText(usernamePrompt);
 		passLabel.setText(passwordPrompt);
 		loginButton.setText(loginText);
-		username = "";
 	}
 
 	/**
 	 * Clears the contents of the username and password text boxes.
-	 * If clearUsername is true, then also clear the username field.
 	 */
-	void clearLoginData(boolean clearUsername) {
+	void clearLoginData() {
 		nameText.setText("");
 		passText.setText("");
-		if ( clearUsername )
-			username = "";
 		nameText.setFocus(true);
 		nameText.selectAll();
 	}
@@ -106,9 +101,16 @@ public class DashboardLogin extends Composite {
 
 	@UiHandler("loginButton")
 	void loginButtonOnClick(ClickEvent event) {
-		username = nameText.getValue().trim();
-		if ( (username.length() > 0) && 
+		if ( (nameText.getValue().trim().length() > 0) && 
 			 (passText.getValue().trim().length() > 0) ) {
+			DashboardPageFactory.setUsername(nameText.getValue().trim());
+			// Rudimentary encryption which someone can see, but at least
+			// the plain-text password is not passed over the wire.
+			DashboardPageFactory.setHashes(
+					DashboardUtils.hashesFromPlainText(
+							nameText.getValue().trim(), passText.getValue()));
+			clearLoginData();
+
 			XsrfTokenServiceAsync xsrf = GWT.create(XsrfTokenService.class);
 			((ServiceDefTarget) xsrf).setServiceEntryPoint(
 					GWT.getModuleBaseURL() + "xsrf");
@@ -119,18 +121,15 @@ public class DashboardLogin extends Composite {
 					DashboardLoginServiceAsync service = 
 							GWT.create(DashboardLoginService.class);
 					((HasRpcToken) service).setRpcToken(token);
-					// Rudimentary encryption which someone can see, but at least
-					// the plain-text password is not passed over the wire.
-					String[] hashes = DashboardUtils.hashesFromPlainText(
-							username, passText.getValue());
-					clearLoginData(false);
-					service.authenticateUser(hashes[0], hashes[1], 
+					service.authenticateUser(DashboardPageFactory.getUserhash(), 
+							DashboardPageFactory.getPasshash(), 
 							createDashboardForUser);
 				}
 				@Override
 				public void onFailure(Throwable ex) {
 					Window.alert(SafeHtmlUtils.htmlEscape(
 							loginErrorMsg + " (" + ex.getMessage() + ")"));
+					DashboardPageFactory.clearAuthentication();
 				}
 			});
 		}
@@ -143,8 +142,7 @@ public class DashboardLogin extends Composite {
 			new AsyncCallback<DashboardCruiseListing>() {
 		@Override
 		public void onSuccess(DashboardCruiseListing cruises) {
-			if ( username.equals(cruises.getUsername()) ) {
-				clearLoginData(true);
+			if ( DashboardPageFactory.getUsername().equals(cruises.getUsername()) ) {
 				RootLayoutPanel.get().remove(DashboardLogin.this);
 				DashboardCruiseListPage cruiseListPage = 
 						DashboardPageFactory.getPage(DashboardCruiseListPage.class);
@@ -152,13 +150,11 @@ public class DashboardLogin extends Composite {
 				cruiseListPage.updateCruises(cruises);
 			}
 			else {
-				clearLoginData(true);
 				Window.alert(loginErrorMsg);
 			}
 		}
 		@Override
 		public void onFailure(Throwable ex) {
-			clearLoginData(true);
 			Window.alert(SafeHtmlUtils.htmlEscape(
 					loginErrorMsg + " (" + ex.getMessage() + ")"));
 		}

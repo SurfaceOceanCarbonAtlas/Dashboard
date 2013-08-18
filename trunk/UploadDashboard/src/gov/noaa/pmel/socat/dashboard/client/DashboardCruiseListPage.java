@@ -40,16 +40,8 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class DashboardCruiseListPage extends Composite {
 
-	final static String COLUMN_NAME_SELECTED = "Selected";
-	final static String COLUMN_NAME_EXPOCODE = "Expocode";
-	final static String COLUMN_NAME_FILENAME = "Filename";
-	final static String COLUMN_NAME_DATA_CHECK = "Data check";
-	final static String COLUMN_NAME_META_CHECK = "Meta check";
-	final static String COLUMN_NAME_QC_STATUS = "Submitted";
-	final static String COLUMN_NAME_ARCHIVED = "Archived";
-
-	protected static String logoutText = "Log out";
 	protected static String welcomeIntro = "Logged in as: ";
+	protected static String logoutText = "Logout";
 	protected static String agreeShareText = 
 			"I give permission for my cruises to be shared for policy (QC) assessment.";
 	protected static String agreeShareInfoHtml =
@@ -78,6 +70,14 @@ public class DashboardCruiseListPage extends Composite {
 	protected static String qcSubmitText = "Submit for QC";
 	protected static String archiveSubmitText = "Archive Now";
 	protected static String emptyTableText = "No uploaded cruises";
+
+	protected static String columnNameSelected = "Selected";
+	protected static String columnNameExpocode = "Expocode";
+	protected static String columnNameFilename = "Filename";
+	protected static String columnNameDataCheck = "Data check";
+	protected static String columnNameMetaCheck = "Meta check";
+	protected static String columnNameSubmitted = "Submitted";
+	protected static String columnNameArchived = "Archived";
 
 	interface DashboardCruiseListPageUiBinder extends
 			UiBinder<Widget, DashboardCruiseListPage> {
@@ -110,13 +110,12 @@ public class DashboardCruiseListPage extends Composite {
 	 * Call {@link #updateCruises(DashboardCruiseListing)}
 	 * to update the cruises displayed on this page.
 	 */
-	public DashboardCruiseListPage() {
+	DashboardCruiseListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildCruiseListTable();
 
 		logoutButton.setText(logoutText);
 
-		uploadButton.setText(uploadText);
 		agreeShareCheckBox.setText(agreeShareText);
 		agreeShareCheckBox.setValue(true);
 		agreeShareInfoButton.setText(moreInfoText);
@@ -127,6 +126,7 @@ public class DashboardCruiseListPage extends Composite {
 		agreeArchiveInfoButton.setText(moreInfoText);
 		agreeArchivePopup = null;
 
+		uploadButton.setText(uploadText);
 		deleteButton.setText(deleteText);
 		dataCheckButton.setText(dataCheckText);
 		metaCheckButton.setText(metaCheckText);
@@ -144,15 +144,9 @@ public class DashboardCruiseListPage extends Composite {
 	 * @param cruises
 	 * 		username and cruises to display
 	 */
-	public void updateCruises(DashboardCruiseListing cruises) {
-		if ( (cruises != null) && (cruises.getUsername() != null) ) {
-			userInfoLabel.setText(
-					SafeHtmlUtils.htmlEscape(welcomeIntro + cruises.getUsername()));
-		}
-		else {
-			userInfoLabel.setText(
-					SafeHtmlUtils.htmlEscape(welcomeIntro));
-		}
+	void updateCruises(DashboardCruiseListing cruises) {
+		userInfoLabel.setText(welcomeIntro + 
+				SafeHtmlUtils.htmlEscape(DashboardPageFactory.getUsername()));
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();
@@ -198,11 +192,20 @@ public class DashboardCruiseListPage extends Composite {
 				agreeArchiveInfoButton.getAbsoluteTop());
 	}
 
+	@UiHandler("uploadButton")
+	void uploadCruiseOnClick(ClickEvent event) {
+		RootLayoutPanel.get().remove(this);
+		DashboardCruiseUploadPage newCruisePage = 
+				DashboardPageFactory.getPage(DashboardCruiseUploadPage.class);
+		RootLayoutPanel.get().add(newCruisePage);
+		newCruisePage.updatePageContents();
+	}
+
 	/**
 	 * Creates the cruise data table columns.  The table will still need 
 	 * to be populated using {@link #updateCruises(DashboardCruiseListing)}.
 	 */
-	void buildCruiseListTable() {
+	private void buildCruiseListTable() {
 		
 		// Create the columns for this table
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
@@ -215,12 +218,12 @@ public class DashboardCruiseListPage extends Composite {
 
 		// Add the columns, with headers, to the table
 		uploadsGrid.addColumn(selectedColumn, "");
-		uploadsGrid.addColumn(expocodeColumn, COLUMN_NAME_EXPOCODE);
-		uploadsGrid.addColumn(filenameColumn, COLUMN_NAME_FILENAME);
-		uploadsGrid.addColumn(dataCheckColumn, COLUMN_NAME_DATA_CHECK);
-		uploadsGrid.addColumn(metaCheckColumn, COLUMN_NAME_META_CHECK);
-		uploadsGrid.addColumn(qcStatusColumn, COLUMN_NAME_QC_STATUS);
-		uploadsGrid.addColumn(archiveStatusColumn, COLUMN_NAME_ARCHIVED);
+		uploadsGrid.addColumn(expocodeColumn, columnNameExpocode);
+		uploadsGrid.addColumn(filenameColumn, columnNameFilename);
+		uploadsGrid.addColumn(dataCheckColumn, columnNameDataCheck);
+		uploadsGrid.addColumn(metaCheckColumn, columnNameMetaCheck);
+		uploadsGrid.addColumn(qcStatusColumn, columnNameSubmitted);
+		uploadsGrid.addColumn(archiveStatusColumn, columnNameArchived);
 
 		// Set the widths of the columns
 		uploadsGrid.setColumnWidth(selectedColumn, 2.0, Unit.EM);
@@ -278,7 +281,7 @@ public class DashboardCruiseListPage extends Composite {
 	/**
 	 * Creates the selection column for the table
 	 */
-	Column<DashboardCruise,Boolean> buildSelectedColumn() {
+	private Column<DashboardCruise,Boolean> buildSelectedColumn() {
 		Column<DashboardCruise,Boolean> selectedColumn = 
 				new Column<DashboardCruise,Boolean>(new CheckboxCell()) {
 			@Override
@@ -292,14 +295,14 @@ public class DashboardCruiseListPage extends Composite {
 				cruise.setSelected(value);
 			}
 		});
-		selectedColumn.setDataStoreName(COLUMN_NAME_SELECTED);
+		selectedColumn.setDataStoreName(columnNameSelected);
 		return selectedColumn;
 	}
 
 	/**
 	 * Creates the expocode column for the table
 	 */
-	TextColumn<DashboardCruise> buildExpocodeColumn() {
+	private TextColumn<DashboardCruise> buildExpocodeColumn() {
 		TextColumn<DashboardCruise> expocodeColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
@@ -307,14 +310,14 @@ public class DashboardCruiseListPage extends Composite {
 				return cruise.getExpocode();
 			}
 		};
-		expocodeColumn.setDataStoreName(COLUMN_NAME_EXPOCODE);
+		expocodeColumn.setDataStoreName(columnNameExpocode);
 		return expocodeColumn;
 	}
 
 	/**
 	 * Creates the filename column for the table
 	 */
-	TextColumn<DashboardCruise> buildFilenameColumn() {
+	private TextColumn<DashboardCruise> buildFilenameColumn() {
 		TextColumn<DashboardCruise> filenameColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
@@ -322,14 +325,14 @@ public class DashboardCruiseListPage extends Composite {
 				return cruise.getUploadFilename();
 			}
 		};
-		filenameColumn.setDataStoreName(COLUMN_NAME_FILENAME);
+		filenameColumn.setDataStoreName(columnNameFilename);
 		return filenameColumn;
 	}
 
 	/**
 	 * Creates the data-check date-string column for the table
 	 */
-	TextColumn<DashboardCruise> buildDataCheckColumn() {
+	private TextColumn<DashboardCruise> buildDataCheckColumn() {
 		TextColumn<DashboardCruise> dataCheckColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
@@ -340,14 +343,14 @@ public class DashboardCruiseListPage extends Composite {
 				return checkStr;
 			}
 		};
-		dataCheckColumn.setDataStoreName(COLUMN_NAME_DATA_CHECK);
+		dataCheckColumn.setDataStoreName(columnNameDataCheck);
 		return dataCheckColumn;
 	}
 
 	/**
 	 * Creates the metadata-check date-string column for the table
 	 */
-	TextColumn<DashboardCruise> buildMetaCheckColumn() {
+	private TextColumn<DashboardCruise> buildMetaCheckColumn() {
 		TextColumn<DashboardCruise> metaCheckColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
@@ -358,14 +361,14 @@ public class DashboardCruiseListPage extends Composite {
 				return checkStr;
 			}
 		};
-		metaCheckColumn.setDataStoreName(COLUMN_NAME_META_CHECK);
+		metaCheckColumn.setDataStoreName(columnNameMetaCheck);
 		return metaCheckColumn;
 	}
 
 	/**
 	 * Creates the QC submission status column for the table
 	 */
-	TextColumn<DashboardCruise> buildQCStatusColumn() {
+	private TextColumn<DashboardCruise> buildQCStatusColumn() {
 		TextColumn<DashboardCruise> qcStatusColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
@@ -373,14 +376,14 @@ public class DashboardCruiseListPage extends Composite {
 				return cruise.getQCStatus();
 			}
 		};
-		qcStatusColumn.setDataStoreName(COLUMN_NAME_QC_STATUS);
+		qcStatusColumn.setDataStoreName(columnNameSubmitted);
 		return qcStatusColumn;
 	}
 
 	/**
 	 * Creates the archive submission status column for the table
 	 */
-	TextColumn<DashboardCruise> buildArchiveStatusColumn() {
+	private TextColumn<DashboardCruise> buildArchiveStatusColumn() {
 		TextColumn<DashboardCruise> archiveStatusColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
@@ -388,7 +391,7 @@ public class DashboardCruiseListPage extends Composite {
 				return cruise.getArchiveStatus();
 			}
 		};
-		archiveStatusColumn.setDataStoreName(COLUMN_NAME_QC_STATUS);
+		archiveStatusColumn.setDataStoreName(columnNameSubmitted);
 		return archiveStatusColumn;
 	}
 

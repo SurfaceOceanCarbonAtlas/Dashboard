@@ -1,0 +1,54 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+	<ui:style src="CommonFullWidth.css" />
+
+	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}" >
+		<g:north size="24">
+			<g:FormPanel ui:field="uploadForm">
+				<g:FlowPanel>
+					<g:FlowPanel addStyleNames="{style.userinfopanel}">
+						<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+						<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+					</g:FlowPanel>
+					<g:HTML addStyleNames="{style.introhtml}" ui:field="introhtml" />
+					<g:FileUpload name="cruiseupload" addStyleNames="{style.uploadfile}"
+							ui:field="cruiseUpload" />
+					<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+						<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="encodingLabel" />
+						<g:ListBox name="cruiseencoding" addStyleNames="{style.labeledlistbox}"
+								ui:field="encodingListBox" />
+					</g:FlowPanel>
+					<g:FlowPanel  addStyleNames="{style.uploadbuttonpanel}">
+						<g:Button addStyleNames="{style.uploadbutton}" ui:field="previewButton" />
+					</g:FlowPanel>
+					<g:Hidden name="username" ui:field="usernameToken" />
+					<g:Hidden name="userhash" ui:field="userhashToken" />
+					<g:Hidden name="passhash" ui:field="passhashToken" />
+					<g:Hidden name="cruisepreview" ui:field="previewToken" />
+				</g:FlowPanel>
+			</g:FormPanel>
+		</g:north>
+		<g:south size="4">
+			<g:FlowPanel addStyleNames="{style.uploadbuttonpanel}">
+				<g:Button addStyleNames="{style.uploadbutton}" ui:field="uploadButton" />
+				<g:Button addStyleNames="{style.uploadbutton}" ui:field="cancelButton" />
+			</g:FlowPanel>
+		</g:south>
+		<g:east size="0.5">
+			<!-- Just to give a margin -->
+			<g:Label />
+		</g:east>
+		<g:west size="0.5">
+			<!-- Just to give a margin -->
+			<g:Label />
+		</g:west>
+		<g:center>
+			<g:ScrollPanel addStyleNames="{style.previewpanel}">
+				<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
+			</g:ScrollPanel>
+		</g:center>
+	</g:DockLayoutPanel>
+
+</ui:UiBinder> 

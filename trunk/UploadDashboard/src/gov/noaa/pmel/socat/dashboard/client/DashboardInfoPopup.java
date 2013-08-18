@@ -34,7 +34,7 @@ public class DashboardInfoPopup extends Composite {
 	@UiField HTML infoHTML;
 	@UiField Button dismissButton;
 
-	protected PopupPanel parentPanel;
+	private PopupPanel parentPanel;
 
 	/**
 	 * Creates an empty info message widget within a PopupPanel.
@@ -46,7 +46,7 @@ public class DashboardInfoPopup extends Composite {
 	 * Use {@link #showAtPosition(int, int)} to show the 
 	 * popup at the specified location.
 	 */
-	public DashboardInfoPopup() {
+	DashboardInfoPopup() {
 		initWidget(uiBinder.createAndBindUi(this));
 		dismissButton.setText(dismissText);
 		parentPanel = new PopupPanel();
@@ -59,7 +59,7 @@ public class DashboardInfoPopup extends Composite {
 	 * 		the unchecked HTML message to display.
 	 * 		For safety, use only known (static) HTML.
 	 */
-	public void setInfoMessage(String htmlMessage) {
+	void setInfoMessage(String htmlMessage) {
 		infoHTML.setHTML(htmlMessage);
 	}
 
@@ -71,7 +71,7 @@ public class DashboardInfoPopup extends Composite {
 	 * @param top
 	 * 		absolute position of the top edge of the popup
 	 */
-	public void showAtPosition(final int left, final int top) {
+	void showAtPosition(final int left, final int top) {
 		parentPanel.setPopupPositionAndShow(new PositionCallback() {
 			@Override
 			public void setPosition(int offsetWidth, int offsetHeight) {
