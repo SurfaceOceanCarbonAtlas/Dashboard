@@ -9,9 +9,10 @@ public class SocatUploadDashboard implements EntryPoint {
 	 *  Entry point for the SOCAT Upload Dashboard.
 	 */
 	public void onModuleLoad() {
+		DashboardPageFactory.clearAuthentication();
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
 		RootLayoutPanel.get().add(loginPage);
-		loginPage.clearLoginData(true);
+		loginPage.clearLoginData();
 	}
 
 }

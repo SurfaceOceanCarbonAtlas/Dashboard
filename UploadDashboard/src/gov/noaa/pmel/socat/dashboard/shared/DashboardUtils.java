@@ -27,7 +27,7 @@ public class DashboardUtils {
 	 */
 	static public String[] hashesFromPlainText(String username, String password) {
 		// Make sure something reasonable Strings are given
-		if ( (username.length() < 4) || (password.length() < 8) ) {
+		if ( (username.length() < 4) || (password.length() < 7) ) {
 			return new String[] { "", "" };
 		}
 

@@ -32,13 +32,13 @@
 		<g:west size="8">
 			<g:ScrollPanel addStyleNames="{style.submitscrollpanel}">
 				<g:VerticalPanel addStyleNames="{style.submitpanel}">
-					<g:Button addStyleNames="{style.submitbuttonmain}" ui:field="uploadButton" />
-					<g:Button addStyleNames="{style.submitbutton}" ui:field="deleteButton" />
-					<g:Button addStyleNames="{style.submitbutton}" ui:field="dataCheckButton" />
-					<g:Button addStyleNames="{style.submitbutton}" ui:field="metaCheckButton" />
-					<g:Button addStyleNames="{style.submitbutton}" ui:field="reviewButton" />
-					<g:Button addStyleNames="{style.submitbutton}" ui:field="qcSubmitButton" />
-					<g:Button addStyleNames="{style.submitbutton}" ui:field="archiveSubmitButton" />
+					<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="deleteButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="dataCheckButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="metaCheckButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="qcSubmitButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="archiveSubmitButton" />
 				</g:VerticalPanel>
 			</g:ScrollPanel>
 		</g:west>

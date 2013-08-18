@@ -21,23 +21,20 @@ import com.google.gwt.user.server.rpc.XsrfProtectedServiceServlet;
 public class DashboardLoginServiceImpl extends XsrfProtectedServiceServlet
 		implements DashboardLoginService {
 
-	private static final long serialVersionUID = 1211859450754183240L;
+	private static final long serialVersionUID = 3988110209221394253L;
 
-	DashboardDataStore dataStore;
-	
 	public DashboardLoginServiceImpl() throws IOException {
-		super();
 		// TODO: use actual store name
-		dataStore = new DashboardDataStore(new File("fake"));
+		DashboardDataStore.setStoreFile(new File("fake"));
 	}
 
 	@Override
 	public DashboardCruiseListing authenticateUser(String userhash, String passhash) {
 		// Authenticate the user
-		String username = dataStore.getUsernameFromHashes(userhash, passhash);
+		String username = DashboardDataStore.get().getUsernameFromHashes(userhash, passhash);
 		ArrayList<DashboardCruise> cruises;
 		if ( username != null ) {
-			cruises = dataStore.getCruisesForUser(username);
+			cruises = DashboardDataStore.get().getCruisesForUser(username);
 		}
 		else
 			cruises = null;

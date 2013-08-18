@@ -38,6 +38,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardCruiseUploadService</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
+		<url-pattern>/socatuploaddashboard/cruiseUploadService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>dashboardLogoutServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardLogoutServiceImpl</servlet-class>
 	</servlet>
