@@ -3,6 +3,7 @@
 	<name>SocatUploadDashboard</name>
 	<comment></comment>
 	<projects>
+		<project>SanityChecker</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -6,95 +6,157 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.googlecode.gwt.crypto.bouncycastle.DataLengthException;
 import com.googlecode.gwt.crypto.bouncycastle.InvalidCipherTextException;
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
 /**
- * Reads and holds the data in a Dashboard data store file
+ * Reads and holds the data in the Dashboard configuration file
  * 
  * @author Karl Smith
  */
 public class DashboardDataStore {
 
-	private static DashboardDataStore singleton;
-	private byte[] storeKey;
-	private String storeSalt;
-	private HashMap<String,String> hashesStore;
+	private static String CONFIG_RELATIVE_FILENAME = "content" + 
+			File.separator + "SocatUploadDashboard" + 
+			File.separator + "config.txt";
+	private static String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
+	private static String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
+	private static String AUTHENTICATION_HASHES_NAME_TAG = "AuthenticationHashes";
+
+	private static AtomicReference<DashboardDataStore> singleton = 
+			new AtomicReference<DashboardDataStore>();
+
+	private byte[] encryptionKey;
+	private String encryptionSalt;
+	private Map<String,String> authenticationHashes;
+
 	private HashMap<String,ArrayList<DashboardCruise>> userCruisesStore;
 
 	/**
+	 * Creates a data store initialized from the contents of the 
+	 * standard configuration file.  This configuration file will
+	 * look something like:
+	 * <pre>
+	 * EncryptionKey=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ]
+	 * EncryptionSalt="ChangeThisAndTheEncryptionKey"
+	 * AuthenticationHashes={ "123456...abcdef"\:"socatuser" }
+	 * </pre>
+	 * 
+	 * The EncryptionKey numbers are 24 values in [-128,127].
+	 * The AuthenticationHashes can be added using the main method of this class.
+	 * 
 	 * Do not create an instance of this class; 
 	 * instead use {@link #get()} to retrieve the singleton instance
+	 * 
+	 * @throws IOException 
+	 * 		if unable to read the standard configuration file
 	 */
-	private DashboardDataStore() {
+	private DashboardDataStore() throws IOException {
+		String baseDir = System.getProperty("catalina.base");
+		// The following is just for debugging under Eclipse
+		if ( baseDir == null ) 
+			baseDir = System.getProperty("user.home");
+		// Read the properties from the standard configuration file
+		Properties configProps = new Properties();
+		File configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
+		BufferedReader reader = new BufferedReader(new FileReader(configFile));
+		try {
+			configProps.load(reader);
+		} finally {
+			reader.close();
+		}
+		// Read and assign the encryption key from the data store
+		try {
+			String keyStr = configProps.getProperty(ENCRYPTION_KEY_NAME_TAG);
+			if ( keyStr == null )
+				throw new IOException("value not defined");
+			encryptionKey = DashboardUtils.decodeByteArray(keyStr.trim());
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + ENCRYPTION_KEY_NAME_TAG + 
+					" value specified in " + configFile.getPath() + 
+					" : " + ex.getMessage());			
+		}
+		// Read the salt string from the data store
+		try {
+			encryptionSalt = configProps.getProperty(ENCRYPTION_SALT_NAME_TAG);
+			if ( encryptionSalt == null )
+				throw new IOException("value not defined");
+			encryptionSalt = encryptionSalt.trim();
+			if ( ! ( encryptionSalt.startsWith("\"") && 
+					 encryptionSalt.endsWith("\"") ) )
+				throw new IOException("value not enclosed in double quotes");
+			encryptionSalt = encryptionSalt.substring(1,encryptionSalt.length()-1);
+		} catch ( Exception ex ) {  
+			throw new IOException("Invalid encryption salt specified in " + 
+					configFile.getPath() + " : " + ex.getMessage());
+		}
+		// Read and assign the authentication hashes 
+		try {
+			String mapStr = configProps.getProperty(AUTHENTICATION_HASHES_NAME_TAG);
+			if ( mapStr == null ) 
+				throw new IOException("value not defined");
+			authenticationHashes = DashboardUtils.decodeStrStrMap(mapStr.trim());
+		} catch ( Exception ex ) {
+			authenticationHashes = new HashMap<String,String>();
+		}
+
+		//TODO: get the filename for the user cruises data store and read the data in that file
+		userCruisesStore = new HashMap<String,ArrayList<DashboardCruise>>();
 	}
 
 	/**
 	 * @return
-	 * 		the singleton instance of the DashboardDataStore;
-	 * 		will be null if {@link #setStoreFile(File)} was
-	 * 		not last called with a valid store file. 
+	 * 		the singleton instance of the DashboardDataStore
+	 * @throws IOException 
+	 * 		if unable to read the standard configuration file
 	 */
-	static DashboardDataStore get() {
-		return singleton;
+	static DashboardDataStore get() throws IOException {
+		if ( singleton.get() == null )
+			singleton.compareAndSet(null, new DashboardDataStore());
+		return singleton.get();
 	}
 
 	/**
-	 * Creates or reassigns the dashboard data store 
-	 * with the the data in the given store file.
+	 * Save the data store to the standard configuration file
 	 * 
-	 * @param storeFile
-	 * 		name of the data store file, or null to clear the data store
 	 * @throws IOException
-	 * 		if one is thrown while reading the data store
+	 * 		if unable to write to the standard configuration file
 	 */
-	static void setStoreFile(File storeFile) throws IOException {
-		if ( singleton == null )
-			singleton = new DashboardDataStore();
-		if ( storeFile != null ) {
-			// TODO: read data from an actual data store
-			singleton.storeKey = "a0U4N[2Uj;sfWzP(T+t9!d#i".getBytes();
-			singleton.storeSalt = "a0U4N[2Uj;sfWzP(T+t9!d#i";
-			singleton.hashesStore = new HashMap<String,String>();
-			String[] hashes = DashboardUtils.hashesFromPlainText("socatuser", "socatpass");
-			singleton.hashesStore.put(singleton.spicedHash(hashes[0], hashes[1]), "socatuser");
-			singleton.userCruisesStore = new HashMap<String,ArrayList<DashboardCruise>>();
-			ArrayList<DashboardCruise> cruiseList = new ArrayList<DashboardCruise>();
-			String[] qcStatuses = new String[] { "No", "Yes", "Yes", "Suspended", 
-					"Accepted QC-B", "Accepted QC-B", "Accepted QC-C", "Accepted QC-D" };
-			String[] archiveStatuses = new String[] { "No", "Submitted to CDIAC", "Submitted to XXXXXX", 
-					"doi:xx.xxxx/XXXXXXX.xxxxxx", "Submit with SOCAT", "Submit with SOCAT", "Submit with SOCAT" };
-			for (int k = 10; k < 23; k++) {
-				DashboardCruise cruise = new DashboardCruise();
-				cruise.setExpocode("XXXX201306" + k);
-				cruise.setUploadFilename("/home/socatuser/data" + k + ".tsv");
-				cruise.setDataCheckDate(new Date(System.currentTimeMillis() 
-						- (long) (1.0E8 * Math.random())));
-				cruise.setMetaCheckDate(new Date(System.currentTimeMillis() 
-						- (long) (1.0E8 * Math.random())));
-				String qcStat = qcStatuses[(int) (qcStatuses.length * Math.random())];
-				cruise.setQCStatus(qcStat);
-				int archiveNum;
-				if ( qcStat.startsWith("Accepted") )
-					archiveNum = (int) ((archiveStatuses.length - 1) * Math.random()) + 1;
-				else
-					archiveNum = 0;
-				cruise.setArchiveStatus(archiveStatuses[archiveNum]);
-				cruiseList.add(cruise);
-			}
-			singleton.userCruisesStore.put("socatuser", cruiseList);
-			hashes = DashboardUtils.hashesFromPlainText("neweruser", "newerpass");
-			singleton.hashesStore.put(singleton.spicedHash(hashes[0], hashes[1]), "neweruser");
-		}
-		else {
-			singleton = null;
+	private void save() throws IOException {
+		Properties configProps = new Properties();
+		String baseDir = System.getProperty("catalina.base");
+		// The following is just for debugging under Eclipse
+		if ( baseDir == null ) 
+			baseDir = System.getProperty("user.home");
+		// Store the encryption key
+		configProps.setProperty(ENCRYPTION_KEY_NAME_TAG, 
+				DashboardUtils.encodeByteArray(encryptionKey));
+		// Store the salt string
+		configProps.setProperty(ENCRYPTION_SALT_NAME_TAG, 
+				"\"" + encryptionSalt + "\"");
+		// Store the authentication hashes
+		configProps.setProperty(AUTHENTICATION_HASHES_NAME_TAG, 
+				DashboardUtils.encodeStrStrMap(authenticationHashes));
+		// Write the properties to the standard configuration file
+		File configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
+		BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
+		try {
+			configProps.store(writer, "");
+		} finally {
+			writer.close();
 		}
 	}
 
@@ -112,8 +174,8 @@ public class DashboardDataStore {
 		if ( (userhash == null) || (passhash == null) ||
 			 userhash.isEmpty() || passhash.isEmpty() )
 			return null;
-		String username = hashesStore.get(spicedHash(userhash, passhash));
-		if ( username.isEmpty() )
+		String username = authenticationHashes.get(spicedHash(userhash, passhash));
+		if ( (username != null) && username.isEmpty() )
 			username = null;
 		return username;
 	}
@@ -124,7 +186,7 @@ public class DashboardDataStore {
 	 * @param username
 	 * 		get cruises for this user
 	 * @return
-	 * 		the list of cruises for the user
+	 * 		the list of cruises for the user; may be null
 	 */
 	ArrayList<DashboardCruise> getCruisesForUser(String username) {
 		if ( (username == null) || username.isEmpty() )
@@ -137,17 +199,17 @@ public class DashboardDataStore {
 	 */
 	private String spicedHash(String userhash, String passhash) {
 		TripleDesCipher cipher = new TripleDesCipher();
-		cipher.setKey(storeKey);
+		cipher.setKey(encryptionKey);
 		String userSpicedHash;
 		try {
-			userSpicedHash = cipher.encrypt(userhash + storeSalt);
+			userSpicedHash = cipher.encrypt(userhash + encryptionSalt);
 		} catch (DataLengthException | IllegalStateException
 				| InvalidCipherTextException ex) {
 			userSpicedHash = "";
 		}
 		String passSpicedHash;
 		try {
-			passSpicedHash = cipher.encrypt(passhash + storeSalt);
+			passSpicedHash = cipher.encrypt(passhash + encryptionSalt);
 		} catch (DataLengthException | IllegalStateException
 				| InvalidCipherTextException ex) {
 			passSpicedHash = "";
@@ -158,9 +220,7 @@ public class DashboardDataStore {
 	}
 
 	/**
-	 * Prints out the username and username/password hash expected to be stored
-	 * for the validateUser method of this class.  The username is unchanged 
-	 * from input.
+	 * Adds the username and username/password hash to the standard configuration file.
 	 * 
 	 * @param args
 	 * 		(username)  (password)
@@ -169,17 +229,18 @@ public class DashboardDataStore {
 		if ( (args.length != 2) || args[0].trim().isEmpty() || args[1].trim().isEmpty() ) {
 			System.err.println();
 			System.err.println("arguments:  <username>  <password>");
-			System.err.println("prints out the username and expected username/password hash");
+			System.err.println("Adds the username and username/password hash ");
+			System.err.println("to the standard configuration file");
 			System.exit(1);
 		}
 		String username = args[0];
 		String password = args[1];
 		String[] hashes = DashboardUtils.hashesFromPlainText(username, password);
 		try {
-			// TODO: use actual data store file
-			DashboardDataStore.setStoreFile(new File("fake"));
-			System.out.println(username + "    " + 
-					DashboardDataStore.get().spicedHash(hashes[0], hashes[1]));
+			DashboardDataStore dataStore = DashboardDataStore.get();
+			String combinedHash = dataStore.spicedHash(hashes[0], hashes[1]);
+			dataStore.authenticationHashes.put(combinedHash, username);
+			dataStore.save();
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}

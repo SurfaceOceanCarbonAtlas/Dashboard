@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import java.util.HashMap;
 
-import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Cookies;  // used when debugging from Eclipse
 import com.google.gwt.user.client.rpc.XsrfToken;
 import com.google.gwt.user.client.ui.Composite;
 
