@@ -65,7 +65,6 @@ public class DashboardCruiseUploadService extends HttpServlet {
 
 		// Get the contents from the post request
 		String username = null;
-		String userhash = null;
 		String passhash = null;
 		String encoding = null;
 		String preview = null;
@@ -76,9 +75,6 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				String itemName = item.getFieldName();
 				if ( "username".equals(itemName) ) {
 					username = item.getString();
-				}
-				else if ( "userhash".equals(itemName) ) {
-					userhash = item.getString();
 				}
 				else if ( "passhash".equals(itemName) ) {
 					passhash = item.getString();
@@ -96,17 +92,23 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		} catch (Exception ex) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
 					"Error processing the request: " + ex.getMessage());
+			return;
 		}
 
 		// Verify contents seem okay
-		if ( (username == null) || (userhash == null) || (passhash == null) || 
+		if ( (username == null) || (passhash == null) || 
 			 (encoding == null) || (preview == null) || (cruiseItem == null) ) {
 			response.sendError(HttpServletResponse.SC_NOT_ACCEPTABLE,
 					"Incomplete request contents for this service.");
+			return;
 		}
-		if ( (DashboardDataStore.get() == null) ||
-			 ( ! username.equals(DashboardDataStore.get()
-					   .getUsernameFromHashes(userhash, passhash)) ) ||
+		DashboardDataStore dataStore = DashboardDataStore.get();
+		if ( dataStore == null ) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+					"Configuration error");
+			return;
+		}
+		if ( ( ! dataStore.validateUser(username, passhash) ) ||
 			 ( ! ("true".equals(preview) || "false".equals(preview)) ) ) {
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					"Invalid request contents for this service.");

@@ -3,17 +3,18 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Date;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Represents an uploaded cruise and its current status.
  * 
  * @author Karl Smith
  */
-public class DashboardCruise implements IsSerializable {
+public class DashboardCruise implements Serializable {
+
+	private static final long serialVersionUID = -7637218782338765114L;
 
 	boolean selected;
 	String expocode;

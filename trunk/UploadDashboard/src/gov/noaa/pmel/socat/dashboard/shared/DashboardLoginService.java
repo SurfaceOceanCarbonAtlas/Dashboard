@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 /**
  * Server side service interface for logging in a user to the dashboard
@@ -12,19 +12,19 @@ import com.google.gwt.user.client.rpc.XsrfProtectedService;
  * @author Karl Smith
  */
 @RemoteServiceRelativePath("loginService")
-public interface DashboardLoginService extends XsrfProtectedService {
+public interface DashboardLoginService extends RemoteService {
 
 	/**
 	 * Authenticate a user with the given login credentials
 	 * 
-	 * @param userhash
-	 * 		encrypted username to use
+	 * @param username
+	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
 	 * @return
 	 * 		the list of cruises, which could be empty, for a user; 
 	 * 		will have a null user if authentication fails
 	 */
-	DashboardCruiseListing authenticateUser(String userhash, String passhash);
+	DashboardCruiseListing authenticateUser(String username, String passhash);
 
 }

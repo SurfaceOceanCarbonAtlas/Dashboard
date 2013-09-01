@@ -24,7 +24,6 @@
 						<g:Button addStyleNames="{style.uploadbutton}" ui:field="previewButton" />
 					</g:FlowPanel>
 					<g:Hidden name="username" ui:field="usernameToken" />
-					<g:Hidden name="userhash" ui:field="userhashToken" />
 					<g:Hidden name="passhash" ui:field="passhashToken" />
 					<g:Hidden name="cruisepreview" ui:field="previewToken" />
 				</g:FlowPanel>

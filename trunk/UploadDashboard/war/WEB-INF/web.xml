@@ -4,20 +4,6 @@
               http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
 
-	<context-param>
-		<param-name>gwt.xsrf.session_cookie_name</param-name>
-		<param-value>JSESSIONID</param-value>
-	</context-param>
-
-	<filter>
-		<filter-name>dashboardSessionFilter</filter-name>
-		<filter-class>gov.noaa.pmel.socat.dashboard.server.DashboardSessionFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>dashboardSessionFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>dashboardLoginServlet</servlet-name>
@@ -26,15 +12,6 @@
 	<servlet-mapping>
 		<servlet-name>dashboardLoginServlet</servlet-name>
 		<url-pattern>/socatuploaddashboard/loginService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>xsrf</servlet-name>
-		<servlet-class>com.google.gwt.user.server.rpc.XsrfTokenServiceServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>xsrf</servlet-name>
-		<url-pattern>/socatuploaddashboard/xsrf</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
