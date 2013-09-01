@@ -15,7 +15,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -43,7 +42,8 @@ public class DashboardLogout extends Composite {
 	protected static String reloginText = "Log in again";
 	protected static String socatInfoText = "Return to socat.info";
 	protected static String socatInfoLink = "http://www.socat.info";
-	protected static String requestFailedMsg = "Sorry, an error occurred";
+	protected static String requestFailedMsg = 
+			"Sorry, an error occurred with your logout request";
 
 	interface DashboardLogoutUiBinder extends UiBinder<Widget, DashboardLogout> {
 	}
@@ -69,13 +69,18 @@ public class DashboardLogout extends Composite {
 	void doLogout() {
 		DashboardLogoutServiceAsync service = 
 				GWT.create(DashboardLogoutService.class);
-		((HasRpcToken) service).setRpcToken(
-				DashboardPageFactory.getToken());
-		service.logoutUser(new AsyncCallback<Void>() {
+		service.logoutUser(DashboardPageFactory.getUsername(),
+						   DashboardPageFactory.getPasshash(),
+						   new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(Void result) {
-				Cookies.removeCookie("JSESSIONID");
-				DashboardPageFactory.clearAuthentication();
+			public void onSuccess(Boolean okay) {
+				if ( okay ) {
+					Cookies.removeCookie("JSESSIONID");
+					DashboardPageFactory.clearAuthentication();
+				}
+				else {
+					Window.alert(requestFailedMsg);
+				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {

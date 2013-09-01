@@ -3,16 +3,17 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Represents a list of uploaded cruises from a user
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseListing implements IsSerializable {
+public class DashboardCruiseListing implements Serializable {
+
+	private static final long serialVersionUID = 4785180378067329280L;
 
 	String username;
 	ArrayList<DashboardCruise> cruises;
@@ -31,7 +32,8 @@ public class DashboardCruiseListing implements IsSerializable {
 	 * @param username
 	 * @param cruises
 	 */
-	public DashboardCruiseListing(String username, ArrayList<DashboardCruise> cruises) {
+	public DashboardCruiseListing(String username, 
+					ArrayList<DashboardCruise> cruises) {
 		this.username = username;
 		this.cruises = cruises;
 	}

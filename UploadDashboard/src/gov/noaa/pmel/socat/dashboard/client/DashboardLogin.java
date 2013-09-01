@@ -18,11 +18,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.HasRpcToken;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.client.rpc.XsrfToken;
-import com.google.gwt.user.client.rpc.XsrfTokenService;
-import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -33,7 +28,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Composite providing an XSRF protected login.
+ * Composite providing login.
  * 
  * @author Karl Smith
  */
@@ -106,30 +101,34 @@ public class DashboardLogin extends Composite {
 			DashboardPageFactory.setUsername(nameText.getValue().trim());
 			// Rudimentary encryption which someone can see, but at least
 			// the plain-text password is not passed over the wire.
-			DashboardPageFactory.setHashes(
-					DashboardUtils.hashesFromPlainText(
+			DashboardPageFactory.setPasshash(
+					DashboardUtils.passhashFromPlainText(
 							nameText.getValue().trim(), passText.getValue()));
 			clearLoginData();
 
-			XsrfTokenServiceAsync xsrf = GWT.create(XsrfTokenService.class);
-			((ServiceDefTarget) xsrf).setServiceEntryPoint(
-					GWT.getModuleBaseURL() + "xsrf");
-			xsrf.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
+			DashboardLoginServiceAsync service = 
+					GWT.create(DashboardLoginService.class);
+			service.authenticateUser(DashboardPageFactory.getUsername(), 
+					DashboardPageFactory.getPasshash(), 
+					new AsyncCallback<DashboardCruiseListing>() {
 				@Override
-				public void onSuccess(XsrfToken token) {
-					DashboardPageFactory.setToken(token);
-					DashboardLoginServiceAsync service = 
-							GWT.create(DashboardLoginService.class);
-					((HasRpcToken) service).setRpcToken(token);
-					service.authenticateUser(DashboardPageFactory.getUserhash(), 
-							DashboardPageFactory.getPasshash(), 
-							createDashboardForUser);
+				public void onSuccess(DashboardCruiseListing cruises) {
+					if ( DashboardPageFactory.getUsername()
+							.equals(cruises.getUsername()) ) {
+						RootLayoutPanel.get().remove(DashboardLogin.this);
+						DashboardCruiseListPage cruiseListPage = 
+								DashboardPageFactory.getPage(DashboardCruiseListPage.class);
+						RootLayoutPanel.get().add(cruiseListPage);
+						cruiseListPage.updateCruises(cruises);
+					}
+					else {
+						Window.alert(loginErrorMsg);
+					}
 				}
 				@Override
 				public void onFailure(Throwable ex) {
 					Window.alert(SafeHtmlUtils.htmlEscape(
 							loginErrorMsg + " (" + ex.getMessage() + ")"));
-					DashboardPageFactory.clearAuthentication();
 				}
 			});
 		}
@@ -137,27 +136,5 @@ public class DashboardLogin extends Composite {
 			Window.alert(noCredErrorMsg);
 		}
 	}
-
-	final AsyncCallback<DashboardCruiseListing> createDashboardForUser = 
-			new AsyncCallback<DashboardCruiseListing>() {
-		@Override
-		public void onSuccess(DashboardCruiseListing cruises) {
-			if ( DashboardPageFactory.getUsername().equals(cruises.getUsername()) ) {
-				RootLayoutPanel.get().remove(DashboardLogin.this);
-				DashboardCruiseListPage cruiseListPage = 
-						DashboardPageFactory.getPage(DashboardCruiseListPage.class);
-				RootLayoutPanel.get().add(cruiseListPage);
-				cruiseListPage.updateCruises(cruises);
-			}
-			else {
-				Window.alert(loginErrorMsg);
-			}
-		}
-		@Override
-		public void onFailure(Throwable ex) {
-			Window.alert(SafeHtmlUtils.htmlEscape(
-					loginErrorMsg + " (" + ex.getMessage() + ")"));
-		}
-	};
 
 }

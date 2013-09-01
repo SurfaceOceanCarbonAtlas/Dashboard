@@ -5,9 +5,8 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import java.util.HashMap;
 
-import com.google.gwt.user.client.Cookies;  // used when debugging from Eclipse
-import com.google.gwt.user.client.rpc.XsrfToken;
 import com.google.gwt.user.client.ui.Composite;
+// used when debugging from Eclipse
 
 
 /**
@@ -20,9 +19,7 @@ import com.google.gwt.user.client.ui.Composite;
 public class DashboardPageFactory {
 
 	private static HashMap<Class<?>,Composite> pagesMap = null;
-	private static XsrfToken token;
 	private static String username;
-	private static String userhash;
 	private static String passhash;
 
 	/**
@@ -30,22 +27,6 @@ public class DashboardPageFactory {
 	 * Use the static method {@link #getPage(Class)} to obtain desired page.
 	 */
 	private DashboardPageFactory() {
-	}
-
-	/**
-	 * @return 
-	 * 		the previously set XSRF token to use when communicating with the server
-	 */
-	static XsrfToken getToken() {
-		return token;
-	}
-
-	/**
-	 * @param token 
-	 * 		the XSRF token to use when communicating with the server
-	 */
-	static void setToken(XsrfToken token) {
-		DashboardPageFactory.token = token;
 	}
 
 	/**
@@ -66,36 +47,25 @@ public class DashboardPageFactory {
 
 	/**
 	 * @return
-	 * 		the previously set userhash to use when communication with the server
-	 */
-	static String getUserhash() {
-		return userhash;
-	}
-
-	/**
-	 * @return
-	 * 		the previously set passhash to use when communication with the server
+	 * 		the previously set password hash to use when communication with the server
 	 */
 	static String getPasshash() {
 		return passhash;
 	}
 
 	/**
-	 * @param hashes
-	 * 		The userhash and passhash to use when communicating with the server
+	 * @param passhash
+	 * 		The password hash to use when communicating with the server
 	 */
-	static void setHashes(String[] hashes) {
-		userhash = hashes[0];
-		passhash = hashes[1];
+	static void setPasshash(String passhash) {
+		DashboardPageFactory.passhash = passhash;
 	}
 
 	/**
 	 * Remove all authentication tokens held in this class
 	 */
 	static void clearAuthentication() {
-		token = null;
 		username = null;
-		userhash = null;
 		passhash = null;
 	}
 
@@ -111,16 +81,6 @@ public class DashboardPageFactory {
 	 */
 	@SuppressWarnings("unchecked")
 	static <T extends Composite> T getPage(Class<T> clazz) {
-		/* 
-		// Start of code only for running directly from eclipse
-		if ( clazz == DashboardLogin.class ) {
-			if ( Cookies.getCookie("JSESSIONID") == null ) {
-				Cookies.setCookie("JSESSIONID", Double.toString(Math.random()));
-			}
-		}
-		// End of code only for running directly from eclipse
-		 */
-
 		// When first called, create a hash map with just the login and logout pages
 		if ( pagesMap == null ) {
 			pagesMap = new HashMap<Class<?>,Composite>();

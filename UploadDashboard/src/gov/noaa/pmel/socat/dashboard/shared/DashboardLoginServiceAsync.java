@@ -13,14 +13,14 @@ public interface DashboardLoginServiceAsync {
 	 * Generate an request to authenticate a user 
 	 * with the given login credentials
 	 * 
-	 * @param userhash
-	 * 		encrypted username to use
+	 * @param username
+	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
 	 * @param callback
 	 * 		callback to make with response
 	 */
-	void authenticateUser(String userhas, String passhash, 
+	void authenticateUser(String username, String passhash, 
 			AsyncCallback<DashboardCruiseListing> callback);
 
 }

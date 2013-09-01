@@ -15,9 +15,14 @@ public interface DashboardLogoutServiceAsync {
 	/**
 	 * Generate an request to logout the current user 
 	 * 
+	 * @param username
+	 * 		name of user making this request
+	 * @param passhash
+	 * 		password hash for validation of request
 	 * @param callback
 	 * 		callback to make with response
 	 */
-	void logoutUser(AsyncCallback<Void> callback);
+	void logoutUser(String username, String passhash, 
+			AsyncCallback<Boolean> callback);
 
 }

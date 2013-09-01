@@ -71,7 +71,6 @@ public class DashboardCruiseUploadPage extends Composite {
 	@UiField ListBox encodingListBox;
 	@UiField Button previewButton;
 	@UiField Hidden usernameToken;
-	@UiField Hidden userhashToken;
 	@UiField Hidden passhashToken;
 	@UiField Hidden previewToken;
 	@UiField HTML previewHtml;
@@ -106,7 +105,6 @@ public class DashboardCruiseUploadPage extends Composite {
 		userInfoLabel.setText(welcomeIntro + 
 				SafeHtmlUtils.htmlEscape(DashboardPageFactory.getUsername()));
 		usernameToken.setValue(DashboardPageFactory.getUsername());
-		userhashToken.setValue(DashboardPageFactory.getUserhash());
 		passhashToken.setValue(DashboardPageFactory.getPasshash());
 		previewHtml.setHTML(noPreviewMsg);
 	}
