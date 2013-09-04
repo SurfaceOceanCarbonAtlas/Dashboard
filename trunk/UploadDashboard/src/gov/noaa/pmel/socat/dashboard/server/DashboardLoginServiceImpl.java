@@ -32,7 +32,7 @@ public class DashboardLoginServiceImpl extends RemoteServiceServlet
 												   String passhash) {
 		// Authenticate the user
 		if ( ! dataStore.validateUser(username, passhash) )
-			return new DashboardCruiseListing(null, null);
+			return new DashboardCruiseListing();
 		return dataStore.getUserFileHandler().getCruiseListing(username);
 	}
 

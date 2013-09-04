@@ -29,7 +29,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String CRUISE_FILE_NAME_EXTENSION = ".tsv";
 	
 	private Pattern[] expocodePatterns;
-	private Pattern createdPattern;
+	private Pattern[] createdPatterns;
 	private Pattern invalidExpocodePattern;
 
 	/**
@@ -55,8 +55,12 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				Pattern.compile("\\s*Cruise\\s*Expocode\\s*=\\s*([A-Z0-9]+)\\s*", 
 						Pattern.CASE_INSENSITIVE)
 		};
-		createdPattern = Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+cruise\\s+file\\s+created",
-				Pattern.CASE_INSENSITIVE);
+		createdPatterns = new Pattern[] {
+				Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+cruise\\s+file\\s+created",
+						Pattern.CASE_INSENSITIVE),
+				Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+dashboard\\s+cruise\\s+file\\s+created",
+						Pattern.CASE_INSENSITIVE)
+		};
 		invalidExpocodePattern= Pattern.compile("[^A-Z0-9]");
 	}
 
@@ -274,17 +278,23 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			try {
 				// Print the standard creation date and expocode headers
 				writer.println("SOCAT version " + DashboardDataStore.get().getSocatVersion() + 
-						" cruise file created: " + datestamp);
+						" dashboard cruise file created: " + datestamp);
 				writer.println("Cruise Expocode: " + expocode);
 				// Print the headers, except for any creation data or expocode headers
 				boolean lastLineBlank = false;
 				for ( String metaline : cruiseData.getPreamble() ) {
-					Matcher mat = createdPattern.matcher(metaline);
-					if ( mat.lookingAt() )
-						continue;
 					boolean found = false;
+					for ( Pattern pat : createdPatterns ) {
+						Matcher mat = pat.matcher(metaline);
+						if ( mat.lookingAt() ) {
+							found = true;
+							break;
+						}
+					}
+					if ( found )
+						continue;
 					for ( Pattern pat : expocodePatterns ) {
-						mat = pat.matcher(metaline);
+						Matcher mat = pat.matcher(metaline);
 						if ( mat.matches() ) {
 							found = true;
 							break;

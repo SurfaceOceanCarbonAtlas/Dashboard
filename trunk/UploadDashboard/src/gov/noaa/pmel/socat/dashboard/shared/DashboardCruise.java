@@ -166,16 +166,16 @@ public class DashboardCruise implements Serializable {
 	public int hashCode() {
 		final int prime = 37;
 		int result = Boolean.valueOf(selected).hashCode();
-		result = prime * result + expocode.hashCode();
-		result = prime * result + uploadFilename.hashCode();
+		result = result * prime + expocode.hashCode();
+		result = result * prime + uploadFilename.hashCode();
 		result *= prime;
 		if ( dataCheckDate != null )
 			result += dataCheckDate.hashCode();
 		result *= prime;
 		if ( metaCheckDate != null )
 			result += metaCheckDate.hashCode();
-		result = prime * result + qcStatus.hashCode();
-		result = prime * result + archiveStatus.hashCode();
+		result = result * prime + qcStatus.hashCode();
+		result = result * prime + archiveStatus.hashCode();
 		return result;
 	}
 

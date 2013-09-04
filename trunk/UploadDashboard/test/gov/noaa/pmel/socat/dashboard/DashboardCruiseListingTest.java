@@ -6,7 +6,6 @@ package gov.noaa.pmel.socat.dashboard;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing;
@@ -30,18 +29,6 @@ public class DashboardCruiseListingTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing#DashboardCruiseListing(java.lang.String, java.util.ArrayList)}.
-	 */
-	@Test
-	public void testDashboardCruiseListingStringArrayListOfDashboardCruise() {
-		String myUsername = "SocatUser";
-		ArrayList<DashboardCruise> myCruises = new ArrayList<DashboardCruise>();
-		myCruises.add(new DashboardCruise());
-		DashboardCruiseListing cruiseList = new DashboardCruiseListing(myUsername, myCruises);
-		assertNotNull(cruiseList);
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing#getUsername()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing#setUsername(java.lang.String)}.
 	 */
@@ -49,13 +36,11 @@ public class DashboardCruiseListingTest {
 	public void testSetGetUsername() {
 		String myUsername = "SocatUser";
 		DashboardCruiseListing cruiseList = new DashboardCruiseListing();
-		assertNull( cruiseList.getUsername() );
+		assertEquals("", cruiseList.getUsername());
 		cruiseList.setUsername(myUsername);
 		assertEquals(myUsername, cruiseList.getUsername());
 		cruiseList.setUsername(null);
-		assertNull( cruiseList.getUsername() );
-		cruiseList = new DashboardCruiseListing(myUsername, new ArrayList<DashboardCruise>());
-		assertEquals(myUsername, cruiseList.getUsername());
+		assertEquals("", cruiseList.getUsername());
 	}
 
 	/**
@@ -69,17 +54,13 @@ public class DashboardCruiseListingTest {
 		myCruise.setExpocode("ABCD20050728");
 		myCruises.add(myCruise);
 		DashboardCruiseListing cruiseList = new DashboardCruiseListing();
-		assertNull( cruiseList.getCruises() );
+		assertEquals(0, cruiseList.getCruises().size());
 		cruiseList.setCruises(myCruises);
 		assertEquals(1, cruiseList.getCruises().size());
 		assertEquals(myCruise, cruiseList.getCruises().get(0));
-		assertNull( cruiseList.getUsername() );
+		assertEquals("", cruiseList.getUsername());
 		cruiseList.setCruises(null);
-		assertNull( cruiseList.getCruises() );
-		String myUsername = "SocatUser";
-		cruiseList = new DashboardCruiseListing(myUsername, myCruises);
-		assertEquals(myCruises, cruiseList.getCruises());
-		assertEquals(myUsername, cruiseList.getUsername());
+		assertEquals(0, cruiseList.getCruises().size());
 	}
 
 	/**
