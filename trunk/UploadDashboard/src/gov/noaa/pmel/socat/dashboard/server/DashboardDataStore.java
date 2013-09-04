@@ -241,10 +241,10 @@ public class DashboardDataStore {
 		if ( (passhash == null) || passhash.isEmpty() )
 			return false;
 		String computedHash = spicedHash(username, passhash);
-		if ( (computedHash != null) && computedHash.isEmpty() )
+		if ( (computedHash == null) || computedHash.isEmpty() )
 			return false;
 		String expectedHash = authenticationHashes.get(username);
-		if ( (expectedHash != null) && expectedHash.isEmpty() )
+		if ( (expectedHash == null) || expectedHash.isEmpty() )
 			return false;
 		return expectedHash.equals(computedHash);
 	}
