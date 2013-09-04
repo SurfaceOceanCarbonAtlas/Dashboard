@@ -30,9 +30,10 @@ public class DashboardDataStore {
 
 	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
 	private static final String CONFIG_RELATIVE_FILENAME = "content" + 
-			File.separator + SERVER_APP_NAME + File.separator + "config.txt";
+			File.separator + SERVER_APP_NAME + File.separator + "config.preferences";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
+	private static final String SOCAT_VERSION_NAME_TAG = "SocatVersion";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
@@ -42,6 +43,7 @@ public class DashboardDataStore {
 			"# ------------------------------ \n" +
 			"EncryptionKey=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			"EncryptionSalt=SomeArbitraryStringOfCharacters \n" +
+			"SocatVersion=4 \n" +
 			"UserFilesDir=/Some/Directory/For/User/Data \n" +
 			"CruiseFilesDir=/Some/Directory/For/Cruise/Data \n" +
 			"HashFor_SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
@@ -57,7 +59,7 @@ public class DashboardDataStore {
 	private TripleDesCipher cipher;
 	private String encryptionSalt;
 	private HashMap<String,String> authenticationHashes;
-
+	private String socatVersion;
 	private DashboardUserFileHandler userFileHandler;
 	private DashboardCruiseFileHandler cruiseFileHandler;
 
@@ -125,6 +127,20 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + 
 					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+		// Read the SOCAT version
+		try {
+			propVal = configProps.getProperty(SOCAT_VERSION_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			if ( propVal.isEmpty() )
+				throw new IllegalArgumentException("blank value");
+			socatVersion = propVal;
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + SOCAT_VERSION_NAME_TAG + 
+					" value specified in " + configFile.getPath() + 
+					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
 		// Read the user files directory name
 		try {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
@@ -179,17 +195,25 @@ public class DashboardDataStore {
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
-	static DashboardDataStore get() throws IOException {
+	public static DashboardDataStore get() throws IOException {
 		if ( singleton.get() == null )
 			singleton.compareAndSet(null, new DashboardDataStore());
 		return singleton.get();
 	}
 
 	/**
+	 * @return
+	 * 		the SOCAT version
+	 */
+	public String getSocatVersion() {
+		return socatVersion;
+	}
+
+	/**
 	 * @return 
 	 * 		the handler for user data files
 	 */
-	DashboardUserFileHandler getUserFileHandler() {
+	public DashboardUserFileHandler getUserFileHandler() {
 		return userFileHandler;
 	}
 
@@ -197,7 +221,7 @@ public class DashboardDataStore {
 	 * @return 
 	 * 		the handler for cruise data files
 	 */
-	DashboardCruiseFileHandler getCruiseFileHandler() {
+	public DashboardCruiseFileHandler getCruiseFileHandler() {
 		return cruiseFileHandler;
 	}
 

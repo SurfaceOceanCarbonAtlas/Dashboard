@@ -162,6 +162,66 @@ public class DashboardCruise implements Serializable {
 			this.archiveStatus = "";
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 37;
+		int result = Boolean.valueOf(selected).hashCode();
+		result = prime * result + expocode.hashCode();
+		result = prime * result + uploadFilename.hashCode();
+		result *= prime;
+		if ( dataCheckDate != null )
+			result += dataCheckDate.hashCode();
+		result *= prime;
+		if ( metaCheckDate != null )
+			result += metaCheckDate.hashCode();
+		result = prime * result + qcStatus.hashCode();
+		result = prime * result + archiveStatus.hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj )
+			return true;
+		if ( obj == null )
+			return false;
+
+		if ( ! (obj instanceof DashboardCruise) )
+			return false;
+		DashboardCruise other = (DashboardCruise) obj;
+
+		if ( selected != other.selected )
+			return false;
+
+		if ( ! expocode.equals(other.expocode) )
+			return false;
+
+		if ( ! uploadFilename.equals(other.uploadFilename) )
+			return false;
+
+		if ( dataCheckDate == null ) {
+			if ( other.dataCheckDate != null )
+				return false;
+		} 
+		else if ( ! dataCheckDate.equals(other.dataCheckDate) )
+			return false;
+
+		if ( metaCheckDate == null ) {
+			if ( other.metaCheckDate != null )
+				return false;
+		} 
+		else if ( ! metaCheckDate.equals(other.metaCheckDate) )
+			return false;
+
+		if ( ! qcStatus.equals(other.qcStatus) )
+			return false;
+
+		if ( ! archiveStatus.equals(other.archiveStatus) )
+			return false;
+
+		return true;
+	}
+
 	public static Comparator<DashboardCruise> selectedComparator =
 			new Comparator<DashboardCruise>() {
 		@Override
