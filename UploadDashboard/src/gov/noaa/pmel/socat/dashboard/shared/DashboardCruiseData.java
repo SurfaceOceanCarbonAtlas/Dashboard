@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the data given an uploaded cruise data file
@@ -13,12 +14,12 @@ import java.util.ArrayList;
  */
 public class DashboardCruiseData implements Serializable {
 
-	private static final long serialVersionUID = -263336885454727722L;
+	private static final long serialVersionUID = 7187005123588531255L;
 
 	String expocode;
 	ArrayList<String> preamble;
-	String[] columnNames;
-	ArrayList<String[]> dataValues;
+	ArrayList<String> columnNames;
+	ArrayList<ArrayList<String>> dataValues;
 
 	/**
 	 * Creates with no cruise data
@@ -26,8 +27,8 @@ public class DashboardCruiseData implements Serializable {
 	public DashboardCruiseData() {
 		expocode = "";
 		preamble = new ArrayList<String>();
-		columnNames = new String[0];
-		dataValues = new ArrayList<String[]>();
+		columnNames = new ArrayList<String>();
+		dataValues = new ArrayList<ArrayList<String>>();
 	}
 
 	/**
@@ -54,7 +55,7 @@ public class DashboardCruiseData implements Serializable {
 	/**
 	 * @return 
 	 * 		the list of metadata preamble strings;
-	 * 		may be empty, but never null
+	 * 		may be empty, but never null.
 	 * 		The actual list in the instance is returned.
 	 */
 	public ArrayList<String> getPreamble() {
@@ -63,55 +64,89 @@ public class DashboardCruiseData implements Serializable {
 
 	/**
 	 * @param preamble 
-	 * 		the list of metadata preamble string to set;
-	 * 		if null the existing list is cleared.
+	 * 		the metadata preamble strings to assign;
+	 * 		if null, the list is cleared.
 	 */
-	public void setPreamble(ArrayList<String> preamble) {
-		if ( preamble == null )
-			this.preamble.clear();
-		else
-			this.preamble = preamble;
+	public void setPreamble(List<String> preamble) {
+		this.preamble.clear();
+		if ( preamble != null )
+			this.preamble.addAll(preamble);
 	}
 
 	/**
 	 * @return 
-	 * 		the column names array; may be empty but never null
+	 * 		the column names list; may be empty but never null.
 	 * 		The actual list contained in the instance is returned.
 	 */
-	public String[] getColumnNames() {
+	public ArrayList<String> getColumnNames() {
 		return columnNames;
 	}
 
 	/**
 	 * @param columnNames 
-	 * 		the column names array to set
+	 * 		the column names to assign;
+	 * 		if null, the list is cleared.
 	 */
-	public void setColumnNames(String[] columnNames) {
-		if ( columnNames == null )
-			this.columnNames = new String[0];
-		else
-			this.columnNames = columnNames;
+	public void setColumnNames(List<String> columnNames) {
+		this.columnNames.clear();
+		if ( columnNames != null )
+			this.columnNames.addAll(columnNames);
 	}
 
 	/**
 	 * @return 
-	 * 		the list of data arrays; may be empty but never null
+	 * 		the list of data string lists; 
+	 * 		may be empty but never null
 	 * 		The actual list in the instance is returned.
 	 */
-	public ArrayList<String[]> getDataValues() {
+	public ArrayList<ArrayList<String>> getDataValues() {
 		return dataValues;
 	}
 
 	/**
 	 * @param dataValues 
-	 * 		the list of data arrays to set;
-	 * 		if null the existing list is cleared
+	 * 		the lists of data values to assign;
+	 * 		if null the list is cleared
 	 */
-	public void setDataValues(ArrayList<String[]> dataValues) {
-		if ( dataValues == null )
-			this.dataValues.clear();
-		else
-			this.dataValues = dataValues;
+	public void setDataValues(ArrayList<ArrayList<String>> dataValues) {
+		this.dataValues.clear();
+		if ( dataValues != null )
+			for ( List<String> datalist : dataValues )
+				if ( datalist != null )
+					this.dataValues.add(new ArrayList<String>(datalist));
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 37;
+		int result = expocode.hashCode();
+		result = prime * result + preamble.hashCode();
+		result = prime * result + columnNames.hashCode();
+		result = prime * result + dataValues.hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if ( this == obj )
+			return true;
+		if (obj == null)
+			return false;
+
+		if ( ! ( obj instanceof DashboardCruiseData ) )
+			return false;
+		DashboardCruiseData other = (DashboardCruiseData) obj;
+
+		if ( ! this.expocode.equals(other.expocode) ) 
+			return false;
+		if ( ! this.preamble.equals(other.preamble) ) 
+			return false;
+		if ( ! columnNames.equals(other.columnNames) )
+			return false;
+		if ( ! dataValues.equals(other.dataValues) ) 
+			return false;
+
+		return true;
+	}
+	
 }
