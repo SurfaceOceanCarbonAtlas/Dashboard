@@ -13,72 +13,63 @@ import java.util.ArrayList;
  */
 public class DashboardCruiseListing implements Serializable {
 
-	private static final long serialVersionUID = 4785180378067329280L;
+	private static final long serialVersionUID = -5585489320536194447L;
 
 	String username;
 	ArrayList<DashboardCruise> cruises;
 
 	/**
-	 * Create without a user and without any cruises
+	 * Creates without a user and without any cruises
 	 */
 	public DashboardCruiseListing() {
-		this.username = null;
-		this.cruises = null;
-	}
-
-	/**
-	 * Create for the given user and list of cruises
-	 * 
-	 * @param username
-	 * @param cruises
-	 */
-	public DashboardCruiseListing(String username, 
-					ArrayList<DashboardCruise> cruises) {
-		this.username = username;
-		this.cruises = cruises;
+		username = "";
+		cruises = new ArrayList<DashboardCruise>();
 	}
 
 	/**
 	 * @return 
-	 * 		the username; may be null
+	 * 		the username; may be blank but will never be null
 	 */
 	public String getUsername() {
-		return this.username;
+		return username;
 	}
 
 	/**
 	 * @param username 
-	 * 		the username to set
+	 * 		the username to set; if null, set to an empty string
 	 */
 	public void setUsername(String username) {
-		this.username = username;
+		if ( username == null )
+			this.username = "";
+		else
+			this.username = username;
 	}
 
 	/**
 	 * @return 
-	 * 		the list of cruises; may be null
+	 * 		the list of cruises; may be empty but will never be null.
+	 * 		The actual list contained in this instance is returned.
 	 */
 	public ArrayList<DashboardCruise> getCruises() {
-		return this.cruises;
+		return cruises;
 	}
 
 	/**
 	 * @param cruises 
-	 * 		the list of cruises to set
+	 * 		the list of cruises to set; 
+	 * 		if null, just clears the list of cruises
 	 */
 	public void setCruises(ArrayList<DashboardCruise> cruises) {
-		this.cruises = cruises;
+		this.cruises.clear();
+		if ( cruises != null )
+			this.cruises.addAll(cruises);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = 0;
-		if ( username != null )
-			result = this.username.hashCode();
-		result *= prime;
-		if ( cruises != null )
-			result += cruises.hashCode();
+		int result = this.username.hashCode();
+		result = result * prime + cruises.hashCode();
 		return result;
 	}
 
@@ -93,18 +84,10 @@ public class DashboardCruiseListing implements Serializable {
 			return false;
 		DashboardCruiseListing other = (DashboardCruiseListing) obj;
 
-		if ( username == null ) {
-			if ( other.username != null )
-				return false;
-		} 
-		else if ( ! username.equals(other.username) )
+		if ( ! username.equals(other.username) )
 			return false;
 
-		if ( cruises == null ) {
-			if ( other.cruises != null )
-				return false;
-		} 
-		else if ( ! cruises.equals(other.cruises) )
+		if ( ! cruises.equals(other.cruises) )
 			return false;
 
 		return true;

@@ -120,9 +120,9 @@ public class DashboardCruiseData implements Serializable {
 	public int hashCode() {
 		final int prime = 37;
 		int result = expocode.hashCode();
-		result = prime * result + preamble.hashCode();
-		result = prime * result + columnNames.hashCode();
-		result = prime * result + dataValues.hashCode();
+		result = result * prime + preamble.hashCode();
+		result = result * prime + columnNames.hashCode();
+		result = result * prime + dataValues.hashCode();
 		return result;
 	}
 

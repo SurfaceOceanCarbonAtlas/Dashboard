@@ -30,7 +30,7 @@ public class DashboardDataStore {
 
 	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
 	private static final String CONFIG_RELATIVE_FILENAME = "content" + 
-			File.separator + SERVER_APP_NAME + File.separator + "config.preferences";
+			File.separator + SERVER_APP_NAME + File.separator + "config.properties";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
 	private static final String SOCAT_VERSION_NAME_TAG = "SocatVersion";

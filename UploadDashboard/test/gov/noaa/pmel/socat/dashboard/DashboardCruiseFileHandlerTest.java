@@ -33,7 +33,7 @@ public class DashboardCruiseFileHandlerTest {
 	public void testDashboardCruiseFileHandler() throws IOException, IllegalArgumentException, SVNException {
 		final String expocode = "FAKE20031205";
 		final String metadataString = 
-				"SOCAT version 3 cruise file created: 2013-09-03 \n" +
+				"SOCAT version 3 dashboard cruise file created: 2013-09-03 \n" +
 				"Cruise Expocode: " + expocode + " \n" +
 				"Cruise Name: FAKE0312 \n" +
 				"Ship/Vessel Name: FakeShip \n" +

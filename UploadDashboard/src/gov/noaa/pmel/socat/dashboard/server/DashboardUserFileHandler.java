@@ -53,7 +53,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		if username was invalid or if there was a problem 
 	 * 		reading an existing cruise listing
 	 */
-	DashboardCruiseListing getCruiseListing(String username) 
+	public DashboardCruiseListing getCruiseListing(String username) 
 										throws IllegalArgumentException {
 		// Get the name of the cruise list XML file for this user
 		if ( (username == null) || username.trim().isEmpty() )
@@ -79,7 +79,8 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			}
 		} catch ( FileNotFoundException ex ) {
 			// Return a valid cruise listing with no cruises
-			cruiseList = new DashboardCruiseListing(username, null);
+			cruiseList = new DashboardCruiseListing();
+			cruiseList.setUsername(username);
 		} catch ( Exception ex ) {
 			// Problems with the listing in the existing file
 			throw new IllegalArgumentException(
@@ -103,7 +104,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		if the cruise listing was invalid or if there was 
 	 * 		a problem saving the cruise listing
 	 */
-	void saveCruiseListing(DashboardCruiseListing cruiseList, 
+	public void saveCruiseListing(DashboardCruiseListing cruiseList, 
 						String message) throws IllegalArgumentException {
 		String username = cruiseList.getUsername();
 		// Get the name of the cruise list XML file for this user
