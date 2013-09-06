@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.Random;
 
 import org.junit.Test;
+import org.tmatesoft.svn.core.SVNException;
 
 /**
  * @author Karl Smith
@@ -26,9 +27,10 @@ public class DashboardUserFileHandlerTest {
 	 * Test method for methods in 
 	 * {@link gov.noaa.pmel.socat.dashboard.server.DashboardUserFileHandler}.
 	 * @throws IOException
+	 * @throws SVNException 
 	 */
 	@Test
-	public void testDashboardUserFileHandler() throws IOException {
+	public void testDashboardUserFileHandler() throws IOException, SVNException {
 		String username = "socatuser";
 		String[] cruiseExpocodes = { 
 				"FAKE19991206", 

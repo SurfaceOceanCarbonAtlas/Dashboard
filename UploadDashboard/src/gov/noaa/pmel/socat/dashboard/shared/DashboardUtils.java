@@ -6,12 +6,23 @@ package gov.noaa.pmel.socat.dashboard.shared;
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
 /**
- * Static dashboard utility functions 
+ * Static dashboard utility functions and constants
  * for use on both the client and server side.
  *  
  * @author Karl Smith
  */
 public class DashboardUtils {
+
+	public static final String REQUEST_PREVIEW_TAG = "REQUEST PREVIEW TAG";
+	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";
+	public static final String REQUEST_OVERWRITE_CRUISE_TAG = "REQUEST OVERWRITE CRUISE TAG";
+
+	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
+	public static final String NO_EXPOCODE_HEADER_TAG = "NO EXPOCODE HEADER TAG";
+	public static final String FILE_EXISTS_HEADER_TAG = "FILE EXISTS HEADER TAG";
+	public static final String NO_FILE_HEADER_TAG = "NO FILE HEADER TAG";
+	public static final String FILE_CREATED_HEADER_TAG = "FILE CREATED HEADER TAG";
+	public static final String FILE_UPDATED_HEADER_TAG = "FILE UPDATED HEADER TAG";
 
 	/**
 	 * Generate the encrypted password for a given plain-text username 

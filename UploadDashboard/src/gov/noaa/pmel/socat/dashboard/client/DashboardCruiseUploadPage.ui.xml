@@ -12,7 +12,7 @@
 						<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
 						<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 					</g:FlowPanel>
-					<g:HTML addStyleNames="{style.introhtml}" ui:field="introhtml" />
+					<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 					<g:FileUpload name="cruiseupload" addStyleNames="{style.uploadfile}"
 							ui:field="cruiseUpload" />
 					<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
@@ -25,14 +25,18 @@
 					</g:FlowPanel>
 					<g:Hidden name="username" ui:field="usernameToken" />
 					<g:Hidden name="passhash" ui:field="passhashToken" />
-					<g:Hidden name="cruisepreview" ui:field="previewToken" />
+					<g:Hidden name="cruiseaction" ui:field="actionToken" />
 				</g:FlowPanel>
 			</g:FormPanel>
 		</g:north>
-		<g:south size="4">
-			<g:FlowPanel addStyleNames="{style.uploadbuttonpanel}">
-				<g:Button addStyleNames="{style.uploadbutton}" ui:field="uploadButton" />
-				<g:Button addStyleNames="{style.uploadbutton}" ui:field="cancelButton" />
+		<g:south size="12">
+			<g:FlowPanel>
+				<g:HTML addStyleNames="{style.introhtml}" ui:field="buttonsHtml" />
+				<g:FlowPanel addStyleNames="{style.uploadbuttonpanel}">
+					<g:Button addStyleNames="{style.uploadbutton}" ui:field="createButton" />
+					<g:Button addStyleNames="{style.uploadbutton}" ui:field="overwriteButton" />
+					<g:Button addStyleNames="{style.uploadbutton}" ui:field="cancelButton" />
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:south>
 		<g:east size="0.5">

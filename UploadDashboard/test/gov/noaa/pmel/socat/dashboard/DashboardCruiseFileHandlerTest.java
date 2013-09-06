@@ -4,7 +4,9 @@
 package gov.noaa.pmel.socat.dashboard;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData;
@@ -24,17 +26,60 @@ import org.tmatesoft.svn.core.SVNException;
 public class DashboardCruiseFileHandlerTest {
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler#cruiseFileExists(java.lang.String)}.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testCruiseFileExists() throws IOException {
+		DashboardCruiseFileHandler handler = 
+				DashboardDataStore.get().getCruiseFileHandler();
+		assertNotNull( handler );
+
+		assertFalse( handler.cruiseFileExists("FAKE_EXPOCODE") );
+		assertFalse( handler.cruiseFileExists("FAKE-EXPOCODE") );
+
+		boolean exceptionMissed = false;
+		try {
+			handler.cruiseFileExists("TOOSHORT");
+			exceptionMissed = true;
+		} catch ( IllegalArgumentException ex ) {
+			// Exceptioned outcome
+			;
+		}
+		assertFalse( exceptionMissed );
+
+		try {
+			handler.cruiseFileExists("TOOLONGEXPOCODE");
+			exceptionMissed = true;
+		} catch ( IllegalArgumentException ex ) {
+			// Exceptioned outcome
+			;
+		}
+		assertFalse( exceptionMissed );
+
+		try {
+			handler.cruiseFileExists("INVALID*CHAR");
+			exceptionMissed = true;
+		} catch ( IllegalArgumentException ex ) {
+			// Exceptioned outcome
+			;
+		}
+		assertFalse( exceptionMissed );
+	}
+
+	/**
 	 * Test method for methods in {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler}.
 	 * @throws IOException 
 	 * @throws SVNException 
-	 * @throws IllegalArgumentException 
 	 */
 	@Test
-	public void testDashboardCruiseFileHandler() throws IOException, IllegalArgumentException, SVNException {
+	public void testDashboardCruiseFileHandler() throws IOException, SVNException {
+		final String username = "SocatUser";
+		final String filename = "fake20031205_revised.tsv";
 		final String expocode = "FAKE20031205";
+		final String versionString = "SOCAT version 3 dashboard cruise file created: 2013-09-03 \n";
+		final String expocodeString = "Cruise Expocode: " + expocode + " \n";
 		final String metadataString = 
-				"SOCAT version 3 dashboard cruise file created: 2013-09-03 \n" +
-				"Cruise Expocode: " + expocode + " \n" +
 				"Cruise Name: FAKE0312 \n" +
 				"Ship/Vessel Name: FakeShip \n" +
 				"Principal Investigator(s): Fake Scientist \n" +
@@ -150,15 +195,16 @@ public class DashboardCruiseFileHandlerTest {
 
 		// Generate the cruise data from a BufferedReader wrapping the String data
 		DashboardCruiseData cruiseData;
-		BufferedReader reader = new BufferedReader(
-				new StringReader(metadataString + headerString + dataString));
+		BufferedReader reader = new BufferedReader(new StringReader(
+				versionString + expocodeString + metadataString + headerString + dataString));
 		try {
-			cruiseData = handler.getCruiseDataFromInput(reader);
+			cruiseData = handler.getCruiseDataFromInput(username, filename, reader);
 		} finally {
 			reader.close();
 		}
 
 		// Check for differences
+		assertEquals(versionString.trim(), cruiseData.getVersion());
 		assertEquals(expocode, cruiseData.getExpocode());
 
 		ArrayList<String> preamble = cruiseData.getPreamble();
@@ -182,17 +228,21 @@ public class DashboardCruiseFileHandlerTest {
 		assertEquals(expectedDatavals.size(), datavals.size());
 
 		// Save and commit the cruise data to file
-		handler.saveCruiseDataToFile(cruiseData, "socatuser", 
-				"test check-in of fake cruise data");
+		handler.saveCruiseDataToFile(cruiseData, "test check-in of fake cruise data");
+
+		// Test that the file exists
+		assertTrue( handler.cruiseFileExists(expocode) );
 
 		// Generate the cruise data from the saved file
 		DashboardCruiseData fileData = handler.getCruiseDataFromFile(expocode);
 
-		// Check for differences
+		// Check for differences - version string will differ
+		assertEquals(username, fileData.getUsername());
+		assertEquals(filename, fileData.getFilename());
 		assertEquals(expocode, fileData.getExpocode());
 
 		preamble = fileData.getPreamble();
-		for (int k = 1; (k < preamble.size()) && (k < expectedPreamble.size()); k++)
+		for (int k = 0; (k < preamble.size()) && (k < expectedPreamble.size()); k++)
 			assertEquals(expectedPreamble.get(k).trim(), preamble.get(k).trim());
 		assertEquals(expectedPreamble.size(), preamble.size());
 
@@ -210,6 +260,23 @@ public class DashboardCruiseFileHandlerTest {
 			assertEquals(expectedDatalist.size(), datalist.size());
 		}
 		assertEquals(expectedDatavals.size(), datavals.size());
+
+		// Check the partial contents listing
+		ArrayList<String> partialContents = handler.getPartialCruiseDataContents(cruiseData);
+		assertEquals(versionString.trim(), partialContents.get(0).trim());
+		assertEquals(expocodeString.trim(), partialContents.get(1).trim());
+		// Metadata preamble
+		int k = 2;
+		for (int j = 0; j < expectedPreamble.size(); j++, k++)
+			assertEquals(expectedPreamble.get(j), partialContents.get(k));
+		// Column headers line
+		assertEquals(headerString.trim(), partialContents.get(k).trim());
+		k++;
+		// Fewer than 25 data points, so they all should be in there
+		for (int j = 0; j < observations.length; j++, k++)
+			assertEquals(observations[j].trim(), partialContents.get(k).trim());
+		// And that should be all there is
+		assertEquals(k, partialContents.size());
 	}
 
 }

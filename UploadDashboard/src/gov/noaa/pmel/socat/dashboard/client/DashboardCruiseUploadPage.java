@@ -3,6 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -48,12 +50,21 @@ public class DashboardCruiseUploadPage extends Composite {
 	protected static String[] knownEncodings = {
 		"ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
 	};
-	protected static String previewText = "Preview Cruise File";
-	protected static String uploadText = "Upload Cruise File";
+	protected static String createText = "Create Cruise";
+	protected static String overwriteText = "Update Cruise";
 	protected static String cancelText = "Return to Cruise List";
+	protected static String buttonsHtmlMsg = 
+			"The <em>" + createText + "</em> button will upload the selected " +
+			"file as a new cruise; it will fail if a cruise exists with the " +
+			"same expocode as this cruise.  The <em>" + overwriteText + "</em> " +
+			"button will upload the selected file as a revised cruise; it will " +
+			"fail if a cruise does not exist with the same expocode as this " +
+			"cruise.  <b>Only use <em>" + overwriteText + "</em> if you are " +
+			"absolutely sure this is an update of the existing cruise.</b>";
+	protected static String previewText = "Preview Cruise File";
+	protected static String noPreviewMsg = "<p>(No file previewed)</p>";
 	protected static String noFileErrorMsg = 
 			"Please select a cruise data file to upload";
-	protected static String noPreviewMsg = "<p>(No file previewed)</p>";
 
 	interface DashboardNewCruisePageUiBinder extends
 			UiBinder<Widget, DashboardCruiseUploadPage> {
@@ -64,7 +75,7 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField HTML introhtml;
+	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload cruiseUpload;
 	@UiField Label encodingLabel;
@@ -72,17 +83,19 @@ public class DashboardCruiseUploadPage extends Composite {
 	@UiField Button previewButton;
 	@UiField Hidden usernameToken;
 	@UiField Hidden passhashToken;
-	@UiField Hidden previewToken;
-	@UiField HTML previewHtml;
-	@UiField Button uploadButton;
+	@UiField Hidden actionToken;
+	@UiField HTML buttonsHtml;
+	@UiField Button createButton;
+	@UiField Button overwriteButton;
 	@UiField Button cancelButton;
+	@UiField HTML previewHtml;
 
 	DashboardCruiseUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		logoutButton.setText(logoutText);
 
-		introhtml.setHTML(introHtmlMsg);
+		introHtml.setHTML(introHtmlMsg);
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
@@ -97,7 +110,9 @@ public class DashboardCruiseUploadPage extends Composite {
 
 		previewButton.setText(previewText);
 
-		uploadButton.setText(uploadText);
+		buttonsHtml.setHTML(buttonsHtmlMsg);
+		createButton.setText(createText);
+		overwriteButton.setText(overwriteText);
 		cancelButton.setText(cancelText);
 	}
 
@@ -120,13 +135,19 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("previewButton") 
 	void previewButtonOnClick(ClickEvent event) {
-		previewToken.setValue("true");
+		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
 		uploadForm.submit();
 	}
 
-	@UiHandler("uploadButton") 
-	void uploadButtonOnClick(ClickEvent event) {
-		previewToken.setValue("false");
+	@UiHandler("createButton") 
+	void createButtonOnClick(ClickEvent event) {
+		actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
+		uploadForm.submit();
+	}
+
+	@UiHandler("overwriteButton") 
+	void overwriteButtonOnClick(ClickEvent event) {
+		actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
 		uploadForm.submit();
 	}
 
@@ -153,8 +174,37 @@ public class DashboardCruiseUploadPage extends Composite {
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
 		String resultMsg = event.getResults();
 		if ( resultMsg != null ) {
-			// If the response was from a request to preview, display the preview
-			previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+			String[] tagMsg = resultMsg.split("\n", 2);
+			if ( tagMsg.length < 2 ) {
+				// probably an error response; display the message in the preview
+				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+			}
+			else if ( DashboardUtils.FILE_PREVIEW_HEADER_TAG.equals(tagMsg[0]) ) {
+				// preview file; show partial file contents in the preview
+				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+			}
+			else if ( DashboardUtils.NO_EXPOCODE_HEADER_TAG.equals(tagMsg[0]) ) {
+				// no expocode found; show uploaded file partial contents
+				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+			}
+			else if ( DashboardUtils.FILE_EXISTS_HEADER_TAG.equals(tagMsg[0]) ) {
+				// cruise file exists and not overwrite; show existing file partial contents in the preview
+				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+			}
+			else if ( DashboardUtils.NO_FILE_HEADER_TAG.equals(tagMsg[0]) ) {
+				// cruise file does not exist and overwrite; show partial file contents in preview
+				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+			}
+			else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
+				// cruise file created
+			}
+			else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
+				// cruise file updated
+			}
+			else {
+				// Unknown response with a newline, display the whole message in the preview
+				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+			}
 		}
 		else {
 			Window.alert("Unexpected null result from submit complete");
