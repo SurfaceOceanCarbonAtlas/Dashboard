@@ -56,8 +56,9 @@ public abstract class VersionedFileHandler {
 	}
 
 	/**
-	 * Updates the working copy file to the latest version from the
-	 * version control repository.
+	 * Updates the working copy file or directory to the latest version 
+	 * from the version control repository.  The update depth is set to
+	 * infinity, so all contents under a directory are updated.
 	 * 
 	 * @param wcfile
 	 * 		working copy file to update
@@ -66,7 +67,7 @@ public abstract class VersionedFileHandler {
 	 */
 	void updateVersion(File wcfile) throws SVNException {
 		svnManager.getUpdateClient().doUpdate(wcfile, 
-				SVNRevision.HEAD, SVNDepth.EMPTY, false, false);
+				SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
 	}
 
 	/**
@@ -77,15 +78,12 @@ public abstract class VersionedFileHandler {
 	 * 
 	 * @param wcfile
 	 * 		working copy file to (add and) commit in version control
-	 * @param username
-	 * 		user name to add to the commit message
 	 * @param message
-	 * 		details to add to the commit message
+	 * 		the commit message to use
 	 * @throws SVNException
 	 * 		if the version control engine throws one
 	 */
-	void commitVersion(File wcfile, String username, String message) 
-													throws SVNException {
+	void commitVersion(File wcfile, String message) throws SVNException {
 		boolean needsAdd = false;
 		try {
 			SVNStatus status = svnManager.getStatusClient()
@@ -122,9 +120,8 @@ public abstract class VersionedFileHandler {
 		// Commit the update, including the add if applicable
 		// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
 		// and not any other updated files under any directories specified
-		svnManager.getCommitClient().doCommit(commitFiles, false, 
-				"Contents updated by " + username + ": " + message, null, 
-				null, false, false, SVNDepth.EMPTY);
+		svnManager.getCommitClient().doCommit(commitFiles, false, message,
+									null, null, false, false, SVNDepth.EMPTY);
 	}
 
 }

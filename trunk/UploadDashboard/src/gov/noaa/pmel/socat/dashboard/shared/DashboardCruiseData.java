@@ -14,8 +14,11 @@ import java.util.List;
  */
 public class DashboardCruiseData implements Serializable {
 
-	private static final long serialVersionUID = 7187005123588531255L;
+	private static final long serialVersionUID = 6974324789113457449L;
 
+	String username;
+	String filename;
+	String version;
 	String expocode;
 	ArrayList<String> preamble;
 	ArrayList<String> columnNames;
@@ -25,10 +28,71 @@ public class DashboardCruiseData implements Serializable {
 	 * Creates with no cruise data
 	 */
 	public DashboardCruiseData() {
+		username = "";
+		filename = "";
+		version = "";
 		expocode = "";
 		preamble = new ArrayList<String>();
 		columnNames = new ArrayList<String>();
 		dataValues = new ArrayList<ArrayList<String>>();
+	}
+
+	/**
+	 * @return the username; may be empty, but never null
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/**
+	 * @param username 
+	 * 		the username to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setUsername(String username) {
+		if ( username == null )
+			this.username = "";
+		else
+			this.username = username;
+	}
+
+	/**
+	 * @return the filename; may be empty, but never null
+	 */
+	public String getFilename() {
+		return filename;
+	}
+
+	/**
+	 * @param filename 
+	 * 		the filename to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setFilename(String filename) {
+		if ( filename == null )
+			this.filename = "";
+		else
+			this.filename = filename;
+	}
+
+	/**
+	 * @return 
+	 * 		the cruise version; may be empty, but never null
+	 */
+	public String getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version 
+	 * 		the cruise version to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setVersion(String version) {
+		if ( version == null )
+			this.version = "";
+		else
+			this.version = version;
 	}
 
 	/**
@@ -43,7 +107,7 @@ public class DashboardCruiseData implements Serializable {
 	 * @param expocode 
 	 * 		the cruise expocode to set, after
 	 * 		converting to upper-case;
-	 * 		if null an empty string is assigned
+	 * 		if null, an empty string is assigned
 	 */
 	public void setExpocode(String expocode) {
 		if ( expocode == null )
@@ -67,7 +131,7 @@ public class DashboardCruiseData implements Serializable {
 	 * 		the metadata preamble strings to assign;
 	 * 		if null, the list is cleared.
 	 */
-	public void setPreamble(List<String> preamble) {
+	public void setPreamble(ArrayList<String> preamble) {
 		this.preamble.clear();
 		if ( preamble != null )
 			this.preamble.addAll(preamble);
@@ -87,7 +151,7 @@ public class DashboardCruiseData implements Serializable {
 	 * 		the column names to assign;
 	 * 		if null, the list is cleared.
 	 */
-	public void setColumnNames(List<String> columnNames) {
+	public void setColumnNames(ArrayList<String> columnNames) {
 		this.columnNames.clear();
 		if ( columnNames != null )
 			this.columnNames.addAll(columnNames);
@@ -119,7 +183,10 @@ public class DashboardCruiseData implements Serializable {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = expocode.hashCode();
+		int result = username.hashCode();
+		result = result * prime + filename.hashCode();
+		result = result * prime + version.hashCode();
+		result = result * prime + expocode.hashCode();
 		result = result * prime + preamble.hashCode();
 		result = result * prime + columnNames.hashCode();
 		result = result * prime + dataValues.hashCode();
@@ -137,9 +204,15 @@ public class DashboardCruiseData implements Serializable {
 			return false;
 		DashboardCruiseData other = (DashboardCruiseData) obj;
 
-		if ( ! this.expocode.equals(other.expocode) ) 
+		if ( ! username.equals(other.username) ) 
 			return false;
-		if ( ! this.preamble.equals(other.preamble) ) 
+		if ( ! filename.equals(other.filename) ) 
+			return false;
+		if ( ! version.equals(other.version) ) 
+			return false;
+		if ( ! expocode.equals(other.expocode) ) 
+			return false;
+		if ( ! preamble.equals(other.preamble) ) 
 			return false;
 		if ( ! columnNames.equals(other.columnNames) )
 			return false;
@@ -148,5 +221,5 @@ public class DashboardCruiseData implements Serializable {
 
 		return true;
 	}
-	
+
 }

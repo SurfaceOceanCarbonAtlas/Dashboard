@@ -29,6 +29,54 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getUsername()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setUsername(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetUsername() {
+		String myUsername = "SocatUser";
+		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		assertEquals("", cruiseData.getUsername());
+		cruiseData.setUsername(myUsername);
+		assertEquals(myUsername, cruiseData.getUsername());
+		cruiseData.setUsername(null);
+		assertEquals("", cruiseData.getUsername());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getFilename()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setFilename(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetFilename() {
+		String myFilename = "agsk20031205_revised.tsv";
+		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		assertEquals("", cruiseData.getFilename());
+		cruiseData.setFilename(myFilename);
+		assertEquals(myFilename, cruiseData.getFilename());
+		assertEquals("", cruiseData.getUsername());
+		cruiseData.setFilename(null);
+		assertEquals("", cruiseData.getFilename());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getVersion()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setVersion(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetVersion() {
+		String myVersion = "SOCAT version 3 cruise file created: 2013-09-05";
+		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		assertEquals("", cruiseData.getVersion());
+		cruiseData.setVersion(myVersion);
+		assertEquals(myVersion, cruiseData.getVersion());
+		assertEquals("", cruiseData.getFilename());
+		assertEquals("", cruiseData.getUsername());
+		cruiseData.setVersion(null);
+		assertEquals("", cruiseData.getVersion());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getExpocode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setExpocode(java.lang.String)}.
 	 */
@@ -39,6 +87,9 @@ public class DashboardCruiseDataTest {
 		assertEquals("", cruiseData.getExpocode());
 		cruiseData.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruiseData.getExpocode());
+		assertEquals("", cruiseData.getVersion());
+		assertEquals("", cruiseData.getFilename());
+		assertEquals("", cruiseData.getUsername());
 		cruiseData.setExpocode(null);
 		assertEquals("", cruiseData.getExpocode());
 	}
@@ -61,6 +112,9 @@ public class DashboardCruiseDataTest {
 		cruiseData.setPreamble(myPreamble);
 		assertEquals(myPreamble, cruiseData.getPreamble());
 		assertEquals("", cruiseData.getExpocode());
+		assertEquals("", cruiseData.getVersion());
+		assertEquals("", cruiseData.getFilename());
+		assertEquals("", cruiseData.getUsername());
 		cruiseData.setPreamble(null);
 		assertEquals(0, cruiseData.getPreamble().size());
 	}
@@ -83,6 +137,9 @@ public class DashboardCruiseDataTest {
 		assertEquals(colNames, cruiseData.getColumnNames());
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
+		assertEquals("", cruiseData.getVersion());
+		assertEquals("", cruiseData.getFilename());
+		assertEquals("", cruiseData.getUsername());
 		cruiseData.setColumnNames(null);
 		assertEquals(0, cruiseData.getColumnNames().size());		
 	}
@@ -116,6 +173,9 @@ public class DashboardCruiseDataTest {
 		assertEquals(0, cruiseData.getColumnNames().size());		
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
+		assertEquals("", cruiseData.getVersion());
+		assertEquals("", cruiseData.getFilename());
+		assertEquals("", cruiseData.getUsername());
 		cruiseData.setDataValues(null);
 		assertEquals(0, cruiseData.getDataValues().size());
 	}
@@ -126,6 +186,9 @@ public class DashboardCruiseDataTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
+		String myUsername = "SocatUser";
+		String myFilename = "agsk20031205_revised.tsv";
+		String myVersion = "SOCAT version 3 cruise file created: 2013-09-05";
 		String myExpocode = "AGSK20031205";
 		ArrayList<String> myPreamble = new ArrayList<String>(Arrays.asList(
 				new String[] {
@@ -161,6 +224,27 @@ public class DashboardCruiseDataTest {
 		assertFalse( firstData.equals(null) );
 		assertFalse( firstData.equals(colNames) );
 		DashboardCruiseData secondData = new DashboardCruiseData();
+		assertEquals(firstData.hashCode(), secondData.hashCode());
+		assertEquals(firstData, secondData);
+
+		firstData.setUsername(myUsername);
+		assertTrue( firstData.hashCode() != secondData.hashCode() );
+		assertFalse( firstData.equals(secondData) );
+		secondData.setUsername(myUsername);
+		assertEquals(firstData.hashCode(), secondData.hashCode());
+		assertEquals(firstData, secondData);
+
+		firstData.setFilename(myFilename);
+		assertTrue( firstData.hashCode() != secondData.hashCode() );
+		assertFalse( firstData.equals(secondData) );
+		secondData.setFilename(myFilename);
+		assertEquals(firstData.hashCode(), secondData.hashCode());
+		assertEquals(firstData, secondData);
+
+		firstData.setVersion(myVersion);
+		assertTrue( firstData.hashCode() != secondData.hashCode() );
+		assertFalse( firstData.equals(secondData) );
+		secondData.setVersion(myVersion);
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 

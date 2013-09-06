@@ -60,6 +60,13 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("invalid username");
 		File userDataFile = new File(filesDir, 
 				username + USER_CRUISE_LIST_NAME_EXTENSION);
+		// Make sure we are reading the latest version
+		try {
+			updateVersion(userDataFile);
+		} catch (SVNException ex) {
+			// May not exist or may not yet be under version control
+			;
+		}
 		// Read the cruise list from the XML file
 		DashboardCruiseListing cruiseList;
 		try {
@@ -97,15 +104,17 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * @param cruiseList
 	 * 		listing of cruises to be saved
 	 * @param message
-	 * 		additional information for the commit message;
-	 * 		the commit message will include username from
-	 * 		the cruise listing as the instigator of the update
+	 * 		version control commit message; 
+	 * 		if null or blank, the commit will not be performed 
 	 * @throws IllegalArgumentException
 	 * 		if the cruise listing was invalid or if there was 
 	 * 		a problem saving the cruise listing
+	 * @throws SVNException
+	 * 		if there was an error committing the updated file 
+	 * 		to version control
 	 */
 	public void saveCruiseListing(DashboardCruiseListing cruiseList, 
-						String message) throws IllegalArgumentException {
+			String message) throws IllegalArgumentException, SVNException {
 		String username = cruiseList.getUsername();
 		// Get the name of the cruise list XML file for this user
 		if ( (username == null) || username.isEmpty() )
@@ -124,16 +133,12 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
 					"Problems saving the cruise listing " + 
-							userDataFile.getPath() + ": " + ex.getMessage());
+					userDataFile.getPath() + ": " + ex.getMessage());
 		}
+		if ( (message == null) || message.trim().isEmpty() )
+			return;
 		// Commit the update to this cruise list XML file
-		try {
-			commitVersion(userDataFile, username, message);
-		} catch ( SVNException ex ) {
-			throw new IllegalArgumentException(
-					"Problems commiting the updated cruise listing " +
-							userDataFile.getPath() + ": " + ex.getMessage());
-		}
+		commitVersion(userDataFile, message);
 	}
 
 }
