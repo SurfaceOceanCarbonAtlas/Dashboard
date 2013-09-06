@@ -5,7 +5,7 @@
 	<ui:style src="CommonFullWidth.css" />
 
 	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}" >
-		<g:north size="24">
+		<g:north size="22">
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
 					<g:FlowPanel addStyleNames="{style.userinfopanel}">
@@ -29,7 +29,7 @@
 				</g:FlowPanel>
 			</g:FormPanel>
 		</g:north>
-		<g:south size="12">
+		<g:south size="10">
 			<g:FlowPanel>
 				<g:HTML addStyleNames="{style.introhtml}" ui:field="buttonsHtml" />
 				<g:FlowPanel addStyleNames="{style.uploadbuttonpanel}">
@@ -39,18 +39,12 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:south>
-		<g:east size="0.5">
-			<!-- Just to give a margin -->
-			<g:Label />
-		</g:east>
-		<g:west size="0.5">
-			<!-- Just to give a margin -->
-			<g:Label />
-		</g:west>
 		<g:center>
-			<g:ScrollPanel addStyleNames="{style.previewpanel}">
-				<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
-			</g:ScrollPanel>
+			<g:SimplePanel addStyleNames="{style.previewpanel}">
+				<g:ScrollPanel addStyleNames="{style.previewscroll}">
+					<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
+				</g:ScrollPanel>
+			</g:SimplePanel>
 		</g:center>
 	</g:DockLayoutPanel>
 

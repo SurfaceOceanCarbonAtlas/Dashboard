@@ -65,6 +65,19 @@ public class DashboardCruiseUploadPage extends Composite {
 	protected static String noPreviewMsg = "<p>(No file previewed)</p>";
 	protected static String noFileErrorMsg = 
 			"Please select a cruise data file to upload";
+	protected static String unknownFailureMsg = 
+			"Upload failed for some unexpected reason";
+	protected static String noExpocodeFailureMsg = 
+			"Unable to obtain a cruise expocode from the uploaded file contents";
+	protected static String fileExistsFailureMsg = 
+			"A cruise already exists with this expocode.  The preview contains " +
+			"the (partial) contents of the existing cruise data.  Use the " +
+			overwriteText + " button if this is an update of the existing cruise " +
+			"after verifying the expocode for this cruise and the contents of the " +
+			"existing cruise.";
+	protected static String fileDoesNotExistFailureMsg = 
+			"A cruise with this expocode does not exist.  Use the " + createText + 
+			" button to create a new cruise after verifying the expocode for this cruise.";
 
 	interface DashboardNewCruisePageUiBinder extends
 			UiBinder<Widget, DashboardCruiseUploadPage> {
@@ -178,6 +191,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			if ( tagMsg.length < 2 ) {
 				// probably an error response; display the message in the preview
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+				Window.alert(unknownFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_PREVIEW_HEADER_TAG.equals(tagMsg[0]) ) {
 				// preview file; show partial file contents in the preview
@@ -186,24 +200,30 @@ public class DashboardCruiseUploadPage extends Composite {
 			else if ( DashboardUtils.NO_EXPOCODE_HEADER_TAG.equals(tagMsg[0]) ) {
 				// no expocode found; show uploaded file partial contents
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				Window.alert(noExpocodeFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_EXISTS_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file exists and not overwrite; show existing file partial contents in the preview
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				Window.alert(fileExistsFailureMsg);
 			}
 			else if ( DashboardUtils.NO_FILE_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file does not exist and overwrite; show partial file contents in preview
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				Window.alert(fileDoesNotExistFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file created
+				Window.alert(tagMsg[1]);
 			}
 			else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file updated
+				Window.alert(tagMsg[1]);
 			}
 			else {
 				// Unknown response with a newline, display the whole message in the preview
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+				Window.alert(unknownFailureMsg);
 			}
 		}
 		else {

@@ -30,6 +30,7 @@ body {
 
 .agreepanel {
 	display: block;
+	width: 55em;
 	margin-top: 0.25em;
 	margin-bottom: 0.25em;
 }
@@ -76,7 +77,7 @@ body {
 .introhtml {
 	display: block;
 	text-align: justify;
-	width: 45em;
+	width: 55em;
 	padding: 0.25em 1em;
 }
 
@@ -88,7 +89,7 @@ body {
 
 .labeledlistpanel {
 	display: block;
-	width: 45em;
+	width: 55em;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
@@ -106,7 +107,7 @@ body {
 
 .uploadbuttonpanel {
 	display: block;
-	width: 45em;
+	width: 55em;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
@@ -114,14 +115,19 @@ body {
 	display: inline;
 	font-size: 100%;
 	width: 12em;
-	margin-left: 5em;
+	margin-left: 3em;
 }
 
 .previewpanel {
-	width: 100%;
+	border-style: solid;
+	border-width: 2px;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+	margin-bottom: 0.25em;
+}
+.previewscroll {
 	height: 100%;
 }
 .previewhtml {
-	width: 100%;
-	height: 100%;
+	padding: 0.25em;
 }
