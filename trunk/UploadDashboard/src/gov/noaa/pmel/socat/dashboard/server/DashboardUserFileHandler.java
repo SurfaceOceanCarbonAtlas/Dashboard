@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -53,7 +53,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		if username was invalid or if there was a problem 
 	 * 		reading an existing cruise listing
 	 */
-	public DashboardCruiseListing getCruiseListing(String username) 
+	public DashboardCruiseList getCruiseListing(String username) 
 										throws IllegalArgumentException {
 		// Get the name of the cruise list XML file for this user
 		if ( (username == null) || username.trim().isEmpty() )
@@ -68,16 +68,16 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			;
 		}
 		// Read the cruise list from the XML file
-		DashboardCruiseListing cruiseList;
+		DashboardCruiseList cruiseList;
 		try {
 			XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(
 					new FileInputStream(userDataFile)));
 			try {
 				Object obj = decoder.readObject();
-				if ( ! (obj instanceof DashboardCruiseListing) )
+				if ( ! (obj instanceof DashboardCruiseList) )
 					throw new Exception(
 							"unexpected type of encoded object");
-				cruiseList = (DashboardCruiseListing) obj;
+				cruiseList = (DashboardCruiseList) obj;
 				if ( ! username.equals(cruiseList.getUsername()) )
 					throw new Exception(
 							"unexpected username associated with saved listing");
@@ -86,7 +86,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			}
 		} catch ( FileNotFoundException ex ) {
 			// Return a valid cruise listing with no cruises
-			cruiseList = new DashboardCruiseListing();
+			cruiseList = new DashboardCruiseList();
 			cruiseList.setUsername(username);
 		} catch ( Exception ex ) {
 			// Problems with the listing in the existing file
@@ -113,7 +113,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		if there was an error committing the updated file 
 	 * 		to version control
 	 */
-	public void saveCruiseListing(DashboardCruiseListing cruiseList, 
+	public void saveCruiseListing(DashboardCruiseList cruiseList, 
 			String message) throws IllegalArgumentException, SVNException {
 		String username = cruiseList.getUsername();
 		// Get the name of the cruise list XML file for this user

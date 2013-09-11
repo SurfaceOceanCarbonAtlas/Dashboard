@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
 import java.util.Date;
 import java.util.List;
@@ -14,7 +14,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -39,6 +38,15 @@ import com.google.gwt.view.client.ListDataProvider;
  * @author Karl Smith
  */
 public class DashboardCruiseListPage extends Composite {
+
+	// Replacement strings for empty or null values
+	protected static String noOwnerString = "(unknown)";
+	protected static String noExpocodeString = "(unknown)";
+	protected static String noUploadFilenameString = "(unknown)";
+	protected static String noDataCheckDateString = "(never checked)";
+	protected static String noMetaCheckDateString = "(never checked)";
+	protected static String noQCStatusString = "(not submitted)";
+	protected static String noArchiveStatusString = "(not archived)";
 
 	protected static String welcomeIntro = "Logged in as: ";
 	protected static String logoutText = "Logout";
@@ -107,7 +115,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	/**
 	 * Creates an empty cruise list page.  
-	 * Call {@link #updateCruises(DashboardCruiseListing)}
+	 * Call {@link #updateCruises(DashboardCruiseList)}
 	 * to update the cruises displayed on this page.
 	 */
 	DashboardCruiseListPage() {
@@ -138,21 +146,20 @@ public class DashboardCruiseListPage extends Composite {
 	}
 
 	/**
-	 * Updates the cruise list page with the username and cruises
-	 * given in the argument.
+	 * Updates the cruise list page with the current username and 
+	 * with the cruises given in the argument.
 	 * 
 	 * @param cruises
-	 * 		username and cruises to display
+	 * 		cruises to display
 	 */
-	void updateCruises(DashboardCruiseListing cruises) {
-		userInfoLabel.setText(welcomeIntro + 
-				SafeHtmlUtils.htmlEscape(DashboardPageFactory.getUsername()));
+	void updateCruises(DashboardCruiseList cruises) {
+		// Update the username
+		userInfoLabel.setText(welcomeIntro + DashboardPageFactory.getUsername());
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();
-		// Update the username
-		if ( (cruises != null) && (cruises.getCruises() != null) ) {
-			cruiseList.addAll(cruises.getCruises());
+		if ( cruises != null ) {
+			cruiseList.addAll(cruises.values());
 		}
 		uploadsGrid.setRowCount(cruiseList.size());
 	}
@@ -161,7 +168,7 @@ public class DashboardCruiseListPage extends Composite {
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogout logoutPage = 
 				DashboardPageFactory.getPage(DashboardLogout.class);
-		RootLayoutPanel.get().remove(this);
+		RootLayoutPanel.get().remove(DashboardCruiseListPage.this);
 		RootLayoutPanel.get().add(logoutPage);
 		logoutPage.doLogout();
 	}
@@ -194,7 +201,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("uploadButton")
 	void uploadCruiseOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(this);
+		RootLayoutPanel.get().remove(DashboardCruiseListPage.this);
 		DashboardCruiseUploadPage newCruisePage = 
 				DashboardPageFactory.getPage(DashboardCruiseUploadPage.class);
 		RootLayoutPanel.get().add(newCruisePage);
@@ -203,7 +210,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	/**
 	 * Creates the cruise data table columns.  The table will still need 
-	 * to be populated using {@link #updateCruises(DashboardCruiseListing)}.
+	 * to be populated using {@link #updateCruises(DashboardCruiseList)}.
 	 */
 	private void buildCruiseListTable() {
 		
@@ -292,7 +299,10 @@ public class DashboardCruiseListPage extends Composite {
 		selectedColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,Boolean>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, Boolean value) {
-				cruise.setSelected(value);
+				if ( value == null )
+					cruise.setSelected(false);
+				else
+					cruise.setSelected(value);
 			}
 		});
 		selectedColumn.setDataStoreName(columnNameSelected);
@@ -307,7 +317,10 @@ public class DashboardCruiseListPage extends Composite {
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				return cruise.getExpocode();
+				String expocode = cruise.getExpocode();
+				if ( expocode.isEmpty() )
+					expocode = noExpocodeString;
+				return expocode;
 			}
 		};
 		expocodeColumn.setDataStoreName(columnNameExpocode);
@@ -322,7 +335,10 @@ public class DashboardCruiseListPage extends Composite {
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				return cruise.getUploadFilename();
+				String uploadFilename = cruise.getUploadFilename();
+				if ( uploadFilename.isEmpty() )
+					uploadFilename = noUploadFilenameString;
+				return uploadFilename;
 			}
 		};
 		filenameColumn.setDataStoreName(columnNameFilename);
@@ -338,8 +354,13 @@ public class DashboardCruiseListPage extends Composite {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				Date checkDate = cruise.getDataCheckDate();
-				//TODO: create a date string in the desired format
-				String checkStr = checkDate.toString();
+				String checkStr;
+				if ( checkDate != null ) {
+					//TODO: create a date string in the desired format
+					checkStr = checkDate.toString();
+				}
+				else
+					checkStr = noDataCheckDateString;
 				return checkStr;
 			}
 		};
@@ -356,8 +377,13 @@ public class DashboardCruiseListPage extends Composite {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				Date checkDate = cruise.getMetaCheckDate();
-				//TODO: create a date string in the desired format
-				String checkStr = checkDate.toString();
+				String checkStr;
+				if ( checkDate != null ) {
+					//TODO: create a date string in the desired format
+					checkStr = checkDate.toString();
+				}
+				else
+					checkStr = noMetaCheckDateString;
 				return checkStr;
 			}
 		};
@@ -373,7 +399,10 @@ public class DashboardCruiseListPage extends Composite {
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				return cruise.getQCStatus();
+				String status = cruise.getQCStatus();
+				if ( status.isEmpty() )
+					status = noQCStatusString;
+				return status;
 			}
 		};
 		qcStatusColumn.setDataStoreName(columnNameSubmitted);
@@ -388,7 +417,10 @@ public class DashboardCruiseListPage extends Composite {
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				return cruise.getArchiveStatus();
+				String status = cruise.getArchiveStatus();
+				if ( status.isEmpty() )
+					status = noArchiveStatusString;
+				return status;
 			}
 		};
 		archiveStatusColumn.setDataStoreName(columnNameSubmitted);

@@ -25,6 +25,6 @@ public interface DashboardLoginService extends RemoteService {
 	 * 		the list of cruises, which could be empty, for a user; 
 	 * 		will have a null user if authentication fails
 	 */
-	DashboardCruiseListing authenticateUser(String username, String passhash);
+	DashboardCruiseList authenticateUser(String username, String passhash);
 
 }

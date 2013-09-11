@@ -93,7 +93,7 @@ public class DashboardLogout extends Composite {
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
 		DashboardPageFactory.clearAuthentication();
-		RootLayoutPanel.get().remove(this);
+		RootLayoutPanel.get().remove(DashboardLogout.this);
 		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
 		RootLayoutPanel.get().add(loginPage);
 		loginPage.clearLoginData();

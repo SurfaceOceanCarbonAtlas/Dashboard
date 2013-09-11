@@ -21,6 +21,6 @@ public interface DashboardLoginServiceAsync {
 	 * 		callback to make with response
 	 */
 	void authenticateUser(String username, String passhash, 
-			AsyncCallback<DashboardCruiseListing> callback);
+			AsyncCallback<DashboardCruiseList> callback);
 
 }

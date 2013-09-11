@@ -37,17 +37,22 @@ public class DashboardDataStore {
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
+	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
 			"This configuration file should look something like: \n" +
 			"# ------------------------------ \n" +
-			"EncryptionKey=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
-			"EncryptionSalt=SomeArbitraryStringOfCharacters \n" +
-			"SocatVersion=4 \n" +
-			"UserFilesDir=/Some/Directory/For/User/Data \n" +
-			"CruiseFilesDir=/Some/Directory/For/Cruise/Data \n" +
-			"HashFor_SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
-			"HashFor_AnotherUserName=AnotherVeryLongKeyOfHexidecimalValues \n" +
+			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
+			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
+			SOCAT_VERSION_NAME_TAG + "=SomeValue \n" +
+			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
+			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
+			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=Group1,Group2 \n" +
+			AUTHENTICATION_NAME_TAG_PREFIX + "SomeManagerName=AnotherVeryLongKeyOfHexidecimalValues \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=Manager1,Group2 \n" +
+			AUTHENTICATION_NAME_TAG_PREFIX + "SomeAdminName=YetAnotherVeryLongKeyOfHexidecimalValues \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
 			"# ------------------------------ \n" +
 			"The EncryptionKey should be 24 random integer values in [-128,127] \n" +
 			"The hashes for users can be added using the main method \n" +
@@ -58,7 +63,8 @@ public class DashboardDataStore {
 
 	private TripleDesCipher cipher;
 	private String encryptionSalt;
-	private HashMap<String,String> authenticationHashes;
+	// Map of username to user info
+	private HashMap<String,DashboardUserInfo> userInfoMap;
 	private String socatVersion;
 	private DashboardUserFileHandler userFileHandler;
 	private DashboardCruiseFileHandler cruiseFileHandler;
@@ -165,8 +171,8 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + 
 					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// Read and assign the authentication hashes 
-		authenticationHashes = new HashMap<String,String>();
+		// Read and assign the authorized users 
+		userInfoMap = new HashMap<String,DashboardUserInfo>();
 		for ( Entry<Object,Object> entry : configProps.entrySet() ) {
 			if ( ! ((entry.getKey() instanceof String) && 
 					(entry.getValue() instanceof String)) )
@@ -175,17 +181,39 @@ public class DashboardDataStore {
 			if ( ! username.startsWith(AUTHENTICATION_NAME_TAG_PREFIX) )
 				continue;
 			username = username.substring(AUTHENTICATION_NAME_TAG_PREFIX.length());
-			if ( username.length() < 4 )
-				throw new IOException("Username too short for " + username + 
-						" specified in " + configFile.getPath() + 
-						"\n" + CONFIG_FILE_INFO_MSG);
 			String hash = (String) entry.getValue();
-			if ( hash.length() < 32 )
-				throw new IOException("Hash too short for username " + username + 
+			DashboardUserInfo userInfo;
+			try {
+				userInfo = new DashboardUserInfo(username, hash);
+			} catch ( IllegalArgumentException ex ) {
+				throw new IOException(ex.getMessage() + " for " + username +
 						" specified in " + configFile.getPath() + 
 						"\n" + CONFIG_FILE_INFO_MSG);
-			// Note that the hash is the key and the user name is the value
-			authenticationHashes.put(username, hash);
+			}
+			userInfoMap.put(username, userInfo);
+		}
+		// Read and assign the authorized user roles 
+		for ( Entry<Object,Object> entry : configProps.entrySet() ) {
+			if ( ! ((entry.getKey() instanceof String) && 
+					(entry.getValue() instanceof String)) )
+				continue;
+			String username = (String) entry.getKey();
+			if ( ! username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
+				continue;
+			username = username.substring(USER_ROLE_NAME_TAG_PREFIX.length());
+			String rolesString = (String) entry.getValue();
+			DashboardUserInfo userInfo = userInfoMap.get(username);
+			if ( userInfo == null )
+				throw new IOException("Unknown user " + username + 
+						" assigned roles in " + configFile.getPath() +
+						"\n" + CONFIG_FILE_INFO_MSG);
+			try {
+				userInfo.addUserRoles(rolesString);
+			} catch ( IllegalArgumentException ex ) {
+				throw new IOException(ex.getMessage() + " for " + username +
+						" specified in " + configFile.getPath() + 
+						"\n" + CONFIG_FILE_INFO_MSG);
+			}
 		}
 	}
 
@@ -240,13 +268,35 @@ public class DashboardDataStore {
 			return false;
 		if ( (passhash == null) || passhash.isEmpty() )
 			return false;
+		DashboardUserInfo userInfo = userInfoMap.get(username);
+		if ( userInfo == null )
+			return false;
 		String computedHash = spicedHash(username, passhash);
 		if ( (computedHash == null) || computedHash.isEmpty() )
 			return false;
-		String expectedHash = authenticationHashes.get(username);
-		if ( (expectedHash == null) || expectedHash.isEmpty() )
+		return computedHash.equals(userInfo.getAuthorizationHash());
+	}
+
+
+	/**
+	 * Determines if username has manager privilege over othername. 
+	 * This can be from username being an administrator, a manager
+	 * of a group othername belongs to, or having the same username,
+	 * so long as username is an authorized user.
+	 * 
+	 * @param username
+	 * 		manager username to check
+	 * @param othername
+	 * 		group member username to check
+	 * @return
+	 * 		true if username is an authorized user and has manager
+	 * 		privileges over username
+	 */
+	boolean userManagesOver(String username, String othername) {
+		DashboardUserInfo userInfo = userInfoMap.get(username);
+		if ( userInfo == null )
 			return false;
-		return expectedHash.equals(computedHash);
+		return userInfo.managesOver(userInfoMap.get(othername));
 	}
 
 	/**

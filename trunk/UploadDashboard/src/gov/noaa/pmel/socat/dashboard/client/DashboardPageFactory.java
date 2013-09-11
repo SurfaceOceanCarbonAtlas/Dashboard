@@ -6,7 +6,6 @@ package gov.noaa.pmel.socat.dashboard.client;
 import java.util.HashMap;
 
 import com.google.gwt.user.client.ui.Composite;
-// used when debugging from Eclipse
 
 
 /**

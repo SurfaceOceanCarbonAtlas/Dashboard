@@ -41,6 +41,22 @@ public class DashboardCruiseTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getOwner()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setOwner(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetOwner() {
+		String myOwner = "SocatUser";
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals("", cruise.getOwner());
+		cruise.setOwner(myOwner);
+		assertEquals(myOwner, cruise.getOwner() );
+		assertFalse( cruise.isSelected() );
+		cruise.setOwner(null);
+		assertEquals("", cruise.getOwner());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getExpocode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setExpocode(java.lang.String)}.
 	 */
@@ -51,6 +67,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getExpocode());
 		cruise.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setExpocode(null);
 		assertEquals("", cruise.getExpocode());
@@ -68,6 +85,7 @@ public class DashboardCruiseTest {
 		cruise.setUploadFilename(myFilename);
 		assertEquals(myFilename, cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setUploadFilename(null);
 		assertEquals("", cruise.getUploadFilename());
@@ -86,6 +104,7 @@ public class DashboardCruiseTest {
 		assertEquals(myDate, cruise.getDataCheckDate());
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setDataCheckDate(null);
 		assertNull( cruise.getDataCheckDate() );
@@ -105,6 +124,7 @@ public class DashboardCruiseTest {
 		assertNull( cruise.getDataCheckDate() );
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setMetaCheckDate(null);
 		assertNull( cruise.getMetaCheckDate() );
@@ -125,6 +145,7 @@ public class DashboardCruiseTest {
 		assertNull( cruise.getDataCheckDate() );
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setQCStatus(null);
 		assertEquals("", cruise.getQCStatus());
@@ -146,6 +167,7 @@ public class DashboardCruiseTest {
 		assertNull( cruise.getDataCheckDate() );
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setArchiveStatus(null);
 		assertEquals("", cruise.getArchiveStatus());
@@ -157,10 +179,11 @@ public class DashboardCruiseTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
+		String myOwner = "SocatUser";
 		String myExpocode = "ABCD20050728";
 		String myFilename = "myUploadFilename.tsv";
-		Date myDataCheckDate = new Date(System.currentTimeMillis() - 1000000);
-		Date myMetaCheckDate = new Date(System.currentTimeMillis() - 2000000);
+		Date myDataCheckDate = new Date(System.currentTimeMillis() - 1234567L);
+		Date myMetaCheckDate = new Date(System.currentTimeMillis() - 2345678L);
 		String myQCStatus = "Submitted";
 		String myArchiveStatus = "Next SOCAT release";
 
@@ -175,6 +198,13 @@ public class DashboardCruiseTest {
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
 		secondCruise.setSelected(true);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setOwner(myOwner);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setOwner(myOwner);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
