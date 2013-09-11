@@ -28,12 +28,36 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 
 	private static final String CRUISE_FILE_NAME_EXTENSION = ".tsv";
 
-	private static final String USERNAME_ID = "username=";
-	private static final String FILENAME_ID = "filename=";
-	
-	private Pattern[] expocodePatterns;
-	private Pattern[] createdPatterns;
-	private Pattern invalidExpocodePattern;
+	private static final String DATA_OWNER_ID = "dataowner=";
+	private static final String UPLOAD_FILENAME_ID = "uploadfilename=";
+
+	/*
+	 * Only valid characters for an expocode are upper-case alphanumeric, 
+	 * underscore, and hyphen; the latter two are for the very rare case 
+	 * of valid duplicate expocodes. 
+	 */
+	private static final String validExpocodeCharacters = "A-Z0-9_-";
+	// Patterns for getting the expocode from the metadata header
+	private static final Pattern[] expocodePatterns = new Pattern[] {
+		Pattern.compile("\\s*Cruise\\s*Expocode\\s*:\\s*([" + 
+				validExpocodeCharacters + "]+)\\s*", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("\\s*Expocode\\s*:\\s*([" + 
+				validExpocodeCharacters + "]+)\\s*", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("\\s*Cruise\\s*Expocode\\s*=\\s*([" + 
+				validExpocodeCharacters + "]+)\\s*", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("\\s*Expocode\\s*=\\s*([" + 
+				validExpocodeCharacters + "]+)\\s*", Pattern.CASE_INSENSITIVE)
+	};
+	// Patterns for file creation date in the metadata header
+	private static final Pattern[] createdPatterns = new Pattern[] {
+		Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+dashboard\\s+" +
+				"cruise\\s+file\\s+created", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+" +
+				"cruise\\s+file\\s+created", Pattern.CASE_INSENSITIVE)
+	};
+	// Pattern for checking for invalid characters in the expocode
+	private static final Pattern invalidExpocodePattern = 
+			Pattern.compile("[^" + validExpocodeCharacters + "]");
 
 	/**
 	 * Handles storage and retrieval of cruise data in files 
@@ -48,23 +72,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 */
 	DashboardCruiseFileHandler(String cruiseFilesDirName) throws SVNException {
 		super(cruiseFilesDirName);
-		expocodePatterns = new Pattern[] {
-				Pattern.compile("\\s*Cruise\\s*Expocode\\s*:\\s*([A-Z0-9]+)\\s*", 
-						Pattern.CASE_INSENSITIVE),
-				Pattern.compile("\\s*Expocode\\s*:\\s*([A-Z0-9]+)\\s*", 
-						Pattern.CASE_INSENSITIVE),
-				Pattern.compile("\\s*Cruise\\s*Expocode\\s*=\\s*([A-Z0-9]+)\\s*", 
-						Pattern.CASE_INSENSITIVE),
-				Pattern.compile("\\s*Expocode\\s*=\\s*([A-Z0-9]+)\\s*", 
-						Pattern.CASE_INSENSITIVE)
-		};
-		createdPatterns = new Pattern[] {
-				Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+dashboard\\s+cruise\\s+file\\s+created",
-						Pattern.CASE_INSENSITIVE),
-				Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+cruise\\s+file\\s+created",
-						Pattern.CASE_INSENSITIVE)
-		};
-		invalidExpocodePattern= Pattern.compile("[^A-Z0-9_-]");
 	}
 
 	/**
@@ -141,25 +148,25 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * value strings matching "null" or "NaN" (case insensitive), 
 	 * are set the null to indicate a missing value.
 	 * 
-	 * @param username
-	 * 		username to associate with this data
+	 * @param owner
+	 * 		owner of this data
 	 * @param filename
-	 * 		filename to asscicate with this data
+	 * 		upload filename for this data
 	 * @param cruiseReader
 	 * 		read data from here
 	 * @return
-	 * 		DashboardCruiseData instance; never null but may not be
-	 * 		complete
+	 * 		DashboardCruiseData instance; 
+	 * 		never null but may not be complete
 	 * @throws IOException
 	 * 		if reading from cruiseReader throws one,
 	 * 		if there is a blank data column header,
 	 * 		or if there is an inconsistent number tab-separated values
 	 */
-	public DashboardCruiseData getCruiseDataFromInput(String username, 
+	public DashboardCruiseData getCruiseDataFromInput(String owner, 
 			String filename, BufferedReader cruiseReader) throws IOException {
 		DashboardCruiseData cruiseData = new DashboardCruiseData();
-		cruiseData.setUsername(username);
-		cruiseData.setFilename(filename);
+		cruiseData.setOwner(owner);
+		cruiseData.setUploadFilename(filename);
 
 		boolean creationDateFound = false;
 		boolean expocodeFound = false;
@@ -358,14 +365,14 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			try {
 				// Get the username for this cruise
 				String dataline = cruiseReader.readLine();
-				if ( ! dataline.startsWith(USERNAME_ID) )
-					throw new IOException("first line does not start with " + USERNAME_ID);
-				String username = dataline.substring(USERNAME_ID.length()).trim();
+				if ( ! dataline.startsWith(DATA_OWNER_ID) )
+					throw new IOException("first line does not start with " + DATA_OWNER_ID);
+				String username = dataline.substring(DATA_OWNER_ID.length()).trim();
 				// Get the filename for this cruise
 				dataline = cruiseReader.readLine();
-				if ( ! dataline.startsWith(FILENAME_ID) )
-					throw new IOException("second line does not start with " + FILENAME_ID);
-				String filename = dataline.substring(FILENAME_ID.length()).trim();
+				if ( ! dataline.startsWith(UPLOAD_FILENAME_ID) )
+					throw new IOException("second line does not start with " + UPLOAD_FILENAME_ID);
+				String filename = dataline.substring(UPLOAD_FILENAME_ID.length()).trim();
 				// Create the cruise
 				cruiseData = getCruiseDataFromInput(username, filename, cruiseReader);
 				if ( ! expocode.equals(cruiseData.getExpocode()) )
@@ -413,8 +420,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		try {
 			PrintWriter writer = new PrintWriter(cruiseFile);
 			try {
-				writer.println(USERNAME_ID + cruiseData.getUsername());
-				writer.println(FILENAME_ID + cruiseData.getFilename());
+				writer.println(DATA_OWNER_ID + cruiseData.getOwner());
+				writer.println(UPLOAD_FILENAME_ID + cruiseData.getUploadFilename());
 				// Print the standard creation date and expocode headers
 				writer.println("SOCAT version " + 
 						DashboardDataStore.get().getSocatVersion() + 

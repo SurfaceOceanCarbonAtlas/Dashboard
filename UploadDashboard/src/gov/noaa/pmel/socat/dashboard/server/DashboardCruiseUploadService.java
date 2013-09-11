@@ -3,7 +3,9 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -212,27 +214,42 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		String tag;
 		String message;
 		if ( cruiseFileExists ) {
+			DashboardCruiseData existingCruiseData = null;
+			String owner = "";
+			try {
+				existingCruiseData = 
+						cruiseHandler.getCruiseDataFromFile(expocode);
+				owner = existingCruiseData.getOwner();
+			} catch ( Exception ex ) {
+				// deal with whatever was read
+				;
+			}
+			boolean problem = false;
 			// If the cruise file exists, make sure the request was for an overwrite
-			if ( ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) {
+			if ( ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) )
+				problem = true;
+			else if ( ! ( owner.isEmpty() || owner.equals(username) ) ) {
+				// verify username has permission to overwrite owner's cruise
+				if ( dataStore.userManagesOver(username, owner) ) {
+					// Preserve the original owner of the data
+					cruiseData.setOwner(owner);
+				}
+				else
+					problem = true;				
+			}
+			if ( problem ) {
 				// Respond with an error message containing partial file contents 
 				// of the existing file
-				DashboardCruiseData existingCruiseData = null;
-				try {
-					existingCruiseData = 
-							cruiseHandler.getCruiseDataFromFile(expocode);
-				} catch ( Exception ex ) {
-					// report whatever was read
-					;
-				}
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter respWriter = response.getWriter();
 				respWriter.println(DashboardUtils.FILE_EXISTS_HEADER_TAG);
 				respWriter.println("----------------------------------------");
 				respWriter.println("(Partial) Contents of existing cruise file:");
-				respWriter.println("Uploaded by: " + existingCruiseData.getUsername());
-				if ( username.equals(existingCruiseData.getUsername()) )
-					respWriter.println("Name of uploaded file: " + existingCruiseData.getFilename());
+				respWriter.println("Owned by: " + owner);
+				if ( username.equals(owner) )
+					respWriter.println("Name of uploaded file: " + 
+							existingCruiseData.getUploadFilename());
 				respWriter.println("----------------------------------------");
 				if ( existingCruiseData != null ) {
 					for ( String dataline : 
@@ -244,9 +261,8 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			}
 			tag = DashboardUtils.FILE_UPDATED_HEADER_TAG;
 			message = "Cruise data for " + expocode + 
-					  " updated by " + cruiseData.getUsername() +
-					  " from uploaded file " + cruiseData.getFilename();
-
+					  " updated by " + cruiseData.getOwner() +
+					  " from uploaded file " + filename;
 		}
 		else {
 			// If the cruise file does not exist, make sure the request was for a new file
@@ -269,10 +285,11 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			}
 			tag = DashboardUtils.FILE_CREATED_HEADER_TAG;
 			message = "Cruise data for " + expocode + 
-					  " created by " + cruiseData.getUsername() +
-					  " from uploaded file " + cruiseData.getFilename();
+					  " created by " + username +
+					  " from uploaded file " + filename;
 		}
 
+		// Save the cruise file and commit it to version control
 		try {
 			cruiseHandler.saveCruiseDataToFile(cruiseData, message);
 		} catch (IllegalArgumentException | SVNException ex) {
@@ -280,6 +297,26 @@ public class DashboardCruiseUploadService extends HttpServlet {
 					"Error processing the request: " + ex.getMessage());
 		}
 
+		// Update the list of cruises for the user
+		try {
+			DashboardUserFileHandler userHandler = dataStore.getUserFileHandler();
+			// Get the list of cruises for the user
+			DashboardCruiseList cruiseList = userHandler.getCruiseListing(username);
+			// Create a cruise entry for this data
+			DashboardCruise cruise = new DashboardCruise();
+			cruise.setOwner(cruiseData.getOwner());
+			cruise.setExpocode(expocode);
+			cruise.setUploadFilename(filename);
+			// Add or replace this cruise in the cruise list
+			cruiseList.put(expocode, cruise);
+			// Save the updated cruise listing
+			userHandler.saveCruiseListing(cruiseList, message);
+		} catch (IllegalArgumentException | SVNException ex) {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+					"Error processing the request: " + ex.getMessage());
+		}
+
+		// Send the success response
 		response.setStatus(HttpServletResponse.SC_CREATED);
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();

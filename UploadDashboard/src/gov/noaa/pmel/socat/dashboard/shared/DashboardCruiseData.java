@@ -14,10 +14,10 @@ import java.util.List;
  */
 public class DashboardCruiseData implements Serializable {
 
-	private static final long serialVersionUID = 6974324789113457449L;
+	private static final long serialVersionUID = 8916342409876124367L;
 
-	String username;
-	String filename;
+	String owner;
+	String uploadFilename;
 	String version;
 	String expocode;
 	ArrayList<String> preamble;
@@ -28,8 +28,8 @@ public class DashboardCruiseData implements Serializable {
 	 * Creates with no cruise data
 	 */
 	public DashboardCruiseData() {
-		username = "";
-		filename = "";
+		owner = "";
+		uploadFilename = "";
 		version = "";
 		expocode = "";
 		preamble = new ArrayList<String>();
@@ -38,46 +38,48 @@ public class DashboardCruiseData implements Serializable {
 	}
 
 	/**
-	 * @return the username; may be empty, but never null
+	 * @return 
+	 * 		the owner; never null
 	 */
-	public String getUsername() {
-		return username;
+	public String getOwner() {
+		return owner;
 	}
 
 	/**
-	 * @param username 
-	 * 		the username to set; 
-	 * 		if null, an empty string is assigned
+	 * @param owner 
+	 * 		the cruise data owner (after trimming) to set; 
+	 * 		if null, sets to an empty string
 	 */
-	public void setUsername(String username) {
-		if ( username == null )
-			this.username = "";
+	public void setOwner(String owner) {
+		if ( owner == null )
+			this.owner = "";
 		else
-			this.username = username;
-	}
-
-	/**
-	 * @return the filename; may be empty, but never null
-	 */
-	public String getFilename() {
-		return filename;
-	}
-
-	/**
-	 * @param filename 
-	 * 		the filename to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setFilename(String filename) {
-		if ( filename == null )
-			this.filename = "";
-		else
-			this.filename = filename;
+			this.owner = owner.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the cruise version; may be empty, but never null
+	 * 		the uploaded data filename; never null
+	 */
+	public String getUploadFilename() {
+		return uploadFilename;
+	}
+
+	/**
+	 * @param uploadFilename 
+	 * 		the uploaded data filename (after trimming) to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setUploadFilename(String uploadFilename) {
+		if ( uploadFilename == null )
+			this.uploadFilename = "";
+		else
+			this.uploadFilename = uploadFilename.trim();
+	}
+
+	/**
+	 * @return 
+	 * 		the cruise version; never null
 	 */
 	public String getVersion() {
 		return version;
@@ -85,19 +87,19 @@ public class DashboardCruiseData implements Serializable {
 
 	/**
 	 * @param version 
-	 * 		the cruise version to set;
-	 * 		if null, an empty string is assigned
+	 * 		the cruise version (after trimming) to set;
+	 * 		if null, sets to an empty string
 	 */
 	public void setVersion(String version) {
 		if ( version == null )
 			this.version = "";
 		else
-			this.version = version;
+			this.version = version.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; may be empty, but never null
+	 * 		the cruise expocode; never null
 	 */
 	public String getExpocode() {
 		return expocode;
@@ -105,15 +107,15 @@ public class DashboardCruiseData implements Serializable {
 
 	/**
 	 * @param expocode 
-	 * 		the cruise expocode to set, after
-	 * 		converting to upper-case;
-	 * 		if null, an empty string is assigned
+	 * 		the cruise expocode (after trimming and 
+	 * 		converting to upper-case) to set;
+	 * 		if null, sets to an empty string
 	 */
 	public void setExpocode(String expocode) {
 		if ( expocode == null )
 			this.expocode = "";
 		else
-			this.expocode = expocode.toUpperCase();
+			this.expocode = expocode.trim().toUpperCase();
 	}
 
 	/**
@@ -183,8 +185,8 @@ public class DashboardCruiseData implements Serializable {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = username.hashCode();
-		result = result * prime + filename.hashCode();
+		int result = owner.hashCode();
+		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + version.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + preamble.hashCode();
@@ -204,9 +206,9 @@ public class DashboardCruiseData implements Serializable {
 			return false;
 		DashboardCruiseData other = (DashboardCruiseData) obj;
 
-		if ( ! username.equals(other.username) ) 
+		if ( ! owner.equals(other.owner) ) 
 			return false;
-		if ( ! filename.equals(other.filename) ) 
+		if ( ! uploadFilename.equals(other.uploadFilename) ) 
 			return false;
 		if ( ! version.equals(other.version) ) 
 			return false;

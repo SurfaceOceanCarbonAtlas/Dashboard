@@ -141,7 +141,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogout logoutPage = 
 				DashboardPageFactory.getPage(DashboardLogout.class);
-		RootLayoutPanel.get().remove(this);
+		RootLayoutPanel.get().remove(DashboardCruiseUploadPage.this);
 		RootLayoutPanel.get().add(logoutPage);
 		logoutPage.doLogout();
 	}
@@ -166,11 +166,11 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(this);
+		RootLayoutPanel.get().remove(DashboardCruiseUploadPage.this);
 		DashboardCruiseListPage page = 
 				DashboardPageFactory.getPage(DashboardCruiseListPage.class);
 		RootLayoutPanel.get().add(page);
-		// Current content should be correct; no need to update
+		// Current contents should still be valid
 	}
 
 	@UiHandler("uploadForm")
@@ -203,22 +203,28 @@ public class DashboardCruiseUploadPage extends Composite {
 				Window.alert(noExpocodeFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_EXISTS_HEADER_TAG.equals(tagMsg[0]) ) {
-				// cruise file exists and not overwrite; show existing file partial contents in the preview
+				// cruise file exists and not overwrite; 
+				// show existing file partial contents in the preview
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
 				Window.alert(fileExistsFailureMsg);
 			}
 			else if ( DashboardUtils.NO_FILE_HEADER_TAG.equals(tagMsg[0]) ) {
-				// cruise file does not exist and overwrite; show partial file contents in preview
+				// cruise file does not exist and overwrite; 
+				// show partial file contents in preview
 				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
 				Window.alert(fileDoesNotExistFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file created
 				Window.alert(tagMsg[1]);
+				// return to the updated cruise list
+				DashboardLogin.showCruiseListPage(DashboardCruiseUploadPage.this);
 			}
 			else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file updated
 				Window.alert(tagMsg[1]);
+				// return to the updated cruise list
+				DashboardLogin.showCruiseListPage(DashboardCruiseUploadPage.this);
 			}
 			else {
 				// Unknown response with a newline, display the whole message in the preview

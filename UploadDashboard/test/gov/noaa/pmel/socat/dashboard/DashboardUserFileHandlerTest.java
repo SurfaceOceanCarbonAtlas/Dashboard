@@ -8,10 +8,9 @@ import static org.junit.Assert.assertNotNull;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardUserFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListing;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
@@ -75,8 +74,8 @@ public class DashboardUserFileHandlerTest {
 				"PANGAEA, doi unknown",
 				"Not Archived"
 		};
-		ArrayList<DashboardCruise> cruises = 
-				new ArrayList<DashboardCruise>(cruiseExpocodes.length);
+		DashboardCruiseList cruiseList = new DashboardCruiseList();
+		cruiseList.setUsername(username);
 		for (int k = 0; k < cruiseExpocodes.length; k++) {
 			DashboardCruise newCruise = new DashboardCruise();
 			newCruise.setSelected(false);
@@ -86,20 +85,17 @@ public class DashboardUserFileHandlerTest {
 			newCruise.setMetaCheckDate(metaCheckDates[k]);
 			newCruise.setQCStatus(qcStatuses[k]);
 			newCruise.setArchiveStatus(archiveStatuses[k]);
-			cruises.add(newCruise);
+			cruiseList.put(newCruise.getExpocode(), newCruise);
 		}
-		DashboardCruiseListing cruiseListing = new DashboardCruiseListing();
-		cruiseListing.setUsername(username);
-		cruiseListing.setCruises(cruises);
 
 		DashboardUserFileHandler handler = 
 				DashboardDataStore.get().getUserFileHandler();
 		assertNotNull( handler );
 
-		handler.saveCruiseListing(cruiseListing, "test check-in of fake cruise listing data");
+		handler.saveCruiseListing(cruiseList, "test check-in of fake cruise listing data");
 
-		DashboardCruiseListing newListing = handler.getCruiseListing(username);
-		assertEquals(cruiseListing, newListing);
+		DashboardCruiseList newListing = handler.getCruiseListing(username);
+		assertEquals(cruiseList, newListing);
 	}
 
 }

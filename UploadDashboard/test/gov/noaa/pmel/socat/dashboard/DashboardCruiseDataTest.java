@@ -29,34 +29,34 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getUsername()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setUsername(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getOwner()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setOwner(java.lang.String)}.
 	 */
 	@Test
-	public void testSetGetUsername() {
+	public void testSetGetOwner() {
 		String myUsername = "SocatUser";
 		DashboardCruiseData cruiseData = new DashboardCruiseData();
-		assertEquals("", cruiseData.getUsername());
-		cruiseData.setUsername(myUsername);
-		assertEquals(myUsername, cruiseData.getUsername());
-		cruiseData.setUsername(null);
-		assertEquals("", cruiseData.getUsername());
+		assertEquals("", cruiseData.getOwner());
+		cruiseData.setOwner(myUsername);
+		assertEquals(myUsername, cruiseData.getOwner());
+		cruiseData.setOwner(null);
+		assertEquals("", cruiseData.getOwner());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getUploadFilename()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setUploadFilename(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetFilename() {
 		String myFilename = "agsk20031205_revised.tsv";
 		DashboardCruiseData cruiseData = new DashboardCruiseData();
-		assertEquals("", cruiseData.getFilename());
-		cruiseData.setFilename(myFilename);
-		assertEquals(myFilename, cruiseData.getFilename());
-		assertEquals("", cruiseData.getUsername());
-		cruiseData.setFilename(null);
-		assertEquals("", cruiseData.getFilename());
+		assertEquals("", cruiseData.getUploadFilename());
+		cruiseData.setUploadFilename(myFilename);
+		assertEquals(myFilename, cruiseData.getUploadFilename());
+		assertEquals("", cruiseData.getOwner());
+		cruiseData.setUploadFilename(null);
+		assertEquals("", cruiseData.getUploadFilename());
 	}
 
 	/**
@@ -70,8 +70,8 @@ public class DashboardCruiseDataTest {
 		assertEquals("", cruiseData.getVersion());
 		cruiseData.setVersion(myVersion);
 		assertEquals(myVersion, cruiseData.getVersion());
-		assertEquals("", cruiseData.getFilename());
-		assertEquals("", cruiseData.getUsername());
+		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals("", cruiseData.getOwner());
 		cruiseData.setVersion(null);
 		assertEquals("", cruiseData.getVersion());
 	}
@@ -88,8 +88,8 @@ public class DashboardCruiseDataTest {
 		cruiseData.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruiseData.getExpocode());
 		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getFilename());
-		assertEquals("", cruiseData.getUsername());
+		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals("", cruiseData.getOwner());
 		cruiseData.setExpocode(null);
 		assertEquals("", cruiseData.getExpocode());
 	}
@@ -113,8 +113,8 @@ public class DashboardCruiseDataTest {
 		assertEquals(myPreamble, cruiseData.getPreamble());
 		assertEquals("", cruiseData.getExpocode());
 		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getFilename());
-		assertEquals("", cruiseData.getUsername());
+		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals("", cruiseData.getOwner());
 		cruiseData.setPreamble(null);
 		assertEquals(0, cruiseData.getPreamble().size());
 	}
@@ -138,8 +138,8 @@ public class DashboardCruiseDataTest {
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
 		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getFilename());
-		assertEquals("", cruiseData.getUsername());
+		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals("", cruiseData.getOwner());
 		cruiseData.setColumnNames(null);
 		assertEquals(0, cruiseData.getColumnNames().size());		
 	}
@@ -174,8 +174,8 @@ public class DashboardCruiseDataTest {
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
 		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getFilename());
-		assertEquals("", cruiseData.getUsername());
+		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals("", cruiseData.getOwner());
 		cruiseData.setDataValues(null);
 		assertEquals(0, cruiseData.getDataValues().size());
 	}
@@ -186,7 +186,7 @@ public class DashboardCruiseDataTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		String myUsername = "SocatUser";
+		String myOwner = "SocatUser";
 		String myFilename = "agsk20031205_revised.tsv";
 		String myVersion = "SOCAT version 3 cruise file created: 2013-09-05";
 		String myExpocode = "AGSK20031205";
@@ -227,17 +227,17 @@ public class DashboardCruiseDataTest {
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 
-		firstData.setUsername(myUsername);
+		firstData.setOwner(myOwner);
 		assertTrue( firstData.hashCode() != secondData.hashCode() );
 		assertFalse( firstData.equals(secondData) );
-		secondData.setUsername(myUsername);
+		secondData.setOwner(myOwner);
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 
-		firstData.setFilename(myFilename);
+		firstData.setUploadFilename(myFilename);
 		assertTrue( firstData.hashCode() != secondData.hashCode() );
 		assertFalse( firstData.equals(secondData) );
-		secondData.setFilename(myFilename);
+		secondData.setUploadFilename(myFilename);
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 

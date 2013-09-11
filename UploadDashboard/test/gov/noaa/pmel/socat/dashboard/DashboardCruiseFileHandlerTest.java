@@ -237,8 +237,8 @@ public class DashboardCruiseFileHandlerTest {
 		DashboardCruiseData fileData = handler.getCruiseDataFromFile(expocode);
 
 		// Check for differences - version string will differ
-		assertEquals(username, fileData.getUsername());
-		assertEquals(filename, fileData.getFilename());
+		assertEquals(username, fileData.getOwner());
+		assertEquals(filename, fileData.getUploadFilename());
 		assertEquals(expocode, fileData.getExpocode());
 
 		preamble = fileData.getPreamble();

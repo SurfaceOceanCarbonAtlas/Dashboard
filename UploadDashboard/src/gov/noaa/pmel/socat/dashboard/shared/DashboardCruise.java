@@ -14,9 +14,10 @@ import java.util.Date;
  */
 public class DashboardCruise implements Serializable {
 
-	private static final long serialVersionUID = -7637218782338765114L;
+	private static final long serialVersionUID = 1655717551218368707L;
 
 	boolean selected;
+	String owner;
 	String expocode;
 	String uploadFilename;
 	Date dataCheckDate;
@@ -26,6 +27,7 @@ public class DashboardCruise implements Serializable {
 
 	public DashboardCruise() {
 		selected = false;
+		owner = "";
 		expocode = "";
 		uploadFilename = "";
 		dataCheckDate = null;
@@ -52,42 +54,63 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * @return 
-	 * 		the cruise expocode;
-	 * 		may be empty, but never null
+	 * 		the owner for this cruise; never null
 	 */
-	public String getExpocode() {
-		return this.expocode;
+	public String getOwner() {
+		return owner;
 	}
 
 	/**
-	 * @param cruiseExpocode 
-	 * 		the cruise expocode to set
+	 * @param owner 
+	 * 		the cruise owner (after trimming) to set;
+	 * 		if null, sets to an empty string
 	 */
-	public void setExpocode(String expocode) {
-		if ( expocode != null )
-			this.expocode = expocode;
+	public void setOwner(String owner) {
+		if ( owner == null )
+			this.owner = "";
 		else
-			this.expocode = "";
+			this.owner = owner.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the uploaded data filename;
-	 * 		may be empty, but never null
+	 * 		the cruise expocode; never null
+	 */
+	public String getExpocode() {
+		return expocode;
+	}
+
+	/**
+	 * @param cruiseExpocode 
+	 * 		the cruise expocode to set (after trimming 
+	 * 		and converting to upper-case) to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setExpocode(String expocode) {
+		if ( expocode == null )
+			this.expocode = "";
+		else
+			this.expocode = expocode.trim().toUpperCase();
+	}
+
+	/**
+	 * @return 
+	 * 		the uploaded data filename; never null
 	 */
 	public String getUploadFilename() {
-		return this.uploadFilename;
+		return uploadFilename;
 	}
 
 	/**
 	 * @param uploadFilename 
-	 * 		the uploaded data filename to set
+	 * 		the uploaded data filename (after trimming) to set;
+	 * 		if null, sets to an empty string
 	 */
 	public void setUploadFilename(String uploadFilename) {
-		if ( uploadFilename != null )
-			this.uploadFilename = uploadFilename;
-		else
+		if ( uploadFilename == null )
 			this.uploadFilename = "";
+		else
+			this.uploadFilename = uploadFilename.trim();
 	}
 
 	/**
@@ -95,7 +118,7 @@ public class DashboardCruise implements Serializable {
 	 * 		the data check date; may be null
 	 */
 	public Date getDataCheckDate() {
-		return this.dataCheckDate;
+		return dataCheckDate;
 	}
 
 	/**
@@ -111,7 +134,7 @@ public class DashboardCruise implements Serializable {
 	 * 		the metadata check date; may be null
 	 */
 	public Date getMetaCheckDate() {
-		return this.metaCheckDate;
+		return metaCheckDate;
 	}
 
 	/**
@@ -124,48 +147,49 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * @return 
-	 * 		the QC submission status;
-	 * 		may be empty, but never null
+	 * 		the QC submission status; never null
 	 */
 	public String getQCStatus() {
-		return this.qcStatus;
+		return qcStatus;
 	}
 
 	/**
 	 * @param qcStatus 
-	 * 		the  QC submission status to set
+	 * 		the  QC submission status (after trimming) to set;
+	 * 		if null, sets to an empty string
 	 */
 	public void setQCStatus(String qcStatus) {
-		if ( qcStatus != null )
-			this.qcStatus = qcStatus;
-		else
+		if ( qcStatus == null )
 			this.qcStatus = "";
+		else
+			this.qcStatus = qcStatus.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the archive submission status;
-	 * 		may be empty, but never null
+	 * 		the archive submission status; never null
 	 */
 	public String getArchiveStatus() {
-		return this.archiveStatus;
+		return archiveStatus;
 	}
 
 	/**
 	 * @param submitStatus 
-	 * 		the archive submission status to set
+	 * 		the archive submission status (after trimming) to set;
+	 * 		if null, sets to an empty string
 	 */
 	public void setArchiveStatus(String archiveStatus) {
-		if ( archiveStatus != null )
-			this.archiveStatus = archiveStatus;
-		else
+		if ( archiveStatus == null )
 			this.archiveStatus = "";
+		else
+			this.archiveStatus = archiveStatus.trim();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = Boolean.valueOf(selected).hashCode();
+		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result *= prime;
@@ -191,6 +215,9 @@ public class DashboardCruise implements Serializable {
 		DashboardCruise other = (DashboardCruise) obj;
 
 		if ( selected != other.selected )
+			return false;
+
+		if ( ! owner.equals(other.owner) )
 			return false;
 
 		if ( ! expocode.equals(other.expocode) )
@@ -221,6 +248,20 @@ public class DashboardCruise implements Serializable {
 
 		return true;
 	}
+
+	public static Comparator<DashboardCruise> ownerComparator =
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getOwner().compareTo(c2.getOwner());
+		}
+	};
 
 	public static Comparator<DashboardCruise> selectedComparator =
 			new Comparator<DashboardCruise>() {
@@ -284,15 +325,15 @@ public class DashboardCruise implements Serializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			Date c1date = c1.getDataCheckDate();
-			Date c2date = c2.getDataCheckDate();
-			if ( c1date == c2date )
+			Date d1 = c1.getDataCheckDate();
+			Date d2 = c2.getDataCheckDate();
+			if ( d1 == d2 )
 				return 0;
-			if ( c1date == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2date == null )
+			if ( d2 == null )
 				return 1;
-			return c1date.compareTo(c2date);
+			return d1.compareTo(d2);
 		}
 	};
 
@@ -309,15 +350,15 @@ public class DashboardCruise implements Serializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			Date c1date = c1.getMetaCheckDate();
-			Date c2date = c2.getMetaCheckDate();
-			if ( c1date == c2date )
+			Date d1 = c1.getMetaCheckDate();
+			Date d2 = c2.getMetaCheckDate();
+			if ( d1 == d2 )
 				return 0;
-			if ( c1date == null )
+			if ( d1 == null )
 				return -1;
-			if ( c2date == null )
+			if ( d2 == null )
 				return 1;
-			return c1date.compareTo(c2date);
+			return d1.compareTo(d2);
 		}
 	};
 
