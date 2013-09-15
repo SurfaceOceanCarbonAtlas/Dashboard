@@ -6,12 +6,12 @@
 
 	<!-- Servlets -->
 	<servlet>
-		<servlet-name>dashboardLoginServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardLoginServiceImpl</servlet-class>
+		<servlet-name>dashboardCruiseListServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardCruiseListServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>dashboardLoginServlet</servlet-name>
-		<url-pattern>/socatuploaddashboard/loginService</url-pattern>
+		<servlet-name>dashboardCruiseListServlet</servlet-name>
+		<url-pattern>/socatuploaddashboard/cruiseListService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

@@ -263,7 +263,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		true if successful
 	 */
-	boolean validateUser(String username, String passhash) {
+	public boolean validateUser(String username, String passhash) {
 		if ( (username == null) || username.isEmpty() )
 			return false;
 		if ( (passhash == null) || passhash.isEmpty() )
@@ -292,7 +292,7 @@ public class DashboardDataStore {
 	 * 		true if username is an authorized user and has manager
 	 * 		privileges over username
 	 */
-	boolean userManagesOver(String username, String othername) {
+	public boolean userManagesOver(String username, String othername) {
 		DashboardUserInfo userInfo = userInfoMap.get(username);
 		if ( userInfo == null )
 			return false;

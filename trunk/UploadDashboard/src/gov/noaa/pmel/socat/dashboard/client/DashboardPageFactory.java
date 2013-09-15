@@ -26,11 +26,14 @@ public class DashboardPageFactory {
 	 * Use the static method {@link #getPage(Class)} to obtain desired page.
 	 */
 	private DashboardPageFactory() {
+		username = "";
+		passhash = "";
 	}
 
 	/**
 	 * @return 
-	 * 		the previously set username to use when communicating with the server
+	 * 		username to use when communicating with the server;
+	 * 		never null, but may be empty
 	 */
 	static String getUsername() {
 		return username;
@@ -38,15 +41,20 @@ public class DashboardPageFactory {
 
 	/**
 	 * @param token 
-	 * 		the username to use when communicating with the server
+	 * 		username to use when communicating with the server;
+	 * 		if null, an empty string is assigned
 	 */
 	static void setUsername(String username) {
-		DashboardPageFactory.username = username;
+		if ( username == null )
+			DashboardPageFactory.username = "";
+		else
+			DashboardPageFactory.username = username.trim();
 	}
 
 	/**
 	 * @return
-	 * 		the previously set password hash to use when communication with the server
+	 * 		password hash to use when communication with the server;
+	 * 		never null, but may be empty
 	 */
 	static String getPasshash() {
 		return passhash;
@@ -54,18 +62,22 @@ public class DashboardPageFactory {
 
 	/**
 	 * @param passhash
-	 * 		The password hash to use when communicating with the server
+	 * 		password hash to use when communicating with the server;
+	 * 		if null, an empty string is assigned
 	 */
 	static void setPasshash(String passhash) {
-		DashboardPageFactory.passhash = passhash;
+		if ( passhash == null )
+			DashboardPageFactory.passhash = "";
+		else
+			DashboardPageFactory.passhash = passhash.trim();
 	}
 
 	/**
 	 * Remove all authentication tokens held in this class
 	 */
 	static void clearAuthentication() {
-		username = null;
-		passhash = null;
+		username = "";
+		passhash = "";
 	}
 
 	/**

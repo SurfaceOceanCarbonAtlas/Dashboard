@@ -78,6 +78,8 @@ public class DashboardCruiseUploadPage extends Composite {
 	protected static String fileDoesNotExistFailureMsg = 
 			"A cruise with this expocode does not exist.  Use the " + createText + 
 			" button to create a new cruise after verifying the expocode for this cruise.";
+	protected static String listUpdateFailedMsg =
+			"Updating of the cruise list failed for some unexpected reason";
 
 	interface DashboardNewCruisePageUiBinder extends
 			UiBinder<Widget, DashboardCruiseUploadPage> {
@@ -132,8 +134,9 @@ public class DashboardCruiseUploadPage extends Composite {
 	void updatePageContents() {
 		userInfoLabel.setText(welcomeIntro + 
 				SafeHtmlUtils.htmlEscape(DashboardPageFactory.getUsername()));
-		usernameToken.setValue(DashboardPageFactory.getUsername());
-		passhashToken.setValue(DashboardPageFactory.getPasshash());
+		usernameToken.setValue("");
+		passhashToken.setValue("");
+		actionToken.setValue("");
 		previewHtml.setHTML(noPreviewMsg);
 	}
 
@@ -148,18 +151,24 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("previewButton") 
 	void previewButtonOnClick(ClickEvent event) {
+		usernameToken.setValue(DashboardPageFactory.getUsername());
+		passhashToken.setValue(DashboardPageFactory.getPasshash());
 		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
 		uploadForm.submit();
 	}
 
 	@UiHandler("createButton") 
 	void createButtonOnClick(ClickEvent event) {
+		usernameToken.setValue(DashboardPageFactory.getUsername());
+		passhashToken.setValue(DashboardPageFactory.getPasshash());
 		actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
 		uploadForm.submit();
 	}
 
 	@UiHandler("overwriteButton") 
 	void overwriteButtonOnClick(ClickEvent event) {
+		usernameToken.setValue(DashboardPageFactory.getUsername());
+		passhashToken.setValue(DashboardPageFactory.getPasshash());
 		actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
 		uploadForm.submit();
 	}
@@ -185,50 +194,85 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
+		usernameToken.setValue("");
+		passhashToken.setValue("");
+		actionToken.setValue("");
 		String resultMsg = event.getResults();
 		if ( resultMsg != null ) {
 			String[] tagMsg = resultMsg.split("\n", 2);
 			if ( tagMsg.length < 2 ) {
 				// probably an error response; display the message in the preview
-				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+				String previewMsg;
+				if ( resultMsg.contains("</pre>") )
+					previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
+				else
+					previewMsg = "<pre>" + resultMsg + "</pre>";
+				previewHtml.setHTML(previewMsg);
 				Window.alert(unknownFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_PREVIEW_HEADER_TAG.equals(tagMsg[0]) ) {
 				// preview file; show partial file contents in the preview
-				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				String previewMsg;
+				if ( (tagMsg[1]).contains("</pre>") )
+					previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+				else
+					previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewHtml.setHTML(previewMsg);
 			}
 			else if ( DashboardUtils.NO_EXPOCODE_HEADER_TAG.equals(tagMsg[0]) ) {
 				// no expocode found; show uploaded file partial contents
-				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				String previewMsg;
+				if ( (tagMsg[1]).contains("</pre>") )
+					previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+				else
+					previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewHtml.setHTML(previewMsg);
 				Window.alert(noExpocodeFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_EXISTS_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file exists and not overwrite; 
 				// show existing file partial contents in the preview
-				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				String previewMsg;
+				if ( (tagMsg[1]).contains("</pre>") )
+					previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+				else
+					previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewHtml.setHTML(previewMsg);
 				Window.alert(fileExistsFailureMsg);
 			}
 			else if ( DashboardUtils.NO_FILE_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file does not exist and overwrite; 
 				// show partial file contents in preview
-				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>");
+				String previewMsg;
+				if ( (tagMsg[1]).contains("</pre>") )
+					previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+				else
+					previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewHtml.setHTML(previewMsg);
 				Window.alert(fileDoesNotExistFailureMsg);
 			}
 			else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file created
 				Window.alert(tagMsg[1]);
 				// return to the updated cruise list
-				DashboardLogin.showCruiseListPage(DashboardCruiseUploadPage.this);
+				DashboardCruiseListPage.showCruiseListPage(
+						DashboardCruiseUploadPage.this, listUpdateFailedMsg);
 			}
 			else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 				// cruise file updated
 				Window.alert(tagMsg[1]);
 				// return to the updated cruise list
-				DashboardLogin.showCruiseListPage(DashboardCruiseUploadPage.this);
+				DashboardCruiseListPage.showCruiseListPage(
+						DashboardCruiseUploadPage.this, listUpdateFailedMsg);
 			}
 			else {
 				// Unknown response with a newline, display the whole message in the preview
-				previewHtml.setHTML("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+				String previewMsg;
+				if ( resultMsg.contains("</pre>") )
+					previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
+				else
+					previewMsg = "<pre>" + resultMsg + "</pre>";
+				previewHtml.setHTML(previewMsg);
 				Window.alert(unknownFailureMsg);
 			}
 		}

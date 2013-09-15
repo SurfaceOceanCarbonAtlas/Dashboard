@@ -3,27 +3,21 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardLoginService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardLoginServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -44,7 +38,7 @@ public class DashboardLogin extends Composite {
 	protected static String passwordPrompt = "Password:";
 	protected static String loginText = "Login";
 	protected static String noCredErrorMsg = "You must provide a username and password";
-	protected static String loginErrorMsg = "Sorry, your login credentials are not valid.";
+	protected static String loginErrorMsg = "Sorry, your login failed.";
 
 	interface DashboardLoginUiBinder extends UiBinder<Widget, DashboardLogin> {
 	}
@@ -106,46 +100,12 @@ public class DashboardLogin extends Composite {
 							nameText.getValue().trim(), passText.getValue()));
 			clearLoginData();
 
-			showCruiseListPage(DashboardLogin.this);
+			DashboardCruiseListPage.showCruiseListPage(
+					DashboardLogin.this, loginErrorMsg);
 		}
 		else {
 			Window.alert(noCredErrorMsg);
 		}
-	}
-
-	/**
-	 * Display the cruise list page with the latest information from the server
-	 * 
-	 * @param currentPage
-	 * 		currently displayed page to be removed when cruise list page
-	 * 		is available
-	 */
-	static void showCruiseListPage(final Composite currentPage) {
-		DashboardLoginServiceAsync service = 
-				GWT.create(DashboardLoginService.class);
-		service.authenticateUser(DashboardPageFactory.getUsername(), 
-				DashboardPageFactory.getPasshash(), 
-				new AsyncCallback<DashboardCruiseList>() {
-			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardPageFactory.getUsername()
-						.equals(cruises.getUsername()) ) {
-					RootLayoutPanel.get().remove(currentPage);
-					DashboardCruiseListPage cruiseListPage = 
-							DashboardPageFactory.getPage(DashboardCruiseListPage.class);
-					RootLayoutPanel.get().add(cruiseListPage);
-					cruiseListPage.updateCruises(cruises);
-				}
-				else {
-					Window.alert(loginErrorMsg);
-				}
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				Window.alert(SafeHtmlUtils.htmlEscape(
-						loginErrorMsg + " (" + ex.getMessage() + ")"));
-			}
-		});
 	}
 
 }

@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData;
 
 import java.io.BufferedReader;
@@ -26,7 +27,7 @@ import org.tmatesoft.svn.core.SVNException;
 public class DashboardCruiseFileHandlerTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler#cruiseFileExists(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler#cruiseDataFileExists(java.lang.String)}.
 	 * @throws IOException 
 	 */
 	@Test
@@ -35,33 +36,33 @@ public class DashboardCruiseFileHandlerTest {
 				DashboardDataStore.get().getCruiseFileHandler();
 		assertNotNull( handler );
 
-		assertFalse( handler.cruiseFileExists("FAKE_EXPOCODE") );
-		assertFalse( handler.cruiseFileExists("FAKE-EXPOCODE") );
+		assertFalse( handler.cruiseDataFileExists("FAKE_EXPOCODE") );
+		assertFalse( handler.cruiseDataFileExists("FAKE-EXPOCODE") );
 
 		boolean exceptionMissed = false;
 		try {
-			handler.cruiseFileExists("TOOSHORT");
+			handler.cruiseDataFileExists("TOOSHORT");
 			exceptionMissed = true;
 		} catch ( IllegalArgumentException ex ) {
-			// Exceptioned outcome
+			// Excepted outcome
 			;
 		}
 		assertFalse( exceptionMissed );
 
 		try {
-			handler.cruiseFileExists("TOOLONGEXPOCODE");
+			handler.cruiseDataFileExists("TOOLONGEXPOCODE");
 			exceptionMissed = true;
 		} catch ( IllegalArgumentException ex ) {
-			// Exceptioned outcome
+			// Expected outcome
 			;
 		}
 		assertFalse( exceptionMissed );
 
 		try {
-			handler.cruiseFileExists("INVALID*CHAR");
+			handler.cruiseDataFileExists("INVALID*CHAR");
 			exceptionMissed = true;
 		} catch ( IllegalArgumentException ex ) {
-			// Exceptioned outcome
+			// Expected outcome
 			;
 		}
 		assertFalse( exceptionMissed );
@@ -74,7 +75,7 @@ public class DashboardCruiseFileHandlerTest {
 	 */
 	@Test
 	public void testDashboardCruiseFileHandler() throws IOException, SVNException {
-		final String username = "SocatUser";
+		final String username = "socatuser";
 		final String filename = "fake20031205_revised.tsv";
 		final String expocode = "FAKE20031205";
 		final String versionString = "SOCAT version 3 dashboard cruise file created: 2013-09-03 \n";
@@ -231,7 +232,7 @@ public class DashboardCruiseFileHandlerTest {
 		handler.saveCruiseDataToFile(cruiseData, "test check-in of fake cruise data");
 
 		// Test that the file exists
-		assertTrue( handler.cruiseFileExists(expocode) );
+		assertTrue( handler.cruiseDataFileExists(expocode) );
 
 		// Generate the cruise data from the saved file
 		DashboardCruiseData fileData = handler.getCruiseDataFromFile(expocode);
@@ -277,6 +278,17 @@ public class DashboardCruiseFileHandlerTest {
 			assertEquals(observations[j].trim(), partialContents.get(k).trim());
 		// And that should be all there is
 		assertEquals(k, partialContents.size());
+
+		// Check createDashboardCruiseFromDataFile
+		DashboardCruise expectedCruise = new DashboardCruise();
+		expectedCruise.setExpocode(expocode);
+		expectedCruise.setOwner(username);
+		expectedCruise.setUploadFilename(filename);
+		DashboardCruise cruise = handler.createDashboardCruiseFromDataFile(expocode);
+		assertEquals(expectedCruise, cruise);
+
+		// Check getCruiseOwnerFromDataFile
+		assertEquals(username, handler.getCruiseOwnerFromFile(expocode));
 	}
 
 }
