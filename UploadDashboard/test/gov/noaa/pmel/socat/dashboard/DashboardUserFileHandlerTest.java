@@ -12,7 +12,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Random;
 
 import org.junit.Test;
 import org.tmatesoft.svn.core.SVNException;
@@ -25,6 +24,7 @@ public class DashboardUserFileHandlerTest {
 	/**
 	 * Test method for methods in 
 	 * {@link gov.noaa.pmel.socat.dashboard.server.DashboardUserFileHandler}.
+	 * This needs to be run after DashboardCruiseFileHandlerTest.
 	 * @throws IOException
 	 * @throws SVNException 
 	 */
@@ -32,47 +32,29 @@ public class DashboardUserFileHandlerTest {
 	public void testDashboardUserFileHandler() throws IOException, SVNException {
 		String username = "socatuser";
 		String[] cruiseExpocodes = { 
-				"FAKE19991206", 
-				"FAKE20030318", 
-				"FAKE20060213", 
-				"FAKE20070123", 
-				"FAKE20091129" 
+				"FAKE20031205", 
+				"GARBAGE202020"
 		};
 		String[] uploadFilenames = { 
-				"fake19991206_rec.tsv", 
-				"fake20030318_rev.tsv", 
-				"fake20060213.tsv", 
-				"fake20070123.tsv", 
-				"fake20091129.tsv" 
+				"fake20031205_revised.tsv",
+				"garbage_data.tsv"
 		};
-		Random random = new Random();
-		Date[] dataCheckDates = { 
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)) 
+		Date[] dataCheckDates = {
+				null,
+				new Date(System.currentTimeMillis())
 		};
-		Date[] metaCheckDates = { 
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)),
-				new Date(System.currentTimeMillis() - random.nextInt(10000000)) 
+		Date[] metaCheckDates = {
+				null,
+				new Date(System.currentTimeMillis())
 		};
 		String[] qcStatuses = {
-				"Accepted, C",
-				"Accepted, B",
-				"Suspended",
-				"Submitted",
-				"Not Submitted"
+				"",
+				"Suspended"
 		};
 		String[] archiveStatuses = {
-				"CDIAC, doi:xxxxx/xxxxx",
-				"Next SOCAT Release",
-				"Not Archived",
-				"PANGAEA, doi unknown",
-				"Not Archived"
+				"",
+				""
+				
 		};
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
@@ -93,6 +75,10 @@ public class DashboardUserFileHandlerTest {
 		assertNotNull( handler );
 
 		handler.saveCruiseListing(cruiseList, "test check-in of fake cruise listing data");
+
+		// The second cruise does not exist, so it should be 
+		// automatically removed when the cruise list is retrieved
+		cruiseList.remove(cruiseExpocodes[1]);
 
 		DashboardCruiseList newListing = handler.getCruiseListing(username);
 		assertEquals(cruiseList, newListing);

@@ -124,4 +124,24 @@ public abstract class VersionedFileHandler {
 									null, null, false, false, SVNDepth.EMPTY);
 	}
 
+	/**
+	 * Deletes the given file from both the working copy directory 
+	 * as well as from version control.
+	 * 
+	 * @param wcFile
+	 * 		working copy file to delete
+	 * @param message
+	 * 		commit message to use for this deletion
+	 * @throws SVNException
+	 * 		if deleting the file or committing the deletion throws one
+	 */
+	void deleteVersionedFile(File wcFile, String message) throws SVNException {
+		// Delete the file from the working directory and
+		// schedule deletion from the repository
+		svnManager.getWCClient().doDelete(wcFile, false, true, false);
+		// Commit the deletion from the repository
+		svnManager.getCommitClient().doCommit(new File[] {wcFile}, false, message,
+									null, null, false, false, SVNDepth.EMPTY);
+	}
+
 }
