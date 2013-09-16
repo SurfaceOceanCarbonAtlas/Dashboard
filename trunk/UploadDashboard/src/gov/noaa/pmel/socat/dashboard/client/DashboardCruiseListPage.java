@@ -47,8 +47,8 @@ import com.google.gwt.view.client.ListDataProvider;
 public class DashboardCruiseListPage extends Composite {
 
 	// Replacement strings for empty or null values
-	protected static String noOwnerString = "(unknown)";
 	protected static String noExpocodeString = "(unknown)";
+	protected static String noOwnerString = "(unknown)";
 	protected static String noUploadFilenameString = "(unknown)";
 	protected static String noDataCheckDateString = "(never checked)";
 	protected static String noMetaCheckDateString = "(never checked)";
@@ -119,6 +119,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	protected static String columnNameSelected = "Selected";
 	protected static String columnNameExpocode = "Expocode";
+	protected static String columnNameOwner = "Owner";
 	protected static String columnNameFilename = "Filename";
 	protected static String columnNameDataCheck = "Data check";
 	protected static String columnNameMetaCheck = "Meta check";
@@ -131,8 +132,8 @@ public class DashboardCruiseListPage extends Composite {
 			"(cruises must be suspended or not submitted).";
 	protected static String deleteConfirmMsg = 
 			": this cruise, including all cruise data, will be deleted from " +
-			"SOCAT.  You will be able to do this only if you own the cruise " +
-			"or manage a group to which the owner belongs.  Do you wish to " +
+			"SOCAT.  You will be able to do this only if the cruise belongs " +
+			"to you or to someone in a group you manage.  Do you wish to " +
 			"proceed?";
 	protected static String deleteCruiseFailMsg = 
 			"Unable to delete the selected cruise(s)";
@@ -397,6 +398,7 @@ public class DashboardCruiseListPage extends Composite {
 		// Create the columns for this table
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
+		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
 		TextColumn<DashboardCruise> metaCheckColumn = buildMetaCheckColumn();
@@ -406,6 +408,7 @@ public class DashboardCruiseListPage extends Composite {
 		// Add the columns, with headers, to the table
 		uploadsGrid.addColumn(selectedColumn, "");
 		uploadsGrid.addColumn(expocodeColumn, columnNameExpocode);
+		uploadsGrid.addColumn(ownerColumn, columnNameOwner);
 		uploadsGrid.addColumn(filenameColumn, columnNameFilename);
 		uploadsGrid.addColumn(dataCheckColumn, columnNameDataCheck);
 		uploadsGrid.addColumn(metaCheckColumn, columnNameMetaCheck);
@@ -415,7 +418,8 @@ public class DashboardCruiseListPage extends Composite {
 		// Set the widths of the columns
 		uploadsGrid.setColumnWidth(selectedColumn, 2.0, Unit.EM);
 		uploadsGrid.setColumnWidth(expocodeColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(filenameColumn, 10.0, Unit.EM);
+		uploadsGrid.setColumnWidth(ownerColumn, 5.0, Unit.EM);
+		uploadsGrid.setColumnWidth(filenameColumn, 7.0, Unit.EM);
 		uploadsGrid.setColumnWidth(dataCheckColumn, 5.0, Unit.EM);
 		uploadsGrid.setColumnWidth(metaCheckColumn, 5.0, Unit.EM);
 		uploadsGrid.setColumnWidth(qcStatusColumn, 5.0, Unit.EM);
@@ -428,6 +432,7 @@ public class DashboardCruiseListPage extends Composite {
 		// Make some of the columns sortable
 		selectedColumn.setSortable(true);
 		expocodeColumn.setSortable(true);
+		ownerColumn.setSortable(true);
 		filenameColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
 		metaCheckColumn.setSortable(true);
@@ -441,6 +446,8 @@ public class DashboardCruiseListPage extends Composite {
 				DashboardCruise.selectedComparator);
 		columnSortHandler.setComparator(expocodeColumn, 
 				DashboardCruise.expocodeComparator);
+		columnSortHandler.setComparator(ownerColumn, 
+				DashboardCruise.ownerComparator);
 		columnSortHandler.setComparator(filenameColumn, 
 				DashboardCruise.filenameComparator);
 		columnSortHandler.setComparator(dataCheckColumn, 
@@ -507,6 +514,24 @@ public class DashboardCruiseListPage extends Composite {
 		};
 		expocodeColumn.setDataStoreName(columnNameExpocode);
 		return expocodeColumn;
+	}
+
+	/**
+	 * Creates the owner column for the table
+	 */
+	private TextColumn<DashboardCruise> buildOwnerColumn() {
+		TextColumn<DashboardCruise> ownerColumn = 
+				new TextColumn<DashboardCruise> () {
+			@Override
+			public String getValue(DashboardCruise cruise) {
+				String owner = cruise.getOwner();
+				if ( owner.isEmpty() )
+					owner = noOwnerString;
+				return owner;
+			}
+		};
+		ownerColumn.setDataStoreName(columnNameOwner);
+		return ownerColumn;
 	}
 
 	/**

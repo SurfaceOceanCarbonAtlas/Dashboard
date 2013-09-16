@@ -19,7 +19,7 @@ public class DashboardUserInfoTest {
 	 */
 	@Test
 	public void testDashboardUserInfoGetAuthorizationHash() {
-		String username = "SocatUser";
+		String username = "socatuser";
 		String authHash = "0123456789ABCDEF0123456789ABCDEF";
 
 		DashboardUserInfo userInfo = new DashboardUserInfo(username, authHash);
@@ -51,29 +51,29 @@ public class DashboardUserInfoTest {
 	 */
 	@Test
 	public void testAddUserRolesManagesOver() {
-		String firstuser = "FirstUser";
-		String seconduser = "SecondUser";
+		String firstuser = "firstuser";
+		String seconduser = "seconduser";
 		String authHash = "0123456789ABCDEF0123456789ABCDEF";
 
 		DashboardUserInfo firstInfo = new DashboardUserInfo(firstuser, authHash);
 		assertTrue(firstInfo.managesOver(firstInfo));
-		firstInfo.addUserRoles("Group1,Group2");
+		firstInfo.addUserRoles("MemberOf1,MemberOf2");
 		DashboardUserInfo secondInfo = new DashboardUserInfo(seconduser, authHash);
 		assertFalse(secondInfo.managesOver(firstInfo));
-		secondInfo.addUserRoles("Group1 ,,\t;; Group2");
+		secondInfo.addUserRoles("MemberOf1 ,,\t;; MemberOf2");
 		assertFalse(secondInfo.managesOver(firstInfo));
-		secondInfo.addUserRoles("Manager1");
+		secondInfo.addUserRoles("ManagerOf1");
 		assertTrue(secondInfo.managesOver(firstInfo));
 
 		secondInfo = new DashboardUserInfo(seconduser, authHash);
 		assertFalse(secondInfo.managesOver(firstInfo));
-		secondInfo.addUserRoles("Manager1");
+		secondInfo.addUserRoles("ManagerOf1");
 		assertTrue(secondInfo.managesOver(firstInfo));
 
 		firstInfo = new DashboardUserInfo(firstuser, authHash);
 		assertFalse(firstInfo.managesOver(secondInfo));
 		assertFalse(secondInfo.managesOver(firstInfo));
-		firstInfo.addUserRoles("Manager1");
+		firstInfo.addUserRoles("ManagerOf1");
 		assertTrue(firstInfo.managesOver(secondInfo));
 		assertTrue(secondInfo.managesOver(firstInfo));
 
@@ -84,7 +84,7 @@ public class DashboardUserInfoTest {
 
 		boolean errMissed = false;
 		try {
-			firstInfo.addUserRoles("Group");
+			firstInfo.addUserRoles("MemberOf");
 			errMissed = true;
 		} catch ( IllegalArgumentException ex ) {
 			// Expected result
@@ -93,7 +93,7 @@ public class DashboardUserInfoTest {
 		assertFalse(errMissed);
 
 		try {
-			firstInfo.addUserRoles("Manager");
+			firstInfo.addUserRoles("ManagerOf");
 			errMissed = true;
 		} catch ( IllegalArgumentException ex ) {
 			// Expected result
@@ -117,10 +117,10 @@ public class DashboardUserInfoTest {
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
-		String username = "SocatUser";
+		String username = "socatuser";
 		String authHash = "0123456789ABCDEF0123456789ABCDEF";
-		String userRole = "Group1";
-		String managerRole = "Manager1";
+		String userRole = "MemberOf1";
+		String managerRole = "ManagerOf1";
 		String adminRole = "Admin";
 
 		DashboardUserInfo userInfo = new DashboardUserInfo(username, authHash);

@@ -29,7 +29,6 @@ import org.tmatesoft.svn.core.SVNException;
 public class DashboardCruiseFileHandler extends VersionedFileHandler {
 
 	private static final String CRUISE_FILE_NAME_EXTENSION = ".tsv";
-
 	private static final String DATA_OWNER_ID = "dataowner=";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename=";
 
@@ -65,13 +64,18 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 
 	 * @param cruiseFilesDirName
 	 * 		name of the cruise files directory
+	 * @param svnUsername
+	 * 		username for SVN authentication
+	 * @param svnPassword
+	 * 		password for SVN authentication
 	 * @throws SVNException
 	 * 		if the specified directory does not exist,
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
-	DashboardCruiseFileHandler(String cruiseFilesDirName) throws SVNException {
-		super(cruiseFilesDirName);
+	DashboardCruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
+									String svnPassword) throws SVNException {
+		super(cruiseFilesDirName, svnUsername, svnPassword);
 	}
 
 	/**

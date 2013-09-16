@@ -25,6 +25,7 @@ public class DashboardUtils {
 	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
 	public static final String NO_EXPOCODE_HEADER_TAG = "NO EXPOCODE HEADER TAG";
 	public static final String FILE_EXISTS_HEADER_TAG = "FILE EXISTS HEADER TAG";
+	public static final String CANNOT_OVERWRITE_HEADER_TAG = "CANNOT OVERWRITE HEADER TAG";
 	public static final String NO_FILE_HEADER_TAG = "NO FILE HEADER TAG";
 	public static final String FILE_CREATED_HEADER_TAG = "FILE CREATED HEADER TAG";
 	public static final String FILE_UPDATED_HEADER_TAG = "FILE UPDATED HEADER TAG";
