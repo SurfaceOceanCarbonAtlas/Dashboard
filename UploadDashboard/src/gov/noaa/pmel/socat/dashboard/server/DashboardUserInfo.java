@@ -12,8 +12,8 @@ import java.util.HashSet;
  */
 public class DashboardUserInfo {
 
-	private static final String GROUP_NAME_TAG = "Group";
-	private static final String MANAGER_NAME_TAG = "Manager";
+	private static final String MEMBER_NAME_TAG = "MemberOf";
+	private static final String MANAGER_NAME_TAG = "ManagerOf";
 	private static final String ADMIN_NAME_TAG = "Admin";
 
 	private String username;
@@ -67,16 +67,16 @@ public class DashboardUserInfo {
 	public void addUserRoles(String rolesString) throws IllegalArgumentException {
 		String[] roles = rolesString.split("[,;\\s]+");
 		for (int k = 0; k < roles.length; k++) {
-			if ( (roles[k]).startsWith(GROUP_NAME_TAG) ) {
+			if ( (roles[k]).startsWith(MEMBER_NAME_TAG) ) {
 				int groupNum;
 				try {
 					groupNum = Integer.parseInt(
-						roles[k].substring(GROUP_NAME_TAG.length()) );
+						roles[k].substring(MEMBER_NAME_TAG.length()) );
 					if ( groupNum <= 0 )
 						throw new NumberFormatException();
 				} catch ( NumberFormatException ex ) {
 					throw new IllegalArgumentException("Invalid " + 
-							GROUP_NAME_TAG + " number in " + roles[k]);
+							MEMBER_NAME_TAG + " number in " + roles[k]);
 				}
 				memberNums.add(groupNum);
 			}

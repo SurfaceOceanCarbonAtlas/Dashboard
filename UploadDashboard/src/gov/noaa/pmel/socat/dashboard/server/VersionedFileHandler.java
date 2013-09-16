@@ -15,6 +15,7 @@ import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
+import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
 /**
  * Abstract file handler for dealing with subversion version
@@ -34,18 +35,24 @@ public abstract class VersionedFileHandler {
 	 * 
 	 * @param filesDirName
 	 * 		name of the working copy directory
+	 * @param svnUsername
+	 * 		username for SVN authentication
+	 * @param svnPassword
+	 * 		password for SVN authentication
 	 * @throws SVNException
 	 * 		if the specified directory does not exist,
 	 * 		is not a directory, is not under version
 	 * 		control, or is in a conflicted state
 	 */
-	VersionedFileHandler(String filesDirName) throws SVNException {
+	VersionedFileHandler(String filesDirName, String svnUsername, 
+									String svnPassword) throws SVNException {
 		filesDir = new File(filesDirName);
 		if ( ! filesDir.isDirectory() )
 			throw new SVNException(SVNErrorMessage.create(
 					SVNErrorCode.BAD_FILENAME,
 					"invalid directory " + filesDirName));
-		svnManager = SVNClientManager.newInstance();
+		svnManager = SVNClientManager.newInstance(
+				SVNWCUtil.createDefaultOptions(true), svnUsername, svnPassword);
 		// Check this directory is under SVN version control
 		SVNInfo info = svnManager.getWCClient()
 								 .doInfo(filesDir, SVNRevision.HEAD);

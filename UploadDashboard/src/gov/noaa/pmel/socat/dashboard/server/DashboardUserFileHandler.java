@@ -34,13 +34,18 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 
 	 * @param userFilesDirName
 	 * 		name of the user files directory
+	 * @param svnUsername
+	 * 		username for SVN authentication
+	 * @param svnPassword
+	 * 		password for SVN authentication
 	 * @throws SVNException
 	 * 		if the specified directory does not exist,
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
-	DashboardUserFileHandler(String userFilesDirName) throws SVNException {
-		super(userFilesDirName);
+	DashboardUserFileHandler(String userFilesDirName, String svnUsername,
+								String svnPassword) throws SVNException {
+		super(userFilesDirName, svnUsername, svnPassword);
 	}
 	
 	/**
@@ -119,7 +124,8 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			if ( ! cruiseHandler.cruiseDataFileExists(expocode) )
 				cruisesToRemove.add(expocode);
 			// TODO: check and update other attributes of the cruise, 
-			//       setting needsCommit is something was changed
+			//       such as the owner, setting needsCommit is something 
+			//       was changed
 		}
 		for ( String expocode : cruisesToRemove ) {
 			cruiseList.remove(expocode);

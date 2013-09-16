@@ -207,6 +207,8 @@ public class DashboardCruiseFileHandlerTest {
 		// Check for differences
 		assertEquals(versionString.trim(), cruiseData.getVersion());
 		assertEquals(expocode, cruiseData.getExpocode());
+		assertEquals(username, cruiseData.getOwner());
+		assertEquals(filename, cruiseData.getUploadFilename());
 
 		ArrayList<String> preamble = cruiseData.getPreamble();
 		for (int k = 0; (k < preamble.size()) && (k < expectedPreamble.size()); k++)

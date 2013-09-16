@@ -34,6 +34,8 @@ public class DashboardDataStore {
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
 	private static final String SOCAT_VERSION_NAME_TAG = "SocatVersion";
+	private static final String SVN_USER_NAME_TAG = "SVNUsername";
+	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
@@ -45,12 +47,14 @@ public class DashboardDataStore {
 			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
 			SOCAT_VERSION_NAME_TAG + "=SomeValue \n" +
+			SVN_USER_NAME_TAG + "=SVNUsername" +
+			SVN_PASSWORD_NAME_TAG + "=SVNPasswork" +
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
-			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=Group1,Group2 \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=Member1,Member2 \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeManagerName=AnotherVeryLongKeyOfHexidecimalValues \n" +
-			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=Manager1,Group2 \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=Manager1,Member2 \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeAdminName=YetAnotherVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
 			"# ------------------------------ \n" +
@@ -147,13 +151,36 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + 
 					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+		// Read the SVN username
+		String svnUsername;
+		try {
+			propVal = configProps.getProperty(SVN_USER_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			if ( propVal.isEmpty() )
+				throw new IllegalArgumentException("blank value");
+			svnUsername = propVal;
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + SVN_USER_NAME_TAG + 
+					" value specified in " + configFile.getPath() + 
+					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// Read the SVN password; can be blank or not given
+		String svnPassword = "";
+		propVal = configProps.getProperty(SVN_PASSWORD_NAME_TAG);
+		if ( propVal != null ) {
+			propVal = propVal.trim();
+			svnPassword = propVal.trim();
+		}
 		// Read the user files directory name
 		try {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			userFileHandler = new DashboardUserFileHandler(propVal);
+			userFileHandler = new DashboardUserFileHandler(propVal, 
+					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + 
@@ -165,7 +192,8 @@ public class DashboardDataStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cruiseFileHandler = new DashboardCruiseFileHandler(propVal);
+			cruiseFileHandler = new DashboardCruiseFileHandler(propVal,
+					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + CRUISE_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + 

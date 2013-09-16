@@ -219,10 +219,11 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				// treat as a cruise with an unknown owner
 				owner = "";
 			}
+			boolean canOverwrite = dataStore.userManagesOver(username, owner);
 			// If the cruise file exists, make sure the request was for an overwrite
 			// and that the user has permission to overwrite this cruise
 			if ( ! ( DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) &&
-					dataStore.userManagesOver(username, owner) ) ) {
+					 canOverwrite ) ) {
 				// Respond with an error message containing partial file contents 
 				// of the existing file
 				DashboardCruiseData existingCruiseData;
@@ -235,7 +236,10 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter respWriter = response.getWriter();
-				respWriter.println(DashboardUtils.FILE_EXISTS_HEADER_TAG);
+				if ( canOverwrite )
+					respWriter.println(DashboardUtils.FILE_EXISTS_HEADER_TAG);
+				else
+					respWriter.println(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG);
 				respWriter.println("----------------------------------------");
 				respWriter.println("(Partial) Contents of existing cruise file:");
 				respWriter.println("Owned by: " + owner);
