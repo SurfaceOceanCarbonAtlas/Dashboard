@@ -62,6 +62,7 @@ public class DashboardUserFileHandlerTest {
 			DashboardCruise newCruise = new DashboardCruise();
 			newCruise.setSelected(false);
 			newCruise.setExpocode(cruiseExpocodes[k]);
+			newCruise.setOwner(username);
 			newCruise.setUploadFilename(uploadFilenames[k]);
 			newCruise.setDataCheckDate(dataCheckDates[k]);
 			newCruise.setMetaCheckDate(metaCheckDates[k]);

@@ -13,7 +13,7 @@ import java.util.HashMap;
  */
 public class DashboardCruiseList extends HashMap<String,DashboardCruise> {
 
-	private static final long serialVersionUID = -7727273419900907772L;
+	private static final long serialVersionUID = 4798888572810557981L;
 
 	String username;
 
@@ -70,6 +70,16 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> {
 			return false;
 
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		String repr = "DashboardCruiseList[ username=" + username;
+		for ( String expocode : keySet() ) {
+			repr += ", " + expocode + ":" + get(expocode).toString();
+		}
+		repr += " ]";
+		return repr;
 	}
 
 }

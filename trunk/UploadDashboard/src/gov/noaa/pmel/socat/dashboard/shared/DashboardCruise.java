@@ -14,7 +14,7 @@ import java.util.Date;
  */
 public class DashboardCruise implements Serializable {
 
-	private static final long serialVersionUID = 1655717551218368707L;
+	private static final long serialVersionUID = 2780945483395179432L;
 
 	boolean selected;
 	String owner;
@@ -247,6 +247,20 @@ public class DashboardCruise implements Serializable {
 			return false;
 
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DashboardCruise" +
+				"[ selected=" + Boolean.toString(selected) + 
+				", owner=" + owner + 
+				", expocode=" + expocode + 
+				", uploadFilename=" + uploadFilename +
+				", dataCheckDate=" + dataCheckDate +
+				", metaCheckDate=" + metaCheckDate +
+				", qcStatus=" + qcStatus + 
+				", archiveStatus=" + archiveStatus + 
+				" ]";
 	}
 
 	public static Comparator<DashboardCruise> ownerComparator =

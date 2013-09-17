@@ -6,17 +6,12 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.HashSet;
-
-import org.tmatesoft.svn.core.SVNException;
 
 /**
  * Handles storage and retrieval of user data in files.
@@ -26,7 +21,7 @@ import org.tmatesoft.svn.core.SVNException;
 public class DashboardUserFileHandler extends VersionedFileHandler {
 
 	private static final String USER_CRUISE_LIST_NAME_EXTENSION = 
-			"_cruise_list.xml";
+			"_cruise_list.txt";
 
 	/**
 	 * Handles storage and retrieval of user data in files under 
@@ -38,13 +33,12 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		username for SVN authentication
 	 * @param svnPassword
 	 * 		password for SVN authentication
-	 * @throws SVNException
-	 * 		if the specified directory does not exist,
-	 * 		is not a directory, or is not under SVN 
-	 * 		version control
+	 * @throws IllegalArgumentException
+	 * 		if the specified directory does not exist, is not a 
+	 * 		directory, or is not under SVN version control
 	 */
 	DashboardUserFileHandler(String userFilesDirName, String svnUsername,
-								String svnPassword) throws SVNException {
+					String svnPassword) throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
 	}
 	
@@ -71,35 +65,22 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 				username + USER_CRUISE_LIST_NAME_EXTENSION);
 		boolean needsCommit = false;
 		String commitMessage = "";
-		// Make sure we are reading the latest version
+		// Read the cruise expocodes from the cruise list file
+		HashSet<String> expocodeSet = new HashSet<String>();
 		try {
-			updateVersion(userDataFile);
-		} catch (SVNException ex) {
-			// May not exist or may not yet be under version control
-			needsCommit = true;
-			commitMessage = "add new cruise listing for " + username + "; ";
-		}
-		// Read the cruise list from the XML file
-		DashboardCruiseList cruiseList;
-		try {
-			XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(
-					new FileInputStream(userDataFile)));
+			BufferedReader expoReader = new BufferedReader(
+										new FileReader(userDataFile));
 			try {
-				Object obj = decoder.readObject();
-				if ( ! (obj instanceof DashboardCruiseList) )
-					throw new Exception(
-							"unexpected type of encoded object");
-				cruiseList = (DashboardCruiseList) obj;
-				if ( ! username.equals(cruiseList.getUsername()) )
-					throw new Exception(
-							"unexpected username associated with saved listing");
+				String expocode = expoReader.readLine();
+				while ( expocode != null ) {
+					expocodeSet.add(expocode);
+					expocode = expoReader.readLine();
+				}
 			} finally {
-				decoder.close();
+				expoReader.close();
 			}
 		} catch ( FileNotFoundException ex ) {
 			// Return a valid cruise listing with no cruises
-			cruiseList = new DashboardCruiseList();
-			cruiseList.setUsername(username);
 			needsCommit = true;
 			commitMessage = "add new cruise listing for " + username + "; ";
 		} catch ( Exception ex ) {
@@ -108,7 +89,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 					"Problems reading the cruise listing from " + 
 					userDataFile.getPath() + ": " + ex.getMessage());
 		}
-		// update the cruise information, committing any changes
+		// Get the cruise file handler
 		DashboardCruiseFileHandler cruiseHandler;
 		try {
 			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
@@ -116,21 +97,21 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the cruise file handler");
 		}
-		HashSet<String> cruisesToRemove = new HashSet<String>();
-		for ( DashboardCruise cruise : cruiseList.values() ) {
-			String expocode = cruise.getExpocode();
-			// Collect cruise entries that need to be removed
-			// (cannot modify the map while going through it)
-			if ( ! cruiseHandler.cruiseDataFileExists(expocode) )
-				cruisesToRemove.add(expocode);
-			// TODO: check and update other attributes of the cruise, 
-			//       such as the owner, setting needsCommit is something 
-			//       was changed
-		}
-		for ( String expocode : cruisesToRemove ) {
-			cruiseList.remove(expocode);
-			needsCommit = true;
-			commitMessage += "remove invalid cruise " + expocode + "; ";
+		// Create the cruise list (map) for these cruises
+		DashboardCruiseList cruiseList = new DashboardCruiseList();
+		cruiseList.setUsername(username);
+		for ( String expocode : expocodeSet ) {
+			// Create the DashboardCruise from the data file
+			try {
+				DashboardCruise cruise = 
+						cruiseHandler.createDashboardCruiseFromDataFile(expocode);
+				cruiseList.put(expocode, cruise);
+			} catch ( FileNotFoundException ex ) {
+				// Remove this expocode from the saved list
+				needsCommit = true;
+				commitMessage += "remove invalid cruise " + expocode + "; ";
+			}
+			// Allow the IllegalArgumentException to escape
 		}
 		if ( needsCommit )
 			saveCruiseListing(cruiseList, commitMessage);
@@ -161,12 +142,12 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 				username + USER_CRUISE_LIST_NAME_EXTENSION);
 		// Write the current cruise list to the XML file
 		try {
-			XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(
-					new FileOutputStream(userDataFile)));
+			PrintWriter expoWriter = new PrintWriter(userDataFile);
 			try {
-				encoder.writeObject(cruiseList);
+				for ( String expocode : cruiseList.keySet() )
+					expoWriter.println(expocode);
 			} finally {
-				encoder.close();
+				expoWriter.close();
 			}
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
@@ -175,10 +156,10 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		}
 		if ( (message == null) || message.trim().isEmpty() )
 			return;
-		// Commit the update to this cruise list XML file
+		// Commit the update to this list of cruise expocodes
 		try {
 			commitVersion(userDataFile, message);
-		} catch (SVNException ex) {
+		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
 					"Problems committing the updated cruise listing: " + 
 					ex.getMessage());
@@ -256,7 +237,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 								.createDashboardCruiseFromDataFile(expocode));
 				changeMade = true;
 				commitMessage += expocode + "; ";
-			} catch (FileNotFoundException ex) {
+			} catch ( FileNotFoundException ex ) {
 				throw new IllegalArgumentException("cruise " + expocode + 
 						" does not exist");
 			} catch ( Exception ex ) {
