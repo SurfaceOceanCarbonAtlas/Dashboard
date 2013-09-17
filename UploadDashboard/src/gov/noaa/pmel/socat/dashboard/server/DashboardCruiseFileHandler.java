@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.tmatesoft.svn.core.SVNException;
-
 /**
  * Handles storage and retrieval of cruise data in files.
  * 
@@ -68,13 +66,13 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		username for SVN authentication
 	 * @param svnPassword
 	 * 		password for SVN authentication
-	 * @throws SVNException
+	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist,
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
 	DashboardCruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
-									String svnPassword) throws SVNException {
+						String svnPassword) throws IllegalArgumentException {
 		super(cruiseFilesDirName, svnUsername, svnPassword);
 	}
 
@@ -116,15 +114,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		if expocode is an invalid cruise expocode 
 	 */
 	public boolean cruiseDataFileExists(String expocode) 
-											throws IllegalArgumentException {
+										throws IllegalArgumentException {
 		File cruiseFile = cruiseDataFile(expocode);
-		// Make sure we at the latest version
-		try {
-			updateVersion(cruiseFile.getParentFile());
-		} catch ( SVNException ex ) {
-			// May not exist or maybe not yet under version control  
-			;
-		}
 		return cruiseFile.exists();
 	}
 
@@ -357,13 +348,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	public DashboardCruiseData getCruiseDataFromFile(String expocode) 
 										throws IllegalArgumentException {
 		File cruiseFile = cruiseDataFile(expocode);
-		// Make sure we read the latest version
-		try {
-			updateVersion(cruiseFile.getParentFile());
-		} catch ( SVNException ex ) {
-			// May not exist or maybe not yet under version control  
-			;
-		}
 		// Read the cruise data from the saved cruise data file
 		DashboardCruiseData cruiseData;
 		try {
@@ -427,6 +411,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			try {
 				writer.println(DATA_OWNER_ID + cruiseData.getOwner());
 				writer.println(UPLOAD_FILENAME_ID + cruiseData.getUploadFilename());
+				// TODO: add more status lines
 				// Print the standard creation date and expocode headers
 				writer.println("SOCAT version " + 
 						DashboardDataStore.get().getSocatVersion() + 
@@ -482,7 +467,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Submit the updated file to version control
 		try {
 			commitVersion(cruiseFile, message);
-		} catch (SVNException ex) {
+		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
 					"Problems committing updated data for cruise " + expocode +
 					": " + ex.getMessage());
@@ -515,7 +500,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			if ( ! DashboardDataStore.get().userManagesOver(username, cruiseOwner) )
 				throw new IllegalArgumentException("Not permitted to delete cruise " + 
 						expocode + " owned by " + cruiseOwner);
-		} catch (IOException ex) {
+		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the user file handler");
 		}
@@ -523,7 +508,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		try {
 			deleteVersionedFile(cruiseDataFile(expocode), "Cruise data file for " +
 								expocode + " deleted by " + username);
-		} catch (SVNException ex) {
+		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
 					"Problems deleting the cruise data file: " + ex.getMessage());
 		}
@@ -547,13 +532,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	public DashboardCruise createDashboardCruiseFromDataFile(String expocode) 
 					throws IllegalArgumentException, FileNotFoundException {
 		File cruiseFile = cruiseDataFile(expocode);
-		// Make sure we read the latest version
-		try {
-			updateVersion(cruiseFile.getParentFile());
-		} catch ( SVNException ex ) {
-			// May not exist or maybe not yet under version control  
-			;
-		}
 		// Create a cruise entry for this data
 		DashboardCruise cruise = new DashboardCruise();
 		cruise.setExpocode(expocode);
@@ -574,6 +552,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 						"second line does not start with " + UPLOAD_FILENAME_ID);
 			cruise.setUploadFilename(
 					dataline.substring(UPLOAD_FILENAME_ID.length()).trim());
+			// TODO: read more status lines when added
 		} catch (IOException ex) {
 			throw new IllegalArgumentException(
 					"Problems access data file for cruise " + expocode + 
@@ -607,13 +586,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	public String getCruiseOwnerFromFile(String expocode)
 			throws IllegalArgumentException, FileNotFoundException {
 		File cruiseFile = cruiseDataFile(expocode);
-		// Make sure we read the latest version
-		try {
-			updateVersion(cruiseFile.getParentFile());
-		} catch ( SVNException ex ) {
-			// May not exist or maybe not yet under version control  
-			;
-		}
 		// Read the cruise data from the saved cruise data file
 		String owner = "";
 		BufferedReader cruiseReader = 

@@ -7,11 +7,8 @@ import java.io.File;
 import java.util.ArrayDeque;
 
 import org.tmatesoft.svn.core.SVNDepth;
-import org.tmatesoft.svn.core.SVNErrorCode;
-import org.tmatesoft.svn.core.SVNErrorMessage;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNInfo;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
@@ -29,9 +26,8 @@ public abstract class VersionedFileHandler {
 	SVNClientManager svnManager;
 
 	/**
-	 * Handles version control for files under the given 
-	 * working copy directory.  Currently, only configured
-	 * for SVN version control.
+	 * Handles version control for files under the given working copy 
+	 * directory.  Currently, only configured for SVN version control.
 	 * 
 	 * @param filesDirName
 	 * 		name of the working copy directory
@@ -39,42 +35,23 @@ public abstract class VersionedFileHandler {
 	 * 		username for SVN authentication
 	 * @param svnPassword
 	 * 		password for SVN authentication
-	 * @throws SVNException
-	 * 		if the specified directory does not exist,
-	 * 		is not a directory, is not under version
-	 * 		control, or is in a conflicted state
+	 * @throws IllegalArgumentException
+	 * 		if the specified directory does not exist, is not a directory 
+	 * 		or is not under version control
 	 */
 	VersionedFileHandler(String filesDirName, String svnUsername, 
-									String svnPassword) throws SVNException {
+						String svnPassword) throws IllegalArgumentException {
 		filesDir = new File(filesDirName);
+		// Check if this is a directory under version control
 		if ( ! filesDir.isDirectory() )
-			throw new SVNException(SVNErrorMessage.create(
-					SVNErrorCode.BAD_FILENAME,
-					"invalid directory " + filesDirName));
+			throw new IllegalArgumentException(
+					filesDirName + " is not a directory");
+		if ( ! SVNWCUtil.isVersionedDirectory(filesDir) ) 
+			throw new IllegalArgumentException(
+					filesDirName + " is not under version control");
+		// Create the version control manager with the provided credentials
 		svnManager = SVNClientManager.newInstance(
 				SVNWCUtil.createDefaultOptions(true), svnUsername, svnPassword);
-		// Check this directory is under SVN version control
-		SVNInfo info = svnManager.getWCClient()
-								 .doInfo(filesDir, SVNRevision.HEAD);
-		if ( info.getTreeConflict() != null )
-			throw new SVNException(SVNErrorMessage.create(
-					SVNErrorCode.FS_CONFLICT,
-					filesDirName + " contains an SVN conflict"));
-	}
-
-	/**
-	 * Updates the working copy file or directory to the latest version 
-	 * from the version control repository.  The update depth is set to
-	 * infinity, so all contents under a directory are updated.
-	 * 
-	 * @param wcfile
-	 * 		working copy file to update
-	 * @throws SVNException
-	 * 		if the version control engine throws one
-	 */
-	void updateVersion(File wcfile) throws SVNException {
-		svnManager.getUpdateClient().doUpdate(wcfile, 
-				SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
 	}
 
 	/**
@@ -112,8 +89,10 @@ public abstract class VersionedFileHandler {
 		// Get the list of directories, as well as the file, that need to be committed
 		ArrayDeque<File> filesToCommit = new ArrayDeque<File>();
 		filesToCommit.push(wcfile);
+		File parentToUpdate = wcfile;
 		for (File currFile = wcfile.getParentFile(); currFile != null; 
 										currFile = currFile.getParentFile()) {
+			parentToUpdate = currFile;
 			SVNStatus status = svnManager.getStatusClient()
 										 .doStatus(currFile, false);
 			if ( status.getContentsStatus() == SVNStatusType.STATUS_ADDED )
@@ -129,6 +108,9 @@ public abstract class VersionedFileHandler {
 		// and not any other updated files under any directories specified
 		svnManager.getCommitClient().doCommit(commitFiles, false, message,
 									null, null, false, false, SVNDepth.EMPTY);
+		// Update the existing parent directory
+		svnManager.getUpdateClient().doUpdate(parentToUpdate, 
+				SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
 	}
 
 	/**
@@ -149,6 +131,9 @@ public abstract class VersionedFileHandler {
 		// Commit the deletion from the repository
 		svnManager.getCommitClient().doCommit(new File[] {wcFile}, false, message,
 									null, null, false, false, SVNDepth.EMPTY);
+		// Update the existing parent directory
+		svnManager.getUpdateClient().doUpdate(wcFile.getParentFile(), 
+				SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
 	}
 
 }
