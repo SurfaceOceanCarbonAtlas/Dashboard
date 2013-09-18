@@ -263,20 +263,9 @@ public class DashboardCruise implements Serializable {
 				" ]";
 	}
 
-	public static Comparator<DashboardCruise> ownerComparator =
-			new Comparator<DashboardCruise>() {
-		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
-				return 0;
-			if ( c1 == null )
-				return -1;
-			if ( c2 == null )
-				return 1;
-			return c1.getOwner().compareTo(c2.getOwner());
-		}
-	};
-
+	/**
+	 * Compare using the selected property of cruises
+	 */
 	public static Comparator<DashboardCruise> selectedComparator =
 			new Comparator<DashboardCruise>() {
 		@Override
@@ -293,7 +282,24 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Comparator using the expocodes of the cruises
+	 * Compare using the owner of cruises
+	 */
+	public static Comparator<DashboardCruise> ownerComparator =
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getOwner().compareTo(c2.getOwner());
+		}
+	};
+
+	/**
+	 * Compare using the expocodes of the cruises
 	 */
 	public static Comparator<DashboardCruise> expocodeComparator = 
 			new Comparator<DashboardCruise>() {
@@ -310,7 +316,7 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Comparator using the upload filenames of the cruises
+	 * Compare using the upload filenames of the cruises
 	 */
 	public static Comparator<DashboardCruise> filenameComparator = 
 			new Comparator<DashboardCruise>() {
@@ -327,7 +333,7 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Comparator using the data check dates of the cruises
+	 * Compare using the data check dates of the cruises
 	 */
 	public static Comparator<DashboardCruise> dataCheckComparator = 
 			new Comparator<DashboardCruise>() {
@@ -352,7 +358,7 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Comparator using the metadata check dates of the cruises
+	 * Compare using the metadata check dates of the cruises
 	 */
 	public static Comparator<DashboardCruise> metaCheckComparator = 
 			new Comparator<DashboardCruise>() {
@@ -377,7 +383,7 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Comparator using the QC status string of the cruises
+	 * Compare using the QC status string of the cruises
 	 */
 	public static Comparator<DashboardCruise> qcStatusComparator = 
 			new Comparator<DashboardCruise>() {
@@ -394,7 +400,7 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Comparator using the archive status of the cruises
+	 * Compare using the archive status of the cruises
 	 */
 	public static Comparator<DashboardCruise> archiveStatusComparator = 
 			new Comparator<DashboardCruise>() {

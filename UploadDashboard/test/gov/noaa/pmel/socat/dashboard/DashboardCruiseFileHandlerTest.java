@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -195,11 +195,13 @@ public class DashboardCruiseFileHandlerTest {
 		assertNotNull( handler );
 
 		// Generate the cruise data from a BufferedReader wrapping the String data
-		DashboardCruiseData cruiseData;
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
+		cruiseData.setOwner(username);
+		cruiseData.setUploadFilename(filename);
 		BufferedReader reader = new BufferedReader(new StringReader(
 				versionString + expocodeString + metadataString + headerString + dataString));
 		try {
-			cruiseData = handler.getCruiseDataFromInput(username, filename, reader);
+			handler.assignCruiseDataFromInput(cruiseData, reader);
 		} finally {
 			reader.close();
 		}
@@ -237,7 +239,7 @@ public class DashboardCruiseFileHandlerTest {
 		assertTrue( handler.cruiseDataFileExists(expocode) );
 
 		// Generate the cruise data from the saved file
-		DashboardCruiseData fileData = handler.getCruiseDataFromFile(expocode);
+		DashboardCruiseWithData fileData = handler.getCruiseDataFromFile(expocode);
 
 		// Check for differences - version string will differ
 		assertEquals(username, fileData.getOwner());
@@ -286,11 +288,11 @@ public class DashboardCruiseFileHandlerTest {
 		expectedCruise.setExpocode(expocode);
 		expectedCruise.setOwner(username);
 		expectedCruise.setUploadFilename(filename);
-		DashboardCruise cruise = handler.createDashboardCruiseFromDataFile(expocode);
+		DashboardCruise cruise = handler.getCruiseFromDataFile(expocode);
 		assertEquals(expectedCruise, cruise);
 
 		// Check getCruiseOwnerFromDataFile
-		assertEquals(username, handler.getCruiseOwnerFromFile(expocode));
+		assertEquals(username, handler.getCruiseOwnerFromDataFile(expocode));
 	}
 
 }

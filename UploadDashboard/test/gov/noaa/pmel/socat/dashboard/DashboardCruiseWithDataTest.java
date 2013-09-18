@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,25 +17,25 @@ import org.junit.Test;
 /**
  * @author Karl Smith
  */
-public class DashboardCruiseDataTest {
+public class DashboardCruiseWithDataTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#DashboardCruiseData()}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#DashboardCruiseWithData()}.
 	 */
 	@Test
-	public void testDashboardCruiseData() {
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+	public void testDashboardCruiseWithData() {
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertNotNull( cruiseData );
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getOwner()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setOwner(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getOwner()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setOwner(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetOwner() {
 		String myUsername = "SocatUser";
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setOwner(myUsername);
 		assertEquals(myUsername, cruiseData.getOwner());
@@ -44,13 +44,13 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getUploadFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setUploadFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getUploadFilename()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setUploadFilename(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetFilename() {
 		String myFilename = "agsk20031205_revised.tsv";
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals("", cruiseData.getUploadFilename());
 		cruiseData.setUploadFilename(myFilename);
 		assertEquals(myFilename, cruiseData.getUploadFilename());
@@ -60,13 +60,13 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getVersion()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setVersion(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getVersion()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setVersion(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetVersion() {
 		String myVersion = "SOCAT version 3 cruise file created: 2013-09-05";
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals("", cruiseData.getVersion());
 		cruiseData.setVersion(myVersion);
 		assertEquals(myVersion, cruiseData.getVersion());
@@ -77,13 +77,13 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getExpocode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getExpocode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setExpocode(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetExpocode() {
 		String myExpocode = "AGSK20031205";
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals("", cruiseData.getExpocode());
 		cruiseData.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruiseData.getExpocode());
@@ -95,8 +95,8 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getPreamble()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setPreamble(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getPreamble()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setPreamble(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetPreamble() {
@@ -107,7 +107,7 @@ public class DashboardCruiseDataTest {
 						"Ship/Vessel Name: Skogafoss",
 						"Principal Investigator(s): Rik Wanninkhof"
 				}));
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals(0, cruiseData.getPreamble().size());
 		cruiseData.setPreamble(myPreamble);
 		assertEquals(myPreamble, cruiseData.getPreamble());
@@ -120,8 +120,8 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getColumnNames()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setColumnNames(java.lang.String[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getColumnNames()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setColumnNames(java.lang.String[])}.
 	 */
 	@Test
 	public void testSetGetColumnNames() {
@@ -131,7 +131,7 @@ public class DashboardCruiseDataTest {
 						"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
 						"xCO2water_equ_dry [umol/mol]" 
 				}));
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals(0, cruiseData.getColumnNames().size());
 		cruiseData.setColumnNames(colNames);
 		assertEquals(colNames, cruiseData.getColumnNames());
@@ -145,8 +145,8 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#getDataValues()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#setDataValues(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getDataValues()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setDataValues(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetDataValues() {
@@ -167,7 +167,7 @@ public class DashboardCruiseDataTest {
 		for (int k = 0; k < observations.length; k++)
 			dataValues.add(new ArrayList<String>(Arrays.asList(observations[k])));
 
-		DashboardCruiseData cruiseData = new DashboardCruiseData();
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		cruiseData.setDataValues(dataValues);
 		assertEquals(dataValues, cruiseData.getDataValues());
 		assertEquals(0, cruiseData.getColumnNames().size());		
@@ -181,8 +181,8 @@ public class DashboardCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseData#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEquals() {
@@ -220,10 +220,10 @@ public class DashboardCruiseDataTest {
 		for (int k = 0; k < observations.length; k++)
 			dataValues.add(new ArrayList<String>(Arrays.asList(observations[k])));
 
-		DashboardCruiseData firstData = new DashboardCruiseData();
+		DashboardCruiseWithData firstData = new DashboardCruiseWithData();
 		assertFalse( firstData.equals(null) );
 		assertFalse( firstData.equals(colNames) );
-		DashboardCruiseData secondData = new DashboardCruiseData();
+		DashboardCruiseWithData secondData = new DashboardCruiseWithData();
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 

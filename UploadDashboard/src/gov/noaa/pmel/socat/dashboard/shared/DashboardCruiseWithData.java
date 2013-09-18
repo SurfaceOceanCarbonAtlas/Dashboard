@@ -3,7 +3,6 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,14 +11,11 @@ import java.util.List;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseData implements Serializable {
+public class DashboardCruiseWithData extends DashboardCruise {
 
-	private static final long serialVersionUID = 8916342409876124367L;
+	private static final long serialVersionUID = 5819589890074395617L;
 
-	String owner;
-	String uploadFilename;
 	String version;
-	String expocode;
 	ArrayList<String> preamble;
 	ArrayList<String> columnNames;
 	ArrayList<ArrayList<String>> dataValues;
@@ -27,54 +23,11 @@ public class DashboardCruiseData implements Serializable {
 	/**
 	 * Creates with no cruise data
 	 */
-	public DashboardCruiseData() {
-		owner = "";
-		uploadFilename = "";
+	public DashboardCruiseWithData() {
 		version = "";
-		expocode = "";
 		preamble = new ArrayList<String>();
 		columnNames = new ArrayList<String>();
 		dataValues = new ArrayList<ArrayList<String>>();
-	}
-
-	/**
-	 * @return 
-	 * 		the owner; never null
-	 */
-	public String getOwner() {
-		return owner;
-	}
-
-	/**
-	 * @param owner 
-	 * 		the cruise data owner (after trimming) to set; 
-	 * 		if null, sets to an empty string
-	 */
-	public void setOwner(String owner) {
-		if ( owner == null )
-			this.owner = "";
-		else
-			this.owner = owner.trim();
-	}
-
-	/**
-	 * @return 
-	 * 		the uploaded data filename; never null
-	 */
-	public String getUploadFilename() {
-		return uploadFilename;
-	}
-
-	/**
-	 * @param uploadFilename 
-	 * 		the uploaded data filename (after trimming) to set;
-	 * 		if null, sets to an empty string
-	 */
-	public void setUploadFilename(String uploadFilename) {
-		if ( uploadFilename == null )
-			this.uploadFilename = "";
-		else
-			this.uploadFilename = uploadFilename.trim();
 	}
 
 	/**
@@ -95,27 +48,6 @@ public class DashboardCruiseData implements Serializable {
 			this.version = "";
 		else
 			this.version = version.trim();
-	}
-
-	/**
-	 * @return 
-	 * 		the cruise expocode; never null
-	 */
-	public String getExpocode() {
-		return expocode;
-	}
-
-	/**
-	 * @param expocode 
-	 * 		the cruise expocode (after trimming and 
-	 * 		converting to upper-case) to set;
-	 * 		if null, sets to an empty string
-	 */
-	public void setExpocode(String expocode) {
-		if ( expocode == null )
-			this.expocode = "";
-		else
-			this.expocode = expocode.trim().toUpperCase();
 	}
 
 	/**
@@ -185,10 +117,8 @@ public class DashboardCruiseData implements Serializable {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = owner.hashCode();
-		result = result * prime + uploadFilename.hashCode();
+		int result = super.hashCode();
 		result = result * prime + version.hashCode();
-		result = result * prime + expocode.hashCode();
 		result = result * prime + preamble.hashCode();
 		result = result * prime + columnNames.hashCode();
 		result = result * prime + dataValues.hashCode();
@@ -202,17 +132,13 @@ public class DashboardCruiseData implements Serializable {
 		if (obj == null)
 			return false;
 
-		if ( ! ( obj instanceof DashboardCruiseData ) )
+		if ( ! ( obj instanceof DashboardCruiseWithData ) )
 			return false;
-		DashboardCruiseData other = (DashboardCruiseData) obj;
+		DashboardCruiseWithData other = (DashboardCruiseWithData) obj;
 
-		if ( ! owner.equals(other.owner) ) 
-			return false;
-		if ( ! uploadFilename.equals(other.uploadFilename) ) 
+		if ( ! super.equals(other) ) 
 			return false;
 		if ( ! version.equals(other.version) ) 
-			return false;
-		if ( ! expocode.equals(other.expocode) ) 
 			return false;
 		if ( ! preamble.equals(other.preamble) ) 
 			return false;
@@ -222,6 +148,18 @@ public class DashboardCruiseData implements Serializable {
 			return false;
 
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		String repr = "DashboardCruiseWithData" +
+					  "[ " + super.toString() +
+					  "; version = " + version +
+					  "; preamble = " + preamble.toString() +
+					  "; columnNames = " + columnNames.toString() +
+					  "; dataValues = " + dataValues.toString() +
+					  " ]";
+		return repr;
 	}
 
 }
