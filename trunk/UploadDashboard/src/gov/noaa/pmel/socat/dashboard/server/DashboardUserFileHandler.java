@@ -104,7 +104,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			// Create the DashboardCruise from the data file
 			try {
 				DashboardCruise cruise = 
-						cruiseHandler.createDashboardCruiseFromDataFile(expocode);
+						cruiseHandler.getCruiseFromDataFile(expocode);
 				cruiseList.put(expocode, cruise);
 			} catch ( FileNotFoundException ex ) {
 				// Remove this expocode from the saved list
@@ -234,7 +234,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 				// add or replace it in the cruise list
 				cruiseList.put(expocode, DashboardDataStore.get()
 								.getCruiseFileHandler()
-								.createDashboardCruiseFromDataFile(expocode));
+								.getCruiseFromDataFile(expocode));
 				changeMade = true;
 				commitMessage += expocode + "; ";
 			} catch ( FileNotFoundException ex ) {
