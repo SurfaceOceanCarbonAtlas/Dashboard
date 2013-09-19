@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -157,7 +157,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	void previewButtonOnClick(ClickEvent event) {
 		usernameToken.setValue(DashboardPageFactory.getUsername());
 		passhashToken.setValue(DashboardPageFactory.getPasshash());
-		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
+		actionToken.setValue(DashboardCruise.REQUEST_PREVIEW_TAG);
 		uploadForm.submit();
 	}
 
@@ -165,7 +165,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	void createButtonOnClick(ClickEvent event) {
 		usernameToken.setValue(DashboardPageFactory.getUsername());
 		passhashToken.setValue(DashboardPageFactory.getPasshash());
-		actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
+		actionToken.setValue(DashboardCruise.REQUEST_NEW_CRUISE_TAG);
 		uploadForm.submit();
 	}
 
@@ -173,7 +173,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	void overwriteButtonOnClick(ClickEvent event) {
 		usernameToken.setValue(DashboardPageFactory.getUsername());
 		passhashToken.setValue(DashboardPageFactory.getPasshash());
-		actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
+		actionToken.setValue(DashboardCruise.REQUEST_OVERWRITE_CRUISE_TAG);
 		uploadForm.submit();
 	}
 
@@ -221,7 +221,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.FILE_PREVIEW_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.FILE_PREVIEW_HEADER_TAG.equals(tagMsg[0]) ) {
 			// preview file; show partial file contents in the preview
 			String previewMsg;
 			if ( (tagMsg[1]).contains("</pre>") )
@@ -232,7 +232,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.NO_EXPOCODE_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.NO_EXPOCODE_HEADER_TAG.equals(tagMsg[0]) ) {
 			// no expocode found; show uploaded file partial contents
 			String previewMsg;
 			if ( (tagMsg[1]).contains("</pre>") )
@@ -244,7 +244,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.FILE_EXISTS_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.FILE_EXISTS_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file exists and not overwrite; 
 			// show existing file partial contents in the preview
 			String previewMsg;
@@ -257,7 +257,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.CANNOT_OVERWRITE_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file exists and not permitted to overwrite; 
 			// show existing file partial contents in the preview
 			String previewMsg;
@@ -270,7 +270,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.NO_FILE_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.NO_FILE_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file does not exist and overwrite; 
 			// show partial file contents in preview
 			String previewMsg;
@@ -283,7 +283,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file created
 			Window.alert(tagMsg[1]);
 			// return to the updated cruise list
@@ -292,7 +292,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			return;
 		}
 
-		if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
+		if ( DashboardCruise.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file updated
 			Window.alert(tagMsg[1]);
 			// return to the updated cruise list

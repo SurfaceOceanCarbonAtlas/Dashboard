@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,16 +37,16 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
 		Pattern.compile("\\s*Cruise\\s*Expocode\\s*:\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE),
 		Pattern.compile("\\s*Expocode\\s*:\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE),
 		Pattern.compile("\\s*Cruise\\s*Expocode\\s*=\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE),
 		Pattern.compile("\\s*Expocode\\s*=\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE)
 	};
 	// Patterns for file creation date in the metadata header
@@ -59,7 +58,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	};
 	// Pattern for checking for invalid characters in the expocode
 	private static final Pattern invalidExpocodePattern = 
-			Pattern.compile("[^" + DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]");
+			Pattern.compile("[^" + DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]");
 
 	/**
 	 * Handles storage and retrieval of cruise data in files 
@@ -95,8 +94,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Do some automatic clean-up
 		String upperExpo = expocode.trim().toUpperCase();
 		// Make sure it is the proper length
-		if ( (upperExpo.length() < DashboardUtils.MIN_EXPOCODE_LENGTH) || 
-			 (upperExpo.length() > DashboardUtils.MAX_EXPOCODE_LENGTH) )
+		if ( (upperExpo.length() < DashboardCruise.MIN_EXPOCODE_LENGTH) || 
+			 (upperExpo.length() > DashboardCruise.MAX_EXPOCODE_LENGTH) )
 			throw new IllegalArgumentException(
 					"Invalid cruise Expocode length");
 		// Make sure there are no invalid characters
@@ -430,25 +429,20 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		if the cruise file does not exist
 	 */
 	public void deleteCruiseDataFile(String expocode, String username) 
-					throws IllegalArgumentException, FileNotFoundException {
-		// Get the owner of the cruise which, in the process, 
-		// checks the expocode is valid and the cruise file exists
-		String cruiseOwner = getCruiseOwnerFromDataFile(expocode);
-		// Check that the user has permission to delete the cruise
+				throws IllegalArgumentException, FileNotFoundException {
+		DashboardCruise cruise;
 		try {
-			if ( ! DashboardDataStore.get()
-								.userManagesOver(username, cruiseOwner) )
-				throw new IllegalArgumentException(
-						"Not permitted to delete cruise " + 
-						expocode + " owned by " + cruiseOwner);
-		} catch ( IOException ex ) {
+			cruise = verifyOkayToDeleteCruise(expocode, username);
+		} catch ( IllegalArgumentException ex ) {
 			throw new IllegalArgumentException(
-					"Unexpected failure to get the user file handler");
+					"Not permitted to delete cruise " + expocode +
+					": " + ex.getMessage());
 		}
 		// Delete the cruise file
 		try {
 			deleteVersionedFile(cruiseDataFile(expocode), 
 					"Cruise data file for " + expocode + 
+					" owned by " + cruise.getOwner() + 
 					" deleted by " + username);
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
@@ -562,49 +556,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Get the owner of a cruise from the first line of the cruise data file
-	 * without reading any other contents of the file.
-	 * 
-	 * @param expocode
-	 * 		cruise to get the owner of
-	 * @return
-	 * 		owner of the cruise; never null
-	 * @throws IllegalArgumentException
-	 * 		if the cruise expocode is invalid or 
-	 * 		if there are problems accessing the data file
-	 * @throws FileNotFoundException
-	 * 		if the cruise file does not exist
-	 */
-	public String getCruiseOwnerFromDataFile(String expocode)
-			throws IllegalArgumentException, FileNotFoundException {
-		File cruiseFile = cruiseDataFile(expocode);
-		// Read the cruise data from the saved cruise data file
-		String owner = "";
-		BufferedReader cruiseReader = 
-					new BufferedReader(new FileReader(cruiseFile));
-		try {
-			// Get the owner of this cruise from the first line of the file
-			String dataline = cruiseReader.readLine();
-			if ( ! dataline.startsWith(DATA_OWNER_ID) )
-				throw new IllegalArgumentException(
-						"first line does not start with " + DATA_OWNER_ID);
-			owner = dataline.substring(DATA_OWNER_ID.length()).trim();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Problems accessing the data for cruise " + expocode + 
-					": " + ex.getMessage());
-		} finally {
-			try {
-				cruiseReader.close();
-			} catch (IOException ex) {
-				// don't care
-				;
-			}
-		}
-		return owner;
-	}
-
-	/**
 	 * Assigns a DashboardCruise with data from the first few lines 
 	 * read from an input reader.
 	 * 
@@ -683,6 +634,48 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"sixth line does not start with " + ARCHIVE_STATUS_ID);
 		cruise.setArchiveStatus(
 				dataline.substring(ARCHIVE_STATUS_ID.length()).trim());
+	}
+
+	/**
+	 * Verify a user can overwrite or delete a cruise.  This checks
+	 * the submission state of the cruise as well as ownership of the
+	 * cruise.  If not permitted, an IllegalArgumentException is
+	 * thrown with reason for the failure.
+	 * 
+	 * @param expocode
+	 * 		cruise to check
+	 * @param username
+	 * 		user wanting to overwrite or delete the cruise
+	 * @return 
+	 * 		the cruise being overwritten or deleted; never null
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid, 
+	 * 		if there are problems accessing the cruise data file
+	 * @throws FileNotFoundException
+	 * 		if there is no cruise data file for this cruise
+	 */
+	public DashboardCruise verifyOkayToDeleteCruise(String expocode, String username) 
+				throws IllegalArgumentException, FileNotFoundException {
+		// Get the cruise information from the data file
+		DashboardCruise cruise = getCruiseFromDataFile(expocode);
+		// Check if the cruise is in a submitted or accepted state
+		String status = cruise.getQCStatus();
+		if ( ! ( status.equals(DashboardCruise.QC_STATUS_NOT_SUBMITTED) || 
+				 status.equals(DashboardCruise.QC_STATUS_AUTOFAIL) ||
+				 status.equals(DashboardCruise.QC_STATUS_UNACCEPTABLE) ||
+				 status.equals(DashboardCruise.QC_STATUS_SUSPENDED) ||
+				 status.equals(DashboardCruise.QC_STATUS_EXCLUDED) ) )
+			throw new IllegalArgumentException("cruise status is " + status);
+		// Check if the user has permission to delete the cruise
+		try {
+			String owner = cruise.getOwner();
+			if ( ! DashboardDataStore.get().userManagesOver(username, owner) )
+				throw new IllegalArgumentException("cruise owner is " + owner);
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the user file handler");
+		}
+		return cruise;
 	}
 
 }

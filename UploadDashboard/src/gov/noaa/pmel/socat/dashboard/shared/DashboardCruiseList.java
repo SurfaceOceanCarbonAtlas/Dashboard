@@ -13,7 +13,12 @@ import java.util.HashMap;
  */
 public class DashboardCruiseList extends HashMap<String,DashboardCruise> {
 
-	private static final long serialVersionUID = 4798888572810557981L;
+	private static final long serialVersionUID = -8933833140165489038L;
+
+	public static final String REQUEST_CRUISE_LIST_ACTION = "GET CRUISE LIST";
+	public static final String REQUEST_CRUISE_DELETE_ACTION = "DELETE CRUISE";
+	public static final String REQUEST_CRUISE_ADD_ACTION = "ADD CRUISE TO LIST";
+	public static final String REQUEST_CRUISE_REMOVE_ACTION = "REMOVE CRUISE FROM LIST";
 
 	String username;
 

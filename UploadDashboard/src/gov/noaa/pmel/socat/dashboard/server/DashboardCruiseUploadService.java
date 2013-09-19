@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -110,9 +110,9 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		if ( (username == null) || (passhash == null) || 
 			 (encoding == null) || (action == null) || (cruiseItem == null) || 
 			 ( ! dataStore.validateUser(username, passhash) ) ||
-			 ! ( DashboardUtils.REQUEST_PREVIEW_TAG.equals(action) ||
-				 DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ||
-				 DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) ) {
+			 ! ( DashboardCruise.REQUEST_PREVIEW_TAG.equals(action) ||
+				 DashboardCruise.REQUEST_NEW_CRUISE_TAG.equals(action) ||
+				 DashboardCruise.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) ) {
 			cruiseItem.delete();
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					"Invalid request contents for this service.");
@@ -122,7 +122,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		// name of the user's uploaded file
 		String filename = cruiseItem.getName();
 
-		if ( DashboardUtils.REQUEST_PREVIEW_TAG.equals(action) ) {
+		if ( DashboardCruise.REQUEST_PREVIEW_TAG.equals(action) ) {
 			// if preview, just return up to 50 lines 
 			/// of interpreted contents of the uploaded file
 			ArrayList<String> contentsList = new ArrayList<String>(50);
@@ -152,7 +152,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_ACCEPTED);
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter respWriter = response.getWriter();
-			respWriter.println(DashboardUtils.FILE_PREVIEW_HEADER_TAG);
+			respWriter.println(DashboardCruise.FILE_PREVIEW_HEADER_TAG);
 			respWriter.println("----------------------------------------");
 			respWriter.println("Filename: " + filename);
 			respWriter.println("Encoding: " + encoding);
@@ -166,7 +166,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 
 		DashboardCruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 
-		// Create a DashboardCruiseWithData from the contents of the file 
+		// Create a DashboardCruiseWithData from the contents of the uploaded data file 
 		DashboardCruiseWithData cruiseData;
 		try {
 			BufferedReader cruiseReader = new BufferedReader(
@@ -188,18 +188,18 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		// done with the uploaded data file
 		cruiseItem.delete();
 
-		// Make sure the expocode was obtained from the file
-		// and check if a cruise data file already exists 
+		// Check if the cruise file exists, and in the process
+		// check if a valid expocode was obtained from the file
 		String expocode = cruiseData.getExpocode();
-		boolean cruiseFileExists;
+		boolean cruiseExists;
 		try {
-			cruiseFileExists = cruiseHandler.cruiseDataFileExists(expocode);
+			cruiseExists = cruiseHandler.cruiseDataFileExists(expocode);
 		} catch ( IllegalArgumentException ex ) {
-			// Respond with an error message containing partial file contents
+			// Invalid expocode - respond with an error message containing partial file contents
 			response.setStatus(HttpServletResponse.SC_ACCEPTED);
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter respWriter = response.getWriter();
-			respWriter.println(DashboardUtils.NO_EXPOCODE_HEADER_TAG);
+			respWriter.println(DashboardCruise.NO_EXPOCODE_HEADER_TAG);
 			respWriter.println("----------------------------------------");
 			respWriter.println("Filename: " + filename);
 			respWriter.println("Encoding: " + encoding);
@@ -212,19 +212,18 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			return;
 		}
 
-		if ( cruiseFileExists ) {
+		if ( cruiseExists ) {
 			String owner;
 			try {
-				owner = cruiseHandler.getCruiseOwnerFromDataFile(expocode);
+				owner = cruiseHandler.verifyOkayToDeleteCruise(expocode, username)
+									 .getOwner();
 			} catch ( Exception ex ) {
-				// treat as a cruise with an unknown owner
-				owner = "";
+				owner = null;
 			}
-			boolean canOverwrite = dataStore.userManagesOver(username, owner);
 			// If the cruise file exists, make sure the request was for an overwrite
-			// and that the user has permission to overwrite this cruise
-			if ( ! ( DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) &&
-					 canOverwrite ) ) {
+			// and that this user has permission to overwrite this cruise
+			if ( (owner == null) ||
+				 DashboardCruise.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) {
 				// Respond with an error message containing partial file contents 
 				// of the existing file
 				DashboardCruiseWithData existingCruiseData;
@@ -237,14 +236,17 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter respWriter = response.getWriter();
-				if ( canOverwrite )
-					respWriter.println(DashboardUtils.FILE_EXISTS_HEADER_TAG);
+				if ( owner == null ) {
+					respWriter.println(DashboardCruise.CANNOT_OVERWRITE_HEADER_TAG);
+					if ( existingCruiseData != null )
+						owner = existingCruiseData.getOwner();
+				}
 				else
-					respWriter.println(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG);
+					respWriter.println(DashboardCruise.FILE_EXISTS_HEADER_TAG);
 				respWriter.println("----------------------------------------");
 				respWriter.println("(Partial) Contents of existing cruise file:");
 				respWriter.println("Owned by: " + owner);
-				if ( (existingCruiseData != null) && username.equals(owner) )
+				if ( existingCruiseData != null )
 					respWriter.println("Name of uploaded file: " + 
 							existingCruiseData.getUploadFilename());
 				respWriter.println("----------------------------------------");
@@ -263,12 +265,12 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		}
 		else {
 			// If the cruise file does not exist, make sure the request was for a new file
-			if ( ! DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ) {
+			if ( ! DashboardCruise.REQUEST_NEW_CRUISE_TAG.equals(action) ) {
 				// Respond with an error message containing the partial file contents
 				response.setStatus(HttpServletResponse.SC_ACCEPTED);
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter respWriter = response.getWriter();
-				respWriter.println(DashboardUtils.NO_FILE_HEADER_TAG);
+				respWriter.println(DashboardCruise.NO_FILE_HEADER_TAG);
 				respWriter.println("----------------------------------------");
 				respWriter.println("Filename: " + filename);
 				respWriter.println("Encoding: " + encoding);
@@ -284,7 +286,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 
 		// Save the cruise file and commit it to version control
 		String message;
-		if ( cruiseFileExists )
+		if ( cruiseExists )
 			message = "Cruise data for " + expocode + " updated by " + 
 					username + " from uploaded file " + filename;
 		else
@@ -312,10 +314,10 @@ public class DashboardCruiseUploadService extends HttpServlet {
 		response.setStatus(HttpServletResponse.SC_CREATED);
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();
-		if ( cruiseFileExists )
-			respWriter.println(DashboardUtils.FILE_UPDATED_HEADER_TAG);
+		if ( cruiseExists )
+			respWriter.println(DashboardCruise.FILE_UPDATED_HEADER_TAG);
 		else
-			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG);
+			respWriter.println(DashboardCruise.FILE_CREATED_HEADER_TAG);
 		respWriter.println(message);
 		response.flushBuffer();
 	}
