@@ -105,13 +105,13 @@ body {
 	margin-left: 0.5em;
 }
 
-.uploadbuttonpanel {
+.verticalbuttonpanel {
 	display: block;
 	width: 55em;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
-.uploadbutton {
+.verticalbutton {
 	display: inline;
 	font-size: 100%;
 	width: 12em;
@@ -130,4 +130,9 @@ body {
 }
 .previewhtml {
 	padding: 0.25em;
+}
+
+.cruiselabel {
+	display: block;
+	margin: 1em;
 }

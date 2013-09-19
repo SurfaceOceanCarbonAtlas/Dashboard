@@ -168,6 +168,7 @@ public class DashboardCruiseWithDataTest {
 			dataValues.add(new ArrayList<String>(Arrays.asList(observations[k])));
 
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
+		assertEquals(0, cruiseData.getDataValues().size());
 		cruiseData.setDataValues(dataValues);
 		assertEquals(dataValues, cruiseData.getDataValues());
 		assertEquals(0, cruiseData.getColumnNames().size());		

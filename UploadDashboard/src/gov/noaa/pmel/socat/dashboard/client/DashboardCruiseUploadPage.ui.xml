@@ -20,8 +20,8 @@
 						<g:ListBox name="cruiseencoding" addStyleNames="{style.labeledlistbox}"
 								ui:field="encodingListBox" />
 					</g:FlowPanel>
-					<g:FlowPanel  addStyleNames="{style.uploadbuttonpanel}">
-						<g:Button addStyleNames="{style.uploadbutton}" ui:field="previewButton" />
+					<g:FlowPanel  addStyleNames="{style.verticalbuttonpanel}">
+						<g:Button addStyleNames="{style.verticalbutton}" ui:field="previewButton" />
 					</g:FlowPanel>
 					<g:Hidden name="username" ui:field="usernameToken" />
 					<g:Hidden name="passhash" ui:field="passhashToken" />
@@ -32,10 +32,10 @@
 		<g:south size="10">
 			<g:FlowPanel>
 				<g:HTML addStyleNames="{style.introhtml}" ui:field="buttonsHtml" />
-				<g:FlowPanel addStyleNames="{style.uploadbuttonpanel}">
-					<g:Button addStyleNames="{style.uploadbutton}" ui:field="createButton" />
-					<g:Button addStyleNames="{style.uploadbutton}" ui:field="overwriteButton" />
-					<g:Button addStyleNames="{style.uploadbutton}" ui:field="cancelButton" />
+				<g:FlowPanel addStyleNames="{style.verticalbuttonpanel}">
+					<g:Button addStyleNames="{style.verticalbutton}" ui:field="createButton" />
+					<g:Button addStyleNames="{style.verticalbutton}" ui:field="overwriteButton" />
+					<g:Button addStyleNames="{style.verticalbutton}" ui:field="cancelButton" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:south>
