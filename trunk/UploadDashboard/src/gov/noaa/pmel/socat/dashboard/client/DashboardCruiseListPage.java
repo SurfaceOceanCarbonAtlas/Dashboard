@@ -8,7 +8,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListServiceAsync;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -49,8 +48,7 @@ public class DashboardCruiseListPage extends Composite {
 	protected static String noExpocodeString = "(unknown)";
 	protected static String noOwnerString = "(unknown)";
 	protected static String noUploadFilenameString = "(unknown)";
-	protected static String noDataCheckDateString = "(never checked)";
-	protected static String noMetaCheckDateString = "(never checked)";
+	protected static String noCheckStatusString = "(not checked)";
 	protected static String noQCStatusString = "(not submitted)";
 	protected static String noArchiveStatusString = "(not archived)";
 
@@ -459,7 +457,7 @@ public class DashboardCruiseListPage extends Composite {
 		columnSortHandler.setComparator(dataCheckColumn, 
 				DashboardCruise.dataCheckComparator);
 		columnSortHandler.setComparator(metaCheckColumn, 
-				DashboardCruise.metaCheckComparator);
+				DashboardCruise.metadataCheckComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
 				DashboardCruise.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
@@ -559,22 +557,17 @@ public class DashboardCruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the data-check date-string column for the table
+	 * Creates the data-check status column for the table
 	 */
 	private TextColumn<DashboardCruise> buildDataCheckColumn() {
 		TextColumn<DashboardCruise> dataCheckColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				Date checkDate = cruise.getDataCheckDate();
-				String checkStr;
-				if ( checkDate != null ) {
-					//TODO: create a date string in the desired format
-					checkStr = checkDate.toString();
-				}
-				else
-					checkStr = noDataCheckDateString;
-				return checkStr;
+				String status = cruise.getDataCheckStatus();
+				if ( status.isEmpty() )
+					status = noCheckStatusString;
+				return status;
 			}
 		};
 		dataCheckColumn.setDataStoreName(columnNameDataCheck);
@@ -582,22 +575,17 @@ public class DashboardCruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the metadata-check date-string column for the table
+	 * Creates the metadata-check status column for the table
 	 */
 	private TextColumn<DashboardCruise> buildMetaCheckColumn() {
 		TextColumn<DashboardCruise> metaCheckColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				Date checkDate = cruise.getMetaCheckDate();
-				String checkStr;
-				if ( checkDate != null ) {
-					//TODO: create a date string in the desired format
-					checkStr = checkDate.toString();
-				}
-				else
-					checkStr = noMetaCheckDateString;
-				return checkStr;
+				String status = cruise.getMetadataCheckStatus();
+				if ( status.isEmpty() )
+					status = noCheckStatusString;
+				return status;
 			}
 		};
 		metaCheckColumn.setDataStoreName(columnNameMetaCheck);

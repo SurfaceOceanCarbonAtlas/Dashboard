@@ -6,11 +6,8 @@ package gov.noaa.pmel.socat.dashboard;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-
-import java.util.Date;
 
 import org.junit.Test;
 
@@ -75,7 +72,7 @@ public class DashboardCruiseTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getUploadFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getDataCheckDate()}.
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getDataCheckStatus()}.
 	 */
 	@Test
 	public void testSetGetUploadFilename() {
@@ -92,42 +89,42 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getDataCheckDate()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setDataCheckDate(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getDataCheckStatus()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setDataCheckStatus(java.lang.String)}.
 	 */
 	@Test
-	public void testSetGetDataCheckDate() {
-		Date myDate = new Date(System.currentTimeMillis());
+	public void testSetGetDataCheckStatus() {
+		String myDataStatus = "Acceptable";
 		DashboardCruise cruise = new DashboardCruise();
-		assertNull( cruise.getDataCheckDate() );
-		cruise.setDataCheckDate(myDate);
-		assertEquals(myDate, cruise.getDataCheckDate());
+		assertEquals("", cruise.getDataCheckStatus());
+		cruise.setDataCheckStatus(myDataStatus);
+		assertEquals(myDataStatus, cruise.getDataCheckStatus());
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setDataCheckDate(null);
-		assertNull( cruise.getDataCheckDate() );
+		cruise.setDataCheckStatus(null);
+		assertEquals("", cruise.getDataCheckStatus());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getMetaCheckDate()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setMetaCheckDate(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getMetadataCheckStatus()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setMetadataCheckStatus(java.lang.String)}.
 	 */
 	@Test
-	public void testSetGetMetaCheckDate() {
-		Date myDate = new Date(System.currentTimeMillis());
+	public void testSetGetMetadataCheckStatus() {
+		String myMetaStatus = "Questionable";
 		DashboardCruise cruise = new DashboardCruise();
-		assertNull( cruise.getMetaCheckDate() );
-		cruise.setMetaCheckDate(myDate);
-		assertEquals(myDate, cruise.getMetaCheckDate());
-		assertNull( cruise.getDataCheckDate() );
+		assertEquals("", cruise.getMetadataCheckStatus());
+		cruise.setMetadataCheckStatus(myMetaStatus);
+		assertEquals(myMetaStatus, cruise.getMetadataCheckStatus());
+		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setMetaCheckDate(null);
-		assertNull( cruise.getMetaCheckDate() );
+		cruise.setMetadataCheckStatus(null);
+		assertEquals("", cruise.getMetadataCheckStatus());
 	}
 
 	/**
@@ -141,8 +138,8 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getQCStatus());
 		cruise.setQCStatus(myQCStatus);
 		assertEquals(myQCStatus, cruise.getQCStatus());
-		assertNull( cruise.getMetaCheckDate() );
-		assertNull( cruise.getDataCheckDate() );
+		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -163,8 +160,8 @@ public class DashboardCruiseTest {
 		cruise.setArchiveStatus(myArchiveStatus);
 		assertEquals(myArchiveStatus, cruise.getArchiveStatus());
 		assertEquals("", cruise.getQCStatus());
-		assertNull( cruise.getMetaCheckDate() );
-		assertNull( cruise.getDataCheckDate() );
+		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -182,14 +179,14 @@ public class DashboardCruiseTest {
 		String myOwner = "SocatUser";
 		String myExpocode = "ABCD20050728";
 		String myFilename = "myUploadFilename.tsv";
-		Date myDataCheckDate = new Date(System.currentTimeMillis() - 1234567L);
-		Date myMetaCheckDate = new Date(System.currentTimeMillis() - 2345678L);
+		String myDataStatus = "Acceptable";
+		String myMetaStatus = "Questionable";
 		String myQCStatus = "Submitted";
 		String myArchiveStatus = "Next SOCAT release";
 
 		DashboardCruise firstCruise = new DashboardCruise();
 		assertFalse( firstCruise.equals(null) );
-		assertFalse( firstCruise.equals(myDataCheckDate) );
+		assertFalse( firstCruise.equals(myDataStatus) );
 		DashboardCruise secondCruise = new DashboardCruise();
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
@@ -222,17 +219,17 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setDataCheckDate(myDataCheckDate);
+		firstCruise.setDataCheckStatus(myDataStatus);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setDataCheckDate(myDataCheckDate);
+		secondCruise.setDataCheckStatus(myDataStatus);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setMetaCheckDate(myMetaCheckDate);
+		firstCruise.setMetadataCheckStatus(myMetaStatus);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setMetaCheckDate(myMetaCheckDate);
+		secondCruise.setMetadataCheckStatus(myMetaStatus);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
