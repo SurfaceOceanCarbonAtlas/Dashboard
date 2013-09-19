@@ -290,9 +290,6 @@ public class DashboardCruiseFileHandlerTest {
 		expectedCruise.setUploadFilename(filename);
 		DashboardCruise cruise = handler.getCruiseFromDataFile(expocode);
 		assertEquals(expectedCruise, cruise);
-
-		// Check getCruiseOwnerFromDataFile
-		assertEquals(username, handler.getCruiseOwnerFromDataFile(expocode));
 	}
 
 }

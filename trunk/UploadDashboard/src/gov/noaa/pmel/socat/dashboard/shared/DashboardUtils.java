@@ -13,33 +13,6 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  */
 public class DashboardUtils {
 
-	public static final String REQUEST_CRUISE_LIST_ACTION = "GET CRUISE LIST";
-	public static final String REQUEST_CRUISE_DELETE_ACTION = "DELETE CRUISE";
-	public static final String REQUEST_CRUISE_ADD_ACTION = "ADD CRUISE TO LIST";
-	public static final String REQUEST_CRUISE_REMOVE_ACTION = "REMOVE CRUISE FROM LIST";
-
-	public static final String REQUEST_PREVIEW_TAG = "REQUEST PREVIEW TAG";
-	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";
-	public static final String REQUEST_OVERWRITE_CRUISE_TAG = "REQUEST OVERWRITE CRUISE TAG";
-
-	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
-	public static final String NO_EXPOCODE_HEADER_TAG = "NO EXPOCODE HEADER TAG";
-	public static final String FILE_EXISTS_HEADER_TAG = "FILE EXISTS HEADER TAG";
-	public static final String CANNOT_OVERWRITE_HEADER_TAG = "CANNOT OVERWRITE HEADER TAG";
-	public static final String NO_FILE_HEADER_TAG = "NO FILE HEADER TAG";
-	public static final String FILE_CREATED_HEADER_TAG = "FILE CREATED HEADER TAG";
-	public static final String FILE_UPDATED_HEADER_TAG = "FILE UPDATED HEADER TAG";
-
-	/**
-	 * Only valid characters for an expocode are upper-case alphanumeric, 
-	 * underscore, and hyphen; the latter two are for the very rare case 
-	 * of valid duplicate expocodes. 
-	 */
-	public static final String VALID_EXPOCODE_CHARACTERS = 
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
-	public static final int MIN_EXPOCODE_LENGTH = 12;
-	public static final int MAX_EXPOCODE_LENGTH = 14;
-
 	/**
 	 * Generate the encrypted password for a given plain-text username 
 	 * and password.  This is intended to only be a first level of

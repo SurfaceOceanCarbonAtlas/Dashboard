@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,12 +37,12 @@ public class DashboardCruiseListServiceImpl extends RemoteServiceServlet
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
 
-		if ( DashboardUtils.REQUEST_CRUISE_LIST_ACTION.equals(action) ) {
+		if ( DashboardCruiseList.REQUEST_CRUISE_LIST_ACTION.equals(action) ) {
 			// Just return the current cruise list for a user
 			return dataStore.getUserFileHandler().getCruiseListing(username);
 		}
 
-		if ( DashboardUtils.REQUEST_CRUISE_DELETE_ACTION.equals(action) ) {
+		if ( DashboardCruiseList.REQUEST_CRUISE_DELETE_ACTION.equals(action) ) {
 			// Remove a cruise data file
 			for ( String expocode : expocodeSet ) {
 				try {
@@ -62,13 +61,13 @@ public class DashboardCruiseListServiceImpl extends RemoteServiceServlet
 			return dataStore.getUserFileHandler().getCruiseListing(username);
 		}
 
-		if ( DashboardUtils.REQUEST_CRUISE_ADD_ACTION.equals(action) ) {
+		if ( DashboardCruiseList.REQUEST_CRUISE_ADD_ACTION.equals(action) ) {
 			// Add the cruise to the user's list, and return the updated cruise list
 			return dataStore.getUserFileHandler()
 							.addCruisesToListing(expocodeSet, username);
 		}
 
-		if ( DashboardUtils.REQUEST_CRUISE_REMOVE_ACTION.equals(action) ) {
+		if ( DashboardCruiseList.REQUEST_CRUISE_REMOVE_ACTION.equals(action) ) {
 			// Remove the cruise from the user's list, and return the updated list
 			return dataStore.getUserFileHandler()
 							.removeCruisesFromListing(expocodeSet, username);
