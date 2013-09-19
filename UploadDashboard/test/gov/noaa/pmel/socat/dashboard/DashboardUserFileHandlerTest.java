@@ -11,7 +11,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
 import java.io.IOException;
-import java.util.Date;
 
 import org.junit.Test;
 import org.tmatesoft.svn.core.SVNException;
@@ -39,13 +38,13 @@ public class DashboardUserFileHandlerTest {
 				"fake20031205_revised.tsv",
 				"garbage_data.tsv"
 		};
-		Date[] dataCheckDates = {
-				null,
-				new Date(System.currentTimeMillis())
+		String[] dataCheckStatuses = {
+				"",
+				"Acceptable"
 		};
-		Date[] metaCheckDates = {
-				null,
-				new Date(System.currentTimeMillis())
+		String[] metaCheckStatuses = {
+				"",
+				"Questionable"
 		};
 		String[] qcStatuses = {
 				"",
@@ -64,8 +63,8 @@ public class DashboardUserFileHandlerTest {
 			newCruise.setExpocode(cruiseExpocodes[k]);
 			newCruise.setOwner(username);
 			newCruise.setUploadFilename(uploadFilenames[k]);
-			newCruise.setDataCheckDate(dataCheckDates[k]);
-			newCruise.setMetaCheckDate(metaCheckDates[k]);
+			newCruise.setDataCheckStatus(dataCheckStatuses[k]);
+			newCruise.setMetadataCheckStatus(metaCheckStatuses[k]);
 			newCruise.setQCStatus(qcStatuses[k]);
 			newCruise.setArchiveStatus(archiveStatuses[k]);
 			cruiseList.put(newCruise.getExpocode(), newCruise);

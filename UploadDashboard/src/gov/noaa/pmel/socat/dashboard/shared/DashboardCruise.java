@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Date;
 
 /**
  * Represents an uploaded cruise and its current status.
@@ -14,7 +13,7 @@ import java.util.Date;
  */
 public class DashboardCruise implements Serializable {
 
-	private static final long serialVersionUID = 5258008575569654473L;
+	private static final long serialVersionUID = 1672557907277279078L;
 
 	public static final String REQUEST_PREVIEW_TAG = "REQUEST PREVIEW TAG";
 	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";
@@ -38,6 +37,11 @@ public class DashboardCruise implements Serializable {
 	public static final int MIN_EXPOCODE_LENGTH = 12;
 	public static final int MAX_EXPOCODE_LENGTH = 14;
 
+	public static final String CHECK_STATUS_NOT_CHECKED = "";
+	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
+	public static final String CHECK_STATUS_QUESTIONABLE = "Questionable";
+	public static final String CHECK_STATUS_FAILED = "Failed";
+
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
 	public static final String QC_STATUS_AUTOFAIL = "Check fail";
 	public static final String QC_STATUS_SUBMITTED = "Submitted";
@@ -59,8 +63,8 @@ public class DashboardCruise implements Serializable {
 	String owner;
 	String expocode;
 	String uploadFilename;
-	Date dataCheckDate;
-	Date metaCheckDate;
+	String dataCheckStatus;
+	String metadataCheckStatus;
 	String qcStatus;
 	String archiveStatus;
 
@@ -69,8 +73,8 @@ public class DashboardCruise implements Serializable {
 		owner = "";
 		expocode = "";
 		uploadFilename = "";
-		dataCheckDate = null;
-		metaCheckDate = null;
+		dataCheckStatus = "";
+		metadataCheckStatus = "";
 		qcStatus = "";
 		archiveStatus = "";
 	}
@@ -154,34 +158,42 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * @return 
-	 * 		the data check date; may be null
+	 * 		the data check status; never null
 	 */
-	public Date getDataCheckDate() {
-		return dataCheckDate;
+	public String getDataCheckStatus() {
+		return dataCheckStatus;
 	}
 
 	/**
-	 * @param dataCheckDate 
-	 * 		the data check date to set
+	 * @param dataCheckStatus 
+	 * 		the data check status to set;
+	 * 		if null, sets to an empty string
 	 */
-	public void setDataCheckDate(Date dataCheckDate) {
-		this.dataCheckDate = dataCheckDate;
+	public void setDataCheckStatus(String dataCheckStatus) {
+		if ( dataCheckStatus == null )
+			this.dataCheckStatus = "";
+		else
+			this.dataCheckStatus = dataCheckStatus;
 	}
 
 	/**
 	 * @return 
-	 * 		the metadata check date; may be null
+	 * 		the metadata check status; never null
 	 */
-	public Date getMetaCheckDate() {
-		return metaCheckDate;
+	public String getMetadataCheckStatus() {
+		return metadataCheckStatus;
 	}
 
 	/**
 	 * @param metadataCheckDate
-	 * 		 the metadata check date to set
+	 * 		the metadata check status to set;
+	 * 		if null, sets to an empty string
 	 */
-	public void setMetaCheckDate(Date metaCheckDate) {
-		this.metaCheckDate = metaCheckDate;
+	public void setMetadataCheckStatus(String metadataCheckStatus) {
+		if ( metadataCheckStatus == null )
+			this.metadataCheckStatus = "";
+		else
+			this.metadataCheckStatus = metadataCheckStatus;
 	}
 
 	/**
@@ -231,12 +243,8 @@ public class DashboardCruise implements Serializable {
 		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + uploadFilename.hashCode();
-		result *= prime;
-		if ( dataCheckDate != null )
-			result += dataCheckDate.hashCode();
-		result *= prime;
-		if ( metaCheckDate != null )
-			result += metaCheckDate.hashCode();
+		result = result * prime + dataCheckStatus.hashCode();
+		result = result * prime + metadataCheckStatus.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
 		return result;
@@ -265,18 +273,10 @@ public class DashboardCruise implements Serializable {
 		if ( ! uploadFilename.equals(other.uploadFilename) )
 			return false;
 
-		if ( dataCheckDate == null ) {
-			if ( other.dataCheckDate != null )
-				return false;
-		} 
-		else if ( ! dataCheckDate.equals(other.dataCheckDate) )
+		if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
 			return false;
 
-		if ( metaCheckDate == null ) {
-			if ( other.metaCheckDate != null )
-				return false;
-		} 
-		else if ( ! metaCheckDate.equals(other.metaCheckDate) )
+		if ( ! metadataCheckStatus.equals(other.metadataCheckStatus) )
 			return false;
 
 		if ( ! qcStatus.equals(other.qcStatus) )
@@ -295,8 +295,8 @@ public class DashboardCruise implements Serializable {
 				", owner=" + owner + 
 				", expocode=" + expocode + 
 				", uploadFilename=" + uploadFilename +
-				", dataCheckDate=" + dataCheckDate +
-				", metaCheckDate=" + metaCheckDate +
+				", dataCheckStatus=" + dataCheckStatus +
+				", metadataCheckStatus=" + metadataCheckStatus +
 				", qcStatus=" + qcStatus + 
 				", archiveStatus=" + archiveStatus + 
 				" ]";
@@ -372,7 +372,7 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Compare using the data check dates of the cruises
+	 * Compare using the data check status of the cruises
 	 */
 	public static Comparator<DashboardCruise> dataCheckComparator = 
 			new Comparator<DashboardCruise>() {
@@ -384,22 +384,14 @@ public class DashboardCruise implements Serializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			Date d1 = c1.getDataCheckDate();
-			Date d2 = c2.getDataCheckDate();
-			if ( d1 == d2 )
-				return 0;
-			if ( d1 == null )
-				return -1;
-			if ( d2 == null )
-				return 1;
-			return d1.compareTo(d2);
+			return c1.getDataCheckStatus().compareTo(c2.getDataCheckStatus());
 		}
 	};
 
 	/**
-	 * Compare using the metadata check dates of the cruises
+	 * Compare using the metadata check status of the cruises
 	 */
-	public static Comparator<DashboardCruise> metaCheckComparator = 
+	public static Comparator<DashboardCruise> metadataCheckComparator = 
 			new Comparator<DashboardCruise>() {
 		@Override
 		public int compare(DashboardCruise c1, DashboardCruise c2) {
@@ -409,15 +401,7 @@ public class DashboardCruise implements Serializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			Date d1 = c1.getMetaCheckDate();
-			Date d2 = c2.getMetaCheckDate();
-			if ( d1 == d2 )
-				return 0;
-			if ( d1 == null )
-				return -1;
-			if ( d2 == null )
-				return 1;
-			return d1.compareTo(d2);
+			return c1.getMetadataCheckStatus().compareTo(c2.getMetadataCheckStatus());
 		}
 	};
 

@@ -15,7 +15,6 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +28,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String CRUISE_FILE_NAME_EXTENSION = ".tsv";
 	private static final String DATA_OWNER_ID = "dataowner=";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename=";
-	private static final String DATA_CHECK_DATE_ID = "datacheckdate=";
-	private static final String META_CHECK_DATE_ID = "metadatacheckdate=";
+	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus=";
+	private static final String META_CHECK_STATUS_ID = "metadatacheckstatus=";
 	private static final String QC_STATUS_ID = "qcstatus=";
 	private static final String ARCHIVE_STATUS_ID = "archivestatus=";
 
@@ -481,16 +480,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				// First write the CruiseData values
 				writer.println(DATA_OWNER_ID + cruiseData.getOwner());
 				writer.println(UPLOAD_FILENAME_ID + cruiseData.getUploadFilename());
-				Date checkDate = cruiseData.getDataCheckDate();
-				if ( checkDate != null )
-					writer.println(DATA_CHECK_DATE_ID + checkDate.getTime());
-				else
-					writer.println(DATA_CHECK_DATE_ID);
-				checkDate = cruiseData.getMetaCheckDate();
-				if ( checkDate != null )
-					writer.println(META_CHECK_DATE_ID + checkDate.getTime());
-				else
-					writer.println(META_CHECK_DATE_ID);
+				writer.println(DATA_CHECK_STATUS_ID + cruiseData.getDataCheckStatus());
+				writer.println(META_CHECK_STATUS_ID + cruiseData.getMetadataCheckStatus());
 				writer.println(QC_STATUS_ID + cruiseData.getQCStatus());
 				writer.println(ARCHIVE_STATUS_ID + cruiseData.getArchiveStatus());
 				// Print the standard creation date and expocode header lines
@@ -586,39 +577,21 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		cruise.setUploadFilename(
 				dataline.substring(UPLOAD_FILENAME_ID.length()).trim());
 
-		// Get the data check date for this cruise
+		// Get the data check status for this cruise
 		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_CHECK_DATE_ID) )
+		if ( ! dataline.startsWith(DATA_CHECK_STATUS_ID) )
 			throw new IOException(
-					"third line does not start with " + DATA_CHECK_DATE_ID);
-		dataline = dataline.substring(DATA_CHECK_DATE_ID.length()).trim();
-		if ( ! ( dataline.isEmpty() || "null".equals(dataline) ) ) {
-			try {
-				cruise.setDataCheckDate(new Date(Long.parseLong(dataline)));
-			} catch ( NumberFormatException ex ) {
-				throw new IOException(
-						"invalid data-check milliseconds timestamp");
-			}
-		}
-		else
-			cruise.setDataCheckDate(null);
+					"third line does not start with " + DATA_CHECK_STATUS_ID);
+		cruise.setDataCheckStatus(
+				dataline.substring(DATA_CHECK_STATUS_ID.length()).trim());
 
-		// Get the data check date for this cruise
+		// Get the metadata check status for this cruise
 		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(META_CHECK_DATE_ID) )
+		if ( ! dataline.startsWith(META_CHECK_STATUS_ID) )
 			throw new IOException(
-					"fourth line does not start with " + META_CHECK_DATE_ID);
-		dataline = dataline.substring(META_CHECK_DATE_ID.length()).trim();
-		if ( ! ( dataline.isEmpty() || "null".equals(dataline) ) ) {
-			try {
-				cruise.setMetaCheckDate(new Date(Long.parseLong(dataline)));
-			} catch ( NumberFormatException ex ) {
-				throw new IOException(
-						"invalid metadata-check milliseconds timestamp");
-			}
-		}
-		else
-			cruise.setMetaCheckDate(null);
+					"fourth line does not start with " + META_CHECK_STATUS_ID);
+		cruise.setMetadataCheckStatus(
+				dataline.substring(META_CHECK_STATUS_ID.length()).trim());
 
 		// Get the QC status for this cruise
 		dataline = cruiseReader.readLine();
