@@ -1,0 +1,32 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+
+	<ui:style src="CommonFullWidth.css" />
+
+	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
+		<g:north size="8">
+			<g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.userinfopanel}">
+					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+				</g:FlowPanel>
+				<g:Label addStyleNames="{style.cruiselabel}" ui:field="cruiseLabel" />
+			</g:FlowPanel>
+		</g:north>
+		<g:south size="6">
+			<g:FlowPanel addStyleNames="{style.verticalbuttonpanel}">
+				<g:Button addStyleNames="{style.verticalbutton}" ui:field="submitButton" />
+
+				<g:Button addStyleNames="{style.verticalbutton}" ui:field="cancelButton" />
+			</g:FlowPanel>
+		</g:south>
+		<g:center>
+			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
+				<cell:DataGrid addStyleNames="{style.gridtable}" ui:field="dataGrid" />
+			</g:ResizeLayoutPanel>
+		</g:center>
+	</g:DockLayoutPanel>
+
+</ui:UiBinder> 
