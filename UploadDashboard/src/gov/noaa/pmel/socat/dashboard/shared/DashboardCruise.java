@@ -13,51 +13,7 @@ import java.util.Comparator;
  */
 public class DashboardCruise implements Serializable {
 
-	private static final long serialVersionUID = 1672557907277279078L;
-
-	public static final String REQUEST_PREVIEW_TAG = "REQUEST PREVIEW TAG";
-	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";
-	public static final String REQUEST_OVERWRITE_CRUISE_TAG = "REQUEST OVERWRITE CRUISE TAG";
-
-	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
-	public static final String NO_EXPOCODE_HEADER_TAG = "NO EXPOCODE HEADER TAG";
-	public static final String FILE_EXISTS_HEADER_TAG = "FILE EXISTS HEADER TAG";
-	public static final String CANNOT_OVERWRITE_HEADER_TAG = "CANNOT OVERWRITE HEADER TAG";
-	public static final String NO_FILE_HEADER_TAG = "NO FILE HEADER TAG";
-	public static final String FILE_CREATED_HEADER_TAG = "FILE CREATED HEADER TAG";
-	public static final String FILE_UPDATED_HEADER_TAG = "FILE UPDATED HEADER TAG";
-
-	/**
-	 * Only valid characters for an expocode are upper-case alphanumeric, 
-	 * underscore, and hyphen; the latter two are for the very rare case 
-	 * of valid duplicate expocodes. 
-	 */
-	public static final String VALID_EXPOCODE_CHARACTERS = 
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
-	public static final int MIN_EXPOCODE_LENGTH = 12;
-	public static final int MAX_EXPOCODE_LENGTH = 14;
-
-	public static final String CHECK_STATUS_NOT_CHECKED = "";
-	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
-	public static final String CHECK_STATUS_QUESTIONABLE = "Questionable";
-	public static final String CHECK_STATUS_FAILED = "Failed";
-
-	public static final String QC_STATUS_NOT_SUBMITTED = "";
-	public static final String QC_STATUS_AUTOFAIL = "Check fail";
-	public static final String QC_STATUS_SUBMITTED = "Submitted";
-	public static final String QC_STATUS_ACCEPTED_A = "QC Flag A";
-	public static final String QC_STATUS_ACCEPTED_B = "QC Flag B";
-	public static final String QC_STATUS_ACCEPTED_C = "QC Flag C";
-	public static final String QC_STATUS_ACCEPTED_D = "QC Flag D";
-	public static final String QC_STATUS_UNACCEPTABLE = "QC Flag F";
-	public static final String QC_STATUS_SUSPENDED = "Suspended";
-	public static final String QC_STATUS_EXCLUDED = "Excluded";
-
-	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
-	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
-	public static final String ARCHIVE_STATUS_OWNER_TO_ARCHIVE = "Waiting on owner";
-	public static final String ARCHIVE_STATUS_SUBMITTED_PREFIX = "Submitted to ";
-	public static final String ARCHIVE_STATUS_ARCHIVED_PREFIX = "DOI ";
+	private static final long serialVersionUID = -2257057046305346263L;
 
 	boolean selected;
 	String owner;

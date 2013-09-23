@@ -8,6 +8,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,11 +88,30 @@ public class CruiseDataColumnSpecsTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#getColumnTypes()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#setColumnTypes(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testSetGetColumnTypes() {
+		ArrayList<CruiseDataColumnType> colTypes = new ArrayList<CruiseDataColumnType>(
+				Arrays.asList(DashboardUtils.STANDARD_TYPES));
+		CruiseDataColumnSpecs specs = new CruiseDataColumnSpecs();
+		assertEquals(0, specs.getColumnTypes().size());
+		specs.setColumnTypes(colTypes);
+		assertEquals(colTypes, specs.getColumnTypes());
+		assertEquals(0, specs.getFirstDataRowIndex());
+		assertEquals(0, specs.getNumRowsTotal());
+		assertEquals("", specs.getExpocode());
+		specs.setColumnTypes(null);
+		assertEquals(0, specs.getColumnTypes().size());		
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#getColumnNames()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#setColumnNames(java.util.ArrayList)}.
 	 */
 	@Test
-	public void testGetColumnNames() {
+	public void testSetGetColumnNames() {
 		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
 				new String[] { 
 						"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
@@ -101,6 +122,7 @@ public class CruiseDataColumnSpecsTest {
 		assertEquals(0, specs.getColumnNames().size());
 		specs.setColumnNames(colNames);
 		assertEquals(colNames, specs.getColumnNames());
+		assertEquals(0, specs.getColumnTypes().size());		
 		assertEquals(0, specs.getFirstDataRowIndex());
 		assertEquals(0, specs.getNumRowsTotal());
 		assertEquals("", specs.getExpocode());
@@ -136,6 +158,7 @@ public class CruiseDataColumnSpecsTest {
 		specs.setDataValues(dataValues);
 		assertEquals(dataValues, specs.getDataValues());
 		assertEquals(0, specs.getColumnNames().size());		
+		assertEquals(0, specs.getColumnTypes().size());		
 		assertEquals(0, specs.getFirstDataRowIndex());
 		assertEquals(0, specs.getNumRowsTotal());
 		assertEquals("", specs.getExpocode());

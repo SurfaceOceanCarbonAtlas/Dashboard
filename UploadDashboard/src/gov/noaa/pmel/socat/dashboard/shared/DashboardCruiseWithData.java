@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Represents the data given an uploaded cruise data file
@@ -109,7 +108,7 @@ public class DashboardCruiseWithData extends DashboardCruise {
 	public void setDataValues(ArrayList<ArrayList<String>> dataValues) {
 		this.dataValues.clear();
 		if ( dataValues != null )
-			for ( List<String> datalist : dataValues )
+			for ( ArrayList<String> datalist : dataValues )
 				if ( datalist != null )
 					this.dataValues.add(new ArrayList<String>(datalist));
 	}

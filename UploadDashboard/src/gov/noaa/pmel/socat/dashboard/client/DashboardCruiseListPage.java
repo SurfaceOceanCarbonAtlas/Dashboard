@@ -7,6 +7,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -265,16 +266,16 @@ public class DashboardCruiseListPage extends Composite {
 			if ( cruise.isSelected() ) {
 				if ( skipSubmitted ) {
 					String status = cruise.getQCStatus();
-					if ( ! ( status.equals(DashboardCruise.QC_STATUS_NOT_SUBMITTED) || 
-							 status.equals(DashboardCruise.QC_STATUS_AUTOFAIL) ||
-							 status.equals(DashboardCruise.QC_STATUS_UNACCEPTABLE) ||
-							 status.equals(DashboardCruise.QC_STATUS_SUSPENDED) ||
-							 status.equals(DashboardCruise.QC_STATUS_EXCLUDED) ) )
+					if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
+							 status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
+							 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+							 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+							 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
 						continue;
 				}
 				if ( skipArchived ) {
 					if ( ! cruise.getArchiveStatus().equals(
-							DashboardCruise.ARCHIVE_STATUS_NOT_SUBMITTED) )
+							DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) )
 						continue;
 				}
 				expocodeSet.add(cruise.getExpocode());
@@ -339,7 +340,7 @@ public class DashboardCruiseListPage extends Composite {
 			if ( ! Window.confirm(expocode + deleteConfirmMsg) ) 
 				return;
 		// Remove the cruises
-		updateCruiseListPage(DashboardCruiseList.REQUEST_CRUISE_DELETE_ACTION, 
+		updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
 						expocodeSet, deleteCruiseFailMsg);
 	}
 
@@ -352,14 +353,14 @@ public class DashboardCruiseListPage extends Composite {
 			boolean badExpo = false;
 			String errMsg = addCruiseFailMsg;
 			int expoLen = expocode.length();
-			if ( (expoLen < DashboardCruise.MIN_EXPOCODE_LENGTH) ||
-				 (expoLen > DashboardCruise.MAX_EXPOCODE_LENGTH) ) {
+			if ( (expoLen < DashboardUtils.MIN_EXPOCODE_LENGTH) ||
+				 (expoLen > DashboardUtils.MAX_EXPOCODE_LENGTH) ) {
 				badExpo = true;
 				errMsg += " (Invalid cruise Expocode length)";
 			}
 			else {
 				for (int k = 0; k < expoLen; k++) {
-					if ( ! DashboardCruise.VALID_EXPOCODE_CHARACTERS
+					if ( ! DashboardUtils.VALID_EXPOCODE_CHARACTERS
 										 .contains(expocode.substring(k, k+1)) ) {
 						badExpo = true;
 						errMsg += " (Invalid characters in the cruise Expocode)";
@@ -373,7 +374,7 @@ public class DashboardCruiseListPage extends Composite {
 			else {
 				HashSet<String> expocodeSet = new HashSet<String>();
 				expocodeSet.add(expocode);
-				updateCruiseListPage(DashboardCruiseList.REQUEST_CRUISE_ADD_ACTION,
+				updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_ADD_ACTION,
 										expocodeSet, errMsg);
 			}
 		}
@@ -389,7 +390,7 @@ public class DashboardCruiseListPage extends Composite {
 		for ( String expocode : expocodeSet )
 			if ( ! Window.confirm(expocode + removeCruiseConfirmMsg) ) 
 				return;
-		updateCruiseListPage(DashboardCruiseList.REQUEST_CRUISE_REMOVE_ACTION,
+		updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_REMOVE_ACTION,
 					expocodeSet, removeCruiseFailMsg);
 	}
 
@@ -642,7 +643,7 @@ public class DashboardCruiseListPage extends Composite {
 				GWT.create(DashboardCruiseListService.class);
 		service.updateCruiseList(DashboardPageFactory.getUsername(), 
 								 DashboardPageFactory.getPasshash(),
-								 DashboardCruiseList.REQUEST_CRUISE_LIST_ACTION, 
+								 DashboardUtils.REQUEST_CRUISE_LIST_ACTION, 
 								 new HashSet<String>(),
 								 new AsyncCallback<DashboardCruiseList>() {
 			@Override
