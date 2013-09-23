@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Used for specifying column types.  Contains data column headers 
@@ -15,13 +14,14 @@ import java.util.List;
  */
 public class CruiseDataColumnSpecs implements Serializable {
 
-	private static final long serialVersionUID = -850895025884813130L;
+	private static final long serialVersionUID = 7649203473028939491L;
 
 	String expocode;
 	int numRowsTotal;
 	int firstDataRowIndex;
 	ArrayList<String> columnNames;
 	ArrayList<ArrayList<String>> dataValues;
+	ArrayList<CruiseDataColumnType> columnTypes;
 
 	/**
 	 * Creates with no cruise data
@@ -32,6 +32,7 @@ public class CruiseDataColumnSpecs implements Serializable {
 		firstDataRowIndex = 0;
 		columnNames = new ArrayList<String>();
 		dataValues = new ArrayList<ArrayList<String>>();
+		columnTypes = new ArrayList<CruiseDataColumnType>();
 	}
 
 	/**
@@ -133,9 +134,29 @@ public class CruiseDataColumnSpecs implements Serializable {
 	public void setDataValues(ArrayList<ArrayList<String>> dataValues) {
 		this.dataValues.clear();
 		if ( dataValues != null )
-			for ( List<String> datalist : dataValues )
+			for ( ArrayList<String> datalist : dataValues )
 				if ( datalist != null )
 					this.dataValues.add(new ArrayList<String>(datalist));
+	}
+
+	/**
+	 * @return 
+	 * 		the data column types; may be empty but never null.
+	 * 		The actual list in this object is returned.
+	 */
+	public ArrayList<CruiseDataColumnType> getColumnTypes() {
+		return columnTypes;
+	}
+
+	/**
+	 * @param columnTypes 
+	 * 		the data column types to set;
+	 * 		if null, the list is cleared
+	 */
+	public void setColumnTypes(ArrayList<CruiseDataColumnType> columnTypes) {
+		this.columnTypes.clear();
+		if ( columnTypes != null )
+			this.columnTypes.addAll(columnTypes);
 	}
 
 	@Override
@@ -144,6 +165,7 @@ public class CruiseDataColumnSpecs implements Serializable {
 		int result = numRowsTotal;
 		result = result * prime + firstDataRowIndex;
 		result = result * prime + expocode.hashCode();
+		result = result * prime + columnTypes.hashCode();
 		result = result * prime + columnNames.hashCode();
 		result = result * prime + dataValues.hashCode();
 		return result;
@@ -166,6 +188,8 @@ public class CruiseDataColumnSpecs implements Serializable {
 			return false;
 		if ( ! expocode.equals(other.expocode) )
 			return false;
+		if ( ! columnTypes.equals(other.columnTypes) )
+			return false;
 		if ( ! columnNames.equals(other.columnNames) )
 			return false;
 		if ( ! dataValues.equals(other.dataValues) )
@@ -179,8 +203,9 @@ public class CruiseDataColumnSpecs implements Serializable {
 				"[ expocode=" + expocode +
 				", numRowsTotal=" + numRowsTotal + 
 				", firstDataRowIndex=" + firstDataRowIndex + 
-				", columnNames=" + columnNames + 
-				", dataValues=" + dataValues + 
+				", columnTypes=" + columnTypes.toString() +
+				", columnNames=" + columnNames.toString() + 
+				", dataValues=" + dataValues.toString() + 
 				" ]";
 	}
 

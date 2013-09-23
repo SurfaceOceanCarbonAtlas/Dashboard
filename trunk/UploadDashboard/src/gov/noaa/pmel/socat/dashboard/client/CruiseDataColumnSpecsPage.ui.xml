@@ -15,11 +15,13 @@
 				<g:Label addStyleNames="{style.cruiselabel}" ui:field="cruiseLabel" />
 			</g:FlowPanel>
 		</g:north>
-		<g:south size="6">
-			<g:FlowPanel addStyleNames="{style.verticalbuttonpanel}">
-				<g:Button addStyleNames="{style.verticalbutton}" ui:field="submitButton" />
-
-				<g:Button addStyleNames="{style.verticalbutton}" ui:field="cancelButton" />
+		<g:south size="8">
+			<g:FlowPanel>
+				<cell:SimplePager addStyleNames="{style.gridpager}" ui:field="gridPager" />
+				<g:FlowPanel addStyleNames="{style.verticalbuttonpanel}">
+					<g:Button addStyleNames="{style.verticalbutton}" ui:field="submitButton" />
+					<g:Button addStyleNames="{style.verticalbutton}" ui:field="cancelButton" />
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:south>
 		<g:center>

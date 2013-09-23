@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,16 +37,16 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
 		Pattern.compile("\\s*Cruise\\s*Expocode\\s*:\\s*([" + 
-				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE),
 		Pattern.compile("\\s*Expocode\\s*:\\s*([" + 
-				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE),
 		Pattern.compile("\\s*Cruise\\s*Expocode\\s*=\\s*([" + 
-				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE),
 		Pattern.compile("\\s*Expocode\\s*=\\s*([" + 
-				DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE)
 	};
 	// Patterns for file creation date in the metadata header
@@ -57,7 +58,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	};
 	// Pattern for checking for invalid characters in the expocode
 	private static final Pattern invalidExpocodePattern = 
-			Pattern.compile("[^" + DashboardCruise.VALID_EXPOCODE_CHARACTERS + "]");
+			Pattern.compile("[^" + DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]");
 
 	/**
 	 * Handles storage and retrieval of cruise data in files 
@@ -93,8 +94,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Do some automatic clean-up
 		String upperExpo = expocode.trim().toUpperCase();
 		// Make sure it is the proper length
-		if ( (upperExpo.length() < DashboardCruise.MIN_EXPOCODE_LENGTH) || 
-			 (upperExpo.length() > DashboardCruise.MAX_EXPOCODE_LENGTH) )
+		if ( (upperExpo.length() < DashboardUtils.MIN_EXPOCODE_LENGTH) || 
+			 (upperExpo.length() > DashboardUtils.MAX_EXPOCODE_LENGTH) )
 			throw new IllegalArgumentException(
 					"Invalid cruise Expocode length");
 		// Make sure there are no invalid characters
@@ -633,11 +634,11 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		DashboardCruise cruise = getCruiseFromDataFile(expocode);
 		// Check if the cruise is in a submitted or accepted state
 		String status = cruise.getQCStatus();
-		if ( ! ( status.equals(DashboardCruise.QC_STATUS_NOT_SUBMITTED) || 
-				 status.equals(DashboardCruise.QC_STATUS_AUTOFAIL) ||
-				 status.equals(DashboardCruise.QC_STATUS_UNACCEPTABLE) ||
-				 status.equals(DashboardCruise.QC_STATUS_SUSPENDED) ||
-				 status.equals(DashboardCruise.QC_STATUS_EXCLUDED) ) )
+		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
+				 status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
+				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+				 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+				 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
 			throw new IllegalArgumentException("cruise status is " + status);
 		// Check if the user has permission to delete the cruise
 		try {
