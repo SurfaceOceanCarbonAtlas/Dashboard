@@ -17,7 +17,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -86,11 +85,11 @@ public class DashboardCruiseListPage extends Composite {
 
 	protected static String dataCheckText = "Check Data";
 	protected static String dataCheckHoverHelp =
-			"programmatically check the data in the selected cruises";
+			"assign data column types and programmatically check the data in the selected cruise";
 
 	protected static String metaCheckText = "Check Metadata";
 	protected static String metaCheckHoverHelp =
-			"programmatically check the metadata in the selected cruises";
+			"programmatically check the metadata in the selected cruise";
 
 	protected static String reviewText = "Review with LAS";
 	protected static String reviewHoverHelp =
@@ -136,6 +135,12 @@ public class DashboardCruiseListPage extends Composite {
 	protected static String deleteCruiseFailMsg = 
 			"Unable to delete the selected cruise(s)";
 
+	protected static String onlyOneCruiseAllowedMsg =
+			"Exactly one cruise must be selected";
+
+	protected static String cruiseDataCheckFailMsg = 
+			"Unable to generate the cruise data column specifications page";
+	
 	protected static String expocodeToAddMsg = 
 			"Enter the expocode of the cruise to wish to add to your cruise list";
 	protected static String addCruiseFailMsg = 
@@ -342,6 +347,38 @@ public class DashboardCruiseListPage extends Composite {
 		// Remove the cruises
 		updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
 						expocodeSet, deleteCruiseFailMsg);
+	}
+
+	@UiHandler("dataCheckButton")
+	void dataCheckOnClick(ClickEvent event) {
+		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(false, false);
+		if ( expocodeSet.size() != 1 ) {
+			Window.alert(onlyOneCruiseAllowedMsg);
+			return;
+		}
+		String expocode = expocodeSet.iterator().next();
+		CruiseDataColumnSpecsPage.showCruiseDataColumnSpecsPage(expocode, 
+				DashboardCruiseListPage.this, cruiseDataCheckFailMsg);
+	}
+
+	@UiHandler("metaCheckButton")
+	void metadataCheckOnClick(ClickEvent event) {
+		Window.alert("Not yet implemented");
+	}
+
+	@UiHandler("reviewButton")
+	void reviewOnClick(ClickEvent event) {
+		Window.alert("Not yet implemented");
+	}
+
+	@UiHandler("qcSubmitButton")
+	void qcSubmitOnClick(ClickEvent event) {
+		Window.alert("Not yet implemented");
+	}
+
+	@UiHandler("archiveSubmitButton")
+	void archiveSubmitOnClick(ClickEvent event) {
+		Window.alert("Not yet implemented");
 	}
 
 	@UiHandler("addToListButton")
@@ -661,8 +698,7 @@ public class DashboardCruiseListPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(SafeHtmlUtils.htmlEscape(
-						errMsg + " (" + ex.getMessage() + ")"));
+				Window.alert(errMsg + " (" + ex.getMessage() + ")");
 			}
 		});
 	}
@@ -698,8 +734,7 @@ public class DashboardCruiseListPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(SafeHtmlUtils.htmlEscape(
-						errMsg + " (" + ex.getMessage() + ")"));
+				Window.alert(errMsg + " (" + ex.getMessage() + ")");
 			}
 		});
 	}

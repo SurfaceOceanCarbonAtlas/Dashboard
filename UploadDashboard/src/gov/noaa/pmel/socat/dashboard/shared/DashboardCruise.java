@@ -259,7 +259,8 @@ public class DashboardCruise implements Serializable {
 	}
 
 	/**
-	 * Compare using the selected property of cruises
+	 * Compare using the "selected" property of cruises.
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> selectedComparator =
 			new Comparator<DashboardCruise>() {
@@ -278,6 +279,7 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * Compare using the owner of cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> ownerComparator =
 			new Comparator<DashboardCruise>() {
@@ -294,7 +296,8 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Compare using the expocodes of the cruises
+	 * Compare using the expocode of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> expocodeComparator = 
 			new Comparator<DashboardCruise>() {
@@ -311,7 +314,8 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Compare using the upload filenames of the cruises
+	 * Compare using the upload filename of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> filenameComparator = 
 			new Comparator<DashboardCruise>() {
@@ -329,6 +333,7 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * Compare using the data check status of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> dataCheckComparator = 
 			new Comparator<DashboardCruise>() {
@@ -346,6 +351,7 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * Compare using the metadata check status of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> metadataCheckComparator = 
 			new Comparator<DashboardCruise>() {
@@ -363,6 +369,7 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * Compare using the QC status string of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> qcStatusComparator = 
 			new Comparator<DashboardCruise>() {
@@ -380,6 +387,7 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * Compare using the archive status of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
 	public static Comparator<DashboardCruise> archiveStatusComparator = 
 			new Comparator<DashboardCruise>() {

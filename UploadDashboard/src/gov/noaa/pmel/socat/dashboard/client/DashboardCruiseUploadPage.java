@@ -136,8 +136,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	}
 
 	void updatePageContents() {
-		userInfoLabel.setText(welcomeIntro + 
-				SafeHtmlUtils.htmlEscape(DashboardPageFactory.getUsername()));
+		userInfoLabel.setText(welcomeIntro + DashboardPageFactory.getUsername());
 		usernameToken.setValue("");
 		passhashToken.setValue("");
 		actionToken.setValue("");

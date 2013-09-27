@@ -153,13 +153,20 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		if reading from a cruise data file, must be positioned
 	 * 		after any cruise information read by 
 	 * 		{@link #assignCruiseFromInput(DashboardCruise, BufferedReader)}
+	 * @param firstDataRow
+	 * 		index of the first data row to return; for all data for the
+	 * 		cruise, specify zero
+	 * @param numDataRows
+	 * 		number of data rows to return; for all data for the cruise,
+	 * 		specify -1 (or any negative integer)
 	 * @throws IOException
 	 * 		if reading from cruiseReader throws one,
 	 * 		if there is a blank data column header, or
 	 * 		if there is an inconsistent number of tab-separated values
 	 */
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
-						BufferedReader cruiseReader) throws IOException {
+			BufferedReader cruiseReader, int firstDataRow, int numDataRows) 
+														throws IOException {
 		boolean creationDateFound = false;
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
@@ -236,26 +243,34 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Just directly add them to the list in cruiseData
 		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
 		dataValues.clear();
+		if ( numDataRows == 0 )
+			return;
+		int dataRowNum = 0;
 		dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
 			// Ignore blank lines
 			if ( ! dataline.trim().isEmpty() ) {
-				// Get the values from this data line
-				String[] datavals = dataline.split("\t");
-				if ( datavals.length != numDataColumns )
-					throw new IOException("Inconsistent number of data columns (" + 
-							datavals.length + " instead of " + numDataColumns + 
-							") in \n" + dataline);
-				// Convert missing values to NaN
-				for (int k = 0; k < datavals.length; k++) {
-					datavals[k] = datavals[k].trim();
-					if ( datavals[k].isEmpty() ||
-						 datavals[k].toLowerCase().equals("null") ||
-						 datavals[k].toLowerCase().equals("nan") ) {
-						datavals[k] = "NaN";
+				if ( dataRowNum >= firstDataRow ) {
+					// Get the values from this data line
+					String[] datavals = dataline.split("\t");
+					if ( datavals.length != numDataColumns )
+						throw new IOException("Inconsistent number of data columns (" + 
+								datavals.length + " instead of " + numDataColumns + 
+								") in \n" + dataline);
+					// Convert missing values to NaN
+					for (int k = 0; k < datavals.length; k++) {
+						datavals[k] = datavals[k].trim();
+						if ( datavals[k].isEmpty() ||
+								datavals[k].toLowerCase().equals("null") ||
+								datavals[k].toLowerCase().equals("nan") ) {
+							datavals[k] = "NaN";
+						}
 					}
+					dataValues.add(new ArrayList<String>(Arrays.asList(datavals)));
+					if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
+						break;
 				}
-				dataValues.add(new ArrayList<String>(Arrays.asList(datavals)));
+				dataRowNum++;
 			}
 			// Read the next line
 			dataline = cruiseReader.readLine();
@@ -333,6 +348,12 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise to get data for
+	 * @param firstDataRow
+	 * 		index of the first data row to return; for all data for the
+	 * 		cruise, specify zero
+	 * @param numDataRows
+	 * 		number of data rows to return; for all data for the cruise,
+	 * 		specify -1 (or any negative integer)
 	 * @return
 	 * 		the saved cruise data, which may be null if there is no data 
 	 * 		saved for this cruise.
@@ -340,8 +361,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		if the expocode is invalid or if there was a error reading 
 	 * 		data for this cruise
 	 */
-	public DashboardCruiseWithData getCruiseDataFromFile(String expocode) 
-										throws IllegalArgumentException {
+	public DashboardCruiseWithData getCruiseDataFromFile(String expocode,
+			int firstDataRow, int numDataRows) throws IllegalArgumentException {
 		File cruiseFile = cruiseDataFile(expocode);
 		// Read the cruise data from the saved cruise data file
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
@@ -352,7 +373,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				// Assign the cruise information at the start of the file
 				assignCruiseFromInput(cruiseData, cruiseReader);
 				// Assign the cruise data in the rest of the file
-				assignCruiseDataFromInput(cruiseData, cruiseReader);
+				assignCruiseDataFromInput(cruiseData, cruiseReader, 
+											firstDataRow, numDataRows);
 				// Make sure the expocode in the file is the one requested
 				if ( ! expocode.equals(cruiseData.getExpocode()) )
 					throw new IllegalArgumentException(

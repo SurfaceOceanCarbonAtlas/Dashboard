@@ -201,7 +201,8 @@ public class DashboardCruiseFileHandlerTest {
 		BufferedReader reader = new BufferedReader(new StringReader(
 				versionString + expocodeString + metadataString + headerString + dataString));
 		try {
-			handler.assignCruiseDataFromInput(cruiseData, reader);
+			handler.assignCruiseDataFromInput(cruiseData, reader, 
+												0, observations.length);
 		} finally {
 			reader.close();
 		}
@@ -239,7 +240,8 @@ public class DashboardCruiseFileHandlerTest {
 		assertTrue( handler.cruiseDataFileExists(expocode) );
 
 		// Generate the cruise data from the saved file
-		DashboardCruiseWithData fileData = handler.getCruiseDataFromFile(expocode);
+		DashboardCruiseWithData fileData = handler.getCruiseDataFromFile(expocode, 
+															0, observations.length);
 
 		// Check for differences - version string will differ
 		assertEquals(username, fileData.getOwner());

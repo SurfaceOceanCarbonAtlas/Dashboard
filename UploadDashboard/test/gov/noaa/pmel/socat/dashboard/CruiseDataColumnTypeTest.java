@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import org.junit.Test;
 
@@ -24,42 +25,42 @@ public class CruiseDataColumnTypeTest {
 	public void testSetGetStdColumnNum() {
 		int stdColumnNum = 4;
 		CruiseDataColumnType spec = new CruiseDataColumnType();
-		assertEquals(0, spec.getStdColumnNum());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
 		spec.setStdColumnNum(stdColumnNum);
 		assertEquals(stdColumnNum, spec.getStdColumnNum());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getFullName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setFullName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getDescription()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setDescription(java.lang.String)}.
 	 */
 	@Test
-	public void testSetGetFullName() {
-		String fullName = "Atmospheric Pressure";
+	public void testSetGetDescription() {
+		String description = "Atmospheric Pressure";
 		CruiseDataColumnType spec = new CruiseDataColumnType();
-		assertEquals("", spec.getFullName());
-		spec.setFullName(fullName);
-		assertEquals(fullName, spec.getFullName());
-		assertEquals(0, spec.getStdColumnNum());
-		spec.setFullName(null);
-		assertEquals("", spec.getFullName());
+		assertEquals("", spec.getDescription());
+		spec.setDescription(description);
+		assertEquals(description, spec.getDescription());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
+		spec.setDescription(null);
+		assertEquals("", spec.getDescription());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getLabelName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setLabelName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getStdHeaderName()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setStdHeaderName(java.lang.String)}.
 	 */
 	@Test
-	public void testSetGetLabelName() {
-		String labelName = "PPPP";
+	public void testSetGetStdHeaderName() {
+		String stdHeaderName = "PPPP";
 		CruiseDataColumnType spec = new CruiseDataColumnType();
-		assertEquals("", spec.getLabelName());
-		spec.setLabelName(labelName);
-		assertEquals(labelName, spec.getLabelName());
-		assertEquals("", spec.getFullName());
-		assertEquals(0, spec.getStdColumnNum());
-		spec.setLabelName(null);
-		assertEquals("", spec.getLabelName());
+		assertEquals("", spec.getStdHeaderName());
+		spec.setStdHeaderName(stdHeaderName);
+		assertEquals(stdHeaderName, spec.getStdHeaderName());
+		assertEquals("", spec.getDescription());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
+		spec.setStdHeaderName(null);
+		assertEquals("", spec.getStdHeaderName());
 	}
 
 	/**
@@ -73,28 +74,69 @@ public class CruiseDataColumnTypeTest {
 		assertEquals("", spec.getDataType());
 		spec.setDataType(dataType);
 		assertEquals(dataType, spec.getDataType());
-		assertEquals("", spec.getLabelName());
-		assertEquals("", spec.getFullName());
-		assertEquals(0, spec.getStdColumnNum());
+		assertEquals("", spec.getStdHeaderName());
+		assertEquals("", spec.getDescription());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
 		spec.setDataType(null);
 		assertEquals("", spec.getDataType());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#DataColumnSpec(
-	 * int,java.lang.String,java.lang.String,java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getUnits()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setUnit(java.lang.String[])}.
 	 */
 	@Test
-	public void testDataColumnSpecStdColumnNumDataTypeLabelNameFullName() {
-		int sdtdColumnNum = 4;
-		String fullName = "Atmospheric Pressure";
-		String labelName = "PPPP";
-		String dataType = "pressure";
-		CruiseDataColumnType spec = new CruiseDataColumnType(sdtdColumnNum, dataType, labelName, fullName);
-		assertEquals(sdtdColumnNum, spec.getStdColumnNum());
-		assertEquals(dataType, spec.getDataType());
-		assertEquals(labelName, spec.getLabelName());
-		assertEquals(fullName, spec.getFullName());
+	public void testSetGetUnits() {
+		String unit = "mbar";
+		CruiseDataColumnType spec = new CruiseDataColumnType();
+		assertEquals("", spec.getUnit());
+		spec.setUnit(unit);
+		assertEquals(unit, spec.getUnit());
+		assertEquals("", spec.getDataType());
+		assertEquals("", spec.getStdHeaderName());
+		assertEquals("", spec.getDescription());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
+		spec.setUnit(null);
+		assertEquals("", spec.getUnit());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getUserHeaderName()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setUserHeaderName(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetUserHeaderName() {
+		String userHeaderName = "P_atm";
+		CruiseDataColumnType spec = new CruiseDataColumnType();
+		assertEquals("", spec.getUserHeaderName());
+		spec.setUserHeaderName(userHeaderName);
+		assertEquals(userHeaderName, spec.getUserHeaderName());
+		assertEquals("", spec.getUnit());
+		assertEquals("", spec.getDataType());
+		assertEquals("", spec.getStdHeaderName());
+		assertEquals("", spec.getDescription());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
+		spec.setUserHeaderName(null);
+		assertEquals("", spec.getUserHeaderName());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#getUserColumnNum()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType#setUserColumnNum(int)}.
+	 */
+	@Test
+	public void testSetGetUserColumnNum() {
+		int userColumnNum = 15;
+		CruiseDataColumnType spec = new CruiseDataColumnType();
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getUserColumnNum());
+		spec.setUserColumnNum(userColumnNum);
+		assertEquals(userColumnNum, spec.getUserColumnNum());
+		assertEquals("", spec.getUserHeaderName());
+		assertEquals("", spec.getUnit());
+		assertEquals("", spec.getDataType());
+		assertEquals("", spec.getStdHeaderName());
+		assertEquals("", spec.getDescription());
+		assertEquals(DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM, spec.getStdColumnNum());
 	}
 
 	/**
@@ -103,36 +145,39 @@ public class CruiseDataColumnTypeTest {
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
-		int priority = 4;
-		String fullName = "Atmospheric Pressure";
-		String labelName = "PPPP";
+		int stdColumnNum = 4;
+		String description = "Atmospheric Pressure";
+		String stdHeaderName = "PPPP";
 		String dataType = "pressure";
+		String unit = "mbar";
+		String userHeaderName = "P_atm";
+		int userColumnNum = 15;
 
 		CruiseDataColumnType firstSpec = new CruiseDataColumnType();
 		assertFalse( firstSpec.equals(null) );
-		assertFalse( firstSpec.equals(fullName) );
+		assertFalse( firstSpec.equals(description) );
 		CruiseDataColumnType secondSpec = new CruiseDataColumnType();
 		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
 		assertEquals(firstSpec, secondSpec);
 
-		firstSpec.setStdColumnNum(priority);
+		firstSpec.setStdColumnNum(stdColumnNum);
 		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
 		assertFalse( firstSpec.equals(secondSpec) );
-		secondSpec.setStdColumnNum(priority);
+		secondSpec.setStdColumnNum(stdColumnNum);
 		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
 		assertEquals(firstSpec, secondSpec);
 
-		firstSpec.setFullName(fullName);
+		firstSpec.setDescription(description);
 		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
 		assertFalse( firstSpec.equals(secondSpec) );
-		secondSpec.setFullName(fullName);
+		secondSpec.setDescription(description);
 		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
 		assertEquals(firstSpec, secondSpec);
 
-		firstSpec.setLabelName(labelName);
+		firstSpec.setStdHeaderName(stdHeaderName);
 		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
 		assertFalse( firstSpec.equals(secondSpec) );
-		secondSpec.setLabelName(labelName);
+		secondSpec.setStdHeaderName(stdHeaderName);
 		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
 		assertEquals(firstSpec, secondSpec);
 
@@ -140,6 +185,27 @@ public class CruiseDataColumnTypeTest {
 		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
 		assertFalse( firstSpec.equals(secondSpec) );
 		secondSpec.setDataType(dataType);
+		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
+		assertEquals(firstSpec, secondSpec);
+
+		firstSpec.setUnit(unit);
+		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
+		assertFalse( firstSpec.equals(secondSpec) );
+		secondSpec.setUnit(unit);
+		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
+		assertEquals(firstSpec, secondSpec);
+
+		firstSpec.setUserHeaderName(userHeaderName);
+		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
+		assertFalse( firstSpec.equals(secondSpec) );
+		secondSpec.setUserHeaderName(userHeaderName);
+		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
+		assertEquals(firstSpec, secondSpec);
+
+		firstSpec.setUserColumnNum(userColumnNum);
+		assertTrue( firstSpec.hashCode() != secondSpec.hashCode() );
+		assertFalse( firstSpec.equals(secondSpec) );
+		secondSpec.setUserColumnNum(userColumnNum);
 		assertEquals(firstSpec.hashCode(), secondSpec.hashCode());
 		assertEquals(firstSpec, secondSpec);
 	}
@@ -152,13 +218,19 @@ public class CruiseDataColumnTypeTest {
 	public void testCompareToDataColumnSpec() {
 		int firstStdColNum = 4;
 		String firstDataType = "pressure";
-		String firstLabelName = "PPPP";
-		String firstFullName = "Atmospheric Pressure";
+		String firstStdHeaderName = "PPPP";
+		String firstDescription = "Atmospheric Pressure";
+		String firstUnit = "atm";
+		String firstUserHeaderName = "P_atm";
+		int firstUserColumnNum = 7;
 
 		int secondStdColNum = 2;
 		String secondDataType = "temperature";
-		String secondLabelName = "SST";
-		String secondFullName = "Sea Surface Temperature";
+		String secondStdHeaderName = "SST";
+		String secondDescription = "Sea Surface Temperature";
+		String secondUnit = "deg C";
+		String secondUserHeaderName = "T_sea";
+		int secondUserColumnNum = 9;
 
 		CruiseDataColumnType firstSpec = new CruiseDataColumnType();
 		CruiseDataColumnType secondSpec = new CruiseDataColumnType();
@@ -185,29 +257,62 @@ public class CruiseDataColumnTypeTest {
 		assertEquals(0, firstSpec.compareTo(secondSpec));
 		assertEquals(0, secondSpec.compareTo(firstSpec));
 
-		firstSpec.setLabelName(firstLabelName);
+		firstSpec.setStdHeaderName(firstStdHeaderName);
 		assertTrue( firstSpec.compareTo(secondSpec) > 0 );
 		assertTrue( secondSpec.compareTo(firstSpec) < 0 );
-		secondSpec.setLabelName(secondLabelName);
+		secondSpec.setStdHeaderName(secondStdHeaderName);
 		assertTrue( firstSpec.compareTo(secondSpec) < 0 );
 		assertTrue( secondSpec.compareTo(firstSpec) > 0 );
-		secondSpec.setLabelName(firstLabelName);
+		secondSpec.setStdHeaderName(firstStdHeaderName);
 		assertEquals(0, firstSpec.compareTo(secondSpec));
 		assertEquals(0, secondSpec.compareTo(firstSpec));
 
-		firstSpec.setFullName(firstFullName);
+		firstSpec.setDescription(firstDescription);
 		assertTrue( firstSpec.compareTo(secondSpec) > 0 );
 		assertTrue( secondSpec.compareTo(firstSpec) < 0 );
-		secondSpec.setFullName(secondFullName);
+		secondSpec.setDescription(secondDescription);
 		assertTrue( firstSpec.compareTo(secondSpec) < 0 );
 		assertTrue( secondSpec.compareTo(firstSpec) > 0 );
-		secondSpec.setFullName(firstFullName);
+		secondSpec.setDescription(firstDescription);
 		assertEquals(0, firstSpec.compareTo(secondSpec));
 		assertEquals(0, secondSpec.compareTo(firstSpec));
 
-		secondSpec.setFullName(firstFullName);
+		firstSpec.setUnit(firstUnit);
+		assertTrue( firstSpec.compareTo(secondSpec) > 0 );
+		assertTrue( secondSpec.compareTo(firstSpec) < 0 );
+		secondSpec.setUnit(secondUnit);
+		assertTrue( firstSpec.compareTo(secondSpec) < 0 );
+		assertTrue( secondSpec.compareTo(firstSpec) > 0 );
+		secondSpec.setUnit(firstUnit);
+		assertEquals(0, firstSpec.compareTo(secondSpec));
+		assertEquals(0, secondSpec.compareTo(firstSpec));
+
+		firstSpec.setUserHeaderName(firstUserHeaderName);
+		assertTrue( firstSpec.compareTo(secondSpec) > 0 );
+		assertTrue( secondSpec.compareTo(firstSpec) < 0 );
+		secondSpec.setUserHeaderName(secondUserHeaderName);
+		assertTrue( firstSpec.compareTo(secondSpec) < 0 );
+		assertTrue( secondSpec.compareTo(firstSpec) > 0 );
+		secondSpec.setUserHeaderName(firstUserHeaderName);
+		assertEquals(0, firstSpec.compareTo(secondSpec));
+		assertEquals(0, secondSpec.compareTo(firstSpec));
+
+		firstSpec.setUserColumnNum(firstUserColumnNum);
+		assertTrue( firstSpec.compareTo(secondSpec) > 0 );
+		assertTrue( secondSpec.compareTo(firstSpec) < 0 );
+		secondSpec.setUserColumnNum(secondUserColumnNum);
+		assertTrue( firstSpec.compareTo(secondSpec) < 0 );
+		assertTrue( secondSpec.compareTo(firstSpec) > 0 );
+		secondSpec.setUserColumnNum(firstUserColumnNum);
+		assertEquals(0, firstSpec.compareTo(secondSpec));
+		assertEquals(0, secondSpec.compareTo(firstSpec));
+
 		secondSpec.setDataType(secondDataType);
-		secondSpec.setLabelName(secondLabelName);
+		secondSpec.setStdHeaderName(secondStdHeaderName);
+		secondSpec.setDescription(firstDescription);
+		secondSpec.setUnit(secondUnit);
+		secondSpec.setUserHeaderName(secondUserHeaderName);
+		secondSpec.setUserColumnNum(secondUserColumnNum);
 		assertTrue( firstSpec.compareTo(secondSpec) < 0 );
 		assertTrue( secondSpec.compareTo(firstSpec) > 0 );
 

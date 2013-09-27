@@ -53,7 +53,7 @@ public class DashboardCruiseWithData extends DashboardCruise {
 	 * @return 
 	 * 		the list of metadata preamble strings;
 	 * 		may be empty, but never null.
-	 * 		The actual list in the instance is returned.
+	 * 		The actual list in this object is returned.
 	 */
 	public ArrayList<String> getPreamble() {
 		return preamble;
@@ -61,8 +61,9 @@ public class DashboardCruiseWithData extends DashboardCruise {
 
 	/**
 	 * @param preamble 
-	 * 		the metadata preamble strings to assign;
-	 * 		if null, the list is cleared.
+	 * 		the metadata preamble strings to assign.  The list in 
+	 * 		this object is cleared and all the contents of the
+	 * 		given list, if not null, are added. 
 	 */
 	public void setPreamble(ArrayList<String> preamble) {
 		this.preamble.clear();
@@ -73,7 +74,7 @@ public class DashboardCruiseWithData extends DashboardCruise {
 	/**
 	 * @return 
 	 * 		the column names list; may be empty but never null.
-	 * 		The actual list contained in the instance is returned.
+	 * 		The actual list contained in this object is returned.
 	 */
 	public ArrayList<String> getColumnNames() {
 		return columnNames;
@@ -81,8 +82,9 @@ public class DashboardCruiseWithData extends DashboardCruise {
 
 	/**
 	 * @param columnNames 
-	 * 		the column names to assign;
-	 * 		if null, the list is cleared.
+	 * 		the column names to assign.  The list in this object 
+	 * 		is cleared and all the contents of the given list, 
+	 * 		if not null, are added. 
 	 */
 	public void setColumnNames(ArrayList<String> columnNames) {
 		this.columnNames.clear();
@@ -93,8 +95,8 @@ public class DashboardCruiseWithData extends DashboardCruise {
 	/**
 	 * @return 
 	 * 		the list of data string lists; 
-	 * 		may be empty but never null
-	 * 		The actual list in the instance is returned.
+	 * 		may be empty but never null.
+	 * 		The actual list in this object is returned.
 	 */
 	public ArrayList<ArrayList<String>> getDataValues() {
 		return dataValues;
@@ -102,15 +104,15 @@ public class DashboardCruiseWithData extends DashboardCruise {
 
 	/**
 	 * @param dataValues 
-	 * 		the lists of data values to assign;
-	 * 		if null the list is cleared
+	 * 		the lists of data values to assign.  The list in this object
+	 * 		is cleared and all the contents of the given list, if not 
+	 * 		null, are added.  Note that this is a shallow copy; the 
+	 * 		lists in the given list are not copied but used directly.
 	 */
 	public void setDataValues(ArrayList<ArrayList<String>> dataValues) {
 		this.dataValues.clear();
 		if ( dataValues != null )
-			for ( ArrayList<String> datalist : dataValues )
-				if ( datalist != null )
-					this.dataValues.add(new ArrayList<String>(datalist));
+			this.dataValues.addAll(dataValues);
 	}
 
 	@Override

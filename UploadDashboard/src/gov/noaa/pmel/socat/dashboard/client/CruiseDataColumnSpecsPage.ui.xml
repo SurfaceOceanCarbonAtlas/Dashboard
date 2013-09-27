@@ -6,7 +6,7 @@
 	<ui:style src="CommonFullWidth.css" />
 
 	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:north size="8">
+		<g:north size="6">
 			<g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.userinfopanel}">
 					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
@@ -15,9 +15,9 @@
 				<g:Label addStyleNames="{style.cruiselabel}" ui:field="cruiseLabel" />
 			</g:FlowPanel>
 		</g:north>
-		<g:south size="8">
+		<g:south size="6">
 			<g:FlowPanel>
-				<cell:SimplePager addStyleNames="{style.gridpager}" ui:field="gridPager" />
+				<cell:SimplePager location="CENTER" addStyleNames="{style.gridpager}" ui:field="gridPager" />
 				<g:FlowPanel addStyleNames="{style.verticalbuttonpanel}">
 					<g:Button addStyleNames="{style.verticalbutton}" ui:field="submitButton" />
 					<g:Button addStyleNames="{style.verticalbutton}" ui:field="cancelButton" />
