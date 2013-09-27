@@ -175,7 +175,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				cruiseData = new DashboardCruiseWithData();
 				cruiseData.setOwner(username);
 				cruiseData.setUploadFilename(filename);
-				cruiseHandler.assignCruiseDataFromInput(cruiseData, cruiseReader);
+				cruiseHandler.assignCruiseDataFromInput(cruiseData, cruiseReader, 0, -1);
 			} finally {
 				cruiseReader.close();
 			}
@@ -228,7 +228,8 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				// of the existing file
 				DashboardCruiseWithData existingCruiseData;
 				try {
-					existingCruiseData = cruiseHandler.getCruiseDataFromFile(expocode);
+					existingCruiseData = 
+							cruiseHandler.getCruiseDataFromFile(expocode, 0, 25);
 				} catch ( Exception ex ) {
 					// just report the error without data
 					existingCruiseData = null;

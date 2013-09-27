@@ -63,71 +63,60 @@ public class CruiseDataColumnSpecsTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#getFirstDataRowIndex()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#setFirstDataRowIndex(int)}.
-	 */
-	@Test
-	public void testSetGetFirstDataRowIndex() {
-		int rowIndex = 23;
-		CruiseDataColumnSpecs specs = new CruiseDataColumnSpecs();
-		assertEquals(0, specs.getFirstDataRowIndex());
-		specs.setFirstDataRowIndex(rowIndex);
-		assertEquals(rowIndex, specs.getFirstDataRowIndex());
-		assertEquals(0, specs.getNumRowsTotal());
-		assertEquals("", specs.getExpocode());
-		boolean missedError = false;
-		try {
-			specs.setFirstDataRowIndex(-15);
-			missedError = true;
-		} catch (IllegalArgumentException ex) {
-			// expected result
-			;
-		}
-		if ( missedError )
-			fail("negative FirstDataRowIndex did not throw an exception");
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#getColumnTypes()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#setColumnTypes(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetColumnTypes() {
-		ArrayList<CruiseDataColumnType> colTypes = new ArrayList<CruiseDataColumnType>(
-				Arrays.asList(DashboardUtils.STANDARD_TYPES));
+		String[] userNames = {"time", "longitude", "latitude",
+				"sal", "SST", "T_equ", "P_atm", "P_equ", "xCO2_equ"};
+		int[] stdColNums = {
+				DashboardUtils.TIMESTAMP_STD_COLUMN_NUM, 
+				DashboardUtils.LONGITUDE_STD_COLUMN_NUM, 
+				DashboardUtils.LATITUDE_STD_COLUMN_NUM, 
+				DashboardUtils.SAMPLE_SAL_STD_COLUMN_NUM, 
+				DashboardUtils.SST_STD_COLUMN_NUM, 
+				DashboardUtils.TEQU_STD_COLUMN_NUM, 
+				DashboardUtils.PPPP_STD_COLUMN_NUM, 
+				DashboardUtils.PEQU_STD_COLUMN_NUM, 
+				DashboardUtils.XCO2_EQU_STD_COLUMN_NUM
+		};
+		String[] units = {"YYYY-MM-DD HH:MM", "dec deg E", "dec deg N",
+				"PSU", "deg C", "deg C", "mbar", "mbar", "umol/mol"};
+		String[] descriptions = {
+				"date and time of the measurement",
+				"longitude",
+				"latitude",
+				"salinity", 
+				"sea temperature",
+				"equilibrator temperature",
+				"atmospheric pressure",
+				"equilibrator pressure",
+				"measured xCO2 at equilibrator temperature (dry air)"				
+		};
+		
+		ArrayList<CruiseDataColumnType> columnTypes = 
+				new ArrayList<CruiseDataColumnType>(stdColNums.length);
+		for (int k = 0; k < stdColNums.length; k++) {
+			CruiseDataColumnType colType = new CruiseDataColumnType();
+			colType.setUserColumnNum(k+1);
+			colType.setStdColumnNum(stdColNums[k]);
+			colType.setDataType(DashboardUtils.STD_DATA_TYPES.get(stdColNums[k]));
+			colType.setStdHeaderName(DashboardUtils.STD_DATA_HEADER_NAMES.get(stdColNums[k]));
+			colType.setUserHeaderName(userNames[k]);
+			colType.setUnit(units[k]);
+			colType.setDescription(descriptions[k]);
+			columnTypes.add(colType);
+		}
+
 		CruiseDataColumnSpecs specs = new CruiseDataColumnSpecs();
 		assertEquals(0, specs.getColumnTypes().size());
-		specs.setColumnTypes(colTypes);
-		assertEquals(colTypes, specs.getColumnTypes());
-		assertEquals(0, specs.getFirstDataRowIndex());
+		specs.setColumnTypes(columnTypes);
+		assertEquals(columnTypes, specs.getColumnTypes());
 		assertEquals(0, specs.getNumRowsTotal());
 		assertEquals("", specs.getExpocode());
 		specs.setColumnTypes(null);
 		assertEquals(0, specs.getColumnTypes().size());		
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#getColumnNames()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs#setColumnNames(java.util.ArrayList)}.
-	 */
-	@Test
-	public void testSetGetColumnNames() {
-		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
-				new String[] { 
-						"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
-						"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
-						"xCO2water_equ_dry [umol/mol]" 
-				}));
-		CruiseDataColumnSpecs specs = new CruiseDataColumnSpecs();
-		assertEquals(0, specs.getColumnNames().size());
-		specs.setColumnNames(colNames);
-		assertEquals(colNames, specs.getColumnNames());
-		assertEquals(0, specs.getColumnTypes().size());		
-		assertEquals(0, specs.getFirstDataRowIndex());
-		assertEquals(0, specs.getNumRowsTotal());
-		assertEquals("", specs.getExpocode());
-		specs.setColumnNames(null);
-		assertEquals(0, specs.getColumnNames().size());		
 	}
 
 	/**
@@ -157,9 +146,7 @@ public class CruiseDataColumnSpecsTest {
 		assertEquals(0, specs.getDataValues().size());
 		specs.setDataValues(dataValues);
 		assertEquals(dataValues, specs.getDataValues());
-		assertEquals(0, specs.getColumnNames().size());		
 		assertEquals(0, specs.getColumnTypes().size());		
-		assertEquals(0, specs.getFirstDataRowIndex());
 		assertEquals(0, specs.getNumRowsTotal());
 		assertEquals("", specs.getExpocode());
 		specs.setDataValues(null);
@@ -174,13 +161,48 @@ public class CruiseDataColumnSpecsTest {
 	public void testHashCodeEqualsObject() {
 		String myExpocode = "AGSK20031205";
 		int numRows = 235;
-		int rowIndex = 23;
-		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
-				new String[] { 
-						"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
-						"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
-						"xCO2water_equ_dry [umol/mol]" 
-				}));
+
+		String[] userNames = {"time", "longitude", "latitude",
+				"sal", "SST", "T_equ", "P_atm", "P_equ", "xCO2_equ"};
+		int[] stdColNums = {
+				DashboardUtils.TIMESTAMP_STD_COLUMN_NUM, 
+				DashboardUtils.LONGITUDE_STD_COLUMN_NUM, 
+				DashboardUtils.LATITUDE_STD_COLUMN_NUM, 
+				DashboardUtils.SAMPLE_SAL_STD_COLUMN_NUM, 
+				DashboardUtils.SST_STD_COLUMN_NUM, 
+				DashboardUtils.TEQU_STD_COLUMN_NUM, 
+				DashboardUtils.PPPP_STD_COLUMN_NUM, 
+				DashboardUtils.PEQU_STD_COLUMN_NUM, 
+				DashboardUtils.XCO2_EQU_STD_COLUMN_NUM
+		};
+		String[] units = {"YYYY-MM-DD HH:MM", "dec deg E", "dec deg N",
+				"PSU", "deg C", "deg C", "mbar", "mbar", "umol/mol"};
+		String[] descriptions = {
+				"date and time of the measurement",
+				"longitude",
+				"latitude",
+				"salinity", 
+				"sea temperature",
+				"equilibrator temperature",
+				"atmospheric pressure",
+				"equilibrator pressure",
+				"measured xCO2 at equilibrator temperature (dry air)"				
+		};
+		
+		ArrayList<CruiseDataColumnType> columnTypes = 
+				new ArrayList<CruiseDataColumnType>(stdColNums.length);
+		for (int k = 0; k < stdColNums.length; k++) {
+			CruiseDataColumnType colType = new CruiseDataColumnType();
+			colType.setUserColumnNum(k+1);
+			colType.setStdColumnNum(stdColNums[k]);
+			colType.setDataType(DashboardUtils.STD_DATA_TYPES.get(stdColNums[k]));
+			colType.setStdHeaderName(DashboardUtils.STD_DATA_HEADER_NAMES.get(stdColNums[k]));
+			colType.setUserHeaderName(userNames[k]);
+			colType.setUnit(units[k]);
+			colType.setDescription(descriptions[k]);
+			columnTypes.add(colType);
+		}
+
 		String[][] observations = {
 				{ "2003-12-05 22:12", "337.28101", "64.10700", "26.910", 
 					"5.410", "5.700", null, "1026.500", "373.740" },
@@ -200,7 +222,7 @@ public class CruiseDataColumnSpecsTest {
 
 		CruiseDataColumnSpecs firstSpecs = new CruiseDataColumnSpecs();
 		assertFalse( firstSpecs.equals(null) );
-		assertFalse( firstSpecs.equals(colNames) );
+		assertFalse( firstSpecs.equals(columnTypes) );
 		CruiseDataColumnSpecs secondSpecs = new CruiseDataColumnSpecs();
 		assertEquals(firstSpecs.hashCode(), secondSpecs.hashCode());
 		assertEquals(firstSpecs, secondSpecs);
@@ -219,17 +241,10 @@ public class CruiseDataColumnSpecsTest {
 		assertEquals(firstSpecs.hashCode(), secondSpecs.hashCode());
 		assertEquals(firstSpecs, secondSpecs);
 
-		firstSpecs.setFirstDataRowIndex(rowIndex);
+		firstSpecs.setColumnTypes(columnTypes);
 		assertTrue( firstSpecs.hashCode() != secondSpecs.hashCode() );
 		assertFalse( firstSpecs.equals(secondSpecs) );
-		secondSpecs.setFirstDataRowIndex(rowIndex);
-		assertEquals(firstSpecs.hashCode(), secondSpecs.hashCode());
-		assertEquals(firstSpecs, secondSpecs);
-
-		firstSpecs.setColumnNames(colNames);
-		assertTrue( firstSpecs.hashCode() != secondSpecs.hashCode() );
-		assertFalse( firstSpecs.equals(secondSpecs) );
-		secondSpecs.setColumnNames(colNames);
+		secondSpecs.setColumnTypes(columnTypes);
 		assertEquals(firstSpecs.hashCode(), secondSpecs.hashCode());
 		assertEquals(firstSpecs, secondSpecs);
 

@@ -101,12 +101,11 @@ public class DashboardCruiseWithDataTest {
 	@Test
 	public void testSetGetPreamble() {
 		ArrayList<String> myPreamble = new ArrayList<String>(Arrays.asList(
-				new String[] {
-						"Cruise Expocode: AGSK20031205",
-						"Cruise Name: SKO313",
-						"Ship/Vessel Name: Skogafoss",
-						"Principal Investigator(s): Rik Wanninkhof"
-				}));
+				"Cruise Expocode: AGSK20031205",
+				"Cruise Name: SKO313",
+				"Ship/Vessel Name: Skogafoss",
+				"Principal Investigator(s): Rik Wanninkhof"
+		));
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals(0, cruiseData.getPreamble().size());
 		cruiseData.setPreamble(myPreamble);
@@ -126,11 +125,10 @@ public class DashboardCruiseWithDataTest {
 	@Test
 	public void testSetGetColumnNames() {
 		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
-				new String[] { 
-						"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
-						"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
-						"xCO2water_equ_dry [umol/mol]" 
-				}));
+				"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
+				"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
+				"xCO2water_equ_dry [umol/mol]" 
+		));
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		assertEquals(0, cruiseData.getColumnNames().size());
 		cruiseData.setColumnNames(colNames);
@@ -192,18 +190,16 @@ public class DashboardCruiseWithDataTest {
 		String myVersion = "SOCAT version 3 cruise file created: 2013-09-05";
 		String myExpocode = "AGSK20031205";
 		ArrayList<String> myPreamble = new ArrayList<String>(Arrays.asList(
-				new String[] {
-						"Cruise Expocode: AGSK20031205",
-						"Cruise Name: SKO313",
-						"Ship/Vessel Name: Skogafoss",
-						"Principal Investigator(s): Rik Wanninkhof"
-				}));
+				"Cruise Expocode: AGSK20031205",
+				"Cruise Name: SKO313",
+				"Ship/Vessel Name: Skogafoss",
+				"Principal Investigator(s): Rik Wanninkhof"
+		));
 		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
-				new String[] { 
-						"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
-						"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
-						"xCO2water_equ_dry [umol/mol]" 
-				}));
+				"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
+				"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
+				"xCO2water_equ_dry [umol/mol]" 
+		));
 		String[][] observations = {
 				{ "2003-12-05 22:12", "337.28101", "64.10700", "26.910", 
 					"5.410", "5.700", null, "1026.500", "373.740" },

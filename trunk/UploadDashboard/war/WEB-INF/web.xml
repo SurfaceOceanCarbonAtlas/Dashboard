@@ -6,6 +6,15 @@
 
 	<!-- Servlets -->
 	<servlet>
+		<servlet-name>cruiseDataColumnSpecsServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.CruiseDataColumnSpecsServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>cruiseDataColumnSpecsServlet</servlet-name>
+		<url-pattern>/socatuploaddashboard/dataColumnSpecsService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>dashboardCruiseListServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardCruiseListServiceImpl</servlet-class>
 	</servlet>

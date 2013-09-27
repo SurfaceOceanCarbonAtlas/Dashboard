@@ -45,9 +45,9 @@ public class DashboardUtilsTest {
 	@Test
 	public void testDecodeByteArray() {
 		String expectedStr = "[ 3, 6, -9, 15, 0, 12 ]";
-		byte[] expectedArray = new byte[] {3, 6, -9, 15, 0, 12};
+		byte[] expectedArray = {3, 6, -9, 15, 0, 12};
 		String oneStr = "[ 8 ]";
-		byte[] oneArray = new byte[] { 8 };
+		byte[] oneArray = { 8 };
 		String emptyStr = "[  ]";
 		byte[] emptyArray = new byte[0];
 
@@ -77,4 +77,15 @@ public class DashboardUtilsTest {
 		assertTrue( exceptionCaught );
 	}
 
+	/**
+	 * Test method for some of the constants
+	 */
+	@Test
+	public void testConstants() {
+		int expectedLength = DashboardUtils.SUPPLEMENTAL_DATA_STD_COLUMN_NUM + 1;
+		assertEquals(expectedLength, DashboardUtils.STD_DATA_TYPES.size());
+		assertEquals(expectedLength, DashboardUtils.STD_DATA_HEADER_NAMES.size());
+		assertEquals(expectedLength, DashboardUtils.STD_DATA_UNITS.size());
+		assertEquals(expectedLength, DashboardUtils.STD_DATA_DESCRIPTIONS.size());
+	}
 }

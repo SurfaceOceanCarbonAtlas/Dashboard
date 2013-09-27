@@ -3,6 +3,9 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
 /**
@@ -30,7 +33,7 @@ public class DashboardUtils {
 	public static final String FILE_CREATED_HEADER_TAG = "FILE CREATED HEADER TAG";
 	public static final String FILE_UPDATED_HEADER_TAG = "FILE UPDATED HEADER TAG";
 
-	/**
+	/*
 	 * Only valid characters for an expocode are upper-case alphanumeric, 
 	 * underscore, and hyphen; the latter two are for the very rare case 
 	 * of valid duplicate expocodes. 
@@ -62,42 +65,186 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_SUBMITTED_PREFIX = "Submitted to ";
 	public static final String ARCHIVE_STATUS_ARCHIVED_PREFIX = "DOI ";
 
+	// Standard data column numbers, 
+	// which are also indices into the arrays that follow
 	/**
-	 * Standard column types.  The delete type indicates data that should 
-	 * be deleted from the data file; only the user can specify a column 
-	 * to be this type.  The unknown type indicates a column that the user 
-	 * needs specify as one of the other standard types.  The supplemental 
-	 * type indicates supplemental data that is carried along but otherwise
-	 * ignored.
+	 * The delete data type indicates data that should be deleted 
+	 * from the data file; only the user can specify a column 
+	 * to be this type.
 	 */
-	public static final CruiseDataColumnType[] STANDARD_TYPES = new CruiseDataColumnType[] {
-		new CruiseDataColumnType(-1, "delete", "delete", "data to be deleted"),
-		new CruiseDataColumnType( 0, "unknown", "unknown", "unknown data"),
-		new CruiseDataColumnType( 1, "timestamp", "timestamp", "date and time of the measurement"),
-		new CruiseDataColumnType( 2, "date", "date", "date of the measurement"),
-		new CruiseDataColumnType( 3, "time", "time", "time of the measurement"),
-		new CruiseDataColumnType( 4, "year", "yr", "year of the time of the measurement"),
-		new CruiseDataColumnType( 5, "month", "mon", "month of the time of the measurement"),
-		new CruiseDataColumnType( 6, "day", "day", "day of the time of the measurement"),
-		new CruiseDataColumnType( 7, "hour", "hh", "hour of the time of the measurement"),
-		new CruiseDataColumnType( 8, "minute", "mm", "minute of the time of the measurement"),
-		new CruiseDataColumnType( 9, "second", "ss", "second of the time of the measurement"),
-		new CruiseDataColumnType(10, "longitude", "longitude", "measurement longitude"),
-		new CruiseDataColumnType(11, "latitude", "latitude", "measurement latitude"),
-		new CruiseDataColumnType(12, "depth", "sample_depth", "water sampling depth"),
-		new CruiseDataColumnType(13, "salinity", "sal", "measured sea surface salinity"),
-		new CruiseDataColumnType(14, "temperature", "Tequ", "equilibrator chamber temperature"),
-		new CruiseDataColumnType(15, "temperature", "SST", "measured sea surface temperature"),
-		new CruiseDataColumnType(16, "pressure", "Pequ", "equilibrator chamber pressure"),
-		new CruiseDataColumnType(17, "pressure", "PPPP", "measured atmospheric pressure"),
-		new CruiseDataColumnType(18, "xCO2", "xCO2water_equ_dry", "measured xCO2 (water) in micromole per mole at equilibrator temperature (dry air)"),
-		new CruiseDataColumnType(19, "xCO2", "xCO2water_SST_dry", "measured xCO2 (water) in micromole per mole at sea surface temperature (dry air)"),
-		new CruiseDataColumnType(20, "pCO2", "pCO2water_equ_wet", "measured pCO2 (water) in microatmospheres at equilibrator temperature (wet air)"),
-		new CruiseDataColumnType(21, "pCO2", "pCO2water_SST_wet", "measured pCO2 (water) in microatmospheres at sea surface temperature (wet air)"),
-		new CruiseDataColumnType(22, "fCO2", "fCO2water_equ_wet", "measured fCO2 (water) in microatmospheres at equilibrator temperature (wet air)"),
-		new CruiseDataColumnType(23, "fCO2", "fCO2water_SST_wet", "measured fCO2 (water) in microatmospheres at sea surface temperature (wet air)"),
-		new CruiseDataColumnType(99, "supplemental", "supplimental", "supplemental data")
-	};
+	public static final int DELETE_DATA_STD_COLUMN_NUM = 0;
+	/**
+	 * The unknown data type indicates data that the user 
+	 * needs specify as one of the other standard types.
+	 */
+	public static final int UNKNOWN_DATA_STD_COLUMN_NUM = 1;
+	/**
+	 * The timestamp data type has both date and time.
+	 */
+	public static final int TIMESTAMP_STD_COLUMN_NUM = 2;
+	/**
+	 * The date data type has only the date; no time.
+	 */
+	public static final int DATE_STD_COLUMN_NUM = 3;
+	public static final int YEAR_STD_COLUMN_NUM = 4;
+	public static final int MONTH_STD_COLUMN_NUM = 5;
+	public static final int DAY_STD_COLUMN_NUM = 6;
+	/**
+	 * The time data type has only the time; no date.
+	 */
+	public static final int TIME_STD_COLUMN_NUM = 7;
+	public static final int HOUR_STD_COLUMN_NUM = 8;
+	public static final int MINUTE_STD_COLUMN_NUM = 9;
+	public static final int SECOND_STD_COLUMN_NUM = 10;
+	public static final int LONGITUDE_STD_COLUMN_NUM = 11;
+	public static final int LATITUDE_STD_COLUMN_NUM = 12;
+	public static final int SAMPLE_DEPTH_STD_COLUMN_NUM = 13;
+	public static final int SAMPLE_SAL_STD_COLUMN_NUM = 14;
+	public static final int TEQU_STD_COLUMN_NUM = 15;
+	public static final int SST_STD_COLUMN_NUM = 16;
+	public static final int PEQU_STD_COLUMN_NUM = 17;
+	public static final int PPPP_STD_COLUMN_NUM = 18;
+	public static final int XCO2_EQU_STD_COLUMN_NUM = 19;
+	public static final int XCO2_SST_STD_COLUMN_NUM = 20;
+	public static final int PCO2_EQU_STD_COLUMN_NUM = 21;
+	public static final int PCO2_SST_STD_COLUMN_NUM = 22;
+	public static final int FCO2_EQU_STD_COLUMN_NUM = 23;
+	public static final int FCO2_SST_STD_COLUMN_NUM = 24;
+	/**
+	 * The supplemental data type indicates data that is 
+	 * carried along but otherwise ignored.
+	 */
+	public static final int SUPPLEMENTAL_DATA_STD_COLUMN_NUM = 25;
+
+	/**
+	 * data types of the standard data columns
+	 */
+	public static final ArrayList<String> STD_DATA_TYPES = 
+			new ArrayList<String>(Arrays.asList(
+					"delete", 
+					"unknown", 
+					"timestamp", 
+					"date", 
+					"year", 
+					"month", 
+					"day", 
+					"time", 
+					"hour", 
+					"minute", 
+					"second", 
+					"longitude", 
+					"latitude", 
+					"depth", 
+					"salinity", 
+					"temperature", 
+					"temperature", 
+					"pressure", 
+					"pressure", 
+					"xCO2", 
+					"xCO2", 
+					"pCO2", 
+					"pCO2", 
+					"fCO2", 
+					"fCO2", 
+					"supplemental" 
+			));
+	/**
+	 * standard header names of the standard data columns
+	 */
+	public static final ArrayList<String> STD_DATA_HEADER_NAMES = 
+			new ArrayList<String>(Arrays.asList(
+					"delete", 
+					"unknown", 
+					"timestamp", 
+					"date", 
+					"yr", 
+					"mon", 
+					"day", 
+					"time", 
+					"hh", 
+					"mm", 
+					"ss", 
+					"longitude", 
+					"latitude", 
+					"sample_depth", 
+					"sal", 
+					"Tequ", 
+					"SST", 
+					"Pequ", 
+					"PPPP", 
+					"xCO2water_equ_dry", 
+					"xCO2water_SST_dry", 
+					"pCO2water_equ_wet", 
+					"pCO2water_SST_wet", 
+					"fCO2water_equ_wet", 
+					"fCO2water_SST_wet", 
+					"supplemental" 
+			));
+	/**
+	 * standard data descriptions of the standard data columns
+	 */
+	public static final ArrayList<String> STD_DATA_DESCRIPTIONS = 
+			new ArrayList<String>(Arrays.asList(
+					"data to be deleted", 
+					"unknown data to be identified", 
+					"date and time of the measurement", 
+					"date of the measurement", 
+					"year of the date of the measurement", 
+					"month of the date of the measurement", 
+					"day of the date of the measurement", 
+					"time of the measurement", 
+					"hour of the time of the measurement", 
+					"minute of the time of the measurement", 
+					"second of the time of the measurement", 
+					"measurement longitude", 
+					"measurement latitude", 
+					"water sampling depth", 
+					"measured sea surface salinity", 
+					"equilibrator chamber temperature", 
+					"measured sea surface temperature", 
+					"equilibrator chamber pressure", 
+					"measured atmospheric pressure", 
+					"measured xCO2 (water) using equilibrator temperature (dry air)", 
+					"measured xCO2 (water) using sea surface temperature (dry air)", 
+					"measured pCO2 (water) using equilibrator temperature (wet air)", 
+					"measured pCO2 (water) using sea surface temperature (wet air)", 
+					"measured fCO2 (water) using equilibrator temperature (wet air)",
+					"measured fCO2 (water) using sea surface temperature (wet air)", 
+					"supplemental data to be kept" 
+			));
+	/**
+	 * arrays of known units for the standard data columns 
+	 */
+	public final static ArrayList<ArrayList<String>> STD_DATA_UNITS = 
+			new ArrayList<ArrayList<String>>(Arrays.asList(
+					new ArrayList<String>(Arrays.asList("")), 
+					new ArrayList<String>(Arrays.asList("")),
+					new ArrayList<String>(Arrays.asList(
+							"YYYY-MM-DD HH:MM:SS", "MON DAY YEAR HH:MM:SS", "DAY MON YEAR HH:MM:SS")), 
+					new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MON DAY YEAR", "DAY MON YEAR")), 
+					new ArrayList<String>(Arrays.asList("")), 
+					new ArrayList<String>(Arrays.asList("")), 
+					new ArrayList<String>(Arrays.asList("")), 
+					new ArrayList<String>(Arrays.asList("HH:MM:SS")), 
+					new ArrayList<String>(Arrays.asList("")),
+					new ArrayList<String>(Arrays.asList("")),
+					new ArrayList<String>(Arrays.asList("")),
+					new ArrayList<String>(Arrays.asList("decimal deg. E")), 
+					new ArrayList<String>(Arrays.asList("decimal deg. N")),
+					new ArrayList<String>(Arrays.asList("meters")), 
+					new ArrayList<String>(Arrays.asList("PSU")), 
+					new ArrayList<String>(Arrays.asList("deg. C")),
+					new ArrayList<String>(Arrays.asList("deg. C")),
+					new ArrayList<String>(Arrays.asList("hPa", "mbar")),
+					new ArrayList<String>(Arrays.asList("hPa", "mbar")),
+					new ArrayList<String>(Arrays.asList("micromole per mole")),
+					new ArrayList<String>(Arrays.asList("micromole per mole")),
+					new ArrayList<String>(Arrays.asList("microatmospheres")),
+					new ArrayList<String>(Arrays.asList("microatmospheres")), 
+					new ArrayList<String>(Arrays.asList("microatmospheres")),
+					new ArrayList<String>(Arrays.asList("microatmospheres")), 
+					new ArrayList<String>(Arrays.asList(""))
+			));
 
 	/**
 	 * Generate the encrypted password for a given plain-text username 

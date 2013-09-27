@@ -15,7 +15,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * @author Karl Smith
  */
 public class DashboardLogoutServiceImpl extends RemoteServiceServlet
-		implements DashboardLogoutService {
+									implements DashboardLogoutService {
 
 	private static final long serialVersionUID = -2160237671362781212L;
 

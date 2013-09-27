@@ -6,45 +6,58 @@ package gov.noaa.pmel.socat.dashboard.shared;
 import java.io.Serializable;
 
 /**
- * Describes the data dataType of a data column
+ * Describes the type of a cruise data column
  * 
  * @author Karl Smith
  */
-public class CruiseDataColumnType implements Serializable, Comparable<CruiseDataColumnType> {
+public class CruiseDataColumnType implements Serializable, 
+										Comparable<CruiseDataColumnType> {
 
-	private static final long serialVersionUID = -2477993828796593230L;
+	private static final long serialVersionUID = 6338855177727993770L;
 
+	int userColumnNum;
 	int stdColumnNum;
-	String fullName;
-	String labelName;
 	String dataType;
+	String unit;
+	String userHeaderName;
+	String stdHeaderName;
+	String description;
 
 	/**
-	 * Creates an spec with no names, no type, and has the 
-	 * standard column number for an unknown column (zero).
+	 * Creates a column type with no names, no type, no unit, and has 
+	 * column numbers set to the unknown data standard column number.
 	 */
 	public CruiseDataColumnType() {
-		stdColumnNum = 0;
-		fullName = "";
-		labelName = "";
+		userColumnNum = DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM;
+		stdColumnNum = DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM;
 		dataType = "";
-	}
-
-	/**
-	 * Creates an empty CruiseDataColumnType and then 
-	 * assigns each of the given value using the "set" methods.
-	 */
-	public CruiseDataColumnType(int stdColNum, String dataType, 
-							String labelName, String fullName) {
-		setStdColumnNum(stdColNum);
-		setDataType(dataType);
-		setLabelName(labelName);
-		setFullName(fullName);
+		unit = "";
+		userHeaderName = "";
+		stdHeaderName = "";
+		description = "";
 	}
 
 	/**
 	 * @return 
-	 * 		the standard column number
+	 * 		the column number of this data 
+	 * 		in the user-provided data file
+	 */
+	public int getUserColumnNum() {
+		return userColumnNum;
+	}
+
+	/**
+	 * @param userColumnNum 
+	 * 		set the column number of this data 
+	 * 		in the user-provided data file to this value
+	 */
+	public void setUserColumnNum(int userColumnNum) {
+		this.userColumnNum = userColumnNum;
+	}
+
+	/**
+	 * @return 
+	 * 		the standard column number of this data
 	 */
 	public int getStdColumnNum() {
 		return stdColumnNum;
@@ -52,7 +65,8 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 
 	/**
 	 * @param stdColumnNum 
-	 * 		the standard column number to set
+	 * 		set the standard column number of this data 
+	 * 		to this value
 	 */
 	public void setStdColumnNum(int stdColumnNum) {
 		this.stdColumnNum = stdColumnNum;
@@ -60,47 +74,8 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 
 	/**
 	 * @return 
-	 * 		the full standard name; never null
-	 */
-	public String getFullName() {
-		return fullName;
-	}
-
-	/**
-	 * @param fullName 
-	 * 		the full standard name to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setFullName(String fullName) {
-		if ( fullName == null )
-			this.fullName = "";
-		else
-			this.fullName = fullName;
-	}
-
-	/**
-	 * @return 
-	 * 		the standard label name; never null
-	 */
-	public String getLabelName() {
-		return labelName;
-	}
-
-	/**
-	 * @param labelName 
-	 * 		the standard label name to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setLabelName(String labelName) {
-		if ( labelName == null )
-			this.labelName = "";
-		else
-			this.labelName = labelName;
-	}
-
-	/**
-	 * @return 
-	 * 		the standard name of the data type; never null
+	 * 		the type of this data; never null, 
+	 * 		but may be empty
 	 */
 	public String getDataType() {
 		return dataType;
@@ -108,7 +83,7 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 
 	/**
 	 * @param dataType 
-	 * 		the standard name of the data type to set;
+	 * 		set the type of this data to this value;
 	 * 		if null, an empty string is assigned
 	 */
 	public void setDataType(String type) {
@@ -119,10 +94,98 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 	}
 
 	/**
+	 * @return 
+	 * 		the unit of this data; never null, 
+	 * 		but may be empty
+	 */
+	public String getUnit() {
+		return unit;
+	}
+
+	/**
+	 * @param unit 
+	 * 		set the unit of this data to this value;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setUnit(String unit) {
+		if ( unit == null )
+			this.unit = "";
+		else
+			this.unit = unit;
+	}
+
+	/**
+	 * @return
+	 * 		the user-provided name (data column header) 
+	 * 		of this data; never null, but may be empty.
+	 */
+	public String getUserHeaderName() {
+		return userHeaderName;
+	}
+
+	/**
+	 * @param userHeaderName
+	 * 		set the user-provided name (data column header) 
+	 * 		of this data to this value; if null, an empty 
+	 * 		string is assigned. 
+	 */
+	public void setUserHeaderName(String userHeaderName) {
+		if ( userHeaderName == null )
+			this.userHeaderName = "";
+		else
+			this.userHeaderName = userHeaderName;
+	}
+
+	/**
+	 * @return 
+	 * 		the standard name (data column header) 
+	 * 		of this data; never null, but may be empty
+	 */
+	public String getStdHeaderName() {
+		return stdHeaderName;
+	}
+
+	/**
+	 * @param stdHeaderName 
+	 * 		set the standard name (data column header) 
+	 * 		of this data to this value; if null, an empty 
+	 * 		string is assigned
+	 */
+	public void setStdHeaderName(String stdHeaderName) {
+		if ( stdHeaderName == null )
+			this.stdHeaderName = "";
+		else
+			this.stdHeaderName = stdHeaderName;
+	}
+
+	/**
+	 * @return 
+	 * 		the full description of this data; 
+	 * 		never null, but may be empty
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description 
+	 * 		set the full description of the data to this value; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setDescription(String description) {
+		if ( description == null )
+			this.description = "";
+		else
+			this.description = description;
+	}
+
+	/**
 	 * Gives a natural ascending ordering from lowest standard column 
 	 * number to largest standard column number.  With the same standard 
-	 * column number, the ordering is alphabetically starting with the 
-	 * data type, then the label name, and the finally full name.
+	 * column number, the ordering is then alphabetical using the data 
+	 * type, the standard name, the user-provided name, and the unit.
+	 * Finally the column number in the user-provided file and the 
+	 * data description is used.  
 	 */
 	@Override
 	public int compareTo(CruiseDataColumnType other) {
@@ -133,10 +196,20 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 		int value = this.dataType.compareTo(other.dataType);
 		if ( value != 0 )
 			return value;
-		value = this.labelName.compareTo(other.labelName);
+		value = this.stdHeaderName.compareTo(other.stdHeaderName);
 		if ( value != 0 )
 			return value;
-		value = this.fullName.compareTo(other.fullName);
+		value = this.userHeaderName.compareTo(other.userHeaderName);
+		if ( value != 0 )
+			return value;
+		value = this.unit.compareTo(other.unit);
+		if ( value != 0 )
+			return value;
+		if ( this.userColumnNum < other.userColumnNum )
+			return -1;
+		if ( this.userColumnNum > other.userColumnNum )
+			return 1;
+		value = this.description.compareTo(other.description);
 		if ( value != 0 )
 			return value;
 		return 0;
@@ -147,8 +220,11 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 		final int prime = 37;
 		int result = stdColumnNum;
 		result = result * prime + dataType.hashCode();
-		result = result * prime + labelName.hashCode();
-		result = result * prime + fullName.hashCode();
+		result = result * prime + stdHeaderName.hashCode();
+		result = result * prime + userHeaderName.hashCode();
+		result = result * prime + unit.hashCode();
+		result = result * prime + userColumnNum;
+		result = result * prime + description.hashCode();
 		return result;
 	}
 
@@ -167,9 +243,15 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 			return false;
 		if ( ! dataType.equals(other.dataType) )
 			return false;
-		if ( ! labelName.equals(other.labelName) )
+		if ( ! stdHeaderName.equals(other.stdHeaderName) )
 			return false;
-		if ( ! fullName.equals(other.fullName) )
+		if ( ! userHeaderName.equals(other.userHeaderName) )
+			return false;
+		if ( ! unit.equals(other.unit) )
+			return false;
+		if ( userColumnNum != other.userColumnNum )
+			return false;
+		if ( ! description.equals(other.description) )
 			return false;
 		return true;
 	}
@@ -179,8 +261,11 @@ public class CruiseDataColumnType implements Serializable, Comparable<CruiseData
 		return "CruiseDataColumnType" +
 				"[ stdColumnNum=" + stdColumnNum + 
 				", dataType=" + dataType +
-				", labelName=" + labelName + 
-				", fullName=" + fullName + 
+				", stdHeaderName=" + stdHeaderName + 
+				", userHeaderName=" + userHeaderName +
+				", unit=" + unit +
+				", userColumnNum=" + userColumnNum +
+				", description=" + description +
 				" ]";
 	}
 

@@ -18,7 +18,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * @author Karl Smith
  */
 public class DashboardCruiseListServiceImpl extends RemoteServiceServlet
-		implements DashboardCruiseListService {
+									implements DashboardCruiseListService {
 
 	private static final long serialVersionUID = 869265874847692108L;
 

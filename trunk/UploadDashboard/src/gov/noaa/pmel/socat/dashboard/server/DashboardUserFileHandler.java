@@ -3,14 +3,19 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -252,4 +257,68 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		return cruiseList;
 	}
 
+	/**
+	 * Creates a cruise data column specifications from the given cruise data.
+	 * TODO: customize for a given user from saved data - which is why this method 
+	 * is part of the user file handler.
+	 * 
+	 * @param cruiseData
+	 * 		cruise data to use
+	 * @return
+	 * 		cruise data column specifications
+	 */
+	public CruiseDataColumnSpecs createColumnSpecsForCruise(
+									DashboardCruiseWithData cruiseData) {
+		CruiseDataColumnSpecs specs = new CruiseDataColumnSpecs();
+		// Copy the cruise expocode
+		specs.setExpocode(cruiseData.getExpocode());
+		// Set the maximum number of data rows in the cruise
+		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
+		int numRows = dataValues.size();
+		specs.setNumRowsTotal(numRows);
+		// Copy up to the first 25 rows of data
+		if ( numRows > 25 )
+			numRows = 25;
+		// Directly assign the ArrayList in specs
+		ArrayList<ArrayList<String>> specsDataVals = specs.getDataValues();
+		specsDataVals.clear();
+		specsDataVals.addAll(dataValues.subList(0, numRows));
+		// Assign the data column type from the header name for each column
+		ArrayList<CruiseDataColumnType> dataColTypes = 
+				new ArrayList<CruiseDataColumnType>(cruiseData.getColumnNames().size());
+		for ( String userColName : cruiseData.getColumnNames() ) {
+			// Create the column type object for this column
+			CruiseDataColumnType colType = new CruiseDataColumnType();
+			// Assign the user-provided information for this column
+			colType.setUserHeaderName(userColName);
+			colType.setUserColumnNum(dataColTypes.size()+1);
+			// Try to assign to one of the standard column types
+			int stdColNum = DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM;
+			for (int k = 0; k < DashboardUtils.STD_DATA_HEADER_NAMES.size(); k++) {
+				if ( userColName.startsWith(
+						DashboardUtils.STD_DATA_HEADER_NAMES.get(k)) ) {
+					stdColNum = k;
+					break;
+				}
+			}
+			// TODO: accept known standard variations and user-specific variations
+			colType.setStdColumnNum(stdColNum);
+			colType.setDataType(DashboardUtils.STD_DATA_TYPES.get(stdColNum));
+			colType.setStdHeaderName(DashboardUtils.STD_DATA_HEADER_NAMES.get(stdColNum));
+			// TODO: accept other units
+			colType.setUnit(DashboardUtils.STD_DATA_UNITS.get(stdColNum).get(0));
+			if ( (stdColNum != DashboardUtils.DELETE_DATA_STD_COLUMN_NUM) &&
+				 (stdColNum != DashboardUtils.UNKNOWN_DATA_STD_COLUMN_NUM) &&
+				 (stdColNum != DashboardUtils.SUPPLEMENTAL_DATA_STD_COLUMN_NUM) ) {
+				colType.setDescription(DashboardUtils.STD_DATA_DESCRIPTIONS.get(stdColNum));
+			}
+			else {
+				// TODO: get data descriptions from the metadata preamble
+				;
+			}
+			dataColTypes.add(colType);
+		}
+		specs.setColumnTypes(dataColTypes);
+		return specs;
+	}
 }
