@@ -15,7 +15,7 @@ import java.util.List;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -114,7 +114,6 @@ public class DashboardCruiseListPage extends Composite {
 			"remove the selected cruises from this list of cruises; " +
 			"this will NOT remove the cruise or cruise data from SOCAT";
 
-	protected static String columnNameSelected = "Selected";
 	protected static String columnNameExpocode = "Expocode";
 	protected static String columnNameOwner = "Owner";
 	protected static String columnNameFilename = "Filename";
@@ -441,31 +440,43 @@ public class DashboardCruiseListPage extends Composite {
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
-		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
 		TextColumn<DashboardCruise> metaCheckColumn = buildMetaCheckColumn();
 		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
 		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
+		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 
 		// Add the columns, with headers, to the table
 		uploadsGrid.addColumn(selectedColumn, "");
 		uploadsGrid.addColumn(expocodeColumn, columnNameExpocode);
 		uploadsGrid.addColumn(ownerColumn, columnNameOwner);
-		uploadsGrid.addColumn(filenameColumn, columnNameFilename);
 		uploadsGrid.addColumn(dataCheckColumn, columnNameDataCheck);
 		uploadsGrid.addColumn(metaCheckColumn, columnNameMetaCheck);
 		uploadsGrid.addColumn(qcStatusColumn, columnNameSubmitted);
 		uploadsGrid.addColumn(archiveStatusColumn, columnNameArchived);
+		uploadsGrid.addColumn(filenameColumn, columnNameFilename);
 
-		// Set the widths of the columns
-		uploadsGrid.setColumnWidth(selectedColumn, 2.0, Unit.EM);
-		uploadsGrid.setColumnWidth(expocodeColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(ownerColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(filenameColumn, 7.0, Unit.EM);
-		uploadsGrid.setColumnWidth(dataCheckColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(metaCheckColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(qcStatusColumn, 5.0, Unit.EM);
-		uploadsGrid.setColumnWidth(archiveStatusColumn, 5.0, Unit.EM);
+		// Set the minimum widths of the columns
+		double tableWidth = 0.0;
+		uploadsGrid.setColumnWidth(selectedColumn, 2.5, Style.Unit.EM);
+		tableWidth += 2.5;
+		uploadsGrid.setColumnWidth(expocodeColumn, 8.0, Style.Unit.EM);
+		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(ownerColumn, 8.0, Style.Unit.EM);
+		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(dataCheckColumn, 8.0, Style.Unit.EM);
+		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(metaCheckColumn, 8.0, Style.Unit.EM);
+		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(qcStatusColumn, 8.0, Style.Unit.EM);
+		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(archiveStatusColumn, 8.0, Style.Unit.EM);
+		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(filenameColumn, 10.0, Style.Unit.EM);
+		tableWidth += 10.0;
+
+		// Set the minimum width of the full table
+		uploadsGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
 
 		// Create the data provider for this table
 		listProvider = new ListDataProvider<DashboardCruise>();
@@ -475,11 +486,11 @@ public class DashboardCruiseListPage extends Composite {
 		selectedColumn.setSortable(true);
 		expocodeColumn.setSortable(true);
 		ownerColumn.setSortable(true);
-		filenameColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
 		metaCheckColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
+		filenameColumn.setSortable(true);
 
 		// Add a column sorting handler for these columns
 		ListHandler<DashboardCruise> columnSortHandler = 
@@ -490,8 +501,6 @@ public class DashboardCruiseListPage extends Composite {
 				DashboardCruise.expocodeComparator);
 		columnSortHandler.setComparator(ownerColumn, 
 				DashboardCruise.ownerComparator);
-		columnSortHandler.setComparator(filenameColumn, 
-				DashboardCruise.filenameComparator);
 		columnSortHandler.setComparator(dataCheckColumn, 
 				DashboardCruise.dataCheckComparator);
 		columnSortHandler.setComparator(metaCheckColumn, 
@@ -500,6 +509,8 @@ public class DashboardCruiseListPage extends Composite {
 				DashboardCruise.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
 				DashboardCruise.archiveStatusComparator);
+		columnSortHandler.setComparator(filenameColumn, 
+				DashboardCruise.filenameComparator);
 
 		// Add the sort handler to the table, and sort by expocode by default
 		uploadsGrid.addColumnSortHandler(columnSortHandler);
@@ -536,7 +547,6 @@ public class DashboardCruiseListPage extends Composite {
 				}
 			}
 		});
-		selectedColumn.setDataStoreName(columnNameSelected);
 		return selectedColumn;
 	}
 
@@ -554,7 +564,6 @@ public class DashboardCruiseListPage extends Composite {
 				return expocode;
 			}
 		};
-		expocodeColumn.setDataStoreName(columnNameExpocode);
 		return expocodeColumn;
 	}
 
@@ -572,26 +581,7 @@ public class DashboardCruiseListPage extends Composite {
 				return owner;
 			}
 		};
-		ownerColumn.setDataStoreName(columnNameOwner);
 		return ownerColumn;
-	}
-
-	/**
-	 * Creates the filename column for the table
-	 */
-	private TextColumn<DashboardCruise> buildFilenameColumn() {
-		TextColumn<DashboardCruise> filenameColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				String uploadFilename = cruise.getUploadFilename();
-				if ( uploadFilename.isEmpty() )
-					uploadFilename = noUploadFilenameString;
-				return uploadFilename;
-			}
-		};
-		filenameColumn.setDataStoreName(columnNameFilename);
-		return filenameColumn;
 	}
 
 	/**
@@ -608,7 +598,6 @@ public class DashboardCruiseListPage extends Composite {
 				return status;
 			}
 		};
-		dataCheckColumn.setDataStoreName(columnNameDataCheck);
 		return dataCheckColumn;
 	}
 
@@ -626,7 +615,6 @@ public class DashboardCruiseListPage extends Composite {
 				return status;
 			}
 		};
-		metaCheckColumn.setDataStoreName(columnNameMetaCheck);
 		return metaCheckColumn;
 	}
 
@@ -644,7 +632,6 @@ public class DashboardCruiseListPage extends Composite {
 				return status;
 			}
 		};
-		qcStatusColumn.setDataStoreName(columnNameSubmitted);
 		return qcStatusColumn;
 	}
 
@@ -662,8 +649,24 @@ public class DashboardCruiseListPage extends Composite {
 				return status;
 			}
 		};
-		archiveStatusColumn.setDataStoreName(columnNameSubmitted);
 		return archiveStatusColumn;
+	}
+
+	/**
+	 * Creates the filename column for the table
+	 */
+	private TextColumn<DashboardCruise> buildFilenameColumn() {
+		TextColumn<DashboardCruise> filenameColumn = 
+				new TextColumn<DashboardCruise> () {
+			@Override
+			public String getValue(DashboardCruise cruise) {
+				String uploadFilename = cruise.getUploadFilename();
+				if ( uploadFilename.isEmpty() )
+					uploadFilename = noUploadFilenameString;
+				return uploadFilename;
+			}
+		};
+		return filenameColumn;
 	}
 
 	/**

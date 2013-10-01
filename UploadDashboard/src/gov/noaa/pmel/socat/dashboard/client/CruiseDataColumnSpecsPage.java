@@ -11,6 +11,7 @@ import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,7 +39,6 @@ import com.google.gwt.view.client.Range;
  */
 public class CruiseDataColumnSpecsPage extends Composite {
 
-	private static final String DATA_COLUMN_NAME_TAG = "DataColumn_";
 	private static final int NUM_ROWS_PER_GRID_PAGE = 15;
 
 	// These CruiseDataColumnType objects will be updated
@@ -73,7 +73,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	@UiField Button cancelButton;
 
 	// Asynchronous provider of more data, if needed, for the cruise
-	AsyncDataProvider<CruiseDataColumnSpecs> asyncCruiseDataProvider;
+	CruiseDataProvider dataProvider;
 
 	/**
 	 * Creates a cruise data column specification page for the 
@@ -106,7 +106,6 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		for (int k = 0; k < dataColTypes.size(); k++) {
 			// TextColumn for displaying the data strings for this column
 			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k);
-			dataColumn.setDataStoreName(DATA_COLUMN_NAME_TAG + k);
 
 			// Object creating the Header cell for this data column
 			CruiseDataColumnHeader dataHeader = 
@@ -116,12 +115,14 @@ public class CruiseDataColumnSpecsPage extends Composite {
 
 			// Add this data column and the header to the grid
 			dataGrid.addColumn(dataColumn, dataHeader.getHeader());
+			// TODO: set the width for this column
 		}
+		// TODO: set the actual table width
+		dataGrid.setMinimumTableWidth(200.0, Style.Unit.EM);
 		// Set the number of data rows to display
 		dataGrid.setPageSize(NUM_ROWS_PER_GRID_PAGE);
 		// Create the async data provider for this data grid 
-		CruiseDataProvider dataProvider = 
-				new CruiseDataProvider(cruiseSpecs.getExpocode());
+		dataProvider = new CruiseDataProvider(cruiseSpecs.getExpocode());
 		dataProvider.addDataDisplay(dataGrid);
 		// Update the data provider with the data in the CruiseDataColumnSpecs
 		dataProvider.updateRowCount(cruiseSpecs.getNumRowsTotal(), true);
