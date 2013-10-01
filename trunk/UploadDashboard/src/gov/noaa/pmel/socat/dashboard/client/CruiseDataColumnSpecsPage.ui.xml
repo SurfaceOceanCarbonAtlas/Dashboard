@@ -26,7 +26,7 @@
 		</g:south>
 		<g:center>
 			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid addStyleNames="{style.gridtable}" ui:field="dataGrid" />
+				<cell:DataGrid ui:field="dataGrid" />
 			</g:ResizeLayoutPanel>
 		</g:center>
 	</g:DockLayoutPanel>

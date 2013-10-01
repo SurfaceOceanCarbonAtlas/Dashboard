@@ -30,7 +30,7 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:north>
-		<g:west size="8">
+		<g:west size="9">
 			<g:ScrollPanel addStyleNames="{style.submitscrollpanel}">
 				<g:VerticalPanel addStyleNames="{style.submitpanel}">
 					<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
@@ -47,7 +47,7 @@
 		</g:west>
 		<g:center>
 			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid addStyleNames="{style.gridtable}" ui:field="uploadsGrid" />
+				<cell:DataGrid ui:field="uploadsGrid" />
 			</g:ResizeLayoutPanel>
 		</g:center>
 	</g:DockLayoutPanel>
