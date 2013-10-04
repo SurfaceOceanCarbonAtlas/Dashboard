@@ -22,12 +22,12 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Logout page with button to login again or to go to socat.info
+ * Logout page with buttons to login again and to go to socat.info
  * @author Karl Smith
  */
-public class DashboardLogout extends Composite {
+public class DashboardLogoutPage extends Composite {
 
-	protected static String goodbyeMsg = 
+	private static final String GOODBYE_MSG = 
 			"Thank you for contributing cruise data to SOCAT.  Please consider, " +
 			"if you are not already a member, joining our group of reviewers as " +
 			"well as joining the SOCAT E-mail list (Google group).  Contact " +
@@ -38,63 +38,74 @@ public class DashboardLogout extends Composite {
 			"accomplish and the problem you encountered. " +
 			"<br /><br />" +
 			"Goodbye.";
-	protected static String reloginText = "Log in again";
-	protected static String socatInfoText = "Return to socat.info";
-	protected static String socatInfoLink = "http://www.socat.info";
-	protected static String requestFailedMsg = 
+	private static final String RELOGIN_TEXT = "Log in again";
+	private static final String SOCAT_INFO_TEXT = "Return to socat.info";
+	private static final String SOCAT_INFO_LINK = "http://www.socat.info";
+	private static final String REQUEST_FAILED_MSG = 
 			"Sorry, an error occurred with your logout request";
 
-	interface DashboardLogoutUiBinder extends UiBinder<Widget, DashboardLogout> {
+	interface DashboardLogoutPageUiBinder 
+			extends UiBinder<Widget, DashboardLogoutPage> {
 	}
 
-	private static DashboardLogoutUiBinder uiBinder = GWT
-			.create(DashboardLogoutUiBinder.class);
+	private static DashboardLogoutPageUiBinder uiBinder = 
+			GWT.create(DashboardLogoutPageUiBinder.class);
+
+	private static DashboardLogoutServiceAsync service = 
+			GWT.create(DashboardLogoutService.class);
 
 	@UiField HTML goodbyeHTML;
 	@UiField Button reloginButton;
 	@UiField Anchor socatInfoAnchor;
 
-	DashboardLogout() {
+	// The singleton instance of this page
+	private static DashboardLogoutPage singleton = null;
+
+	/**
+	 * Creates a logout page.  Do not call this constructor; 
+	 * instead use the showPage static method to show the 
+	 * singleton instance of this page.
+	 */
+	private DashboardLogoutPage() {
 		initWidget(uiBinder.createAndBindUi(this));
-		goodbyeHTML.setHTML(goodbyeMsg);
-		reloginButton.setText(reloginText);
-		socatInfoAnchor.setText(socatInfoText);
-		socatInfoAnchor.setHref(socatInfoLink);
+		goodbyeHTML.setHTML(GOODBYE_MSG);
+		reloginButton.setText(RELOGIN_TEXT);
+		socatInfoAnchor.setText(SOCAT_INFO_TEXT);
+		socatInfoAnchor.setHref(SOCAT_INFO_LINK);
 	}
 
 	/**
-	 * Tell the server to invalidate this session.
+	 * Shows the logout page in the RootLayoutPanel 
+	 * and logs out the user.
 	 */
-	void doLogout() {
-		DashboardLogoutServiceAsync service = 
-				GWT.create(DashboardLogoutService.class);
-		service.logoutUser(DashboardPageFactory.getUsername(),
-						   DashboardPageFactory.getPasshash(),
+	static void showPage() {
+		if ( singleton == null )
+			singleton = new DashboardLogoutPage();
+		RootLayoutPanel.get().add(singleton);
+		service.logoutUser(DashboardLoginPage.getUsername(),
+						   DashboardLoginPage.getPasshash(),
 						   new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean okay) {
 				if ( okay ) {
 					Cookies.removeCookie("JSESSIONID");
-					DashboardPageFactory.clearAuthentication();
+					DashboardLoginPage.clearAuthentication();
 				}
 				else {
-					Window.alert(requestFailedMsg);
+					Window.alert(REQUEST_FAILED_MSG);
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(requestFailedMsg + " (" + ex.getMessage() + ")");
+				Window.alert(REQUEST_FAILED_MSG + " (" + ex.getMessage() + ")");
 			}
 		});
 	}
 
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
-		DashboardPageFactory.clearAuthentication();
-		RootLayoutPanel.get().remove(DashboardLogout.this);
-		DashboardLogin loginPage = DashboardPageFactory.getPage(DashboardLogin.class);
-		RootLayoutPanel.get().add(loginPage);
-		loginPage.clearLoginData();
+		RootLayoutPanel.get().remove(DashboardLogoutPage.this);
+		DashboardLoginPage.showPage();
 	}
 
 }

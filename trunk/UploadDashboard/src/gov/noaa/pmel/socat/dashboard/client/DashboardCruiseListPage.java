@@ -44,27 +44,22 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class DashboardCruiseListPage extends Composite {
 
-	// Replacement strings for empty or null values
-	protected static String noExpocodeString = "(unknown)";
-	protected static String noOwnerString = "(unknown)";
-	protected static String noUploadFilenameString = "(unknown)";
-	protected static String noCheckStatusString = "(not checked)";
-	protected static String noQCStatusString = "(not submitted)";
-	protected static String noArchiveStatusString = "(not archived)";
+	private static final String WELCOME_INTRO = "Logged in as: ";
+	private static final String LOGOUT_TEXT = "Logout";
+	private static final String MORE_INFO_TEXT = "more explanation";
 
-	protected static String welcomeIntro = "Logged in as: ";
-	protected static String logoutText = "Logout";
-	protected static String agreeShareText = 
+	private static final String AGREE_SHARE_TEXT = 
 			"I give permission for my cruises to be shared for policy (QC) assessment.";
-	protected static String agreeShareInfoHtml =
+	private static final String AGREE_SHARE_INFO_HTML =
 			"By checking this box I am giving permission for my uploaded cruise files " +
 			"to be shared for purposes of policy (QC) assessment.  I understand that " +
 			"data so-released will be used only for that narrow purpose and will not " +
 			"be further distributed until the next official publication of SOCAT if " +
 			"the cruise was deemed acceptable. ";
-	protected static String agreeArchiveText = 
+
+	private static final String AGREE_ARCHIVE_TEXT = 
 			"I give permission for my cruises to be automatically archived at CDIAC.  ";
-	protected static String agreeArchiveInfoHtml = 
+	private static final String AGREE_ARCHIVE_INFO_HTML = 
 			"By checking this box I am giving permission for my uploaded cruise files " +
 			"and metadata to be archived at CDIAC.  This will occur, if the cruise was " +
 			"deemed acceptable, at the time of the next SOCAT public release, after " +
@@ -73,93 +68,101 @@ public class DashboardCruiseListPage extends Composite {
 			"<br /><br /> " +
 			"<em>Note that declining permission here implies an obligation on my part to " +
 			"ensure that these data will be made accessible via another data center.</em>";
-	protected static String moreInfoText = "more explanation";
 
-	protected static String uploadText = "Upload New Cruise Data";
-	protected static String uploadHoverHelp = 
+	private static final String UPLOAD_TEXT = "Upload New Cruise Data";
+	private static final String UPLOAD_HOVER_HELP = 
 			"upload cruise data to create a new cruise or replace an existing cruise";
 
-	protected static String deleteText = "Delete Cruise";
-	protected static String deleteHoverHelp =
+	private static final String DELETE_TEXT = "Delete Cruise";
+	private static final String DELETE_HOVER_HELP =
 			"delete the selected cruises, including the cruise data, from SOCAT";
 
-	protected static String dataCheckText = "Check Data";
-	protected static String dataCheckHoverHelp =
+	private static final String DATA_CHECK_TEXT = "Check Data";
+	private static final String DATA_CHECK_HOVER_HELP =
 			"assign data column types and programmatically check the data in the selected cruise";
 
-	protected static String metaCheckText = "Check Metadata";
-	protected static String metaCheckHoverHelp =
+	private static final String META_CHECK_TEXT = "Check Metadata";
+	private static final String META_CHECK_HOVER_HELP =
 			"programmatically check the metadata in the selected cruise";
 
-	protected static String reviewText = "Review with LAS";
-	protected static String reviewHoverHelp =
+	private static final String REVIEW_TEXT = "Review with LAS";
+	private static final String REVIEW_HOVER_HELP =
 			"examine the selected cruises in the cruise viewer " +
 			"aside other SOCAT cruises";
 
-	protected static String qcSubmitText = "Submit for QC";
-	protected static String qcSubmitHoverHelp =
+	private static final String QC_SUBMIT_TEXT = "Submit for QC";
+	private static final String QC_SUBMIT_HOVER_HELP =
 			"submit the selected cruises to SOCAT for quality assessment";
 
-	protected static String archiveSubmitText = "Archive Now";
-	protected static String archiveSubmitHoverHelp =
+	private static final String ARCHIVE_SUBMIT_TEXT = "Archive Now";
+	private static final String ARCHIVE_SUBMIT_HOVER_HELP =
 			"report the archival of the selected cruises, " +
 			"or submit the selected cruises for immediate archival";
 
-	protected static String addToListText = "Add Cruise";
-	protected static String addToListHoverHelp = 
+	private static final String ADD_TO_LIST_TEXT = "Add Cruise";
+	private static final String ADD_TO_LIST_HOVER_HELP = 
 			"add an existing cruise to this list of cruises";
 
-	protected static String removeFromListText = "Remove Cruise";
-	protected static String removeFromListHoverHelp =
+	private static final String REMOVE_FROM_LIST_TEXT = "Remove Cruise";
+	private static final String REMOVE_FROM_LIST_HOVER_HELP =
 			"remove the selected cruises from this list of cruises; " +
 			"this will NOT remove the cruise or cruise data from SOCAT";
 
-	protected static String columnNameExpocode = "Expocode";
-	protected static String columnNameOwner = "Owner";
-	protected static String columnNameFilename = "Filename";
-	protected static String columnNameDataCheck = "Data check";
-	protected static String columnNameMetaCheck = "Meta check";
-	protected static String columnNameSubmitted = "Submitted";
-	protected static String columnNameArchived = "Archived";
-	protected static String emptyTableText = "No uploaded cruises";
-
-	protected static String noCruisesToDeleteMsg = 
+	private static final String NO_CRUISE_TO_DELETE_MSG = 
 			"No cruises are selected which can be deleted " +
 			"(cruises must be suspended or not submitted).";
-	protected static String deleteConfirmMsg = 
+	private static final String DELETE_CONFIRM_MSG = 
 			": this cruise, including all cruise data, will be deleted from " +
 			"SOCAT.  You will be able to do this only if the cruise belongs " +
 			"to you or to someone in a group you manage.  Do you wish to " +
 			"proceed?";
-	protected static String deleteCruiseFailMsg = 
+	private static final String DELETE_CRUISE_FAIL_MSG = 
 			"Unable to delete the selected cruise(s)";
 
-	protected static String onlyOneCruiseAllowedMsg =
+	private static final String ONLY_ONE_CRUISE_ALLOWED_MSG =
 			"Exactly one cruise must be selected";
 
-	protected static String cruiseDataCheckFailMsg = 
-			"Unable to generate the cruise data column specifications page";
-	
-	protected static String expocodeToAddMsg = 
+	private static final String EXPOCODE_TO_ADD_MSG = 
 			"Enter the expocode of the cruise to wish to add to your cruise list";
-	protected static String addCruiseFailMsg = 
+	private static final String ADD_CRUISE_FAIL_MSG = 
 			"Unable to add the specified cruise to your list of cruises";
 
-	protected static String noCruisesToRemoveMsg = 
+	private static final String NO_CRUISE_TO_REMOVE_MSG = 
 			"No cruises are selected for removal ";
-	protected static String removeCruiseConfirmMsg = 
+	private static final String REMOVE_CRUISE_CONFIRM_MSG = 
 			": this cruise will be removed from your personal list of cruises; " +
 			"the cruise data file will NOT be removed from SOCAT.  Do you wish " +
 			"to proceed?";
-	protected static String removeCruiseFailMsg = 
+	private static final String REMOVE_CRUISE_FAIL_MSG = 
 			"Unable to remove the selected cruise(s) from your list of cruises";
 
-	interface DashboardCruiseListPageUiBinder extends
-			UiBinder<Widget, DashboardCruiseListPage> {
+	// Column header strings
+	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
+	private static final String OWNER_COLUMN_NAME = "Owner";
+	private static final String DATA_CHECK_COLUMN_NAME = "Data check";
+	private static final String META_CHECK_COLUMN_NAME = "Meta check";
+	private static final String SUBMITTED_COLUMN_NAME = "Submitted";
+	private static final String ARCHIVED_COLUMN_NAME = "Archived";
+	private static final String FILENAME_COLUMN_NAME = "Filename";
+
+	// Replacement strings for empty or null values
+	private static final String EMPTY_TABLE_TEXT = "No uploaded cruises";
+	private static final String NO_EXPOCODE_STRING = "(unknown)";
+	private static final String NO_OWNER_STRING = "(unknown)";
+	private static final String NO_CHECK_STATUS_STRING = "(not checked)";
+	private static final String NO_QC_STATUS_STRING = "(not submitted)";
+	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
+	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
+
+	interface DashboardCruiseListPageUiBinder 
+			extends UiBinder<Widget, DashboardCruiseListPage> {
 	}
 
 	private static DashboardCruiseListPageUiBinder uiBinder = 
 			GWT.create(DashboardCruiseListPageUiBinder.class);
+
+	private static DashboardCruiseListServiceAsync service = 
+			GWT.create(DashboardCruiseListService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -182,55 +185,98 @@ public class DashboardCruiseListPage extends Composite {
 	private DashboardInfoPopup agreeSharePopup;
 	private DashboardInfoPopup agreeArchivePopup;
 
+	// The singleton instance of this page
+	private static DashboardCruiseListPage singleton;
+
 	/**
-	 * Creates an empty cruise list page.  
-	 * Call {@link #updateCruises(DashboardCruiseList)}
-	 * to update the cruises displayed on this page.
+	 * Creates an empty cruise list page.  Do not call this 
+	 * constructor; instead use the showPage static method 
+	 * to show the singleton instance of this page with the
+	 * latest cruise list from the server. 
 	 */
-	DashboardCruiseListPage() {
+	private DashboardCruiseListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildCruiseListTable();
 
-		logoutButton.setText(logoutText);
+		logoutButton.setText(LOGOUT_TEXT);
 
-		agreeShareCheckBox.setText(agreeShareText);
+		agreeShareCheckBox.setText(AGREE_SHARE_TEXT);
 		agreeShareCheckBox.setValue(true);
-		agreeShareInfoButton.setText(moreInfoText);
+		agreeShareInfoButton.setText(MORE_INFO_TEXT);
 		agreeSharePopup = null;
 
-		agreeArchiveCheckBox.setText(agreeArchiveText);
+		agreeArchiveCheckBox.setText(AGREE_ARCHIVE_TEXT);
 		agreeArchiveCheckBox.setValue(true);
-		agreeArchiveInfoButton.setText(moreInfoText);
+		agreeArchiveInfoButton.setText(MORE_INFO_TEXT);
 		agreeArchivePopup = null;
 
-		uploadButton.setText(uploadText);
-		uploadButton.setTitle(uploadHoverHelp);
+		uploadButton.setText(UPLOAD_TEXT);
+		uploadButton.setTitle(UPLOAD_HOVER_HELP);
 
-		deleteButton.setText(deleteText);
-		deleteButton.setTitle(deleteHoverHelp);
+		deleteButton.setText(DELETE_TEXT);
+		deleteButton.setTitle(DELETE_HOVER_HELP);
 
-		dataCheckButton.setText(dataCheckText);
-		dataCheckButton.setTitle(dataCheckHoverHelp);
+		dataCheckButton.setText(DATA_CHECK_TEXT);
+		dataCheckButton.setTitle(DATA_CHECK_HOVER_HELP);
 
-		metaCheckButton.setText(metaCheckText);
-		metaCheckButton.setTitle(metaCheckHoverHelp);
+		metaCheckButton.setText(META_CHECK_TEXT);
+		metaCheckButton.setTitle(META_CHECK_HOVER_HELP);
 
-		reviewButton.setText(reviewText);
-		reviewButton.setTitle(reviewHoverHelp);
+		reviewButton.setText(REVIEW_TEXT);
+		reviewButton.setTitle(REVIEW_HOVER_HELP);
 
-		qcSubmitButton.setText(qcSubmitText);
-		qcSubmitButton.setTitle(qcSubmitHoverHelp);
+		qcSubmitButton.setText(QC_SUBMIT_TEXT);
+		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
 
-		archiveSubmitButton.setText(archiveSubmitText);
-		archiveSubmitButton.setTitle(archiveSubmitHoverHelp);
+		archiveSubmitButton.setText(ARCHIVE_SUBMIT_TEXT);
+		archiveSubmitButton.setTitle(ARCHIVE_SUBMIT_HOVER_HELP);
 
-		addToListButton.setText(addToListText);
-		addToListButton.setTitle(addToListHoverHelp);
+		addToListButton.setText(ADD_TO_LIST_TEXT);
+		addToListButton.setTitle(ADD_TO_LIST_HOVER_HELP);
 
-		removeFromListButton.setText(removeFromListText);
-		removeFromListButton.setTitle(removeFromListHoverHelp);
+		removeFromListButton.setText(REMOVE_FROM_LIST_TEXT);
+		removeFromListButton.setTitle(REMOVE_FROM_LIST_HOVER_HELP);
 
 		uploadButton.setFocus(true);
+	}
+
+	/**
+	 * Display the cruise list page in the RootLayoutPanel 
+	 * with the latest information from the server
+	 * 
+	 * @param currentPage
+	 * 		currently displayed page in the RootLayoutPanel
+	 * 		to be removed when cruise list page is available
+	 * @param errMsg
+	 * 		message to show, along with some explanation, 
+	 * 		in a Window.alert if unable to obtain the cruise
+	 * 		list from the server
+	 */
+	static void showPage(final Composite currentPage, final String errMsg) {
+		service.updateCruiseList(DashboardLoginPage.getUsername(), 
+								 DashboardLoginPage.getPasshash(),
+								 DashboardUtils.REQUEST_CRUISE_LIST_ACTION, 
+								 new HashSet<String>(),
+								 new AsyncCallback<DashboardCruiseList>() {
+			@Override
+			public void onSuccess(DashboardCruiseList cruises) {
+				if ( DashboardLoginPage.getUsername()
+										.equals(cruises.getUsername()) ) {
+					if ( singleton == null )
+						singleton = new DashboardCruiseListPage();
+					RootLayoutPanel.get().remove(currentPage);
+					RootLayoutPanel.get().add(singleton);
+					singleton.updateCruises(cruises);
+				}
+				else {
+					Window.alert(errMsg + " (unexpected invalid cruise list)");
+				}
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				Window.alert(errMsg + " (" + ex.getMessage() + ")");
+			}
+		});
 	}
 
 	/**
@@ -240,9 +286,9 @@ public class DashboardCruiseListPage extends Composite {
 	 * @param cruises
 	 * 		cruises to display
 	 */
-	void updateCruises(DashboardCruiseList cruises) {
+	private void updateCruises(DashboardCruiseList cruises) {
 		// Update the username
-		userInfoLabel.setText(welcomeIntro + DashboardPageFactory.getUsername());
+		userInfoLabel.setText(WELCOME_INTRO + DashboardLoginPage.getUsername());
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();
@@ -250,6 +296,41 @@ public class DashboardCruiseListPage extends Composite {
 			cruiseList.addAll(cruises.values());
 		}
 		uploadsGrid.setRowCount(cruiseList.size());
+	}
+
+	/**
+	 * Update the currently displayed cruise list page with the latest 
+	 * information from the server after performing the specified action.
+	 * 
+	 * @param action
+	 * 		cruise list action to perform
+	 * @param expocodes
+	 * 		cruise expocodes to act upon (if appropriate)
+	 * @param errMsg
+	 * 		if fails, message to show, along with some explanation, 
+	 * 		in a Window.alert
+	 */
+	private void updatePage(String action, HashSet<String> expocodes, 
+													final String errMsg) {
+		service.updateCruiseList(DashboardLoginPage.getUsername(), 
+								 DashboardLoginPage.getPasshash(), 
+								 action, expocodes,
+								 new AsyncCallback<DashboardCruiseList>() {
+			@Override
+			public void onSuccess(DashboardCruiseList cruises) {
+				if ( DashboardLoginPage.getUsername()
+										.equals(cruises.getUsername()) ) {
+					DashboardCruiseListPage.this.updateCruises(cruises);
+				}
+				else {
+					Window.alert(errMsg + " (unexpected invalid cruise list)");
+				}
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				Window.alert(errMsg + " (" + ex.getMessage() + ")");
+			}
+		});
 	}
 
 	/**
@@ -263,7 +344,7 @@ public class DashboardCruiseListPage extends Composite {
 	 * 		set of expocodes of the selected cruises fitting the desired criteria;
 	 * 		will not be null, but may be empty. 
 	 */
-	HashSet<String> getSelectedCruiseExpocodes(boolean skipSubmitted, 
+	private HashSet<String> getSelectedCruiseExpocodes(boolean skipSubmitted, 
 											   boolean skipArchived) {
 		HashSet<String> expocodeSet = new HashSet<String>();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
@@ -290,11 +371,8 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogout logoutPage = 
-				DashboardPageFactory.getPage(DashboardLogout.class);
 		RootLayoutPanel.get().remove(DashboardCruiseListPage.this);
-		RootLayoutPanel.get().add(logoutPage);
-		logoutPage.doLogout();
+		DashboardLogoutPage.showPage();
 	}
 
 	@UiHandler("agreeShareInfoButton")
@@ -302,7 +380,7 @@ public class DashboardCruiseListPage extends Composite {
 		// Create the popup only when needed and if it does not exist
 		if ( agreeSharePopup == null ) {
 			agreeSharePopup = new DashboardInfoPopup();
-			agreeSharePopup.setInfoMessage(agreeShareInfoHtml);
+			agreeSharePopup.setInfoMessage(AGREE_SHARE_INFO_HTML);
 		}
 		// Show the popup over the info button
 		agreeSharePopup.showAtPosition(
@@ -315,7 +393,7 @@ public class DashboardCruiseListPage extends Composite {
 		// Create the popup only when needed and if it does not exist
 		if ( agreeArchivePopup == null ) {
 			agreeArchivePopup = new DashboardInfoPopup();
-			agreeArchivePopup.setInfoMessage(agreeArchiveInfoHtml);
+			agreeArchivePopup.setInfoMessage(AGREE_ARCHIVE_INFO_HTML);
 		}
 		// Show the popup over the info button
 		agreeArchivePopup.showAtPosition(
@@ -326,38 +404,34 @@ public class DashboardCruiseListPage extends Composite {
 	@UiHandler("uploadButton")
 	void uploadCruiseOnClick(ClickEvent event) {
 		RootLayoutPanel.get().remove(DashboardCruiseListPage.this);
-		DashboardCruiseUploadPage newCruisePage = 
-				DashboardPageFactory.getPage(DashboardCruiseUploadPage.class);
-		RootLayoutPanel.get().add(newCruisePage);
-		newCruisePage.updatePageContents();
+		DashboardCruiseUploadPage.showPage();
 	}
 
 	@UiHandler("deleteButton")
 	void deleteCruiseOnClick(ClickEvent event) {
 		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(true, false);
 		if ( expocodeSet.size() == 0 ) {
-			Window.alert(noCruisesToDeleteMsg);
+			Window.alert(NO_CRUISE_TO_DELETE_MSG);
 			return;
 		}
 		// Confirm each cruise 
 		for ( String expocode : expocodeSet )
-			if ( ! Window.confirm(expocode + deleteConfirmMsg) ) 
+			if ( ! Window.confirm(expocode + DELETE_CONFIRM_MSG) ) 
 				return;
 		// Remove the cruises
-		updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
-						expocodeSet, deleteCruiseFailMsg);
+		updatePage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
+						expocodeSet, DELETE_CRUISE_FAIL_MSG);
 	}
 
 	@UiHandler("dataCheckButton")
 	void dataCheckOnClick(ClickEvent event) {
 		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(false, false);
 		if ( expocodeSet.size() != 1 ) {
-			Window.alert(onlyOneCruiseAllowedMsg);
+			Window.alert(ONLY_ONE_CRUISE_ALLOWED_MSG);
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
-		CruiseDataColumnSpecsPage.showCruiseDataColumnSpecsPage(expocode, 
-				DashboardCruiseListPage.this, cruiseDataCheckFailMsg);
+		CruiseDataColumnSpecsPage.showPage(expocode, DashboardCruiseListPage.this);
 	}
 
 	@UiHandler("metaCheckButton")
@@ -382,12 +456,12 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("addToListButton")
 	void addToListOnClick(ClickEvent event) {
-		String expocode = Window.prompt(expocodeToAddMsg, "");
+		String expocode = Window.prompt(EXPOCODE_TO_ADD_MSG, "");
 		if ( expocode != null ) {
 			expocode = expocode.trim().toUpperCase();
 			// Quick local check if the expocode is obviously invalid
 			boolean badExpo = false;
-			String errMsg = addCruiseFailMsg;
+			String errMsg = ADD_CRUISE_FAIL_MSG;
 			int expoLen = expocode.length();
 			if ( (expoLen < DashboardUtils.MIN_EXPOCODE_LENGTH) ||
 				 (expoLen > DashboardUtils.MAX_EXPOCODE_LENGTH) ) {
@@ -410,7 +484,7 @@ public class DashboardCruiseListPage extends Composite {
 			else {
 				HashSet<String> expocodeSet = new HashSet<String>();
 				expocodeSet.add(expocode);
-				updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_ADD_ACTION,
+				updatePage(DashboardUtils.REQUEST_CRUISE_ADD_ACTION,
 										expocodeSet, errMsg);
 			}
 		}
@@ -420,14 +494,14 @@ public class DashboardCruiseListPage extends Composite {
 	void removeFromListOnClick(ClickEvent event) {
 		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(false, false);
 		if ( expocodeSet.size() == 0 ) {
-			Window.alert(noCruisesToRemoveMsg);
+			Window.alert(NO_CRUISE_TO_REMOVE_MSG);
 			return;
 		}
 		for ( String expocode : expocodeSet )
-			if ( ! Window.confirm(expocode + removeCruiseConfirmMsg) ) 
+			if ( ! Window.confirm(expocode + REMOVE_CRUISE_CONFIRM_MSG) ) 
 				return;
-		updateCruiseListPage(DashboardUtils.REQUEST_CRUISE_REMOVE_ACTION,
-					expocodeSet, removeCruiseFailMsg);
+		updatePage(DashboardUtils.REQUEST_CRUISE_REMOVE_ACTION,
+					expocodeSet, REMOVE_CRUISE_FAIL_MSG);
 	}
 
 	/**
@@ -448,13 +522,13 @@ public class DashboardCruiseListPage extends Composite {
 
 		// Add the columns, with headers, to the table
 		uploadsGrid.addColumn(selectedColumn, "");
-		uploadsGrid.addColumn(expocodeColumn, columnNameExpocode);
-		uploadsGrid.addColumn(ownerColumn, columnNameOwner);
-		uploadsGrid.addColumn(dataCheckColumn, columnNameDataCheck);
-		uploadsGrid.addColumn(metaCheckColumn, columnNameMetaCheck);
-		uploadsGrid.addColumn(qcStatusColumn, columnNameSubmitted);
-		uploadsGrid.addColumn(archiveStatusColumn, columnNameArchived);
-		uploadsGrid.addColumn(filenameColumn, columnNameFilename);
+		uploadsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
+		uploadsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
+		uploadsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
+		uploadsGrid.addColumn(metaCheckColumn, META_CHECK_COLUMN_NAME);
+		uploadsGrid.addColumn(qcStatusColumn, SUBMITTED_COLUMN_NAME);
+		uploadsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
+		uploadsGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
 
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
@@ -517,7 +591,7 @@ public class DashboardCruiseListPage extends Composite {
 		uploadsGrid.getColumnSortList().push(expocodeColumn);
 
 		// Set the contents if there are no rows
-		uploadsGrid.setEmptyTableWidget(new Label(emptyTableText));
+		uploadsGrid.setEmptyTableWidget(new Label(EMPTY_TABLE_TEXT));
 
 		// Following recommended to improve efficiency with IE
 		uploadsGrid.setSkipRowHoverCheck(false);
@@ -560,7 +634,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String expocode = cruise.getExpocode();
 				if ( expocode.isEmpty() )
-					expocode = noExpocodeString;
+					expocode = NO_EXPOCODE_STRING;
 				return expocode;
 			}
 		};
@@ -577,7 +651,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String owner = cruise.getOwner();
 				if ( owner.isEmpty() )
-					owner = noOwnerString;
+					owner = NO_OWNER_STRING;
 				return owner;
 			}
 		};
@@ -594,7 +668,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getDataCheckStatus();
 				if ( status.isEmpty() )
-					status = noCheckStatusString;
+					status = NO_CHECK_STATUS_STRING;
 				return status;
 			}
 		};
@@ -611,7 +685,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getMetadataCheckStatus();
 				if ( status.isEmpty() )
-					status = noCheckStatusString;
+					status = NO_CHECK_STATUS_STRING;
 				return status;
 			}
 		};
@@ -628,7 +702,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getQCStatus();
 				if ( status.isEmpty() )
-					status = noQCStatusString;
+					status = NO_QC_STATUS_STRING;
 				return status;
 			}
 		};
@@ -645,7 +719,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getArchiveStatus();
 				if ( status.isEmpty() )
-					status = noArchiveStatusString;
+					status = NO_ARCHIVE_STATUS_STRING;
 				return status;
 			}
 		};
@@ -662,84 +736,11 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String uploadFilename = cruise.getUploadFilename();
 				if ( uploadFilename.isEmpty() )
-					uploadFilename = noUploadFilenameString;
+					uploadFilename = NO_UPLOAD_FILENAME_STRING;
 				return uploadFilename;
 			}
 		};
 		return filenameColumn;
-	}
-
-	/**
-	 * Display the cruise list page with the latest information from the server
-	 * 
-	 * @param currentPage
-	 * 		currently displayed page to be removed when cruise list page
-	 * 		is available
-	 * @param errMsg
-	 * 		if fails, message to show, along with some explanation, in a Window.alert
-	 */
-	static void showCruiseListPage(final Composite currentPage, final String errMsg) {
-		DashboardCruiseListServiceAsync service = 
-				GWT.create(DashboardCruiseListService.class);
-		service.updateCruiseList(DashboardPageFactory.getUsername(), 
-								 DashboardPageFactory.getPasshash(),
-								 DashboardUtils.REQUEST_CRUISE_LIST_ACTION, 
-								 new HashSet<String>(),
-								 new AsyncCallback<DashboardCruiseList>() {
-			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardPageFactory.getUsername().equals(cruises.getUsername()) ) {
-					RootLayoutPanel.get().remove(currentPage);
-					DashboardCruiseListPage cruiseListPage = 
-							DashboardPageFactory.getPage(DashboardCruiseListPage.class);
-					RootLayoutPanel.get().add(cruiseListPage);
-					cruiseListPage.updateCruises(cruises);
-				}
-				else {
-					Window.alert(errMsg + " (unexpected invalid cruise list)");
-				}
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				Window.alert(errMsg + " (" + ex.getMessage() + ")");
-			}
-		});
-	}
-
-	/**
-	 * Update the currently displayed cruise list page with the latest 
-	 * information from the server after performing the specified action.
-	 * 
-	 * @param action
-	 * 		cruise list action to perform
-	 * @param expocodes
-	 * 		cruise expocodes to act upon (if appropriate)
-	 * @param errMsg
-	 * 		if fails, message to show, along with some explanation, 
-	 * 		in a Window.alert
-	 */
-	void updateCruiseListPage(String action, HashSet<String> expocodes, 
-			final String errMsg) {
-		DashboardCruiseListServiceAsync service = 
-				GWT.create(DashboardCruiseListService.class);
-		service.updateCruiseList(DashboardPageFactory.getUsername(), 
-				DashboardPageFactory.getPasshash(), action, expocodes,
-				new AsyncCallback<DashboardCruiseList>() {
-			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardPageFactory.getUsername()
-										 .equals(cruises.getUsername()) ) {
-					DashboardCruiseListPage.this.updateCruises(cruises);
-				}
-				else {
-					Window.alert(errMsg + " (unexpected invalid cruise list)");
-				}
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				Window.alert(errMsg + " (" + ex.getMessage() + ")");
-			}
-		});
 	}
 
 }

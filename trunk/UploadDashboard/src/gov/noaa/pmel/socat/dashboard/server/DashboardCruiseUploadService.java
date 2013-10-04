@@ -223,7 +223,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			// If the cruise file exists, make sure the request was for an overwrite
 			// and that this user has permission to overwrite this cruise
 			if ( (owner == null) ||
-					DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) {
+				 ( ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) ) {
 				// Respond with an error message containing partial file contents 
 				// of the existing file
 				DashboardCruiseWithData existingCruiseData;
