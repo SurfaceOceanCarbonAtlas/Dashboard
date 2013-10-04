@@ -22,10 +22,10 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardInfoPopup extends Composite {
 
-	protected static String dismissText = "Dismiss";
+	private static final String DISMISS_TEXT = "Dismiss";
 
-	interface DashboardInfoPopupUiBinder extends 
-			UiBinder<Widget, DashboardInfoPopup> {
+	interface DashboardInfoPopupUiBinder 
+			extends UiBinder<Widget, DashboardInfoPopup> {
 	}
 
 	private static DashboardInfoPopupUiBinder uiBinder = 
@@ -48,7 +48,7 @@ public class DashboardInfoPopup extends Composite {
 	 */
 	DashboardInfoPopup() {
 		initWidget(uiBinder.createAndBindUi(this));
-		dismissButton.setText(dismissText);
+		dismissButton.setText(DISMISS_TEXT);
 		parentPanel = new PopupPanel();
 		parentPanel.setWidget(this);
 		parentPanel.setAutoHideEnabled(true);
