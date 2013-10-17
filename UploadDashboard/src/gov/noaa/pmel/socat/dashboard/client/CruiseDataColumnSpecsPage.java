@@ -3,10 +3,11 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 import java.util.ArrayList;
 
@@ -77,14 +78,10 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	@UiField Button cancelButton;
 	@UiField SimplePager gridPager;
 
-	// Expocode of cruise associated with this page
-	private String expocode;
-	// These CruiseDataColumnType objects will be updated
-	// by the user interacting with the header SelectionCell
-	private ArrayList<CruiseDataColumnType> dataColTypes;
-	// This maintains references to the CruiseDataColumnHeader 
-	// objects which contain the mechanism for updating data types
-	private ArrayList<CruiseDataColumnHeader> dataColHeaders;
+	// Cruise associated with and updated by this page
+	private DashboardCruise cruise;
+	// List of CruiseDataColumn objects associated with the column Headers
+	private ArrayList<CruiseDataColumn> cruiseDataCols;
 	// Asynchronous data provider for the data grid 
 	private AsyncDataProvider<ArrayList<String>> dataProvider;
 
@@ -101,21 +98,20 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		logoutButton.setText(LOGOUT_TEXT);
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
-		expocode = "";
-		dataColTypes = new ArrayList<CruiseDataColumnType>();
-		dataColHeaders = new ArrayList<CruiseDataColumnHeader>();
+		cruise = new DashboardCruise();
+		cruiseDataCols = new ArrayList<CruiseDataColumn>();
 		// Create the asynchronous data provider for the data grid
 		dataProvider = new AsyncDataProvider<ArrayList<String>>() {
 			@Override
 			protected void onRangeChanged(HasData<ArrayList<String>> display) {
 				// Ignore the call if there is no expocode assigned
-				if ( expocode.isEmpty() )
+				if ( cruise.getExpocode().isEmpty() )
 					return;
 				// Get the data for the cruise from the server
 				final Range range = display.getVisibleRange();
 				service.getCruiseData(DashboardLoginPage.getUsername(), 
 						DashboardLoginPage.getPasshash(), 
-						expocode, range.getStart(), range.getLength(), 
+						cruise.getExpocode(), range.getStart(), range.getLength(), 
 						new AsyncCallback<ArrayList<ArrayList<String>>>() {
 					@Override
 					public void onSuccess(ArrayList<ArrayList<String>> newData) {
@@ -147,9 +143,9 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	static void showPage(String expocode, final Composite currentPage) {
 		service.getCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
 								DashboardLoginPage.getPasshash(), expocode, 
-								new AsyncCallback<CruiseDataColumnSpecs>() {
+								new AsyncCallback<DashboardCruiseWithData>() {
 			@Override
-			public void onSuccess(CruiseDataColumnSpecs cruiseSpecs) {
+			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
 					RootLayoutPanel.get().remove(currentPage);
 					if ( singleton == null )
@@ -178,52 +174,57 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	 * 		current cruise data column type specifications and
 	 * 		initial cruise data for display
 	 */
-	private void updateCruiseColumnSpecs(CruiseDataColumnSpecs cruiseSpecs) {
+	private void updateCruiseColumnSpecs(DashboardCruiseWithData cruiseSpecs) {
 		userInfoLabel.setText(WELCOME_INTRO + DashboardLoginPage.getUsername());
 
 		// Clear the expocode in case the data provider gets called while clearing
-		expocode = "";
-		// Delete any existing columns, headers, and types
+		cruise.setExpocode(null);
+
+		// Delete any existing columns and headers
 		int k = dataGrid.getColumnCount();
 		while ( k > 0 ) {
 			k--;
 			dataGrid.removeColumn(k);
 		}
-		dataColHeaders.clear();
-		dataColTypes.clear();
+		// Clear the list of CruiseDataColumns
+		cruiseDataCols.clear();
 
-		// Assign the new cruise information
-		expocode = cruiseSpecs.getExpocode();
-		cruiseLabel.setText(CRUISE_INTRO + expocode);
+		// Assign the new cruise information needed by this page
+		cruise.setNumDataRows(cruiseSpecs.getNumDataRows());
+		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
+		cruise.setUserColIndices(cruiseSpecs.getUserColIndices());
+		cruise.setUserColNames(cruiseSpecs.getUserColNames());
+		cruise.setDataColUnits(cruiseSpecs.getDataColUnits());
+		cruise.setDataColDescriptions(cruiseSpecs.getDataColDescriptions());
+
+		cruise.setExpocode(cruiseSpecs.getExpocode());
+		cruiseLabel.setText(CRUISE_INTRO + cruise.getExpocode());
 
 		// Rebuild the data grid using the provided CruiseDataColumnSpecs
-		if ( cruiseSpecs.getColumnTypes().size() < 4 )
+		if ( cruise.getDataColTypes().size() < 4 )
 			throw new IllegalArgumentException(
 					"Unexpected small number of data columns: " + 
-					dataColTypes.size());
-		dataColTypes.addAll(cruiseSpecs.getColumnTypes());
-		dataColHeaders.ensureCapacity(dataColTypes.size());
+					cruise.getDataColTypes().size());
 		int minTableWidth = 0;
-		for (k = 0; k < dataColTypes.size(); k++) {
+		for (k = 0; k < cruise.getDataColTypes().size(); k++) {
 			// TextColumn for displaying the data strings for this column
 			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k);
 
-			// Object creating the Header cell for this data column
-			CruiseDataColumnType colType = dataColTypes.get(k);
-			CruiseDataColumnHeader dataHeader = 
-							new CruiseDataColumnHeader(colType);
-			// Maintain a reference to the CruiseDataColumnHeader object
-			dataColHeaders.add(dataHeader);
+			// CruiseDataColumn for creating the Header cell for this column
+			CruiseDataColumn cruiseColumn = new CruiseDataColumn(cruise, k);
+			// Maintain a reference to the CruiseDataColumn object
+			cruiseDataCols.add(cruiseColumn);
 
 			// Add this data column and the header to the grid
-			dataGrid.addColumn(dataColumn, dataHeader.getHeader());
+			dataGrid.addColumn(dataColumn, cruiseColumn.createHeader());
 
 			// Get the width for this column
 			int colWidth = 3;
-			int len = colType.getUserHeaderName().length();
+			int len = cruise.getUserColNames().get(k).length();
 			if ( colWidth < len )
 				colWidth = len;
-			len = colType.getStdHeaderName().length();
+			len = CruiseDataColumnType.STD_HEADER_NAMES.get(
+					cruise.getDataColTypes().get(k)).length();
 			if ( colWidth < len )
 				colWidth = len;
 			for ( ArrayList<String> dataRow : cruiseSpecs.getDataValues() ) {
@@ -251,7 +252,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		// Set the minimum table width
 		dataGrid.setMinimumTableWidth((double) minTableWidth, Style.Unit.EM);
 		// Update the data provider with the data in the CruiseDataColumnSpecs
-		dataProvider.updateRowCount(cruiseSpecs.getNumRowsTotal(), true);
+		dataProvider.updateRowCount(cruise.getNumDataRows(), true);
 		dataProvider.updateRowData(0, cruiseSpecs.getDataValues());
 		// Set the number of data rows to display in the grid.
 		// This will refresh the view.
@@ -278,14 +279,11 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		// Submit the updated data column types to the server.
 		// This update invokes the SanityChecker on the data and
 		// the results are then reported back to this page.
-		CruiseDataColumnSpecs newSpecs = new CruiseDataColumnSpecs();
-		newSpecs.setExpocode(expocode);
-		newSpecs.setColumnTypes(dataColTypes);
 		service.updateCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
-								DashboardLoginPage.getPasshash(), newSpecs, 
-								new AsyncCallback<CruiseDataColumnSpecs>() {
+								DashboardLoginPage.getPasshash(), cruise, 
+								new AsyncCallback<DashboardCruiseWithData>() {
 			@Override
-			public void onSuccess(CruiseDataColumnSpecs specs) {
+			public void onSuccess(DashboardCruiseWithData specs) {
 				if ( specs != null ) {
 					updateCruiseColumnSpecs(specs);
 					Window.alert(SUBMIT_SUCCESS_MSG + specs.getExpocode());

@@ -3,14 +3,14 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecs;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 /**
  * Server side implementation of the CruiseDataColumnSpecsService
@@ -19,10 +19,10 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 									implements CruiseDataColumnSpecsService {
 
-	private static final long serialVersionUID = 1097219634256593888L;
+	private static final long serialVersionUID = 3851933149162963899L;
 
 	@Override
-	public CruiseDataColumnSpecs getCruiseDataColumnSpecs(String username,
+	public DashboardCruiseWithData getCruiseDataColumnSpecs(String username,
 			String passhash, String expocode) throws IllegalArgumentException {
 		// Authenticate the user
 		DashboardDataStore dataStore;
@@ -36,17 +36,18 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
 
-		// Get the cruise with all the data
-		// so we know how many data rows are available.
+		// Get the cruise with the first 25 rows of data
 		DashboardCruiseWithData cruiseData = dataStore.getCruiseFileHandler()
-									.getCruiseDataFromFile(expocode, 0, -1);
+									.getCruiseDataFromFile(expocode, 0, 25);
 		if ( cruiseData == null )
 			throw new IllegalArgumentException(
 					"cruise " + expocode + " does not exist");
 
-		// Create and return the cruise data column specs from this cruise data
-		return dataStore.getUserFileHandler()
-						.createColumnSpecsForCruise(cruiseData);
+		// Remove any metadata preamble to reduced data transmitted
+		cruiseData.getPreamble().clear();
+
+		// Return the cruise with the partial data
+		return cruiseData;
 	}
 
 	@Override
@@ -81,8 +82,8 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 	}
 
 	@Override
-	public CruiseDataColumnSpecs updateCruiseDataColumnSpecs(String username,
-							String passhash, CruiseDataColumnSpecs newSpecs)
+	public DashboardCruiseWithData updateCruiseDataColumnSpecs(String username,
+							String passhash, DashboardCruise newSpecs)
 											throws IllegalArgumentException {
 		// Authenticate the user
 		DashboardDataStore dataStore;

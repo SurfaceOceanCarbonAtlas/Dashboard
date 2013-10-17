@@ -119,30 +119,6 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getColumnNames()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setColumnNames(java.lang.String[])}.
-	 */
-	@Test
-	public void testSetGetColumnNames() {
-		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
-				"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
-				"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
-				"xCO2water_equ_dry [umol/mol]" 
-		));
-		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals(0, cruiseData.getColumnNames().size());
-		cruiseData.setColumnNames(colNames);
-		assertEquals(colNames, cruiseData.getColumnNames());
-		assertEquals(0, cruiseData.getPreamble().size());
-		assertEquals("", cruiseData.getExpocode());
-		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
-		cruiseData.setColumnNames(null);
-		assertEquals(0, cruiseData.getColumnNames().size());		
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getDataValues()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setDataValues(java.util.ArrayList)}.
 	 */
@@ -169,7 +145,6 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(0, cruiseData.getDataValues().size());
 		cruiseData.setDataValues(dataValues);
 		assertEquals(dataValues, cruiseData.getDataValues());
-		assertEquals(0, cruiseData.getColumnNames().size());		
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
 		assertEquals("", cruiseData.getVersion());
@@ -195,11 +170,6 @@ public class DashboardCruiseWithDataTest {
 				"Ship/Vessel Name: Skogafoss",
 				"Principal Investigator(s): Rik Wanninkhof"
 		));
-		ArrayList<String> colNames = new ArrayList<String>(Arrays.asList(
-				"obs. time [UTC]", "longitude", "latitude", "sal [PSU]",
-				"SST [C]", "Tequ [C]", "PPPP [hPa]", "Pequ [hPa]",
-				"xCO2water_equ_dry [umol/mol]" 
-		));
 		String[][] observations = {
 				{ "2003-12-05 22:12", "337.28101", "64.10700", "26.910", 
 					"5.410", "5.700", null, "1026.500", "373.740" },
@@ -219,7 +189,7 @@ public class DashboardCruiseWithDataTest {
 
 		DashboardCruiseWithData firstData = new DashboardCruiseWithData();
 		assertFalse( firstData.equals(null) );
-		assertFalse( firstData.equals(colNames) );
+		assertFalse( firstData.equals(myPreamble) );
 		DashboardCruiseWithData secondData = new DashboardCruiseWithData();
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
@@ -256,13 +226,6 @@ public class DashboardCruiseWithDataTest {
 		assertTrue( firstData.hashCode() != secondData.hashCode() );
 		assertFalse( firstData.equals(secondData) );
 		secondData.setPreamble(myPreamble);
-		assertEquals(firstData.hashCode(), secondData.hashCode());
-		assertEquals(firstData, secondData);
-
-		firstData.setColumnNames(colNames);
-		assertTrue( firstData.hashCode() != secondData.hashCode() );
-		assertFalse( firstData.equals(secondData) );
-		secondData.setColumnNames(colNames);
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 

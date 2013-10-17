@@ -7,6 +7,10 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import org.junit.Test;
@@ -78,14 +82,37 @@ public class DashboardUtilsTest {
 	}
 
 	/**
-	 * Test method for some of the constants
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeIntgerArrayList(java.util.ArrayList)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#encodeIntegerArrayList(java.util.ArrayList)}.
 	 */
 	@Test
-	public void testConstants() {
-		int expectedLength = DashboardUtils.SUPPLEMENTAL_DATA_STD_COLUMN_NUM + 1;
-		assertEquals(expectedLength, DashboardUtils.STD_DATA_TYPES.size());
-		assertEquals(expectedLength, DashboardUtils.STD_DATA_HEADER_NAMES.size());
-		assertEquals(expectedLength, DashboardUtils.STD_DATA_UNITS.size());
-		assertEquals(expectedLength, DashboardUtils.STD_DATA_DESCRIPTIONS.size());
+	public void testEncodeDecodeIntegerArrayList() {
+		ArrayList<Integer> myList = new ArrayList<Integer>(
+				Arrays.asList(234, 4563, 90312, -2349));
+		String encoded = DashboardUtils.encodeIntegerArrayList(myList);
+		ArrayList<Integer> decodedList = 
+				DashboardUtils.decodeIntegerArrayList(encoded);
+		assertEquals(myList, decodedList);
+		decodedList = DashboardUtils.decodeIntegerArrayList("[ ]");
+		assertEquals(new ArrayList<Integer>(), decodedList);
 	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeStringArrayList(java.util.ArrayList)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#encodeStringArrayList(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testEncodeDecodeStringArrayList() {
+		ArrayList<String> myList = new ArrayList<String>(
+				Arrays.asList("one", "two", "", "four, five, and six"));
+		String encoded = DashboardUtils.encodeStringArrayList(myList);
+		ArrayList<String> decodedList = 
+				DashboardUtils.decodeStringArrayList(encoded);
+		assertEquals(myList, decodedList);
+		decodedList = DashboardUtils.decodeStringArrayList("[ ]");
+		assertEquals(new ArrayList<String>(), decodedList);
+		decodedList = DashboardUtils.decodeStringArrayList("[ \"\" ]");
+		assertEquals(new ArrayList<String>(Arrays.asList("")), decodedList);
+	}
+
 }

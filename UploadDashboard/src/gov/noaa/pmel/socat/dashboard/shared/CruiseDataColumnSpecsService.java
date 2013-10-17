@@ -34,7 +34,7 @@ public interface CruiseDataColumnSpecsService extends RemoteService {
 	 * 		if the cruise does not exist, or if there are 
 	 * 		problems obtaining the data for the cruise
 	 */
-	CruiseDataColumnSpecs getCruiseDataColumnSpecs(String username, 
+	DashboardCruiseWithData getCruiseDataColumnSpecs(String username, 
 			String passhash, String expocode) throws IllegalArgumentException;
 
 	/**
@@ -88,8 +88,8 @@ public interface CruiseDataColumnSpecsService extends RemoteService {
 	 * 		problems obtaining or evaluating the data for 
 	 * 		the cruise
 	 */
-	CruiseDataColumnSpecs updateCruiseDataColumnSpecs(String username, 
-			String passhash, CruiseDataColumnSpecs newSpecs) 
+	DashboardCruiseWithData updateCruiseDataColumnSpecs(String username, 
+			String passhash, DashboardCruise newSpecs) 
 					throws IllegalArgumentException;
 
 }

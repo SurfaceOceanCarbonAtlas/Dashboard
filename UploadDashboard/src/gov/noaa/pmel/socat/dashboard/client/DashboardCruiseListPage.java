@@ -350,7 +350,7 @@ public class DashboardCruiseListPage extends Composite {
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
 				if ( skipSubmitted ) {
-					String status = cruise.getQCStatus();
+					String status = cruise.getQcStatus();
 					if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
 							 status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
 							 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
@@ -700,7 +700,7 @@ public class DashboardCruiseListPage extends Composite {
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				String status = cruise.getQCStatus();
+				String status = cruise.getQcStatus();
 				if ( status.isEmpty() )
 					status = NO_QC_STATUS_STRING;
 				return status;
