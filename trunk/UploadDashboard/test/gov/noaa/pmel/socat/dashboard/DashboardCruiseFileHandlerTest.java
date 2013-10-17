@@ -218,7 +218,7 @@ public class DashboardCruiseFileHandlerTest {
 			assertEquals(expectedPreamble.get(k), preamble.get(k));
 		assertEquals(expectedPreamble.size(), preamble.size());
 
-		ArrayList<String> headers = cruiseData.getColumnNames();
+		ArrayList<String> headers = cruiseData.getUserColNames();
 		for (int k = 0; (k < headers.size()) && (k < expectedHeaders.size()); k++)
 			assertEquals(expectedHeaders.get(k), headers.get(k));
 		assertEquals(expectedHeaders.size(), headers.size());
@@ -253,7 +253,7 @@ public class DashboardCruiseFileHandlerTest {
 			assertEquals(expectedPreamble.get(k).trim(), preamble.get(k).trim());
 		assertEquals(expectedPreamble.size(), preamble.size());
 
-		headers = fileData.getColumnNames();
+		headers = fileData.getUserColNames();
 		for (int k = 0; (k < headers.size()) && (k < expectedHeaders.size()); k++)
 			assertEquals(expectedHeaders.get(k), headers.get(k));
 		assertEquals(expectedHeaders.size(), headers.size());

@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -30,9 +31,15 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String DATA_OWNER_ID = "dataowner=";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename=";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus=";
-	private static final String META_CHECK_STATUS_ID = "metadatacheckstatus=";
+	private static final String METADATA_CHECK_STATUS_ID = "metadatacheckstatus=";
 	private static final String QC_STATUS_ID = "qcstatus=";
 	private static final String ARCHIVE_STATUS_ID = "archivestatus=";
+	private static final String NUM_DATA_ROWS_ID = "numdatarows=";
+	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes=";
+	private static final String USER_COLUMN_INDICES_ID = "usercolumnindices=";
+	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames=";
+	private static final String DATA_COLUMN_UNITS_ID = "datacolumntypes=";
+	private static final String DATA_COLUMN_DESCRIPTIONS_ID = "datacolumndescriptions=";
 
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
@@ -137,11 +144,11 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * Cruise Expocode :
 	 * Cruise Expocode =
 	 * </pre>
-	 * The first line containing at least four tab-separated values
-	 * with be taken to be the line of data column headers.  No data 
-	 * column headers can be blank.  All remaining (non-blank) lines 
-	 * are considered data lines and should have the same number of 
-	 * tab-separated values as there are column header.  Any blank 
+	 * The first line containing at least four tab-separated non-blank
+	 * values with be taken to be the line of data column headers.  
+	 * No data column headers can be blank.  All remaining (non-blank) 
+	 * lines are considered data lines and should have the same number 
+	 * of tab-separated values as there are column header.  Any blank 
 	 * data value strings, or data value strings matching "null" or 
 	 * "NaN" (case insensitive), are set to "NaN" to indicate a missing 
 	 * value.
@@ -178,9 +185,13 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Read the metadata preamble
 		String dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
-			// Check if we have gotten to tab-separated data values 
+			// Check if we have gotten to non-blank tab-separated values 
 			String[] datavals = dataline.split("\t");
-			if ( datavals.length > 3 ) {
+			if ( (   datavals.length > 3 ) &&
+				 ( ! datavals[0].trim().isEmpty() ) &&
+				 ( ! datavals[1].trim().isEmpty() ) &&
+				 ( ! datavals[2].trim().isEmpty() ) &&
+				 ( ! datavals[3].trim().isEmpty() ) ) {
 				// These are the column headers;
 				// clean them up and make sure there are no blank values
 				for (int k = 0; k < datavals.length; k++) {
@@ -190,7 +201,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 												(k+1) + " is blank");
 				}
 				// Just directly add the column names to the list in cruiseData
-				ArrayList<String> colNames = cruiseData.getColumnNames();
+				ArrayList<String> colNames = cruiseData.getUserColNames();
 				colNames.clear();
 				colNames.addAll(Arrays.asList(datavals));
 				numDataColumns = datavals.length;
@@ -314,7 +325,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Add the data column headers line
 		String dataline = "";
 		boolean first = true;
-		for ( String name : cruiseData.getColumnNames() ) {
+		for ( String name : cruiseData.getUserColNames() ) {
 			if ( ! first )
 				dataline += "\t";
 			else
@@ -501,12 +512,39 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			PrintWriter writer = new PrintWriter(cruiseFile);
 			try {
 				// First write the CruiseData values
-				writer.println(DATA_OWNER_ID + cruiseData.getOwner());
-				writer.println(UPLOAD_FILENAME_ID + cruiseData.getUploadFilename());
-				writer.println(DATA_CHECK_STATUS_ID + cruiseData.getDataCheckStatus());
-				writer.println(META_CHECK_STATUS_ID + cruiseData.getMetadataCheckStatus());
-				writer.println(QC_STATUS_ID + cruiseData.getQCStatus());
-				writer.println(ARCHIVE_STATUS_ID + cruiseData.getArchiveStatus());
+				writer.println(DATA_OWNER_ID + 
+						cruiseData.getOwner());
+				writer.println(UPLOAD_FILENAME_ID + 
+						cruiseData.getUploadFilename());
+				writer.println(DATA_CHECK_STATUS_ID + 
+						cruiseData.getDataCheckStatus());
+				writer.println(METADATA_CHECK_STATUS_ID + 
+						cruiseData.getMetadataCheckStatus());
+				writer.println(QC_STATUS_ID + 
+						cruiseData.getQcStatus());
+				writer.println(ARCHIVE_STATUS_ID + 
+						cruiseData.getArchiveStatus());
+				writer.println(NUM_DATA_ROWS_ID + 
+						Integer.toString(cruiseData.getNumDataRows()));
+				// Encode the column types using the enumerated names
+				ArrayList<String> colTypeNames = 
+						new ArrayList<String>(cruiseData.getDataColTypes().size());
+				for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() )
+					colTypeNames.add(colType.toString());
+				writer.println(DATA_COLUMN_TYPES_ID + 
+						DashboardUtils.encodeStringArrayList(colTypeNames));
+				writer.println(USER_COLUMN_INDICES_ID + 
+						DashboardUtils.encodeIntegerArrayList(
+								cruiseData.getUserColIndices()));
+				writer.println(USER_COLUMN_NAMES_ID + 
+						DashboardUtils.encodeStringArrayList(
+								cruiseData.getUserColNames()));
+				writer.println(DATA_COLUMN_UNITS_ID + 
+						DashboardUtils.encodeStringArrayList(
+								cruiseData.getDataColUnits()));
+				writer.println(DATA_COLUMN_DESCRIPTIONS_ID + 
+						DashboardUtils.encodeStringArrayList(
+								cruiseData.getDataColDescriptions()));
 				// Print the standard creation date and expocode header lines
 				writer.println("SOCAT version " + 
 						DashboardDataStore.get().getSocatVersion() + 
@@ -526,7 +564,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				// Print the data column headers
 				String dataline = "";
 				boolean first = true;
-				for ( String name : cruiseData.getColumnNames() ) {
+				for ( String name : cruiseData.getUserColNames() ) {
 					if ( ! first )
 						dataline += "\t";
 					else
@@ -610,18 +648,18 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 
 		// Get the metadata check status for this cruise
 		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(META_CHECK_STATUS_ID) )
+		if ( ! dataline.startsWith(METADATA_CHECK_STATUS_ID) )
 			throw new IOException(
-					"fourth line does not start with " + META_CHECK_STATUS_ID);
+					"fourth line does not start with " + METADATA_CHECK_STATUS_ID);
 		cruise.setMetadataCheckStatus(
-				dataline.substring(META_CHECK_STATUS_ID.length()).trim());
+				dataline.substring(METADATA_CHECK_STATUS_ID.length()).trim());
 
 		// Get the QC status for this cruise
 		dataline = cruiseReader.readLine();
 		if ( ! dataline.startsWith(QC_STATUS_ID) )
 			throw new IOException(
 					"fifth line does not start with " + QC_STATUS_ID);
-		cruise.setQCStatus(dataline.substring(QC_STATUS_ID.length()).trim());
+		cruise.setQcStatus(dataline.substring(QC_STATUS_ID.length()).trim());
 
 		// Get the archive status for this cruise
 		dataline = cruiseReader.readLine();
@@ -655,7 +693,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Get the cruise information from the data file
 		DashboardCruise cruise = getCruiseFromDataFile(expocode);
 		// Check if the cruise is in a submitted or accepted state
-		String status = cruise.getQCStatus();
+		String status = cruise.getQcStatus();
 		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
 				 status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
 				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||

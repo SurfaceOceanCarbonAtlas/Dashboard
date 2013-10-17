@@ -65,7 +65,7 @@ public class DashboardUserFileHandlerTest {
 			newCruise.setUploadFilename(uploadFilenames[k]);
 			newCruise.setDataCheckStatus(dataCheckStatuses[k]);
 			newCruise.setMetadataCheckStatus(metaCheckStatuses[k]);
-			newCruise.setQCStatus(qcStatuses[k]);
+			newCruise.setQcStatus(qcStatuses[k]);
 			newCruise.setArchiveStatus(archiveStatuses[k]);
 			cruiseList.put(newCruise.getExpocode(), newCruise);
 		}

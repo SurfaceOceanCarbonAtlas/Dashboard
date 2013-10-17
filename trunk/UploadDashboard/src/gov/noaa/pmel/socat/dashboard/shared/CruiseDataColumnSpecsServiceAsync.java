@@ -32,7 +32,7 @@ public interface CruiseDataColumnSpecsServiceAsync {
 	 * 		or if there are problems obtaining the data for the cruise
 	 */
 	void getCruiseDataColumnSpecs(String username, String passhash,
-			String expocode, AsyncCallback<CruiseDataColumnSpecs> callback);
+			String expocode, AsyncCallback<DashboardCruiseWithData> callback);
 
 	/**
 	 * Reads the saved cruise file and returns the specified
@@ -86,7 +86,7 @@ public interface CruiseDataColumnSpecsServiceAsync {
 	 * 		the cruise
 	 */
 	void updateCruiseDataColumnSpecs(String username, String passhash,
-			CruiseDataColumnSpecs newSpecs, 
-			AsyncCallback<CruiseDataColumnSpecs> callback);
+			DashboardCruise newSpecs, 
+			AsyncCallback<DashboardCruiseWithData> callback);
 
 }

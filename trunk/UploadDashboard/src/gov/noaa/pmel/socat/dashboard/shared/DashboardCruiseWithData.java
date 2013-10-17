@@ -12,11 +12,10 @@ import java.util.ArrayList;
  */
 public class DashboardCruiseWithData extends DashboardCruise {
 
-	private static final long serialVersionUID = 5819589890074395617L;
+	private static final long serialVersionUID = -7383174672122766457L;
 
 	String version;
 	ArrayList<String> preamble;
-	ArrayList<String> columnNames;
 	ArrayList<ArrayList<String>> dataValues;
 
 	/**
@@ -25,7 +24,6 @@ public class DashboardCruiseWithData extends DashboardCruise {
 	public DashboardCruiseWithData() {
 		version = "";
 		preamble = new ArrayList<String>();
-		columnNames = new ArrayList<String>();
 		dataValues = new ArrayList<ArrayList<String>>();
 	}
 
@@ -73,27 +71,6 @@ public class DashboardCruiseWithData extends DashboardCruise {
 
 	/**
 	 * @return 
-	 * 		the column names list; may be empty but never null.
-	 * 		The actual list contained in this object is returned.
-	 */
-	public ArrayList<String> getColumnNames() {
-		return columnNames;
-	}
-
-	/**
-	 * @param columnNames 
-	 * 		the column names to assign.  The list in this object 
-	 * 		is cleared and all the contents of the given list, 
-	 * 		if not null, are added. 
-	 */
-	public void setColumnNames(ArrayList<String> columnNames) {
-		this.columnNames.clear();
-		if ( columnNames != null )
-			this.columnNames.addAll(columnNames);
-	}
-
-	/**
-	 * @return 
 	 * 		the list of data string lists; 
 	 * 		may be empty but never null.
 	 * 		The actual list in this object is returned.
@@ -121,7 +98,6 @@ public class DashboardCruiseWithData extends DashboardCruise {
 		int result = super.hashCode();
 		result = result * prime + version.hashCode();
 		result = result * prime + preamble.hashCode();
-		result = result * prime + columnNames.hashCode();
 		result = result * prime + dataValues.hashCode();
 		return result;
 	}
@@ -143,8 +119,6 @@ public class DashboardCruiseWithData extends DashboardCruise {
 			return false;
 		if ( ! preamble.equals(other.preamble) ) 
 			return false;
-		if ( ! columnNames.equals(other.columnNames) )
-			return false;
 		if ( ! dataValues.equals(other.dataValues) ) 
 			return false;
 
@@ -154,11 +128,10 @@ public class DashboardCruiseWithData extends DashboardCruise {
 	@Override
 	public String toString() {
 		String repr = "DashboardCruiseWithData" +
-					  "[ " + super.toString() +
-					  "; version = " + version +
-					  "; preamble = " + preamble.toString() +
-					  "; columnNames = " + columnNames.toString() +
-					  "; dataValues = " + dataValues.toString() +
+					  "[ version = " + version +
+					  ";\n    " + super.toString() +
+					  ";\n    preamble = " + preamble.toString() +
+					  ";\n    dataValues = " + dataValues.toString() +
 					  " ]";
 		return repr;
 	}

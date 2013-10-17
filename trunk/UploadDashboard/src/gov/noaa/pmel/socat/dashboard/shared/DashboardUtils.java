@@ -65,187 +65,6 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_SUBMITTED_PREFIX = "Submitted to ";
 	public static final String ARCHIVE_STATUS_ARCHIVED_PREFIX = "DOI ";
 
-	// Standard data column numbers, 
-	// which are also indices into the arrays that follow
-	/**
-	 * The delete data type indicates data that should be deleted 
-	 * from the data file; only the user can specify a column 
-	 * to be this type.
-	 */
-	public static final int DELETE_DATA_STD_COLUMN_NUM = 0;
-	/**
-	 * The unknown data type indicates data that the user 
-	 * needs specify as one of the other standard types.
-	 */
-	public static final int UNKNOWN_DATA_STD_COLUMN_NUM = 1;
-	/**
-	 * The timestamp data type has both date and time.
-	 */
-	public static final int TIMESTAMP_STD_COLUMN_NUM = 2;
-	/**
-	 * The date data type has only the date; no time.
-	 */
-	public static final int DATE_STD_COLUMN_NUM = 3;
-	public static final int YEAR_STD_COLUMN_NUM = 4;
-	public static final int MONTH_STD_COLUMN_NUM = 5;
-	public static final int DAY_STD_COLUMN_NUM = 6;
-	/**
-	 * The time data type has only the time; no date.
-	 */
-	public static final int TIME_STD_COLUMN_NUM = 7;
-	public static final int HOUR_STD_COLUMN_NUM = 8;
-	public static final int MINUTE_STD_COLUMN_NUM = 9;
-	public static final int SECOND_STD_COLUMN_NUM = 10;
-	public static final int LONGITUDE_STD_COLUMN_NUM = 11;
-	public static final int LATITUDE_STD_COLUMN_NUM = 12;
-	public static final int SAMPLE_DEPTH_STD_COLUMN_NUM = 13;
-	public static final int SAMPLE_SAL_STD_COLUMN_NUM = 14;
-	public static final int TEQU_STD_COLUMN_NUM = 15;
-	public static final int SST_STD_COLUMN_NUM = 16;
-	public static final int PEQU_STD_COLUMN_NUM = 17;
-	public static final int PPPP_STD_COLUMN_NUM = 18;
-	public static final int XCO2_EQU_STD_COLUMN_NUM = 19;
-	public static final int XCO2_SST_STD_COLUMN_NUM = 20;
-	public static final int PCO2_EQU_STD_COLUMN_NUM = 21;
-	public static final int PCO2_SST_STD_COLUMN_NUM = 22;
-	public static final int FCO2_EQU_STD_COLUMN_NUM = 23;
-	public static final int FCO2_SST_STD_COLUMN_NUM = 24;
-	/**
-	 * The supplemental data type indicates data that is 
-	 * carried along but otherwise ignored.
-	 */
-	public static final int SUPPLEMENTAL_DATA_STD_COLUMN_NUM = 25;
-
-	/**
-	 * data types of the standard data columns
-	 */
-	public static final ArrayList<String> STD_DATA_TYPES = 
-			new ArrayList<String>(Arrays.asList(
-					"delete", 
-					"unknown", 
-					"timestamp", 
-					"date", 
-					"year", 
-					"month", 
-					"day", 
-					"time", 
-					"hour", 
-					"minute", 
-					"second", 
-					"longitude", 
-					"latitude", 
-					"depth", 
-					"salinity", 
-					"temperature", 
-					"temperature", 
-					"pressure", 
-					"pressure", 
-					"xCO2", 
-					"xCO2", 
-					"pCO2", 
-					"pCO2", 
-					"fCO2", 
-					"fCO2", 
-					"supplemental" 
-			));
-	/**
-	 * standard header names of the standard data columns
-	 */
-	public static final ArrayList<String> STD_DATA_HEADER_NAMES = 
-			new ArrayList<String>(Arrays.asList(
-					"delete", 
-					"unknown", 
-					"timestamp", 
-					"date", 
-					"yr", 
-					"mon", 
-					"day", 
-					"time", 
-					"hh", 
-					"mm", 
-					"ss", 
-					"longitude", 
-					"latitude", 
-					"sample_depth", 
-					"sal", 
-					"Tequ", 
-					"SST", 
-					"Pequ", 
-					"PPPP", 
-					"xCO2water_equ_dry", 
-					"xCO2water_SST_dry", 
-					"pCO2water_equ_wet", 
-					"pCO2water_SST_wet", 
-					"fCO2water_equ_wet", 
-					"fCO2water_SST_wet", 
-					"supplemental" 
-			));
-	/**
-	 * standard data descriptions of the standard data columns
-	 */
-	public static final ArrayList<String> STD_DATA_DESCRIPTIONS = 
-			new ArrayList<String>(Arrays.asList(
-					"data to be deleted", 
-					"unknown data to be identified", 
-					"date and time of the measurement", 
-					"date of the measurement", 
-					"year of the date of the measurement", 
-					"month of the date of the measurement", 
-					"day of the date of the measurement", 
-					"time of the measurement", 
-					"hour of the time of the measurement", 
-					"minute of the time of the measurement", 
-					"second of the time of the measurement", 
-					"measurement longitude", 
-					"measurement latitude", 
-					"water sampling depth", 
-					"measured sea surface salinity", 
-					"equilibrator chamber temperature", 
-					"measured sea surface temperature", 
-					"equilibrator chamber pressure", 
-					"measured atmospheric pressure", 
-					"measured xCO2 (water) using equilibrator temperature (dry air)", 
-					"measured xCO2 (water) using sea surface temperature (dry air)", 
-					"measured pCO2 (water) using equilibrator temperature (wet air)", 
-					"measured pCO2 (water) using sea surface temperature (wet air)", 
-					"measured fCO2 (water) using equilibrator temperature (wet air)",
-					"measured fCO2 (water) using sea surface temperature (wet air)", 
-					"supplemental data to be kept" 
-			));
-	/**
-	 * arrays of known units for the standard data columns 
-	 */
-	public final static ArrayList<ArrayList<String>> STD_DATA_UNITS = 
-			new ArrayList<ArrayList<String>>(Arrays.asList(
-					new ArrayList<String>(Arrays.asList("")), 
-					new ArrayList<String>(Arrays.asList("")),
-					new ArrayList<String>(Arrays.asList(
-							"YYYY-MM-DD HH:MM:SS", "MON DAY YEAR HH:MM:SS", "DAY MON YEAR HH:MM:SS")), 
-					new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MON DAY YEAR", "DAY MON YEAR")), 
-					new ArrayList<String>(Arrays.asList("")), 
-					new ArrayList<String>(Arrays.asList("")), 
-					new ArrayList<String>(Arrays.asList("")), 
-					new ArrayList<String>(Arrays.asList("HH:MM:SS")), 
-					new ArrayList<String>(Arrays.asList("")),
-					new ArrayList<String>(Arrays.asList("")),
-					new ArrayList<String>(Arrays.asList("")),
-					new ArrayList<String>(Arrays.asList("decimal deg. E")), 
-					new ArrayList<String>(Arrays.asList("decimal deg. N")),
-					new ArrayList<String>(Arrays.asList("meters")), 
-					new ArrayList<String>(Arrays.asList("PSU")), 
-					new ArrayList<String>(Arrays.asList("deg. C")),
-					new ArrayList<String>(Arrays.asList("deg. C")),
-					new ArrayList<String>(Arrays.asList("hPa", "mbar")),
-					new ArrayList<String>(Arrays.asList("hPa", "mbar")),
-					new ArrayList<String>(Arrays.asList("micromole per mole")),
-					new ArrayList<String>(Arrays.asList("micromole per mole")),
-					new ArrayList<String>(Arrays.asList("microatmospheres")),
-					new ArrayList<String>(Arrays.asList("microatmospheres")), 
-					new ArrayList<String>(Arrays.asList("microatmospheres")),
-					new ArrayList<String>(Arrays.asList("microatmospheres")), 
-					new ArrayList<String>(Arrays.asList(""))
-			));
-
 	/**
 	 * Generate the encrypted password for a given plain-text username 
 	 * and password.  This is intended to only be a first level of
@@ -282,15 +101,16 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * Decodes a JSON-encoded array of numbers into a byte array.
-	 * May not be a complete implementation. 
+	 * Decodes a (JSON-like) encoded array of numbers into a byte array. 
+	 * Numeric values are separated by a comma, which may have whitespace
+	 * around it.
 	 * 
 	 * @param arrayStr
 	 * 		JSON-encoded array of byte values to use
 	 * @return
 	 * 		a byte array represented arrayStr
 	 * @throws NumberFormatException
-	 * 		if keyStr does not start with '[', does not end with ']', 
+	 * 		if arrayStr does not start with '[', does not end with ']', 
 	 * 		or contains values inappropriate for the byte type
 	 */
 	public static byte[] decodeByteArray(String arrayStr) 
@@ -306,6 +126,135 @@ public class DashboardUtils {
 		for (int k = 0; k < pieces.length; k++)
 			byteArray[k] = Byte.parseByte(pieces[k].trim());
 		return byteArray;
+	}
+
+	/**
+	 * JSON-encodes an ArrayList of Integers suitable for decoding 
+	 * with {@link #decodeIntegerArrayList(String)}
+	 * 
+	 * @param intList
+	 * 		list of integer values to encode
+	 * @return
+	 * 		the encoded list of integer values
+	 */
+	public static String encodeIntegerArrayList(ArrayList<Integer> intList) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[ ");
+		boolean firstValue = true;
+		for ( Integer intVal : intList ) {
+			if ( firstValue )
+				firstValue = false;
+			else
+				sb.append(", ");
+			sb.append(intVal.toString());
+		}
+		sb.append(" ]");
+		return sb.toString();
+	}
+
+	/**
+	 * Decodes a (JSON-like) encoded array of numbers into an ArrayList of 
+	 * Integers.  Will decode an encoded string produced by 
+	 * {@link #encodeIntegerArrayList(ArrayList)}  
+	 * 
+	 * @param arrayStr
+	 * 		JSON-encoded array of integer values to use
+	 * @return
+	 * 		the decoded ArrayList of Integers; never null but may be empty
+	 * @throws NumberFormatException
+	 * 		if arrayStr does not start with '[', does not end with ']', 
+	 * 		or contains values inappropriate for the integer type
+	 */
+	public static ArrayList<Integer> decodeIntegerArrayList(String arrayStr) 
+										throws NumberFormatException {
+		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+			throw new NumberFormatException(
+					"Encoded integer array not enclosed in brackets");
+		String[] pieces = arrayStr.substring(1, arrayStr.length()-1)
+								  .split("\\s*,\\s*");
+		if ( (pieces.length == 1) && pieces[0].trim().isEmpty() )
+			return new ArrayList<Integer>(0);
+		Integer[] intArray = new Integer[pieces.length];
+		for (int k = 0; k < pieces.length; k++)
+			intArray[k] = Integer.parseInt(pieces[k].trim());
+		return new ArrayList<Integer>(Arrays.asList(intArray));
+	}
+
+	/**
+	 * Encodes an ArrayList of strings suitable for decoding using 
+	 * {@link #decodeStringArrayList(String)}.  Characters within
+	 * the strings are copied as-is, thus newline characters, or
+	 * the character sequence double quote - comma - double quote, 
+	 * within a string will likely cause problems when reading or 
+	 * decoding the encoded string.
+	 * 
+	 * @param strList
+	 * 		the ArrayList of strings to encode
+	 * @return
+	 * 		the encoded string array
+	 */
+	public static String encodeStringArrayList(ArrayList<String> strList) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[ ");
+		boolean firstValue = true;
+		for ( String strVal : strList ) {
+			if ( firstValue )
+				firstValue = false;
+			else
+				sb.append(", ");
+			sb.append("\"");
+			sb.append(strVal);
+			sb.append("\"");
+		}
+		sb.append(" ]");
+		return sb.toString();
+	}
+
+	/**
+	 * Decodes a (somewhat-JSON-like) encoded string array, like that 
+	 * produced by {@link #encodeStringArrayList(ArrayList)}, into an 
+	 * ArrayList of strings.  Each string must be enclosed in double 
+	 * quotes; escaped characters within a string are not recognized 
+	 * or modified.  Strings must be separated by commas.  Whitespace 
+	 * around the comma is allowed.
+	 * 
+	 * @param arrayStr
+	 * 		the encoded string array
+	 * @return
+	 * 		the decoded ArrayList of strings; never null, but may
+	 * 		be empty (if the encoded string array contains no strings)
+	 * @throws IllegalArgumentException
+	 * 		if arrayStr does not start with '[', does not end with ']', 
+	 * 		or contains strings not enclosed within double quotes.
+	 */
+	public static ArrayList<String> decodeStringArrayList(String arrayStr) 
+									throws IllegalArgumentException {
+		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+			throw new IllegalArgumentException(
+					"Encoded string array not enclosed in brackets");
+		// Locate the double quote at the start of the first string 
+		// and at the end of the last string
+		int firstIndex = arrayStr.indexOf("\"");
+		int lastIndex = arrayStr.lastIndexOf("\"");
+		// Check for values not in double quotes within the brackets
+		if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
+			 ( (firstIndex > 1) && 
+				! arrayStr.substring(1, firstIndex).trim().isEmpty() ) ||
+			 ( (lastIndex > 1) && (lastIndex < arrayStr.length() - 2) && 
+				! arrayStr.substring(lastIndex+1, 
+								arrayStr.length()-1).trim().isEmpty() ) ) {
+			// Check for an empty array
+			if ( (firstIndex < 1) && 
+				 arrayStr.substring(1, arrayStr.length()-1).trim().isEmpty() )
+				return new ArrayList<String>(0);
+			throw new IllegalArgumentException("Strings in encoded " +
+					"string array are not enclosed in double quotes");
+		}
+		// Split up the substring between the first and last double quote
+		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
+								  .split("\"\\s*,\\s*\"");
+		// Return an ArrayList<String> generated from the array of Strings
+		return new ArrayList<String>(Arrays.asList(pieces));
 	}
 
 }

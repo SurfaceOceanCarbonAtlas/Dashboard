@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
 
 /**
@@ -13,26 +14,38 @@ import java.util.Comparator;
  */
 public class DashboardCruise implements Serializable {
 
-	private static final long serialVersionUID = -2257057046305346263L;
+	private static final long serialVersionUID = -2373783036245133660L;
 
 	boolean selected;
 	String owner;
 	String expocode;
-	String uploadFilename;
 	String dataCheckStatus;
 	String metadataCheckStatus;
 	String qcStatus;
 	String archiveStatus;
+	String uploadFilename;
+	int numDataRows;
+	ArrayList<CruiseDataColumnType> dataColTypes;
+	ArrayList<Integer> userColIndices;
+	ArrayList<String> userColNames;
+	ArrayList<String> dataColUnits;
+	ArrayList<String> dataColDescriptions;
 
 	public DashboardCruise() {
 		selected = false;
 		owner = "";
 		expocode = "";
-		uploadFilename = "";
 		dataCheckStatus = "";
 		metadataCheckStatus = "";
 		qcStatus = "";
 		archiveStatus = "";
+		uploadFilename = "";
+		numDataRows = 0;
+		dataColTypes = new ArrayList<CruiseDataColumnType>();
+		userColIndices = new ArrayList<Integer>();
+		userColNames = new ArrayList<String>();
+		dataColUnits = new ArrayList<String>();
+		dataColDescriptions = new ArrayList<String>();
 	}
 
 	/**
@@ -94,26 +107,6 @@ public class DashboardCruise implements Serializable {
 
 	/**
 	 * @return 
-	 * 		the uploaded data filename; never null
-	 */
-	public String getUploadFilename() {
-		return uploadFilename;
-	}
-
-	/**
-	 * @param uploadFilename 
-	 * 		the uploaded data filename (after trimming) to set;
-	 * 		if null, sets to an empty string
-	 */
-	public void setUploadFilename(String uploadFilename) {
-		if ( uploadFilename == null )
-			this.uploadFilename = "";
-		else
-			this.uploadFilename = uploadFilename.trim();
-	}
-
-	/**
-	 * @return 
 	 * 		the data check status; never null
 	 */
 	public String getDataCheckStatus() {
@@ -156,7 +149,7 @@ public class DashboardCruise implements Serializable {
 	 * @return 
 	 * 		the QC submission status; never null
 	 */
-	public String getQCStatus() {
+	public String getQcStatus() {
 		return qcStatus;
 	}
 
@@ -165,7 +158,7 @@ public class DashboardCruise implements Serializable {
 	 * 		the  QC submission status (after trimming) to set;
 	 * 		if null, sets to an empty string
 	 */
-	public void setQCStatus(String qcStatus) {
+	public void setQcStatus(String qcStatus) {
 		if ( qcStatus == null )
 			this.qcStatus = "";
 		else
@@ -192,17 +185,173 @@ public class DashboardCruise implements Serializable {
 			this.archiveStatus = archiveStatus.trim();
 	}
 
+	/**
+	 * @return 
+	 * 		the uploaded data filename; never null
+	 */
+	public String getUploadFilename() {
+		return uploadFilename;
+	}
+
+	/**
+	 * @param uploadFilename 
+	 * 		the uploaded data filename (after trimming) to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setUploadFilename(String uploadFilename) {
+		if ( uploadFilename == null )
+			this.uploadFilename = "";
+		else
+			this.uploadFilename = uploadFilename.trim();
+	}
+
+	/**
+	 * @return 
+	 * 		the total number of data measurements (data rows) 
+	 * 		for the cruise
+	 */
+	public int getNumDataRows() {
+		return numDataRows;
+	}
+
+	/**
+	 * @param numDataRows 
+	 * 		the total number of data measurements (data rows) 
+	 * 		to set for the cruise 
+	 */
+	public void setNumDataRows(int numDataRows) {
+		this.numDataRows = numDataRows;
+	}
+
+	/**
+	 * @return 
+	 * 		the list of data column types for this cruise; may be empty 
+	 * 		but never null.  The actual list in this object is returned.
+	 */
+	public ArrayList<CruiseDataColumnType> getDataColTypes() {
+		return dataColTypes;
+	}
+
+	/**
+	 * @param dataColTypes 
+	 * 		the list of data column types for this cruise.  The list in 
+	 * 		this object is cleared and all the contents of the given list, 
+	 * 		if not null, are added. 
+	 */
+	public void setDataColTypes(ArrayList<CruiseDataColumnType> dataColTypes) {
+		this.dataColTypes.clear();
+		if ( dataColTypes != null )
+			this.dataColTypes.addAll(dataColTypes);
+	}
+
+	/**
+	 * @return 
+	 * 		the list of data column indices as they appeared in the 
+	 * 		original user-provided data file for this cruise; may be 
+	 * 		empty but never null.  The actual list in this object is 
+	 * 		returned.
+	 */
+	public ArrayList<Integer> getUserColIndices() {
+		return userColIndices;
+	}
+
+	/**
+	 * @param userColIndices 
+	 * 		the list of data column indices as they appeared in the 
+	 * 		original user-provided data file for this cruise.  The list 
+	 * 		in this object is cleared and all the contents of the given 
+	 * 		list, if not null, are added. 
+	 */
+	public void setUserColIndices(ArrayList<Integer> userColIndices) {
+		this.userColIndices.clear();
+		if ( userColIndices != null )
+			this.userColIndices.addAll(userColIndices);
+	}
+
+	/**
+	 * @return the userColNames
+	 * 		the list of data column header names as they appeared in 
+	 * 		the original user-provided data file for this cruise; may 
+	 * 		be empty but never null.  The actual list in this object 
+	 * 		is returned. 
+	 */
+	public ArrayList<String> getUserColNames() {
+		return userColNames;
+	}
+
+	/**
+	 * @param userColNames 
+	 * 		the list of data column header names as they appeared in 
+	 * 		the original user-provided data file for this cruise.  The 
+	 * 		list in this object is cleared and all the contents of the  
+	 * 		given list, if not null, are added. 
+	 */
+	public void setUserColNames(ArrayList<String> userColNames) {
+		this.userColNames.clear();
+		if ( userColNames != null )
+			this.userColNames.addAll(userColNames);
+	}
+
+	/**
+	 * @return 
+	 * 		the list of data column units for this cruise; may be empty 
+	 * 		but never null.  The actual list in this object is returned. 
+	 */
+	public ArrayList<String> getDataColUnits() {
+		return dataColUnits;
+	}
+
+	/**
+	 * @param dataColUnits 
+	 * 		the list of data column units for this cruise.  The list 
+	 * 		in this object is cleared and all the contents of the given 
+	 * 		list, if not null, are added. 
+	 */
+	public void setDataColUnits(ArrayList<String> dataColUnits) {
+		this.dataColUnits.clear();
+		if ( dataColUnits != null )
+			this.dataColUnits.addAll(dataColUnits);
+	}
+
+	/**
+	 * @return 
+	 * 		the list of data column descriptions for this cruise; may 
+	 * 		be empty but never null.  The actual list in this object is 
+	 * 		returned. 
+	 */
+	public ArrayList<String> getDataColDescriptions() {
+		return dataColDescriptions;
+	}
+
+	/**
+	 * @param dataColDescriptions 
+	 * 		the list of data column descriptions for this cruise.  The 
+	 * 		list in this object is cleared and all the contents of the 
+	 * 		given list, if not null, are added. 
+	 */
+	public void setDataColDescriptions(ArrayList<String> dataColDescriptions) {
+		this.dataColDescriptions.clear();
+		if ( dataColDescriptions != null )
+			this.dataColDescriptions.addAll(dataColDescriptions);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = Boolean.valueOf(selected).hashCode();
 		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
-		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
 		result = result * prime + metadataCheckStatus.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
+		result = result * prime + uploadFilename.hashCode();
+		result = result * prime + numDataRows;
+		result = result * prime + dataColTypes.hashCode();
+		result = result * prime + userColIndices.hashCode();
+		result = result * prime + userColNames.hashCode();
+		result = result * prime + dataColUnits.hashCode();
+		result = result * prime + dataColDescriptions.hashCode();
 		return result;
 	}
 
@@ -219,28 +368,32 @@ public class DashboardCruise implements Serializable {
 
 		if ( selected != other.selected )
 			return false;
-
 		if ( ! owner.equals(other.owner) )
 			return false;
-
 		if ( ! expocode.equals(other.expocode) )
 			return false;
-
-		if ( ! uploadFilename.equals(other.uploadFilename) )
-			return false;
-
 		if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
 			return false;
-
 		if ( ! metadataCheckStatus.equals(other.metadataCheckStatus) )
 			return false;
-
 		if ( ! qcStatus.equals(other.qcStatus) )
 			return false;
-
 		if ( ! archiveStatus.equals(other.archiveStatus) )
 			return false;
-
+		if ( ! uploadFilename.equals(other.uploadFilename) )
+			return false;
+		if ( numDataRows != other.numDataRows )
+			return false;
+		if ( ! dataColTypes.equals(other.dataColTypes) )
+			return false;
+		if ( ! userColIndices.equals(other.userColIndices) )
+			return false;
+		if ( ! userColNames.equals(other.userColNames) )
+			return false;
+		if ( ! dataColUnits.equals(other.dataColUnits) )
+			return false;
+		if ( ! dataColDescriptions.equals(other.dataColDescriptions) )
+			return false;
 		return true;
 	}
 
@@ -248,13 +401,19 @@ public class DashboardCruise implements Serializable {
 	public String toString() {
 		return "DashboardCruise" +
 				"[ selected=" + Boolean.toString(selected) + 
-				", owner=" + owner + 
-				", expocode=" + expocode + 
-				", uploadFilename=" + uploadFilename +
-				", dataCheckStatus=" + dataCheckStatus +
-				", metadataCheckStatus=" + metadataCheckStatus +
-				", qcStatus=" + qcStatus + 
-				", archiveStatus=" + archiveStatus + 
+				",\n    owner=" + owner + 
+				",\n    expocode=" + expocode + 
+				",\n    dataCheckStatus=" + dataCheckStatus +
+				",\n    metadataCheckStatus=" + metadataCheckStatus +
+				",\n    qcStatus=" + qcStatus + 
+				",\n    archiveStatus=" + archiveStatus + 
+				",\n    uploadFilename=" + uploadFilename +
+				",\n    numDataRows=" + Integer.toString(numDataRows) +
+				",\n    dataColTypes=" + dataColTypes.toString() +
+				",\n    userColIndices=" + userColIndices.toString() +
+				",\n    userColNames=" + userColNames.toString() +
+				",\n    dataColUnits=" + dataColUnits.toString() +
+				",\n    dataColDescriptions=" + dataColDescriptions.toString() +
 				" ]";
 	}
 
@@ -314,24 +473,6 @@ public class DashboardCruise implements Serializable {
 	};
 
 	/**
-	 * Compare using the upload filename of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
-	 */
-	public static Comparator<DashboardCruise> filenameComparator = 
-			new Comparator<DashboardCruise>() {
-		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
-				return 0;
-			if ( c1 == null )
-				return -1;
-			if ( c2 == null )
-				return 1;
-			return c1.getUploadFilename().compareTo(c2.getUploadFilename());
-		}
-	};
-
-	/**
 	 * Compare using the data check status of the cruises
 	 * Note that this is inconsistent with DashboardCruise.equals.
 	 */
@@ -381,7 +522,7 @@ public class DashboardCruise implements Serializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			return c1.getQCStatus().compareTo(c2.getQCStatus());
+			return c1.getQcStatus().compareTo(c2.getQcStatus());
 		}
 	};
 
@@ -400,6 +541,24 @@ public class DashboardCruise implements Serializable {
 			if ( c2 == null )
 				return 1;
 			return c1.getArchiveStatus().compareTo(c2.getArchiveStatus());
+		}
+	};
+
+	/**
+	 * Compare using the upload filename of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals.
+	 */
+	public static Comparator<DashboardCruise> filenameComparator = 
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getUploadFilename().compareTo(c2.getUploadFilename());
 		}
 	};
 

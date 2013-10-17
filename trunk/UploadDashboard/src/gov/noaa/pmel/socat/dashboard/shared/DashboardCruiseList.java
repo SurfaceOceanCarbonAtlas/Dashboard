@@ -76,7 +76,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> {
 	public String toString() {
 		String repr = "DashboardCruiseList[ username=" + username;
 		for ( String expocode : keySet() ) {
-			repr += ", " + expocode + ":" + get(expocode).toString();
+			repr += ", \n    " + expocode + ":" + get(expocode).toString();
 		}
 		repr += " ]";
 		return repr;
