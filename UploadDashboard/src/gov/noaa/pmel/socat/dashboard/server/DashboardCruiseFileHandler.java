@@ -132,8 +132,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Assigns a DashboardCruiseWithData from data read from the 
-	 * given BufferedReader.  Only the expocode field of the superclass 
-	 * DashboardCruise is assigned by this method.
+	 * given BufferedReader. 
 	 * 
 	 * Blank lines in the file are ignored.  The data read can (should) 
 	 * have a preamble of metadata containing at least the expocode on 
@@ -511,46 +510,58 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		try {
 			PrintWriter writer = new PrintWriter(cruiseFile);
 			try {
-				// First write the CruiseData values
+				// First write the DashboardCruise property values
+				// Owner of the cruise
 				writer.println(DATA_OWNER_ID + 
 						cruiseData.getOwner());
+				// Upload filename
 				writer.println(UPLOAD_FILENAME_ID + 
 						cruiseData.getUploadFilename());
+				// Data-check status string
 				writer.println(DATA_CHECK_STATUS_ID + 
 						cruiseData.getDataCheckStatus());
+				// Metadata-check status string
 				writer.println(METADATA_CHECK_STATUS_ID + 
 						cruiseData.getMetadataCheckStatus());
+				// QC-submission status string
 				writer.println(QC_STATUS_ID + 
 						cruiseData.getQcStatus());
+				// Archive status string
 				writer.println(ARCHIVE_STATUS_ID + 
 						cruiseData.getArchiveStatus());
+				// Total number of data measurements (rows of data)
 				writer.println(NUM_DATA_ROWS_ID + 
 						Integer.toString(cruiseData.getNumDataRows()));
-				// Encode the column types using the enumerated names
+				// Data column types - encoded using the enumerated names
 				ArrayList<String> colTypeNames = 
 						new ArrayList<String>(cruiseData.getDataColTypes().size());
 				for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() )
 					colTypeNames.add(colType.toString());
 				writer.println(DATA_COLUMN_TYPES_ID + 
 						DashboardUtils.encodeStringArrayList(colTypeNames));
+				// Data column index in original upload data file
 				writer.println(USER_COLUMN_INDICES_ID + 
 						DashboardUtils.encodeIntegerArrayList(
 								cruiseData.getUserColIndices()));
+				// Data column name in the original upload data file
 				writer.println(USER_COLUMN_NAMES_ID + 
 						DashboardUtils.encodeStringArrayList(
 								cruiseData.getUserColNames()));
+				// Unit for each data column
 				writer.println(DATA_COLUMN_UNITS_ID + 
 						DashboardUtils.encodeStringArrayList(
 								cruiseData.getDataColUnits()));
+				// Description of each data column
 				writer.println(DATA_COLUMN_DESCRIPTIONS_ID + 
 						DashboardUtils.encodeStringArrayList(
 								cruiseData.getDataColDescriptions()));
-				// Print the standard creation date and expocode header lines
+				// Now print the normal data file contents 
+				// The standard creation date and expocode header lines
 				writer.println("SOCAT version " + 
 						DashboardDataStore.get().getSocatVersion() + 
 						" dashboard cruise file created: " + datestamp);
 				writer.println("Cruise Expocode: " + expocode);
-				// Print the saved metadata preamble
+				// The saved metadata preamble
 				boolean lastLineBlank = false;
 				for ( String metaline : cruiseData.getPreamble() ) {
 					writer.println(metaline);
@@ -561,7 +572,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				}
 				if ( ! lastLineBlank )
 					writer.println();
-				// Print the data column headers
+				// The data column headers
 				String dataline = "";
 				boolean first = true;
 				for ( String name : cruiseData.getUserColNames() ) {
@@ -572,7 +583,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					dataline += name;
 				}
 				writer.println(dataline);
-				// Print the rows of data
+				// The data measurements (rows of data)
 				for ( ArrayList<String> datarow : cruiseData.getDataValues() ) {
 					dataline = "";
 					first = true;
@@ -668,6 +679,34 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"sixth line does not start with " + ARCHIVE_STATUS_ID);
 		cruise.setArchiveStatus(
 				dataline.substring(ARCHIVE_STATUS_ID.length()).trim());
+		/* *******************************
+		// Total number of data measurements (rows of data)
+		writer.println(NUM_DATA_ROWS_ID + 
+				Integer.toString(cruiseData.getNumDataRows()));
+		// Data column types - encoded using the enumerated names
+		ArrayList<String> colTypeNames = 
+				new ArrayList<String>(cruiseData.getDataColTypes().size());
+		for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() )
+			colTypeNames.add(colType.toString());
+		writer.println(DATA_COLUMN_TYPES_ID + 
+				DashboardUtils.encodeStringArrayList(colTypeNames));
+		// Data column index in original upload data file
+		writer.println(USER_COLUMN_INDICES_ID + 
+				DashboardUtils.encodeIntegerArrayList(
+						cruiseData.getUserColIndices()));
+		// Data column name in the original upload data file
+		writer.println(USER_COLUMN_NAMES_ID + 
+				DashboardUtils.encodeStringArrayList(
+						cruiseData.getUserColNames()));
+		// Unit for each data column
+		writer.println(DATA_COLUMN_UNITS_ID + 
+				DashboardUtils.encodeStringArrayList(
+						cruiseData.getDataColUnits()));
+		// Description of each data column
+		writer.println(DATA_COLUMN_DESCRIPTIONS_ID + 
+				DashboardUtils.encodeStringArrayList(
+						cruiseData.getDataColDescriptions()));
+		*********************************** */
 	}
 
 	/**
