@@ -104,7 +104,7 @@ public class DashboardUtilsTest {
 	@Test
 	public void testEncodeDecodeStringArrayList() {
 		ArrayList<String> myList = new ArrayList<String>(
-				Arrays.asList("one", "two", "", "four, five, and six"));
+				Arrays.asList("one", "two", "", "four, five, and six", "", ""));
 		String encoded = DashboardUtils.encodeStringArrayList(myList);
 		ArrayList<String> decodedList = 
 				DashboardUtils.decodeStringArrayList(encoded);

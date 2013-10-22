@@ -175,7 +175,8 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				cruiseData = new DashboardCruiseWithData();
 				cruiseData.setOwner(username);
 				cruiseData.setUploadFilename(filename);
-				cruiseHandler.assignCruiseDataFromInput(cruiseData, cruiseReader, 0, -1);
+				cruiseHandler.assignCruiseDataFromInput(cruiseData, 
+														cruiseReader, 0, -1, true);
 			} finally {
 				cruiseReader.close();
 			}

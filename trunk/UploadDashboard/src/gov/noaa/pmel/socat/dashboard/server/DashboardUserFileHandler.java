@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
@@ -11,7 +12,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 /**
  * Handles storage and retrieval of user data in files.
@@ -250,6 +253,48 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			saveCruiseListing(cruiseList, commitMessage);
 		}
 		return cruiseList;
+	}
+
+	/**
+	 * Assigns the standard data column types from the user-provided 
+	 * data column names.  TODO: The cruise owner is used to obtain 
+	 * customized associations of user-provided column names to standard 
+	 * column names.
+	 *  
+	 * @param cruise
+	 * 		cruise whose data column types are to be assigned
+	 */
+	public void assignStandardDataColumnTypes(DashboardCruise cruise) {
+		// Directly assign the lists contained in the cruise
+		ArrayList<Integer> colIndices = cruise.getUserColIndices();
+		colIndices.clear();
+		ArrayList<CruiseDataColumnType> colTypes = cruise.getDataColTypes();
+		colTypes.clear();
+		ArrayList<String> colUnits = cruise.getDataColUnits();
+		colUnits.clear();
+		ArrayList<String> colDescripts = cruise.getDataColDescriptions();
+		colDescripts.clear();
+		// Go through the column names to assign these lists
+		int k = 0;
+		for ( String colName : cruise.getUserColNames() ) {
+			colIndices.add(k);
+			k++;
+			// TODO: use the cruise owner name to retrieve a file with 
+			//       customized associations of column name to type
+			CruiseDataColumnType dataType = CruiseDataColumnType.UNKNOWN;
+			for ( Entry<CruiseDataColumnType,String> stdNameEntry : 
+				CruiseDataColumnType.STD_HEADER_NAMES.entrySet() ) {
+				if ( colName.startsWith(stdNameEntry.getValue()) ) {
+					dataType = stdNameEntry.getKey();
+					break;
+				}
+			}
+			colTypes.add(dataType);
+			// TODO: get units from column name
+			colUnits.add(CruiseDataColumnType.STD_DATA_UNITS.get(dataType).get(0));
+			// TODO: get data descriptions from metadata preamble
+			colDescripts.add(CruiseDataColumnType.STD_DESCRIPTIONS.get(dataType));
+		}
 	}
 
 }

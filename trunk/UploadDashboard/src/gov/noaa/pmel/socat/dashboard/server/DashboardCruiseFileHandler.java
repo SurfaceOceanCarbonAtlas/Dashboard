@@ -38,7 +38,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes=";
 	private static final String USER_COLUMN_INDICES_ID = "usercolumnindices=";
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames=";
-	private static final String DATA_COLUMN_UNITS_ID = "datacolumntypes=";
+	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits=";
 	private static final String DATA_COLUMN_DESCRIPTIONS_ID = "datacolumndescriptions=";
 
 	// Patterns for getting the expocode from the metadata header
@@ -165,14 +165,21 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * @param numDataRows
 	 * 		number of data rows to return; for all data for the cruise,
 	 * 		specify -1 (or any negative integer)
+	 * @param assignCruiseInfo
+	 * 		assign values in the superclass DashboardCruise from the data?
+	 * 		This includes the expocode, total number of rows of data, 
+	 * 		and data column information.  If true, values are assigned from
+	 * 		the data read (so firstDataRow should be zero, numDataRows should
+	 * 		be -1).  If false, the expocode and number of data columns are
+	 * 		validated against what is read from the data file.
 	 * @throws IOException
 	 * 		if reading from cruiseReader throws one,
 	 * 		if there is a blank data column header, or
 	 * 		if there is an inconsistent number of tab-separated values
 	 */
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
-			BufferedReader cruiseReader, int firstDataRow, int numDataRows) 
-														throws IOException {
+			BufferedReader cruiseReader, int firstDataRow, int numDataRows,
+			boolean assignCruiseInfo) throws IOException {
 		boolean creationDateFound = false;
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
@@ -185,7 +192,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		String dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
 			// Check if we have gotten to non-blank tab-separated values 
-			String[] datavals = dataline.split("\t");
+			String[] datavals = dataline.split("\t", -1);
 			if ( (   datavals.length > 3 ) &&
 				 ( ! datavals[0].trim().isEmpty() ) &&
 				 ( ! datavals[1].trim().isEmpty() ) &&
@@ -199,11 +206,18 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 						throw new IOException("Data column header " + 
 												(k+1) + " is blank");
 				}
-				// Just directly add the column names to the list in cruiseData
-				ArrayList<String> colNames = cruiseData.getUserColNames();
-				colNames.clear();
-				colNames.addAll(Arrays.asList(datavals));
 				numDataColumns = datavals.length;
+				// Just directly add the column names to the list in cruiseData
+				if ( assignCruiseInfo ) {
+					ArrayList<String> colNames = cruiseData.getUserColNames();
+					colNames.clear();
+					colNames.addAll(Arrays.asList(datavals));
+				}
+				else if ( cruiseData.getUserColNames().size() != numDataColumns ) {
+					throw new IOException("Unexpected number of data columns (" + 
+							numDataColumns + " instead of " + 
+							cruiseData.getUserColNames().size()  + ")");
+				}
 				// Treat the rest of the lines as tab-separated data value lines
 				break;
 			}
@@ -230,8 +244,16 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					for ( Pattern pat : expocodePatterns ) {
 						Matcher mat = pat.matcher(dataline);
 						if ( mat.matches() ) {
-							// Get the expocode from this line
-							cruiseData.setExpocode(mat.group(1).toUpperCase());
+							String expocode = mat.group(1).toUpperCase();
+							if ( assignCruiseInfo ) {
+								// Get the expocode from this line
+								cruiseData.setExpocode(expocode);
+							}
+							else if ( ! cruiseData.getExpocode().equals(expocode) ) {
+								throw new IOException("Unexpected expocode (" +
+										expocode + " instead of " +
+										cruiseData.getExpocode());
+							}
 							expocodeFound = true;
 							break;
 						}
@@ -249,12 +271,27 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			dataline = cruiseReader.readLine();
 		}
 
+		if ( assignCruiseInfo ) {
+			// Guess the data column types, units, and descriptions from the 
+			// user-provided data column names
+			try {
+				DashboardDataStore.get().getUserFileHandler()
+										.assignStandardDataColumnTypes(cruiseData);
+			} catch ( IOException ex ) {
+				throw new IOException(
+						"Unexpected failure to get the user file handler");
+			}
+		}
+
 		// Read the tab-separated column values
 		// Just directly add them to the list in cruiseData
 		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
 		dataValues.clear();
-		if ( numDataRows == 0 )
+		if ( numDataRows == 0 ) {
+			if ( assignCruiseInfo )
+				cruiseData.setNumDataRows(0);
 			return;
+		}
 		int dataRowNum = 0;
 		dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
@@ -262,7 +299,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			if ( ! dataline.trim().isEmpty() ) {
 				if ( dataRowNum >= firstDataRow ) {
 					// Get the values from this data line
-					String[] datavals = dataline.split("\t");
+					String[] datavals = dataline.split("\t", -1);
 					if ( datavals.length != numDataColumns )
 						throw new IOException("Inconsistent number of data columns (" + 
 								datavals.length + " instead of " + numDataColumns + 
@@ -271,8 +308,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					for (int k = 0; k < datavals.length; k++) {
 						datavals[k] = datavals[k].trim();
 						if ( datavals[k].isEmpty() ||
-								datavals[k].toLowerCase().equals("null") ||
-								datavals[k].toLowerCase().equals("nan") ) {
+							 datavals[k].toLowerCase().equals("null") ||
+							 datavals[k].toLowerCase().equals("nan") ) {
 							datavals[k] = "NaN";
 						}
 					}
@@ -285,6 +322,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			// Read the next line
 			dataline = cruiseReader.readLine();
 		}
+		if ( assignCruiseInfo )
+			cruiseData.setNumDataRows(dataValues.size());
 	}
 
 	/**
@@ -373,10 +412,13 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardCruiseWithData getCruiseDataFromFile(String expocode,
 			int firstDataRow, int numDataRows) throws IllegalArgumentException {
+		// Get the filename of the saved cruise data file
 		File cruiseFile = cruiseDataFile(expocode);
-		// Read the cruise data from the saved cruise data file
+		// Create the cruise and assign the expocode
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
+		cruiseData.setExpocode(expocode);
 		try {
+			// Read the cruise data from the saved cruise data file
 			BufferedReader cruiseReader = 
 					new BufferedReader(new FileReader(cruiseFile));
 			try {
@@ -384,11 +426,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				assignCruiseFromInput(cruiseData, cruiseReader);
 				// Assign the cruise data in the rest of the file
 				assignCruiseDataFromInput(cruiseData, cruiseReader, 
-											firstDataRow, numDataRows);
-				// Make sure the expocode in the file is the one requested
-				if ( ! expocode.equals(cruiseData.getExpocode()) )
-					throw new IllegalArgumentException(
-							"unexpected expocode associated with saved cruise data");
+											firstDataRow, numDataRows, false);
 			} finally {
 				cruiseReader.close();
 			}
@@ -536,7 +574,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				ArrayList<String> colTypeNames = 
 						new ArrayList<String>(cruiseData.getDataColTypes().size());
 				for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() )
-					colTypeNames.add(colType.toString());
+					colTypeNames.add(colType.name());
 				writer.println(DATA_COLUMN_TYPES_ID + 
 						DashboardUtils.encodeStringArrayList(colTypeNames));
 				// Data column index in original upload data file
@@ -679,34 +717,71 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"sixth line does not start with " + ARCHIVE_STATUS_ID);
 		cruise.setArchiveStatus(
 				dataline.substring(ARCHIVE_STATUS_ID.length()).trim());
-		/* *******************************
 		// Total number of data measurements (rows of data)
-		writer.println(NUM_DATA_ROWS_ID + 
-				Integer.toString(cruiseData.getNumDataRows()));
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(NUM_DATA_ROWS_ID) )
+			throw new IOException(
+					"seventh line does not start with " + NUM_DATA_ROWS_ID);
+		cruise.setNumDataRows(Integer.parseInt(
+				dataline.substring(NUM_DATA_ROWS_ID.length()).trim()));
 		// Data column types - encoded using the enumerated names
-		ArrayList<String> colTypeNames = 
-				new ArrayList<String>(cruiseData.getDataColTypes().size());
-		for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() )
-			colTypeNames.add(colType.toString());
-		writer.println(DATA_COLUMN_TYPES_ID + 
-				DashboardUtils.encodeStringArrayList(colTypeNames));
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(DATA_COLUMN_TYPES_ID) )
+			throw new IOException(
+					"eighth line does not start with " + DATA_COLUMN_TYPES_ID);
+		ArrayList<String> colTypeNames = DashboardUtils.decodeStringArrayList(
+				dataline.substring(DATA_COLUMN_TYPES_ID.length()).trim());
+		// Assign the column types directly to the array in the cruise 
+		ArrayList<CruiseDataColumnType> colTypes = cruise.getDataColTypes();
+		colTypes.clear();
+		for ( String name : colTypeNames )
+			colTypes.add(CruiseDataColumnType.valueOf(
+											CruiseDataColumnType.class, name));
+		int numDataColumns = colTypes.size();
 		// Data column index in original upload data file
-		writer.println(USER_COLUMN_INDICES_ID + 
-				DashboardUtils.encodeIntegerArrayList(
-						cruiseData.getUserColIndices()));
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(USER_COLUMN_INDICES_ID) )
+			throw new IOException(
+					"ninth line does not start with " + USER_COLUMN_INDICES_ID);
+		cruise.setUserColIndices(DashboardUtils.decodeIntegerArrayList(
+				dataline.substring(USER_COLUMN_INDICES_ID.length()).trim()));
+		if ( cruise.getUserColIndices().size() != numDataColumns )
+			throw new IOException(
+					"number of user column indices different from " +
+					"number of data column types");
 		// Data column name in the original upload data file
-		writer.println(USER_COLUMN_NAMES_ID + 
-				DashboardUtils.encodeStringArrayList(
-						cruiseData.getUserColNames()));
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(USER_COLUMN_NAMES_ID) )
+			throw new IOException(
+					"tenth line does not start with " + USER_COLUMN_NAMES_ID);
+		cruise.setUserColNames(DashboardUtils.decodeStringArrayList(
+				dataline.substring(USER_COLUMN_NAMES_ID.length()).trim()));
+		if ( cruise.getUserColNames().size() != numDataColumns )
+			throw new IOException(
+					"number of user column names different from " +
+					"number of data column types");
 		// Unit for each data column
-		writer.println(DATA_COLUMN_UNITS_ID + 
-				DashboardUtils.encodeStringArrayList(
-						cruiseData.getDataColUnits()));
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(DATA_COLUMN_UNITS_ID) )
+			throw new IOException(
+					"eleventh line does not start with " + DATA_COLUMN_UNITS_ID);
+		cruise.setDataColUnits(DashboardUtils.decodeStringArrayList(
+				dataline.substring(DATA_COLUMN_UNITS_ID.length()).trim()));
+		if ( cruise.getDataColUnits().size() != numDataColumns )
+			throw new IOException(
+					"number of data column units different from " +
+					"number of data column types");
 		// Description of each data column
-		writer.println(DATA_COLUMN_DESCRIPTIONS_ID + 
-				DashboardUtils.encodeStringArrayList(
-						cruiseData.getDataColDescriptions()));
-		*********************************** */
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(DATA_COLUMN_DESCRIPTIONS_ID) )
+			throw new IOException(
+					"twelfth line does not start with " + DATA_COLUMN_DESCRIPTIONS_ID);
+		cruise.setDataColDescriptions(DashboardUtils.decodeStringArrayList(
+				dataline.substring(DATA_COLUMN_DESCRIPTIONS_ID.length()).trim()));
+		if ( cruise.getDataColDescriptions().size() != numDataColumns )
+			throw new IOException(
+					"number of data column descriptions different from " +
+					"number of data column types");
 	}
 
 	/**

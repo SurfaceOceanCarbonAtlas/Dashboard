@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
@@ -165,7 +166,41 @@ public class DashboardCruiseFileHandlerTest {
 		final String headerString = 
 				"Expocode	SOCAT_DOI	QC_ID	yr	mon	day	hh	mm	ss	longitude [dec.deg.E]	latitude [dec.deg.N]	sample_depth [m]	sal	SST [deg.C]	Tequ [deg.C]	PPPP [hPa]	Pequ [hPa]	WOA_SSS	NCEP_SLP [hPa]	ETOPO2_depth [m]	d2l [km]	GVCO2 [umol/mol]	xCO2water_equ_dry [umol/mol]	xCO2water_SST_dry [umol/mol]	pCO2water_equ_wet [uatm]	pCO2water_SST_wet [uatm]	fCO2water_equ_wet [uatm]	fCO2water_SST_wet [uatm]	fCO2rec [uatm]	fCO2rec_src	fCO2rec_flag \n";
 		ArrayList<String> expectedHeaders = 
-				new ArrayList<String>(Arrays.asList(headerString.trim().split("\t")));
+				new ArrayList<String>(Arrays.asList(headerString.trim().split("\t", -1)));
+		ArrayList<CruiseDataColumnType> expectedColumnTypes = 
+				new ArrayList<CruiseDataColumnType>(Arrays.asList(
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.YEAR,
+						CruiseDataColumnType.MONTH,
+						CruiseDataColumnType.DAY,
+						CruiseDataColumnType.HOUR,
+						CruiseDataColumnType.MINUTE,
+						CruiseDataColumnType.SECOND,
+						CruiseDataColumnType.LONGITUDE,
+						CruiseDataColumnType.LATITUDE,
+						CruiseDataColumnType.SAMPLE_DEPTH,
+						CruiseDataColumnType.SAMPLE_SALINITY,
+						CruiseDataColumnType.SEA_SURFACE_TEMPERATURE,
+						CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE,
+						CruiseDataColumnType.SEA_LEVEL_PRESSURE,
+						CruiseDataColumnType.EQUILIBRATOR_PRESSURE,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.XCO2_EQU,
+						CruiseDataColumnType.XCO2_SST,
+						CruiseDataColumnType.PCO2_EQU,
+						CruiseDataColumnType.PCO2_SST,
+						CruiseDataColumnType.FCO2_EQU,
+						CruiseDataColumnType.FCO2_SST,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN,
+						CruiseDataColumnType.UNKNOWN
+				));
 		final String dataString = 
 				"AGSK20031205	doi:10.1594/PANGAEA.814792	13	2003	12	05	22	12	00.00	337.28101	64.10700	5.	26.910	5.410	5.700	NaN	1026.500	NaN	1022.900	39.	40.	380.341	373.740	NaN	NaN	NaN	NaN	369.260	369.196	1	2 \n" +
 				"AGSK20031205	doi:10.1594/PANGAEA.814792	13	2003	12	05	22	18	00.00	337.23901	64.09700	5.	28.360	5.390	5.680	NaN	1026.100	NaN	1022.900	17.	42.	380.340	374.390	NaN	NaN	NaN	NaN	369.770	369.700	1	2 \n" +
@@ -188,7 +223,7 @@ public class DashboardCruiseFileHandlerTest {
 				new ArrayList<ArrayList<String>>(observations.length);
 		for ( String obs : observations )
 			expectedDatavals.add(
-					new ArrayList<String>(Arrays.asList(obs.trim().split("\t"))));
+					new ArrayList<String>(Arrays.asList(obs.trim().split("\t", -1))));
 
 		DashboardCruiseFileHandler handler = 
 				DashboardDataStore.get().getCruiseFileHandler();
@@ -202,7 +237,7 @@ public class DashboardCruiseFileHandlerTest {
 				versionString + expocodeString + metadataString + headerString + dataString));
 		try {
 			handler.assignCruiseDataFromInput(cruiseData, reader, 
-												0, observations.length);
+												0, observations.length, true);
 		} finally {
 			reader.close();
 		}
@@ -212,6 +247,12 @@ public class DashboardCruiseFileHandlerTest {
 		assertEquals(expocode, cruiseData.getExpocode());
 		assertEquals(username, cruiseData.getOwner());
 		assertEquals(filename, cruiseData.getUploadFilename());
+
+		// These are checked item by item to make it easier to report differences
+		ArrayList<CruiseDataColumnType> colTypes = cruiseData.getDataColTypes();
+		for (int k = 0; (k < colTypes.size()) && (k < expectedColumnTypes.size()); k++)
+			assertEquals(expectedColumnTypes.get(k), colTypes.get(k));
+		assertEquals(expectedColumnTypes.size(), colTypes.size());
 
 		ArrayList<String> preamble = cruiseData.getPreamble();
 		for (int k = 0; (k < preamble.size()) && (k < expectedPreamble.size()); k++)
@@ -290,6 +331,12 @@ public class DashboardCruiseFileHandlerTest {
 		expectedCruise.setExpocode(expocode);
 		expectedCruise.setOwner(username);
 		expectedCruise.setUploadFilename(filename);
+		expectedCruise.setNumDataRows(observations.length);
+		expectedCruise.setDataColTypes(expectedColumnTypes);
+		expectedCruise.setUserColNames(expectedHeaders);
+		expectedCruise.setUserColIndices(fileData.getUserColIndices());
+		expectedCruise.setDataColUnits(fileData.getDataColUnits());
+		expectedCruise.setDataColDescriptions(fileData.getDataColDescriptions());
 		DashboardCruise cruise = handler.getCruiseFromDataFile(expocode);
 		assertEquals(expectedCruise, cruise);
 	}
