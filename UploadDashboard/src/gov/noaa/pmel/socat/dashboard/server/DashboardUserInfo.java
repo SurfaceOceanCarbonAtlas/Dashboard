@@ -65,7 +65,7 @@ public class DashboardUserInfo {
 	 * 		if a role cannot be interpreted
 	 */
 	public void addUserRoles(String rolesString) throws IllegalArgumentException {
-		String[] roles = rolesString.split("[,;\\s]+");
+		String[] roles = rolesString.split("[,;\\s]+", -1);
 		for (int k = 0; k < roles.length; k++) {
 			if ( (roles[k]).startsWith(MEMBER_NAME_TAG) ) {
 				int groupNum;

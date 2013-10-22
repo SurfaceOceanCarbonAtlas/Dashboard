@@ -119,7 +119,7 @@ public class DashboardUtils {
 			throw new NumberFormatException(
 					"Encoded byte array not enclosed in brackets");
 		String[] pieces = arrayStr.substring(1, arrayStr.length()-1)
-								  .split("\\s*,\\s*");
+								  .split("\\s*,\\s*", -1);
 		if ( (pieces.length == 1) && pieces[0].trim().isEmpty() )
 			return new byte[0];
 		byte[] byteArray = new byte[pieces.length];
@@ -171,7 +171,7 @@ public class DashboardUtils {
 			throw new NumberFormatException(
 					"Encoded integer array not enclosed in brackets");
 		String[] pieces = arrayStr.substring(1, arrayStr.length()-1)
-								  .split("\\s*,\\s*");
+								  .split("\\s*,\\s*", -1);
 		if ( (pieces.length == 1) && pieces[0].trim().isEmpty() )
 			return new ArrayList<Integer>(0);
 		Integer[] intArray = new Integer[pieces.length];
@@ -252,7 +252,7 @@ public class DashboardUtils {
 		}
 		// Split up the substring between the first and last double quote
 		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
-								  .split("\"\\s*,\\s*\"");
+								  .split("\"\\s*,\\s*\"", -1);
 		// Return an ArrayList<String> generated from the array of Strings
 		return new ArrayList<String>(Arrays.asList(pieces));
 	}
