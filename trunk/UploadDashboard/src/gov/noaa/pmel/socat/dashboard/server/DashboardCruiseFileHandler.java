@@ -40,6 +40,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames=";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits=";
 	private static final String DATA_COLUMN_DESCRIPTIONS_ID = "datacolumndescriptions=";
+	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities=";
 
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
@@ -207,16 +208,26 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 												(k+1) + " is blank");
 				}
 				numDataColumns = datavals.length;
-				// Just directly add the column names to the list in cruiseData
 				if ( assignCruiseInfo ) {
+					// Just directly add the column names to the list in cruiseData
 					ArrayList<String> colNames = cruiseData.getUserColNames();
 					colNames.clear();
 					colNames.addAll(Arrays.asList(datavals));
+					// Just directly add the default column quality of 2 ("okay")
+					// to the list in cruiseData
+					ArrayList<Integer> colQualities = cruiseData.getDataColQualities();
+					for (int k = 0; k < numDataColumns; k++)
+						colQualities.add(2);
 				}
 				else if ( cruiseData.getUserColNames().size() != numDataColumns ) {
 					throw new IOException("Unexpected number of data columns (" + 
 							numDataColumns + " instead of " + 
 							cruiseData.getUserColNames().size()  + ")");
+				}
+				else if ( cruiseData.getDataColQualities().size() != numDataColumns ) {
+					throw new IOException("Unexpected number of data column qualities (" + 
+							numDataColumns + " instead of " + 
+							cruiseData.getDataColQualities().size()  + ")");
 				}
 				// Treat the rest of the lines as tab-separated data value lines
 				break;
@@ -593,6 +604,10 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				writer.println(DATA_COLUMN_DESCRIPTIONS_ID + 
 						DashboardUtils.encodeStringArrayList(
 								cruiseData.getDataColDescriptions()));
+				// Qualities of each data column
+				writer.println(DATA_COLUMN_QUALITIES_ID + 
+						DashboardUtils.encodeIntegerArrayList(
+								cruiseData.getDataColQualities()));
 				// Now print the normal data file contents 
 				// The standard creation date and expocode header lines
 				writer.println("SOCAT version " + 
@@ -781,6 +796,17 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		if ( cruise.getDataColDescriptions().size() != numDataColumns )
 			throw new IOException(
 					"number of data column descriptions different from " +
+					"number of data column types");
+		// QUality of each data column
+		dataline = cruiseReader.readLine();
+		if ( ! dataline.startsWith(DATA_COLUMN_QUALITIES_ID) )
+			throw new IOException(
+					"thirteenth line does not start with " + DATA_COLUMN_QUALITIES_ID);
+		cruise.setDataColQualities(DashboardUtils.decodeIntegerArrayList(
+				dataline.substring(DATA_COLUMN_QUALITIES_ID.length()).trim()));
+		if ( cruise.getDataColQualities().size() != numDataColumns )
+			throw new IOException(
+					"number of data column qualities different from " +
 					"number of data column types");
 	}
 
