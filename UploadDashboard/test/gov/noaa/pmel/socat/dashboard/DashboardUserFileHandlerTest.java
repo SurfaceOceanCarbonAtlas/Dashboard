@@ -34,27 +34,7 @@ public class DashboardUserFileHandlerTest {
 				"FAKE20031205", 
 				"GARBAGE202020"
 		};
-		String[] uploadFilenames = { 
-				"fake20031205_revised.tsv",
-				"garbage_data.tsv"
-		};
-		String[] dataCheckStatuses = {
-				"",
-				"Acceptable"
-		};
-		String[] metaCheckStatuses = {
-				"",
-				"Questionable"
-		};
-		String[] qcStatuses = {
-				"",
-				"Suspended"
-		};
-		String[] archiveStatuses = {
-				"",
-				""
-				
-		};
+
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
 		for (int k = 0; k < cruiseExpocodes.length; k++) {
@@ -62,11 +42,6 @@ public class DashboardUserFileHandlerTest {
 			newCruise.setSelected(false);
 			newCruise.setExpocode(cruiseExpocodes[k]);
 			newCruise.setOwner(username);
-			newCruise.setUploadFilename(uploadFilenames[k]);
-			newCruise.setDataCheckStatus(dataCheckStatuses[k]);
-			newCruise.setMetadataCheckStatus(metaCheckStatuses[k]);
-			newCruise.setQcStatus(qcStatuses[k]);
-			newCruise.setArchiveStatus(archiveStatuses[k]);
 			cruiseList.put(newCruise.getExpocode(), newCruise);
 		}
 
@@ -81,7 +56,8 @@ public class DashboardUserFileHandlerTest {
 		cruiseList.remove(cruiseExpocodes[1]);
 
 		DashboardCruiseList newListing = handler.getCruiseListing(username);
-		assertEquals(cruiseList, newListing);
+		assertEquals(cruiseList.keySet(), newListing.keySet());
+		assertEquals(cruiseList.getUsername(), newListing.getUsername());
 	}
 
 }

@@ -346,6 +346,36 @@ public class DashboardCruiseTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getDataColQualities()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setDataColQualities(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testSetGetDataColQualities() {
+		ArrayList<Integer> myDataColQualities = new ArrayList<Integer>(
+				Arrays.asList(2, 3, 4, 3, 2, 3, 4)); 
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals(0, cruise.getDataColQualities().size());
+		cruise.setDataColQualities(myDataColQualities);
+		assertEquals(myDataColQualities, cruise.getDataColQualities());
+		assertEquals(0, cruise.getDataColDescriptions().size());
+		assertEquals(0, cruise.getDataColUnits().size());
+		assertEquals(0, cruise.getUserColNames().size());
+		assertEquals(0, cruise.getUserColIndices().size());
+		assertEquals(0, cruise.getDataColTypes().size());
+		assertEquals(0, cruise.getNumDataRows());
+		assertEquals("", cruise.getUploadFilename());
+		assertEquals("", cruise.getArchiveStatus());
+		assertEquals("", cruise.getQcStatus());
+		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
+		assertFalse( cruise.isSelected() );
+		cruise.setDataColQualities(null);
+		assertEquals(0, cruise.getDataColQualities().size());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#equals(java.lang.Object)}.
 	 */
@@ -383,6 +413,8 @@ public class DashboardCruiseTest {
 				"equilibrator temperature", 
 				"equilibrator pressure", 
 				"measured CO2 of sample")); 
+		ArrayList<Integer> myDataColQualities = new ArrayList<Integer>(
+				Arrays.asList(2, 3, 4, 3, 2, 3, 4)); 
 
 		DashboardCruise firstCruise = new DashboardCruise();
 		assertFalse( firstCruise.equals(null) );
@@ -486,6 +518,13 @@ public class DashboardCruiseTest {
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
 		secondCruise.setDataColDescriptions(myDataColDescriptions);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setDataColQualities(myDataColQualities);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setDataColQualities(myDataColQualities);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 	}

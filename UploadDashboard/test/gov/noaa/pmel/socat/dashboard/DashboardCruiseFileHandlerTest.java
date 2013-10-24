@@ -201,6 +201,9 @@ public class DashboardCruiseFileHandlerTest {
 						CruiseDataColumnType.UNKNOWN,
 						CruiseDataColumnType.UNKNOWN
 				));
+		ArrayList<Integer> expectedQualities = new ArrayList<Integer>(expectedColumnTypes.size());
+		for (int k = 0; k < expectedColumnTypes.size(); k++)
+			expectedQualities.add(2);
 		final String dataString = 
 				"AGSK20031205	doi:10.1594/PANGAEA.814792	13	2003	12	05	22	12	00.00	337.28101	64.10700	5.	26.910	5.410	5.700	NaN	1026.500	NaN	1022.900	39.	40.	380.341	373.740	NaN	NaN	NaN	NaN	369.260	369.196	1	2 \n" +
 				"AGSK20031205	doi:10.1594/PANGAEA.814792	13	2003	12	05	22	18	00.00	337.23901	64.09700	5.	28.360	5.390	5.680	NaN	1026.100	NaN	1022.900	17.	42.	380.340	374.390	NaN	NaN	NaN	NaN	369.770	369.700	1	2 \n" +
@@ -299,6 +302,8 @@ public class DashboardCruiseFileHandlerTest {
 			assertEquals(expectedHeaders.get(k), headers.get(k));
 		assertEquals(expectedHeaders.size(), headers.size());
 
+		assertEquals(expectedQualities, fileData.getDataColQualities());
+
 		datavals = fileData.getDataValues();
 		for (int k = 0; (k < datavals.size()) && (k < expectedDatavals.size()); k++) {
 			ArrayList<String> datalist = datavals.get(k);
@@ -334,6 +339,7 @@ public class DashboardCruiseFileHandlerTest {
 		expectedCruise.setNumDataRows(observations.length);
 		expectedCruise.setDataColTypes(expectedColumnTypes);
 		expectedCruise.setUserColNames(expectedHeaders);
+		expectedCruise.setDataColQualities(expectedQualities);
 		expectedCruise.setUserColIndices(fileData.getUserColIndices());
 		expectedCruise.setDataColUnits(fileData.getDataColUnits());
 		expectedCruise.setDataColDescriptions(fileData.getDataColDescriptions());

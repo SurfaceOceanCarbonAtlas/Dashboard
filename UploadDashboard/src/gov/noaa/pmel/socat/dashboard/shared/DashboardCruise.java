@@ -14,7 +14,7 @@ import java.util.Comparator;
  */
 public class DashboardCruise implements Serializable {
 
-	private static final long serialVersionUID = -2373783036245133660L;
+	private static final long serialVersionUID = -6136173535954634332L;
 
 	boolean selected;
 	String owner;
@@ -30,6 +30,7 @@ public class DashboardCruise implements Serializable {
 	ArrayList<String> userColNames;
 	ArrayList<String> dataColUnits;
 	ArrayList<String> dataColDescriptions;
+	ArrayList<Integer> dataColQualities;
 
 	public DashboardCruise() {
 		selected = false;
@@ -46,6 +47,7 @@ public class DashboardCruise implements Serializable {
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
 		dataColDescriptions = new ArrayList<String>();
+		dataColQualities = new ArrayList<Integer>();
 	}
 
 	/**
@@ -335,6 +337,29 @@ public class DashboardCruise implements Serializable {
 			this.dataColDescriptions.addAll(dataColDescriptions);
 	}
 
+	/**
+	 * @return 
+	 * 		the list of data column qualities (a WOCE-like flag for each
+	 * 		data column taken as a whole) for this cruise; may be empty 
+	 * 		but never null.  The actual list in this object is returned. 
+	 */
+	public ArrayList<Integer> getDataColQualities() {
+		return dataColQualities;
+	}
+
+	/**
+	 * @param dataColQualities 
+	 * 		the list of data column qualities (a WOCE-like flag for each
+	 * 		data column taken as a whole) for this cruise.  The list in 
+	 * 		this object is cleared and all the contents of the given list, 
+	 * 		if not null, are added. 
+	 */
+	public void setDataColQualities(ArrayList<Integer> dataColQualities) {
+		this.dataColQualities.clear();
+		if ( dataColQualities != null )
+			this.dataColQualities.addAll(dataColQualities);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -352,6 +377,7 @@ public class DashboardCruise implements Serializable {
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColUnits.hashCode();
 		result = result * prime + dataColDescriptions.hashCode();
+		result = result * prime + dataColQualities.hashCode();
 		return result;
 	}
 
@@ -394,6 +420,8 @@ public class DashboardCruise implements Serializable {
 			return false;
 		if ( ! dataColDescriptions.equals(other.dataColDescriptions) )
 			return false;
+		if ( ! dataColQualities.equals(other.dataColQualities) )
+			return false;
 		return true;
 	}
 
@@ -414,6 +442,7 @@ public class DashboardCruise implements Serializable {
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +
 				",\n    dataColDescriptions=" + dataColDescriptions.toString() +
+				",\n    dataColQualities=" + dataColQualities.toString() +
 				" ]";
 	}
 
