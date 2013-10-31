@@ -99,11 +99,11 @@ public class DashboardCruiseListPage extends Composite {
 			"report the archival of the selected cruises, " +
 			"or submit the selected cruises for immediate archival";
 
-	private static final String ADD_TO_LIST_TEXT = "Add Cruise";
+	private static final String ADD_TO_LIST_TEXT = "Add Cruise to List";
 	private static final String ADD_TO_LIST_HOVER_HELP = 
 			"add an existing cruise to this list of cruises";
 
-	private static final String REMOVE_FROM_LIST_TEXT = "Remove Cruise";
+	private static final String REMOVE_FROM_LIST_TEXT = "Remove Cruise from List";
 	private static final String REMOVE_FROM_LIST_HOVER_HELP =
 			"remove the selected cruises from this list of cruises; " +
 			"this will NOT remove the cruise or cruise data from SOCAT";

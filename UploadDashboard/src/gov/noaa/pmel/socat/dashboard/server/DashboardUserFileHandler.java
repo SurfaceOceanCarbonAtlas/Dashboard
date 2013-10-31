@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -283,7 +284,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			//       customized associations of column name to type
 			CruiseDataColumnType dataType = CruiseDataColumnType.UNKNOWN;
 			for ( Entry<CruiseDataColumnType,String> stdNameEntry : 
-				CruiseDataColumnType.STD_HEADER_NAMES.entrySet() ) {
+				DashboardUtils.STD_HEADER_NAMES.entrySet() ) {
 				if ( colName.startsWith(stdNameEntry.getValue()) ) {
 					dataType = stdNameEntry.getKey();
 					break;
@@ -291,9 +292,9 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			}
 			colTypes.add(dataType);
 			// TODO: get units from column name
-			colUnits.add(CruiseDataColumnType.STD_DATA_UNITS.get(dataType).get(0));
+			colUnits.add(DashboardUtils.STD_DATA_UNITS.get(dataType).get(0));
 			// TODO: get data descriptions from metadata preamble
-			colDescripts.add(CruiseDataColumnType.STD_DESCRIPTIONS.get(dataType));
+			colDescripts.add(DashboardUtils.STD_DESCRIPTIONS.get(dataType));
 		}
 	}
 

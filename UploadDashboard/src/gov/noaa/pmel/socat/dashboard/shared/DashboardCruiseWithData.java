@@ -6,14 +6,15 @@ package gov.noaa.pmel.socat.dashboard.shared;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * Represents the data given an uploaded cruise data file
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseWithData extends DashboardCruise {
-
-	private static final long serialVersionUID = 4543596573819043192L;
+public class DashboardCruiseWithData extends DashboardCruise 
+										implements IsSerializable {
 
 	String version;
 	ArrayList<String> preamble;
