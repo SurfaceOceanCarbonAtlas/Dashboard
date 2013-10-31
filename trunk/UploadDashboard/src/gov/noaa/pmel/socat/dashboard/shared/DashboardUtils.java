@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
@@ -64,6 +65,110 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_OWNER_TO_ARCHIVE = "Waiting on owner";
 	public static final String ARCHIVE_STATUS_SUBMITTED_PREFIX = "Submitted to ";
 	public static final String ARCHIVE_STATUS_ARCHIVED_PREFIX = "DOI ";
+
+	/**
+	 * standard header names of the standard data columns
+	 */
+	public static final EnumMap<CruiseDataColumnType,String> STD_HEADER_NAMES = 
+			new EnumMap<CruiseDataColumnType,String>(CruiseDataColumnType.class);
+	static {
+		STD_HEADER_NAMES.put(CruiseDataColumnType.DELETE, "delete");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.UNKNOWN, "unknown");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.TIMESTAMP, "timestamp");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.DATE, "date");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.YEAR, "yr");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.MONTH, "mon");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.DAY, "day");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.TIME, "time");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.HOUR, "hh");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.MINUTE, "mm");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SECOND, "ss");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.LONGITUDE, "longitude");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.LATITUDE, "latitude");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SAMPLE_DEPTH, "sample_depth");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SAMPLE_SALINITY, "sal");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE, "Tequ");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.EQUILIBRATOR_PRESSURE, "Pequ");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SEA_LEVEL_PRESSURE, "PPPP");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.XCO2_EQU, "xCO2water_equ_dry");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.XCO2_SST, "xCO2water_SST_dry");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.PCO2_EQU, "pCO2water_equ_wet");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.PCO2_SST, "pCO2water_SST_wet");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.FCO2_EQU, "fCO2water_equ_wet");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.FCO2_SST, "fCO2water_SST_wet");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SUPPLEMENTAL, "supplemental");
+	}
+
+	/**
+	 * standard data descriptions of the standard data columns
+	 */
+	public static final EnumMap<CruiseDataColumnType,String> STD_DESCRIPTIONS = 
+			new EnumMap<CruiseDataColumnType,String>(CruiseDataColumnType.class);
+	static {
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.DELETE, "data to be deleted"); 
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.UNKNOWN, "unknown data to be identified");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.TIMESTAMP, "date and time of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.DATE, "date of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.YEAR, "year of the date of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.MONTH, "month of the date of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.DAY, "day of the date of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.TIME, "time of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.HOUR, "hour of the time of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.MINUTE, "minute of the time of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.SECOND, "second of the time of the measurement");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.LONGITUDE, "measurement longitude");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.LATITUDE, "measurement latitude");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.SAMPLE_DEPTH, "water sampling depth");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.SAMPLE_SALINITY, "measured sea surface salinity");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE, "equilibrator chamber temperature");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.SEA_SURFACE_TEMPERATURE, "measured sea surface temperature");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.EQUILIBRATOR_PRESSURE, "equilibrator chamber pressure");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.SEA_LEVEL_PRESSURE, "measured atmospheric pressure");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.XCO2_EQU, "measured xCO2 (water) using equilibrator temperature (dry air)");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.XCO2_SST, "measured xCO2 (water) using sea surface temperature (dry air)");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.PCO2_EQU, "measured pCO2 (water) using equilibrator temperature (wet air)");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.PCO2_SST, "measured pCO2 (water) using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.FCO2_EQU, "measured fCO2 (water) using equilibrator temperature (wet air)");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.FCO2_SST, "measured fCO2 (water) using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.SUPPLEMENTAL, "supplemental data to be kept");
+	}
+
+	/**
+	 * known data units of the standard data columns
+	 */
+	public static final EnumMap<CruiseDataColumnType,ArrayList<String>> STD_DATA_UNITS = 
+			new EnumMap<CruiseDataColumnType,ArrayList<String>>(CruiseDataColumnType.class);
+	static {
+		STD_DATA_UNITS.put(CruiseDataColumnType.DELETE, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
+				"YYYY-MM-DD HH:MM:SS", "MON DAY YEAR HH:MM:SS", "DAY MON YEAR HH:MM:SS")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.DATE, new ArrayList<String>(Arrays.asList(
+				"YYYY-MM-DD", "MON DAY YEAR", "DAY MON YEAR")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.YEAR, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.MONTH, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.DAY, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.TIME, new ArrayList<String>(Arrays.asList("HH:MM:SS")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.HOUR, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.MINUTE, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SECOND, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("decimal deg. E")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("decimal deg. N")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SAMPLE_DEPTH, new ArrayList<String>(Arrays.asList("meters")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("PSU")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.XCO2_EQU, new ArrayList<String>(Arrays.asList("micromole per mole")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.XCO2_SST, new ArrayList<String>(Arrays.asList("micromole per mole")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.PCO2_EQU, new ArrayList<String>(Arrays.asList("microatmospheres")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.PCO2_SST, new ArrayList<String>(Arrays.asList("microatmospheres")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.FCO2_EQU, new ArrayList<String>(Arrays.asList("microatmospheres")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.FCO2_SST, new ArrayList<String>(Arrays.asList("microatmospheres")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SUPPLEMENTAL, new ArrayList<String>(Arrays.asList("")));
+	}
 
 	/**
 	 * Generate the encrypted password for a given plain-text username 

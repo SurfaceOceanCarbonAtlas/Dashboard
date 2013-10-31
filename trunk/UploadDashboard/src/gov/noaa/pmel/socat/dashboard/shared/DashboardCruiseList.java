@@ -5,15 +5,18 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.HashMap;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * Represents a list of uploaded cruises for a user,
  * mapped by cruise expocode.
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseList extends HashMap<String,DashboardCruise> {
+public class DashboardCruiseList extends HashMap<String,DashboardCruise> 
+												implements IsSerializable {
 
-	private static final long serialVersionUID = 4798888572810557981L;
+	private static final long serialVersionUID = -2223946990539617665L;
 
 	String username;
 

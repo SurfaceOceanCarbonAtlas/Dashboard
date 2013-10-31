@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;
@@ -88,7 +89,7 @@ public class CruiseDataColumn {
 										new HasCell<CruiseDataColumn,String>() {
 			// SelectionCell needs a List, not just a Collection
 			SelectionCell typeSelectCell = new SelectionCell(new ArrayList<String>(
-					CruiseDataColumnType.STD_HEADER_NAMES.values()));
+					DashboardUtils.STD_HEADER_NAMES.values()));
 			@Override
 			public SelectionCell getCell() {
 				return typeSelectCell;
@@ -106,7 +107,7 @@ public class CruiseDataColumn {
 							return;
 						// Assign the data type corresponding to this String value
 						for ( Entry<CruiseDataColumnType,String> stdNameEntry : 
-							CruiseDataColumnType.STD_HEADER_NAMES.entrySet() ) {
+							DashboardUtils.STD_HEADER_NAMES.entrySet() ) {
 							if ( value.equals(stdNameEntry.getValue()) ) {
 								dataCol.cruise.getDataColTypes().set(
 										dataCol.columnIndex, stdNameEntry.getKey());
@@ -118,7 +119,7 @@ public class CruiseDataColumn {
 			}
 			@Override
 			public String getValue(CruiseDataColumn dataCol) {
-				return CruiseDataColumnType.STD_HEADER_NAMES.get(
+				return DashboardUtils.STD_HEADER_NAMES.get(
 						dataCol.cruise.getDataColTypes().get(dataCol.columnIndex));
 			}
 		};

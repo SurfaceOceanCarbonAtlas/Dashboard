@@ -5,9 +5,9 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsServiceAsync;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 
@@ -205,7 +205,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			throw new IllegalArgumentException(
 					"Unexpected small number of data columns: " + 
 					cruise.getDataColTypes().size());
-		int minTableWidth = 0;
+		int minTableWidth = 2;
 		for (k = 0; k < cruise.getDataColTypes().size(); k++) {
 			// TextColumn for displaying the data strings for this column
 			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k);
@@ -219,11 +219,11 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			dataGrid.addColumn(dataColumn, cruiseColumn.createHeader());
 
 			// Get the width for this column
-			int colWidth = 3;
+			int colWidth = 15;
 			int len = cruise.getUserColNames().get(k).length();
 			if ( colWidth < len )
 				colWidth = len;
-			len = CruiseDataColumnType.STD_HEADER_NAMES.get(
+			len = DashboardUtils.STD_HEADER_NAMES.get(
 					cruise.getDataColTypes().get(k)).length();
 			if ( colWidth < len )
 				colWidth = len;
@@ -239,18 +239,18 @@ public class CruiseDataColumnSpecsPage extends Composite {
 				}
 			}
 			// Limit the column width in case URLs or filenames are given
-			if ( colWidth > 16 )
-				colWidth = 16;
+			if ( colWidth > 24 )
+				colWidth = 24;
 			// Set the width of this column
-			dataGrid.setColumnWidth(dataColumn, (double) colWidth, Style.Unit.EM);
+			dataGrid.setColumnWidth(dataColumn, 0.75 * colWidth, Style.Unit.EM);
 			// Add this width to the minimum table width
 			minTableWidth += colWidth;
 		}
 		// Make sure the table has some reasonable minimum width
-		if ( minTableWidth < 45 )
-			minTableWidth = 45;
+		if ( minTableWidth < 60 )
+			minTableWidth = 60;
 		// Set the minimum table width
-		dataGrid.setMinimumTableWidth((double) minTableWidth, Style.Unit.EM);
+		dataGrid.setMinimumTableWidth(0.75 * minTableWidth, Style.Unit.EM);
 		// Update the data provider with the data in the CruiseDataColumnSpecs
 		dataProvider.updateRowCount(cruise.getNumDataRows(), true);
 		dataProvider.updateRowData(0, cruiseSpecs.getDataValues());

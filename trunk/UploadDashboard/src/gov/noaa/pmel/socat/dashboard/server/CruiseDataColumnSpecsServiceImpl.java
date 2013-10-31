@@ -130,6 +130,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 			ArrayList<String> colNames = cruiseData.getUserColNames();
 			ArrayList<String> colUnits = cruiseData.getDataColUnits();
 			ArrayList<String> colDescripts = cruiseData.getDataColDescriptions();
+			ArrayList<Integer> colQualities = cruiseData.getDataColQualities();
 			ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
 			// Remove the columns to be deleted by column index - last index first 
 			for ( int idx : delIdxs ) {
@@ -138,6 +139,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 				colNames.remove(idx);
 				colUnits.remove(idx);
 				colDescripts.remove(idx);
+				colQualities.remove(idx);
 				for ( ArrayList<String> dataRow : dataVals )
 					dataRow.remove(idx);
 			}
