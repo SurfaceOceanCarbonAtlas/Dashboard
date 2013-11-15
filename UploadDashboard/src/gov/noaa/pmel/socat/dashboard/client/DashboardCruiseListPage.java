@@ -11,6 +11,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -81,9 +82,9 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String DATA_CHECK_HOVER_HELP =
 			"assign data column types and programmatically check the data in the selected cruise";
 
-	private static final String META_CHECK_TEXT = "Check Metadata";
-	private static final String META_CHECK_HOVER_HELP =
-			"programmatically check the metadata in the selected cruise";
+	private static final String METADATA_TEXT = "Associate Metadata";
+	private static final String METADATA_HOVER_HELP =
+			"associate metadata files to the selected cruises";
 
 	private static final String REVIEW_TEXT = "Review with LAS";
 	private static final String REVIEW_HOVER_HELP =
@@ -140,7 +141,7 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data check";
-	private static final String META_CHECK_COLUMN_NAME = "Meta check";
+	private static final String METADATA_COLUMN_NAME = "Metadata";
 	private static final String SUBMITTED_COLUMN_NAME = "Submitted";
 	private static final String ARCHIVED_COLUMN_NAME = "Archived";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
@@ -149,7 +150,8 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String EMPTY_TABLE_TEXT = "No uploaded cruises";
 	private static final String NO_EXPOCODE_STRING = "(unknown)";
 	private static final String NO_OWNER_STRING = "(unknown)";
-	private static final String NO_CHECK_STATUS_STRING = "(not checked)";
+	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
+	private static final String NO_METADATA_STATUS_STRING = "(no metadata)";
 	private static final String NO_QC_STATUS_STRING = "(not submitted)";
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
@@ -219,8 +221,8 @@ public class DashboardCruiseListPage extends Composite {
 		dataCheckButton.setText(DATA_CHECK_TEXT);
 		dataCheckButton.setTitle(DATA_CHECK_HOVER_HELP);
 
-		metaCheckButton.setText(META_CHECK_TEXT);
-		metaCheckButton.setTitle(META_CHECK_HOVER_HELP);
+		metaCheckButton.setText(METADATA_TEXT);
+		metaCheckButton.setTitle(METADATA_HOVER_HELP);
 
 		reviewButton.setText(REVIEW_TEXT);
 		reviewButton.setTitle(REVIEW_HOVER_HELP);
@@ -515,7 +517,7 @@ public class DashboardCruiseListPage extends Composite {
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
-		TextColumn<DashboardCruise> metaCheckColumn = buildMetaCheckColumn();
+		TextColumn<DashboardCruise> metadataColumn = buildMetadataColumn();
 		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
 		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
@@ -525,7 +527,7 @@ public class DashboardCruiseListPage extends Composite {
 		uploadsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
 		uploadsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
 		uploadsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
-		uploadsGrid.addColumn(metaCheckColumn, META_CHECK_COLUMN_NAME);
+		uploadsGrid.addColumn(metadataColumn, METADATA_COLUMN_NAME);
 		uploadsGrid.addColumn(qcStatusColumn, SUBMITTED_COLUMN_NAME);
 		uploadsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
 		uploadsGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
@@ -540,7 +542,7 @@ public class DashboardCruiseListPage extends Composite {
 		tableWidth += 8.0;
 		uploadsGrid.setColumnWidth(dataCheckColumn, 8.0, Style.Unit.EM);
 		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(metaCheckColumn, 8.0, Style.Unit.EM);
+		uploadsGrid.setColumnWidth(metadataColumn, 8.0, Style.Unit.EM);
 		tableWidth += 8.0;
 		uploadsGrid.setColumnWidth(qcStatusColumn, 8.0, Style.Unit.EM);
 		tableWidth += 8.0;
@@ -561,7 +563,7 @@ public class DashboardCruiseListPage extends Composite {
 		expocodeColumn.setSortable(true);
 		ownerColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
-		metaCheckColumn.setSortable(true);
+		metadataColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
 		filenameColumn.setSortable(true);
@@ -577,8 +579,8 @@ public class DashboardCruiseListPage extends Composite {
 				DashboardCruise.ownerComparator);
 		columnSortHandler.setComparator(dataCheckColumn, 
 				DashboardCruise.dataCheckComparator);
-		columnSortHandler.setComparator(metaCheckColumn, 
-				DashboardCruise.metadataCheckComparator);
+		columnSortHandler.setComparator(metadataColumn, 
+				DashboardCruise.metadataFilenamesComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
 				DashboardCruise.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
@@ -668,7 +670,7 @@ public class DashboardCruiseListPage extends Composite {
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getDataCheckStatus();
 				if ( status.isEmpty() )
-					status = NO_CHECK_STATUS_STRING;
+					status = NO_DATA_CHECK_STATUS_STRING;
 				return status;
 			}
 		};
@@ -676,17 +678,26 @@ public class DashboardCruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the metadata-check status column for the table
+	 * Creates the metadata files column for the table
 	 */
-	private TextColumn<DashboardCruise> buildMetaCheckColumn() {
+	private TextColumn<DashboardCruise> buildMetadataColumn() {
 		TextColumn<DashboardCruise> metaCheckColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				String status = cruise.getMetadataCheckStatus();
-				if ( status.isEmpty() )
-					status = NO_CHECK_STATUS_STRING;
-				return status;
+				TreeSet<String> filenames = cruise.getMetadataFilenames();
+				if ( filenames.size() == 0 )
+					return NO_METADATA_STATUS_STRING;
+				StringBuilder sb = new StringBuilder();
+				boolean firstEntry = true;
+				for ( String name : filenames ) {
+					if ( firstEntry )
+						firstEntry = false;
+					else
+						sb.append("; ");
+					sb.append(name);
+				}
+				return sb.toString();
 			}
 		};
 		return metaCheckColumn;
