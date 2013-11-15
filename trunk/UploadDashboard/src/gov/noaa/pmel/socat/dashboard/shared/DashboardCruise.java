@@ -5,6 +5,8 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -19,7 +21,7 @@ public class DashboardCruise implements IsSerializable {
 	String owner;
 	String expocode;
 	String dataCheckStatus;
-	String metadataCheckStatus;
+	TreeSet<String> metadataFilenames;
 	String qcStatus;
 	String archiveStatus;
 	String uploadFilename;
@@ -36,7 +38,7 @@ public class DashboardCruise implements IsSerializable {
 		owner = "";
 		expocode = "";
 		dataCheckStatus = "";
-		metadataCheckStatus = "";
+		metadataFilenames = new TreeSet<String>();
 		qcStatus = "";
 		archiveStatus = "";
 		uploadFilename = "";
@@ -128,22 +130,24 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the metadata check status; never null
+	 * 		the metadata filenames associated with this cruise; 
+	 * 		may be empty but never null.  The actual set of strings
+	 * 		in this object is returned.
 	 */
-	public String getMetadataCheckStatus() {
-		return metadataCheckStatus;
+	public TreeSet<String> getMetadataFilenames() {
+		return metadataFilenames;
 	}
 
 	/**
-	 * @param metadataCheckDate
-	 * 		the metadata check status to set;
-	 * 		if null, sets to an empty string
+	 * @param metadataFilenames
+	 * 		the set of metadata filenames for this cruise.  The set in 
+	 * 		this object is cleared and all the contents of the given set, 
+	 * 		if not null, are added. 
 	 */
-	public void setMetadataCheckStatus(String metadataCheckStatus) {
-		if ( metadataCheckStatus == null )
-			this.metadataCheckStatus = "";
-		else
-			this.metadataCheckStatus = metadataCheckStatus;
+	public void setMetadataFilenames(TreeSet<String> metadataFilenames) {
+		this.metadataFilenames.clear();
+		if ( metadataFilenames != null )
+			this.metadataFilenames.addAll(metadataFilenames);
 	}
 
 	/**
@@ -366,7 +370,7 @@ public class DashboardCruise implements IsSerializable {
 		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
-		result = result * prime + metadataCheckStatus.hashCode();
+		result = result * prime + metadataFilenames.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
 		result = result * prime + uploadFilename.hashCode();
@@ -399,7 +403,7 @@ public class DashboardCruise implements IsSerializable {
 			return false;
 		if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
 			return false;
-		if ( ! metadataCheckStatus.equals(other.metadataCheckStatus) )
+		if ( ! metadataFilenames.equals(other.metadataFilenames) )
 			return false;
 		if ( ! qcStatus.equals(other.qcStatus) )
 			return false;
@@ -431,7 +435,7 @@ public class DashboardCruise implements IsSerializable {
 				",\n    owner=" + owner + 
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
-				",\n    metadataCheckStatus=" + metadataCheckStatus +
+				",\n    metadataFilenames=" + metadataFilenames +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    uploadFilename=" + uploadFilename +
@@ -447,7 +451,8 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * Compare using the "selected" property of cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> selectedComparator =
 			new Comparator<DashboardCruise>() {
@@ -466,7 +471,8 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * Compare using the owner of cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> ownerComparator =
 			new Comparator<DashboardCruise>() {
@@ -484,7 +490,8 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * Compare using the expocode of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> expocodeComparator = 
 			new Comparator<DashboardCruise>() {
@@ -502,7 +509,8 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * Compare using the data check status of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> dataCheckComparator = 
 			new Comparator<DashboardCruise>() {
@@ -519,10 +527,11 @@ public class DashboardCruise implements IsSerializable {
 	};
 
 	/**
-	 * Compare using the metadata check status of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Compare using the metadata filenames of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
-	public static Comparator<DashboardCruise> metadataCheckComparator = 
+	public static Comparator<DashboardCruise> metadataFilenamesComparator = 
 			new Comparator<DashboardCruise>() {
 		@Override
 		public int compare(DashboardCruise c1, DashboardCruise c2) {
@@ -532,13 +541,28 @@ public class DashboardCruise implements IsSerializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			return c1.getMetadataCheckStatus().compareTo(c2.getMetadataCheckStatus());
+			Iterator<String> iter1 = c1.getMetadataFilenames().iterator();
+			Iterator<String> iter2 = c2.getMetadataFilenames().iterator();
+			while ( iter1.hasNext() && iter2.hasNext() ) {
+				int result = iter1.next().compareTo(iter2.next());
+				if ( result != 0 )
+					return result;
+			}
+			// The lists are the same up to the minimum number of strings given,
+			// so the list with more items is larger; or they are equal if they
+			// both have no more items
+			if ( iter1.hasNext() )
+				return 1;
+			if ( iter2.hasNext() )
+				return -1;
+			return 0;
 		}
 	};
 
 	/**
 	 * Compare using the QC status string of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> qcStatusComparator = 
 			new Comparator<DashboardCruise>() {
@@ -556,7 +580,8 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * Compare using the archive status of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> archiveStatusComparator = 
 			new Comparator<DashboardCruise>() {
@@ -574,7 +599,8 @@ public class DashboardCruise implements IsSerializable {
 
 	/**
 	 * Compare using the upload filename of the cruises
-	 * Note that this is inconsistent with DashboardCruise.equals.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
 	 */
 	public static Comparator<DashboardCruise> filenameComparator = 
 			new Comparator<DashboardCruise>() {

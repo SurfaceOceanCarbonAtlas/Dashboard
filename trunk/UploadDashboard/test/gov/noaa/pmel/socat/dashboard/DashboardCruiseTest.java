@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeSet;
 
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
@@ -94,22 +95,25 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getMetadataCheckStatus()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setMetadataCheckStatus(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getMetadataFilenames()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setMetadataFilenames(java.util.TreeSet)}.
 	 */
 	@Test
-	public void testSetGetMetadataCheckStatus() {
-		String myMetaStatus = "Questionable";
+	public void testSetGetMetadataFilenames() {
+		TreeSet<String> myMetaNames = new TreeSet<String>(Arrays.asList(
+				"ABCD20050728_metadata.xml", 
+				"ABCD20050728_metadata_2.doc", 
+				"ABCD20050728_metadata_3.pdf"));
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getMetadataCheckStatus());
-		cruise.setMetadataCheckStatus(myMetaStatus);
-		assertEquals(myMetaStatus, cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
+		cruise.setMetadataFilenames(myMetaNames);
+		assertEquals(myMetaNames, cruise.getMetadataFilenames());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setMetadataCheckStatus(null);
-		assertEquals("", cruise.getMetadataCheckStatus());
+		cruise.setMetadataFilenames(null);
+		assertEquals(0, cruise.getMetadataFilenames().size());
 	}
 
 	/**
@@ -123,7 +127,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getQcStatus());
 		cruise.setQcStatus(myQCStatus);
 		assertEquals(myQCStatus, cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -144,7 +148,7 @@ public class DashboardCruiseTest {
 		cruise.setArchiveStatus(myArchiveStatus);
 		assertEquals(myArchiveStatus, cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -166,7 +170,7 @@ public class DashboardCruiseTest {
 		assertEquals(myFilename, cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -189,7 +193,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -220,7 +224,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -246,7 +250,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -273,7 +277,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -301,7 +305,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -336,7 +340,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -366,7 +370,7 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals("", cruise.getMetadataCheckStatus());
+		assertEquals(0, cruise.getMetadataFilenames().size());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -384,7 +388,10 @@ public class DashboardCruiseTest {
 		String myOwner = "SocatUser";
 		String myExpocode = "ABCD20050728";
 		String myDataStatus = "Acceptable";
-		String myMetaStatus = "Questionable";
+		TreeSet<String> myMetaNames = new TreeSet<String>(Arrays.asList(
+				"ABCD20050728_metadata.xml", 
+				"ABCD20050728_metadata_2.doc", 
+				"ABCD20050728_metadata_3.pdf"));
 		String myQCStatus = "Submitted";
 		String myArchiveStatus = "Next SOCAT release";
 		String myFilename = "myUploadFilename.tsv";
@@ -451,10 +458,10 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setMetadataCheckStatus(myMetaStatus);
+		firstCruise.setMetadataFilenames(myMetaNames);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setMetadataCheckStatus(myMetaStatus);
+		secondCruise.setMetadataFilenames(myMetaNames);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 

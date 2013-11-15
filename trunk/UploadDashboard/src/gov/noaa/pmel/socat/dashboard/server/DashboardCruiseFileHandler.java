@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +32,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String DATA_OWNER_ID = "dataowner=";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename=";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus=";
-	private static final String METADATA_CHECK_STATUS_ID = "metadatacheckstatus=";
+	private static final String METADATA_FILENAMES_ID = "metadatafilenames=";
 	private static final String QC_STATUS_ID = "qcstatus=";
 	private static final String ARCHIVE_STATUS_ID = "archivestatus=";
 	private static final String NUM_DATA_ROWS_ID = "numdatarows=";
@@ -569,9 +570,11 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				// Data-check status string
 				writer.println(DATA_CHECK_STATUS_ID + 
 						cruiseData.getDataCheckStatus());
-				// Metadata-check status string
-				writer.println(METADATA_CHECK_STATUS_ID + 
-						cruiseData.getMetadataCheckStatus());
+				// Metadata filenames
+				// a little arguably unnecessary overhead going through an ArrayList<String>
+				writer.println(METADATA_FILENAMES_ID + 
+						DashboardUtils.encodeStringArrayList(new ArrayList<String>(
+								cruiseData.getMetadataFilenames())));
 				// QC-submission status string
 				writer.println(QC_STATUS_ID + 
 						cruiseData.getQcStatus());
@@ -710,13 +713,15 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		cruise.setDataCheckStatus(
 				dataline.substring(DATA_CHECK_STATUS_ID.length()).trim());
 
-		// Get the metadata check status for this cruise
+		// Get the metadata filenames for this cruise
 		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(METADATA_CHECK_STATUS_ID) )
+		if ( ! dataline.startsWith(METADATA_FILENAMES_ID) )
 			throw new IOException(
-					"fourth line does not start with " + METADATA_CHECK_STATUS_ID);
-		cruise.setMetadataCheckStatus(
-				dataline.substring(METADATA_CHECK_STATUS_ID.length()).trim());
+					"fourth line does not start with " + METADATA_FILENAMES_ID);
+		// a little arguably unnecessary overhead going through an ArrayList<String>
+		cruise.setMetadataFilenames(new TreeSet<String>(
+				DashboardUtils.decodeStringArrayList(
+						dataline.substring(METADATA_FILENAMES_ID.length()).trim())));
 
 		// Get the QC status for this cruise
 		dataline = cruiseReader.readLine();
