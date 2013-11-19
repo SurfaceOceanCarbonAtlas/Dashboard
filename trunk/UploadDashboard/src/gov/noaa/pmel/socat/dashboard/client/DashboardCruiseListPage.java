@@ -175,7 +175,7 @@ public class DashboardCruiseListPage extends Composite {
 	@UiField Button uploadButton;
 	@UiField Button deleteButton;
 	@UiField Button dataCheckButton;
-	@UiField Button metaCheckButton;
+	@UiField Button metadataButton;
 	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
 	@UiField Button archiveSubmitButton;
@@ -221,8 +221,8 @@ public class DashboardCruiseListPage extends Composite {
 		dataCheckButton.setText(DATA_CHECK_TEXT);
 		dataCheckButton.setTitle(DATA_CHECK_HOVER_HELP);
 
-		metaCheckButton.setText(METADATA_TEXT);
-		metaCheckButton.setTitle(METADATA_HOVER_HELP);
+		metadataButton.setText(METADATA_TEXT);
+		metadataButton.setTitle(METADATA_HOVER_HELP);
 
 		reviewButton.setText(REVIEW_TEXT);
 		reviewButton.setTitle(REVIEW_HOVER_HELP);
@@ -436,8 +436,8 @@ public class DashboardCruiseListPage extends Composite {
 		CruiseDataColumnSpecsPage.showPage(expocode, DashboardCruiseListPage.this);
 	}
 
-	@UiHandler("metaCheckButton")
-	void metadataCheckOnClick(ClickEvent event) {
+	@UiHandler("metadataButton")
+	void metadataOnClick(ClickEvent event) {
 		Window.alert("Not yet implemented");
 	}
 
@@ -558,7 +558,7 @@ public class DashboardCruiseListPage extends Composite {
 		listProvider = new ListDataProvider<DashboardCruise>();
 		listProvider.addDataDisplay(uploadsGrid);
 
-		// Make some of the columns sortable
+		// Make the columns sortable
 		selectedColumn.setSortable(true);
 		expocodeColumn.setSortable(true);
 		ownerColumn.setSortable(true);

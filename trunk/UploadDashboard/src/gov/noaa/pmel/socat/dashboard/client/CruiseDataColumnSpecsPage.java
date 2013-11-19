@@ -267,9 +267,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
-		// Change to the latest cruise listing page and discard this page. 
-		// (These pages are not kept by DashboardPageFactory.)  The cruise
-		// listing may have been updated from previous actions on this page.
+		// Change to the latest cruise listing page, which may  
+		// have been updated from previous actions on this page.
 		DashboardCruiseListPage.showPage(
 				CruiseDataColumnSpecsPage.this, GET_CRUISE_LIST_FAIL_MSG);
 	}

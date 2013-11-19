@@ -14,7 +14,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +33,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 
 	private ServletFileUpload cruiseUpload;
 
-	public DashboardCruiseUploadService() throws IOException {
+	public DashboardCruiseUploadService() {
 		File servletTmpDir;
 		try {
 			// Get the temporary directory used by the servlet
@@ -56,7 +55,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-											throws ServletException, IOException {
+																throws IOException {
 		// Verify the post has the correct encoding
 		if ( ! ServletFileUpload.isMultipartContent(request) ) {
 			response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
