@@ -36,7 +36,7 @@
 					<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="deleteButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="dataCheckButton" />
-					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="metaCheckButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="metadataButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="qcSubmitButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="archiveSubmitButton" />

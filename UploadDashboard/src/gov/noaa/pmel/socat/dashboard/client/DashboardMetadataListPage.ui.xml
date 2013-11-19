@@ -6,27 +6,34 @@
 	<ui:style src="CommonFullWidth.css" />
 
 	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:north size="6">
+		<g:east size="0.5">
+			<!-- Just to give uniform padding -->
+			<g:Label />
+		</g:east>
+		<g:north size="9">
 			<g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.userinfopanel}">
 					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
 					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 				</g:FlowPanel>
-				<g:Label addStyleNames="{style.cruiselabel}" ui:field="cruiseLabel" />
+				<g:HTML addStyleNames="{style.cruisenamesintro}" ui:field="cruiseNamesHtml" />
 			</g:FlowPanel>
 		</g:north>
-		<g:south size="6">
-			<g:FlowPanel>
-				<cell:SimplePager location="CENTER" addStyleNames="{style.gridpager}" ui:field="gridPager" />
-				<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
-					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
-				</g:FlowPanel>
+		<g:south size="4">
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
 			</g:FlowPanel>
 		</g:south>
+		<g:west size="12">
+			<g:FlowPanel addStyleNames="{style.uploadpanel}">
+				<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="uploadNewButton" />
+				<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="uploadUpdateButton" />
+			</g:FlowPanel>
+		</g:west>
 		<g:center>
 			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid ui:field="dataGrid" />
+				<cell:DataGrid ui:field="uploadsGrid" />
 			</g:ResizeLayoutPanel>
 		</g:center>
 	</g:DockLayoutPanel>
