@@ -87,12 +87,12 @@ public class DashboardCruiseUploadPage extends Composite {
 	private static final String LIST_UPDATE_FAIL_MSG =
 			"Updating of the cruise list failed for some unexpected reason";
 
-	interface DashboardNewCruisePageUiBinder 
+	interface DashboardCruiseUploadPageUiBinder 
 			extends UiBinder<Widget, DashboardCruiseUploadPage> {
 	}
 
-	private static DashboardNewCruisePageUiBinder uiBinder = 
-			GWT.create(DashboardNewCruisePageUiBinder.class);
+	private static DashboardCruiseUploadPageUiBinder uiBinder = 
+			GWT.create(DashboardCruiseUploadPageUiBinder.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -170,30 +170,37 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("previewButton") 
 	void previewButtonOnClick(ClickEvent event) {
+		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
+		// Submit the form
 		uploadForm.submit();
 	}
 
 	@UiHandler("createButton") 
 	void createButtonOnClick(ClickEvent event) {
+		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
+		// Submit the form
 		uploadForm.submit();
 	}
 
 	@UiHandler("overwriteButton") 
 	void overwriteButtonOnClick(ClickEvent event) {
+		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
+		// Submit the form
 		uploadForm.submit();
 	}
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
+		// Return to the cruise list page
 		DashboardCruiseListPage.showPage(DashboardCruiseUploadPage.this, 
 											GET_CRUISE_LIST_FAIL_MSG);
 	}
@@ -210,10 +217,12 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
+		// Clear the "hidden" values
 		usernameToken.setValue("");
 		passhashToken.setValue("");
 		actionToken.setValue("");
 
+		// Check the returned results
 		String resultMsg = event.getResults();
 		if ( resultMsg == null ) {
 			Window.alert("Unexpected null result from submit complete");

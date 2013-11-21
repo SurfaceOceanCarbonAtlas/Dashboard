@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -47,7 +48,7 @@ public interface DashboardMetadataListServiceAsync {
 	 * 		if a metadata expocode filename is invalid, or if the update failed
 	 */
 	void associateMetadata(String username, String passhash,
-			HashSet<String> cruiseExpocodes,
+			TreeSet<String> cruiseExpocodes,
 			HashSet<String> metadataExpocodeFilenames,
 			AsyncCallback<Void> callback);
 
