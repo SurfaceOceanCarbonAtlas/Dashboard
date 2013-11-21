@@ -6,12 +6,19 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,6 +33,8 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 
 	private static final String USER_CRUISE_LIST_NAME_EXTENSION = 
 			"_cruise_list.txt";
+	private static final String USER_METADATA_LIST_NAME_EXTENSION =
+			"_metadata_list.xml";
 
 	/**
 	 * Handles storage and retrieval of user data in files under 
@@ -45,7 +54,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 					String svnPassword) throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
 	}
-	
+
 	/**
 	 * Gets the list of cruises for a user
 	 * 
@@ -62,7 +71,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardCruiseList getCruiseListing(String username) 
 										throws IllegalArgumentException {
-		// Get the name of the cruise list XML file for this user
+		// Get the name of the cruise list file for this user
 		if ( (username == null) || username.trim().isEmpty() )
 			throw new IllegalArgumentException("invalid username");
 		File userDataFile = new File(filesDir, 
@@ -139,12 +148,12 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	public void saveCruiseListing(DashboardCruiseList cruiseList, 
 						String message) throws IllegalArgumentException {
 		String username = cruiseList.getUsername();
-		// Get the name of the cruise list XML file for this user
+		// Get the name of the cruise list file for this user
 		if ( (username == null) || username.isEmpty() )
 			throw new IllegalArgumentException("invalid username");
 		File userDataFile = new File(filesDir, 
 				username + USER_CRUISE_LIST_NAME_EXTENSION);
-		// Write the current cruise list to the XML file
+		// Write the expocodes of the cruises in the listing to the file
 		try {
 			PrintWriter expoWriter = new PrintWriter(userDataFile);
 			try {
@@ -254,6 +263,108 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			saveCruiseListing(cruiseList, commitMessage);
 		}
 		return cruiseList;
+	}
+
+	/**
+	 * Gets the list of available metadata documents for a user
+	 * 
+	 * @param username
+	 * 		get available metadata documents for this user
+	 * @return
+	 * 		the listing of metadata documents for the user
+	 * @throws IllegalArgumentException
+	 * 		if username was invalid or if there was a problem
+	 * 		reading an existing metadata documents listing
+	 */
+	public DashboardMetadataList getMetadataListing(String username) 
+										throws IllegalArgumentException {
+		// Get the name of the metadata list file for this user
+		if ( (username == null) || username.trim().isEmpty() )
+			throw new IllegalArgumentException("invalid username");
+		// Create the DashboardMetadataList to return
+		DashboardMetadataList metadataList = new DashboardMetadataList();
+		metadataList.setUsername(username);
+		// Get the metadata list file for this user
+		File userDataFile = new File(filesDir, 
+				username + USER_METADATA_LIST_NAME_EXTENSION);
+		// Read the metadata documents from the list file
+		try {
+			ObjectInputStream objInpStream = 
+					new ObjectInputStream(new FileInputStream(userDataFile));
+			try {
+				for (;;) {
+					// Read objects until an EOFException is thrown
+					DashboardMetadata mdata = 
+							(DashboardMetadata) objInpStream.readObject();
+					// Add this metadata object to the set
+					metadataList.add(mdata);
+				}
+			} finally {
+				objInpStream.close();
+			}
+		} catch ( FileNotFoundException ex ) {
+			// No metadata list file for this user
+			;
+		} catch ( EOFException ex ) {
+			// Normal end of reading the object input stream
+			;
+		} catch ( Exception ex ) {
+			// Problems with the listing in the existing file
+			throw new IllegalArgumentException(
+					"Problems reading the metadata listing from " + 
+					userDataFile.getPath() + ": " + ex.getMessage());
+		}
+		// Return the metadata list populated with the metadata objects read
+		return metadataList;
+	}
+
+	/**
+	 * Saves the list of available metadata documents for a user
+	 * 
+	 * @param metadataList
+	 * 		listing of metadata documents to be saved
+	 * @param message
+	 * 		version control commit message; 
+	 * 		if null or blank, the commit will not be performed 
+	 * @throws IllegalArgumentException
+	 * 		if the metadata listing was invalid, if there was 
+	 * 		a problem saving the metadata listing, or if there 
+	 * 		was an error committing the updated file to 
+	 * 		version control
+	 */
+	public void saveMetadataListing(DashboardMetadataList metadataList, 
+						String message) throws IllegalArgumentException {
+		String username = metadataList.getUsername();
+		// Get the name of the metadata list XML file for this user
+		if ( (username == null) || username.isEmpty() )
+			throw new IllegalArgumentException("invalid username");
+		File userMetaListFile = new File(filesDir, 
+				username + USER_METADATA_LIST_NAME_EXTENSION);
+		// Write the current set of metadata objects to the XML file
+		try {
+			ObjectOutputStream objOutStream = 
+					new ObjectOutputStream(new FileOutputStream(userMetaListFile));
+			try {
+				for ( DashboardMetadata mdata : metadataList )
+					objOutStream.writeObject(mdata);
+			} finally {
+				objOutStream.close();
+			}
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems saving the metadata listing " + 
+					userMetaListFile.getPath() + ": " + ex.getMessage());
+		}
+		if ( (message == null) || message.trim().isEmpty() )
+			return;
+		// Commit the update to this metadata listing
+		try {
+			commitVersion(userMetaListFile, message);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems committing the updated cruise listing: " + 
+					ex.getMessage());
+		}
 	}
 
 	/**

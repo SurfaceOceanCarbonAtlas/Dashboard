@@ -38,6 +38,7 @@ public class DashboardDataStore {
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
+	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
@@ -51,6 +52,7 @@ public class DashboardDataStore {
 			SVN_PASSWORD_NAME_TAG + "=SVNPasswork" +
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
+			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=Member1,Member2 \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeManagerName=AnotherVeryLongKeyOfHexidecimalValues \n" +
@@ -72,6 +74,7 @@ public class DashboardDataStore {
 	private String socatVersion;
 	private DashboardUserFileHandler userFileHandler;
 	private DashboardCruiseFileHandler cruiseFileHandler;
+	private DashboardMetadataFileHandler metadataFileHandler;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -199,6 +202,19 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + 
 					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+		// Read the metadata files directory name
+		try {
+			propVal = configProps.getProperty(METADATA_FILES_DIR_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			metadataFileHandler = new DashboardMetadataFileHandler(propVal,
+					svnUsername, svnPassword);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + 
+					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
 		for ( Entry<Object,Object> entry : configProps.entrySet() ) {
@@ -279,6 +295,14 @@ public class DashboardDataStore {
 	 */
 	public DashboardCruiseFileHandler getCruiseFileHandler() {
 		return cruiseFileHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the handler for cruise metadata documents
+	 */
+	public DashboardMetadataFileHandler getMetadataFileHandler() {
+		return metadataFileHandler;
 	}
 
 	/**
