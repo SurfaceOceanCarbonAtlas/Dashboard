@@ -6,12 +6,11 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.TreeSet;
 
+import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.tmatesoft.svn.core.SVNException;
 
 /**
@@ -56,8 +55,8 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 	 * @return
 	 * 		a new expocode filename for this metadata file
 	 */
-	private String newMetadataFilename(String cruiseExpocode, 
-									   String uploadFilename) {
+	private String newMetadataExpocodeFilename(String cruiseExpocode, 
+											   String uploadFilename) {
 		// Make sure the expocode is uppercase
 		String upperExpocode = cruiseExpocode.toUpperCase();
 		// Root of the expocode filename
@@ -101,7 +100,7 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 			}
 		}
 		// Copy the filename extension from the upload filename
-		int idx = uploadFilename.indexOf(".");
+		int idx = uploadFilename.lastIndexOf(".");
 		if ( idx > 0 )
 			filename += uploadFilename.substring(idx);
 		return filename;
@@ -113,13 +112,13 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 	 * @param cruiseExpocode
 	 * 		cruise expocode to be associated with this metadata.
 	 * 		This is used to create the root of the expocode filename.
-	 * @param uploadFilename
-	 * 		name of the file that was uploaded.  This is used to
-	 * 		create the extension of the expocode filename.
 	 * @param owner
-	 * 		owner of the metadata
-	 * @param uploadStream
-	 * 		file upload stream provided the metadata contents
+	 * 		owner of the metadata.  This is only used when creating 
+	 * 		the returned DashboardMetadata object.
+	 * @param uploadFileItem
+	 * 		upload file item providing the metadata contents as well
+	 * 		as the name of the upload file.  This upload filename is 
+	 * 		used to create the extension of the expocode filename.
 	 * @return
 	 * 		a DashboardMetadata describing the new metadata document 
 	 * @throws IOException
@@ -129,41 +128,99 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 	 * 		if problems committing the new metadata document to version control
 	 */
 	public DashboardMetadata saveNewMetadataFile(String cruiseExpocode, 
-			String uploadFilename, String owner, InputStream uploadStream) 
-														throws IOException {
+			String owner, FileItem uploadFileItem) throws IOException {
 		// Note: potential clash in the code below in the unlikely situation 
 		// where two threads are simultaneously creating metadata files for 
 		// the same cruise
 
 		// Create a new metadata filename
-		String metadataFilename = 
-				newMetadataFilename(cruiseExpocode, uploadFilename);
-		// Create the new metadata file
-		File metadataFile = new File(filesDir, 
-				metadataFilename.substring(0,4) +
-				File.separatorChar + metadataFilename);
-		FileOutputStream output = new FileOutputStream(metadataFile);
-		byte[] buffer = new byte[2048];
-		int k = uploadStream.read(buffer);
-		while ( k > 0 ) {
-			output.write(buffer, 0, k);
-			k = uploadStream.read(buffer);
-		}
-		output.close();
+		String uploadFilename = uploadFileItem.getName();
+		String expocodeFilename = 
+				newMetadataExpocodeFilename(cruiseExpocode, uploadFilename);
 
+		// Create the new metadata file from the uploaded contents
+		File metadataFile = new File(filesDir, expocodeFilename.substring(0,4) +
+									 File.separatorChar + expocodeFilename);
 		try {
-			commitVersion(metadataFile, "New metadata file " + 
-					metadataFile.toString() + " added for " + owner);
+			uploadFileItem.write(metadataFile);
+		} catch (Exception ex) {
+			throw new IOException(
+					"Problems creating the new metadata document " +
+					expocodeFilename + " (" + uploadFilename + "): " + 
+					ex.getMessage());
+		}
+
+		// Commit the new file to version control
+		try {
+			commitVersion(metadataFile, "New metadata document " + 
+					expocodeFilename + " (" + uploadFilename + 
+					") added for " + owner);
 		} catch (SVNException ex) {
 			throw new IOException("Problems committing " + 
-					metadataFile.toString() + " to version control: " + 
+					metadataFile.getPath() + " to version control: " + 
+					ex.getMessage());
+		}
+
+		// Create the DashboardMetadata to return
+		DashboardMetadata metadata = new DashboardMetadata();
+		metadata.setOwner(owner);
+		metadata.setUploadFilename(uploadFilename);
+		metadata.setExpocodeFilename(expocodeFilename);
+		return metadata;
+	}
+
+	/**
+	 * Update an existing metadata document from the contents of a file upload.
+	 * 
+	 * @param expocodeFilename
+	 * 		expocode filename of the metadata document to update.
+	 * @param owner
+	 * 		owner of the metadata.
+	 * @param uploadFileItem
+	 * 		upload file item providing the metadata contents as well
+	 * 		as the name of the upload file.
+	 * @return
+	 * 		a DashboardMetadata describing the updated metadata document 
+	 * @throws IOException
+	 * 		if metadata document does not already exist,
+	 * 		if problems reading from the file upload stream,
+	 * 		if problems writing to the metadata document, or
+	 * 		if problems committing the metadata document to version control
+	 */
+	public DashboardMetadata saveUpdatedMetadataFile(String expocodeFilename,
+			String owner, FileItem uploadFileItem) throws IOException {
+		// Check the metadata document exists on the system
+		File metadataFile = new File(filesDir, expocodeFilename.substring(0,4) +
+									 File.separatorChar + expocodeFilename);
+		if ( ! metadataFile.exists() ) 
+			throw new IOException("metadata document " + expocodeFilename +
+								  " does not not exist");
+
+		// Create the new metadata file from the uploaded contents
+		String uploadFilename = uploadFileItem.getName();
+		try {
+			uploadFileItem.write(metadataFile);
+		} catch (Exception ex) {
+			throw new IOException(
+					"Problems creating the new metadata document " +
+					expocodeFilename + " (" + uploadFilename + "): " + 
+					ex.getMessage());
+		}
+
+		try {
+			commitVersion(metadataFile, "Updated metadata document " + 
+					expocodeFilename + " (" + uploadFilename + 
+					") added for " + owner);
+		} catch (SVNException ex) {
+			throw new IOException("Problems committing " + 
+					metadataFile.getPath() + " to version control: " + 
 					ex.getMessage());
 		}
 
 		DashboardMetadata metadata = new DashboardMetadata();
 		metadata.setOwner(owner);
 		metadata.setUploadFilename(uploadFilename);
-		metadata.setExpocodeFilename(metadataFilename);
+		metadata.setExpocodeFilename(expocodeFilename);
 		return metadata;
 	}
 

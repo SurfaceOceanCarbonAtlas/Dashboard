@@ -3,8 +3,13 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +24,8 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
  * @author Karl Smith
  */
 public class DashboardMetadataUploadService extends HttpServlet {
+
+	private static final long serialVersionUID = 6095108321672612644L;
 
 	private ServletFileUpload metadataUpload;
 
@@ -71,6 +78,8 @@ public class DashboardMetadataUploadService extends HttpServlet {
 					item.delete();
 				}
 				else if ( "expocodeFilename".equals(itemName) ) {
+					// This is either the complete expocode filename or just 
+					// the cruise expocode, depending on the value of overwrite.
 					expocodeFilename = item.getString();
 					item.delete();
 				}
@@ -97,7 +106,7 @@ public class DashboardMetadataUploadService extends HttpServlet {
 			return;
 		}
 
-		// Verify contents seem okay
+		// Verify page contents seem okay
 		DashboardDataStore dataStore = DashboardDataStore.get();
 		if ( (username == null) || (passhash == null) || (metadataItem == null) || 
 			 (expocodeFilename == null) || (overwrite == null) ||
@@ -108,11 +117,57 @@ public class DashboardMetadataUploadService extends HttpServlet {
 			return;
 		}
 
-		// name of the user's uploaded file
-		String uploadFilename = metadataItem.getName();
+		// Save the metadata document
+		DashboardMetadata metadata;
+		String message;
+		try {
+			if ( overwrite ) {
+				// expocodeFilename is the expocode filename
+				metadata = dataStore.getMetadataFileHandler()
+									.saveUpdatedMetadataFile(expocodeFilename, 
+											username, metadataItem);
+				message = "Updated metadata document " + 
+						metadata.getExpocodeFilename() + " (" + 
+						metadata.getUploadFilename() + ")";
+			}
+			else {
+				// expocodeFilename is just the cruise expocode
+				metadata = dataStore.getMetadataFileHandler()
+									.saveNewMetadataFile(expocodeFilename, 
+											username, metadataItem);
+				message = "Created metadata document " + 
+						metadata.getExpocodeFilename() + " (" + 
+						metadata.getUploadFilename() + ")";
+			}
+			// Done with the uploaded file
+			metadataItem.delete();
+			// Update the available metadata documents for this user
+			DashboardMetadataList metadataList = 
+					dataStore.getUserFileHandler().getMetadataListing(username);
+			metadataList.add(metadata);
+			dataStore.getUserFileHandler()
+					 .saveMetadataListing(metadataList, message);
+		} catch (Exception ex) {
+			metadataItem.delete();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+								ex.getMessage());
+			return;
+		}
 
-		// TODO: 
+		
+		// Send the success response
+		response.setStatus(HttpServletResponse.SC_CREATED);
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter respWriter = response.getWriter();
+		if ( overwrite ) {
+			respWriter.println(DashboardUtils.FILE_UPDATED_HEADER_TAG);
+			respWriter.println(message);
+		}
+		else {
+			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG);
+			respWriter.println(message);
+		}
+		response.flushBuffer();
 	}
-
 
 }
