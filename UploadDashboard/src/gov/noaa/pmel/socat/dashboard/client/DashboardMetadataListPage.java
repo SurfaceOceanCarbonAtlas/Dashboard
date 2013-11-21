@@ -10,6 +10,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataListServiceAsync;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
@@ -101,7 +102,7 @@ public class DashboardMetadataListPage extends Composite {
 	@UiField Button cancelButton;
 
 	private ListDataProvider<DashboardMetadata> listProvider;
-	private HashSet<String> cruiseExpocodes;
+	private TreeSet<String> cruiseExpocodes;
 
 	// The singleton instance of this page
 	private static DashboardMetadataListPage singleton;
@@ -133,7 +134,7 @@ public class DashboardMetadataListPage extends Composite {
 	 * Display the metadata list page in the RootLayoutPanel 
 	 * with the latest information from the server
 	 * 
-	 * @param expocodes
+	 * @param cruiseExpocodes
 	 * 		associate metadata to the cruises with these expocodes 
 	 * @param currentPage
 	 * 		currently displayed page in the RootLayoutPanel
@@ -143,7 +144,7 @@ public class DashboardMetadataListPage extends Composite {
 	 * 		in a Window.alert if unable to obtain the metadata
 	 * 		list from the server
 	 */
-	static void showPage(final HashSet<String> expocodes, 
+	static void showPage(final TreeSet<String> cruiseExpocodes, 
 						final Composite currentPage, final String errMsg) {
 		service.getMetadataList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
@@ -156,7 +157,7 @@ public class DashboardMetadataListPage extends Composite {
 						singleton = new DashboardMetadataListPage();
 					RootLayoutPanel.get().remove(currentPage);
 					RootLayoutPanel.get().add(singleton);
-					singleton.updateMetadataList(expocodes, mdataList);
+					singleton.updateMetadataList(cruiseExpocodes, mdataList);
 				}
 				else {
 					Window.alert(errMsg + " (unexpected invalid cruise list)");
@@ -173,26 +174,26 @@ public class DashboardMetadataListPage extends Composite {
 	 * Updates the cruise list page with the current username, 
 	 * cruise expocodes, and list of available metadata files.
 	 * 
-	 * @param expocodes
+	 * @param cruiseExpocodes
 	 * 		associate metadata to the cruises with these expocodes 
 	 * @param mdataList
 	 * 		metadata documents to display
 	 */
-	private void updateMetadataList(HashSet<String>expocodes, 
+	private void updateMetadataList(TreeSet<String> cruiseExpocodes, 
 									DashboardMetadataList mdataList) {
 		// Update the username
 		userInfoLabel.setText(WELCOME_INTRO + 
 				DashboardLoginPage.getUsername());
 		// Update the cruises to be assigned by this page
-		cruiseExpocodes.clear();
-		if ( expocodes != null ) {
-			cruiseExpocodes.addAll(expocodes);
+		this.cruiseExpocodes.clear();
+		if ( cruiseExpocodes != null ) {
+			this.cruiseExpocodes.addAll(cruiseExpocodes);
 		}
 		// Update the HTML intro naming the cruises
 		StringBuilder sb = new StringBuilder();
 		sb.append(CRUISES_HTML_INTRO);
 		boolean first = true;
-		for ( String expo : expocodes ) {
+		for ( String expo : this.cruiseExpocodes ) {
 			if ( first )
 				first = false;
 			else
@@ -242,8 +243,8 @@ public class DashboardMetadataListPage extends Composite {
 
 	@UiHandler("uploadNewButton")
 	void uploadNewOnClick(ClickEvent event) {
-		// RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
-		// DashboardMetadataUploadPage.showPage("");
+		RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
+		DashboardMetadataUploadPage.showPage(cruiseExpocodes, null);
 	}
 
 	@UiHandler("uploadUpdateButton")
@@ -254,8 +255,8 @@ public class DashboardMetadataListPage extends Composite {
 			return;
 		}
 		String expoFilename = selectedFilenames.iterator().next();
-		// RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
-		// DashboardMetadataUploadPage.showPage(expoFilename);
+		RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
+		DashboardMetadataUploadPage.showPage(cruiseExpocodes, expoFilename);
 	}
 
 	@UiHandler("submitButton")

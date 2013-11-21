@@ -77,7 +77,7 @@ public class DashboardMetadataUploadService extends HttpServlet {
 					passhash = item.getString();
 					item.delete();
 				}
-				else if ( "expocodeFilename".equals(itemName) ) {
+				else if ( "expocode".equals(itemName) ) {
 					// This is either the complete expocode filename or just 
 					// the cruise expocode, depending on the value of overwrite.
 					expocodeFilename = item.getString();
@@ -91,7 +91,7 @@ public class DashboardMetadataUploadService extends HttpServlet {
 						overwrite = true;
 					item.delete();
 				}
-				else if ( "cruiseupload".equals(itemName) ) {
+				else if ( "metadataupload".equals(itemName) ) {
 					metadataItem = item;
 				}
 				else {
