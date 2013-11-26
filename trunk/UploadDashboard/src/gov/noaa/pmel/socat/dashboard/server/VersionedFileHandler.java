@@ -72,7 +72,8 @@ public abstract class VersionedFileHandler {
 		try {
 			SVNStatus status = svnManager.getStatusClient()
 										 .doStatus(wcfile, false);
-			if ( status.getContentsStatus() == SVNStatusType.STATUS_UNVERSIONED )
+			if ( (status.getContentsStatus() == SVNStatusType.STATUS_UNVERSIONED) ||
+				 (status.getContentsStatus() == SVNStatusType.STATUS_NONE) )
 				needsAdd = true;
 		} catch ( SVNException ex ) {
 			// At this point, assume the parent directory is not version controlled
@@ -89,16 +90,19 @@ public abstract class VersionedFileHandler {
 		// Get the list of directories, as well as the file, that need to be committed
 		ArrayDeque<File> filesToCommit = new ArrayDeque<File>();
 		filesToCommit.push(wcfile);
-		File parentToUpdate = wcfile;
-		for (File currFile = wcfile.getParentFile(); currFile != null; 
+		File parentToUpdate = wcfile.getParentFile();
+		filesToCommit.push(parentToUpdate);
+		for (File currFile = parentToUpdate.getParentFile(); currFile != null; 
 										currFile = currFile.getParentFile()) {
-			parentToUpdate = currFile;
 			SVNStatus status = svnManager.getStatusClient()
 										 .doStatus(currFile, false);
 			if ( status.getContentsStatus() == SVNStatusType.STATUS_ADDED )
 				filesToCommit.push(currFile);
-			else
+			else {
+				if ( status.getContentsStatus() == SVNStatusType.STATUS_NORMAL )
+					parentToUpdate = currFile;
 				break;
+			}
 		}
 		File[] commitFiles = new File[filesToCommit.size()];
 		commitFiles = filesToCommit.toArray(commitFiles);

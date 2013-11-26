@@ -14,7 +14,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @author Karl Smith
  */
-@RemoteServiceRelativePath("cruiseListService")
+@RemoteServiceRelativePath("CruiseListService")
 public interface DashboardCruiseListService extends RemoteService {
 
 	/**

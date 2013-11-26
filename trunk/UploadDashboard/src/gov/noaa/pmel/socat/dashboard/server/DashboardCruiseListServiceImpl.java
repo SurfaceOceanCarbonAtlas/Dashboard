@@ -48,7 +48,7 @@ public class DashboardCruiseListServiceImpl extends RemoteServiceServlet
 			for ( String expocode : expocodeSet ) {
 				try {
 					dataStore.getCruiseFileHandler()
-							 .deleteCruiseDataFile(expocode, username);
+							 .deleteCruiseFiles(expocode, username);
 
 				} catch (FileNotFoundException ex) {
 					// Cruise already deleted?

@@ -6,17 +6,16 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -114,17 +113,16 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
 		for ( String expocode : expocodeSet ) {
-			// Create the DashboardCruise from the data file
-			try {
-				DashboardCruise cruise = 
-						cruiseHandler.getCruiseFromDataFile(expocode);
-				cruiseList.put(expocode, cruise);
-			} catch ( FileNotFoundException ex ) {
+			// Create the DashboardCruise from the info file
+			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+			if ( cruise == null ) {
 				// Remove this expocode from the saved list
 				needsCommit = true;
 				commitMessage += "remove invalid cruise " + expocode + "; ";
 			}
-			// Allow the IllegalArgumentException to escape
+			else {
+				cruiseList.put(expocode, cruise);
+			}
 		}
 		if ( needsCommit )
 			saveCruiseListing(cruiseList, commitMessage);
@@ -228,34 +226,37 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		updated list of cruises for user
 	 * @throws IllegalArgumentException
 	 * 		if username is invalid, if expocode is invalid,
-	 * 		if the cruise data file does not exist, if 
-	 * 		there was a problem saving the updated cruise 
+	 * 		if the cruise information file does not exist, 
+	 * 		if there was a problem saving the updated cruise 
 	 * 		listing, or if there was an error committing 
 	 * 		the updated cruise listing to version control
 	 */
 	public DashboardCruiseList addCruisesToListing(
 							HashSet<String> expocodeSet, String username) 
 										throws IllegalArgumentException {
+		DashboardCruiseFileHandler cruiseHandler;
+		try {
+			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the cruise file handler");
+		}
 		DashboardCruiseList cruiseList = getCruiseListing(username);
 		boolean changeMade = false;
 		String commitMessage = 
 				"cruises added to the listing for " + username + ": ";
 		for ( String expocode : expocodeSet ) {
 			// Create a cruise entry for this data
-			try {
-				// Create a cruise entry for this data and 
-				// add or replace it in the cruise list
-				cruiseList.put(expocode, DashboardDataStore.get()
-								.getCruiseFileHandler()
-								.getCruiseFromDataFile(expocode));
+			DashboardCruise cruise = 
+					cruiseHandler.getCruiseFromInfoFile(expocode);
+			if ( cruise == null ) 
+				throw new IllegalArgumentException(
+						"cruise " + expocode + " does not exist");
+			// Add or replace this cruise entry in the cruise list
+			// Only the expocodes (keys) are saved in the cruise list
+			if ( cruiseList.put(expocode, cruise) == null ) {
 				changeMade = true;
 				commitMessage += expocode + "; ";
-			} catch ( FileNotFoundException ex ) {
-				throw new IllegalArgumentException("cruise " + expocode + 
-						" does not exist");
-			} catch ( Exception ex ) {
-				throw new IllegalArgumentException(
-						"Unexpected failure to get the cruise file handler");
 			}
 		}
 		if ( changeMade ) {
@@ -281,39 +282,33 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		// Get the name of the metadata list file for this user
 		if ( (username == null) || username.trim().isEmpty() )
 			throw new IllegalArgumentException("invalid username");
-		// Create the DashboardMetadataList to return
-		DashboardMetadataList metadataList = new DashboardMetadataList();
-		metadataList.setUsername(username);
 		// Get the metadata list file for this user
 		File userDataFile = new File(filesDir, 
 				username + USER_METADATA_LIST_NAME_EXTENSION);
 		// Read the metadata documents from the list file
+		DashboardMetadataList metadataList;
 		try {
 			ObjectInputStream objInpStream = 
 					new ObjectInputStream(new FileInputStream(userDataFile));
 			try {
-				for (;;) {
-					// Read objects until an EOFException is thrown
-					DashboardMetadata mdata = 
-							(DashboardMetadata) objInpStream.readObject();
-					// Add this metadata object to the set
-					metadataList.add(mdata);
-				}
+				metadataList = (DashboardMetadataList) objInpStream.readObject();
 			} finally {
 				objInpStream.close();
 			}
 		} catch ( FileNotFoundException ex ) {
 			// No metadata list file for this user
-			;
-		} catch ( EOFException ex ) {
-			// Normal end of reading the object input stream
-			;
+			metadataList = new DashboardMetadataList();
+			metadataList.setUsername(username);
 		} catch ( Exception ex ) {
 			// Problems with the listing in the existing file
 			throw new IllegalArgumentException(
 					"Problems reading the metadata listing from " + 
 					userDataFile.getPath() + ": " + ex.getMessage());
 		}
+		if ( ! username.equals(metadataList.getUsername()) )
+			throw new IllegalArgumentException(
+					"Unexpected username mismatch in metadata listing from " +
+					userDataFile.getPath());
 		// Return the metadata list populated with the metadata objects read
 		return metadataList;
 	}
@@ -345,8 +340,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			ObjectOutputStream objOutStream = 
 					new ObjectOutputStream(new FileOutputStream(userMetaListFile));
 			try {
-				for ( DashboardMetadata mdata : metadataList )
-					objOutStream.writeObject(mdata);
+				objOutStream.writeObject(metadataList);
 			} finally {
 				objOutStream.close();
 			}

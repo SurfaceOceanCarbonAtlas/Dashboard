@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard;
+package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.tmatesoft.svn.core.SVNException;
 
 /**
  * @author Karl Smith
@@ -28,7 +27,8 @@ import org.tmatesoft.svn.core.SVNException;
 public class DashboardCruiseFileHandlerTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler#cruiseDataFileExists(java.lang.String)}.
+	 * Test method mainly for {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler#checkExpocode(java.lang.String)}
+	 * by calling {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler#cruiseDataFileExists(java.lang.String)}.
 	 * @throws IOException 
 	 */
 	@Test
@@ -72,10 +72,9 @@ public class DashboardCruiseFileHandlerTest {
 	/**
 	 * Test method for methods in {@link gov.noaa.pmel.socat.dashboard.server.DashboardCruiseFileHandler}.
 	 * @throws IOException 
-	 * @throws SVNException 
 	 */
 	@Test
-	public void testDashboardCruiseFileHandler() throws IOException, SVNException {
+	public void testDashboardCruiseFileHandler() throws IOException {
 		final String username = "socatuser";
 		final String filename = "fake20031205_revised.tsv";
 		final String expocode = "FAKE20031205";
@@ -278,13 +277,14 @@ public class DashboardCruiseFileHandlerTest {
 		assertEquals(expectedDatavals.size(), datavals.size());
 
 		// Save and commit the cruise data to file
-		handler.saveCruiseDataToFile(cruiseData, "test check-in of fake cruise data");
+		handler.saveCruiseDataToFiles(cruiseData, "test check-in of fake cruise data");
 
 		// Test that the file exists
+		assertTrue( handler.cruiseInfoFileExists(expocode) );
 		assertTrue( handler.cruiseDataFileExists(expocode) );
 
 		// Generate the cruise data from the saved file
-		DashboardCruiseWithData fileData = handler.getCruiseDataFromFile(expocode, 
+		DashboardCruiseWithData fileData = handler.getCruiseDataFromFiles(expocode, 
 															0, observations.length);
 
 		// Check for differences - version string will differ
@@ -331,7 +331,7 @@ public class DashboardCruiseFileHandlerTest {
 		// And that should be all there is
 		assertEquals(k, partialContents.size());
 
-		// Check createDashboardCruiseFromDataFile
+		// Check createCruiseFromInfoFile
 		DashboardCruise expectedCruise = new DashboardCruise();
 		expectedCruise.setExpocode(expocode);
 		expectedCruise.setOwner(username);
@@ -343,7 +343,7 @@ public class DashboardCruiseFileHandlerTest {
 		expectedCruise.setUserColIndices(fileData.getUserColIndices());
 		expectedCruise.setDataColUnits(fileData.getDataColUnits());
 		expectedCruise.setDataColDescriptions(fileData.getDataColDescriptions());
-		DashboardCruise cruise = handler.getCruiseFromDataFile(expocode);
+		DashboardCruise cruise = handler.getCruiseFromInfoFile(expocode);
 		assertEquals(expectedCruise, cruise);
 	}
 

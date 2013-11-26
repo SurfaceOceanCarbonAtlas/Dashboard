@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard;
+package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.*;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;

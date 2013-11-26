@@ -6,21 +6,39 @@
 
 	<!-- Servlets -->
 	<servlet>
-		<servlet-name>cruiseDataColumnSpecsServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.CruiseDataColumnSpecsServiceImpl</servlet-class>
+		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardMetadataUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>cruiseDataColumnSpecsServlet</servlet-name>
-		<url-pattern>/socatuploaddashboard/dataColumnSpecsService</url-pattern>
+		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/MetadataUploadService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>dashboardCruiseListServlet</servlet-name>
+		<servlet-name>DashboardMetadataListServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardMetadataListServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DashboardMetadataListServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/MetadataListService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>CruiseDataColumnSpecsServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.CruiseDataColumnSpecsServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CruiseDataColumnSpecsServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/DataColumnSpecsService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>DashboardCruiseListServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardCruiseListServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>dashboardCruiseListServlet</servlet-name>
-		<url-pattern>/socatuploaddashboard/cruiseListService</url-pattern>
+		<servlet-name>DashboardCruiseListServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/CruiseListService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -29,16 +47,16 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<url-pattern>/socatuploaddashboard/cruiseUploadService</url-pattern>
+		<url-pattern>/SocatUploadDashboard/CruiseUploadService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>dashboardLogoutServlet</servlet-name>
+		<servlet-name>DashboardLogoutServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardLogoutServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>dashboardLogoutServlet</servlet-name>
-		<url-pattern>/socatuploaddashboard/logoutService</url-pattern>
+		<servlet-name>DashboardLogoutServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/LogoutService</url-pattern>
 	</servlet-mapping>
 
 	<!-- Default page to serve -->

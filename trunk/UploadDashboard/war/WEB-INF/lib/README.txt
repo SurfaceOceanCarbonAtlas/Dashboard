@@ -5,7 +5,8 @@ The jar file joda-time-2.3.jar was obtained from the Joda-Time site http://www.j
 The jar file log4j-1.2.14.jar was obtained from the Apache Log4j site http://logging.apache.org/log4j/
 The jar file jdom-2.0.5.jar was obtained from the JDOM site http://www.jdom.org/
 The jar files:
-	svnkit-1.7.10.jar
-	sqljet-1.1.7.jar
+	svnkit-1.7.11.jar
+	sqljet-1.1.8.jar
 	sequence-library-1.0.2.jar
-were obtained from the SVNKit (version 1.7.10) site http://svnkit.com/
+	antlr-runtime-3.4.jar
+were obtained from the SVNKit (version 1.7.11) site http://svnkit.com/

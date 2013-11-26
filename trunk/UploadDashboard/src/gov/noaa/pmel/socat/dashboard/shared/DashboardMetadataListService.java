@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * Server side interface for obtaining a user's list of metadata files.
  * @author Karl Smith
  */
-@RemoteServiceRelativePath("metadataListService")
+@RemoteServiceRelativePath("MetadataListService")
 public interface DashboardMetadataListService extends RemoteService {
 
 	/**
@@ -24,13 +24,16 @@ public interface DashboardMetadataListService extends RemoteService {
 	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
+	 * @param cruiseExpocodes 
+	 * 		set as selected the metadata documents associated 
+	 * 		with these cruises
 	 * @return
 	 * 		the metadata list
 	 * @throws IllegalArgumentException
 	 * 		if authentication failed
 	 */
-	DashboardMetadataList getMetadataList(String username, String passhash) 
-											throws IllegalArgumentException;
+	DashboardMetadataList getMetadataList(String username, String passhash,
+			TreeSet<String> cruiseExpocodes) throws IllegalArgumentException;
 
 	/**
 	 * Associates metadata documents with cruises
@@ -41,16 +44,14 @@ public interface DashboardMetadataListService extends RemoteService {
 	 * 		encrypted password to use
 	 * @param cruiseExpocodes
 	 * 		associate metadata documents to the cruises with these expocodes
-	 * @param metadataExpocodeFilenames
-	 * 		expocode filenames of the metadata documents to associate 
-	 * 		with the cruises
+	 * @param metadata
+	 * 		metadata documents to associate with the cruises
 	 * @throws IllegalArgumentException
 	 * 		if authentication failed, if a cruise expocode is invalid, 
-	 * 		if a metadata expocode filename is invalid, or if the update failed
+	 * 		or if the update failed
 	 */
 	void associateMetadata(String username, String passhash, 
-			TreeSet<String> cruiseExpocodes, 
-			HashSet<String> metadataExpocodeFilenames) 
-										throws IllegalArgumentException;
+			TreeSet<String> cruiseExpocodes, HashSet<DashboardMetadata> metadata) 
+												throws IllegalArgumentException;
 
 }

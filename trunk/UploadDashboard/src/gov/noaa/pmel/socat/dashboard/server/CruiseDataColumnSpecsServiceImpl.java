@@ -40,7 +40,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 
 		// Get the cruise with the first 25 rows of data
 		DashboardCruiseWithData cruiseData = dataStore.getCruiseFileHandler()
-									.getCruiseDataFromFile(expocode, 0, 25);
+									.getCruiseDataFromFiles(expocode, 0, 25);
 		if ( cruiseData == null )
 			throw new IllegalArgumentException(
 					"cruise " + expocode + " does not exist");
@@ -71,7 +71,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 		// Get the cruise data with exactly the data rows desired
 		DashboardCruiseWithData cruiseWithData = 
 				dataStore.getCruiseFileHandler()
-						 .getCruiseDataFromFile(expocode, firstRow, numRows);
+						 .getCruiseDataFromFiles(expocode, firstRow, numRows);
 		if ( cruiseWithData == null )
 			throw new IllegalArgumentException(
 					"cruise " + expocode + " does not exist");
@@ -101,7 +101,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 
 		// Retrieve all the current cruise data
 		DashboardCruiseWithData cruiseData = dataStore.getCruiseFileHandler()
-						.getCruiseDataFromFile(newSpecs.getExpocode(), 0, -1);
+						.getCruiseDataFromFiles(newSpecs.getExpocode(), 0, -1);
 		// Revise the cruise data column types and units 
 		if ( newSpecs.getDataColTypes().size() != 
 				cruiseData.getDataColTypes().size() )
@@ -153,7 +153,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 		//       major problems.
 
 		// Save and commit the updated cruise columns
-		dataStore.getCruiseFileHandler().saveCruiseDataToFile(cruiseData, 
+		dataStore.getCruiseFileHandler().saveCruiseDataToFiles(cruiseData, 
 				"Cruise data column types for " +  cruiseData.getExpocode() + 
 				" updated by " + username);
 		

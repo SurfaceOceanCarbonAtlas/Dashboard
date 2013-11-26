@@ -144,15 +144,16 @@ body {
 	display: block;
 	font-size: large;
 	margin-left: 1em;
+	margin-bottom: 1em;
 }
 
 .uploadpanel {
 	display: block;
 	width: 4em;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
+	padding-left: 1.5em;
+	padding-right: 1.5em;
 }
 .uploadpanelbutton {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 }

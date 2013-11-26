@@ -21,12 +21,16 @@ public interface DashboardMetadataListServiceAsync {
 	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
+	 * @param cruiseExpocodes 
+	 * 		set as selected the metadata documents associated 
+	 * 		with these cruises
 	 * @param callback
 	 * 		the callback to make with the metadata list;
 	 * 		the onFailure method of the callback will be called
 	 * 		if authentication failed
 	 */
 	void getMetadataList(String username, String passhash,
+			TreeSet<String> cruiseExpocodes, 
 			AsyncCallback<DashboardMetadataList> callback);
 
 	/**
@@ -38,18 +42,17 @@ public interface DashboardMetadataListServiceAsync {
 	 * 		encrypted password to use
 	 * @param cruiseExpocodes
 	 * 		associate metadata documents to the cruises with these expocodes
-	 * @param metadataExpocodeFilenames
-	 * 		expocode filenames of the metadata documents to associate 
-	 * 		with the cruises
+	 * @param metadata
+	 * 		metadata documents to associate with the cruises
 	 * @param callback
 	 * 		the callback to make when done;
 	 * 		the onFailure method of the callback will be called
 	 * 		if authentication failed, if a cruise expocode is invalid, 
-	 * 		if a metadata expocode filename is invalid, or if the update failed
+	 * 		or if the update failed
 	 */
 	void associateMetadata(String username, String passhash,
 			TreeSet<String> cruiseExpocodes,
-			HashSet<String> metadataExpocodeFilenames,
+			HashSet<DashboardMetadata> metadataExpocodeFilenames,
 			AsyncCallback<Void> callback);
 
 }

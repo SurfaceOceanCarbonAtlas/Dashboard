@@ -9,7 +9,6 @@ import java.util.TreeSet;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -20,7 +19,6 @@ import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -33,16 +31,14 @@ public class DashboardMetadataUploadPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String OK_TEXT = "OK";
+	private static final String UPLOAD_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
-	private static final String UPLOAD_NEW_HTML_INTRO = 
+	private static final String UPLOAD_NEW_LABEL_INTRO = 
 			"Select a file that will be uploaded as a new metadata " + 
-			"document for the cruise expocode (and possibly others):<br />";
-	private static final String UPLOAD_UPDATE_HTML_INTRO =
+			"document for the cruise expocode (and possibly others):  ";
+	private static final String UPLOAD_UPDATE_LABEL_INTRO =
 			"Select a file that will be uploaded as a replacement " + 
-			"document for the cruise metadata file: <br />";
-	private static final String GET_METADATA_LIST_FAIL_MSG = 
-			"Unable to obtain the cruise list for some unexpected reason";
+			"document for the cruise metadata file:  ";
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a metadata file to upload";
 
@@ -56,31 +52,33 @@ public class DashboardMetadataUploadPage extends Composite {
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField FormPanel uploadForm;
-	@UiField HTML expocodeHtml;
+	@UiField Label expocodeLabel;
 	@UiField FileUpload metadataUpload;
 	@UiField Hidden usernameToken;
 	@UiField Hidden passhashToken;
 	@UiField Hidden expocodeToken;
 	@UiField Hidden overwriteToken;
-	@UiField Button okButton;
+	@UiField Button uploadButton;
 	@UiField Button cancelButton;
 
-	String metadataFilename;
 	TreeSet<String> cruiseExpocodes;
+	String metadataFilename;
 
 	// Singleton instance of this page
 	private static DashboardMetadataUploadPage singleton = null;
 
 	private DashboardMetadataUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		cruiseExpocodes = new TreeSet<String>();
+		metadataFilename = null;
 
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
-		uploadForm.setAction(GWT.getModuleBaseURL() + "metadataUploadService");
+		uploadForm.setAction(GWT.getModuleBaseURL() + "MetadataUploadService");
 
-		okButton.setText(OK_TEXT);
+		uploadButton.setText(UPLOAD_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
 	}
 
@@ -89,22 +87,22 @@ public class DashboardMetadataUploadPage extends Composite {
 			singleton = new DashboardMetadataUploadPage();
 		singleton.userInfoLabel.setText(WELCOME_INTRO + 
 				DashboardLoginPage.getUsername());
-		singleton.cruiseExpocodes = cruiseExpocodes;
+		singleton.cruiseExpocodes.clear();
+		singleton.cruiseExpocodes.addAll(cruiseExpocodes);
 		singleton.metadataFilename = metadataFilename;
 		if ( metadataFilename == null ) {
-			singleton.expocodeHtml.setHTML(
-					SafeHtmlUtils.fromSafeConstant(UPLOAD_NEW_HTML_INTRO +
-					SafeHtmlUtils.htmlEscape(cruiseExpocodes.first())));
+			singleton.expocodeLabel.setText(UPLOAD_NEW_LABEL_INTRO +
+					cruiseExpocodes.first());
 		}
 		else {
-			singleton.expocodeHtml.setHTML(
-					SafeHtmlUtils.fromSafeConstant(UPLOAD_UPDATE_HTML_INTRO +
-					SafeHtmlUtils.htmlEscape(metadataFilename)));
+			singleton.expocodeLabel.setText(UPLOAD_UPDATE_LABEL_INTRO +
+					metadataFilename);
 		}
 		singleton.usernameToken.setValue("");
 		singleton.passhashToken.setValue("");
 		singleton.expocodeToken.setValue("");
 		singleton.overwriteToken.setValue("");
+		RootLayoutPanel.get().add(singleton);
 	}
 
 	@UiHandler("logoutButton")
@@ -113,7 +111,7 @@ public class DashboardMetadataUploadPage extends Composite {
 		DashboardLogoutPage.showPage();
 	}
 
-	@UiHandler("okButton") 
+	@UiHandler("uploadButton") 
 	void createButtonOnClick(ClickEvent event) {
 		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
@@ -134,14 +132,14 @@ public class DashboardMetadataUploadPage extends Composite {
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the metadata list page
 		DashboardMetadataListPage.showPage(cruiseExpocodes, 
-				DashboardMetadataUploadPage.this, GET_METADATA_LIST_FAIL_MSG);
+				DashboardMetadataUploadPage.this);
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
 		// Make sure a file was selected
-		String metadataFilename = metadataUpload.getFilename();
-		if ( (metadataFilename == null) || metadataFilename.trim().isEmpty() ) {
+		String uploadFilename = metadataUpload.getFilename();
+		if ( (uploadFilename == null) || uploadFilename.trim().isEmpty() ) {
 			Window.alert(NO_FILE_ERROR_MSG);
 			event.cancel();
 		}
@@ -152,8 +150,8 @@ public class DashboardMetadataUploadPage extends Composite {
 		// Clear the "hidden" values
 		usernameToken.setValue("");
 		passhashToken.setValue("");
-		singleton.expocodeToken.setValue("");
-		singleton.overwriteToken.setValue("");
+		expocodeToken.setValue("");
+		overwriteToken.setValue("");
 
 		// Check the result returned
 		String resultMsg = event.getResults();
@@ -172,14 +170,14 @@ public class DashboardMetadataUploadPage extends Composite {
 			Window.alert(tagMsg[1]);
 			// return to the updated metadata list
 			DashboardMetadataListPage.showPage(cruiseExpocodes, 
-					DashboardMetadataUploadPage.this, GET_METADATA_LIST_FAIL_MSG);
+					DashboardMetadataUploadPage.this);
 		}
 		else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file updated
 			Window.alert(tagMsg[1]);
 			// return to the updated metadata list
 			DashboardMetadataListPage.showPage(cruiseExpocodes, 
-					DashboardMetadataUploadPage.this, GET_METADATA_LIST_FAIL_MSG);
+					DashboardMetadataUploadPage.this);
 		}
 		else {
 			// Unknown response with a newline, just display the whole message
