@@ -139,8 +139,14 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 				newMetadataExpocodeFilename(cruiseExpocode, uploadFilename);
 
 		// Create the new metadata file from the uploaded contents
-		File metadataFile = new File(filesDir, expocodeFilename.substring(0,4) +
-									 File.separatorChar + expocodeFilename);
+		File metadataFile = new File(filesDir, expocodeFilename.substring(0,4));
+		if ( ! metadataFile.exists() ) {
+			if ( ! metadataFile.mkdirs() )
+				throw new IOException(
+						"Problems creating the parent directory for " + 
+								expocodeFilename);
+		}
+		metadataFile = new File(metadataFile, expocodeFilename);
 		try {
 			uploadFileItem.write(metadataFile);
 		} catch (Exception ex) {

@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,20 +29,21 @@ import java.util.regex.Pattern;
  */
 public class DashboardCruiseFileHandler extends VersionedFileHandler {
 
-	private static final String CRUISE_FILE_NAME_EXTENSION = ".tsv";
-	private static final String DATA_OWNER_ID = "dataowner=";
-	private static final String UPLOAD_FILENAME_ID = "uploadfilename=";
-	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus=";
-	private static final String METADATA_FILENAMES_ID = "metadatafilenames=";
-	private static final String QC_STATUS_ID = "qcstatus=";
-	private static final String ARCHIVE_STATUS_ID = "archivestatus=";
-	private static final String NUM_DATA_ROWS_ID = "numdatarows=";
-	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes=";
-	private static final String USER_COLUMN_INDICES_ID = "usercolumnindices=";
-	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames=";
-	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits=";
-	private static final String DATA_COLUMN_DESCRIPTIONS_ID = "datacolumndescriptions=";
-	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities=";
+	private static final String CRUISE_DATA_FILENAME_EXTENSION = ".tsv";
+	private static final String CRUISE_INFO_FILENAME_EXTENSION = ".properties";
+	private static final String DATA_OWNER_ID = "dataowner";
+	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
+	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
+	private static final String METADATA_FILENAMES_ID = "metadatafilenames";
+	private static final String QC_STATUS_ID = "qcstatus";
+	private static final String ARCHIVE_STATUS_ID = "archivestatus";
+	private static final String NUM_DATA_ROWS_ID = "numdatarows";
+	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes";
+	private static final String USER_COLUMN_INDICES_ID = "usercolumnindices";
+	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
+	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
+	private static final String DATA_COLUMN_DESCRIPTIONS_ID = "datacolumndescriptions";
+	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities";
 
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
@@ -90,14 +92,17 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
+	 * Checks and standardized a given expocode.
+	 * 
 	 * @param expocode
-	 * 		cruise expocode to use
+	 * 		expocode to check
 	 * @return
-	 * 		the cruise data file associated with the cruise expcode
+	 * 		standardized (uppercase) expocode
 	 * @throws IllegalArgumentException
-	 * 		if the cruise expocode is invalid
+	 * 		if the expocode is unreasonable
+	 * 		(invalid characters, too short, too long)
 	 */
-	private File cruiseDataFile(String expocode) throws IllegalArgumentException {
+	private String checkExpocode(String expocode) throws IllegalArgumentException {
 		if ( expocode == null )
 			throw new IllegalArgumentException("Cruise expocode not given");
 		// Do some automatic clean-up
@@ -112,17 +117,62 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		if ( mat.find() )
 			throw new IllegalArgumentException(
 					"Invalid characters in the cruise Expocode");
-		// Get the name of the saved cruise data file
-		return new File(filesDir, upperExpo.substring(0,4) + 
-				File.separatorChar + upperExpo + CRUISE_FILE_NAME_EXTENSION);
+		return upperExpo;
 	}
 
 	/**
-	 * Determines if a cruise file exists for a cruise
+	 * @param expocode
+	 * 		cruise expocode to use
+	 * @return
+	 * 		the cruise information file associated with the cruise expocode
+	 * @throws IllegalArgumentException
+	 * 		if the cruise expocode is invalid
+	 */
+	private File cruiseInfoFile(String expocode) throws IllegalArgumentException {
+		// Check that the expocode is somewhat reasonable
+		String upperExpo = checkExpocode(expocode);
+		// Get the name of the saved cruise properties file
+		return new File(filesDir, upperExpo.substring(0,4) + 
+				File.separatorChar + upperExpo + CRUISE_INFO_FILENAME_EXTENSION);
+	}
+
+	/**
+	 * @param expocode
+	 * 		cruise expocode to use
+	 * @return
+	 * 		the cruise data file associated with the cruise expocode
+	 * @throws IllegalArgumentException
+	 * 		if the cruise expocode is invalid
+	 */
+	private File cruiseDataFile(String expocode) throws IllegalArgumentException {
+		// Check that the expocode is somewhat reasonable
+		String upperExpo = checkExpocode(expocode);
+		// Get the name of the saved cruise data file
+		return new File(filesDir, upperExpo.substring(0,4) + 
+				File.separatorChar + upperExpo + CRUISE_DATA_FILENAME_EXTENSION);
+	}
+
+	/**
+	 * Determines if a cruise information file exists for a cruise
 	 * @param expocode
 	 * 		expcode of the cruise to check
 	 * @return
-	 * 		true if the cruise file exists
+	 * 		true if the cruise information file exists
+	 * @throws IllegalArgumentException
+	 * 		if expocode is an invalid cruise expocode 
+	 */
+	public boolean cruiseInfoFileExists(String expocode)
+										throws IllegalArgumentException {
+		File cruiseFile = cruiseInfoFile(expocode);
+		return cruiseFile.exists();
+	}
+
+	/**
+	 * Determines if a cruise data file exists for a cruise
+	 * @param expocode
+	 * 		expcode of the cruise to check
+	 * @return
+	 * 		true if the cruise data file exists
 	 * @throws IllegalArgumentException
 	 * 		if expocode is an invalid cruise expocode 
 	 */
@@ -416,87 +466,83 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		number of data rows to return; for all data for the cruise,
 	 * 		specify -1 (or any negative integer)
 	 * @return
-	 * 		the saved cruise data, which may be null if there is no data 
-	 * 		saved for this cruise.
+	 * 		the saved cruise data, 
+	 * 		or null if there is no information or data saved for this cruise.
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid or if there was a error reading 
-	 * 		data for this cruise
+	 * 		information or data for this cruise
 	 */
-	public DashboardCruiseWithData getCruiseDataFromFile(String expocode,
+	public DashboardCruiseWithData getCruiseDataFromFiles(String expocode,
 			int firstDataRow, int numDataRows) throws IllegalArgumentException {
-		// Get the filename of the saved cruise data file
-		File cruiseFile = cruiseDataFile(expocode);
 		// Create the cruise and assign the expocode
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		cruiseData.setExpocode(expocode);
 		try {
-			// Read the cruise data from the saved cruise data file
+			// Assign values from the cruise information file
+			assignCruiseFromInfoFile(cruiseData);
+		} catch ( FileNotFoundException ex ) {
+			return null;
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Problems reading cruise information for " + expocode + 
+					": " + ex.getMessage());
+		}
+		// Read the cruise data file
+		File cruiseFile = cruiseDataFile(expocode);
+		try {
 			BufferedReader cruiseReader = 
 					new BufferedReader(new FileReader(cruiseFile));
 			try {
-				// Assign the cruise information at the start of the file
-				assignCruiseFromInput(cruiseData, cruiseReader);
-				// Assign the cruise data in the rest of the file
+				// Assign values from the cruise data file
 				assignCruiseDataFromInput(cruiseData, cruiseReader, 
-											firstDataRow, numDataRows, false);
+										  firstDataRow, numDataRows, false);
 			} finally {
 				cruiseReader.close();
 			}
 		} catch ( FileNotFoundException ex ) {
-			cruiseData = null;
+			return null;
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
-					"Problems reading data for cruise " + expocode + 
-					" from " + cruiseFile.getPath() + ": " + ex.getMessage());
+					"Problems reading cruise data for " + expocode + 
+					": " + ex.getMessage());
 		}
 		return cruiseData;
 	}
 
 	/**
-	 * Returns a new DashboardCruise assigned from the header lines 
-	 * in the cruise data file, without reading any of the data in 
-	 * the file.
+	 * Returns a new DashboardCruise assigned from the cruise information
+	 * file without reading any of the data in cruise data file.
 	 * 
 	 * @param expocode
-	 * 		cruise whose data file to examine
+	 * 		cruise whose information file to examine
 	 * @return
-	 * 		new DashboardCruise assigned from the data file
+	 * 		new DashboardCruise assigned from the information file,
+	 * 		or null if the cruise information file does not exist
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid or
-	 * 		if there are problems accessing the data file
-	 * @throws FileNotFoundException
-	 * 		if the cruise data file does not exist
+	 * 		if there are problems accessing the information file
 	 */
-	public DashboardCruise getCruiseFromDataFile(String expocode) 
-				throws IllegalArgumentException, FileNotFoundException {
-		File cruiseFile = cruiseDataFile(expocode);
+	public DashboardCruise getCruiseFromInfoFile(String expocode) 
+									throws IllegalArgumentException {
 		// Create a cruise for this data and assign the expocode given
 		DashboardCruise cruise = new DashboardCruise();
 		cruise.setExpocode(expocode);
-		// Read the information saved in the first few lines 
-		// of the cruise data file without reading all the data
-		BufferedReader cruiseReader = 
-				new BufferedReader(new FileReader(cruiseFile));
+		// Read the information saved cruise information file
 		try {
-			assignCruiseFromInput(cruise, cruiseReader);
+			assignCruiseFromInfoFile(cruise);
+		} catch ( FileNotFoundException ex ) {
+			return null;
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
-					"Problems accessing the data for cruise " + expocode + 
-					": " + ex.getMessage());
-		} finally {
-			try {
-				cruiseReader.close();
-			} catch (IOException ex) {
-				// don't care
-				;
-			}
+					"Problems reading cruise information for " + 
+							expocode + ": " + ex.getMessage());
 		}
 		return cruise;
 	}
 
 	/**
-	 * Deletes a cruise data file after verifying the user is permitted
-	 * to delete this cruise.
+	 * Deletes the information and data files for a cruise 
+	 * after verifying the user is permitted to delete this cruise.
 	 * 
 	 * @param expocode
 	 * 		cruise to delete
@@ -506,11 +552,11 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		if the cruise expocode is not valid, if there were
 	 * 		problems access the cruise, if the user is not permitted 
 	 * 		to delete the cruise, or if there were problems deleting
-	 * 		the file or committing the deletion from version control
+	 * 		a file or committing the deletion from version control
 	 * @throws FileNotFoundException
-	 * 		if the cruise file does not exist
+	 * 		if the cruise information file does not exist
 	 */
-	public void deleteCruiseDataFile(String expocode, String username) 
+	public void deleteCruiseFiles(String expocode, String username) 
 				throws IllegalArgumentException, FileNotFoundException {
 		DashboardCruise cruise;
 		try {
@@ -520,7 +566,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"Not permitted to delete cruise " + expocode +
 					": " + ex.getMessage());
 		}
-		// Delete the cruise file
+		// Delete the cruise data file
 		try {
 			deleteVersionedFile(cruiseDataFile(expocode), 
 					"Cruise data file for " + expocode + 
@@ -531,10 +577,114 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"Problems deleting the cruise data file: " + 
 					ex.getMessage());
 		}
+		// Delete the cruise information file
+		try {
+			deleteVersionedFile(cruiseInfoFile(expocode), 
+					"Cruise information file for " + expocode + 
+					" owned by " + cruise.getOwner() + 
+					" deleted by " + username);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems deleting the cruise information file: " + 
+					ex.getMessage());
+		}
 	}
 
 	/**
-	 * Saves and commits the cruise data to file.
+	 * Saves and commits only the cruise information to the information file.
+	 * This does not save the cruise data of a DashboardCruiseWithData.
+	 * 
+	 * @param cruise
+	 * 		cruise information to save
+	 * @param message
+	 * 		version control commit message; 
+	 * 		if null or blank, the commit will not be performed 
+	 * @throws IllegalArgumentException
+	 * 		if the expocode for the cruise is invalid, if there was an 
+	 * 		error writing information for this cruise to file, or if there 
+	 * 		was an error committing the updated file to version control
+	 */
+	public void saveCruiseToInfoFile(DashboardCruise cruise, String message)
+										throws IllegalArgumentException {
+		// Get the cruise information filename
+		String expocode = cruise.getExpocode();
+		File infoFile = cruiseInfoFile(expocode);
+		// Create the NODC subdirectory if it does not exist
+		File parentFile = infoFile.getParentFile();
+		if ( ! parentFile.exists() )
+			parentFile.mkdirs();
+		// Create the properties for this cruise information file
+		Properties cruiseProps = new Properties();
+		// Owner of the cruise
+		cruiseProps.setProperty(DATA_OWNER_ID, cruise.getOwner());
+		// Upload filename
+		cruiseProps.setProperty(UPLOAD_FILENAME_ID, cruise.getUploadFilename());
+		// Data-check status string
+		cruiseProps.setProperty(DATA_CHECK_STATUS_ID, cruise.getDataCheckStatus());
+		// Metadata documents
+		// a little arguably-unnecessary overhead going through an ArrayList<String>
+		cruiseProps.setProperty(METADATA_FILENAMES_ID, 
+				DashboardUtils.encodeStringArrayList(new ArrayList<String>(
+						cruise.getMetadataFilenames())));
+		// QC-submission status string
+		cruiseProps.setProperty(QC_STATUS_ID, cruise.getQcStatus());
+		// Archive status string
+		cruiseProps.setProperty(ARCHIVE_STATUS_ID, cruise.getArchiveStatus());
+				// Total number of data measurements (rows of data)
+		cruiseProps.setProperty(NUM_DATA_ROWS_ID, 
+				Integer.toString(cruise.getNumDataRows()));
+		// Data column types - encoded using the enumerated names
+		ArrayList<String> colTypeNames = 
+				new ArrayList<String>(cruise.getDataColTypes().size());
+		for ( CruiseDataColumnType colType : cruise.getDataColTypes() )
+			colTypeNames.add(colType.name());
+		cruiseProps.setProperty(DATA_COLUMN_TYPES_ID, 
+				DashboardUtils.encodeStringArrayList(colTypeNames));
+		// Data column index in original upload data file
+		cruiseProps.setProperty(USER_COLUMN_INDICES_ID, 
+				DashboardUtils.encodeIntegerArrayList(cruise.getUserColIndices()));
+		// Data column name in the original upload data file
+		cruiseProps.setProperty(USER_COLUMN_NAMES_ID, 
+				DashboardUtils.encodeStringArrayList(cruise.getUserColNames()));
+		// Unit for each data column
+		cruiseProps.setProperty(DATA_COLUMN_UNITS_ID, 
+				DashboardUtils.encodeStringArrayList(cruise.getDataColUnits()));
+		// Description of each data column
+		cruiseProps.setProperty(DATA_COLUMN_DESCRIPTIONS_ID, 
+				DashboardUtils.encodeStringArrayList(cruise.getDataColDescriptions()));
+		// Qualities of each data column
+		cruiseProps.setProperty(DATA_COLUMN_QUALITIES_ID, 
+				DashboardUtils.encodeIntegerArrayList(cruise.getDataColQualities()));
+		// Save the properties to the cruise information file
+		try {
+			PrintWriter cruiseWriter = new PrintWriter(infoFile);
+			try {
+				cruiseProps.store(cruiseWriter, null);
+			} finally {
+				cruiseWriter.close();
+			}
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Problems writing cruise information for " + expocode + 
+					" to " + infoFile.getPath() + ": " + ex.getMessage());
+		}
+		
+		if ( (message == null) || message.trim().isEmpty() )
+			return;
+
+		// Submit the updated information file to version control
+		try {
+			commitVersion(infoFile, message);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems committing updated cruise information for  " + 
+							expocode + ": " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Saves and commits the cruise information to the information file
+	 * and the cruise data to data file.
 	 * 
 	 * @param cruiseData
 	 * 		cruise data to save
@@ -546,72 +696,27 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		an error writing data for this cruise to file, or if there 
 	 * 		was an error committing the updated file to version control
 	 */
-	public void saveCruiseDataToFile(DashboardCruiseWithData cruiseData, 
+	public void saveCruiseDataToFiles(DashboardCruiseWithData cruiseData, 
 						String message) throws IllegalArgumentException {
+		// Save the cruise information to the information file
+		saveCruiseToInfoFile(cruiseData, message);
+
 		// Get the update date for the cruise data file
 		String datestamp = (new Timestamp(System.currentTimeMillis()))
 							.toString().substring(0, 10);
-		// Get the cruise file name
+		// Get the cruise data filename
 		String expocode = cruiseData.getExpocode();
-		File cruiseFile = cruiseDataFile(expocode);
-		File parentFile = cruiseFile.getParentFile();
+		File dataFile = cruiseDataFile(expocode);
+		// Create the NODC subdirectory if it does not exist 
+		// Should be the same as the info file, but just in case not
+		File parentFile = dataFile.getParentFile();
 		if ( ! parentFile.exists() )
 			parentFile.mkdirs();
+		// Print the cruise data to the data file
 		try {
-			PrintWriter writer = new PrintWriter(cruiseFile);
+			PrintWriter writer = new PrintWriter(dataFile);
 			try {
-				// First write the DashboardCruise property values
-				// Owner of the cruise
-				writer.println(DATA_OWNER_ID + 
-						cruiseData.getOwner());
-				// Upload filename
-				writer.println(UPLOAD_FILENAME_ID + 
-						cruiseData.getUploadFilename());
-				// Data-check status string
-				writer.println(DATA_CHECK_STATUS_ID + 
-						cruiseData.getDataCheckStatus());
-				// Metadata filenames
-				// a little arguably unnecessary overhead going through an ArrayList<String>
-				writer.println(METADATA_FILENAMES_ID + 
-						DashboardUtils.encodeStringArrayList(new ArrayList<String>(
-								cruiseData.getMetadataFilenames())));
-				// QC-submission status string
-				writer.println(QC_STATUS_ID + 
-						cruiseData.getQcStatus());
-				// Archive status string
-				writer.println(ARCHIVE_STATUS_ID + 
-						cruiseData.getArchiveStatus());
-				// Total number of data measurements (rows of data)
-				writer.println(NUM_DATA_ROWS_ID + 
-						Integer.toString(cruiseData.getNumDataRows()));
-				// Data column types - encoded using the enumerated names
-				ArrayList<String> colTypeNames = 
-						new ArrayList<String>(cruiseData.getDataColTypes().size());
-				for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() )
-					colTypeNames.add(colType.name());
-				writer.println(DATA_COLUMN_TYPES_ID + 
-						DashboardUtils.encodeStringArrayList(colTypeNames));
-				// Data column index in original upload data file
-				writer.println(USER_COLUMN_INDICES_ID + 
-						DashboardUtils.encodeIntegerArrayList(
-								cruiseData.getUserColIndices()));
-				// Data column name in the original upload data file
-				writer.println(USER_COLUMN_NAMES_ID + 
-						DashboardUtils.encodeStringArrayList(
-								cruiseData.getUserColNames()));
-				// Unit for each data column
-				writer.println(DATA_COLUMN_UNITS_ID + 
-						DashboardUtils.encodeStringArrayList(
-								cruiseData.getDataColUnits()));
-				// Description of each data column
-				writer.println(DATA_COLUMN_DESCRIPTIONS_ID + 
-						DashboardUtils.encodeStringArrayList(
-								cruiseData.getDataColDescriptions()));
-				// Qualities of each data column
-				writer.println(DATA_COLUMN_QUALITIES_ID + 
-						DashboardUtils.encodeIntegerArrayList(
-								cruiseData.getDataColQualities()));
-				// Now print the normal data file contents 
+				// Print the normal data file contents to the cruise data file
 				// The standard creation date and expocode header lines
 				writer.println("SOCAT version " + 
 						DashboardDataStore.get().getSocatVersion() + 
@@ -657,160 +762,180 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			}
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
-					"Problems writing data for cruise " + expocode + 
-					" to " + cruiseFile.getPath() + ": " + ex.getMessage());
+					"Problems writing cruise data for " + expocode + 
+					" to " + dataFile.getPath() + ": " + ex.getMessage());
 		}
 
 		if ( (message == null) || message.trim().isEmpty() )
 			return;
 
-		// Submit the updated file to version control
+		// Submit the updated data file to version control
 		try {
-			commitVersion(cruiseFile, message);
+			commitVersion(dataFile, message);
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Problems committing updated data for cruise " + expocode +
-					": " + ex.getMessage());
+					"Problems committing updated cruise data for " + 
+							expocode + ": " + ex.getMessage());
 		}
 	}
 
 	/**
-	 * Assigns a DashboardCruise with data from the first few lines 
-	 * read from an input reader.
+	 * Assigns a DashboardCruise from the cruise information file.  
+	 * The expocode of the cruise is obtained from the cruise object. 
 	 * 
 	 * @param cruise
-	 * 		assign cruise information to this cruise object
-	 * @param cruiseReader
-	 * 		read cruise information from here;
-	 * 		must be positioned at the start of the cruise data file 
+	 * 		assign cruise information to this cruise object 
+	 * @throws IllegalArgumentException
+	 * 		if the cruise expocode is invalid, or if the properties
+	 * 		file is invalid
+	 * @throws FileNotFoundException
+	 * 		if the cruise information file does not exist
 	 * @throws IOException
-	 * 		if reading data from the reader throws one or
-	 * 		if the expected first few lines with cruise information
-	 * 		are not found
+	 * 		if there are problems reading the properties given in
+	 * 		the cruise information file
 	 */
-	private void assignCruiseFromInput(DashboardCruise cruise, 
-						BufferedReader cruiseReader) throws IOException {
-		// Get the username for this cruise
-		String dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_OWNER_ID) )
-			throw new IOException(
-					"first line does not start with " + DATA_OWNER_ID);
-		cruise.setOwner(dataline.substring(DATA_OWNER_ID.length()).trim());
+	private void assignCruiseFromInfoFile(DashboardCruise cruise) 
+			throws IllegalArgumentException, FileNotFoundException, IOException {
+		// Get the cruise information file
+		File infoFile = cruiseInfoFile(cruise.getExpocode());
+		// Get the properties given in this file
+		Properties cruiseProps = new Properties();
+		BufferedReader infoReader = new BufferedReader(new FileReader(infoFile));
+		try {
+			cruiseProps.load(infoReader);
+		} finally {
+			infoReader.close();
+		}
 
-		// Get the filename for this cruise
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(UPLOAD_FILENAME_ID) )
-			throw new IOException(
-					"second line does not start with " + UPLOAD_FILENAME_ID);
-		cruise.setUploadFilename(
-				dataline.substring(UPLOAD_FILENAME_ID.length()).trim());
+		// Assign the DashboardCruise from the values in the properties file
 
-		// Get the data check status for this cruise
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_CHECK_STATUS_ID) )
-			throw new IOException(
-					"third line does not start with " + DATA_CHECK_STATUS_ID);
-		cruise.setDataCheckStatus(
-				dataline.substring(DATA_CHECK_STATUS_ID.length()).trim());
+		// Owner of the data file
+		String value = cruiseProps.getProperty(DATA_OWNER_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_OWNER_ID + " given in " + infoFile.getPath());
+		cruise.setOwner(value);
 
-		// Get the metadata filenames for this cruise
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(METADATA_FILENAMES_ID) )
-			throw new IOException(
-					"fourth line does not start with " + METADATA_FILENAMES_ID);
-		// a little arguably unnecessary overhead going through an ArrayList<String>
+		// Name of uploaded file
+		value = cruiseProps.getProperty(UPLOAD_FILENAME_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					UPLOAD_FILENAME_ID + " given in " + infoFile.getPath());			
+		cruise.setUploadFilename(value);
+
+		// Data check status
+		value = cruiseProps.getProperty(DATA_CHECK_STATUS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_CHECK_STATUS_ID + " given in " + infoFile.getPath());			
+		cruise.setDataCheckStatus(value);
+
+		// Metadata documents
+		value = cruiseProps.getProperty(METADATA_FILENAMES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					METADATA_FILENAMES_ID + " given in " + infoFile.getPath());			
+		// a little arguably-unnecessary overhead going through an ArrayList<String>
 		cruise.setMetadataFilenames(new TreeSet<String>(
-				DashboardUtils.decodeStringArrayList(
-						dataline.substring(METADATA_FILENAMES_ID.length()).trim())));
+				DashboardUtils.decodeStringArrayList(value)));
 
-		// Get the QC status for this cruise
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(QC_STATUS_ID) )
-			throw new IOException(
-					"fifth line does not start with " + QC_STATUS_ID);
-		cruise.setQcStatus(dataline.substring(QC_STATUS_ID.length()).trim());
+		// QC status
+		value = cruiseProps.getProperty(QC_STATUS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					QC_STATUS_ID + " given in " + infoFile.getPath());			
+		cruise.setQcStatus(value);
 
-		// Get the archive status for this cruise
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(ARCHIVE_STATUS_ID) )
-			throw new IOException(
-					"sixth line does not start with " + ARCHIVE_STATUS_ID);
-		cruise.setArchiveStatus(
-				dataline.substring(ARCHIVE_STATUS_ID.length()).trim());
-		// Total number of data measurements (rows of data)
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(NUM_DATA_ROWS_ID) )
-			throw new IOException(
-					"seventh line does not start with " + NUM_DATA_ROWS_ID);
-		cruise.setNumDataRows(Integer.parseInt(
-				dataline.substring(NUM_DATA_ROWS_ID.length()).trim()));
+		// Archive status
+		value = cruiseProps.getProperty(ARCHIVE_STATUS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					ARCHIVE_STATUS_ID + " given in " + infoFile.getPath());			
+		cruise.setArchiveStatus(value);
+
+		// Number of rows of data (number of samples)
+		value = cruiseProps.getProperty(NUM_DATA_ROWS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					NUM_DATA_ROWS_ID + " given in " + infoFile.getPath());
+		try {
+			cruise.setNumDataRows(Integer.parseInt(value));
+		} catch ( NumberFormatException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
+
 		// Data column types - encoded using the enumerated names
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_COLUMN_TYPES_ID) )
-			throw new IOException(
-					"eighth line does not start with " + DATA_COLUMN_TYPES_ID);
-		ArrayList<String> colTypeNames = DashboardUtils.decodeStringArrayList(
-				dataline.substring(DATA_COLUMN_TYPES_ID.length()).trim());
+		value = cruiseProps.getProperty(DATA_COLUMN_TYPES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_COLUMN_TYPES_ID + " given in " + infoFile.getPath());
+		ArrayList<String> colTypeNames = DashboardUtils.decodeStringArrayList(value);
 		// Assign the column types directly to the array in the cruise 
 		ArrayList<CruiseDataColumnType> colTypes = cruise.getDataColTypes();
 		colTypes.clear();
 		for ( String name : colTypeNames )
-			colTypes.add(CruiseDataColumnType.valueOf(
-											CruiseDataColumnType.class, name));
-		int numDataColumns = colTypes.size();
+			colTypes.add(CruiseDataColumnType.valueOf(name));
+
 		// Data column index in original upload data file
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(USER_COLUMN_INDICES_ID) )
-			throw new IOException(
-					"ninth line does not start with " + USER_COLUMN_INDICES_ID);
-		cruise.setUserColIndices(DashboardUtils.decodeIntegerArrayList(
-				dataline.substring(USER_COLUMN_INDICES_ID.length()).trim()));
-		if ( cruise.getUserColIndices().size() != numDataColumns )
-			throw new IOException(
+		value = cruiseProps.getProperty(USER_COLUMN_INDICES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					USER_COLUMN_INDICES_ID + " given in " + infoFile.getPath());
+		try {
+			cruise.setUserColIndices(DashboardUtils.decodeIntegerArrayList(value));
+		} catch ( NumberFormatException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
+		if ( cruise.getUserColIndices().size() != colTypes.size() )
+			throw new IllegalArgumentException(
 					"number of user column indices different from " +
 					"number of data column types");
+
 		// Data column name in the original upload data file
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(USER_COLUMN_NAMES_ID) )
-			throw new IOException(
-					"tenth line does not start with " + USER_COLUMN_NAMES_ID);
-		cruise.setUserColNames(DashboardUtils.decodeStringArrayList(
-				dataline.substring(USER_COLUMN_NAMES_ID.length()).trim()));
-		if ( cruise.getUserColNames().size() != numDataColumns )
-			throw new IOException(
+		value = cruiseProps.getProperty(USER_COLUMN_NAMES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					USER_COLUMN_NAMES_ID + " given in " + infoFile.getPath());
+		cruise.setUserColNames(DashboardUtils.decodeStringArrayList(value));
+		if ( cruise.getUserColNames().size() != colTypes.size() )
+			throw new IllegalArgumentException(
 					"number of user column names different from " +
 					"number of data column types");
+
 		// Unit for each data column
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_COLUMN_UNITS_ID) )
-			throw new IOException(
-					"eleventh line does not start with " + DATA_COLUMN_UNITS_ID);
-		cruise.setDataColUnits(DashboardUtils.decodeStringArrayList(
-				dataline.substring(DATA_COLUMN_UNITS_ID.length()).trim()));
-		if ( cruise.getDataColUnits().size() != numDataColumns )
-			throw new IOException(
+		value = cruiseProps.getProperty(DATA_COLUMN_UNITS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_COLUMN_UNITS_ID + " given in " + infoFile.getPath());
+		cruise.setDataColUnits(DashboardUtils.decodeStringArrayList(value));
+		if ( cruise.getDataColUnits().size() != colTypes.size() )
+			throw new IllegalArgumentException(
 					"number of data column units different from " +
 					"number of data column types");
+
 		// Description of each data column
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_COLUMN_DESCRIPTIONS_ID) )
-			throw new IOException(
-					"twelfth line does not start with " + DATA_COLUMN_DESCRIPTIONS_ID);
-		cruise.setDataColDescriptions(DashboardUtils.decodeStringArrayList(
-				dataline.substring(DATA_COLUMN_DESCRIPTIONS_ID.length()).trim()));
-		if ( cruise.getDataColDescriptions().size() != numDataColumns )
-			throw new IOException(
+		value = cruiseProps.getProperty(DATA_COLUMN_DESCRIPTIONS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_COLUMN_DESCRIPTIONS_ID + " given in " + infoFile.getPath());
+		cruise.setDataColDescriptions(DashboardUtils.decodeStringArrayList(value));
+		if ( cruise.getDataColDescriptions().size() != colTypes.size() )
+			throw new IllegalArgumentException(
 					"number of data column descriptions different from " +
 					"number of data column types");
-		// QUality of each data column
-		dataline = cruiseReader.readLine();
-		if ( ! dataline.startsWith(DATA_COLUMN_QUALITIES_ID) )
-			throw new IOException(
-					"thirteenth line does not start with " + DATA_COLUMN_QUALITIES_ID);
-		cruise.setDataColQualities(DashboardUtils.decodeIntegerArrayList(
-				dataline.substring(DATA_COLUMN_QUALITIES_ID.length()).trim()));
-		if ( cruise.getDataColQualities().size() != numDataColumns )
-			throw new IOException(
+
+		// Quality of each data column
+		value = cruiseProps.getProperty(DATA_COLUMN_QUALITIES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_COLUMN_QUALITIES_ID + " given in " + infoFile.getPath());
+		try {
+			cruise.setDataColQualities(DashboardUtils.decodeIntegerArrayList(value));
+		} catch ( NumberFormatException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
+		if ( cruise.getDataColQualities().size() != colTypes.size() )
+			throw new IllegalArgumentException(
 					"number of data column qualities different from " +
 					"number of data column types");
 	}
@@ -831,12 +956,12 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		if the expocode is invalid, 
 	 * 		if there are problems accessing the cruise data file
 	 * @throws FileNotFoundException
-	 * 		if there is no cruise data file for this cruise
+	 * 		if there is no cruise information file for this cruise
 	 */
 	public DashboardCruise verifyOkayToDeleteCruise(String expocode, String username) 
 				throws IllegalArgumentException, FileNotFoundException {
 		// Get the cruise information from the data file
-		DashboardCruise cruise = getCruiseFromDataFile(expocode);
+		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
 		// Check if the cruise is in a submitted or accepted state
 		String status = cruise.getQcStatus();
 		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 

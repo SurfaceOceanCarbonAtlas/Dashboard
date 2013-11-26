@@ -17,7 +17,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -29,7 +28,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -49,7 +47,7 @@ public class DashboardMetadataListPage extends Composite {
 	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String CRUISES_HTML_INTRO = 
-			"Select metadata documents to be associated with the cruise(s):<br />";
+			"Select metadata documents to be associated with the cruise(s):  ";
 
 	private static final String UPLOAD_NEW_TEXT = "Upload New Metadata";
 	private static final String UPLOAD_NEW_HOVER_HELP = 
@@ -62,9 +60,11 @@ public class DashboardMetadataListPage extends Composite {
 	private static final String ONLY_ONE_METADATA_ALLOWED_MSG =
 			"Exactly one metadata document must be selected";
 
-	private static final String SUBMIT_TEXT = "Associate Selected Metadata";
+	private static final String SUBMIT_TEXT = "Associate Selected";
 	private static final String CANCEL_TEXT = "Cancel";
 
+	private static final String METADATA_LIST_FAIL_MSG = 
+			"Unexpected problems obtaining the list of available metadata documents";
 	private static final String GET_CRUISE_LIST_FAIL_MSG = 
 			"Problems obtaining the latest cruise listing";
 	private static final String SUBMIT_FAIL_MSG = 
@@ -73,7 +73,7 @@ public class DashboardMetadataListPage extends Composite {
 			"Metadata successfully associated with the cruises";
 
 	// Replacement strings for empty or null values
-	private static final String EMPTY_TABLE_TEXT = "No uploaded cruises";
+	private static final String EMPTY_TABLE_TEXT = "No uploaded metadata documents";
 	private static final String NO_OWNER_STRING = "(unknown)";
 	private static final String NO_FILENAME_STRING = "(unknown)";
 
@@ -93,7 +93,7 @@ public class DashboardMetadataListPage extends Composite {
 			GWT.create(DashboardMetadataListService.class);
 
 	@UiField Label userInfoLabel;
-	@UiField HTML cruiseNamesHtml; 
+	@UiField Label cruiseNamesLabel; 
 	@UiField Button logoutButton;
 	@UiField Button uploadNewButton;
 	@UiField Button uploadUpdateButton;
@@ -116,6 +116,7 @@ public class DashboardMetadataListPage extends Composite {
 	private DashboardMetadataListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildMetadataListTable();
+		cruiseExpocodes = new TreeSet<String>();
 
 		logoutButton.setText(LOGOUT_TEXT);
 		submitButton.setText(SUBMIT_TEXT);
@@ -145,9 +146,10 @@ public class DashboardMetadataListPage extends Composite {
 	 * 		list from the server
 	 */
 	static void showPage(final TreeSet<String> cruiseExpocodes, 
-						final Composite currentPage, final String errMsg) {
+			final Composite currentPage) {
 		service.getMetadataList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
+								 cruiseExpocodes,
 								 new AsyncCallback<DashboardMetadataList>() {
 			@Override
 			public void onSuccess(DashboardMetadataList mdataList) {
@@ -160,12 +162,12 @@ public class DashboardMetadataListPage extends Composite {
 					singleton.updateMetadataList(cruiseExpocodes, mdataList);
 				}
 				else {
-					Window.alert(errMsg + " (unexpected invalid cruise list)");
+					Window.alert(METADATA_LIST_FAIL_MSG + " (unexpected invalid cruise list)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(errMsg + " (" + ex.getMessage() + ")");
+				Window.alert(METADATA_LIST_FAIL_MSG + " (" + ex.getMessage() + ")");
 			}
 		});
 	}
@@ -197,12 +199,10 @@ public class DashboardMetadataListPage extends Composite {
 			if ( first )
 				first = false;
 			else
-				sb.append("; ");
-			sb.append("<b>");
-			sb.append(SafeHtmlUtils.htmlEscape(expo));
-			sb.append("</b>");
+				sb.append(";  ");
+			sb.append(expo);
 		}
-		cruiseNamesHtml.setHTML(SafeHtmlUtils.fromTrustedString(sb.toString()));
+		cruiseNamesLabel.setText(sb.toString());
 		// Update the metadata shown by resetting the data 
 		// in the data provider
 		List<DashboardMetadata> metadataList = listProvider.getList();
@@ -215,17 +215,32 @@ public class DashboardMetadataListPage extends Composite {
 
 	/**
 	 * @return
-	 * 		set of metadata expocode filenames of the selected 
+	 * 		a tree set of metadata expocode filenames of the selected 
 	 * 		metadata documents; will not be null, but may be empty. 
 	 */
-	private HashSet<String> getSelectedExpocodeFilenames() {
-		HashSet<String> expoNameSet = new HashSet<String>();
+	private TreeSet<String> getSelectedExpocodeFilenames() {
+		TreeSet<String> expoNameSet = new TreeSet<String>();
 		for ( DashboardMetadata mdata : listProvider.getList() ) {
 			if ( mdata.isSelected() ) {
 				expoNameSet.add(mdata.getExpocodeFilename());
 			}
 		}
 		return expoNameSet;
+	}
+
+	/**
+	 * @return
+	 * 		a hash set of the selected metadata documents; 
+	 * 		will not be null but may be empty.
+	 */
+	private HashSet<DashboardMetadata> getSelectedMetadata()  {
+		HashSet<DashboardMetadata> mdataSet = new HashSet<DashboardMetadata>();
+		for ( DashboardMetadata mdata : listProvider.getList() ) {
+			if ( mdata.isSelected() ) {
+				mdataSet.add(mdata);
+			}
+		}
+		return mdataSet;
 	}
 
 	@UiHandler("logoutButton")
@@ -249,7 +264,7 @@ public class DashboardMetadataListPage extends Composite {
 
 	@UiHandler("uploadUpdateButton")
 	void uploadUpdateOnClick(ClickEvent event) {
-		HashSet<String> selectedFilenames = getSelectedExpocodeFilenames();
+		TreeSet<String> selectedFilenames = getSelectedExpocodeFilenames();
 		if ( selectedFilenames.size() != 1 ) {
 			Window.alert(ONLY_ONE_METADATA_ALLOWED_MSG);
 			return;
@@ -263,10 +278,10 @@ public class DashboardMetadataListPage extends Composite {
 	void submitOnClick(ClickEvent event) {
 		// Submit the selected metadata documents with the list of cruises
 		// associated with this page
-		HashSet<String> expoFilenames = getSelectedExpocodeFilenames();
+		HashSet<DashboardMetadata> selectedMetadata = getSelectedMetadata();
 		service.associateMetadata(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), cruiseExpocodes, 
-				expoFilenames, new AsyncCallback<Void>() {
+				selectedMetadata, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Change to the latest cruise listing page.

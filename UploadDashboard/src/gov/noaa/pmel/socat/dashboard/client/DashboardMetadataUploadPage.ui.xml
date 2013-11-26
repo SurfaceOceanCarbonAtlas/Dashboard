@@ -11,7 +11,7 @@
 		</g:FlowPanel>
 		<g:FormPanel ui:field="uploadForm">
 			<g:FlowPanel>
-				<g:HTML addStyleNames="{style.cruisenamesintro}" ui:field="expocodeHtml" />
+				<g:Label addStyleNames="{style.cruisenamesintro}" ui:field="expocodeLabel" />
 				<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
 						ui:field="metadataUpload" />
 				<g:Hidden name="username" ui:field="usernameToken" />
@@ -21,7 +21,7 @@
 			</g:FlowPanel>
 		</g:FormPanel>
 		<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="okButton" />
+			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="uploadButton" />
 			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
 		</g:FlowPanel>
 	</g:FlowPanel>

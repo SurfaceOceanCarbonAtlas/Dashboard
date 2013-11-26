@@ -128,7 +128,7 @@ public class DashboardCruiseUploadPage extends Composite {
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
-		uploadForm.setAction(GWT.getModuleBaseURL() + "cruiseUploadService");
+		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
 
 		encodingLabel.setText(ENCODING_TEXT);
 

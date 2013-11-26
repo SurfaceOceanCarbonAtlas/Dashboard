@@ -229,7 +229,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 				DashboardCruiseWithData existingCruiseData;
 				try {
 					existingCruiseData = 
-							cruiseHandler.getCruiseDataFromFile(expocode, 0, 25);
+							cruiseHandler.getCruiseDataFromFiles(expocode, 0, 25);
 				} catch ( Exception ex ) {
 					// just report the error without data
 					existingCruiseData = null;
@@ -294,7 +294,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			message = "Cruise data for " + expocode + " created by " + 
 					username + " from uploaded file " + filename;			
 		try {
-			cruiseHandler.saveCruiseDataToFile(cruiseData, message);
+			cruiseHandler.saveCruiseDataToFiles(cruiseData, message);
 		} catch (IllegalArgumentException ex) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
 					"Error processing the request: " + ex.getMessage());

@@ -53,7 +53,7 @@ public class DashboardCruiseListPage extends Composite {
 			"I give permission for my cruises to be shared for policy (QC) assessment.";
 	private static final String AGREE_SHARE_INFO_HTML =
 			"By checking this box I am giving permission for my uploaded cruise files " +
-			"to be shared for purposes of policy (QC) assessment.  I understand that " +
+			"to be shared for purposes of policy (QC) assessment.  I understand that " +
 			"data so-released will be used only for that narrow purpose and will not " +
 			"be further distributed until the next official publication of SOCAT if " +
 			"the cruise was deemed acceptable. ";
@@ -136,6 +136,9 @@ public class DashboardCruiseListPage extends Composite {
 			"to proceed?";
 	private static final String REMOVE_CRUISE_FAIL_MSG = 
 			"Unable to remove the selected cruise(s) from your list of cruises";
+
+	private static final String NO_CRUISES_SELECTED_FOR_METADATA_MSG = 
+			"No cruises are selected with which to associating metadata documents";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
@@ -427,18 +430,26 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("dataCheckButton")
 	void dataCheckOnClick(ClickEvent event) {
-		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(false, false);
+		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(true, false);
 		if ( expocodeSet.size() != 1 ) {
 			Window.alert(ONLY_ONE_CRUISE_ALLOWED_MSG);
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
-		CruiseDataColumnSpecsPage.showPage(expocode, DashboardCruiseListPage.this);
+		CruiseDataColumnSpecsPage.showPage(expocode, 
+				DashboardCruiseListPage.this);
 	}
 
 	@UiHandler("metadataButton")
 	void metadataOnClick(ClickEvent event) {
-		Window.alert("Not yet implemented");
+		TreeSet<String> expocodeSet = new TreeSet<String>();
+		expocodeSet.addAll(getSelectedCruiseExpocodes(true, false));
+		if ( expocodeSet.size() < 1 ) {
+			Window.alert(NO_CRUISES_SELECTED_FOR_METADATA_MSG);
+			return;
+		}
+		DashboardMetadataListPage.showPage(expocodeSet, 
+				DashboardCruiseListPage.this);
 	}
 
 	@UiHandler("reviewButton")

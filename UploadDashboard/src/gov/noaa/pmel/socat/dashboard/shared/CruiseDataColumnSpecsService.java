@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * Server side specification of data column specification services
  * @author Karl Smith
  */
-@RemoteServiceRelativePath("dataColumnSpecsService")
+@RemoteServiceRelativePath("DataColumnSpecsService")
 public interface CruiseDataColumnSpecsService extends RemoteService {
 
 	/**
