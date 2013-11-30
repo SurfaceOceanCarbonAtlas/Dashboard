@@ -54,9 +54,9 @@ public class DashboardDataStore {
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
-			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=Member1,Member2 \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeManagerName=AnotherVeryLongKeyOfHexidecimalValues \n" +
-			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=Manager1,Member2 \n" +
+			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeAdminName=YetAnotherVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
 			"# ------------------------------ \n" +

@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -11,6 +12,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -22,7 +24,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -82,10 +83,6 @@ public class DashboardCruiseUploadPage extends Composite {
 	private static final String FILE_DOES_NOT_EXIST_FAIL_MSG = 
 			"A cruise with this expocode does not exist.  Use the " + CREATE_TEXT + 
 			" button to create a new cruise after verifying the expocode for this cruise.";
-	private static final String GET_CRUISE_LIST_FAIL_MSG = 
-			"Unable to obtain the cruise list for some unexpected reason";
-	private static final String LIST_UPDATE_FAIL_MSG =
-			"Updating of the cruise list failed for some unexpected reason";
 
 	interface DashboardCruiseUploadPageUiBinder 
 			extends UiBinder<Widget, DashboardCruiseUploadPage> {
@@ -111,6 +108,8 @@ public class DashboardCruiseUploadPage extends Composite {
 	@UiField Button cancelButton;
 	@UiField HTML previewHtml;
 
+	private String username;
+
 	// Singleton instance of this page
 	private static DashboardCruiseUploadPage singleton = null;
 
@@ -121,6 +120,8 @@ public class DashboardCruiseUploadPage extends Composite {
 	 */
 	private DashboardCruiseUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+
+		username = "";
 
 		logoutButton.setText(LOGOUT_TEXT);
 
@@ -149,22 +150,39 @@ public class DashboardCruiseUploadPage extends Composite {
 	 * Display the cruise upload page in the RootLayoutPanel
 	 * after clearing as much of the page as possible.  
 	 * The upload filename cannot be cleared. 
+	 * Adds this page to the page history.
 	 */
 	static void showPage() {
 		if ( singleton == null )
 			singleton = new DashboardCruiseUploadPage();
+		singleton.username = DashboardLoginPage.getUsername();
 		singleton.userInfoLabel.setText(WELCOME_INTRO + 
-				DashboardLoginPage.getUsername());
+				singleton.username);
 		singleton.usernameToken.setValue("");
 		singleton.passhashToken.setValue("");
 		singleton.actionToken.setValue("");
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
-		RootLayoutPanel.get().add(singleton);
+		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		History.newItem(PagesEnum.CRUISE_UPLOAD.name(), false);
+	}
+
+	/**
+	 * Redisplays the last version of this page if the username
+	 * associated with this page matches the current login username.
+	 * Does not add this page to the page history.
+	 */
+	static void redisplayPage() {
+		// If never show before, or if the username does not match the 
+		// current login username, show the login page instead
+		if ( (singleton == null) || 
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
+			DashboardLoginPage.showPage();
+		else
+			SocatUploadDashboard.get().updateCurrentPage(singleton);
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardCruiseUploadPage.this);
 		DashboardLogoutPage.showPage();
 	}
 
@@ -201,8 +219,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the cruise list page
-		DashboardCruiseListPage.showPage(DashboardCruiseUploadPage.this, 
-											GET_CRUISE_LIST_FAIL_MSG);
+		DashboardCruiseListPage.showPage(false);
 	}
 
 	@UiHandler("uploadForm")
@@ -296,15 +313,13 @@ public class DashboardCruiseUploadPage extends Composite {
 			// cruise file created
 			Window.alert(tagMsg[1]);
 			// return to the updated cruise list
-			DashboardCruiseListPage.showPage(
-					DashboardCruiseUploadPage.this, LIST_UPDATE_FAIL_MSG);
+			DashboardCruiseListPage.showPage(false);
 		}
 		else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file updated
 			Window.alert(tagMsg[1]);
 			// return to the updated cruise list
-			DashboardCruiseListPage.showPage(
-					DashboardCruiseUploadPage.this, LIST_UPDATE_FAIL_MSG);
+			DashboardCruiseListPage.showPage(false);
 		}
 		else {
 			// Unknown response with a newline, display the whole message in the preview

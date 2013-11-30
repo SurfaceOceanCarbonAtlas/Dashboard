@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataListService;
@@ -24,12 +25,12 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -65,8 +66,6 @@ public class DashboardMetadataListPage extends Composite {
 
 	private static final String METADATA_LIST_FAIL_MSG = 
 			"Unexpected problems obtaining the list of available metadata documents";
-	private static final String GET_CRUISE_LIST_FAIL_MSG = 
-			"Problems obtaining the latest cruise listing";
 	private static final String SUBMIT_FAIL_MSG = 
 			"Problems associating the metadata with the cruises";
 	private static final String SUBMIT_SUCCESS_MSG = 
@@ -101,6 +100,7 @@ public class DashboardMetadataListPage extends Composite {
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
+	private String username;
 	private ListDataProvider<DashboardMetadata> listProvider;
 	private TreeSet<String> cruiseExpocodes;
 
@@ -116,6 +116,7 @@ public class DashboardMetadataListPage extends Composite {
 	private DashboardMetadataListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildMetadataListTable();
+		username = "";
 		cruiseExpocodes = new TreeSet<String>();
 
 		logoutButton.setText(LOGOUT_TEXT);
@@ -133,7 +134,8 @@ public class DashboardMetadataListPage extends Composite {
 
 	/**
 	 * Display the metadata list page in the RootLayoutPanel 
-	 * with the latest information from the server
+	 * with the latest information from the server.
+	 * Adds this page to the page history list.
 	 * 
 	 * @param cruiseExpocodes
 	 * 		associate metadata to the cruises with these expocodes 
@@ -157,12 +159,13 @@ public class DashboardMetadataListPage extends Composite {
 										.equals(mdataList.getUsername()) ) {
 					if ( singleton == null )
 						singleton = new DashboardMetadataListPage();
-					RootLayoutPanel.get().remove(currentPage);
-					RootLayoutPanel.get().add(singleton);
+					SocatUploadDashboard.get().updateCurrentPage(singleton);
 					singleton.updateMetadataList(cruiseExpocodes, mdataList);
+					History.newItem(PagesEnum.METADATA_LIST.name(), false);
 				}
 				else {
-					Window.alert(METADATA_LIST_FAIL_MSG + " (unexpected invalid cruise list)");
+					Window.alert(METADATA_LIST_FAIL_MSG + 
+							" (unexpected invalid cruise list)");
 				}
 			}
 			@Override
@@ -170,6 +173,21 @@ public class DashboardMetadataListPage extends Composite {
 				Window.alert(METADATA_LIST_FAIL_MSG + " (" + ex.getMessage() + ")");
 			}
 		});
+	}
+
+	/**
+	 * Redisplays the last version of this page if the username
+	 * associated with this page matches the current login username.
+	 * Does not add this page to the page history list.
+	 */
+	static void redisplayPage() {
+		// If never show before, or if the username does not match the 
+		// current login username, show the login page instead
+		if ( (singleton == null) || 
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
+			DashboardLoginPage.showPage();
+		else
+			SocatUploadDashboard.get().updateCurrentPage(singleton);
 	}
 
 	/**
@@ -184,8 +202,8 @@ public class DashboardMetadataListPage extends Composite {
 	private void updateMetadataList(TreeSet<String> cruiseExpocodes, 
 									DashboardMetadataList mdataList) {
 		// Update the username
-		userInfoLabel.setText(WELCOME_INTRO + 
-				DashboardLoginPage.getUsername());
+		username = DashboardLoginPage.getUsername();
+		userInfoLabel.setText(WELCOME_INTRO + username);
 		// Update the cruises to be assigned by this page
 		this.cruiseExpocodes.clear();
 		if ( cruiseExpocodes != null ) {
@@ -245,20 +263,17 @@ public class DashboardMetadataListPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
 		DashboardLogoutPage.showPage();
 	}
 
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page.
-		DashboardCruiseListPage.showPage(
-				DashboardMetadataListPage.this, GET_CRUISE_LIST_FAIL_MSG);
+		DashboardCruiseListPage.showPage(false);
 	}
 
 	@UiHandler("uploadNewButton")
 	void uploadNewOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
 		DashboardMetadataUploadPage.showPage(cruiseExpocodes, null);
 	}
 
@@ -270,7 +285,6 @@ public class DashboardMetadataListPage extends Composite {
 			return;
 		}
 		String expoFilename = selectedFilenames.iterator().next();
-		RootLayoutPanel.get().remove(DashboardMetadataListPage.this);
 		DashboardMetadataUploadPage.showPage(cruiseExpocodes, expoFilename);
 	}
 
@@ -285,8 +299,7 @@ public class DashboardMetadataListPage extends Composite {
 			@Override
 			public void onSuccess(Void result) {
 				// Change to the latest cruise listing page.
-				DashboardCruiseListPage.showPage(
-						DashboardMetadataListPage.this, GET_CRUISE_LIST_FAIL_MSG);
+				DashboardCruiseListPage.showPage(false);
 				Window.alert(SUBMIT_SUCCESS_MSG);
 			}
 			@Override

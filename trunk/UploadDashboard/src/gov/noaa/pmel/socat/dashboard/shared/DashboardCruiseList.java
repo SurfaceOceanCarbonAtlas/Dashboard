@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -14,9 +15,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author Karl Smith
  */
 public class DashboardCruiseList extends HashMap<String,DashboardCruise> 
-												implements IsSerializable {
+								implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2223946990539617665L;
+	private static final long serialVersionUID = 8003534046177591863L;
 
 	String username;
 

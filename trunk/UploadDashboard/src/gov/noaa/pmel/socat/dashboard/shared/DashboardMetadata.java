@@ -6,15 +6,17 @@ package gov.noaa.pmel.socat.dashboard.shared;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 /**
  * Currently represents an uploaded metadata file of unknown contents.
  * This may change in the future when contents are standardized.
  *  
  * @author Karl Smith
  */
-public class DashboardMetadata implements Serializable {
+public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2652350053303715910L;
+	private static final long serialVersionUID = 6910216828667718754L;
 
 	boolean selected;
 	String owner;

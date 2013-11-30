@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -12,13 +13,13 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -40,8 +41,6 @@ public class DashboardLoginPage extends Composite {
 	private static final String LOGIN_TEXT = "Login";
 	private static final String NO_CREDENTIALS_ERROR_MSG = 
 			"You must provide a username and password";
-	private static final String LOGIN_ERROR_MSG = 
-			"Sorry, your login failed.";
 
 	interface DashboardLoginPageUiBinder 
 			extends UiBinder<Widget, DashboardLoginPage> {
@@ -96,12 +95,32 @@ public class DashboardLoginPage extends Composite {
 	/**
 	 * Clears any stored authentication information and 
 	 * shows the login page in the RootLayoutPanel.
+	 * Adds this page to the page history.
 	 */
 	static void showPage() {
 		if ( singleton == null )
 			singleton = new DashboardLoginPage();
 		clearAuthentication();
-		RootLayoutPanel.get().add(singleton);
+		/*
+		 * Since this gets called if there are problems loading 
+		 * a page from history, allow History.newItem make the 
+		 * onValueChanged call, which will call the redisplayPage 
+		 * method below, showing the page.
+		 */
+		History.newItem(PagesEnum.LOGIN.name(), true);
+	}
+
+	/**
+	 * Clears any stored authentication information and 
+	 * shows the login page in the RootLayoutPanel.
+	 * Does not add the login page to the page history.
+	 */
+	static void redisplayPage() {
+		// Allow this succeed even if never called before
+		if ( singleton == null )
+			singleton = new DashboardLoginPage();
+		clearAuthentication();
+		SocatUploadDashboard.get().updateCurrentPage(singleton);
 	}
 
 	/**
@@ -177,7 +196,7 @@ public class DashboardLoginPage extends Composite {
 			setPasshash(DashboardUtils.passhashFromPlainText(
 						nameText.getValue().trim(), passText.getValue()));
 			passText.setText("");
-			DashboardCruiseListPage.showPage(DashboardLoginPage.this, LOGIN_ERROR_MSG);
+			DashboardCruiseListPage.showPage(true);
 		}
 		else {
 			Window.alert(NO_CREDENTIALS_ERROR_MSG);

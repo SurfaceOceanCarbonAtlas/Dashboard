@@ -3,6 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -10,7 +12,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public enum CruiseDataColumnType implements IsSerializable {
+public enum CruiseDataColumnType implements Serializable, IsSerializable {
 	/**
 	 * The delete data type indicates data that should be 
 	 * deleted from the data file when updated; only the 

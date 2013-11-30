@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.TreeSet;
@@ -12,6 +13,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -21,7 +23,6 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -61,14 +62,16 @@ public class DashboardMetadataUploadPage extends Composite {
 	@UiField Button uploadButton;
 	@UiField Button cancelButton;
 
-	TreeSet<String> cruiseExpocodes;
-	String metadataFilename;
+	private String username;
+	private TreeSet<String> cruiseExpocodes;
+	private String metadataFilename;
 
 	// Singleton instance of this page
 	private static DashboardMetadataUploadPage singleton = null;
 
 	private DashboardMetadataUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		username = "";
 		cruiseExpocodes = new TreeSet<String>();
 		metadataFilename = null;
 
@@ -82,11 +85,22 @@ public class DashboardMetadataUploadPage extends Composite {
 		cancelButton.setText(CANCEL_TEXT);
 	}
 
+	/**
+	 * Display the metadata upload page in the RootLayoutPanel.
+	 * Adds this page to the page history.
+	 * 
+	 * @param cruiseExpocodes
+	 * 		cruises currently associated with the DashboardMetadataListPage
+	 * @param metadataFilename
+	 * 		metadata document to be updated, or null if a new metadata
+	 * 		document is to be created
+	 * 		
+	 */
 	static void showPage(TreeSet<String> cruiseExpocodes, String metadataFilename) {
 		if ( singleton == null )
 			singleton = new DashboardMetadataUploadPage();
-		singleton.userInfoLabel.setText(WELCOME_INTRO + 
-				DashboardLoginPage.getUsername());
+		singleton.username = DashboardLoginPage.getUsername();
+		singleton.userInfoLabel.setText(WELCOME_INTRO + singleton.username);
 		singleton.cruiseExpocodes.clear();
 		singleton.cruiseExpocodes.addAll(cruiseExpocodes);
 		singleton.metadataFilename = metadataFilename;
@@ -102,12 +116,27 @@ public class DashboardMetadataUploadPage extends Composite {
 		singleton.passhashToken.setValue("");
 		singleton.expocodeToken.setValue("");
 		singleton.overwriteToken.setValue("");
-		RootLayoutPanel.get().add(singleton);
+		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		History.newItem(PagesEnum.METADATA_UPLOAD.name(), false);
+	}
+
+	/**
+	 * Redisplays the last version of this page if the username
+	 * associated with this page matches the current login username.
+	 * Does not add this page to the page history.
+	 */
+	static void redisplayPage() {
+		// If never show before, or if the username does not match the 
+		// current login username, show the login page instead
+		if ( (singleton == null) || 
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
+			DashboardLoginPage.showPage();
+		else
+			SocatUploadDashboard.get().updateCurrentPage(singleton);
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardMetadataUploadPage.this);
 		DashboardLogoutPage.showPage();
 	}
 
