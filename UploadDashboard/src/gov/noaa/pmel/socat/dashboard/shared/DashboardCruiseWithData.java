@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -14,7 +15,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author Karl Smith
  */
 public class DashboardCruiseWithData extends DashboardCruise 
-										implements IsSerializable {
+						implements Serializable, IsSerializable {
+
+	private static final long serialVersionUID = -8946792242247576598L;
 
 	String version;
 	ArrayList<String> preamble;

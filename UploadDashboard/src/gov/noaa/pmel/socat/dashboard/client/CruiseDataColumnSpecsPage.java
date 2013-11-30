@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
@@ -20,12 +21,12 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -55,8 +56,6 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			"Problems updating the cruise column types";
 	private static final String MORE_DATA_FAIL_MSG = 
 			"Problems obtaining more cruise data";
-	private static final String GET_CRUISE_LIST_FAIL_MSG = 
-			"Problems obtaining the latest cruise listing";
 	private static final String SUBMIT_SUCCESS_MSG = 
 			"Columns specifications updated for cruise: ";
 
@@ -78,6 +77,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	@UiField Button cancelButton;
 	@UiField SimplePager gridPager;
 
+	// Username associated with this page
+	private String username;
 	// Cruise associated with and updated by this page
 	private DashboardCruise cruise;
 	// List of CruiseDataColumn objects associated with the column Headers
@@ -95,6 +96,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	 */
 	private CruiseDataColumnSpecsPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		username = "";
 		logoutButton.setText(LOGOUT_TEXT);
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
@@ -133,25 +135,23 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	/**
 	 * Display the cruise data column specifications page for a cruise
 	 * with the latest cruise data column specifications from the server.
+	 * Add this page to the page history list.
 	 * 
 	 * @param expocode
 	 * 		show the specifications for this cruise
-	 * @param currentPage
-	 * 		current page on the RootLayoutPanel to be removed when
-	 * 		the cruise data column specifications page is available
 	 */
-	static void showPage(String expocode, final Composite currentPage) {
+	static void showPage(String expocode) {
 		service.getCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
 								DashboardLoginPage.getPasshash(), expocode, 
 								new AsyncCallback<DashboardCruiseWithData>() {
 			@Override
 			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
-					RootLayoutPanel.get().remove(currentPage);
 					if ( singleton == null )
 						singleton = new CruiseDataColumnSpecsPage();
-					RootLayoutPanel.get().add(singleton);
+					SocatUploadDashboard.get().updateCurrentPage(singleton);
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
+					History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
 				}
 				else {
 					Window.alert(GET_COLUMN_SPECS_FAIL_MSG + 
@@ -167,6 +167,21 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	}
 
 	/**
+	 * Redisplays the last version of this page if the username
+	 * associated with this page matches the current login username.
+	 * Does not add this page to the page history list.
+	 */
+	static void redisplayPage() {
+		// If never show before, or if the username does not match the 
+		// current login username, show the login page instead
+		if ( (singleton == null) || 
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
+			DashboardLoginPage.showPage();
+		else
+			SocatUploadDashboard.get().updateCurrentPage(singleton);
+	}
+
+	/**
 	 * Updates the data column specification page with the given
 	 * column types and data.
 	 * 
@@ -175,7 +190,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	 * 		initial cruise data for display
 	 */
 	private void updateCruiseColumnSpecs(DashboardCruiseWithData cruiseSpecs) {
-		userInfoLabel.setText(WELCOME_INTRO + DashboardLoginPage.getUsername());
+		username = DashboardLoginPage.getUsername();
+		userInfoLabel.setText(WELCOME_INTRO + username);
 
 		// Clear the expocode in case the data provider gets called while clearing
 		cruise.setExpocode(null);
@@ -261,7 +277,6 @@ public class CruiseDataColumnSpecsPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(CruiseDataColumnSpecsPage.this);
 		DashboardLogoutPage.showPage();
 	}
 
@@ -269,8 +284,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page, which may  
 		// have been updated from previous actions on this page.
-		DashboardCruiseListPage.showPage(
-				CruiseDataColumnSpecsPage.this, GET_CRUISE_LIST_FAIL_MSG);
+		DashboardCruiseListPage.showPage(false);
 	}
 
 	@UiHandler("submitButton")

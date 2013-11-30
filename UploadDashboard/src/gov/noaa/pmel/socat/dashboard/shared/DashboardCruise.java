@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -15,7 +16,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DashboardCruise implements IsSerializable {
+public class DashboardCruise implements Serializable, IsSerializable {
+
+	private static final long serialVersionUID = 2497856646119934549L;
 
 	boolean selected;
 	String owner;

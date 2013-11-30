@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import java.io.Serializable;
 import java.util.HashSet;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -13,9 +14,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author Karl Smith
  */
 public class DashboardMetadataList extends HashSet<DashboardMetadata> 
-												implements IsSerializable {
+								implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -703809110442781304L;
+	private static final long serialVersionUID = 8821642387470578963L;
 
 	String username;
 

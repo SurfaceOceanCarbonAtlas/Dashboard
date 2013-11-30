@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardLogoutService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardLogoutServiceAsync;
 
@@ -12,13 +13,13 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -76,12 +77,14 @@ public class DashboardLogoutPage extends Composite {
 
 	/**
 	 * Shows the logout page in the RootLayoutPanel 
-	 * and logs out the user.
+	 * and logs out the user.  
+	 * Adds this page to the page history.
 	 */
 	static void showPage() {
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		RootLayoutPanel.get().add(singleton);
+		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		History.newItem(PagesEnum.LOGOUT.name(), false);
 		service.logoutUser(DashboardLoginPage.getUsername(),
 						   DashboardLoginPage.getPasshash(),
 						   new AsyncCallback<Boolean>() {
@@ -102,9 +105,20 @@ public class DashboardLogoutPage extends Composite {
 		});
 	}
 
+	/**
+	 * Shows the logout page in the RootLayoutPanel.
+	 * Does not attempt to logout the user.
+	 * Does not add the logout page to the page history.
+	 */
+	static void redisplayPage() {
+		// Allow this succeed even if never called before
+		if ( singleton == null )
+			singleton = new DashboardLogoutPage();
+		SocatUploadDashboard.get().updateCurrentPage(singleton);
+	}
+
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardLogoutPage.this);
 		DashboardLoginPage.showPage();
 	}
 

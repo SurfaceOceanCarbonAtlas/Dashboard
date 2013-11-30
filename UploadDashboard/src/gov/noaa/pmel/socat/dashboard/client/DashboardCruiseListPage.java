@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
+import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListService;
@@ -25,13 +26,13 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
@@ -109,6 +110,12 @@ public class DashboardCruiseListPage extends Composite {
 			"remove the selected cruises from this list of cruises; " +
 			"this will NOT remove the cruise or cruise data from SOCAT";
 
+	// Error messages when the request for the latest cruise list fails
+	private static final String LOGIN_ERROR_MSG = 
+			"Sorry, your login failed";
+	private static final String GET_CRUISE_LIST_ERROR_MSG = 
+			"Problems obtaining the latest cruise listing";
+
 	private static final String NO_CRUISE_TO_DELETE_MSG = 
 			"No cruises are selected which can be deleted " +
 			"(cruises must be suspended or not submitted).";
@@ -159,6 +166,11 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 
+	// Column widths in em's
+	private static double CHECKBOX_COLUMN_WIDTH = 2.5;
+	private static double NORMAL_COLUMN_WIDTH = 8.0;
+	private static double FILENAME_COLUMN_WIDTH = 12.0;
+
 	interface DashboardCruiseListPageUiBinder 
 			extends UiBinder<Widget, DashboardCruiseListPage> {
 	}
@@ -186,6 +198,7 @@ public class DashboardCruiseListPage extends Composite {
 	@UiField Button removeFromListButton;
 	@UiField DataGrid<DashboardCruise> uploadsGrid;
 
+	private String username;
 	private ListDataProvider<DashboardCruise> listProvider;
 	private DashboardInfoPopup agreeSharePopup;
 	private DashboardInfoPopup agreeArchivePopup;
@@ -202,6 +215,8 @@ public class DashboardCruiseListPage extends Composite {
 	private DashboardCruiseListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildCruiseListTable();
+
+		username = "";
 
 		logoutButton.setText(LOGOUT_TEXT);
 
@@ -247,17 +262,22 @@ public class DashboardCruiseListPage extends Composite {
 
 	/**
 	 * Display the cruise list page in the RootLayoutPanel 
-	 * with the latest information from the server
+	 * with the latest information from the server.
+	 * Adds this page to the page history.
 	 * 
-	 * @param currentPage
-	 * 		currently displayed page in the RootLayoutPanel
-	 * 		to be removed when cruise list page is available
 	 * @param errMsg
 	 * 		message to show, along with some explanation, 
 	 * 		in a Window.alert if unable to obtain the cruise
 	 * 		list from the server
 	 */
-	static void showPage(final Composite currentPage, final String errMsg) {
+	static void showPage(boolean loggingIn) {
+		// Select the appropriate error message if the request fails 
+		final String errMsg;
+		if ( loggingIn )
+			errMsg = LOGIN_ERROR_MSG;
+		else
+			errMsg = GET_CRUISE_LIST_ERROR_MSG;
+		// Request the latest cruise list
 		service.updateCruiseList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
 								 DashboardUtils.REQUEST_CRUISE_LIST_ACTION, 
@@ -269,9 +289,9 @@ public class DashboardCruiseListPage extends Composite {
 										.equals(cruises.getUsername()) ) {
 					if ( singleton == null )
 						singleton = new DashboardCruiseListPage();
-					RootLayoutPanel.get().remove(currentPage);
-					RootLayoutPanel.get().add(singleton);
+					SocatUploadDashboard.get().updateCurrentPage(singleton);
 					singleton.updateCruises(cruises);
+					History.newItem(PagesEnum.CRUISE_LIST.name(), false);
 				}
 				else {
 					Window.alert(errMsg + " (unexpected invalid cruise list)");
@@ -285,6 +305,21 @@ public class DashboardCruiseListPage extends Composite {
 	}
 
 	/**
+	 * Redisplays the last version of this page if the username
+	 * associated with this page matches the current login username.
+	 * Does not add this page to the page history list.
+	 */
+	static void redisplayPage() {
+		// If never show before, or if the username does not match the 
+		// current login username, show the login page instead
+		if ( (singleton == null) || 
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
+			DashboardLoginPage.showPage();
+		else
+			SocatUploadDashboard.get().updateCurrentPage(singleton);
+	}
+
+	/**
 	 * Updates the cruise list page with the current username and 
 	 * with the cruises given in the argument.
 	 * 
@@ -293,7 +328,8 @@ public class DashboardCruiseListPage extends Composite {
 	 */
 	private void updateCruises(DashboardCruiseList cruises) {
 		// Update the username
-		userInfoLabel.setText(WELCOME_INTRO + DashboardLoginPage.getUsername());
+		username = DashboardLoginPage.getUsername();
+		userInfoLabel.setText(WELCOME_INTRO + username);
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();
@@ -376,7 +412,6 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardCruiseListPage.this);
 		DashboardLogoutPage.showPage();
 	}
 
@@ -408,7 +443,6 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("uploadButton")
 	void uploadCruiseOnClick(ClickEvent event) {
-		RootLayoutPanel.get().remove(DashboardCruiseListPage.this);
 		DashboardCruiseUploadPage.showPage();
 	}
 
@@ -436,8 +470,7 @@ public class DashboardCruiseListPage extends Composite {
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
-		CruiseDataColumnSpecsPage.showPage(expocode, 
-				DashboardCruiseListPage.this);
+		CruiseDataColumnSpecsPage.showPage(expocode);
 	}
 
 	@UiHandler("metadataButton")
@@ -545,22 +578,30 @@ public class DashboardCruiseListPage extends Composite {
 
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
-		uploadsGrid.setColumnWidth(selectedColumn, 2.5, Style.Unit.EM);
-		tableWidth += 2.5;
-		uploadsGrid.setColumnWidth(expocodeColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(ownerColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(dataCheckColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(metadataColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(qcStatusColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(archiveStatusColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
-		uploadsGrid.setColumnWidth(filenameColumn, 10.0, Style.Unit.EM);
-		tableWidth += 10.0;
+		uploadsGrid.setColumnWidth(selectedColumn, 
+				CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += CHECKBOX_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(expocodeColumn, 
+				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += NORMAL_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(ownerColumn, 
+				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += NORMAL_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(dataCheckColumn, 
+				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += NORMAL_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(metadataColumn, 
+				FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += FILENAME_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(qcStatusColumn, 
+				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += NORMAL_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(archiveStatusColumn, 
+				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += NORMAL_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(filenameColumn, 
+				FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += FILENAME_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		uploadsGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
