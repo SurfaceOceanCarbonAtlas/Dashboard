@@ -593,6 +593,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	/**
 	 * Saves and commits only the cruise information to the information file.
 	 * This does not save the cruise data of a DashboardCruiseWithData.
+	 * This first checks the currently saved properties for the cruise, and 
+	 * writes and commits a new properties file only if there are changes.
 	 * 
 	 * @param cruise
 	 * 		cruise information to save
@@ -609,6 +611,15 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Get the cruise information filename
 		String expocode = cruise.getExpocode();
 		File infoFile = cruiseInfoFile(expocode);
+		// First check if there are any changes from what is saved to file
+		try {
+			DashboardCruise savedCruise = getCruiseFromInfoFile(expocode);
+			if ( (savedCruise != null) && savedCruise.equals(cruise) )
+				return;
+		} catch ( IllegalArgumentException ex ) {
+			// Some problem with the saved data
+			;
+		}
 		// Create the NODC subdirectory if it does not exist
 		File parentFile = infoFile.getParentFile();
 		if ( ! parentFile.exists() )

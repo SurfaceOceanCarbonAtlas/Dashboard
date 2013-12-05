@@ -7,6 +7,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.TreeSet;
+
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
 import org.junit.Test;
@@ -90,6 +94,26 @@ public class DashboardMetadataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getAssociatedCruises()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setAssociatedCruises(java.util.TreeSet)}.
+	 */
+	@Test
+	public void testGetSetAssociatedCruises() {
+		TreeSet<String> myCruises = new TreeSet<String>();
+		myCruises.addAll(Arrays.asList("CYNS20120124", "CYNS20121015"));
+		DashboardMetadata mdata = new DashboardMetadata();
+		assertEquals(0, mdata.getAssociatedCruises().size());
+		mdata.setAssociatedCruises(myCruises);
+		assertEquals(myCruises, mdata.getAssociatedCruises());
+		assertEquals("", mdata.getExpocodeFilename());
+		assertEquals("", mdata.getUploadFilename());
+		assertEquals("", mdata.getOwner());
+		assertFalse( mdata.isSelected() );
+		mdata.setAssociatedCruises(null);
+		assertEquals(0, mdata.getAssociatedCruises().size());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#equals(java.lang.Object)}.
 	 */
@@ -98,6 +122,8 @@ public class DashboardMetadataTest {
 		String myOwner = "SocatUser";
 		String myUploadFilename = "NatalieSchulte_2013.doc";
 		String myExpocodeFilename = "CYNS20120124_metadata.doc";
+		TreeSet<String> myCruises = new TreeSet<String>();
+		myCruises.addAll(Arrays.asList("CYNS20120124", "CYNS20121015"));
 
 		DashboardMetadata firstMData = new DashboardMetadata();
 		assertFalse( firstMData.equals(null) );
@@ -131,6 +157,13 @@ public class DashboardMetadataTest {
 		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
 		assertFalse( firstMData.equals(secondMData) );
 		secondMData.setExpocodeFilename(myExpocodeFilename);
+		assertEquals(firstMData.hashCode(), secondMData.hashCode());
+		assertEquals(firstMData, secondMData);
+
+		firstMData.setAssociatedCruises(myCruises);
+		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
+		assertFalse( firstMData.equals(secondMData) );
+		secondMData.setAssociatedCruises(myCruises);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
 	}

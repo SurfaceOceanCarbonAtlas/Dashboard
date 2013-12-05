@@ -6,18 +6,15 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,7 +30,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	private static final String USER_CRUISE_LIST_NAME_EXTENSION = 
 			"_cruise_list.txt";
 	private static final String USER_METADATA_LIST_NAME_EXTENSION =
-			"_metadata_list.xml";
+			"_metadata_list.txt";
 
 	/**
 	 * Handles storage and retrieval of user data in files under 
@@ -267,7 +264,8 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Gets the list of available metadata documents for a user
+	 * Gets the list of available metadata documents for a user.
+	 * None of the metadata documents will be "selected".
 	 * 
 	 * @param username
 	 * 		get available metadata documents for this user
@@ -285,31 +283,58 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		// Get the metadata list file for this user
 		File userDataFile = new File(filesDir, 
 				username + USER_METADATA_LIST_NAME_EXTENSION);
-		// Read the metadata documents from the list file
-		DashboardMetadataList metadataList;
+		boolean needsCommit = false;
+		String commitMessage = "";
+		// Read the metadata document expocode filenames from the list file
+		HashSet<String> expocodeFilenames = new HashSet<String>();
 		try {
-			ObjectInputStream objInpStream = 
-					new ObjectInputStream(new FileInputStream(userDataFile));
+			BufferedReader expoReader = 
+					new BufferedReader(new FileReader(userDataFile));
 			try {
-				metadataList = (DashboardMetadataList) objInpStream.readObject();
+				String expoName = expoReader.readLine();
+				while ( expoName != null ) {
+					expocodeFilenames.add(expoName);
+					expoName = expoReader.readLine();
+				}
 			} finally {
-				objInpStream.close();
+				expoReader.close();
 			}
 		} catch ( FileNotFoundException ex ) {
 			// No metadata list file for this user
-			metadataList = new DashboardMetadataList();
-			metadataList.setUsername(username);
+			needsCommit = true;
+			commitMessage = "add new metadata listing for " + username + "; ";
 		} catch ( Exception ex ) {
 			// Problems with the listing in the existing file
 			throw new IllegalArgumentException(
 					"Problems reading the metadata listing from " + 
 					userDataFile.getPath() + ": " + ex.getMessage());
 		}
-		if ( ! username.equals(metadataList.getUsername()) )
+		// Get the cruise file handler
+		DashboardMetadataFileHandler metadataHandler;
+		try {
+			metadataHandler = DashboardDataStore.get().getMetadataFileHandler();
+		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Unexpected username mismatch in metadata listing from " +
-					userDataFile.getPath());
-		// Return the metadata list populated with the metadata objects read
+					"Unexpected failure to get the metadata file handler");
+		}
+		// Create the metadata listing (map) for these metadata expocode filenames
+		DashboardMetadataList metadataList = new DashboardMetadataList();
+		metadataList.setUsername(username);
+		for ( String expoName : expocodeFilenames ) {
+			// Create the DashboardMetadata from the info file
+			DashboardMetadata mdata = metadataHandler.getMetadataInfo(expoName);
+			if ( mdata == null ) { 
+				// Remove this expocode filename from the saved list
+				needsCommit = true;
+				commitMessage += "remove invalid metadata " + expoName + "; ";
+			}
+			else 
+				metadataList.put(mdata.getExpocodeFilename(), mdata);
+		}
+		// If any changes, save the updated listing
+		if ( needsCommit )
+			saveMetadataListing(metadataList, commitMessage);
+		// Return this metadata listing
 		return metadataList;
 	}
 
@@ -335,14 +360,14 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("invalid username");
 		File userMetaListFile = new File(filesDir, 
 				username + USER_METADATA_LIST_NAME_EXTENSION);
-		// Write the current set of metadata objects to the XML file
+		// Save the current set of metadata expocode filenames
 		try {
-			ObjectOutputStream objOutStream = 
-					new ObjectOutputStream(new FileOutputStream(userMetaListFile));
+			PrintWriter expoWriter = new PrintWriter(userMetaListFile);
 			try {
-				objOutStream.writeObject(metadataList);
+				for ( String expocodeFilename : metadataList.keySet() )
+					expoWriter.println(expocodeFilename);
 			} finally {
-				objOutStream.close();
+				expoWriter.close();
 			}
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(

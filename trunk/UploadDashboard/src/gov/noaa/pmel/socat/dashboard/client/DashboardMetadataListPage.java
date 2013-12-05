@@ -81,6 +81,11 @@ public class DashboardMetadataListPage extends Composite {
 	private static final String UPLOAD_FILENAME_COLUMN_NAME = "User's Filename";
 	private static final String EXPOCODE_FILENAME_COLUMN_NAME = "Expocode Filename";
 
+	// Column widths in em's
+	private static double CHECKBOX_COLUMN_WIDTH = 2.5;
+	private static double NORMAL_COLUMN_WIDTH = 8.0;
+	private static double FILENAME_COLUMN_WIDTH = 12.0;
+
 	interface DashboardMetadataListPageUiBinder 
 			extends UiBinder<Widget, DashboardMetadataListPage> {
 	}
@@ -155,6 +160,8 @@ public class DashboardMetadataListPage extends Composite {
 								 new AsyncCallback<DashboardMetadataList>() {
 			@Override
 			public void onSuccess(DashboardMetadataList mdataList) {
+				// Note that to reduce payload, the list of associated cruises 
+				// have been removed from the metadata objects returned here
 				if ( DashboardLoginPage.getUsername()
 										.equals(mdataList.getUsername()) ) {
 					if ( singleton == null )
@@ -226,7 +233,7 @@ public class DashboardMetadataListPage extends Composite {
 		List<DashboardMetadata> metadataList = listProvider.getList();
 		metadataList.clear();
 		if ( mdataList != null ) {
-			metadataList.addAll(mdataList);
+			metadataList.addAll(mdataList.values());
 		}
 		uploadsGrid.setRowCount(metadataList.size());
 	}
@@ -251,11 +258,11 @@ public class DashboardMetadataListPage extends Composite {
 	 * 		a hash set of the selected metadata documents; 
 	 * 		will not be null but may be empty.
 	 */
-	private HashSet<DashboardMetadata> getSelectedMetadata()  {
-		HashSet<DashboardMetadata> mdataSet = new HashSet<DashboardMetadata>();
+	private HashSet<String> getSelectedMetaExpoNames()  {
+		HashSet<String> mdataSet = new HashSet<String>();
 		for ( DashboardMetadata mdata : listProvider.getList() ) {
 			if ( mdata.isSelected() ) {
-				mdataSet.add(mdata);
+				mdataSet.add(mdata.getExpocodeFilename());
 			}
 		}
 		return mdataSet;
@@ -290,12 +297,11 @@ public class DashboardMetadataListPage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
-		// Submit the selected metadata documents with the list of cruises
-		// associated with this page
-		HashSet<DashboardMetadata> selectedMetadata = getSelectedMetadata();
+		// Associate the selected metadata documents 
+		// with the list of cruises associated with this page
 		service.associateMetadata(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), cruiseExpocodes, 
-				selectedMetadata, new AsyncCallback<Void>() {
+				getSelectedMetaExpoNames(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Change to the latest cruise listing page.
@@ -324,14 +330,14 @@ public class DashboardMetadataListPage extends Composite {
 
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
-		uploadsGrid.setColumnWidth(selectedColumn, 2.5, Style.Unit.EM);
-		tableWidth += 2.5;
-		uploadsGrid.setColumnWidth(uploadFilenameColumn, 15.0, Style.Unit.EM);
-		tableWidth += 15.0;
-		uploadsGrid.setColumnWidth(expocodeFilenameColumn, 15.0, Style.Unit.EM);
-		tableWidth += 15.0;
-		uploadsGrid.setColumnWidth(ownerColumn, 8.0, Style.Unit.EM);
-		tableWidth += 8.0;
+		uploadsGrid.setColumnWidth(selectedColumn, CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += CHECKBOX_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(uploadFilenameColumn, FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += FILENAME_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(expocodeFilenameColumn, FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += FILENAME_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(ownerColumn, NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += NORMAL_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		uploadsGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);

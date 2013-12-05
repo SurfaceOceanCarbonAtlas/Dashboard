@@ -42,8 +42,9 @@ public interface DashboardMetadataListServiceAsync {
 	 * 		encrypted password to use
 	 * @param cruiseExpocodes
 	 * 		associate metadata documents to the cruises with these expocodes
-	 * @param metadata
-	 * 		metadata documents to associate with the cruises
+	 * @param metaExpoNames
+	 * 		expocode filenames of the metadata documents to associate 
+	 * 		with the cruises
 	 * @param callback
 	 * 		the callback to make when done;
 	 * 		the onFailure method of the callback will be called
@@ -51,8 +52,7 @@ public interface DashboardMetadataListServiceAsync {
 	 * 		or if the update failed
 	 */
 	void associateMetadata(String username, String passhash,
-			TreeSet<String> cruiseExpocodes,
-			HashSet<DashboardMetadata> metadataExpocodeFilenames,
+			TreeSet<String> cruiseExpocodes, HashSet<String> metaExpoNames,
 			AsyncCallback<Void> callback);
 
 }

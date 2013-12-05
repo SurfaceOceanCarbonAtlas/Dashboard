@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -16,12 +17,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6910216828667718754L;
+	private static final long serialVersionUID = -4312888451252120669L;
 
 	boolean selected;
 	String owner;
 	String uploadFilename;
 	String expocodeFilename;
+	TreeSet<String> associatedCruises;
 
 	/**
 	 * Creates an empty metadata document record
@@ -31,6 +33,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		owner = "";
 		uploadFilename = "";
 		expocodeFilename = "";
+		associatedCruises = new TreeSet<String>();
 	}
 
 	/**
@@ -106,6 +109,28 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			this.expocodeFilename = "";
 	}
 
+	/**
+	 * @return 
+	 * 		the expocodes of cruises associated with this metadata 
+	 * 		document;  never null but may be empty.  The actual set 
+	 * 		used in this object instance is returned.
+	 */
+	public TreeSet<String> getAssociatedCruises() {
+		return associatedCruises;
+	}
+
+	/**
+	 * @param associatedCruises 
+	 * 		the expocodes of cruises to associate with this metadata.
+	 * 		The set of expocodes in this object instance is cleared 
+	 * 		and this set of expocodes, if not null, is then added.
+	 */
+	public void setAssociatedCruises(TreeSet<String> associatedCruises) {
+		this.associatedCruises.clear();
+		if ( associatedCruises != null )
+			this.associatedCruises.addAll(associatedCruises);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -113,6 +138,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		result = result * prime + owner.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + expocodeFilename.hashCode();
+		result = result * prime + associatedCruises.hashCode();
 		return result;
 	}
 
@@ -135,6 +161,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			return false;
 		if ( ! expocodeFilename.equals(other.expocodeFilename) )
 			return false;
+		if ( ! associatedCruises.equals(other.associatedCruises) )
+			return false;
 		return true;
 	}
 
@@ -142,9 +170,10 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	public String toString() {
 		return "DashboardMetadata" +
 				"[ selected=" + Boolean.toString(selected) + 
-				", owner=" + owner + 
-				", uploadFilename=" + uploadFilename +
-				", expocodeFilename=" + expocodeFilename +
+				",\n  owner=" + owner + 
+				",\n  uploadFilename=" + uploadFilename +
+				",\n  expocodeFilename=" + expocodeFilename +
+				",\n  associatedCruises=" + associatedCruises.toString() +
 				" ]";
 	}
 

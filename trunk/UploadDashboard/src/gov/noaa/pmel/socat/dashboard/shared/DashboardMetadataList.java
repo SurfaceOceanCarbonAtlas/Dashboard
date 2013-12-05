@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DashboardMetadataList extends HashSet<DashboardMetadata> 
+public class DashboardMetadataList extends HashMap<String,DashboardMetadata> 
 								implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = 8821642387470578963L;
@@ -78,8 +78,8 @@ public class DashboardMetadataList extends HashSet<DashboardMetadata>
 	@Override
 	public String toString() {
 		String repr = "DashboardMetadataList[ username=" + username;
-		for ( DashboardMetadata mdata : this ) {
-			repr += ", \n    " + mdata.toString();
+		for ( String expoFilename : keySet() ) {
+			repr += ", \n    " + expoFilename + ":" + get(expoFilename).toString();
 		}
 		repr += " ]";
 		return repr;

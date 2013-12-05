@@ -82,23 +82,23 @@ public class DashboardMetadataListTest {
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 
-		firstMDataList.add(mdata);
+		firstMDataList.put(mdata.getExpocodeFilename(), mdata);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
-		secondMDataList.add(sameMData);
+		secondMDataList.put(sameMData.getExpocodeFilename(), sameMData);
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
-		secondMDataList.add(otherMData);
+		secondMDataList.put(otherMData.getExpocodeFilename(), otherMData);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
 
 		secondMDataList.clear();
 		assertEquals(myUsername, secondMDataList.getUsername());
-		secondMDataList.add(otherMData);
+		secondMDataList.put(otherMData.getExpocodeFilename(), otherMData);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
-		firstMDataList.add(otherMData);
-		secondMDataList.add(sameMData);
+		firstMDataList.put(otherMData.getExpocodeFilename(), otherMData);
+		secondMDataList.put(sameMData.getExpocodeFilename(), sameMData);
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 	}
