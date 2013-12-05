@@ -44,14 +44,15 @@ public interface DashboardMetadataListService extends RemoteService {
 	 * 		encrypted password to use
 	 * @param cruiseExpocodes
 	 * 		associate metadata documents to the cruises with these expocodes
-	 * @param metadata
-	 * 		metadata documents to associate with the cruises
+	 * @param metaExpoNames
+	 * 		expocode filenames of the metadata documents to associate 
+	 * 		with the cruises
 	 * @throws IllegalArgumentException
 	 * 		if authentication failed, if a cruise expocode is invalid, 
 	 * 		or if the update failed
 	 */
 	void associateMetadata(String username, String passhash, 
-			TreeSet<String> cruiseExpocodes, HashSet<DashboardMetadata> metadata) 
-												throws IllegalArgumentException;
+			TreeSet<String> cruiseExpocodes, HashSet<String> metaExpoNames) 
+											throws IllegalArgumentException;
 
 }

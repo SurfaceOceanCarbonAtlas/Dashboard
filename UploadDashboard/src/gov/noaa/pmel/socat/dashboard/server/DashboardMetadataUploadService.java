@@ -144,7 +144,7 @@ public class DashboardMetadataUploadService extends HttpServlet {
 			// Update the available metadata documents for this user
 			DashboardMetadataList metadataList = 
 					dataStore.getUserFileHandler().getMetadataListing(username);
-			metadataList.add(metadata);
+			metadataList.put(metadata.getExpocodeFilename(), metadata);
 			dataStore.getUserFileHandler()
 					 .saveMetadataListing(metadataList, message);
 		} catch (Exception ex) {
