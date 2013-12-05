@@ -54,7 +54,12 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 			for ( String metadataNames : cruise.getMetadataFilenames() ) {
 				// The metadata filenames from the cruise 
 				// should have format "expocodeFilename (uploadFilename)"
-				String expoName = metadataNames.split(" (")[0];
+				String expoName;
+				int idx = metadataNames.indexOf(" (");
+				if ( idx > 0 ) 
+					expoName = metadataNames.substring(0, idx).trim();
+				else
+					expoName = metadataNames.trim();
 				DashboardMetadata mdata = mdataList.get(expoName);
 				if ( mdata == null )
 					throw new IllegalArgumentException("Metadata document " + 
@@ -161,7 +166,12 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		message = "Removed associated cruise(s): " + 
 				cruiseExposStr + " from metadata ";
 		for ( String metaNames : removedMetaNames ) {
-			String expoName = metaNames.split(" (")[0];
+			int idx = metaNames.indexOf(" (");
+			String expoName;
+			if ( idx > 0 )
+				expoName = metaNames.substring(0, idx).trim();
+			else
+				expoName = metaNames.trim();
 			DashboardMetadata mdata = dataStore.getMetadataFileHandler()
 											   .getMetadataInfo(expoName);
 			if ( mdata == null ) 
