@@ -90,17 +90,32 @@ public abstract class VersionedFileHandler {
 		// Get the list of directories, as well as the file, that need to be committed
 		ArrayDeque<File> filesToCommit = new ArrayDeque<File>();
 		filesToCommit.push(wcfile);
+		// Always add the parent directory to the list to be examined
 		File parentToUpdate = wcfile.getParentFile();
 		filesToCommit.push(parentToUpdate);
+		// Work down the directory tree until we fall out 
+		// or find an unchanged directory
 		for (File currFile = parentToUpdate.getParentFile(); currFile != null; 
 										currFile = currFile.getParentFile()) {
-			SVNStatus status = svnManager.getStatusClient()
-										 .doStatus(currFile, false);
-			if ( status.getContentsStatus() == SVNStatusType.STATUS_ADDED )
+			SVNStatus status;
+			try {
+				status = svnManager.getStatusClient().doStatus(currFile, false);
+			} catch ( SVNException ex ) {
+				// Probably outside the working copy
+				break;
+			}
+			SVNStatusType statType = status.getContentsStatus();
+			if ( statType == SVNStatusType.STATUS_ADDED ) {
 				filesToCommit.push(currFile);
+				parentToUpdate = currFile;
+			}
+			else if ( statType == SVNStatusType.STATUS_NORMAL ) {
+				// Normal revisioned directory in the working copy
+				parentToUpdate = currFile;
+				break;
+			}
 			else {
-				if ( status.getContentsStatus() == SVNStatusType.STATUS_NORMAL )
-					parentToUpdate = currFile;
+				// Unknown or non-revisioned directory
 				break;
 			}
 		}
