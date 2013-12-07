@@ -144,24 +144,14 @@ public class DashboardMetadataListPage extends Composite {
 	 * 
 	 * @param cruiseExpocodes
 	 * 		associate metadata to the cruises with these expocodes 
-	 * @param currentPage
-	 * 		currently displayed page in the RootLayoutPanel
-	 * 		to be removed when the metadata list page is available
-	 * @param errMsg
-	 * 		message to show, along with some explanation, 
-	 * 		in a Window.alert if unable to obtain the metadata
-	 * 		list from the server
 	 */
-	static void showPage(final TreeSet<String> cruiseExpocodes, 
-			final Composite currentPage) {
+	static void showPage(final TreeSet<String> cruiseExpocodes) {
 		service.getMetadataList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
 								 cruiseExpocodes,
 								 new AsyncCallback<DashboardMetadataList>() {
 			@Override
 			public void onSuccess(DashboardMetadataList mdataList) {
-				// Note that to reduce payload, the list of associated cruises 
-				// have been removed from the metadata objects returned here
 				if ( DashboardLoginPage.getUsername()
 										.equals(mdataList.getUsername()) ) {
 					if ( singleton == null )

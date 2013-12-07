@@ -14,20 +14,10 @@
 			<!-- Just to give uniform padding -->
 			<g:Label />
 		</g:south>
-		<g:north size="9">
-			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.agreepanel}">
-					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
-					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.agreepanel}">
-					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeArchiveCheckBox" />
-					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeArchiveInfoButton" />
-				</g:FlowPanel>
+		<g:north size="4">
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 			</g:FlowPanel>
 		</g:north>
 		<g:west size="9">
@@ -37,7 +27,7 @@
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="deleteButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="dataCheckButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="metadataButton" />
-					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />
+					<!--  <g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />  -->
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="qcSubmitButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="archiveSubmitButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="addToListButton" />

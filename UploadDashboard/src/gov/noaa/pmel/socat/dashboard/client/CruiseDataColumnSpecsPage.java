@@ -44,14 +44,14 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	private static final int NUM_ROWS_PER_GRID_PAGE = 15;
 
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String SUBMIT_TEXT = "Submit Column Types";
+	private static final String SUBMIT_TEXT = "Check Column Types";
 	private static final String CANCEL_TEXT = "Return to Cruise List";
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String CRUISE_INTRO = "Cruise: ";
 
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
-			"Unable to obtaining the cruise column types";
+			"Problems obtaining the cruise column types";
 	private static final String SUBMIT_FAIL_MSG = 
 			"Problems updating the cruise column types";
 	private static final String MORE_DATA_FAIL_MSG = 

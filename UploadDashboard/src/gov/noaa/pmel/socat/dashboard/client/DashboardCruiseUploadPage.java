@@ -47,13 +47,16 @@ public class DashboardCruiseUploadPage extends Composite {
 			"show the beginning of the file as it will be used for SOCAT " +
 			"ingestion.  Note that this uploads the entire file only for " +
 			"the purpose of creating the preview. ";
+
 	private static final String ENCODING_TEXT = "File encoding:";
 	private static final String[] KNOWN_ENCODINGS = {
 		"ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
 	};
+
 	private static final String CREATE_TEXT = "Create Cruise";
 	private static final String OVERWRITE_TEXT = "Update Cruise";
-	private static final String CANCEL_TEXT = "Return to Cruise List";
+	private static final String CANCEL_TEXT = "Cancel";
+
 	private static final String BUTTONS_HTML_MSG = 
 			"The <em>" + CREATE_TEXT + "</em> button will upload the selected " +
 			"file as a new cruise; it will fail if a cruise exists with the " +
@@ -62,8 +65,10 @@ public class DashboardCruiseUploadPage extends Composite {
 			"fail if a cruise does not exist with the same expocode as this " +
 			"cruise.  <b>Only use <em>" + OVERWRITE_TEXT + "</em> if you are " +
 			"absolutely sure this is an update of the existing cruise.</b>";
+
 	private static final String PREVIEW_TEXT = "Preview Cruise File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
+
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a cruise data file to upload";
 	private static final String UNKNOWN_FAIL_MSG = 
@@ -218,8 +223,8 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
-		// Return to the cruise list page
-		DashboardCruiseListPage.showPage(false);
+		// Return to the cruise list page exactly as it was
+		DashboardCruiseListPage.redisplayPage();
 	}
 
 	@UiHandler("uploadForm")

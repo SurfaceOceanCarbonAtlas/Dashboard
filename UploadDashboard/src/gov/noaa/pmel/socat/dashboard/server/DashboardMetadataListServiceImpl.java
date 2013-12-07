@@ -40,10 +40,6 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		// Get the metadata listing for this user
 		DashboardMetadataList mdataList = 
 				dataStore.getUserFileHandler().getMetadataListing(username);
-		// Remove the lists of associated cruises to reduce payload 
-		// since these lists are not used in the page
-		for ( DashboardMetadata mdata : mdataList.values() )
-			mdata.setAssociatedCruises(null);
 		// Select the metadata documents for the given cruises
 		for ( String expocode : cruiseExpocodes ) {
 			DashboardCruise cruise = dataStore.getCruiseFileHandler()
