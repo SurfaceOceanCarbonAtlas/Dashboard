@@ -159,9 +159,8 @@ public class DashboardMetadataUploadPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
-		// Return to the metadata list page
-		DashboardMetadataListPage.showPage(cruiseExpocodes, 
-				DashboardMetadataUploadPage.this);
+		// Return to the metadata list page exactly as it was
+		DashboardMetadataListPage.redisplayPage();
 	}
 
 	@UiHandler("uploadForm")
@@ -198,15 +197,13 @@ public class DashboardMetadataUploadPage extends Composite {
 			// cruise file created
 			Window.alert(tagMsg[1]);
 			// return to the updated metadata list
-			DashboardMetadataListPage.showPage(cruiseExpocodes, 
-					DashboardMetadataUploadPage.this);
+			DashboardMetadataListPage.showPage(cruiseExpocodes);
 		}
 		else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file updated
 			Window.alert(tagMsg[1]);
 			// return to the updated metadata list
-			DashboardMetadataListPage.showPage(cruiseExpocodes, 
-					DashboardMetadataUploadPage.this);
+			DashboardMetadataListPage.showPage(cruiseExpocodes);
 		}
 		else {
 			// Unknown response with a newline, just display the whole message

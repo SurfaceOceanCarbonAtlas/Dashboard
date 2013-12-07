@@ -28,7 +28,14 @@ public class SocatUploadDashboard
 		METADATA_LIST,
 		/** History tag for DashboardMetadataUploadPage */
 		METADATA_UPLOAD,
+		/** History tag for CruiseAddToSocatPage */
+		ADD_TO_SOCAT,
 	}
+
+	// Column widths in em's
+	static double CHECKBOX_COLUMN_WIDTH = 2.5;
+	static double NORMAL_COLUMN_WIDTH = 8.0;
+	static double FILENAME_COLUMN_WIDTH = 12.0;
 
 	// Singleton instance of this object
 	private static SocatUploadDashboard singleton = null;

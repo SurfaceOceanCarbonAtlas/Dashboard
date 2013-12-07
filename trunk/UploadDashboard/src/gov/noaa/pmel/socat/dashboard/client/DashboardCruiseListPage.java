@@ -30,7 +30,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,28 +47,6 @@ public class DashboardCruiseListPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String MORE_INFO_TEXT = "more explanation";
-
-	private static final String AGREE_SHARE_TEXT = 
-			"I give permission for my cruises to be shared for policy (QC) assessment.";
-	private static final String AGREE_SHARE_INFO_HTML =
-			"By checking this box I am giving permission for my uploaded cruise files " +
-			"to be shared for purposes of policy (QC) assessment.  I understand that " +
-			"data so-released will be used only for that narrow purpose and will not " +
-			"be further distributed until the next official publication of SOCAT if " +
-			"the cruise was deemed acceptable. ";
-
-	private static final String AGREE_ARCHIVE_TEXT = 
-			"I give permission for my cruises to be automatically archived at CDIAC.  ";
-	private static final String AGREE_ARCHIVE_INFO_HTML = 
-			"By checking this box I am giving permission for my uploaded cruise files " +
-			"and metadata to be archived at CDIAC.  This will occur, if the cruise was " +
-			"deemed acceptable, at the time of the next SOCAT public release, after " +
-			"which the files will be made accessible to the public through the CDIAC " +
-			"Web site. " +
-			"<br /><br /> " +
-			"<em>Note that declining permission here implies an obligation on my part to " +
-			"ensure that these data will be made accessible via another data center.</em>";
 
 	private static final String UPLOAD_TEXT = "Upload New Cruise Data";
 	private static final String UPLOAD_HOVER_HELP = 
@@ -87,16 +64,18 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String METADATA_HOVER_HELP =
 			"associate metadata files to the selected cruises";
 
-	private static final String REVIEW_TEXT = "Review with LAS";
-	private static final String REVIEW_HOVER_HELP =
-			"examine the selected cruises in the cruise viewer " +
-			"aside other SOCAT cruises";
+	/* 
+	 * private static final String REVIEW_TEXT = "Review with LAS";
+	 * private static final String REVIEW_HOVER_HELP =
+	 * 		"examine the selected cruises in the cruise viewer " +
+	 * 		"aside other SOCAT cruises";
+	 */
 
 	private static final String QC_SUBMIT_TEXT = "Submit for QC";
 	private static final String QC_SUBMIT_HOVER_HELP =
 			"submit the selected cruises to SOCAT for quality assessment";
 
-	private static final String ARCHIVE_SUBMIT_TEXT = "Archive Now";
+	static final String ARCHIVE_SUBMIT_TEXT = "Archive Now";
 	private static final String ARCHIVE_SUBMIT_HOVER_HELP =
 			"report the archival of the selected cruises, " +
 			"or submit the selected cruises for immediate archival";
@@ -145,7 +124,13 @@ public class DashboardCruiseListPage extends Composite {
 			"Unable to remove the selected cruise(s) from your list of cruises";
 
 	private static final String NO_CRUISES_SELECTED_FOR_METADATA_MSG = 
-			"No cruises are selected with which to associating metadata documents";
+			"No cruises are selected for associating metadata documents.  " +
+			"Cruises submitted to SOCAT (and not suspended or failed) " +
+			"were automatically removed from the list of cruises to use.";
+	private static final String NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG =
+			"No cruises are selected for submitting to SOCAT.  " +
+			"Cruises submitted to SOCAT (and not suspended or failed) " +
+			"were automatically removed from the list of cruises to submit.";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
@@ -166,11 +151,6 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 
-	// Column widths in em's
-	private static double CHECKBOX_COLUMN_WIDTH = 2.5;
-	private static double NORMAL_COLUMN_WIDTH = 8.0;
-	private static double FILENAME_COLUMN_WIDTH = 12.0;
-
 	interface DashboardCruiseListPageUiBinder 
 			extends UiBinder<Widget, DashboardCruiseListPage> {
 	}
@@ -183,15 +163,11 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField CheckBox agreeShareCheckBox;
-	@UiField Button agreeShareInfoButton;
-	@UiField CheckBox agreeArchiveCheckBox;
-	@UiField Button agreeArchiveInfoButton;
 	@UiField Button uploadButton;
 	@UiField Button deleteButton;
 	@UiField Button dataCheckButton;
 	@UiField Button metadataButton;
-	@UiField Button reviewButton;
+	// @UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
 	@UiField Button archiveSubmitButton;
 	@UiField Button addToListButton;
@@ -200,8 +176,6 @@ public class DashboardCruiseListPage extends Composite {
 
 	private String username;
 	private ListDataProvider<DashboardCruise> listProvider;
-	private DashboardInfoPopup agreeSharePopup;
-	private DashboardInfoPopup agreeArchivePopup;
 
 	// The singleton instance of this page
 	private static DashboardCruiseListPage singleton;
@@ -220,16 +194,6 @@ public class DashboardCruiseListPage extends Composite {
 
 		logoutButton.setText(LOGOUT_TEXT);
 
-		agreeShareCheckBox.setText(AGREE_SHARE_TEXT);
-		agreeShareCheckBox.setValue(true);
-		agreeShareInfoButton.setText(MORE_INFO_TEXT);
-		agreeSharePopup = null;
-
-		agreeArchiveCheckBox.setText(AGREE_ARCHIVE_TEXT);
-		agreeArchiveCheckBox.setValue(true);
-		agreeArchiveInfoButton.setText(MORE_INFO_TEXT);
-		agreeArchivePopup = null;
-
 		uploadButton.setText(UPLOAD_TEXT);
 		uploadButton.setTitle(UPLOAD_HOVER_HELP);
 
@@ -242,8 +206,10 @@ public class DashboardCruiseListPage extends Composite {
 		metadataButton.setText(METADATA_TEXT);
 		metadataButton.setTitle(METADATA_HOVER_HELP);
 
-		reviewButton.setText(REVIEW_TEXT);
-		reviewButton.setTitle(REVIEW_HOVER_HELP);
+		/* 
+		 * reviewButton.setText(REVIEW_TEXT);
+		 * reviewButton.setTitle(REVIEW_HOVER_HELP);
+		 */
 
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
@@ -265,10 +231,11 @@ public class DashboardCruiseListPage extends Composite {
 	 * with the latest information from the server.
 	 * Adds this page to the page history.
 	 * 
-	 * @param errMsg
-	 * 		message to show, along with some explanation, 
-	 * 		in a Window.alert if unable to obtain the cruise
-	 * 		list from the server
+	 * @param loggingIn
+	 * 		is this request coming from a login request?  
+	 * 		This is only used to select the error message 
+	 * 		to show in a Window.alert when the request for
+	 * 		the latest cruise information fails.
 	 */
 	static void showPage(boolean loggingIn) {
 		// Select the appropriate error message if the request fails 
@@ -382,21 +349,21 @@ public class DashboardCruiseListPage extends Composite {
 	 * 		if true, do not include cruises whose archive status 
 	 * 		is one of the submitted or assigned types 
 	 * @return
-	 * 		set of expocodes of the selected cruises fitting the desired criteria;
+	 * 		set of selected cruises fitting the desired criteria;
 	 * 		will not be null, but may be empty. 
 	 */
-	private HashSet<String> getSelectedCruiseExpocodes(boolean skipSubmitted, 
-											   boolean skipArchived) {
-		HashSet<String> expocodeSet = new HashSet<String>();
+	private HashSet<DashboardCruise> getSelectedCruises(boolean skipSubmitted,
+														boolean skipArchived) {
+		HashSet<DashboardCruise> cruiseSet = new HashSet<DashboardCruise>();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
 				if ( skipSubmitted ) {
 					String status = cruise.getQcStatus();
 					if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-							 status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
-							 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-							 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-							 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
+							status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
+							status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+							status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+							status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
 						continue;
 				}
 				if ( skipArchived ) {
@@ -404,8 +371,29 @@ public class DashboardCruiseListPage extends Composite {
 							DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) )
 						continue;
 				}
-				expocodeSet.add(cruise.getExpocode());
+				cruiseSet.add(cruise);
 			}
+		}
+		return cruiseSet;
+	}
+
+	/**
+	 * @param skipSubmitted
+	 * 		if true, do not include cruises whose QC status 
+	 * 		is one of the submitted or accepted types
+	 * @param skipArchived
+	 * 		if true, do not include cruises whose archive status 
+	 * 		is one of the submitted or assigned types 
+	 * @return
+	 * 		set of expocodes of the selected cruises fitting the 
+	 * 		desired criteria; will not be null, but may be empty. 
+	 */
+	private HashSet<String> getSelectedCruiseExpocodes(boolean skipSubmitted, 
+											   		   boolean skipArchived) {
+		HashSet<String> expocodeSet = new HashSet<String>();
+		for ( DashboardCruise cruise : 
+			getSelectedCruises(skipSubmitted, skipArchived) ) {
+			expocodeSet.add(cruise.getExpocode());
 		}
 		return expocodeSet;
 	}
@@ -413,32 +401,6 @@ public class DashboardCruiseListPage extends Composite {
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
-	}
-
-	@UiHandler("agreeShareInfoButton")
-	void agreeShareInfoOnClick(ClickEvent event) {
-		// Create the popup only when needed and if it does not exist
-		if ( agreeSharePopup == null ) {
-			agreeSharePopup = new DashboardInfoPopup();
-			agreeSharePopup.setInfoMessage(AGREE_SHARE_INFO_HTML);
-		}
-		// Show the popup over the info button
-		agreeSharePopup.showAtPosition(
-				agreeShareInfoButton.getAbsoluteLeft(),
-				agreeShareInfoButton.getAbsoluteTop());
-	}
-
-	@UiHandler("agreeArchiveInfoButton")
-	void agreeArchiveInfoOnClick(ClickEvent event) {
-		// Create the popup only when needed and if it does not exist
-		if ( agreeArchivePopup == null ) {
-			agreeArchivePopup = new DashboardInfoPopup();
-			agreeArchivePopup.setInfoMessage(AGREE_ARCHIVE_INFO_HTML);
-		}
-		// Show the popup over the info button
-		agreeArchivePopup.showAtPosition(
-				agreeArchiveInfoButton.getAbsoluteLeft(),
-				agreeArchiveInfoButton.getAbsoluteTop());
 	}
 
 	@UiHandler("uploadButton")
@@ -481,22 +443,30 @@ public class DashboardCruiseListPage extends Composite {
 			Window.alert(NO_CRUISES_SELECTED_FOR_METADATA_MSG);
 			return;
 		}
-		DashboardMetadataListPage.showPage(expocodeSet, 
-				DashboardCruiseListPage.this);
+		DashboardMetadataListPage.showPage(expocodeSet);
 	}
 
-	@UiHandler("reviewButton")
-	void reviewOnClick(ClickEvent event) {
-		Window.alert("Not yet implemented");
-	}
+	/*
+	 * @UiHandler("reviewButton")
+	 * void reviewOnClick(ClickEvent event) {
+	 * 	// TODO:
+	 * 	Window.alert("Not yet implemented");
+	 * }
+	 */
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		Window.alert("Not yet implemented");
+		HashSet<DashboardCruise> cruiseSet = getSelectedCruises(true, false);
+		if ( cruiseSet.size() == 0 ) {
+			Window.alert(NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG);
+			return;
+		}
+		CruiseAddToSocatPage.showPage(cruiseSet);
 	}
 
 	@UiHandler("archiveSubmitButton")
 	void archiveSubmitOnClick(ClickEvent event) {
+		// TODO:
 		Window.alert("Not yet implemented");
 	}
 
@@ -579,29 +549,29 @@ public class DashboardCruiseListPage extends Composite {
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
 		uploadsGrid.setColumnWidth(selectedColumn, 
-				CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += CHECKBOX_COLUMN_WIDTH;
+				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(expocodeColumn, 
-				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += NORMAL_COLUMN_WIDTH;
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(ownerColumn, 
-				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += NORMAL_COLUMN_WIDTH;
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(dataCheckColumn, 
-				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += NORMAL_COLUMN_WIDTH;
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(metadataColumn, 
-				FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += FILENAME_COLUMN_WIDTH;
+				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(qcStatusColumn, 
-				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += NORMAL_COLUMN_WIDTH;
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(archiveStatusColumn, 
-				NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += NORMAL_COLUMN_WIDTH;
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(filenameColumn, 
-				FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += FILENAME_COLUMN_WIDTH;
+				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		uploadsGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
