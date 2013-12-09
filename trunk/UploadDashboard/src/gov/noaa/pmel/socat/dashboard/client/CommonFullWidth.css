@@ -32,7 +32,7 @@ body {
 	display: block;
 	width: 55em;
 	margin-top: 0.25em;
-	margin-bottom: 0.25em;
+	margin-bottom: 1.25em;
 }
 .agreecheckbox {
 	display: inline;
@@ -157,3 +157,10 @@ body {
 	margin-top: 1.5em;
 	margin-bottom: 1.5em;
 }
+
+.addinfo {
+	display: block;
+	margin-left: 1em;
+	margin-bottom: 1em;
+}
+

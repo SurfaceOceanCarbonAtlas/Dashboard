@@ -40,6 +40,8 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		// Get the metadata listing for this user
 		DashboardMetadataList mdataList = 
 				dataStore.getUserFileHandler().getMetadataListing(username);
+		boolean needsUpdate = false;
+		String message = "Updated metadata list for " + username + ": ";
 		// Select the metadata documents for the given cruises
 		for ( String expocode : cruiseExpocodes ) {
 			DashboardCruise cruise = dataStore.getCruiseFileHandler()
@@ -56,13 +58,28 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 					expoName = metadataNames.substring(0, idx).trim();
 				else
 					expoName = metadataNames.trim();
+				// Get the DashboardMetadata from the user's list
 				DashboardMetadata mdata = mdataList.get(expoName);
-				if ( mdata == null )
-					throw new IllegalArgumentException("Metadata document " + 
-							expoName + " for cruise " + expocode + 
-							" not in the metadata list for " + username);
+				if ( mdata == null ) {
+					// Metadata document not in the users's list;
+					// add it to the list, if it exists
+					mdata = dataStore.getMetadataFileHandler()
+									 .getMetadataInfo(expoName);
+					if ( mdata == null )
+						throw new IllegalArgumentException(
+								"Metadata document " + expoName + 
+								" for cruise " + expocode + " does not exist");
+					mdataList.put(expoName, mdata);
+					needsUpdate = true;
+					message += "added " + expoName + "; ";
+				}
 				mdata.setSelected(true);
 			}
+		}
+		// If the metadata list was changed, save the changes
+		if ( needsUpdate ) {
+			dataStore.getUserFileHandler()
+					 .saveMetadataListing(mdataList, message);
 		}
 		// Return the metadata listing
 		return mdataList;
@@ -83,12 +100,11 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		if ( ! dataStore.validateUser(username, passhash) )
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
+		// cruiseExpocodes cannot be empty (must have a cruise to work with)
 		if ( cruiseExpocodes.size() < 1 ) 
 			throw new IllegalArgumentException(
 					"No cruise expocodes specified");
-		if ( metaExpoNames.size() < 1 )
-			throw new IllegalArgumentException(
-					"No metadata documents specified");
+		// metaExpoNames could be empty (remove all associated metadata from the cruise)
 
 		// Get the current metadata properties for the indicated metadata documents
 		DashboardMetadataList mdataList = new DashboardMetadataList();

@@ -14,17 +14,18 @@
 			<!-- Just to give uniform padding -->
 			<g:Label />
 		</g:west>
-		<g:north size="16">
+		<g:north size="24">
 			<g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.userinfopanel}">
 					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
 					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.cruisenamesintro}" ui:field="infoHtml" />
+				<g:HTML addStyleNames="{style.addinfo}" ui:field="firstInfoHtml" />
 				<g:FlowPanel addStyleNames="{style.agreepanel}">
 					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
 					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
 				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.addinfo}" ui:field="secondInfoHtml" />
 				<g:FlowPanel addStyleNames="{style.agreepanel}">
 					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeArchiveCheckBox" />
 					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeArchiveInfoButton" />

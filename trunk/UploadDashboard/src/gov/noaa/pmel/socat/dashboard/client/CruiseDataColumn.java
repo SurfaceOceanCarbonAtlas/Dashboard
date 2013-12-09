@@ -86,13 +86,29 @@ public class CruiseDataColumn {
 
 		// Create the SelectionCell listing the known standard headers
 		HasCell<CruiseDataColumn,String> stdNameCell = 
-										new HasCell<CruiseDataColumn,String>() {
-			// SelectionCell needs a List, not just a Collection
-			SelectionCell typeSelectCell = new SelectionCell(new ArrayList<String>(
-					DashboardUtils.STD_HEADER_NAMES.values()));
+									new HasCell<CruiseDataColumn,String>() {
 			@Override
 			public SelectionCell getCell() {
-				return typeSelectCell;
+				// SelectionCell needs a List, not just a Collection
+				ArrayList<String> typesList = new ArrayList<String>(
+									DashboardUtils.STD_HEADER_NAMES.size()); 
+				// Move SUPPLEMENTAL from the tail to the head of the list.
+				// Do not move SUPPLEMENTAL in the enum list, 
+				// since we want that data to be at the end when sorted
+				String supplStr = DashboardUtils.STD_HEADER_NAMES.get(
+								CruiseDataColumnType.SUPPLEMENTAL);
+				typesList.add(supplStr);
+				// Remove DELETE (at the head of the list);
+				// DELETE may eventually be removed.
+				String removeStr = DashboardUtils.STD_HEADER_NAMES.get(
+								CruiseDataColumnType.DELETE);
+				// Add everything except SUPPLEMENTS (which has been added) and DELETE
+				for ( String name : DashboardUtils.STD_HEADER_NAMES.values() ) {
+					if ( ! ( name.equals(removeStr) || name.equals(supplStr) ) ) {
+						typesList.add(name);
+					}
+				}
+				return new SelectionCell(typesList);
 			}
 			@Override
 			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {

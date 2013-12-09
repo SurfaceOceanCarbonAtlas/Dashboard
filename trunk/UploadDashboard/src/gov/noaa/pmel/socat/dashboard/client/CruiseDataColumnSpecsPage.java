@@ -44,7 +44,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	private static final int NUM_ROWS_PER_GRID_PAGE = 15;
 
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String SUBMIT_TEXT = "Check Column Types";
+	private static final String SUBMIT_TEXT = "Update Column Types";
 	private static final String CANCEL_TEXT = "Return to Cruise List";
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
