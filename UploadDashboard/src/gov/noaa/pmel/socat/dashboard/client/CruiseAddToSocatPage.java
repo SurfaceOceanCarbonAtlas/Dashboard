@@ -41,7 +41,7 @@ public class CruiseAddToSocatPage extends Composite {
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String MORE_INFO_TEXT = "more explanation";
 
-	private static final String ADD_TO_SOCAT_INFO_HTML =
+	private static final String ADD_TO_SOCAT_FIRST_INFO_HTML =
 			"This page will submit the cruises listed in the table below to SOCAT " +
 			"for examination and quality assessment.  You can withdraw cruises from " +
 			"SOCAT after this submission if you just wanted to examine your cruises " +
@@ -49,8 +49,8 @@ public class CruiseAddToSocatPage extends Composite {
 			"to submitted cruises. " +
 			"<br /><br />" +
 			"In order to submit cruises to SOCAT, you must give permission to share " +
-			"your cruises for policy assessment (the first check box). " +
-			"<br /><br />" +
+			"your cruises for policy assessment: ";
+	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
 			"It is highly recommended (although not required) that you also give " +
 			"permission for your cruises to to automatically archived at CDIAC (the " +
 			"second check box).  If this check box is not selected when you add " +
@@ -108,9 +108,10 @@ public class CruiseAddToSocatPage extends Composite {
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField HTML infoHtml;
+	@UiField HTML firstInfoHtml;
 	@UiField CheckBox agreeShareCheckBox;
 	@UiField Button agreeShareInfoButton;
+	@UiField HTML secondInfoHtml;
 	@UiField CheckBox agreeArchiveCheckBox;
 	@UiField Button agreeArchiveInfoButton;
 	@UiField Button submitButton;
@@ -133,11 +134,13 @@ public class CruiseAddToSocatPage extends Composite {
 
 		logoutButton.setText(LOGOUT_TEXT);
 
-		infoHtml.setHTML(ADD_TO_SOCAT_INFO_HTML);
+		firstInfoHtml.setHTML(ADD_TO_SOCAT_FIRST_INFO_HTML);
 
 		agreeShareCheckBox.setText(AGREE_SHARE_TEXT);
 		agreeShareInfoButton.setText(MORE_INFO_TEXT);
 		agreeSharePopup = null;
+
+		secondInfoHtml.setHTML(ADD_TO_SOCAT_SECOND_INFO_HTML);
 
 		agreeArchiveCheckBox.setText(AGREE_ARCHIVE_TEXT);
 		agreeArchiveInfoButton.setText(MORE_INFO_TEXT);
