@@ -99,13 +99,14 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 					userDataFile.getPath() + ": " + ex.getMessage());
 		}
 		// Get the cruise file handler
-		DashboardCruiseFileHandler cruiseHandler;
+		DashboardDataStore dataStore;
 		try {
-			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
+			dataStore = DashboardDataStore.get();
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Unexpected failure to get the cruise file handler");
+					"Unexpected failure to get settings");
 		}
+		DashboardCruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		// Create the cruise list (map) for these cruises
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
@@ -123,6 +124,9 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		}
 		if ( needsCommit )
 			saveCruiseListing(cruiseList, commitMessage);
+		// Determine whether or not this user is a manager/admin 
+		cruiseList.setManager(dataStore.isManager(username));
+		// Return the listing of cruises
 		return cruiseList;
 	}
 

@@ -95,32 +95,17 @@ public class DashboardLoginPage extends Composite {
 	/**
 	 * Clears any stored authentication information and 
 	 * shows the login page in the RootLayoutPanel.
-	 * Adds this page to the page history.
+	 * 
+	 * @param addToHistory 
+	 * 		if true, adds this page to the page history.
 	 */
-	static void showPage() {
-		if ( singleton == null )
-			singleton = new DashboardLoginPage();
-		clearAuthentication();
-		/*
-		 * Since this gets called if there are problems loading 
-		 * a page from history, allow History.newItem make the 
-		 * onValueChanged call, which will call the redisplayPage 
-		 * method below, showing the page.
-		 */
-		History.newItem(PagesEnum.LOGIN.name(), true);
-	}
-
-	/**
-	 * Clears any stored authentication information and 
-	 * shows the login page in the RootLayoutPanel.
-	 * Does not add the login page to the page history.
-	 */
-	static void redisplayPage() {
-		// Allow this succeed even if never called before
+	static void showPage(boolean addToHistory) {
 		if ( singleton == null )
 			singleton = new DashboardLoginPage();
 		clearAuthentication();
 		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		if ( addToHistory )
+			History.newItem(PagesEnum.LOGIN.name(), false);
 	}
 
 	/**

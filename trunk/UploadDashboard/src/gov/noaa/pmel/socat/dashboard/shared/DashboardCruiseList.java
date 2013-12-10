@@ -17,9 +17,12 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class DashboardCruiseList extends HashMap<String,DashboardCruise> 
 								implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8003534046177591863L;
+	private static final long serialVersionUID = -8484865552946287748L;
 
 	String username;
+	// The following indicated whether or not the above user 
+	// has manager or admin privileges; a bit of a hack.
+	boolean manager;
 
 	/**
 	 * Creates without a user or any cruises
@@ -27,6 +30,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 	public DashboardCruiseList() {
 		super();
 		username = "";
+		manager = false;
 	}
 
 	/**
@@ -48,10 +52,27 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 			this.username = username;
 	}
 
+	/**
+	 * @return 
+	 * 		if this user is a manager/admin
+	 */
+	public boolean isManager() {
+		return manager;
+	}
+
+	/**
+	 * @param manager 
+	 * 		set if this user is a manager/admin
+	 */
+	public void setManager(boolean manager) {
+		this.manager = manager;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = username.hashCode();
+		result = result * prime + Boolean.valueOf(manager).hashCode();
 		result = result * prime + super.hashCode();
 		return result;
 	}
@@ -70,6 +91,9 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 		if ( ! username.equals(other.username) )
 			return false;
 
+		if ( manager != other.manager )
+			return false;
+
 		if ( ! super.equals(other) )
 			return false;
 
@@ -79,6 +103,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 	@Override
 	public String toString() {
 		String repr = "DashboardCruiseList[ username=" + username;
+		repr += ", \n    manager=" + Boolean.valueOf(manager).toString();
 		for ( String expocode : keySet() ) {
 			repr += ", \n    " + expocode + ":" + get(expocode).toString();
 		}

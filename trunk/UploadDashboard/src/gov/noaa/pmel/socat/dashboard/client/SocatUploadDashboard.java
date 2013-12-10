@@ -30,6 +30,8 @@ public class SocatUploadDashboard
 		METADATA_UPLOAD,
 		/** History tag for CruiseAddToSocatPage */
 		ADD_TO_SOCAT,
+		/** History tag for CruiseArchivePage */
+		ARCHIVE,
 	}
 
 	// Column widths in em's
@@ -103,39 +105,47 @@ public class SocatUploadDashboard
 			token = token.trim();
 		if ( (token == null) || token.isEmpty() ) {
 			// Initial history setup; show the login page
-			DashboardLoginPage.showPage();
+			DashboardLoginPage.showPage(true);
 		}
 		else if ( token.equals(PagesEnum.LOGIN.name()) ) {
 			// Login page from history
-			DashboardLoginPage.redisplayPage();
+			DashboardLoginPage.showPage(false);
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
 			// Logout page from history
-			DashboardLogoutPage.redisplayPage();
+			DashboardLogoutPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.CRUISE_LIST.name()) ) {
 			// Cruise list page from history
-			DashboardCruiseListPage.redisplayPage();
+			DashboardCruiseListPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.CRUISE_UPLOAD.name()) ) {
 			// Cruise upload page from history
-			DashboardCruiseUploadPage.redisplayPage();
+			DashboardCruiseUploadPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.DATA_COLUMN_SPECS.name()) ) {
 			// Data column specs page from history
-			CruiseDataColumnSpecsPage.redisplayPage();
+			CruiseDataColumnSpecsPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.METADATA_LIST.name()) ) {
 			// Metadata list page from history
-			DashboardMetadataListPage.redisplayPage();
+			DashboardMetadataListPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.METADATA_UPLOAD.name()) ) {
 			// Metadata upload page from history
-			DashboardMetadataUploadPage.redisplayPage();
+			DashboardMetadataUploadPage.redisplayPage(false);
+		}
+		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
+			// Add to SOCAT page from history
+			CruiseAddToSocatPage.redisplayPage(false);
+		}
+		else if ( token.equals(PagesEnum.ARCHIVE.name()) ) {
+			// Archive page from history
+			CruiseArchivePage.redisplayPage(false);
 		}
 		else {
 			// Unknown page from the history; instead show the login page 
-			DashboardLoginPage.showPage();
+			DashboardLoginPage.showPage(true);
 		}
 	}
 

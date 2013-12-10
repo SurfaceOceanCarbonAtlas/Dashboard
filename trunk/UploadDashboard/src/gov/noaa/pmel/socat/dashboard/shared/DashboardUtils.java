@@ -62,8 +62,8 @@ public class DashboardUtils {
 
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
-	public static final String ARCHIVE_STATUS_OWNER_TO_ARCHIVE = "Waiting on owner";
-	public static final String ARCHIVE_STATUS_SUBMITTED_PREFIX = "Submitted to ";
+	public static final String ARCHIVE_STATUS_SUBMIT_CDIAC = "Submitted to CDIAC";
+	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_ARCHIVED_PREFIX = "DOI ";
 
 	/**

@@ -104,6 +104,17 @@ public class DashboardUserInfo {
 	}
 
 	/**
+	 * @return
+	 * 		true is this user is an admin or a manager of a group
+	 * 		(regardless of whether there is anyone else in the group)
+	 */
+	public boolean isManager() {
+		if ( admin || (managerNums.size() > 0) )
+			return true;
+		return false;
+	}
+
+	/**
 	 * Determines if this user has manager privilege over a user. 
 	 * This can be from this user being an administrator, a manager
 	 * of a group the other user belongs to, or actually being the

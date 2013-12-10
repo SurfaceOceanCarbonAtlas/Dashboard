@@ -50,15 +50,6 @@ public class CruiseAddToSocatPage extends Composite {
 			"<br /><br />" +
 			"In order to submit cruises to SOCAT, you must give permission to share " +
 			"your cruises for policy assessment: ";
-	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
-			"It is highly recommended (although not required) that you also give " +
-			"permission for your cruises to to automatically archived at CDIAC (the " +
-			"second check box).  If this check box is not selected when you add " +
-			"your cruises to SOCAT, you will be required to provide DOIs of the " +
-			"archived data for these cruises before they will be included in a " +
-			"SOCAT release.  The DOIs from cruises are provided using the \"" + 
-			DashboardCruiseListPage.ARCHIVE_SUBMIT_TEXT + "\" button on the main " +
-			"cruise listing page. ";
 
 	private static final String AGREE_SHARE_TEXT = 
 			"I give permission for my cruises to be shared for policy (QC) assessment.";
@@ -68,6 +59,16 @@ public class CruiseAddToSocatPage extends Composite {
 			"data so-released will be used only for that narrow purpose and will not " +
 			"be further distributed until the next official publication of SOCAT if " +
 			"the cruise was deemed acceptable. ";
+
+	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
+			"It is highly recommended (although not required) that you also give " +
+			"permission for your cruises to to automatically archived at CDIAC (the " +
+			"second check box).  If this check box is not selected when you add " +
+			"your cruises to SOCAT, you will be required to provide DOIs of the " +
+			"archived data for these cruises before they will be included in a " +
+			"SOCAT release.  The DOIs from cruises are provided using the \"" + 
+			DashboardCruiseListPage.ARCHIVE_SUBMIT_TEXT + "\" button on the main " +
+			"cruise listing page. ";
 
 	private static final String AGREE_ARCHIVE_TEXT = 
 			"I give permission for my cruises to be automatically archived at CDIAC.  ";
@@ -165,16 +166,22 @@ public class CruiseAddToSocatPage extends Composite {
 	/**
 	 * Redisplays the last version of this page if the username
 	 * associated with this page matches the current login username.
-	 * Does not add this page to the page history list.
+	 * 
+	 * @param addToHistory
+	 * 		if true, adds this page to the page history 
 	 */
-	static void redisplayPage() {
+	static void redisplayPage(boolean addToHistory) {
 		// If never show before, or if the username does not match the 
 		// current login username, show the login page instead
 		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
-			DashboardLoginPage.showPage();
-		else
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
+			DashboardLoginPage.showPage(true);
+		}
+		else {
 			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			if ( addToHistory )	
+				History.newItem(PagesEnum.ADD_TO_SOCAT.name(), false);
+		}
 	}
 
 	/**
@@ -238,9 +245,9 @@ public class CruiseAddToSocatPage extends Composite {
 	}
 
 	@UiHandler("cancelButton")
-	void cancelOnCLick(ClickEvent event) {
+	void cancelOnClick(ClickEvent event) {
 		// Return to the cruise list page exactly as it was
-		DashboardCruiseListPage.redisplayPage();
+		DashboardCruiseListPage.redisplayPage(true);
 	}
 
 	@UiHandler("submitButton")
