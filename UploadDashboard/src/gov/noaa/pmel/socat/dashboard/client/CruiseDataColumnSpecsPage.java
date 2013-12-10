@@ -135,7 +135,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	/**
 	 * Display the cruise data column specifications page for a cruise
 	 * with the latest cruise data column specifications from the server.
-	 * Add this page to the page history list.
+	 * Adds this page to the page history.
 	 * 
 	 * @param expocode
 	 * 		show the specifications for this cruise
@@ -169,16 +169,22 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	/**
 	 * Redisplays the last version of this page if the username
 	 * associated with this page matches the current login username.
-	 * Does not add this page to the page history list.
+	 * 
+	 * @param addToHistory 
+	 * 		if true, adds this page to the page history 
 	 */
-	static void redisplayPage() {
+	static void redisplayPage(boolean addToHistory) {
 		// If never show before, or if the username does not match the 
 		// current login username, show the login page instead
 		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
-			DashboardLoginPage.showPage();
-		else
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
+			DashboardLoginPage.showPage(true);
+		}
+		else {
 			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			if ( addToHistory )
+				History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
+		}
 	}
 
 	/**

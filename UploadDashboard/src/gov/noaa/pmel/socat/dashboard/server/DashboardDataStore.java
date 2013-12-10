@@ -352,6 +352,20 @@ public class DashboardDataStore {
 	}
 
 	/**
+	 * @param username
+	 * 		name of the user
+	 * @return
+	 * 		true is this user is an admin or a manager of a group
+	 * 		(regardless of whether there is anyone else in the group)
+	 */
+	public boolean isManager(String username) {
+		DashboardUserInfo userInfo = userInfoMap.get(username);
+		if ( userInfo == null )
+			return false;
+		return userInfo.isManager();
+	}
+
+	/**
 	 * Generates an further encrypted password hash 
 	 * from the given username and initially encrypted password
 	 * @param username

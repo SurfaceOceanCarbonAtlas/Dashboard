@@ -123,16 +123,22 @@ public class DashboardMetadataUploadPage extends Composite {
 	/**
 	 * Redisplays the last version of this page if the username
 	 * associated with this page matches the current login username.
-	 * Does not add this page to the page history.
+	 * 
+	 * @param addToHistory 
+	 * 		if true, adds this page to the page history 
 	 */
-	static void redisplayPage() {
+	static void redisplayPage(boolean addToHistory) {
 		// If never show before, or if the username does not match the 
 		// current login username, show the login page instead
 		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
-			DashboardLoginPage.showPage();
-		else
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
+			DashboardLoginPage.showPage(true);
+		}
+		else {
 			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			if ( addToHistory )
+				History.newItem(PagesEnum.METADATA_UPLOAD.name(), false);
+		}
 	}
 
 	@UiHandler("logoutButton")
@@ -160,7 +166,7 @@ public class DashboardMetadataUploadPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the metadata list page exactly as it was
-		DashboardMetadataListPage.redisplayPage();
+		DashboardMetadataListPage.redisplayPage(true);
 	}
 
 	@UiHandler("uploadForm")

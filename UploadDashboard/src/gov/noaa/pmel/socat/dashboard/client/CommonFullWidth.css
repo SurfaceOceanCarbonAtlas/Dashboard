@@ -164,3 +164,21 @@ body {
 	margin-bottom: 1em;
 }
 
+.archivepanel {
+	display: block;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+.archivebutton {
+	display: inline;
+	margin-left: 3em;
+}
+.archiveinfobutton {
+	display: inline;
+	font-size: small;
+	margin-left: 1em;
+}
+.doitextbox {
+	display:inline;
+	margin-left: 0.5em;
+}

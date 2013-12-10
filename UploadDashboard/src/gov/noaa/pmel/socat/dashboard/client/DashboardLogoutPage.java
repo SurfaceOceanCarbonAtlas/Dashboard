@@ -108,18 +108,22 @@ public class DashboardLogoutPage extends Composite {
 	/**
 	 * Shows the logout page in the RootLayoutPanel.
 	 * Does not attempt to logout the user.
-	 * Does not add the logout page to the page history.
+	 * 
+	 * @param addToHistory 
+	 * 		if true, adds this page to the page history 
 	 */
-	static void redisplayPage() {
+	static void redisplayPage(boolean addToHistory) {
 		// Allow this succeed even if never called before
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
 		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		if ( addToHistory )
+			History.newItem(PagesEnum.LOGOUT.name(), false);
 	}
 
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
-		DashboardLoginPage.showPage();
+		DashboardLoginPage.showPage(true);
 	}
 
 }

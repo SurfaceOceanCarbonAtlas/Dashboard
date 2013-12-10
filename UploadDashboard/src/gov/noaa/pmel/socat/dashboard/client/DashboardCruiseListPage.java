@@ -48,21 +48,23 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
 
-	private static final String UPLOAD_TEXT = "Upload New Cruise Data";
+	private static final String UPLOAD_TEXT = "Upload Cruise Data";
 	private static final String UPLOAD_HOVER_HELP = 
-			"upload cruise data to create a new cruise or replace an existing cruise";
+			"upload cruise data to create a new cruise " +
+			"or replace an existing cruise";
 
 	private static final String DELETE_TEXT = "Delete Cruise";
 	private static final String DELETE_HOVER_HELP =
-			"delete the selected cruises, including the cruise data, from SOCAT";
+			"delete the selected cruises, including the cruise data";
 
 	private static final String DATA_CHECK_TEXT = "Check Data";
 	private static final String DATA_CHECK_HOVER_HELP =
-			"assign data column types and programmatically check the data in the selected cruise";
+			"assign data column types and programmatically " +
+			"check the data in the selected cruise";
 
-	private static final String METADATA_TEXT = "Associate Metadata";
+	private static final String METADATA_TEXT = "Manage Metadata";
 	private static final String METADATA_HOVER_HELP =
-			"associate metadata files to the selected cruises";
+			"manage metadata files for the selected cruise(s)";
 
 	/* 
 	 * private static final String REVIEW_TEXT = "Review with LAS";
@@ -73,21 +75,23 @@ public class DashboardCruiseListPage extends Composite {
 
 	private static final String QC_SUBMIT_TEXT = "Submit for QC";
 	private static final String QC_SUBMIT_HOVER_HELP =
-			"submit the selected cruises to SOCAT for quality assessment";
+			"submit the selected cruises to SOCAT for policy " +
+			"(quality control) assessment ";
 
-	static final String ARCHIVE_SUBMIT_TEXT = "Archive Now";
+	static final String ARCHIVE_SUBMIT_TEXT = "Archive Cruise";
 	private static final String ARCHIVE_SUBMIT_HOVER_HELP =
-			"report the archival of the selected cruises, " +
-			"or submit the selected cruises for immediate archival";
+			"manage the archival of the selected cruise";
 
-	private static final String ADD_TO_LIST_TEXT = "Add Cruise to List";
+	private static final String ADD_TO_LIST_TEXT = 
+			"Add Cruise to List";
 	private static final String ADD_TO_LIST_HOVER_HELP = 
 			"add an existing cruise to this list of cruises";
 
-	private static final String REMOVE_FROM_LIST_TEXT = "Remove Cruise from List";
+	private static final String REMOVE_FROM_LIST_TEXT = 
+			"Remove Cruise from List";
 	private static final String REMOVE_FROM_LIST_HOVER_HELP =
 			"remove the selected cruises from this list of cruises; " +
-			"this will NOT remove the cruise or cruise data from SOCAT";
+			"this will NOT remove the cruise data";
 
 	// Error messages when the request for the latest cruise list fails
 	private static final String LOGIN_ERROR_MSG = 
@@ -99,10 +103,8 @@ public class DashboardCruiseListPage extends Composite {
 			"No cruises are selected which can be deleted " +
 			"(cruises must be suspended or not submitted).";
 	private static final String DELETE_CONFIRM_MSG = 
-			": this cruise, including all cruise data, will be deleted from " +
-			"SOCAT.  You will be able to do this only if the cruise belongs " +
-			"to you or to someone in a group you manage.  Do you wish to " +
-			"proceed?";
+			": all cruise data for this cruise will be deleted.  " +
+			"Do you wish to proceed?";
 	private static final String DELETE_CRUISE_FAIL_MSG = 
 			"Unable to delete the selected cruise(s)";
 
@@ -110,26 +112,30 @@ public class DashboardCruiseListPage extends Composite {
 			"Exactly one cruise must be selected";
 
 	private static final String EXPOCODE_TO_ADD_MSG = 
-			"Enter the expocode of the cruise to wish to add to your cruise list";
+			"Enter the expocode of the cruise to wish to add " +
+			"to your list of cruises";
 	private static final String ADD_CRUISE_FAIL_MSG = 
-			"Unable to add the specified cruise to your list of cruises";
+			"Unable to add the specified cruise " +
+			"to your list of cruises";
 
 	private static final String NO_CRUISE_TO_REMOVE_MSG = 
 			"No cruises are selected for removal ";
 	private static final String REMOVE_CRUISE_CONFIRM_MSG = 
-			": this cruise will be removed from your personal list of cruises; " +
-			"the cruise data file will NOT be removed from SOCAT.  Do you wish " +
-			"to proceed?";
+			": will be removed from your personal list of cruises; " +
+			"the cruise data file will NOT be removed.  " +
+			"Do you wish to proceed?";
 	private static final String REMOVE_CRUISE_FAIL_MSG = 
-			"Unable to remove the selected cruise(s) from your list of cruises";
+			"Unable to remove the selected cruise(s) " +
+			"from your list of cruises";
 
 	private static final String NO_CRUISES_SELECTED_FOR_METADATA_MSG = 
 			"No cruises are selected for associating metadata documents.  " +
 			"Cruises submitted to SOCAT (and not suspended or failed) " +
 			"were automatically removed from the list of cruises to use.";
+
 	private static final String NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG =
 			"No cruises are selected for submitting to SOCAT.  " +
-			"Cruises submitted to SOCAT (and not suspended or failed) " +
+			"Cruises already submitted to SOCAT (and not suspended or failed) " +
 			"were automatically removed from the list of cruises to submit.";
 
 	// Column header strings
@@ -274,16 +280,22 @@ public class DashboardCruiseListPage extends Composite {
 	/**
 	 * Redisplays the last version of this page if the username
 	 * associated with this page matches the current login username.
-	 * Does not add this page to the page history list.
+	 * 
+	 * @param addToHistory 
+	 * 		if true, adds this page to the page history 
 	 */
-	static void redisplayPage() {
+	static void redisplayPage(boolean addToHistory) {
 		// If never show before, or if the username does not match the 
 		// current login username, show the login page instead
 		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) )
-			DashboardLoginPage.showPage();
-		else
+			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
+			DashboardLoginPage.showPage(true);
+		}
+		else {
 			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			if ( addToHistory )
+				History.newItem(PagesEnum.CRUISE_LIST.name(), false);
+		}
 	}
 
 	/**
@@ -297,6 +309,14 @@ public class DashboardCruiseListPage extends Composite {
 		// Update the username
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
+		if ( cruises.isManager() ) {
+			addToListButton.setVisible(true);
+			removeFromListButton.setVisible(true);
+		}
+		else {
+			addToListButton.setVisible(false);
+			removeFromListButton.setVisible(false);
+		}
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();
@@ -345,15 +365,11 @@ public class DashboardCruiseListPage extends Composite {
 	 * @param skipSubmitted
 	 * 		if true, do not include cruises whose QC status 
 	 * 		is one of the submitted or accepted types
-	 * @param skipArchived
-	 * 		if true, do not include cruises whose archive status 
-	 * 		is one of the submitted or assigned types 
 	 * @return
 	 * 		set of selected cruises fitting the desired criteria;
 	 * 		will not be null, but may be empty. 
 	 */
-	private HashSet<DashboardCruise> getSelectedCruises(boolean skipSubmitted,
-														boolean skipArchived) {
+	private HashSet<DashboardCruise> getSelectedCruises(boolean skipSubmitted) {
 		HashSet<DashboardCruise> cruiseSet = new HashSet<DashboardCruise>();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
@@ -366,11 +382,6 @@ public class DashboardCruiseListPage extends Composite {
 							status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
 						continue;
 				}
-				if ( skipArchived ) {
-					if ( ! cruise.getArchiveStatus().equals(
-							DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) )
-						continue;
-				}
 				cruiseSet.add(cruise);
 			}
 		}
@@ -381,18 +392,14 @@ public class DashboardCruiseListPage extends Composite {
 	 * @param skipSubmitted
 	 * 		if true, do not include cruises whose QC status 
 	 * 		is one of the submitted or accepted types
-	 * @param skipArchived
-	 * 		if true, do not include cruises whose archive status 
-	 * 		is one of the submitted or assigned types 
 	 * @return
 	 * 		set of expocodes of the selected cruises fitting the 
 	 * 		desired criteria; will not be null, but may be empty. 
 	 */
-	private HashSet<String> getSelectedCruiseExpocodes(boolean skipSubmitted, 
-											   		   boolean skipArchived) {
+	private HashSet<String> getSelectedCruiseExpocodes(boolean skipSubmitted) {
 		HashSet<String> expocodeSet = new HashSet<String>();
 		for ( DashboardCruise cruise : 
-			getSelectedCruises(skipSubmitted, skipArchived) ) {
+			getSelectedCruises(skipSubmitted) ) {
 			expocodeSet.add(cruise.getExpocode());
 		}
 		return expocodeSet;
@@ -410,7 +417,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("deleteButton")
 	void deleteCruiseOnClick(ClickEvent event) {
-		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(true, false);
+		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(true);
 		if ( expocodeSet.size() == 0 ) {
 			Window.alert(NO_CRUISE_TO_DELETE_MSG);
 			return;
@@ -426,7 +433,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("dataCheckButton")
 	void dataCheckOnClick(ClickEvent event) {
-		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(true, false);
+		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(true);
 		if ( expocodeSet.size() != 1 ) {
 			Window.alert(ONLY_ONE_CRUISE_ALLOWED_MSG);
 			return;
@@ -438,7 +445,7 @@ public class DashboardCruiseListPage extends Composite {
 	@UiHandler("metadataButton")
 	void metadataOnClick(ClickEvent event) {
 		TreeSet<String> expocodeSet = new TreeSet<String>();
-		expocodeSet.addAll(getSelectedCruiseExpocodes(true, false));
+		expocodeSet.addAll(getSelectedCruiseExpocodes(true));
 		if ( expocodeSet.size() < 1 ) {
 			Window.alert(NO_CRUISES_SELECTED_FOR_METADATA_MSG);
 			return;
@@ -456,7 +463,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		HashSet<DashboardCruise> cruiseSet = getSelectedCruises(true, false);
+		HashSet<DashboardCruise> cruiseSet = getSelectedCruises(true);
 		if ( cruiseSet.size() == 0 ) {
 			Window.alert(NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG);
 			return;
@@ -466,8 +473,12 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("archiveSubmitButton")
 	void archiveSubmitOnClick(ClickEvent event) {
-		// TODO:
-		Window.alert("Not yet implemented");
+		HashSet<DashboardCruise> cruiseSet = getSelectedCruises(false);
+		if ( cruiseSet.size() != 1 ) {
+			Window.alert(ONLY_ONE_CRUISE_ALLOWED_MSG);
+			return;
+		}
+		CruiseArchivePage.showPage(cruiseSet.iterator().next());
 	}
 
 	@UiHandler("addToListButton")
@@ -508,7 +519,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("removeFromListButton")
 	void removeFromListOnClick(ClickEvent event) {
-		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(false, false);
+		HashSet<String> expocodeSet = getSelectedCruiseExpocodes(false);
 		if ( expocodeSet.size() == 0 ) {
 			Window.alert(NO_CRUISE_TO_REMOVE_MSG);
 			return;
