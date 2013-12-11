@@ -14,11 +14,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public enum CruiseDataColumnType implements Serializable, IsSerializable {
 	/**
-	 * The delete data type indicates data that should be 
-	 * deleted from the data file when updated; only the 
-	 * user should assign a column to be this type.
+	 * The ignore data type indicates data that should be 
+	 * completely ignored.
 	 */
-	DELETE,
+	IGNORE,
 	/**
 	 * The unknown data type indicates data that the user 
 	 * needs specify as one of the other standard types.

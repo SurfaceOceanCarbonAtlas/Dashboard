@@ -17,6 +17,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
@@ -24,6 +25,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -33,38 +35,35 @@ public class DashboardCruiseUploadPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
+	private static final String CREATE_TEXT = "Create Cruise";
+	private static final String OVERWRITE_TEXT = "Update Cruise";
+	private static final String CANCEL_TEXT = "Cancel";
+	private static final String HIDE_ADVANCED_TEXT = "Hide Advanced Settings";
+	private static final String SHOW_ADVANCED_TEXT = "Show Advanced Settings";
+
 	private static final String INTRO_HTML_MSG = 
-			"Select a cruise file to upload, and select the character set " +
-			"encoding for that file.  Standard ASCII text files can use " +
-			"either of the ISO, or the UTF-8, encodings.  Only use UTF-16 " +
-			"if you know your file is in that encoding, but be aware that " +
-			"only Western European characters can be properly handled.  " +
-			"Use the Window encoding for files produced by older Window " +
-			"programs.  Finally upload the file (or cancel) using the buttons " +
-			"at the bottom of the page. " +
+			"Select a cruise file to upload. The <em>" + CREATE_TEXT + 
+			"</em> button will upload the selected file as a new cruise.  The <em>" + 
+			OVERWRITE_TEXT + "</em> button will upload the selected file as revised " +
+			"data for an existing cruise.";
+
+	private static final String ADVANCED_HTML_MSG = 
+			"Select a character set encoding for this file.  If you are unsure " +
+			"of the encoding, either of the ISO, or the UTF-8, encodings should " +
+			"work fine.  The main differences in the ISO and UTF-8 encodings are " +
+			"in the \"extended\" characters.  Only use UTF-16 if you know your file " +
+			"is encoded in that format, but be aware that only Western European " +
+			"characters can be properly handled.  Use the Window encoding only " +
+			"for files produced by older Window programs. " +
 			"<br /><br /> " +
-			"If you are unsure of the encoding, use the preview button to " +
-			"show the beginning of the file as it will be used for SOCAT " +
-			"ingestion.  Note that this uploads the entire file only for " +
-			"the purpose of creating the preview. ";
+			"Use the preview button to show the beginning of the file as it " +
+			"will be seen by SOCAT.  Note that this uploads the entire file " +
+			"only for the purpose of creating the preview. ";
 
 	private static final String ENCODING_TEXT = "File encoding:";
 	private static final String[] KNOWN_ENCODINGS = {
 		"ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
 	};
-
-	private static final String CREATE_TEXT = "Create Cruise";
-	private static final String OVERWRITE_TEXT = "Update Cruise";
-	private static final String CANCEL_TEXT = "Cancel";
-
-	private static final String BUTTONS_HTML_MSG = 
-			"The <em>" + CREATE_TEXT + "</em> button will upload the selected " +
-			"file as a new cruise; it will fail if a cruise exists with the " +
-			"same expocode as this cruise.  The <em>" + OVERWRITE_TEXT + "</em> " +
-			"button will upload the selected file as a revised cruise; it will " +
-			"fail if a cruise does not exist with the same expocode as this " +
-			"cruise.  <b>Only use <em>" + OVERWRITE_TEXT + "</em> if you are " +
-			"absolutely sure this is an update of the existing cruise.</b>";
 
 	private static final String PREVIEW_TEXT = "Preview Cruise File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
@@ -74,7 +73,10 @@ public class DashboardCruiseUploadPage extends Composite {
 	private static final String UNKNOWN_FAIL_MSG = 
 			"Upload failed for some unexpected reason";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"Unable to obtain a cruise expocode from the uploaded file contents";
+			"Unable to obtain a cruise expocode from the uploaded file contents. " +
+			"The preview contains the (partial) contents of the file as seen " +
+			"by SOCAT.  If the contents look very strange, you might need to " +
+			"change the character encoding in the advanced settings.";
 	private static final String FILE_EXISTS_FAIL_MSG = 
 			"A cruise already exists with this expocode.  The preview contains " +
 			"the (partial) contents of the existing cruise data.  Use the " +
@@ -83,11 +85,12 @@ public class DashboardCruiseUploadPage extends Composite {
 			"existing cruise.";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG = 
 			"A cruise already exists with this expocode which does not belong to " +
-			"you or to someone in a group you manage.  The preview contains the " +
-			"(partial) contents of the existing cruise data.";
+			"you.  The preview contains the (partial) contents of the existing " +
+			"cruise data.";
 	private static final String FILE_DOES_NOT_EXIST_FAIL_MSG = 
-			"A cruise with this expocode does not exist.  Use the " + CREATE_TEXT + 
-			" button to create a new cruise after verifying the expocode for this cruise.";
+			"A cruise with this expocode does not exist.  If the expocode in the " +
+			"cruise file is correct, use the " + CREATE_TEXT + " button to create " +
+			"a new cruise.";
 
 	interface DashboardCruiseUploadPageUiBinder 
 			extends UiBinder<Widget, DashboardCruiseUploadPage> {
@@ -101,19 +104,24 @@ public class DashboardCruiseUploadPage extends Composite {
 	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload cruiseUpload;
-	@UiField Label encodingLabel;
-	@UiField ListBox encodingListBox;
-	@UiField Button previewButton;
 	@UiField Hidden usernameToken;
 	@UiField Hidden passhashToken;
 	@UiField Hidden actionToken;
-	@UiField HTML buttonsHtml;
+	@UiField Hidden encodingToken;
+	@UiField Button advancedButton;
 	@UiField Button createButton;
 	@UiField Button overwriteButton;
 	@UiField Button cancelButton;
+	@UiField FlowPanel advancedPanel;
+	@UiField HTML advancedHtml;
+	@UiField Label encodingLabel;
+	@UiField ListBox encodingListBox;
+	@UiField SimplePanel previewPanel;
+	@UiField Button previewButton;
 	@UiField HTML previewHtml;
 
 	private String username;
+	private boolean advancedShown; 
 
 	// Singleton instance of this page
 	private static DashboardCruiseUploadPage singleton = null;
@@ -136,19 +144,16 @@ public class DashboardCruiseUploadPage extends Composite {
 		uploadForm.setMethod(FormPanel.METHOD_POST);
 		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
 
-		encodingLabel.setText(ENCODING_TEXT);
-
-		encodingListBox.setVisibleItemCount(1);
-		for ( String encoding : KNOWN_ENCODINGS ) {
-			encodingListBox.addItem(encoding);
-		}
-
-		previewButton.setText(PREVIEW_TEXT);
-
-		buttonsHtml.setHTML(BUTTONS_HTML_MSG);
 		createButton.setText(CREATE_TEXT);
 		overwriteButton.setText(OVERWRITE_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
+
+		advancedHtml.setHTML(ADVANCED_HTML_MSG);
+		encodingLabel.setText(ENCODING_TEXT);
+		encodingListBox.setVisibleItemCount(1);
+		for ( String encoding : KNOWN_ENCODINGS )
+			encodingListBox.addItem(encoding);
+		previewButton.setText(PREVIEW_TEXT);
 	}
 
 	/**
@@ -165,8 +170,11 @@ public class DashboardCruiseUploadPage extends Composite {
 				singleton.username);
 		singleton.usernameToken.setValue("");
 		singleton.passhashToken.setValue("");
+		singleton.encodingToken.setValue("");
 		singleton.actionToken.setValue("");
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
+		singleton.encodingListBox.setSelectedIndex(2);
+		singleton.hideAdvancedOptions();
 		SocatUploadDashboard.get().updateCurrentPage(singleton);
 		History.newItem(PagesEnum.CRUISE_UPLOAD.name(), false);
 	}
@@ -192,9 +200,37 @@ public class DashboardCruiseUploadPage extends Composite {
 		}
 	}
 
+	/**
+	 * Hides the advanced options on the page.
+	 */
+	private void hideAdvancedOptions() {
+		advancedButton.setText(SHOW_ADVANCED_TEXT);
+		advancedPanel.setVisible(false);
+		previewPanel.setVisible(false);
+		advancedShown = false;
+	}
+
+	/**
+	 * Shows the advanced options on the page.
+	 */
+	private void showAdvancedOptions() {
+		advancedButton.setText(HIDE_ADVANCED_TEXT);
+		advancedPanel.setVisible(true);
+		previewPanel.setVisible(true);
+		advancedShown = true;
+	}
+
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
+	}
+
+	@UiHandler("advancedButton")
+	void showAdvancedOnClick(ClickEvent event) {
+		if ( advancedShown )
+			hideAdvancedOptions();
+		else
+			showAdvancedOptions();
 	}
 
 	@UiHandler("previewButton") 
@@ -202,6 +238,8 @@ public class DashboardCruiseUploadPage extends Composite {
 		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
+		encodingToken.setValue(
+				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
 		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
 		// Submit the form
 		uploadForm.submit();
@@ -212,6 +250,8 @@ public class DashboardCruiseUploadPage extends Composite {
 		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
+		encodingToken.setValue(
+				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
 		actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
 		// Submit the form
 		uploadForm.submit();
@@ -222,6 +262,8 @@ public class DashboardCruiseUploadPage extends Composite {
 		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
+		encodingToken.setValue(
+				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
 		actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
 		// Submit the form
 		uploadForm.submit();
@@ -248,6 +290,7 @@ public class DashboardCruiseUploadPage extends Composite {
 		// Clear the "hidden" values
 		usernameToken.setValue("");
 		passhashToken.setValue("");
+		encodingToken.setValue("");
 		actionToken.setValue("");
 
 		// Check the returned results
@@ -265,6 +308,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
 				previewMsg = "<pre>" + resultMsg + "</pre>";
+			previewPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			Window.alert(UNKNOWN_FAIL_MSG);
 		}
@@ -275,6 +319,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+			// Advanced options must already be visible to have sent this request
 			previewHtml.setHTML(previewMsg);
 		}
 		else if ( DashboardUtils.NO_EXPOCODE_HEADER_TAG.equals(tagMsg[0]) ) {
@@ -284,6 +329,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+			previewPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			Window.alert(NO_EXPOCODE_FAIL_MSG);
 		}
@@ -295,6 +341,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+			previewPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			Window.alert(FILE_EXISTS_FAIL_MSG);
 		}
@@ -306,6 +353,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+			previewPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			Window.alert(CANNOT_OVERWRITE_FAIL_MSG);
 		}
@@ -317,6 +365,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+			previewPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			Window.alert(FILE_DOES_NOT_EXIST_FAIL_MSG);
 		}
@@ -339,6 +388,7 @@ public class DashboardCruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
 				previewMsg = "<pre>" + resultMsg + "</pre>";
+			previewPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			Window.alert(UNKNOWN_FAIL_MSG);
 		}
