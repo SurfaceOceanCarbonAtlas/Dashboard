@@ -98,13 +98,9 @@ public class CruiseDataColumn {
 				String supplStr = DashboardUtils.STD_HEADER_NAMES.get(
 								CruiseDataColumnType.SUPPLEMENTAL);
 				typesList.add(supplStr);
-				// Remove DELETE (at the head of the list);
-				// DELETE may eventually be removed.
-				String removeStr = DashboardUtils.STD_HEADER_NAMES.get(
-								CruiseDataColumnType.DELETE);
-				// Add everything except SUPPLEMENTS (which has been added) and DELETE
+				// Add everything except SUPPLEMENTAL, which has been already been added
 				for ( String name : DashboardUtils.STD_HEADER_NAMES.values() ) {
-					if ( ! ( name.equals(removeStr) || name.equals(supplStr) ) ) {
+					if ( ! name.equals(supplStr) ) {
 						typesList.add(name);
 					}
 				}

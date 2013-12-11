@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -26,6 +27,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
@@ -44,11 +46,24 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	private static final int NUM_ROWS_PER_GRID_PAGE = 15;
 
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String SUBMIT_TEXT = "Update Column Types";
+	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Return to Cruise List";
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
-	private static final String CRUISE_INTRO = "Cruise: ";
+	private static final String INTRO_PROLOGUE = 
+			"Verify the assignment of data column types for this cruise, then " +
+			"select the " + SUBMIT_TEXT + " button to check the data values. " +
+			"If problems are found, this page will stay up and present the issues " +
+			"discovered.  " +
+			"<br /><br />" +
+			"Any <em>(unknown)</em> column types must be reassigned.  " +
+			"The type <em>(ignore)</em> means SOCAT will completely ignore " +
+			"this data column.  The type <em>(supplemental)</em> means SOCAT " +
+			"will not use or examine the data values, but will include the data " +
+			"in the SOCAT-enhanced data file as supplemental data. " +
+			"<br /><br />" +
+			"Cruise: ";
+	private static final String PAGER_LABEL_TEXT = "Rows shown";
 
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
 			"Problems obtaining the cruise column types";
@@ -71,10 +86,11 @@ public class CruiseDataColumnSpecsPage extends Composite {
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField Label cruiseLabel;
+	@UiField HTML introHtml;
 	@UiField DataGrid<ArrayList<String>> dataGrid;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
+	@UiField Label pagerLabel;
 	@UiField SimplePager gridPager;
 
 	// Username associated with this page
@@ -100,6 +116,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		logoutButton.setText(LOGOUT_TEXT);
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
+		pagerLabel.setText(PAGER_LABEL_TEXT);
 		cruise = new DashboardCruise();
 		cruiseDataCols = new ArrayList<CruiseDataColumn>();
 		// Create the asynchronous data provider for the data grid
@@ -220,7 +237,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		cruise.setDataColDescriptions(cruiseSpecs.getDataColDescriptions());
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
-		cruiseLabel.setText(CRUISE_INTRO + cruise.getExpocode());
+		introHtml.setHTML(INTRO_PROLOGUE + 
+				SafeHtmlUtils.htmlEscape(cruise.getExpocode()));
 
 		// Rebuild the data grid using the provided CruiseDataColumnSpecs
 		if ( cruise.getDataColTypes().size() < 4 )

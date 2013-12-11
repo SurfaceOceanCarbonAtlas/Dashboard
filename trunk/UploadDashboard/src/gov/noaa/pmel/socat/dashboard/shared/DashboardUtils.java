@@ -72,8 +72,8 @@ public class DashboardUtils {
 	public static final EnumMap<CruiseDataColumnType,String> STD_HEADER_NAMES = 
 			new EnumMap<CruiseDataColumnType,String>(CruiseDataColumnType.class);
 	static {
-		STD_HEADER_NAMES.put(CruiseDataColumnType.DELETE, "delete");
-		STD_HEADER_NAMES.put(CruiseDataColumnType.UNKNOWN, "unknown");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.IGNORE, "(ignore)");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.UNKNOWN, "(unknown)");
 		STD_HEADER_NAMES.put(CruiseDataColumnType.TIMESTAMP, "timestamp");
 		STD_HEADER_NAMES.put(CruiseDataColumnType.DATE, "date");
 		STD_HEADER_NAMES.put(CruiseDataColumnType.YEAR, "yr");
@@ -97,7 +97,7 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(CruiseDataColumnType.PCO2_SST, "pCO2water_SST_wet");
 		STD_HEADER_NAMES.put(CruiseDataColumnType.FCO2_EQU, "fCO2water_equ_wet");
 		STD_HEADER_NAMES.put(CruiseDataColumnType.FCO2_SST, "fCO2water_SST_wet");
-		STD_HEADER_NAMES.put(CruiseDataColumnType.SUPPLEMENTAL, "supplemental");
+		STD_HEADER_NAMES.put(CruiseDataColumnType.SUPPLEMENTAL, "(supplemental)");
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class DashboardUtils {
 	public static final EnumMap<CruiseDataColumnType,String> STD_DESCRIPTIONS = 
 			new EnumMap<CruiseDataColumnType,String>(CruiseDataColumnType.class);
 	static {
-		STD_DESCRIPTIONS.put(CruiseDataColumnType.DELETE, "data to be deleted"); 
+		STD_DESCRIPTIONS.put(CruiseDataColumnType.IGNORE, "data to be ignored"); 
 		STD_DESCRIPTIONS.put(CruiseDataColumnType.UNKNOWN, "unknown data to be identified");
 		STD_DESCRIPTIONS.put(CruiseDataColumnType.TIMESTAMP, "date and time of the measurement");
 		STD_DESCRIPTIONS.put(CruiseDataColumnType.DATE, "date of the measurement");
@@ -140,7 +140,7 @@ public class DashboardUtils {
 	public static final EnumMap<CruiseDataColumnType,ArrayList<String>> STD_DATA_UNITS = 
 			new EnumMap<CruiseDataColumnType,ArrayList<String>>(CruiseDataColumnType.class);
 	static {
-		STD_DATA_UNITS.put(CruiseDataColumnType.DELETE, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.IGNORE, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
 				"YYYY-MM-DD HH:MM:SS", "MON DAY YEAR HH:MM:SS", "DAY MON YEAR HH:MM:SS")));

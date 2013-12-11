@@ -6,17 +6,18 @@
 	<ui:style src="CommonFullWidth.css" />
 
 	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:north size="6">
+		<g:north size="15">
 			<g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.userinfopanel}">
 					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
 					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 				</g:FlowPanel>
-				<g:Label addStyleNames="{style.cruiselabel}" ui:field="cruiseLabel" />
+				<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			</g:FlowPanel>
 		</g:north>
-		<g:south size="6">
+		<g:south size="8">
 			<g:FlowPanel>
+				<g:Label addStyleNames="{style.gridpagerlabel}" ui:field="pagerLabel" />
 				<cell:SimplePager location="CENTER" addStyleNames="{style.gridpager}" ui:field="gridPager" />
 				<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />

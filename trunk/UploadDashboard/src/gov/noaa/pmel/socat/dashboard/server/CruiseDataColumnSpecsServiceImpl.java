@@ -4,12 +4,10 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -113,37 +111,6 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 		cruiseData.setDataColUnits(newSpecs.getDataColUnits());
 		// TODO?: revise the data descriptions to the standard if it is a 
 		// well-known type (not delete, unknown, or supplemental) ?
-
-		// Get the indices of column to be deleted as a stack - last in first out
-		ArrayDeque<Integer> delIdxs = new ArrayDeque<Integer>();
-		int k = 0;
-		for ( CruiseDataColumnType colType : cruiseData.getDataColTypes() ) {
-			if ( colType == CruiseDataColumnType.DELETE )
-				delIdxs.push(k);
-			k++;
-		}
-		// Completely remove any data columns marked to be deleted 
-		if ( delIdxs.size() > 0 ) {
-			// Directly modify the lists in the cruise object
-			ArrayList<CruiseDataColumnType> colTypes = cruiseData.getDataColTypes();
-			ArrayList<Integer> colIndices = cruiseData.getUserColIndices();
-			ArrayList<String> colNames = cruiseData.getUserColNames();
-			ArrayList<String> colUnits = cruiseData.getDataColUnits();
-			ArrayList<String> colDescripts = cruiseData.getDataColDescriptions();
-			ArrayList<Integer> colQualities = cruiseData.getDataColQualities();
-			ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
-			// Remove the columns to be deleted by column index - last index first 
-			for ( int idx : delIdxs ) {
-				colTypes.remove(idx);
-				colIndices.remove(idx);
-				colNames.remove(idx);
-				colUnits.remove(idx);
-				colDescripts.remove(idx);
-				colQualities.remove(idx);
-				for ( ArrayList<String> dataRow : dataVals )
-					dataRow.remove(idx);
-			}
-		}
 
 		// TODO: run the SanityChecker on the cruise data 
 		//       with the updated cruise column specifications
