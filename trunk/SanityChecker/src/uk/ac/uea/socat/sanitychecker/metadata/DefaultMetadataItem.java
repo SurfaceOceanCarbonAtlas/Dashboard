@@ -2,12 +2,14 @@ package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 
 /**
@@ -33,7 +35,7 @@ public class DefaultMetadataItem extends MetadataItem {
 	 * cannot generate values, so an exception is always thrown. 
 	 */
 	@Override
-	public void generateValue() throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
 		throw new MetadataException("This metadata value cannot be automatically generated");
 	}
 
@@ -42,7 +44,7 @@ public class DefaultMetadataItem extends MetadataItem {
 	 * cannot generate values, so an exception is always thrown. 
 	 */
 	@Override
-	public void processRecordForValue(HashMap<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
 		throw new MetadataException("This metadata value cannot be automatically generated");
 	}
 }

@@ -2,12 +2,14 @@ package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 /**
  * Implementation of the {@code MetadataItem} class
@@ -33,14 +35,13 @@ public class VesselLookupMetadataItem extends MetadataItem {
 	 * NODC code.
 	 */
 	@Override
-	public void generateValue() throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void processRecordForValue(HashMap<String, MetadataItem> metadataSet,
-			SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
 		// TODO Auto-generated method stub
 		
 	}

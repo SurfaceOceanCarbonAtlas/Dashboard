@@ -32,9 +32,32 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	private static final String CONVERTER_CLASS_PREFIX = "uk.ac.uea.socat.sanitychecker.data.conversion.";
 	
 	/**
-	 * The name of the configuration file
+	 * The name of the configuration file.
+	 * Must be set via @code{init} before calling
+	 * @code{getInstance}.
 	 */
-	private String itsFilename;
+	private static String itsFilename = null;
+	
+	/**
+	 * The logger to be used by the singleton instance of this class
+	 */
+	private static Logger itsLogger = null;
+	
+	/**
+	 * The singleton instance of this class
+	 */
+	private static ColumnConversionConfig columnConversionConfigInstance = null;
+	
+	/**
+	 * Set the required data for building the singleton instance of this class
+	 * 
+	 * @param filename The name of the file containing the configuration
+	 * @param logger The logger to be used
+	 */
+	public static void init(String filename, Logger logger) {
+		itsFilename = filename;
+		itsLogger = logger;
+	}
 	
 	/**
 	 * Create the data conversion configuration
@@ -42,16 +65,42 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	 * @throws FileNotFoundException If the file doesn't exist.
 	 * @throws IOException If an error occurs while reading the file
 	 */
-	public ColumnConversionConfig(File conversionConfig, Logger logger) throws ConfigException {
-		itsFilename = conversionConfig.getName();
+	private ColumnConversionConfig() throws ConfigException {
+		
+		if (itsFilename == null) {
+			throw new ConfigException(null, "ColumnConversionConfig filename has not been set - must run init first");
+		}
+		
 		try {
 			Properties config = new Properties();
-			config.load(new FileReader(conversionConfig));
-			buildMap(config, logger);
+			config.load(new FileReader(new File(itsFilename)));
+			buildMap(config, itsLogger);
 		} catch (IOException e) {
-			throw new ConfigException(conversionConfig.getName(), e.getMessage(), e);
+			throw new ConfigException(itsFilename, e.getMessage(), e);
 		}
 	}
+	
+	/**
+	 * Retrieves the singleton instance of this class
+	 * 
+	 * @return The singleton instance of this class
+	 * @throws ConfigException
+	 */
+	public static ColumnConversionConfig getInstance() throws ConfigException {
+		if (columnConversionConfigInstance == null) {
+			columnConversionConfigInstance = new ColumnConversionConfig();
+		}
+		
+		return columnConversionConfigInstance;
+	}
+	
+	/**
+	 * Destroy the singleton instance of this class
+	 */
+	public static void destroy() {
+		columnConversionConfigInstance = null;
+	}
+	
 	
 	/**
 	 * Build the lookup table of data conversion classes for the Sanity Checker

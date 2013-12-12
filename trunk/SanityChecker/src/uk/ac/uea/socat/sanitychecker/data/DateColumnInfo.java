@@ -144,7 +144,7 @@ public class DateColumnInfo {
 		}
 	}
 	
-	public DateTime makeDateTime(List<String> dataFields) throws DateTimeException {
+	public DateTime makeDateTime(List<String> dataFields, DateTimeHandler dateTimeHandler) throws DateTimeException {
 
 		DateTime result = null;
 
@@ -156,7 +156,7 @@ public class DateColumnInfo {
 			if (CheckerUtils.isEmpty(value)) {
 				throw new MissingDateTimeElementException();
 			} else {
-				result = DateTimeHandler.getInstance().parseDateTime(value);
+				result = dateTimeHandler.parseDateTime(value);
 			}
 			
 			break;
@@ -171,7 +171,7 @@ public class DateColumnInfo {
 				throw new MissingDateTimeElementException();
 			} else {
 				String dateTimeString = dateValue + " " + timeValue;
-				result = DateTimeHandler.getInstance().parseDateTime(dateTimeString);
+				result = dateTimeHandler.parseDateTime(dateTimeString);
 			}
 			
 			break;

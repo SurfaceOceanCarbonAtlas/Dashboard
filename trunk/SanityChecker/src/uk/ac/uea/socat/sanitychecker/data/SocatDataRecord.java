@@ -14,6 +14,7 @@ import org.joda.time.DateTime;
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.DataMessage;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
+import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
@@ -120,39 +121,37 @@ public class SocatDataRecord {
 	 */
 	private Logger itsLogger;
 
-	public SocatDataRecord(String line, int lineNumber, ColumnSpec colSpec, SocatColumnConfig columnConfig, ColumnConversionConfig conversionConfig, HashMap<String, MetadataItem> metadata, Logger logger) throws SocatDataException {
+	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger) throws ConfigException, SocatDataException {
 		itsMessages = new ArrayList<DataMessage>();
 		itsColumnSpec = colSpec;
-		itsColumnConfig = columnConfig;
 		itsLineNumber = lineNumber;
 		itsLogger = logger;
-		
-		// Build the set of data field objects ready to be populated
-		itsOutputColumns = columnConfig.buildDataFields(); 
 
-		// Extract the data values from the input
-		List<String> dataFields = CheckerUtils.trimAndLowerList(Arrays.asList(line.split(",")));
-		
+		itsColumnConfig = SocatColumnConfig.getInstance();
+
+		// Build the set of data field objects ready to be populated
+		itsOutputColumns = itsColumnConfig.buildDataFields(); 
+
 		// Populate all the basic data columns
 		setDataValues(dataFields);
 		
 		// Populate the date fields
-		populateDateFields(dataFields);
+		populateDateFields(dataFields, dateTimeHandler);
 		
 		// Populate all columns whose data is drawn from the metadata
-		setMetadataValues(metadata);
+		setMetadataValues(metadata, dateTimeHandler);
 		
 		// Run methods to populate columns from calculations
 		setCalculatedValues(metadata);
 	}
 
-	private void populateDateFields(List<String> dataFields) throws SocatDataException {
+	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException {
 		DateColumnInfo colInfo = itsColumnSpec.getDateColumnInfo();
 		
 		try {
-			DateTime parsedDateTime = colInfo.makeDateTime(dataFields);
+			DateTime parsedDateTime = colInfo.makeDateTime(dataFields, dateTimeHandler);
 			
-			itsLogger.trace("Setting record date/time to: " + DateTimeHandler.getInstance().formatDateTime(parsedDateTime));
+			itsLogger.trace("Setting record date/time to: " + dateTimeHandler.formatDateTime(parsedDateTime));
 			
 			setFieldValue(YEAR_COLUMN_NAME, String.valueOf(parsedDateTime.getYear()));
 			setFieldValue(MONTH_COLUMN_NAME, String.valueOf(parsedDateTime.getMonthOfYear()));
@@ -161,7 +160,7 @@ public class SocatDataRecord {
 			setFieldValue(MINUTE_COLUMN_NAME, String.valueOf(parsedDateTime.getMinuteOfHour()));
 			setFieldValue(SECOND_COLUMN_NAME, String.valueOf(parsedDateTime.getSecondOfMinute()));
 			
-			setFieldValue(ISO_DATE_COLUMN_NAME, DateTimeHandler.getInstance().formatDateTime(parsedDateTime));
+			setFieldValue(ISO_DATE_COLUMN_NAME, dateTimeHandler.formatDateTime(parsedDateTime));
 		} catch (MissingDateTimeElementException e) {
 			itsMessages.add(new DataMessage(DataMessage.ERROR, itsLineNumber, -1, "", e.getMessage()));
 			
@@ -221,7 +220,7 @@ public class SocatDataRecord {
 	 * Populate all fields whose values are extracted from the file's metadata.
 	 * @param metadata The set of metadata to use as a data source.
 	 */
-	private void setMetadataValues(HashMap<String, MetadataItem> metadata) throws SocatDataException {
+	private void setMetadataValues(Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler) throws SocatDataException {
 		for (String column : itsColumnConfig.getColumnList()) {
 			if (getDataSource(column) == SocatColumnConfigItem.METADATA_SOURCE) {
 				String metadataName = getMetadataSourceName(column);
@@ -230,7 +229,7 @@ public class SocatDataRecord {
 				MetadataItem metadataItem = metadata.get(metadataName);
 				if (null != metadataItem) {
 					try {
-						setFieldValue(column, metadataItem.getValue());
+						setFieldValue(column, metadataItem.getValue(dateTimeHandler));
 					} catch (DateTimeException e) {
 						throw new SocatDataException(itsLineNumber, itsColumnSpec.getColumnInfo(column).getInputColumnIndex(), column, "Could not retrieve metadata value", e);
 					}
@@ -243,7 +242,7 @@ public class SocatDataRecord {
 	 * Populate all fields whose values are calculated by the Sanity Checker
 	 * @param metadata
 	 */
-	private void setCalculatedValues(HashMap<String, MetadataItem> metadata) throws SocatDataException {
+	private void setCalculatedValues(Map<String, MetadataItem> metadata) throws SocatDataException {
 		
 		int columnIndex = 0;
 		for (String column : itsColumnConfig.getColumnList()) {

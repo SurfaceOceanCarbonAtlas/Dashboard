@@ -43,11 +43,6 @@ public class DateTimeHandler {
 	public static final Integer PIVOT_YEAR = Integer.valueOf(2000);
 	
 	/**
-	 * The format for dates supplied on the command line
-	 */
-	public static final String COMMAND_LINE_FORMAT = "YYYYMMdd";
-	
-	/**
 	 * The output format for dates
 	 */
 	private static final String DATE_OUTPUT_FORMAT = "YYYYMMdd";
@@ -56,11 +51,6 @@ public class DateTimeHandler {
 	 * The output format for dates and times
 	 */
 	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYYMMddHHmmss";
-	
-	/**
-	 * The singleton instance of the DateTimeHandler class
-	 */
-	private static DateTimeHandler dateParserInstance;
 	
 	/**
 	 * The formatter used to parse dates from input data and metadata
@@ -85,14 +75,9 @@ public class DateTimeHandler {
 	private DateTimeFormatter itsOutputDateTimeFormatter = null;
 	
 	/**
-	 * The formatter used for parsing dates passed in on the command line.
-	 */
-	private DateTimeFormatter itsCommandLineFormatter = null;
-	
-	/**
 	 * Initialises all the date formats
 	 */
-	private DateTimeHandler(String dateFormat) throws DateTimeException {
+	public DateTimeHandler(String dateFormat) throws DateTimeException {
 		String adjustedDateString = validateDateFormatString(dateFormat);
 		itsDateOnlyFormatter = DateTimeFormat.forPattern(adjustedDateString);
 		
@@ -103,45 +88,6 @@ public class DateTimeHandler {
 		
 		itsOutputDateFormatter = DateTimeFormat.forPattern(DATE_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
 		itsOutputDateTimeFormatter = DateTimeFormat.forPattern(DATE_TIME_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
-		
-		itsCommandLineFormatter = DateTimeFormat.forPattern(COMMAND_LINE_FORMAT).withPivotYear(PIVOT_YEAR);
-	}
-	
-	/**
-	 * Retrieves an instance of the DateParser object. If there isn't one already, it gets created.
-	 * @return An instance of the DateParser object.
-	 */
-	public static DateTimeHandler initialise(String dateFormat) throws DateTimeException {
-		dateParserInstance = new DateTimeHandler(dateFormat);
-		return dateParserInstance;
-	}
-	
-	/**
-	 * Returns the initialised instance of the DateTimeHandler singleton
-	 * @return The initialised instance of the DateTimeHandler singleton
-	 * @throws DateTimeException If the handler has not been initialised
-	 */
-	public static DateTimeHandler getInstance() throws DateTimeException {
-		if (null == dateParserInstance) {
-			throw new DateTimeException("DateTimeHandler has not been initialised!");
-		}
-		
-		return dateParserInstance;
-	}
-	
-	/**
-	 * Determines whether or not the date handler has been initialised
-	 * @return {@code true} if the handler has been initialised; {@code false} otherwise
-	 */
-	public static boolean isInitialised() {
-		return null != dateParserInstance;
-	}
-	
-	/**
-	 * Destroy the instance 
-	 */
-	public static void destroy() {
-		dateParserInstance = null;
 	}
 	
 	/**
@@ -220,16 +166,6 @@ public class DateTimeHandler {
 	 */
 	public DateMidnight parseDate(String date) throws DateTimeParseException {
 		return parseDateWorker(date, itsDateOnlyFormatter);
-	}
-	
-	/**
-	 * Parse a date string from the command line into a date object
-	 * @param date The date string
-	 * @return The date object
-	 * @throws DateTimeException If the string does not conform to the expected format
-	 */
-	public DateMidnight parseCommandLineDate(String date) throws DateTimeParseException {
-		return parseDateWorker(date, itsCommandLineFormatter);
 	}
 	
 	/**

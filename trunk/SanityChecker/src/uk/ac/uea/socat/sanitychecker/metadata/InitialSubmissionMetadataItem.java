@@ -2,6 +2,7 @@ package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
@@ -10,6 +11,7 @@ import org.joda.time.DateTime;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 
 /**
@@ -31,11 +33,11 @@ public class InitialSubmissionMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue() throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
 		// If there's already an initial submission date, we do nothing.
 		// Otherwise we set today's date.
 		try {
-			if (null == getValue()) {
+			if (null == getValue(dateTimeHandler)) {
 				setValue(new DateMidnight());
 			}
 		} catch (DateTimeException e) {
@@ -44,9 +46,7 @@ public class InitialSubmissionMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void processRecordForValue(
-			HashMap<String, MetadataItem> metadataSet, SocatDataRecord record)
-			throws MetadataException {
+	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
 		// TODO Auto-generated method stub
 		
 	}
