@@ -1,9 +1,10 @@
 package uk.ac.uea.socat.sanitychecker.data.calculate;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import uk.ac.uea.socat.sanitychecker.data.SocatDataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
 /**
@@ -20,5 +21,5 @@ public interface DataCalculator {
 	 * @return The calculated value
 	 * @throws SocatDataException If the value cannot be calculated
 	 */
-	public String calculateDataValue(HashMap<String, MetadataItem> metadata, SocatDataRecord record, int colIndex, String colName) throws SocatDataException;
+	public String calculateDataValue(Map<String, MetadataItem> metadata, SocatDataRecord record, int colIndex, String colName, DateTimeHandler dateTimeHander) throws SocatDataException;
 }

@@ -2,6 +2,7 @@ package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
@@ -132,7 +133,7 @@ public abstract class MetadataItem {
 	 * @param value The value to be stored
 	 * @throws DateTimeException If a passed in value for a date item cannot be parsed
 	 */
-	public void setValue(String value) throws DateTimeException {
+	public void setValue(String value, DateTimeHandler dateTimeHandler) throws DateTimeException {
 		itsLogger.trace("Setting metadata value '" + itsConfigItem.getName() + "' to '" + value + "'");
 
 		switch(itsConfigItem.getType()) {
@@ -158,13 +159,7 @@ public abstract class MetadataItem {
 		}
 		case DATE_TYPE:
 		{
-			DateMidnight parsedDate;
-			if (itsLine == -1) {
-				parsedDate = DateTimeHandler.getInstance().parseCommandLineDate(value);
-			} else {
-				parsedDate = DateTimeHandler.getInstance().parseDate(value);
-			}
-
+			DateMidnight parsedDate = dateTimeHandler.parseDate(value);
 			itsValue = new MetadataValue(parsedDate);
 			break;
 		}
@@ -275,10 +270,10 @@ public abstract class MetadataItem {
 	 * Returns the value of this metadata item as a String, regardless of its actual type.
 	 * @return The value of the metadata item
 	 */
-	public String getValue() throws DateTimeException {
+	public String getValue(DateTimeHandler dateTimeHandler) throws DateTimeException {
 		String result = null;
 		if (null != itsValue) {
-			result = itsValue.getValue();
+			result = itsValue.getValue(dateTimeHandler);
 		}
 		
 		return result;
@@ -287,14 +282,14 @@ public abstract class MetadataItem {
 	/**
 	 * Generates the value for this metadata item from the data file and/or system data
 	 */
-	public abstract void generateValue() throws MetadataException;
+	public abstract void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException;
 	
 	/**
 	 * Processes a single data record to extract information for generating this metadata value.
 	 * @param metadataSet The currently extracted metadata
 	 * @param record The data record
 	 */
-	public abstract void processRecordForValue(HashMap<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException;
+	public abstract void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException;
 	
 	/**
 	 * Internal class for holding a metadata value. This handles the fact that
@@ -382,7 +377,7 @@ public abstract class MetadataItem {
 		 * data type.
 		 * @return A string representation of the value
 		 */
-		String getValue() throws DateTimeException {
+		String getValue(DateTimeHandler dateTimeHandler) throws DateTimeException {
 			String result = null;
 			
 			switch (itsType) {
@@ -408,7 +403,7 @@ public abstract class MetadataItem {
 			}
 			case MetadataItem.DATE_TYPE:
 			{
-				result = DateTimeHandler.getInstance().formatDate(itsDateValue);
+				result = dateTimeHandler.formatDate(itsDateValue);
 				break;
 			}
 			}

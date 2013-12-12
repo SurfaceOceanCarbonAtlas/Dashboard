@@ -1,6 +1,7 @@
 package uk.ac.uea.socat.sanitychecker.config;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -108,18 +109,65 @@ public class SocatColumnConfig {
 	 * The set of configuration items for the SOCAT columns
 	 */
 	private Map<String, SocatColumnConfigItem> itsColumnConfig;
+	
+	/**
+	 * The location of the metadata config file.
+	 * Must be set via @code{init} before calling
+	 * @code{getInstance}
+	 */
+	private static String itsConfigFilename = null;
 
 	/**
-	 * Reads the SOCAT column configuration.
-	 * @param configFile The file containing the configuration 
-	 * @param logger The logger
-	 * @throws IOException If the file cannot be read
-	 * @throws ConfigException If the contents of the file are invalid
+	 * The logger to be used by the config object.
 	 */
-	public SocatColumnConfig(String configFile, Logger logger) throws IOException, ConfigException {
+	private static Logger itsLogger = null; 
+	
+	/**
+	 * The singleton instance of this class.
+	 */
+	private static SocatColumnConfig socatColumnConfigInstance = null;
+
+	/**
+	 * Set the required data for building the singleton instance of this class
+	 * 
+	 * @param filename The name of the file containing the configuration
+	 * @param logger The logger to be used
+	 */
+	public static void init(String filename, Logger logger) {
+		itsConfigFilename = filename;
+		itsLogger = logger;
+	}
+
+	private SocatColumnConfig() throws ConfigException {
+		if (itsConfigFilename == null) {
+			throw new ConfigException(null, "SocatColumnConfig filename has not been set - must run init first");
+		}
+		
 		itsColumns = new ArrayList<String>();
 		itsColumnConfig = new HashMap<String, SocatColumnConfigItem>();
-		readFile(configFile, logger);
+		readFile();
+	}
+	
+	/**
+	 * Retrieve the singleton instance of this class, creating it if
+	 * it doesn't exist.
+	 * 
+	 * @return The singleton instance of this class
+	 * @throws ConfigException If the configuration is invalid
+	 */
+	public static SocatColumnConfig getInstance() throws ConfigException {
+		if (socatColumnConfigInstance == null) {
+			socatColumnConfigInstance = new SocatColumnConfig();
+		}
+		
+		return socatColumnConfigInstance;
+	}
+	
+	/**
+	 * Destroys the singleton instance of this class
+	 */
+	public static void destroy() {
+		socatColumnConfigInstance = null;
 	}
 	
 	/**
@@ -129,126 +177,130 @@ public class SocatColumnConfig {
 	 * @throws IOException If the file cannot be read
 	 * @throws ConfigException If the configuration is invalid
 	 */
-	private void readFile(String configFile, Logger logger) throws IOException, ConfigException {
-		BufferedReader reader = new BufferedReader(new FileReader(configFile));
-		String line = reader.readLine();
-		int lineCount = 1;
-		
-		while (null != line) {
-			if (!CheckerUtils.isComment(line)) {
-				List<String> fields = Arrays.asList(line.split(","));
-				fields = CheckerUtils.trimList(fields);
-				
-				String columnName = fields.get(NAME_COL);
-				logger.trace("Creating SOCAT column config item '" + columnName + "'");
-				
-				if (itsColumns.contains(columnName)) {
-					throw new ConfigException(configFile, columnName, lineCount, "Item is configured more than once");
-				}
-				
-				boolean required;
-				try {
-					required = CheckerUtils.parseBoolean(fields.get(REQUIRED_COL));
-				} catch (ParseException e) {
-					throw new ConfigException(configFile, columnName, lineCount, "Invalid boolean value");
-				}
-				
-				String requiredGroup = null;
-				if (required) {
-					requiredGroup = fields.get(REQUIRED_GROUP_COL);
-				}
-				
-				int dataSource = SocatColumnConfigItem.convertDataSourceString(configFile, columnName, lineCount, fields.get(SOURCE_COL));
-				
-				String metadataName = null;
-				if (dataSource == SocatColumnConfigItem.METADATA_SOURCE) {
-					metadataName = fields.get(METADATA_COL);
-				}
-				
-				String calcClassName = null;
-				DataCalculator calculatorObject = null;
-				Method calculatorMethod = null;
-				if (dataSource == SocatColumnConfigItem.CALCULATION_SOURCE) {
-					try {
-						calcClassName = fields.get(CALC_METHOD_COL);
-						
-						// Check that the class and method exist.
-						Class<?> calcClass = Class.forName(CALCULATOR_PACKAGE + "." + calcClassName);
-						List<Class<?>> interfaces = Arrays.asList(calcClass.getInterfaces());
-						Class<?> interfaceClass = Class.forName(CALCULATOR_INTERFACE_NAME);
-						if (!interfaces.contains(interfaceClass)) {
-							throw new ConfigException(configFile, columnName, lineCount, "Specified calculator method does not implement the correct interface");
-						}
-						
-						calculatorObject = (DataCalculator) calcClass.newInstance();
-						calculatorMethod = calculatorObject.getClass().getDeclaredMethod(CALCULATOR_METHOD_NAME, HashMap.class, SocatDataRecord.class, int.class, String.class);
-					}
-					catch (ClassNotFoundException e) {
-						throw new ConfigException(configFile, columnName, lineCount, "The specified calculator class does not exist");
-					}
-					catch (NoSuchMethodException e) {
-						throw new ConfigException(configFile, columnName, lineCount, "The specified calculator class does not contain the required method");
-					}
-					catch (ConfigException e) {
-						throw e;
-					}
-					catch (Exception e) {
-						throw new ConfigException(configFile, columnName, lineCount, "Unhandled exception while checking calculator method", e);
-					}
-				}
-				
-				boolean isNumeric;
-				try {
-					isNumeric = CheckerUtils.parseBoolean(fields.get(NUMERIC_COL));
-				} catch (ParseException e) {
-					throw new ConfigException(configFile, columnName, lineCount, "Invalid boolean value");
-				}
-				
-				boolean hasRange = false;
-				double rangeMin = 0;
-				double rangeMax = 0;
-				
-				if (fields.get(RANGE_MIN_COL).length() > 0 || fields.get(RANGE_MAX_COL).length() > 0) {
-					hasRange = true;
-					try {
-						rangeMin = Double.parseDouble(fields.get(RANGE_MIN_COL));
-						rangeMax = Double.parseDouble(fields.get(RANGE_MAX_COL));
-					} catch (NumberFormatException e) {
-						throw new ConfigException(configFile, columnName, lineCount, "Invalid range specification");
-					}
-				}
-				
-				int flagType = SocatColumnConfigItem.convertFlagTypeString(configFile, columnName, lineCount, fields.get(FLAG_COL));
-				
-				int missingFlag = SocatColumnConfigItem.GOOD_FLAG;
-				int rangeFlag = SocatColumnConfigItem.GOOD_FLAG;
-				if (flagType != SocatColumnConfigItem.NO_FLAG) {
-					
-					if (required) {
-						if (fields.size() < MISSING_FLAG_COL) {
-							throw new ConfigException(configFile, columnName, lineCount, "Missing flag values");
-						} else {
-							missingFlag = SocatColumnConfigItem.convertFlagValueString(configFile, columnName, lineCount, fields.get(MISSING_FLAG_COL));
-						}
-					}
-					
-					if (hasRange) {
-						if (fields.size() <= RANGE_FLAG_COL) {
-							throw new ConfigException(configFile, columnName, lineCount, "Range is specified, but no range flag is set");
-						} else {
-							rangeFlag = SocatColumnConfigItem.convertFlagValueString(configFile, columnName, lineCount, fields.get(RANGE_FLAG_COL));
-						}
-					}
-				}
-				
-				SocatColumnConfigItem configItem = new SocatColumnConfigItem(columnName, lineCount, required, requiredGroup, dataSource, metadataName, calculatorObject, calculatorMethod, isNumeric, hasRange, rangeMin, rangeMax, flagType, missingFlag, rangeFlag);
-				itsColumns.add(columnName);
-				itsColumnConfig.put(columnName, configItem);
-				
-			}
+	private void readFile() throws ConfigException {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(itsConfigFilename));
+			String line = reader.readLine();
+			int lineCount = 1;
 			
-			line = reader.readLine();
-			lineCount++;
+			while (null != line) {
+				if (!CheckerUtils.isComment(line)) {
+					List<String> fields = Arrays.asList(line.split(","));
+					fields = CheckerUtils.trimList(fields);
+					
+					String columnName = fields.get(NAME_COL);
+					itsLogger.trace("Creating SOCAT column config item '" + columnName + "'");
+					
+					if (itsColumns.contains(columnName)) {
+						throw new ConfigException(itsConfigFilename, columnName, lineCount, "Item is configured more than once");
+					}
+					
+					boolean required;
+					try {
+						required = CheckerUtils.parseBoolean(fields.get(REQUIRED_COL));
+					} catch (ParseException e) {
+						throw new ConfigException(itsConfigFilename, columnName, lineCount, "Invalid boolean value");
+					}
+					
+					String requiredGroup = null;
+					if (required) {
+						requiredGroup = fields.get(REQUIRED_GROUP_COL);
+					}
+					
+					int dataSource = SocatColumnConfigItem.convertDataSourceString(itsConfigFilename, columnName, lineCount, fields.get(SOURCE_COL));
+					
+					String metadataName = null;
+					if (dataSource == SocatColumnConfigItem.METADATA_SOURCE) {
+						metadataName = fields.get(METADATA_COL);
+					}
+					
+					String calcClassName = null;
+					DataCalculator calculatorObject = null;
+					Method calculatorMethod = null;
+					if (dataSource == SocatColumnConfigItem.CALCULATION_SOURCE) {
+						try {
+							calcClassName = fields.get(CALC_METHOD_COL);
+							
+							// Check that the class and method exist.
+							Class<?> calcClass = Class.forName(CALCULATOR_PACKAGE + "." + calcClassName);
+							List<Class<?>> interfaces = Arrays.asList(calcClass.getInterfaces());
+							Class<?> interfaceClass = Class.forName(CALCULATOR_INTERFACE_NAME);
+							if (!interfaces.contains(interfaceClass)) {
+								throw new ConfigException(itsConfigFilename, columnName, lineCount, "Specified calculator method does not implement the correct interface");
+							}
+							
+							calculatorObject = (DataCalculator) calcClass.newInstance();
+							calculatorMethod = calculatorObject.getClass().getDeclaredMethod(CALCULATOR_METHOD_NAME, HashMap.class, SocatDataRecord.class, int.class, String.class);
+						}
+						catch (ClassNotFoundException e) {
+							throw new ConfigException(itsConfigFilename, columnName, lineCount, "The specified calculator class does not exist");
+						}
+						catch (NoSuchMethodException e) {
+							throw new ConfigException(itsConfigFilename, columnName, lineCount, "The specified calculator class does not contain the required method");
+						}
+						catch (ConfigException e) {
+							throw e;
+						}
+						catch (Exception e) {
+							throw new ConfigException(itsConfigFilename, columnName, lineCount, "Unhandled exception while checking calculator method", e);
+						}
+					}
+					
+					boolean isNumeric;
+					try {
+						isNumeric = CheckerUtils.parseBoolean(fields.get(NUMERIC_COL));
+					} catch (ParseException e) {
+						throw new ConfigException(itsConfigFilename, columnName, lineCount, "Invalid boolean value");
+					}
+					
+					boolean hasRange = false;
+					double rangeMin = 0;
+					double rangeMax = 0;
+					
+					if (fields.get(RANGE_MIN_COL).length() > 0 || fields.get(RANGE_MAX_COL).length() > 0) {
+						hasRange = true;
+						try {
+							rangeMin = Double.parseDouble(fields.get(RANGE_MIN_COL));
+							rangeMax = Double.parseDouble(fields.get(RANGE_MAX_COL));
+						} catch (NumberFormatException e) {
+							throw new ConfigException(itsConfigFilename, columnName, lineCount, "Invalid range specification");
+						}
+					}
+					
+					int flagType = SocatColumnConfigItem.convertFlagTypeString(itsConfigFilename, columnName, lineCount, fields.get(FLAG_COL));
+					
+					int missingFlag = SocatColumnConfigItem.GOOD_FLAG;
+					int rangeFlag = SocatColumnConfigItem.GOOD_FLAG;
+					if (flagType != SocatColumnConfigItem.NO_FLAG) {
+						
+						if (required) {
+							if (fields.size() < MISSING_FLAG_COL) {
+								throw new ConfigException(itsConfigFilename, columnName, lineCount, "Missing flag values");
+							} else {
+								missingFlag = SocatColumnConfigItem.convertFlagValueString(itsConfigFilename, columnName, lineCount, fields.get(MISSING_FLAG_COL));
+							}
+						}
+						
+						if (hasRange) {
+							if (fields.size() <= RANGE_FLAG_COL) {
+								throw new ConfigException(itsConfigFilename, columnName, lineCount, "Range is specified, but no range flag is set");
+							} else {
+								rangeFlag = SocatColumnConfigItem.convertFlagValueString(itsConfigFilename, columnName, lineCount, fields.get(RANGE_FLAG_COL));
+							}
+						}
+					}
+					
+					SocatColumnConfigItem configItem = new SocatColumnConfigItem(columnName, lineCount, required, requiredGroup, dataSource, metadataName, calculatorObject, calculatorMethod, isNumeric, hasRange, rangeMin, rangeMax, flagType, missingFlag, rangeFlag);
+					itsColumns.add(columnName);
+					itsColumnConfig.put(columnName, configItem);
+					
+				}
+				
+				line = reader.readLine();
+				lineCount++;
+			}
+		} catch (IOException e) {
+			throw new ConfigException(itsConfigFilename, "I/O Error while reading file", e);
 		}
 	}
 	

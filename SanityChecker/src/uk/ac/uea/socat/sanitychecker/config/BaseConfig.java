@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.Reader;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 /**
  * The base configuration for the Sanity Checker.
  * 
@@ -21,11 +23,6 @@ public class BaseConfig extends Properties {
 	private static final long serialVersionUID = 10001001L;
 	
 	/**
-	 * The default location of the Sanity Checker's configuration file.
-	 */
-	private static final String DEFAULT_CONFIG_FILE = "./config.properties";
-
-	/**
 	 * The config value containing the location of the metadata processing configuration.
 	 */
 	private static final String METADATA_CONFIG_FILE = "MetadataConfigFile";
@@ -34,11 +31,6 @@ public class BaseConfig extends Properties {
 	 * The config value containing the location of the SOCAT data format configuration.
 	 */
 	private static final String SOCAT_CONFIG_FILE = "SocatConfigFile";
-	
-	/**
-	 * The config value containing the location of the data processing configuration.
-	 */
-	private static final String DATA_CONFIG_FILE = "DataConfigFile";
 	
 	/**
 	 * The config value containing the location of the column specification XML Schema file.
@@ -52,57 +44,115 @@ public class BaseConfig extends Properties {
 	
 	/**
 	 * The file containing the configuration.
+	 * Must be set via @code{init} before
+	 * calling @code{getInstance}.
 	 */
-	private String itsConfigFile;
+	private static String itsConfigFile = null;
 	
 	/**
-	 * Constructs an empty {@code BaseConfig} object. 
+	 * The logger to be used for all configuration files.
 	 */
-	private BaseConfig(String configFile) {
+	private static Logger itsLogger = null;
+	
+	/**
+	 * The singleton instance of the base configuration
+	 */
+	private static BaseConfig baseConfigInstance = null;
+	
+
+	/**
+	 * Constructs an empty @code{BaseConfig} object.
+	 * This only exists to ensure that @code{BaseConfig}
+	 * objects cannot be created except through the @code{getInstance}
+	 * method. 
+	 */
+	private BaseConfig() {
 		super();
-		itsConfigFile = configFile;
+	}
+	
+	/**
+	 * Retrieves an instance of the BaseConfig. If it doesn't exist, create it. 
+	 */
+	public static BaseConfig getInstance() throws ConfigException {
+		if (baseConfigInstance == null) {
+			loadConfig();
+		}
+		
+		return baseConfigInstance;
+	}
+	
+	/**
+	 * Destroy the current instance of the base config.
+	 */
+	public static void destroy() {
+		baseConfigInstance = null;
+	}
+	
+	/**
+	 * Set the location of the @code{BaseConfig} file.
+	 * @param filename The location of the @code{BaseConfig} file.
+	 */
+	public static void init(String filename, Logger logger) {
+		itsConfigFile = filename;
+		itsLogger = logger;
+	}
+	
+	/**
+	 * Checks to see if the @code{BaseConfig} has been initialised with a filename.
+	 * This does not guarantee that the configuration is valid.
+	 * 
+	 * @return @code{true} if the @code{BaseConfig} has been initialised; @code{false} if it hasn't.
+	 */
+	public static boolean isInitialised() {
+		return (itsConfigFile != null);
 	}
 		
-	/**
-	 * Load a configuration file from the system default location.
-	 * 
-	 * @return The loaded configuration.
-	 * @throws ConfigException If the configuration cannot be loaded or is invalid.
-	 * 
-	 */
-	public static BaseConfig loadConfig() throws ConfigException {
-		return loadConfig(DEFAULT_CONFIG_FILE);
-	}
-	
 	/**
 	 * Load a configuration from the specified file location.
 	 * @param configFile The name of the file containing the configuration.
 	 * @return The loaded configuration.
 	 * @throws ConfigException If the configuration cannot be loaded or is invalid.
 	 */
-	public static BaseConfig loadConfig(String configFile) throws ConfigException {
-		BaseConfig loadedConfig = new BaseConfig(configFile);
+	private static void loadConfig() throws ConfigException {
+		if (itsConfigFile == null) {
+			throw new ConfigException(null, "Base config file location has not been set");
+		}
+		
+		BaseConfig loadedConfig = new BaseConfig();
 		
 		// Make sure the file exists and we can read it.
-		File fileCheck = new File(configFile);
+		File fileCheck = new File(itsConfigFile);
 		if (!fileCheck.exists()) {
-			throw new ConfigException(configFile, "File does not exist");
+			throw new ConfigException(itsConfigFile, "File does not exist");
 		} else if (!fileCheck.canRead()) {
-			throw new ConfigException(configFile, "Cannot access file for reading");
+			throw new ConfigException(itsConfigFile, "Cannot access file for reading");
 		}
 		
 		// Load the file.
 		try {
-			Reader configReader = new FileReader(configFile);
+			Reader configReader = new FileReader(itsConfigFile);
 			loadedConfig.load(configReader);
 		} catch (Exception e) {
-			throw new ConfigException(configFile, "Error reading base configuration file", e);
+			throw new ConfigException(itsConfigFile, "Error reading base configuration file", e);
 		}
 		
 		// Validate the file.
 		loadedConfig.validate();
 		
-		return loadedConfig;
+		// Log the config details
+		itsLogger.trace("Base configuration loaded.");
+		itsLogger.trace("Metadata config file = " + loadedConfig.getMetadataConfigFile());
+		itsLogger.trace("Column specification schema file = " + loadedConfig.getColumnSpecSchemaFile());
+		itsLogger.trace("Column conversion config file = " + loadedConfig.getColumnConversionConfigFile());
+		itsLogger.trace("SOCAT data config file = " + loadedConfig.getSocatConfigFile());
+
+		// Initialise the configurations specified in the base config
+		MetadataConfig.init(loadedConfig.getMetadataConfigFile(), itsLogger);
+		ColumnConversionConfig.init(loadedConfig.getColumnConversionConfigFile(), itsLogger);
+		SocatColumnConfig.init(loadedConfig.getSocatConfigFile(), itsLogger);
+		
+		// Store the loaded configuration as the singleton instance
+		baseConfigInstance = loadedConfig;
 	}
 	
 	/**
@@ -111,14 +161,6 @@ public class BaseConfig extends Properties {
 	 */
 	public String getMetadataConfigFile() {
 		return getProperty(METADATA_CONFIG_FILE);
-	}
-	
-	/**
-	 * Returns the name of the file containing the configuration for data processing.
-	 * @return The name of the file containing the configuration for data processing.
-	 */
-	public String getDataConfigFile() {
-		return getProperty(DATA_CONFIG_FILE);
 	}
 	
 	/**
@@ -160,7 +202,6 @@ public class BaseConfig extends Properties {
 		}
 		
 		validateMetadataConfig();
-		validateDataConfig();
 		validateColumnConversionConfig();
 	}
 
@@ -199,40 +240,10 @@ public class BaseConfig extends Properties {
 	 * can access it.
 	 * @throws ConfigException If the file isn't specified or can't be accessed.
 	 */
-	private void validateDataConfig() throws ConfigException {
-		
-		// Get the log file value. If it's missing, throw an exception.
-		String configFile = getDataConfigFile();
-		if (null == configFile) {
-			throw new ConfigException(itsConfigFile, "Missing config value " + DATA_CONFIG_FILE);
-		}
-		
-		File theFile = new File(configFile);
-		
-		// Make sure the file exists
-		if (!theFile.exists()) {
-			throw new ConfigException(itsConfigFile, "The specified " + DATA_CONFIG_FILE + " does not exist");
-		}
-		
-		// Make sure we can read it
-		if (!theFile.isFile()) {
-			throw new ConfigException(itsConfigFile, "The specified " + DATA_CONFIG_FILE + " is not a regular file");
-		}
-
-		if (!theFile.canRead()) {
-			throw new ConfigException(itsConfigFile, "Cannot access specified " + DATA_CONFIG_FILE);
-		}
-	}
-
-	/**
-	 * Ensure the data config file location has been configured correctly, and that the Sanity Checker
-	 * can access it.
-	 * @throws ConfigException If the file isn't specified or can't be accessed.
-	 */
 	private void validateColumnConversionConfig() throws ConfigException {
 		
 		// Get the log file value. If it's missing, throw an exception.
-		String configFile = getDataConfigFile();
+		String configFile = getColumnConversionConfigFile();
 		if (null == configFile) {
 			throw new ConfigException(itsConfigFile, "Missing config value " + COLUMN_CONVERSION_FILE);
 		}

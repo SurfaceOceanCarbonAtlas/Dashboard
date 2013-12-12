@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 
 /**
@@ -64,7 +66,7 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue() throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
 		// If we haven't had any data, set a dummy value
 		if (!hasValue) {
 			setValue(MISSING_VALUE);
@@ -117,7 +119,7 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void processRecordForValue(HashMap<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
 		// Get the latitude from the record - covert to 0-360 range
 		Double position = Double.parseDouble(record.getColumn(LONGITUDE_COLUMN).getValue());
 		if (position < 0) {

@@ -2,6 +2,7 @@ package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
@@ -9,6 +10,7 @@ import org.joda.time.DateMidnight;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 
 /**
@@ -32,12 +34,12 @@ public class DataDateMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue() throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
 		setValue(itsDate);
 	}
 
 	@Override
-	public void processRecordForValue(HashMap<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
 		
 		// Get the record's date
 		int year = Integer.parseInt(record.getColumn(SocatDataRecord.YEAR_COLUMN_NAME).getValue());
