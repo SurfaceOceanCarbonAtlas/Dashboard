@@ -3,13 +3,14 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -62,8 +63,8 @@ public class DashboardMetadataUploadService extends HttpServlet {
 		// Get the contents from the post request
 		String username = null;
 		String passhash = null;
-		String expocodeFilename = null;
-		Boolean overwrite = null;
+		String expocodes = null;
+		String uploadTimestamp = null;
 		FileItem metadataItem = null;
 		try {
 			// Go through each item in the request
@@ -77,18 +78,12 @@ public class DashboardMetadataUploadService extends HttpServlet {
 					passhash = item.getString();
 					item.delete();
 				}
-				else if ( "expocode".equals(itemName) ) {
-					// This is either the complete expocode filename or just 
-					// the cruise expocode, depending on the value of overwrite.
-					expocodeFilename = item.getString();
+				else if ( "expocodes".equals(itemName) ) {
+					expocodes = item.getString();
 					item.delete();
 				}
-				else if ( "overwrite".equals(itemName) ) {
-					String overwriteVal = item.getString();
-					if ( "false".equals(overwriteVal) )
-						overwrite = false;
-					else if ( "true".equals(overwriteVal) )
-						overwrite = true;
+				else if ( "timestamp".equals(itemName) ) {
+					uploadTimestamp = item.getString();
 					item.delete();
 				}
 				else if ( "metadataupload".equals(itemName) ) {
@@ -108,65 +103,91 @@ public class DashboardMetadataUploadService extends HttpServlet {
 
 		// Verify page contents seem okay
 		DashboardDataStore dataStore = DashboardDataStore.get();
-		if ( (username == null) || (passhash == null) || (metadataItem == null) || 
-			 (expocodeFilename == null) || (overwrite == null) ||
+		if ( (username == null) || (passhash == null) || 
+			 (expocodes == null) || (uploadTimestamp == null) ||
+			 (metadataItem == null) || 
 			 ! dataStore.validateUser(username, passhash) ) {
 			metadataItem.delete();
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					"Invalid request contents for this service.");
 			return;
 		}
-
-		// Save the metadata document
-		DashboardMetadata metadata;
-		String message;
+		// Extract the cruise expocodes from the expocodes string
+		TreeSet<String> cruiseExpocodes = new TreeSet<String>(); 
 		try {
-			if ( overwrite ) {
-				// expocodeFilename is the expocode filename
-				metadata = dataStore.getMetadataFileHandler()
-									.saveUpdatedMetadataFile(expocodeFilename, 
-											username, metadataItem);
-				message = "Updated metadata document " + 
-						metadata.getExpocodeFilename() + " (" + 
-						metadata.getUploadFilename() + ")";
-			}
-			else {
-				// expocodeFilename is just the cruise expocode
-				metadata = dataStore.getMetadataFileHandler()
-									.saveNewMetadataFile(expocodeFilename, 
-											username, metadataItem);
-				message = "Created metadata document " + 
-						metadata.getExpocodeFilename() + " (" + 
-						metadata.getUploadFilename() + ")";
-			}
-			// Done with the uploaded file
+			cruiseExpocodes.addAll(
+					DashboardUtils.decodeStringArrayList(expocodes));
+			if ( cruiseExpocodes.size() < 1 )
+				throw new IllegalArgumentException();
+		} catch ( IllegalArgumentException ex ) {
 			metadataItem.delete();
-			// Update the available metadata documents for this user
-			DashboardMetadataList metadataList = 
-					dataStore.getUserFileHandler().getMetadataListing(username);
-			metadataList.put(metadata.getExpocodeFilename(), metadata);
-			dataStore.getUserFileHandler()
-					 .saveMetadataListing(metadataList, message);
-		} catch (Exception ex) {
-			metadataItem.delete();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-								ex.getMessage());
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+					"Invalid request contents for this service.");
 			return;
 		}
 
-		
+		DashboardMetadataFileHandler metadataHandler = 
+				dataStore.getMetadataFileHandler();
+		DashboardCruiseFileHandler cruiseHandler = 
+				dataStore.getCruiseFileHandler();
+		String uploadFilename = metadataItem.getName();
+
+		DashboardMetadata metadata = null;
+		for ( String expo : cruiseExpocodes ) {
+			try {
+				// Save the metadata document for this cruise
+				if ( metadata == null ) {
+					metadata = metadataHandler.saveMetadataFile(expo, 
+							username, uploadTimestamp, metadataItem);
+				}
+				else {
+					metadata = metadataHandler.copyMetadataFile(expo,
+							uploadFilename, metadata);
+				}
+				// Update the metadata documents associated with this cruise
+				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expo);
+				if ( cruise == null )
+					throw new IllegalArgumentException(
+							"Cruise " + expo + " does not exist");
+				// Directly modify the metadata listing in the cruise
+				if ( cruise.getMetadataFilenames().add(metadata.getFilename()) ) {
+					// New metadata document added
+					cruiseHandler.saveCruiseToInfoFile(cruise, 
+							"Added metadata document " + metadata.getFilename() + 
+							" to cruise " + expo);
+				}
+			} catch ( Exception ex ) {
+				metadataItem.delete();
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+									ex.getMessage());
+				return;
+			}
+		}
+
+		// Generate the message for the success response
+		StringBuffer sb = new StringBuffer();
+		sb.append("Added/updated metadata document ");
+		sb.append(uploadFilename);
+		if ( cruiseExpocodes.size() == 1 )
+			sb.append(" for cruise ");
+		else
+			sb.append(" for cruises: ");
+		boolean first = true;
+		for ( String expo : cruiseExpocodes ) {
+			if ( first )
+				first = false;
+			else
+				sb.append(", ");
+			sb.append(expo);
+		}
+		String message = sb.toString();
+
 		// Send the success response
 		response.setStatus(HttpServletResponse.SC_CREATED);
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();
-		if ( overwrite ) {
-			respWriter.println(DashboardUtils.FILE_UPDATED_HEADER_TAG);
-			respWriter.println(message);
-		}
-		else {
-			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG);
-			respWriter.println(message);
-		}
+		respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG);
+		respWriter.println(message);
 		response.flushBuffer();
 	}
 

@@ -42,7 +42,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	private static final String SHOW_ADVANCED_TEXT = "Show Advanced Settings";
 
 	private static final String INTRO_HTML_MSG = 
-			"Select a cruise file to upload. The <em>" + CREATE_TEXT + 
+			"Select a cruise file to upload.  The <em>" + CREATE_TEXT + 
 			"</em> button will upload the selected file as a new cruise.  The <em>" + 
 			OVERWRITE_TEXT + "</em> button will upload the selected file as revised " +
 			"data for an existing cruise.";

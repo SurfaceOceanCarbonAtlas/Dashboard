@@ -7,10 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.TreeSet;
-
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
 import org.junit.Test;
@@ -59,58 +55,38 @@ public class DashboardMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getUploadFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setUploadFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getFilename()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setFilename(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetUploadFilename() {
-		String myUploadFilename = "NatalieSchulte_2013.doc";
+	public void testGetSetFilename() {
+		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
 		DashboardMetadata mdata = new DashboardMetadata();
-		assertEquals("", mdata.getUploadFilename());
-		mdata.setUploadFilename(myUploadFilename);
-		assertEquals(myUploadFilename, mdata.getUploadFilename());
+		assertEquals("", mdata.getFilename());
+		mdata.setFilename(myFilename);
+		assertEquals(myFilename, mdata.getFilename());
 		assertEquals("", mdata.getOwner());
 		assertFalse( mdata.isSelected() );
-		mdata.setUploadFilename(null);
-		assertEquals("", mdata.getUploadFilename());
+		mdata.setFilename(null);
+		assertEquals("", mdata.getFilename());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getExpocodeFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setExpocodeFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getUploadTimestamp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setUploadTimestamp(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetExpocodeFilename() {
-		String myExpocodeFilename = "CYNS20120124_metadata.doc";
+	public void testGetUploadTimestamp() {
+		String myTimestamp = "2013-12-11 10:09:08";
 		DashboardMetadata mdata = new DashboardMetadata();
-		assertEquals("", mdata.getExpocodeFilename());
-		mdata.setExpocodeFilename(myExpocodeFilename);
-		assertEquals(myExpocodeFilename, mdata.getExpocodeFilename());
-		assertEquals("", mdata.getUploadFilename());
+		assertEquals("", mdata.getUploadTimestamp());
+		mdata.setUploadTimestamp(myTimestamp);
+		assertEquals(myTimestamp, mdata.getUploadTimestamp());
+		assertEquals("", mdata.getFilename());
 		assertEquals("", mdata.getOwner());
 		assertFalse( mdata.isSelected() );
-		mdata.setExpocodeFilename(null);
-		assertEquals("", mdata.getExpocodeFilename());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getAssociatedCruises()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setAssociatedCruises(java.util.TreeSet)}.
-	 */
-	@Test
-	public void testGetSetAssociatedCruises() {
-		TreeSet<String> myCruises = new TreeSet<String>();
-		myCruises.addAll(Arrays.asList("CYNS20120124", "CYNS20121015"));
-		DashboardMetadata mdata = new DashboardMetadata();
-		assertEquals(0, mdata.getAssociatedCruises().size());
-		mdata.setAssociatedCruises(myCruises);
-		assertEquals(myCruises, mdata.getAssociatedCruises());
-		assertEquals("", mdata.getExpocodeFilename());
-		assertEquals("", mdata.getUploadFilename());
-		assertEquals("", mdata.getOwner());
-		assertFalse( mdata.isSelected() );
-		mdata.setAssociatedCruises(null);
-		assertEquals(0, mdata.getAssociatedCruises().size());
+		mdata.setUploadTimestamp(null);
+		assertEquals("", mdata.getUploadTimestamp());
 	}
 
 	/**
@@ -120,14 +96,12 @@ public class DashboardMetadataTest {
 	@Test
 	public void testHashCodeEqualsObject() {
 		String myOwner = "SocatUser";
-		String myUploadFilename = "NatalieSchulte_2013.doc";
-		String myExpocodeFilename = "CYNS20120124_metadata.doc";
-		TreeSet<String> myCruises = new TreeSet<String>();
-		myCruises.addAll(Arrays.asList("CYNS20120124", "CYNS20121015"));
+		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
+		String myTimestamp = "2013-12-11 10:09:08";
 
 		DashboardMetadata firstMData = new DashboardMetadata();
 		assertFalse( firstMData.equals(null) );
-		assertFalse( firstMData.equals(myUploadFilename) );
+		assertFalse( firstMData.equals(myFilename) );
 		DashboardMetadata secondMData = new DashboardMetadata();
 		assertEquals(firstMData.hashCode(), firstMData.hashCode());
 		assertEquals(firstMData, secondMData);
@@ -146,24 +120,17 @@ public class DashboardMetadataTest {
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
 
-		firstMData.setUploadFilename(myUploadFilename);
+		firstMData.setFilename(myFilename);
 		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
 		assertFalse( firstMData.equals(secondMData) );
-		secondMData.setUploadFilename(myUploadFilename);
+		secondMData.setFilename(myFilename);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
 
-		firstMData.setExpocodeFilename(myExpocodeFilename);
+		firstMData.setUploadTimestamp(myTimestamp);
 		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
 		assertFalse( firstMData.equals(secondMData) );
-		secondMData.setExpocodeFilename(myExpocodeFilename);
-		assertEquals(firstMData.hashCode(), secondMData.hashCode());
-		assertEquals(firstMData, secondMData);
-
-		firstMData.setAssociatedCruises(myCruises);
-		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
-		assertFalse( firstMData.equals(secondMData) );
-		secondMData.setAssociatedCruises(myCruises);
+		secondMData.setUploadTimestamp(myTimestamp);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
 	}

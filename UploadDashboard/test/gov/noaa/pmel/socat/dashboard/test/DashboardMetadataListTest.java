@@ -48,25 +48,24 @@ public class DashboardMetadataListTest {
 	public void testHashCodeEquals() {
 		String myUsername = "SocatUser";
 		String myOwner = "Cathy";
-		String myUploadFilename = "NatalieSchulte_2013.doc";
-		String myExpocodeFilename = "CYNS20120124_metadata.doc";
-		String otherUploadFilename = "NatalieSchulte_2013.pdf";
-		String otherExpocodeFilename = "CYNS20120124_metadata_2.pdf";
+		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
+		String myTimestamp = "2013-12-11 10:09:08";
+		String otherFilename = "CYNS20120124_NatalieSchulte_2013.pdf";
 
 		DashboardMetadata mdata = new DashboardMetadata();
 		mdata.setOwner(myOwner);
-		mdata.setUploadFilename(myUploadFilename);
-		mdata.setExpocodeFilename(myExpocodeFilename);
+		mdata.setFilename(myFilename);
+		mdata.setUploadTimestamp(myTimestamp);
 
 		DashboardMetadata sameMData = new DashboardMetadata();
 		sameMData.setOwner(myOwner);
-		sameMData.setUploadFilename(myUploadFilename);
-		sameMData.setExpocodeFilename(myExpocodeFilename);
+		sameMData.setFilename(myFilename);
+		sameMData.setUploadTimestamp(myTimestamp);
 
 		DashboardMetadata otherMData = new DashboardMetadata();
 		otherMData.setOwner(myOwner);
-		otherMData.setUploadFilename(otherUploadFilename);
-		otherMData.setExpocodeFilename(otherExpocodeFilename);
+		otherMData.setFilename(otherFilename);
+		otherMData.setUploadTimestamp(myTimestamp);
 
 		DashboardMetadataList firstMDataList = new DashboardMetadataList();
 		assertFalse( firstMDataList.equals(null) );
@@ -82,23 +81,23 @@ public class DashboardMetadataListTest {
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 
-		firstMDataList.put(mdata.getExpocodeFilename(), mdata);
+		firstMDataList.put(mdata.getFilename(), mdata);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
-		secondMDataList.put(sameMData.getExpocodeFilename(), sameMData);
+		secondMDataList.put(sameMData.getFilename(), sameMData);
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
-		secondMDataList.put(otherMData.getExpocodeFilename(), otherMData);
+		secondMDataList.put(otherMData.getFilename(), otherMData);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
 
 		secondMDataList.clear();
 		assertEquals(myUsername, secondMDataList.getUsername());
-		secondMDataList.put(otherMData.getExpocodeFilename(), otherMData);
+		secondMDataList.put(otherMData.getFilename(), otherMData);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
-		firstMDataList.put(otherMData.getExpocodeFilename(), otherMData);
-		secondMDataList.put(sameMData.getExpocodeFilename(), sameMData);
+		firstMDataList.put(otherMData.getFilename(), otherMData);
+		secondMDataList.put(sameMData.getFilename(), sameMData);
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 	}

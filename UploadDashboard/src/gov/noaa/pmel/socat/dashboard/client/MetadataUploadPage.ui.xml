@@ -9,15 +9,15 @@
 			<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
 			<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 		</g:FlowPanel>
+		<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 		<g:FormPanel ui:field="uploadForm">
 			<g:FlowPanel>
-				<g:Label addStyleNames="{style.cruisenamesintro}" ui:field="expocodeLabel" />
 				<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
 						ui:field="metadataUpload" />
 				<g:Hidden name="username" ui:field="usernameToken" />
 				<g:Hidden name="passhash" ui:field="passhashToken" />
-				<g:Hidden name="expocode" ui:field="expocodeToken" />
-				<g:Hidden name="overwrite" ui:field="overwriteToken" />
+				<g:Hidden name="timestamp" ui:field="timestampToken" /> 
+				<g:Hidden name="expocodes" ui:field="expocodesToken" />
 			</g:FlowPanel>
 		</g:FormPanel>
 		<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">

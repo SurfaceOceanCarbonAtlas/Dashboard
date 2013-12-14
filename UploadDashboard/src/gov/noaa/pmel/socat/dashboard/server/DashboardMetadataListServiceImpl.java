@@ -9,7 +9,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataListService;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -21,11 +20,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 									implements DashboardMetadataListService {
 
-	private static final long serialVersionUID = 9076359833749591580L;
+	private static final long serialVersionUID = -3315960782424412471L;
 
 	@Override
 	public DashboardMetadataList getMetadataList(String username, String passhash, 
-			TreeSet<String> cruiseExpocodes) throws IllegalArgumentException {
+			String cruiseExpocode) throws IllegalArgumentException {
 		// Authenticate the user
 		DashboardDataStore dataStore;
 		try {
@@ -37,58 +36,33 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		if ( ! dataStore.validateUser(username, passhash) )
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
-		// Get the metadata listing for this user
-		DashboardMetadataList mdataList = 
-				dataStore.getUserFileHandler().getMetadataListing(username);
-		boolean needsUpdate = false;
-		String message = "Updated metadata list for " + username + ": ";
-		// Select the metadata documents for the given cruises
-		for ( String expocode : cruiseExpocodes ) {
-			DashboardCruise cruise = dataStore.getCruiseFileHandler()
-											  .getCruiseFromInfoFile(expocode);
-			if ( cruise == null )
+		// Get the information about the cruise 
+		DashboardCruise cruise = dataStore.getCruiseFileHandler()
+									.getCruiseFromInfoFile(cruiseExpocode);
+		if ( cruise == null )
+			throw new IllegalArgumentException(
+					"No cruise file for " + cruiseExpocode);
+		// Create the metadata listing to be returned
+		DashboardMetadataList mdataList = new DashboardMetadataList();
+		mdataList.setUsername(username);
+		for ( String mdataName : cruise.getMetadataFilenames() ) {
+			// Get the information for this metadata document
+			DashboardMetadata mdata = dataStore.getMetadataFileHandler()
+											   .getMetadataInfo(mdataName);
+			if ( mdata == null )
 				throw new IllegalArgumentException(
-						"No cruise file for " + expocode);
-			for ( String metadataNames : cruise.getMetadataFilenames() ) {
-				// The metadata filenames from the cruise 
-				// should have format "expocodeFilename (uploadFilename)"
-				String expoName;
-				int idx = metadataNames.indexOf(" (");
-				if ( idx > 0 ) 
-					expoName = metadataNames.substring(0, idx).trim();
-				else
-					expoName = metadataNames.trim();
-				// Get the DashboardMetadata from the user's list
-				DashboardMetadata mdata = mdataList.get(expoName);
-				if ( mdata == null ) {
-					// Metadata document not in the users's list;
-					// add it to the list, if it exists
-					mdata = dataStore.getMetadataFileHandler()
-									 .getMetadataInfo(expoName);
-					if ( mdata == null )
-						throw new IllegalArgumentException(
-								"Metadata document " + expoName + 
-								" for cruise " + expocode + " does not exist");
-					mdataList.put(expoName, mdata);
-					needsUpdate = true;
-					message += "added " + expoName + "; ";
-				}
-				mdata.setSelected(true);
-			}
-		}
-		// If the metadata list was changed, save the changes
-		if ( needsUpdate ) {
-			dataStore.getUserFileHandler()
-					 .saveMetadataListing(mdataList, message);
+						"Metadata document " + mdataName + " for cruise " + 
+						cruiseExpocode + " does not exist");
+			mdataList.put(mdataName, mdata);
 		}
 		// Return the metadata listing
 		return mdataList;
 	}
 
 	@Override
-	public void associateMetadata(String username, String passhash,
-			TreeSet<String> cruiseExpocodes, HashSet<String> metaExpoNames)
-											throws IllegalArgumentException {
+	public DashboardMetadataList removeMetadata(String username, String passhash,
+			String cruiseExpocode, TreeSet<String> metadataNames) 
+									throws IllegalArgumentException {
 		// Authenticate the user
 		DashboardDataStore dataStore;
 		try {
@@ -100,33 +74,28 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		if ( ! dataStore.validateUser(username, passhash) )
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
-		// cruiseExpocodes cannot be empty (must have a cruise to work with)
-		if ( cruiseExpocodes.size() < 1 ) 
+		if ( metadataNames.size() < 1 )
 			throw new IllegalArgumentException(
-					"No cruise expocodes specified");
-		// metaExpoNames could be empty (remove all associated metadata from the cruise)
+					"No metadata documents given for removal");
 
-		// Get the current metadata properties for the indicated metadata documents
-		DashboardMetadataList mdataList = new DashboardMetadataList();
-		for ( String metaName : metaExpoNames ) {
-			DashboardMetadata mdata = dataStore.getMetadataFileHandler()
-											   .getMetadataInfo(metaName);
-			if ( mdata == null ) 
-				throw new IllegalArgumentException(
-						"No metadata properties for " + metaName);
-			mdataList.put(metaName, mdata);
-		}
-		
-		// Make metadata descriptions for each metadata document
-		TreeSet<String> metadataNames = new TreeSet<String>(); 
-		for ( DashboardMetadata mdata : mdataList.values() ) {
-			metadataNames.add(mdata.getExpocodeFilename() + 
-					" (" + mdata.getUploadFilename() + ")");
+		// Get the current metadata documents for the cruise
+		DashboardCruise cruise = dataStore.getCruiseFileHandler()
+										  .getCruiseFromInfoFile(cruiseExpocode);
+		DashboardMetadataFileHandler metadataHandler = 
+				dataStore.getMetadataFileHandler();
+		// Work directly with the set of filenames in the cruise object
+		TreeSet<String> cruiseMDataNames = cruise.getMetadataFilenames(); 
+		for ( String mdataName : metadataNames ) {
+			if ( ! cruiseMDataNames.remove(mdataName) )
+				throw new IllegalArgumentException("Metadata document " +
+						mdataName + " is not associated with cruise " +
+						cruiseExpocode);
+			metadataHandler.removeMetadata(mdataName);
 		}
 
 		// Create the commit message
 		StringBuilder sb = new StringBuilder();
-		sb.append("Assigned associated metadata document(s): ");
+		sb.append("Removed metadata document(s): ");
 		boolean first = true;
 		for ( String name : metadataNames ) {
 			if ( first )
@@ -135,85 +104,28 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 				sb.append(", ");
 			sb.append(name);
 		}
-		sb.append(" to cruise ");
+		sb.append(" from cruise ");
+		sb.append(cruiseExpocode);
 		String message = sb.toString();
 
-		// Create a set of metadata documents removed from cruises
-		TreeSet<String> removedMetaNames = new TreeSet<String>();
+		// Save the updated cruise
+		dataStore.getCruiseFileHandler()
+				 .saveCruiseToInfoFile(cruise, message);
 
-		// Assign this set of metadata documents to each of the cruises
-		for ( String expocode : cruiseExpocodes ) {
-			// Read the cruise information file
-			DashboardCruise cruise = dataStore.getCruiseFileHandler()
-											  .getCruiseFromInfoFile(expocode);
-			if ( cruise == null )
-				throw new IllegalArgumentException(
-						"Cruise does not exist: " + expocode);
-			// Working directly with the set in the cruise object
-			TreeSet<String> cruiseMetaNames = cruise.getMetadataFilenames();
-			// Record the metadata documents that will be removed by this change
-			cruiseMetaNames.removeAll(metadataNames);
-			removedMetaNames.addAll(cruiseMetaNames);
-			// Change to the new set of metadata documents for this cruise
-			cruiseMetaNames.clear();
-			cruiseMetaNames.addAll(metadataNames);
-			// Save the updated cruise
-			dataStore.getCruiseFileHandler()
-					 .saveCruiseToInfoFile(cruise, message + expocode);
-		}
-
-		// Build the message for updating metadata with removed cruises
-		sb = new StringBuilder();
-		first = true;
-		for ( String expocode : cruiseExpocodes ) {
-			if ( first )
-				first = false;
-			else
-				sb.append(", ");
-			sb.append(expocode);
-		}
-		String cruiseExposStr = sb.toString();
-
-		// Remove associated cruises from the metadata documents that got dropped
-		message = "Removed associated cruise(s): " + 
-				cruiseExposStr + " from metadata ";
-		for ( String metaNames : removedMetaNames ) {
-			int idx = metaNames.indexOf(" (");
-			String expoName;
-			if ( idx > 0 )
-				expoName = metaNames.substring(0, idx).trim();
-			else
-				expoName = metaNames.trim();
+		// Create the updated metadata listing for the cruise
+		DashboardMetadataList mdataList = new DashboardMetadataList();
+		mdataList.setUsername(username);
+		for ( String mdataName : cruiseMDataNames ) {
 			DashboardMetadata mdata = dataStore.getMetadataFileHandler()
-											   .getMetadataInfo(expoName);
-			if ( mdata == null ) 
+											   .getMetadataInfo(mdataName);
+			if ( mdata == null )
 				throw new IllegalArgumentException(
-						"Metadata properties file for " + expoName + 
-						" (a metadata document removed from cruise(s): " + 
-						cruiseExposStr + ") does not exist");
-			// Work directly with the set in the metadata object
-			TreeSet<String> expocodes = mdata.getAssociatedCruises();
-			int origSize = expocodes.size();
-			expocodes.removeAll(cruiseExpocodes);
-			// Save the updated metadata properties if a cruise was removed
-			if ( expocodes.size() != origSize )
-				dataStore.getMetadataFileHandler().saveMetadataInfo(mdata, 
-						message + expoName);
+						"Metadata document " + mdataName + " for cruise " + 
+						cruiseExpocode + " does not exist");
+			mdataList.put(mdataName, mdata);
 		}
-
-		// Add associated cruises to the metadata documents that were selected
-		message = "Added associated cruise(s): " + 
-				cruiseExposStr + " to metadata ";
-		for ( DashboardMetadata mdata : mdataList.values() ) {
-			// Work directly with the set in the metadata object
-			TreeSet<String> expocodes = mdata.getAssociatedCruises();
-			int origSize = expocodes.size();
-			expocodes.addAll(cruiseExpocodes);
-			// Save the updated metadata properties if a cruise was added
-			if ( expocodes.size() != origSize )
-				dataStore.getMetadataFileHandler().saveMetadataInfo(mdata, 
-						message + mdata.getExpocodeFilename());
-		}
+		// Return the updated metadata listing
+		return mdataList;
 	}
 
 }
