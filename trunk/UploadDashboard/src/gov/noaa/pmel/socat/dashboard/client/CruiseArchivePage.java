@@ -41,8 +41,8 @@ public class CruiseArchivePage extends Composite {
 			"before the next SOCAT release for the cruise to be included in that SOCAT " +
 			"release.</em> " +
 			"<br /><br />" +
-			"<large>For the cruise: ";
-	private static final String INTRO_HTML_EPILOGUE = "</large>";
+			"Cruise: <b>";
+	private static final String INTRO_HTML_EPILOGUE = "</b>";
 
 	private static final String SOCAT_BUTTON_TEXT = 
 			"I give permission for my cruise to be automatically archived at CDIAC";

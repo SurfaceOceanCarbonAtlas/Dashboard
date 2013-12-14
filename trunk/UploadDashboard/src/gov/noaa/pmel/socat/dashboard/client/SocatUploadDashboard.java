@@ -24,9 +24,9 @@ public class SocatUploadDashboard
 		CRUISE_UPLOAD,
 		/** History tag for CruiseDataColumnSpecsPage */
 		DATA_COLUMN_SPECS,
-		/** History tag for DashboardMetadataListPage */
-		METADATA_LIST,
-		/** History tag for DashboardMetadataUploadPage */
+		/** History tag for MetadataManagerPage */
+		METADATA_MANAGER,
+		/** History tag for MetadataUploadPage */
 		METADATA_UPLOAD,
 		/** History tag for CruiseAddToSocatPage */
 		ADD_TO_SOCAT,
@@ -127,13 +127,13 @@ public class SocatUploadDashboard
 			// Data column specs page from history
 			CruiseDataColumnSpecsPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.METADATA_LIST.name()) ) {
-			// Metadata list page from history
-			DashboardMetadataListPage.redisplayPage(false);
+		else if ( token.equals(PagesEnum.METADATA_MANAGER.name()) ) {
+			// Metadata manager page from history
+			MetadataManagerPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.METADATA_UPLOAD.name()) ) {
 			// Metadata upload page from history
-			DashboardMetadataUploadPage.redisplayPage(false);
+			MetadataUploadPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
 			// Add to SOCAT page from history

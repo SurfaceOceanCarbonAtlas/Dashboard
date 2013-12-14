@@ -362,4 +362,35 @@ public class DashboardUtils {
 		return new ArrayList<String>(Arrays.asList(pieces));
 	}
 
+	/**
+	 * Generates the cruise-specific root filename of a metadata document.
+	 * If the the upload filename starts with the cruise expocode, the upload 
+	 * filename is just returned; otherwise the upload filename prefixed with 
+	 * the cruise expocode and an underscore is returned.
+	 * 
+	 * @param cruiseExpocode
+	 * 		expocode of the cruise associated with this metadata document
+	 * @param uploadName
+	 * 		user's name of the uploaded metadata document 
+	 * @return
+	 * 		cruise-specific metadata document filename
+	 */
+	public static String metadataFilename(String cruiseExpocode, String uploadName) {
+		// Get the root filename, in case a path was given
+		String rootName;
+		int idx = uploadName.lastIndexOf("/");
+		if ( idx >= 0 )
+			rootName = uploadName.substring(idx+1);
+		else
+			rootName = uploadName;
+		idx = rootName.lastIndexOf("\\");
+		if ( idx >= 0 )
+			rootName = rootName.substring(idx+1);
+		// Check if the root filename already starts with the expocode
+		if ( rootName.startsWith(cruiseExpocode) )
+			return rootName;
+		// Prefix with the cruise expocode and an underscore
+		return cruiseExpocode + "_" + rootName;
+	}
+
 }

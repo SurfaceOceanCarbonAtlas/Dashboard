@@ -62,7 +62,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			"will not use or examine the data values, but will include the data " +
 			"in the SOCAT-enhanced data file as supplemental data. " +
 			"<br /><br />" +
-			"Cruise: ";
+			"Cruise: <b>";
+	private static final String INTRO_EPILOGUE = "</b>";
 	private static final String PAGER_LABEL_TEXT = "Rows shown";
 
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
@@ -238,7 +239,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 		introHtml.setHTML(INTRO_PROLOGUE + 
-				SafeHtmlUtils.htmlEscape(cruise.getExpocode()));
+				SafeHtmlUtils.htmlEscape(cruise.getExpocode()) +
+				INTRO_EPILOGUE);
 
 		// Rebuild the data grid using the provided CruiseDataColumnSpecs
 		if ( cruise.getDataColTypes().size() < 4 )

@@ -588,6 +588,16 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"Problems deleting the cruise information file: " + 
 					ex.getMessage());
 		}
+		// Delete the metadata documents associated with this cruise
+		DashboardMetadataFileHandler metadataHandler;
+		try {
+			metadataHandler = DashboardDataStore.get().getMetadataFileHandler();
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to obtain the metadata file handler");
+		}
+		for ( String mdataName : cruise.getMetadataFilenames() )
+			metadataHandler.removeMetadata(mdataName);
 	}
 
 	/**
@@ -811,7 +821,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		File infoFile = cruiseInfoFile(cruise.getExpocode());
 		// Get the properties given in this file
 		Properties cruiseProps = new Properties();
-		BufferedReader infoReader = new BufferedReader(new FileReader(infoFile));
+		FileReader infoReader = new FileReader(infoFile);
 		try {
 			cruiseProps.load(infoReader);
 		} finally {

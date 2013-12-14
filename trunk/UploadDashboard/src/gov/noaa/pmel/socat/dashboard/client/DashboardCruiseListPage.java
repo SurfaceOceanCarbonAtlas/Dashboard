@@ -129,9 +129,10 @@ public class DashboardCruiseListPage extends Composite {
 			"from your list of cruises";
 
 	private static final String NO_CRUISES_SELECTED_FOR_METADATA_MSG = 
-			"No cruises are selected for associating metadata documents.  " +
+			"No cruises are selected for managing metadata documents.  " +
 			"Cruises submitted to SOCAT (and not suspended or failed) " +
-			"were automatically removed from the list of cruises to use.";
+			"were automatically removed from the list of cruises " +
+			"considered.";
 
 	private static final String NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG =
 			"No cruises are selected for submitting to SOCAT.  " +
@@ -444,13 +445,20 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("metadataButton")
 	void metadataOnClick(ClickEvent event) {
-		TreeSet<String> expocodeSet = new TreeSet<String>();
-		expocodeSet.addAll(getSelectedCruiseExpocodes(true));
-		if ( expocodeSet.size() < 1 ) {
+		HashSet<DashboardCruise> cruises = getSelectedCruises(true);
+		if ( cruises.size() < 1 ) {
 			Window.alert(NO_CRUISES_SELECTED_FOR_METADATA_MSG);
 			return;
 		}
-		DashboardMetadataListPage.showPage(expocodeSet);
+		else if ( cruises.size() == 1 ) {
+			// Single cruise selected; go to the metadata manager page
+			MetadataManagerPage.showPage(
+					cruises.iterator().next().getExpocode());
+		}
+		else {
+			// Multiple cruises selected; go to the metadata upload page
+			MetadataUploadPage.showPage(cruises);
+		}
 	}
 
 	/*
