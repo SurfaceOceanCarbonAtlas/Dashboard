@@ -20,8 +20,8 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 	private static final long serialVersionUID = -8484865552946287748L;
 
 	String username;
-	// The following indicated whether or not the above user 
-	// has manager or admin privileges; a bit of a hack.
+	// The following indicates whether or not the above user 
+	// has manager or admin privileges; a bit of a kludge.
 	boolean manager;
 
 	/**

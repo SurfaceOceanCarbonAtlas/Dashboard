@@ -51,6 +51,36 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 	}
 
 	/**
+	 * Validates that a user has permission to delete or overwrite
+	 * and existing metadata document.
+	 * 	
+	 * @param username
+	 * 		name of user wanting to delete or overwrite the metadata document
+	 * @param metadataName
+	 * 		name of the metadata document to be deleted or overwritten
+	 * @throws IllegalArgumentException
+	 * 		if the user is not permitted to overwrite the metadata document
+	 */
+	private void verifyOkayToDelete(String username, String metadataName) 
+											throws IllegalArgumentException {
+		DashboardMetadata oldMData = getMetadataInfo(metadataName);
+		if ( oldMData == null )
+			return;
+		DashboardDataStore dataStore;
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected error obtaining the dashboard configuration");
+		}
+		String oldOwner = oldMData.getOwner();
+		if ( ! dataStore.userManagesOver(username, oldOwner) )
+			throw new IllegalArgumentException(
+					"Not permitted to update metadata document " + 
+					metadataName + " owned by " + oldOwner);
+	}
+
+	/**
 	 * Create or update a metadata document from the contents of a file upload.
 	 * 
 	 * @param cruiseExpocode
@@ -93,6 +123,7 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		String message;
 		if ( metadataFile.exists() ) {
+			verifyOkayToDelete(owner, metadataFilename);
 			message = "Updated metadata document " + metadataFilename + 
 					" for " + owner;
 		}
@@ -181,6 +212,7 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		String message;
 		if ( destFile.exists() ) {
+			verifyOkayToDelete(owner, destName);
 			message = "Updated metadata document " + destName + 
 					" for " + owner;
 		}
@@ -337,24 +369,28 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Removes (deletes) metadata document, committing the change 
-	 * to version control.
+	 * Removes (deletes) a metadata document (including its properties
+	 * file), committing the change to version control.
 	 * 
+	 * @param username
+	 * 		name of the user wanting to remove the metadata document
 	 * @param metadataName
 	 * 		filename of the metadata document to remove
 	 * 		(as returned by DashboardUtils.metadataFilename)
 	 * @throws IllegalArgumentException 
-	 * 		if there are problems deleting the document or 
-	 * 		its associated properties file, or if either of
-	 * 		these files do not exist.
+	 * 		if the user is not permitted to delete the metadata document
+	 * 		if there are problems deleting the document, or 
+	 * 		if either of the document files do not exist.
 	 */
-	public void removeMetadata(String mdataName) throws IllegalArgumentException {
+	public void removeMetadata(String username, String mdataName) 
+										throws IllegalArgumentException {
 		File parentDir = new File(filesDir, mdataName.substring(0, 4));
 		File mdataFile = new File(parentDir, mdataName);
 		if ( ! mdataFile.exists() ) 
 			throw new IllegalArgumentException(
 					"Metadata file " + mdataFile.getPath() + 
 					" does not exist");
+		verifyOkayToDelete(username, mdataName);
 		try {
 			deleteVersionedFile(mdataFile, 
 					"Deleted metadata document " + mdataName);

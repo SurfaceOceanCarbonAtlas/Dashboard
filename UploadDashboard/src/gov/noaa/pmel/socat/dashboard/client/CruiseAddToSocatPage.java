@@ -4,8 +4,11 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatService;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +26,7 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -33,6 +37,7 @@ import com.google.gwt.view.client.ListDataProvider;
 
 /**
  * Page for submitting cruises to be incorporated into the SOCAT collection.
+ * 
  * @author Karl Smith
  */
 public class CruiseAddToSocatPage extends Composite {
@@ -44,9 +49,9 @@ public class CruiseAddToSocatPage extends Composite {
 	private static final String ADD_TO_SOCAT_FIRST_INFO_HTML =
 			"This page will submit the cruises listed in the table below to SOCAT " +
 			"for examination and quality assessment.  You can withdraw cruises from " +
-			"SOCAT after this submission if you just wanted to examine your cruises " +
-			"alongside other cruises in SOCAT, or if you need to make corrections " +
-			"to submitted cruises. " +
+			"SOCAT after this submission if you need to make corrections to submitted " +
+			"cruises, or if you just wanted to examine your cruises alongside other " +
+			"cruises in SOCAT." +
 			"<br /><br />" +
 			"In order to submit cruises to SOCAT, you must give permission to share " +
 			"your cruises for policy assessment: ";
@@ -82,6 +87,14 @@ public class CruiseAddToSocatPage extends Composite {
 			"<em>Note that declining permission here implies an obligation on my part to " +
 			"ensure that these data will be made accessible via another data center.</em>";
 
+	private static final String PLEASE_WAIT_MSG = 
+			"Please wait; your cruises are being added to the SOCAT database.  This may " +
+			"take a minute.  When complete, you will be returned to the main dashboard " +
+			"cruise listing page.";
+
+	private static final String SUBMIT_FAILURE_MSG = 
+			"Unexpected failure submitting cruises to SOCAT: ";
+
 	private static final String SUBMIT_TEXT = "Add to SOCAT";
 	private static final String CANCEL_TEXT = "Cancel";
 
@@ -106,6 +119,9 @@ public class CruiseAddToSocatPage extends Composite {
 
 	private static AddCruiseToSocatPageUiBinder uiBinder = 
 			GWT.create(AddCruiseToSocatPageUiBinder.class);
+
+	private static CruiseToSocatServiceAsync service = 
+			GWT.create(CruiseToSocatService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -252,11 +268,32 @@ public class CruiseAddToSocatPage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
-		// TODO: tell the server the expocodes of cruises to submit to SOCAT, 
-		// and whether the agreeArchiveCheckBox is selected.
-		// Popup a window indicating that it may take a few minutes before the
-		// cruise shows up SOCAT due to computing added data.
-		Window.alert("Not yet implemented");
+		// Get the expocodes of cruises to be submitted
+		HashSet<String> cruiseExpocodes = new HashSet<String>();
+		for ( DashboardCruise cruise : listProvider.getList() )
+			cruiseExpocodes.add(cruise.getExpocode());
+		// Get the default status for cruises without DOI's
+		String archiveStatus;
+		if ( agreeArchiveCheckBox.getValue() )
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT;
+		else
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
+		service.addCruisesToSocat(DashboardLoginPage.getUsername(), 
+				DashboardLoginPage.getPasshash(), cruiseExpocodes, 
+				archiveStatus, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				// Success - go back to the cruise list page
+				DashboardCruiseListPage.showPage(false);
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				// Unexpected problems - show the error message
+				Window.alert(SUBMIT_FAILURE_MSG + ex.getMessage());
+			}
+		});
+		// Popup a window indicating that this may take a minute
+		Window.alert(PLEASE_WAIT_MSG);
 	}
 
 	/**

@@ -597,7 +597,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					"Unexpected failure to obtain the metadata file handler");
 		}
 		for ( String mdataName : cruise.getMetadataFilenames() )
-			metadataHandler.removeMetadata(mdataName);
+			metadataHandler.removeMetadata(username, mdataName);
 	}
 
 	/**
