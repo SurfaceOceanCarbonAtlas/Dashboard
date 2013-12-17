@@ -90,7 +90,7 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 				throw new IllegalArgumentException("Metadata document " +
 						mdataName + " is not associated with cruise " +
 						cruiseExpocode);
-			metadataHandler.removeMetadata(mdataName);
+			metadataHandler.removeMetadata(username, mdataName);
 		}
 
 		// Create the commit message

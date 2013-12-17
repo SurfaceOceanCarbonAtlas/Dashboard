@@ -4,6 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatService;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -16,6 +18,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -25,6 +28,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
+ * Page for updating the archive status of a cruise.
+ * 
  * @author Karl Smith
  */
 public class CruiseArchivePage extends Composite {
@@ -79,9 +84,15 @@ public class CruiseArchivePage extends Composite {
 
 	private static final String DOI_BUTTON_TEXT = 
 			"The cruise is archived at a data center with the DOI";
+	private static final String NO_DOI_ERROR_MSG =
+			"You have indicated the cruise is archived, " +
+			"but have not provided a DOI";
 
 	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Cancel";
+
+	private static final String UPDATE_FAILURE_MSG = 
+			"Unexpected error updating the cruise archive status: ";
 
 	interface CruiseArchivePageUiBinder 
 			extends UiBinder<Widget, CruiseArchivePage> {
@@ -89,6 +100,9 @@ public class CruiseArchivePage extends Composite {
 
 	private static CruiseArchivePageUiBinder uiBinder = 
 			GWT.create(CruiseArchivePageUiBinder.class);
+
+	private static CruiseToSocatServiceAsync service = 
+			GWT.create(CruiseToSocatService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -105,6 +119,7 @@ public class CruiseArchivePage extends Composite {
 	@UiField Button cancelButton;
 
 	private String username;
+	private String expocode;
 	private DashboardInfoPopup socatInfoPopup;
 	private DashboardInfoPopup cdiacInfoPopup;
 	private DashboardInfoPopup ownerInfoPopup;
@@ -183,8 +198,9 @@ public class CruiseArchivePage extends Composite {
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
 
+		expocode = cruise.getExpocode();
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + 
-				SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + 
+				SafeHtmlUtils.htmlEscape(expocode) + 
 				INTRO_HTML_EPILOGUE);
 
 		// Check the appropriate radio button
@@ -298,8 +314,47 @@ public class CruiseArchivePage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
-		// TODO: tell the server of the archive status for this cruise
-		Window.alert("Not yet implemented");
+		String archiveStatus;
+		if ( socatRadio.getValue() ) {
+			// Archive with the next release of SOCAT
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT;
+		}
+		else if ( cdiacRadio.getValue() ) {
+			// Tell CDIAC to archive now
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SUBMIT_CDIAC;
+		}
+		else if ( ownerRadio.getValue() ) {
+			// Owner will archive, but no DOI yet
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
+		}
+		else if ( doiRadio.getValue() ) {
+			// Archived; user providing the DOI
+			String doi = doiTextBox.getText().trim();
+			if ( doi.isEmpty() ) {
+				Window.alert(NO_DOI_ERROR_MSG);
+				return;
+			}
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_ARCHIVED_PREFIX + 
+					doi;
+		}
+		else {
+			// Should never happen
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
+		}
+		service.setCruiseArchiveStatus(DashboardLoginPage.getUsername(), 
+				DashboardLoginPage.getPasshash(), expocode, archiveStatus, 
+				new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				// Success; show the updated cruise list page
+				DashboardCruiseListPage.showPage(false);
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				// unexpected failure; show the error message
+				Window.alert(UPDATE_FAILURE_MSG + ex.getMessage());
+			}
+		});
 	}
 
 }

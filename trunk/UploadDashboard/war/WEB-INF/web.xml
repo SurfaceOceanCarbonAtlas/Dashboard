@@ -6,6 +6,15 @@
 
 	<!-- Servlets -->
 	<servlet>
+		<servlet-name>CruiseToSocatServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.CruiseToSocatServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CruiseToSocatServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/CruiseToSocatService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardMetadataUploadService</servlet-class>
 	</servlet>
