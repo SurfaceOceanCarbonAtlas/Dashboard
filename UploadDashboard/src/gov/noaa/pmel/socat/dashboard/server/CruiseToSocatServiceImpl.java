@@ -61,7 +61,7 @@ public class CruiseToSocatServiceImpl extends RemoteServiceServlet
 				  DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(dataStatus)) )
 				qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 			else
-				qcStatus = DashboardUtils.QC_STATUS_AUTOFAIL;
+				qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;
 			cruise.setQcStatus(qcStatus);
 
 			// Update the archive status for this cruise

@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -65,6 +66,11 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			"Cruise: <b>";
 	private static final String INTRO_EPILOGUE = "</b>";
 	private static final String PAGER_LABEL_TEXT = "Rows shown";
+
+	private static final String UNKNOWN_COLUMN_TYPE_MSG = 
+			" are still unknown data types.  Please specify the data types " +
+			"for these columns.  The data type (ignore) or (supplemental) " +
+			"can be used to specify data types not used by SOCAT.";
 
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
 			"Problems obtaining the cruise column types";
@@ -232,10 +238,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		// Assign the new cruise information needed by this page
 		cruise.setNumDataRows(cruiseSpecs.getNumDataRows());
 		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
-		cruise.setUserColIndices(cruiseSpecs.getUserColIndices());
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
 		cruise.setDataColUnits(cruiseSpecs.getDataColUnits());
-		cruise.setDataColDescriptions(cruiseSpecs.getDataColDescriptions());
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 		introHtml.setHTML(INTRO_PROLOGUE + 
@@ -281,8 +285,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 				}
 			}
 			// Limit the column width in case URLs or filenames are given
-			if ( colWidth > 24 )
-				colWidth = 24;
+			if ( colWidth > 25 )
+				colWidth = 25;
 			// Set the width of this column
 			dataGrid.setColumnWidth(dataColumn, 0.75 * colWidth, Style.Unit.EM);
 			// Add this width to the minimum table width
@@ -315,6 +319,31 @@ public class CruiseDataColumnSpecsPage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
+		// Check if there are any unknown data column types still specified
+		ArrayList<Integer> unknownIndices = new ArrayList<Integer>();
+		int k = 0;
+		for ( CruiseDataColumnType colType : cruise.getDataColTypes() ) {
+			if ( colType == CruiseDataColumnType.UNKNOWN )
+				unknownIndices.add(k);
+			k++;
+		}
+		if ( unknownIndices.size() > 0 ) {
+			// Unknown column data types found; put up error message and return
+			ArrayList<String> colNames = cruise.getUserColNames();
+			StringBuffer sb = new StringBuffer();
+			boolean first = true;
+			for (int idx : unknownIndices) {
+				if ( first )
+					first = false;
+				else
+					sb.append(", ");
+				sb.append(colNames.get(idx));
+			}
+			sb.append(UNKNOWN_COLUMN_TYPE_MSG);
+			Window.alert(sb.toString());
+			return;
+		}
+
 		// Submit the updated data column types to the server.
 		// This update invokes the SanityChecker on the data and
 		// the results are then reported back to this page.

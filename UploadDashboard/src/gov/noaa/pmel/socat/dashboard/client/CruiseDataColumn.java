@@ -21,13 +21,84 @@ import com.google.gwt.user.cellview.client.Header;
 
 /**
  * Class for creating a CompositeCell Header for a cruise data column.
+ * The cell includes a selection box for specifying the column type 
+ * including the units.
  * 
  * @author Karl Smith
  */
 public class CruiseDataColumn {
 
-	DashboardCruise cruise;
-	int columnIndex;
+	// Class to deal with pairs of data column types and units
+	private static class TypeUnits {
+		CruiseDataColumnType type;
+		String units;
+		TypeUnits(CruiseDataColumnType type, String units) {
+			if ( type != null )
+				this.type = type;
+			else
+				this.type = CruiseDataColumnType.UNKNOWN;
+			if ( units != null )
+				this.units = units;
+			else
+				this.units = "";
+		}
+		@Override
+		public int hashCode() {
+			int result = 37 * type.hashCode() + units.hashCode();
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj )
+				return true;
+			if ( obj == null )
+				return false;
+			if ( ! (obj instanceof TypeUnits) )
+				return false;
+			TypeUnits other = (TypeUnits) obj;
+			if ( type != other.type )
+				return false;
+			if ( ! units.equals(other.units) )
+				return false;
+			return true;
+		}		
+	}
+	// Static list of standard data column types with units
+	private static final ArrayList<TypeUnits> STD_TYPE_UNITS = 
+												new ArrayList<TypeUnits>();
+	static {
+		// Move SUPPLEMENTAL from the tail to the head of the list.
+		// Do not move SUPPLEMENTAL in the enum list, 
+		// since we want that data to be at the end when sorted.
+		STD_TYPE_UNITS.add(
+				new TypeUnits(CruiseDataColumnType.SUPPLEMENTAL, ""));
+		// Add everything else in the enumerated type order
+		for ( Entry<CruiseDataColumnType,ArrayList<String>> entry : 
+								DashboardUtils.STD_DATA_UNITS.entrySet() ) {
+			CruiseDataColumnType type = entry.getKey();
+			if ( type != CruiseDataColumnType.SUPPLEMENTAL ) {
+				for ( String units : entry.getValue() ) {
+					STD_TYPE_UNITS.add(new TypeUnits(type, units));
+				}
+			}
+		}
+	}
+	// Static list of headers for the standard data column types with units
+	private static final ArrayList<String> STD_TYPE_UNITS_HEADERS = 
+								new ArrayList<String>(STD_TYPE_UNITS.size());
+	static {
+		for ( TypeUnits descr : STD_TYPE_UNITS ) {
+			String header = DashboardUtils.STD_HEADER_NAMES.get(descr.type);
+			if ( ! descr.units.isEmpty() )
+				header += " [ " + descr.units + " ]";
+			STD_TYPE_UNITS_HEADERS.add(header);
+		}
+	}
+
+	// Cruise associated with this instance
+	private DashboardCruise cruise;
+	// Cruise data column index associated with this instance
+	private int columnIndex;
 
 	/**
 	 * Specifies a data column of a DashboardCruise.
@@ -89,22 +160,8 @@ public class CruiseDataColumn {
 									new HasCell<CruiseDataColumn,String>() {
 			@Override
 			public SelectionCell getCell() {
-				// SelectionCell needs a List, not just a Collection
-				ArrayList<String> typesList = new ArrayList<String>(
-									DashboardUtils.STD_HEADER_NAMES.size()); 
-				// Move SUPPLEMENTAL from the tail to the head of the list.
-				// Do not move SUPPLEMENTAL in the enum list, 
-				// since we want that data to be at the end when sorted
-				String supplStr = DashboardUtils.STD_HEADER_NAMES.get(
-								CruiseDataColumnType.SUPPLEMENTAL);
-				typesList.add(supplStr);
-				// Add everything except SUPPLEMENTAL, which has been already been added
-				for ( String name : DashboardUtils.STD_HEADER_NAMES.values() ) {
-					if ( ! name.equals(supplStr) ) {
-						typesList.add(name);
-					}
-				}
-				return new SelectionCell(typesList);
+				// Create a list of all the standard column headers with units
+				return new SelectionCell(STD_TYPE_UNITS_HEADERS);
 			}
 			@Override
 			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
@@ -113,26 +170,40 @@ public class CruiseDataColumn {
 					public void update(int index, 
 										CruiseDataColumn dataCol, String value) {
 						// Note: index is the row index of the cell in a table 
-						//       column where it is normally used.
-						// Ignore this callback if a null String value is given
-						if ( value == null )
+						// column where it is normally used; not of use here.
+
+						// Find the data type and units corresponding to header
+						int idx = STD_TYPE_UNITS_HEADERS.indexOf(value);
+						if ( idx < 0 ) {
+							// Ignore this callback if value is not found, 
+							// probably because value is null
 							return;
-						// Assign the data type corresponding to this String value
-						for ( Entry<CruiseDataColumnType,String> stdNameEntry : 
-							DashboardUtils.STD_HEADER_NAMES.entrySet() ) {
-							if ( value.equals(stdNameEntry.getValue()) ) {
-								dataCol.cruise.getDataColTypes().set(
-										dataCol.columnIndex, stdNameEntry.getKey());
-								return;
-							}
 						}
+						TypeUnits descr = STD_TYPE_UNITS.get(idx);
+						// Assign the data type and units directly in the lists 
+						// for the cruise instance
+						dataCol.cruise.getDataColTypes()
+									  .set(dataCol.columnIndex, descr.type);
+						dataCol.cruise.getDataColUnits()
+									  .set(dataCol.columnIndex, descr.units);
 					}
 				};
 			}
 			@Override
 			public String getValue(CruiseDataColumn dataCol) {
-				return DashboardUtils.STD_HEADER_NAMES.get(
-						dataCol.cruise.getDataColTypes().get(dataCol.columnIndex));
+				// Find this column type with units
+				CruiseDataColumnType type = 
+						dataCol.cruise.getDataColTypes().get(dataCol.columnIndex);
+				String units = 
+						dataCol.cruise.getDataColUnits().get(dataCol.columnIndex);
+				int idx = STD_TYPE_UNITS.indexOf(new TypeUnits(type, units));
+				if ( idx < 0 ) {
+					// Not a recognized column type with units; set to unknown
+					idx = STD_TYPE_UNITS.indexOf(
+							new TypeUnits(CruiseDataColumnType.UNKNOWN, ""));
+				}
+				// Return the header for this column type with units
+				return STD_TYPE_UNITS_HEADERS.get(idx);
 			}
 		};
 

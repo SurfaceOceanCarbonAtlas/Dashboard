@@ -135,7 +135,7 @@ public class DashboardCruiseListPage extends Composite {
 			"considered.";
 
 	private static final String NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG =
-			"No cruises are selected for submitting to SOCAT.  " +
+			"No unsubmitted cruises are selected for submitting to SOCAT.  " +
 			"Cruises already submitted to SOCAT (and not suspended or failed) " +
 			"were automatically removed from the list of cruises to submit.";
 
@@ -377,10 +377,9 @@ public class DashboardCruiseListPage extends Composite {
 				if ( skipSubmitted ) {
 					String status = cruise.getQcStatus();
 					if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-							status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
-							status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-							status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-							status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
+							 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+							 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+							 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
 						continue;
 				}
 				cruiseSet.add(cruise);

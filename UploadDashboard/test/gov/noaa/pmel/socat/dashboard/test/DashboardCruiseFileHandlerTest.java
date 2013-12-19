@@ -78,17 +78,11 @@ public class DashboardCruiseFileHandlerTest {
 		final String username = "socatuser";
 		final String filename = "fake20031205_revised.tsv";
 		final String expocode = "FAKE20031205";
-		final String versionString = "SOCAT version 3 dashboard cruise file created: 2013-09-03 \n";
-		final String expocodeString = "Cruise Expocode: " + expocode + " \n";
 		final String metadataString = 
+				"Cruise Expocode: " + expocode + " \n" +
 				"Cruise Name: FAKE0312 \n" +
 				"Ship/Vessel Name: FakeShip \n" +
 				"Principal Investigator(s): Fake Scientist \n" +
-				"DOI of original data: not available \n" +
-				"DOI of this SOCAT-enhanced data: doi:10.1594/PANGAEA.814792 \n" +
-				"    or see: http://doi.pangaea.de/10.1594/PANGAEA.814792 \n" +
-				"DOI of the entire SOCAT collection: doi:10.1594/PANGAEA.811776 \n" +
-				"    or see: http://doi.pangaea.de/10.1594/PANGAEA.811776 \n" +
 				" \n" +
 				"Additional metadata reference(s): \n" +
 				"    http://www.aoml.noaa.gov/ocd/gcc/skogafoss/socatmetadata/readme_312_608_FOR_SOCAT.doc \n" +
@@ -236,7 +230,7 @@ public class DashboardCruiseFileHandlerTest {
 		cruiseData.setOwner(username);
 		cruiseData.setUploadFilename(filename);
 		BufferedReader reader = new BufferedReader(new StringReader(
-				versionString + expocodeString + metadataString + headerString + dataString));
+				metadataString + headerString + dataString));
 		try {
 			handler.assignCruiseDataFromInput(cruiseData, reader, 
 												0, observations.length, true);
@@ -245,7 +239,6 @@ public class DashboardCruiseFileHandlerTest {
 		}
 
 		// Check for differences
-		assertEquals(versionString.trim(), cruiseData.getVersion());
 		assertEquals(expocode, cruiseData.getExpocode());
 		assertEquals(username, cruiseData.getOwner());
 		assertEquals(filename, cruiseData.getUploadFilename());
@@ -316,10 +309,8 @@ public class DashboardCruiseFileHandlerTest {
 
 		// Check the partial contents listing
 		ArrayList<String> partialContents = handler.getPartialCruiseDataContents(cruiseData);
-		assertEquals(versionString.trim(), partialContents.get(0).trim());
-		assertEquals(expocodeString.trim(), partialContents.get(1).trim());
 		// Metadata preamble
-		int k = 2;
+		int k = 0;
 		for (int j = 0; j < expectedPreamble.size(); j++, k++)
 			assertEquals(expectedPreamble.get(j), partialContents.get(k));
 		// Column headers line
@@ -337,12 +328,10 @@ public class DashboardCruiseFileHandlerTest {
 		expectedCruise.setOwner(username);
 		expectedCruise.setUploadFilename(filename);
 		expectedCruise.setNumDataRows(observations.length);
-		expectedCruise.setDataColTypes(expectedColumnTypes);
 		expectedCruise.setUserColNames(expectedHeaders);
-		expectedCruise.setDataColQualities(expectedQualities);
-		expectedCruise.setUserColIndices(fileData.getUserColIndices());
+		expectedCruise.setDataColTypes(expectedColumnTypes);
 		expectedCruise.setDataColUnits(fileData.getDataColUnits());
-		expectedCruise.setDataColDescriptions(fileData.getDataColDescriptions());
+		expectedCruise.setDataColQualities(expectedQualities);
 		DashboardCruise cruise = handler.getCruiseFromInfoFile(expocode);
 		assertEquals(expectedCruise, cruise);
 	}
