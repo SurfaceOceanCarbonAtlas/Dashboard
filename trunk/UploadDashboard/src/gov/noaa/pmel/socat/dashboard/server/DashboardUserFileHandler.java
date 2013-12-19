@@ -274,19 +274,12 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 */
 	public void assignStandardDataColumnTypes(DashboardCruise cruise) {
 		// Directly assign the lists contained in the cruise
-		ArrayList<Integer> colIndices = cruise.getUserColIndices();
-		colIndices.clear();
 		ArrayList<CruiseDataColumnType> colTypes = cruise.getDataColTypes();
 		colTypes.clear();
 		ArrayList<String> colUnits = cruise.getDataColUnits();
 		colUnits.clear();
-		ArrayList<String> colDescripts = cruise.getDataColDescriptions();
-		colDescripts.clear();
 		// Go through the column names to assign these lists
-		int k = 0;
 		for ( String colName : cruise.getUserColNames() ) {
-			colIndices.add(k);
-			k++;
 			// TODO: use the cruise owner name to retrieve a file with 
 			//       customized associations of column name to type
 			CruiseDataColumnType dataType = CruiseDataColumnType.UNKNOWN;
@@ -300,8 +293,6 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			colTypes.add(dataType);
 			// TODO: get units from column name
 			colUnits.add(DashboardUtils.STD_DATA_UNITS.get(dataType).get(0));
-			// TODO: get data descriptions from metadata preamble
-			colDescripts.add(DashboardUtils.STD_DESCRIPTIONS.get(dataType));
 		}
 	}
 

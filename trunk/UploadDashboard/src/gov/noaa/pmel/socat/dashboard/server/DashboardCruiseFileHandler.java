@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -39,10 +38,8 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	private static final String ARCHIVE_STATUS_ID = "archivestatus";
 	private static final String NUM_DATA_ROWS_ID = "numdatarows";
 	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes";
-	private static final String USER_COLUMN_INDICES_ID = "usercolumnindices";
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
-	private static final String DATA_COLUMN_DESCRIPTIONS_ID = "datacolumndescriptions";
 	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities";
 
 	// Patterns for getting the expocode from the metadata header
@@ -59,13 +56,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		Pattern.compile("\\s*Expocode\\s*=\\s*([" + 
 				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE)
-	};
-	// Patterns for file creation date in the metadata header
-	private static final Pattern[] createdPatterns = new Pattern[] {
-		Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+dashboard\\s+" +
-				"cruise\\s+file\\s+created", Pattern.CASE_INSENSITIVE),
-		Pattern.compile("\\s*SOCAT\\s+version\\s+\\S+\\s+" +
-				"cruise\\s+file\\s+created", Pattern.CASE_INSENSITIVE)
 	};
 	// Pattern for checking for invalid characters in the expocode
 	private static final Pattern invalidExpocodePattern = 
@@ -186,9 +176,9 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * Assigns a DashboardCruiseWithData from data read from the 
 	 * given BufferedReader. 
 	 * 
-	 * Blank lines in the file are ignored.  The data read can (should) 
-	 * have a preamble of metadata containing at least the expocode on 
-	 * a line such as one of the following (case and space insensitive):
+	 * The data read should have a preamble of metadata containing at least 
+	 * the expocode on a line such as one of the following (case and space 
+	 * insensitive):
 	 * <pre>
 	 * Expocode :
 	 * Expocode = 
@@ -196,7 +186,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * Cruise Expocode =
 	 * </pre>
 	 * The first line containing at least four tab-separated non-blank
-	 * values with be taken to be the line of data column headers.  
+	 * values will be taken to be the line of data column headers.  
 	 * No data column headers can be blank.  All remaining (non-blank) 
 	 * lines are considered data lines and should have the same number 
 	 * of tab-separated values as there are column header.  Any blank 
@@ -232,7 +222,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
 			BufferedReader cruiseReader, int firstDataRow, int numDataRows,
 			boolean assignCruiseInfo) throws IOException {
-		boolean creationDateFound = false;
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
 
@@ -284,23 +273,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 				break;
 			}
 			if ( ! dataline.trim().isEmpty() ) {
-				if ( ! creationDateFound ) {
-					// Check if this is a creation date line
-					for ( Pattern pat : createdPatterns ) {
-						Matcher mat = pat.matcher(dataline);
-						if ( mat.lookingAt() ) {
-							// Save this creation date line as the cruise version
-							cruiseData.setVersion(dataline.trim());
-							creationDateFound = true;
-							break;
-						}
-					}
-					if ( creationDateFound ) {
-						// go on to the next line
-						dataline = cruiseReader.readLine();
-						continue;
-					}
-				}
 				if ( ! expocodeFound ) {
 					// Check if this is an expocode identification line
 					for ( Pattern pat : expocodePatterns ) {
@@ -319,11 +291,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 							expocodeFound = true;
 							break;
 						}
-					}
-					if ( expocodeFound ) {
-						// go on to the next line
-						dataline = cruiseReader.readLine();
-						continue;
 					}
 				}
 			}
@@ -404,12 +371,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 									DashboardCruiseWithData cruiseData) {
 		ArrayList<String> partialContents =
 				new ArrayList<String>(cruiseData.getPreamble().size() + 30);
-		String version = cruiseData.getVersion();
-		if ( ! version.trim().isEmpty() )
-			partialContents.add(version);
-		String expocode = cruiseData.getExpocode();
-		if ( ! expocode.trim().isEmpty() )
-			partialContents.add("Cruise Expocode: " + expocode);
 		// Add all the preamble contents, check if the last line was blank
 		boolean lastLineBlank = false;
 		for ( String dataline : cruiseData.getPreamble() ) {
@@ -661,18 +622,12 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			colTypeNames.add(colType.name());
 		cruiseProps.setProperty(DATA_COLUMN_TYPES_ID, 
 				DashboardUtils.encodeStringArrayList(colTypeNames));
-		// Data column index in original upload data file
-		cruiseProps.setProperty(USER_COLUMN_INDICES_ID, 
-				DashboardUtils.encodeIntegerArrayList(cruise.getUserColIndices()));
 		// Data column name in the original upload data file
 		cruiseProps.setProperty(USER_COLUMN_NAMES_ID, 
 				DashboardUtils.encodeStringArrayList(cruise.getUserColNames()));
 		// Unit for each data column
 		cruiseProps.setProperty(DATA_COLUMN_UNITS_ID, 
 				DashboardUtils.encodeStringArrayList(cruise.getDataColUnits()));
-		// Description of each data column
-		cruiseProps.setProperty(DATA_COLUMN_DESCRIPTIONS_ID, 
-				DashboardUtils.encodeStringArrayList(cruise.getDataColDescriptions()));
 		// Qualities of each data column
 		cruiseProps.setProperty(DATA_COLUMN_QUALITIES_ID, 
 				DashboardUtils.encodeIntegerArrayList(cruise.getDataColQualities()));
@@ -721,10 +676,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 						String message) throws IllegalArgumentException {
 		// Save the cruise information to the information file
 		saveCruiseToInfoFile(cruiseData, message);
-
-		// Get the update date for the cruise data file
-		String datestamp = (new Timestamp(System.currentTimeMillis()))
-							.toString().substring(0, 10);
 		// Get the cruise data filename
 		String expocode = cruiseData.getExpocode();
 		File dataFile = cruiseDataFile(expocode);
@@ -738,11 +689,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 			PrintWriter writer = new PrintWriter(dataFile);
 			try {
 				// Print the normal data file contents to the cruise data file
-				// The standard creation date and expocode header lines
-				writer.println("SOCAT version " + 
-						DashboardDataStore.get().getSocatVersion() + 
-						" dashboard cruise file created: " + datestamp);
-				writer.println("Cruise Expocode: " + expocode);
 				// The saved metadata preamble
 				boolean lastLineBlank = false;
 				for ( String metaline : cruiseData.getPreamble() ) {
@@ -897,21 +843,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		for ( String name : colTypeNames )
 			colTypes.add(CruiseDataColumnType.valueOf(name));
 
-		// Data column index in original upload data file
-		value = cruiseProps.getProperty(USER_COLUMN_INDICES_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					USER_COLUMN_INDICES_ID + " given in " + infoFile.getPath());
-		try {
-			cruise.setUserColIndices(DashboardUtils.decodeIntegerArrayList(value));
-		} catch ( NumberFormatException ex ) {
-			throw new IllegalArgumentException(ex);
-		}
-		if ( cruise.getUserColIndices().size() != colTypes.size() )
-			throw new IllegalArgumentException(
-					"number of user column indices different from " +
-					"number of data column types");
-
 		// Data column name in the original upload data file
 		value = cruiseProps.getProperty(USER_COLUMN_NAMES_ID);
 		if ( value == null )
@@ -932,17 +863,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		if ( cruise.getDataColUnits().size() != colTypes.size() )
 			throw new IllegalArgumentException(
 					"number of data column units different from " +
-					"number of data column types");
-
-		// Description of each data column
-		value = cruiseProps.getProperty(DATA_COLUMN_DESCRIPTIONS_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					DATA_COLUMN_DESCRIPTIONS_ID + " given in " + infoFile.getPath());
-		cruise.setDataColDescriptions(DashboardUtils.decodeStringArrayList(value));
-		if ( cruise.getDataColDescriptions().size() != colTypes.size() )
-			throw new IllegalArgumentException(
-					"number of data column descriptions different from " +
 					"number of data column types");
 
 		// Quality of each data column
@@ -986,7 +906,6 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Check if the cruise is in a submitted or accepted state
 		String status = cruise.getQcStatus();
 		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-				 status.equals(DashboardUtils.QC_STATUS_AUTOFAIL) ||
 				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
 				 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
 				 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )

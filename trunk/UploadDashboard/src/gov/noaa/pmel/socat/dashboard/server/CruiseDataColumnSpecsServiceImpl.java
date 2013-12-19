@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -118,10 +119,11 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 		//       to DashboardCruiseWithData to indicate questionable 
 		//       and bad data values, and columns with minor or 
 		//       major problems.
+		cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 
 		// Save and commit the updated cruise columns
-		dataStore.getCruiseFileHandler().saveCruiseDataToFiles(cruiseData, 
-				"Cruise data column types for " +  cruiseData.getExpocode() + 
+		dataStore.getCruiseFileHandler().saveCruiseToInfoFile(cruiseData, 
+				"Cruise column types and units for " +  cruiseData.getExpocode() + 
 				" updated by " + username);
 		
 		// Remove all but the first 25 rows of cruise data 

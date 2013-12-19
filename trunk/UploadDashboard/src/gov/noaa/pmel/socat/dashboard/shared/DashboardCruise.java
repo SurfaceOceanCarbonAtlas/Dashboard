@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 2497856646119934549L;
+	private static final long serialVersionUID = 5834625831282119117L;
 
 	boolean selected;
 	String owner;
@@ -29,11 +29,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	String archiveStatus;
 	String uploadFilename;
 	int numDataRows;
-	ArrayList<CruiseDataColumnType> dataColTypes;
-	ArrayList<Integer> userColIndices;
 	ArrayList<String> userColNames;
+	ArrayList<CruiseDataColumnType> dataColTypes;
 	ArrayList<String> dataColUnits;
-	ArrayList<String> dataColDescriptions;
 	ArrayList<Integer> dataColQualities;
 
 	public DashboardCruise() {
@@ -47,10 +45,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		uploadFilename = "";
 		numDataRows = 0;
 		dataColTypes = new ArrayList<CruiseDataColumnType>();
-		userColIndices = new ArrayList<Integer>();
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
-		dataColDescriptions = new ArrayList<String>();
 		dataColQualities = new ArrayList<Integer>();
 	}
 
@@ -232,51 +228,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @return 
-	 * 		the list of data column types for this cruise; may be empty 
-	 * 		but never null.  The actual list in this object is returned.
-	 */
-	public ArrayList<CruiseDataColumnType> getDataColTypes() {
-		return dataColTypes;
-	}
-
-	/**
-	 * @param dataColTypes 
-	 * 		the list of data column types for this cruise.  The list in 
-	 * 		this object is cleared and all the contents of the given list, 
-	 * 		if not null, are added. 
-	 */
-	public void setDataColTypes(ArrayList<CruiseDataColumnType> dataColTypes) {
-		this.dataColTypes.clear();
-		if ( dataColTypes != null )
-			this.dataColTypes.addAll(dataColTypes);
-	}
-
-	/**
-	 * @return 
-	 * 		the list of data column indices as they appeared in the 
-	 * 		original user-provided data file for this cruise; may be 
-	 * 		empty but never null.  The actual list in this object is 
-	 * 		returned.
-	 */
-	public ArrayList<Integer> getUserColIndices() {
-		return userColIndices;
-	}
-
-	/**
-	 * @param userColIndices 
-	 * 		the list of data column indices as they appeared in the 
-	 * 		original user-provided data file for this cruise.  The list 
-	 * 		in this object is cleared and all the contents of the given 
-	 * 		list, if not null, are added. 
-	 */
-	public void setUserColIndices(ArrayList<Integer> userColIndices) {
-		this.userColIndices.clear();
-		if ( userColIndices != null )
-			this.userColIndices.addAll(userColIndices);
-	}
-
-	/**
 	 * @return the userColNames
 	 * 		the list of data column header names as they appeared in 
 	 * 		the original user-provided data file for this cruise; may 
@@ -302,6 +253,27 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the list of data column types for this cruise; may be empty 
+	 * 		but never null.  The actual list in this object is returned.
+	 */
+	public ArrayList<CruiseDataColumnType> getDataColTypes() {
+		return dataColTypes;
+	}
+
+	/**
+	 * @param dataColTypes 
+	 * 		the list of data column types for this cruise.  The list in 
+	 * 		this object is cleared and all the contents of the given list, 
+	 * 		if not null, are added. 
+	 */
+	public void setDataColTypes(ArrayList<CruiseDataColumnType> dataColTypes) {
+		this.dataColTypes.clear();
+		if ( dataColTypes != null )
+			this.dataColTypes.addAll(dataColTypes);
+	}
+
+	/**
+	 * @return 
 	 * 		the list of data column units for this cruise; may be empty 
 	 * 		but never null.  The actual list in this object is returned. 
 	 */
@@ -319,28 +291,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		this.dataColUnits.clear();
 		if ( dataColUnits != null )
 			this.dataColUnits.addAll(dataColUnits);
-	}
-
-	/**
-	 * @return 
-	 * 		the list of data column descriptions for this cruise; may 
-	 * 		be empty but never null.  The actual list in this object is 
-	 * 		returned. 
-	 */
-	public ArrayList<String> getDataColDescriptions() {
-		return dataColDescriptions;
-	}
-
-	/**
-	 * @param dataColDescriptions 
-	 * 		the list of data column descriptions for this cruise.  The 
-	 * 		list in this object is cleared and all the contents of the 
-	 * 		given list, if not null, are added. 
-	 */
-	public void setDataColDescriptions(ArrayList<String> dataColDescriptions) {
-		this.dataColDescriptions.clear();
-		if ( dataColDescriptions != null )
-			this.dataColDescriptions.addAll(dataColDescriptions);
 	}
 
 	/**
@@ -378,11 +328,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + archiveStatus.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + numDataRows;
-		result = result * prime + dataColTypes.hashCode();
-		result = result * prime + userColIndices.hashCode();
 		result = result * prime + userColNames.hashCode();
+		result = result * prime + dataColTypes.hashCode();
 		result = result * prime + dataColUnits.hashCode();
-		result = result * prime + dataColDescriptions.hashCode();
 		result = result * prime + dataColQualities.hashCode();
 		return result;
 	}
@@ -416,15 +364,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( numDataRows != other.numDataRows )
 			return false;
-		if ( ! dataColTypes.equals(other.dataColTypes) )
-			return false;
-		if ( ! userColIndices.equals(other.userColIndices) )
-			return false;
 		if ( ! userColNames.equals(other.userColNames) )
 			return false;
-		if ( ! dataColUnits.equals(other.dataColUnits) )
+		if ( ! dataColTypes.equals(other.dataColTypes) )
 			return false;
-		if ( ! dataColDescriptions.equals(other.dataColDescriptions) )
+		if ( ! dataColUnits.equals(other.dataColUnits) )
 			return false;
 		if ( ! dataColQualities.equals(other.dataColQualities) )
 			return false;
@@ -443,11 +387,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
-				",\n    dataColTypes=" + dataColTypes.toString() +
-				",\n    userColIndices=" + userColIndices.toString() +
 				",\n    userColNames=" + userColNames.toString() +
+				",\n    dataColTypes=" + dataColTypes.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +
-				",\n    dataColDescriptions=" + dataColDescriptions.toString() +
 				",\n    dataColQualities=" + dataColQualities.toString() +
 				" ]";
 	}

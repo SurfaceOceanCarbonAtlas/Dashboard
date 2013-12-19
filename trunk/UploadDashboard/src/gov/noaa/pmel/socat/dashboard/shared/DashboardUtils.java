@@ -50,13 +50,12 @@ public class DashboardUtils {
 	public static final String CHECK_STATUS_FAILED = "Failed";
 
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
-	public static final String QC_STATUS_AUTOFAIL = "Check fail";
 	public static final String QC_STATUS_SUBMITTED = "Submitted";
 	public static final String QC_STATUS_ACCEPTED_A = "QC Flag A";
 	public static final String QC_STATUS_ACCEPTED_B = "QC Flag B";
 	public static final String QC_STATUS_ACCEPTED_C = "QC Flag C";
 	public static final String QC_STATUS_ACCEPTED_D = "QC Flag D";
-	public static final String QC_STATUS_UNACCEPTABLE = "QC Flag F";
+	public static final String QC_STATUS_UNACCEPTABLE = "Unacceptable";
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
 
@@ -142,10 +141,8 @@ public class DashboardUtils {
 	static {
 		STD_DATA_UNITS.put(CruiseDataColumnType.IGNORE, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD HH:MM:SS", "MON DAY YEAR HH:MM:SS", "DAY MON YEAR HH:MM:SS")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.DATE, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD", "MON DAY YEAR", "DAY MON YEAR")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList("YYYY-MM-DD HH:MM:SS Z")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.DATE, new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.YEAR, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.MONTH, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.DAY, new ArrayList<String>(Arrays.asList("")));
@@ -153,20 +150,20 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(CruiseDataColumnType.HOUR, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.MINUTE, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.SECOND, new ArrayList<String>(Arrays.asList("")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("decimal deg. E")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("decimal deg. N")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("dec. deg. E")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("dec. deg. N")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.SAMPLE_DEPTH, new ArrayList<String>(Arrays.asList("meters")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("PSU")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.XCO2_EQU, new ArrayList<String>(Arrays.asList("micromole per mole")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.XCO2_SST, new ArrayList<String>(Arrays.asList("micromole per mole")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.PCO2_EQU, new ArrayList<String>(Arrays.asList("microatmospheres")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.PCO2_SST, new ArrayList<String>(Arrays.asList("microatmospheres")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.FCO2_EQU, new ArrayList<String>(Arrays.asList("microatmospheres")));
-		STD_DATA_UNITS.put(CruiseDataColumnType.FCO2_SST, new ArrayList<String>(Arrays.asList("microatmospheres")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.XCO2_EQU, new ArrayList<String>(Arrays.asList("umol/mol")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.XCO2_SST, new ArrayList<String>(Arrays.asList("umol/mol")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.PCO2_EQU, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.PCO2_SST, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.FCO2_EQU, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(CruiseDataColumnType.FCO2_SST, new ArrayList<String>(Arrays.asList("uatm")));
 		STD_DATA_UNITS.put(CruiseDataColumnType.SUPPLEMENTAL, new ArrayList<String>(Arrays.asList("")));
 	}
 

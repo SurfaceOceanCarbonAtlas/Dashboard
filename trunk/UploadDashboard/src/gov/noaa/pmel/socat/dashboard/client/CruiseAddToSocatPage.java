@@ -87,10 +87,21 @@ public class CruiseAddToSocatPage extends Composite {
 			"<em>Note that declining permission here implies an obligation on my part to " +
 			"ensure that these data will be made accessible via another data center.</em>";
 
-	private static final String PLEASE_WAIT_MSG = 
-			"Please wait; your cruises are being added to the SOCAT database.  This may " +
-			"take a minute.  When complete, you will be returned to the main dashboard " +
-			"cruise listing page.";
+	private static final String WILL_AUTOFAIL_ON_DATA_MSG = ": has data with serious " +
+			"problems detected by the automated data checking software.  This cruise " +
+			"can be added to SOCAT, but will be automatically be given the QC status '" +
+			DashboardUtils.QC_STATUS_UNACCEPTABLE + "'.  Do you want to continue? ";
+	private static final String WILL_AUTOFAIL_ON_METADATA_MSG = 
+			": does not have any metadata documents associated with it.  This cruise " +
+			"can be added to SOCAT, but will be automatically be given the QC status '" +
+			DashboardUtils.QC_STATUS_UNACCEPTABLE + "'.  Do you want to continue? ";
+
+	/*
+	 * private static final String PLEASE_WAIT_MSG = 
+	 *		"Please wait; your cruises are being added to the SOCAT database.  This may " +
+	 *		"take a minute.  When complete, you will be returned to the main dashboard " +
+	 *		"cruise listing page.";
+	 */
 
 	private static final String SUBMIT_FAILURE_MSG = 
 			"Unexpected failure submitting cruises to SOCAT: ";
@@ -270,8 +281,21 @@ public class CruiseAddToSocatPage extends Composite {
 	void submitOnClick(ClickEvent event) {
 		// Get the expocodes of cruises to be submitted
 		HashSet<String> cruiseExpocodes = new HashSet<String>();
-		for ( DashboardCruise cruise : listProvider.getList() )
-			cruiseExpocodes.add(cruise.getExpocode());
+		for ( DashboardCruise cruise : listProvider.getList() ) {
+			String expocode = cruise.getExpocode();
+			TreeSet<String> metaNames = cruise.getMetadataFilenames();
+			if ( metaNames.size() < 1 ) {
+				if ( ! Window.confirm(expocode + WILL_AUTOFAIL_ON_METADATA_MSG) )
+					return;
+			}
+			String status = cruise.getDataCheckStatus();
+			if ( ! ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(status) ||
+					 DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(status) ) ) {
+				if ( ! Window.confirm(expocode + WILL_AUTOFAIL_ON_DATA_MSG) )
+					return;
+			}
+			cruiseExpocodes.add(expocode);
+		}
 		// Get the default status for cruises without DOI's
 		String archiveStatus;
 		if ( agreeArchiveCheckBox.getValue() )
@@ -293,7 +317,7 @@ public class CruiseAddToSocatPage extends Composite {
 			}
 		});
 		// Popup a window indicating that this may take a minute
-		Window.alert(PLEASE_WAIT_MSG);
+		// Window.alert(PLEASE_WAIT_MSG);
 	}
 
 	/**
