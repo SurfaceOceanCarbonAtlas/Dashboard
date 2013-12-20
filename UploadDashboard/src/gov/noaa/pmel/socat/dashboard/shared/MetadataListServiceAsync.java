@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * Client side interface for obtaining a user's list of metadata files.
  * @author Karl Smith
  */
-public interface DashboardMetadataListServiceAsync {
+public interface MetadataListServiceAsync {
 
 	/**
 	 * Client side request to get the list of metadata documents for a cruise. 

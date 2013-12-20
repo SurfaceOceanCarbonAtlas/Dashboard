@@ -72,9 +72,9 @@ public class DashboardDataStore {
 	// Map of username to user info
 	private HashMap<String,DashboardUserInfo> userInfoMap;
 	private String socatVersion;
-	private DashboardUserFileHandler userFileHandler;
-	private DashboardCruiseFileHandler cruiseFileHandler;
-	private DashboardMetadataFileHandler metadataFileHandler;
+	private UserFileHandler userFileHandler;
+	private CruiseFileHandler cruiseFileHandler;
+	private MetadataFileHandler metadataFileHandler;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -182,7 +182,7 @@ public class DashboardDataStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			userFileHandler = new DashboardUserFileHandler(propVal, 
+			userFileHandler = new UserFileHandler(propVal, 
 					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + 
@@ -195,7 +195,7 @@ public class DashboardDataStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cruiseFileHandler = new DashboardCruiseFileHandler(propVal,
+			cruiseFileHandler = new CruiseFileHandler(propVal,
 					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + CRUISE_FILES_DIR_NAME_TAG + 
@@ -208,7 +208,7 @@ public class DashboardDataStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			metadataFileHandler = new DashboardMetadataFileHandler(propVal,
+			metadataFileHandler = new MetadataFileHandler(propVal,
 					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
@@ -285,7 +285,7 @@ public class DashboardDataStore {
 	 * @return 
 	 * 		the handler for user data files
 	 */
-	public DashboardUserFileHandler getUserFileHandler() {
+	public UserFileHandler getUserFileHandler() {
 		return userFileHandler;
 	}
 
@@ -293,7 +293,7 @@ public class DashboardDataStore {
 	 * @return 
 	 * 		the handler for cruise data files
 	 */
-	public DashboardCruiseFileHandler getCruiseFileHandler() {
+	public CruiseFileHandler getCruiseFileHandler() {
 		return cruiseFileHandler;
 	}
 
@@ -301,7 +301,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		the handler for cruise metadata documents
 	 */
-	public DashboardMetadataFileHandler getMetadataFileHandler() {
+	public MetadataFileHandler getMetadataFileHandler() {
 		return metadataFileHandler;
 	}
 

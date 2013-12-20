@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * @author Karl Smith
  */
-public interface DashboardLogoutServiceAsync {
+public interface LogoutServiceAsync {
 
 	/**
 	 * Generate an request to logout the current user 

@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * @author Karl Smith
  */
 @RemoteServiceRelativePath("LogoutService")
-public interface DashboardLogoutService extends RemoteService {
+public interface LogoutService extends RemoteService {
 
 	/**
 	 * Logs out the current user

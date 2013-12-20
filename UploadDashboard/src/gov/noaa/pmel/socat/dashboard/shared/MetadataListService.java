@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * @author Karl Smith
  */
 @RemoteServiceRelativePath("MetadataListService")
-public interface DashboardMetadataListService extends RemoteService {
+public interface MetadataListService extends RemoteService {
 
 	/**
 	 * After authenticating the user using the given credentials,

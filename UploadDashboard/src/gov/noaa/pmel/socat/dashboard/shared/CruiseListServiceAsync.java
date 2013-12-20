@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * @author Karl Smith
  */
-public interface DashboardCruiseListServiceAsync {
+public interface CruiseListServiceAsync {
 
 	/**
 	 * Client side request to modify the user's list of cruises, 

@@ -6,8 +6,8 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseListService;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.HashSet;
@@ -43,7 +43,7 @@ import com.google.gwt.view.client.ListDataProvider;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseListPage extends Composite {
+public class CruiseListPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
@@ -159,14 +159,14 @@ public class DashboardCruiseListPage extends Composite {
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 
 	interface DashboardCruiseListPageUiBinder 
-			extends UiBinder<Widget, DashboardCruiseListPage> {
+			extends UiBinder<Widget, CruiseListPage> {
 	}
 
 	private static DashboardCruiseListPageUiBinder uiBinder = 
 			GWT.create(DashboardCruiseListPageUiBinder.class);
 
-	private static DashboardCruiseListServiceAsync service = 
-			GWT.create(DashboardCruiseListService.class);
+	private static CruiseListServiceAsync service = 
+			GWT.create(CruiseListService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -185,7 +185,7 @@ public class DashboardCruiseListPage extends Composite {
 	private ListDataProvider<DashboardCruise> listProvider;
 
 	// The singleton instance of this page
-	private static DashboardCruiseListPage singleton;
+	private static CruiseListPage singleton;
 
 	/**
 	 * Creates an empty cruise list page.  Do not call this 
@@ -193,7 +193,7 @@ public class DashboardCruiseListPage extends Composite {
 	 * to show the singleton instance of this page with the
 	 * latest cruise list from the server. 
 	 */
-	private DashboardCruiseListPage() {
+	private CruiseListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildCruiseListTable();
 
@@ -262,7 +262,7 @@ public class DashboardCruiseListPage extends Composite {
 				if ( DashboardLoginPage.getUsername()
 										.equals(cruises.getUsername()) ) {
 					if ( singleton == null )
-						singleton = new DashboardCruiseListPage();
+						singleton = new CruiseListPage();
 					SocatUploadDashboard.get().updateCurrentPage(singleton);
 					singleton.updateCruises(cruises);
 					History.newItem(PagesEnum.CRUISE_LIST.name(), false);
@@ -349,7 +349,7 @@ public class DashboardCruiseListPage extends Composite {
 			public void onSuccess(DashboardCruiseList cruises) {
 				if ( DashboardLoginPage.getUsername()
 										.equals(cruises.getUsername()) ) {
-					DashboardCruiseListPage.this.updateCruises(cruises);
+					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
 					Window.alert(errMsg + " (unexpected invalid cruise list)");
@@ -412,7 +412,7 @@ public class DashboardCruiseListPage extends Composite {
 
 	@UiHandler("uploadButton")
 	void uploadCruiseOnClick(ClickEvent event) {
-		DashboardCruiseUploadPage.showPage();
+		CruiseUploadPage.showPage();
 	}
 
 	@UiHandler("deleteButton")
@@ -439,7 +439,7 @@ public class DashboardCruiseListPage extends Composite {
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
-		CruiseDataColumnSpecsPage.showPage(expocode);
+		DataColumnSpecsPage.showPage(expocode);
 	}
 
 	@UiHandler("metadataButton")
@@ -475,7 +475,7 @@ public class DashboardCruiseListPage extends Composite {
 			Window.alert(NO_CRUISES_SELECTED_FOR_QC_SUBMIT_MSG);
 			return;
 		}
-		CruiseAddToSocatPage.showPage(cruiseSet);
+		AddToSocatPage.showPage(cruiseSet);
 	}
 
 	@UiHandler("archiveSubmitButton")

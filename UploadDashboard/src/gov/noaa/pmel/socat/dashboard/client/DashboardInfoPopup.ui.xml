@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-	<ui:style src="CommonFixedWidth.css" />
+	<ui:style src="FixedWidth.css" />
 
 	<g:VerticalPanel addStyleNames="{style.infopanel}" horizontalAlignment="ALIGN_CENTER">
 		<g:HTML addStyleNames="{style.infohtml}" ui:field="infoHTML" />

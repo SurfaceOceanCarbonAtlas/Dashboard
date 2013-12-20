@@ -27,13 +27,13 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseUploadService extends HttpServlet {
+public class CruiseUploadService extends HttpServlet {
 
-	private static final long serialVersionUID = -6964079374165945117L;
+	private static final long serialVersionUID = 273235043648709372L;
 
 	private ServletFileUpload cruiseUpload;
 
-	public DashboardCruiseUploadService() {
+	public CruiseUploadService() {
 		File servletTmpDir;
 		try {
 			// Get the temporary directory used by the servlet
@@ -163,7 +163,7 @@ public class DashboardCruiseUploadService extends HttpServlet {
 			return;
 		}
 
-		DashboardCruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 
 		// Create a DashboardCruiseWithData from the contents of the uploaded data file 
 		DashboardCruiseWithData cruiseData;

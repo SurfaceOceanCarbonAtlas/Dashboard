@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseListService;
+import gov.noaa.pmel.socat.dashboard.shared.CruiseListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.FileNotFoundException;
@@ -14,13 +14,13 @@ import java.util.HashSet;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
- * Server side implementation of DashboardCruiseListService
+ * Server side implementation of CruiseListService
  * @author Karl Smith
  */
-public class DashboardCruiseListServiceImpl extends RemoteServiceServlet
-									implements DashboardCruiseListService {
+public class CruiseListServiceImpl extends RemoteServiceServlet
+									implements CruiseListService {
 
-	private static final long serialVersionUID = 869265874847692108L;
+	private static final long serialVersionUID = 4534512457479911838L;
 
 	@Override
 	public DashboardCruiseList updateCruiseList(String username,

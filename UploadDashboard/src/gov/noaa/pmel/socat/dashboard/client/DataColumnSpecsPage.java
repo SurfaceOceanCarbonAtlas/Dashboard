@@ -4,9 +4,9 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsServiceAsync;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
+import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -42,7 +42,7 @@ import com.google.gwt.view.client.Range;
  * 
  * @author Karl Smith
  */
-public class CruiseDataColumnSpecsPage extends Composite {
+public class DataColumnSpecsPage extends Composite {
 
 	private static final int NUM_ROWS_PER_GRID_PAGE = 15;
 
@@ -82,14 +82,14 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			"Columns specifications updated for cruise: ";
 
 	interface CruiseDataColumnSpecsPageUiBinder 
-			extends UiBinder<Widget, CruiseDataColumnSpecsPage> {
+			extends UiBinder<Widget, DataColumnSpecsPage> {
 	}
 
 	private static CruiseDataColumnSpecsPageUiBinder uiBinder = 
 			GWT.create(CruiseDataColumnSpecsPageUiBinder.class);
 
-	private static CruiseDataColumnSpecsServiceAsync service = 
-			GWT.create(CruiseDataColumnSpecsService.class);
+	private static DataSpecsServiceAsync service = 
+			GWT.create(DataSpecsService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -110,14 +110,14 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	private AsyncDataProvider<ArrayList<String>> dataProvider;
 
 	// Singleton instance of this page
-	private static CruiseDataColumnSpecsPage singleton = null;
+	private static DataColumnSpecsPage singleton = null;
 
 	/**
 	 * Creates an empty cruise data column specification page.  
 	 * Allows the user to update the data column types for a
 	 * cruise when populated.
 	 */
-	private CruiseDataColumnSpecsPage() {
+	private DataColumnSpecsPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		username = "";
 		logoutButton.setText(LOGOUT_TEXT);
@@ -172,7 +172,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
 					if ( singleton == null )
-						singleton = new CruiseDataColumnSpecsPage();
+						singleton = new DataColumnSpecsPage();
 					SocatUploadDashboard.get().updateCurrentPage(singleton);
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
 					History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
@@ -314,7 +314,7 @@ public class CruiseDataColumnSpecsPage extends Composite {
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page, which may  
 		// have been updated from previous actions on this page.
-		DashboardCruiseListPage.showPage(false);
+		CruiseListPage.showPage(false);
 	}
 
 	@UiHandler("submitButton")
@@ -322,8 +322,8 @@ public class CruiseDataColumnSpecsPage extends Composite {
 		// Check if there are any unknown data column types still specified
 		ArrayList<Integer> unknownIndices = new ArrayList<Integer>();
 		int k = 0;
-		for ( CruiseDataColumnType colType : cruise.getDataColTypes() ) {
-			if ( colType == CruiseDataColumnType.UNKNOWN )
+		for ( DataColumnType colType : cruise.getDataColTypes() ) {
+			if ( colType == DataColumnType.UNKNOWN )
 				unknownIndices.add(k);
 			k++;
 		}

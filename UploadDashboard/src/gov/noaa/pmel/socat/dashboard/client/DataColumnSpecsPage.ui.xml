@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
 	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
-	<ui:style src="CommonFullWidth.css" />
+	<ui:style src="FullWidth.css" />
 
 	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
 		<g:north size="15">

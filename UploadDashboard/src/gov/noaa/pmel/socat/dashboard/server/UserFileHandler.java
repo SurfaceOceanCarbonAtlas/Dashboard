@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -23,7 +23,7 @@ import java.util.Map.Entry;
  * 
  * @author Karl Smith
  */
-public class DashboardUserFileHandler extends VersionedFileHandler {
+public class UserFileHandler extends VersionedFileHandler {
 
 	private static final String USER_CRUISE_LIST_NAME_EXTENSION = 
 			"_cruise_list.txt";
@@ -42,7 +42,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 * 		if the specified directory does not exist, is not a 
 	 * 		directory, or is not under SVN version control
 	 */
-	DashboardUserFileHandler(String userFilesDirName, String svnUsername,
+	UserFileHandler(String userFilesDirName, String svnUsername,
 					String svnPassword) throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
 	}
@@ -102,7 +102,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get settings");
 		}
-		DashboardCruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		// Create the cruise list (map) for these cruises
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
@@ -231,7 +231,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	public DashboardCruiseList addCruisesToListing(
 							HashSet<String> expocodeSet, String username) 
 										throws IllegalArgumentException {
-		DashboardCruiseFileHandler cruiseHandler;
+		CruiseFileHandler cruiseHandler;
 		try {
 			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
 		} catch ( IOException ex ) {
@@ -274,7 +274,7 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 	 */
 	public void assignStandardDataColumnTypes(DashboardCruise cruise) {
 		// Directly assign the lists contained in the cruise
-		ArrayList<CruiseDataColumnType> colTypes = cruise.getDataColTypes();
+		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
 		colTypes.clear();
 		ArrayList<String> colUnits = cruise.getDataColUnits();
 		colUnits.clear();
@@ -282,8 +282,8 @@ public class DashboardUserFileHandler extends VersionedFileHandler {
 		for ( String colName : cruise.getUserColNames() ) {
 			// TODO: use the cruise owner name to retrieve a file with 
 			//       customized associations of column name to type
-			CruiseDataColumnType dataType = CruiseDataColumnType.UNKNOWN;
-			for ( Entry<CruiseDataColumnType,String> stdNameEntry : 
+			DataColumnType dataType = DataColumnType.UNKNOWN;
+			for ( Entry<DataColumnType,String> stdNameEntry : 
 				DashboardUtils.STD_HEADER_NAMES.entrySet() ) {
 				if ( colName.startsWith(stdNameEntry.getValue()) ) {
 					dataType = stdNameEntry.getKey();

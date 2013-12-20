@@ -14,8 +14,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * 
  * @author Karl Smith
  */
-@RemoteServiceRelativePath("CruiseToSocatService")
-public interface CruiseToSocatService extends RemoteService {
+@RemoteServiceRelativePath("AddToSocatService")
+public interface AddToSocatService extends RemoteService {
 
 	/**
 	 * After authenticating the user using the given credentials,

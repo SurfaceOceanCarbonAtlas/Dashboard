@@ -4,8 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatService;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
+import gov.noaa.pmel.socat.dashboard.shared.AddToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -40,7 +40,7 @@ import com.google.gwt.view.client.ListDataProvider;
  * 
  * @author Karl Smith
  */
-public class CruiseAddToSocatPage extends Composite {
+public class AddToSocatPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
@@ -72,7 +72,7 @@ public class CruiseAddToSocatPage extends Composite {
 			"your cruises to SOCAT, you will be required to provide DOIs of the " +
 			"archived data for these cruises before they will be included in a " +
 			"SOCAT release.  The DOIs from cruises are provided using the \"" + 
-			DashboardCruiseListPage.ARCHIVE_SUBMIT_TEXT + "\" button on the main " +
+			CruiseListPage.ARCHIVE_SUBMIT_TEXT + "\" button on the main " +
 			"cruise listing page. ";
 
 	private static final String AGREE_ARCHIVE_TEXT = 
@@ -125,14 +125,14 @@ public class CruiseAddToSocatPage extends Composite {
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 
 	interface AddCruiseToSocatPageUiBinder 
-			extends UiBinder<Widget, CruiseAddToSocatPage> {
+			extends UiBinder<Widget, AddToSocatPage> {
 	}
 
 	private static AddCruiseToSocatPageUiBinder uiBinder = 
 			GWT.create(AddCruiseToSocatPageUiBinder.class);
 
-	private static CruiseToSocatServiceAsync service = 
-			GWT.create(CruiseToSocatService.class);
+	private static AddToSocatServiceAsync service = 
+			GWT.create(AddToSocatService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -152,9 +152,9 @@ public class CruiseAddToSocatPage extends Composite {
 	private ListDataProvider<DashboardCruise> listProvider;
 
 	// The singleton instance of this page
-	private static CruiseAddToSocatPage singleton;
+	private static AddToSocatPage singleton;
 
-	private CruiseAddToSocatPage() {
+	private AddToSocatPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildCruiseListTable();
 
@@ -184,7 +184,7 @@ public class CruiseAddToSocatPage extends Composite {
 	 */
 	static void showPage(HashSet<DashboardCruise> cruises) {
 		if ( singleton == null )
-			singleton = new CruiseAddToSocatPage();
+			singleton = new AddToSocatPage();
 		SocatUploadDashboard.get().updateCurrentPage(singleton);
 		singleton.updateCruises(cruises);
 		History.newItem(PagesEnum.ADD_TO_SOCAT.name(), false);
@@ -274,7 +274,7 @@ public class CruiseAddToSocatPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Return to the cruise list page exactly as it was
-		DashboardCruiseListPage.redisplayPage(true);
+		CruiseListPage.redisplayPage(true);
 	}
 
 	@UiHandler("submitButton")
@@ -308,7 +308,7 @@ public class CruiseAddToSocatPage extends Composite {
 			@Override
 			public void onSuccess(Void result) {
 				// Success - go back to the cruise list page
-				DashboardCruiseListPage.showPage(false);
+				CruiseListPage.showPage(false);
 			}
 			@Override
 			public void onFailure(Throwable ex) {

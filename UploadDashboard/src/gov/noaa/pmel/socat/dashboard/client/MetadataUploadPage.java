@@ -242,7 +242,7 @@ public class MetadataUploadPage extends Composite {
 			MetadataManagerPage.redisplayPage(true);
 		}
 		else {
-			DashboardCruiseListPage.redisplayPage(true);
+			CruiseListPage.redisplayPage(true);
 		}
 	}
 
@@ -301,7 +301,7 @@ public class MetadataUploadPage extends Composite {
 			else {
 				// return to the cruise list, having it request 
 				// the updated cruises for the user from the server
-				DashboardCruiseListPage.showPage(false);
+				CruiseListPage.showPage(false);
 			}
 		}
 		else {

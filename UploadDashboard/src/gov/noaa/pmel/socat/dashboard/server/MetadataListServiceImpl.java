@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataListService;
+import gov.noaa.pmel.socat.dashboard.shared.MetadataListService;
 
 import java.io.IOException;
 import java.util.TreeSet;
@@ -14,13 +14,13 @@ import java.util.TreeSet;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
- * Server side implementation of the DashboardMetadataListService
+ * Server side implementation of the MetadataListService
  * @author Karl Smith
  */
-public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
-									implements DashboardMetadataListService {
+public class MetadataListServiceImpl extends RemoteServiceServlet
+									implements MetadataListService {
 
-	private static final long serialVersionUID = -3315960782424412471L;
+	private static final long serialVersionUID = 5809230023905849184L;
 
 	@Override
 	public DashboardMetadataList getMetadataList(String username, String passhash, 
@@ -81,7 +81,7 @@ public class DashboardMetadataListServiceImpl extends RemoteServiceServlet
 		// Get the current metadata documents for the cruise
 		DashboardCruise cruise = dataStore.getCruiseFileHandler()
 										  .getCruiseFromInfoFile(cruiseExpocode);
-		DashboardMetadataFileHandler metadataHandler = 
+		MetadataFileHandler metadataHandler = 
 				dataStore.getMetadataFileHandler();
 		// Work directly with the set of filenames in the cruise object
 		TreeSet<String> cruiseMDataNames = cruise.getMetadataFilenames(); 

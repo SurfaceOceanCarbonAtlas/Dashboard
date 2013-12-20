@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * Client side specification of data column specification services
  * @author Karl Smith
  */
-public interface CruiseDataColumnSpecsServiceAsync {
+public interface DataSpecsServiceAsync {
 
 	/**
 	 * Reads the saved cruise file and returns the current data
