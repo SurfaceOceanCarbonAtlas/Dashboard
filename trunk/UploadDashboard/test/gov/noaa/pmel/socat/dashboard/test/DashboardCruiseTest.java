@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeSet;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 
 import org.junit.Test;
@@ -206,15 +206,15 @@ public class DashboardCruiseTest {
 	 */
 	@Test
 	public void testSetGetDataColTypes() {
-		ArrayList<CruiseDataColumnType> myDataColTypes = 
-				new ArrayList<CruiseDataColumnType>(Arrays.asList(
-					CruiseDataColumnType.TIMESTAMP,
-					CruiseDataColumnType.LONGITUDE,
-					CruiseDataColumnType.LATITUDE,
-					CruiseDataColumnType.SAMPLE_SALINITY,
-					CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE,
-					CruiseDataColumnType.EQUILIBRATOR_PRESSURE,
-					CruiseDataColumnType.XCO2_EQU
+		ArrayList<DataColumnType> myDataColTypes = 
+				new ArrayList<DataColumnType>(Arrays.asList(
+					DataColumnType.TIMESTAMP,
+					DataColumnType.LONGITUDE,
+					DataColumnType.LATITUDE,
+					DataColumnType.SAMPLE_SALINITY,
+					DataColumnType.EQUILIBRATOR_TEMPERATURE,
+					DataColumnType.EQUILIBRATOR_PRESSURE,
+					DataColumnType.XCO2_EQU
 				));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getDataColTypes().size());
@@ -331,15 +331,15 @@ public class DashboardCruiseTest {
 		String myArchiveStatus = "Next SOCAT release";
 		String myFilename = "myUploadFilename.tsv";
 		int myNumDataRows = 2581;
-		ArrayList<CruiseDataColumnType> myDataColTypes = 
-				new ArrayList<CruiseDataColumnType>(Arrays.asList(
-					CruiseDataColumnType.TIMESTAMP,
-					CruiseDataColumnType.LONGITUDE,
-					CruiseDataColumnType.LATITUDE,
-					CruiseDataColumnType.SAMPLE_SALINITY,
-					CruiseDataColumnType.EQUILIBRATOR_TEMPERATURE,
-					CruiseDataColumnType.EQUILIBRATOR_PRESSURE,
-					CruiseDataColumnType.XCO2_EQU
+		ArrayList<DataColumnType> myDataColTypes = 
+				new ArrayList<DataColumnType>(Arrays.asList(
+					DataColumnType.TIMESTAMP,
+					DataColumnType.LONGITUDE,
+					DataColumnType.LATITUDE,
+					DataColumnType.SAMPLE_SALINITY,
+					DataColumnType.EQUILIBRATOR_TEMPERATURE,
+					DataColumnType.EQUILIBRATOR_PRESSURE,
+					DataColumnType.XCO2_EQU
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "sal", "temp", "pres", "xco2")); 

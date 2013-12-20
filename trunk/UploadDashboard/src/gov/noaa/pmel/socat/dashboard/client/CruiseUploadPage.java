@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * @author Karl Smith
  */
-public class DashboardCruiseUploadPage extends Composite {
+public class CruiseUploadPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
@@ -93,7 +93,7 @@ public class DashboardCruiseUploadPage extends Composite {
 			"a new cruise.";
 
 	interface DashboardCruiseUploadPageUiBinder 
-			extends UiBinder<Widget, DashboardCruiseUploadPage> {
+			extends UiBinder<Widget, CruiseUploadPage> {
 	}
 
 	private static DashboardCruiseUploadPageUiBinder uiBinder = 
@@ -124,14 +124,14 @@ public class DashboardCruiseUploadPage extends Composite {
 	private boolean advancedShown; 
 
 	// Singleton instance of this page
-	private static DashboardCruiseUploadPage singleton = null;
+	private static CruiseUploadPage singleton = null;
 
 	/**
 	 * Creates an empty cruise upload page.  Do not call this 
 	 * constructor; instead use the showPage static method 
 	 * to show the singleton instance of this page. 
 	 */
-	private DashboardCruiseUploadPage() {
+	private CruiseUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		username = "";
@@ -164,7 +164,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	 */
 	static void showPage() {
 		if ( singleton == null )
-			singleton = new DashboardCruiseUploadPage();
+			singleton = new CruiseUploadPage();
 		singleton.username = DashboardLoginPage.getUsername();
 		singleton.userInfoLabel.setText(WELCOME_INTRO + 
 				singleton.username);
@@ -272,7 +272,7 @@ public class DashboardCruiseUploadPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the cruise list page exactly as it was
-		DashboardCruiseListPage.redisplayPage(true);
+		CruiseListPage.redisplayPage(true);
 	}
 
 	@UiHandler("uploadForm")
@@ -373,13 +373,13 @@ public class DashboardCruiseUploadPage extends Composite {
 			// cruise file created
 			Window.alert(tagMsg[1]);
 			// return to the updated cruise list
-			DashboardCruiseListPage.showPage(false);
+			CruiseListPage.showPage(false);
 		}
 		else if ( DashboardUtils.FILE_UPDATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file updated
 			Window.alert(tagMsg[1]);
 			// return to the updated cruise list
-			DashboardCruiseListPage.showPage(false);
+			CruiseListPage.showPage(false);
 		}
 		else {
 			// Unknown response with a newline, display the whole message in the preview

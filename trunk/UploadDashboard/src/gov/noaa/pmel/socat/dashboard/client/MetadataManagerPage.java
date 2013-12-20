@@ -6,8 +6,8 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.MetadataListService;
+import gov.noaa.pmel.socat.dashboard.shared.MetadataListServiceAsync;
 
 import java.util.List;
 import java.util.TreeSet;
@@ -95,8 +95,8 @@ public class MetadataManagerPage extends Composite {
 	private static MetadataManagerPageUiBinder uiBinder = 
 			GWT.create(MetadataManagerPageUiBinder.class);
 
-	private static DashboardMetadataListServiceAsync service = 
-			GWT.create(DashboardMetadataListService.class);
+	private static MetadataListServiceAsync service = 
+			GWT.create(MetadataListService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField HTML introHtml; 
@@ -233,7 +233,7 @@ public class MetadataManagerPage extends Composite {
 	@UiHandler("dismissButton")
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page.
-		DashboardCruiseListPage.showPage(false);
+		CruiseListPage.showPage(false);
 	}
 
 	@UiHandler("uploadButton")

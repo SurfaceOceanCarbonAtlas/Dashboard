@@ -18,17 +18,17 @@ public class SocatUploadDashboard
 		LOGIN,
 		/** History tag for DashboardLogoutPage */
 		LOGOUT,
-		/** History tag for DashboardCruiseListPage */
+		/** History tag for CruiseListPage */
 		CRUISE_LIST,
-		/** History tag for DashboardCruiseUploadPage */
+		/** History tag for CruiseUploadPage */
 		CRUISE_UPLOAD,
-		/** History tag for CruiseDataColumnSpecsPage */
+		/** History tag for DataColumnSpecsPage */
 		DATA_COLUMN_SPECS,
 		/** History tag for MetadataManagerPage */
 		METADATA_MANAGER,
 		/** History tag for MetadataUploadPage */
 		METADATA_UPLOAD,
-		/** History tag for CruiseAddToSocatPage */
+		/** History tag for AddToSocatPage */
 		ADD_TO_SOCAT,
 		/** History tag for CruiseArchivePage */
 		ARCHIVE,
@@ -117,15 +117,15 @@ public class SocatUploadDashboard
 		}
 		else if ( token.equals(PagesEnum.CRUISE_LIST.name()) ) {
 			// Cruise list page from history
-			DashboardCruiseListPage.redisplayPage(false);
+			CruiseListPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.CRUISE_UPLOAD.name()) ) {
 			// Cruise upload page from history
-			DashboardCruiseUploadPage.redisplayPage(false);
+			CruiseUploadPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.DATA_COLUMN_SPECS.name()) ) {
 			// Data column specs page from history
-			CruiseDataColumnSpecsPage.redisplayPage(false);
+			DataColumnSpecsPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.METADATA_MANAGER.name()) ) {
 			// Metadata manager page from history
@@ -137,7 +137,7 @@ public class SocatUploadDashboard
 		}
 		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
 			// Add to SOCAT page from history
-			CruiseAddToSocatPage.redisplayPage(false);
+			AddToSocatPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.ARCHIVE.name()) ) {
 			// Archive page from history

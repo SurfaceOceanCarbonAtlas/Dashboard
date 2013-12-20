@@ -24,13 +24,13 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
  * Service to receive the uploaded metadata file from the client
  * @author Karl Smith
  */
-public class DashboardMetadataUploadService extends HttpServlet {
+public class MetadataUploadService extends HttpServlet {
 
-	private static final long serialVersionUID = 6095108321672612644L;
+	private static final long serialVersionUID = 6620559111563840485L;
 
 	private ServletFileUpload metadataUpload;
 
-	public DashboardMetadataUploadService() {
+	public MetadataUploadService() {
 		File servletTmpDir;
 		try {
 			// Get the temporary directory used by the servlet
@@ -126,9 +126,9 @@ public class DashboardMetadataUploadService extends HttpServlet {
 			return;
 		}
 
-		DashboardMetadataFileHandler metadataHandler = 
+		MetadataFileHandler metadataHandler = 
 				dataStore.getMetadataFileHandler();
-		DashboardCruiseFileHandler cruiseHandler = 
+		CruiseFileHandler cruiseHandler = 
 				dataStore.getCruiseFileHandler();
 		String uploadFilename = metadataItem.getName();
 

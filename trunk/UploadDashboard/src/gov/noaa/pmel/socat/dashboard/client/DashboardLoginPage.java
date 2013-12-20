@@ -181,7 +181,7 @@ public class DashboardLoginPage extends Composite {
 			setPasshash(DashboardUtils.passhashFromPlainText(
 						nameText.getValue().trim(), passText.getValue()));
 			passText.setText("");
-			DashboardCruiseListPage.showPage(true);
+			CruiseListPage.showPage(true);
 		}
 		else {
 			Window.alert(NO_CREDENTIALS_ERROR_MSG);

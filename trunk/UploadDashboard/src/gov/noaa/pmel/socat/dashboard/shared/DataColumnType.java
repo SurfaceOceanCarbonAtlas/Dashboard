@@ -12,7 +12,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public enum CruiseDataColumnType implements Serializable, IsSerializable {
+public enum DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * The ignore data type indicates data that should be 
 	 * completely ignored.

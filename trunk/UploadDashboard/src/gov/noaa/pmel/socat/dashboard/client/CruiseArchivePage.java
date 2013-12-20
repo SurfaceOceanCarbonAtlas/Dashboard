@@ -4,8 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatService;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
+import gov.noaa.pmel.socat.dashboard.shared.AddToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -101,8 +101,8 @@ public class CruiseArchivePage extends Composite {
 	private static CruiseArchivePageUiBinder uiBinder = 
 			GWT.create(CruiseArchivePageUiBinder.class);
 
-	private static CruiseToSocatServiceAsync service = 
-			GWT.create(CruiseToSocatService.class);
+	private static AddToSocatServiceAsync service = 
+			GWT.create(AddToSocatService.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
@@ -309,7 +309,7 @@ public class CruiseArchivePage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Return to the cruise list page exactly as it was
-		DashboardCruiseListPage.redisplayPage(true);
+		CruiseListPage.redisplayPage(true);
 	}
 
 	@UiHandler("submitButton")
@@ -347,7 +347,7 @@ public class CruiseArchivePage extends Composite {
 			@Override
 			public void onSuccess(Void result) {
 				// Success; show the updated cruise list page
-				DashboardCruiseListPage.showPage(false);
+				CruiseListPage.showPage(false);
 			}
 			@Override
 			public void onFailure(Throwable ex) {

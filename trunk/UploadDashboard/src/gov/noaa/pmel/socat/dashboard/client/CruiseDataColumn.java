@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -30,13 +30,13 @@ public class CruiseDataColumn {
 
 	// Class to deal with pairs of data column types and units
 	private static class TypeUnits {
-		CruiseDataColumnType type;
+		DataColumnType type;
 		String units;
-		TypeUnits(CruiseDataColumnType type, String units) {
+		TypeUnits(DataColumnType type, String units) {
 			if ( type != null )
 				this.type = type;
 			else
-				this.type = CruiseDataColumnType.UNKNOWN;
+				this.type = DataColumnType.UNKNOWN;
 			if ( units != null )
 				this.units = units;
 			else
@@ -71,12 +71,12 @@ public class CruiseDataColumn {
 		// Do not move SUPPLEMENTAL in the enum list, 
 		// since we want that data to be at the end when sorted.
 		STD_TYPE_UNITS.add(
-				new TypeUnits(CruiseDataColumnType.SUPPLEMENTAL, ""));
+				new TypeUnits(DataColumnType.SUPPLEMENTAL, ""));
 		// Add everything else in the enumerated type order
-		for ( Entry<CruiseDataColumnType,ArrayList<String>> entry : 
+		for ( Entry<DataColumnType,ArrayList<String>> entry : 
 								DashboardUtils.STD_DATA_UNITS.entrySet() ) {
-			CruiseDataColumnType type = entry.getKey();
-			if ( type != CruiseDataColumnType.SUPPLEMENTAL ) {
+			DataColumnType type = entry.getKey();
+			if ( type != DataColumnType.SUPPLEMENTAL ) {
 				for ( String units : entry.getValue() ) {
 					STD_TYPE_UNITS.add(new TypeUnits(type, units));
 				}
@@ -192,7 +192,7 @@ public class CruiseDataColumn {
 			@Override
 			public String getValue(CruiseDataColumn dataCol) {
 				// Find this column type with units
-				CruiseDataColumnType type = 
+				DataColumnType type = 
 						dataCol.cruise.getDataColTypes().get(dataCol.columnIndex);
 				String units = 
 						dataCol.cruise.getDataColUnits().get(dataCol.columnIndex);
@@ -200,7 +200,7 @@ public class CruiseDataColumn {
 				if ( idx < 0 ) {
 					// Not a recognized column type with units; set to unknown
 					idx = STD_TYPE_UNITS.indexOf(
-							new TypeUnits(CruiseDataColumnType.UNKNOWN, ""));
+							new TypeUnits(DataColumnType.UNKNOWN, ""));
 				}
 				// Return the header for this column type with units
 				return STD_TYPE_UNITS_HEADERS.get(idx);

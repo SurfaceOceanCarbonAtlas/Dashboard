@@ -23,7 +23,7 @@ import org.tmatesoft.svn.core.SVNException;
  *  
  * @author Karl Smith
  */
-public class DashboardMetadataFileHandler extends VersionedFileHandler {
+public class MetadataFileHandler extends VersionedFileHandler {
 
 	private static final String METADATA_INFOFILE_SUFFIX = ".properties";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
@@ -44,7 +44,7 @@ public class DashboardMetadataFileHandler extends VersionedFileHandler {
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
-	public DashboardMetadataFileHandler(String metadataFilesDirName, 
+	public MetadataFileHandler(String metadataFilesDirName, 
 							String svnUsername, String svnPassword) 
 									throws IllegalArgumentException {
 		super(metadataFilesDirName, svnUsername, svnPassword);

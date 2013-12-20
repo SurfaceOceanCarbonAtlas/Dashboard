@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
-import gov.noaa.pmel.socat.dashboard.server.DashboardUserFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.UserFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 
@@ -18,12 +18,12 @@ import org.tmatesoft.svn.core.SVNException;
 /**
  * @author Karl Smith
  */
-public class DashboardUserFileHandlerTest {
+public class UserFileHandlerTest {
 
 	/**
 	 * Test method for methods in 
-	 * {@link gov.noaa.pmel.socat.dashboard.server.DashboardUserFileHandler}.
-	 * This needs to be run after DashboardCruiseFileHandlerTest.
+	 * {@link gov.noaa.pmel.socat.dashboard.server.UserFileHandler}.
+	 * This needs to be run after CruiseFileHandlerTest.
 	 * @throws IOException
 	 * @throws SVNException 
 	 */
@@ -45,7 +45,7 @@ public class DashboardUserFileHandlerTest {
 			cruiseList.put(newCruise.getExpocode(), newCruise);
 		}
 
-		DashboardUserFileHandler handler = 
+		UserFileHandler handler = 
 				DashboardDataStore.get().getUserFileHandler();
 		assertNotNull( handler );
 

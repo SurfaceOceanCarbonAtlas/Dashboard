@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseFileHandler extends VersionedFileHandler {
+public class CruiseFileHandler extends VersionedFileHandler {
 
 	private static final String CRUISE_DATA_FILENAME_EXTENSION = ".tsv";
 	private static final String CRUISE_INFO_FILENAME_EXTENSION = ".properties";
@@ -76,7 +76,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
-	DashboardCruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
+	CruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
 						String svnPassword) throws IllegalArgumentException {
 		super(cruiseFilesDirName, svnUsername, svnPassword);
 	}
@@ -550,7 +550,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					ex.getMessage());
 		}
 		// Delete the metadata documents associated with this cruise
-		DashboardMetadataFileHandler metadataHandler;
+		MetadataFileHandler metadataHandler;
 		try {
 			metadataHandler = DashboardDataStore.get().getMetadataFileHandler();
 		} catch ( IOException ex ) {
@@ -618,7 +618,7 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 		// Data column types - encoded using the enumerated names
 		ArrayList<String> colTypeNames = 
 				new ArrayList<String>(cruise.getDataColTypes().size());
-		for ( CruiseDataColumnType colType : cruise.getDataColTypes() )
+		for ( DataColumnType colType : cruise.getDataColTypes() )
 			colTypeNames.add(colType.name());
 		cruiseProps.setProperty(DATA_COLUMN_TYPES_ID, 
 				DashboardUtils.encodeStringArrayList(colTypeNames));
@@ -838,10 +838,10 @@ public class DashboardCruiseFileHandler extends VersionedFileHandler {
 					DATA_COLUMN_TYPES_ID + " given in " + infoFile.getPath());
 		ArrayList<String> colTypeNames = DashboardUtils.decodeStringArrayList(value);
 		// Assign the column types directly to the array in the cruise 
-		ArrayList<CruiseDataColumnType> colTypes = cruise.getDataColTypes();
+		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
 		colTypes.clear();
 		for ( String name : colTypeNames )
-			colTypes.add(CruiseDataColumnType.valueOf(name));
+			colTypes.add(DataColumnType.valueOf(name));
 
 		// Data column name in the original upload data file
 		value = cruiseProps.getProperty(USER_COLUMN_NAMES_ID);

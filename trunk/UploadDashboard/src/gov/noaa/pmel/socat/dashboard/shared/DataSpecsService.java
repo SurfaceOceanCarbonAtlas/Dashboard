@@ -12,8 +12,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
  * Server side specification of data column specification services
  * @author Karl Smith
  */
-@RemoteServiceRelativePath("DataColumnSpecsService")
-public interface CruiseDataColumnSpecsService extends RemoteService {
+@RemoteServiceRelativePath("DataSpecsService")
+public interface DataSpecsService extends RemoteService {
 
 	/**
 	 * Reads the saved cruise file and returns the current data

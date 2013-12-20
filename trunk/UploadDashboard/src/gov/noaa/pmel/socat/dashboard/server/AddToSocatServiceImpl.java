@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseToSocatService;
+import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -14,14 +14,14 @@ import java.util.TreeSet;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
- * Server side implementation of CruiseToSocatService
+ * Server side implementation of AddToSocatService
  * 
  * @author Karl Smith
  */
-public class CruiseToSocatServiceImpl extends RemoteServiceServlet 
-										implements CruiseToSocatService {
+public class AddToSocatServiceImpl extends RemoteServiceServlet 
+										implements AddToSocatService {
 
-	private static final long serialVersionUID = -5117139976060573415L;
+	private static final long serialVersionUID = 4928528579465036911L;
 
 	@Override
 	public void addCruisesToSocat(String username, String passhash, 
@@ -39,7 +39,7 @@ public class CruiseToSocatServiceImpl extends RemoteServiceServlet
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
 
-		DashboardCruiseFileHandler cruiseHandler = 
+		CruiseFileHandler cruiseHandler = 
 				dataStore.getCruiseFileHandler();
 		// Update the SOCAT status of the cruises
 		for ( String expocode : cruiseExpocodes ) {

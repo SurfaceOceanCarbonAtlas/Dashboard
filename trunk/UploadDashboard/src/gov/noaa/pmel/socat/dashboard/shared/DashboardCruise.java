@@ -30,7 +30,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	String uploadFilename;
 	int numDataRows;
 	ArrayList<String> userColNames;
-	ArrayList<CruiseDataColumnType> dataColTypes;
+	ArrayList<DataColumnType> dataColTypes;
 	ArrayList<String> dataColUnits;
 	ArrayList<Integer> dataColQualities;
 
@@ -44,7 +44,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		archiveStatus = "";
 		uploadFilename = "";
 		numDataRows = 0;
-		dataColTypes = new ArrayList<CruiseDataColumnType>();
+		dataColTypes = new ArrayList<DataColumnType>();
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
 		dataColQualities = new ArrayList<Integer>();
@@ -256,7 +256,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 * 		the list of data column types for this cruise; may be empty 
 	 * 		but never null.  The actual list in this object is returned.
 	 */
-	public ArrayList<CruiseDataColumnType> getDataColTypes() {
+	public ArrayList<DataColumnType> getDataColTypes() {
 		return dataColTypes;
 	}
 
@@ -266,7 +266,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 * 		this object is cleared and all the contents of the given list, 
 	 * 		if not null, are added. 
 	 */
-	public void setDataColTypes(ArrayList<CruiseDataColumnType> dataColTypes) {
+	public void setDataColTypes(ArrayList<DataColumnType> dataColTypes) {
 		this.dataColTypes.clear();
 		if ( dataColTypes != null )
 			this.dataColTypes.addAll(dataColTypes);

@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * @author Karl Smith
  */
-public interface CruiseToSocatServiceAsync {
+public interface AddToSocatServiceAsync {
 
 	/**
 	 * Client-side interface for adding a listing of cruises 

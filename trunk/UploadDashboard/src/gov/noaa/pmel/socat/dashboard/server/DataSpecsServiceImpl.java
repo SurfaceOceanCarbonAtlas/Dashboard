@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.CruiseDataColumnSpecsService;
+import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
- * Server side implementation of the CruiseDataColumnSpecsService
+ * Server side implementation of the DataSpecsService
  * @author Karl Smith
  */
-public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
-									implements CruiseDataColumnSpecsService {
+public class DataSpecsServiceImpl extends RemoteServiceServlet
+									implements DataSpecsService {
 
-	private static final long serialVersionUID = 3851933149162963899L;
+	private static final long serialVersionUID = -7106452856622957624L;
 
 	@Override
 	public DashboardCruiseWithData getCruiseDataColumnSpecs(String username,
@@ -132,7 +132,7 @@ public class CruiseDataColumnSpecsServiceImpl extends RemoteServiceServlet
 			cruiseData.getDataValues().subList(0,25).clear();
 
 		// Return the updated truncated cruise data for redisplay 
-		// in the CruiseDataColumnSpecsPage
+		// in the DataColumnSpecsPage
 		return cruiseData;
 	}
 
