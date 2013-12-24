@@ -11,9 +11,32 @@ body {
 	width: 35em;
 }
 
+.horizontalpanel {
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+}
+.horizontalbutton {
+	width: 5em;
+	margin-left: 3.5em;
+	margin-right: 3.5em;
+}
+
 .introhtml {
 	text-align: justify;
 	padding: 2em;
+}
+
+.infopanel {
+	background-color: #DDD;
+	width: 25em;
+}
+.infohtml {
+	text-align: justify;
+	padding: 1em;
+}
+.infobutton {
+	margin-top: 0.5em;
+	margin-bottom: 1em;
 }
 
 .labeledtextpanel {
@@ -40,23 +63,11 @@ body {
 	margin-bottom: 2em;
 }
 
-.socatinfopanel {
-	margin: 2em;
-}
 .socatinfoanchor {
 	font-weight: bold;
 	font-size: large;
 }
 
-.infopanel {
-	width: 25em;
-	background-color: lightgray;
-}
-.infohtml {
-	text-align: justify;
-	padding: 1em;
-}
-.dismissbutton {
-	margin-top: 0.5em;
-	margin-bottom: 1em;
+.socatinfopanel {
+	margin: 2em;
 }

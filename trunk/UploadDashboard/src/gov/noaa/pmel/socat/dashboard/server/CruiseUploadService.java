@@ -66,6 +66,7 @@ public class CruiseUploadService extends HttpServlet {
 		// Get the contents from the post request
 		String username = null;
 		String passhash = null;
+		String timestamp = null;
 		String encoding = null;
 		String action = null;
 		FileItem cruiseItem = null;
@@ -79,6 +80,10 @@ public class CruiseUploadService extends HttpServlet {
 				}
 				else if ( "passhash".equals(itemName) ) {
 					passhash = item.getString();
+					item.delete();
+				}
+				else if ( "timestamp".equals(itemName) ) {
+					timestamp = item.getString();
 					item.delete();
 				}
 				else if ( "cruiseencoding".equals(itemName) ) {
@@ -107,7 +112,8 @@ public class CruiseUploadService extends HttpServlet {
 		// Verify contents seem okay
 		DashboardDataStore dataStore = DashboardDataStore.get();
 		if ( (username == null) || (passhash == null) || 
-			 (encoding == null) || (action == null) || (cruiseItem == null) || 
+			 (encoding == null) || (action == null) || 
+			 (timestamp == null) || (cruiseItem == null) || 
 			 ( ! dataStore.validateUser(username, passhash) ) ||
 			 ! ( DashboardUtils.REQUEST_PREVIEW_TAG.equals(action) ||
 				 DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ||
@@ -174,6 +180,7 @@ public class CruiseUploadService extends HttpServlet {
 				cruiseData = new DashboardCruiseWithData();
 				cruiseData.setOwner(username);
 				cruiseData.setUploadFilename(filename);
+				cruiseData.setUploadTimestamp(timestamp);
 				cruiseHandler.assignCruiseDataFromInput(cruiseData, 
 														cruiseReader, 0, -1, true);
 			} finally {
@@ -291,7 +298,7 @@ public class CruiseUploadService extends HttpServlet {
 			message = "Cruise data for " + expocode + " updated by " + 
 					username + " from uploaded file " + filename;
 		else
-			message = "Cruise data for " + expocode + " created by " + 
+			message = "Cruise data for " + expocode + " added by " + 
 					username + " from uploaded file " + filename;			
 		try {
 			cruiseHandler.saveCruiseDataToFiles(cruiseData, message);
@@ -316,9 +323,9 @@ public class CruiseUploadService extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();
 		if ( cruiseExists )
-			respWriter.println(DashboardUtils.FILE_UPDATED_HEADER_TAG);
+			respWriter.println(DashboardUtils.FILE_UPDATED_HEADER_TAG + " " + expocode);
 		else
-			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG);
+			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG + " " + expocode);
 		respWriter.println(message);
 		response.flushBuffer();
 	}

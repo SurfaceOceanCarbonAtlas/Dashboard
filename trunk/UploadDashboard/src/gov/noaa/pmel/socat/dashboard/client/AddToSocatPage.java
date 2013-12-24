@@ -18,6 +18,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -25,7 +26,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -49,12 +49,9 @@ public class AddToSocatPage extends Composite {
 	private static final String ADD_TO_SOCAT_FIRST_INFO_HTML =
 			"This page will submit the cruises listed in the table below to SOCAT " +
 			"for examination and quality assessment.  You can withdraw cruises from " +
-			"SOCAT after this submission if you need to make corrections to submitted " +
-			"cruises, or if you just wanted to examine your cruises alongside other " +
-			"cruises in SOCAT." +
+			"SOCAT after this submission if you need to make changes." +
 			"<br /><br />" +
-			"In order to submit cruises to SOCAT, you must give permission to share " +
-			"your cruises for policy assessment: ";
+			"<b>Required</b>:";
 
 	private static final String AGREE_SHARE_TEXT = 
 			"I give permission for my cruises to be shared for policy (QC) assessment.";
@@ -66,14 +63,7 @@ public class AddToSocatPage extends Composite {
 			"the cruise was deemed acceptable. ";
 
 	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
-			"It is highly recommended (although not required) that you also give " +
-			"permission for your cruises to to automatically archived at CDIAC (the " +
-			"second check box).  If this check box is not selected when you add " +
-			"your cruises to SOCAT, you will be required to provide DOIs of the " +
-			"archived data for these cruises before they will be included in a " +
-			"SOCAT release.  The DOIs from cruises are provided using the \"" + 
-			CruiseListPage.ARCHIVE_SUBMIT_TEXT + "\" button on the main " +
-			"cruise listing page. ";
+			"Highly recommended:";
 
 	private static final String AGREE_ARCHIVE_TEXT = 
 			"I give permission for my cruises to be automatically archived at CDIAC.  ";
@@ -87,21 +77,17 @@ public class AddToSocatPage extends Composite {
 			"<em>Note that declining permission here implies an obligation on my part to " +
 			"ensure that these data will be made accessible via another data center.</em>";
 
-	private static final String WILL_AUTOFAIL_ON_DATA_MSG = ": has data with serious " +
-			"problems detected by the automated data checking software.  This cruise " +
-			"can be added to SOCAT, but will be automatically be given the QC status '" +
-			DashboardUtils.QC_STATUS_UNACCEPTABLE + "'.  Do you want to continue? ";
-	private static final String WILL_AUTOFAIL_ON_METADATA_MSG = 
-			": does not have any metadata documents associated with it.  This cruise " +
-			"can be added to SOCAT, but will be automatically be given the QC status '" +
-			DashboardUtils.QC_STATUS_UNACCEPTABLE + "'.  Do you want to continue? ";
-
-	/*
-	 * private static final String PLEASE_WAIT_MSG = 
-	 *		"Please wait; your cruises are being added to the SOCAT database.  This may " +
-	 *		"take a minute.  When complete, you will be returned to the main dashboard " +
-	 *		"cruise listing page.";
-	 */
+	private static final String METADATA_AUTOFAIL_HTML_PROLOGUE = 
+			"The following cruises do not have any metadata documents: <ul>";
+	private static final String DATA_AUTOFAIL_HTML_PROLOGUE = 
+			"The following cruises have data with serious problems detected " +
+			"by the automated data checking software: <ul>";
+	private static final String AUTOFAIL_HTML_EPILOGUE = 
+			"</ul> These cruises can be added to SOCAT, but will be automatically be " +
+			"given the QC status '" + DashboardUtils.QC_STATUS_UNACCEPTABLE + 
+			"'.  Do you want to continue? ";
+	private static final String AUTOFAIL_YES_TEXT = "Yes";
+	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String SUBMIT_FAILURE_MSG = 
 			"Unexpected failure submitting cruises to SOCAT: ";
@@ -117,7 +103,6 @@ public class AddToSocatPage extends Composite {
 	private static final String FILENAME_COLUMN_NAME = "Filename";
 
 	// Replacement strings for empty or null values
-	private static final String EMPTY_TABLE_TEXT = "No cruises???";
 	private static final String NO_EXPOCODE_STRING = "(unknown)";
 	private static final String NO_OWNER_STRING = "(unknown)";
 	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
@@ -150,6 +135,9 @@ public class AddToSocatPage extends Composite {
 	private DashboardInfoPopup agreeSharePopup;
 	private DashboardInfoPopup agreeArchivePopup;
 	private ListDataProvider<DashboardCruise> listProvider;
+	private DashboardAskPopup askMetaAutofailPopup;
+	private DashboardAskPopup askDataAutofailPopup;
+	private HashSet<String> cruiseExpocodes;
 
 	// The singleton instance of this page
 	private static AddToSocatPage singleton;
@@ -174,6 +162,10 @@ public class AddToSocatPage extends Composite {
 		agreeArchiveInfoButton.setText(MORE_INFO_TEXT);
 		agreeArchivePopup = null;
 
+		askMetaAutofailPopup = null;
+		askDataAutofailPopup = null;
+		cruiseExpocodes = new HashSet<String>();
+
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
 	}
@@ -185,7 +177,7 @@ public class AddToSocatPage extends Composite {
 	static void showPage(HashSet<DashboardCruise> cruises) {
 		if ( singleton == null )
 			singleton = new AddToSocatPage();
-		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		SocatUploadDashboard.updateCurrentPage(singleton);
 		singleton.updateCruises(cruises);
 		History.newItem(PagesEnum.ADD_TO_SOCAT.name(), false);
 	}
@@ -205,7 +197,7 @@ public class AddToSocatPage extends Composite {
 			DashboardLoginPage.showPage(true);
 		}
 		else {
-			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )	
 				History.newItem(PagesEnum.ADD_TO_SOCAT.name(), false);
 		}
@@ -247,9 +239,7 @@ public class AddToSocatPage extends Composite {
 			agreeSharePopup.setInfoMessage(AGREE_SHARE_INFO_HTML);
 		}
 		// Show the popup over the info button
-		agreeSharePopup.showAtPosition(
-				agreeShareInfoButton.getAbsoluteLeft(),
-				agreeShareInfoButton.getAbsoluteTop());
+		agreeSharePopup.showRelativeTo(agreeShareInfoButton);
 	}
 
 	@UiHandler("agreeArchiveInfoButton")
@@ -260,9 +250,7 @@ public class AddToSocatPage extends Composite {
 			agreeArchivePopup.setInfoMessage(AGREE_ARCHIVE_INFO_HTML);
 		}
 		// Show the popup over the info button
-		agreeArchivePopup.showAtPosition(
-				agreeArchiveInfoButton.getAbsoluteLeft(),
-				agreeArchiveInfoButton.getAbsoluteTop());
+		agreeArchivePopup.showRelativeTo(agreeArchiveInfoButton);
 	}
 
 	@UiHandler("agreeShareCheckBox")
@@ -279,23 +267,100 @@ public class AddToSocatPage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
-		// Get the expocodes of cruises to be submitted
-		HashSet<String> cruiseExpocodes = new HashSet<String>();
+		// Get the expocodes of cruises to be submitted,
+		// checking if they have metadata documents
+		cruiseExpocodes.clear();
+		String message = METADATA_AUTOFAIL_HTML_PROLOGUE;
+		boolean willAutofail = false;
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			String expocode = cruise.getExpocode();
+			cruiseExpocodes.add(expocode);
+
 			TreeSet<String> metaNames = cruise.getMetadataFilenames();
 			if ( metaNames.size() < 1 ) {
-				if ( ! Window.confirm(expocode + WILL_AUTOFAIL_ON_METADATA_MSG) )
-					return;
+				message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
+				willAutofail = true;
 			}
+		}
+
+		// If missing metadata, ask to continue
+		if ( willAutofail ) {
+			message += AUTOFAIL_HTML_EPILOGUE;
+			if ( askMetaAutofailPopup == null ) {
+				askMetaAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
+						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+						// Only proceed if yes; ignore if no or null
+						if ( result == true )
+							continueSubmit();
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			askMetaAutofailPopup.askQuestion(message);
+			return;
+		}
+
+		// All cruises have metadata; continue on
+		continueSubmit();
+	}
+
+	/**
+	 * Continues the submit process from the submitOnClick callback,
+	 * checking the data check status.
+	 */
+	private void continueSubmit() {
+		// Check that the cruise data is checked and reasonable
+		String message = DATA_AUTOFAIL_HTML_PROLOGUE;
+		boolean willAutofail = false;
+		for ( DashboardCruise cruise : listProvider.getList() ) {
 			String status = cruise.getDataCheckStatus();
 			if ( ! ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(status) ||
 					 DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(status) ) ) {
-				if ( ! Window.confirm(expocode + WILL_AUTOFAIL_ON_DATA_MSG) )
-					return;
+				message += "<li>" + 
+					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+				willAutofail = true;
 			}
-			cruiseExpocodes.add(expocode);
 		}
+
+		// If unreasonable data, ask to continue
+		if ( willAutofail ) {
+			message += AUTOFAIL_HTML_EPILOGUE;
+			if ( askDataAutofailPopup == null ) {
+				askDataAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
+						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+						// Only proceed if yes; ignore if no or null
+						if ( result == true )
+							furtherContinueSubmit();
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			askDataAutofailPopup.askQuestion(message);
+			return;
+		}
+
+		// All cruises have reasonable data; continue on
+		furtherContinueSubmit();
+	}
+
+	/**
+	 * Further continues the submit process, actually performing the
+	 * submit to the server.  Assumes cruiseExpocodes has been assigned 
+	 * the expocodes of the cruises to submit to SOCAT.
+	 */
+	private void furtherContinueSubmit() {
 		// Get the default status for cruises without DOI's
 		String archiveStatus;
 		if ( agreeArchiveCheckBox.getValue() )
@@ -313,11 +378,10 @@ public class AddToSocatPage extends Composite {
 			@Override
 			public void onFailure(Throwable ex) {
 				// Unexpected problems - show the error message
-				Window.alert(SUBMIT_FAILURE_MSG + ex.getMessage());
+				SocatUploadDashboard.showMessage(SUBMIT_FAILURE_MSG + 
+						SafeHtmlUtils.htmlEscape(ex.getMessage()));
 			}
 		});
-		// Popup a window indicating that this may take a minute
-		// Window.alert(PLEASE_WAIT_MSG);
 	}
 
 	/**
@@ -391,7 +455,7 @@ public class AddToSocatPage extends Composite {
 		cruisesGrid.getColumnSortList().push(expocodeColumn);
 
 		// Set the contents if there are no rows
-		cruisesGrid.setEmptyTableWidget(new Label(EMPTY_TABLE_TEXT));
+		cruisesGrid.setEmptyTableWidget(new Label("No cruises???"));
 
 		// Following recommended to improve efficiency with IE
 		cruisesGrid.setSkipRowHoverCheck(false);

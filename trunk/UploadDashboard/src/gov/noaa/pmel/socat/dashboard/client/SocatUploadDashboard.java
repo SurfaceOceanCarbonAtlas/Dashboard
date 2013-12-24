@@ -16,8 +16,6 @@ public class SocatUploadDashboard
 	public enum PagesEnum {
 		/** History tag for DashboardLoginPage */
 		LOGIN,
-		/** History tag for DashboardLogoutPage */
-		LOGOUT,
 		/** History tag for CruiseListPage */
 		CRUISE_LIST,
 		/** History tag for CruiseUploadPage */
@@ -30,8 +28,8 @@ public class SocatUploadDashboard
 		METADATA_UPLOAD,
 		/** History tag for AddToSocatPage */
 		ADD_TO_SOCAT,
-		/** History tag for CruiseArchivePage */
-		ARCHIVE,
+		/** History tag for DashboardLogoutPage */
+		LOGOUT
 	}
 
 	// Column widths in em's
@@ -43,7 +41,9 @@ public class SocatUploadDashboard
 	private static SocatUploadDashboard singleton = null;
 
 	// Keep a record of the currently displayed page
-	private Composite currentPage = null;
+	private Composite currentPage;
+	// PopupPanel for displaying messages (instead of using Window.alert)
+	private DashboardInfoPopup msgPopup;
 
 	/**
 	 * Create the manager for the SocatUploadDashboard pages.
@@ -59,20 +59,25 @@ public class SocatUploadDashboard
 			singleton.currentPage = null;
 		}
 		currentPage = null;
+		msgPopup = null;
 		// Make sure singleton is assign to this instance since 
 		// this constructor is probably called from GWT.
 		singleton = this;
 	}
 
 	/**
-	 * @return
-	 * 		the singleton instance of the SocatUploadDashboard
-	 * 		page manager.
+	 * Shows the message in a popup panel centered on the page.
+	 * 
+	 * @param htmlMsg
+	 * 		unchecked HTML message to show.
 	 */
-	public static SocatUploadDashboard get() {
+	public static void showMessage(String htmlMsg) {
 		if ( singleton == null )
 			singleton = new SocatUploadDashboard();
-		return singleton;
+		if ( singleton.msgPopup == null )
+			singleton.msgPopup = new DashboardInfoPopup();
+		singleton.msgPopup.setInfoMessage(htmlMsg);
+		singleton.msgPopup.showCentered();
 	}
 
 	/**
@@ -82,12 +87,14 @@ public class SocatUploadDashboard
 	 * @param newPage
 	 * 		new page to be shown; if null, not page is shown
 	 */
-	public void updateCurrentPage(Composite newPage) {
-		if ( currentPage != null )
-			RootLayoutPanel.get().remove(currentPage);
-		currentPage = newPage;
-		if ( currentPage != null )
-			RootLayoutPanel.get().add(currentPage);
+	public static void updateCurrentPage(Composite newPage) {
+		if ( singleton == null )
+			singleton = new SocatUploadDashboard();
+		if ( singleton.currentPage != null )
+			RootLayoutPanel.get().remove(singleton.currentPage);
+		singleton.currentPage = newPage;
+		if ( singleton.currentPage != null )
+			RootLayoutPanel.get().add(singleton.currentPage);
 	}
 
 	@Override
@@ -110,10 +117,6 @@ public class SocatUploadDashboard
 		else if ( token.equals(PagesEnum.LOGIN.name()) ) {
 			// Login page from history
 			DashboardLoginPage.showPage(false);
-		}
-		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
-			// Logout page from history
-			DashboardLogoutPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.CRUISE_LIST.name()) ) {
 			// Cruise list page from history
@@ -139,9 +142,9 @@ public class SocatUploadDashboard
 			// Add to SOCAT page from history
 			AddToSocatPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.ARCHIVE.name()) ) {
-			// Archive page from history
-			CruiseArchivePage.redisplayPage(false);
+		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
+			// Logout page from history
+			DashboardLogoutPage.redisplayPage(false);
 		}
 		else {
 			// Unknown page from the history; instead show the login page 
