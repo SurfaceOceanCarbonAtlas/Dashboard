@@ -21,7 +21,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class AddToSocatServiceImpl extends RemoteServiceServlet 
 										implements AddToSocatService {
 
-	private static final long serialVersionUID = 4928528579465036911L;
+	private static final long serialVersionUID = -7086803355103349071L;
 
 	@Override
 	public void addCruisesToSocat(String username, String passhash, 
@@ -78,37 +78,6 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 					" with initial QC status '" + qcStatus + 
 					"' and archive status '" + doiStatus + "'");
 		}
-	}
-
-	@Override
-	public void setCruiseArchiveStatus(String username, String passhash, 
-			String expocode, String archiveStatus)
-										throws IllegalArgumentException {
-		// Authenticate the user
-		DashboardDataStore dataStore;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected configuration error: " + ex.getMessage());
-		}
-		if ( ! dataStore.validateUser(username, passhash) )
-			throw new IllegalArgumentException(
-					"Invalid authentication credentials");
-
-		// Update the archive status for this cruise
-		DashboardCruise cruise = dataStore.getCruiseFileHandler()
-										  .getCruiseFromInfoFile(expocode);
-		if ( cruise == null ) 
-			throw new IllegalArgumentException("Unknown cruise " + expocode);
-		cruise.setArchiveStatus(archiveStatus);
-
-		// TODO: modify the cruise in SOCAT
-
-		// Commit this update of the cruise properties
-		dataStore.getCruiseFileHandler().saveCruiseToInfoFile(cruise, 
-				"Cruise " + expocode + " archive status to '" + 
-				archiveStatus + "' by " + username);
 	}
 
 }

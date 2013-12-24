@@ -26,7 +26,6 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -71,10 +70,12 @@ public class MetadataManagerPage extends Composite {
 	private static final String NO_SELECTED_METADATA_TO_DELETE_MSG = 
 			"No metadata documents are selected for deletion";
 
-	private static final String DELETE_METADATA_MSG_PROLOGUE =
-			"The following metadata document(s) will be deleted: ";
-	private static final String DELETE_METADATA_MSG_EPILOGUE =
-			"\n\n Do you wish to proceed?";
+	private static final String DELETE_METADATA_HTML_PROLOGUE =
+			"The following metadata document(s) will be deleted: <ul>";
+	private static final String DELETE_METADATA_HTML_EPILOGUE =
+			"</ul> Do you wish to proceed?";
+	private static final String DELETE_YES_TEXT = "Yes";
+	private static final String DELETE_NO_TEXT = "No";
 
 	private static final String DELETE_METADATA_FAIL_MSG =
 			"Problems deleting metadata documents";
@@ -109,6 +110,7 @@ public class MetadataManagerPage extends Composite {
 	private String username;
 	private ListDataProvider<DashboardMetadata> listProvider;
 	private String expocode;
+	private DashboardAskPopup askDeletePopup;
 
 	// The singleton instance of this page
 	private static MetadataManagerPage singleton;
@@ -123,6 +125,7 @@ public class MetadataManagerPage extends Composite {
 		buildMetadataListTable();
 		username = "";
 		expocode = "";
+		askDeletePopup = null;
 
 		logoutButton.setText(LOGOUT_TEXT);
 		dismissButton.setText(DISMISS_TEXT);
@@ -153,19 +156,19 @@ public class MetadataManagerPage extends Composite {
 										.equals(mdataList.getUsername()) ) {
 					if ( singleton == null )
 						singleton = new MetadataManagerPage();
-					SocatUploadDashboard.get().updateCurrentPage(singleton);
+					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.updateMetadataList(cruiseExpocode, mdataList);
 					History.newItem(PagesEnum.METADATA_MANAGER.name(), false);
 				}
 				else {
-					Window.alert(METADATA_LIST_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(METADATA_LIST_FAIL_MSG + 
 							" (unexpected invalid metadata list)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(METADATA_LIST_FAIL_MSG + 
-						" (" + ex.getMessage() + ")");
+				SocatUploadDashboard.showMessage(METADATA_LIST_FAIL_MSG + 
+						" (" + SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
 			}
 		});
 	}
@@ -185,7 +188,7 @@ public class MetadataManagerPage extends Composite {
 			DashboardLoginPage.showPage(true);
 		}
 		else {
-			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
 				History.newItem(PagesEnum.METADATA_MANAGER.name(), false);
 		}
@@ -250,30 +253,49 @@ public class MetadataManagerPage extends Composite {
 	@UiHandler("deleteButton")
 	void deleteOnClick(ClickEvent event) {
 		// Get the list of selected metadata documents
-		TreeSet<String> mdataNames = new TreeSet<String>();
+		final TreeSet<String> mdataNames = new TreeSet<String>();
 		for ( DashboardMetadata mdata : listProvider.getList() ) {
 			if ( mdata.isSelected() ) {
 				mdataNames.add(mdata.getFilename());
 			}
 		}
 		if ( mdataNames.size() < 1 ) {
-			Window.alert(NO_SELECTED_METADATA_TO_DELETE_MSG);
+			SocatUploadDashboard.showMessage(NO_SELECTED_METADATA_TO_DELETE_MSG);
 			return;
 		}
+
 		// Present the list of documents that will be deleted
 		// and ask the user to confirm
-		String message = DELETE_METADATA_MSG_PROLOGUE;
+		String message = DELETE_METADATA_HTML_PROLOGUE;
 		boolean first = true;
 		for ( String name : mdataNames ) {
 			if ( first )
 				first = false;
 			else
-				message += ", ";
+				message += "<li>" + SafeHtmlUtils.htmlEscape(name) + "</li>";
 			message += name;
 		}
-		message += DELETE_METADATA_MSG_EPILOGUE;
-		if ( ! Window.confirm(message) )
-			return;
+		message += DELETE_METADATA_HTML_EPILOGUE;
+		if ( askDeletePopup == null ) {
+			askDeletePopup = new DashboardAskPopup(DELETE_YES_TEXT, DELETE_NO_TEXT, 
+					new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean result) {
+					// Only continue if yes returned; ignore if no or null
+					if ( result == true )
+						continueDelete(mdataNames);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					// Never called
+					;
+				}
+			});
+		}
+		askDeletePopup.askQuestion(message);
+	}
+
+	private void continueDelete(TreeSet<String> mdataNames) {
 		// Send the request to the server
 		service.removeMetadata(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(),
@@ -287,14 +309,14 @@ public class MetadataManagerPage extends Composite {
 					updateMetadataList(expocode, mdataList);
 				}
 				else {
-					Window.alert(DELETE_METADATA_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(DELETE_METADATA_FAIL_MSG + 
 							" (unexpected invalid metadata list)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(DELETE_METADATA_FAIL_MSG + 
-						" (" + ex.getMessage() + ")");
+				SocatUploadDashboard.showMessage(DELETE_METADATA_FAIL_MSG + 
+						" (" + SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
 			}
 		});
 	}

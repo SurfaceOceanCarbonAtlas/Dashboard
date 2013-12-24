@@ -32,6 +32,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String CRUISE_INFO_FILENAME_EXTENSION = ".properties";
 	private static final String DATA_OWNER_ID = "dataowner";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
+	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
 	private static final String METADATA_FILENAMES_ID = "metadatafilenames";
 	private static final String QC_STATUS_ID = "qcstatus";
@@ -601,6 +602,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruiseProps.setProperty(DATA_OWNER_ID, cruise.getOwner());
 		// Upload filename
 		cruiseProps.setProperty(UPLOAD_FILENAME_ID, cruise.getUploadFilename());
+		// Upload timestamp
+		cruiseProps.setProperty(UPLOAD_TIMESTAMP_ID, cruise.getUploadTimestamp());
 		// Data-check status string
 		cruiseProps.setProperty(DATA_CHECK_STATUS_ID, cruise.getDataCheckStatus());
 		// Metadata documents
@@ -789,6 +792,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					UPLOAD_FILENAME_ID + " given in " + infoFile.getPath());			
 		cruise.setUploadFilename(value);
+
+		// Time of uploading the file
+		value = cruiseProps.getProperty(UPLOAD_TIMESTAMP_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					UPLOAD_TIMESTAMP_ID + " given in " + infoFile.getPath());			
+		cruise.setUploadTimestamp(value);
 
 		// Data check status
 		value = cruiseProps.getProperty(DATA_CHECK_STATUS_ID);

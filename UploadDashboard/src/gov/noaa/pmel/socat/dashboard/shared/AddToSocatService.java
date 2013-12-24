@@ -40,27 +40,4 @@ public interface AddToSocatService extends RemoteService {
 			HashSet<String> cruiseExpocodes, String archiveStatus) 
 					throws IllegalArgumentException;
 
-	/**
-	 * After authenticating the user using the given credentials,
-	 * sets the archive status for a cruise.
-	 * 
-	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
-	 * @param expocode
-	 * 		expocode of cruise to use
-	 * @param archiveStatus
-	 * 		archive status to assign to the cruise
-	 * @return
-	 * 		updated dashboard listing of all cruises for the user
-	 * @throws IllegalArgumentException
-	 * 		if authentication failed,
-	 * 		if the dashboard cruise does not exist, or 
-	 * 		if adding the cruise data failed
-	 */
-	void setCruiseArchiveStatus(String username, String passhash,
-			String expocode, String archiveStatus) 
-					throws IllegalArgumentException;
-
 }

@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 5834625831282119117L;
+	private static final long serialVersionUID = -1015467419823198744L;
 
 	boolean selected;
 	String owner;
@@ -28,6 +28,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	String qcStatus;
 	String archiveStatus;
 	String uploadFilename;
+	String uploadTimestamp;
 	int numDataRows;
 	ArrayList<String> userColNames;
 	ArrayList<DataColumnType> dataColTypes;
@@ -43,6 +44,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		qcStatus = "";
 		archiveStatus = "";
 		uploadFilename = "";
+		uploadTimestamp = "";
 		numDataRows = 0;
 		dataColTypes = new ArrayList<DataColumnType>();
 		userColNames = new ArrayList<String>();
@@ -211,6 +213,26 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the uploaded data timestamp; never null
+	 */
+	public String getUploadTimestamp() {
+		return uploadTimestamp;
+	}
+
+	/**
+	 * @param uploadTimestamp 
+	 * 		the uploaded data timestamp (after trimming) to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setUploadTimestamp(String uploadTimestamp) {
+		if ( uploadTimestamp == null )
+			this.uploadTimestamp = "";
+		else
+			this.uploadTimestamp = uploadTimestamp.trim();
+	}
+
+	/**
+	 * @return 
 	 * 		the total number of data measurements (data rows) 
 	 * 		for the cruise
 	 */
@@ -327,6 +349,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
 		result = result * prime + uploadFilename.hashCode();
+		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + numDataRows;
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
@@ -362,6 +385,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! uploadFilename.equals(other.uploadFilename) )
 			return false;
+		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
+			return false;
 		if ( numDataRows != other.numDataRows )
 			return false;
 		if ( ! userColNames.equals(other.userColNames) )
@@ -386,6 +411,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    uploadFilename=" + uploadFilename +
+				",\n    uploadTimestamp=" + uploadTimestamp +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
@@ -558,6 +584,25 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			if ( c2 == null )
 				return 1;
 			return c1.getUploadFilename().compareTo(c2.getUploadFilename());
+		}
+	};
+
+	/**
+	 * Compare using the upload timestamp of the cruises
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
+	 */
+	public static Comparator<DashboardCruise> timestampComparator = 
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getUploadTimestamp().compareTo(c2.getUploadTimestamp());
 		}
 	};
 

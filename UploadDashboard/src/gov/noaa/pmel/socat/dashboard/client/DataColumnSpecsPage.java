@@ -4,14 +4,15 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
-import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
+import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -24,7 +25,6 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -48,7 +48,7 @@ public class DataColumnSpecsPage extends Composite {
 
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String SUBMIT_TEXT = "OK";
-	private static final String CANCEL_TEXT = "Return to Cruise List";
+	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String INTRO_PROLOGUE = 
@@ -81,6 +81,16 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String SUBMIT_SUCCESS_MSG = 
 			"Columns specifications updated for cruise: ";
 
+	private static final String KEEP_DELETE_NEW_CRUISE_HTML_PROLOGUE =
+			"<b>";
+	private static final String KEEP_DELETE_NEW_CRUISE_HTML_EPILOGUE = 
+			"</b>: This cruise was just uploaded but has <b>not</b> been " +
+			"assigned acceptable column types.  Do you want to keep or " +
+			"delete this cruise? ";
+	private static final String KEEP_TEXT = "Keep";
+	private static final String DELETE_TEXT = "Delete";
+
+
 	interface CruiseDataColumnSpecsPageUiBinder 
 			extends UiBinder<Widget, DataColumnSpecsPage> {
 	}
@@ -102,8 +112,12 @@ public class DataColumnSpecsPage extends Composite {
 
 	// Username associated with this page
 	private String username;
+	// Popup to confirm deleting a cruise just added
+	private DashboardAskPopup okayToDeletePopup;
 	// Cruise associated with and updated by this page
 	private DashboardCruise cruise;
+	// Was this page called from the cruise upload page?
+	private boolean fromUpload;
 	// List of CruiseDataColumn objects associated with the column Headers
 	private ArrayList<CruiseDataColumn> cruiseDataCols;
 	// Asynchronous data provider for the data grid 
@@ -145,8 +159,8 @@ public class DataColumnSpecsPage extends Composite {
 					}
 					@Override
 					public void onFailure(Throwable ex) {
-						Window.alert(MORE_DATA_FAIL_MSG + 
-								" (" + ex.getMessage() + ")");
+						SocatUploadDashboard.showMessage(MORE_DATA_FAIL_MSG + " (" + 
+								SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
 					}
 				});
 			}
@@ -163,8 +177,11 @@ public class DataColumnSpecsPage extends Composite {
 	 * 
 	 * @param expocode
 	 * 		show the specifications for this cruise
+	 * @param fromUpload
+	 * 		was this called from the cruise upload page?  This is used 
+	 * 		to determine the actions to take if this page is cancelled.
 	 */
-	static void showPage(String expocode) {
+	static void showPage(String expocode, final boolean fromUpload) {
 		service.getCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
 								DashboardLoginPage.getPasshash(), expocode, 
 								new AsyncCallback<DashboardCruiseWithData>() {
@@ -173,19 +190,20 @@ public class DataColumnSpecsPage extends Composite {
 				if ( cruiseSpecs != null ) {
 					if ( singleton == null )
 						singleton = new DataColumnSpecsPage();
-					SocatUploadDashboard.get().updateCurrentPage(singleton);
+					SocatUploadDashboard.updateCurrentPage(singleton);
+					singleton.fromUpload = fromUpload;
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
 					History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
 				}
 				else {
-					Window.alert(GET_COLUMN_SPECS_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
 						" (unexpected null cruise column specificiations)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(GET_COLUMN_SPECS_FAIL_MSG + 
-						" (" + ex.getMessage() + ")");
+				SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
+						" (" + SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
 			}
 		});
 	}
@@ -205,7 +223,7 @@ public class DataColumnSpecsPage extends Composite {
 			DashboardLoginPage.showPage(true);
 		}
 		else {
-			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
 				History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
 		}
@@ -312,9 +330,43 @@ public class DataColumnSpecsPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
-		// Change to the latest cruise listing page, which may  
-		// have been updated from previous actions on this page.
-		CruiseListPage.showPage(false);
+		if ( fromUpload ) {
+			// From the cruise upload page;
+			// ask if the cruise should be deleted.
+			if ( okayToDeletePopup == null ) {
+				okayToDeletePopup = new DashboardAskPopup(KEEP_TEXT, DELETE_TEXT, 
+						new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean keepIt) {
+						// Only delete the cruise if the answer was delete; do nothing 
+						// if the answer was keep or null (window closed somehow)
+						if ( keepIt == false ) {
+							HashSet<String> cruiseSet = new HashSet<String>();
+							cruiseSet.add(cruise.getExpocode());
+							// Delete the cruise and update the CruiseListPage
+							CruiseListPage.deleteCruises(cruiseSet);
+						}
+						// Return to the cruise upload page
+						CruiseUploadPage.showPage();
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			// Assign and show the question
+			okayToDeletePopup.askQuestion(
+					KEEP_DELETE_NEW_CRUISE_HTML_PROLOGUE + 
+					SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + 
+					KEEP_DELETE_NEW_CRUISE_HTML_EPILOGUE);
+		}
+		else {
+			// Change to the latest cruise listing page, which may  
+			// have been updated from previous actions on this page.
+			CruiseListPage.showPage(false);
+		}
 	}
 
 	@UiHandler("submitButton")
@@ -337,10 +389,10 @@ public class DataColumnSpecsPage extends Composite {
 					first = false;
 				else
 					sb.append(", ");
-				sb.append(colNames.get(idx));
+				sb.append(SafeHtmlUtils.htmlEscape(colNames.get(idx)));
 			}
 			sb.append(UNKNOWN_COLUMN_TYPE_MSG);
-			Window.alert(sb.toString());
+			SocatUploadDashboard.showMessage(sb.toString());
 			return;
 		}
 
@@ -354,16 +406,20 @@ public class DataColumnSpecsPage extends Composite {
 			public void onSuccess(DashboardCruiseWithData specs) {
 				if ( specs != null ) {
 					updateCruiseColumnSpecs(specs);
-					Window.alert(SUBMIT_SUCCESS_MSG + specs.getExpocode());
+					// TODO: if failure, stay on page; if success, return to CruiseListPage
+					SocatUploadDashboard.showMessage(SUBMIT_SUCCESS_MSG + 
+							SafeHtmlUtils.htmlEscape(specs.getExpocode()));
+					CruiseListPage.showPage(false);
 				}
 				else {
-					Window.alert(SUBMIT_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(SUBMIT_FAIL_MSG + 
 							" (unexpected null cruise column specificiations)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(SUBMIT_FAIL_MSG + " (" + ex.getMessage() + ")");
+				SocatUploadDashboard.showMessage(SUBMIT_FAIL_MSG + " (" + 
+						SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
 			}
 		});
 	}

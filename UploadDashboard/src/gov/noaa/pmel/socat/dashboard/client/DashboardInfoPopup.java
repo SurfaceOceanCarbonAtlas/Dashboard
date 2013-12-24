@@ -12,11 +12,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * An info message that is embedded within a PopupPanel.
+ * An message embedded within a PopupPanel.
  * 
  * @author Karl Smith
  */
@@ -31,27 +31,27 @@ public class DashboardInfoPopup extends Composite {
 	private static DashboardInfoPopupUiBinder uiBinder = 
 			GWT.create(DashboardInfoPopupUiBinder.class);
 
-	@UiField HTML infoHTML;
+	@UiField HTML infoHtml;
 	@UiField Button dismissButton;
 
 	private PopupPanel parentPanel;
 
 	/**
-	 * Creates an empty info message widget within a PopupPanel.
+	 * Creates an empty message within a PopupPanel.
 	 * The popup includes a dismiss button to hide it.  
-	 * Sets auto-hide so clicking outside the popup will also 
-	 * hide it.  
+	 * Sets auto-hide so clicking outside the popup 
+	 * will also hide it.  
 	 * Use {@link #setInfoMessage(String)} to assign 
 	 * the message to be displayed.  
-	 * Use {@link #showAtPosition(int, int)} to show the 
-	 * popup at the specified location.
+	 * Use {@link #showAtPosition(int, int)} 
+	 * or {@link #showInCenterOf(UIObject)} 
+	 * to show the popup.
 	 */
 	DashboardInfoPopup() {
 		initWidget(uiBinder.createAndBindUi(this));
 		dismissButton.setText(DISMISS_TEXT);
-		parentPanel = new PopupPanel();
+		parentPanel = new PopupPanel(true);
 		parentPanel.setWidget(this);
-		parentPanel.setAutoHideEnabled(true);
 	}
 
 	/**
@@ -60,24 +60,25 @@ public class DashboardInfoPopup extends Composite {
 	 * 		For safety, use only known (static) HTML.
 	 */
 	void setInfoMessage(String htmlMessage) {
-		infoHTML.setHTML(htmlMessage);
+		infoHtml.setHTML(htmlMessage);
 	}
 
 	/**
-	 * Show the popup at the specified location.
+	 * Show the popup relative to the given object.
+	 * See {@link PopupPanel#showRelativeTo(UIObject)}.
 	 * 
-	 * @param left
-	 * 		absolute position of the left edge of the popup
-	 * @param top
-	 * 		absolute position of the top edge of the popup
+	 * @param obj
+	 * 		show relative to this UI object
 	 */
-	void showAtPosition(final int left, final int top) {
-		parentPanel.setPopupPositionAndShow(new PositionCallback() {
-			@Override
-			public void setPosition(int offsetWidth, int offsetHeight) {
-				parentPanel.setPopupPosition(left, top);
-			}
-		});
+	void showRelativeTo(UIObject obj) {
+		parentPanel.showRelativeTo(obj);
+	}
+
+	/**
+	 * Show the popup centered in the browser window.
+	 */
+	void showCentered() {
+		parentPanel.center();
 	}
 
 	@UiHandler("dismissButton")

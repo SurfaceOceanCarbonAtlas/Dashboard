@@ -14,7 +14,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -103,7 +102,7 @@ public class DashboardLoginPage extends Composite {
 		if ( singleton == null )
 			singleton = new DashboardLoginPage();
 		clearAuthentication();
-		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		SocatUploadDashboard.updateCurrentPage(singleton);
 		if ( addToHistory )
 			History.newItem(PagesEnum.LOGIN.name(), false);
 	}
@@ -184,7 +183,7 @@ public class DashboardLoginPage extends Composite {
 			CruiseListPage.showPage(true);
 		}
 		else {
-			Window.alert(NO_CREDENTIALS_ERROR_MSG);
+			SocatUploadDashboard.showMessage(NO_CREDENTIALS_ERROR_MSG);
 		}
 	}
 

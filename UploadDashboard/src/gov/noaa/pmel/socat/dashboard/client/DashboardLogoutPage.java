@@ -9,12 +9,12 @@ import gov.noaa.pmel.socat.dashboard.shared.LogoutServiceAsync;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -83,7 +83,7 @@ public class DashboardLogoutPage extends Composite {
 	static void showPage() {
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.LOGOUT.name(), false);
 		service.logoutUser(DashboardLoginPage.getUsername(),
 						   DashboardLoginPage.getPasshash(),
@@ -95,12 +95,13 @@ public class DashboardLogoutPage extends Composite {
 					DashboardLoginPage.clearAuthentication();
 				}
 				else {
-					Window.alert(REQUEST_FAILED_MSG);
+					SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG);
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				Window.alert(REQUEST_FAILED_MSG + " (" + ex.getMessage() + ")");
+				SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG + " (" + 
+						SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
 			}
 		});
 	}
@@ -116,7 +117,7 @@ public class DashboardLogoutPage extends Composite {
 		// Allow this succeed even if never called before
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		SocatUploadDashboard.updateCurrentPage(singleton);
 		if ( addToHistory )
 			History.newItem(PagesEnum.LOGOUT.name(), false);
 	}

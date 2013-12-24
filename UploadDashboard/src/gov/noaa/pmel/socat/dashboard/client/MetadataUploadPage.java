@@ -20,7 +20,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -65,9 +65,12 @@ public class MetadataUploadPage extends Composite {
 			"Please select a metadata file to upload";
 
 	private static final String OVERWRITE_WARNING_MSG_PROLOGUE = 
-			"This will replace the metadata document for cruise ";
+			"The following metadata documents for this cruise will be " +
+			"overwritten: <ul>";
 	private static final String OVERWRITE_WARNING_MSG_EPILOGUE =
-			" Do you wish to proceed?";
+			"</ul> Do you wish to proceed?";
+	private static final String OVERWRITE_YES_TEXT = "Yes";
+	private static final String OVERWRITE_NO_TEXT = "No";
 
 	interface MetadataUploadPageUiBinder 
 			extends UiBinder<Widget, MetadataUploadPage> {
@@ -91,6 +94,8 @@ public class MetadataUploadPage extends Composite {
 	private String username;
 	private HashSet<DashboardCruise> cruises;
 	private TreeSet<String> expocodes;
+	private DashboardAskPopup askOverwritePopup;
+	private boolean okayToOverwrite;
 
 	// Singleton instance of this page
 	private static MetadataUploadPage singleton = null;
@@ -100,6 +105,7 @@ public class MetadataUploadPage extends Composite {
 		username = "";
 		cruises = new HashSet<DashboardCruise>();
 		expocodes = new TreeSet<String>();
+		askOverwritePopup = null;
 
 		logoutButton.setText(LOGOUT_TEXT);
 
@@ -123,7 +129,7 @@ public class MetadataUploadPage extends Composite {
 		if ( singleton == null )
 			singleton = new MetadataUploadPage();
 		singleton.updateCruises(cruises);
-		SocatUploadDashboard.get().updateCurrentPage(singleton);
+		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.METADATA_UPLOAD.name(), false);
 	}
 
@@ -164,7 +170,7 @@ public class MetadataUploadPage extends Composite {
 			DashboardLoginPage.showPage(true);
 		}
 		else {
-			SocatUploadDashboard.get().updateCurrentPage(singleton);
+			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
 				History.newItem(PagesEnum.METADATA_UPLOAD.name(), false);
 		}
@@ -212,11 +218,25 @@ public class MetadataUploadPage extends Composite {
 		passhashToken.setValue("");
 		timestampToken.setValue("");
 		expocodesToken.setValue("");
+
+		// Set to ask about any overwrites
+		okayToOverwrite = false;
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
+	}
+
+	@UiHandler("cancelButton")
+	void cancelButtonOnClick(ClickEvent event) {
+		if ( expocodes.size() == 1 ) {
+			// Return to the metadata list page exactly as it was
+			MetadataManagerPage.redisplayPage(true);
+		}
+		else {
+			CruiseListPage.redisplayPage(true);
+		}
 	}
 
 	@UiHandler("uploadButton") 
@@ -235,64 +255,101 @@ public class MetadataUploadPage extends Composite {
 		uploadForm.submit();
 	}
 
-	@UiHandler("cancelButton")
-	void cancelButtonOnClick(ClickEvent event) {
-		if ( expocodes.size() == 1 ) {
-			// Return to the metadata list page exactly as it was
-			MetadataManagerPage.redisplayPage(true);
-		}
-		else {
-			CruiseListPage.redisplayPage(true);
-		}
-	}
-
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
 		// Make sure a file was selected
 		String uploadFilename = metadataUpload.getFilename();
 		if ( (uploadFilename == null) || uploadFilename.trim().isEmpty() ) {
-			Window.alert(NO_FILE_ERROR_MSG);
 			event.cancel();
+			usernameToken.setValue("");
+			passhashToken.setValue("");
+			timestampToken.setValue("");
+			expocodesToken.setValue("");
+			okayToOverwrite = false;
+			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
-		// Warn about any overwrites that will happen
+
+		// If this is a resubmit with overwriting, let the submit go through
+		// (event is not cancelled)
+		if ( okayToOverwrite ) {
+			okayToOverwrite = false;
+			return;
+		}
+
+		// Check for any overwrites that will happen
+		String message = OVERWRITE_WARNING_MSG_PROLOGUE;
+		boolean willOverwrite = false;
 		for ( DashboardCruise cruz : cruises ) {
 			String mdataName = DashboardUtils.metadataFilename(
 										cruz.getExpocode(), uploadFilename);
 			if ( cruz.getMetadataFilenames().contains(mdataName) ) {
-				String warning = OVERWRITE_WARNING_MSG_PROLOGUE +
-						cruz.getExpocode() + OVERWRITE_WARNING_MSG_EPILOGUE;
-				if ( ! Window.confirm(warning) ) {
-					event.cancel();
-					return;
-				}
+				message += "<li>" + SafeHtmlUtils.htmlEscape(mdataName) + "</li>";
+				willOverwrite = true;
 			}
 		}
+
+		// If an overwrite will occur, cancel this submit and ask for confirmation
+		if ( willOverwrite ) {
+			event.cancel();
+			message += OVERWRITE_WARNING_MSG_EPILOGUE;
+			if ( askOverwritePopup == null ) {
+				askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT, 
+						OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+						// Resubmit only if yes; clear tokens if no or null
+						if ( result == true ) {
+							okayToOverwrite = true;
+							uploadForm.submit();
+						}
+						else {
+							usernameToken.setValue("");
+							passhashToken.setValue("");
+							timestampToken.setValue("");
+							expocodesToken.setValue("");
+							okayToOverwrite = false;
+						}
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			askOverwritePopup.askQuestion(message);
+			return;
+		}
+
+		// Nothing overwritten, let the submit continue
+		// (event not cancelled)
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
-		// Clear the "hidden" values
 		usernameToken.setValue("");
 		passhashToken.setValue("");
 		timestampToken.setValue("");
 		expocodesToken.setValue("");
+		okayToOverwrite = false;
 
 		// Check the result returned
 		String resultMsg = event.getResults();
 		if ( resultMsg == null ) {
-			Window.alert("Unexpected null result from submit complete");
+			SocatUploadDashboard.showMessage(
+					"Unexpected null result from submit complete");
 			return;
 		}
 
 		String[] tagMsg = resultMsg.split("\n", 2);
 		if ( tagMsg.length < 2 ) {
 			// probably an error response; just display the entire message
-			Window.alert(resultMsg);
+			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
 		}
 		else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file(s) created or updated
-			Window.alert(tagMsg[1]);
+			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(tagMsg[1]));
 			if ( expocodes.size() == 1 ) {
 				// return to the metadata manager, having it
 				// request the updated cruise from the server 
@@ -306,7 +363,7 @@ public class MetadataUploadPage extends Composite {
 		}
 		else {
 			// Unknown response with a newline, just display the entire message
-			Window.alert(resultMsg);
+			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
 		}
 	}
 

@@ -38,26 +38,4 @@ public interface AddToSocatServiceAsync {
 			HashSet<String> cruiseExpocodes, String archiveStatus,
 			AsyncCallback<Void> callback);
 
-	/**
-	 * Client-side interface for setting the archive status 
-	 * for a cruise.
-	 * 
-	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
-	 * @param expocode
-	 * 		expocode of cruise to use
-	 * @param archiveStatus
-	 * 		archive status to assign to the cruise
-	 * @param callback
-	 * 		the callback to make with the updated cruise listing;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed or if the change to the cruise
-	 * 		failed.
-	 */
-	void setCruiseArchiveStatus(String username, String passhash, 
-			String expocode, String archiveStatus, 
-			AsyncCallback<Void> callback);
-
 }
