@@ -9,7 +9,6 @@ import gov.noaa.pmel.socat.dashboard.shared.LogoutServiceAsync;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -100,8 +99,7 @@ public class DashboardLogoutPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG + " (" + 
-						SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(REQUEST_FAILED_MSG, ex);
 			}
 		});
 	}

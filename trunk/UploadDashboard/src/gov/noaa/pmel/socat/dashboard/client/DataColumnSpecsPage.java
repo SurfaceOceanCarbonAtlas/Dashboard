@@ -159,8 +159,7 @@ public class DataColumnSpecsPage extends Composite {
 					}
 					@Override
 					public void onFailure(Throwable ex) {
-						SocatUploadDashboard.showMessage(MORE_DATA_FAIL_MSG + " (" + 
-								SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+						SocatUploadDashboard.showFailureMessage(MORE_DATA_FAIL_MSG, ex);
 					}
 				});
 			}
@@ -202,8 +201,7 @@ public class DataColumnSpecsPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
-						" (" + SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(GET_COLUMN_SPECS_FAIL_MSG, ex);
 			}
 		});
 	}
@@ -418,8 +416,7 @@ public class DataColumnSpecsPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(SUBMIT_FAIL_MSG + " (" + 
-						SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
 			}
 		});
 	}

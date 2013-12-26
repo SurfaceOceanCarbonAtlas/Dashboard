@@ -167,8 +167,7 @@ public class MetadataManagerPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(METADATA_LIST_FAIL_MSG + 
-						" (" + SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(METADATA_LIST_FAIL_MSG, ex);
 			}
 		});
 	}
@@ -315,8 +314,7 @@ public class MetadataManagerPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(DELETE_METADATA_FAIL_MSG + 
-						" (" + SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(DELETE_METADATA_FAIL_MSG, ex);
 			}
 		});
 	}
