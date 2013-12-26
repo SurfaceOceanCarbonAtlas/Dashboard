@@ -286,8 +286,7 @@ public class CruiseListPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(errMsg + " (" + 
-						SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(errMsg, ex);
 			}
 		});
 	}
@@ -371,8 +370,7 @@ public class CruiseListPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showMessage(errMsg + " (" + 
-						SafeHtmlUtils.htmlEscape(ex.getMessage()) + ")");
+				SocatUploadDashboard.showFailureMessage(errMsg, ex);
 			}
 		});
 	}

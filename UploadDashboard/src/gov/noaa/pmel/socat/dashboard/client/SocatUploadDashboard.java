@@ -3,6 +3,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -78,6 +79,27 @@ public class SocatUploadDashboard
 			singleton.msgPopup = new DashboardInfoPopup();
 		singleton.msgPopup.setInfoMessage(htmlMsg);
 		singleton.msgPopup.showCentered();
+	}
+
+	/**
+	 * Shows an error message, along with the message from an
+	 * exception, in a popup panel centered on the page.
+	 * 
+	 * @param htmlMsg
+	 * 		unchecked HTML message to show before the exception message
+	 * @param ex
+	 * 		exception whose message is to be shown
+	 */
+	public static void showFailureMessage(String htmlMsg, Throwable ex) {
+		String exceptMsg = ex.getMessage();
+		if ( exceptMsg == null )
+			exceptMsg = htmlMsg;
+		else if ( exceptMsg.contains("</pre>") )
+			exceptMsg = htmlMsg + "<br /><pre>" + 
+					SafeHtmlUtils.htmlEscape(exceptMsg) + "</pre>";
+		else
+			exceptMsg = htmlMsg + "<br /><pre>" + exceptMsg + "</pre>";
+		SocatUploadDashboard.showMessage(exceptMsg);
 	}
 
 	/**

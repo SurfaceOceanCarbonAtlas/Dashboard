@@ -17,6 +17,9 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
+import uk.ac.uea.socat.sanitychecker.SanityChecker;
+import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
+
 import com.googlecode.gwt.crypto.bouncycastle.DataLengthException;
 import com.googlecode.gwt.crypto.bouncycastle.InvalidCipherTextException;
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
@@ -30,7 +33,8 @@ public class DashboardDataStore {
 
 	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
 	private static final String CONFIG_RELATIVE_FILENAME = "content" + 
-			File.separator + SERVER_APP_NAME + File.separator + "config.properties";
+			File.separator + SERVER_APP_NAME + File.separator + 
+			"SocatUploadDashboard.properties";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
 	private static final String SOCAT_VERSION_NAME_TAG = "SocatVersion";
@@ -45,7 +49,8 @@ public class DashboardDataStore {
 	private static final String CONFIG_FILE_INFO_MSG = 
 			"This configuration file should look something like: \n" +
 			"# ------------------------------ \n" +
-			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
+			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, " +
+					"13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
 			SOCAT_VERSION_NAME_TAG + "=SomeValue \n" +
 			SVN_USER_NAME_TAG + "=SVNUsername" +
@@ -53,6 +58,10 @@ public class DashboardDataStore {
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
+			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
+			BaseConfig.SOCAT_CONFIG_FILE + "=/Path/To/DataColumnConfig/CSVFile \n" + 
+			BaseConfig.COLUMN_SPEC_SCHEMA_FILE + "=/Path/To/ColumnSpecSchema/XMLFile \n" + 
+			BaseConfig.COLUMN_CONVERSION_FILE + "=/Path/To/ColumnConversion/PropsFile \n" + 
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeManagerName=AnotherVeryLongKeyOfHexidecimalValues \n" +
@@ -106,7 +115,7 @@ public class DashboardDataStore {
 		}
 		catch ( Exception ex ) {
 			throw new IOException("Problems reading " + configFile.getPath() +
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					"\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		String propVal;
 		// Read the encryption key from the data store and initialize the cipher with it
@@ -122,8 +131,8 @@ public class DashboardDataStore {
 			cipher.setKey(encryptionKey);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ENCRYPTION_KEY_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the salt string from the data store
 		try {
@@ -137,8 +146,8 @@ public class DashboardDataStore {
 			encryptionSalt = propVal;
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ENCRYPTION_SALT_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the SOCAT version
 		try {
@@ -151,8 +160,8 @@ public class DashboardDataStore {
 			socatVersion = propVal;
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + SOCAT_VERSION_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the SVN username
 		String svnUsername;
@@ -166,16 +175,14 @@ public class DashboardDataStore {
 			svnUsername = propVal;
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + SVN_USER_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the SVN password; can be blank or not given
 		String svnPassword = "";
 		propVal = configProps.getProperty(SVN_PASSWORD_NAME_TAG);
-		if ( propVal != null ) {
-			propVal = propVal.trim();
+		if ( propVal != null )
 			svnPassword = propVal.trim();
-		}
 		// Read the user files directory name
 		try {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
@@ -186,8 +193,8 @@ public class DashboardDataStore {
 					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the cruise files directory name
 		try {
@@ -199,8 +206,8 @@ public class DashboardDataStore {
 					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + CRUISE_FILES_DIR_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the metadata files directory name
 		try {
@@ -212,8 +219,16 @@ public class DashboardDataStore {
 					svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
-					" value specified in " + configFile.getPath() + 
-					" : " + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// Sanity checker initialization from this same properties file 
+		try {
+			SanityChecker.initConfig(configFile.getAbsolutePath());
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid SanityChecker configuration" + 
+					" values specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
@@ -230,9 +245,9 @@ public class DashboardDataStore {
 			try {
 				userInfo = new DashboardUserInfo(username, hash);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IOException(ex.getMessage() + " for " + username +
-						" specified in " + configFile.getPath() + 
-						"\n" + CONFIG_FILE_INFO_MSG);
+				throw new IOException(ex.getMessage() + "\n" +
+						"for " + username + " specified in " + 
+						configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
 			}
 			userInfoMap.put(username, userInfo);
 		}
@@ -254,9 +269,9 @@ public class DashboardDataStore {
 			try {
 				userInfo.addUserRoles(rolesString);
 			} catch ( IllegalArgumentException ex ) {
-				throw new IOException(ex.getMessage() + " for " + username +
-						" specified in " + configFile.getPath() + 
-						"\n" + CONFIG_FILE_INFO_MSG);
+				throw new IOException(ex.getMessage() + "\n" +
+						"for " + username + " specified in " + 
+						configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
 			}
 		}
 	}

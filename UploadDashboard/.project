@@ -32,4 +32,11 @@
 		<nature>com.google.gwt.eclipse.core.gwtNature</nature>
 		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/log4j.properties</name>
+			<type>1</type>
+			<locationURI>PROJECT_LOC/war/WEB-INF/lib/log4j.properties</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

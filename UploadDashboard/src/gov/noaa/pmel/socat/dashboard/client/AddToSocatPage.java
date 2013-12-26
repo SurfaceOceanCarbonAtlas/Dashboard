@@ -377,9 +377,7 @@ public class AddToSocatPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				// Unexpected problems - show the error message
-				SocatUploadDashboard.showMessage(SUBMIT_FAILURE_MSG + 
-						SafeHtmlUtils.htmlEscape(ex.getMessage()));
+				SocatUploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
 			}
 		});
 	}

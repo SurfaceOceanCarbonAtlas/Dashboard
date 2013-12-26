@@ -39,8 +39,6 @@ public class DashboardInfoPopup extends Composite {
 	/**
 	 * Creates an empty message within a PopupPanel.
 	 * The popup includes a dismiss button to hide it.  
-	 * Sets auto-hide so clicking outside the popup 
-	 * will also hide it.  
 	 * Use {@link #setInfoMessage(String)} to assign 
 	 * the message to be displayed.  
 	 * Use {@link #showAtPosition(int, int)} 
@@ -50,7 +48,7 @@ public class DashboardInfoPopup extends Composite {
 	DashboardInfoPopup() {
 		initWidget(uiBinder.createAndBindUi(this));
 		dismissButton.setText(DISMISS_TEXT);
-		parentPanel = new PopupPanel(true);
+		parentPanel = new PopupPanel(false);
 		parentPanel.setWidget(this);
 	}
 

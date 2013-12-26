@@ -3,13 +3,24 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+
+import uk.ac.uea.socat.sanitychecker.SanityChecker;
+import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
+import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
+import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -110,8 +121,41 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 					cruiseData.getDataColTypes().size());
 		cruiseData.setDataColTypes(newSpecs.getDataColTypes());
 		cruiseData.setDataColUnits(newSpecs.getDataColUnits());
-		// TODO?: revise the data descriptions to the standard if it is a 
-		// well-known type (not delete, unknown, or supplemental) ?
+
+		// Create the metadata properties of this cruise for the sanity checker
+		Properties metadataInput = new Properties();
+		metadataInput.setProperty("ExpoCode", cruiseData.getExpocode());
+
+		// Create the Document specifying the columns in this cruise data
+		Element rootElement = new Element("Expocode_" + cruiseData.getExpocode());
+		Document cruiseDoc = new Document(rootElement);
+		// TODO: add column specifications to the document
+
+		// Create the column specification of this cruise for the sanity checker
+		File name = new File(cruiseData.getExpocode());
+		ColumnSpec colSpec;
+		ColumnConversionConfig convConfig = null;
+		Logger logger = Logger.getLogger("Sanity Checker - " + 
+				cruiseData.getExpocode());
+		try {
+			colSpec = new ColumnSpec(name, cruiseDoc, convConfig, logger);
+		} catch (InvalidColumnSpecException ex) {
+			throw new IllegalArgumentException(
+					"Column Specification Exception: " + ex.getMessage());
+		};
+
+		// Specify the date format used in this cruise 
+		String dateFormat = "YYYY-MM-DD ";
+		
+
+		SanityChecker checker;
+		try {
+			checker = new SanityChecker(cruiseData.getExpocode(), metadataInput, 
+					colSpec, cruiseData.getDataValues(), dateFormat);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException(
+					"Sanity Checker Exception: " + ex.getMessage());
+		}
 
 		// TODO: run the SanityChecker on the cruise data 
 		//       with the updated cruise column specifications
@@ -119,6 +163,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		//       to DashboardCruiseWithData to indicate questionable 
 		//       and bad data values, and columns with minor or 
 		//       major problems.
+		// Output output = checker.process();
+		STUB:
 		cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 
 		// Save and commit the updated cruise columns
