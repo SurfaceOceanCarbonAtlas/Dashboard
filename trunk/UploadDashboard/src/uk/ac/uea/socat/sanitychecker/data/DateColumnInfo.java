@@ -123,7 +123,7 @@ public class DateColumnInfo {
 			processDateTimeElements(dateElement, logger);
 			break;
 		}
-		case 3:
+		case 6:
 		{
 			processIndividualColumnElements(dateElement, logger);
 			break;

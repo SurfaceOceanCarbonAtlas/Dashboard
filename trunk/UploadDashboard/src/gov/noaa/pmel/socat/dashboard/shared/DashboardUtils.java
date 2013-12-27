@@ -46,8 +46,9 @@ public class DashboardUtils {
 
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
 	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
-	public static final String CHECK_STATUS_QUESTIONABLE = "Questionable";
-	public static final String CHECK_STATUS_FAILED = "Failed";
+	public static final String CHECK_STATUS_QUESTIONABLE = "Possibly has errors";
+	public static final String CHECK_STATUS_ERRORS = "Has serious errors";
+	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
 
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
 	public static final String QC_STATUS_SUBMITTED = "Submitted";
@@ -90,15 +91,66 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "Pequ");
 		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "PPPP");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_EQU, "xCO2water_equ_dry");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_SST, "xCO2water_SST_dry");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_EQU, "pCO2water_equ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_SST, "pCO2water_SST_wet");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_EQU, "fCO2water_equ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_SST, "fCO2water_SST_wet");
+		STD_HEADER_NAMES.put(DataColumnType.USER_FCO2_REC, "fCO2_rec_user");
+		STD_HEADER_NAMES.put(DataColumnType.USER_FCO2_SRC, "fCO2_src_user");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_AIR, "fCO2_air");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED, "wind_speed");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION, "wind_direction");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2WATER_EQU, "xCO2water_equ_dry");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2WATER_SST, "xCO2water_SST_dry");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2WATER_EQU, "pCO2water_equ_wet");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2WATER_SST, "pCO2water_SST_wet");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fCO2water_equ_wet");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2WATER_SST, "fCO2water_SST_wet");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2AIR_DRY, "xCO2air_dry");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2AIR_EQU, "xCO2air_equ");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2AIR_WET, "pCO2air_wet");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2AIR_WET, "fCO2air_wet");
 		STD_HEADER_NAMES.put(DataColumnType.SUPPLEMENTAL, "(supplemental)");
 	}
 
+	/**
+	 * column names used by the sanity checker
+	 */
+	public static final EnumMap<DataColumnType,String> CHECKER_NAMES = 
+			new EnumMap<DataColumnType,String>(DataColumnType.class);
+	static {
+		CHECKER_NAMES.put(DataColumnType.IGNORE, "");
+		CHECKER_NAMES.put(DataColumnType.UNKNOWN, "");
+		CHECKER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
+		CHECKER_NAMES.put(DataColumnType.DATE, "date");
+		CHECKER_NAMES.put(DataColumnType.YEAR, "yr");
+		CHECKER_NAMES.put(DataColumnType.MONTH, "mon");
+		CHECKER_NAMES.put(DataColumnType.DAY, "day");
+		CHECKER_NAMES.put(DataColumnType.TIME, "time");
+		CHECKER_NAMES.put(DataColumnType.HOUR, "hh");
+		CHECKER_NAMES.put(DataColumnType.MINUTE, "mm");
+		CHECKER_NAMES.put(DataColumnType.SECOND, "ss");
+		CHECKER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
+		CHECKER_NAMES.put(DataColumnType.LATITUDE, "latitude");
+		CHECKER_NAMES.put(DataColumnType.SAMPLE_DEPTH, "depth");
+		CHECKER_NAMES.put(DataColumnType.SAMPLE_SALINITY, "sal");
+		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "temperature_equi");
+		CHECKER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "temp");
+		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "pressure_equi");
+		CHECKER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "pressure_atm");
+		CHECKER_NAMES.put(DataColumnType.USER_FCO2_REC, "fCO2_rec");
+		CHECKER_NAMES.put(DataColumnType.USER_FCO2_SRC, "fCO2_src");
+		CHECKER_NAMES.put(DataColumnType.FCO2_AIR, "fCO2_air");
+		CHECKER_NAMES.put(DataColumnType.WIND_SPEED, "wind_speed");
+		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION, "wind_direction");
+		CHECKER_NAMES.put(DataColumnType.XCO2WATER_EQU, "xCO2water_eq_dry");
+		CHECKER_NAMES.put(DataColumnType.XCO2WATER_SST, "xCO2water_sst_dry");
+		CHECKER_NAMES.put(DataColumnType.PCO2WATER_EQU, "pCO2water_eq_wet");
+		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST, "pCO2water_sst_wet");
+		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fCO2water_eq_wet");
+		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST, "fCO2water_sst_wet");
+		CHECKER_NAMES.put(DataColumnType.XCO2AIR_DRY, "xCO2air_dry");
+		CHECKER_NAMES.put(DataColumnType.XCO2AIR_EQU, "xCO2air_eq");
+		CHECKER_NAMES.put(DataColumnType.PCO2AIR_WET, "pCO2air_wet");
+		CHECKER_NAMES.put(DataColumnType.FCO2AIR_WET, "fCO2air_wet");
+		CHECKER_NAMES.put(DataColumnType.SUPPLEMENTAL, "");
+	}
 	/**
 	 * standard data descriptions of the standard data columns
 	 */
@@ -124,12 +176,21 @@ public class DashboardUtils {
 		STD_DESCRIPTIONS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "measured sea surface temperature");
 		STD_DESCRIPTIONS.put(DataColumnType.EQUILIBRATOR_PRESSURE, "equilibrator chamber pressure");
 		STD_DESCRIPTIONS.put(DataColumnType.SEA_LEVEL_PRESSURE, "measured atmospheric pressure");
-		STD_DESCRIPTIONS.put(DataColumnType.XCO2_EQU, "measured xCO2 (water) using equilibrator temperature (dry air)");
-		STD_DESCRIPTIONS.put(DataColumnType.XCO2_SST, "measured xCO2 (water) using sea surface temperature (dry air)");
-		STD_DESCRIPTIONS.put(DataColumnType.PCO2_EQU, "measured pCO2 (water) using equilibrator temperature (wet air)");
-		STD_DESCRIPTIONS.put(DataColumnType.PCO2_SST, "measured pCO2 (water) using sea surface temperature (wet air)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2_EQU, "measured fCO2 (water) using equilibrator temperature (wet air)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2_SST, "measured fCO2 (water) using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.USER_FCO2_REC, "user-provided recomputed fCO2");
+		STD_DESCRIPTIONS.put(DataColumnType.USER_FCO2_SRC, "method of computing user-provided fCO2");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_AIR, "measured air fCO2");
+		STD_DESCRIPTIONS.put(DataColumnType.WIND_SPEED, "wind speed");
+		STD_DESCRIPTIONS.put(DataColumnType.WIND_DIRECTION, "wind direction");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2WATER_EQU, "measured xCO2 (water) using equilibrator temperature (dry air)");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2WATER_SST, "measured xCO2 (water) using sea surface temperature (dry air)");
+		STD_DESCRIPTIONS.put(DataColumnType.PCO2WATER_EQU, "measured pCO2 (water) using equilibrator temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.PCO2WATER_SST, "measured pCO2 (water) using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2WATER_EQU, "measured fCO2 (water) using equilibrator temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2WATER_SST, "measured fCO2 (water) using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2AIR_DRY, " measured xCO2 (dry air)");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2AIR_EQU, "measured xCO2 (dry air) using equilibrator temperature");
+		STD_DESCRIPTIONS.put(DataColumnType.PCO2AIR_WET, "measured pCO2 (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2AIR_WET, "measured fCO2 (wet air)");
 		STD_DESCRIPTIONS.put(DataColumnType.SUPPLEMENTAL, "supplemental data to be kept");
 	}
 
@@ -153,18 +214,69 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("dec. deg. E")));
 		STD_DATA_UNITS.put(DataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("dec. deg. N")));
 		STD_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, new ArrayList<String>(Arrays.asList("meters")));
-		STD_DATA_UNITS.put(DataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(DataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("PSU")));
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
 		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
 		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
-		STD_DATA_UNITS.put(DataColumnType.XCO2_EQU, new ArrayList<String>(Arrays.asList("umol/mol")));
-		STD_DATA_UNITS.put(DataColumnType.XCO2_SST, new ArrayList<String>(Arrays.asList("umol/mol")));
-		STD_DATA_UNITS.put(DataColumnType.PCO2_EQU, new ArrayList<String>(Arrays.asList("uatm")));
-		STD_DATA_UNITS.put(DataColumnType.PCO2_SST, new ArrayList<String>(Arrays.asList("uatm")));
-		STD_DATA_UNITS.put(DataColumnType.FCO2_EQU, new ArrayList<String>(Arrays.asList("uatm")));
-		STD_DATA_UNITS.put(DataColumnType.FCO2_SST, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.USER_FCO2_REC, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.USER_FCO2_SRC, new ArrayList<String>(Arrays.asList("")));
+		STD_DATA_UNITS.put(DataColumnType.FCO2_AIR, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED, new ArrayList<String>(Arrays.asList("kn", "km/h", "m/s", "mph")));
+		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION, new ArrayList<String>(Arrays.asList("dec. deg.")));
+		STD_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU, new ArrayList<String>(Arrays.asList("umol/mol")));
+		STD_DATA_UNITS.put(DataColumnType.XCO2WATER_SST, new ArrayList<String>(Arrays.asList("umol/mol")));
+		STD_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.XCO2AIR_DRY, new ArrayList<String>(Arrays.asList("umol/mol")));
+		STD_DATA_UNITS.put(DataColumnType.XCO2AIR_EQU, new ArrayList<String>(Arrays.asList("umol/mol")));
+		STD_DATA_UNITS.put(DataColumnType.PCO2AIR_WET, new ArrayList<String>(Arrays.asList("uatm")));
+		STD_DATA_UNITS.put(DataColumnType.FCO2AIR_WET, new ArrayList<String>(Arrays.asList("uatm")));
 		STD_DATA_UNITS.put(DataColumnType.SUPPLEMENTAL, new ArrayList<String>(Arrays.asList("")));
+	}
+	/**
+	 * data units of the standard data columns used by the sanity checker
+	 */
+	public static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
+			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
+	static {
+		CHECKER_DATA_UNITS.put(DataColumnType.IGNORE, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
+		CHECKER_DATA_UNITS.put(DataColumnType.YEAR, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.MONTH, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.DAY, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.TIME, new ArrayList<String>(Arrays.asList("HH:MM:SS")));
+		CHECKER_DATA_UNITS.put(DataColumnType.HOUR, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.MINUTE, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SECOND, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("decimal_degrees")));
+		CHECKER_DATA_UNITS.put(DataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("decimal_degress")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, new ArrayList<String>(Arrays.asList("meters")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("psu")));
+		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("degC")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("degC")));
+		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		CHECKER_DATA_UNITS.put(DataColumnType.USER_FCO2_REC, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.USER_FCO2_SRC, new ArrayList<String>(Arrays.asList("")));
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_AIR, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED, new ArrayList<String>(Arrays.asList("kn", "km/h", "m/s", "mph")));
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION, new ArrayList<String>(Arrays.asList("decimal_degrees")));
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU, new ArrayList<String>(Arrays.asList("ppm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_SST, new ArrayList<String>(Arrays.asList("ppm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2AIR_DRY, new ArrayList<String>(Arrays.asList("ppm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2AIR_EQU, new ArrayList<String>(Arrays.asList("ppm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2AIR_WET, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2AIR_WET, new ArrayList<String>(Arrays.asList("uatm")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SUPPLEMENTAL, new ArrayList<String>(Arrays.asList("")));
 	}
 
 	/**
