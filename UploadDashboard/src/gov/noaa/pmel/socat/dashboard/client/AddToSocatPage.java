@@ -79,8 +79,14 @@ public class AddToSocatPage extends Composite {
 
 	private static final String METADATA_AUTOFAIL_HTML_PROLOGUE = 
 			"The following cruises do not have any metadata documents: <ul>";
+	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
+			"The following cruises have data that have not been checked, or have very " +
+			"serious errors detected by the automated data checking software: <ul>";
+	private static final String CANNOT_SUBMIT_HTML_EPILOGUE =
+			"</ul> These cruises cannot be added to SOCAT until these problems have " +
+			"been resolved.";
 	private static final String DATA_AUTOFAIL_HTML_PROLOGUE = 
-			"The following cruises have data with serious problems detected " +
+			"The following cruises have data with serious errors detected " +
 			"by the automated data checking software: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
 			"</ul> These cruises can be added to SOCAT, but will be automatically be " +
@@ -267,27 +273,39 @@ public class AddToSocatPage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
-		// Get the expocodes of cruises to be submitted,
-		// checking if they have metadata documents
-		cruiseExpocodes.clear();
-		String message = METADATA_AUTOFAIL_HTML_PROLOGUE;
+		// Check that the cruise data is checked and reasonable
+		String errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
+		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
+		boolean cannotSubmit = false;
 		boolean willAutofail = false;
 		for ( DashboardCruise cruise : listProvider.getList() ) {
-			String expocode = cruise.getExpocode();
-			cruiseExpocodes.add(expocode);
-
-			TreeSet<String> metaNames = cruise.getMetadataFilenames();
-			if ( metaNames.size() < 1 ) {
-				message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
+			String status = cruise.getDataCheckStatus();
+			if ( DashboardUtils.CHECK_STATUS_NOT_CHECKED.equals(status) ||
+				 DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(status) ) {
+				errMsg += "<li>" + 
+						 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+				cannotSubmit = true;
+			}
+			else if ( ! ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(status) ||
+						  DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(status) ) ) {
+				warnMsg += "<li>" + 
+					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				willAutofail = true;
 			}
 		}
 
-		// If missing metadata, ask to continue
+		// If unchecked or very serious data issues, put up error message
+		if ( cannotSubmit ) {
+			errMsg += CANNOT_SUBMIT_HTML_EPILOGUE;
+			SocatUploadDashboard.showMessage(errMsg);
+			return;
+		}
+
+		// If unreasonable data, ask to continue
 		if ( willAutofail ) {
-			message += AUTOFAIL_HTML_EPILOGUE;
-			if ( askMetaAutofailPopup == null ) {
-				askMetaAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
+			warnMsg += AUTOFAIL_HTML_EPILOGUE;
+			if ( askDataAutofailPopup == null ) {
+				askDataAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
 						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
 					@Override
 					public void onSuccess(Boolean result) {
@@ -302,11 +320,11 @@ public class AddToSocatPage extends Composite {
 					}
 				});
 			}
-			askMetaAutofailPopup.askQuestion(message);
+			askDataAutofailPopup.askQuestion(warnMsg);
 			return;
 		}
 
-		// All cruises have metadata; continue on
+		// All cruises have reasonable data; continue on
 		continueSubmit();
 	}
 
@@ -315,24 +333,27 @@ public class AddToSocatPage extends Composite {
 	 * checking the data check status.
 	 */
 	private void continueSubmit() {
-		// Check that the cruise data is checked and reasonable
-		String message = DATA_AUTOFAIL_HTML_PROLOGUE;
+		// Get the expocodes of cruises to be submitted,
+		// checking if they have metadata documents
+		cruiseExpocodes.clear();
+		String warnMsg = METADATA_AUTOFAIL_HTML_PROLOGUE;
 		boolean willAutofail = false;
 		for ( DashboardCruise cruise : listProvider.getList() ) {
-			String status = cruise.getDataCheckStatus();
-			if ( ! ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(status) ||
-					 DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(status) ) ) {
-				message += "<li>" + 
-					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+			String expocode = cruise.getExpocode();
+			cruiseExpocodes.add(expocode);
+
+			TreeSet<String> metaNames = cruise.getMetadataFilenames();
+			if ( metaNames.size() < 1 ) {
+				warnMsg += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
 				willAutofail = true;
 			}
 		}
 
-		// If unreasonable data, ask to continue
+		// If missing metadata, ask to continue
 		if ( willAutofail ) {
-			message += AUTOFAIL_HTML_EPILOGUE;
-			if ( askDataAutofailPopup == null ) {
-				askDataAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
+			warnMsg += AUTOFAIL_HTML_EPILOGUE;
+			if ( askMetaAutofailPopup == null ) {
+				askMetaAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
 						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
 					@Override
 					public void onSuccess(Boolean result) {
@@ -347,11 +368,11 @@ public class AddToSocatPage extends Composite {
 					}
 				});
 			}
-			askDataAutofailPopup.askQuestion(message);
+			askMetaAutofailPopup.askQuestion(warnMsg);
 			return;
 		}
 
-		// All cruises have reasonable data; continue on
+		// All cruises have metadata; continue on
 		furtherContinueSubmit();
 	}
 
