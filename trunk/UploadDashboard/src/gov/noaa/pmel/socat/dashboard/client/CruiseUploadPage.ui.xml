@@ -16,6 +16,11 @@
 					<g:FlowPanel>
 						<g:FileUpload name="cruiseupload" addStyleNames="{style.uploadfile}"
 								ui:field="cruiseUpload" />
+						<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+							<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="formatLabel" />
+							<g:ListBox name="cruiseformat" addStyleNames="{style.labeledlistbox}" 
+								ui:field="formatListBox" />
+						</g:FlowPanel>
 						<g:Hidden name="username" ui:field="usernameToken" />
 						<g:Hidden name="passhash" ui:field="passhashToken" />
 						<g:Hidden name="timestamp" ui:field="timestampToken" />

@@ -31,6 +31,8 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
+ * Page for uploading new or updated cruise data files.
+ * 
  * @author Karl Smith
  */
 public class CruiseUploadPage extends Composite {
@@ -61,6 +63,8 @@ public class CruiseUploadPage extends Composite {
 			"Use the preview button to show the beginning of the file as it " +
 			"will be seen by SOCAT.  Note that this uploads the entire file " +
 			"only for the purpose of creating the preview. ";
+
+	private static final String FORMAT_TEXT = "Cruise data format:";
 
 	private static final String ENCODING_TEXT = "File encoding:";
 	private static final String[] KNOWN_ENCODINGS = {
@@ -105,6 +109,8 @@ public class CruiseUploadPage extends Composite {
 	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload cruiseUpload;
+	@UiField Label formatLabel;
+	@UiField ListBox formatListBox;
 	@UiField Hidden usernameToken;
 	@UiField Hidden passhashToken;
 	@UiField Hidden timestampToken;
@@ -145,6 +151,10 @@ public class CruiseUploadPage extends Composite {
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
 		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
+
+		formatLabel.setText(FORMAT_TEXT);
+		formatListBox.addItem(DashboardUtils.CRUISE_FORMAT_TAB);
+		formatListBox.addItem(DashboardUtils.CRUISE_FORMAT_COMMA);
 
 		createButton.setText(CREATE_TEXT);
 		overwriteButton.setText(OVERWRITE_TEXT);

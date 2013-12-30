@@ -67,6 +67,7 @@ public class CruiseUploadService extends HttpServlet {
 		String username = null;
 		String passhash = null;
 		String timestamp = null;
+		String dataFormat = null;
 		String encoding = null;
 		String action = null;
 		FileItem cruiseItem = null;
@@ -84,6 +85,10 @@ public class CruiseUploadService extends HttpServlet {
 				}
 				else if ( "timestamp".equals(itemName) ) {
 					timestamp = item.getString();
+					item.delete();
+				}
+				else if ( "cruiseformat".equals(itemName) ) {
+					dataFormat = item.getString();
 					item.delete();
 				}
 				else if ( "cruiseencoding".equals(itemName) ) {
@@ -111,13 +116,13 @@ public class CruiseUploadService extends HttpServlet {
 
 		// Verify contents seem okay
 		DashboardDataStore dataStore = DashboardDataStore.get();
-		if ( (username == null) || (passhash == null) || 
-			 (encoding == null) || (action == null) || 
-			 (timestamp == null) || (cruiseItem == null) || 
+		if ( (username == null) || (passhash == null) || (dataFormat == null) || 
+			 (encoding == null) || (action == null) || (timestamp == null) || 
+			 (cruiseItem == null) || 
 			 ( ! dataStore.validateUser(username, passhash) ) ||
-			 ! ( DashboardUtils.REQUEST_PREVIEW_TAG.equals(action) ||
-				 DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ||
-				 DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) ) {
+			 ! ( action.equals(DashboardUtils.REQUEST_PREVIEW_TAG) ||
+				 action.equals(DashboardUtils.REQUEST_NEW_CRUISE_TAG) ||
+				 action.equals(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG) ) ) {
 			cruiseItem.delete();
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 					"Invalid request contents for this service.");
@@ -181,7 +186,7 @@ public class CruiseUploadService extends HttpServlet {
 				cruiseData.setOwner(username);
 				cruiseData.setUploadFilename(filename);
 				cruiseData.setUploadTimestamp(timestamp);
-				cruiseHandler.assignCruiseDataFromInput(cruiseData, 
+				cruiseHandler.assignCruiseDataFromInput(cruiseData, dataFormat, 
 														cruiseReader, 0, -1, true);
 			} finally {
 				cruiseReader.close();

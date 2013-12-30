@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -91,11 +92,6 @@ public class CruiseFileHandlerTest {
 				"Latitude range: 37.12N to 64.11N \n" +
 				"Time range: 2003-12-05 22:12 to 2003-12-21 10:48 UTC \n" +
 				" \n" +
-				"Observation times were not provided to a resolution of seconds; \n" +
-				"the seconds given are artificially generated values (usually zero) \n" +
-				" \n" +
-				"Cruise QC flag: C (see below) \n" +
-				" \n" +
 				"Explanation of data columns: \n" +
 				"Expocode: unique identifier for the cruise from which this data was obtained \n" +
 				"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data \n" +
@@ -134,25 +130,6 @@ public class CruiseFileHandlerTest {
 				"fCO2rec_flag: WOCE flag for this fCO2rec value (2:good, 3:questionable, 4:bad, 9:not generated; see below) \n" +
 				" \n" +
 				"Missing values are indicated by 'NaN' \n" +
-				" \n" +
-				"The quality assessments given by the Cruise QC flag and fCO2rec_flag only apply \n" +
-				"to the fCO2rec value.  For more information about the recomputed fCO2 value and \n" +
-				"the meaning of the Cruise QC flag, fCO2rec_src, and fCO2rec_flag values, see: \n" +
-				"B. Pfeil, A. Olsen, D. C. E. Bakker, et. al. \"A uniform, quality controlled \n" +
-				"Surface Ocean CO2 Atlas (SOCAT)\" Earth Syst. Sci. Data, 5, 125-143, 2013 \n" +
-				"doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/ \n" +
-				" \n" +
-				"If the WOA Sea Surface Salinity is missing for an observation, but was need \n" +
-				"for the recomputed fCO2 calculation, an approximated value of 35.0 was used. \n" +
-				" \n" +
-				"This is a report of all cruise data points, including those with missing \n" +
-				"recomputed fCO2 values and those with a WOCE flag indicating questionable (3) \n" +
-				"or bad (4) recomputed fCO2 values. \n" +
-				" \n" +
-				"The data use policy can be found at http://www.socat.info/DataUsePolicy.htm \n" +
-				" \n" +
-				"All standard SOCAT version 2 data columns are reported in this file, \n" +
-				"even if all values are missing ('NaN') for this cruise. \n" +
 				" \n";
 		ArrayList<String> expectedPreamble = 
 				new ArrayList<String>(Arrays.asList(metadataString.split("\n")));
@@ -232,8 +209,9 @@ public class CruiseFileHandlerTest {
 		BufferedReader reader = new BufferedReader(new StringReader(
 				metadataString + headerString + dataString));
 		try {
-			handler.assignCruiseDataFromInput(cruiseData, reader, 
-												0, observations.length, true);
+			handler.assignCruiseDataFromInput(cruiseData, 
+					DashboardUtils.CRUISE_FORMAT_TAB, 
+					reader, 0, observations.length, true);
 		} finally {
 			reader.close();
 		}
