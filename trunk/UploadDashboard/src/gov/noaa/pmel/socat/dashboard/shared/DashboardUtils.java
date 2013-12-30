@@ -205,8 +205,10 @@ public class DashboardUtils {
 	static {
 		STD_DATA_UNITS.put(DataColumnType.IGNORE, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
-		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList("YYYY-MM-DD HH:MM:SS Z")));
-		STD_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
+		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
+				"YYYY-MM-DD HH:MM:SS", "MM/DD/YYYY HH:MM:SS", "DD/MM/YYYY HH:MM:SS")));
+		STD_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
+				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
 		STD_DATA_UNITS.put(DataColumnType.YEAR, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.MONTH, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.DAY, new ArrayList<String>(Arrays.asList("")));
@@ -220,8 +222,8 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("PSU")));
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
 		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
-		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "kPa", "mbar")));
+		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "kPa", "mbar")));
 		STD_DATA_UNITS.put(DataColumnType.USER_FCO2_REC, new ArrayList<String>(Arrays.asList("uatm")));
 		STD_DATA_UNITS.put(DataColumnType.USER_FCO2_SRC, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.FCO2_AIR, new ArrayList<String>(Arrays.asList("uatm")));
@@ -247,8 +249,10 @@ public class DashboardUtils {
 	static {
 		CHECKER_DATA_UNITS.put(DataColumnType.IGNORE, new ArrayList<String>(Arrays.asList("")));
 		CHECKER_DATA_UNITS.put(DataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
-		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList("")));
-		CHECKER_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
+		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
+				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
+		CHECKER_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
+				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
 		CHECKER_DATA_UNITS.put(DataColumnType.YEAR, new ArrayList<String>(Arrays.asList("")));
 		CHECKER_DATA_UNITS.put(DataColumnType.MONTH, new ArrayList<String>(Arrays.asList("")));
 		CHECKER_DATA_UNITS.put(DataColumnType.DAY, new ArrayList<String>(Arrays.asList("")));
@@ -262,8 +266,8 @@ public class DashboardUtils {
 		CHECKER_DATA_UNITS.put(DataColumnType.SAMPLE_SALINITY, new ArrayList<String>(Arrays.asList("psu")));
 		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("degC")));
 		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("degC")));
-		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
-		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "kPa", "mbar")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "kPa", "mbar")));
 		CHECKER_DATA_UNITS.put(DataColumnType.USER_FCO2_REC, new ArrayList<String>(Arrays.asList("uatm")));
 		CHECKER_DATA_UNITS.put(DataColumnType.USER_FCO2_SRC, new ArrayList<String>(Arrays.asList("")));
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_AIR, new ArrayList<String>(Arrays.asList("uatm")));

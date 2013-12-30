@@ -155,7 +155,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
 				// Set the date format
-				dateFormat = "YYYY-MM-DD ";
+				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
+						cruiseData.getDataColUnits().get(k));
+				dateFormat = DashboardUtils.CHECKER_DATA_UNITS.get(colType).get(idx);
 			}
 			else if ( colType == DataColumnType.DATE ) {
 				// Element specifying the index and user name of the column
