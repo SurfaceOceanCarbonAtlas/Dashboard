@@ -21,7 +21,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class AddToSocatServiceImpl extends RemoteServiceServlet 
 										implements AddToSocatService {
 
-	private static final long serialVersionUID = -7086803355103349071L;
+	private static final long serialVersionUID = 4928528579465036911L;
 
 	@Override
 	public void addCruisesToSocat(String username, String passhash, 
@@ -50,8 +50,6 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				throw new IllegalArgumentException(
 						"Unknown cruise " + expocode);
 
-			// TODO: add the cruise to SOCAT
-
 			// Update the QC status for this cruise
 			String qcStatus;
 			String dataStatus = cruise.getDataCheckStatus();
@@ -77,7 +75,44 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 					" submitted to SOCAT by " + username + 
 					" with initial QC status '" + qcStatus + 
 					"' and archive status '" + doiStatus + "'");
+
+			// TODO: add the cruise to SOCAT
+
 		}
+	}
+
+	@Override
+	public void setCruiseArchiveStatus(String username, String passhash,
+			String expocode, String archiveStatus) {
+		// Authenticate the user
+		DashboardDataStore dataStore;
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected configuration error: " + ex.getMessage());
+		}
+		if ( ! dataStore.validateUser(username, passhash) )
+			throw new IllegalArgumentException(
+					"Invalid authentication credentials");
+		
+		// Get the properties of this cruise
+		DashboardCruise cruise = dataStore.getCruiseFileHandler()
+										  .getCruiseFromInfoFile(expocode);
+		if ( cruise == null ) 
+			throw new IllegalArgumentException(
+					"Unknown cruise " + expocode);
+
+		// Update the archive status for this cruise
+		cruise.setArchiveStatus(archiveStatus);
+
+		// Commit this update of the cruise properties
+		dataStore.getCruiseFileHandler().saveCruiseToInfoFile(cruise, 
+				"Archive status of cruise " + expocode + " updated by " + 
+				username + " to '" + archiveStatus + "'");
+
+		// TODO: modify the cruise archive status in SOCAT
+
 	}
 
 }

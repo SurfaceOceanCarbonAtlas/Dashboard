@@ -43,6 +43,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
 	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities";
 
+	private static final int MIN_NUM_DATA_COLUMNS = 6;
+	private static final String MISSING_VALUE_STRING = "NaN";
+
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
 		Pattern.compile("\\s*Cruise\\s*Expocode\\s*:\\s*([" + 
@@ -186,14 +189,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * Cruise Expocode :
 	 * Cruise Expocode =
 	 * </pre>
-	 * The first line containing at least six tab- or comma-separated 
-	 * (depending on dataForm) non-blank values will be taken to be the 
-	 * line of data column headers.  No data column headers can be blank.  
-	 * All remaining (non-blank) lines are considered data lines and 
-	 * should have the same number of tab- or comma-separated values as 
-	 * in the column headers line.  Any blank data value strings, or data 
-	 * value strings matching "null" or "NaN" (case insensitive), are set 
-	 * to "NaN" to indicate a missing value.
+	 * The first line containing at least {@value #MIN_NUM_DATA_COLUMNS}
+	 * tab- or comma-separated (depending on dataForm) non-blank values 
+	 * will be taken to be the line of data column headers.  No data 
+	 * column headers can be blank.  All remaining (non-blank) lines are 
+	 * considered data lines and should have the same number of tab- or 
+	 * comma-separated values as in the column headers line.  Any blank 
+	 * data value strings, or data value strings matching "null", "NaN", 
+	 * "NA", "N/A" (all case insensitive), are set to 
+	 * {@value #MISSING_VALUE_STRING} to indicate a missing value.
 	 * 
 	 * @param cruiseData
 	 * 		assign cruise data here
@@ -221,7 +225,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * @throws IOException
 	 * 		if reading from cruiseReader throws one,
 	 * 		if there is a blank data column header, 
-	 * 		if there is an inconsistent number of data values, or
+	 * 		if there is an inconsistent number of data values, 
+	 * 		if there are no data columns recognized, or
 	 * 		if the dataFormat string is not recognized. 
 	 */
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
@@ -247,7 +252,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		while ( dataline != null ) {
 			// Check if we have gotten to non-blank header values 
 			String[] datavals = dataline.split(separator, -1);
-			if ( (   datavals.length > 5 ) &&
+			if ( (   datavals.length >= MIN_NUM_DATA_COLUMNS ) &&
 				 ( ! datavals[0].trim().isEmpty() ) &&
 				 ( ! datavals[1].trim().isEmpty() ) &&
 				 ( ! datavals[2].trim().isEmpty() ) &&
@@ -315,6 +320,10 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			dataline = cruiseReader.readLine();
 		}
 
+		if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
+			throw new IOException(
+					"No data columns found, possibly due to incorrect format");
+
 		if ( assignCruiseInfo ) {
 			// Guess the data column types, units, and descriptions from the 
 			// user-provided data column names
@@ -348,13 +357,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						throw new IOException("Inconsistent number of data columns (" + 
 								datavals.length + " instead of " + numDataColumns + 
 								") in \n" + dataline);
-					// Convert missing values to NaN
+					// Convert an obvious missing values to MISSING_VALUE_STRING
 					for (int k = 0; k < datavals.length; k++) {
 						datavals[k] = datavals[k].trim();
 						if ( datavals[k].isEmpty() ||
 							 datavals[k].toLowerCase().equals("null") ||
-							 datavals[k].toLowerCase().equals("nan") ) {
-							datavals[k] = "NaN";
+							 datavals[k].toLowerCase().equals("nan") ||
+							 datavals[k].toLowerCase().equals("n/a") ||
+							 datavals[k].toLowerCase().equals("na") ) {
+							datavals[k] = MISSING_VALUE_STRING;
 						}
 					}
 					dataValues.add(new ArrayList<String>(Arrays.asList(datavals)));

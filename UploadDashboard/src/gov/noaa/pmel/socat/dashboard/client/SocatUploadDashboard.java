@@ -29,6 +29,8 @@ public class SocatUploadDashboard
 		METADATA_UPLOAD,
 		/** History tag for AddToSocatPage */
 		ADD_TO_SOCAT,
+		/** History tag for ArchivePage */
+		ARCHIVE,
 		/** History tag for DashboardLogoutPage */
 		LOGOUT
 	}
@@ -163,6 +165,10 @@ public class SocatUploadDashboard
 		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
 			// Add to SOCAT page from history
 			AddToSocatPage.redisplayPage(false);
+		}
+		else if ( token.equals(PagesEnum.ARCHIVE.name()) ) {
+			// Archive page from history
+			ArchivePage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
 			// Logout page from history

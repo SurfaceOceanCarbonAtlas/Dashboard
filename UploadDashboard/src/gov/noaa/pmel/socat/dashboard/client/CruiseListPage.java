@@ -79,6 +79,10 @@ public class CruiseListPage extends Composite {
 			"submit the selected cruises to SOCAT for policy " +
 			"(quality control) assessment ";
 
+	static final String ARCHIVE_TEXT = "Archive Cruise";
+	private static final String ARCHIVE_HOVER_HELP =
+			"manage the archival of the selected cruise";
+
 	private static final String ADD_TO_LIST_TEXT = 
 			"Add Cruise to List";
 	private static final String ADD_TO_LIST_HOVER_HELP = 
@@ -96,9 +100,27 @@ public class CruiseListPage extends Composite {
 	private static final String GET_CRUISE_LIST_ERROR_MSG = 
 			"Problems obtaining the latest cruise listing";
 
+	private static final String NO_CRUISES_FOR_DATACHECK_MSG = 
+			"No unsubmitted cruises are selected for checking data";
+	private static final String MANY_CRUISES_FOR_DATACHECK_MSG = 
+			"Only one unsubmitted cruise may be selected when checking data";
+
+	private static final String NO_CRUISES_FOR_METADATA_MSG = 
+			"No unsubmitted cruises are selected for managing " +
+			"metadata documents.";
+
+	private static final String NO_CRUISES_FOR_QC_SUBMIT_MSG =
+			"No unsubmitted cruises are selected for submitting to SOCAT.";
+
+	private static final String NO_CRUISES_FOR_ARCHIVE_MSG = 
+			"No <b>successfully submitted</b> cruises selected for " +
+			"managing archival status.";
+	private static final String TOO_MANY_CRUISES_FOR_ARCHIVE_MSG = 
+			"Only one <b>successfully submitted</b> cruise can be " +
+			"selected for managing archival status.";
+
 	private static final String NO_CRUISE_TO_DELETE_MSG = 
-			"No cruises are selected which can be deleted " +
-			"(cruises must be suspended or not submitted).";
+			"No unsubmitted cruises are selected to be deleted.";
 	private static final String DELETE_CRUISE_HTML_PROLOGUE = 
 			"All cruise data and metadata will be deleted for the " +
 			"following cruises: <ul>";
@@ -107,12 +129,7 @@ public class CruiseListPage extends Composite {
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
 	private static final String DELETE_CRUISE_FAIL_MSG = 
-			"Unable to delete the selected cruise(s)";
-
-	private static final String NO_CRUISES_FOR_DATACHECK_MSG = 
-			"No cruises are selected for checking data";
-	private static final String MANY_CRUISES_FOR_DATACHECK_MSG = 
-			"Only one cruise may be selected when checking data";
+			"Unable to delete the cruise(s)";
 
 	private static final String EXPOCODE_TO_ADD_MSG = 
 			"Enter the expocode of the cruise to wish to add " +
@@ -134,17 +151,6 @@ public class CruiseListPage extends Composite {
 	private static final String REMOVE_CRUISE_FAIL_MSG = 
 			"Unable to remove the selected cruise(s) " +
 			"from your personal list of cruises";
-
-	private static final String NO_CRUISES_FOR_METADATA_MSG = 
-			"No cruises are selected for managing metadata documents.  " +
-			"Cruises submitted to SOCAT (and not suspended or failed) " +
-			"were automatically removed from the list of cruises " +
-			"considered.";
-
-	private static final String NO_CRUISES_FOR_QC_SUBMIT_MSG =
-			"No unsubmitted cruises are selected for submitting to SOCAT.  " +
-			"Cruises already submitted to SOCAT (and not suspended or failed) " +
-			"were automatically removed from the list of cruises to submit.";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
@@ -184,6 +190,7 @@ public class CruiseListPage extends Composite {
 	@UiField Button metadataButton;
 	// @UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
+	@UiField Button archiveButton;
 	@UiField Button deleteButton;
 	@UiField Button addToListButton;
 	@UiField Button removeFromListButton;
@@ -235,6 +242,9 @@ public class CruiseListPage extends Composite {
 
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
+
+		archiveButton.setText(ARCHIVE_TEXT);
+		archiveButton.setTitle(ARCHIVE_HOVER_HELP);
 
 		addToListButton.setText(ADD_TO_LIST_TEXT);
 		addToListButton.setTitle(ADD_TO_LIST_HOVER_HELP);
@@ -376,33 +386,51 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * @return
-	 * 		set of selected cruises fitting the desired criteria;
-	 * 		will not be null, but may be empty. 
-	 * 		Does not include any cruises submitted to SOCAT. 
+	 * Assigns cruiseSet in this instance with the set of selected cruises 
+	 * fitting the desired criteria.
+	 *  
+	 * @param unsubmitted
+	 * 		if true, obtains only unsubmitted selected cruises;
+	 * 		if false, obtains only submitted selected cruises;
+	 * 		if null, obtains all selected cruises
 	 */
-	private void getSelectedCruises() {
+	private void getSelectedCruises(Boolean unsubmitted) {
 		cruiseSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
 				String status = cruise.getQcStatus();
-				if ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-					 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-					 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-					 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) )
+				if ( unsubmitted == null ) {
 					cruiseSet.add(cruise);
+				}
+				else {
+					if ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
+						 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+						 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+						 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) {
+						if ( unsubmitted == true )
+							cruiseSet.add(cruise);
+					}
+					else {
+						if ( unsubmitted == false )
+							cruiseSet.add(cruise);
+					}
+				}
 			}
 		}
 	}
 
 	/**
-	 * @return
-	 * 		set of expocodes of the selected cruises fitting the 
-	 * 		desired criteria; will not be null, but may be empty. 
-	 * 		Does not include any cruises submitted to SOCAT. 
+	 * Assigns cruiseSet in this instance with the set of selected cruises 
+	 * fitting the desired criteria, then assigns expocodeSet in this 
+	 * instance with the expocodes of these cruises. 
+	 *  
+	 * @param unsubmitted
+	 * 		if true, obtains only unsubmitted selected cruises;
+	 * 		if false, obtains only submitted selected cruises;
+	 * 		if null, obtains all selected cruises
 	 */
-	private void getSelectedCruiseExpocodes() {
-		getSelectedCruises();
+	private void getSelectedCruiseExpocodes(Boolean unsubmitted) {
+		getSelectedCruises(unsubmitted);
 		expocodeSet.clear();
 		for ( DashboardCruise cruise : cruiseSet )
 			expocodeSet.add(cruise.getExpocode());
@@ -420,7 +448,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("dataCheckButton")
 	void dataCheckOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes();
+		getSelectedCruiseExpocodes(true);
 		if ( expocodeSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_DATACHECK_MSG);
 			return;
@@ -435,7 +463,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("metadataButton")
 	void metadataOnClick(ClickEvent event) {
-		getSelectedCruises();
+		getSelectedCruises(true);
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_METADATA_MSG);
 			return;
@@ -460,7 +488,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		getSelectedCruises();
+		getSelectedCruises(true);
 		if ( cruiseSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_QC_SUBMIT_MSG);
 			return;
@@ -468,9 +496,23 @@ public class CruiseListPage extends Composite {
 		AddToSocatPage.showPage(cruiseSet);
 	}
 
+	@UiHandler("archiveButton")
+	void archiveSubmitOnClick(ClickEvent event) {
+		getSelectedCruises(false);
+		if ( cruiseSet.size() < 1 ) {
+			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_ARCHIVE_MSG);
+			return;
+		}
+		if ( cruiseSet.size() > 1 ) {
+			SocatUploadDashboard.showMessage(TOO_MANY_CRUISES_FOR_ARCHIVE_MSG);
+			return;
+		}
+		ArchivePage.showPage(cruiseSet.iterator().next());
+	}
+
 	@UiHandler("deleteButton")
 	void deleteCruiseOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes();
+		getSelectedCruiseExpocodes(true);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISE_TO_DELETE_MSG);
 			return;
@@ -549,8 +591,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("removeFromListButton")
 	void removeFromListOnClick(ClickEvent event) {
-		// TODO: need to be able to remove only submitted cruises
-		getSelectedCruiseExpocodes();
+		getSelectedCruiseExpocodes(null);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISE_TO_REMOVE_MSG);
 			return;
