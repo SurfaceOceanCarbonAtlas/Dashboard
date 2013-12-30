@@ -44,6 +44,9 @@ public class DashboardUtils {
 	public static final int MIN_EXPOCODE_LENGTH = 12;
 	public static final int MAX_EXPOCODE_LENGTH = 14;
 
+	public static final String CRUISE_FORMAT_TAB = "tab-separated values";
+	public static final String CRUISE_FORMAT_COMMA = "comma-separated values";
+
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
 	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
 	public static final String CHECK_STATUS_QUESTIONABLE = "Possibly has errors";

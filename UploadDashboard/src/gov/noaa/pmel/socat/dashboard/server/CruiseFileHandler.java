@@ -186,17 +186,20 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * Cruise Expocode :
 	 * Cruise Expocode =
 	 * </pre>
-	 * The first line containing at least four tab-separated non-blank
-	 * values will be taken to be the line of data column headers.  
-	 * No data column headers can be blank.  All remaining (non-blank) 
-	 * lines are considered data lines and should have the same number 
-	 * of tab-separated values as there are column header.  Any blank 
-	 * data value strings, or data value strings matching "null" or 
-	 * "NaN" (case insensitive), are set to "NaN" to indicate a missing 
-	 * value.
+	 * The first line containing at least six tab- or comma-separated 
+	 * (depending on dataForm) non-blank values will be taken to be the 
+	 * line of data column headers.  No data column headers can be blank.  
+	 * All remaining (non-blank) lines are considered data lines and 
+	 * should have the same number of tab- or comma-separated values as 
+	 * in the column headers line.  Any blank data value strings, or data 
+	 * value strings matching "null" or "NaN" (case insensitive), are set 
+	 * to "NaN" to indicate a missing value.
 	 * 
 	 * @param cruiseData
 	 * 		assign cruise data here
+	 * @param dataFormat 
+	 * 		format of the cruise data table; one of the 
+	 * 		DashboardUtils.CRUISE_FORMAT_* strings
 	 * @param cruiseReader
 	 * 		read cruise data from here;
 	 * 		if reading from a cruise data file, must be positioned
@@ -217,15 +220,24 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		validated against what is read from the data file.
 	 * @throws IOException
 	 * 		if reading from cruiseReader throws one,
-	 * 		if there is a blank data column header, or
-	 * 		if there is an inconsistent number of tab-separated values
+	 * 		if there is a blank data column header, 
+	 * 		if there is an inconsistent number of data values, or
+	 * 		if the dataFormat string is not recognized. 
 	 */
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
-			BufferedReader cruiseReader, int firstDataRow, int numDataRows,
-			boolean assignCruiseInfo) throws IOException {
+			String dataFormat, BufferedReader cruiseReader, int firstDataRow, 
+			int numDataRows, boolean assignCruiseInfo) throws IOException {
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
 
+		String separator;
+		if ( DashboardUtils.CRUISE_FORMAT_TAB.equals(dataFormat) )
+			separator = "\t";
+		else if ( DashboardUtils.CRUISE_FORMAT_COMMA.equals(dataFormat) )
+			separator = ",";
+		else
+			throw new IOException(
+					"Unexpected invalid data format '" + dataFormat + "'");
 		// Directly add the metadata strings to the list in cruiseData
 		ArrayList<String> preamble = cruiseData.getPreamble();
 		preamble.clear();
@@ -233,13 +245,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Read the metadata preamble
 		String dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
-			// Check if we have gotten to non-blank tab-separated values 
-			String[] datavals = dataline.split("\t", -1);
-			if ( (   datavals.length > 3 ) &&
+			// Check if we have gotten to non-blank header values 
+			String[] datavals = dataline.split(separator, -1);
+			if ( (   datavals.length > 5 ) &&
 				 ( ! datavals[0].trim().isEmpty() ) &&
 				 ( ! datavals[1].trim().isEmpty() ) &&
 				 ( ! datavals[2].trim().isEmpty() ) &&
-				 ( ! datavals[3].trim().isEmpty() ) ) {
+				 ( ! datavals[3].trim().isEmpty() ) &&
+				 ( ! datavals[4].trim().isEmpty() ) &&
+				 ( ! datavals[5].trim().isEmpty() ) ) {
 				// These are the column headers;
 				// clean them up and make sure there are no blank values
 				for (int k = 0; k < datavals.length; k++) {
@@ -329,7 +343,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			if ( ! dataline.trim().isEmpty() ) {
 				if ( dataRowNum >= firstDataRow ) {
 					// Get the values from this data line
-					String[] datavals = dataline.split("\t", -1);
+					String[] datavals = dataline.split(separator, -1);
 					if ( datavals.length != numDataColumns )
 						throw new IOException("Inconsistent number of data columns (" + 
 								datavals.length + " instead of " + numDataColumns + 
@@ -456,8 +470,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					new BufferedReader(new FileReader(cruiseFile));
 			try {
 				// Assign values from the cruise data file
-				assignCruiseDataFromInput(cruiseData, cruiseReader, 
-										  firstDataRow, numDataRows, false);
+				assignCruiseDataFromInput(cruiseData, 
+						DashboardUtils.CRUISE_FORMAT_TAB, cruiseReader, 
+						firstDataRow, numDataRows, false);
 			} finally {
 				cruiseReader.close();
 			}
