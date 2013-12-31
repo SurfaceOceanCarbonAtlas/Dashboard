@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -16,6 +15,7 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 /**
  * An object representing a metadata entry for a data file
  */
+@SuppressWarnings("deprecation")
 public abstract class MetadataItem {
 	
 	/**

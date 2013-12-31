@@ -6,6 +6,8 @@ package uk.ac.uea.socat.sanitychecker.data.datetime;
  */
 public class DateTimeException extends Exception {
 
+	private static final long serialVersionUID = 9005363827084489835L;
+
 	/**
 	 * Basic constructor with a message
 	 * @param message

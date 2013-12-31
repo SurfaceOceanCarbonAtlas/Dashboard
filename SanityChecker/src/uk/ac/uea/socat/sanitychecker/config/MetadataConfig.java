@@ -177,87 +177,91 @@ public class MetadataConfig {
 
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(itsConfigFilename));
-			String line = reader.readLine().trim();
-			int lineCount = 1;
-			
-			while (null != line) {
-				if (!CheckerUtils.isComment(line)) {
-					List<String> fields = Arrays.asList(line.split(","));
-					
-					String name = fields.get(NAME_COL).toLowerCase();
-					
-					if (contains(name)) {
-						throw new ConfigException(itsConfigFilename, name, lineCount, "Item is configured more than once");
-					}
-	
-					try {
-						
-						// Extract all values from the config line
-						// All the simple ones are at the top!
-						int dataType = MetadataItem.getTypeFlag(fields.get(TYPE_COL));
-						boolean itemRequired = CheckerUtils.parseBoolean(fields.get(REQUIRED_COL));
-						String requiredGroup = fields.get(REQUIRED_GROUP_COL);
-						boolean mustGenerate = CheckerUtils.parseBoolean(fields.get(GENERATE_COL));
-						boolean multilineAllowed = CheckerUtils.parseBoolean(fields.get(MULTILINE_COL));
-						
-	
-						// Process the data range information
-						String minColValue = fields.get(MIN_COL);
-						String maxColValue = fields.get(MAX_COL);
-						ConfigValueRange range = null;
-						if (!minColValue.equalsIgnoreCase("NA") || !maxColValue.equalsIgnoreCase("NA")) {
-							range = new ConfigValueRange(dataType, minColValue, maxColValue);
+			try {
+				String line = reader.readLine().trim();
+				int lineCount = 1;
+
+				while (null != line) {
+					if (!CheckerUtils.isComment(line)) {
+						List<String> fields = Arrays.asList(line.split(","));
+
+						String name = fields.get(NAME_COL).toLowerCase();
+
+						if (contains(name)) {
+							throw new ConfigException(itsConfigFilename, name, lineCount, "Item is configured more than once");
 						}
-						
-						
-						// Get the class of the final metadata item
-						Class<? extends MetadataItem> itemClass = null;
-						String fullClassName = null;
+
 						try {
-							String itemClassName = fields.get(ITEM_CLASS_COL);
-							if (null == itemClassName) {
-								itemClassName = DEFAULT_ITEM_CLASS;
+
+							// Extract all values from the config line
+							// All the simple ones are at the top!
+							int dataType = MetadataItem.getTypeFlag(fields.get(TYPE_COL));
+							boolean itemRequired = CheckerUtils.parseBoolean(fields.get(REQUIRED_COL));
+							String requiredGroup = fields.get(REQUIRED_GROUP_COL);
+							boolean mustGenerate = CheckerUtils.parseBoolean(fields.get(GENERATE_COL));
+							boolean multilineAllowed = CheckerUtils.parseBoolean(fields.get(MULTILINE_COL));
+
+
+							// Process the data range information
+							String minColValue = fields.get(MIN_COL);
+							String maxColValue = fields.get(MAX_COL);
+							ConfigValueRange range = null;
+							if (!minColValue.equalsIgnoreCase("NA") || !maxColValue.equalsIgnoreCase("NA")) {
+								range = new ConfigValueRange(dataType, minColValue, maxColValue);
 							}
-							
-							fullClassName = ITEM_CLASS_ROOT + "." + itemClassName + ITEM_CLASS_TAIL;
-							itemClass = (Class<? extends MetadataItem>) Class.forName(fullClassName);
-						} catch (ClassNotFoundException e) {
-							throw new Exception("Cannot find metadata item class " + fullClassName);
+
+
+							// Get the class of the final metadata item
+							Class<? extends MetadataItem> itemClass = null;
+							String fullClassName = null;
+							try {
+								String itemClassName = fields.get(ITEM_CLASS_COL);
+								if (null == itemClassName) {
+									itemClassName = DEFAULT_ITEM_CLASS;
+								}
+
+								fullClassName = ITEM_CLASS_ROOT + "." + itemClassName + ITEM_CLASS_TAIL;
+								itemClass = (Class<? extends MetadataItem>) Class.forName(fullClassName);
+							} catch (ClassNotFoundException e) {
+								throw new Exception("Cannot find metadata item class " + fullClassName);
+							}
+
+							/*
+							 * Get the generator parameter if it's present.
+							 * 
+							 * Java's string splitter isn't very good with an empty last column.
+							 * Therefore we must explicitly check whether or not the column exists
+							 * before we try to access it.
+							 */
+							String generatorParameter = null;
+							if (fields.size() > GENERATOR_PARAM_COL) {
+								generatorParameter = fields.get(GENERATOR_PARAM_COL);
+							}
+
+							// Now we have all the values, construct an object for them
+							MetadataConfigItem configItem = new MetadataConfigItem(name, dataType,
+									itemRequired, mustGenerate, requiredGroup, range, multilineAllowed, itemClass, generatorParameter, itsLogger);
+
+							// And add it to the configuration list
+							itsConfigItems.put(name, configItem);
+
+							// If the config item is part of a Required Group, add it to the
+							// relevant group
+							if (null != requiredGroup && requiredGroup.length() > 0) {
+								itsRequiredGroups.addGroupEntry(requiredGroup, name);
+							}
+						} catch (Exception e) {
+							itsLogger.error("Error processing Metadata config", e);
+							throw new ConfigException(itsConfigFilename, name, lineCount, e.getMessage());
 						}
-						
-						/*
-						 * Get the generator parameter if it's present.
-						 * 
-						 * Java's string splitter isn't very good with an empty last column.
-						 * Therefore we must explicitly check whether or not the column exists
-						 * before we try to access it.
-						 */
-						String generatorParameter = null;
-						if (fields.size() > GENERATOR_PARAM_COL) {
-							generatorParameter = fields.get(GENERATOR_PARAM_COL);
-						}
-	
-						// Now we have all the values, construct an object for them
-						MetadataConfigItem configItem = new MetadataConfigItem(name, dataType,
-								itemRequired, mustGenerate, requiredGroup, range, multilineAllowed, itemClass, generatorParameter, itsLogger);
-						
-						// And add it to the configuration list
-						itsConfigItems.put(name, configItem);
-						
-						// If the config item is part of a Required Group, add it to the
-						// relevant group
-						if (null != requiredGroup && requiredGroup.length() > 0) {
-							itsRequiredGroups.addGroupEntry(requiredGroup, name);
-						}
-					} catch (Exception e) {
-						itsLogger.error("Error processing Metadata config", e);
-						throw new ConfigException(itsConfigFilename, name, lineCount, e.getMessage());
 					}
+
+					// Read the next line
+					line = reader.readLine();
+					lineCount++;
 				}
-				
-				// Read the next line
-				line = reader.readLine();
-				lineCount++;
+			} finally {
+				reader.close();
 			}
 		} catch (IOException e) {
 			throw new ConfigException(itsConfigFilename, "I/O Error while reading from file", e);

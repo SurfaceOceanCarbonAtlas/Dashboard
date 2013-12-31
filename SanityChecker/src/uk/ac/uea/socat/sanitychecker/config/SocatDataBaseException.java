@@ -7,6 +7,8 @@ package uk.ac.uea.socat.sanitychecker.config;
  */
 public class SocatDataBaseException extends Exception {
 	
+	private static final long serialVersionUID = -5044586548550083279L;
+
 	/**
 	 * The name of the column where the error occurred
 	 */

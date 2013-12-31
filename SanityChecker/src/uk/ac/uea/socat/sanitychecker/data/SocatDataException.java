@@ -7,6 +7,8 @@ package uk.ac.uea.socat.sanitychecker.data;
  */
 public class SocatDataException extends Exception {
 	
+	private static final long serialVersionUID = 6539512783276005987L;
+
 	/**
 	 * The line number of the input file that was being processed when the error occurred.
 	 */

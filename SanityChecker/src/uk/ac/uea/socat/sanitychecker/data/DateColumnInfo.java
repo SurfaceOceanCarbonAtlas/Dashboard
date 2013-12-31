@@ -1,14 +1,11 @@
 package uk.ac.uea.socat.sanitychecker.data;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
@@ -87,11 +84,6 @@ public class DateColumnInfo {
 	private ColInfo itsSecondInfo = null;
 	
 	/**
-	 * The formatter to use for parsing date strings
-	 */
-	private DateTimeFormatter itsInputFormatter = null;
-	
-	/**
 	 * Takes an XML column spec date element and parses it.
 	 * @param dateElement The date element.
 	 * @param logger The program logger
@@ -131,7 +123,7 @@ public class DateColumnInfo {
 			processDateTimeElements(dateElement, logger);
 			break;
 		}
-		case 3:
+		case 6:
 		{
 			processIndividualColumnElements(dateElement, logger);
 			break;

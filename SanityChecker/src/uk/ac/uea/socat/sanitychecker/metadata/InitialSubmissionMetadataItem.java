@@ -1,12 +1,10 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -18,6 +16,7 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
  * Implementation of the {@code MetadataItem} class
  * to handle the Initial Submission Date entry
  */
+@SuppressWarnings("deprecation")
 public class InitialSubmissionMetadataItem extends MetadataItem {
 
 	/**

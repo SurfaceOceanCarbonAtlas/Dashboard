@@ -17,10 +17,12 @@ public class MetadataMessage {
 	
 	public static final String MAX_PROPERTY = "max";
 	
+	@SuppressWarnings("unused")
 	private int itsLine;
 	
 	private int itsSeverity;
 	
+	@SuppressWarnings("unused")
 	private String itsMessage;
 	
 	private Properties itsProperties;

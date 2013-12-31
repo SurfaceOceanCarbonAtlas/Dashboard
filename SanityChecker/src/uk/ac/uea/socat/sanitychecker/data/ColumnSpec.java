@@ -18,7 +18,6 @@ import org.jdom2.input.sax.XMLReaderXSDFactory;
 
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.data.conversion.ConversionException;
-import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 /**
  * A Java representation of the passed in column specification

@@ -20,27 +20,27 @@ public class BaseConfig extends Properties {
 	 * Version string for the BaseConfig class. This should be changed if the
 	 * class is ever updated and becomes incompatible with previous versions.
 	 */
-	private static final long serialVersionUID = 10001001L;
+	private static final long serialVersionUID = 10001002L;
 	
 	/**
 	 * The config value containing the location of the metadata processing configuration.
 	 */
-	private static final String METADATA_CONFIG_FILE = "MetadataConfigFile";
+	public static final String METADATA_CONFIG_FILE = "MetadataConfigFile";
 	
 	/**
 	 * The config value containing the location of the SOCAT data format configuration.
 	 */
-	private static final String SOCAT_CONFIG_FILE = "SocatConfigFile";
+	public static final String SOCAT_CONFIG_FILE = "SocatConfigFile";
 	
 	/**
 	 * The config value containing the location of the column specification XML Schema file.
 	 */
-	private static final String COLUMN_SPEC_SCHEMA_FILE = "ColumnSpecSchemaFile";
+	public static final String COLUMN_SPEC_SCHEMA_FILE = "ColumnSpecSchemaFile";
 	
 	/**
 	 * The config value containing the location of the column conversion configuration.
 	 */
-	private static final String COLUMN_CONVERSION_FILE = "ColumnConversionFile";
+	public static final String COLUMN_CONVERSION_FILE = "ColumnConversionFile";
 	
 	/**
 	 * The file containing the configuration.

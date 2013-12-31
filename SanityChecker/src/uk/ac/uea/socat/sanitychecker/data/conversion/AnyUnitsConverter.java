@@ -1,6 +1,5 @@
 package uk.ac.uea.socat.sanitychecker.data.conversion;
 
-import java.util.List;
 
 /**
  * Base implementation of the Converter interface.

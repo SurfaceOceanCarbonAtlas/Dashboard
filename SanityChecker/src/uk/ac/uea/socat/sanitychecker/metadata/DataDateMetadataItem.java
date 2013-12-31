@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -17,6 +16,7 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
  * Implementation of the {@code MetadataItem} class
  * to extract dates from the data in the file
  */
+@SuppressWarnings("deprecation")
 public class DataDateMetadataItem extends MetadataItem {
 
 	DateMidnight itsDate = null;
