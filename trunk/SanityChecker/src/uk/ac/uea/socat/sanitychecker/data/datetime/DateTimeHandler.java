@@ -28,6 +28,7 @@ import org.joda.time.format.DateTimeFormatter;
  * Any date/time string will be parsed against the three possible formats above.
  * 
  */
+@SuppressWarnings("deprecation")
 public class DateTimeHandler {
 	
 	/**

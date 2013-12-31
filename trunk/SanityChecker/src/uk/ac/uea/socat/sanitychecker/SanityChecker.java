@@ -1,31 +1,18 @@
 package uk.ac.uea.socat.sanitychecker;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Scanner;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
-import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
@@ -34,11 +21,8 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
-import uk.ac.uea.socat.sanitychecker.data.DateColumnInfo;
-import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.data.StandardColumnInfo;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataException;
@@ -74,7 +58,7 @@ public class SanityChecker {
 	/**
 	 * The passed in data fields
 	 */
-	private List<List<String>> itsInputData;
+	private ArrayList<ArrayList<String>> itsInputData;
 	
 	/**
 	 * The column specification for the passed in data
@@ -116,10 +100,11 @@ public class SanityChecker {
 		// Retrieve instances of the other configurations. This will
 		// ensure that they are valid and set up properly before
 		// we start trying to process files.
+		BaseConfig.getInstance();
 		MetadataConfig.getInstance();
 		SocatColumnConfig.getInstance();
 
-}
+	}
 	
 	/**
 	 * Base constructor for an instance of the Sanity Checker. This must be called for each
@@ -138,7 +123,8 @@ public class SanityChecker {
 	 * @param dateTimeFormat The date format to be used for parsing date strings. Do not include the time specification!
 	 * @throws ConfigException If the base configuration has not been initialised
 	 */
-	public SanityChecker(String filename, Properties metadataInput, ColumnSpec colSpec, List<List<String>> dataInput, String dateFormat) throws SanityCheckerException {
+	public SanityChecker(String filename, Properties metadataInput, ColumnSpec colSpec, 
+			ArrayList<ArrayList<String>> dataInput, String dateFormat) throws SanityCheckerException {
 		
 		itsLogger = Logger.getLogger("Sanity Checker - " + filename);
 		itsLogger.trace("SanityChecker called");

@@ -27,7 +27,7 @@ public class MissingValuesCandidates {
 	/**
 	 * Add a value to the list of candidates. If the value hasn't
 	 * already been added, it is given a count of one. Otherwise the
-	 * cound for that value is incremented
+	 * count for that value is incremented
 	 * @param value The missing value candidate
 	 */
 	public void add(String value) {

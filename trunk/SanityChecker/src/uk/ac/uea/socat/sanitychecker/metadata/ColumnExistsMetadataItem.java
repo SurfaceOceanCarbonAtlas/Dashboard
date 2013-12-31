@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 

@@ -2,8 +2,6 @@ package uk.ac.uea.socat.sanitychecker.data;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +11,6 @@ import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.DataMessage;
-import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
