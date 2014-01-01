@@ -14,9 +14,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
@@ -126,7 +129,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Create the metadata properties of this cruise for the sanity checker
 		Properties metadataInput = new Properties();
-		metadataInput.setProperty("Expocode", cruiseData.getExpocode());
+		metadataInput.setProperty("ExpoCode", cruiseData.getExpocode());
 
 		// Get the data column units conversion object
 		ColumnConversionConfig convConfig;
@@ -230,26 +233,17 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 			else if ( (colType == DataColumnType.LONGITUDE) || 
 					  (colType == DataColumnType.LATITUDE) || 
 					  (colType == DataColumnType.SAMPLE_DEPTH) || 
-					  (colType == DataColumnType.SAMPLE_SALINITY) || 
+					  (colType == DataColumnType.SALINITY) || 
 					  (colType == DataColumnType.EQUILIBRATOR_TEMPERATURE) || 
 					  (colType == DataColumnType.SEA_SURFACE_TEMPERATURE) || 
 					  (colType == DataColumnType.EQUILIBRATOR_PRESSURE) || 
 					  (colType == DataColumnType.SEA_LEVEL_PRESSURE) || 
-					  (colType == DataColumnType.USER_FCO2_REC) || 
-					  (colType == DataColumnType.USER_FCO2_SRC) || 
-					  (colType == DataColumnType.FCO2_AIR) || 
-					  (colType == DataColumnType.WIND_SPEED) || 
-					  (colType == DataColumnType.WIND_DIRECTION) || 
 					  (colType == DataColumnType.XCO2WATER_EQU) ||
 					  (colType == DataColumnType.XCO2WATER_SST) ||
 					  (colType == DataColumnType.PCO2WATER_EQU) ||
 					  (colType == DataColumnType.PCO2WATER_SST) ||
 					  (colType == DataColumnType.FCO2WATER_EQU) ||
-					  (colType == DataColumnType.FCO2WATER_SST) ||
-					  (colType == DataColumnType.XCO2AIR_DRY) || 
-					  (colType == DataColumnType.XCO2AIR_EQU) || 
-					  (colType == DataColumnType.PCO2AIR_WET) || 
-					  (colType == DataColumnType.FCO2AIR_WET) ) {
+					  (colType == DataColumnType.FCO2WATER_SST) ) {
 				// Element specifying the units of the column
 				Element unitsElement = new Element(ColumnSpec.INPUT_UNITS_ELEMENT_NAME);
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
@@ -293,6 +287,11 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		File name = new File(cruiseData.getExpocode());
 		Logger logger = Logger.getLogger("Sanity Checker - " + 
 				cruiseData.getExpocode());
+		if ( Level.DEBUG.isGreaterOrEqual(logger.getEffectiveLevel()) ) {
+			logger.debug("cruise columns specifications document:\n" + 
+					(new XMLOutputter(Format.getPrettyFormat()))
+					.outputString(cruiseDoc));
+		}
 		ColumnSpec colSpec;
 		try {
 			colSpec = new ColumnSpec(name, cruiseDoc, convConfig, logger);

@@ -1,0 +1,2 @@
+#Name,Type,Required?,Required Group,Generate?,Min,Max,Multiline?,Item Class,Generator Parameter
+ExpoCode,String,Y,,N,NA,NA,N,Default,
