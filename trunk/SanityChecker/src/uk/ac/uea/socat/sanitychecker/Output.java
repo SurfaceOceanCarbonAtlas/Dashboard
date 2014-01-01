@@ -52,10 +52,9 @@ public class Output {
 	public static final int INTERNAL_ERROR_FLAG = 1 << 4;
 	
 	/**
-	 * The result code from processing a file. Initialised to -1 to indicate
-	 * that processing has not yet happened.
+	 * The result code from processing a file.
 	 */
-	private int itsResultCode = -1;
+	private int itsResultCode;
 	
 	/**
 	 *	The metadata processed from the passed in metadata entries 
@@ -83,6 +82,8 @@ public class Output {
 	 * @param filename The filename of the original data file
 	 */
 	protected Output(String filename, int metadataLength, int dataLength) {
+		// Initialize result code to zero since flags can only be mixed in
+		itsResultCode = 0;
 		itsFilename = filename;
 		itsMetadata = new HashMap<String, MetadataItem>(metadataLength);
 		itsDataRecords = new ArrayList<SocatDataRecord>(dataLength);
@@ -112,17 +113,11 @@ public class Output {
 	 * @return @code{true} If processing was successful; @code{false} if the processing failed.
 	 */
 	public boolean processedOK() {
-		boolean result = true;
-		
-		if (itsResultCode < 0) {
-			result = false;
-		} else {
-			if ((itsResultCode & INVALID_INPUT_FLAG) > 0 || (itsResultCode & INTERNAL_ERROR_FLAG) > 0) {
-				result = false;
-			}
-		}
-		
-		return result;
+		if ((itsResultCode & INVALID_INPUT_FLAG) > 0 || (itsResultCode & INTERNAL_ERROR_FLAG) > 0) {
+			return false;
+		}	
+
+		return true;
 	}
 	
 	/**
