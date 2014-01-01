@@ -151,7 +151,7 @@ public class CruiseFileHandlerTest {
 						DataColumnType.LONGITUDE,
 						DataColumnType.LATITUDE,
 						DataColumnType.SAMPLE_DEPTH,
-						DataColumnType.SAMPLE_SALINITY,
+						DataColumnType.SALINITY,
 						DataColumnType.SEA_SURFACE_TEMPERATURE,
 						DataColumnType.EQUILIBRATOR_TEMPERATURE,
 						DataColumnType.SEA_LEVEL_PRESSURE,

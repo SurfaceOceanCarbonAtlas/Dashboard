@@ -211,7 +211,7 @@ public class DashboardCruiseTest {
 					DataColumnType.TIMESTAMP,
 					DataColumnType.LONGITUDE,
 					DataColumnType.LATITUDE,
-					DataColumnType.SAMPLE_SALINITY,
+					DataColumnType.SALINITY,
 					DataColumnType.EQUILIBRATOR_TEMPERATURE,
 					DataColumnType.EQUILIBRATOR_PRESSURE,
 					DataColumnType.XCO2WATER_EQU
@@ -336,7 +336,7 @@ public class DashboardCruiseTest {
 					DataColumnType.TIMESTAMP,
 					DataColumnType.LONGITUDE,
 					DataColumnType.LATITUDE,
-					DataColumnType.SAMPLE_SALINITY,
+					DataColumnType.SALINITY,
 					DataColumnType.EQUILIBRATOR_TEMPERATURE,
 					DataColumnType.EQUILIBRATOR_PRESSURE,
 					DataColumnType.XCO2WATER_EQU
