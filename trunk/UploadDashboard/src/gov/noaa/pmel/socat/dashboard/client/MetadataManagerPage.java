@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
@@ -225,6 +226,8 @@ public class MetadataManagerPage extends Composite {
 			metadataList.addAll(mdataList.values());
 		}
 		metadataGrid.setRowCount(metadataList.size());
+		// Make sure the table is sorted according to the last specification
+		ColumnSortEvent.fire(metadataGrid, metadataGrid.getColumnSortList());
 	}
 
 	@UiHandler("logoutButton")

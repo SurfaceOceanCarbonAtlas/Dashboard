@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
@@ -231,6 +232,8 @@ public class AddToSocatPage extends Composite {
 			cruiseList.addAll(cruises);
 		}
 		cruisesGrid.setRowCount(cruiseList.size());
+		// Make sure the table is sorted according to the last specification
+		ColumnSortEvent.fire(cruisesGrid, cruisesGrid.getColumnSortList());
 		// Enable the submit button since the agreeShareCheckBox is checked
 		submitButton.setEnabled(true);
 		// Reset the focus on the submit button
