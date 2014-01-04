@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -40,60 +40,69 @@ public class CruiseUploadPage extends Composite {
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String CREATE_TEXT = "Add Cruise";
+	private static final String CREATE_HOVER_HELP = 
+			"upload the data as a new cruise";
 	private static final String OVERWRITE_TEXT = "Update Cruise";
+	private static final String OVERWRITE_HOVER_HELP = 
+			"upload the data as revised data for an existing cruise";
 	private static final String CANCEL_TEXT = "Cancel";
+	private static final String CANCEL_HOVER_HELP =
+			"returns to the list of cruises";
 	private static final String HIDE_ADVANCED_TEXT = "Hide Advanced Settings";
 	private static final String SHOW_ADVANCED_TEXT = "Show Advanced Settings";
 
 	private static final String INTRO_HTML_MSG = 
-			"Select a cruise file to upload.  The <em>" + CREATE_TEXT + "</em> " +
-			"button will upload the selected file as a new cruise.  The <em>" + 
-			OVERWRITE_TEXT + "</em> button will upload the selected file as " +
-			"revised data for an existing cruise.";
-
-	private static final String ADVANCED_HTML_MSG = 
-			"Select a character set encoding for this file.  If you are unsure " +
-			"of the encoding, either of the ISO, or the UTF-8, encodings should " +
-			"work fine.  The main differences in the ISO and UTF-8 encodings " +
-			"are in the \"extended\" characters.  Only use UTF-16 if you know " +
-			"your file is encoded in that format, but be aware that only Western " +
-			"European characters can be properly handled.  Use the Window " +
-			"encoding only for files produced by older Window programs. " +
-			"<br /><br /> " +
-			"Use the preview button to show the beginning of the file as it " +
-			"will be seen by SOCAT.  Note that this uploads the entire file " +
-			"only for the purpose of creating the preview. ";
+			"<b>Upload Cruise Data</b><br />" +
+			"Select a cruise data file to upload.";
 
 	private static final String FORMAT_TEXT = "Cruise data format:";
 
+	private static final String ADVANCED_HTML_MSG = 
+			"<b>Select a character set encoding for this file.</b>" +
+			"<ul>" +
+			"<li>If you are unsure of the encoding, UTF-8, or either of the ISO " +
+			"encodings, should work fine.  The main differences in the UTF-8 " +
+			"and ISO encodings are in the \"extended\" characters.</li>" +
+			"<li>Use UTF-16 only if you know your file is encoded in that format, " +
+			"but be aware that only Western European characters can be " +
+			"properly handled.  Use the Window encoding only for files " +
+			"produced by older Window programs. </li>" +
+			"<li>The preview button will show the beginning of the file as it will " +
+			"be seen by SOCAT using the given encoding.  Note that this uploads " +
+			"the entire file only for the purpose of creating the preview.</li>" +
+			"</ul>";
 	private static final String ENCODING_TEXT = "File encoding:";
 	private static final String[] KNOWN_ENCODINGS = {
 		"ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
 	};
-
 	private static final String PREVIEW_TEXT = "Preview Cruise File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
 
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a cruise data file to upload";
 	private static final String UNKNOWN_FAIL_MSG = 
-			"Upload failed.  See the preview on the page for more information.";
+			"<b>Upload failed.</b>  See the preview on the page for more information.";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"Unable to obtain a cruise expocode from the uploaded file contents. " +
+			"<b>No cruise expocode found.</b>  The data file needs to contain the " +
+			"cruise expocode in the metadata preamble to the data as a line that " +
+			"looks like \"expocode = \" followed by the expocode.  The expocode is " +
+			"the NODC code for the ship follow by the year, month, and day of " +
+			"departure for the cruise. " +
+			"<br /><br />" +
 			"The preview on the page contains the beginning of the file as it " +
 			"appears to SOCAT.  If the contents look very strange, you might need " +
 			"to change the character encoding in the advanced settings.";
 	private static final String FILE_EXISTS_FAIL_HTML = 
-			"A cruise already exists with this expocode.  The preview contains " +
+			"<b>A cruise already exists with this expocode.</b>  The preview contains " +
 			"the beginning of the existing cruise data.  Use the <em>" + 
 			OVERWRITE_TEXT + "</em> button if this is an update of the existing " +
 			"cruise.";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG = 
-			"A cruise with this expocode already exists and has been submitted " +
-			"to SOCAT or does not below to you.  The preview on this page " +
+			"<b>A cruise with this expocode already exists which has been submitted " +
+			"to SOCAT or does not below to you.</b>  The preview on this page " +
 			"contains the beginning of the existing cruise data.";
 	private static final String FILE_DOES_NOT_EXIST_FAIL_HTML = 
-			"A cruise with this expocode does not exist.  If the expocode in " +
+			"<b>A cruise with this expocode does not exist.</b>  If the expocode in " +
 			"the cruise file is correct, use the <em>" + CREATE_TEXT + 
 			"</em> button to create a new cruise.";
 
@@ -124,7 +133,7 @@ public class CruiseUploadPage extends Composite {
 	@UiField HTML advancedHtml;
 	@UiField Label encodingLabel;
 	@UiField ListBox encodingListBox;
-	@UiField SimplePanel previewPanel;
+	@UiField ScrollPanel previewPanel;
 	@UiField Button previewButton;
 	@UiField HTML previewHtml;
 
@@ -157,8 +166,11 @@ public class CruiseUploadPage extends Composite {
 		formatListBox.addItem(DashboardUtils.CRUISE_FORMAT_COMMA);
 
 		createButton.setText(CREATE_TEXT);
+		createButton.setTitle(CREATE_HOVER_HELP);
 		overwriteButton.setText(OVERWRITE_TEXT);
+		overwriteButton.setTitle(OVERWRITE_HOVER_HELP);
 		cancelButton.setText(CANCEL_TEXT);
+		cancelButton.setTitle(CANCEL_HOVER_HELP);
 
 		advancedHtml.setHTML(ADVANCED_HTML_MSG);
 		encodingLabel.setText(ENCODING_TEXT);

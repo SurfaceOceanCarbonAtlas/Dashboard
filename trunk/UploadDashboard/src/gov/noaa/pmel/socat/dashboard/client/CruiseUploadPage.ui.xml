@@ -4,61 +4,50 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}" >
-		<g:north size="28">
-			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
-				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
-				<g:FormPanel ui:field="uploadForm">
-					<g:FlowPanel>
-						<g:FileUpload name="cruiseupload" addStyleNames="{style.uploadfile}"
-								ui:field="cruiseUpload" />
-						<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
-							<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="formatLabel" />
-							<g:ListBox name="cruiseformat" addStyleNames="{style.labeledlistbox}" 
-								ui:field="formatListBox" />
-						</g:FlowPanel>
-						<g:Hidden name="username" ui:field="usernameToken" />
-						<g:Hidden name="passhash" ui:field="passhashToken" />
-						<g:Hidden name="timestamp" ui:field="timestampToken" />
-						<g:Hidden name="cruiseaction" ui:field="actionToken" />
-						<g:Hidden name="cruiseencoding" ui:field="encodingToken" />
+	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<g:FormPanel ui:field="uploadForm">
+				<g:FlowPanel>
+					<g:FileUpload name="cruiseupload" addStyleNames="{style.uploadfile}"
+							ui:field="cruiseUpload" />
+					<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+						<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="formatLabel" />
+						<g:ListBox name="cruiseformat" addStyleNames="{style.labeledlistbox}" 
+							ui:field="formatListBox" />
 					</g:FlowPanel>
-				</g:FormPanel>
-				<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="advancedButton" />
+					<g:Hidden name="username" ui:field="usernameToken" />
+					<g:Hidden name="passhash" ui:field="passhashToken" />
+					<g:Hidden name="timestamp" ui:field="timestampToken" />
+					<g:Hidden name="cruiseaction" ui:field="actionToken" />
+					<g:Hidden name="cruiseencoding" ui:field="encodingToken" />
 				</g:FlowPanel>
+			</g:FormPanel>
+			<g:FlowPanel addStyleNames="{style.borderpanel}">
+				<g:Button addStyleNames="{style.advancedbutton}" ui:field="advancedButton" />
 				<!-- The following FlowPanel is only shown in advanced settings -->
-				<g:FlowPanel ui:field="advancedPanel">
+				<g:FlowPanel addStyleNames="{style.advancedpanel}" ui:field="advancedPanel">
 					<g:HTML addStyleNames="{style.introhtml}" ui:field="advancedHtml"/>
 					<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
 						<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="encodingLabel" />
 						<g:ListBox addStyleNames="{style.labeledlistbox}" ui:field="encodingListBox" />
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-						<g:Button addStyleNames="{style.horizontalbutton}" ui:field="previewButton" />
-					</g:FlowPanel>
+					<g:Button addStyleNames="{style.advancedbutton}" ui:field="previewButton" />
 				</g:FlowPanel>
 			</g:FlowPanel>
-		</g:north>
-		<g:south size="4">
+			<g:ScrollPanel addStyleNames="{style.previewpanel}" ui:field="previewPanel">
+				<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
+			</g:ScrollPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="createButton" />
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="overwriteButton" />
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
 			</g:FlowPanel>
-		</g:south>
-		<g:center>
-			<!-- The following SimplePanel is only shown in advanced settings or if there was an error -->
-			<g:SimplePanel addStyleNames="{style.previewpanel}" ui:field="previewPanel">
-				<g:ScrollPanel addStyleNames="{style.previewscroll}">
-					<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
-				</g:ScrollPanel>
-			</g:SimplePanel>
-		</g:center>
-	</g:DockLayoutPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder> 

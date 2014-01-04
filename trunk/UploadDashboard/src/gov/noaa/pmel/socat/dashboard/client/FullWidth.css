@@ -14,6 +14,16 @@ body {
 	margin-bottom: 1em;
 }
 
+.advancedbutton {
+	display: block;
+	font-size: 100%;
+	width: 15em;
+	margin: 1em 2em;
+}
+.advancedpanel {
+	display: block;
+}
+
 .agreepanel {
 	display: block;
 	margin-top: 0.25em;
@@ -42,6 +52,16 @@ body {
 	display: inline;
 	font-size: small;
 	margin-left: 1em;
+}
+
+.borderpanel {
+	display: block;
+	border-style: solid;
+	border-width: 2px;
+	margin-top: 1em;
+	margin-bottom: 0em;
+	margin-left: 1em;
+	margin-right: 1em;
 }
 
 .cruisenamesintro {
@@ -119,14 +139,13 @@ body {
 }
 
 .previewpanel {
+	height: 35em;
 	border-style: solid;
 	border-width: 2px;
-	margin-left: 0.25em;
-	margin-right: 0.25em;
-	margin-bottom: 0.25em;
-}
-.previewscroll {
-	height: 100%;
+	margin-top: 0em;
+	margin-bottom: 1em;
+	margin-left: 1em;
+	margin-right: 1em;
 }
 .previewhtml {
 	padding: 0.25em;
