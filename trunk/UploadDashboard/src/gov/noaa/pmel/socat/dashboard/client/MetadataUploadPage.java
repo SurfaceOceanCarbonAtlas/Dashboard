@@ -349,7 +349,6 @@ public class MetadataUploadPage extends Composite {
 		}
 		else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
 			// cruise file(s) created or updated
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(tagMsg[1]));
 			if ( expocodes.size() == 1 ) {
 				// return to the metadata manager, having it
 				// request the updated cruise from the server 
