@@ -64,25 +64,25 @@ public interface DataSpecsServiceAsync {
 			AsyncCallback<ArrayList<ArrayList<String>>> callback);
 
 	/**
-	 * Updates the data column specifications for a cruise 
-	 * to those provided.  This triggers the SanityChecker
-	 * to run using the new data column specifications.
+	 * Updates the data column specifications for a cruise to those 
+	 * provided.  This triggers the SanityChecker to run using the 
+	 * new data column specifications.
 	 * 
 	 * @param username
 	 * 		authenticate using this username
 	 * @param passhash
 	 * 		authenticate using this password hash
 	 * @param newSpecs
-	 * 		cruise data column types to assign.  The expocode
-	 * 		in this object specifies the cruise to update.
-	 * 		Any cruise data in this object is ignored.
+	 * 		cruise data column types to assign.  The expocode in this 
+	 * 		object specifies the cruise to update.  Any cruise data in 
+	 * 		this object is ignored.
 	 * @param callback
-	 * 		callback to make with the updated data column 
-	 * 		specification after processing through the 
-	 * 		SanityChecker.  The fail method is invoked 
-	 * 		if authentication fails, if expocode is invalid,
-	 * 		if the cruise does not exist, or if there are 
-	 * 		problems obtaining or evaluating the data for 
+	 * 		callback to make with the the updated cruise with  
+	 * 		(abbreviated) data after processing through the SanityChecker
+ after processing through the 
+	 * 		SanityChecker.  The fail method is invoked if authentication 
+	 * 		fails, if expocode is invalid, if the cruise does not exist, 
+	 * 		or if there are problems obtaining or evaluating the data for 
 	 * 		the cruise
 	 */
 	void updateCruiseDataColumnSpecs(String username, String passhash,

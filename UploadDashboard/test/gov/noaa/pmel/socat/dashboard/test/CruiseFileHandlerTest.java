@@ -248,7 +248,8 @@ public class CruiseFileHandlerTest {
 		assertEquals(expectedDatavals.size(), datavals.size());
 
 		// Save and commit the cruise data to file
-		handler.saveCruiseDataToFiles(cruiseData, "test check-in of fake cruise data");
+		handler.saveCruiseInfoToFile(cruiseData, "test check-in of fake cruise info file");
+		handler.saveCruiseDataToFile(cruiseData, "test check-in of fake cruise data file");
 
 		// Test that the file exists
 		assertTrue( handler.cruiseInfoFileExists(expocode) );

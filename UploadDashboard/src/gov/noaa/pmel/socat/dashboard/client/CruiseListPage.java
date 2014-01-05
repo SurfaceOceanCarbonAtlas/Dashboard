@@ -389,6 +389,31 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
+	 * Submit a request to the server to delete cruises, 
+	 * but do not display this updated page or show errors.
+	 * 
+	 * @param expoSet
+	 * 		expocodes of the cruises to be deleted
+	 */
+	static void deleteCruises(HashSet<String> expoSet) {
+		service.updateCruiseList(DashboardLoginPage.getUsername(), 
+				DashboardLoginPage.getPasshash(), 
+				DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, expoSet,
+				new AsyncCallback<DashboardCruiseList>() {
+			@Override
+			public void onSuccess(DashboardCruiseList cruises) {
+				// Do nothing
+				;
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				// Do nothing
+				;
+			}
+		});
+	}
+
+	/**
 	 * Assigns cruiseSet in this instance with the set of selected cruises 
 	 * fitting the desired criteria.
 	 *  
@@ -529,10 +554,12 @@ public class CruiseListPage extends Composite {
 			askDeletePopup = new DashboardAskPopup(DELETE_YES_TEXT, 
 					DELETE_NO_TEXT, new AsyncCallback<Boolean>() {
 				@Override
-				public void onSuccess(Boolean result) {
-					// Only proceed if yes; ignore if no or null
-					if ( result == true )
-						deleteCruises(expocodeSet);
+				public void onSuccess(Boolean okay) {
+					// Only proceed if okay
+					if ( okay ) {
+						updatePage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
+								expocodeSet, DELETE_CRUISE_FAIL_MSG);
+					}
 				}
 				@Override
 				public void onFailure(Throwable ex) {
@@ -542,18 +569,6 @@ public class CruiseListPage extends Composite {
 			});
 		}
 		askDeletePopup.askQuestion(message);
-	}
-
-	/**
-	 * Submit a request to the server to delete cruises.
-	 * 
-	 * @param expoSet
-	 * 		expocodes of the cruises to be deleted
-	 */
-	static void deleteCruises(HashSet<String> expoSet) {
-		// This page must have already been created to get here
-		singleton.updatePage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
-				expoSet, DELETE_CRUISE_FAIL_MSG);
 	}
 
 	@UiHandler("addToListButton")

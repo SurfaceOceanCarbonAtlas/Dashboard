@@ -604,7 +604,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		error writing information for this cruise to file, or if there 
 	 * 		was an error committing the updated file to version control
 	 */
-	public void saveCruiseToInfoFile(DashboardCruise cruise, String message)
+	public void saveCruiseInfoToFile(DashboardCruise cruise, String message)
 										throws IllegalArgumentException {
 		// Get the cruise information filename
 		String expocode = cruise.getExpocode();
@@ -688,8 +688,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Saves and commits the cruise information to the information file
-	 * and the cruise data to data file.
+	 * Saves and commits the cruise the cruise data to data file.
+	 * The cruise information file needs to be saved using 
+	 * {@link #saveCruiseInfoToFile(DashboardCruise, String)}.
 	 * 
 	 * @param cruiseData
 	 * 		cruise data to save
@@ -701,10 +702,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		an error writing data for this cruise to file, or if there 
 	 * 		was an error committing the updated file to version control
 	 */
-	public void saveCruiseDataToFiles(DashboardCruiseWithData cruiseData, 
+	public void saveCruiseDataToFile(DashboardCruiseWithData cruiseData, 
 						String message) throws IllegalArgumentException {
-		// Save the cruise information to the information file
-		saveCruiseToInfoFile(cruiseData, message);
 		// Get the cruise data filename
 		String expocode = cruiseData.getExpocode();
 		File dataFile = cruiseDataFile(expocode);

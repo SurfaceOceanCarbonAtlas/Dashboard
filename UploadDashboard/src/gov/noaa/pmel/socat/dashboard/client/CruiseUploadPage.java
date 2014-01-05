@@ -373,7 +373,7 @@ public class CruiseUploadPage extends Composite {
 			SocatUploadDashboard.showMessage(NO_EXPOCODE_FAIL_MSG);
 		}
 		else if ( tagMsg[0].equals(DashboardUtils.FILE_EXISTS_HEADER_TAG) ) {
-			// cruise file exists and not overwrite; 
+			// cruise file exists and request was to create a new cruise; 
 			// show existing file partial contents in the preview
 			String previewMsg;
 			if ( tagMsg[1].contains("</pre>") )
@@ -397,8 +397,8 @@ public class CruiseUploadPage extends Composite {
 			SocatUploadDashboard.showMessage(CANNOT_OVERWRITE_FAIL_MSG);
 		}
 		else if ( tagMsg[0].equals(DashboardUtils.NO_FILE_HEADER_TAG) ) {
-			// cruise file does not exist and overwrite; 
-			// show partial file contents in preview
+			// cruise file does not exist and request was to overwrite
+			// an existing cruise; show partial file contents in preview
 			String previewMsg;
 			if ( (tagMsg[1]).contains("</pre>") )
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
@@ -411,16 +411,12 @@ public class CruiseUploadPage extends Composite {
 		else if ( tagMsg[0].startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
 			String expocode = tagMsg[0].substring(
 					DashboardUtils.FILE_CREATED_HEADER_TAG.length()).trim();
-			// cruise file created or updated
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(tagMsg[1]));
 			// go to the data column specifications page
 			DataColumnSpecsPage.showPage(expocode, true);
 		}
 		else if ( tagMsg[0].startsWith(DashboardUtils.FILE_UPDATED_HEADER_TAG) ) {
 			String expocode = tagMsg[0].substring(
 					DashboardUtils.FILE_UPDATED_HEADER_TAG.length()).trim();
-			// cruise file created or updated
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(tagMsg[1]));
 			// go to the data column specifications page
 			DataColumnSpecsPage.showPage(expocode, true);
 		}

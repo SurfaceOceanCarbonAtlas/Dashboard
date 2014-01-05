@@ -110,7 +110,7 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 
 		// Save the updated cruise
 		dataStore.getCruiseFileHandler()
-				 .saveCruiseToInfoFile(cruise, message);
+				 .saveCruiseInfoToFile(cruise, message);
 
 		// Create the updated metadata listing for the cruise
 		DashboardMetadataList mdataList = new DashboardMetadataList();

@@ -324,10 +324,11 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		else {
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 		}
+
 		// TODO: add the reports of any issues found
 
 		// Save and commit the updated cruise columns
-		dataStore.getCruiseFileHandler().saveCruiseToInfoFile(cruiseData, 
+		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
 				"Cruise column types and units for " +  cruiseData.getExpocode() + 
 				" updated by " + username);
 		

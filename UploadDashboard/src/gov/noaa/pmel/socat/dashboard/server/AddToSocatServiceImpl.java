@@ -71,7 +71,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			}
 
 			// Commit this update of the cruise properties
-			cruiseHandler.saveCruiseToInfoFile(cruise, "Cruise " + expocode +
+			cruiseHandler.saveCruiseInfoToFile(cruise, "Cruise " + expocode +
 					" submitted to SOCAT by " + username + 
 					" with initial QC status '" + qcStatus + 
 					"' and archive status '" + doiStatus + "'");
@@ -107,7 +107,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 		cruise.setArchiveStatus(archiveStatus);
 
 		// Commit this update of the cruise properties
-		dataStore.getCruiseFileHandler().saveCruiseToInfoFile(cruise, 
+		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruise, 
 				"Archive status of cruise " + expocode + " updated by " + 
 				username + " to '" + archiveStatus + "'");
 

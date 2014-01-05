@@ -152,7 +152,7 @@ public class MetadataUploadService extends HttpServlet {
 				// Directly modify the metadata listing in the cruise
 				if ( cruise.getMetadataFilenames().add(metadata.getFilename()) ) {
 					// New metadata document added
-					cruiseHandler.saveCruiseToInfoFile(cruise, 
+					cruiseHandler.saveCruiseInfoToFile(cruise, 
 							"Added metadata document " + metadata.getFilename() + 
 							" to cruise " + expo);
 				}
