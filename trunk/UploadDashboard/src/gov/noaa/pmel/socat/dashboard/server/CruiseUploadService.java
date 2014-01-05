@@ -299,14 +299,17 @@ public class CruiseUploadService extends HttpServlet {
 
 		// Save the cruise file and commit it to version control
 		String message;
-		if ( cruiseExists )
-			message = "Cruise data for " + expocode + " updated by " + 
+		if ( cruiseExists ) 
+			message = "for " + expocode + " updated by " + 
 					username + " from uploaded file " + filename;
 		else
-			message = "Cruise data for " + expocode + " added by " + 
+			message = "for " + expocode + " added by " + 
 					username + " from uploaded file " + filename;			
 		try {
-			cruiseHandler.saveCruiseDataToFiles(cruiseData, message);
+			cruiseHandler.saveCruiseInfoToFile(cruiseData, 
+					"Cruise info file " + message);
+			cruiseHandler.saveCruiseDataToFile(cruiseData, 
+					"Cruise data file " + message);
 		} catch (IllegalArgumentException ex) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
 					"Error processing the request: " + ex.getMessage());

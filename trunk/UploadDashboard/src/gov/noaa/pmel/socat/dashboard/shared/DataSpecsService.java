@@ -80,7 +80,7 @@ public interface DataSpecsService extends RemoteService {
 	 * 		in this object specifies the cruise to update.
 	 * 		Any cruise data in this object is ignored.
 	 * @return
-	 * 		the updated data column specification after 
+	 * 		the updated cruise with (abbreviated) data after 
 	 * 		processing through the SanityChecker
 	 * @throws IllegalArgumentException
 	 * 		if authentication fails, if expocode is invalid,
