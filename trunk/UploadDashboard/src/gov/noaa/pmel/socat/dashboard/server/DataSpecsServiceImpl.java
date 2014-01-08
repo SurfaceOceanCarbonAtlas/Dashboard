@@ -329,8 +329,11 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Save and commit the updated cruise columns
 		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
-				"Cruise column types and units for " +  cruiseData.getExpocode() + 
-				" updated by " + username);
+				"Cruise data column types and units for " + 
+				cruiseData.getExpocode() + " updated by " + username);
+		// Update the user-specific data column names to types and units 
+		dataStore.getUserFileHandler()
+				 .updateUserDataColumnTypes(cruiseData, username);
 		
 		// Remove all but the first 25 rows of cruise data 
 		// to minimize the payload of the returned cruise data

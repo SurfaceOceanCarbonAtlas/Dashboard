@@ -325,11 +325,10 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					"No data columns found, possibly due to incorrect format");
 
 		if ( assignCruiseInfo ) {
-			// Guess the data column types, units, and descriptions from the 
-			// user-provided data column names
+			// Assign the data column types and units from the data column names
 			try {
 				DashboardDataStore.get().getUserFileHandler()
-										.assignStandardDataColumnTypes(cruiseData);
+										.assignDataColumnTypes(cruiseData);
 			} catch ( IOException ex ) {
 				throw new IOException(
 						"Unexpected failure to get the user file handler");
