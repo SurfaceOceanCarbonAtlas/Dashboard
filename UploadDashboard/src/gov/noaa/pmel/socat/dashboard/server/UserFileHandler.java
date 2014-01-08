@@ -3,20 +3,22 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 /**
  * Handles storage and retrieval of user data in files.
@@ -27,6 +29,13 @@ public class UserFileHandler extends VersionedFileHandler {
 
 	private static final String USER_CRUISE_LIST_NAME_EXTENSION = 
 			"_cruise_list.txt";
+	private static final String DEFAULT_DATA_COLUMNS_FILENAME = 
+			"data_column_defaults.properties";
+	private static final String USER_DATA_COLUMNS_NAME_EXTENSION =
+			"_data_columns.properties";
+
+	private HashMap<String,DataColumnType> defaultColNamesToTypes;
+	private HashMap<String,String> defaultColNamesToUnits;
 
 	/**
 	 * Handles storage and retrieval of user data in files under 
@@ -40,11 +49,65 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		password for SVN authentication
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a 
-	 * 		directory, or is not under SVN version control
+	 * 		directory, or is not under SVN version control; 
+	 * 		also, if the default column name to type properties
+	 * 		file does not exist or is invalid.
 	 */
 	UserFileHandler(String userFilesDirName, String svnUsername,
 					String svnPassword) throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
+		// Generate the default data column name to type map
+		defaultColNamesToTypes = new HashMap<String,DataColumnType>();
+		defaultColNamesToUnits = new HashMap<String,String>();
+		addDataColumnNames(
+				new File(userFilesDirName, DEFAULT_DATA_COLUMNS_FILENAME), 
+				defaultColNamesToTypes, defaultColNamesToUnits);
+	}
+
+	/**
+	 * Reads a properties file mapping data column names to data column
+	 * types and units, and adds these mappings to the provided maps.
+	 * 
+	 * @param propFile
+	 * 		properties file where each key is the name of a data column, 
+	 * 		and each value is the name of a DataColumnType, a comma, and
+	 * 		a unit string
+	 * @param dataColNamesToTypes
+	 * 		add the mappings of column names to types to this map
+	 * @param dataColNamesToUnits
+	 * 		add the mappings of column names to units to this map
+	 * @throws IllegalArgumentException
+	 * 		if the properties file does not exist or is invalid
+	 */
+	private void addDataColumnNames(File propFile, 
+			HashMap<String,DataColumnType> dataColNamesToTypes,
+			HashMap<String,String> dataColNamesToUnits) 
+										throws IllegalArgumentException {
+		// Read the column name to type properties file
+		Properties colProps = new Properties();
+		try {
+			FileReader propsReader = new FileReader(propFile);
+			try {
+				colProps.load(propsReader);
+			} finally {
+				propsReader.close();
+			}
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+		// Convert the properties to a map of data column name to type
+		// and add to the given map
+		for ( Entry<Object,Object> prop : colProps.entrySet() ) {
+			String colName = (String) prop.getKey();
+			String propVal = (String) prop.getValue();
+			String[] vals = propVal.split(",",-1);
+			if ( vals.length != 2 ) 
+				throw new IllegalArgumentException("invalid type,unit value \"" + 
+						propVal + "\" for key \"" + colName + "\" given in " +
+						propFile.getPath());
+			dataColNamesToTypes.put(colName, DataColumnType.valueOf(vals[0]));
+			dataColNamesToUnits.put(colName, vals[1]);
+		}
 	}
 
 	/**
@@ -264,15 +327,29 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Assigns the standard data column types from the user-provided 
-	 * data column names.  TODO: The cruise owner is used to obtain 
-	 * customized associations of user-provided column names to standard 
-	 * column names.
+	 * Assigns the data column types and units for a cruise 
+	 * from the user-provided data column names using the 
+	 * mappings of column names to types and units associated
+	 * with the cruise owner. 
 	 *  
 	 * @param cruise
 	 * 		cruise whose data column types are to be assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data column names to types and units properties 
+	 * 		file for the cruise owner, if it exists, is invalid.
 	 */
-	public void assignStandardDataColumnTypes(DashboardCruise cruise) {
+	public void assignDataColumnTypes(DashboardCruise cruise) 
+												throws IllegalArgumentException {
+		// Copy the default maps of data column names to types and units
+		HashMap<String,DataColumnType> userColNamesToTypes = 
+				new HashMap<String,DataColumnType>(defaultColNamesToTypes);
+		HashMap<String,String> userColNamesToUnits =
+				new HashMap<String,String>(defaultColNamesToUnits);
+		// Add the user-customized map of column names to types
+		File propsFile = new File(filesDir, 
+				cruise.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
+		if ( propsFile.exists() ) 
+			addDataColumnNames(propsFile, userColNamesToTypes, userColNamesToUnits);
 		// Directly assign the lists contained in the cruise
 		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
 		colTypes.clear();
@@ -280,19 +357,119 @@ public class UserFileHandler extends VersionedFileHandler {
 		colUnits.clear();
 		// Go through the column names to assign these lists
 		for ( String colName : cruise.getUserColNames() ) {
-			// TODO: use the cruise owner name to retrieve a file with 
-			//       customized associations of column name to type
-			DataColumnType dataType = DataColumnType.UNKNOWN;
-			for ( Entry<DataColumnType,String> stdNameEntry : 
-				DashboardUtils.STD_HEADER_NAMES.entrySet() ) {
-				if ( colName.startsWith(stdNameEntry.getValue()) ) {
-					dataType = stdNameEntry.getKey();
-					break;
-				}
+			// Convert the column name to the key
+			String key = colName.toLowerCase()
+								.replaceAll("[^a-z]", "");
+			DataColumnType thisColType = userColNamesToTypes.get(key);
+			if ( thisColType == null )
+				thisColType = DataColumnType.UNKNOWN;
+			String thisColUnit = userColNamesToUnits.get(key);
+			if ( thisColUnit == null )
+				thisColUnit = "";
+			colTypes.add(thisColType);
+			colUnits.add(thisColUnit);
+		}
+	}
+
+	/**
+	 * Updates and saves the data column names to types and units properties
+	 * file for a cruise owner from the currently assigned column names, types
+	 * and units given in a cruise.
+	 * 
+	 * @param cruise
+	 * 		update the data column names to types and units from this cruise
+	 * @param username
+	 * 		user making this update (for the version control commit message)
+	 * @throws IllegalArgumentException
+	 * 		if the data column names to types and units properties 
+	 * 		file for the cruise owner, if it exists, is invalid, or 
+	 * 		if unable to save or commit the updated version of this file 
+	 */
+	public void updateUserDataColumnTypes(DashboardCruise cruise, String username) 
+											throws IllegalArgumentException {
+		// Copy the default maps of data column names to types and units
+		HashMap<String,DataColumnType> userColNamesToTypes = 
+				new HashMap<String,DataColumnType>(defaultColNamesToTypes);
+		HashMap<String,String> userColNamesToUnits =
+				new HashMap<String,String>(defaultColNamesToUnits);
+		// Add the user-customized map of column names to types
+		File propsFile = new File(filesDir, 
+				cruise.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
+		if ( propsFile.exists() ) 
+			addDataColumnNames(propsFile, 
+					userColNamesToTypes, userColNamesToUnits);
+		// Add mappings of data columns names to types and units from this cruise
+		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
+		ArrayList<String> colUnits = cruise.getDataColUnits();
+		boolean changed = false;
+		int k = 0;
+		for ( String colName : cruise.getUserColNames() ) {
+			// Convert the column name to the key
+			String key = colName.toLowerCase()
+								.replaceAll("[^a-z]", "");
+			DataColumnType thisColType = colTypes.get(k);
+			DataColumnType oldType = userColNamesToTypes.put(key, thisColType);
+			if ( thisColType != oldType )
+				changed = true;
+			String thisColUnit = colUnits.get(k);
+			String oldColUnit = userColNamesToUnits.put(key, thisColUnit);
+			if ( ! thisColUnit.equals(oldColUnit) )
+				changed = true;
+			k++;
+		}
+
+		// If nothing has changed, nothing to do
+		if ( ! changed ) 
+			return;
+
+		// Remove the default name to type mappings
+		for ( Entry<String,DataColumnType> defEntry : defaultColNamesToTypes.entrySet() ) {
+			DataColumnType thisColType = userColNamesToTypes.remove(defEntry.getKey());
+			if ( thisColType != defEntry.getValue() )
+				userColNamesToTypes.put(defEntry.getKey(), thisColType);
+		}
+		// Remove the default name to type mappings
+		for ( Entry<String,String> defEntry : defaultColNamesToUnits.entrySet() ) {
+			String thisColUnit = userColNamesToUnits.remove(defEntry.getKey());
+			if ( ! thisColUnit.equals(defEntry.getValue()) )
+				userColNamesToUnits.put(defEntry.getKey(), thisColUnit);
+		}
+		// Create the Properties object for these mappings. 
+		Properties colProps = new Properties();
+		// Note that the keys for the two maps could no longer be identical. 
+		HashSet<String> allKeys = new HashSet<String>(userColNamesToTypes.keySet());
+		allKeys.addAll(userColNamesToUnits.keySet());
+		for ( String key : allKeys ) {
+			DataColumnType thisColType = userColNamesToTypes.get(key);
+			if ( thisColType == null )
+				thisColType = defaultColNamesToTypes.get(key);
+			String thisColUnit = userColNamesToUnits.get(key);
+			if ( thisColUnit == null )
+				thisColUnit = defaultColNamesToUnits.get(key);
+			colProps.setProperty(key, thisColType.name() + "," + thisColUnit);
+		}
+		// Save this Properties object to file
+		try {
+			FileWriter propsWriter = new FileWriter(propsFile);
+			try {
+				colProps.store(propsWriter, null);
+			} finally {
+				propsWriter.close();
 			}
-			colTypes.add(dataType);
-			// TODO: get units from column name
-			colUnits.add(DashboardUtils.STD_DATA_UNITS.get(dataType).get(0));
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Problems saving the data column names to types and units " +
+					"file for " + cruise.getOwner() + "\n" + ex.getMessage());
+		}
+		// Commit the update version of this file
+		try {
+			commitVersion(propsFile, 
+					"Data column names to types and units properties file for " + 
+					cruise.getOwner() + " updated by " + username);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException(
+					"Problems committing the data column names to types and units " +
+					"file for " + cruise.getOwner() + "\n" + ex.getMessage());
 		}
 	}
 

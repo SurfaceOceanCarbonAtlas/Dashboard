@@ -179,24 +179,24 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.IGNORE, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.UNKNOWN, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD HH:MM:SS", "MM/DD/YYYY HH:MM:SS", "DD/MM/YYYY HH:MM:SS")));
+				"yyyy-mm-dd hh:mm:ss", "mm/dd/yyyy hh:mm:ss", "dd/mm/yyyy hh:mm:ss")));
 		STD_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
+				"yyyy-mm-dd", "mm/dd/yyyy", "dd/mm/yyyy")));
 		STD_DATA_UNITS.put(DataColumnType.YEAR, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.MONTH, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.DAY, new ArrayList<String>(Arrays.asList("")));
-		STD_DATA_UNITS.put(DataColumnType.TIME, new ArrayList<String>(Arrays.asList("HH:MM:SS")));
+		STD_DATA_UNITS.put(DataColumnType.TIME, new ArrayList<String>(Arrays.asList("hh:mm:ss")));
 		STD_DATA_UNITS.put(DataColumnType.HOUR, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.MINUTE, new ArrayList<String>(Arrays.asList("")));
 		STD_DATA_UNITS.put(DataColumnType.SECOND, new ArrayList<String>(Arrays.asList("")));
-		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("dec. deg. E")));
-		STD_DATA_UNITS.put(DataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("dec. deg. N")));
+		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, new ArrayList<String>(Arrays.asList("dec.deg.E")));
+		STD_DATA_UNITS.put(DataColumnType.LATITUDE, new ArrayList<String>(Arrays.asList("dec.deg.N")));
 		STD_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, new ArrayList<String>(Arrays.asList("meters")));
 		STD_DATA_UNITS.put(DataColumnType.SALINITY, new ArrayList<String>(Arrays.asList("PSU")));
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
-		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg. C")));
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
-		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg.C")));
+		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("deg.C")));
+		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa")));
+		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa")));
 		STD_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU, new ArrayList<String>(Arrays.asList("umol/mol")));
 		STD_DATA_UNITS.put(DataColumnType.XCO2WATER_SST, new ArrayList<String>(Arrays.asList("umol/mol")));
 		STD_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU, new ArrayList<String>(Arrays.asList("uatm")));
@@ -230,8 +230,8 @@ public class DashboardUtils {
 		CHECKER_DATA_UNITS.put(DataColumnType.SALINITY, new ArrayList<String>(Arrays.asList("psu")));
 		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, new ArrayList<String>(Arrays.asList("degC")));
 		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, new ArrayList<String>(Arrays.asList("degC")));
-		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
-		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa", "mbar")));
+		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, new ArrayList<String>(Arrays.asList("hPa")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, new ArrayList<String>(Arrays.asList("hPa")));
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU, new ArrayList<String>(Arrays.asList("ppm")));
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_SST, new ArrayList<String>(Arrays.asList("ppm")));
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU, new ArrayList<String>(Arrays.asList("uatm")));
