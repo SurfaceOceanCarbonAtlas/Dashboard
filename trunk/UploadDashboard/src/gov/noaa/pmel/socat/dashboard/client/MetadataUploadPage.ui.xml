@@ -4,26 +4,28 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:FlowPanel>
-		<g:FlowPanel addStyleNames="{style.userinfopanel}">
-			<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-			<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
-		</g:FlowPanel>
-		<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
-		<g:FormPanel ui:field="uploadForm">
-			<g:FlowPanel>
-				<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
-						ui:field="metadataUpload" />
-				<g:Hidden name="username" ui:field="usernameToken" />
-				<g:Hidden name="passhash" ui:field="passhashToken" />
-				<g:Hidden name="timestamp" ui:field="timestampToken" /> 
-				<g:Hidden name="expocodes" ui:field="expocodesToken" />
+	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 			</g:FlowPanel>
-		</g:FormPanel>
-		<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="uploadButton" />
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<g:FormPanel ui:field="uploadForm">
+				<g:FlowPanel>
+					<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
+							ui:field="metadataUpload" />
+					<g:Hidden name="username" ui:field="usernameToken" />
+					<g:Hidden name="passhash" ui:field="passhashToken" />
+					<g:Hidden name="timestamp" ui:field="timestampToken" /> 
+					<g:Hidden name="expocodes" ui:field="expocodesToken" />
+				</g:FlowPanel>
+			</g:FormPanel>
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="uploadButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+			</g:FlowPanel>
 		</g:FlowPanel>
-	</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder> 

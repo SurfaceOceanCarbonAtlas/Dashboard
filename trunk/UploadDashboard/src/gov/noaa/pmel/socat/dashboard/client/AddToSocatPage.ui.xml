@@ -1,42 +1,41 @@
-<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
 	<ui:style src="FullWidth.css" />
 
-	<g:FlowPanel addStyleNames="{style.fullwidthcontainer}">
-		<g:FlowPanel addStyleNames="{style.userinfopanel}">
-			<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-			<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
-		</g:FlowPanel>
-		<g:HTML addStyleNames="{style.addinfo}" ui:field="firstInfoHtml" />
-		<g:FlowPanel addStyleNames="{style.agreepanel}">
-			<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
-			<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
-		</g:FlowPanel>
-		<g:HTML addStyleNames="{style.addinfo}" ui:field="secondInfoHtml" />
-		<g:FlowPanel addStyleNames="{style.borderpanel}">
-			<g:FlowPanel addStyleNames="{style.archivepanel}">
-				<g:RadioButton addStyleNames="{style.archivebutton}" 
-						name="archiveRadioGroup" ui:field="socatRadio" />
-				<g:Button addStyleNames="{style.archiveinfobutton}" 
-						ui:field="socatInfoButton" />
+	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="{style.archivepanel}">
-				<g:RadioButton addStyleNames="{style.archivebutton}" 
-						name="archiveRadioGroup" ui:field="ownerRadio" />
-				<g:Button addStyleNames="{style.archiveinfobutton}" 
-						ui:field="ownerInfoButton" />
+			<g:HTML addStyleNames="{style.addinfo}" ui:field="firstInfoHtml" />
+			<g:FlowPanel addStyleNames="{style.agreepanel}">
+				<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
+				<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
+			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.addinfo}" ui:field="secondInfoHtml" />
+			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionbutton}"
+							name="archiveRadioGroup" ui:field="socatRadio" />
+					<g:Button addStyleNames="{style.optioninfobutton}" ui:field="socatInfoButton" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionbutton}"
+							name="archiveRadioGroup" ui:field="ownerRadio" />
+					<g:Button addStyleNames="{style.optioninfobutton}" ui:field="ownerInfoButton" />
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<g:ResizeLayoutPanel addStyleNames="{style.cruisespanel}" ui:field="cruisesPanel">
+				<cell:DataGrid ui:field="cruisesGrid" />
+			</g:ResizeLayoutPanel>
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:ResizeLayoutPanel addStyleNames="{style.cruisespanel}" ui:field="cruisesPanel">
-			<cell:DataGrid ui:field="cruisesGrid" />
-		</g:ResizeLayoutPanel>
-		<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
-		</g:FlowPanel>
-	</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder> 

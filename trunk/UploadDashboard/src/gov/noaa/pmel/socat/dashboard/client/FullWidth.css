@@ -2,6 +2,7 @@
 
 body {
 	width: 100%;
+	height: 100%;
 	background-color: #DEF;
 	font-size: 100%;
 	margin: 0;
@@ -36,22 +37,8 @@ body {
 .agreeinfobutton {
 	display: inline;
 	font-size: small;
-	margin-left: 1em;
-}
-
-.archivepanel {
-	display: block;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-}
-.archivebutton {
-	display: inline;
-	margin-left: 3em;
-}
-.archiveinfobutton {
-	display: inline;
-	font-size: small;
-	margin-left: 1em;
+	margin-left: 1.5em;
+	margin-right: 0.25em;
 }
 
 .borderpanel {
@@ -73,7 +60,6 @@ body {
 
 .cruisespanel {
 	display: block;
-	width: 100%;
 	margin-top: 2em;
 	margin-left: 1em;
 	margin-right: 1em;
@@ -145,6 +131,41 @@ body {
 	display: inline;
 	margin-left: 10em;
 }
+
+.metadatapanel {
+	display: block;
+	height: 15em;
+}
+.metadatagridpanel {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+.optionsborderpanel {
+	display: block;
+	border-style: solid;
+	border-width: 2px;
+	padding: 0.25em;
+	margin-top: 1em;
+	margin-bottom: 0em;
+	margin-left: 2em;
+	margin-right: 1em;
+}
+.optionpanel {
+	display: block;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+.optionbutton {
+	display: inline;
+	margin-left: 0.75em;
+}
+.optioninfobutton {
+	display: inline;
+	font-size: small;
+	margin-left: 1.5em;
+}
+
 
 .previewpanel {
 	height: 35em;

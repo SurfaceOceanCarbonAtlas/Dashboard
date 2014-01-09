@@ -5,36 +5,30 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:east size="0.5">
-			<!-- Just to give uniform padding -->
-			<g:Label />
-		</g:east>
-		<g:north size="9">
-			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
-				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.cruisenamesintro}" ui:field="introHtml" />
+	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
 			</g:FlowPanel>
-		</g:north>
-		<g:south size="4">
+			<g:HTML addStyleNames="{style.cruisenamesintro}" ui:field="introHtml" />
+			<g:DockLayoutPanel unit="EM" addStyleNames="{style.metadatapanel}">
+				<g:west size="7">
+					<g:FlowPanel addStyleNames="{style.uploadpanel}">
+						<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="uploadButton" />
+						<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="deleteButton" />
+					</g:FlowPanel>
+				</g:west>
+				<g:center>
+					<g:ResizeLayoutPanel addStyleNames="{style.metadatagridpanel}">
+						<cell:DataGrid ui:field="metadataGrid" />
+					</g:ResizeLayoutPanel>
+				</g:center>
+			</g:DockLayoutPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton" />
 			</g:FlowPanel>
-		</g:south>
-		<g:west size="7">
-			<g:FlowPanel addStyleNames="{style.uploadpanel}">
-				<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="uploadButton" />
-				<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="deleteButton" />
-			</g:FlowPanel>
-		</g:west>
-		<g:center>
-			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid ui:field="metadataGrid" />
-			</g:ResizeLayoutPanel>
-		</g:center>
-	</g:DockLayoutPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder> 
