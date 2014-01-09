@@ -103,10 +103,10 @@ public class CruiseListPage extends Composite {
 
 	private static final String SUBMITTED_CRUISES_SELECTED_ERROR_MSG = 
 			"The selected cruises can only include cruises which have not " +
-			"been added to SOCAT or which have been suspended.";
+			"been added to SOCAT or have been suspended.";
 	private static final String UNSUBMITTED_CRUISES_SELECTED_ERROR_MSG =
 			"The selected cruises can only include cruises which have been " +
-			"added to SOCAT and which have not been suspended.";
+			"added to SOCAT and have not been suspended.";
 
 	private static final String NO_CRUISES_FOR_DATACHECK_MSG = 
 			"No cruise is selected for checking data";

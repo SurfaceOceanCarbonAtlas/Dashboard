@@ -47,22 +47,22 @@ public class MetadataUploadPage extends Composite {
 	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String MULTI_CRUISE_HTML_INTRO_PROLOGUE = 
+			"<b>Upload a Metadata Document</b>" +
+			"<br /><br />" +
 			"Because multiple cruises were selected, you can only upload " +
 			"metadata documents.  The uploaded metadata document will be " +
 			"duplicated to uniquely associate a copy to each cruise selected, " +
 			"either as a new document or replacing an existing document. " +
 			"<br /><br />" +
-			"In order to perform other operations with metadata documents " +
-			"for a cruise, select only the one cruise on the main cruise " +
-			"list page before showing the metadata manager. " +
-			"<br /><br />" +
-			"Upload documents for the cruises: <b>";
+			"Upload metadata for the cruises: <b>";
 	private static final String SINGLE_CRUISE_HTML_INTRO_PROLOGUE = 
-			"Upload documents for the cruise: <b>";
+			"<b>Upload a Metadata Document</b>" +
+			"<br /><br />" +
+			"Upload metadata for the cruise: <b>";
 	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</b>";
 
 	private static final String NO_FILE_ERROR_MSG = 
-			"Please select a metadata file to upload";
+			"Please select a metadata document to upload";
 
 	private static final String OVERWRITE_WARNING_MSG_PROLOGUE = 
 			"The following metadata documents for this cruise will be " +
