@@ -250,6 +250,11 @@ public class ArchivePage extends Composite {
 		}
 	}
 
+	@UiHandler("logoutButton")
+	void logoutOnClick(ClickEvent event) {
+		DashboardLogoutPage.showPage();
+	}
+
 	@UiHandler({"socatRadio","cdiacRadio","ownerRadio"})
 	void noDoiRadioOnValueChange(ValueChangeEvent<Boolean> event) {
 		if ( event.getValue() ) {

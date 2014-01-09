@@ -25,6 +25,7 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -351,8 +352,21 @@ public class DataColumnSpecsPage extends Composite {
 						DashboardLogoutPage.showPage();
 					}
 					else {
-						// Return to the cruise list page
-						CruiseListPage.showPage(false);
+						// Wait (up to 15 sec) for the deletion to complete.
+						(new Timer() {
+							int count = 0;
+							@Override
+							public void run() {
+								count++;
+								if ( (count > 15) || 
+									 CruiseListPage.deleteCruisesDone() ) {
+									// Delete done or waiting too long
+									// return to the cruise list page
+									cancel();
+									CruiseListPage.showPage(false);
+								}
+							}
+						}).scheduleRepeating(1000);
 					}
 				}
 			}

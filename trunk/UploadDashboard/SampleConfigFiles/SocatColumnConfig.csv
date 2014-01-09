@@ -73,7 +73,7 @@
 #Field,Required,RequiredGroup,Source,Metadata_Name,Calc_Class,Numeric,Range_Min,Range_Max,Flag,MissingFlag,RangeFlag
 longitude,Y,,D,,,Y,-180,180,C,B,B
 latitude,Y,,D,,,Y,-90,90,C,B,B
-depth,N,,D,,,Y,-20,0,F,Q,Q
+depth,N,,D,,,Y,0,20,F,Q,Q
 temp,Y,,D,,,Y,-5,40,F,Q,Q
 temperature_equi,Y,,D,,,Y,-5,35,F,Q,Q
 pressure_atm,Y,,D,,,Y,800,1100,F,Q,Q

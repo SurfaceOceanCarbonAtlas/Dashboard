@@ -75,12 +75,12 @@ public class CruiseListPage extends Composite {
 	 * 		"aside other SOCAT cruises";
 	 */
 
-	private static final String QC_SUBMIT_TEXT = "Submit for QC";
+	private static final String QC_SUBMIT_TEXT = "Add to SOCAT";
 	private static final String QC_SUBMIT_HOVER_HELP =
 			"submit the selected cruises to SOCAT for policy " +
 			"(quality control) assessment ";
 
-	static final String ARCHIVE_TEXT = "Archive Cruise";
+	static final String ARCHIVE_TEXT = "Manage Archival";
 	private static final String ARCHIVE_HOVER_HELP =
 			"manage the archival of the selected cruise";
 
@@ -101,27 +101,49 @@ public class CruiseListPage extends Composite {
 	private static final String GET_CRUISE_LIST_ERROR_MSG = 
 			"Problems obtaining the latest cruise listing";
 
+	private static final String SUBMITTED_CRUISES_SELECTED_ERROR_MSG = 
+			"The selected cruises can only include cruises which have not " +
+			"been added to SOCAT or which have been suspended.";
+	private static final String UNSUBMITTED_CRUISES_SELECTED_ERROR_MSG =
+			"The selected cruises can only include cruises which have been " +
+			"added to SOCAT and which have not been suspended.";
+
 	private static final String NO_CRUISES_FOR_DATACHECK_MSG = 
-			"No unsubmitted cruises are selected for checking data";
+			"No cruise is selected for checking data";
 	private static final String MANY_CRUISES_FOR_DATACHECK_MSG = 
-			"Only one unsubmitted cruise may be selected when checking data";
+			"Only one cruise may be selected for checking data";
 
 	private static final String NO_CRUISES_FOR_METADATA_MSG = 
-			"No unsubmitted cruises are selected for managing " +
-			"metadata documents.";
+			"No cruises are selected for managing metadata documents.";
 
 	private static final String NO_CRUISES_FOR_QC_SUBMIT_MSG =
-			"No unsubmitted cruises are selected for submitting to SOCAT.";
+			"No cruises are selected for adding to SOCAT.";
+
+	private static final String METADATA_AUTOFAIL_HTML_PROLOGUE = 
+			"The following cruises do not have any metadata documents: <ul>";
+	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
+			"The following cruises have data that have not been checked, " +
+			"or have very serious errors detected by the automated data " +
+			"checker: <ul>";
+	private static final String CANNOT_SUBMIT_HTML_EPILOGUE =
+			"</ul> These cruises cannot be added to SOCAT until these " +
+			"problems have been resolved.";
+	private static final String DATA_AUTOFAIL_HTML_PROLOGUE = 
+			"The following cruises have data with serious errors detected " +
+			"by the automated data checker: <ul>";
+	private static final String AUTOFAIL_HTML_EPILOGUE = 
+			"</ul> These cruises can be added to SOCAT, but will be given " +
+			"a QC flag of F when added.  Do you want to continue? ";
+	private static final String AUTOFAIL_YES_TEXT = "Yes";
+	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String NO_CRUISES_FOR_ARCHIVE_MSG = 
-			"No <b>successfully submitted</b> cruises selected for " +
-			"managing archival status.";
+			"No cruise is selected for managing archival status.";
 	private static final String TOO_MANY_CRUISES_FOR_ARCHIVE_MSG = 
-			"Only one <b>successfully submitted</b> cruise can be " +
-			"selected for managing archival status.";
+			"Only one cruise can be selected for managing archival status.";
 
 	private static final String NO_CRUISE_TO_DELETE_MSG = 
-			"No unsubmitted cruises are selected to be deleted.";
+			"No cruises are selected to be deleted.";
 	private static final String DELETE_CRUISE_HTML_PROLOGUE = 
 			"All cruise data and metadata will be deleted for the " +
 			"following cruises: <ul>";
@@ -156,9 +178,9 @@ public class CruiseListPage extends Composite {
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
 	private static final String TIMESTAMP_COLUMN_NAME = "Uploaded on";
-	private static final String DATA_CHECK_COLUMN_NAME = "Data check";
+	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
 	private static final String METADATA_COLUMN_NAME = "Metadata";
-	private static final String SUBMITTED_COLUMN_NAME = "Submitted";
+	private static final String SUBMITTED_COLUMN_NAME = "SOCAT Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archived";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
@@ -169,7 +191,7 @@ public class CruiseListPage extends Composite {
 	private static final String NO_TIMESTAMP_STRING = "(unknown)";
 	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
 	private static final String NO_METADATA_STATUS_STRING = "(no metadata)";
-	private static final String NO_QC_STATUS_STRING = "(not submitted)";
+	private static final String NO_QC_STATUS_STRING = "(not added)";
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
 	private static final String NO_OWNER_STRING = "(unknown)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
@@ -203,6 +225,8 @@ public class CruiseListPage extends Composite {
 	private DashboardAskPopup askRemovePopup;
 	private HashSet<DashboardCruise> cruiseSet;
 	private HashSet<String> expocodeSet;
+	private DashboardAskPopup askMetaAutofailPopup;
+	private DashboardAskPopup askDataAutofailPopup;
 
 	// The singleton instance of this page
 	private static CruiseListPage singleton;
@@ -252,6 +276,9 @@ public class CruiseListPage extends Composite {
 
 		removeFromListButton.setText(REMOVE_FROM_LIST_TEXT);
 		removeFromListButton.setTitle(REMOVE_FROM_LIST_HOVER_HELP);
+
+		askMetaAutofailPopup = null;
+		askDataAutofailPopup = null;
 
 		uploadButton.setFocus(true);
 	}
@@ -395,73 +422,90 @@ public class CruiseListPage extends Composite {
 	 * @param expoSet
 	 * 		expocodes of the cruises to be deleted
 	 */
+	static boolean updating = false;
 	static void deleteCruises(HashSet<String> expoSet) {
+		updating = true;
 		service.updateCruiseList(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), 
 				DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, expoSet,
 				new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
-				// Do nothing
-				;
+				updating = false;
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				// Do nothing
-				;
+				updating = false;
 			}
 		});
 	}
+	/**
+	 * This should only be called after calling {@link #deleteCruises(HashSet)}.
+	 * @return
+	 * 		false if the deletion of cruises is still in progress 
+	 * 		(the callback has not yet been made); otherwise true.
+	 */
+	static boolean deleteCruisesDone() {
+		if ( updating )
+			return false;
+		return true;
+	}
 
 	/**
-	 * Assigns cruiseSet in this instance with the set of selected cruises 
-	 * fitting the desired criteria.
+	 * Assigns cruiseSet in this instance with the set of selected cruises. 
+	 * Succeeds only if all the cruises fit the desired criterion.
 	 *  
 	 * @param unsubmitted
-	 * 		if true, obtains only unsubmitted selected cruises;
-	 * 		if false, obtains only submitted selected cruises;
-	 * 		if null, obtains all selected cruises
+	 * 		if true, fails if a submitted cruise is selected;
+	 * 		if false, fails if an unsubmitted cruise is selected;
+	 * 		if null, no restriction and always succeeds.
+	 * @return
+	 * 		if successful
 	 */
-	private void getSelectedCruises(Boolean unsubmitted) {
+	private boolean getSelectedCruises(Boolean unsubmitted) {
 		cruiseSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
-				String status = cruise.getQcStatus();
-				if ( unsubmitted == null ) {
-					cruiseSet.add(cruise);
-				}
-				else {
+				cruiseSet.add(cruise);
+				if ( unsubmitted != null ){
+					String status = cruise.getQcStatus();
 					if ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
 						 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
 						 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
 						 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) {
-						if ( unsubmitted == true )
-							cruiseSet.add(cruise);
+						if ( unsubmitted == false )
+							return false;
 					}
 					else {
-						if ( unsubmitted == false )
-							cruiseSet.add(cruise);
+						if ( unsubmitted == true )
+							return false;
 					}
 				}
 			}
 		}
+		return true;
 	}
 
 	/**
-	 * Assigns cruiseSet in this instance with the set of selected cruises 
-	 * fitting the desired criteria, then assigns expocodeSet in this 
-	 * instance with the expocodes of these cruises. 
+	 * Assigns cruiseSet in this instance with the set of selected cruises, 
+	 * then assigns expocodeSet in this instance with the expocodes of these 
+	 * cruises.  Succeeds only if all the cruises fit the desired criterion.
 	 *  
 	 * @param unsubmitted
-	 * 		if true, obtains only unsubmitted selected cruises;
-	 * 		if false, obtains only submitted selected cruises;
-	 * 		if null, obtains all selected cruises
+	 * 		if true, fails if a submitted cruise is selected;
+	 * 		if false, fails if an unsubmitted cruise is selected;
+	 * 		if null, no restriction and always succeeds.
+	 * @return
+	 * 		if successful
 	 */
-	private void getSelectedCruiseExpocodes(Boolean unsubmitted) {
-		getSelectedCruises(unsubmitted);
+	private boolean getSelectedCruiseExpocodes(Boolean unsubmitted) {
+		boolean success = getSelectedCruises(unsubmitted);
+		if ( ! success )
+			return false;
 		expocodeSet.clear();
 		for ( DashboardCruise cruise : cruiseSet )
 			expocodeSet.add(cruise.getExpocode());
+		return true;
 	}
 
 	@UiHandler("logoutButton")
@@ -476,7 +520,10 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("dataCheckButton")
 	void dataCheckOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes(true);
+		if ( ! getSelectedCruiseExpocodes(true) ) {
+			SocatUploadDashboard.showMessage(SUBMITTED_CRUISES_SELECTED_ERROR_MSG);
+			return;
+		}
 		if ( expocodeSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_DATACHECK_MSG);
 			return;
@@ -491,7 +538,10 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("metadataButton")
 	void metadataOnClick(ClickEvent event) {
-		getSelectedCruises(true);
+		if ( ! getSelectedCruises(true) ) {
+			SocatUploadDashboard.showMessage(SUBMITTED_CRUISES_SELECTED_ERROR_MSG);
+			return;
+		}
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_METADATA_MSG);
 			return;
@@ -516,17 +566,23 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		getSelectedCruises(true);
+		if ( ! getSelectedCruises(true) ) {
+			SocatUploadDashboard.showMessage(SUBMITTED_CRUISES_SELECTED_ERROR_MSG);
+			return;
+		}
 		if ( cruiseSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_QC_SUBMIT_MSG);
 			return;
 		}
-		AddToSocatPage.showPage(cruiseSet);
+		checkCruisesForSOCAT();
 	}
 
 	@UiHandler("archiveButton")
 	void archiveSubmitOnClick(ClickEvent event) {
-		getSelectedCruises(false);
+		if ( ! getSelectedCruises(false) ) {
+			SocatUploadDashboard.showMessage(UNSUBMITTED_CRUISES_SELECTED_ERROR_MSG);
+			return;
+		}
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_ARCHIVE_MSG);
 			return;
@@ -540,7 +596,10 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("deleteButton")
 	void deleteCruiseOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes(true);
+		if ( ! getSelectedCruiseExpocodes(true) ) {
+			SocatUploadDashboard.showMessage(SUBMITTED_CRUISES_SELECTED_ERROR_MSG);
+			return;
+		}
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(NO_CRUISE_TO_DELETE_MSG);
 			return;
@@ -918,6 +977,119 @@ public class CruiseListPage extends Composite {
 			}
 		};
 		return filenameColumn;
+	}
+
+	/**
+	 * Checks the cruises given in cruiseSet in this instance for
+	 * data compatibility for adding to SOCAT.  If the data has 
+	 * not been checked or is unacceptable, this method presents an
+	 * error message and returns.  If the data has serious issues
+	 * to cause an automatic F flag, asks the user if the submit
+	 * should be continued.  If the answer is yes, or if there
+	 * were no serious data issues, continues the submission to
+	 * SOCAT by calling {@link #continueCheckCruisesForSOCAT()}.
+	 */
+	private void checkCruisesForSOCAT() {
+		// Check that the cruise data is checked and reasonable
+		String errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
+		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
+		boolean cannotSubmit = false;
+		boolean willAutofail = false;
+		for ( DashboardCruise cruise : cruiseSet ) {
+			String status = cruise.getDataCheckStatus();
+			if ( DashboardUtils.CHECK_STATUS_NOT_CHECKED.equals(status) ||
+				 DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(status) ) {
+				errMsg += "<li>" + 
+						 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+				cannotSubmit = true;
+			}
+			else if ( ! ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(status) ||
+						  DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(status) ) ) {
+				warnMsg += "<li>" + 
+					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+				willAutofail = true;
+			}
+		}
+
+		// If unchecked or very serious data issues, put up error message and stop
+		if ( cannotSubmit ) {
+			errMsg += CANNOT_SUBMIT_HTML_EPILOGUE;
+			SocatUploadDashboard.showMessage(errMsg);
+			return;
+		}
+
+		// If unreasonable data, ask to continue
+		if ( willAutofail ) {
+			warnMsg += AUTOFAIL_HTML_EPILOGUE;
+			if ( askDataAutofailPopup == null ) {
+				askDataAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
+						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+						// Only proceed if yes; ignore if no or null
+						if ( result == true )
+							continueCheckCruisesForSOCAT();
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			askDataAutofailPopup.askQuestion(warnMsg);
+			return;
+		}
+		continueCheckCruisesForSOCAT();		
+	}
+
+	/**
+	 * Checks the cruises given in cruiseSet in this instance for
+	 * metadata compatibility for adding to SOCAT.  At this time
+	 * this only checks that some metadata document is associated
+	 * with each cruise.  If a cruise has no metadata documents,
+	 * thus causing an automatic F flag, asks the user if the submit
+	 * should be continued.  If the answer is yes, or if all the 
+	 * cruises have metadata documents, continues the submission to
+	 * SOCAT by calling {@link AddToSocatPage#showPage(HashSet)}.
+	 */
+	private void continueCheckCruisesForSOCAT() {
+		// Check if the cruises have metadata documents
+		String warnMsg = METADATA_AUTOFAIL_HTML_PROLOGUE;
+		boolean willAutofail = false;
+		for ( DashboardCruise cruise : cruiseSet ) {
+			if ( cruise.getMetadataFilenames().size() < 1 ) {
+				warnMsg += "<li>" + 
+						SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+				willAutofail = true;
+			}
+		}
+
+		// If missing metadata, ask to continue
+		if ( willAutofail ) {
+			warnMsg += AUTOFAIL_HTML_EPILOGUE;
+			if ( askMetaAutofailPopup == null ) {
+				askMetaAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
+						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+						// Only proceed if yes; ignore if no or null
+						if ( result == true )
+							AddToSocatPage.showPage(cruiseSet);
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			askMetaAutofailPopup.askQuestion(warnMsg);
+			return;
+		}
+
+		// All cruises have metadata; continue on
+		AddToSocatPage.showPage(cruiseSet);
 	}
 
 }
