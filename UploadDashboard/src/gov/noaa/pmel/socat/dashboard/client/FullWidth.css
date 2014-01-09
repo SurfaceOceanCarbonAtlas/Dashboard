@@ -71,6 +71,14 @@ body {
 	margin-bottom: 1em;
 }
 
+.cruisespanel {
+	display: block;
+	width: 100%;
+	margin-top: 2em;
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
 .doitextbox {
 	display:inline;
 	margin-left: 0.5em;

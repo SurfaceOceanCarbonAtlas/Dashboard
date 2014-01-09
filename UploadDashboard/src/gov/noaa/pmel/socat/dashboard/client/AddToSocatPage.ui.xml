@@ -5,44 +5,38 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:east size="0.5">
-			<!-- Just to give uniform padding -->
-			<g:Label />
-		</g:east>
-		<g:west size="0.5">
-			<!-- Just to give uniform padding -->
-			<g:Label />
-		</g:west>
-		<g:north size="24">
-			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
-				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.addinfo}" ui:field="firstInfoHtml" />
-				<g:FlowPanel addStyleNames="{style.agreepanel}">
-					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
-					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
-				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.addinfo}" ui:field="secondInfoHtml" />
-				<g:FlowPanel addStyleNames="{style.agreepanel}">
-					<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeArchiveCheckBox" />
-					<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeArchiveInfoButton" />
-				</g:FlowPanel>
+	<g:FlowPanel addStyleNames="{style.fullwidthcontainer}">
+		<g:FlowPanel addStyleNames="{style.userinfopanel}">
+			<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+			<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+		</g:FlowPanel>
+		<g:HTML addStyleNames="{style.addinfo}" ui:field="firstInfoHtml" />
+		<g:FlowPanel addStyleNames="{style.agreepanel}">
+			<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
+			<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
+		</g:FlowPanel>
+		<g:HTML addStyleNames="{style.addinfo}" ui:field="secondInfoHtml" />
+		<g:FlowPanel addStyleNames="{style.borderpanel}">
+			<g:FlowPanel addStyleNames="{style.archivepanel}">
+				<g:RadioButton addStyleNames="{style.archivebutton}" 
+						name="archiveRadioGroup" ui:field="socatRadio" />
+				<g:Button addStyleNames="{style.archiveinfobutton}" 
+						ui:field="socatInfoButton" />
 			</g:FlowPanel>
-		</g:north>
-		<g:south size="4">
-			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
-				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+			<g:FlowPanel addStyleNames="{style.archivepanel}">
+				<g:RadioButton addStyleNames="{style.archivebutton}" 
+						name="archiveRadioGroup" ui:field="ownerRadio" />
+				<g:Button addStyleNames="{style.archiveinfobutton}" 
+						ui:field="ownerInfoButton" />
 			</g:FlowPanel>
-		</g:south>
-		<g:center>
-			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid ui:field="cruisesGrid" />
-			</g:ResizeLayoutPanel>
-		</g:center>
-	</g:DockLayoutPanel>
+		</g:FlowPanel>
+		<g:ResizeLayoutPanel addStyleNames="{style.cruisespanel}" ui:field="cruisesPanel">
+			<cell:DataGrid ui:field="cruisesGrid" />
+		</g:ResizeLayoutPanel>
+		<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
+			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+		</g:FlowPanel>
+	</g:FlowPanel>
 
 </ui:UiBinder> 
