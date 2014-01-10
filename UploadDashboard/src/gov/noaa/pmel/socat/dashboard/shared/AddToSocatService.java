@@ -55,9 +55,12 @@ public interface AddToSocatService extends RemoteService {
 	 * 		archive status for the cruises
 	 * @param localTimestamp
 	 * 		client local timestamp of this request 
+	 * @param repeatSend
+	 * 		if the request is to send to CDIAC ASAP,
+	 * 		should cruises already sent be resent?
 	 */
 	void setCruiseArchiveStatus(String username, String passhash,
 			TreeSet<String> expocodes, String archiveStatus, 
-			String localTimestamp);
+			String localTimestamp, boolean repeatSend);
 
 }

@@ -52,6 +52,9 @@ public interface AddToSocatServiceAsync {
 	 * 		archive status for the cruises
 	 * @param localTimestamp
 	 * 		client local timestamp of this request 
+	 * @param repeatSend
+	 * 		if the request is to send to CDIAC ASAP,
+	 * 		should cruises already sent be resent?
 	 * @param callback
 	 * 		the callback to make when complete; the onFailure method 
 	 * 		of the callback will be called if authentication failed, 
@@ -60,6 +63,7 @@ public interface AddToSocatServiceAsync {
 	 */
 	void setCruiseArchiveStatus(String username, String passhash,
 			TreeSet<String> expocode, String archiveStatus, 
-			String localTimestamp, AsyncCallback<Void> callback);
+			String localTimestamp, boolean repeatSend, 
+			AsyncCallback<Void> callback);
 
 }
