@@ -59,15 +59,14 @@ public class DashboardUtils {
 	public static final String QC_STATUS_ACCEPTED_B = "QC Flag B";
 	public static final String QC_STATUS_ACCEPTED_C = "QC Flag C";
 	public static final String QC_STATUS_ACCEPTED_D = "QC Flag D";
-	public static final String QC_STATUS_UNACCEPTABLE = "Unacceptable";
+	public static final String QC_STATUS_UNACCEPTABLE = "Failed";
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
 
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
-	public static final String ARCHIVE_STATUS_SUBMIT_CDIAC = "Submitted to CDIAC";
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
-	public static final String ARCHIVE_STATUS_ARCHIVED_PREFIX = "DOI ";
+	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
 
 	/**
 	 * standard header names of the standard data columns

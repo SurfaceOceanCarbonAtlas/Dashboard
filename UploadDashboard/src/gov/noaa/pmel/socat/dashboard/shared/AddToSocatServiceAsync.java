@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.HashSet;
+import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -39,16 +40,18 @@ public interface AddToSocatServiceAsync {
 
 	/**
 	 * Client-side interface for changing the archive status
-	 * for a cruise.
+	 * of cruises.
 	 * 
 	 * @param username
 	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
 	 * @param expocode
-	 * 		expocode of cruise
+	 * 		expocode of cruises
 	 * @param archiveStatus
-	 * 		archive status for the cruise
+	 * 		archive status for the cruises
+	 * @param localTimestamp
+	 * 		client local timestamp of this request 
 	 * @param callback
 	 * 		the callback to make when complete; the onFailure method 
 	 * 		of the callback will be called if authentication failed, 
@@ -56,7 +59,7 @@ public interface AddToSocatServiceAsync {
 	 * 		expocode, or if the change in cruise archive status failed.
 	 */
 	void setCruiseArchiveStatus(String username, String passhash,
-			String expocode, String archiveStatus,
-			AsyncCallback<Void> callback);
+			TreeSet<String> expocode, String archiveStatus, 
+			String localTimestamp, AsyncCallback<Void> callback);
 
 }

@@ -65,6 +65,13 @@ body {
 	margin-right: 1em;
 }
 
+.datelabel {
+	display: block;
+	margin-left: 5em;
+	margin-top: 0.25em;
+	margin-bottom: 1.5em;
+}
+
 .doitextbox {
 	display:inline;
 	margin-left: 0.5em;

@@ -67,23 +67,6 @@ public class AddToSocatPage extends Composite {
 	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
 			"Select an archive option:";
 
-	private static final String SOCAT_ARCHIVE_TEXT = 
-			"I give permission for these cruises to be automatically archived at CDIAC.  ";
-	private static final String SOCAT_ARCHIVE_INFO_HTML = 
-			"By selecting this option I am giving permission for my uploaded cruise " +
-			"files and metadata for these cruises to be archived at CDIAC.  This will " +
-			"occur, for cruises deemed acceptable, at the time of the next SOCAT public " +
-			"release, after which the files will be made accessible to the public " +
-			"through the CDIAC Web site.";
-	private static final String OWNER_ARCHIVE_TEXT =
-			"I will archive these cruises at a data center of my choice.  ";
-	private static final String OWNER_ARCHIVE_INFO_HTML = 
-			"By selecting this option I am agreeing to archive the uploaded cruise " +
-			"files and metadata for these cruises at a data center of my choice before " +
-			"the SOCAT public release containing these cruises.  If I am provided a " +
-			"DOI or other reference for these archived files, I will included these " +
-			"references in the metadata supplied to SOCAT for the cruises.";
-
 	private static final String SUBMIT_FAILURE_MSG = 
 			"Unexpected failure submitting cruises to SOCAT: ";
 
@@ -154,11 +137,11 @@ public class AddToSocatPage extends Composite {
 
 		secondInfoHtml.setHTML(ADD_TO_SOCAT_SECOND_INFO_HTML);
 
-		socatRadio.setText(SOCAT_ARCHIVE_TEXT);
+		socatRadio.setText(ArchivePage.SOCAT_ARCHIVE_TEXT);
 		socatInfoButton.setText(MORE_INFO_TEXT);
 		socatArchivePopup = null;
 
-		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
+		ownerRadio.setText(ArchivePage.OWNER_ARCHIVE_TEXT);
 		ownerInfoButton.setText(MORE_INFO_TEXT);
 		ownerArchivePopup = null;
 
@@ -252,7 +235,7 @@ public class AddToSocatPage extends Composite {
 		// Create the popup only when needed and if it does not exist
 		if ( socatArchivePopup == null ) {
 			socatArchivePopup = new DashboardInfoPopup();
-			socatArchivePopup.setInfoMessage(SOCAT_ARCHIVE_INFO_HTML);
+			socatArchivePopup.setInfoMessage(ArchivePage.SOCAT_ARCHIVE_INFO_HTML);
 		}
 		// Show the popup over the info button
 		socatArchivePopup.showRelativeTo(socatInfoButton);
@@ -263,7 +246,7 @@ public class AddToSocatPage extends Composite {
 		// Create the popup only when needed and if it does not exist
 		if ( ownerArchivePopup == null ) {
 			ownerArchivePopup = new DashboardInfoPopup();
-			ownerArchivePopup.setInfoMessage(OWNER_ARCHIVE_INFO_HTML);
+			ownerArchivePopup.setInfoMessage(ArchivePage.OWNER_ARCHIVE_INFO_HTML);
 		}
 		// Show the popup over the info button
 		ownerArchivePopup.showRelativeTo(ownerInfoButton);

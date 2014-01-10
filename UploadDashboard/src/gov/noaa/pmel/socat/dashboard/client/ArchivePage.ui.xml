@@ -4,39 +4,39 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:FlowPanel>
-		<g:FlowPanel addStyleNames="{style.userinfopanel}">
-			<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-			<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.addinfo}" ui:field="introHtml" />
+			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionbutton}" 
+							name="archiveRadioGroup" ui:field="socatRadio" />
+					<g:Button addStyleNames="{style.optioninfobutton}" 
+							ui:field="socatInfoButton" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionbutton}" 
+							name="archiveRadioGroup" ui:field="ownerRadio" />
+					<g:Button addStyleNames="{style.optioninfobutton}" 
+							ui:field="ownerInfoButton" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionbutton}" 
+							name="archiveRadioGroup" ui:field="cdiacRadio" />
+					<g:Button addStyleNames="{style.optioninfobutton}" 
+							ui:field="cdiacInfoButton" />
+				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.datelabel}" ui:field="cdiacDateHtml" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:HTML addStyleNames="{style.addinfo}" ui:field="introHtml" />
-		<g:FlowPanel addStyleNames="{style.optionpanel}">
-			<g:RadioButton addStyleNames="{style.optionbutton}" 
-					name="archiveRadioGroup" ui:field="socatRadio" />
-			<g:Button addStyleNames="{style.optioninfobutton}" 
-					ui:field="socatInfoButton" />
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="{style.optionpanel}">
-			<g:RadioButton addStyleNames="{style.optionbutton}" 
-					name="archiveRadioGroup" ui:field="cdiacRadio" />
-			<g:Button addStyleNames="{style.optioninfobutton}" 
-					ui:field="cdiacInfoButton" />
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="{style.optionpanel}">
-			<g:RadioButton addStyleNames="{style.optionbutton}" 
-					name="archiveRadioGroup" ui:field="ownerRadio" />
-			<g:Button addStyleNames="{style.optioninfobutton}" 
-					ui:field="ownerInfoButton" />
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="{style.optionpanel}">
-			<g:RadioButton addStyleNames="{style.optionbutton}" 
-					name="archiveRadioGroup" ui:field="doiRadio" />
-			<g:TextBox addStyleNames="{style.doitextbox}" ui:field="doiTextBox" />
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
-			<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
-		</g:FlowPanel>
-	</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder> 
