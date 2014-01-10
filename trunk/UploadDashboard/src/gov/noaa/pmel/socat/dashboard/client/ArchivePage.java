@@ -73,6 +73,20 @@ public class ArchivePage extends Composite {
 			"archived files, I will include these references in the metadata supplied " +
 			"to SOCAT for the cruises.";
 
+	static final String ALREADY_SENT_CDIAC_HTML =
+			"<b>WARNING</b>" +
+			"<br /><br />" +
+			"A request to archive (some of) these cruises at CDIAC as soon as possible " +
+			"had been sent earlier.  Since this should have archived the cruises, you " +
+			"normally do not want to change the archival option for these cruises.";
+	static final String RESEND_CDIAC_QUESTION = 
+			"A request to archive (some of) these cruises at CDIAC as soon as possible " +
+			"had been sent earlier.  Do you want to send <em>another</em> request to " +
+			"archive these cruises?" +
+			"<br /><br />" +
+			"<em>If you do send another request to archive these cruises, you should " +
+			"contact CDIAC to explain the reason for this repeated request.</em>";
+
 	private static final String NO_CDIAC_ARCHIVALS = 
 			"<em>None archived at CDIAC</em>";
 	private static final String CDIAC_ARCHIVE_DATE_PROLOGUE =
@@ -344,9 +358,11 @@ public class ArchivePage extends Composite {
 			// Should never happen
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
 		}
+		// TODO: ask user, if appropriate, if repeat send 
+		boolean repeatSend = false;
 		service.setCruiseArchiveStatus(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodes, archiveStatus, 
-				localTimestamp, new AsyncCallback<Void>() {
+				localTimestamp, repeatSend, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Success; show the updated cruise list page
