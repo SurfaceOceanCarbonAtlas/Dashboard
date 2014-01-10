@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1015467419823198744L;
+	private static final long serialVersionUID = 6957546853174213555L;
 
 	boolean selected;
 	String owner;
@@ -27,6 +27,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	TreeSet<String> metadataFilenames;
 	String qcStatus;
 	String archiveStatus;
+	String cdiacDate;
 	String uploadFilename;
 	String uploadTimestamp;
 	int numDataRows;
@@ -43,6 +44,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		metadataFilenames = new TreeSet<String>();
 		qcStatus = "";
 		archiveStatus = "";
+		cdiacDate = "";
 		uploadFilename = "";
 		uploadTimestamp = "";
 		numDataRows = 0;
@@ -189,6 +191,26 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			this.archiveStatus = "";
 		else
 			this.archiveStatus = archiveStatus.trim();
+	}
+
+	/**
+	 * @return 
+	 * 		the CDIAC submission date; never null but may be empty
+	 */
+	public String getCdiacDate() {
+		return cdiacDate;
+	}
+
+	/**
+	 * @param cdiacDate 
+	 * 		the CDIAC submission date (after trimming) to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setCdiacDate(String cdiacDate) {
+		if ( cdiacDate == null )
+			this.cdiacDate = "";
+		else
+			this.cdiacDate = cdiacDate.trim();
 	}
 
 	/**
@@ -348,6 +370,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + metadataFilenames.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
+		result = result * prime + cdiacDate.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + numDataRows;
@@ -383,6 +406,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! archiveStatus.equals(other.archiveStatus) )
 			return false;
+		if ( ! cdiacDate.equals(other.cdiacDate) )
+			return false;
 		if ( ! uploadFilename.equals(other.uploadFilename) )
 			return false;
 		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
@@ -410,6 +435,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    metadataFilenames=" + metadataFilenames +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
+				",\n    cdiacDate=" + cdiacDate + 
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +

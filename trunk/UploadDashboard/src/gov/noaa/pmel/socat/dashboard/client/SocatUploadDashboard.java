@@ -37,7 +37,7 @@ public class SocatUploadDashboard
 
 	// Column widths in em's
 	static double CHECKBOX_COLUMN_WIDTH = 2.5;
-	static double NORMAL_COLUMN_WIDTH = 8.0;
+	static double NORMAL_COLUMN_WIDTH = 9.0;
 	static double FILENAME_COLUMN_WIDTH = 12.0;
 
 	// Singleton instance of this object

@@ -138,9 +138,7 @@ public class CruiseListPage extends Composite {
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String NO_CRUISES_FOR_ARCHIVE_MSG = 
-			"No cruise is selected for managing archival status.";
-	private static final String TOO_MANY_CRUISES_FOR_ARCHIVE_MSG = 
-			"Only one cruise can be selected for managing archival status.";
+			"No cruises selected for managing archival status.";
 
 	private static final String NO_CRUISE_TO_DELETE_MSG = 
 			"No cruises are selected to be deleted.";
@@ -181,7 +179,7 @@ public class CruiseListPage extends Composite {
 	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
 	private static final String METADATA_COLUMN_NAME = "Metadata";
 	private static final String SUBMITTED_COLUMN_NAME = "SOCAT Status";
-	private static final String ARCHIVED_COLUMN_NAME = "Archived";
+	private static final String ARCHIVED_COLUMN_NAME = "Archive Status";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
 
@@ -587,11 +585,7 @@ public class CruiseListPage extends Composite {
 			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_ARCHIVE_MSG);
 			return;
 		}
-		if ( cruiseSet.size() > 1 ) {
-			SocatUploadDashboard.showMessage(TOO_MANY_CRUISES_FOR_ARCHIVE_MSG);
-			return;
-		}
-		ArchivePage.showPage(cruiseSet.iterator().next());
+		ArchivePage.showPage(cruiseSet);
 	}
 
 	@UiHandler("deleteButton")

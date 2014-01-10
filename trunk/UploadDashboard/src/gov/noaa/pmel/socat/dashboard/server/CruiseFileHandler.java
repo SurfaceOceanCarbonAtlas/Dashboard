@@ -37,6 +37,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String METADATA_FILENAMES_ID = "metadatafilenames";
 	private static final String QC_STATUS_ID = "qcstatus";
 	private static final String ARCHIVE_STATUS_ID = "archivestatus";
+	private static final String CDIAC_DATE_ID = "cdiacdate";
 	private static final String NUM_DATA_ROWS_ID = "numdatarows";
 	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes";
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
@@ -640,7 +641,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruiseProps.setProperty(QC_STATUS_ID, cruise.getQcStatus());
 		// Archive status string
 		cruiseProps.setProperty(ARCHIVE_STATUS_ID, cruise.getArchiveStatus());
-				// Total number of data measurements (rows of data)
+		// Date of request to archive original data and metadata files with CDIAC
+		cruiseProps.setProperty(CDIAC_DATE_ID, cruise.getCdiacDate());
+		// Total number of data measurements (rows of data)
 		cruiseProps.setProperty(NUM_DATA_ROWS_ID, 
 				Integer.toString(cruise.getNumDataRows()));
 		// Data column types - encoded using the enumerated names
@@ -853,6 +856,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					ARCHIVE_STATUS_ID + " given in " + infoFile.getPath());			
 		cruise.setArchiveStatus(value);
+
+		// Date of request to archive original data and metadata with CDIAC
+		value = cruiseProps.getProperty(CDIAC_DATE_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					CDIAC_DATE_ID + " given in " + infoFile.getPath());			
+		cruise.setCdiacDate(value);
 
 		// Number of rows of data (number of samples)
 		value = cruiseProps.getProperty(NUM_DATA_ROWS_ID);
