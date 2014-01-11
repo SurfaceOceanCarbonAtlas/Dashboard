@@ -21,7 +21,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class AddToSocatServiceImpl extends RemoteServiceServlet 
 										implements AddToSocatService {
 
-	private static final long serialVersionUID = -2864373216622024236L;
+	private static final long serialVersionUID = 5328412844537124821L;
 
 	@Override
 	public void addCruisesToSocat(String username, String passhash, 
@@ -80,7 +80,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public void setCruiseArchiveStatus(String username, String passhash,
-			TreeSet<String> expocodes, String archiveStatus, 
+			HashSet<String> cruiseExpocodes, String archiveStatus, 
 			String localTimestamp, boolean repeatSend) {
 		// Authenticate the user
 		DashboardDataStore dataStore;
@@ -94,16 +94,16 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
 
-		TreeSet<String> changedExpos = new TreeSet<String>();
-		TreeSet<String> cdiacExpos = new TreeSet<String>();
-		for ( String expo : expocodes ) {
+		HashSet<String> changedExpos = new HashSet<String>();
+		HashSet<String> cdiacExpos = new HashSet<String>();
+		for ( String expocode : cruiseExpocodes ) {
 			// Get the properties of this cruise
 			DashboardCruise cruise = dataStore.getCruiseFileHandler()
-											  .getCruiseFromInfoFile(expo);
+											  .getCruiseFromInfoFile(expocode);
 			if ( cruise == null ) 
-				throw new IllegalArgumentException("Unknown cruise " + expo);
+				throw new IllegalArgumentException("Unknown cruise " + expocode);
 
-			String commitMsg = "Archive status of cruise " + expo + " updated by " + 
+			String commitMsg = "Archive status of cruise " + expocode + " updated by " + 
 					username + " to '" + archiveStatus + "'";
 
 			if ( ! archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
@@ -115,13 +115,13 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				// Send to CDIAC; repeat the send or has never been sent
 				commitMsg += " with CDIAC date of '" + localTimestamp + "'";
 				cruise.setCdiacDate(localTimestamp);
-				cdiacExpos.add(expo);
+				cdiacExpos.add(expocode);
 			}
 			else if ( archiveStatus.equals(cruise.getArchiveStatus()) ) {
 				// No changes to the archive status or the CDIAC timestamp; skip it
 				continue;
 			}
-			changedExpos.add(expo);
+			changedExpos.add(expocode);
 
 			// Update the archive status for this cruise
 			cruise.setArchiveStatus(archiveStatus);

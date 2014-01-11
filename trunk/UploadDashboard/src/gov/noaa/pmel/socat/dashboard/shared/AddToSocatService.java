@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.HashSet;
-import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
@@ -49,7 +48,7 @@ public interface AddToSocatService extends RemoteService {
 	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
-	 * @param expocodes
+	 * @param cruiseExpocodes
 	 * 		expocodes of the cruises
 	 * @param archiveStatus
 	 * 		archive status for the cruises
@@ -60,7 +59,7 @@ public interface AddToSocatService extends RemoteService {
 	 * 		should cruises already sent be resent?
 	 */
 	void setCruiseArchiveStatus(String username, String passhash,
-			TreeSet<String> expocodes, String archiveStatus, 
+			HashSet<String> cruiseExpocodes, String archiveStatus, 
 			String localTimestamp, boolean repeatSend);
 
 }
