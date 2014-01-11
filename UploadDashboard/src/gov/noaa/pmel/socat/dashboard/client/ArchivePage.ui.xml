@@ -20,17 +20,17 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionbutton}" 
-							name="archiveRadioGroup" ui:field="ownerRadio" />
-					<g:Button addStyleNames="{style.optioninfobutton}" 
-							ui:field="ownerInfoButton" />
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.optionpanel}">
-					<g:RadioButton addStyleNames="{style.optionbutton}" 
 							name="archiveRadioGroup" ui:field="cdiacRadio" />
 					<g:Button addStyleNames="{style.optioninfobutton}" 
 							ui:field="cdiacInfoButton" />
 				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.datelabel}" ui:field="cdiacDateHtml" />
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionbutton}" 
+							name="archiveRadioGroup" ui:field="ownerRadio" />
+					<g:Button addStyleNames="{style.optioninfobutton}" 
+							ui:field="ownerInfoButton" />
+				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="ownerAddnHtml" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />

@@ -39,62 +39,66 @@ public class ArchivePage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String MORE_INFO_TEXT = "more explanation";
+	private static final String MORE_INFO_TEXT = "more ...";
 
 	private static final String INTRO_HTML_PROLOGUE = 
-			"<b>Manage Archival for Cruises</b>" +
+			"<b>Manage Cruise Archival</b>" +
 			"<br /><br />" +
-			"Select an archive option for the uploaded data and metadata for " +
-			"the cruises: <ul>";
+			"Archival plan for the uploaded data and metadata of the cruises: " +
+			"<ul>";
 	private static final String INTRO_HTML_EPILOGUE = "</ul>";
+	private static final String CDIAC_ARCHIVE_DATE_PROLOGUE =
+			"&nbsp;&nbsp;&nbsp;&nbsp;<em>(archive request sent to CDIAC on ";
+	private static final String CDIAC_ARCHIVE_DATE_EPILOGUE =
+			")</em>";
 
 	static final String SOCAT_ARCHIVE_TEXT = 
-			"I give permission for these cruises to be automatically archived at CDIAC.  ";
+			"archive at CDIAC at time of publication of next SOCAT version";
 	static final String SOCAT_ARCHIVE_INFO_HTML = 
 			"By selecting this option I am giving permission for my uploaded cruise " +
 			"files and metadata for these cruises to be archived at CDIAC.  This will " +
 			"occur, for cruises deemed acceptable, at the time of the next SOCAT public " +
 			"release, after which the files will be made accessible to the public " +
 			"through the CDIAC Web site.";
+
+	static final String CDIAC_ARCHIVE_TEXT = 
+			"archive at CDIAC as soon as possible";
+	static final String CDIAC_ARCHIVE_INFO_HTML =
+			"By selecting this option I am requesting that my uploaded cruise files " +
+			"and metadata for these cruise be archived at CDIAC as soon as possible.  " +
+			"When CDIAC provides a DOI, or other reference, for these archived files, " +
+			"I will include these references in the metadata supplied to SOCAT for " +
+			"the cruises.";
+
 	static final String OWNER_ARCHIVE_TEXT =
-			"I will archive these cruises at a data center of my choice.  ";
+			"do not archive at CDIAC; I will manage archival myself";
+	static final String OWNER_ARCHIVE_ADDN_HTML =
+			"<em>(and I understand it is my responsibility to include DOIs " +
+			"in SOCAT metadata)</em>";
 	static final String OWNER_ARCHIVE_INFO_HTML = 
 			"By selecting this option I am agreeing to archive the uploaded cruise " +
 			"files and metadata for these cruises at a data center of my choice before " +
 			"the SOCAT public release containing these cruises.  If I am provided a " +
 			"DOI or other reference for these archived files, I will include these " +
 			"references in the metadata supplied to SOCAT for the cruises.";
-	static final String CDIAC_ARCHIVE_TEXT = 
-			"I wish to archive these cruises at CDIAC as soon as possible";
-	static final String CDIAC_ARCHIVE_INFO_HTML =
-			"By selecting this option I am giving permission for my uploaded cruise " +
-			"files and metadata for these cruise to be archived at CDIAC as soon as " +
-			"possible.  When CDIAC provides a DOI, or other reference, for these " +
-			"archived files, I will include these references in the metadata supplied " +
-			"to SOCAT for the cruises.";
 
 	static final String ALREADY_SENT_CDIAC_HTML =
 			"<b>WARNING</b>" +
 			"<br /><br />" +
-			"A request to archive (some of) these cruises at CDIAC as soon as possible " +
-			"had been sent earlier.  Since this should have archived the cruises, you " +
-			"normally do not want to change the archival option for these cruises.";
-	static final String RESEND_CDIAC_QUESTION = 
-			"A request to archive (some of) these cruises at CDIAC as soon as possible " +
-			"had been sent earlier.  Do you want to send <em>another</em> request to " +
-			"archive these cruises?" +
+			"Some or all of these cruises were earlier sent to CDIAC for archival. " +
+			"Normally you do not want to change the archival option for these cruises. " +
 			"<br /><br />" +
-			"<em>If you do send another request to archive these cruises, you should " +
-			"contact CDIAC to explain the reason for this repeated request.</em>";
-
-	private static final String NO_CDIAC_ARCHIVALS = 
-			"<em>None archived at CDIAC</em>";
-	private static final String CDIAC_ARCHIVE_DATE_PROLOGUE =
-			"<em>Request to archive at CDIAC sent on ";
-	private static final String CDIAC_ARCHIVE_DATE_EPILOGUE =
-			"</em>";
-	private static final String CDIAC_ARCHIVE_MULTIPLE_DATES =
-			"<em>Request to archive at CDIAC sent on various dates</em>";
+			"If you are managing the archival of a mix of cruises that have and have " +
+			"not been sent to CDIAC, we strongly recommend you cancel this action and " +
+			"manage only those cruises that have not been sent to CDIAC.";
+	static final String RESEND_CDIAC_QUESTION = 
+			"Some or all of these cruises were earlier sent to CDIAC for archival.  " +
+			"Do you want to send these cruises <em>again<em>?" +
+			"<br /><br />" +
+			"<em>If you do want these cruises sent again, you should contact CDIAC to " +
+			"explain the reason for this repeated request for archival.</em>";
+	static final String YES_RESEND_TEXT = "Yes, send";
+	static final String NO_CANCEL_TEXT = "No, cancel";
 
 	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Cancel";
@@ -116,19 +120,21 @@ public class ArchivePage extends Composite {
 	@UiField HTML introHtml;
 	@UiField RadioButton socatRadio;
 	@UiField Button socatInfoButton;
-	@UiField RadioButton ownerRadio;
-	@UiField Button ownerInfoButton;
 	@UiField RadioButton cdiacRadio;
 	@UiField Button cdiacInfoButton;
-	@UiField HTML cdiacDateHtml;
+	@UiField RadioButton ownerRadio;
+	@UiField Button ownerInfoButton;
+	@UiField HTML ownerAddnHtml;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
 	private String username;
-	private TreeSet<String> expocodes;
+	private HashSet<String> expocodes;
+	private boolean hasSentCruise;
 	private DashboardInfoPopup socatInfoPopup;
 	private DashboardInfoPopup ownerInfoPopup;
 	private DashboardInfoPopup cdiacInfoPopup;
+	private DashboardAskPopup resubmitAskPopup;
 
 	// The singleton instance of this page
 	private static ArchivePage singleton;
@@ -137,22 +143,25 @@ public class ArchivePage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		username = "";
-		expocodes = new TreeSet<String>();
-		socatInfoPopup = null;
-		ownerInfoPopup = null;
-		cdiacInfoPopup = null;
+		expocodes = new HashSet<String>();
+		hasSentCruise = false;
 
 		logoutButton.setText(LOGOUT_TEXT);
 
 		socatRadio.setText(SOCAT_ARCHIVE_TEXT);
 		socatInfoButton.setText(MORE_INFO_TEXT);
-
-		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
-		ownerInfoButton.setText(MORE_INFO_TEXT);
+		socatInfoPopup = null;
 
 		cdiacRadio.setText(CDIAC_ARCHIVE_TEXT);
 		cdiacInfoButton.setText(MORE_INFO_TEXT);
-		cdiacDateHtml.setHTML(" ");
+		cdiacInfoPopup = null;
+
+		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
+		ownerInfoButton.setText(MORE_INFO_TEXT);
+		ownerInfoPopup = null;
+		ownerAddnHtml.setHTML(ArchivePage.OWNER_ARCHIVE_ADDN_HTML);
+
+		resubmitAskPopup = null;
 
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
@@ -205,86 +214,73 @@ public class ArchivePage extends Composite {
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
 
-		// Get the ordered list of expocodes and count archival statuses
 		expocodes.clear();
+		hasSentCruise = false;
 		int numSocat = 0;
 		int numOwner = 0;
 		int numCdiac = 0;
-		String cdiacDate = null;
+		TreeSet<String> cruiseIntros = new TreeSet<String>();
 		for ( DashboardCruise cruise : cruisesSet ) {
-			expocodes.add(cruise.getExpocode());
+			String expo = cruise.getExpocode();
+			// Add the expocode of this cruise to the list for the server 
+			expocodes.add(expo);
+			// Add the status of this cruise to the counts 
 			String archiveStatus = cruise.getArchiveStatus();
 			if ( archiveStatus.equals(
-					DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED)  ) {
-				// Nothing assigned yet
-				;
-			}
-			else if ( archiveStatus.equals(
 					DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ) {
 				// Archive with next SOCAT release
 				numSocat++;
+			}
+			else if ( archiveStatus.equals(
+					DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
+				// Archive at CDIAC now
+				numCdiac++;
 			}
 			else if ( archiveStatus.equals(
 					DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
 				// Owner will archive
 				numOwner++;
 			}
-			else if ( archiveStatus.equals(
-					DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
-				numCdiac++;
-			}
 			else {
-				// Should not happen
+				// Nothing assigned or unknown status - should not happen
 				Window.alert("Unexpected archive status: " + archiveStatus);
 			}
-			String dateStr = cruise.getCdiacDate();
-			if ( ! dateStr.isEmpty() ) {
-				if ( cdiacDate == null ) {
-					// The one submission date (so far)
-					cdiacDate = dateStr;
-				}
-				else if ( ! cdiacDate.equals(dateStr) ){
-					// Multiple submission dates
-					cdiacDate = "";
-				}
+			// Add this cruise to the intro list
+			String cdiacDate = cruise.getCdiacDate();
+			if ( cdiacDate.isEmpty() ) {
+				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
+						"</li>");
+			}
+			else {
+				hasSentCruise = true;
+				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
+						CDIAC_ARCHIVE_DATE_PROLOGUE + 
+						SafeHtmlUtils.htmlEscape(cdiacDate) + 
+						CDIAC_ARCHIVE_DATE_EPILOGUE + 
+						"</li>");
 			}
 		}
 
 		// Create the intro using the ordered expocodes
 		String introMsg = INTRO_HTML_PROLOGUE;
-		for ( String expo : expocodes ) {
-			introMsg += "<li>" + SafeHtmlUtils.htmlEscape(expo) + "</li>";
+		for ( String introItem : cruiseIntros ) {
+			introMsg += introItem;
 		}
 		introMsg += INTRO_HTML_EPILOGUE;
 		introHtml.setHTML(introMsg);
-
-		// Assign the CDIAC submission date label
-		if ( cdiacDate == null ) {
-			// No cruises submitted to CDIAC
-			cdiacDateHtml.setHTML(NO_CDIAC_ARCHIVALS);
-		}
-		else if ( cdiacDate.isEmpty() ) {
-			// Multiple submissions to CDIAC at different times
-			cdiacDateHtml.setText(CDIAC_ARCHIVE_MULTIPLE_DATES);
-		}
-		else {
-			cdiacDateHtml.setHTML(CDIAC_ARCHIVE_DATE_PROLOGUE + 
-					SafeHtmlUtils.htmlEscape(cdiacDate) + 
-					CDIAC_ARCHIVE_DATE_EPILOGUE);
-		}
 
 		// Check the appropriate radio button
 		if ( (numOwner == 0) && (numCdiac == 0) ) {
 			// All "with next SOCAT" or not assigned
 			socatRadio.setValue(true, true);
 		}
-		else if ( (numSocat == 0) && (numCdiac == 0) ) {
-			// All "owner will archive", so keep that setting
-			ownerRadio.setValue(true, true);
-		}
 		else if ( (numSocat == 0) && (numOwner == 0) ) {
 			// All "sent to CDIAC", so keep that setting
 			cdiacRadio.setValue(true, true);
+		}
+		else if ( (numSocat == 0) && (numCdiac == 0) ) {
+			// All "owner will archive", so keep that setting
+			ownerRadio.setValue(true, true);
 		}
 		else {
 			// A mix, so set to "with next SOCAT" and let the user decide
@@ -295,6 +291,14 @@ public class ArchivePage extends Composite {
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
+	}
+
+	@UiHandler({"socatRadio","ownerRadio"})
+	void radioOnClick(ClickEvent event) {
+		// If there is a cruise sent to CDIAC, warn if another selection is made
+		if ( hasSentCruise ) {
+			SocatUploadDashboard.showMessage(ALREADY_SENT_CDIAC_HTML);
+		}
 	}
 
 	@UiHandler("socatInfoButton")
@@ -308,17 +312,6 @@ public class ArchivePage extends Composite {
 		socatInfoPopup.showRelativeTo(socatInfoButton);
 	}
 
-	@UiHandler("ownerInfoButton")
-	void ownerInfoOnClick(ClickEvent event) {
-		// Create the popup only when needed and if it does not exist
-		if ( ownerInfoPopup == null ) {
-			ownerInfoPopup = new DashboardInfoPopup();
-			ownerInfoPopup.setInfoMessage(OWNER_ARCHIVE_INFO_HTML);
-		}
-		// Show the popup over the info button
-		ownerInfoPopup.showRelativeTo(ownerInfoButton);
-	}
-
 	@UiHandler("cdiacInfoButton")
 	void cdiacInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
@@ -330,6 +323,17 @@ public class ArchivePage extends Composite {
 		cdiacInfoPopup.showRelativeTo(cdiacInfoButton);
 	}
 
+	@UiHandler("ownerInfoButton")
+	void ownerInfoOnClick(ClickEvent event) {
+		// Create the popup only when needed and if it does not exist
+		if ( ownerInfoPopup == null ) {
+			ownerInfoPopup = new DashboardInfoPopup();
+			ownerInfoPopup.setInfoMessage(OWNER_ARCHIVE_INFO_HTML);
+		}
+		// Show the popup over the info button
+		ownerInfoPopup.showRelativeTo(ownerInfoButton);
+	}
+
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Return to the cruise list page exactly as it was
@@ -338,6 +342,36 @@ public class ArchivePage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
+		if ( hasSentCruise && cdiacRadio.getValue() ) {
+			// Asking to submit to CDIAC now, but has a cruise already sent
+			if ( resubmitAskPopup == null ) {
+				resubmitAskPopup = new DashboardAskPopup(YES_RESEND_TEXT, 
+						NO_CANCEL_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean okay) {
+						// Continue setting the archive status (and thus, 
+						// sending the request to CDIAC) only if user okays it
+						if ( okay ) {
+							continueSubmit();
+						}
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			resubmitAskPopup.askQuestion(RESEND_CDIAC_QUESTION);
+		}
+		else {
+			// Either no cruises sent to CDIAC, or not a send to CDIAC now request. 
+			// Continue setting the archive status.
+			continueSubmit();
+		}
+	}
+	
+	void continueSubmit() {
 		String localTimestamp = 
 				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z")
 							  .format(new Date());
@@ -346,20 +380,21 @@ public class ArchivePage extends Composite {
 			// Archive with the next release of SOCAT
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT;
 		}
-		else if ( ownerRadio.getValue() ) {
-			// Owner will archive
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
-		}
 		else if ( cdiacRadio.getValue() ) {
 			// Tell CDIAC to archive now
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC;
 		}
+		else if ( ownerRadio.getValue() ) {
+			// Owner will archive
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
+		}
 		else {
 			// Should never happen
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
+			Window.alert("Unexpect state where no radio buttons are selected");
+			return;
 		}
-		// TODO: ask user, if appropriate, if repeat send 
-		boolean repeatSend = false;
+
+		boolean repeatSend = true;
 		service.setCruiseArchiveStatus(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodes, archiveStatus, 
 				localTimestamp, repeatSend, new AsyncCallback<Void>() {

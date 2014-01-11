@@ -46,7 +46,7 @@ public class AddToSocatPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String MORE_INFO_TEXT = "more explanation";
+	private static final String MORE_INFO_TEXT = "more ...";
 
 	private static final String ADD_TO_SOCAT_FIRST_INFO_HTML =
 			"<b>Add Cruises to SOCAT</b>" +
@@ -56,7 +56,7 @@ public class AddToSocatPage extends Composite {
 			"<b>Required:</b>";
 
 	private static final String AGREE_SHARE_TEXT = 
-			"I give permission for my cruises to be shared for policy (QC) assessment.";
+			"I give permission for these cruises to be shared for policy (QC) assessment.";
 	private static final String AGREE_SHARE_INFO_HTML =
 			"By checking this box I am giving permission for my uploaded cruise files " +
 			"to be shared for purposes of policy (QC) assessment.  I understand that " +
@@ -65,7 +65,7 @@ public class AddToSocatPage extends Composite {
 			"the cruise was deemed acceptable. ";
 
 	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
-			"Select an archive option:";
+			"Archival plan for the uploaded data and metadata of these cruises:";
 
 	private static final String SUBMIT_FAILURE_MSG = 
 			"Unexpected failure submitting cruises to SOCAT: ";
@@ -107,6 +107,7 @@ public class AddToSocatPage extends Composite {
 	@UiField Button socatInfoButton;
 	@UiField RadioButton ownerRadio;
 	@UiField Button ownerInfoButton;
+	@UiField HTML ownerAddnHtml;
 	@UiField ResizeLayoutPanel cruisesPanel;
 	@UiField DataGrid<DashboardCruise> cruisesGrid;
 	@UiField Button submitButton;
@@ -144,6 +145,7 @@ public class AddToSocatPage extends Composite {
 		ownerRadio.setText(ArchivePage.OWNER_ARCHIVE_TEXT);
 		ownerInfoButton.setText(MORE_INFO_TEXT);
 		ownerArchivePopup = null;
+		ownerAddnHtml.setHTML(ArchivePage.OWNER_ARCHIVE_ADDN_HTML);
 
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);

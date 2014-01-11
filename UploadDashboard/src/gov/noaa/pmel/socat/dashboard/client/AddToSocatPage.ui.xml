@@ -27,6 +27,7 @@
 							name="archiveRadioGroup" ui:field="ownerRadio" />
 					<g:Button addStyleNames="{style.optioninfobutton}" ui:field="ownerInfoButton" />
 				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="ownerAddnHtml" />
 			</g:FlowPanel>
 			<g:ResizeLayoutPanel addStyleNames="{style.cruisespanel}" ui:field="cruisesPanel">
 				<cell:DataGrid ui:field="cruisesGrid" />

@@ -59,7 +59,7 @@ public class DashboardUtils {
 	public static final String QC_STATUS_ACCEPTED_B = "QC Flag B";
 	public static final String QC_STATUS_ACCEPTED_C = "QC Flag C";
 	public static final String QC_STATUS_ACCEPTED_D = "QC Flag D";
-	public static final String QC_STATUS_UNACCEPTABLE = "Failed";
+	public static final String QC_STATUS_UNACCEPTABLE = "QC Flag F";
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
 
