@@ -3,10 +3,10 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.BufferedReader;
 import java.io.File;
