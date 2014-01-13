@@ -14,7 +14,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 490244134330107618L;
+	private static final long serialVersionUID = 883513839967911719L;
 
 	Integer year;
 	Integer month;
@@ -297,7 +297,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 */
 	public void setSampleDepth(Double sampleDepth) {
 		if ( sampleDepth == null )
-			sampleDepth = Double.NaN;
+			this.sampleDepth = Double.NaN;
 		else
 			this.sampleDepth = sampleDepth;
 	}
@@ -421,7 +421,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the xCO2WaterSst to set;
 	 * 		if null, {@link Double#NaN} is assigned
 	 */
-	public void setxCO2WaterSst(Double xCO2WaterSst) {
+	public void setXCO2WaterSst(Double xCO2WaterSst) {
 		if ( xCO2WaterSst == null )
 			this.xCO2WaterSst = Double.NaN;
 		else
@@ -610,7 +610,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the fCO2 from xCO2 SST to set;
 	 * 		if null, {@link Double#NaN} is assigned
 	 */
-	public void setFCO2FromXCO2SST(Double fCO2FromXCO2Sst) {
+	public void setFCO2FromXCO2Sst(Double fCO2FromXCO2Sst) {
 		if ( fCO2FromXCO2Sst == null )
 			this.fCO2FromXCO2Sst = Double.NaN;
 		else
@@ -736,7 +736,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the fCO2 from pCO2 SST NCEP to set;
 	 * 		if null, {@link Double#NaN} is assigned
 	 */
-	public void setFCO2FromPCO2SstNcsp(Double fCO2FromPCO2SstNcep) {
+	public void setFCO2FromPCO2SstNcep(Double fCO2FromPCO2SstNcep) {
 		if ( fCO2FromPCO2SstNcep == null )
 			this.fCO2FromPCO2SstNcep = Double.NaN;
 		else
@@ -757,7 +757,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the fCO2 from xCO2 TEqu WOA to set;
 	 * 		if null, {@link Double#NaN} is assigned
 	 */
-	public void setFCO2FromXCO2TEquWos(Double fCO2FromXCO2TEquWoa) {
+	public void setFCO2FromXCO2TEquWoa(Double fCO2FromXCO2TEquWoa) {
 		if ( fCO2FromXCO2TEquWoa == null )
 			this.fCO2FromXCO2TEquWoa = Double.NaN;
 		else
@@ -790,7 +790,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the fCO2 from xCO2 TEqu NCEP;
 	 * 		never null but could be {@link Double#NaN} if not assigned
 	 */
-	public Double getFCO2FromXCO2TEquNcsp() {
+	public Double getFCO2FromXCO2TEquNcep() {
 		return fCO2FromXCO2TEquNcep;
 	}
 
@@ -799,7 +799,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the fCO2 from xCO2 TEqu NCEP to set;
 	 * 		if null, {@link Double#NaN} is assigned
 	 */
-	public void setFCO2FromXCO2TEquNcsp(Double fCO2FromXCO2TEquNcep) {
+	public void setFCO2FromXCO2TEquNcep(Double fCO2FromXCO2TEquNcep) {
 		if ( fCO2FromXCO2TEquNcep == null )
 			this.fCO2FromXCO2TEquNcep = Double.NaN;
 		else
@@ -1061,7 +1061,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	@Override 
 	public int hashCode() {
 		// Do not use floating-point fields since they do not 
-		// have to be exact for equality.  Ignore woceFlag.
+		// have to be exact the same for equals to return true.
 		final int prime = 67;
 		int result = year.hashCode();
 		result = result * prime + month.hashCode();
@@ -1070,6 +1070,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		result = result * prime + minute.hashCode();
 		result = result * prime + fCO2Source.hashCode();
 		result = result * prime + regionID.hashCode();
+		result = result * prime + woceFlag.hashCode();
 		return result;
 	}
 
@@ -1097,8 +1098,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! fCO2Source.equals(other.fCO2Source) ) 
 			return false;
-
-		// Ignore woceFlag 
+		if ( ! woceFlag.equals(other.woceFlag) )
+			return false;
 
 		// String comparisons
 		if ( ! regionID.equals(other.regionID) )
@@ -1247,7 +1248,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    gvCO2=" + gvCO2.toString() +
 				",\n    distToLand=" + distToLand.toString() +
 				",\n    woceFlag=" + woceFlag.toString() +
-				",\n    etopo2=" + etopo2.toString() +
 				" ]";
 	}
 

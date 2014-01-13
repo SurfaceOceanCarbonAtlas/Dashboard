@@ -12,10 +12,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SocatMetadata 
-		implements Serializable, IsSerializable, Comparable<SocatMetadata> {
+public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7779594548740747487L;
+	private static final long serialVersionUID = -8760815956964862162L;
 
 	String expocode;
 	String cruiseName;
@@ -31,7 +30,7 @@ public class SocatMetadata
 	String metadataHRef;
 	String socatDOI;
 	String socatDOIHRef;
-	String flag;
+	String cruiseFlag;
 
 	/**
 	 * Generates an empty SocatMetadata object.
@@ -51,7 +50,7 @@ public class SocatMetadata
 		metadataHRef = "";
 		socatDOI = "";
 		socatDOIHRef = "";
-		flag = "";
+		cruiseFlag = "";
 	}
 
 	/**
@@ -258,7 +257,10 @@ public class SocatMetadata
 	 * 		if null, an empty string is assigned
 	 */
 	public void setScienceGroup(String scienceGroup) {
-		this.scienceGroup = scienceGroup;
+		if ( scienceGroup == null )
+			this.scienceGroup = "";
+		else
+			this.scienceGroup = scienceGroup;
 	}
 
 	/**
@@ -276,7 +278,10 @@ public class SocatMetadata
 	 * 		if null, an empty string is assigned
 	 */
 	public void setOrigDOI(String origDOI) {
-		this.origDOI = origDOI;
+		if ( origDOI == null )
+			this.origDOI = "";
+		else
+			this.origDOI = origDOI;
 	}
 
 	/**
@@ -294,7 +299,10 @@ public class SocatMetadata
 	 * 		if null, an empty string is assigned
 	 */
 	public void setMetadataHRef(String metadataHRef) {
-		this.metadataHRef = metadataHRef;
+		if ( metadataHRef == null )
+			this.metadataHRef = "";
+		else
+			this.metadataHRef = metadataHRef;
 	}
 
 	/**
@@ -312,7 +320,10 @@ public class SocatMetadata
 	 * 		if null, an empty string is assigned
 	 */
 	public void setSocatDOI(String socatDOI) {
-		this.socatDOI = socatDOI;
+		if ( socatDOI == null )
+			this.socatDOI = "";
+		else
+			this.socatDOI = socatDOI;
 	}
 
 	/**
@@ -330,94 +341,37 @@ public class SocatMetadata
 	 * 		if null, an empty string is assigned
 	 */
 	public void setSocatDOIHRef(String socatDOIHRef) {
-		this.socatDOIHRef = socatDOIHRef;
+		if ( socatDOIHRef == null )
+			this.socatDOIHRef = "";
+		else
+			this.socatDOIHRef = socatDOIHRef;
 	}
 
 	/**
 	 * @return
-	 * 		the flag value associated with this instance;
+	 * 		the cruise flag value associated with this instance;
 	 * 		never null but could be empty if not assigned
 	 */
-	public String getFlag() {
-		return flag;
+	public String getCruiseFlag() {
+		return cruiseFlag;
 	}
 
 	/**
-	 * @param flag 
-	 * 		the flag value to set; 
+	 * @param cruiseFlag 
+	 * 		the cruise flag value to set; 
 	 * 		if null, an empty string is assigned
 	 */
-	public void setFlag(String flag) {
-		this.flag = flag;
-	}
-
-	/**
-	 * Compares first by expocode, then cruise name, vessel name, begin time, 
-	 * end time, etc.  Does not compare socatDOI, socatDOIHRef, or flag.  
-	 */
-	@Override
-	public int compareTo(SocatMetadata other) {
-		int result;
-
-		result = expocode.compareTo(other.expocode);
-		if ( result != 0 )
-			return result;
-
-		result = cruiseName.compareTo(other.cruiseName);
-		if ( result != 0 )
-			return result;
-
-		result = vesselName.compareTo(other.vesselName);
-		if ( result != 0 )
-			return result;
-
-		result = westmostLongitude.compareTo(other.westmostLongitude);
-		if ( result != 0 )
-			return result;
-
-		result = eastmostLongitude.compareTo(other.eastmostLongitude);
-		if ( result != 0 )
-			return result;
-
-		result = southmostLatitude.compareTo(other.southmostLatitude);
-		if ( result != 0 )
-			return result;
-
-		result = northmostLatitude.compareTo(other.northmostLatitude);
-		if ( result != 0 )
-			return result;
-
-		result = beginTime.compareTo(other.beginTime);
-		if ( result != 0 )
-			return result;
-
-		result = endTime.compareTo(other.endTime);
-		if ( result != 0 )
-			return result;
-
-		result = scienceGroup.compareTo(other.scienceGroup);
-		if ( result != 0 )
-			return result;
-
-		result = origDOI.compareTo(other.origDOI);
-		if ( result != 0 )
-			return result;
-
-		result = metadataHRef.compareTo(other.metadataHRef);
-		if ( result != 0 )
-			return result;
-
-		// Ignore socatDOI, socatDOIHRef, and flag
-		return 0;
+	public void setCruiseFlag(String cruiseFlag) {
+		if ( cruiseFlag == null )
+			this.cruiseFlag = "";
+		else
+			this.cruiseFlag = cruiseFlag;
 	}
 
 	@Override 
 	public int hashCode() {
-		/*
-		 * Do not consider floating-point fields since they do not have to be exactly 
-		 * the same for equals to be true.  Also, socatDOI, socatDOIHRef and flag 
-		 * are ignored, so they do not have to be the same for equals to be true.  
-		 */
+		// Do not consider floating-point fields since they do not 
+		// have to be exactly the same for equals to return true.
 		final int prime = 37;
 		int result = expocode.hashCode();
 		result = result * prime + cruiseName.hashCode();
@@ -427,9 +381,11 @@ public class SocatMetadata
 		result = result * prime + scienceGroup.hashCode();
 		result = result * prime + origDOI.hashCode();
 		result = result * prime + metadataHRef.hashCode();
+		result = result * prime + socatDOI.hashCode();
+		result = result * prime + socatDOIHRef.hashCode();
+		result = result * prime + cruiseFlag.hashCode();
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -441,6 +397,13 @@ public class SocatMetadata
 		if ( ! (obj instanceof SocatMetadata) )
 			return false;
 		SocatMetadata other = (SocatMetadata) obj;
+
+		// Date comparisons
+		if ( ! beginTime.equals(other.beginTime) )
+			return false;
+
+		if ( ! endTime.equals(other.endTime) )
+			return false;
 
 		// String comparisons
 		if ( ! expocode.equals(other.expocode) )
@@ -461,7 +424,14 @@ public class SocatMetadata
 		if ( ! metadataHRef.equals(other.metadataHRef) )
 			return false;
 
-		// Ignore socatDOI, socatDOIHRef, and flag
+		if ( ! socatDOI.equals(other.socatDOI) )
+			return false;
+
+		if ( ! socatDOIHRef.equals(other.socatDOIHRef) )
+			return false;
+
+		if ( ! cruiseFlag.equals(other.cruiseFlag) )
+			return false;
 
 		// Floating-point comparisons
 		if ( ! DashboardUtils.closeTo(westmostLongitude, 
@@ -475,13 +445,6 @@ public class SocatMetadata
 			return false;
 		if ( ! DashboardUtils.closeTo(northmostLatitude, 
 				other.northmostLatitude, 0.0, 1.0E-4) )
-			return false;
-
-		// Timestamp comparisons
-		if ( ! beginTime.equals(other.beginTime) )
-			return false;
-
-		if ( ! endTime.equals(other.endTime) )
 			return false;
 
 		return true;
@@ -502,7 +465,7 @@ public class SocatMetadata
 				",\n    metadataHRef=" + metadataHRef + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    socatDOIHRef=" + socatDOIHRef + 
-				",\n    flag=" + flag + 
+				",\n    cruiseFlag=" + cruiseFlag + 
 				" ]";
 	}
 
