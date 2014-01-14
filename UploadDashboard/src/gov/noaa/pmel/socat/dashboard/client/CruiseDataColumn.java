@@ -152,9 +152,8 @@ public class CruiseDataColumn {
 					@Override
 					public void render(Cell.Context context, String value, 
 										SafeHtmlBuilder sb) {
-						sb.appendHtmlConstant("<div>");
 						super.render(context, value, sb);
-						sb.appendHtmlConstant("</div>");
+						sb.appendHtmlConstant("<br />");
 					}
 				};
 			}
@@ -180,9 +179,8 @@ public class CruiseDataColumn {
 					@Override
 					public void render(Cell.Context context, String value,
 										SafeHtmlBuilder sb) {
-						sb.appendHtmlConstant("<div>");
 						super.render(context, value, sb);
-						sb.appendHtmlConstant("</div>");
+						sb.appendHtmlConstant("<br />");
 					}
 				};
 			}
