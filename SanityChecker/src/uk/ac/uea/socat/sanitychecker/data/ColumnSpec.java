@@ -111,6 +111,14 @@ public class ColumnSpec {
 	 */
 	private DateColumnInfo itsDateColumnInfo;
 	
+	/**
+	 * Construct the ColumnSpec object from XML
+	 * @param specFile The original XML file
+	 * @param xml The parsed column spec XML
+	 * @param dataConversionConfig The data conversion configuration
+	 * @param logger The logger
+	 * @throws InvalidColumnSpecException
+	 */
 	public ColumnSpec(File specFile, Document xml, ColumnConversionConfig dataConversionConfig, Logger logger) throws InvalidColumnSpecException {
 		
 		itsStandardColumnInfo = new HashMap<String, StandardColumnInfo>();
