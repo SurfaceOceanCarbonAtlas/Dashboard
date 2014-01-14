@@ -42,6 +42,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes";
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
+	private static final String MISSING_VALUES_ID = "missingvalues";
 	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities";
 
 	private static final int MIN_NUM_DATA_COLUMNS = 6;
@@ -659,6 +660,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Unit for each data column
 		cruiseProps.setProperty(DATA_COLUMN_UNITS_ID, 
 				DashboardUtils.encodeStringArrayList(cruise.getDataColUnits()));
+		// Missing value for each data column
+		cruiseProps.setProperty(MISSING_VALUES_ID, 
+				DashboardUtils.encodeStringArrayList(cruise.getMissingValues()));
 		// Qualities of each data column
 		cruiseProps.setProperty(DATA_COLUMN_QUALITIES_ID, 
 				DashboardUtils.encodeIntegerArrayList(cruise.getDataColQualities()));
@@ -907,6 +911,17 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( cruise.getDataColUnits().size() != colTypes.size() )
 			throw new IllegalArgumentException(
 					"number of data column units different from " +
+					"number of data column types");
+
+		// Missing valeues for each data column
+		value = cruiseProps.getProperty(MISSING_VALUES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					MISSING_VALUES_ID + " given in " + infoFile.getPath());
+		cruise.setMissingValues(DashboardUtils.decodeStringArrayList(value));
+		if ( cruise.getMissingValues().size() != colTypes.size() )
+			throw new IllegalArgumentException(
+					"number of data column missing-value values different from " +
 					"number of data column types");
 
 		// Quality of each data column
