@@ -16,6 +16,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = 883513839967911719L;
 
+	// The following need to be provided by the user data file.
 	Integer year;
 	Integer month;
 	Integer day;
@@ -36,6 +37,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double fCO2WaterTEqu;
 	Double pCO2WaterSst;
 	Double pCO2WaterTEqu;
+	// The following are provided by Ferret calculations using the above data
 	Double woaSss;
 	Double ncepSlp;
 	Double fCO2FromXCO2TEqu;
@@ -60,6 +62,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double etopo2;
 	Double gvCO2;
 	Double distToLand;
+	// The following may be provided by the SanityChecker for questionable or bad data.
 	Integer woceFlag;
 
 	/**
