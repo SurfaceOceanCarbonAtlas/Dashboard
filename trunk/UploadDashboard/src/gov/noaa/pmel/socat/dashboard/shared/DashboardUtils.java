@@ -3,6 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
+import gov.noaa.pmel.socat.dashboard.nc.SocatMetadata;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;

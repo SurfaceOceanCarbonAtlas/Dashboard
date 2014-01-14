@@ -1,6 +1,8 @@
 /**
  */
-package gov.noaa.pmel.socat.dashboard.shared;
+package gov.noaa.pmel.socat.dashboard.nc;
+
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.Serializable;
 import java.util.Date;
