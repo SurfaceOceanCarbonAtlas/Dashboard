@@ -46,25 +46,27 @@ import com.google.gwt.view.client.Range;
 public class DataColumnSpecsPage extends Composite {
 
 	private static final int NUM_ROWS_PER_GRID_PAGE = 10;
-	private static final int DATA_COLUMN_WIDTH = 18;
+	private static final int DATA_COLUMN_WIDTH = 16;
 
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String SUBMIT_TEXT = "Check Data";
+	private static final String SUBMIT_TEXT_FROM_UPLOAD = "Check Data";
+	private static final String SUBMIT_TEXT_FROM_LIST = "Recheck Data";
 	private static final String CANCEL_TEXT_FROM_UPLOAD = "Abort Upload";
-	private static final String CANCEL_TEXT_FROM_LIST = "Return to Cruise List";
+	private static final String CANCEL_TEXT_FROM_LIST = "Cancel";
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String INTRO_PROLOGUE = 
 			"<b><large>Check Cruise Data</large></b>" +
 			"<br />" +
-			"Assign the type and missing-value for the data columns of this cruise." +
+			"Assign the type and, optionally, the missing-value for " +
+			"the data columns of this cruise." +
 			"<ul>" +
 			"<li><em>(unknown)</em> data must be reassigned</li>" +
 			"<li><em>(ignore)</em> data will be completely ignored</li>" +
 			"<li><em>(supplemental)</em> data will not be checked " +
 			"or used, but will be included in SOCAT output files</li>" +
-			"<li>any missing values specified are in addition to " +
-			"<em>NaN</em>, <em>NA</em>, and <em>N/A</em></li>" +
+			"<li><em>NaN</em>, <em>NA</em>, <em>N/A</em>, and blank " +
+			"fields are always recognized as missing values</li>" +
 			"</ul>" +
 			"Cruise: <b>";
 	private static final String INTRO_EPILOGUE = "</b>";
@@ -176,7 +178,6 @@ public class DataColumnSpecsPage extends Composite {
 		fromLogoutButton = false;
 		defaultSecondsPopup = null;
 		logoutButton.setText(LOGOUT_TEXT);
-		submitButton.setText(SUBMIT_TEXT);
 		pagerLabel.setText(PAGER_LABEL_TEXT);
 		cruise = new DashboardCruise();
 		cruiseDataCols = new ArrayList<CruiseDataColumn>();
@@ -231,10 +232,6 @@ public class DataColumnSpecsPage extends Composite {
 						singleton = new DataColumnSpecsPage();
 					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.fromUpload = fromUpload;
-					if ( fromUpload )
-						singleton.cancelButton.setText(CANCEL_TEXT_FROM_UPLOAD);
-					else
-						singleton.cancelButton.setText(CANCEL_TEXT_FROM_LIST);
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
 					History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
 				}
@@ -282,6 +279,15 @@ public class DataColumnSpecsPage extends Composite {
 	private void updateCruiseColumnSpecs(DashboardCruiseWithData cruiseSpecs) {
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
+
+		if ( fromUpload ) {
+			submitButton.setText(SUBMIT_TEXT_FROM_UPLOAD);
+			cancelButton.setText(CANCEL_TEXT_FROM_UPLOAD);
+		}
+		else {
+			submitButton.setText(SUBMIT_TEXT_FROM_LIST);
+			cancelButton.setText(CANCEL_TEXT_FROM_LIST);
+		}
 
 		// Clear the expocode in case the data provider gets called while clearing
 		cruise.setExpocode(null);

@@ -90,8 +90,8 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.UNKNOWN, "(unknown)");
 		STD_HEADER_NAMES.put(DataColumnType.TIMESTAMP, "timestamp");
 		STD_HEADER_NAMES.put(DataColumnType.DATE, "date");
-		STD_HEADER_NAMES.put(DataColumnType.YEAR, "yr");
-		STD_HEADER_NAMES.put(DataColumnType.MONTH, "mon");
+		STD_HEADER_NAMES.put(DataColumnType.YEAR, "year");
+		STD_HEADER_NAMES.put(DataColumnType.MONTH, "month");
 		STD_HEADER_NAMES.put(DataColumnType.DAY, "day");
 		STD_HEADER_NAMES.put(DataColumnType.TIME, "time");
 		STD_HEADER_NAMES.put(DataColumnType.HOUR, "hh");
