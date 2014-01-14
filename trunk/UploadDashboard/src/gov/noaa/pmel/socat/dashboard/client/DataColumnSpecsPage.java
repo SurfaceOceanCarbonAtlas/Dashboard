@@ -45,8 +45,8 @@ import com.google.gwt.view.client.Range;
  */
 public class DataColumnSpecsPage extends Composite {
 
-	private static final int NUM_ROWS_PER_GRID_PAGE = 15;
-	private static final int DATA_COLUMN_WIDTH = 15;
+	private static final int NUM_ROWS_PER_GRID_PAGE = 10;
+	private static final int DATA_COLUMN_WIDTH = 18;
 
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String SUBMIT_TEXT = "Check Data";
@@ -57,12 +57,14 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String INTRO_PROLOGUE = 
 			"<b><large>Check Cruise Data</large></b>" +
 			"<br />" +
-			"Assign the types for the data columns of this cruise." +
+			"Assign the type and missing-value for the data columns of this cruise." +
 			"<ul>" +
 			"<li><em>(unknown)</em> data must be reassigned</li>" +
 			"<li><em>(ignore)</em> data will be completely ignored</li>" +
 			"<li><em>(supplemental)</em> data will not be checked " +
 			"or used, but will be included in SOCAT output files</li>" +
+			"<li>any missing values specified are in addition to " +
+			"<em>NaN</em>, <em>NA</em>, and <em>N/A</em></li>" +
 			"</ul>" +
 			"Cruise: <b>";
 	private static final String INTRO_EPILOGUE = "</b>";
@@ -298,6 +300,7 @@ public class DataColumnSpecsPage extends Composite {
 		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
 		cruise.setDataColUnits(cruiseSpecs.getDataColUnits());
+		cruise.setMissingValues(cruiseSpecs.getMissingValues());
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 		introHtml.setHTML(INTRO_PROLOGUE + 
@@ -318,7 +321,7 @@ public class DataColumnSpecsPage extends Composite {
 			// Maintain a reference to the CruiseDataColumn object
 			cruiseDataCols.add(cruiseColumn);
 			// Add this data column and the header to the grid
-			dataGrid.addColumn(dataColumn, cruiseColumn.createHeader());
+			dataGrid.addColumn(dataColumn, cruiseColumn.getHeader());
 			// Set the width of this column - all the same width
 			dataGrid.setColumnWidth(dataColumn, DATA_COLUMN_WIDTH, Style.Unit.EM);
 			// Add this width to the minimum table width

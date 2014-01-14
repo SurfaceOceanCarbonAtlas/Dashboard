@@ -126,6 +126,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 					cruiseData.getDataColTypes().size());
 		cruiseData.setDataColTypes(newSpecs.getDataColTypes());
 		cruiseData.setDataColUnits(newSpecs.getDataColUnits());
+		cruiseData.setMissingValues(newSpecs.getMissingValues());
 
 		// Create the metadata properties of this cruise for the sanity checker
 		Properties metadataInput = new Properties();
@@ -329,9 +330,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Save and commit the updated cruise columns
 		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
-				"Cruise data column types and units for " + 
+				"Cruise data column types, units, and missing values for " + 
 				cruiseData.getExpocode() + " updated by " + username);
-		// Update the user-specific data column names to types and units 
+		// Update the user-specific data column names to types, units, and missing values 
 		dataStore.getUserFileHandler()
 				 .updateUserDataColumnTypes(cruiseData, username);
 		

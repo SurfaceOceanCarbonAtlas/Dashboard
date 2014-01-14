@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6957546853174213555L;
+	private static final long serialVersionUID = -7524399500525667195L;
 
 	boolean selected;
 	String owner;
@@ -34,6 +34,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	ArrayList<String> userColNames;
 	ArrayList<DataColumnType> dataColTypes;
 	ArrayList<String> dataColUnits;
+	ArrayList<String> missingValues;
 	ArrayList<Integer> dataColQualities;
 
 	public DashboardCruise() {
@@ -51,6 +52,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		dataColTypes = new ArrayList<DataColumnType>();
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
+		missingValues = new ArrayList<String>();
 		dataColQualities = new ArrayList<Integer>();
 	}
 
@@ -339,6 +341,28 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the list giving the missing value for each data column in this 
+	 * 		cruise; may be empty but never null.  The actual list in this 
+	 * 		object is returned. 
+	 */
+	public ArrayList<String> getMissingValues() {
+		return missingValues;
+	}
+
+	/**
+	 * @param missingValues 
+	 * 		the list giving the missing value for each data column in this 
+	 * 		cruise.  The list in this object is cleared and all the contents 
+	 * 		of the given list, if not null, are added. 
+	 */
+	public void setMissingValues(ArrayList<String> missingValues) {
+		this.missingValues.clear();
+		if ( missingValues != null )
+			this.missingValues.addAll(missingValues);
+	}
+
+	/**
+	 * @return 
 	 * 		the list of data column qualities (a WOCE-like flag for each
 	 * 		data column taken as a whole) for this cruise; may be empty 
 	 * 		but never null.  The actual list in this object is returned. 
@@ -377,6 +401,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
 		result = result * prime + dataColUnits.hashCode();
+		result = result * prime + missingValues.hashCode();
 		result = result * prime + dataColQualities.hashCode();
 		return result;
 	}
@@ -420,6 +445,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! dataColUnits.equals(other.dataColUnits) )
 			return false;
+		if ( ! missingValues.equals(other.missingValues) )
+			return false;
 		if ( ! dataColQualities.equals(other.dataColQualities) )
 			return false;
 		return true;
@@ -442,6 +469,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +
+				",\n    missingValues=" + missingValues.toString() +
 				",\n    dataColQualities=" + dataColQualities.toString() +
 				" ]";
 	}
