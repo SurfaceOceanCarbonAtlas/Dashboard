@@ -5,6 +5,8 @@ package gov.noaa.pmel.socat.dashboard.nc;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -528,5 +530,29 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		if ( newName != null )
 			metadata.setScienceGroup(newName);
 	}
+
+    public int getMaxStringLength() {
+        
+        int maxlength = -1;
+        Field[] fields = this.getClass().getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            Field f = fields[i];
+            f.setAccessible(true);
+            if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers())) {
+                String s;
+                try {
+                    s = (String) f.get(this);
+                    if ( s.length() > maxlength ) {
+                        maxlength = s.length();
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Carry on.  The value form other strings will be fine.
+                } catch (IllegalAccessException e) {
+                    // Carry on.  The value form other strings will be fine.
+                }            
+            }
+        }
+        return maxlength;
+    }
 
 }
