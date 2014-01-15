@@ -103,10 +103,10 @@ public class CruiseListPage extends Composite {
 
 	private static final String SUBMITTED_CRUISES_SELECTED_ERROR_MSG = 
 			"The selected cruises can only include cruises which have not " +
-			"been added to SOCAT or have been suspended.";
+			"been added to SOCAT, or have been suspended or failed.";
 	private static final String UNSUBMITTED_CRUISES_SELECTED_ERROR_MSG =
 			"The selected cruises can only include cruises which have been " +
-			"added to SOCAT and have not been suspended.";
+			"added to SOCAT and are neither suspended nor failed.";
 
 	private static final String NO_CRUISES_FOR_DATACHECK_MSG = 
 			"No cruise is selected for checking data";
@@ -178,7 +178,7 @@ public class CruiseListPage extends Composite {
 	private static final String TIMESTAMP_COLUMN_NAME = "Uploaded on";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
 	private static final String OME_FILENAME_COLUMN_NAME = "OME Metadata";
-	private static final String ADDN_METADATA_COLUMN_NAME = "Addnl Metadata";
+	private static final String ADDN_METADATA_COLUMN_NAME = "Addn Metadata";
 	private static final String SUBMITTED_COLUMN_NAME = "SOCAT Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archive Status";
 	private static final String OWNER_COLUMN_NAME = "Owner";

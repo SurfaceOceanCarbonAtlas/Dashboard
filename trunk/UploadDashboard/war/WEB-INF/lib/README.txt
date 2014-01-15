@@ -10,3 +10,5 @@ The jar files:
 	sequence-library-1.0.2.jar
 	antlr-runtime-3.4.jar
 were obtained from the SVNKit (version 1.7.11) site http://svnkit.com/
+The jar file netcdfAll-4.3.jar was obtained from the Unidata netCDF downloads site http://www.unidata.ucar.edu/downloads/netcdf/
+(The jar file sanitychecker.jar is built as part of this project and added to this location.)
