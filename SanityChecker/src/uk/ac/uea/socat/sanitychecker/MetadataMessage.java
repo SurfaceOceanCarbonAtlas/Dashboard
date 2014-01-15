@@ -1,5 +1,6 @@
 package uk.ac.uea.socat.sanitychecker;
 
+import java.util.Enumeration;
 import java.util.Properties;
 
 /**
@@ -17,13 +18,11 @@ public class MetadataMessage {
 	
 	public static final String MAX_PROPERTY = "max";
 	
-	@SuppressWarnings("unused")
-	private int itsLine;
+	protected int itsLine;
 	
 	private int itsSeverity;
 	
-	@SuppressWarnings("unused")
-	private String itsMessage;
+	protected String itsMessage;
 	
 	private Properties itsProperties;
 	
@@ -70,8 +69,17 @@ public class MetadataMessage {
 		if (itsLine != -1) {
 			output.append("LINE " + itsLine + ": ");
 		}
-		
+
 		output.append(itsMessage);
+		
+		if (itsProperties.size() > 0) {
+			output.append("\n");
+			Enumeration<?> propNames = itsProperties.propertyNames();
+			while (propNames.hasMoreElements()) {
+				String name = (String) propNames.nextElement();
+				output.append("  " + name + " = " + itsProperties.getProperty(name));
+			}
+		}
 
 		return output.toString();
 	}
