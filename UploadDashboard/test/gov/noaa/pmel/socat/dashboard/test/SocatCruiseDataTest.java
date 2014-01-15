@@ -6,8 +6,12 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -20,6 +24,145 @@ public class SocatCruiseDataTest {
 
 	static final Integer NEGATIVE_ONE = -1;
 	static final Integer ZERO = 0;
+
+	static final ArrayList<DataColumnType> TEST_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
+			DataColumnType.IGNORE,
+			DataColumnType.IGNORE,
+			DataColumnType.MONTH, 
+			DataColumnType.DAY, 
+			DataColumnType.YEAR, 
+			DataColumnType.HOUR, 
+			DataColumnType.MINUTE, 
+			DataColumnType.LATITUDE, 
+			DataColumnType.LONGITUDE, 
+			DataColumnType.SEA_SURFACE_TEMPERATURE,
+			DataColumnType.SALINITY,
+			DataColumnType.XCO2WATER_SST,
+			DataColumnType.PCO2WATER_EQU,
+			DataColumnType.SEA_LEVEL_PRESSURE,
+			DataColumnType.SUPPLEMENTAL));
+	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
+	static final ArrayList<Integer> EXPECTED_YEARS = new ArrayList<Integer>();
+	static final ArrayList<Integer> EXPECTED_MONTHS = new ArrayList<Integer>();
+	static final ArrayList<Integer> EXPECTED_DAYS = new ArrayList<Integer>();
+	static final ArrayList<Integer> EXPECTED_HOURS = new ArrayList<Integer>();
+	static final ArrayList<Integer> EXPECTED_MINUTES = new ArrayList<Integer>();
+	static final ArrayList<Double> EXPECTED_LATITUDES = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_LONGITUDES = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_SSTS = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_SALS = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_XCO2WATER_SSTS = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_PCO2WATER_EQUS = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_SLPS = new ArrayList<Double>();
+
+	static {
+		// No seconds, and pressure is in kPa instead of hPa, but shouldn't matter for these tests
+		// First two "ignores" are Expocode and Cruise ID, last "supplemental" is ship speed in knots.
+		// The last line is a fake entry to test missing values.
+		String[] dataValueStrings = {
+			"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,100.9281,0.3", 
+			"31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,100.9298,0.3", 
+			"31B520060606,GM0606,6,10,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,100.9314,2", 
+			"31B520060606,GM0606,6,10,2006,23,51,29.0517,-92.7592,28.99,33.44,399.7,382.7,100.9302,0.3", 
+			"31B520060606,GM0606,6,10,2006,23,52,29.0516,-92.7592,28.9,33.39,397.9,381,100.929,0.3", 
+			"31B520060606,GM0606,6,10,2006,23,53,29.0516,-92.7593,28.93,33.38,397.1,380.3,100.9283,0.3", 
+			"31B520060606,GM0606,6,10,2006,23,54,29.0515,-92.7593,28.96,33.38,395.8,379,100.9272,0.3", 
+			"31B520060606,GM0606,6,10,2006,23,55,29.051,-92.76,28.88,33.38,395.7,378.9,100.9264,3", 
+			"31B520060606,GM0606,6,10,2006,23,56,29.0502,-92.7597,29.08,33.4,395.3,378.3,100.9264,3.1", 
+			"31B520060606,GM0606,6,10,2006,23,57,29.0494,-92.7593,29.35,33.3,392.1,375.1,100.9255,3.1", 
+			"31B520060606,GM0606,6,10,2006,23,58,29.0486,-92.759,29.34,33.28,391,374,100.9246,3.1", 
+			"31B520060606,GM0606,6,10,2006,23,59,29.0478,-92.7587,29.29,33.28,390.5,373.6,100.9223,3.1", 
+			"31B520060606,GM0606,6,11,2006,0,00,29.0478,-92.7538,29.29,33.32,390.9,374,100.923,17.6", 
+			"31B520060606,GM0606,6,11,2006,0,01,29.0492,-92.7522,29.35,33.41,390.3,373.3,100.9255,7.8", 
+			"31B520060606,GM0606,6,11,2006,0,02,29.0506,-92.7505,29.39,33.47,393,375.9,100.9266,7.8", 
+			"31B520060606,GM0606,6,11,2006,0,03,29.052,-92.7489,29.43,33.55,395.7,378.4,100.928,7.8", 
+			"31B520060606,GM0606,6,11,2006,0,04,29.0534,-92.7472,29.73,33.64,399.7,382,100.93,7.8", 
+			"31B520060606,GM0606,6,11,2006,0,05,29.0577,-92.7492,29.84,33.64,402.9,385,100.9302,16.9", 
+			"31B520060606,GM0606,6,11,2006,0,06,29.0587,-92.7512,29.67,33.55,406.9,388.9,100.9305,8.2", 
+			"31B520060606,GM0606,6,11,2006,0,07,29.0597,-92.7533,29.66,33.52,408.1,390.2,100.9308,8.2", 
+			"31B520060606,GM0606,6,11,2006,0,08,29.0608,-92.7553,29.82,33.42,408.1,390,100.9306,8.2", 
+			"31B520060606,GM0606,6,11,2006,0,09,29.0618,-92.7574,29.81,33.31,408.2,390,100.931,8.2", 
+			"31B520060606,GM0606,6,11,2006,0,10,29.0648,-92.7623,29.82,33.22,405.9,387.9,100.9304,20.8", 
+			"31B520060606,GM0606,6,11,2006,0,11,29.0641,-92.7641,29.9,33.14,404,386,100.926,7.1", 
+			"31B520060606,GM0606,6,11,2006,0,12,29.0634,-92.766,29.89,32.97,402.9,384.9,100.9237,7.1",
+			"31B520060606,GM0606,6,11,2006,0,13,NaN,NaN,NaN,NaN,NaN,NaN,NaN,0.0"
+		};
+		for ( String valsString : dataValueStrings ) {
+			ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",",-1)));
+			TEST_VALUES.add(dataVals);
+			EXPECTED_YEARS.add(Integer.valueOf(dataVals.get(4)));
+			EXPECTED_MONTHS.add(Integer.valueOf(dataVals.get(2)));
+			EXPECTED_DAYS.add(Integer.valueOf(dataVals.get(3)));
+			EXPECTED_HOURS.add(Integer.valueOf(dataVals.get(5)));
+			EXPECTED_MINUTES.add(Integer.valueOf(dataVals.get(6)));
+			EXPECTED_LATITUDES.add(Double.valueOf(dataVals.get(7)));
+			EXPECTED_LONGITUDES.add(Double.valueOf(dataVals.get(8)));
+			EXPECTED_SSTS.add(Double.valueOf(dataVals.get(9)));
+			EXPECTED_SALS.add(Double.valueOf(dataVals.get(10)));
+			EXPECTED_XCO2WATER_SSTS.add(Double.valueOf(dataVals.get(11)));
+			EXPECTED_PCO2WATER_EQUS.add(Double.valueOf(dataVals.get(12)));
+			EXPECTED_SLPS.add(Double.valueOf(dataVals.get(13)));
+		}
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#SocatCruiseData(java.util.List, java.util.List)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#dataListFromDashboardCruise(gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData)}.
+	 */
+	@Test
+	public void testSocatCruiseDataList() {
+		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
+		cruise.setDataColTypes(TEST_TYPES);
+		cruise.setDataValues(TEST_VALUES);
+		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
+		for (int k = 0; k < TEST_TYPES.size(); k++) {
+			assertEquals(EXPECTED_YEARS.get(k), dataList.get(k).getYear());
+			assertEquals(EXPECTED_MONTHS.get(k), dataList.get(k).getMonth());
+			assertEquals(EXPECTED_DAYS.get(k), dataList.get(k).getDay());
+			assertEquals(EXPECTED_HOURS.get(k), dataList.get(k).getHour());
+			assertEquals(EXPECTED_MINUTES.get(k), dataList.get(k).getMinute());
+			assertEquals(EXPECTED_LATITUDES.get(k), dataList.get(k).getLatitude());
+			assertEquals(EXPECTED_LONGITUDES.get(k), dataList.get(k).getLongitude());
+			assertEquals(EXPECTED_SSTS.get(k), dataList.get(k).getSst());
+			assertEquals(EXPECTED_SALS.get(k), dataList.get(k).getSal());
+			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), dataList.get(k).getXCO2WaterSst());
+			assertEquals(EXPECTED_PCO2WATER_EQUS.get(k), dataList.get(k).getPCO2WaterTEqu());
+			assertEquals(EXPECTED_SLPS.get(k), dataList.get(k).getPAtm());
+			assertTrue( dataList.get(k).getSecond().isNaN() );
+			assertTrue( dataList.get(k).getSampleDepth().isNaN() );
+			assertTrue( dataList.get(k).getTEqu().isNaN() );
+			assertTrue( dataList.get(k).getPEqu().isNaN() );
+			assertTrue( dataList.get(k).getXCO2WaterTEqu().isNaN() );
+			assertTrue( dataList.get(k).getFCO2WaterSst().isNaN() );
+			assertTrue( dataList.get(k).getFCO2WaterTEqu().isNaN() );
+			assertTrue( dataList.get(k).getPCO2WaterSst().isNaN() );
+			assertTrue( dataList.get(k).getWoaSss().isNaN() );
+			assertTrue( dataList.get(k).getNcepSlp().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2TEqu().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2Sst().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromPCO2TEqu().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromPCO2Sst().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromFCO2TEqu().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromFCO2Sst().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromPCO2TEquNcep().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromPCO2SstNcep().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2TEquWoa().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2SstWoa().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2TEquNcep().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2SstNcep().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2TEquNcepWoa().isNaN() );
+			assertTrue( dataList.get(k).getFCO2FromXCO2SstNcepWoa().isNaN() );
+			assertTrue( dataList.get(k).getFCO2Rec().isNaN() );
+			assertTrue( dataList.get(k).getDeltaT().isNaN() );
+			assertTrue( dataList.get(k).getCalcSpeed().isNaN() );
+			assertTrue( dataList.get(k).getEtopo2().isNaN() );
+			assertTrue( dataList.get(k).getGVCO2().isNaN() );
+			assertTrue( dataList.get(k).getDistToLand().isNaN() );
+			assertEquals(ZERO, dataList.get(k).getFCO2Source());
+			assertEquals(ZERO, dataList.get(k).getWoceFlag());
+			assertEquals("", dataList.get(k).getRegionID());
+		}
+	}
 
 	static final Integer YEAR = 2014;
 	/**
