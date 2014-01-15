@@ -286,6 +286,13 @@ public class SanityChecker {
 		 * 
 		 * Any such values are replaced with an empty string.
 		 */
+
+		
+/* 
+		 * This method of auto-detecting 'missing' value denoters has been removed.
+		 * It may be reinstated at a later date, but needs careful testing for false positives/negatives.
+		 * 
+		 * 
 		for (String columnName : SocatColumnConfig.getInstance().getColumnList()) {
 			SocatColumnConfigItem columnConfig = SocatColumnConfig.getInstance().getColumnConfig(columnName);
 			
@@ -328,7 +335,7 @@ public class SanityChecker {
 				}
 			}
 		}
-		
+*/
 		/*
 		 * Now we can go through all the data looking for required values that are
 		 * missing, and numeric values that are out of range. 
