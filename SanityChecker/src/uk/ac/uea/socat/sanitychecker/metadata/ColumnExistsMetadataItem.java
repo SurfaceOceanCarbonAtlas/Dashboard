@@ -29,7 +29,7 @@ public class ColumnExistsMetadataItem extends MetadataItem {
 	 * @param value The value of the metadata item
 	 * @throws ParseException If the supplied in value could not be parsed into the correct data type
 	 */
-	public ColumnExistsMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException, DateTimeException {
+	public ColumnExistsMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException {
 		super(config, line, logger);
 		itCanGenerate = true;
 		itCanGenerateFromOneRecord = true;

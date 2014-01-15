@@ -127,7 +127,7 @@ public class SanityChecker {
 			ArrayList<ArrayList<String>> dataInput, String dateFormat) throws SanityCheckerException {
 		
 		itsLogger = Logger.getLogger("Sanity Checker - " + filename);
-		itsLogger.trace("SanityChecker called");
+		itsLogger.trace("SanityChecker initialised");
 
 		// Make sure the the base configuration is set up. Otherwise we can't do anything!
 		if (!BaseConfig.isInitialised()) {
@@ -209,7 +209,7 @@ public class SanityChecker {
 	 * @throws IllegalAccessException If an error occurs setting up the MetadataItem object
 	 * @throws InvocationTargetException If an error occurs setting up the MetadataItem object
 	 */
-	private MetadataItem createMetadataItem(String metadataItemName, String metadataValue, int line) throws ConfigException, DateTimeException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	private MetadataItem createMetadataItem(String metadataItemName, String metadataValue, int line) throws ConfigException, SanityCheckerException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		MetadataConfigItem metadataItemConfig = MetadataConfig.getInstance().get(metadataItemName);
 		@SuppressWarnings("unchecked")
 		Class<? extends MetadataItem> itemClass = metadataItemConfig.getItemClass();
@@ -224,7 +224,7 @@ public class SanityChecker {
 	 * Any conflicting metadata items already present will be overwritten
 	 * @param metadataSet The metadata that has been extracted thus far. New metadata will be added to this.
 	 */
-	private void generateMetadataFromData() throws ConfigException, MetadataException, DateTimeException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	private void generateMetadataFromData() throws ConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		
 		List<MetadataItem> allRecordItems = new ArrayList<MetadataItem>();
 		Map<String, MetadataItem> metadataSet = itsOutput.getMetadata();
