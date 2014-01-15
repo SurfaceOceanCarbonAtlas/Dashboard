@@ -6,6 +6,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -16,7 +17,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -8760815956964862162L;
+	private static final long serialVersionUID = -2900404512113576746L;
+
+	// Jan 2, 3000 00:00:00 GMT
+	public static final Date INVALID_DATE = new Date(32503766400429L);
 
 	String expocode;
 	String cruiseName;
@@ -45,8 +49,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		eastmostLongitude = Double.NaN;
 		southmostLatitude = Double.NaN;
 		northmostLatitude = Double.NaN;
-		beginTime = DashboardUtils.INVALID_DATE;
-		endTime = DashboardUtils.INVALID_DATE;
+		beginTime = INVALID_DATE;
+		endTime = INVALID_DATE;
 		scienceGroup = "";
 		origDOI = "";
 		metadataHRef = "";
@@ -205,7 +209,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the beginning time for the cruise;
-	 * 		never null but could be {@link DashboardUtils#INVALID_DATE} if not assigned.
+	 * 		never null but could be {@link #INVALID_DATE} if not assigned.
 	 */
 	public Date getBeginTime() {
 		return beginTime;
@@ -214,11 +218,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param beginTime 
 	 * 		the beginning time for the cruise to set;
-	 * 		if null, {@link DashboardUtils#INVALID_DATE} is assigned
+	 * 		if null, {@link #INVALID_DATE} is assigned
 	 */
 	public void setBeginTime(Date beginTime) {
 		if ( beginTime == null )
-			this.beginTime = DashboardUtils.INVALID_DATE;
+			this.beginTime = INVALID_DATE;
 		else 
 			this.beginTime = beginTime;
 	}
@@ -226,7 +230,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the ending time for the cruise;
-	 * 		never null but could be {@link DashboardUtils#INVALID_DATE} if not assigned.
+	 * 		never null but could be {@link #INVALID_DATE} if not assigned.
 	 */
 	public Date getEndTime() {
 		return endTime;
@@ -235,11 +239,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param endTime 
 	 * 		the ending time for the cruise to set;
-	 * 		if null, {@link DashboardUtils#INVALID_DATE} is assigned
+	 * 		if null, {@link #INVALID_DATE} is assigned
 	 */
 	public void setEndTime(Date endTime) {
 		if ( endTime == null )
-			this.endTime = DashboardUtils.INVALID_DATE;
+			this.endTime = INVALID_DATE;
 		else 
 			this.endTime = endTime;
 	}
@@ -469,6 +473,60 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    socatDOIHRef=" + socatDOIHRef + 
 				",\n    cruiseFlag=" + cruiseFlag + 
 				" ]";
+	}
+
+	// Use the Unicode code points to define these characters
+	// so we know exactly what value is being used in the String
+	public static final String aAcute = "\u00E1";
+	public static final String aRing = "\u00E5";
+	public static final String eGrave = "\u00E8";
+	public static final String eAcute = "\u00E9";
+	public static final String iAcute = "\u00ED";
+	public static final String oUmlaut = "\u00F6";
+
+	public static final HashMap<String,String> VESSEL_NAME_CORRECTIONS = 
+			new HashMap<String,String>();
+	static {
+		VESSEL_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
+		VESSEL_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
+		VESSEL_NAME_CORRECTIONS.put("Ka imimoana", "Ka'imimoana");
+		VESSEL_NAME_CORRECTIONS.put("L Astrolabe", "L'Astrolabe");
+		VESSEL_NAME_CORRECTIONS.put("L Atalante", "L'Atalante");
+	}
+
+	public static final HashMap<String,String> SCIENCE_GROUP_NAME_CORRECTIONS = 
+			new HashMap<String,String>();
+	static {
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Aida F. Rios", 
+				"Aida F. R" + iAcute + "os");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Aida F. Rios; Fiz F. Perez", 
+				"Aida F. R" + iAcute + "os; Fiz F. P" + eAcute + "rez");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Are Olsen; Sara Jutterstrom; Truls Johannessen",
+				"Are Olsen; Sara Jutterstr" + oUmlaut + "m; Truls Johannessen");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Arne Koertzinger", 
+				"Arne K" + oUmlaut + "rtzinger");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Fiz F. Perez", 
+				"Fiz F. P" + eAcute + "rez");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Melchor Gonzalez-Davila; J. Magdalena Santana-Casiano",
+				"Melchor Gonz" + aAcute + "lez-D" +  aAcute + "vila; J. Magdalena Santana-Casiano");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Nathalie Lefevre", 
+				"Nathalie Lef" + eGrave + "vre");
+		SCIENCE_GROUP_NAME_CORRECTIONS.put("Tobias Steinhoff; Arne Koertzinger", 
+				"Tobias Steinhoff; Arne K" + oUmlaut + "rtzinger");
+	}
+
+	/**
+	 * Corrects the spelling of ship and PI names intentionally misspelled 
+	 * in SOCAT metadata because they contain characters that the SOCAT 
+	 * database cannot always handle correctly.
+	 */
+	public static void correctSpellings(SocatMetadata metadata) {
+		String newName = VESSEL_NAME_CORRECTIONS.get(metadata.getVesselName());
+		if ( newName != null )
+			metadata.setVesselName(newName);
+		newName = SCIENCE_GROUP_NAME_CORRECTIONS.get(metadata.getScienceGroup());
+		if ( newName != null )
+			metadata.setScienceGroup(newName);
 	}
 
 }

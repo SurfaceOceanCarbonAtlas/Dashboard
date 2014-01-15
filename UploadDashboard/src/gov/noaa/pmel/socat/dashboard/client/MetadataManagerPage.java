@@ -96,8 +96,8 @@ public class MetadataManagerPage extends Composite {
 	private static final String UPLOAD_TIME_COLUMN_NAME = "Uploaded on";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 
-	private static final String IS_OME_STRING = "*";
-	private static final String NOT_OME_STRING = " ";
+	private static final String IS_OME_STRING = "***";
+	private static final String NOT_OME_STRING = "   ";
 
 	interface MetadataManagerPageUiBinder 
 			extends UiBinder<Widget, MetadataManagerPage> {

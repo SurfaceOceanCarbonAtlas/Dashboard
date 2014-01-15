@@ -3,13 +3,9 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
-import gov.noaa.pmel.socat.dashboard.nc.SocatMetadata;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.EnumMap;
-import java.util.HashMap;
 
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
@@ -20,16 +16,6 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  * @author Karl Smith
  */
 public class DashboardUtils {
-
-	// Use the Unicode code points to define these characters
-	// so we know exactly what value is being used in the String
-	public static final String aAcute = "\u00E1";
-	public static final String aRing = "\u00E5";
-	public static final String eGrave = "\u00E8";
-	public static final String eAcute = "\u00E9";
-	public static final String iAcute = "\u00ED";
-	public static final String oUmlaut = "\u00F6";
-
 
 	public static final String REQUEST_CRUISE_LIST_ACTION = "GET CRUISE LIST";
 	public static final String REQUEST_CRUISE_DELETE_ACTION = "DELETE CRUISE";
@@ -242,40 +228,6 @@ public class DashboardUtils {
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SUPPLEMENTAL, NO_UNITS);
 	}
-
-	public static final HashMap<String,String> VESSEL_NAME_CORRECTIONS = 
-			new HashMap<String,String>();
-	static {
-		VESSEL_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
-		VESSEL_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
-		VESSEL_NAME_CORRECTIONS.put("Ka imimoana", "Ka'imimoana");
-		VESSEL_NAME_CORRECTIONS.put("L Astrolabe", "L'Astrolabe");
-		VESSEL_NAME_CORRECTIONS.put("L Atalante", "L'Atalante");
-	}
-
-	public static final HashMap<String,String> SCIENCE_GROUP_NAME_CORRECTIONS = 
-			new HashMap<String,String>();
-	static {
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Aida F. Rios", 
-				"Aida F. R" + iAcute + "os");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Aida F. Rios; Fiz F. Perez", 
-				"Aida F. R" + iAcute + "os; Fiz F. P" + eAcute + "rez");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Are Olsen; Sara Jutterstrom; Truls Johannessen",
-				"Are Olsen; Sara Jutterstr" + oUmlaut + "m; Truls Johannessen");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Arne Koertzinger", 
-				"Arne K" + oUmlaut + "rtzinger");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Fiz F. Perez", 
-				"Fiz F. P" + eAcute + "rez");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Melchor Gonzalez-Davila; J. Magdalena Santana-Casiano",
-				"Melchor Gonz" + aAcute + "lez-D" +  aAcute + "vila; J. Magdalena Santana-Casiano");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Nathalie Lefevre", 
-				"Nathalie Lef" + eGrave + "vre");
-		SCIENCE_GROUP_NAME_CORRECTIONS.put("Tobias Steinhoff; Arne Koertzinger", 
-				"Tobias Steinhoff; Arne K" + oUmlaut + "rtzinger");
-	}
-
-	// Jan 2, 3000 00:00:00 GMT
-	public static final Date INVALID_DATE = new Date(32503766400429L);
 
 	/**
 	 * Generate the encrypted password for a given plain-text username 
@@ -546,20 +498,6 @@ public class DashboardUtils {
 		double absDiff = Math.abs(first - second);
 		double absAver = Math.abs((first + second) * 0.5);
 		return ( absDiff < absAver * rtol + atol );
-	}
-
-	/**
-	 * Corrects the spelling of ship and PI names intentionally misspelled 
-	 * in SOCAT metadata because they contain characters that the SOCAT 
-	 * database cannot always handle correctly.
-	 */
-	public static void correctSpellings(SocatMetadata metadata) {
-		String newName = VESSEL_NAME_CORRECTIONS.get(metadata.getVesselName());
-		if ( newName != null )
-			metadata.setVesselName(newName);
-		newName = SCIENCE_GROUP_NAME_CORRECTIONS.get(metadata.getScienceGroup());
-		if ( newName != null )
-			metadata.setScienceGroup(newName);
 	}
 
 }
