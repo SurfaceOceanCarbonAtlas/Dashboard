@@ -2,9 +2,13 @@
  */
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -16,9 +20,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 883513839967911719L;
-
-	// The following need to be provided by the user data file.
+	private static final long serialVersionUID = 4507737367458225951L;
 
 	// Time of measurement
 	Integer year;
@@ -144,6 +146,145 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		gvCO2 = Double.NaN;
 		distToLand = Double.NaN;
 		woceFlag = 0;
+	}
+
+	/**
+	 * Generates a SOCAT cruise data objects from a list of data column 
+	 * types and matching data strings.  This assumes the data in the 
+	 * strings are in the standard units for each type, and the missing
+	 * value is "NaN", and empty string, or null.  The data column types 
+	 * {@link DataColumnType#TIMESTAMP}, {@link DataColumnType#DATE}, 
+	 * and {@link DataColumnType#TIME} are ignored; the date and time 
+	 * must be given using the {@link DataColumnType#YEAR}, 
+	 * {@link DataColumnType#MONTH}, {@link DataColumnType#DAY},
+	 * {@link DataColumnType#HOUR}, {@link DataColumnType#MINUTE},
+	 * and {@link DataColumnType#SECOND} data column types.
+	 * 
+	 * @param columnTypes
+	 * 		types of the data values
+	 * @param dataValues
+	 * 		data values
+	 * @throws IllegalArgumentException
+	 * 		if the number of data types and data values do not match, or
+	 * 		if a data value string cannot be parsed for the expected type 
+	 */
+	public SocatCruiseData(List<DataColumnType> columnTypes, 
+			List<String> dataValues) throws IllegalArgumentException {
+		// Initialize to an empty data record
+		this();
+		// Verify the number of types and values match
+		int numColumns = columnTypes.size();
+		if ( dataValues.size() != numColumns )
+			throw new IllegalArgumentException("Number of column types (" +
+					numColumns + ") does not match the number of data values (" +
+					dataValues.size());
+		// Add values to the empty record
+		for (int k = 0; k < numColumns; k++) {
+			// Skip over missing values since the empty data record
+			// initialized to the missing value for that type.
+			// The string should always be "NaN", but allow some flexibility
+			String value = dataValues.get(k);
+			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
+				continue;
+			// Only pay attention to the column types needed
+			DataColumnType type = columnTypes.get(k);
+			try {
+				if ( type == DataColumnType.YEAR ) {
+					this.year = Integer.valueOf(value);
+				}
+				else if ( type == DataColumnType.MONTH ) {
+					this.month = Integer.valueOf(value);
+				}
+				else if ( type == DataColumnType.DAY ) {
+					this.day = Integer.valueOf(value);
+				}
+				else if ( type == DataColumnType.HOUR ) {
+					this.hour = Integer.valueOf(value);
+				}
+				else if ( type == DataColumnType.MINUTE ) {
+					this.minute = Integer.valueOf(value);
+				}
+				else if ( type == DataColumnType.SECOND ) {
+					this.second = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.LONGITUDE ) {
+					this.longitude = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.LATITUDE ) {
+					this.latitude = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.SAMPLE_DEPTH ) {
+					this.sampleDepth = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.SALINITY ) {
+					this.sal = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.EQUILIBRATOR_TEMPERATURE ) {
+					this.tEqu = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.SEA_SURFACE_TEMPERATURE ) {
+					this.sst = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.EQUILIBRATOR_PRESSURE ) {
+					this.pEqu = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.SEA_LEVEL_PRESSURE ) {
+					this.pAtm = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.XCO2WATER_EQU ) {
+					this.xCO2WaterTEqu = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.XCO2WATER_SST ) {
+					this.xCO2WaterSst = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.PCO2WATER_EQU ) {
+					this.pCO2WaterTEqu = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.PCO2WATER_SST ) {
+					this.pCO2WaterSst = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.FCO2WATER_EQU ) {
+					this.fCO2WaterTEqu = Double.valueOf(value);
+				}
+				else if ( type == DataColumnType.FCO2WATER_SST ) {
+					this.fCO2WaterSst = Double.valueOf(value);
+				}
+				// Ignore it if not one of the above types
+			} catch (NumberFormatException ex) {
+				throw new IllegalArgumentException("Unable to parse '" + 
+						value + "' as a value of type " + type.name() + 
+						"\n    " + ex.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Generates a list of SOCAT cruise data objects from the values
+	 * and data column types given in a dashboard cruise with data.
+	 * This assumes the data is in the standard units for each type.
+	 * 
+	 * @param cruise
+	 * 		dashboard cruise with data
+	 * @return
+	 * 		list of SOCAT cruise data objects
+	 * @throws IllegalArgumentException
+	 * 		if the number of data types and data values in a given row 
+	 * 		do not match, or if a data value string cannot be parsed 
+	 * 		for the expected type 
+	 */
+	public static ArrayList<SocatCruiseData> dataListFromDashboardCruise(
+			DashboardCruiseWithData cruise) throws IllegalArgumentException {
+		// Get the required data from the cruise
+		ArrayList<ArrayList<String>> dataValsTable = cruise.getDataValues();
+		ArrayList<DataColumnType> dataTypes = cruise.getDataColTypes();
+		// Create the list of SOCAT cruise data objects, and populate
+		// it with data from each row of the table
+		ArrayList<SocatCruiseData> socatDataList = 
+				new ArrayList<SocatCruiseData>(dataValsTable.size());
+		for ( ArrayList<String> dataVals : dataValsTable ) {
+			socatDataList.add(new SocatCruiseData(dataTypes, dataVals));
+		}
+		return socatDataList;
 	}
 
 	/**
