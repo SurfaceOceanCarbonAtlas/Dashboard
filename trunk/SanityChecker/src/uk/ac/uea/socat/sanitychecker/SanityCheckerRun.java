@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.util.Properties;
 import java.util.ArrayList;
@@ -77,11 +78,8 @@ public class SanityCheckerRun {
 	 * @param args The command line arguments
 	 */
 	private SanityCheckerRun(String[] args) {
-		
-		System.out.println("Preprocessing");
-		
 		// Extract what we need from the data file
-		ColumnSpec colSpec;
+		ColumnSpec colSpec = null;
 		Properties metadata = new Properties();
 		ArrayList<ArrayList<String>> records = new ArrayList<ArrayList<String>>();
 		
@@ -103,11 +101,14 @@ public class SanityCheckerRun {
 			// Read in base config and build the column spec object
 			try {
 				// Load in the basic properties
-				BaseConfig.init(BASE_CONFIG_LOCATION, itsLogger);
+				SanityChecker.initConfig(BASE_CONFIG_LOCATION);
 				itsBaseConfig = BaseConfig.getInstance();
 
 				ColumnConversionConfig.init(itsBaseConfig.getColumnConversionConfigFile(), itsLogger);
 				colSpec = ColumnSpec.importSpec(new File(itsInputDir, itsColSpecFilename), new File(itsBaseConfig.getColumnSpecSchemaFile()), ColumnConversionConfig.getInstance(), itsLogger);
+			} catch(SanityCheckerException e) {
+				System.out.println("Error initialising configuration: " + e.getMessage());
+				ok = false;
 			} catch (InvalidColumnSpecException e) {
 				System.out.println("The Column Spec is invalid:" + e.getMessage());
 				ok = false;
@@ -120,7 +121,6 @@ public class SanityCheckerRun {
 		if (ok) {
 			
 			try {
-				
 				readInputFile(metadata, records);
 			} catch (IOException e) {
 				System.out.println("Error reading from file: " + e.getMessage());
@@ -129,8 +129,52 @@ public class SanityCheckerRun {
 		}
 		
 		if (ok) {
-			System.out.println("Calling Sanity Checker");
+			System.out.println("FILE: " + itsDataFilename);
+			
+			try {
+				// Create the Sanity Checker and process the file
+				SanityChecker checker = new SanityChecker(itsDataFilename, metadata, colSpec, records, DATE_FORMAT);
+				Output checkerOutput = checker.process();
+				
+				
+				// Print summary
+				System.out.println("Output generated? " + checkerOutput.outputGenerated());
+				
+				if (checkerOutput.outputGenerated()) {
+					System.out.println("Metadata Items: " + checkerOutput.getMetadataCount());
+					System.out.println("Records: " + checkerOutput.getRecordCount());
+				}
+				
+				Messages messages = checkerOutput.getMessages();
+				System.out.println("Metadata messages: " + messages.getMetadataErrorCount() + " errors, " + messages.getMetadataWarningCount() + " warnings");
+				System.out.println("Data messages: " + messages.getDataErrorCount() + " errors, " + messages.getDataWarningCount() + " warnings");
+				
+				// Write output files as needed
+				try {
+					writeMessages(messages);
+				} catch (IOException e) {
+					System.out.println("ERROR WRITING OUTPUT FILES");
+					e.printStackTrace();
+				}
+				
+				
+			} catch (SanityCheckerException e) {
+				e.printStackTrace();
+				ok = false;
+			}
 		}
+	}
+	
+	private void writeMessages(Messages messages) throws IOException {
+		String messagesFilename = itsDataFilename + ".messages.txt";
+		PrintWriter writer = new PrintWriter(new File(itsOutputDir, messagesFilename));
+		writer.println("METADATA MESSAGES");
+		writer.println("=================");
+		writer.print(messages.getMetadataMessageStrings());
+		writer.println("\nDATA MESSAGES");
+		writer.println("=============");
+		writer.print(messages.getDataMessageStrings());
+		writer.close();
 	}
 	
 	

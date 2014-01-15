@@ -193,7 +193,7 @@ public class SanityChecker {
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
-			itsOutput.clear(true);
+			itsOutput.clear(true, true);
 		}
 
 		return itsOutput;
