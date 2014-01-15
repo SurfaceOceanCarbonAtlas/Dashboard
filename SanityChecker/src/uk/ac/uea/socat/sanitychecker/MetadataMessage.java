@@ -77,7 +77,7 @@ public class MetadataMessage {
 			Enumeration<?> propNames = itsProperties.propertyNames();
 			while (propNames.hasMoreElements()) {
 				String name = (String) propNames.nextElement();
-				output.append("  " + name + " = " + itsProperties.getProperty(name));
+				output.append("  " + name + " = " + itsProperties.getProperty(name) + "\n");
 			}
 		}
 

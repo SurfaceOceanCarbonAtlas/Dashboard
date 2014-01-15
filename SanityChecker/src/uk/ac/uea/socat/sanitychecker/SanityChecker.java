@@ -76,6 +76,11 @@ public class SanityChecker {
 	private Output itsOutput;
 	
 	/**
+	 * A counter for the number of records processed
+	 */
+	private int itsRecordCount = 0;
+	
+	/**
 	 * Initialise the configuration of the Sanity Checker
 	 * 
 	 * @param filename The location of the @code{BaseConfig} file. 
@@ -172,12 +177,10 @@ public class SanityChecker {
 			if (ok) {
 				itsLogger.debug("Processing data records");
 				
-				int recordCount = 0;
-				
 				for (List<String> record: itsInputData) {
-					recordCount++;
-					itsLogger.trace("Processing record " + recordCount);
-					SocatDataRecord socatRecord = new SocatDataRecord(record, recordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
+					itsRecordCount++;
+					itsLogger.trace("Processing record " + itsRecordCount);
+					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
 					itsOutput.addRecord(socatRecord);
 				}
 				
@@ -192,8 +195,13 @@ public class SanityChecker {
 			
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
+			
+			DataMessage message = new DataMessage(MetadataMessage.ERROR, itsRecordCount, -1, "", "Unhandled exception encountered");
+			message.addProperty("Error", e.getMessage());
+			
+			itsOutput.addDataMessage(message);
 			itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
-			itsOutput.clear(true, true);
+			itsOutput.clear(true);
 		}
 
 		return itsOutput;

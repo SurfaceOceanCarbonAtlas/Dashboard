@@ -216,29 +216,15 @@ public class Output {
 	 * @param setNoOutputFlag States whether or not the @code{NO_OUTPUT_FLAG} should be set.
 	 * @param clearMessages States whether or not error and warning message should be removed.
 	 */
-	public void clear(boolean setNoOutputFlag, boolean clearMessages) {
+	public void clear(boolean setNoOutputFlag) {
 		itsMetadata = null;
 		itsDataRecords = null;
-		
-		if (clearMessages) {
-			itsMessages = null;
-		}
 		
 		if (setNoOutputFlag) {
 			setExitFlag(NO_OUTPUT_FLAG);
 		}
 	}
 	
-	/**
-	 * Clear the metadata and data output.
-	 * Used to destroy output data if no valid output can be made from processing a file
-	 * 
-	 * @param setNoOutputFlag States whether or not the @code{NO_OUTPUT_FLAG} should be set.
-	 */
-	public void clear(boolean setNoOutputFlag) {
-		clear(setNoOutputFlag, false);
-	}
-
 	/**
 	 * Add an item to the output metadata
 	 * @param item The metadata item
