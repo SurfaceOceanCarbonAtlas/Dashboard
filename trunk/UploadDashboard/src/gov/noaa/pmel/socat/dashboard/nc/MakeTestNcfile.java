@@ -166,8 +166,7 @@ public class MakeTestNcfile {
             CruiseSdgncFile ncfile = new CruiseSdgncFile(metadata, data);
 
             ncfile.create("testDSG.nc");
-            ncfile.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

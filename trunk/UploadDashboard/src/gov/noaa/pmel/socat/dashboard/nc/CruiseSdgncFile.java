@@ -27,7 +27,7 @@ import ucar.nc2.time.CalendarDate;
 
 
 public class CruiseSdgncFile {
-    
+
     SocatMetadata metadata;
     List<SocatCruiseData> data;
     NetcdfFileWriter ncfile;
@@ -37,15 +37,15 @@ public class CruiseSdgncFile {
         this.metadata = metadata;
         this.data = data;
     }
-    public void create(String sdgFilename) throws IOException {
+    public void create(String sdgFilename) throws Exception {
 
         ncfile = NetcdfFileWriter.createNew(Version.netcdf3, sdgFilename);
 
         // According to the CF standard if a file only has one trajectory, the the trajectory dimension is not necessary.
         // However, who knows what would break downstream from this process without it...
-        
+
         Dimension traj = ncfile.addDimension(null, "trajectory", 1);
-        
+
         // There will be 9 trajectory variables of type character from the metadata.
         // Which is the longest?
         int maxchar = metadata.getMaxStringLength();
@@ -56,24 +56,22 @@ public class CruiseSdgncFile {
 
         List<Dimension> trajdims = new ArrayList<Dimension>();
         trajdims.add(traj);
-        
+
         Dimension d = ncfile.addDimension(null, "obs", data.size());
         List<Dimension> dims = new ArrayList<Dimension>();
         dims.add(d);
-        
+
         // Make character netCDF variables of all the string metadata.
         Field[] metafields = metadata.getClass().getDeclaredFields();
         for (int i = 0; i < metafields.length; i++) {
             Field f = metafields[i];
             if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers()) ) {
-                try {
-                    Variable var = ncfile.addVariable(null, f.getName(), DataType.CHAR, trajdimsChar);
-                    if ( f.getName().equals("expocode")) {
-                        ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
-                    }
-                } catch (IllegalArgumentException e) {
-                    // Carry on.  We'll just do without this one
+
+                Variable var = ncfile.addVariable(null, f.getName(), DataType.CHAR, trajdimsChar);
+                if ( f.getName().equals("expocode")) {
+                    ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
                 }
+
             }
         }
         Variable var = ncfile.addVariable(null, "rowSize", DataType.DOUBLE, trajdims);
@@ -89,10 +87,10 @@ public class CruiseSdgncFile {
                 String name = f.getName();
                 Class<?> type = f.getType();
                 if ( !name.equals("serialVersionUID")) {
-                    
-                   var = null;
-                    
-                    
+
+                    var = null;
+
+
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
                         var = ncfile.addVariable(null, name, DataType.DOUBLE, dims);
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
@@ -113,16 +111,16 @@ public class CruiseSdgncFile {
                         }
                         ncfile.addVariableAttribute(var, new Attribute("missing_value", Double.NaN));
                     }
-                   
-                    
-                    
-                    
+
+
+
+
                 }
             }
-            
+
             var = ncfile.addVariable(null, "time", DataType.DOUBLE, dims);
             ncfile.addVariableAttribute(var, new Attribute("units", "seconds since 1970-01-01 00:00"));
-            
+
             ncfile.addGroupAttribute(null, new Attribute("History", version));
             ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
             ncfile.addGroupAttribute(null, new Attribute("Convenstions", "CF-1.6"));
@@ -130,48 +128,37 @@ public class CruiseSdgncFile {
             ncfile.addGroupAttribute(null, new Attribute("WestMostLongitude", metadata.getWestmostLongitude()));
             ncfile.addGroupAttribute(null, new Attribute("NorthMostLatitude", metadata.getNorthmostLatitude()));
             ncfile.addGroupAttribute(null, new Attribute("SouthMostLatitude", metadata.getSouthmostLatitude()));
-            
+
             CalendarDate start = CalendarDate.of(metadata.getBeginTime());
             CalendarDate end = CalendarDate.of(metadata.getEndTime());
-            
+
             ncfile.addGroupAttribute(null, new Attribute("time_coverage_start", start.toString()));
             ncfile.addGroupAttribute(null, new Attribute("time_converage_end", end.toString()));
 
             ncfile.create();
             // The header has been created.  Now let's fill it up.
-    
+
             for (int i = 0; i < metafields.length; i++) {
                 Field f = metafields[i];
                 if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers()) ) {
-                    try {
-                        var = null;
-                        String s = (String) f.get(metadata);
-                        var = ncfile.findVariable(f.getName());
-                        if ( var != null ) {
-                            ArrayChar.D2 values = new ArrayChar.D2(1, maxchar);
-                            values.setString(0, s);
-                            ncfile.write(var, values);
-                        }
-                    } catch (IllegalArgumentException e) {
-                        
-                    
-                    } catch (IllegalAccessException e) {
-                        
-                    } catch (InvalidRangeException e) {
-                       
+
+                    var = null;
+                    String s = (String) f.get(metadata);
+                    var = ncfile.findVariable(f.getName());
+                    if ( var != null ) {
+                        ArrayChar.D2 values = new ArrayChar.D2(1, maxchar);
+                        values.setString(0, s);
+                        ncfile.write(var, values);
                     }
+
                 }
             }
             ArrayDouble.D1 obscount = new ArrayDouble.D1(1);
             obscount.set(0, (double)data.size());
             var = ncfile.findVariable("rowSize");
             if ( var != null ) {
-                try {
-                    ncfile.write(var, obscount);
-                } catch (InvalidRangeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                ncfile.write(var, obscount);
+
             }
             for (int i = 0; i < fields.length; i++) {
                 Field f = fields[i];
@@ -185,30 +172,13 @@ public class CruiseSdgncFile {
                             ArrayDouble.D1 dvar = new ArrayDouble.D1(data.size());
                             for (int index = 0; index < data.size(); index++) {
                                 SocatCruiseData datarow = (SocatCruiseData) data.get(index);
-                                try {
-                                    Long value = (Long) datarow.getClass().getDeclaredField(name).get(datarow);
-                                    Double dvalue = new Double(value);
-                                    dvar.set(index, dvalue);
-                                } catch (IllegalArgumentException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (IllegalAccessException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (NoSuchFieldException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (SecurityException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
+                                Long value = (Long) datarow.getClass().getDeclaredField(name).get(datarow);
+                                Double dvalue = new Double(value);
+                                dvar.set(index, dvalue);
+
                             }
-                            try {
-                                ncfile.write(var, dvar);
-                            } catch (InvalidRangeException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                            ncfile.write(var, dvar);
+
                         }
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
                         var = ncfile.findVariable(name);
@@ -216,29 +186,12 @@ public class CruiseSdgncFile {
                             ArrayDouble.D1 dvar = new ArrayDouble.D1(data.size());
                             for (int index = 0; index < data.size(); index++) {
                                 SocatCruiseData datarow = (SocatCruiseData) data.get(index);
-                                try {
-                                    Double dvalue = (Double) datarow.getClass().getDeclaredField(name).get(datarow);
-                                    dvar.set(index, dvalue);
-                                } catch (IllegalArgumentException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (IllegalAccessException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (NoSuchFieldException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (SecurityException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
+                                Double dvalue = (Double) datarow.getClass().getDeclaredField(name).get(datarow);
+                                dvar.set(index, dvalue);
+
                             }
-                            try {
-                                ncfile.write(var, dvar);
-                            } catch (InvalidRangeException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                            ncfile.write(var, dvar);
+
                         }
                     } else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
                         var = ncfile.findVariable(name);
@@ -246,22 +199,10 @@ public class CruiseSdgncFile {
                             ArrayInt.D1 dvar = new ArrayInt.D1(data.size());
                             for (int index = 0; index < data.size(); index++) {
                                 SocatCruiseData datarow = (SocatCruiseData) data.get(index);
-                                try {
-                                    Integer dvalue = (Integer) datarow.getClass().getDeclaredField(name).get(datarow);
-                                    dvar.set(index, dvalue);
-                                } catch (IllegalArgumentException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (IllegalAccessException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (NoSuchFieldException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } catch (SecurityException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
+
+                                Integer dvalue = (Integer) datarow.getClass().getDeclaredField(name).get(datarow);
+                                dvar.set(index, dvalue);
+
                             }
                             try {
                                 ncfile.write(var, dvar);
@@ -273,7 +214,7 @@ public class CruiseSdgncFile {
                     } else if ( type.equals(String.class) ) {
                         // Skip for now.
                     }
-                    
+
                 }
             }
             var = ncfile.findVariable("time");
@@ -294,21 +235,10 @@ public class CruiseSdgncFile {
                     double value = (double) lvalue;
                     values.set(index, value);
                 }
-                try {
-                    ncfile.write(var, values);
-                } catch (InvalidRangeException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                ncfile.write(var, values);
+
             }
         }
-    }
-    public void close() {
-        try {
-            ncfile.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        ncfile.close();
     }
 }
