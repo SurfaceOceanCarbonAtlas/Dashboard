@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
 
 import uk.ac.uea.socat.sanitychecker.MetadataMessage;
+import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
@@ -133,7 +134,7 @@ public abstract class MetadataItem {
 	 * @param value The value to be stored
 	 * @throws DateTimeException If a passed in value for a date item cannot be parsed
 	 */
-	public void setValue(String value, DateTimeHandler dateTimeHandler) throws DateTimeException {
+	public void setValue(String value, DateTimeHandler dateTimeHandler) throws SanityCheckerException {
 		itsLogger.trace("Setting metadata value '" + itsConfigItem.getName() + "' to '" + value + "'");
 
 		switch(itsConfigItem.getType()) {
@@ -159,8 +160,12 @@ public abstract class MetadataItem {
 		}
 		case DATE_TYPE:
 		{
-			DateMidnight parsedDate = dateTimeHandler.parseDate(value);
-			itsValue = new MetadataValue(parsedDate);
+			try {
+				DateMidnight parsedDate = dateTimeHandler.parseDate(value);
+				itsValue = new MetadataValue(parsedDate);
+			} catch (DateTimeException e) {
+				throw new SanityCheckerException("Invalid date format in metadata item '" + itsConfigItem.getName() + "'", e);
+			}
 			break;
 		}
 		default:

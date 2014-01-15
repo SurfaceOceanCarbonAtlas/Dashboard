@@ -23,7 +23,7 @@ public class DefaultMetadataItem extends MetadataItem {
 	 * @param value The value of the metadata item
 	 * @throws ParseException If the supplied in value could not be parsed into the correct data type
 	 */
-	public DefaultMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException, DateTimeException {
+	public DefaultMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException {
 		super(config, line, logger);
 		itCanGenerate = false;
 		itCanGenerateFromOneRecord = false;

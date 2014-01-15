@@ -27,7 +27,7 @@ public class DataDateMetadataItem extends MetadataItem {
 	 * @param value The value of the metadata item
 	 * @throws ParseException If the supplied in value could not be parsed into the correct data type
 	 */
-	public DataDateMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException, DateTimeException {
+	public DataDateMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException {
 		super(config, line, logger);
 		itCanGenerate = true;
 		itCanGenerateFromOneRecord = false;
