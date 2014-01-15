@@ -171,8 +171,4 @@ public class MakeTestNcfile {
             e.printStackTrace();
         }
     }
-
-    public static void loadRandom(Class<?> clazz) throws IntrospectionException {
-
-    }
 }
