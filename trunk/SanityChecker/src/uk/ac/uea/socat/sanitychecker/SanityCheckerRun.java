@@ -146,15 +146,17 @@ public class SanityCheckerRun {
 				}
 				
 				Messages messages = checkerOutput.getMessages();
-				System.out.println("Metadata messages: " + messages.getMetadataErrorCount() + " errors, " + messages.getMetadataWarningCount() + " warnings");
-				System.out.println("Data messages: " + messages.getDataErrorCount() + " errors, " + messages.getDataWarningCount() + " warnings");
+				if (messages != null) {
+					System.out.println("Metadata messages: " + messages.getMetadataErrorCount() + " errors, " + messages.getMetadataWarningCount() + " warnings");
+					System.out.println("Data messages: " + messages.getDataErrorCount() + " errors, " + messages.getDataWarningCount() + " warnings");
 				
-				// Write output files as needed
-				try {
-					writeMessages(messages);
-				} catch (IOException e) {
-					System.out.println("ERROR WRITING OUTPUT FILES");
-					e.printStackTrace();
+					// Write complete messages to file
+					try {
+						writeMessages(messages);
+					} catch (IOException e) {
+						System.out.println("ERROR WRITING OUTPUT FILES");
+						e.printStackTrace();
+					}
 				}
 				
 				
