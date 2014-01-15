@@ -195,6 +195,14 @@ public class Output {
 	 */
 	protected void addDataMessage(DataMessage message) {
 		itsMessages.addDataMessage(message);
+		setExitFlag(message);
+	}
+	
+	protected void addDataMessages(List<DataMessage> messages) {
+		itsMessages.addDataMessages(messages);
+		for (MetadataMessage message: messages) {
+			setExitFlag(message);
+		}
 	}
 
 	/**
@@ -203,6 +211,15 @@ public class Output {
 	 */
 	protected void addMetadataMessage(MetadataMessage message) {
 		itsMessages.addMetadataMessage(message);
+		setExitFlag(message);
+	}
+	
+	private void setExitFlag(MetadataMessage message) {
+		if (message.isError()) {
+			setExitFlag(ERRORS_FLAG);
+		} else if (message.isWarning()) {
+			setExitFlag(WARNINGS_FLAG);
+		}
 	}
 	
 	/**

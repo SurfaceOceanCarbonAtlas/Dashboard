@@ -182,6 +182,7 @@ public class SanityChecker {
 					itsLogger.trace("Processing record " + itsRecordCount);
 					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
 					itsOutput.addRecord(socatRecord);
+					itsOutput.addDataMessages(socatRecord.getMessages());
 				}
 				
 				// Check for missing/out-of-range values
@@ -191,8 +192,6 @@ public class SanityChecker {
 				generateMetadataFromData();
 
 			}
-	
-			
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
