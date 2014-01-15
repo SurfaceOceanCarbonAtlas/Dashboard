@@ -50,10 +50,13 @@ public class CruiseSdgncFile {
         // Which is the longest?
         int maxchar = metadata.getMaxStringLength();
         Dimension stringlen = ncfile.addDimension(null, "string_lenght", maxchar);
+        List<Dimension> trajdimsChar = new ArrayList<Dimension>();
+        trajdimsChar.add(traj);
+        trajdimsChar.add(stringlen);
+
         List<Dimension> trajdims = new ArrayList<Dimension>();
         trajdims.add(traj);
-        trajdims.add(stringlen);
-
+        
         Dimension d = ncfile.addDimension(null, "obs", data.size());
         List<Dimension> dims = new ArrayList<Dimension>();
         dims.add(d);
@@ -64,7 +67,7 @@ public class CruiseSdgncFile {
             Field f = metafields[i];
             if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers()) ) {
                 try {
-                    Variable var = ncfile.addVariable(null, f.getName(), DataType.CHAR, trajdims);
+                    Variable var = ncfile.addVariable(null, f.getName(), DataType.CHAR, trajdimsChar);
                     if ( f.getName().equals("expocode")) {
                         ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
                     }
@@ -73,8 +76,10 @@ public class CruiseSdgncFile {
                 }
             }
         }
-        
-        
+        Variable var = ncfile.addVariable(null, "rowSize", DataType.DOUBLE, trajdims);
+        ncfile.addVariableAttribute(var, new Attribute("sample_dimension", "obs"));
+        ncfile.addVariableAttribute(var, new Attribute("long_name", "Number of Observations"));
+
         if ( data.size() > 0 ) {
             Class<?> d0 = data.get(0).getClass();
             Field[] fields = d0.getDeclaredFields();
@@ -85,7 +90,7 @@ public class CruiseSdgncFile {
                 Class<?> type = f.getType();
                 if ( !name.equals("serialVersionUID")) {
                     
-                   Variable var = null;
+                   var = null;
                     
                     
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
@@ -115,7 +120,7 @@ public class CruiseSdgncFile {
                 }
             }
             
-            Variable var = ncfile.addVariable(null, "time", DataType.DOUBLE, dims);
+            var = ncfile.addVariable(null, "time", DataType.DOUBLE, dims);
             ncfile.addVariableAttribute(var, new Attribute("units", "seconds since 1970-01-01 00:00"));
             
             ncfile.addGroupAttribute(null, new Attribute("History", version));
@@ -157,7 +162,17 @@ public class CruiseSdgncFile {
                     }
                 }
             }
-            
+            ArrayDouble.D1 obscount = new ArrayDouble.D1(1);
+            obscount.set(0, (double)data.size());
+            var = ncfile.findVariable("rowSize");
+            if ( var != null ) {
+                try {
+                    ncfile.write(var, obscount);
+                } catch (InvalidRangeException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
             for (int i = 0; i < fields.length; i++) {
                 Field f = fields[i];
                 String name = f.getName();
