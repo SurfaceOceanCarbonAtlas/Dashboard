@@ -17,6 +17,7 @@ import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
+import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 /**
  * Holds the SOCAT Column configuration for the Sanity Checker
@@ -230,7 +231,7 @@ public class SocatColumnConfig {
 								}
 
 								calculatorObject = (DataCalculator) calcClass.newInstance();
-								calculatorMethod = calculatorObject.getClass().getDeclaredMethod(CALCULATOR_METHOD_NAME, HashMap.class, SocatDataRecord.class, int.class, String.class);
+								calculatorMethod = calculatorObject.getClass().getDeclaredMethod(CALCULATOR_METHOD_NAME, Map.class, SocatDataRecord.class, int.class, String.class, DateTimeHandler.class);
 							}
 							catch (ClassNotFoundException e) {
 								throw new ConfigException(itsConfigFilename, columnName, lineCount, "The specified calculator class does not exist");
