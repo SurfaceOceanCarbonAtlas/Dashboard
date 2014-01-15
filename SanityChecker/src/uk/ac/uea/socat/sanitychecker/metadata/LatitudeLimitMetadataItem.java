@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 
