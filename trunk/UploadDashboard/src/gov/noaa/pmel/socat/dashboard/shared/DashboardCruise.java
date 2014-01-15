@@ -18,12 +18,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7524399500525667195L;
+	private static final long serialVersionUID = 7081034199322570999L;
 
 	boolean selected;
 	String owner;
 	String expocode;
 	String dataCheckStatus;
+	String omeFilename;
 	TreeSet<String> metadataFilenames;
 	String qcStatus;
 	String archiveStatus;
@@ -42,6 +43,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		owner = "";
 		expocode = "";
 		dataCheckStatus = "";
+		omeFilename = "";
 		metadataFilenames = new TreeSet<String>();
 		qcStatus = "";
 		archiveStatus = "";
@@ -74,7 +76,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the owner for this cruise; never null
+	 * 		the owner for this cruise; never null but may be empty
 	 */
 	public String getOwner() {
 		return owner;
@@ -94,7 +96,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; never null
+	 * 		the cruise expocode; never null but may be empty
 	 */
 	public String getExpocode() {
 		return expocode;
@@ -115,7 +117,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the data check status; never null
+	 * 		the data check status; never null but may be empty
 	 */
 	public String getDataCheckStatus() {
 		return dataCheckStatus;
@@ -135,8 +137,28 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the OME metadata filename; never null but may be empty
+	 */
+	public String getOmeFilename() {
+		return omeFilename;
+	}
+
+	/**
+	 * @param omeFilename 
+	 * 		the OME metadata filename to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setOmeFilename(String omeFilename) {
+		if ( omeFilename == null )
+			this.omeFilename = "";
+		else
+			this.omeFilename = omeFilename;
+	}
+
+	/**
+	 * @return 
 	 * 		the metadata filenames associated with this cruise; 
-	 * 		may be empty but never null.  The actual set of strings
+	 * 		never null but may be empty.  The actual set of strings
 	 * 		in this object is returned.
 	 */
 	public TreeSet<String> getMetadataFilenames() {
@@ -157,7 +179,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the QC submission status; never null
+	 * 		the QC submission status; never null but may be empty
 	 */
 	public String getQcStatus() {
 		return qcStatus;
@@ -177,7 +199,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the archive submission status; never null
+	 * 		the archive submission status; never null but may be empty
 	 */
 	public String getArchiveStatus() {
 		return archiveStatus;
@@ -217,7 +239,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the uploaded data filename; never null
+	 * 		the uploaded data filename; never null but may be empty
 	 */
 	public String getUploadFilename() {
 		return uploadFilename;
@@ -237,7 +259,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the uploaded data timestamp; never null
+	 * 		the uploaded data timestamp; never null but may be empty
 	 */
 	public String getUploadTimestamp() {
 		return uploadTimestamp;
@@ -276,9 +298,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @return the userColNames
 	 * 		the list of data column header names as they appeared in 
-	 * 		the original user-provided data file for this cruise; may 
-	 * 		be empty but never null.  The actual list in this object 
-	 * 		is returned. 
+	 * 		the original user-provided data file for this cruise; 
+	 * 		never null but may be empty.  The actual list in this 
+	 * 		object is returned. 
 	 */
 	public ArrayList<String> getUserColNames() {
 		return userColNames;
@@ -391,6 +413,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
+		result = result * prime + omeFilename.hashCode();
 		result = result * prime + metadataFilenames.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
@@ -424,6 +447,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		if ( ! expocode.equals(other.expocode) )
 			return false;
 		if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
+			return false;
+		if ( ! omeFilename.equals(other.omeFilename) )
 			return false;
 		if ( ! metadataFilenames.equals(other.metadataFilenames) )
 			return false;
@@ -459,7 +484,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    owner=" + owner + 
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
-				",\n    metadataFilenames=" + metadataFilenames +
+				",\n    omeFilename=" + omeFilename + 
+				",\n    metadataFilenames=" + metadataFilenames.toString() +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    cdiacDate=" + cdiacDate + 
@@ -495,7 +521,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the owner of cruises
+	 * Compare using the owner of cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -514,7 +540,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the expocode of the cruises
+	 * Compare using the expocode of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -533,7 +559,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the data check status of the cruises
+	 * Compare using the data check status of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -552,7 +578,26 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the metadata filenames of the cruises
+	 * Compare using the OME metadata filename of the cruises.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
+	 */
+	public static Comparator<DashboardCruise> omeFilenameComparator = 
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getOmeFilename().compareTo(c2.getOmeFilename());
+		}
+	};
+
+	/**
+	 * Compare using the metadata filenames of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -585,7 +630,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the QC status string of the cruises
+	 * Compare using the QC status string of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -604,7 +649,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the archive status of the cruises
+	 * Compare using the archive status of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -623,7 +668,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the upload filename of the cruises
+	 * Compare using the upload filename of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
@@ -642,7 +687,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the upload timestamp of the cruises
+	 * Compare using the upload timestamp of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */

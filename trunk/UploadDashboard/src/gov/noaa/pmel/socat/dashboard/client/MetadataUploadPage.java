@@ -139,14 +139,21 @@ public class MetadataUploadPage extends Composite {
 	 * 
 	 * @param cruiseExpocode
 	 * 		add/replace the metadata for this cruise
+	 * @param omeFilename
+	 * 		OME metadata document filename currently 
+	 * 		associated with this cruise
 	 * @param mdataNames
 	 * 		set of metadata document filenames currently
-	 * 		associated with this cruise
+	 * 		associated with this cruise; may or may not
+	 * 		include omeFilename 
 	 */
-	static void showPage(String cruiseExpocode, TreeSet<String> mdataNames) {
+	static void showPage(String cruiseExpocode, String omeFilename, 
+			TreeSet<String> mdataNames) {
 		// Create a DashboardCruise using the above information
 		DashboardCruise cruise = new DashboardCruise();
 		cruise.setExpocode(cruiseExpocode);
+		cruise.setOmeFilename(omeFilename);
+		// Not a problem here if mdataNames includes omeFilename
 		cruise.setMetadataFilenames(mdataNames);
 		// Create a set containing just this cruise
 		HashSet<DashboardCruise> cruiseSet = new HashSet<DashboardCruise>();
@@ -283,7 +290,12 @@ public class MetadataUploadPage extends Composite {
 		for ( DashboardCruise cruz : cruises ) {
 			String mdataName = DashboardUtils.metadataFilename(
 										cruz.getExpocode(), uploadFilename);
-			if ( cruz.getMetadataFilenames().contains(mdataName) ) {
+			if ( cruz.getOmeFilename().equals(mdataName) ) {
+				message += "<li>" + SafeHtmlUtils.htmlEscape(mdataName) + 
+						" <em>(OME metadata)</em></li>";
+				willOverwrite = true;
+			}
+			else if ( cruz.getMetadataFilenames().contains(mdataName) ) {
 				message += "<li>" + SafeHtmlUtils.htmlEscape(mdataName) + "</li>";
 				willOverwrite = true;
 			}

@@ -16,6 +16,7 @@
 				<g:west size="7">
 					<g:FlowPanel addStyleNames="{style.uploadpanel}">
 						<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="uploadButton" />
+						<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="setOmeButton" />
 						<g:Button addStyleNames="{style.uploadpanelbutton}" ui:field="deleteButton" />
 					</g:FlowPanel>
 				</g:west>

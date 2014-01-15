@@ -66,7 +66,7 @@ public class CruiseListPage extends Composite {
 
 	private static final String METADATA_TEXT = "Manage Metadata";
 	private static final String METADATA_HOVER_HELP =
-			"manage metadata files for the selected cruise(s)";
+			"manage metadata documents for the selected cruise(s)";
 
 	/* 
 	 * private static final String REVIEW_TEXT = "Review with LAS";
@@ -120,7 +120,7 @@ public class CruiseListPage extends Composite {
 			"No cruises are selected for adding to SOCAT.";
 
 	private static final String METADATA_AUTOFAIL_HTML_PROLOGUE = 
-			"The following cruises do not have any metadata documents: <ul>";
+			"The following cruises do not have an OME metadata document: <ul>";
 	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
 			"The following cruises have data that have not been checked, " +
 			"or have very serious errors detected by the automated data " +
@@ -177,7 +177,8 @@ public class CruiseListPage extends Composite {
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
 	private static final String TIMESTAMP_COLUMN_NAME = "Uploaded on";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
-	private static final String METADATA_COLUMN_NAME = "Metadata";
+	private static final String OME_FILENAME_COLUMN_NAME = "OME Metadata";
+	private static final String ADDN_METADATA_COLUMN_NAME = "Addnl Metadata";
 	private static final String SUBMITTED_COLUMN_NAME = "SOCAT Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archive Status";
 	private static final String OWNER_COLUMN_NAME = "Owner";
@@ -188,7 +189,8 @@ public class CruiseListPage extends Composite {
 	private static final String NO_EXPOCODE_STRING = "(unknown)";
 	private static final String NO_TIMESTAMP_STRING = "(unknown)";
 	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
-	private static final String NO_METADATA_STATUS_STRING = "(no metadata)";
+	private static final String NO_OME_METADATA_STATUS_STRING = "(no OME metadata)";
+	private static final String NO_ADDN_METADATA_STATUS_STRING = "(no additional metadata)";
 	private static final String NO_QC_STATUS_STRING = "(not added)";
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
 	private static final String NO_OWNER_STRING = "(unknown)";
@@ -702,7 +704,8 @@ public class CruiseListPage extends Composite {
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
 		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
-		TextColumn<DashboardCruise> metadataColumn = buildMetadataColumn();
+		TextColumn<DashboardCruise> omeFilenameColumn = buildOmeFilenameColumn();
+		TextColumn<DashboardCruise> metadataColumn = buildAddnMetadataColumn();
 		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
 		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
 		TextColumn<DashboardCruise> timestampColumn = buildTimestampColumn();
@@ -714,7 +717,8 @@ public class CruiseListPage extends Composite {
 		uploadsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
 		uploadsGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
 		uploadsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
-		uploadsGrid.addColumn(metadataColumn, METADATA_COLUMN_NAME);
+		uploadsGrid.addColumn(omeFilenameColumn, OME_FILENAME_COLUMN_NAME);
+		uploadsGrid.addColumn(metadataColumn, ADDN_METADATA_COLUMN_NAME);
 		uploadsGrid.addColumn(qcStatusColumn, SUBMITTED_COLUMN_NAME);
 		uploadsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
 		uploadsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
@@ -734,6 +738,9 @@ public class CruiseListPage extends Composite {
 		uploadsGrid.setColumnWidth(dataCheckColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		uploadsGrid.setColumnWidth(omeFilenameColumn, 
+				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
 		uploadsGrid.setColumnWidth(metadataColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
@@ -762,6 +769,7 @@ public class CruiseListPage extends Composite {
 		expocodeColumn.setSortable(true);
 		timestampColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
+		omeFilenameColumn.setSortable(true);
 		metadataColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
@@ -779,6 +787,8 @@ public class CruiseListPage extends Composite {
 				DashboardCruise.timestampComparator);
 		columnSortHandler.setComparator(dataCheckColumn, 
 				DashboardCruise.dataCheckComparator);
+		columnSortHandler.setComparator(omeFilenameColumn, 
+				DashboardCruise.omeFilenameComparator);
 		columnSortHandler.setComparator(metadataColumn, 
 				DashboardCruise.metadataFilenamesComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
@@ -880,16 +890,33 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the metadata files column for the table
+	 * Creates the OME metadata filename column for the table
 	 */
-	private TextColumn<DashboardCruise> buildMetadataColumn() {
-		TextColumn<DashboardCruise> metaCheckColumn = 
+	private TextColumn<DashboardCruise> buildOmeFilenameColumn() {
+		TextColumn<DashboardCruise> omeFilenameColumn = 
+				new TextColumn<DashboardCruise> () {
+			@Override
+			public String getValue(DashboardCruise cruise) {
+				String omeFilename = cruise.getOmeFilename();
+				if ( omeFilename.isEmpty() )
+					omeFilename = NO_OME_METADATA_STATUS_STRING;
+				return omeFilename;
+			}
+		};
+		return omeFilenameColumn;
+	}
+
+	/**
+	 * Creates the additional metadata files column for the table
+	 */
+	private TextColumn<DashboardCruise> buildAddnMetadataColumn() {
+		TextColumn<DashboardCruise> addnMetaColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				TreeSet<String> filenames = cruise.getMetadataFilenames();
 				if ( filenames.size() == 0 )
-					return NO_METADATA_STATUS_STRING;
+					return NO_ADDN_METADATA_STATUS_STRING;
 				StringBuilder sb = new StringBuilder();
 				boolean firstEntry = true;
 				for ( String name : filenames ) {
@@ -902,7 +929,7 @@ public class CruiseListPage extends Composite {
 				return sb.toString();
 			}
 		};
-		return metaCheckColumn;
+		return addnMetaColumn;
 	}
 
 	/**
@@ -1040,19 +1067,19 @@ public class CruiseListPage extends Composite {
 	/**
 	 * Checks the cruises given in cruiseSet in this instance for
 	 * metadata compatibility for adding to SOCAT.  At this time
-	 * this only checks that some metadata document is associated
-	 * with each cruise.  If a cruise has no metadata documents,
-	 * thus causing an automatic F flag, asks the user if the submit
-	 * should be continued.  If the answer is yes, or if all the 
-	 * cruises have metadata documents, continues the submission to
-	 * SOCAT by calling {@link AddToSocatPage#showPage(HashSet)}.
+	 * this only checks that an OME metadata document is associated
+	 * with each cruise.  If not, thus causing an automatic F flag, 
+	 * asks the user if the submit should be continued.  If the 
+	 * answer is yes, or if all the cruises have OME metadata 
+	 * documents, continues the submission to SOCAT by calling 
+	 * {@link AddToSocatPage#showPage(HashSet)}.
 	 */
 	private void continueCheckCruisesForSOCAT() {
 		// Check if the cruises have metadata documents
 		String warnMsg = METADATA_AUTOFAIL_HTML_PROLOGUE;
 		boolean willAutofail = false;
 		for ( DashboardCruise cruise : cruiseSet ) {
-			if ( cruise.getMetadataFilenames().size() < 1 ) {
+			if ( cruise.getOmeFilename().isEmpty() ) {
 				warnMsg += "<li>" + 
 						SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				willAutofail = true;

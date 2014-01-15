@@ -8,14 +8,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.nc.SocatMetadata;
 
 import java.util.Date;
 
 import org.junit.Test;
 
 /**
- * Unit test for methods in gov.noaa.pmel.socat.dashboard.shared.SocatMetadata.
+ * Unit test for methods in gov.noaa.pmel.socat.dashboard.nc.SocatMetadata.
  * 
  * @author Karl Smith
  */
@@ -38,8 +38,8 @@ public class SocatMetadataTest {
 	static final String CRUISE_FLAG = "C";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getExpocode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getExpocode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setExpocode(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetExpocode() {
@@ -52,8 +52,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getCruiseName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setCruiseName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getCruiseName()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setCruiseName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetCruiseName() {
@@ -67,8 +67,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getVesselName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setVesselName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getVesselName()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setVesselName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetVesselName() {
@@ -83,8 +83,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getWestmostLongitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setWestmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getWestmostLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setWestmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWestmostLongitude() {
@@ -100,8 +100,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getEastmostLongitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setEastmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getEastmostLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setEastmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetEastmostLongitude() {
@@ -118,8 +118,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getSouthmostLatitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setSouthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getSouthmostLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setSouthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSouthmostLatitude() {
@@ -137,8 +137,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getNorthmostLatitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setNorthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getNorthmostLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setNorthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetNorthmostLatitude() {
@@ -157,8 +157,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getBeginTime()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setBeginTime(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getBeginTime()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setBeginTime(java.util.Date)}.
 	 */
 	@Test
 	public void testSetBeginTime() {
@@ -178,8 +178,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getEndTime()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setEndTime(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getEndTime()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setEndTime(java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetEndTime() {
@@ -200,8 +200,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getScienceGroup()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setScienceGroup(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getScienceGroup()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setScienceGroup(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetScienceGroup() {
@@ -223,8 +223,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getOrigDOI()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setOrigDOI(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getOrigDOI()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setOrigDOI(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetOrigDOI() {
@@ -247,8 +247,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getMetadataHRef()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setMetadataHRef(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getMetadataHRef()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setMetadataHRef(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetMetadataHRef() {
@@ -272,8 +272,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getSocatDOI()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setSocatDOI(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getSocatDOI()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setSocatDOI(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetSocatDOI() {
@@ -298,8 +298,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getSocatDOIHRef()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setSocatDOIHRef(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getSocatDOIHRef()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setSocatDOIHRef(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetSocatDOIHRef() {
@@ -325,8 +325,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getCruiseFlag()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#getCruiseFlag()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#setFlag(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetFlag() {
@@ -353,8 +353,8 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatMetadata#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {

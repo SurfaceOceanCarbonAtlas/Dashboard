@@ -19,29 +19,47 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	private static final long serialVersionUID = 883513839967911719L;
 
 	// The following need to be provided by the user data file.
+
+	// Time of measurement
 	Integer year;
 	Integer month;
 	Integer day;
 	Integer hour;
 	Integer minute;
 	Double second;
+	// Longitude of measurement
 	Double longitude;
+	// Latitude of measurement
 	Double latitude;
+	// Sampling depth for the measurement
 	Double sampleDepth;
+	// Sea surface temperature
 	Double sst;
+	// Equilibrator temperature
 	Double tEqu;
+	// salinity
 	Double sal;
+	// Atmospheric pressure / sea level pressure
 	Double pAtm;
+	// Equilibrator pressure
 	Double pEqu;
+	// Six possible CO2 measurements reported; 
+	// typically only one or two actually reported
 	Double xCO2WaterSst;
 	Double xCO2WaterTEqu;
 	Double fCO2WaterSst;
 	Double fCO2WaterTEqu;
 	Double pCO2WaterSst;
 	Double pCO2WaterTEqu;
+
 	// The following are provided by Ferret calculations using the above data
+
+	// WOA Sea Surface Salinity at this measurement's time and location
 	Double woaSss;
+	// NCEP sea level pressure at this measurement's time and location
 	Double ncepSlp;
+    // Fourteen different recomputed fCO2 possibilities 
+	// depending on what was and was not provided by the PI
 	Double fCO2FromXCO2TEqu;
 	Double fCO2FromXCO2Sst;
 	Double fCO2FromPCO2TEqu;
@@ -56,15 +74,25 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double fCO2FromXCO2SstNcep;
 	Double fCO2FromXCO2TEquNcepWoa;
 	Double fCO2FromXCO2SstNcepWoa;
+    // "Best" recomputed fCO2 value
 	Double fCO2Rec;
+    // Marker 1-14 of which of the recomputed fCO2 value was selected as "best"
 	Integer fCO2Source;
+	// TEqu - SST
 	Double deltaT;
+	// one-letter ID of the cruise region in which this measurement lies
 	String regionID;
+	// calculated ship speed from adjacent measurements
 	Double calcSpeed;
+	// ETOPO2 depth
 	Double etopo2;
+	// GlobalView xCO2 value
 	Double gvCO2;
+	// distance to closest land mass (up to 1000 km)
 	Double distToLand;
-	// The following may be provided by the SanityChecker for questionable or bad data.
+	// overall data WOCE flag; 
+	// may be assigned by the SanityChecker for questionable (3) or bad (4) data
+	// and to be assigned by QC'ers
 	Integer woceFlag;
 
 	/**

@@ -9,6 +9,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.MetadataListService;
 import gov.noaa.pmel.socat.dashboard.shared.MetadataListServiceAsync;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -58,6 +59,10 @@ public class MetadataManagerPage extends Composite {
 			"upload a file that will be added as a new metadata document, " +
 			"or replace an existing metadata document, for this cruise";
 
+	private static final String SET_OME_TEXT = "Set Selected as OME";
+	private static final String SET_OME_HOVER_HELP = 
+			"set the selected document as the OME metadata document";
+
 	private static final String DELETE_TEXT = "Delete Selected Metadata";
 	private static final String DELETE_HOVER_HELP =
 			"delete the selected metadata documents from this cruise";
@@ -86,9 +91,13 @@ public class MetadataManagerPage extends Composite {
 			"No uploaded metadata documents";
 
 	// Column header strings
+	private static final String OME_STAR_COLUMN_NAME = "OME";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
 	private static final String UPLOAD_TIME_COLUMN_NAME = "Uploaded on";
 	private static final String OWNER_COLUMN_NAME = "Owner";
+
+	private static final String IS_OME_STRING = "*";
+	private static final String NOT_OME_STRING = " ";
 
 	interface MetadataManagerPageUiBinder 
 			extends UiBinder<Widget, MetadataManagerPage> {
@@ -104,6 +113,7 @@ public class MetadataManagerPage extends Composite {
 	@UiField HTML introHtml; 
 	@UiField Button logoutButton;
 	@UiField Button uploadButton;
+	@UiField Button setOmeButton;
 	@UiField Button deleteButton;
 	@UiField DataGrid<DashboardMetadata> metadataGrid;
 	@UiField Button dismissButton;
@@ -111,6 +121,7 @@ public class MetadataManagerPage extends Composite {
 	private String username;
 	private ListDataProvider<DashboardMetadata> listProvider;
 	private String expocode;
+	private String omeFilename;
 	private DashboardAskPopup askDeletePopup;
 
 	// The singleton instance of this page
@@ -126,6 +137,7 @@ public class MetadataManagerPage extends Composite {
 		buildMetadataListTable();
 		username = "";
 		expocode = "";
+		omeFilename = "";
 		askDeletePopup = null;
 
 		logoutButton.setText(LOGOUT_TEXT);
@@ -133,6 +145,9 @@ public class MetadataManagerPage extends Composite {
 
 		uploadButton.setText(UPLOAD_TEXT);
 		uploadButton.setTitle(UPLOAD_HOVER_HELP);
+
+		setOmeButton.setText(SET_OME_TEXT);
+		setOmeButton.setTitle(SET_OME_HOVER_HELP);
 
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
@@ -218,11 +233,13 @@ public class MetadataManagerPage extends Composite {
 				SafeHtmlUtils.htmlEscape(cruiseExpocode) +
 				INTRO_HTML_EPILOGUE);
 
-		// Update the metadata shown by resetting the data 
-		// in the data provider
+		// record the name of the OME file in the metadata list 
+		omeFilename = mdataList.getOmeFilename();
+		// Update the metadata shown by resetting the data in the data provider
 		List<DashboardMetadata> metadataList = listProvider.getList();
 		metadataList.clear();
 		if ( mdataList != null ) {
+			// This list includes the OME metadata filename
 			metadataList.addAll(mdataList.values());
 		}
 		metadataGrid.setRowCount(metadataList.size());
@@ -249,7 +266,12 @@ public class MetadataManagerPage extends Composite {
 			mdataNames.add(mdata.getFilename());
 		}
 		// Show the metadata upload page for this cruise
-		MetadataUploadPage.showPage(expocode, mdataNames);
+		MetadataUploadPage.showPage(expocode, omeFilename, mdataNames);
+	}
+
+	@UiHandler("setOmeButton")
+	void setOmeOnClick(ClickEvent event) {
+		// TODO:
 	}
 
 	@UiHandler("deleteButton")
@@ -328,12 +350,14 @@ public class MetadataManagerPage extends Composite {
 	private void buildMetadataListTable() {
 		// Create the columns for this table
 		Column<DashboardMetadata,Boolean> selectedColumn = buildSelectedColumn();
+		TextColumn<DashboardMetadata> omeStarColumn = buildOmeStarColumn();
 		TextColumn<DashboardMetadata> filenameColumn = buildFilenameColumn();
 		TextColumn<DashboardMetadata> uploadTimeColumn = buildUploadTimeColumn();
 		TextColumn<DashboardMetadata> ownerColumn = buildOwnerColumn();
 		
 		// Add the columns, with headers, to the table
 		metadataGrid.addColumn(selectedColumn, "");
+		metadataGrid.addColumn(omeStarColumn, OME_STAR_COLUMN_NAME);
 		metadataGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
 		metadataGrid.addColumn(uploadTimeColumn, UPLOAD_TIME_COLUMN_NAME);
 		metadataGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
@@ -343,6 +367,9 @@ public class MetadataManagerPage extends Composite {
 		metadataGrid.setColumnWidth(selectedColumn, 
 				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
+		metadataGrid.setColumnWidth(omeStarColumn,
+				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
 		metadataGrid.setColumnWidth(filenameColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
@@ -362,6 +389,7 @@ public class MetadataManagerPage extends Composite {
 
 		// Make the columns sortable
 		selectedColumn.setSortable(true);
+		omeStarColumn.setSortable(true);
 		filenameColumn.setSortable(true);
 		uploadTimeColumn.setSortable(true);
 		ownerColumn.setSortable(true);
@@ -371,6 +399,22 @@ public class MetadataManagerPage extends Composite {
 				new ListHandler<DashboardMetadata>(listProvider.getList());
 		columnSortHandler.setComparator(selectedColumn,
 				DashboardMetadata.selectedComparator);
+		columnSortHandler.setComparator(omeStarColumn, new Comparator<DashboardMetadata>() {
+			@Override
+			public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+				String s1;
+				if ( omeFilename.equals(m1.getFilename()) )
+					s1 = IS_OME_STRING;
+				else 
+					s1 = NOT_OME_STRING;
+				String s2;
+				if ( omeFilename.equals(m2.getFilename()) )
+					s2 = IS_OME_STRING;
+				else
+					s2 = NOT_OME_STRING;
+				return s1.compareTo(s2);
+			}
+		});
 		columnSortHandler.setComparator(filenameColumn, 
 				DashboardMetadata.filenameComparator);
 		columnSortHandler.setComparator(uploadTimeColumn, 
@@ -416,6 +460,22 @@ public class MetadataManagerPage extends Composite {
 			}
 		});
 		return selectedColumn;
+	}
+
+	/**
+	 * Creates the OME star column for the table
+	 */
+	private TextColumn<DashboardMetadata> buildOmeStarColumn() {
+		TextColumn<DashboardMetadata> starColumn = 
+						new TextColumn<DashboardMetadata> () {
+			@Override
+			public String getValue(DashboardMetadata mdata) {
+				if ( omeFilename.equals(mdata.getFilename()) )
+					return IS_OME_STRING;
+				return NOT_OME_STRING;
+			}
+		};
+		return starColumn;
 	}
 
 	/**
