@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.util.Properties;
 import java.util.ArrayList;
 
@@ -32,11 +31,6 @@ public class SanityCheckerRun {
 	 */
 	private static final String BASE_CONFIG_LOCATION = "config.properties";
 	
-	/** 
-	 * The output date format
-	 */
-	private static final String DATE_FORMAT = "YYYY-MM-DD";
-
 	/**
 	 * The name of the input dir
 	 */
@@ -56,6 +50,11 @@ public class SanityCheckerRun {
 	 * The name of the XML file containing the column spec
 	 */
 	private String itsColSpecFilename = null;
+	
+	/**
+	 * The date format used in the file
+	 */
+	private String itsDateFormat = null;
 	
 	/**
 	 * Base config
@@ -133,7 +132,7 @@ public class SanityCheckerRun {
 			
 			try {
 				// Create the Sanity Checker and process the file
-				SanityChecker checker = new SanityChecker(itsDataFilename, metadata, colSpec, records, DATE_FORMAT);
+				SanityChecker checker = new SanityChecker(itsDataFilename, metadata, colSpec, records, itsDateFormat);
 				Output checkerOutput = checker.process();
 				
 				
@@ -292,8 +291,10 @@ public class SanityCheckerRun {
         	} else if (args[currentPos].startsWith("-C")) {
                 itsColSpecFilename = args[currentPos].substring(2);
             // Data Filename
-            } else if (args[currentPos].startsWith("-D")) {
+            } else if (args[currentPos].startsWith("-F")) {
                 itsDataFilename = args[currentPos].substring(2);
+            } else if (args[currentPos].startsWith("-D")) {
+            	itsDateFormat = args[currentPos].substring(2);
             }
             // Move to the next argument
             currentPos++;
