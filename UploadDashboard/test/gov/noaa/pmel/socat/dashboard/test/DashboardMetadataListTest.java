@@ -41,6 +41,25 @@ public class DashboardMetadataListTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#getOmeFilename()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#setOmeFilename(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetOmeFilename() {
+		String myOmeFilename = "XXXX20060515_OME.xml";
+		DashboardMetadataList mdataList = new DashboardMetadataList();
+		assertEquals("", mdataList.getOmeFilename());
+		mdataList.setOmeFilename(myOmeFilename);
+		assertEquals(myOmeFilename, mdataList.getOmeFilename());
+		assertEquals("", mdataList.getUsername());
+		// Actually, the OME metadata filename is suppose to refer to one 
+		// of the files in the list, so the following is a bit misleading.
+		assertEquals(0, mdataList.size());
+		mdataList.setOmeFilename(null);
+		assertEquals("", mdataList.getOmeFilename());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#equals(java.lang.Object)}.
 	 */
@@ -48,6 +67,7 @@ public class DashboardMetadataListTest {
 	public void testHashCodeEquals() {
 		String myUsername = "SocatUser";
 		String myOwner = "Cathy";
+		String myOmeFilename = "CYNS20120124_OME.xml";
 		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
 		String myTimestamp = "2013-12-11 10:09:08";
 		String otherFilename = "CYNS20120124_NatalieSchulte_2013.pdf";
@@ -78,6 +98,13 @@ public class DashboardMetadataListTest {
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
 		secondMDataList.setUsername(myUsername);
+		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
+		assertEquals(firstMDataList, secondMDataList);
+
+		firstMDataList.setOmeFilename(myOmeFilename);
+		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
+		assertFalse( firstMDataList.equals(secondMDataList) );
+		secondMDataList.setOmeFilename(myOmeFilename);
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 

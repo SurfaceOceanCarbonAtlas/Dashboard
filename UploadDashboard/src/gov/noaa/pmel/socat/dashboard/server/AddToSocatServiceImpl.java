@@ -9,7 +9,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.TreeSet;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -53,10 +52,10 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			// Update the QC status for this cruise
 			String qcStatus;
 			String dataStatus = cruise.getDataCheckStatus();
-			TreeSet<String> metaNames = cruise.getMetadataFilenames();
-			if ( (metaNames.size() > 0) && 
-				 (DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(dataStatus) ||
-				  DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(dataStatus)) )
+			String omeFilename = cruise.getOmeFilename();
+			if ( ( ! omeFilename.isEmpty() ) && 
+				 ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(dataStatus) ||
+				   DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(dataStatus) ) )
 				qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 			else
 				qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;

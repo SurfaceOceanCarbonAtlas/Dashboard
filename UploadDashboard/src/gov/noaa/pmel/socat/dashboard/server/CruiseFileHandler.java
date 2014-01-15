@@ -34,6 +34,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
+	private static final String OME_FILENAME_ID = "omefilename";
 	private static final String METADATA_FILENAMES_ID = "metadatafilenames";
 	private static final String QC_STATUS_ID = "qcstatus";
 	private static final String ARCHIVE_STATUS_ID = "archivestatus";
@@ -585,6 +586,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to obtain the metadata file handler");
 		}
+		metadataHandler.removeMetadata(username, cruise.getOmeFilename());
 		for ( String mdataName : cruise.getMetadataFilenames() )
 			metadataHandler.removeMetadata(username, mdataName);
 	}
@@ -633,6 +635,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruiseProps.setProperty(UPLOAD_TIMESTAMP_ID, cruise.getUploadTimestamp());
 		// Data-check status string
 		cruiseProps.setProperty(DATA_CHECK_STATUS_ID, cruise.getDataCheckStatus());
+		// OME metadata filename
+		cruiseProps.setProperty(OME_FILENAME_ID, cruise.getOmeFilename());
 		// Metadata documents
 		// a little arguably-unnecessary overhead going through an ArrayList<String>
 		cruiseProps.setProperty(METADATA_FILENAMES_ID, 
@@ -837,6 +841,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					DATA_CHECK_STATUS_ID + " given in " + infoFile.getPath());			
 		cruise.setDataCheckStatus(value);
+
+		// OME metadata filename
+		value = cruiseProps.getProperty(OME_FILENAME_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					OME_FILENAME_ID + " given in " + infoFile.getPath());			
+		cruise.setOmeFilename(value);
 
 		// Metadata documents
 		value = cruiseProps.getProperty(METADATA_FILENAMES_ID);

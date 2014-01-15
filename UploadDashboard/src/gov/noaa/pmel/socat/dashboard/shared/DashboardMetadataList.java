@@ -17,9 +17,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class DashboardMetadataList extends HashMap<String,DashboardMetadata> 
 								implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8821642387470578963L;
+	private static final long serialVersionUID = 1648041641148179121L;
 
 	String username;
+	String omeFilename;
 
 	/**
 	 * Creates without a user and without any metadata files
@@ -27,6 +28,7 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 	public DashboardMetadataList() {
 		super();
 		username = "";
+		omeFilename = "";
 	}
 
 	/**
@@ -48,10 +50,30 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 			this.username = "";
 	}
 
+	/**
+	 * @return 
+	 * 		the OME metadata filename; never null, but may be empty
+	 */
+	public String getOmeFilename() {
+		return omeFilename;
+	}
+
+	/**
+	 * @param username 
+	 * 		the username to set; if null, an empty string is assigned
+	 */
+	public void setOmeFilename(String omeFilename) {
+		if ( omeFilename != null )
+			this.omeFilename = omeFilename;
+		else
+			this.omeFilename = "";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = username.hashCode();
+		result = result * prime + omeFilename.hashCode();
 		result = result * prime + super.hashCode();
 		return result;
 	}
@@ -70,6 +92,9 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 		if ( ! username.equals(other.username) )
 			return false;
 
+		if ( ! omeFilename.equals(other.omeFilename) )
+			return false;
+
 		if ( ! super.equals(other) )
 			return false;
 
@@ -78,9 +103,11 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 
 	@Override
 	public String toString() {
-		String repr = "DashboardMetadataList[ username=" + username;
+		String repr = "DashboardMetadataList" +
+				"[ username=" + username +
+				",\n    omeFilename=" + omeFilename;
 		for ( String expoFilename : keySet() ) {
-			repr += ", \n    " + expoFilename + ":" + get(expoFilename).toString();
+			repr += ",\n    " + expoFilename + ":" + get(expoFilename).toString();
 		}
 		repr += " ]";
 		return repr;
