@@ -206,19 +206,37 @@ public class Output {
 	}
 	
 	/**
-	 * Clear the metadata, data and messages output. Used to destroy output data
-	 * if unforeseen circumstances occur.
+	 * Clear the metadata, data and (optionally) messages output.
+	 * Used to destroy output data if no valid output can be made from processing a file.
+	 * 
+	 * It is sometimes desirable to clear the output messages, if unforseen errors mean that
+	 * the messages are likely to be rendered irrelevant (e.g. if unhandled exceptions occur).
+	 * This should be used with caution.
 	 * 
 	 * @param setNoOutputFlag States whether or not the @code{NO_OUTPUT_FLAG} should be set.
+	 * @param clearMessages States whether or not error and warning message should be removed.
 	 */
-	public void clear(boolean setNoOutputFlag) {
+	public void clear(boolean setNoOutputFlag, boolean clearMessages) {
 		itsMetadata = null;
 		itsDataRecords = null;
-		itsMessages = null;
+		
+		if (clearMessages) {
+			itsMessages = null;
+		}
 		
 		if (setNoOutputFlag) {
 			setExitFlag(NO_OUTPUT_FLAG);
 		}
+	}
+	
+	/**
+	 * Clear the metadata and data output.
+	 * Used to destroy output data if no valid output can be made from processing a file
+	 * 
+	 * @param setNoOutputFlag States whether or not the @code{NO_OUTPUT_FLAG} should be set.
+	 */
+	public void clear(boolean setNoOutputFlag) {
+		clear(setNoOutputFlag, false);
 	}
 
 	/**
@@ -235,5 +253,17 @@ public class Output {
 	 */
 	public Map<String, MetadataItem> getMetadata() {
 		return itsMetadata;
+	}
+	
+	/**
+	 * Returns the number of metadata items in the output
+	 * @return The number of metadata items
+	 */
+	public int getMetadataCount() {
+		return itsMetadata.size();
+	}
+	
+	public Messages getMessages() {
+		return itsMessages;
 	}
 }

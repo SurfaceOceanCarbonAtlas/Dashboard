@@ -19,6 +19,26 @@ public class Messages {
 	private List<DataMessage> itsDataMessages;
 	
 	/**
+	 * The number of metadata errors
+	 */
+	private int itsMetadataErrorCount = 0;
+	
+	/**
+	 * The number of metadata warnings
+	 */
+	private int itsMetadataWarningCount = 0;
+	
+	/**
+	 * The number of data errors
+	 */
+	private int itsDataErrorCount = 0;
+	
+	/**
+	 * The number of data warnings
+	 */
+	private int itsDataWarningCount = 0;
+	
+	/**
 	 * Simple constructor - initialises an empty output object
 	 */
 	protected Messages() {
@@ -32,6 +52,7 @@ public class Messages {
 	 */
 	protected void addMetadataMessage(MetadataMessage message) {
 		itsMetadataMessages.add(message);
+		addToCount(message);
 	}
 	
 	/**
@@ -40,6 +61,7 @@ public class Messages {
 	 */
 	protected void addDataMessage(DataMessage message) {
 		itsDataMessages.add(message);
+		addToCount(message);
 	}
 	
 	/**
@@ -56,7 +78,80 @@ public class Messages {
 	 */
 	protected void addDataMessages(List<DataMessage> messages) {
 		itsDataMessages.addAll(messages);
-		
+		for (DataMessage message : messages) {
+			addToCount(message);
+		}
 	}
 	
+	/**
+	 * Update the relevant message count based on a given message
+	 * @param message The message to be added to the count
+	 */
+	private void addToCount(MetadataMessage message) {
+		
+		if (message instanceof DataMessage) {
+			if (message.isWarning()) {
+				itsDataWarningCount++;
+			} else if (message.isError()) {
+				itsDataErrorCount++;
+			}
+		} else {
+			if (message.isWarning()) {
+				itsMetadataWarningCount++;
+			} else if (message.isError()) {
+				itsMetadataErrorCount++;
+			}
+		}
+	}
+	
+	public int getMetadataErrorCount() {
+		return itsMetadataErrorCount;
+	}
+	
+	public int getMetadataWarningCount() {
+		return itsMetadataWarningCount;
+	}
+	
+	public int getDataErrorCount() {
+		return itsDataErrorCount;
+	}
+	
+	public int getDataWarningCount() {
+		return itsDataWarningCount;
+	}
+	
+	/**
+	 * Returns a string containing all metadata messages.
+	 * This is a temporary method to be replaced by XML output,
+	 * which can be formatted using XSLT
+	 * 
+	 * @return
+	 */
+	public String getMetadataMessageStrings() {
+		StringBuffer output = new StringBuffer();
+		
+		for (MetadataMessage message: itsMetadataMessages) {
+			output.append(message + "\n");
+		}
+		
+		return output.toString();
+	}
+	
+	
+	/**
+	 * Returns a string containing all metadata messages.
+	 * This is a temporary method to be replaced by XML output,
+	 * which can be formatted using XSLT
+	 * 
+	 * @return
+	 */
+	public String getDataMessageStrings() {
+		StringBuffer output = new StringBuffer();
+		
+		for (MetadataMessage message: itsDataMessages) {
+			output.append(message + "\n");
+		}
+		
+		return output.toString();
+	}
 }

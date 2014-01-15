@@ -49,4 +49,30 @@ public class MetadataMessage {
 	public int getSeverity() {
 		return itsSeverity;
 	}
+	
+	public boolean isError() {
+		return itsSeverity == ERROR;
+	}
+	
+	public boolean isWarning() {
+		return itsSeverity == WARNING;
+	}
+	
+	public String toString() {
+		StringBuffer output = new StringBuffer();
+		
+		if (isWarning()) {
+			output.append("WARNING: ");
+		} else if (isError()) {
+			output.append("ERROR: ");
+		}
+		
+		if (itsLine != -1) {
+			output.append("LINE " + itsLine + ": ");
+		}
+		
+		output.append(itsMessage);
+
+		return output.toString();
+	}
 }
