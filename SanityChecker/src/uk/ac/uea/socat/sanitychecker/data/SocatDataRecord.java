@@ -139,7 +139,7 @@ public class SocatDataRecord {
 		setMetadataValues(metadata, dateTimeHandler);
 		
 		// Run methods to populate columns from calculations
-		setCalculatedValues(metadata);
+		setCalculatedValues(metadata, dateTimeHandler);
 	}
 
 	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException {
@@ -239,7 +239,7 @@ public class SocatDataRecord {
 	 * Populate all fields whose values are calculated by the Sanity Checker
 	 * @param metadata
 	 */
-	private void setCalculatedValues(Map<String, MetadataItem> metadata) throws SocatDataException {
+	private void setCalculatedValues(Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler) throws SocatDataException {
 		
 		int columnIndex = 0;
 		for (String column : itsColumnConfig.getColumnList()) {
@@ -252,7 +252,7 @@ public class SocatDataRecord {
 					Method calculatorMethod = getCalculatorMethod(column);
 					
 					itsLogger.trace("Calculating value for column '" + column + "' using calculator class '" + calculatorObject.getClass().getName() + "'");
-					String dataValue = (String) calculatorMethod.invoke(calculatorObject, metadata, this, columnIndex, column);
+					String dataValue = (String) calculatorMethod.invoke(calculatorObject, metadata, this, columnIndex, column, dateTimeHandler);
 					if (null != dataValue) {
 						setFieldValue(column, dataValue);
 					}
