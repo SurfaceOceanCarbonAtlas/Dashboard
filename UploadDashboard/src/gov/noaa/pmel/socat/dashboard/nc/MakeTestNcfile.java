@@ -8,6 +8,7 @@ import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MakeTestNcfile {
                         }
                     } else if ( flazz.equals(String.class) ) {
                         try {
-                            String bling = "A string with a random number "+String.valueOf(rand.nextDouble());
+                            String bling = "A string for "+field.getName()+" with a random number "+String.valueOf(rand.nextDouble());
                             field.set(cruise, bling);
                         } catch (IllegalArgumentException e) {
                             // TODO Auto-generated catch block
@@ -85,6 +86,12 @@ public class MakeTestNcfile {
                         }
                     }
                 }
+                cruise.setYear(2001);
+                cruise.setMonth(3);
+                cruise.setDay(i+1);
+                cruise.setHour(rand.nextInt(24));
+                cruise.setMinute(rand.nextInt(60));
+                cruise.setSecond((double)rand.nextInt(60));
                 data.add(cruise);
 
             }
@@ -108,8 +115,10 @@ public class MakeTestNcfile {
                     }
                 } else if ( flazz.equals(String.class) ) {
                     try {
-                        String bling = "A string with a random number "+String.valueOf(rand.nextDouble());
-                        field.set(metadata, bling);
+                        if ( !Modifier.isStatic(field.getModifiers())) {
+                            String bling = "A string for "+field.getName()+" with random number "+String.valueOf(rand.nextDouble());
+                            field.set(metadata, bling);
+                        }
                     } catch (IllegalArgumentException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -141,7 +150,9 @@ public class MakeTestNcfile {
                     }
                 } else if ( flazz.equals(Date.class) ) {
                     try {
-                        field.set(metadata, new Date());
+                        if ( !Modifier.isStatic(field.getModifiers()) ) {
+                            field.set(metadata, new Date());
+                        }
                     } catch (IllegalArgumentException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
