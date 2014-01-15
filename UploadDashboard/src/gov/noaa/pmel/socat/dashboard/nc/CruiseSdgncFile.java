@@ -106,6 +106,7 @@ public class CruiseSdgncFile {
                         if ( description != null ) {
                             ncfile.addVariableAttribute(var, new Attribute("long_name", description));
                         }
+                        ncfile.addVariableAttribute(var, new Attribute("missing_value", Double.NaN));
                     }
                    
                     
