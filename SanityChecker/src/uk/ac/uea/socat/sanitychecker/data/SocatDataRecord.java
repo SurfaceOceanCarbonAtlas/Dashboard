@@ -291,17 +291,17 @@ public class SocatDataRecord {
 		// If this is a cascading flag field, set all the cascading targets' flags
 		int columnFlagType = flagColumn.getFlagType();
 		if (columnFlagType == SocatColumnConfigItem.CASCADING_FLAG || columnFlagType == SocatColumnConfigItem.CASCADE_TARGET_FLAG) {
-			setCascadeFlags(flag, messages, record, message);
+			setCascadeFlags(flag);
 		}
 	}
 	
 	/**
 	 * Set a flag on all columns that have cascade target flag
 	 */
-	private void setCascadeFlags(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
+	private void setCascadeFlags(int flag) throws SocatDataBaseException {
 		for (SocatDataColumn column : itsOutputColumns.values()) {
 			if (column.getFlagType() == SocatColumnConfigItem.CASCADE_TARGET_FLAG) {
-				column.setFlag(flag, messages, record, message);
+				column.setCascadeFlag(flag);
 			}
 		}
 	}
@@ -320,7 +320,7 @@ public class SocatDataRecord {
 		setFlag(SECOND_COLUMN_NAME, flag, messages, record, message);
 		
 		// Date flags are always cascade flags.
-		setCascadeFlags(flag, messages, record, message);
+		setCascadeFlags(flag);
 	}
 	
 	/**
