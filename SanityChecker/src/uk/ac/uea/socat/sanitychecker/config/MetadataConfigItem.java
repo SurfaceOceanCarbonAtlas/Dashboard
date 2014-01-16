@@ -38,12 +38,6 @@ public class MetadataConfigItem {
 	private int itsDataType;
 	
 	/**
-	 * Indicates whether or not this item can span multiple lines in the
-	 * data file header
-	 */
-	private boolean itIsMultiLine;
-	
-	/**
 	 * The range limit of this metadata item
 	 */
 	private ConfigValueRange itsRange;
@@ -64,7 +58,7 @@ public class MetadataConfigItem {
 	 */
 	@SuppressWarnings("rawtypes")
 	public MetadataConfigItem(String name, int dataType, boolean required, boolean generate,
-			String requiredGroup, ConfigValueRange range, boolean multiline, Class itemClass,
+			String requiredGroup, ConfigValueRange range, Class itemClass,
 			String generatorParameter, Logger logger) throws ConfigException {
 		
 		logger.trace("Creating Metadata Config Item " + name);
@@ -75,7 +69,6 @@ public class MetadataConfigItem {
 		itMustGenerate = generate;
 		itsRequiredGroup = requiredGroup;
 		itsRange = range;
-		itIsMultiLine = multiline;
 		itsItemClass = itemClass;
 		itsGeneratorParameter = generatorParameter;
 	}
@@ -136,15 +129,6 @@ public class MetadataConfigItem {
 	 */
 	public String getRequiredGroup() {
 		return itsRequiredGroup;
-	}
-	
-	/**
-	 * Indicates whether or not the value for this metadata item can
-	 * span multiple lines in the header.
-	 * @return {@code true} if the value can span multiple lines; {@code false} otherwise.
-	 */
-	public boolean isMultiline() {
-		return itIsMultiLine;
 	}
 	
 	/**

@@ -55,19 +55,14 @@ public class MetadataConfig {
 	private static final int MAX_COL = 6;
 	
 	/**
-	 * The index of the column that states whether the item's value can span multiple lines
-	 */
-	private static final int MULTILINE_COL = 7;
-	
-	/**
 	 * The index of the column that contains name of the class to use for the metadata item 
 	 */
-	private static final int ITEM_CLASS_COL = 8;
+	private static final int ITEM_CLASS_COL = 7;
 	
 	/**
 	 * The index of the column that contains the parameter to be passed to the generator function
 	 */
-	private static final int GENERATOR_PARAM_COL = 9;
+	private static final int GENERATOR_PARAM_COL = 8;
 	
 	/**
 	 * The root of all metadata item class names
@@ -199,8 +194,6 @@ public class MetadataConfig {
 							boolean itemRequired = CheckerUtils.parseBoolean(fields.get(REQUIRED_COL));
 							String requiredGroup = fields.get(REQUIRED_GROUP_COL);
 							boolean mustGenerate = CheckerUtils.parseBoolean(fields.get(GENERATE_COL));
-							boolean multilineAllowed = CheckerUtils.parseBoolean(fields.get(MULTILINE_COL));
-
 
 							// Process the data range information
 							String minColValue = fields.get(MIN_COL);
@@ -240,7 +233,7 @@ public class MetadataConfig {
 
 							// Now we have all the values, construct an object for them
 							MetadataConfigItem configItem = new MetadataConfigItem(name, dataType,
-									itemRequired, mustGenerate, requiredGroup, range, multilineAllowed, itemClass, generatorParameter, itsLogger);
+									itemRequired, mustGenerate, requiredGroup, range, itemClass, generatorParameter, itsLogger);
 
 							// And add it to the configuration list
 							itsConfigItems.put(name, configItem);
