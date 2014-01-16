@@ -158,10 +158,6 @@ public class SanityCheckerRun {
 					}
 				}
 				
-				System.out.println(checkerOutput.getRecords().get(0).getColumn("temperature_equi").getValue());
-				System.out.println(checkerOutput.getRecords().get(0).getColumn("temperature_equi").getFlag());
-				
-				
 			} catch (SanityCheckerException e) {
 				e.printStackTrace();
 				ok = false;
