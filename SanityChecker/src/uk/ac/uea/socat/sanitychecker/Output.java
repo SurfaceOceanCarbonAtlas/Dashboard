@@ -193,12 +193,12 @@ public class Output {
 	 * Add a data message to the output
 	 * @param message The message
 	 */
-	protected void addDataMessage(DataMessage message) {
+	public void addDataMessage(DataMessage message) {
 		itsMessages.addDataMessage(message);
 		setExitFlag(message);
 	}
 	
-	protected void addDataMessages(List<DataMessage> messages) {
+	public void addDataMessages(List<DataMessage> messages) {
 		itsMessages.addDataMessages(messages);
 		for (MetadataMessage message: messages) {
 			setExitFlag(message);
@@ -209,7 +209,7 @@ public class Output {
 	 * Add a metadata message to the output
 	 * @param message The message
 	 */
-	protected void addMetadataMessage(MetadataMessage message) {
+	public void addMetadataMessage(MetadataMessage message) {
 		itsMessages.addMetadataMessage(message);
 		setExitFlag(message);
 	}
