@@ -1,8 +1,11 @@
 package uk.ac.uea.socat.sanitychecker.data;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
+import uk.ac.uea.socat.sanitychecker.DataMessage;
+import uk.ac.uea.socat.sanitychecker.MetadataMessage;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
@@ -48,7 +51,7 @@ public class SocatDataColumn {
 	 * @param flag The flag to be set
 	 * @throws SocatDataBaseException If the field doesn't have a flag.
 	 */
-	public void setFlag(int flag) throws SocatDataBaseException {
+	public void setFlag(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
 		if (itsConfig.hasFlag()) {
 			
 			// The flag codes are set up so worse flags are greater than weaker flags.
@@ -56,9 +59,23 @@ public class SocatDataColumn {
 			if (flag > itsFlag) {
 				itsFlag = flag;
 			}
+			
+			// Add a message to the output regarding the flag
+			if (itsFlag != SocatColumnConfigItem.NO_FLAG) {
+				int severity = MetadataMessage.WARNING;
+				if (flag == SocatColumnConfigItem.BAD_FLAG) {
+					severity = MetadataMessage.ERROR;
+				}
+				
+				messages.add(new DataMessage(severity, record, itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
+			}
 		} else {
 			throw new SocatDataBaseException(itsConfig.getColumnName(), "Attempted to set the flag on a field without a flag.");
 		}
+	}
+	
+	public int getFlag() {
+		return itsFlag;
 	}
 	
 	/**

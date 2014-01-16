@@ -3,6 +3,7 @@ package uk.ac.uea.socat.sanitychecker.config;
 import java.lang.reflect.Method;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
+import uk.ac.uea.socat.sanitychecker.MetadataMessage;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
 
 /**
@@ -440,5 +441,17 @@ public class SocatColumnConfigItem {
 	 */
 	public boolean isInRange(double value) {
 		return !(itHasRange && (value < itsRangeMin || value > itsRangeMax));
+	}
+	
+	public int getOutputMessageFlag(int columnFlag) {
+		int result = -1;
+		
+		if (columnFlag == QUESTIONABLE_FLAG) {
+			result = MetadataMessage.WARNING;
+		} else if (columnFlag == BAD_FLAG) {
+			result = MetadataMessage.ERROR;
+		}
+		
+		return result;
 	}
 }

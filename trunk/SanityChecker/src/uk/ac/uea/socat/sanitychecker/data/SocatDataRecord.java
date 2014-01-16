@@ -11,6 +11,7 @@ import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.DataMessage;
+import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
@@ -118,7 +119,7 @@ public class SocatDataRecord {
 	 */
 	private Logger itsLogger;
 
-	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger) throws ConfigException, SocatDataException {
+	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger, Output output) throws ConfigException, SocatDataException {
 		itsMessages = new ArrayList<DataMessage>();
 		itsColumnSpec = colSpec;
 		itsLineNumber = lineNumber;
@@ -140,6 +141,9 @@ public class SocatDataRecord {
 		
 		// Run methods to populate columns from calculations
 		setCalculatedValues(metadata, dateTimeHandler);
+		
+		// Add the list of messages to the output
+		output.addDataMessages(itsMessages);
 	}
 
 	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException {
@@ -162,7 +166,7 @@ public class SocatDataRecord {
 			itsMessages.add(new DataMessage(DataMessage.ERROR, itsLineNumber, -1, "", e.getMessage()));
 			
 			try {
-				setDateFlags(SocatColumnConfigItem.BAD_FLAG);
+				setDateFlags(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsLineNumber, "Missing date element");
 			} catch(SocatDataBaseException e2) {
 				throw new SocatDataException(itsLineNumber, -1, "Date", e2);
 			}
@@ -279,25 +283,25 @@ public class SocatDataRecord {
 	 * @param flag The flag value
 	 * @throws SocatDataBaseException If the field doesn't have a flag
 	 */
-	private void setFlag(String column, int flag) throws SocatDataBaseException {
+	private void setFlag(String column, int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
 		
 		SocatDataColumn flagColumn = itsOutputColumns.get(column);
-		flagColumn.setFlag(flag);
+		flagColumn.setFlag(flag, messages, record, message);
 
 		// If this is a cascading flag field, set all the cascading targets' flags
 		int columnFlagType = flagColumn.getFlagType();
 		if (columnFlagType == SocatColumnConfigItem.CASCADING_FLAG || columnFlagType == SocatColumnConfigItem.CASCADE_TARGET_FLAG) {
-			setCascadeFlags(flag);
+			setCascadeFlags(flag, messages, record, message);
 		}
 	}
 	
 	/**
 	 * Set a flag on all columns that have cascade target flag
 	 */
-	private void setCascadeFlags(int flag) throws SocatDataBaseException {
+	private void setCascadeFlags(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
 		for (SocatDataColumn column : itsOutputColumns.values()) {
 			if (column.getFlagType() == SocatColumnConfigItem.CASCADE_TARGET_FLAG) {
-				column.setFlag(flag);
+				column.setFlag(flag, messages, record, message);
 			}
 		}
 	}
@@ -307,16 +311,16 @@ public class SocatDataRecord {
 	 * @param flag The flag value
 	 * @throws SocatDataBaseException If the flag cannot be set
 	 */
-	private void setDateFlags(int flag) throws SocatDataBaseException {
-		setFlag(YEAR_COLUMN_NAME, flag);
-		setFlag(MONTH_COLUMN_NAME, flag);
-		setFlag(DAY_COLUMN_NAME, flag);
-		setFlag(HOUR_COLUMN_NAME, flag);
-		setFlag(MINUTE_COLUMN_NAME, flag);
-		setFlag(SECOND_COLUMN_NAME, flag);
+	private void setDateFlags(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
+		setFlag(YEAR_COLUMN_NAME, flag, messages, record, message);
+		setFlag(MONTH_COLUMN_NAME, flag, messages, record, message);
+		setFlag(DAY_COLUMN_NAME, flag, messages, record, message);
+		setFlag(HOUR_COLUMN_NAME, flag, messages, record, message);
+		setFlag(MINUTE_COLUMN_NAME, flag, messages, record, message);
+		setFlag(SECOND_COLUMN_NAME, flag, messages, record, message);
 		
 		// Date flags are always cascade flags.
-		setCascadeFlags(flag);
+		setCascadeFlags(flag, messages, record, message);
 	}
 	
 	/**

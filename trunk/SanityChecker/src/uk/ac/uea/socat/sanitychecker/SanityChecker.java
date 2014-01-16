@@ -180,7 +180,7 @@ public class SanityChecker {
 				for (List<String> record: itsInputData) {
 					itsRecordCount++;
 					itsLogger.trace("Processing record " + itsRecordCount);
-					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
+					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger, itsOutput);
 					itsOutput.addRecord(socatRecord);
 					itsOutput.addDataMessages(socatRecord.getMessages());
 				}
@@ -340,10 +340,16 @@ public class SanityChecker {
 		 * Now we can go through all the data looking for required values that are
 		 * missing, and numeric values that are out of range. 
 		 */
+		
+		// A store for any generated messages
+		List<DataMessage> messages = new ArrayList<DataMessage>();
+		
 		for (String columnName : SocatColumnConfig.getInstance().getColumnList()) {
 			SocatColumnConfigItem columnConfig = SocatColumnConfig.getInstance().getColumnConfig(columnName);
 
+			int currentRecord = 0;
 			for (SocatDataRecord record : itsOutput.getRecords()) {
+				currentRecord++;
 				SocatDataColumn column = record.getColumn(columnName);
 				
 				// If the column is empty, see if it's required and set the flag if it is.
@@ -352,14 +358,15 @@ public class SanityChecker {
 						
 						// Check the Required Group
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
-							column.setFlag(columnConfig.getMissingFlag());
-							itsLogger.trace("Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'");
-							itsOutput.addDataMessage(new DataMessage(DataMessage.ERROR, record.getLineNumber(), columnConfig.getIndex(), columnName, "Missing required value"));
+							String message = "Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'";
+							itsLogger.trace(message);
+							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, message);
 						} else {
 							List<String> requiredGroupValues = record.getRequiredGroupValues(columnConfig.getRequiredGroup());
 							if (CheckerUtils.isEmpty(requiredGroupValues)) {
-								itsLogger.trace("Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'");
-								column.setFlag(columnConfig.getMissingFlag());
+								String message = "Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'";
+								itsLogger.trace(message);
+								column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, message);
 							}
 						}
 					}
@@ -367,17 +374,21 @@ public class SanityChecker {
 					
 					// If it's supposed to be numeric and isn't, this is always bad!
 					if (!CheckerUtils.isNumeric(column.getValue())) {
-						itsLogger.trace("Non-parseable numeric value on line " + record.getLineNumber() + ", column '" + columnName + "'");
-						column.setFlag(SocatColumnConfigItem.BAD_FLAG);
+						String message = "Non-parseable numeric value on line " + record.getLineNumber() + ", column '" + columnName + "'";
+						itsLogger.trace(message);
+						column.setFlag(SocatColumnConfigItem.BAD_FLAG, messages, currentRecord, message);
 					} else {
 						if (!columnConfig.isInRange(Double.parseDouble(column.getValue()))) {
-							itsLogger.trace("Value is out of range on line " + record.getLineNumber() + ", column '" + columnName + "'");
-							column.setFlag(columnConfig.getRangeFlag());
+							String message = "Value is out of range on line " + record.getLineNumber() + ", column '" + columnName + "'";
+							itsLogger.trace(message);
+							column.setFlag(columnConfig.getRangeFlag(), messages, currentRecord, message);
 						}
 					}
 				}
 			}
 		}
+		
+		itsOutput.addDataMessages(messages);
 	}
 
 	/**
