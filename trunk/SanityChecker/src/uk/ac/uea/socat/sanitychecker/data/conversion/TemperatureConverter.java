@@ -16,6 +16,8 @@ public class TemperatureConverter extends SpecifiedUnitsConverter {
 		itsSupportedUnits.add("celsius");
 		itsSupportedUnits.add("degk");
 		itsSupportedUnits.add("kelvin");
+		itsSupportedUnits.add("degf");
+		itsSupportedUnits.add("fahrenheit");
 	}
 	
 	@Override
@@ -24,6 +26,8 @@ public class TemperatureConverter extends SpecifiedUnitsConverter {
 		
 		if (units.equalsIgnoreCase("degk") || units.equalsIgnoreCase("kelvin")) {
 			result = convertKelvin(value); 
+		} else if (units.equalsIgnoreCase("degf") || units.equalsIgnoreCase("fahrenheit")) {
+			result = convertFahrenheit(value);
 		}
 		
 		return result;
@@ -40,6 +44,19 @@ public class TemperatureConverter extends SpecifiedUnitsConverter {
 		
 		try {
 			result = Double.toString(Double.parseDouble(value) + 273.15);
+		} catch (NumberFormatException e) {
+			throw new ConversionException("Cannot parse value");
+		}
+		
+		return result;
+	}
+	
+	private String convertFahrenheit(String value) throws ConversionException {
+		String result = value;
+		
+		try {
+			double startValue = Double.parseDouble(value);
+			result = Double.toString((startValue - 32) * 5 / 9);
 		} catch (NumberFormatException e) {
 			throw new ConversionException("Cannot parse value");
 		}
