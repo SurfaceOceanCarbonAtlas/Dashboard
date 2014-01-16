@@ -46,9 +46,12 @@ public class SocatDataColumn {
 	}
 	
 	/**
-	 * Sets the flag on this field. If a worse flag has already been set,
-	 * no action is taken.
-	 * @param flag The flag to be set
+	 * Sets the flag on this field, and add a message to the main checker output.
+	 * If a worse flag has already been set, no action is taken.
+	 * @param flag The flag to be set.
+	 * @param messages A list of messages to which this flag's message will be added
+	 * @param record The record number for the message
+	 * @param message The message text
 	 * @throws SocatDataBaseException If the field doesn't have a flag.
 	 */
 	public void setFlag(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
@@ -58,16 +61,35 @@ public class SocatDataColumn {
 			// We only set the flag if it's worse than what's already been set.
 			if (flag > itsFlag) {
 				itsFlag = flag;
+
+				// Add a message to the output regarding the flag
+				if (itsFlag != SocatColumnConfigItem.NO_FLAG) {
+					int severity = MetadataMessage.WARNING;
+					if (flag == SocatColumnConfigItem.BAD_FLAG) {
+						severity = MetadataMessage.ERROR;
+					}
+					
+					messages.add(new DataMessage(severity, record, itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
+				}
 			}
 			
-			// Add a message to the output regarding the flag
-			if (itsFlag != SocatColumnConfigItem.NO_FLAG) {
-				int severity = MetadataMessage.WARNING;
-				if (flag == SocatColumnConfigItem.BAD_FLAG) {
-					severity = MetadataMessage.ERROR;
-				}
-				
-				messages.add(new DataMessage(severity, record, itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
+		} else {
+			throw new SocatDataBaseException(itsConfig.getColumnName(), "Attempted to set the flag on a field without a flag.");
+		}
+	}
+	
+	/**
+	 * Set the cascading flag for a column. This does not generate messages.
+	 * @param flag The flag to be set
+	 * @throws SocatDataBaseException If the field doesn't have a flag.
+	 */
+	public void setCascadeFlag(int flag) throws SocatDataBaseException {
+		if (itsConfig.hasFlag()) {
+			
+			// The flag codes are set up so worse flags are greater than weaker flags.
+			// We only set the flag if it's worse than what's already been set.
+			if (flag > itsFlag) {
+				itsFlag = flag;
 			}
 		} else {
 			throw new SocatDataBaseException(itsConfig.getColumnName(), "Attempted to set the flag on a field without a flag.");
