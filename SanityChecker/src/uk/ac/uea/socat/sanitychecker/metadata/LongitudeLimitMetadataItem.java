@@ -118,10 +118,13 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 
 	@Override
 	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
-		// Get the latitude from the record - covert to 0-360 range
+		// Get the longitude from the record - covert to 0-360 range
 		Double position = Double.parseDouble(record.getColumn(LONGITUDE_COLUMN).getValue());
-		if (position < 0) {
-			position = 360 - Math.abs(position);
+		while ( position < 0.0 ) {
+			position += 360.0;
+		}
+		while ( position >= 360.0 ) {
+			position -= 360.0;
 		}
 		
 		// Add the latitude to the list of all latitudes
