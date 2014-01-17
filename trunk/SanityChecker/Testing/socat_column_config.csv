@@ -76,9 +76,6 @@
 #
 #     These are translated to WOCE flag values in the final output file
 #
-# Range_Flag
-#    The flag to set if a numeric field value falls outside the specified
-#    range. Values are the same as for the Missing_Flag above.
 
 #Field,Required,RequiredGroup,Source,Metadata_Name,Calc_Class,Numeric,Questionable_Range_Min,Questionable_Range_Max,Bad_Range_Min,Bad_Range_Max,Flag,MissingFlag
 cruise_id,Y,,C,,ExpoCode,N,,,,,C,B
