@@ -30,9 +30,9 @@
  				<element name="input_column" type="SanityCheckercolinfo:input_col"
   				maxOccurs="1" minOccurs="1">
   				</element>
-			<element name="input_units" type="string" maxOccurs="1" minOccurs="1">
-      </element>
-		</sequence>
+			<element name="input_units" type="string" maxOccurs="1" minOccurs="1"></element>
+		  <element name="missing_value" type="double" maxOccurs="1" minOccurs="0"></element>
+     </sequence>
    	<attribute name="name" type="string"></attribute>
 	</complexType>
 	

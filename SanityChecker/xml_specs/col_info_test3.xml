@@ -8,6 +8,7 @@
 <socat_column name="longitude">
 		<input_column index="2">lon</input_column>
 		<input_units>dddmm.mmm</input_units>
+		<missing_value>-999</missing_value>
 	</socat_column>
   <date_columns>
     <year index="3">date</year>

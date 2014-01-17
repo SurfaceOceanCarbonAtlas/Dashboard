@@ -120,7 +120,7 @@ public class SocatDataColumn {
 	 * Sets the value for this field.
 	 * @param value The value.
 	 */
-	public void setValue(String value) {
+	public void setValue(String value, Double missingValue) {
 		
 		if (null == value) {
 			itsValue = MISSING_VALUE;
@@ -128,6 +128,18 @@ public class SocatDataColumn {
 			String trimmedValue = value.trim();
 			if (trimmedValue.length() == 0 || trimmedValue.equalsIgnoreCase("na") || trimmedValue.equalsIgnoreCase("nan")) {
 				itsValue = MISSING_VALUE;
+			} else if (null != missingValue) {
+				try {
+					double doubleValue = Double.parseDouble(value);
+					if (doubleValue == missingValue.doubleValue()) {
+						itsValue = MISSING_VALUE;
+					} else {
+						itsValue = value;
+					}
+				} catch (NumberFormatException e) {
+					// If it's not a parseable number, we simply store the value
+					itsValue = value;
+				}
 			} else {
 				itsValue = value;
 			}

@@ -273,7 +273,13 @@ public class SocatDataRecord {
 	 * @param value The value
 	 */
 	private void setFieldValue(String field, String value) {
-		itsOutputColumns.get(field).setValue(value);
+		Double missingValue = null;
+		StandardColumnInfo colInfo = itsColumnSpec.getColumnInfo(field);
+		if (null != colInfo) {
+			missingValue = colInfo.getMissingValue();
+		}
+		
+		itsOutputColumns.get(field).setValue(value, missingValue);
 	}
 	
 	/**
