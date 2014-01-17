@@ -130,7 +130,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Create the metadata properties of this cruise for the sanity checker
 		Properties metadataInput = new Properties();
-		metadataInput.setProperty("ExpoCode", cruiseData.getExpocode());
+		metadataInput.setProperty("EXPOCode", cruiseData.getExpocode());
 
 		// Get the data column units conversion object
 		ColumnConversionConfig convConfig;
