@@ -63,27 +63,32 @@ public class SocatColumnConfig {
 	/**
 	 * The index of the column containing the minimum value of the entry's possible range
 	 */
-	private static final int RANGE_MIN_COL = 7;
+	private static final int QUESTIONABLE_RANGE_MIN_COL = 7;
 	
 	/**
 	 * The index of the column containing the maximum value of the entry's possible range
 	 */
-	private static final int RANGE_MAX_COL = 8;
+	private static final int QUESTIONABLE_RANGE_MAX_COL = 8;
+	
+	/**
+	 * The index of the column containing the minimum value of the entry's possible range
+	 */
+	private static final int BAD_RANGE_MIN_COL = 9;
+	
+	/**
+	 * The index of the column containing the maximum value of the entry's possible range
+	 */
+	private static final int BAD_RANGE_MAX_COL = 10;
 	
 	/**
 	 * The index of the column indicating whether or not this field has a flag
 	 */
-	private static final int FLAG_COL = 9;
+	private static final int FLAG_COL = 11;
 	
 	/**
 	 * The index of the column indicating which flag to assign to missing values
 	 */
-	private static final int MISSING_FLAG_COL = 10;
-	
-	/**
-	 * The index of the column indicating which flag to assign out-of-range values
-	 */
-	private static final int RANGE_FLAG_COL = 11;
+	private static final int MISSING_FLAG_COL = 12;
 	
 	/**
 	 * The name of the package in which classes and methods for calculating data values are defined 
@@ -254,26 +259,48 @@ public class SocatColumnConfig {
 							throw new ConfigException(itsConfigFilename, columnName, lineCount, "Invalid boolean value");
 						}
 
-						boolean hasRange = false;
-						double rangeMin = 0;
-						double rangeMax = 0;
+						
+						
+						
+						
+						boolean hasQuestionableRange = false;
+						boolean hasBadRange = false;
+						double questionableRangeMin = 0;
+						double questionableRangeMax = 0;
+						double badRangeMin = 0;
+						double badRangeMax = 0;
 
-						if (fields.get(RANGE_MIN_COL).length() > 0 || fields.get(RANGE_MAX_COL).length() > 0) {
-							hasRange = true;
+						if (fields.get(QUESTIONABLE_RANGE_MIN_COL).length() > 0 || fields.get(QUESTIONABLE_RANGE_MAX_COL).length() > 0) {
+							hasQuestionableRange = true;
 							try {
-								rangeMin = Double.parseDouble(fields.get(RANGE_MIN_COL));
-								rangeMax = Double.parseDouble(fields.get(RANGE_MAX_COL));
+								questionableRangeMin = Double.parseDouble(fields.get(QUESTIONABLE_RANGE_MIN_COL));
+								questionableRangeMax = Double.parseDouble(fields.get(QUESTIONABLE_RANGE_MAX_COL));
 							} catch (NumberFormatException e) {
 								throw new ConfigException(itsConfigFilename, columnName, lineCount, "Invalid range specification");
+							}
+						}
+						
+						
+						if (fields.get(BAD_RANGE_MIN_COL).length() > 0 || fields.get(BAD_RANGE_MAX_COL).length() > 0) {
+							hasBadRange = true;
+							try {
+								badRangeMin = Double.parseDouble(fields.get(BAD_RANGE_MIN_COL));
+								badRangeMax = Double.parseDouble(fields.get(BAD_RANGE_MAX_COL));
+							} catch (NumberFormatException e) {
+								throw new ConfigException(itsConfigFilename, columnName, lineCount, "Invalid range specification");
+							}
+						}
+						
+						if (hasQuestionableRange && hasBadRange) {
+							if (badRangeMin > questionableRangeMin || badRangeMax < questionableRangeMax) {
+								throw new ConfigException(itsConfigFilename, columnName, lineCount, "Bad range must be larger than questionable range");
 							}
 						}
 
 						int flagType = SocatColumnConfigItem.convertFlagTypeString(itsConfigFilename, columnName, lineCount, fields.get(FLAG_COL));
 
 						int missingFlag = SocatColumnConfigItem.GOOD_FLAG;
-						int rangeFlag = SocatColumnConfigItem.GOOD_FLAG;
 						if (flagType != SocatColumnConfigItem.NO_FLAG) {
-
 							if (required) {
 								if (fields.size() < MISSING_FLAG_COL) {
 									throw new ConfigException(itsConfigFilename, columnName, lineCount, "Missing flag values");
@@ -281,20 +308,11 @@ public class SocatColumnConfig {
 									missingFlag = SocatColumnConfigItem.convertFlagValueString(itsConfigFilename, columnName, lineCount, fields.get(MISSING_FLAG_COL));
 								}
 							}
-
-							if (hasRange) {
-								if (fields.size() <= RANGE_FLAG_COL) {
-									throw new ConfigException(itsConfigFilename, columnName, lineCount, "Range is specified, but no range flag is set");
-								} else {
-									rangeFlag = SocatColumnConfigItem.convertFlagValueString(itsConfigFilename, columnName, lineCount, fields.get(RANGE_FLAG_COL));
-								}
-							}
 						}
 
-						SocatColumnConfigItem configItem = new SocatColumnConfigItem(columnName, lineCount, required, requiredGroup, dataSource, metadataName, calculatorObject, calculatorMethod, isNumeric, hasRange, rangeMin, rangeMax, flagType, missingFlag, rangeFlag);
+						SocatColumnConfigItem configItem = new SocatColumnConfigItem(columnName, lineCount, required, requiredGroup, dataSource, metadataName, calculatorObject, calculatorMethod, isNumeric, hasQuestionableRange, questionableRangeMin, questionableRangeMax, hasBadRange, badRangeMin, badRangeMax, flagType, missingFlag);
 						itsColumns.add(columnName);
 						itsColumnConfig.put(columnName, configItem);
-
 					}
 
 					line = reader.readLine();

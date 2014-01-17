@@ -170,22 +170,40 @@ public class SocatColumnConfigItem {
 	private boolean itIsNumeric;
 	
 	/**
-	 * Indicates whether or not this column has a data range.
+	 * Indicates whether or not this column has a data range outside which a questionable flag is raised
 	 * Only relevant for numeric fields.
 	 */
-	private boolean itHasRange;
+	private boolean itHasQuestionableRange;
 	
 	/**
-	 * This minimum value that this column can contain.
+	 * Indicates whether or not this column has a data range outside which a questionable flag is raised
+	 * Only relevant for numeric fields.
+	 */
+	private boolean itHasBadRange;
+
+	/**
+	 * The minimum allowed value that this column can contain, outside which a questionable flag is raised.
 	 * Only relevant for numeric columns with a range.
 	 */
-	private double itsRangeMin;
+	private double itsQuestionableRangeMin;
 	
 	/**
-	 * This maximum value that this column can contain.
+	 * The minimum allowed value that this column can contain, outside which a questionable flag is raised.
 	 * Only relevant for numeric columns with a range.
 	 */
-	private double itsRangeMax;
+	private double itsQuestionableRangeMax;
+	
+	/**
+	 * The minimum allowed value that this column can contain, outside which a bad flag is raised.
+	 * Only relevant for numeric columns with a range.
+	 */
+	private double itsBadRangeMin;
+	
+	/**
+	 * The minimum allowed value that this column can contain, outside which a bad flag is raised.
+	 * Only relevant for numeric columns with a range.
+	 */
+	private double itsBadRangeMax;
 	
 	/**
 	 * The type of flag set for this field
@@ -212,13 +230,14 @@ public class SocatColumnConfigItem {
 	 * @param calcMethod The method to be used to calculate the field's value
 	 * @param isNumeric Is this a numeric field?
 	 * @param hasRange Is a range specified for this column?
-	 * @param rangeMin The minimum allowed value
-	 * @param rangeMax The maximum allowed value
+	 * @param questionableRangeMin The minimum allowed value outside which a questionable flag is raised
+	 * @param questionableRangeMax The maximum allowed value outside which a questionable flag is raised
+	 * @param badRangeMin The minimum allowed value outside which a questionable flag is raised
+	 * @param badRangeMax The maximum allowed value outside which a questionable flag is raised
 	 * @param flagType The type of flag that can be set on this field
 	 * @param missingFlag The severity of the missing flag
-	 * @param rangeFlag The severity of the range flag
 	 */
-	public SocatColumnConfigItem(String name, int index, boolean isRequired, String requiredGroup, int dataSource, String metadataName, DataCalculator calculatorObject, Method calculatorMethod, boolean isNumeric, boolean hasRange, double rangeMin, double rangeMax, int flagType, int missingFlag, int rangeFlag) {
+	public SocatColumnConfigItem(String name, int index, boolean isRequired, String requiredGroup, int dataSource, String metadataName, DataCalculator calculatorObject, Method calculatorMethod, boolean isNumeric, boolean hasQuestionableRange, double questionableRangeMin, double questionableRangeMax, boolean hasBadRange, double badRangeMin, double badRangeMax, int flagType, int missingFlag) {
 		itsName = name;
 		itsIndex = index;
 		itIsRequired = isRequired;
@@ -233,12 +252,14 @@ public class SocatColumnConfigItem {
 		itsCalcObject = calculatorObject;
 		itsCalcMethod = calculatorMethod;
 		itIsNumeric = isNumeric;
-		itHasRange = hasRange;
-		itsRangeMin = rangeMin;
-		itsRangeMax = rangeMax;
+		itHasQuestionableRange = hasQuestionableRange;
+		itHasBadRange = hasBadRange;
+		itsQuestionableRangeMin = questionableRangeMin;
+		itsQuestionableRangeMax = questionableRangeMax;
+		itsBadRangeMin = badRangeMin;
+		itsBadRangeMax = badRangeMax;
 		itsFlagType = flagType;
 		itsMissingFlag = missingFlag;
-		itsRangeFlag = rangeFlag;
 	}
 	
 	/**
@@ -433,16 +454,18 @@ public class SocatColumnConfigItem {
 		return itsIndex;
 	}
 	
-	/**
-	 * Determines whether or not the given value is in the range specified for this column.
-	 * If no range is specified, for the column, the value is always in range.
-	 * @param value {@code true} if the value is in range; {@code false} otherwise
-	 * @return
-	 */
-	public boolean isInRange(double value) {
-		return !(itHasRange && (value < itsRangeMin || value > itsRangeMax));
+	public int checkRange(double value) {
+		int result = GOOD_FLAG;
+		
+		if (itHasBadRange && (value < itsBadRangeMin || value > itsBadRangeMax)) {
+			result = BAD_FLAG;
+		} else if (itHasQuestionableRange && (value < itsQuestionableRangeMin || value > itsQuestionableRangeMax)) {
+			result = QUESTIONABLE_FLAG;
+		}
+		
+		return result;
 	}
-	
+
 	public int getOutputMessageFlag(int columnFlag) {
 		int result = -1;
 		

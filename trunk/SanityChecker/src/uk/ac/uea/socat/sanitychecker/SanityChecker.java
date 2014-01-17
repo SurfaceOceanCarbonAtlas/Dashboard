@@ -378,10 +378,12 @@ public class SanityChecker {
 						itsLogger.trace(message);
 						column.setFlag(SocatColumnConfigItem.BAD_FLAG, messages, currentRecord, message);
 					} else {
-						if (!columnConfig.isInRange(Double.parseDouble(column.getValue()))) {
+						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
+
+						if (SocatColumnConfigItem.GOOD_FLAG != rangeCheckFlag) {
 							String message = "Value is out of range on line " + record.getLineNumber() + ", column '" + columnName + "'";
 							itsLogger.trace(message);
-							column.setFlag(columnConfig.getRangeFlag(), messages, currentRecord, message);
+							column.setFlag(rangeCheckFlag, messages, currentRecord, message);
 						}
 					}
 				}
