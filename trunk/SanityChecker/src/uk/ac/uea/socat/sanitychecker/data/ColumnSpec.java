@@ -55,6 +55,11 @@ public class ColumnSpec {
 	public static final String INPUT_UNITS_ELEMENT_NAME = "input_units";
 	
 	/**
+	 * The name of the element containing the (optional) missing value of the input column
+	 */
+	public static final String MISSING_VALUE_ELEMENT_NAME = "missing_value";
+	
+	/**
 	 * The name of the element containing the details for a combined date and time column
 	 */
 	public static final String SINGLE_DATE_TIME_ELEMENT = "date_time";
@@ -159,8 +164,14 @@ public class ColumnSpec {
 		String inputColumnName = inputColumn.getText();
 		String inputUnits = element.getChild(INPUT_UNITS_ELEMENT_NAME, element.getNamespace()).getTextTrim();
 		
+		Double missingValue = null;
+		Element missingValueElement = element.getChild(MISSING_VALUE_ELEMENT_NAME, element.getNamespace());
+		if (null != missingValueElement) {
+			missingValue = Double.parseDouble(missingValueElement.getTextTrim());
+		}
+		
 		logger.trace("Column spec: SOCAT = " + socatColumn + ", Input = '" + inputColumnName + "' (" + inputColumnIndex + ")");
-		return new StandardColumnInfo(socatColumn, inputColumnIndex, inputColumnName, inputUnits, columnConversionConfig.get(socatColumn));		
+		return new StandardColumnInfo(socatColumn, inputColumnIndex, inputColumnName, inputUnits, missingValue, columnConversionConfig.get(socatColumn));		
 	}
 	
 	/**

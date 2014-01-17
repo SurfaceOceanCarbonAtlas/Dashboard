@@ -31,6 +31,11 @@ public class StandardColumnInfo {
 	private String itsInputUnits;
 	
 	/**
+	 * The missing value for the input column
+	 */
+	private Double itsMissingValue;
+	
+	/**
 	 * The Converter object used to convert the input value to the
 	 * required SOCAT units. If this is {@code null}, no conversion
 	 * will be performed.
@@ -46,11 +51,12 @@ public class StandardColumnInfo {
 	 * @param converter The converter to be used to produce the SOCAT output value
 	 * @throws ConversionException If the converter cannot work with the specified input units.
 	 */
-	public StandardColumnInfo(String socatColumn, int inputColumnIndex, String inputColumnName, String inputUnits, Converter converter) throws ConversionException {
+	public StandardColumnInfo(String socatColumn, int inputColumnIndex, String inputColumnName, String inputUnits, Double missingValue, Converter converter) throws ConversionException {
 		itsSocatColumn = socatColumn;
 		itsInputColumnIndex = inputColumnIndex;
 		itsInputColumnName = inputColumnName;
 		itsInputUnits = inputUnits;
+		itsMissingValue = missingValue;
 		itsConverter = converter;
 		
 		if (null != converter && !converter.checkHandledUnits(inputUnits)) {
@@ -84,6 +90,14 @@ public class StandardColumnInfo {
 		return itsInputColumnName;
 	}
 	
+	public boolean hasMissingValue() {
+		return itsMissingValue != null;
+	}
+	
+	public Double getMissingValue() {
+		return itsMissingValue;
+	}
+
 	/**
 	 * Convert an input value to the required units for the SOCAT output,
 	 * using the converter specified when this information object was created.
