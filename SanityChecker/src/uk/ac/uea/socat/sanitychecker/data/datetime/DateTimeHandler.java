@@ -82,10 +82,12 @@ public class DateTimeHandler {
 		String adjustedDateString = validateDateFormatString(dateFormat);
 		itsDateOnlyFormatter = DateTimeFormat.forPattern(adjustedDateString);
 		
-		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(3);
+		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(5);
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss.S").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
 		
 		itsOutputDateFormatter = DateTimeFormat.forPattern(DATE_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
 		itsOutputDateTimeFormatter = DateTimeFormat.forPattern(DATE_TIME_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
@@ -177,6 +179,7 @@ public class DateTimeHandler {
 	 * &lt;Date&gt;HHMMSS
 	 * &lt;Date&gt; HHMMSS
 	 * &lt;Date&gt; HH:MM:SS
+	 * &lt;Date&gt; HH:MM:SS.S
 	 * 
 	 * @param dateTime The string to be parsed
 	 * @return The parsed date-time object

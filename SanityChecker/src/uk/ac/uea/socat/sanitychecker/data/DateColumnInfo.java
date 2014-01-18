@@ -123,6 +123,7 @@ public class DateColumnInfo {
 			processDateTimeElements(dateElement, logger);
 			break;
 		}
+		case 5:
 		case 6:
 		{
 			processIndividualColumnElements(dateElement, logger);
@@ -175,7 +176,12 @@ public class DateColumnInfo {
 			String dayString = dataFields.get(getDayColumnIndex() - 1);
 			String hourString = dataFields.get(getHourColumnIndex() - 1);
 			String minuteString = dataFields.get(getMinuteColumnIndex() - 1);
-			String secondString = dataFields.get(getSecondColumnIndex() - 1);
+			String secondString;
+			int idx = getSecondColumnIndex();
+			if ( idx > 0 )
+				secondString = dataFields.get(idx - 1);
+			else
+				secondString = "0";
 			
 			if (CheckerUtils.isEmpty(yearString, monthString, dayString, hourString, minuteString, secondString)) {
 				throw new MissingDateTimeElementException();
@@ -186,7 +192,7 @@ public class DateColumnInfo {
 					int day = Integer.parseInt(dayString);
 					int hour = Integer.parseInt(hourString);
 					int minute = Integer.parseInt(minuteString);
-					int second = Integer.parseInt(secondString);
+					int second = (int) Math.round(Double.parseDouble(secondString));
 				
 					result = new DateTime(year, month, day, hour, minute, second);
 				} catch (Exception e) {
@@ -283,10 +289,16 @@ public class DateColumnInfo {
 		itsMinuteInfo = new ColInfo(columnIndex, columnName);
 		
 		child = parent.getChild(ColumnSpec.SECOND_ELEMENT, parent.getNamespace());
-		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
-		columnName = child.getTextTrim();
-		logger.trace("Date column spec: Second column '" + columnName + "' (" + columnIndex + ")");
-		itsSecondInfo = new ColInfo(columnIndex, columnName);
+		if ( child != null ) {
+			columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+			columnName = child.getTextTrim();
+			logger.trace("Date column spec: Second column '" + columnName + "' (" + columnIndex + ")");
+			itsSecondInfo = new ColInfo(columnIndex, columnName);
+		}
+		else {
+			logger.trace("Date column spec: Second column not specified");
+			itsSecondInfo = null;
+		}
 	}
 	
 	/**
@@ -437,7 +449,10 @@ public class DateColumnInfo {
 			break;
 		}
 		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsSecondInfo.index;
+			if ( itsSecondInfo != null )
+				result = itsSecondInfo.index;
+			else
+				result = -1;
 			break;
 		}
 		}
@@ -593,7 +608,10 @@ public class DateColumnInfo {
 			break;
 		}
 		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsSecondInfo.name;
+			if ( itsSecondInfo != null )
+				result = itsSecondInfo.name;
+			else
+				result = null;
 			break;
 		}
 		}
