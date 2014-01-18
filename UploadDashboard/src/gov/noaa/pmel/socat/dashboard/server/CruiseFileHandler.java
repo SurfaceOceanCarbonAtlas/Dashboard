@@ -99,7 +99,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		if the expocode is unreasonable
 	 * 		(invalid characters, too short, too long)
 	 */
-	private String checkExpocode(String expocode) throws IllegalArgumentException {
+	public static String checkExpocode(String expocode) throws IllegalArgumentException {
 		if ( expocode == null )
 			throw new IllegalArgumentException("Cruise expocode not given");
 		// Do some automatic clean-up
@@ -586,9 +586,11 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to obtain the metadata file handler");
 		}
-		metadataHandler.removeMetadata(username, cruise.getOmeFilename());
+		String omeFilename = cruise.getOmeFilename();
+		if ( ! omeFilename.isEmpty() )
+			metadataHandler.removeMetadata(username, expocode, cruise.getOmeFilename());
 		for ( String mdataName : cruise.getMetadataFilenames() )
-			metadataHandler.removeMetadata(username, mdataName);
+			metadataHandler.removeMetadata(username, expocode, mdataName);
 	}
 
 	/**

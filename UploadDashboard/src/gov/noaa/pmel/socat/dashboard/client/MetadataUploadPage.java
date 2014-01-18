@@ -265,8 +265,8 @@ public class MetadataUploadPage extends Composite {
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
 		// Make sure a file was selected
-		String uploadFilename = metadataUpload.getFilename();
-		if ( (uploadFilename == null) || uploadFilename.trim().isEmpty() ) {
+		String uploadFilename = DashboardUtils.baseName(metadataUpload.getFilename());
+		if ( uploadFilename.isEmpty() ) {
 			event.cancel();
 			usernameToken.setValue("");
 			passhashToken.setValue("");
@@ -288,15 +288,14 @@ public class MetadataUploadPage extends Composite {
 		String message = OVERWRITE_WARNING_MSG_PROLOGUE;
 		boolean willOverwrite = false;
 		for ( DashboardCruise cruz : cruises ) {
-			String mdataName = DashboardUtils.metadataFilename(
-										cruz.getExpocode(), uploadFilename);
-			if ( cruz.getOmeFilename().equals(mdataName) ) {
-				message += "<li>" + SafeHtmlUtils.htmlEscape(mdataName) + 
-						" <em>(OME metadata)</em></li>";
+			if ( cruz.getOmeFilename().equals(uploadFilename) ) {
+				message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
+						" <em>OME metadata for cruise " + SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
 				willOverwrite = true;
 			}
-			else if ( cruz.getMetadataFilenames().contains(mdataName) ) {
-				message += "<li>" + SafeHtmlUtils.htmlEscape(mdataName) + "</li>";
+			else if ( cruz.getMetadataFilenames().contains(uploadFilename) ) {
+				message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
+						" <em>for cruise " + SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
 				willOverwrite = true;
 			}
 		}
