@@ -11,8 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -51,19 +51,51 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	}
 
 	/**
+	 * Generates the cruise-specific metadata file for a metadata document
+	 * from the cruise expocode and the upload filename.
+	 * 
+	 * @param cruiseExpocode
+	 * 		expocode of the cruise associated with this metadata document
+	 * @param uploadName
+	 * 		user's name of the uploaded metadata document 
+	 * @return
+	 * 		cruise-specific metadata file on the server
+	 * @throws IllegalArgumentException
+	 * 		if uploadName is null or ends in a slash or backslash, or 
+	 * 		if the expocode is invalid
+	 */
+	public File getMetadataFile(String cruiseExpocode, String uploadName) 
+											throws IllegalArgumentException {
+		// Check and standardize the expocode
+		String expocode = CruiseFileHandler.checkExpocode(cruiseExpocode);
+		// Remove any path from uploadName
+		String basename = DashboardUtils.baseName(uploadName);
+		if ( basename.isEmpty() )
+			throw new IllegalArgumentException(
+					"Invalid metadate document name " + uploadName);
+		// Generate the full path filename for this cruise metadata
+		File metadataFile = new File(filesDir, expocode.substring(0,4) +
+				File.separator + expocode + "_" + basename);
+		return metadataFile;
+	}
+
+	/**
 	 * Validates that a user has permission to delete or overwrite
 	 * and existing metadata document.
 	 * 	
 	 * @param username
 	 * 		name of user wanting to delete or overwrite the metadata document
-	 * @param metadataName
+	 * @param expocode
+	 * 		expocode of the cruise associated with this metadata document
+	 * @param metaname
 	 * 		name of the metadata document to be deleted or overwritten
 	 * @throws IllegalArgumentException
+	 * 		if expocode or metaname are invalid, or
 	 * 		if the user is not permitted to overwrite the metadata document
 	 */
-	private void verifyOkayToDelete(String username, String metadataName) 
-											throws IllegalArgumentException {
-		DashboardMetadata oldMData = getMetadataInfo(metadataName);
+	private void verifyOkayToDelete(String username, String expocode, 
+							String metaname) throws IllegalArgumentException {
+		DashboardMetadata oldMData = getMetadataInfo(expocode, metaname);
 		if ( oldMData == null )
 			return;
 		DashboardDataStore dataStore;
@@ -76,8 +108,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		String oldOwner = oldMData.getOwner();
 		if ( ! dataStore.userManagesOver(username, oldOwner) )
 			throw new IllegalArgumentException(
-					"Not permitted to update metadata document " + 
-					metadataName + " owned by " + oldOwner);
+					"Not permitted to update metadata document " + metaname + 
+					" for cruise " + expocode + " owned by " + oldOwner);
 	}
 
 	/**
@@ -106,30 +138,26 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			String owner, String uploadTimestamp, FileItem uploadFileItem) 
 											throws IllegalArgumentException {
 		// Create the metadata filename
-		String uploadFilename = uploadFileItem.getName();
-		String metadataFilename = 
-				DashboardUtils.metadataFilename(cruiseExpocode, uploadFilename);
+		String uploadFilename = DashboardUtils.baseName(uploadFileItem.getName());
+		File metadataFile = getMetadataFile(cruiseExpocode, uploadFilename);
 
-		// Create the full path name for the metadata document 
-		File metadataFile = new File(filesDir, metadataFilename.substring(0,4));
-		if ( ! metadataFile.exists() ) {
-			if ( ! metadataFile.mkdirs() )
+		// Make sure the parent directory exists 
+		File parentDir = metadataFile.getParentFile();
+		if ( ! parentDir.exists() ) {
+			if ( ! parentDir.mkdirs() )
 				throw new IllegalArgumentException(
 						"Problems creating the parent directory for " + 
-						metadataFilename);
+						metadataFile.getPath());
 		}
-		metadataFile = new File(metadataFile, metadataFilename);
 
-		// Create the appropriate check-in message
-		String message;
+		// Check if this will overwrite existing metadata
+		boolean isUpdate;
 		if ( metadataFile.exists() ) {
-			verifyOkayToDelete(owner, metadataFilename);
-			message = "Updated metadata document " + metadataFilename + 
-					" for " + owner;
+			verifyOkayToDelete(owner, cruiseExpocode, uploadFilename);
+			isUpdate = true;
 		}
 		else {
-			message = "Added metadata document " + metadataFilename + 
-					" for " + owner;
+			isUpdate = false;
 		}
 
 		// Copy the uploaded data to the metadata document
@@ -137,8 +165,19 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			uploadFileItem.write(metadataFile);
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Problems creating the new metadata document " +
-					metadataFilename + ": " + ex.getMessage());
+					"Problems creating/updating the metadata document " +
+					metadataFile.getPath() + ":\n    " + ex.getMessage());
+		}
+
+		// Create the appropriate check-in message
+		String message;
+		if ( isUpdate ) {
+			message = "Updated metadata document " + uploadFilename + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
+		}
+		else {
+			message = "Added metadata document " + uploadFilename + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 
 		// Commit the new/updated metadata document to version control
@@ -146,17 +185,26 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			commitVersion(metadataFile, message);
 		} catch ( SVNException ex ) {
 			throw new IllegalArgumentException("Problems committing " + 
-					metadataFile.getPath() + " to version control: " + 
+					metadataFile.getPath() + " to version control:\n    " + 
 					ex.getMessage());
 		}
 
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		metadata.setOwner(owner);
-		metadata.setFilename(metadataFilename);
+		metadata.setExpocode(cruiseExpocode);
+		metadata.setFilename(uploadFilename);
 		metadata.setUploadTimestamp(uploadTimestamp);
+		metadata.setOwner(owner);
 
 		// Save the metadata properties
+		if ( isUpdate ) {
+			message = "Updated properties of metadata document " + uploadFilename + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
+		}
+		else {
+			message = "Added properties of metadata document " + uploadFilename + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
+		}
 		saveMetadataInfo(metadata, message);
 
 		return metadata;
@@ -170,9 +218,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param destCruiseExpo
 	 * 		expocode of the cruise to be associated with the 
 	 * 		copy of the metadata file
-	 * @param uploadFilename
-	 * 		name of the uploaded file
-	 *  	(the user's unmodified filename)
 	 * @param srcMetadata
 	 * 		metadata document to be copied
 	 * @return
@@ -185,40 +230,33 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		destination metadata document.
 	 */
 	public DashboardMetadata copyMetadataFile(String destCruiseExpo,
-			String uploadFilename, DashboardMetadata srcMetadata) 
-									throws IllegalArgumentException {
-		// Get the source metadata document information
+			DashboardMetadata srcMetadata) throws IllegalArgumentException {
 		String owner = srcMetadata.getOwner();
-		String srcName = srcMetadata.getFilename();
-		File srcFile = new File(filesDir, srcName.substring(0, 4) + 
-								File.separator + srcName);
+		String uploadName = srcMetadata.getFilename();
+		// Get the source metadata document
+		File srcFile = getMetadataFile(srcMetadata.getExpocode(), uploadName);
 		if ( ! srcFile.exists() )
-			throw new IllegalArgumentException(
-					"Source metadata file " + srcName + " does not exist");
+			throw new IllegalArgumentException("Source metadata file " + 
+					srcFile.getPath() + " does not exist");
 
-		// Create the metadata filename
-		String destName = 
-				DashboardUtils.metadataFilename(destCruiseExpo, uploadFilename);
-		// Create the full path name for the destination metadata document 
-		File destFile = new File(filesDir, destName.substring(0,4));
-		if ( ! destFile.exists() ) {
-			if ( ! destFile.mkdirs() )
+		// Get the destination metadata document 
+		File destFile = getMetadataFile(destCruiseExpo, uploadName);
+		File parentDir = destFile.getParentFile();
+		if ( ! parentDir.exists() ) {
+			if ( ! parentDir.mkdirs() )
 				throw new IllegalArgumentException(
 						"Problems creating the parent directory for " + 
-						destName);
+						destFile.getPath());
 		}
-		destFile = new File(destFile, destName);
 
-		// Create the appropriate check-in message
-		String message;
+		// Check if this will overwrite existing metadata
+		boolean isUpdate;
 		if ( destFile.exists() ) {
-			verifyOkayToDelete(owner, destName);
-			message = "Updated metadata document " + destName + 
-					" for " + owner;
+			verifyOkayToDelete(owner, destCruiseExpo, uploadName);
+			isUpdate = true;
 		}
 		else {
-			message = "Added metadata document " + destName + 
-					" for " + owner;
+			isUpdate = false;
 		}
 
 		// Copy the metadata document
@@ -243,7 +281,20 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Problems copying the metadata document " + 
-					srcName + " to " + destName + ": " + ex.getMessage());
+					srcFile.getPath() + " to " + destFile.getPath() + 
+					":\n    " + ex.getMessage());
+		}
+
+		// Create the appropriate check-in message
+		String message;
+		if ( isUpdate ) {
+			verifyOkayToDelete(owner, destCruiseExpo, uploadName);
+			message = "Updated metadata document " + uploadName + 
+					  " for cruise " + destCruiseExpo + " and owner " + owner;
+		}
+		else {
+			message = "Added metadata document " + uploadName + 
+					  " for cruise " + destCruiseExpo + " and owner " + owner;
 		}
 
 		// Commit the new/updated metadata document to version control
@@ -251,15 +302,27 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			commitVersion(destFile, message);
 		} catch ( SVNException ex ) {
 			throw new IllegalArgumentException("Problems committing " + 
-					destFile.getPath() + " to version control: " + 
+					destFile.getPath() + " to version control:\n    " + 
 					ex.getMessage());
 		}
 		
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		metadata.setOwner(owner);
-		metadata.setFilename(destName);
+		metadata.setExpocode(destCruiseExpo);
+		metadata.setFilename(uploadName);
 		metadata.setUploadTimestamp(srcMetadata.getUploadTimestamp());
+		metadata.setOwner(owner);
+
+		// Create the appropriate check-in message
+		if ( isUpdate ) {
+			verifyOkayToDelete(owner, destCruiseExpo, uploadName);
+			message = "Updated properties of metadata document " + uploadName + 
+					  " for cruise " + destCruiseExpo + " and owner " + owner;
+		}
+		else {
+			message = "Added properties of metadata document " + uploadName + 
+					  " for cruise " + destCruiseExpo + " and owner " + owner;
+		}
 
 		// Save the metadata properties
 		saveMetadataInfo(metadata, message);
@@ -268,24 +331,31 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * @param metadataFilename
-	 * 		name of the metadata document 
-	 * 		(as returned by DashboardUtils.metadataFilename)
+	 * Generates a DashboardMetadata initialized with the contents of
+	 * the information (properties) file for the metadata.  It will not 
+	 * be "selected".
+	 * 
+	 * @param expocode
+	 * 		expocode of the cruise associated with this metadata
+	 * @param metaname
+	 * 		name of the metadata document
 	 * @return
-	 * 		DashboardMetadata assigned from the properties file for the given 
-	 * 		metadata document.  It will not be "selected".  If the properties 
-	 * 		file does not exist, null is returned.
+	 * 		DashboardMetadata assigned from the properties file for the 
+	 * 		given metadata document.  If the properties file does not 
+	 * 		exist, null is returned.
 	 * @throws IllegalArgumentException
+	 * 		if expocode or metaname is invalid, or
 	 * 		if there were problems reading from the properties file
 	 */
-	public DashboardMetadata getMetadataInfo(String metadataFilename) 
+	public DashboardMetadata getMetadataInfo(String expocode, String metaname) 
 											throws IllegalArgumentException {
+		// Get the full path filename of the metadata file
+		File metadataFile = getMetadataFile(expocode, metaname);
 		// Read the properties associated with this metadata document
 		Properties metaProps = new Properties();
 		try {
-			FileReader propsReader = new FileReader(new File(filesDir,
-					metadataFilename.substring(0,4) + File.separator + 
-					metadataFilename + METADATA_INFOFILE_SUFFIX));
+			FileReader propsReader = new FileReader(
+					new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX));
 			try {
 				metaProps.load(propsReader);
 			} finally {
@@ -299,8 +369,10 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 		// Create and assign the DashboardMetadata object to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		// Metadata document filename
-		metadata.setFilename(metadataFilename);
+		// Cruise expocode
+		metadata.setExpocode(expocode);
+		// Metadata document name
+		metadata.setFilename(metaname);
 		// Upload timestamp
 		String value = metaProps.getProperty(UPLOAD_TIMESTAMP_ID);
 		metadata.setUploadTimestamp(value);
@@ -328,12 +400,14 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 */
 	public void saveMetadataInfo(DashboardMetadata metadata, String message) 
 											throws IllegalArgumentException {
-		String propsFilename = metadata.getFilename() + METADATA_INFOFILE_SUFFIX;
+		// Get full path name of the properties file
+		File metadataFile = getMetadataFile(metadata.getExpocode(), 
+											metadata.getFilename());
+		File propsFile = new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX);
 		// Make sure the parent subdirectory exists
-		File propsFile = new File(filesDir, propsFilename.substring(0,4));
-		if ( ! propsFile.exists() )
-			propsFile.mkdirs();
-		propsFile = new File(propsFile, propsFilename);
+		File parentDir = propsFile.getParentFile();
+		if ( ! parentDir.exists() )
+			parentDir.mkdirs();
 		// Create the properties for this metadata properties file
 		Properties metaProps = new Properties();
 		// Upload timestamp
@@ -342,7 +416,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		metaProps.setProperty(METADATA_OWNER_ID, metadata.getOwner());
 		// Save the properties to the metadata properties file
 		try {
-			PrintWriter propsWriter = new PrintWriter(propsFile);
+			FileWriter propsWriter = new FileWriter(propsFile);
 			try {
 				metaProps.store(propsWriter, null);
 			} finally {
@@ -352,7 +426,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Problems writing metadata information for " + 
 					metadata.getFilename() + " to " + propsFile.getPath() + 
-					": " + ex.getMessage());
+					":\n    " + ex.getMessage());
 		}
 		
 		if ( (message == null) || message.trim().isEmpty() )
@@ -364,54 +438,53 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
 					"Problems committing updated metadata information for  " + 
-					metadata.getFilename() + ": " + ex.getMessage());
+					metadata.getFilename() + ":\n    " + ex.getMessage());
 		}
 	}
 
 	/**
-	 * Removes (deletes) a metadata document (including its properties
-	 * file), committing the change to version control.
+	 * Removes (deletes) a metadata document and its properties
+	 * file, committing the change to version control.
 	 * 
 	 * @param username
 	 * 		name of the user wanting to remove the metadata document
-	 * @param metadataName
-	 * 		filename of the metadata document to remove
-	 * 		(as returned by DashboardUtils.metadataFilename)
+	 * @param expocode
+	 * 		expocode of the cruise associated with this metadata
+	 * @param metaname
+	 * 		name of the metadata document
 	 * @throws IllegalArgumentException 
-	 * 		if the user is not permitted to delete the metadata document
+	 * 		if expocode or metaname is invalid, 
+	 * 		if the user is not permitted to delete the metadata document,
 	 * 		if there are problems deleting the document, or 
-	 * 		if either of the document files do not exist.
+	 * 		if the document or information files do not exist.
 	 */
-	public void removeMetadata(String username, String mdataName) 
-										throws IllegalArgumentException {
-		File parentDir = new File(filesDir, mdataName.substring(0, 4));
-		File mdataFile = new File(parentDir, mdataName);
-		if ( ! mdataFile.exists() ) 
-			throw new IllegalArgumentException(
-					"Metadata file " + mdataFile.getPath() + 
-					" does not exist");
-		verifyOkayToDelete(username, mdataName);
+	public void removeMetadata(String username, String expocode,
+			String metaname) throws IllegalArgumentException {
+		// Verify that the metadata document exists
+		File metadataFile = getMetadataFile(expocode, metaname);
+		if ( ! metadataFile.exists() ) 
+			throw new IllegalArgumentException("Metadata file " + 
+					metadataFile.getPath() + " does not exist");
+		// Throw an exception if not allowed to overwrite
+		verifyOkayToDelete(username, expocode, metaname);
 		try {
-			deleteVersionedFile(mdataFile, 
-					"Deleted metadata document " + mdataName);
+			deleteVersionedFile(metadataFile, 
+					"Deleted metadata document " + metadataFile.getPath());
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Unable to delete metadata file " + 
-							mdataFile.getPath());
+					"Unable to delete metadata file " + metadataFile.getPath());
 		}
-		String propsName = mdataName + METADATA_INFOFILE_SUFFIX;
-		File propsFile = new File(parentDir, propsName);
+		File propsFile = new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX);
 		if ( ! propsFile.exists() ) 
 			throw new IllegalArgumentException(
 					"Metadata properties file " + propsFile.getPath() + 
 					" does not exist");
 		try {
 			deleteVersionedFile(propsFile, 
-					"Deleted metadata properties " + propsName);
+					"Deleted metadata properties " + propsFile.getPath());
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Unable to delete metadata file " + 
-							mdataFile.getPath());
+					"Unable to delete metadata properties file " + propsFile.getPath());
 		}
 	}
 

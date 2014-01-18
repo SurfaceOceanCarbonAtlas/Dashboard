@@ -16,18 +16,20 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4803583562521926004L;
+	private static final long serialVersionUID = 7573312210271737957L;
 
 	boolean selected;
-	String filename;
-	String uploadTimestamp;
-	String owner;
+	protected String expocode;
+	protected String filename;
+	protected String uploadTimestamp;
+	protected String owner;
 
 	/**
 	 * Creates an empty metadata document record
 	 */
 	public DashboardMetadata() {
 		selected = false;
+		expocode = "";
 		filename = "";
 		uploadTimestamp = "";
 		owner = "";
@@ -47,6 +49,25 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	 */
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	/**
+	 * @return 
+	 * 		the cruise expocode; never null, but may be empty
+	 */
+	public String getExpocode() {
+		return expocode;
+	}
+
+	/**
+	 * @param expocode 
+	 * 		the cruise expocode to set; if null, an empty string is assigned
+	 */
+	public void setExpocode(String expocode) {
+		if ( expocode != null )
+			this.expocode = expocode;
+		else
+			this.expocode = "";
 	}
 
 	/**
@@ -110,6 +131,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	public int hashCode() {
 		final int prime = 37;
 		int result = Boolean.valueOf(selected).hashCode();
+		result = result * prime + expocode.hashCode();
 		result = result * prime + filename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + owner.hashCode();
@@ -129,6 +151,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 		if ( selected != other.selected )
 			return false;
+		if ( expocode != other.expocode )
+			return false;
 		if ( ! filename.equals(other.filename) )
 			return false;
 		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
@@ -142,6 +166,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	public String toString() {
 		return "DashboardMetadata" +
 				"[ selected=" + Boolean.toString(selected) + 
+				",\n  expocode=" + expocode +
 				",\n  filename=" + filename +
 				",\n  uploadTimestamp=" + uploadTimestamp +
 				",\n  owner=" + owner + 
@@ -165,6 +190,25 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 				return 1;
 			Boolean s1 = m1.isSelected();
 			return s1.compareTo(m2.isSelected());
+		}
+	};
+
+	/**
+	 * Compare using the expocode of the cruise metadata.
+	 * Note that this is inconsistent with DashboardMetadata.equals 
+	 * in that this is only examining one field of DashboardMetadata.
+	 */
+	public static Comparator<DashboardMetadata> expocodeComparator =
+			new Comparator<DashboardMetadata>() {
+		@Override
+		public int compare(DashboardMetadata m1, DashboardMetadata m2) {
+			if ( m1 == m2 )
+				return 0;
+			if ( m1 == null )
+				return -1;
+			if ( m2 == null )
+				return 1;
+			return m1.getExpocode().compareTo(m2.getExpocode());
 		}
 	};
 

@@ -149,8 +149,11 @@ public class DashboardUtils {
 	public static final ArrayList<String> XCO2_UNITS = new ArrayList<String>(Arrays.asList("umol/mol"));
 	public static final ArrayList<String> PCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
 	public static final ArrayList<String> FCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
+
 	public static final ArrayList<String> DISTANCE_UNITS = new ArrayList<String>(Arrays.asList("km"));
 	public static final ArrayList<String> SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots"));
+	public static final ArrayList<String> DAYS_UNITS = new ArrayList<String>(Arrays.asList("days"));
+	public static final ArrayList<String> HOURS_UNITS = new ArrayList<String>(Arrays.asList("hours"));
 
 	/**
 	 * SanityChecker version of the strings for above data units when not the same strings
@@ -422,34 +425,35 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * Generates the cruise-specific root filename of a metadata document.
-	 * If the the upload filename starts with the cruise expocode, the upload 
-	 * filename is just returned; otherwise the upload filename prefixed with 
-	 * the cruise expocode and an underscore is returned.
+	 * Returns the basename of a filename.  Does this by returning only the
+	 * portion of the string after the last slash or backslash character 
+	 * (either one if both present).
 	 * 
-	 * @param cruiseExpocode
-	 * 		expocode of the cruise associated with this metadata document
-	 * @param uploadName
-	 * 		user's name of the uploaded metadata document 
-	 * @return
-	 * 		cruise-specific metadata document filename
+	 * If null is given, or if the name ends in a slash or backslash, an empty 
+	 * string is returned.  Whitespace is trimmed from the returned name.
 	 */
-	public static String metadataFilename(String cruiseExpocode, String uploadName) {
-		// Get the root filename, in case a path was given
-		String rootName;
-		int idx = uploadName.lastIndexOf("/");
-		if ( idx >= 0 )
-			rootName = uploadName.substring(idx+1);
-		else
-			rootName = uploadName;
-		idx = rootName.lastIndexOf("\\");
-		if ( idx >= 0 )
-			rootName = rootName.substring(idx+1);
-		// Check if the root filename already starts with the expocode
-		if ( rootName.startsWith(cruiseExpocode) )
-			return rootName;
-		// Prefix with the cruise expocode and an underscore
-		return cruiseExpocode + "_" + rootName;
+	public static String baseName(String filename) {
+		if ( filename == null )
+			return "";
+
+		String basename = filename;
+		int idx = basename.lastIndexOf('/');
+		if ( idx >= 0 ) {
+			idx++;
+			if ( basename.length() == idx )
+				return "";
+			else
+				basename = basename.substring(idx);
+		}
+		idx = basename.lastIndexOf('\\');
+		if ( idx >= 0 ) {
+			idx++;
+			if ( basename.length() == idx )
+				return "";
+			else
+				basename = basename.substring(idx);
+		}
+		return basename.trim();
 	}
 
 	/**
