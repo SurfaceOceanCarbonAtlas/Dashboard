@@ -16,9 +16,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7573312210271737957L;
+	private static final long serialVersionUID = -2671704405016542399L;
 
-	boolean selected;
+	protected boolean selected;
 	protected String expocode;
 	protected String filename;
 	protected String uploadTimestamp;
