@@ -41,27 +41,30 @@ public class DataDateMetadataItem extends MetadataItem {
 	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
 		
 		// Get the record's date
-		int year = Integer.parseInt(record.getColumn(SocatDataRecord.YEAR_COLUMN_NAME).getValue());
-		int month = Integer.parseInt(record.getColumn(SocatDataRecord.MONTH_COLUMN_NAME).getValue());
-		int day = Integer.parseInt(record.getColumn(SocatDataRecord.DAY_COLUMN_NAME).getValue());
-		DateMidnight newDate = new DateMidnight(year, month, day);
+		if (!record.getColumn(SocatDataRecord.YEAR_COLUMN_NAME).getValue().equalsIgnoreCase("NaN")) {
 		
-		// If no date is currently set, then this record's date is be recorded
-		if (null == itsDate) {
-			itsDate = newDate;
-		} else {
+			int year = Integer.parseInt(record.getColumn(SocatDataRecord.YEAR_COLUMN_NAME).getValue());
+			int month = Integer.parseInt(record.getColumn(SocatDataRecord.MONTH_COLUMN_NAME).getValue());
+			int day = Integer.parseInt(record.getColumn(SocatDataRecord.DAY_COLUMN_NAME).getValue());
+			DateMidnight newDate = new DateMidnight(year, month, day);
 			
-			/* If we're looking for the start date, only store this date if it's before
-			   what we already have */ 
-			if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("start")) {
-				if (newDate.isBefore(itsDate)) {
-					itsDate = newDate;
-				}
-			/* If we're looking for the end date, only store this date if it's after
-			   what we already have */ 
-			} else if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("end")) {
-				if (newDate.isAfter(itsDate)) {
-					itsDate = newDate;
+			// If no date is currently set, then this record's date is be recorded
+			if (null == itsDate) {
+				itsDate = newDate;
+			} else {
+				
+				/* If we're looking for the start date, only store this date if it's before
+				   what we already have */ 
+				if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("start")) {
+					if (newDate.isBefore(itsDate)) {
+						itsDate = newDate;
+					}
+				/* If we're looking for the end date, only store this date if it's after
+				   what we already have */ 
+				} else if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("end")) {
+					if (newDate.isAfter(itsDate)) {
+						itsDate = newDate;
+					}
 				}
 			}
 		}

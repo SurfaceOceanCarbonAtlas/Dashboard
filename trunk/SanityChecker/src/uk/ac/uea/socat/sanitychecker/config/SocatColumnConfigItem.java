@@ -122,6 +122,12 @@ public class SocatColumnConfigItem {
 	public static final int BAD_FLAG = 4;
 	
 	/**
+	 * The list of date column headers. These columns will always return @code{false}
+	 * to the @code{isRequired()} function
+	 */
+	private static final String DATE_COLUMN_NAMES[] = {"yr", "mon", "day", "hh", "mm", "ss", "iso_date"};
+	
+	/**
 	 * The name of the SOCAT column
 	 */
 	private String itsName;
@@ -240,7 +246,6 @@ public class SocatColumnConfigItem {
 	public SocatColumnConfigItem(String name, int index, boolean isRequired, String requiredGroup, int dataSource, String metadataName, DataCalculator calculatorObject, Method calculatorMethod, boolean isNumeric, boolean hasQuestionableRange, double questionableRangeMin, double questionableRangeMax, boolean hasBadRange, double badRangeMin, double badRangeMax, int flagType, int missingFlag) {
 		itsName = name;
 		itsIndex = index;
-		itIsRequired = isRequired;
 		itsRequiredGroup = requiredGroup;
 		if (!CheckerUtils.isEmpty(requiredGroup)) {
 			itIsRequired = true;
@@ -260,6 +265,21 @@ public class SocatColumnConfigItem {
 		itsBadRangeMax = badRangeMax;
 		itsFlagType = flagType;
 		itsMissingFlag = missingFlag;
+		
+		itIsRequired = isRequired;
+		
+		/*
+		 * The date columns are never flagged as required here, because
+		 * they are handled as a special case.
+		 */
+		if (itIsRequired) {
+			for (int i = 0; i < DATE_COLUMN_NAMES.length && itIsRequired; i++) {
+				if (itsName.equalsIgnoreCase(DATE_COLUMN_NAMES[i])) {
+					itIsRequired = false;
+				}
+			}
+		}
+
 	}
 	
 	/**
