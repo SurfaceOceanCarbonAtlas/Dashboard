@@ -6,12 +6,15 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
@@ -21,7 +24,7 @@ import org.jdom2.input.SAXBuilder;
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 8817540931987107642L;
+	private static final long serialVersionUID = 4504357041667329566L;
 
 	// The following come from the OME metadata 
 	String cruiseName;
@@ -391,6 +394,112 @@ public class OmeMetadata extends DashboardMetadata {
 				else 
 					origDataRef += "/" + name;
 			}
+		}
+	}
+
+	/**
+	 * Generated an pseudo-OME XML document that contains the contents
+	 * of the fields read by {@link #assignFromOmeXmlDoc(Document)}.
+	 * Fields not read by that methos are not saved in the document
+	 * produced by this method.
+	 * <b>
+	 * This is intended to be used only for generating pseudo-OME XML 
+	 * metadata documents from Benjamin's metadata spreadsheet TSV table. 
+	 * </b>
+	 * @return
+	 * 		the generated pseudo-OME XML document
+	 */
+	public Document createMinimalOmeXmlDoc() {
+		// expocode goes in <Cruise_Info><Experiment><Cruise><Cruise_ID>
+		Element cruiseIdElem = new Element("Cruise_ID");
+		cruiseIdElem.setText(expocode);
+		Element cruiseElem = new Element("Cruise");
+		cruiseElem.addContent(cruiseIdElem);
+
+		Element experimentElem = new Element("Experiment");
+		experimentElem.addContent(cruiseElem);
+
+		// cruiseName goes in <Cruise_Info><Experiment><Experiment_Name>
+		Element experimentNameElem = new Element("Experiment_Name");
+		experimentNameElem.setText(cruiseName);
+
+		experimentElem.addContent(experimentNameElem);
+
+		Element cruiseInfoElem = new Element("Cruise_Info");
+		cruiseInfoElem.addContent(experimentElem);
+
+		// vesselName goes in <Cruise_Info><Vessel><Vessel_Name>
+		Element vesselNameElem = new Element("Vessel_Name");
+		vesselNameElem.setText(vesselName);
+		Element vesselElem = new Element("Vessel");
+		vesselElem.addContent(vesselNameElem);
+
+		cruiseInfoElem.addContent(vesselElem);
+
+		Element rootElem = new Element("x_tags");
+		rootElem.addContent(cruiseInfoElem);
+
+		// names in scienceGroup go in separate <Investigator><Name>
+		String[] piNames = scienceGroup.split("; ");
+		for ( String name : piNames ) {
+			Element nameElem = new Element("Name");
+			nameElem.setText(name);
+			Element investigatorElem = new Element("Investigator");
+			investigatorElem.addContent(nameElem);
+
+			rootElem.addContent(investigatorElem);
+		}
+
+		// Put origDataRef, if there is one, in <Data_Link><URL>
+		if ( ! origDataRef.isEmpty() ) {
+			Element urlElem = new Element("URL");
+			urlElem.setText(origDataRef);
+			Element dataLinkElem = new Element("Data_Link");
+			dataLinkElem.addContent(urlElem);
+
+			rootElem.addContent(dataLinkElem);
+		}
+
+		// Return the document created from the root element
+		return new Document(rootElem);
+	}
+
+	/**
+	 * Save the pseudo-OME XML document (created by 
+	 * {@link #createMinimalOmeXmlDoc()}) as the document file for this 
+	 * metadata.  The parent directory for this file is expected to exist 
+	 * and this will overwrite any existing metadata file.
+	 * <b>
+	 * This is intended to be used only for generating pseudo-OME XML 
+	 * metadata documents from Benjamin's metadata spreadsheet TSV table. 
+	 * </b>
+	 * @throws IOException
+	 * 		if opening for writing, or writing to, the metadata document 
+	 * 		file generates one
+	 * @throws IllegalArgumentException
+	 * 		if the expocode or uploadFilename in this object is invalid
+	 */
+	public void saveAsMinimalOmeXmlDoc() 
+							throws IOException, IllegalArgumentException {
+		// Get the metadata document file
+		MetadataFileHandler mdataHandler;
+		try {
+			mdataHandler = DashboardDataStore.get().getMetadataFileHandler();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the metadata handler");
+		}
+		File mdataFile = mdataHandler.getMetadataFile(expocode, filename);
+
+		// Generate the pseudo-OME XML document
+		Document omeDoc = createMinimalOmeXmlDoc();
+
+		// Save the XML document to the metadata document file
+		FileOutputStream out = new FileOutputStream(mdataFile);
+		try {
+			(new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, out);
+		} finally {
+			out.close();
 		}
 	}
 
