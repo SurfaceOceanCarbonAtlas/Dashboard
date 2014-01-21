@@ -188,9 +188,13 @@ public class SocatColumnConfig {
 			try {
 				String line = reader.readLine();
 				int lineCount = 1;
+				int entryCount = 0;
 
+				
+				
 				while (null != line) {
 					if (!CheckerUtils.isComment(line)) {
+						entryCount++;
 						List<String> fields = Arrays.asList(line.split(","));
 						fields = CheckerUtils.trimList(fields);
 
@@ -310,7 +314,7 @@ public class SocatColumnConfig {
 							}
 						}
 
-						SocatColumnConfigItem configItem = new SocatColumnConfigItem(columnName, lineCount, required, requiredGroup, dataSource, metadataName, calculatorObject, calculatorMethod, isNumeric, hasQuestionableRange, questionableRangeMin, questionableRangeMax, hasBadRange, badRangeMin, badRangeMax, flagType, missingFlag);
+						SocatColumnConfigItem configItem = new SocatColumnConfigItem(columnName, entryCount, required, requiredGroup, dataSource, metadataName, calculatorObject, calculatorMethod, isNumeric, hasQuestionableRange, questionableRangeMin, questionableRangeMax, hasBadRange, badRangeMin, badRangeMax, flagType, missingFlag);
 						itsColumns.add(columnName);
 						itsColumnConfig.put(columnName, configItem);
 					}
