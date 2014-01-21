@@ -203,7 +203,7 @@ public class DateTimeHandler {
 		}
 
 		if (null == parsedDateTime) {
-			throw new DateTimeParseException("Unable to parse date-time string '" + dateTime + "': It's not in a supported format");
+			throw new DateTimeParseException("Unable to parse date-time string '" + dateTime + "': It is not in a supported format");
 		}
 		
 		return parsedDateTime;

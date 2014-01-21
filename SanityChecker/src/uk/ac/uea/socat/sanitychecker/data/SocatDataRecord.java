@@ -141,9 +141,6 @@ public class SocatDataRecord {
 		
 		// Run methods to populate columns from calculations
 		setCalculatedValues(metadata, dateTimeHandler);
-		
-		// Add the list of messages to the output
-		output.addDataMessages(itsMessages);
 	}
 
 	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException {
@@ -166,7 +163,8 @@ public class SocatDataRecord {
 			itsMessages.add(new DataMessage(DataMessage.ERROR, itsLineNumber, -1, "", e.getMessage()));
 			
 			try {
-				setDateFlags(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsLineNumber, "Missing date element");
+				// Date errors will always set cascade flags
+				setCascadeFlags(SocatColumnConfigItem.BAD_FLAG);
 			} catch(SocatDataBaseException e2) {
 				throw new SocatDataException(itsLineNumber, -1, "Date", e2);
 			}
@@ -310,23 +308,6 @@ public class SocatDataRecord {
 				column.setCascadeFlag(flag);
 			}
 		}
-	}
-	
-	/**
-	 * Set a flag for all date fields
-	 * @param flag The flag value
-	 * @throws SocatDataBaseException If the flag cannot be set
-	 */
-	private void setDateFlags(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
-		setFlag(YEAR_COLUMN_NAME, flag, messages, record, message);
-		setFlag(MONTH_COLUMN_NAME, flag, messages, record, message);
-		setFlag(DAY_COLUMN_NAME, flag, messages, record, message);
-		setFlag(HOUR_COLUMN_NAME, flag, messages, record, message);
-		setFlag(MINUTE_COLUMN_NAME, flag, messages, record, message);
-		setFlag(SECOND_COLUMN_NAME, flag, messages, record, message);
-		
-		// Date flags are always cascade flags.
-		setCascadeFlags(flag);
 	}
 	
 	/**
