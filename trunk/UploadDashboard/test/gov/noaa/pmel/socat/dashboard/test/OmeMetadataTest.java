@@ -533,4 +533,38 @@ public class OmeMetadataTest {
 		assertEquals("", mdata.getCruiseFlag());
 	}
 
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#createMinimalOmeXmlDoc()}.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testCreateMinimalOmeXmlDoc() throws IOException {
+		final String[] actualMetadataHeaders = {
+				"Cruise Label", "ship/platform", "PI", "PI_2", "PI_3", "metadata_hyperlink", 
+				"Metadata_hyperlink_2", "Metadata_hyperlink_3", "doi", "Expocode created", 
+				"# Samples", "Station IDs", "Longitude Range", "Latitude Range", "Time Period"
+			};
+
+			final String actualMetadataString = "AR2007_09\tAlbert Rickmers\t" + 
+				"Richard Feely\tNaN\tNaN\thttp://www.socat.info/metadata/AR2007_10_Readme.doc\t" +
+				"NaN\tNaN\t10.3334/CDIAC/otg.VOS_Albert_Rickmers_2007\t54WA20060923\t7496\t" + 
+				"2165109 ~ 2172604\t175�E ~ 240.1�E\t36.1�S ~ 30.8�N\tSep 2006 ~ 04 Oct 2006";
+
+			final String uploadTimestamp = "2012-04-23 11:24 -0800";
+
+			OmeMetadata mdata = new OmeMetadata(actualMetadataHeaders, actualMetadataString, uploadTimestamp);
+			Document minOmeDoc = mdata.createMinimalOmeXmlDoc();
+
+			OmeMetadata other = new OmeMetadata();
+			other.setExpocode(mdata.getExpocode());
+			other.setFilename(mdata.getFilename());
+			other.setUploadTimestamp(uploadTimestamp);
+			other.assignFromOmeXmlDoc(minOmeDoc);
+
+			// Does not save the metadata http references
+			other.setMetadataHRef(mdata.getMetadataHRef());
+
+			assertEquals(mdata, other);
+	}
+	
 }
