@@ -14,8 +14,10 @@ public class DataMessage extends MetadataMessage {
 
 	public String toString() {
 		StringBuffer output = new StringBuffer(super.toString());
-
-		output.append("  Column index " + itsColumnIndex + ", name '" + itsColumnName + "'");
+		
+		if (itsColumnIndex >= 0) {
+			output.append("  Column index " + itsColumnIndex + ", name '" + itsColumnName + "'");
+		}
 
 		return output.toString();
 	}
