@@ -162,9 +162,6 @@ public class SocatDataRecord {
 			setFieldValue(SECOND_COLUMN_NAME, String.valueOf(second));
 			
 			setFieldValue(ISO_DATE_COLUMN_NAME, dateTimeHandler.formatDateTime(parsedDateTime));
-			
-			System.out.println(second);
-			System.out.println(dateTimeHandler.formatDateTime(parsedDateTime));
 		} catch (MissingDateTimeElementException e) {
 			itsMessages.add(new Message(Message.ERROR, itsLineNumber, -1, "", e.getMessage()));
 			
