@@ -51,7 +51,7 @@ public class DateTimeHandler {
 	/**
 	 * The output format for dates and times
 	 */
-	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYYMMddHHmmss";
+	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYYMMddHHmmss.SSS";
 	
 	/**
 	 * The formatter used to parse dates from input data and metadata
@@ -83,9 +83,9 @@ public class DateTimeHandler {
 		itsDateOnlyFormatter = DateTimeFormat.forPattern(adjustedDateString);
 		
 		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(5);
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + "HHmmss.SSS").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss.S").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
 		

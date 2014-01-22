@@ -156,9 +156,15 @@ public class SocatDataRecord {
 			setFieldValue(DAY_COLUMN_NAME, String.valueOf(parsedDateTime.getDayOfMonth()));
 			setFieldValue(HOUR_COLUMN_NAME, String.valueOf(parsedDateTime.getHourOfDay()));
 			setFieldValue(MINUTE_COLUMN_NAME, String.valueOf(parsedDateTime.getMinuteOfHour()));
-			setFieldValue(SECOND_COLUMN_NAME, String.valueOf(parsedDateTime.getSecondOfMinute()));
+			
+			double second = (double) parsedDateTime.getSecondOfMinute();
+			second = second + (((double) parsedDateTime.getMillisOfSecond()) / 1000);
+			setFieldValue(SECOND_COLUMN_NAME, String.valueOf(second));
 			
 			setFieldValue(ISO_DATE_COLUMN_NAME, dateTimeHandler.formatDateTime(parsedDateTime));
+			
+			System.out.println(second);
+			System.out.println(dateTimeHandler.formatDateTime(parsedDateTime));
 		} catch (MissingDateTimeElementException e) {
 			itsMessages.add(new Message(Message.ERROR, itsLineNumber, -1, "", e.getMessage()));
 			
@@ -170,7 +176,7 @@ public class SocatDataRecord {
 			}
 			
 		} catch (DateTimeParseException e) {
-			itsMessages.add(new Message(Message.ERROR, itsLineNumber, -1, "", e.getMessage()));
+			itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", e.getMessage()));
 		} catch (DateTimeException e) {
 			throw new SocatDataException(itsLineNumber, -1, "Date", e);
 		}

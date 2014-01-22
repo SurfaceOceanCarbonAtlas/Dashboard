@@ -192,9 +192,13 @@ public class DateColumnInfo {
 					int day = Integer.parseInt(dayString);
 					int hour = Integer.parseInt(hourString);
 					int minute = Integer.parseInt(minuteString);
-					int second = (int) Math.round(Double.parseDouble(secondString));
+					
+					double second = Double.parseDouble(secondString);
+					int wholeSecond = (int) Math.floor(second);
+					int millisecond = (int) Math.floor((second - wholeSecond) * 1000);
+					
 				
-					result = new DateTime(year, month, day, hour, minute, second);
+					result = new DateTime(year, month, day, hour, minute, wholeSecond, millisecond);
 				} catch (Exception e) {
 					throw new DateTimeParseException(e);
 				}
