@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Properties;
 import java.util.ArrayList;
 
@@ -146,8 +147,8 @@ public class SanityCheckerRun {
 				
 				Messages messages = checkerOutput.getMessages();
 				if (messages != null) {
-					System.out.println("Metadata messages: " + messages.getMetadataErrorCount() + " errors, " + messages.getMetadataWarningCount() + " warnings");
-					System.out.println("Data messages: " + messages.getDataErrorCount() + " errors, " + messages.getDataWarningCount() + " warnings");
+					System.out.println("Metadata messages: " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.WARNING) + " warnings");
+					System.out.println("Data messages: " + messages.getMessageCount(Message.DATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.DATA_MESSAGE, Message.WARNING) + " warnings");
 				
 					// Write complete messages to file
 					try {
@@ -170,10 +171,16 @@ public class SanityCheckerRun {
 		PrintWriter writer = new PrintWriter(new File(itsOutputDir, messagesFilename));
 		writer.println("METADATA MESSAGES");
 		writer.println("=================");
-		writer.print(messages.getMetadataMessageStrings());
+		List<Message> metadataMessages = messages.getMessagesByType(Message.METADATA_MESSAGE);
+		for (Message message: metadataMessages) {
+			writer.println(message.toString());
+		}
 		writer.println("\nDATA MESSAGES");
 		writer.println("=============");
-		writer.print(messages.getDataMessageStrings());
+		List<Message> dataMessages = messages.getMessagesByType(Message.DATA_MESSAGE);
+		for (Message message: dataMessages) {
+			writer.println(message.toString());
+		}
 		writer.close();
 	}
 	

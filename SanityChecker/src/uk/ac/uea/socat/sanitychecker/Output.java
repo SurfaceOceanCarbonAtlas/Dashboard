@@ -193,28 +193,19 @@ public class Output {
 	 * Add a data message to the output
 	 * @param message The message
 	 */
-	public void addDataMessage(DataMessage message) {
-		itsMessages.addDataMessage(message);
+	public void addMessage(Message message) {
+		itsMessages.addMessage(message);
 		setExitFlag(message);
 	}
 	
-	public void addDataMessages(List<DataMessage> messages) {
-		itsMessages.addDataMessages(messages);
-		for (MetadataMessage message: messages) {
+	public void addDataMessages(List<Message> messages) {
+		itsMessages.addMessages(messages);
+		for (Message message: messages) {
 			setExitFlag(message);
 		}
 	}
 
-	/**
-	 * Add a metadata message to the output
-	 * @param message The message
-	 */
-	public void addMetadataMessage(MetadataMessage message) {
-		itsMessages.addMetadataMessage(message);
-		setExitFlag(message);
-	}
-	
-	private void setExitFlag(MetadataMessage message) {
+	private void setExitFlag(Message message) {
 		if (message.isError()) {
 			setExitFlag(ERRORS_FLAG);
 		} else if (message.isWarning()) {

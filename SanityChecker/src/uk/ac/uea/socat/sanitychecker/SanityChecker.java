@@ -190,21 +190,23 @@ public class SanityChecker {
 				
 				// Generate metadata from data
 				generateMetadataFromData();
-
 			}
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
-			DataMessage message = new DataMessage(MetadataMessage.ERROR, itsRecordCount, -1, "", "Unhandled exception encountered");
+			Message message = new Message(Message.DATA_MESSAGE, Message.ERROR, itsRecordCount, "Unhandled exception encountered");
 			message.addProperty("Error", e.getMessage());
 			
-			itsOutput.addDataMessage(message);
+			itsOutput.addMessage(message);
 			itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
 			itsOutput.clear(true);
 		}
 
 		return itsOutput;
 	}
+
+	
+	
 
 	/**
 	 * Generates a MetadataItem object for a given piece of metadata
@@ -342,7 +344,7 @@ public class SanityChecker {
 		 */
 		
 		// A store for any generated messages
-		List<DataMessage> messages = new ArrayList<DataMessage>();
+		List<Message> messages = new ArrayList<Message>();
 		
 		for (String columnName : SocatColumnConfig.getInstance().getColumnList()) {
 			SocatColumnConfigItem columnConfig = SocatColumnConfig.getInstance().getColumnConfig(columnName);
@@ -358,15 +360,13 @@ public class SanityChecker {
 						
 						// Check the Required Group
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
-							String message = "Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'";
-							itsLogger.trace(message);
-							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, message);
+							itsLogger.trace("Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'");
+							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
 						} else {
 							List<String> requiredGroupValues = record.getRequiredGroupValues(columnConfig.getRequiredGroup());
 							if (CheckerUtils.isEmpty(requiredGroupValues)) {
-								String message = "Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'";
-								itsLogger.trace(message);
-								column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, message);
+								itsLogger.trace("Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'");
+								column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
 							}
 						}
 					}
@@ -374,16 +374,15 @@ public class SanityChecker {
 					
 					// If it's supposed to be numeric and isn't, this is always bad!
 					if (!CheckerUtils.isNumeric(column.getValue())) {
-						String message = "Non-parseable numeric value on line " + record.getLineNumber() + ", column '" + columnName + "'";
-						itsLogger.trace(message);
-						column.setFlag(SocatColumnConfigItem.BAD_FLAG, messages, currentRecord, message);
+						itsLogger.trace("Non-parseable numeric value on line " + record.getLineNumber() + ", column '" + columnName + "'");
+						column.setFlag(SocatColumnConfigItem.BAD_FLAG, messages, currentRecord, "Non-numeric value");
 					} else {
 						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
 
 						if (SocatColumnConfigItem.GOOD_FLAG != rangeCheckFlag) {
 							String message = "Value is out of range on line " + record.getLineNumber() + ", column '" + columnName + "'";
 							itsLogger.trace(message);
-							column.setFlag(rangeCheckFlag, messages, currentRecord, message);
+							column.setFlag(rangeCheckFlag, messages, currentRecord, "Value out of range");
 						}
 					}
 				}
@@ -406,9 +405,9 @@ public class SanityChecker {
 			if (null == config) {
 				itsLogger.trace("Unrecognised metadata item '" + name);
 				
-				MetadataMessage message = new MetadataMessage(MetadataMessage.WARNING, -1, name, "Unrecognised metadata item");
+				Message message = new Message(Message.METADATA_MESSAGE, Message.WARNING, -1, "Unrecognised metadata item");
 				itsOutput.setExitFlag(Output.WARNINGS_FLAG);
-				itsOutput.addMetadataMessage(message);
+				itsOutput.addMessage(message);
 				itsLogger.warn("Unrecognised metadata item " + name);
 			} else {
 				itsLogger.trace("Metadata item: " + name + " = " + value);
@@ -417,9 +416,9 @@ public class SanityChecker {
 					itsOutput.addMetadataItem(createMetadataItem(name, value, -1));					
 				} catch (Exception e) {
 					if (e.getCause() instanceof DateTimeException) {
-						MetadataMessage message = new MetadataMessage(MetadataMessage.ERROR, -1, name, "Invalid date format");
+						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, name, "Invalid date format");
 						itsOutput.setExitFlag(Output.ERRORS_FLAG);
-						itsOutput.addMetadataMessage(message);
+						itsOutput.addMessage(message);
 						itsLogger.error("Invalid date format for metadata item " + name);
 					} else {
 						// Other exceptions are internal Java issues from Reflection. There's not much
@@ -454,24 +453,14 @@ public class SanityChecker {
 		// The severity of any validation failure is determined by the validation method.
 		for (String metadataName : metadata.keySet()) {
 			MetadataItem value = metadata.get(metadataName);
-			MetadataMessage validateResult = value.validate(itsLogger);
+			Message validateResult = value.validate(itsLogger);
 
 			if (validateResult != null) {
-				switch (validateResult.getSeverity()) {
-				case MetadataMessage.WARNING:
-				{
-					itsOutput.setExitFlag(Output.WARNINGS_FLAG);
-					break;
-				}
-				case MetadataMessage.ERROR:
-				{
-					itsOutput.setExitFlag(Output.ERRORS_FLAG);
+				if (validateResult.getSeverity() == Message.ERROR) {
 					validatedOK = false;
-					break;
-				}
 				}
 				
-				itsOutput.addMetadataMessage(validateResult);
+				itsOutput.addMessage(validateResult);
 			}
 		}
 		return validatedOK;
@@ -498,8 +487,8 @@ public class SanityChecker {
 						ok = false;
 						itsOutput.setExitFlag(Output.ERRORS_FLAG);
 
-						MetadataMessage message = new MetadataMessage(MetadataMessage.ERROR, -1, metadataName, "Required metadata value is missng");
-						itsOutput.addMetadataMessage(message);
+						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, metadataName, "Required metadata value is missng");
+						itsOutput.addMessage(message);
 					}
 				}
 			}
@@ -533,8 +522,8 @@ public class SanityChecker {
 				itsOutput.setExitFlag(Output.ERRORS_FLAG);
 				ok = false;
 				
-				MetadataMessage message = new MetadataMessage(MetadataMessage.ERROR, -1, groupedItemNames.toString(), "At least one of these metadata items must be present");
-				itsOutput.addMetadataMessage(message);
+				Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, groupedItemNames.toString(), "At least one of these metadata items must be present");
+				itsOutput.addMessage(message);
 			}
 		}
 		return ok;

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.joda.time.DateMidnight;
 
-import uk.ac.uea.socat.sanitychecker.MetadataMessage;
+import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -180,8 +180,8 @@ public abstract class MetadataItem {
 	 * @param logger A logger to send messages to.
 	 * @return A message for the Sanity Checker's output. If the message is {@code null}, this indicates that validation was successful.
 	 */
-	public MetadataMessage validate(Logger logger) {
-		MetadataMessage result = null;
+	public Message validate(Logger logger) {
+		Message result = null;
 		
 		// No validation is performed on strings
 		switch (itsConfigItem.getType()) {
@@ -209,9 +209,9 @@ public abstract class MetadataItem {
 					result = null;
 				} else {
 					logger.warn("Metadata value '" + itsConfigItem.getName() + "' is out of range");
-					result = new MetadataMessage(MetadataMessage.WARNING, itsLine, itsConfigItem.getName(), "Value is out of range");
-					result.addProperty(MetadataMessage.MIN_PROPERTY, "" + itsConfigItem.getRange().getIntMin());
-					result.addProperty(MetadataMessage.MAX_PROPERTY, "" + itsConfigItem.getRange().getIntMax());
+					result = new Message(Message.METADATA_MESSAGE, Message.WARNING, itsLine, itsConfigItem.getName(), "Value is out of range");
+					result.addProperty(Message.MIN_PROPERTY, "" + itsConfigItem.getRange().getIntMin());
+					result.addProperty(Message.MAX_PROPERTY, "" + itsConfigItem.getRange().getIntMax());
 				}
 			}
 			
@@ -231,9 +231,9 @@ public abstract class MetadataItem {
 					result = null;
 				} else {
 					logger.warn("Metadata value '" + itsConfigItem.getName() + "' is out of range");
-					result = new MetadataMessage(MetadataMessage.WARNING, itsLine, itsConfigItem.getName(), "Value is out of range");
-					result.addProperty(MetadataMessage.MIN_PROPERTY, "" + itsConfigItem.getRange().getRealMin());
-					result.addProperty(MetadataMessage.MAX_PROPERTY, "" + itsConfigItem.getRange().getRealMax());
+					result = new Message(Message.METADATA_MESSAGE, Message.WARNING, itsLine, itsConfigItem.getName(), "Value is out of range");
+					result.addProperty(Message.MIN_PROPERTY, "" + itsConfigItem.getRange().getRealMin());
+					result.addProperty(Message.MAX_PROPERTY, "" + itsConfigItem.getRange().getRealMax());
 				}
 			}
 			
