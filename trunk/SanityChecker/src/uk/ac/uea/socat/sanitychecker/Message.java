@@ -3,11 +3,12 @@ package uk.ac.uea.socat.sanitychecker;
 import java.util.Enumeration;
 import java.util.Properties;
 
-/**
- * Holds all the details of a message raised regarding a metadata line
- */
-public class MetadataMessage {
+public class Message {
+
+	public static final int DATA_MESSAGE = 1;
 	
+	public static final int METADATA_MESSAGE = 2;
+
 	public static final int WARNING = 0;
 	
 	public static final int ERROR = 1;
@@ -18,6 +19,8 @@ public class MetadataMessage {
 	
 	public static final String MAX_PROPERTY = "max";
 	
+	protected int itsMessageType;
+	
 	protected int itsLine;
 	
 	private int itsSeverity;
@@ -25,20 +28,43 @@ public class MetadataMessage {
 	protected String itsMessage;
 	
 	private Properties itsProperties;
+
 	
-	public MetadataMessage(int severity, int line, String message) {
+	private int itsItemIndex;
+	
+	private String itsItemName;
+	
+	public Message(int type, int severity, int line, String message) {
+		itsMessageType = type;
 		itsSeverity = severity;
 		itsLine = line;
 		itsMessage = message;
 		itsProperties = new Properties();
+		
+		itsItemIndex = -1;
+		itsItemName = null;
 	}
 	
-	public MetadataMessage(int severity, int line, String itemName, String message) {
+	public Message(int type, int severity, int line, int itemIndex, String itemName, String message) {
+		itsMessageType = type;
 		itsSeverity = severity;
 		itsLine = line;
 		itsMessage = message;
 		itsProperties = new Properties();
-		itsProperties.setProperty(NAME_PROPERTY, itemName);
+		
+		itsItemIndex = itemIndex;
+		itsItemName = itemName;
+	}
+	
+	public Message(int type, int severity, int line, String name, String message) {
+		itsMessageType = type;
+		itsSeverity = severity;
+		itsLine = line;
+		itsMessage = message;
+		itsProperties = new Properties();
+		
+		itsItemIndex = -1;
+		itsItemName = name;
 	}
 	
 	public void addProperty(String name, String value) {
@@ -56,6 +82,10 @@ public class MetadataMessage {
 	public boolean isWarning() {
 		return itsSeverity == WARNING;
 	}
+
+	public int getMessageType() {
+		return itsMessageType;
+	}
 	
 	public String toString() {
 		StringBuffer output = new StringBuffer();
@@ -67,10 +97,16 @@ public class MetadataMessage {
 		}
 		
 		if (itsLine != -1) {
-			output.append("LINE " + itsLine + ": ");
+			output.append("LINE " + itsLine + ":");
 		}
 
-		output.append(itsMessage);
+		if (itsItemIndex >= 0) {
+			output.append(" ITEM " + itsItemIndex + " ('" + itsItemName + "')");
+		} else if (null != itsItemName) {
+			output.append(" ITEM '" + itsItemName + "'");
+		}
+
+		output.append(": " + itsMessage);
 		
 		if (itsProperties.size() > 0) {
 			output.append("\n");
@@ -82,5 +118,9 @@ public class MetadataMessage {
 		}
 
 		return output.toString();
+	}
+	
+	public String getProperty(String name) {
+		return itsProperties.getProperty(name);
 	}
 }

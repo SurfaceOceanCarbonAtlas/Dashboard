@@ -11,57 +11,21 @@ public class Messages {
 	/**
 	 * A list of all the metadata messages generated during processing 
 	 */
-	private List<MetadataMessage> itsMetadataMessages;
-	
-	/**
-	 * A list of all the data messages generated during processing 
-	 */
-	private List<DataMessage> itsDataMessages;
-	
-	/**
-	 * The number of metadata errors
-	 */
-	private int itsMetadataErrorCount = 0;
-	
-	/**
-	 * The number of metadata warnings
-	 */
-	private int itsMetadataWarningCount = 0;
-	
-	/**
-	 * The number of data errors
-	 */
-	private int itsDataErrorCount = 0;
-	
-	/**
-	 * The number of data warnings
-	 */
-	private int itsDataWarningCount = 0;
+	private List<Message> itsMessages;
 	
 	/**
 	 * Simple constructor - initialises an empty output object
 	 */
 	protected Messages() {
-		itsMetadataMessages = new ArrayList<MetadataMessage>();
-		itsDataMessages = new ArrayList<DataMessage>();
+		itsMessages = new ArrayList<Message>();
 	}
 	
 	/**
-	 * Add a metadata message to the output
+	 * Add a message to the output
 	 * @param message The message
 	 */
-	protected void addMetadataMessage(MetadataMessage message) {
-		itsMetadataMessages.add(message);
-		addToCount(message);
-	}
-	
-	/**
-	 * Add a data message to the output
-	 * @param message The message
-	 */
-	protected void addDataMessage(DataMessage message) {
-		itsDataMessages.add(message);
-		addToCount(message);
+	protected void addMessage(Message message) {
+		itsMessages.add(message);
 	}
 	
 	/**
@@ -73,85 +37,66 @@ public class Messages {
 	}
 
 	/**
-	 * Add a set of data messages to the output
+	 * Add a set of messages
 	 * @param messages The set of messages to be added
 	 */
-	protected void addDataMessages(List<DataMessage> messages) {
-		itsDataMessages.addAll(messages);
-		for (DataMessage message : messages) {
-			addToCount(message);
-		}
+	protected void addMessages(List<Message> messages) {
+		itsMessages.addAll(messages);
 	}
 	
-	/**
-	 * Update the relevant message count based on a given message
-	 * @param message The message to be added to the count
-	 */
-	private void addToCount(MetadataMessage message) {
+	public List<Message> getMessages() {
+		return itsMessages;
+	}
+	
+	public List<Message> getMessages(int type, int severity) {
+		List<Message> result = new ArrayList<Message>();
 		
-		if (message instanceof DataMessage) {
-			if (message.isWarning()) {
-				itsDataWarningCount++;
-			} else if (message.isError()) {
-				itsDataErrorCount++;
-			}
-		} else {
-			if (message.isWarning()) {
-				itsMetadataWarningCount++;
-			} else if (message.isError()) {
-				itsMetadataErrorCount++;
+		for (Message message: itsMessages) {
+			if (message.getMessageType() == type && message.getSeverity() == severity) {
+				result.add(message);
 			}
 		}
-	}
-	
-	public int getMetadataErrorCount() {
-		return itsMetadataErrorCount;
-	}
-	
-	public int getMetadataWarningCount() {
-		return itsMetadataWarningCount;
-	}
-	
-	public int getDataErrorCount() {
-		return itsDataErrorCount;
-	}
-	
-	public int getDataWarningCount() {
-		return itsDataWarningCount;
-	}
-	
-	/**
-	 * Returns a string containing all metadata messages.
-	 * This is a temporary method to be replaced by XML output,
-	 * which can be formatted using XSLT
-	 * 
-	 * @return
-	 */
-	public String getMetadataMessageStrings() {
-		StringBuffer output = new StringBuffer();
 		
-		for (MetadataMessage message: itsMetadataMessages) {
-			output.append(message + "\n");
+		return result;
+	}
+	
+	public List<Message> getMessagesByType(int type) {
+		List<Message> result = new ArrayList<Message>();
+		
+		for (Message message: itsMessages) {
+			if (message.getMessageType() == type) {
+				result.add(message);
+			}
 		}
 		
-		return output.toString();
+		return result;
 	}
 	
-	
-	/**
-	 * Returns a string containing all metadata messages.
-	 * This is a temporary method to be replaced by XML output,
-	 * which can be formatted using XSLT
-	 * 
-	 * @return
-	 */
-	public String getDataMessageStrings() {
-		StringBuffer output = new StringBuffer();
+	public List<Message> getMessagesBySeverity(int severity) {
+		List<Message> result = new ArrayList<Message>();
 		
-		for (MetadataMessage message: itsDataMessages) {
-			output.append(message + "\n");
+		for (Message message: itsMessages) {
+			if (message.getSeverity() == severity) {
+				result.add(message);
+			}
 		}
 		
-		return output.toString();
+		return result;
+	}
+	
+	public int getMessageCount() {
+		return itsMessages.size();
+	}
+	
+	public int getMessageCount(int type, int severity) {
+		return getMessages(type, severity).size();
+	}
+
+	public int getMessageCountByType(int type) {
+		return getMessagesByType(type).size();
+	}
+	
+	public int getMessageCountBySeverity(int severity) {
+		return getMessagesBySeverity(severity).size();
 	}
 }

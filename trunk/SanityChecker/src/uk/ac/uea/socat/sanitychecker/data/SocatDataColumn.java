@@ -4,8 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
-import uk.ac.uea.socat.sanitychecker.DataMessage;
-import uk.ac.uea.socat.sanitychecker.MetadataMessage;
+import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
@@ -54,7 +53,7 @@ public class SocatDataColumn {
 	 * @param message The message text
 	 * @throws SocatDataBaseException If the field doesn't have a flag.
 	 */
-	public void setFlag(int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
+	public void setFlag(int flag, List<Message> messages, int record, String message) throws SocatDataBaseException {
 		if (itsConfig.hasFlag()) {
 			
 			// The flag codes are set up so worse flags are greater than weaker flags.
@@ -64,12 +63,12 @@ public class SocatDataColumn {
 
 				// Add a message to the output regarding the flag
 				if (itsFlag != SocatColumnConfigItem.NO_FLAG) {
-					int severity = MetadataMessage.WARNING;
+					int severity = Message.WARNING;
 					if (flag == SocatColumnConfigItem.BAD_FLAG) {
-						severity = MetadataMessage.ERROR;
+						severity = Message.ERROR;
 					}
 					
-					messages.add(new DataMessage(severity, record, itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
+					messages.add(new Message(Message.DATA_MESSAGE, severity, record, itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
 				}
 			}
 			

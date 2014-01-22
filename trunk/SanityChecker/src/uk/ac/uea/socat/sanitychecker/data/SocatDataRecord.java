@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
-import uk.ac.uea.socat.sanitychecker.DataMessage;
+import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
@@ -82,7 +82,7 @@ public class SocatDataRecord {
 	/**
 	 * The output messages generated for this line, if any
 	 */
-	private List<DataMessage> itsMessages;
+	private List<Message> itsMessages;
 	
 	/**
 	 * Flag to indicate the presence of warnings raised during processing
@@ -120,7 +120,7 @@ public class SocatDataRecord {
 	private Logger itsLogger;
 
 	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger, Output output) throws ConfigException, SocatDataException {
-		itsMessages = new ArrayList<DataMessage>();
+		itsMessages = new ArrayList<Message>();
 		itsColumnSpec = colSpec;
 		itsLineNumber = lineNumber;
 		itsLogger = logger;
@@ -160,7 +160,7 @@ public class SocatDataRecord {
 			
 			setFieldValue(ISO_DATE_COLUMN_NAME, dateTimeHandler.formatDateTime(parsedDateTime));
 		} catch (MissingDateTimeElementException e) {
-			itsMessages.add(new DataMessage(DataMessage.ERROR, itsLineNumber, -1, "", e.getMessage()));
+			itsMessages.add(new Message(Message.ERROR, itsLineNumber, -1, "", e.getMessage()));
 			
 			try {
 				// Date errors will always set cascade flags
@@ -170,7 +170,7 @@ public class SocatDataRecord {
 			}
 			
 		} catch (DateTimeParseException e) {
-			itsMessages.add(new DataMessage(DataMessage.ERROR, itsLineNumber, -1, "", e.getMessage()));
+			itsMessages.add(new Message(Message.ERROR, itsLineNumber, -1, "", e.getMessage()));
 		} catch (DateTimeException e) {
 			throw new SocatDataException(itsLineNumber, -1, "Date", e);
 		}
@@ -287,7 +287,7 @@ public class SocatDataRecord {
 	 * @param flag The flag value
 	 * @throws SocatDataBaseException If the field doesn't have a flag
 	 */
-	private void setFlag(String column, int flag, List<DataMessage> messages, int record, String message) throws SocatDataBaseException {
+	private void setFlag(String column, int flag, List<Message> messages, int record, String message) throws SocatDataBaseException {
 		
 		SocatDataColumn flagColumn = itsOutputColumns.get(column);
 		flagColumn.setFlag(flag, messages, record, message);
@@ -365,7 +365,7 @@ public class SocatDataRecord {
 	 * Returns the list of all messages created during processing of this record
 	 * @return The list of messages
 	 */
-	public List<DataMessage> getMessages() {
+	public List<Message> getMessages() {
 		return itsMessages;
 	}
 	

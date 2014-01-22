@@ -3,7 +3,7 @@ package uk.ac.uea.socat.sanitychecker.config;
 import java.lang.reflect.Method;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
-import uk.ac.uea.socat.sanitychecker.MetadataMessage;
+import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
 
 /**
@@ -490,9 +490,9 @@ public class SocatColumnConfigItem {
 		int result = -1;
 		
 		if (columnFlag == QUESTIONABLE_FLAG) {
-			result = MetadataMessage.WARNING;
+			result = Message.WARNING;
 		} else if (columnFlag == BAD_FLAG) {
-			result = MetadataMessage.ERROR;
+			result = Message.ERROR;
 		}
 		
 		return result;
