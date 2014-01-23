@@ -283,7 +283,7 @@ public class SocatColumnConfigItem {
 			
 			itHasQuestionableRange = false;
 			itHasBadRange = true;
-			itsBadRangeMin = 0.0;
+			itsBadRangeMin = -180.0;
 			itsBadRangeMax = 360.0;
 		}
 		
