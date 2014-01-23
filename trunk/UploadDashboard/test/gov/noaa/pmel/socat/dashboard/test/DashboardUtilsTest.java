@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -82,7 +83,7 @@ public class DashboardUtilsTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeIntgerArrayList(java.util.ArrayList)}
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeIntegerArrayList(java.lang.String)}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#encodeIntegerArrayList(java.util.ArrayList)}.
 	 */
 	@Test
@@ -98,7 +99,7 @@ public class DashboardUtilsTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeStringArrayList(java.util.ArrayList)}
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeStringArrayList(java.lang.String)}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#encodeStringArrayList(java.util.ArrayList)}.
 	 */
 	@Test
@@ -113,6 +114,27 @@ public class DashboardUtilsTest {
 		assertEquals(new ArrayList<String>(), decodedList);
 		decodedList = DashboardUtils.decodeStringArrayList("[ \"\" ]");
 		assertEquals(new ArrayList<String>(Arrays.asList("")), decodedList);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#decodeSetsArrayList(java.lang.String)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#encodeSetsArrayList(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testEncodeDecodeSetsArrayList() {
+		ArrayList<HashSet<Integer>> myList = new ArrayList<HashSet<Integer>>();
+		myList.add(new HashSet<Integer>(Arrays.asList(1,5,9,12)));
+		myList.add(new HashSet<Integer>(Arrays.asList(6,9,12,21)));
+		String encoded = DashboardUtils.encodeSetsArrayList(myList);
+		ArrayList<HashSet<Integer>> decodedList = 
+				DashboardUtils.decodeSetsArrayList(encoded);
+		assertEquals(myList, decodedList);
+		decodedList = DashboardUtils.decodeSetsArrayList("[ ]");
+		assertEquals(new ArrayList<HashSet<Integer>>(), decodedList);
+		myList = new ArrayList<HashSet<Integer>>();
+		myList.add(new HashSet<Integer>());
+		decodedList = DashboardUtils.decodeSetsArrayList("[ [ ] ]");
+		assertEquals(myList, decodedList);
 	}
 
 }

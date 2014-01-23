@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -18,9 +19,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7081034199322570999L;
+	private static final long serialVersionUID = 5964270451086258279L;
 
 	boolean selected;
+	String version;
 	String owner;
 	String expocode;
 	String dataCheckStatus;
@@ -36,10 +38,14 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	ArrayList<DataColumnType> dataColTypes;
 	ArrayList<String> dataColUnits;
 	ArrayList<String> missingValues;
-	ArrayList<Integer> dataColQualities;
+	// For each data column, a set of row indices with questionable data
+	ArrayList<HashSet<Integer>> woceThreeRowIndices;
+	// For each data column, a set of row indices with bad data
+	ArrayList<HashSet<Integer>> woceFourRowIndices;
 
 	public DashboardCruise() {
 		selected = false;
+		version = "";
 		owner = "";
 		expocode = "";
 		dataCheckStatus = "";
@@ -55,7 +61,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
 		missingValues = new ArrayList<String>();
-		dataColQualities = new ArrayList<Integer>();
+		woceThreeRowIndices = new ArrayList<HashSet<Integer>>();
+		woceFourRowIndices = new ArrayList<HashSet<Integer>>();
 	}
 
 	/**
@@ -72,6 +79,26 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 */
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	/**
+	 * @return 
+	 * 		the cruise version; never null
+	 */
+	public String getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version 
+	 * 		the cruise version (after trimming) to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setVersion(String version) {
+		if ( version == null )
+			this.version = "";
+		else
+			this.version = version.trim();
 	}
 
 	/**
@@ -384,32 +411,82 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	}
 
 	/**
+	 * The list of sets of WOCE-3 data row indices iterates over the 
+	 * columns of the data table.  A set in this list specifies the 
+	 * row indices where the data of the column has a WOCE-3 
+	 * (questionable) flag.  Presumably these sets will be small and 
+	 * could be empty. 
+	 * 
 	 * @return 
-	 * 		the list of data column qualities (a WOCE-like flag for each
-	 * 		data column taken as a whole) for this cruise; may be empty 
-	 * 		but never null.  The actual list in this object is returned. 
+	 * 		the list of sets of WOCE-3 data row indices; 
+	 * 		may be empty but never null.
+	 * 		The actual list in this object is returned.
 	 */
-	public ArrayList<Integer> getDataColQualities() {
-		return dataColQualities;
+	public ArrayList<HashSet<Integer>> getWoceThreeRowIndices() {
+		return woceThreeRowIndices;
 	}
 
 	/**
-	 * @param dataColQualities 
-	 * 		the list of data column qualities (a WOCE-like flag for each
-	 * 		data column taken as a whole) for this cruise.  The list in 
-	 * 		this object is cleared and all the contents of the given list, 
-	 * 		if not null, are added. 
+	 * The list of sets of WOCE-3 data row indices iterates over the 
+	 * columns of the data table.  A set in this list specifies the 
+	 * row indices where the data of the column has a WOCE-3 
+	 * (questionable) flag.  Presumably these sets will be small and 
+	 * could be empty. 
+	 * 
+	 * @param woceThreeRowIndices 
+	 * 		the list of sets of WOCE-3 data row indices to assign. 
+	 * 		The list in this object is cleared and all the contents 
+	 * 		of the given list, if not null, are added.  Note that 
+	 * 		this is a shallow copy; the sets in the given list are 
+	 * 		not copied but used directly.
 	 */
-	public void setDataColQualities(ArrayList<Integer> dataColQualities) {
-		this.dataColQualities.clear();
-		if ( dataColQualities != null )
-			this.dataColQualities.addAll(dataColQualities);
+	public void setWoceThreeRowIndices(
+					ArrayList<HashSet<Integer>> woceThreeRowIndices) {
+		this.woceThreeRowIndices.clear();
+		if ( woceThreeRowIndices != null )
+			this.woceThreeRowIndices.addAll(woceThreeRowIndices);
+	}
+
+	/**
+	 * The list of sets of WOCE-4 data row indices iterates over the 
+	 * columns of the data table.  A set in this list specifies the 
+	 * row indices where the data of the column has a WOCE-4 (bad)  
+	 * flag.  Presumably these sets will be small and could be empty. 
+	 * 
+	 * @return 
+	 * 		the list of sets of WOCE-4 data row indices; 
+	 * 		may be empty but never null.
+	 * 		The actual list in this object is returned.
+	 */
+	public ArrayList<HashSet<Integer>> getWoceFourRowIndices() {
+		return woceFourRowIndices;
+	}
+
+	/**
+	 * The list of sets of WOCE-4 data row indices iterates over the 
+	 * columns of the data table.  A set in this list specifies the 
+	 * row indices where the data of the column has a WOCE-4 (bad)  
+	 * flag.  Presumably these sets will be small and could be empty. 
+	 * 
+	 * @param woceFourRowIndices 
+	 * 		the list of sets of WOCE-4 data row indices to assign. 
+	 * 		The list in this object is cleared and all the contents 
+	 * 		of the given list, if not null, are added.  Note that 
+	 * 		this is a shallow copy; the sets in the given list are 
+	 * 		not copied but used directly.
+	 */
+	public void setWoceFourRowIndices(
+					ArrayList<HashSet<Integer>> woceFourRowIndices) {
+		this.woceFourRowIndices.clear();
+		if ( woceFourRowIndices != null )
+			this.woceFourRowIndices.addAll(woceFourRowIndices);
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = Boolean.valueOf(selected).hashCode();
+		result = result * prime + version.hashCode();
 		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
@@ -425,7 +502,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + dataColTypes.hashCode();
 		result = result * prime + dataColUnits.hashCode();
 		result = result * prime + missingValues.hashCode();
-		result = result * prime + dataColQualities.hashCode();
+		result = result * prime + woceThreeRowIndices.hashCode();
+		result = result * prime + woceFourRowIndices.hashCode();
 		return result;
 	}
 
@@ -441,6 +519,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		DashboardCruise other = (DashboardCruise) obj;
 
 		if ( selected != other.selected )
+			return false;
+		if ( ! version.equals(other.version) ) 
 			return false;
 		if ( ! owner.equals(other.owner) )
 			return false;
@@ -472,7 +552,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! missingValues.equals(other.missingValues) )
 			return false;
-		if ( ! dataColQualities.equals(other.dataColQualities) )
+		if ( ! woceThreeRowIndices.equals(other.woceThreeRowIndices) ) 
+			return false;
+		if ( ! woceFourRowIndices.equals(other.woceFourRowIndices) ) 
 			return false;
 		return true;
 	}
@@ -481,6 +563,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	public String toString() {
 		return "DashboardCruise" +
 				"[ selected=" + Boolean.toString(selected) + 
+				",\n    version = " + version +
 				",\n    owner=" + owner + 
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
@@ -496,7 +579,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    dataColTypes=" + dataColTypes.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +
 				",\n    missingValues=" + missingValues.toString() +
-				",\n    dataColQualities=" + dataColQualities.toString() +
+				";\n    woceThreeRowIndices = " + woceThreeRowIndices.toString() +
+				";\n    woceFourRowIndices = " + woceFourRowIndices.toString() +
 				" ]";
 	}
 

@@ -30,8 +30,8 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getOwner()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setOwner(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getOwner()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setOwner(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetOwner() {
@@ -45,8 +45,8 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getUploadFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setUploadFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getUploadFilename()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setUploadFilename(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetFilename() {
@@ -61,8 +61,8 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getVersion()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setVersion(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getVersion()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setVersion(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetVersion() {
@@ -78,8 +78,8 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getExpocode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getExpocode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setExpocode(java.lang.String)}.
 	 */
 	@Test
 	public void testSetGetExpocode() {
@@ -156,8 +156,8 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getWoceThreeRowIndices()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setWoceThreeRowIndices(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getWoceThreeRowIndices()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setWoceThreeRowIndices(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetWoceThreeRowIndices() {
@@ -188,8 +188,8 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#getWoceFourRowIndices()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData#setWoceFourRowIndices(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getWoceFourRowIndices()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setWoceFourRowIndices(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testSetGetWoceFourRowIndices() {

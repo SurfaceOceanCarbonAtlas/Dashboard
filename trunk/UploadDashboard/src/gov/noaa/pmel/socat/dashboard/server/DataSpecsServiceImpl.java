@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Properties;
 
 import org.apache.log4j.Level;
@@ -21,6 +22,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
@@ -145,6 +147,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		// Specify the default date format used in this cruise
 		String dateFormat = "YYYY-MM-DD ";
 
+		HashSet<Integer> timeColumnIndices = new HashSet<Integer>();
+
 		// Specify the columns in this cruise data
 		Element rootElement = new Element("Expocode_" + cruiseData.getExpocode());
 		Element timestampElement = new Element(ColumnSpec.DATE_COLUMN_ELEMENT);
@@ -162,6 +166,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
 						cruiseData.getDataColUnits().get(k));
 				dateFormat = DashboardUtils.CHECKER_DATA_UNITS.get(colType).get(idx);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.DATE ) {
 				// Element specifying the index and user name of the column
@@ -174,6 +180,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
 						cruiseData.getDataColUnits().get(k));
 				dateFormat = DashboardUtils.CHECKER_DATA_UNITS.get(colType).get(idx);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.YEAR ) {
 				// Element specifying the index and user name of the column
@@ -182,6 +190,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.MONTH ) {
 				// Element specifying the index and user name of the column
@@ -190,6 +200,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.DAY ) {
 				// Element specifying the index and user name of the column
@@ -198,6 +210,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.TIME ) {
 				// Element specifying the index and user name of the column
@@ -206,6 +220,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.HOUR ) {
 				// Element specifying the index and user name of the column
@@ -214,6 +230,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.MINUTE ) {
 				// Element specifying the index and user name of the column
@@ -222,6 +240,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( colType == DataColumnType.SECOND ) {
 				// Element specifying the index and user name of the column
@@ -230,6 +250,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
+				// Save the index of this date/time column for message processing
+				timeColumnIndices.add(k);
 			}
 			else if ( (colType == DataColumnType.LONGITUDE) || 
 					  (colType == DataColumnType.LATITUDE) || 
@@ -326,6 +348,13 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 		}
 
+		// Clear all WOCE flags, then set those from the current set of message
+		cruiseData.setWoceThreeRowIndices(null);
+		cruiseData.setWoceFourRowIndices(null);
+		for ( Message msg : output.getMessages().getMessages() ) {
+			processMessage(cruiseData, msg, timeColumnIndices);
+		}
+		
 		// TODO: add the reports of any issues found
 
 		// Save and commit the updated cruise columns
@@ -345,6 +374,57 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		// Return the updated truncated cruise data for redisplay 
 		// in the DataColumnSpecsPage
 		return cruiseData;
+	}
+
+	/**
+	 * Assigns the WOCE-3 or WOCE-4 flag associated with this message 
+	 * to the cruise.
+	 * 
+	 * @param cruiseData
+	 * 		cruise with data to assign
+	 * @param msg
+	 * 		SanityChecker message
+	 * @param timeColumnIndices
+	 * 		indices of date/time columns in this cruise; used for
+	 * 		messages that do not have a column index, indicating the
+	 * 		problem is something to do with the date/time
+	 */
+	private void processMessage(DashboardCruiseWithData cruiseData, 
+			Message msg, HashSet<Integer> timeColumnIndices) {
+		int rowIdx = msg.getLineIndex();
+		int colIdx = msg.getItemIndex();
+		if ( msg.isError() ) {
+			// Erroneous data value
+			if ( colIdx < 0 ) {
+				// If the message is concerning the timestamp, it may not 
+				// have a column index.  So associate the WOCE flag with 
+				// all timestamp columns
+				for ( int timeColIdx : timeColumnIndices )
+					cruiseData.getWoceFourRowIndices().get(timeColIdx).add(rowIdx);
+			}
+			else {
+				cruiseData.getWoceFourRowIndices().get(colIdx).add(rowIdx);
+			}
+		}
+		else if ( msg.isWarning() ) {
+			// Questionable data value
+			if ( colIdx < 0 ) {
+				// If the message is concerning the timestamp, it may not 
+				// have a column index.  So associate the WOCE flag with 
+				// all timestamp columns.
+				for ( int timeColIdx : timeColumnIndices )
+					cruiseData.getWoceThreeRowIndices().get(timeColIdx).add(rowIdx);
+			}
+			else {
+				cruiseData.getWoceThreeRowIndices().get(colIdx).add(rowIdx);
+			}
+		}
+		else {
+			// Should never happen
+			throw new IllegalArgumentException("Unexpected " +
+					"message that is neither an error nor a warning:" +
+					"\n    " + msg.toString());
+		}
 	}
 
 }
