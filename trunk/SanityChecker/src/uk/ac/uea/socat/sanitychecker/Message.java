@@ -86,7 +86,15 @@ public class Message {
 	public int getMessageType() {
 		return itsMessageType;
 	}
-	
+
+	public int getLineIndex() {
+		return itsLine;
+	}
+
+	public int getItemIndex() {
+		return itsItemIndex;
+	}
+
 	public String toString() {
 		StringBuffer output = new StringBuffer();
 		
