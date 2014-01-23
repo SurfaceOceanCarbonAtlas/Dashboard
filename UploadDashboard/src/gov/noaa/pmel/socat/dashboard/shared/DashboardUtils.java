@@ -6,6 +6,8 @@ package gov.noaa.pmel.socat.dashboard.shared;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
@@ -422,6 +424,85 @@ public class DashboardUtils {
 								  .split("\"\\s*,\\s*\"", -1);
 		// Return an ArrayList<String> generated from the array of Strings
 		return new ArrayList<String>(Arrays.asList(pieces));
+	}
+
+	/**
+	 * Encodes an ArrayList of HashSets of Integers suitable for decoding 
+	 * with {@link #decodeSetsArrayList(String)}
+	 * 
+	 * @param setsList
+	 * 		list of sets of integer values to encode
+	 * @return
+	 * 		the encoded list of sets of integer values
+	 */
+	public static String encodeSetsArrayList(ArrayList<HashSet<Integer>> setsList) 
+											throws IllegalArgumentException {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[ ");
+		boolean firstValue = true;
+		for ( HashSet<Integer> setVal : setsList ) {
+			if ( firstValue )
+				firstValue = false;
+			else
+				sb.append(", ");
+			// Go to the trouble of sorting the list before creating the string
+			// in order to simplify human reading and detecting real differences
+			sb.append(encodeIntegerArrayList(
+					new ArrayList<Integer>(new TreeSet<Integer>(setVal))));
+		}
+		sb.append(" ]");
+		return sb.toString();
+	}
+
+	/**
+	 * Decodes a (somewhat-JSON-like) encoded array of sets of integers, 
+	 * like that produced by {@link #encodeSetsArrayList(ArrayList)}, 
+	 * into an ArrayList of HashSets of Integers.  Each set must be 
+	 * comma-separated integer values enclosed in brackets (like that 
+	 * produced {@link #encodeIntegerArrayList(ArrayList)}, and each set 
+	 * must be by separated by a comma.  Whitespace around brackets and 
+	 * commas is allowed.
+	 * 
+	 * @param arrayStr
+	 * 		the encoded sets of integers array
+	 * @return
+	 * 		the decoded ArrayList of HashSets of Integers; never null, 
+	 * 		but may be empty (if the encoded array contains no sets)
+	 * @throws IllegalArgumentException
+	 * 		if arrayStr does not start with '[', does not end with ']', 
+	 * 		or contains sets not enclosed within '[' and ']'.
+	 */
+	public static ArrayList<HashSet<Integer>> decodeSetsArrayList(String arrayStr) 
+											throws IllegalArgumentException {
+		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+			throw new IllegalArgumentException(
+					"Encoded string array not enclosed in brackets");
+		// Locate the opening bracket of the first set
+		int firstIndex = arrayStr.indexOf("[", 1);
+		// Locate the closing bracket of the last set
+		int lastIndex = arrayStr.lastIndexOf("]", arrayStr.length() - 2);
+		if ( (firstIndex < 0) || (lastIndex < 0) ) {
+			if ( (firstIndex < 0) && (lastIndex < 0) &&
+				 arrayStr.substring(1, arrayStr.length() - 1).trim().isEmpty() ) {
+				// no sets; return an empty list
+				return new ArrayList<HashSet<Integer>>(0);
+			}
+			// Not empty, but 
+			throw new IllegalArgumentException(
+					"Sets in encoded sets array not enclosed in brackets");
+		}
+		// Split the string into each of the sets
+		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
+								  .split("\\]\\s*,\\s*\\[", -1);
+		// Create the list to return
+		ArrayList<HashSet<Integer>> setsList = 
+				new ArrayList<HashSet<Integer>>(pieces.length);
+		// Convert each of the set strings and add to the list
+		for ( String setStr : pieces ) {
+			setsList.add(new HashSet<Integer>(
+					decodeIntegerArrayList("[" + setStr + "]")));
+		}
+		return setsList;
 	}
 
 	/**

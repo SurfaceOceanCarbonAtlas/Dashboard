@@ -336,16 +336,17 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Assigns the data column types and units for a cruise 
-	 * from the user-provided data column names using the 
-	 * mappings of column names to types and units associated
-	 * with the cruise owner. 
+	 * Assigns the data column types, units, and missing values for a cruise 
+	 * from the user-provided data column names using the mappings of column 
+	 * names to types, units, and missing values associated with the cruise 
+	 * owner. 
 	 *  
 	 * @param cruise
-	 * 		cruise whose data column types are to be assigned
+	 * 		cruise whose data column types, units, and missing values are to 
+	 * 		be assigned
 	 * @throws IllegalArgumentException
-	 * 		if the data column names to types and units properties 
-	 * 		file for the cruise owner, if it exists, is invalid.
+	 * 		if the data column names to types, units, and missing values
+	 * 		properties file for the cruise owner, if it exists, is invalid.
 	 */
 	public void assignDataColumnTypes(DashboardCruise cruise) 
 												throws IllegalArgumentException {
@@ -390,18 +391,19 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Updates and saves the data column names to types and units properties
-	 * file for a cruise owner from the currently assigned column names, types
-	 * and units given in a cruise.
+	 * Updates and saves the data column names to types, units, and missing
+	 * values properties file for a cruise owner from the currently assigned 
+	 * column names, types, units, and missing values given in a cruise.
 	 * 
 	 * @param cruise
-	 * 		update the data column names to types and units from this cruise
+	 * 		update the data column names to types, units, and missing values
+	 * 		from this cruise
 	 * @param username
 	 * 		user making this update (for the version control commit message)
 	 * @throws IllegalArgumentException
-	 * 		if the data column names to types and units properties 
-	 * 		file for the cruise owner, if it exists, is invalid, or 
-	 * 		if unable to save or commit the updated version of this file 
+	 * 		if the data column names to types, units, and missing values 
+	 * 		properties file for the cruise owner, if it exists, is invalid, 
+	 * 		or if unable to save or commit the updated version of this file 
 	 */
 	public void updateUserDataColumnTypes(DashboardCruise cruise, String username) 
 											throws IllegalArgumentException {

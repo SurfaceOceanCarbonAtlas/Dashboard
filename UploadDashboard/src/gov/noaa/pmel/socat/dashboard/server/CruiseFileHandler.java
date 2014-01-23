@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -44,7 +45,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
 	private static final String MISSING_VALUES_ID = "missingvalues";
-	private static final String DATA_COLUMN_QUALITIES_ID = "datacolumnqualities";
+	private static final String WOCE_THREE_ROWS_ID = "wocethreerows";
+	private static final String WOCE_FOUR_ROWS_ID = "wocefourrows";
 
 	private static final int MIN_NUM_DATA_COLUMNS = 6;
 	private static final String MISSING_VALUE_STRING = "NaN";
@@ -276,21 +278,11 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					ArrayList<String> colNames = cruiseData.getUserColNames();
 					colNames.clear();
 					colNames.addAll(Arrays.asList(datavals));
-					// Just directly add the default column quality of 2 ("okay")
-					// to the list in cruiseData
-					ArrayList<Integer> colQualities = cruiseData.getDataColQualities();
-					for (int k = 0; k < numDataColumns; k++)
-						colQualities.add(2);
 				}
 				else if ( cruiseData.getUserColNames().size() != numDataColumns ) {
 					throw new IOException("Unexpected number of data columns (" + 
 							numDataColumns + " instead of " + 
 							cruiseData.getUserColNames().size()  + ")");
-				}
-				else if ( cruiseData.getDataColQualities().size() != numDataColumns ) {
-					throw new IOException("Unexpected number of data column qualities (" + 
-							numDataColumns + " instead of " + 
-							cruiseData.getDataColQualities().size()  + ")");
 				}
 				// Treat the rest of the lines as tab-separated data value lines
 				break;
@@ -328,7 +320,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					"No data columns found, possibly due to incorrect format");
 
 		if ( assignCruiseInfo ) {
-			// Assign the data column types and units from the data column names
+			// Assign the data column types, units, and missing values 
+			// from the data column names
 			try {
 				DashboardDataStore.get().getUserFileHandler()
 										.assignDataColumnTypes(cruiseData);
@@ -336,6 +329,17 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				throw new IOException(
 						"Unexpected failure to get the user file handler");
 			}
+			// Set all WOCE-3 row index sets to empty
+			ArrayList<HashSet<Integer>> woceFlags = 
+									cruiseData.getWoceThreeRowIndices();
+			woceFlags.clear();
+			for (int k = 0; k < numDataColumns; k++)
+				woceFlags.add(new HashSet<Integer>());
+			// Set all WOCE-4 row index sets to empty
+			woceFlags = cruiseData.getWoceFourRowIndices();
+			woceFlags.clear();
+			for (int k = 0; k < numDataColumns; k++)
+				woceFlags.add(new HashSet<Integer>());
 		}
 
 		// Read the tab-separated column values
@@ -669,9 +673,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Missing value for each data column
 		cruiseProps.setProperty(MISSING_VALUES_ID, 
 				DashboardUtils.encodeStringArrayList(cruise.getMissingValues()));
-		// Qualities of each data column
-		cruiseProps.setProperty(DATA_COLUMN_QUALITIES_ID, 
-				DashboardUtils.encodeIntegerArrayList(cruise.getDataColQualities()));
+		// WOCE-3 row indices for each data column
+		cruiseProps.setProperty(WOCE_THREE_ROWS_ID, 
+				DashboardUtils.encodeSetsArrayList(cruise.getWoceThreeRowIndices()));
+		// WOCE-4 row indices for each data column
+		cruiseProps.setProperty(WOCE_FOUR_ROWS_ID, 
+				DashboardUtils.encodeSetsArrayList(cruise.getWoceThreeRowIndices()));
 		// Save the properties to the cruise information file
 		try {
 			PrintWriter cruiseWriter = new PrintWriter(infoFile);
@@ -937,20 +944,19 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					"number of data column missing-value values different from " +
 					"number of data column types");
 
-		// Quality of each data column
-		value = cruiseProps.getProperty(DATA_COLUMN_QUALITIES_ID);
+		// WOCE-3 row indices for each data column
+		value = cruiseProps.getProperty(WOCE_THREE_ROWS_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
-					DATA_COLUMN_QUALITIES_ID + " given in " + infoFile.getPath());
-		try {
-			cruise.setDataColQualities(DashboardUtils.decodeIntegerArrayList(value));
-		} catch ( NumberFormatException ex ) {
-			throw new IllegalArgumentException(ex);
-		}
-		if ( cruise.getDataColQualities().size() != colTypes.size() )
-			throw new IllegalArgumentException(
-					"number of data column qualities different from " +
-					"number of data column types");
+					WOCE_THREE_ROWS_ID + " given in " + infoFile.getPath());
+		cruise.setWoceThreeRowIndices(DashboardUtils.decodeSetsArrayList(value));
+
+		// WOCE-4 row indices for each data column
+		value = cruiseProps.getProperty(WOCE_FOUR_ROWS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					WOCE_FOUR_ROWS_ID + " given in " + infoFile.getPath());
+		cruise.setWoceFourRowIndices(DashboardUtils.decodeSetsArrayList(value));
 	}
 
 	/**
