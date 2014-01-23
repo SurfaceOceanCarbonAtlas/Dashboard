@@ -92,11 +92,11 @@ public class CruiseSdgncFile {
 
 
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
-                        var = ncfile.addVariable(null, name, DataType.DOUBLE, dims);
+                        var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-                        var = ncfile.addVariable(null, name, DataType.DOUBLE, dims);
+                        var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
                     } else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
-                        var = ncfile.addVariable(null, name, DataType.INT, dims);
+                        var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.INT, dims);
                     } else if ( type.equals(String.class) ) {
                         // Skip for now.
                     }
@@ -105,7 +105,7 @@ public class CruiseSdgncFile {
                         if ( units != null ) {
                             ncfile.addVariableAttribute(var, new Attribute("units", units));
                         }
-                        String description = Constants.DESCRIPTION.get(name);
+                        String description = Constants.LONG_NAME.get(name);
                         if ( description != null ) {
                             ncfile.addVariableAttribute(var, new Attribute("long_name", description));
                         }
@@ -144,7 +144,7 @@ public class CruiseSdgncFile {
 
                     var = null;
                     String s = (String) f.get(metadata);
-                    var = ncfile.findVariable(f.getName());
+                    var = ncfile.findVariable(Constants.SHORT_NAME.get(f.getName()));
                     if ( var != null ) {
                         ArrayChar.D2 values = new ArrayChar.D2(1, maxchar);
                         values.setString(0, s);
@@ -167,7 +167,7 @@ public class CruiseSdgncFile {
                 if ( !name.equals("serialVersionUID")) {
                     var = null;
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
-                        var = ncfile.findVariable(name);
+                        var = ncfile.findVariable(Constants.SHORT_NAME.get(name));
                         if ( var != null ) {
                             ArrayDouble.D1 dvar = new ArrayDouble.D1(data.size());
                             for (int index = 0; index < data.size(); index++) {
