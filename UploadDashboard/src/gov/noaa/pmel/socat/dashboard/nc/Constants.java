@@ -60,6 +60,9 @@ public class Constants {
 		aMap.put("etopo2",DashboardUtils.DEPTH_UNITS);
 		aMap.put("gvCO2",DashboardUtils.XCO2_UNITS);
 		aMap.put("distToLand",DashboardUtils.DISTANCE_UNITS);
+        aMap.put("time", DashboardUtils.SECONDS_UNITS);
+		aMap.put("days1970", DashboardUtils.DAYS_UNITS);
+		aMap.put("dayOfYear", DashboardUtils.DAYS_UNITS);
 		aMap.put("woceFlag",DashboardUtils.NO_UNITS);
 
 		UNITS = Collections.unmodifiableMap(aMap);
@@ -108,7 +111,9 @@ public class Constants {
         aMap.put("deltaT", "Equilibrator Temp - SST");
         aMap.put("regionID", "SOCAT region ID");
         aMap.put("time", "Datetime");
-        aMap.put("calcSpeed", "calculated ship speed");
+		aMap.put("days1970", "days since Jan 1 1970");
+		aMap.put("dayOfYear", "days since Jan 1 of the year");
+		aMap.put("calcSpeed", "calculated ship speed");
         aMap.put("etopo2", "bathymetry from ETOPO2");
         aMap.put("gvCO2", "GlobalView xCO2");
         aMap.put("distToLand", "Distance to Land");
@@ -159,6 +164,8 @@ public class Constants {
         aMap.put("deltaT", "delta_temperature");
         aMap.put("regionID", "regionID");
         aMap.put("time", "time");
+		aMap.put("days1970", "days1970");
+		aMap.put("dayOfYear", "dayOfYear");
         aMap.put("calcSpeed", "calcSpeed");
         aMap.put("etopo2", "etopo2");
         aMap.put("gvCO2", "gvCO2");
@@ -171,52 +178,138 @@ public class Constants {
 	public static final Map<String, String> DESCRIPTION;
 	static {
 		Map<String, String> aMap = new HashMap<String, String>();
-		aMap.put("year", "year of the date (UTC) of the measurement");
-		aMap.put("month", "month of the date (UTC) of the measurement");
-		aMap.put("day", "day of the date (UTC) of the measurement");
-		aMap.put("hour", "hour of the date (UTC) of the measurement");
-		aMap.put("minute", "minute of the date (UTC) of the measurement");
-		aMap.put("second", "second of the date (UTC) of the measurement");
-		aMap.put("longitude", "measurement longitude");
-		aMap.put("latitude", "measurement latitude");
-		aMap.put("sampleDepth", "water sampling depth");
-		aMap.put("sst", "measured sea surface temperature");
-		aMap.put("tEqu", "equilibrator chamber temperature");
-		aMap.put("sal", "measured salinity");
-		aMap.put("pAtm", "measured sea-level atmonspheric pressure");
-		aMap.put("pEqu", "equilibrator chamber pressure");
-		aMap.put("xCO2WaterSst", "measured xCO2 (water) using sea surface temperature (dry air)");
-		aMap.put("xCO2WaterTEqu", "measured xCO2 (water) using equilibrator temperature (dry air)");
-		aMap.put("fCO2WaterSst", "measured fCO2 (water) using sea surface temperature (wet air)");
-		aMap.put("fCO2WaterTEqu", "measured fCO2 (water) using equilibrator temperature (wet air)");
-		aMap.put("pCO2WaterSst", "measured pCO2 (water) using sea surface temperature (wet air)");
-		aMap.put("pCO2WaterTEqu", "measured pCO2 (water) using equilibrator temperature (wet air)");
-		aMap.put("woaSss", "sea surface salinity interpolated from the World Ocean Atlas 2005 (see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)");
-		aMap.put("ncepSlp", "sea level pressure interpolated from the NCEP/NCAR 40-Year Reanalysis Project (see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)");
-		aMap.put("fCO2FromXCO2TEqu", "fCO2 recomputed from measured xCO2 (water) using equilibrator temperature, equilibrator pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2Sst", "fCO2 recomputed from measured xCO2 (water) using sea surface temperature, equilibrator pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromPCO2TEqu", "fCO2 recomputed from measured pCO2 (water) using equilibrator temperature, equilibrator pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromPCO2Sst", "fCO2 recomputed from measured pCO2 (water) using sea surface temperature, equilibrator pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromFCO2TEqu", "fCO2 recomputed from measured fCO2 (water) using equilibrator temperature, equilibrator pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromFCO2Sst", "fCO2 recomputed from measured fCO2 (water) using sea surface temperature, equilibrator pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromPCO2TEquNcep", "fCO2 recomputed from measured pCO2 (water) using equilibrator temperature, NCEP sea level pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromPCO2SstNcep", "fCO2 recomputed from measured pCO2 (water) using sea surface temperature, NCEP sea level pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2TEquWoa", "fCO2 recomputed from measured xCO2 (water) using equilibrator temperature, equilibrator pressure, and WOA sea surface salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2SstWoa", "fCO2 recomputed from measured xCO2 (water) using sea surface temperature, equilibrator pressure, and WOA sea surface salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2TEquNcep", "fCO2 recomputed from measured xCO2 (water) using sea surface temperature, equilibrator pressure, and WOA sea surface salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2SstNcep", "fCO2 recomputed from measured xCO2 (water) using sea surface temperature, NCEP sea level pressure, and measured salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2TEquNcepWoa", "fCO2 recomputed from measured xCO2 (water) using equilibrator temperature, NCEP sea level pressure, and WOA sea surface salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2FromXCO2SstNcepWoa", "fCO2 recomputed from measured xCO2 (water) using sea surface temperature, NCEP sea level pressure, and WOA sea surface salinity (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2Rec", "fCO2 recomputed from the most desireable measured CO2 data (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("fCO2Source", "algorithm number (1-14) for generating the fCO2Rec value (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("deltaT", "difference in temperature between the equilibrator water and the sea surface water (Temperature_equi - sst)");
-		aMap.put("regionID", "SOCAT region ID for the location of this measurement (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
-		aMap.put("time", "seconds since 1970");
-		aMap.put("calcSpeed", "calculated ship speed using the previous and subsequent data measurement");
-		aMap.put("etopo2", "bathymetry interpolated from the ETOPO2 2 arc-minute Gridded Global Relief Data (see: http://www.ngdc.noaa.gov/mgg/global/etopo2.html)");
-		aMap.put("gvCO2", "atmospheric xCO2 interpolated from GlobalView-CO2, 2012 1979-01-01 to 2012-01-01 data (see: http://www.esrl.noaa.gov/gmd/ccgg/globalview/index.html)");
-		aMap.put("distToLand", "estimated distance to major land mass (up to 1000 km)");
-		aMap.put("woceFlag", "WOCE quality-control flag (2=okay,3=questionable,4=bad) for the fCO2Rec value (see: doi:10.5194/essd-5-125-2013 http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("year", 
+				"year of the date (UTC) of the measurement");
+		aMap.put("month", 
+				"month of the date (UTC) of the measurement");
+		aMap.put("day", 
+				"day of the date (UTC) of the measurement");
+		aMap.put("hour", 
+				"hour of the time (UTC) of the measurement");
+		aMap.put("minute", 
+				"minute of the time (UTC) of the measurement");
+		aMap.put("second", 
+				"second of the time (UTC) of the measurement");
+		aMap.put("longitude", 
+				"measurement longitude in decimal degrees East");
+		aMap.put("latitude", 
+				"measurement latitude in decimal degrees North");
+		aMap.put("sampleDepth", 
+				"water sampling depth in meters");
+		aMap.put("sst", 
+				"measured sea surface temperature in degrees Celcius");
+		aMap.put("tEqu", 
+				"equilibrator chamber temperature in degrees Celcius");
+		aMap.put("sal", 
+				"measured salinity on the practical salinity scale");
+		aMap.put("pAtm", 
+				"measured sea-level atmospheric pressure in hectopascals");
+		aMap.put("pEqu", 
+				"equilibrator chamber pressure in hectopascals");
+		aMap.put("xCO2WaterSst", 
+				"measured xCO2 (water) in micromoles per mole using sea surface temperature (dry air)");
+		aMap.put("xCO2WaterTEqu", 
+				"measured xCO2 (water) in micromoles per mole using equilibrator temperature (dry air)");
+		aMap.put("fCO2WaterSst", 
+				"measured fCO2 (water) in microatmospheres using sea surface temperature (wet air)");
+		aMap.put("fCO2WaterTEqu", 
+				"measured fCO2 (water) in microatmospheres using equilibrator temperature (wet air)");
+		aMap.put("pCO2WaterSst", 
+				"measured pCO2 (water) in microatmospheres using sea surface temperature (wet air)");
+		aMap.put("pCO2WaterTEqu", 
+				"measured pCO2 (water) in microatmospheres using equilibrator temperature (wet air)");
+		aMap.put("woaSss",
+				"sea surface salinity on the practical salinity scale interpolated from the World Ocean Atlas 2005 " +
+				"(see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)");
+		aMap.put("ncepSlp",
+				"sea level pressure in hectopascals interpolated from the NCEP/NCAR 40-Year Reanalysis Project " +
+				"(see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)");
+		aMap.put("fCO2FromXCO2TEqu",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2Sst",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromPCO2TEqu",
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromPCO2Sst",
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromFCO2TEqu",
+				"fCO2 in microatmospheres recomputed from measured fCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromFCO2Sst",
+				"fCO2 in microatmospheres recomputed from measured fCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromPCO2TEquNcep",
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using equilibrator temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromPCO2SstNcep",
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using sea surface temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2TEquWoa",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2SstWoa",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2TEquNcep",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2SstNcep",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2TEquNcepWoa",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"NCEP sea level pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2FromXCO2SstNcepWoa",
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"NCEP sea level pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2Rec",
+				"fCO2 in microatmospheres recomputed from the most desireable measured CO2 data " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("fCO2Source",
+				"algorithm number (1-14) for generating the fCO2Rec value " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("deltaT",
+				"difference in temperature in degrees Celcius between the equilibrator water and the sea surface water (TEqu - SST)");
+		aMap.put("regionID",
+				"SOCAT region ID for the location of this measurement " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		aMap.put("time", 
+				"seconds since Jan 1, 1970 00:00:00 UTC");
+		aMap.put("days1970",
+				"fractional number of days since Jan 1, 1970 00:00:00 UTC");
+		aMap.put("dayOfYear",
+				"fractional number of days since Jan 1 00:00 UTC of that year");
+		aMap.put("calcSpeed",
+				"calculated ship speed in knots using the previous and subsequent data measurement");
+		aMap.put("etopo2",
+				"bathymetry in meters interpolated from the ETOPO2 2 arc-minute Gridded Global Relief Data " +
+				"(see: http://www.ngdc.noaa.gov/mgg/global/etopo2.html)");
+		aMap.put("gvCO2",
+				"atmospheric xCO2 in micromoles per mole interpolated from GlobalView-CO2, 2012 1979-01-01 to 2012-01-01 data " +
+				"(see: http://www.esrl.noaa.gov/gmd/ccgg/globalview/index.html)");
+		aMap.put("distToLand",
+				"estimated distance in km to major land mass (up to 1000 km)");
+		aMap.put("woceFlag",
+				"WOCE quality-control flag (2=okay,3=questionable,4=bad) for the fCO2Rec value " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
 		DESCRIPTION = Collections.unmodifiableMap(aMap);
 	}
 }

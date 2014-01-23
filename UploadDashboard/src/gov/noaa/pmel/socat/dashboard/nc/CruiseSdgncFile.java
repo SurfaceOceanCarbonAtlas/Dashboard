@@ -1,22 +1,14 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.james.mime4j.io.MaxLineLimitException;
-
-import ucar.ma2.Array;
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
-import ucar.ma2.ArrayString;
 import ucar.ma2.DataType;
-import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriter;
@@ -49,7 +41,7 @@ public class CruiseSdgncFile {
         // There will be 9 trajectory variables of type character from the metadata.
         // Which is the longest?
         int maxchar = metadata.getMaxStringLength();
-        Dimension stringlen = ncfile.addDimension(null, "string_lenght", maxchar);
+        Dimension stringlen = ncfile.addDimension(null, "string_length", maxchar);
         List<Dimension> trajdimsChar = new ArrayList<Dimension>();
         trajdimsChar.add(traj);
         trajdimsChar.add(stringlen);
@@ -90,7 +82,6 @@ public class CruiseSdgncFile {
 
                     var = null;
 
-
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
@@ -111,10 +102,6 @@ public class CruiseSdgncFile {
                         }
                         ncfile.addVariableAttribute(var, new Attribute("missing_value", Double.NaN));
                     }
-
-
-
-
                 }
             }
 
@@ -204,12 +191,7 @@ public class CruiseSdgncFile {
                                 dvar.set(index, dvalue);
 
                             }
-                            try {
-                                ncfile.write(var, dvar);
-                            } catch (InvalidRangeException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                            ncfile.write(var, dvar);
                         }
                     } else if ( type.equals(String.class) ) {
                         // Skip for now.
