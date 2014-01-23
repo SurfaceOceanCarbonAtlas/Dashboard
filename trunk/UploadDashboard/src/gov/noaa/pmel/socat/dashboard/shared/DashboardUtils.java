@@ -155,7 +155,7 @@ public class DashboardUtils {
 	public static final ArrayList<String> DISTANCE_UNITS = new ArrayList<String>(Arrays.asList("km"));
 	public static final ArrayList<String> SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots"));
 	public static final ArrayList<String> DAYS_UNITS = new ArrayList<String>(Arrays.asList("days"));
-	public static final ArrayList<String> HOURS_UNITS = new ArrayList<String>(Arrays.asList("hours"));
+	public static final ArrayList<String> SECONDS_UNITS = new ArrayList<String>(Arrays.asList("seconds"));
 
 	/**
 	 * SanityChecker version of the strings for above data units when not the same strings

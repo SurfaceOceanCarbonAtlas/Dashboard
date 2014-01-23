@@ -20,7 +20,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4507737367458225951L;
+	private static final long serialVersionUID = 3506155014333889793L;
+
+	private static final double MAX_RELATIVE_ERROR = 1.0E-6;
+	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
 
 	// Time of measurement
 	Integer year;
@@ -92,6 +95,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double gvCO2;
 	// distance to closest land mass (up to 1000 km)
 	Double distToLand;
+	// days since Jan 1, 1970 00:00:00
+	Double days1970;
+	// days since Jan 1 of that year; 0.0 - 367.0, 0.0 == Jan 1 00:00
+	Double dayOfYear;
 	// overall data WOCE flag; 
 	// may be assigned by the SanityChecker for questionable (3) or bad (4) data
 	// and to be assigned by QC'ers
@@ -145,6 +152,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		etopo2 = Double.NaN;
 		gvCO2 = Double.NaN;
 		distToLand = Double.NaN;
+		days1970 = Double.NaN;
+		dayOfYear = Double.NaN;
 		woceFlag = 0;
 	}
 
@@ -177,7 +186,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		if ( dataValues.size() != numColumns )
 			throw new IllegalArgumentException("Number of column types (" +
 					numColumns + ") does not match the number of data values (" +
-					dataValues.size());
+					dataValues.size() + ")");
 		// Add values to the empty record
 		for (int k = 0; k < numColumns; k++) {
 			// Skip over missing values since the empty data record
@@ -261,7 +270,15 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * Generates a list of SOCAT cruise data objects from the values
 	 * and data column types given in a dashboard cruise with data.
-	 * This assumes the data is in the standard units for each type.
+	 * This assumes the data is in the standard units for each type, 
+	 * and the missing value is "NaN", and empty string, or null.  
+	 * The data column types {@link DataColumnType#TIMESTAMP}, 
+	 * {@link DataColumnType#DATE}, and {@link DataColumnType#TIME} 
+	 * are ignored; the date and time must be given using the 
+	 * {@link DataColumnType#YEAR}, {@link DataColumnType#MONTH}, 
+	 * {@link DataColumnType#DAY}, {@link DataColumnType#HOUR}, 
+	 * {@link DataColumnType#MINUTE}, and {@link DataColumnType#SECOND} 
+	 * data column types.
 	 * 
 	 * @param cruise
 	 * 		dashboard cruise with data
@@ -1213,6 +1230,48 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the fractional hours since Jan 1, 1970 00:00;
+	 * 		never null but could be {@link Double#NaN} if not assigned
+	 */
+	public Double getDays1970() {
+		return days1970;
+	}
+
+	/**
+	 * @param days1970 
+	 * 		the fractional hours since Jan 1, 1970 00:00 to set;
+	 * 		if null, {@link Double#NaN} is assigned
+	 */
+	public void setDays1970(Double days1970) {
+		if ( days1970 == null )
+			this.days1970 = Double.NaN;
+		else
+			this.days1970 = days1970;
+	}
+
+	/**
+	 * @return 
+	 * 		the fractional day of the year (0.0 == Jan 1 00:00);
+	 * 		never null but could be {@link Double#NaN} if not assigned
+	 */
+	public Double getDayOfYear() {
+		return dayOfYear;
+	}
+
+	/**
+	 * @param dayOfYear 
+	 * 		the fractional day of the year (0.0 == Jan 1 00:00) to set;
+	 * 		if null, {@link Double#NaN} is assigned
+	 */
+	public void setDayOfYear(Double dayOfYear) {
+		if ( dayOfYear == null )
+			this.dayOfYear = Double.NaN;
+		else
+			this.dayOfYear = dayOfYear;
+	}
+
+	/**
+	 * @return 
 	 * 		the WOCE flag;
 	 * 		never null but could be zero if not assigned
 	 */
@@ -1235,7 +1294,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	@Override 
 	public int hashCode() {
 		// Do not use floating-point fields since they do not 
-		// have to be exact the same for equals to return true.
+		// have to be exactly the same for equals to return true.
 		final int prime = 67;
 		int result = year.hashCode();
 		result = result * prime + month.hashCode();
@@ -1290,9 +1349,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		if ( ! longitude.isNaN() ) {
 			if ( other.longitude.isNaN() )
 				return false;
-			if ( ! DashboardUtils.closeTo(this.longitude, other.longitude, 0.0, 1.0E-4) )
-				if ( ! DashboardUtils.closeTo(this.longitude + 360.0, other.longitude, 0.0, 1.0E-4) )
-					if ( ! DashboardUtils.closeTo(this.longitude, other.longitude + 360.0, 0.0, 1.0E-4) )
+			if ( ! DashboardUtils.closeTo(this.longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+				if ( ! DashboardUtils.closeTo(this.longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+					if ( ! DashboardUtils.closeTo(this.longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) )
 						return false;
 		}
 		else {
@@ -1301,75 +1360,79 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		}
 
 		// rest of the Double comparisons
-		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(sampleDepth, other.sampleDepth, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(sampleDepth, other.sampleDepth, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(sst, other.sst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(sst, other.sst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(tEqu, other.tEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(tEqu, other.tEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(sal, other.sal, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(sal, other.sal, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pAtm, other.pAtm, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(pAtm, other.pAtm, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pEqu, other.pEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(pEqu, other.pEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(xCO2WaterSst, other.xCO2WaterSst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(xCO2WaterSst, other.xCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(xCO2WaterTEqu, other.xCO2WaterTEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(xCO2WaterTEqu, other.xCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2WaterSst, other.fCO2WaterSst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2WaterSst, other.fCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2WaterTEqu, other.fCO2WaterTEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2WaterTEqu, other.fCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pCO2WaterSst, other.pCO2WaterSst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(pCO2WaterSst, other.pCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pCO2WaterTEqu, other.pCO2WaterTEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(pCO2WaterTEqu, other.pCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(woaSss, other.woaSss, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(woaSss, other.woaSss, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(ncepSlp, other.ncepSlp, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(ncepSlp, other.ncepSlp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEqu, other.fCO2FromXCO2TEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEqu, other.fCO2FromXCO2TEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2Sst, other.fCO2FromXCO2Sst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2Sst, other.fCO2FromXCO2Sst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromPCO2TEqu, other.fCO2FromPCO2TEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromPCO2TEqu, other.fCO2FromPCO2TEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromPCO2Sst, other.fCO2FromPCO2Sst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromPCO2Sst, other.fCO2FromPCO2Sst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromFCO2TEqu, other.fCO2FromFCO2TEqu, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromFCO2TEqu, other.fCO2FromFCO2TEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromFCO2Sst, other.fCO2FromFCO2Sst, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromFCO2Sst, other.fCO2FromFCO2Sst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromPCO2TEquNcep, other.fCO2FromPCO2TEquNcep, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromPCO2TEquNcep, other.fCO2FromPCO2TEquNcep, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromPCO2SstNcep, other.fCO2FromPCO2SstNcep, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromPCO2SstNcep, other.fCO2FromPCO2SstNcep, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEquWoa, other.fCO2FromXCO2TEquWoa, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEquWoa, other.fCO2FromXCO2TEquWoa, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2SstWoa, other.fCO2FromXCO2SstWoa, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2SstWoa, other.fCO2FromXCO2SstWoa, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEquNcep, other.fCO2FromXCO2TEquNcep, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEquNcep, other.fCO2FromXCO2TEquNcep, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2SstNcep, other.fCO2FromXCO2SstNcep, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2SstNcep, other.fCO2FromXCO2SstNcep, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEquNcepWoa, other.fCO2FromXCO2TEquNcepWoa, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2TEquNcepWoa, other.fCO2FromXCO2TEquNcepWoa, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2FromXCO2SstNcepWoa, other.fCO2FromXCO2SstNcepWoa, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2FromXCO2SstNcepWoa, other.fCO2FromXCO2SstNcepWoa, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2Rec, other.fCO2Rec, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(fCO2Rec, other.fCO2Rec, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(deltaT, other.deltaT, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(deltaT, other.deltaT, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(calcSpeed, other.calcSpeed, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(calcSpeed, other.calcSpeed, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(etopo2, other.etopo2, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(etopo2, other.etopo2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(gvCO2, other.gvCO2, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(gvCO2, other.gvCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(distToLand, other.distToLand, 1.0E-6, 1.0E-4) )
+		if ( ! DashboardUtils.closeTo(distToLand, other.distToLand, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(days1970, other.days1970, 0.0, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(dayOfYear, other.dayOfYear, 0.0, MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		return true;
@@ -1421,6 +1484,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    etopo2=" + etopo2.toString() +
 				",\n    gvCO2=" + gvCO2.toString() +
 				",\n    distToLand=" + distToLand.toString() +
+				",\n    days1970=" + days1970.toString() +
+				",\n    dayOfYear=" + dayOfYear.toString() +
 				",\n    woceFlag=" + woceFlag.toString() +
 				" ]";
 	}
