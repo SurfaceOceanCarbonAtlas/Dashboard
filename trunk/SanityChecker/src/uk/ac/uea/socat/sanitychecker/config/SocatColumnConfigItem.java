@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.Message;
+import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
 
 /**
@@ -120,12 +121,6 @@ public class SocatColumnConfigItem {
 	 * The internal code indicating the "Bad" flag value
 	 */
 	public static final int BAD_FLAG = 4;
-	
-	/**
-	 * The list of date column headers. These columns will always return @code{false}
-	 * to the @code{isRequired()} function
-	 */
-	private static final String DATE_COLUMN_NAMES[] = {"yr", "mon", "day", "hh", "mm", "ss", "iso_date"};
 	
 	/**
 	 * The name of the SOCAT column
@@ -273,13 +268,32 @@ public class SocatColumnConfigItem {
 		 * they are handled as a special case.
 		 */
 		if (itIsRequired) {
-			for (int i = 0; i < DATE_COLUMN_NAMES.length && itIsRequired; i++) {
-				if (itsName.equalsIgnoreCase(DATE_COLUMN_NAMES[i])) {
+			for (int i = 0; i < SocatDataRecord.DATE_COLUMN_NAMES.length && itIsRequired; i++) {
+				if (itsName.equalsIgnoreCase(SocatDataRecord.DATE_COLUMN_NAMES[i])) {
 					itIsRequired = false;
 				}
 			}
 		}
-
+		
+		/*
+		 * Lat/lon fields, on the other hand, are always required. Their ranges are fixed too.
+		 */
+		if (itsName.equalsIgnoreCase(SocatDataRecord.LONGITUDE_COLUMN_NAME)) {
+			itIsRequired = true;
+			
+			itHasQuestionableRange = false;
+			itHasBadRange = true;
+			itsBadRangeMin = 0.0;
+			itsBadRangeMax = 360.0;
+		}
+		
+		if (itsName.equalsIgnoreCase(SocatDataRecord.LATITUDE_COLUMN_NAME)) {
+			itIsRequired = true;
+			itHasQuestionableRange = false;
+			itHasBadRange = true;
+			itsBadRangeMin = -90.0;
+			itsBadRangeMax = 90.0;
+		}
 	}
 	
 	/**
