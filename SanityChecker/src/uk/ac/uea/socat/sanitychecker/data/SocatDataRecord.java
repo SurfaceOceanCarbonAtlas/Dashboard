@@ -65,6 +65,13 @@ public class SocatDataRecord {
 	public static final String SECOND_COLUMN_NAME = "ss";
 	
 	/**
+	 * The list of date column headers. These columns will always return @code{false}
+	 * to the @code{isRequired()} function
+	 */
+	public static final String DATE_COLUMN_NAMES[] = {"yr", "mon", "day", "hh", "mm", "ss", "iso_date"};
+	
+
+	/**
 	 * The column name for the ISO date
 	 */
 	private static final String ISO_DATE_COLUMN_NAME = "iso_date";
@@ -179,6 +186,27 @@ public class SocatDataRecord {
 		}
 	}
 	
+	public DateTime getDate() {
+		int year = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+		int month = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+		int day = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+		int hour = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+		int minute = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+		double second = Double.parseDouble(getColumn(SECOND_COLUMN_NAME).getValue());
+		
+		int wholeSecond = (int) Math.floor(second);
+		int millisecond = (int) Math.floor((second - wholeSecond) * 1000);
+		
+		return new DateTime(year, month, day, hour, minute, wholeSecond, millisecond);
+	}
+	
+	public double getLongitude() {
+		return Double.parseDouble(getColumn(LONGITUDE_COLUMN_NAME).getValue());
+	}
+	
+	public double getLatitude() {
+		return Double.parseDouble(getColumn(LATITUDE_COLUMN_NAME).getValue());
+	}
 	
 	/**
 	 * Populate all fields whose values are taken directly from the input data, converting where necessary
