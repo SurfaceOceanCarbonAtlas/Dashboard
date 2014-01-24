@@ -272,6 +272,7 @@ public class MetadataManagerPage extends Composite {
 	@UiHandler("setOmeButton")
 	void setOmeOnClick(ClickEvent event) {
 		// TODO:
+		SocatUploadDashboard.showMessage("Not yet implemented");
 	}
 
 	@UiHandler("deleteButton")

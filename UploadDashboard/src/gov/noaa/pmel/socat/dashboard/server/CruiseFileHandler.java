@@ -678,7 +678,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				DashboardUtils.encodeSetsArrayList(cruise.getWoceThreeRowIndices()));
 		// WOCE-4 row indices for each data column
 		cruiseProps.setProperty(WOCE_FOUR_ROWS_ID, 
-				DashboardUtils.encodeSetsArrayList(cruise.getWoceThreeRowIndices()));
+				DashboardUtils.encodeSetsArrayList(cruise.getWoceFourRowIndices()));
 		// Save the properties to the cruise information file
 		try {
 			PrintWriter cruiseWriter = new PrintWriter(infoFile);

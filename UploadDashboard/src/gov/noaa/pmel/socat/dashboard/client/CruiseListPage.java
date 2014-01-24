@@ -55,34 +55,32 @@ public class CruiseListPage extends Composite {
 			"upload cruise data to create a new cruise " +
 			"or replace an existing cruise";
 
-	private static final String DELETE_TEXT = "Delete Cruise";
-	private static final String DELETE_HOVER_HELP =
-			"delete the selected cruises, including the cruise data";
-
-	private static final String DATA_CHECK_TEXT = "Check Data";
+	private static final String DATA_CHECK_TEXT = "View Data";
 	private static final String DATA_CHECK_HOVER_HELP =
-			"assign data column types and programmatically " +
-			"check the data in the selected cruise";
+			"view and modify data column type assignments in the selected " +
+			"cruise, highlighting any issues with the data";
 
 	private static final String METADATA_TEXT = "Manage Metadata";
 	private static final String METADATA_HOVER_HELP =
 			"manage metadata documents for the selected cruise(s)";
 
-	/* 
-	 * private static final String REVIEW_TEXT = "Review with LAS";
-	 * private static final String REVIEW_HOVER_HELP =
-	 * 		"examine the selected cruises in the cruise viewer " +
-	 * 		"aside other SOCAT cruises";
-	 */
+	private static final String REVIEW_TEXT = "Preview in QC System";
+	private static final String REVIEW_HOVER_HELP =
+			"examine the selected cruises in the cruise viewer " +
+			"aside other SOCAT cruises";
 
-	private static final String QC_SUBMIT_TEXT = "Add to SOCAT";
+	private static final String QC_SUBMIT_TEXT = "Send to QC System";
 	private static final String QC_SUBMIT_HOVER_HELP =
-			"submit the selected cruises to SOCAT for policy " +
-			"(quality control) assessment ";
+			"submit the selected cruises for policy (quality control) " +
+			"assessment";
 
 	static final String ARCHIVE_TEXT = "Manage Archival";
 	private static final String ARCHIVE_HOVER_HELP =
 			"manage the archival of the selected cruise";
+
+	private static final String DELETE_TEXT = "Delete Cruise";
+	private static final String DELETE_HOVER_HELP =
+			"delete the selected cruises, including the cruise data";
 
 	private static final String ADD_TO_LIST_TEXT = 
 			"Add Cruise to List";
@@ -175,12 +173,12 @@ public class CruiseListPage extends Composite {
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
-	private static final String TIMESTAMP_COLUMN_NAME = "Uploaded on";
+	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
 	private static final String OME_FILENAME_COLUMN_NAME = "OME Metadata";
 	private static final String ADDN_METADATA_COLUMN_NAME = "Addn Metadata";
-	private static final String SUBMITTED_COLUMN_NAME = "SOCAT Status";
-	private static final String ARCHIVED_COLUMN_NAME = "Archive Status";
+	private static final String SUBMITTED_COLUMN_NAME = "QC Status";
+	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
 
@@ -191,8 +189,8 @@ public class CruiseListPage extends Composite {
 	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
 	private static final String NO_OME_METADATA_STATUS_STRING = "(no OME metadata)";
 	private static final String NO_ADDN_METADATA_STATUS_STRING = "(no additional metadata)";
-	private static final String NO_QC_STATUS_STRING = "(not added)";
-	private static final String NO_ARCHIVE_STATUS_STRING = "(not archived)";
+	private static final String NO_QC_STATUS_STRING = "(private)";
+	private static final String NO_ARCHIVE_STATUS_STRING = "(not specified)";
 	private static final String NO_OWNER_STRING = "(unknown)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 
@@ -211,7 +209,7 @@ public class CruiseListPage extends Composite {
 	@UiField Button uploadButton;
 	@UiField Button dataCheckButton;
 	@UiField Button metadataButton;
-	// @UiField Button reviewButton;
+	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
 	@UiField Button archiveButton;
 	@UiField Button deleteButton;
@@ -251,25 +249,23 @@ public class CruiseListPage extends Composite {
 		uploadButton.setText(UPLOAD_TEXT);
 		uploadButton.setTitle(UPLOAD_HOVER_HELP);
 
-		deleteButton.setText(DELETE_TEXT);
-		deleteButton.setTitle(DELETE_HOVER_HELP);
-
 		dataCheckButton.setText(DATA_CHECK_TEXT);
 		dataCheckButton.setTitle(DATA_CHECK_HOVER_HELP);
 
 		metadataButton.setText(METADATA_TEXT);
 		metadataButton.setTitle(METADATA_HOVER_HELP);
 
-		/* 
-		 * reviewButton.setText(REVIEW_TEXT);
-		 * reviewButton.setTitle(REVIEW_HOVER_HELP);
-		 */
+		reviewButton.setText(REVIEW_TEXT);
+		reviewButton.setTitle(REVIEW_HOVER_HELP);
 
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
 
 		archiveButton.setText(ARCHIVE_TEXT);
 		archiveButton.setTitle(ARCHIVE_HOVER_HELP);
+
+		deleteButton.setText(DELETE_TEXT);
+		deleteButton.setTitle(DELETE_HOVER_HELP);
 
 		addToListButton.setText(ADD_TO_LIST_TEXT);
 		addToListButton.setTitle(ADD_TO_LIST_HOVER_HELP);
@@ -557,12 +553,11 @@ public class CruiseListPage extends Composite {
 		}
 	}
 
-	/*
-	 * @UiHandler("reviewButton")
-	 * void reviewOnClick(ClickEvent event) {
-	 * 	// TODO:
-	 * }
-	 */
+	@UiHandler("reviewButton")
+	void reviewOnClick(ClickEvent event) {
+		SocatUploadDashboard.showMessage("Not yet implemented");
+		return;
+	}
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {

@@ -30,7 +30,7 @@ import com.google.gwt.user.cellview.client.Header;
  */
 public class CruiseDataColumn {
 
-	private static final String MISSING_VALUE_LABEL = "Missing=";
+	private static final String DEFAULT_MISSING_VALUE = "(default missing)";
 
 	// Class to deal with a data column type and unit pair
 	private static class TypeUnits {
@@ -131,8 +131,8 @@ public class CruiseDataColumn {
 	 * Returns the header for this cruise data column.  This header is a 
 	 * CompositeCell consisting of a TextCell, for displaying the user-
 	 * provided column name, a SelectionCell, for selecting the standard 
-	 * column type, a TextCell, for displaying {@link #MISSING_VALUE_LABEL},
-	 * and a TextInputCell, for the user to specify a missing value.
+	 * column type, a TextCell, and a TextInputCell, for the user to 
+	 * specify a missing value.
 	 */
 	Header<CruiseDataColumn> getHeader() {
 		return columnHeader;
@@ -234,30 +234,13 @@ public class CruiseDataColumn {
 			}
 		};
 
-		// Create the TextCell for statically showing the MISSING_VALUE_LABEL string
-		HasCell<CruiseDataColumn,String> missLabelCell = 
-									new HasCell<CruiseDataColumn,String>() {
-			@Override
-			public TextCell getCell() {
-				// Text cell rendered in-line with the next cell
-				return new TextCell();
-			}
-			@Override
-			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
-				return null;
-			}
-			@Override
-			public String getValue(CruiseDataColumn dataCol) {
-				return MISSING_VALUE_LABEL;
-			}
-		};
-
-		// Create the EditTextCell allowing the user to specify the missing value
+		// Create the TextInputCell allowing the user to specify the missing value
 		HasCell<CruiseDataColumn,String> missValCell = 
 									new HasCell<CruiseDataColumn,String>() {
 			@Override
 			public TextInputCell getCell() {
 				return new TextInputCell();
+				// TODO: capture events with starting to edit to erase DEFAULT_MISSING_VALUE
 			}
 			@Override
 			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
@@ -270,6 +253,9 @@ public class CruiseDataColumn {
 							return;
 						}
 						// Set this missing value
+						value = value.trim();
+						if ( value.equals(DEFAULT_MISSING_VALUE) )
+							value = "";
 						dataCol.cruise.getMissingValues()
 									  .set(dataCol.columnIndex, value);
 					}
@@ -279,8 +265,8 @@ public class CruiseDataColumn {
 			public String getValue(CruiseDataColumn dataCol) {
 				String value = dataCol.cruise.getMissingValues()
 											 .get(dataCol.columnIndex);
-				if ( value == null )
-					value = "";
+				if ( (value == null) || value.isEmpty() )
+					value = DEFAULT_MISSING_VALUE;
 				return value;
 			}
 		};
@@ -288,8 +274,7 @@ public class CruiseDataColumn {
 		CompositeCell<CruiseDataColumn> compCell = 
 			new CompositeCell<CruiseDataColumn>(
 				new ArrayList<HasCell<CruiseDataColumn,?>>(
-					Arrays.asList(userNameCell, stdNameCell, 
-						missLabelCell, missValCell)));
+					Arrays.asList(userNameCell, stdNameCell, missValCell)));
 
 		// Create and return the Header
 		Header<CruiseDataColumn> headerCell = new Header<CruiseDataColumn>(compCell) {
