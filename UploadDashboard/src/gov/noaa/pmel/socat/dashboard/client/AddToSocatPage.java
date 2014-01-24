@@ -49,9 +49,9 @@ public class AddToSocatPage extends Composite {
 	private static final String MORE_INFO_TEXT = "more ...";
 
 	private static final String ADD_TO_SOCAT_FIRST_INFO_HTML =
-			"<b>Add Cruises to SOCAT</b>" +
+			"<b>Submit Cruises to the QC System</b>" +
 			"<br /><br />" +
-			"Add the cruises listed in the table below to SOCAT for policy (QC) assessment." +
+			"Add the cruises listed in the table below for policy (QC) assessment." +
 			"<br /><br />" +
 			"<b>Required:</b>";
 
