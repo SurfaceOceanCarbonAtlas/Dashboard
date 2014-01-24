@@ -89,7 +89,7 @@ public class CruiseSdgncFileTest {
 		mdata.setExpocode(expocode);
 		mdata.setCruiseName("GM0606");
 		mdata.setScienceGroup("Public, Nancy S.; Public, John Q.");
-		mdata.setVesselName("Tropical Vacationer");
+		mdata.setVesselName("Caribbean Cruiser");
 		mdata.setOrigDOI("doi:cdiac12345");
 
 		CruiseSdgncFile sdgncFile = new CruiseSdgncFile(mdata, dataList);
