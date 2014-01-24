@@ -140,7 +140,7 @@ public class CruiseSdgncFile {
 
                     var = null;
                     String s = (String) f.get(metadata);
-                    var = ncfile.findVariable(Constants.SHORT_NAME.get(f.getName()));
+                    var = ncfile.findVariable(f.getName());
                     if ( var != null ) {
                         ArrayChar.D2 values = new ArrayChar.D2(1, maxchar);
                         values.setString(0, s);
