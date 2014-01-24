@@ -78,16 +78,19 @@ public class CruiseSdgncFile {
                 Field f = fields[i];
                 String name = f.getName();
                 Class<?> type = f.getType();
-                if ( !name.equals("serialVersionUID")) {
+                if ( !Modifier.isStatic(f.getModifiers()) ) {
 
                     var = null;
-
+                    Number missVal = Double.NaN;
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
+                        missVal = Double.valueOf(-1.0);
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
+                        missVal = Double.NaN;
                     } else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.INT, dims);
+                        missVal = Integer.valueOf(-1);
                     } else if ( type.equals(String.class) ) {
                         // Skip for now.
                     }
@@ -100,7 +103,7 @@ public class CruiseSdgncFile {
                         if ( description != null ) {
                             ncfile.addVariableAttribute(var, new Attribute("long_name", description));
                         }
-                        ncfile.addVariableAttribute(var, new Attribute("missing_value", Double.NaN));
+                        ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
                     }
                 }
             }
@@ -111,16 +114,22 @@ public class CruiseSdgncFile {
             ncfile.addGroupAttribute(null, new Attribute("History", version));
             ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
             ncfile.addGroupAttribute(null, new Attribute("Convenstions", "CF-1.6"));
-            ncfile.addGroupAttribute(null, new Attribute("EastMostLongitude", metadata.getEastmostLongitude()));
-            ncfile.addGroupAttribute(null, new Attribute("WestMostLongitude", metadata.getWestmostLongitude()));
-            ncfile.addGroupAttribute(null, new Attribute("NorthMostLatitude", metadata.getNorthmostLatitude()));
-            ncfile.addGroupAttribute(null, new Attribute("SouthMostLatitude", metadata.getSouthmostLatitude()));
-
-            CalendarDate start = CalendarDate.of(metadata.getBeginTime());
-            CalendarDate end = CalendarDate.of(metadata.getEndTime());
-
-            ncfile.addGroupAttribute(null, new Attribute("time_coverage_start", start.toString()));
-            ncfile.addGroupAttribute(null, new Attribute("time_converage_end", end.toString()));
+            if ( ! metadata.getEastmostLongitude().isNaN() )
+            	ncfile.addGroupAttribute(null, new Attribute("EastMostLongitude", metadata.getEastmostLongitude()));
+            if ( ! metadata.getWestmostLongitude().isNaN() )
+            	ncfile.addGroupAttribute(null, new Attribute("WestMostLongitude", metadata.getWestmostLongitude()));
+            if ( ! metadata.getNorthmostLatitude().isNaN() )
+            	ncfile.addGroupAttribute(null, new Attribute("NorthMostLatitude", metadata.getNorthmostLatitude()));
+            if ( ! metadata.getSouthmostLatitude().isNaN() )
+            	ncfile.addGroupAttribute(null, new Attribute("SouthMostLatitude", metadata.getSouthmostLatitude()));
+            if ( ! metadata.getBeginTime().equals(SocatMetadata.INVALID_DATE) ) {
+            	CalendarDate start = CalendarDate.of(metadata.getBeginTime());
+            	ncfile.addGroupAttribute(null, new Attribute("time_coverage_start", start.toString()));
+            }
+            if ( ! metadata.getEndTime().equals(SocatMetadata.INVALID_DATE) ) {
+            	CalendarDate end = CalendarDate.of(metadata.getEndTime());
+            	ncfile.addGroupAttribute(null, new Attribute("time_converage_end", end.toString()));
+            }
 
             ncfile.create();
             // The header has been created.  Now let's fill it up.
@@ -151,7 +160,7 @@ public class CruiseSdgncFile {
                 Field f = fields[i];
                 String name = f.getName();
                 Class<?> type = f.getType();
-                if ( !name.equals("serialVersionUID")) {
+                if ( !Modifier.isStatic(f.getModifiers()) ) {
                     var = null;
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
                         var = ncfile.findVariable(Constants.SHORT_NAME.get(name));
@@ -168,7 +177,7 @@ public class CruiseSdgncFile {
 
                         }
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-                        var = ncfile.findVariable(name);
+                        var = ncfile.findVariable(Constants.SHORT_NAME.get(name));
                         if ( var != null ) {
                             ArrayDouble.D1 dvar = new ArrayDouble.D1(data.size());
                             for (int index = 0; index < data.size(); index++) {
@@ -181,7 +190,7 @@ public class CruiseSdgncFile {
 
                         }
                     } else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
-                        var = ncfile.findVariable(name);
+                        var = ncfile.findVariable(Constants.SHORT_NAME.get(name));
                         if ( var != null ) {
                             ArrayInt.D1 dvar = new ArrayInt.D1(data.size());
                             for (int index = 0; index < data.size(); index++) {
@@ -210,7 +219,11 @@ public class CruiseSdgncFile {
                     Integer hour = datarow.getHour();
                     Integer minute = datarow.getMinute();
                     Double second = datarow.getSecond();
-                    Integer sec = (int)Math.round(second);
+                    Integer sec;
+                    if ( second.isNaN() )
+                    	sec = 0;
+                    else
+                    	sec = (int)Math.round(second);
                     CalendarDate date = CalendarDate.of(Calendar.proleptic_gregorian, year, month, day, hour, minute, sec);
                     CalendarDate base = CalendarDate.of(Calendar.proleptic_gregorian, 1970, 1, 1, 0, 0, 0);
                     long lvalue = date.getDifferenceInMsecs(base);

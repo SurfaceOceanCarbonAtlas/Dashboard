@@ -23,7 +23,6 @@ import org.junit.Test;
 public class SocatCruiseDataTest {
 
 	static final Integer NEGATIVE_ONE = -1;
-	static final Integer ZERO = 0;
 
 	static final ArrayList<DataColumnType> TEST_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
 			DataColumnType.IGNORE,
@@ -158,8 +157,8 @@ public class SocatCruiseDataTest {
 			assertTrue( dataList.get(k).getEtopo2().isNaN() );
 			assertTrue( dataList.get(k).getGVCO2().isNaN() );
 			assertTrue( dataList.get(k).getDistToLand().isNaN() );
-			assertEquals(ZERO, dataList.get(k).getFCO2Source());
-			assertEquals(ZERO, dataList.get(k).getWoceFlag());
+			assertEquals(NEGATIVE_ONE, dataList.get(k).getFCO2Source());
+			assertEquals(NEGATIVE_ONE, dataList.get(k).getWoceFlag());
 			assertEquals("", dataList.get(k).getRegionID());
 		}
 	}
@@ -1393,7 +1392,7 @@ public class SocatCruiseDataTest {
 	@Test
 	public void testGetSetFCO2Source() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		data.setFCO2Source(F_CO2_SOURCE);
 		assertEquals(F_CO2_SOURCE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
@@ -1434,7 +1433,7 @@ public class SocatCruiseDataTest {
 		assertEquals(NEGATIVE_ONE, data.getMonth());
 		assertEquals(NEGATIVE_ONE, data.getYear());
 		data.setFCO2Source(null);
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 	}
 
 	static final Double DELTA_T = 0.3;
@@ -1448,7 +1447,7 @@ public class SocatCruiseDataTest {
 		assertTrue( data.getDeltaT().isNaN() );
 		data.setDeltaT(DELTA_T);
 		assertEquals(DELTA_T, data.getDeltaT());
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1502,7 +1501,7 @@ public class SocatCruiseDataTest {
 		data.setRegionID(REGION_ID);
 		assertEquals(REGION_ID, data.getRegionID());
 		assertTrue( data.getDeltaT().isNaN() );
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1557,7 +1556,7 @@ public class SocatCruiseDataTest {
 		assertEquals(CALC_SPEED, data.getCalcSpeed());
 		assertEquals("", data.getRegionID());
 		assertTrue( data.getDeltaT().isNaN() );
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1613,7 +1612,7 @@ public class SocatCruiseDataTest {
 		assertTrue( data.getCalcSpeed().isNaN() );
 		assertEquals("", data.getRegionID());
 		assertTrue( data.getDeltaT().isNaN() );
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1670,7 +1669,7 @@ public class SocatCruiseDataTest {
 		assertTrue( data.getCalcSpeed().isNaN() );
 		assertEquals("", data.getRegionID());
 		assertTrue( data.getDeltaT().isNaN() );
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1728,7 +1727,7 @@ public class SocatCruiseDataTest {
 		assertTrue( data.getCalcSpeed().isNaN() );
 		assertEquals("", data.getRegionID());
 		assertTrue( data.getDeltaT().isNaN() );
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1778,7 +1777,7 @@ public class SocatCruiseDataTest {
 	@Test
 	public void testGetSetWoceFlag() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(ZERO, data.getWoceFlag() );
+		assertEquals(NEGATIVE_ONE, data.getWoceFlag() );
 		data.setWoceFlag(WOCE_FLAG);
 		assertEquals(WOCE_FLAG, data.getWoceFlag());
 		assertTrue( data.getDistToLand().isNaN() );
@@ -1787,7 +1786,7 @@ public class SocatCruiseDataTest {
 		assertTrue( data.getCalcSpeed().isNaN() );
 		assertEquals("", data.getRegionID());
 		assertTrue( data.getDeltaT().isNaN() );
-		assertEquals(ZERO, data.getFCO2Source());
+		assertEquals(NEGATIVE_ONE, data.getFCO2Source());
 		assertTrue( data.getFCO2Rec().isNaN() );
 		assertTrue( data.getFCO2FromXCO2SstNcepWoa().isNaN() );
 		assertTrue( data.getFCO2FromXCO2TEquNcepWoa().isNaN() );
@@ -1826,7 +1825,7 @@ public class SocatCruiseDataTest {
 		assertEquals(NEGATIVE_ONE, data.getMonth());
 		assertEquals(NEGATIVE_ONE, data.getYear());
 		data.setWoceFlag(null);
-		assertEquals(ZERO, data.getWoceFlag() );
+		assertEquals(NEGATIVE_ONE, data.getWoceFlag() );
 	}
 
 	/**

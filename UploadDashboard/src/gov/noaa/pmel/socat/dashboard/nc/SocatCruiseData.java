@@ -145,7 +145,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		fCO2FromXCO2TEquNcepWoa = Double.NaN;
 		fCO2FromXCO2SstNcepWoa = Double.NaN;
 		fCO2Rec = Double.NaN;
-		fCO2Source = 0;
+		fCO2Source = -1;
 		deltaT = Double.NaN;
 		regionID = "";
 		calcSpeed = Double.NaN;
@@ -154,7 +154,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		distToLand = Double.NaN;
 		days1970 = Double.NaN;
 		dayOfYear = Double.NaN;
-		woceFlag = 0;
+		woceFlag = -1;
 	}
 
 	/**
@@ -1084,7 +1084,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the method used to create the recomputed fCO2;
-	 * 		never null but could be zero if not assigned
+	 * 		never null but could be -1 if not assigned
 	 */
 	public Integer getFCO2Source() {
 		return fCO2Source;
@@ -1093,11 +1093,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2Source
 	 * 		the method used to create the recomputed fCO2 to set;
-	 * 		if null, zero is assigned
+	 * 		if null, -1 is assigned
 	 */
 	public void setFCO2Source(Integer fCO2Source) {
 		if ( fCO2Source == null )
-			this.fCO2Source = 0;
+			this.fCO2Source = -1;
 		else
 			this.fCO2Source = fCO2Source;
 	}
@@ -1273,7 +1273,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the WOCE flag;
-	 * 		never null but could be zero if not assigned
+	 * 		never null but could be -1 if not assigned
 	 */
 	public Integer getWoceFlag() {
 		return woceFlag;
@@ -1282,11 +1282,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woceFlag 
 	 * 		the WOCE Flag to set;
-	 * 		if null, zero is assigned
+	 * 		if null, -1 is assigned
 	 */
 	public void setWoceFlag(Integer woceFlag) {
 		if ( woceFlag == null )
-			this.woceFlag = 0;
+			this.woceFlag = -1;
 		else
 			this.woceFlag = woceFlag;
 	}
