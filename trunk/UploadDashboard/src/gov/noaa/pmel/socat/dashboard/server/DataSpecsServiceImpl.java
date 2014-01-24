@@ -349,11 +349,12 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		}
 
 		// Clear all WOCE flags, then set those from the current set of message
-		cruiseData.setWoceThreeRowIndices(null);
-		cruiseData.setWoceFourRowIndices(null);
-		for ( Message msg : output.getMessages().getMessages() ) {
+		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceThreeRowIndices() )
+			rowIdxSet.clear();
+		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceFourRowIndices() )
+			rowIdxSet.clear();
+		for ( Message msg : output.getMessages().getMessages() )
 			processMessage(cruiseData, msg, timeColumnIndices);
-		}
 		
 		// TODO: add the reports of any issues found
 
@@ -393,6 +394,10 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 			Message msg, HashSet<Integer> timeColumnIndices) {
 		int rowIdx = msg.getLineIndex();
 		int colIdx = msg.getItemIndex();
+		// Currently colIdx is the output, not input, column index.
+		// So this is incorrect, but for testing the UI let it go on if we can.
+		if ( colIdx >= cruiseData.getDataColTypes().size() ) 
+			return;
 		if ( msg.isError() ) {
 			// Erroneous data value
 			if ( colIdx < 0 ) {

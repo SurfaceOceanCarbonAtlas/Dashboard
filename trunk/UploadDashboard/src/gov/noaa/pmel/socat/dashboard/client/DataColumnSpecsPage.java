@@ -14,9 +14,11 @@ import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -49,8 +51,8 @@ public class DataColumnSpecsPage extends Composite {
 	private static final int DATA_COLUMN_WIDTH = 16;
 
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String SUBMIT_TEXT_FROM_UPLOAD = "Check Data";
-	private static final String SUBMIT_TEXT_FROM_LIST = "Recheck Data";
+	private static final String SUBMIT_TEXT_FROM_UPLOAD = "OK";
+	private static final String SUBMIT_TEXT_FROM_LIST = "OK";
 	private static final String CANCEL_TEXT_FROM_UPLOAD = "Abort Upload";
 	private static final String CANCEL_TEXT_FROM_LIST = "Cancel";
 
@@ -65,8 +67,8 @@ public class DataColumnSpecsPage extends Composite {
 			"<li><em>(ignore)</em> data will be completely ignored</li>" +
 			"<li><em>(supplemental)</em> data will not be checked " +
 			"or used, but will be included in SOCAT output files</li>" +
-			"<li><em>NaN</em>, <em>NA</em>, <em>N/A</em>, and blank " +
-			"fields are always recognized as missing values</li>" +
+			"<li><em>(default missing values)</em> missing data values are " +
+			"any of <em>NaN</em>, <em>NA</em>, <em>N/A</em>, and blank</li>" +
 			"</ul>" +
 			"Cruise: <b>";
 	private static final String INTRO_EPILOGUE = "</b>";
@@ -307,6 +309,8 @@ public class DataColumnSpecsPage extends Composite {
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
 		cruise.setDataColUnits(cruiseSpecs.getDataColUnits());
 		cruise.setMissingValues(cruiseSpecs.getMissingValues());
+		cruise.setWoceThreeRowIndices(cruiseSpecs.getWoceThreeRowIndices());
+		cruise.setWoceFourRowIndices(cruiseSpecs.getWoceFourRowIndices());
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 		introHtml.setHTML(INTRO_PROLOGUE + 
@@ -585,16 +589,8 @@ public class DataColumnSpecsPage extends Composite {
 					SocatUploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
 					updateCruiseColumnSpecs(specs);
 				}
-				else if ( fromUpload ||
-					 status.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
-					// Return to the cruise list if no problems, 
-					// or even with errors if coming from cruise upload 
-					CruiseListPage.showPage(false);
-				}
 				else {
-					// Stays on the page if coming from the cruise list
-					// and errors or warnings were issued 
-					updateCruiseColumnSpecs(specs);
+					CruiseListPage.showPage(false);
 				}
 			}
 			@Override
@@ -626,6 +622,23 @@ public class DataColumnSpecsPage extends Composite {
 				return dataRow.get(colNum);
 			else
 				return "";
+		}
+		@Override
+		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
+			Integer rowIdx = ctx.getIndex();
+			if ( cruise.getWoceFourRowIndices().get(colNum).contains(rowIdx) ) {
+				sb.appendHtmlConstant("<span style=\"background-color:#FBB;\">");
+				super.render(ctx, obj, sb);
+				sb.appendHtmlConstant("</span>");
+			}
+			else if ( cruise.getWoceThreeRowIndices().get(colNum).contains(rowIdx) ) {
+				sb.appendHtmlConstant("<span style=\"background-color:#EEB;\">");
+				super.render(ctx, obj, sb);
+				sb.appendHtmlConstant("</span>");
+			}
+			else {
+				super.render(ctx, obj, sb);
+			}
 		}
 	}
 
