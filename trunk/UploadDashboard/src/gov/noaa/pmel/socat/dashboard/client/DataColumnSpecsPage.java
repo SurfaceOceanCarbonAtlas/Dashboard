@@ -58,7 +58,7 @@ public class DataColumnSpecsPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String INTRO_PROLOGUE = 
-			"<b><large>Check Cruise Data</large></b>" +
+			"<b><large>View Cruise Data</large></b>" +
 			"<br />" +
 			"Assign the type and, optionally, the missing-value for " +
 			"the data columns of this cruise." +
