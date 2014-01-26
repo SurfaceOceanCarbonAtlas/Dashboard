@@ -51,24 +51,25 @@ public class DashboardUtils {
 
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
 	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
-	public static final String CHECK_STATUS_QUESTIONABLE = "Possibly has errors";
-	public static final String CHECK_STATUS_ERRORS = "Has serious errors";
+	public static final String CHECK_STATUS_QUESTIONABLE = "Has questionable data";
+	public static final String CHECK_STATUS_ERRORS = "Has erroroneous data";
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
 
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
 	public static final String QC_STATUS_SUBMITTED = "Submitted";
-	public static final String QC_STATUS_ACCEPTED_A = "QC Flag A";
-	public static final String QC_STATUS_ACCEPTED_B = "QC Flag B";
-	public static final String QC_STATUS_ACCEPTED_C = "QC Flag C";
-	public static final String QC_STATUS_ACCEPTED_D = "QC Flag D";
-	public static final String QC_STATUS_UNACCEPTABLE = "QC Flag F";
+	public static final String QC_STATUS_ACCEPTED_A = "Flag A";
+	public static final String QC_STATUS_ACCEPTED_B = "Flag B";
+	public static final String QC_STATUS_ACCEPTED_C = "Flag C";
+	public static final String QC_STATUS_ACCEPTED_D = "Flag D";
+	public static final String QC_STATUS_ACCEPTED_E = "Flag E";
+	public static final String QC_STATUS_UNACCEPTABLE = "Flag F";
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
 
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
-	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
+	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 
 	/**
 	 * standard header names of the standard data columns

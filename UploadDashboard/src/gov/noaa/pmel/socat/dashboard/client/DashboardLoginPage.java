@@ -41,8 +41,7 @@ public class DashboardLoginPage extends Composite {
 	private static final String NO_CREDENTIALS_ERROR_MSG = 
 			"You must provide a username and password";
 
-	interface DashboardLoginPageUiBinder 
-			extends UiBinder<Widget, DashboardLoginPage> {
+	interface DashboardLoginPageUiBinder extends UiBinder<Widget, DashboardLoginPage> {
 	}
 
 	private static DashboardLoginPageUiBinder uiBinder = 
@@ -68,7 +67,7 @@ public class DashboardLoginPage extends Composite {
 	 * cleared.  Use the static methods getUsername and 
 	 * getPasshash to obtain current authentication values. 
 	 */
-	private DashboardLoginPage() {
+	DashboardLoginPage() {
 		// Create the page and set the static strings
 		initWidget(uiBinder.createAndBindUi(this));
 		welcomeHTML.setHTML(WELCOME_MSG);

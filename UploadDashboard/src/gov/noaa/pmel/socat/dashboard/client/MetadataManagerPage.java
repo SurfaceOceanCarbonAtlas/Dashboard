@@ -99,8 +99,7 @@ public class MetadataManagerPage extends Composite {
 	private static final String IS_OME_STRING = "***";
 	private static final String NOT_OME_STRING = "   ";
 
-	interface MetadataManagerPageUiBinder 
-			extends UiBinder<Widget, MetadataManagerPage> {
+	interface MetadataManagerPageUiBinder extends UiBinder<Widget, MetadataManagerPage> {
 	}
 
 	private static MetadataManagerPageUiBinder uiBinder = 
@@ -132,7 +131,7 @@ public class MetadataManagerPage extends Composite {
 	 * instead use the one of the showPage static methods to show the 
 	 * singleton instance of this page with the metadata for a cruise. 
 	 */
-	private MetadataManagerPage() {
+	MetadataManagerPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildMetadataListTable();
 		username = "";

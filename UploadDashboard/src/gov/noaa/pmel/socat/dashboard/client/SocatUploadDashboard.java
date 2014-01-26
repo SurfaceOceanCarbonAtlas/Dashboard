@@ -6,10 +6,11 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.UIObject;
 
-public class SocatUploadDashboard 
-					implements EntryPoint, ValueChangeHandler<String> {
+public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 
 	/**
 	 * Enumerated type to specify pages for browser history.
@@ -29,8 +30,6 @@ public class SocatUploadDashboard
 		METADATA_UPLOAD,
 		/** History tag for AddToSocatPage */
 		ADD_TO_SOCAT,
-		/** History tag for ArchivePage */
-		ARCHIVE,
 		/** History tag for DashboardLogoutPage */
 		LOGOUT
 	}
@@ -46,16 +45,15 @@ public class SocatUploadDashboard
 
 	// Keep a record of the currently displayed page
 	private Composite currentPage;
-	// PopupPanel for displaying messages (instead of using Window.alert)
+	// PopupPanel for displaying messages 
 	private DashboardInfoPopup msgPopup;
 
 	/**
 	 * Create the manager for the SocatUploadDashboard pages.
 	 * Do not use this constructor; instead use the static
-	 * get() method to obtain the singleton instance of this
-	 * class.
+	 * methods provided to display pages and messages.
 	 */
-	private SocatUploadDashboard() {
+	SocatUploadDashboard() {
 		// Just in case this gets called more than once, 
 		// remove any recorded page in the previous instantiation
 		if ( (singleton != null) && (singleton.currentPage != null) ) {
@@ -82,6 +80,25 @@ public class SocatUploadDashboard
 			singleton.msgPopup = new DashboardInfoPopup();
 		singleton.msgPopup.setInfoMessage(htmlMsg);
 		singleton.msgPopup.showCentered();
+	}
+
+	/**
+	 * Shows the message in a popup panel relative to the given UI obect. 
+	 * See {@link PopupPanel#showRelativeTo(UIObject)}. 
+	 * 
+	 * @param htmlMsg
+	 * 		unchecked HTML message to show.
+	 * @param obj
+	 * 		show the message relative to this object
+	 * 		(usually underneath, left-aligned)
+	 */
+	public static void showMessageAt(String htmlMsg, UIObject obj) {
+		if ( singleton == null )
+			singleton = new SocatUploadDashboard();
+		if ( singleton.msgPopup == null )
+			singleton.msgPopup = new DashboardInfoPopup();
+		singleton.msgPopup.setInfoMessage(htmlMsg);
+		singleton.msgPopup.showRelativeTo(obj);
 	}
 
 	/**
@@ -166,10 +183,6 @@ public class SocatUploadDashboard
 		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
 			// Add to SOCAT page from history
 			AddToSocatPage.redisplayPage(false);
-		}
-		else if ( token.equals(PagesEnum.ARCHIVE.name()) ) {
-			// Archive page from history
-			ArchivePage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
 			// Logout page from history

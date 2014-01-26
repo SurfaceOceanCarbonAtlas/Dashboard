@@ -44,8 +44,7 @@ public class DashboardLogoutPage extends Composite {
 	private static final String REQUEST_FAILED_MSG = 
 			"Sorry, an error occurred with your logout request";
 
-	interface DashboardLogoutPageUiBinder 
-			extends UiBinder<Widget, DashboardLogoutPage> {
+	interface DashboardLogoutPageUiBinder extends UiBinder<Widget, DashboardLogoutPage> {
 	}
 
 	private static DashboardLogoutPageUiBinder uiBinder = 
@@ -66,7 +65,7 @@ public class DashboardLogoutPage extends Composite {
 	 * instead use the showPage static method to show the 
 	 * singleton instance of this page.
 	 */
-	private DashboardLogoutPage() {
+	DashboardLogoutPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		goodbyeHTML.setHTML(GOODBYE_MSG);
 		reloginButton.setText(RELOGIN_TEXT);

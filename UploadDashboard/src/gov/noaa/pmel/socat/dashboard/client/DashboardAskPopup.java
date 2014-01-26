@@ -25,8 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardAskPopup extends Composite {
 
-	interface DashboardAskPopupUiBinder 
-			extends UiBinder<Widget, DashboardAskPopup> {
+	interface DashboardAskPopupUiBinder extends UiBinder<Widget, DashboardAskPopup> {
 	}
 
 	private static DashboardAskPopupUiBinder uiBinder = 

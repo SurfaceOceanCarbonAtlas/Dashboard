@@ -30,7 +30,7 @@ import com.google.gwt.user.cellview.client.Header;
  */
 public class CruiseDataColumn {
 
-	private static final String DEFAULT_MISSING_VALUE = "(default missing)";
+	static final String DEFAULT_MISSING_VALUE = "(default missing values)";
 
 	// Class to deal with a data column type and unit pair
 	private static class TypeUnits {
