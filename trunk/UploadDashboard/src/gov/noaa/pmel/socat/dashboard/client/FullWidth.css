@@ -146,6 +146,12 @@ body {
 	margin-left: 2em;
 	margin-right: 1em;
 }
+.optionsintro {
+	display: block;
+	margin-left: 0.5em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
 .optionpanel {
 	display: block;
 	margin-top: 1.5em;

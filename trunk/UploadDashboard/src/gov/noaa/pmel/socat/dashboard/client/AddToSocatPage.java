@@ -7,25 +7,21 @@ import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
 import gov.noaa.pmel.socat.dashboard.shared.AddToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
+import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.TreeSet;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
-import com.google.gwt.user.cellview.client.DataGrid;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -33,9 +29,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
 
 /**
  * Page for submitting cruises to be incorporated into the SOCAT collection.
@@ -48,12 +42,74 @@ public class AddToSocatPage extends Composite {
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String MORE_INFO_TEXT = "more ...";
 
-	private static final String ADD_TO_SOCAT_FIRST_INFO_HTML =
-			"<b>Submit Cruises to the QC System</b>" +
+	private static final String INTRO_HTML_PROLOGUE =
+			"<b>Submit Cruises to the QC System / Manage Archival</b>" +
 			"<br /><br />" +
-			"Add the cruises listed in the table below for policy (QC) assessment." +
+			"Add the following cruises to the SOCAT collection for policy (QC) " +
+			"assessment, or modify the archival of already-submitted cruises." +
+			"<ul>";
+	private static final String INTRO_HTML_EPILOGUE = 
+			"</ul>";
+
+	private static final String CRUISE_INFO_PROLOGUE = 
+			"&nbsp;&nbsp;&nbsp;&nbsp;<em>(";
+	private static final String QC_STATUS_INTRO =
+			"QC status: ";
+	private static final String ARCHIVE_STATUS_INTRO =
+			"CDIAC archive request sent on ";
+	private static final String CRUISE_INFO_EPILOGUE =
+			")</em>";
+
+	private static final String ARCHIVE_PLAN_INTRO = 
+			"Archival plan for the uploaded data and metadata of these cruises: ";
+	private static final String SOCAT_ARCHIVE_TEXT = 
+			"archive at CDIAC at the time of the next SOCAT public release";
+	private static final String SOCAT_ARCHIVE_INFO_HTML = 
+			"By selecting this option I am giving permission for my uploaded cruise " +
+			"files and metadata for these cruises to be archived at CDIAC.  This will " +
+			"occur, for cruises deemed acceptable, at the time of the next SOCAT public " +
+			"release, after which the files will be made accessible to the public " +
+			"through the CDIAC Web site.";
+
+	private static final String CDIAC_ARCHIVE_TEXT = 
+			"archive at CDIAC as soon as possible";
+	private static final String CDIAC_ARCHIVE_INFO_HTML =
+			"By selecting this option I am requesting that my uploaded cruise files " +
+			"and metadata for these cruise be archived at CDIAC as soon as possible.  " +
+			"When CDIAC provides a DOI, or other reference, for these archived files, " +
+			"I will insure these references are in the metadata supplied to SOCAT for " +
+			"the cruises.";
+
+	private static final String OWNER_ARCHIVE_TEXT =
+			"do not archive at CDIAC; I will manage archival myself";
+	private static final String OWNER_ARCHIVE_ADDN_HTML =
+			"<em>(and I understand it is my responsibility to include DOIs " +
+			"in SOCAT metadata)</em>";
+	private static final String OWNER_ARCHIVE_INFO_HTML = 
+			"By selecting this option I am agreeing to archive the uploaded cruise " +
+			"files and metadata for these cruises at a data center of my choice before " +
+			"the SOCAT public release containing these cruises.  If I am provided a " +
+			"DOI or other reference for these archived files, I will include these " +
+			"references in the metadata supplied to SOCAT for the cruises.";
+
+	private static final String ALREADY_SENT_CDIAC_HTML =
+			"<b>WARNING</b>" +
 			"<br /><br />" +
-			"<b>Required:</b>";
+			"Some or all of these cruises were earlier sent to CDIAC for archival. " +
+			"Normally you do not want to change the archival option for these cruises. " +
+			"<br /><br />" +
+			"If you are managing the archival of a mix of cruises that have and have " +
+			"not been sent to CDIAC, we strongly recommend you cancel this action and " +
+			"manage only those cruises that have not been sent to CDIAC.";
+
+	private static final String RESEND_CDIAC_QUESTION = 
+			"Some or all of these cruises were earlier sent to CDIAC for archival.  " +
+			"Do you want to send these cruises <em>again<em>?" +
+			"<br /><br />" +
+			"<em>If you send these cruises again, you should contact CDIAC to " +
+			"explain the reason for this repeated request for archival.</em>";
+	private static final String YES_RESEND_TEXT = "Yes, send";
+	private static final String NO_CANCEL_TEXT = "No, cancel";
 
 	private static final String AGREE_SHARE_TEXT = 
 			"I give permission for these cruises to be shared for policy (QC) assessment.";
@@ -64,31 +120,17 @@ public class AddToSocatPage extends Composite {
 			"be further distributed until the next official publication of SOCAT, if " +
 			"the cruise was deemed acceptable. ";
 
-	private static final String ADD_TO_SOCAT_SECOND_INFO_HTML =
-			"Archival plan for the uploaded data and metadata of these cruises:";
+	private static final String AGREE_SHARE_REQUIRED_MSG =
+			"You must give permission to shared the cruise data for policy " +
+			"(QC) assessment before the cruises can be added to the QC system.";
 
 	private static final String SUBMIT_FAILURE_MSG = 
-			"Unexpected failure submitting cruises to SOCAT: ";
+			"Unexpected failure with submitting cruises to SOCAT: ";
 
-	private static final String SUBMIT_TEXT = "Add to SOCAT";
+	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Cancel";
 
-	// Column header strings
-	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
-	private static final String OWNER_COLUMN_NAME = "Owner";
-	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
-	private static final String METADATA_COLUMN_NAME = "Metadata";
-	private static final String FILENAME_COLUMN_NAME = "Filename";
-
-	// Replacement strings for empty or null values
-	private static final String NO_EXPOCODE_STRING = "(unknown)";
-	private static final String NO_OWNER_STRING = "(unknown)";
-	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
-	private static final String NO_METADATA_STATUS_STRING = "(no metadata)";
-	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
-
-	interface AddCruiseToSocatPageUiBinder 
-			extends UiBinder<Widget, AddToSocatPage> {
+	interface AddCruiseToSocatPageUiBinder extends UiBinder<Widget, AddToSocatPage> {
 	}
 
 	private static AddCruiseToSocatPageUiBinder uiBinder = 
@@ -99,54 +141,64 @@ public class AddToSocatPage extends Composite {
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField HTML firstInfoHtml;
-	@UiField CheckBox agreeShareCheckBox;
-	@UiField Button agreeShareInfoButton;
-	@UiField HTML secondInfoHtml;
+	@UiField HTML introHtml;
+	@UiField Label archivePlanLabel;
 	@UiField RadioButton socatRadio;
 	@UiField Button socatInfoButton;
+	@UiField RadioButton cdiacRadio;
+	@UiField Button cdiacInfoButton;
 	@UiField RadioButton ownerRadio;
 	@UiField Button ownerInfoButton;
 	@UiField HTML ownerAddnHtml;
-	@UiField ResizeLayoutPanel cruisesPanel;
-	@UiField DataGrid<DashboardCruise> cruisesGrid;
+	@UiField CheckBox agreeShareCheckBox;
+	@UiField Button agreeShareInfoButton;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
 	private String username;
-	private DashboardInfoPopup agreeSharePopup;
+	private HashSet<String> expocodes;
+	private boolean hasSentCruise;
 	private DashboardInfoPopup socatArchivePopup;
+	private DashboardInfoPopup cdiacInfoPopup;
 	private DashboardInfoPopup ownerArchivePopup;
-	private ListDataProvider<DashboardCruise> listProvider;
+	private DashboardInfoPopup agreeSharePopup;
+	private DashboardAskPopup resubmitAskPopup;
 
 	// The singleton instance of this page
 	private static AddToSocatPage singleton;
 
-	private AddToSocatPage() {
+	/**
+	 * Creates an empty AddToSocat page.  Do not use this constructor;
+	 * instead use the static showPage or redisplayPage method.
+	 */
+	AddToSocatPage() {
 		initWidget(uiBinder.createAndBindUi(this));
-		buildCruiseListTable();
 
 		username = "";
+		expocodes = new HashSet<String>();
+		hasSentCruise = false;
 
 		logoutButton.setText(LOGOUT_TEXT);
 
-		firstInfoHtml.setHTML(ADD_TO_SOCAT_FIRST_INFO_HTML);
+		archivePlanLabel.setText(ARCHIVE_PLAN_INTRO);
+		socatRadio.setText(SOCAT_ARCHIVE_TEXT);
+		socatInfoButton.setText(MORE_INFO_TEXT);
+		socatArchivePopup = null;
+
+		cdiacRadio.setText(CDIAC_ARCHIVE_TEXT);
+		cdiacInfoButton.setText(MORE_INFO_TEXT);
+		cdiacInfoPopup = null;
+
+		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
+		ownerInfoButton.setText(MORE_INFO_TEXT);
+		ownerAddnHtml.setHTML(OWNER_ARCHIVE_ADDN_HTML);
+		ownerArchivePopup = null;
 
 		agreeShareCheckBox.setText(AGREE_SHARE_TEXT);
 		agreeShareInfoButton.setText(MORE_INFO_TEXT);
 		agreeSharePopup = null;
 
-		secondInfoHtml.setHTML(ADD_TO_SOCAT_SECOND_INFO_HTML);
-
-		socatRadio.setText(ArchivePage.SOCAT_ARCHIVE_TEXT);
-		socatInfoButton.setText(MORE_INFO_TEXT);
-		socatArchivePopup = null;
-
-		ownerRadio.setText(ArchivePage.OWNER_ARCHIVE_TEXT);
-		ownerInfoButton.setText(MORE_INFO_TEXT);
-		ownerArchivePopup = null;
-		ownerAddnHtml.setHTML(ArchivePage.OWNER_ARCHIVE_ADDN_HTML);
-
+		resubmitAskPopup = null;
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
 	}
@@ -192,26 +244,99 @@ public class AddToSocatPage extends Composite {
 	 * @param cruises
 	 * 		cruises to display
 	 */
-	private void updateCruises(HashSet<DashboardCruise> cruises) {
+	private void updateCruises(HashSet<DashboardCruise> cruisesSet) {
 		// Update the username
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
-		// Reselect the check boxes
-		agreeShareCheckBox.setValue(true, true);
-		socatRadio.setValue(true, true);
-		// Update the cruises shown by resetting the data in the data provider
-		List<DashboardCruise> cruiseList = listProvider.getList();
-		cruiseList.clear();
-		if ( cruises != null ) {
-			cruiseList.addAll(cruises);
+
+		expocodes.clear();
+		hasSentCruise = false;
+		int numSocat = 0;
+		int numOwner = 0;
+		int numCdiac = 0;
+		TreeSet<String> cruiseIntros = new TreeSet<String>();
+		for ( DashboardCruise cruise : cruisesSet ) {
+			String expo = cruise.getExpocode();
+			// Add the expocode of this cruise to the list for the server 
+			expocodes.add(expo);
+			// Add the status of this cruise to the counts 
+			String archiveStatus = cruise.getArchiveStatus();
+			if ( archiveStatus.equals(
+					DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ) {
+				// Archive with next SOCAT release
+				numSocat++;
+			}
+			else if ( archiveStatus.equals(
+					DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
+				// Archive at CDIAC now
+				numCdiac++;
+			}
+			else if ( archiveStatus.equals(
+					DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
+				// Owner will archive
+				numOwner++;
+			}
+			else if ( ! archiveStatus.equals(
+					DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ) {
+				// unknown status - should not happen
+				Window.alert("Unexpected archive status: " + archiveStatus);
+			}
+			// Add this cruise to the intro list
+			String submitStatus = cruise.getQcStatus();
+			String cdiacDate = cruise.getCdiacDate();
+			if ( submitStatus.isEmpty() && cdiacDate.isEmpty() ) {
+				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
+						"</li>");				
+			}
+			else if ( cdiacDate.isEmpty() ) {
+				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
+						CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
+						submitStatus + CRUISE_INFO_EPILOGUE + "</li>");								
+			}
+			else if ( submitStatus.isEmpty() ) {
+				hasSentCruise = true;
+				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
+						CRUISE_INFO_PROLOGUE + ARCHIVE_STATUS_INTRO +
+						cdiacDate + CRUISE_INFO_EPILOGUE + "</li>");								
+			}
+			else {
+				hasSentCruise = true;
+				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
+						CRUISE_INFO_PROLOGUE + QC_STATUS_INTRO +
+						submitStatus + "; " + ARCHIVE_STATUS_INTRO +
+						cdiacDate + CRUISE_INFO_EPILOGUE + "</li>");								
+			}
 		}
-		cruisesGrid.setRowCount(cruiseList.size());
-		// Make sure the table is sorted according to the last specification
-		ColumnSortEvent.fire(cruisesGrid, cruisesGrid.getColumnSortList());
-		// Resize the panel containing the grid 
-		cruisesPanel.setHeight(Integer.toString(2 * cruiseList.size() + 3) + "em");
-		// Make sure the submit button is enabled since the agreeShareCheckBox is checked
-		submitButton.setEnabled(true);
+
+		// Create the intro using the ordered expocodes
+		String introMsg = INTRO_HTML_PROLOGUE;
+		for ( String introItem : cruiseIntros ) {
+			introMsg += introItem;
+		}
+		introMsg += INTRO_HTML_EPILOGUE;
+		introHtml.setHTML(introMsg);
+
+		// Check the appropriate radio button
+		if ( (numOwner == 0) && (numCdiac == 0) ) {
+			// All "with next SOCAT" or not assigned
+			socatRadio.setValue(true, true);
+		}
+		else if ( (numSocat == 0) && (numOwner == 0) ) {
+			// All "sent to CDIAC", so keep that setting
+			cdiacRadio.setValue(true, true);
+		}
+		else if ( (numSocat == 0) && (numCdiac == 0) ) {
+			// All "owner will archive", so keep that setting
+			ownerRadio.setValue(true, true);
+		}
+		else {
+			// A mix, so set to "with next SOCAT" and let the user decide
+			socatRadio.setValue(true, true);
+		}
+
+		// Select the agree-to-share check boxes
+		agreeShareCheckBox.setValue(true, true);
+
 		// Reset the focus on the submit button
 		submitButton.setFocus(true);
 	}
@@ -219,6 +344,47 @@ public class AddToSocatPage extends Composite {
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
+	}
+
+	@UiHandler({"socatRadio","ownerRadio"})
+	void radioOnClick(ClickEvent event) {
+		// If there is a cruise sent to CDIAC, warn if another selection is made
+		if ( hasSentCruise ) {
+			SocatUploadDashboard.showMessage(ALREADY_SENT_CDIAC_HTML);
+		}
+	}
+
+	@UiHandler("socatInfoButton")
+	void socatInfoOnClick(ClickEvent event) {
+		// Create the popup only when needed and if it does not exist
+		if ( socatArchivePopup == null ) {
+			socatArchivePopup = new DashboardInfoPopup();
+			socatArchivePopup.setInfoMessage(SOCAT_ARCHIVE_INFO_HTML);
+		}
+		// Show the popup over the info button
+		socatArchivePopup.showRelativeTo(socatInfoButton);
+	}
+
+	@UiHandler("cdiacInfoButton")
+	void cdiacInfoOnClick(ClickEvent event) {
+		// Create the popup only when needed and if it does not exist
+		if ( cdiacInfoPopup == null ) {
+			cdiacInfoPopup = new DashboardInfoPopup();
+			cdiacInfoPopup.setInfoMessage(CDIAC_ARCHIVE_INFO_HTML);
+		}
+		// Show the popup over the info button
+		cdiacInfoPopup.showRelativeTo(cdiacInfoButton);
+	}
+
+	@UiHandler("ownerInfoButton")
+	void ownerInfoOnClick(ClickEvent event) {
+		// Create the popup only when needed and if it does not exist
+		if ( ownerArchivePopup == null ) {
+			ownerArchivePopup = new DashboardInfoPopup();
+			ownerArchivePopup.setInfoMessage(OWNER_ARCHIVE_INFO_HTML);
+		}
+		// Show the popup over the info button
+		ownerArchivePopup.showRelativeTo(ownerInfoButton);
 	}
 
 	@UiHandler("agreeShareInfoButton")
@@ -232,34 +398,6 @@ public class AddToSocatPage extends Composite {
 		agreeSharePopup.showRelativeTo(agreeShareInfoButton);
 	}
 
-	@UiHandler("socatInfoButton")
-	void socatInfoOnClick(ClickEvent event) {
-		// Create the popup only when needed and if it does not exist
-		if ( socatArchivePopup == null ) {
-			socatArchivePopup = new DashboardInfoPopup();
-			socatArchivePopup.setInfoMessage(ArchivePage.SOCAT_ARCHIVE_INFO_HTML);
-		}
-		// Show the popup over the info button
-		socatArchivePopup.showRelativeTo(socatInfoButton);
-	}
-
-	@UiHandler("ownerInfoButton")
-	void ownerInfoOnClick(ClickEvent event) {
-		// Create the popup only when needed and if it does not exist
-		if ( ownerArchivePopup == null ) {
-			ownerArchivePopup = new DashboardInfoPopup();
-			ownerArchivePopup.setInfoMessage(ArchivePage.OWNER_ARCHIVE_INFO_HTML);
-		}
-		// Show the popup over the info button
-		ownerArchivePopup.showRelativeTo(ownerInfoButton);
-	}
-
-	@UiHandler("agreeShareCheckBox")
-	void agreeShareCheckBoxOnValueChange(ValueChangeEvent<Boolean> event) {
-		// submitButton is enabled if and only if agreeShareCheckBox is checked
-		submitButton.setEnabled(agreeShareCheckBox.getValue());
-	}
-
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Return to the cruise list page exactly as it was
@@ -268,20 +406,72 @@ public class AddToSocatPage extends Composite {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
-		// Get the expocodes of the cruises to add to SOCAT
-		HashSet<String> cruiseExpocodes = new HashSet<String>();
-		for ( DashboardCruise cruise : listProvider.getList() )
-			cruiseExpocodes.add(cruise.getExpocode());
-		// Get the default archive status for cruises without DOI's
+		if ( ! agreeShareCheckBox.getValue() ) {
+			SocatUploadDashboard.showMessageAt(
+					AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
+			return;
+		}
+		if ( hasSentCruise && cdiacRadio.getValue() ) {
+			// Asking to submit to CDIAC now, but has a cruise already sent
+			if ( resubmitAskPopup == null ) {
+				resubmitAskPopup = new DashboardAskPopup(YES_RESEND_TEXT, 
+						NO_CANCEL_TEXT, new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean okay) {
+						// Continue setting the archive status (and thus, 
+						// sending the request to CDIAC) only if user okays it
+						if ( okay ) {
+							continueSubmit();
+						}
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						// Never called
+						;
+					}
+				});
+			}
+			resubmitAskPopup.askQuestion(RESEND_CDIAC_QUESTION);
+		}
+		else {
+			// Either no cruises sent to CDIAC, or not a send to CDIAC now request. 
+			// Continue setting the archive status.
+			continueSubmit();
+		}
+	}
+
+	/**
+	 * Submits cruises and updated archival selection to SOCAT.
+	 */
+	void continueSubmit() {
+		String localTimestamp = 
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
+							  .format(new Date());
 		String archiveStatus;
-		if ( socatRadio.getValue() )
+		if ( socatRadio.getValue() ) {
+			// Archive with the next release of SOCAT
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT;
-		else
+		}
+		else if ( cdiacRadio.getValue() ) {
+			// Tell CDIAC to archive now
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC;
+		}
+		else if ( ownerRadio.getValue() ) {
+			// Owner will archive
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
+		}
+		else {
+			// Should never happen
+			Window.alert("Unexpect state where no radio buttons are selected");
+			return;
+		}
+
+		boolean repeatSend = true;
 		// Add the cruises to SOCAT
 		service.addCruisesToSocat(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), cruiseExpocodes, 
-				archiveStatus, new AsyncCallback<Void>() {
+				DashboardLoginPage.getPasshash(), expocodes, 
+				archiveStatus, localTimestamp, repeatSend,
+				new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Success - go back to the cruise list page
@@ -292,179 +482,6 @@ public class AddToSocatPage extends Composite {
 				SocatUploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
 			}
 		});
-	}
-
-	/**
-	 * Creates the cruise data table columns.  The table will still need 
-	 * to be populated using {@link #updateCruises(DashboardCruiseList)}.
-	 */
-	private void buildCruiseListTable() {
-		
-		// Create the columns for this table
-		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
-		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
-		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
-		TextColumn<DashboardCruise> metadataColumn = buildMetadataColumn();
-		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
-
-		// Add the columns, with headers, to the table
-		cruisesGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
-		cruisesGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
-		cruisesGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
-		cruisesGrid.addColumn(metadataColumn, METADATA_COLUMN_NAME);
-		cruisesGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
-
-		// Set the minimum widths of the columns
-		double tableWidth = 0.0;
-		cruisesGrid.setColumnWidth(expocodeColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		cruisesGrid.setColumnWidth(ownerColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		cruisesGrid.setColumnWidth(dataCheckColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		cruisesGrid.setColumnWidth(metadataColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
-		cruisesGrid.setColumnWidth(filenameColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
-
-		// Set the minimum width of the full table
-		cruisesGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
-
-		// Create the data provider for this table
-		listProvider = new ListDataProvider<DashboardCruise>();
-		listProvider.addDataDisplay(cruisesGrid);
-
-		// Make the columns sortable
-		expocodeColumn.setSortable(true);
-		ownerColumn.setSortable(true);
-		dataCheckColumn.setSortable(true);
-		metadataColumn.setSortable(true);
-		filenameColumn.setSortable(true);
-
-		// Add a column sorting handler for these columns
-		ListHandler<DashboardCruise> columnSortHandler = 
-				new ListHandler<DashboardCruise>(listProvider.getList());
-		columnSortHandler.setComparator(expocodeColumn, 
-				DashboardCruise.expocodeComparator);
-		columnSortHandler.setComparator(ownerColumn, 
-				DashboardCruise.ownerComparator);
-		columnSortHandler.setComparator(dataCheckColumn, 
-				DashboardCruise.dataCheckComparator);
-		columnSortHandler.setComparator(metadataColumn, 
-				DashboardCruise.metadataFilenamesComparator);
-		columnSortHandler.setComparator(filenameColumn, 
-				DashboardCruise.filenameComparator);
-
-		// Add the sort handler to the table, and sort by expocode by default
-		cruisesGrid.addColumnSortHandler(columnSortHandler);
-		cruisesGrid.getColumnSortList().push(expocodeColumn);
-
-		// Set the contents if there are no rows
-		cruisesGrid.setEmptyTableWidget(new Label("No cruises???"));
-
-		// Following recommended to improve efficiency with IE
-		cruisesGrid.setSkipRowHoverCheck(false);
-		cruisesGrid.setSkipRowHoverFloatElementCheck(false);
-		cruisesGrid.setSkipRowHoverStyleUpdate(false);
-	}
-
-	/**
-	 * Creates the expocode column for the table
-	 */
-	private TextColumn<DashboardCruise> buildExpocodeColumn() {
-		TextColumn<DashboardCruise> expocodeColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				String expocode = cruise.getExpocode();
-				if ( expocode.isEmpty() )
-					expocode = NO_EXPOCODE_STRING;
-				return expocode;
-			}
-		};
-		return expocodeColumn;
-	}
-
-	/**
-	 * Creates the owner column for the table
-	 */
-	private TextColumn<DashboardCruise> buildOwnerColumn() {
-		TextColumn<DashboardCruise> ownerColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				String owner = cruise.getOwner();
-				if ( owner.isEmpty() )
-					owner = NO_OWNER_STRING;
-				return owner;
-			}
-		};
-		return ownerColumn;
-	}
-
-	/**
-	 * Creates the data-check status column for the table
-	 */
-	private TextColumn<DashboardCruise> buildDataCheckColumn() {
-		TextColumn<DashboardCruise> dataCheckColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				String status = cruise.getDataCheckStatus();
-				if ( status.isEmpty() )
-					status = NO_DATA_CHECK_STATUS_STRING;
-				return status;
-			}
-		};
-		return dataCheckColumn;
-	}
-
-	/**
-	 * Creates the metadata files column for the table
-	 */
-	private TextColumn<DashboardCruise> buildMetadataColumn() {
-		TextColumn<DashboardCruise> metaCheckColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				TreeSet<String> filenames = cruise.getMetadataFilenames();
-				if ( filenames.size() == 0 )
-					return NO_METADATA_STATUS_STRING;
-				StringBuilder sb = new StringBuilder();
-				boolean firstEntry = true;
-				for ( String name : filenames ) {
-					if ( firstEntry )
-						firstEntry = false;
-					else
-						sb.append("; ");
-					sb.append(name);
-				}
-				return sb.toString();
-			}
-		};
-		return metaCheckColumn;
-	}
-
-	/**
-	 * Creates the filename column for the table
-	 */
-	private TextColumn<DashboardCruise> buildFilenameColumn() {
-		TextColumn<DashboardCruise> filenameColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				String uploadFilename = cruise.getUploadFilename();
-				if ( uploadFilename.isEmpty() )
-					uploadFilename = NO_UPLOAD_FILENAME_STRING;
-				return uploadFilename;
-			}
-		};
-		return filenameColumn;
 	}
 
 }

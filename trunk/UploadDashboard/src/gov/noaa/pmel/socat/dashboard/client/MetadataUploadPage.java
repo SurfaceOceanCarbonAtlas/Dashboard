@@ -72,8 +72,7 @@ public class MetadataUploadPage extends Composite {
 	private static final String OVERWRITE_YES_TEXT = "Yes";
 	private static final String OVERWRITE_NO_TEXT = "No";
 
-	interface MetadataUploadPageUiBinder 
-			extends UiBinder<Widget, MetadataUploadPage> {
+	interface MetadataUploadPageUiBinder extends UiBinder<Widget, MetadataUploadPage> {
 	}
 
 	private static MetadataUploadPageUiBinder uiBinder = 
@@ -100,7 +99,7 @@ public class MetadataUploadPage extends Composite {
 	// Singleton instance of this page
 	private static MetadataUploadPage singleton = null;
 
-	private MetadataUploadPage() {
+	MetadataUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		username = "";
 		cruises = new HashSet<DashboardCruise>();
@@ -252,7 +251,7 @@ public class MetadataUploadPage extends Composite {
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z")
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
 		timestampToken.setValue(localTimestamp);
 		expocodesToken.setValue(

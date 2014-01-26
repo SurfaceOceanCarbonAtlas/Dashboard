@@ -24,8 +24,7 @@ public class DashboardInfoPopup extends Composite {
 
 	private static final String DISMISS_TEXT = "Dismiss";
 
-	interface DashboardInfoPopupUiBinder 
-			extends UiBinder<Widget, DashboardInfoPopup> {
+	interface DashboardInfoPopupUiBinder extends UiBinder<Widget, DashboardInfoPopup> {
 	}
 
 	private static DashboardInfoPopupUiBinder uiBinder = 

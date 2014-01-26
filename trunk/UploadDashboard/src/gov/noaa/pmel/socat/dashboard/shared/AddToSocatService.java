@@ -29,6 +29,11 @@ public interface AddToSocatService extends RemoteService {
 	 * 		expocodes of cruises to add to SOCAT
 	 * @param archiveStatus
 	 * 		archive status to apply to all cruises without a DOI
+	 * @param localTimestamp
+	 * 		client local timestamp of this request 
+	 * @param repeatSend
+	 * 		if the request is to send to CDIAC ASAP,
+	 * 		should cruises already sent be resent?
 	 * @return
 	 * 		updated dashboard listing of all cruises for the user
 	 * @throws IllegalArgumentException
@@ -37,29 +42,8 @@ public interface AddToSocatService extends RemoteService {
 	 * 		the cruise data failed
 	 */
 	void addCruisesToSocat(String username, String passhash, 
-			HashSet<String> cruiseExpocodes, String archiveStatus) 
-					throws IllegalArgumentException;
-
-	/**
-	 * After authenticating the user using the given credentials,
-	 * changes the archive status for the given cruises.
-	 * 
-	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
-	 * @param cruiseExpocodes
-	 * 		expocodes of the cruises
-	 * @param archiveStatus
-	 * 		archive status for the cruises
-	 * @param localTimestamp
-	 * 		client local timestamp of this request 
-	 * @param repeatSend
-	 * 		if the request is to send to CDIAC ASAP,
-	 * 		should cruises already sent be resent?
-	 */
-	void setCruiseArchiveStatus(String username, String passhash,
 			HashSet<String> cruiseExpocodes, String archiveStatus, 
-			String localTimestamp, boolean repeatSend);
+			String localTimestamp, boolean repeatSend)
+									throws IllegalArgumentException;
 
 }

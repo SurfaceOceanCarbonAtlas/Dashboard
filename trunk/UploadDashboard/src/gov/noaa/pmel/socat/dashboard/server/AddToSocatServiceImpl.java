@@ -20,11 +20,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class AddToSocatServiceImpl extends RemoteServiceServlet 
 										implements AddToSocatService {
 
-	private static final long serialVersionUID = 5328412844537124821L;
+	private static final long serialVersionUID = -177066153383975100L;
 
 	@Override
 	public void addCruisesToSocat(String username, String passhash, 
-			HashSet<String> cruiseExpocodes, String archiveStatus) 
+			HashSet<String> cruiseExpocodes, String archiveStatus, 
+			String localTimestamp, boolean repeatSend) 
 										throws IllegalArgumentException {
 		// Authenticate the user
 		DashboardDataStore dataStore;
@@ -35,103 +36,72 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 					"Unexpected configuration error: " + ex.getMessage());
 		}
 		if ( ! dataStore.validateUser(username, passhash) )
-			throw new IllegalArgumentException(
-					"Invalid authentication credentials");
+			throw new IllegalArgumentException("Invalid authentication credentials");
 
-		CruiseFileHandler cruiseHandler = 
-				dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		HashSet<String> ingestExpos = new HashSet<String>();
+		HashSet<String> archiveExpos = new HashSet<String>();
+		HashSet<String> cdiacExpos = new HashSet<String>();
+
 		// Update the SOCAT status of the cruises
 		for ( String expocode : cruiseExpocodes ) {
 			// Get the properties of this cruise
-			DashboardCruise cruise = 
-					cruiseHandler.getCruiseFromInfoFile(expocode);
-			if ( cruise == null ) 
-				throw new IllegalArgumentException(
-						"Unknown cruise " + expocode);
-
-			// Update the QC status for this cruise
-			String qcStatus;
-			String dataStatus = cruise.getDataCheckStatus();
-			String omeFilename = cruise.getOmeFilename();
-			if ( ( ! omeFilename.isEmpty() ) && 
-				 ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(dataStatus) ||
-				   DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(dataStatus) ) )
-				qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
-			else
-				qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;
-			cruise.setQcStatus(qcStatus);
-
-			// Update the archive status for this cruise.  
-			// Does not offer (at this time) the "archive now with CDIAC" 
-			// option, so no timestamp needed.
-			cruise.setArchiveStatus(archiveStatus);
-
-			// Commit this update of the cruise properties
-			cruiseHandler.saveCruiseInfoToFile(cruise, "Cruise " + expocode +
-					" submitted to SOCAT by " + username + 
-					" with initial QC status '" + qcStatus + 
-					"' and archive status '" + archiveStatus + "'");
-
-			// TODO: add the cruise to SOCAT
-
-		}
-	}
-
-	@Override
-	public void setCruiseArchiveStatus(String username, String passhash,
-			HashSet<String> cruiseExpocodes, String archiveStatus, 
-			String localTimestamp, boolean repeatSend) {
-		// Authenticate the user
-		DashboardDataStore dataStore;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected configuration error: " + ex.getMessage());
-		}
-		if ( ! dataStore.validateUser(username, passhash) )
-			throw new IllegalArgumentException(
-					"Invalid authentication credentials");
-
-		HashSet<String> changedExpos = new HashSet<String>();
-		HashSet<String> cdiacExpos = new HashSet<String>();
-		for ( String expocode : cruiseExpocodes ) {
-			// Get the properties of this cruise
-			DashboardCruise cruise = dataStore.getCruiseFileHandler()
-											  .getCruiseFromInfoFile(expocode);
+			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 			if ( cruise == null ) 
 				throw new IllegalArgumentException("Unknown cruise " + expocode);
 
-			String commitMsg = "Archive status of cruise " + expocode + " updated by " + 
-					username + " to '" + archiveStatus + "'";
+			boolean changed = false;
+			String commitMsg = "Cruise '" + expocode + "'";
 
-			if ( ! archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
-				// No changes to archive status, which is not send to CDIAC; skip it
-				if ( archiveStatus.equals(cruise.getArchiveStatus()) )
-					continue;
+			String qcStatus = cruise.getQcStatus();
+			if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
+				 qcStatus.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+				 qcStatus.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ) { 
+				// Update the QC status for this cruise
+				String dataStatus = cruise.getDataCheckStatus();
+				String omeFilename = cruise.getOmeFilename();
+				if ( ( ! omeFilename.isEmpty() ) && 
+					 ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(dataStatus) || 
+					   DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(dataStatus) ) )
+					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
+				else
+					qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;
+				cruise.setQcStatus(qcStatus);
+				changed = true;
+				commitMsg += " add with QC status '" + qcStatus + "'";
+				ingestExpos.add(expocode);
 			}
-			else if ( repeatSend || cruise.getCdiacDate().isEmpty() ) {
-				// Send to CDIAC; repeat the send or has never been sent
-				commitMsg += " with CDIAC date of '" + localTimestamp + "'";
-				cruise.setCdiacDate(localTimestamp);
-				cdiacExpos.add(expocode);
-			}
-			else if ( archiveStatus.equals(cruise.getArchiveStatus()) ) {
-				// No changes to the archive status or the CDIAC timestamp; skip it
-				continue;
-			}
-			changedExpos.add(expocode);
 
-			// Update the archive status for this cruise
-			cruise.setArchiveStatus(archiveStatus);
+			if ( ! archiveStatus.equals(cruise.getArchiveStatus()) ) {
+				// Update the archive status
+				cruise.setArchiveStatus(archiveStatus);
+				changed = true;
+				commitMsg += " archive status '" + archiveStatus + "'"; 
+				archiveExpos.add(expocode);
+			}
 
-			// Commit this update of the cruise properties
-			dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruise, commitMsg);
+			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
+				if ( repeatSend || cruise.getCdiacDate().isEmpty() ) {
+					// Send (or re-send) the original cruise data and metadata to CDIAC
+					cruise.setCdiacDate(localTimestamp);
+					changed = true;
+					commitMsg += " send to CDIAC '" + localTimestamp + "'";
+					cdiacExpos.add(expocode);
+				}
+			}
+
+			if ( changed ) {
+				// Commit this update of the cruise properties
+				commitMsg += " by user '" + username + "'";
+				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);				
+			}
 		}
 
-		// TODO: modify the cruise archive status in SOCAT for changedExpos
+		// TODO: add ingestExpos cruises to SOCAT
 
-		// TODO: send notice to CDIAC to get cruises named in cdiacExpos
+		// TODO?: modify cruise archive info in SOCAT for archiveExpos ?
+
+		// TODO: send data to CDIAC for cruises in cdiacExpos
 
 	}
 

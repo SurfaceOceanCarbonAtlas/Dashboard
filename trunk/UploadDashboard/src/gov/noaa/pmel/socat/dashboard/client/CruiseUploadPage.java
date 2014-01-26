@@ -106,8 +106,7 @@ public class CruiseUploadPage extends Composite {
 			"the cruise file is correct, use the <em>" + CREATE_TEXT + 
 			"</em> button to create a new cruise.";
 
-	interface DashboardCruiseUploadPageUiBinder 
-			extends UiBinder<Widget, CruiseUploadPage> {
+	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, CruiseUploadPage> {
 	}
 
 	private static DashboardCruiseUploadPageUiBinder uiBinder = 
@@ -148,7 +147,7 @@ public class CruiseUploadPage extends Composite {
 	 * constructor; instead use the showPage static method 
 	 * to show the singleton instance of this page. 
 	 */
-	private CruiseUploadPage() {
+	CruiseUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		username = "";
@@ -264,7 +263,7 @@ public class CruiseUploadPage extends Composite {
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z")
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
 		timestampToken.setValue(localTimestamp);
 		encodingToken.setValue(
@@ -280,7 +279,7 @@ public class CruiseUploadPage extends Composite {
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z")
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
 		timestampToken.setValue(localTimestamp);
 		encodingToken.setValue(
@@ -296,7 +295,7 @@ public class CruiseUploadPage extends Composite {
 		usernameToken.setValue(DashboardLoginPage.getUsername());
 		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z")
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
 		timestampToken.setValue(localTimestamp);
 		encodingToken.setValue(

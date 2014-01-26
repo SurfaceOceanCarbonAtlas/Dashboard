@@ -74,10 +74,6 @@ public class CruiseListPage extends Composite {
 			"submit the selected cruises for policy (quality control) " +
 			"assessment";
 
-	static final String ARCHIVE_TEXT = "Manage Archival";
-	private static final String ARCHIVE_HOVER_HELP =
-			"manage the archival of the selected cruise";
-
 	private static final String DELETE_TEXT = "Delete Cruise";
 	private static final String DELETE_HOVER_HELP =
 			"delete the selected cruises, including the cruise data";
@@ -102,9 +98,6 @@ public class CruiseListPage extends Composite {
 	private static final String SUBMITTED_CRUISES_SELECTED_ERROR_MSG = 
 			"The selected cruises can only include cruises which have not " +
 			"been added to SOCAT, or have been suspended or failed.";
-	private static final String UNSUBMITTED_CRUISES_SELECTED_ERROR_MSG =
-			"The selected cruises can only include cruises which have been " +
-			"added to SOCAT and are neither suspended nor failed.";
 
 	private static final String NO_CRUISES_FOR_DATACHECK_MSG = 
 			"No cruise is selected for checking data";
@@ -131,12 +124,9 @@ public class CruiseListPage extends Composite {
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
 			"</ul> These cruises can be added to SOCAT, but will be given " +
-			"a QC flag of F when added.  Do you want to continue? ";
+			"a QC Flag F when added.  Do you want to continue? ";
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
-
-	private static final String NO_CRUISES_FOR_ARCHIVE_MSG = 
-			"No cruises selected for managing archival status.";
 
 	private static final String NO_CRUISE_TO_DELETE_MSG = 
 			"No cruises are selected to be deleted.";
@@ -194,8 +184,7 @@ public class CruiseListPage extends Composite {
 	private static final String NO_OWNER_STRING = "(unknown)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 
-	interface DashboardCruiseListPageUiBinder 
-			extends UiBinder<Widget, CruiseListPage> {
+	interface DashboardCruiseListPageUiBinder extends UiBinder<Widget, CruiseListPage> {
 	}
 
 	private static DashboardCruiseListPageUiBinder uiBinder = 
@@ -211,7 +200,6 @@ public class CruiseListPage extends Composite {
 	@UiField Button metadataButton;
 	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
-	@UiField Button archiveButton;
 	@UiField Button deleteButton;
 	@UiField Button addToListButton;
 	@UiField Button removeFromListButton;
@@ -235,7 +223,7 @@ public class CruiseListPage extends Composite {
 	 * to show the singleton instance of this page with the
 	 * latest cruise list from the server. 
 	 */
-	private CruiseListPage() {
+	CruiseListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		buildCruiseListTable();
 
@@ -260,9 +248,6 @@ public class CruiseListPage extends Composite {
 
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
-
-		archiveButton.setText(ARCHIVE_TEXT);
-		archiveButton.setTitle(ARCHIVE_HOVER_HELP);
 
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
@@ -570,19 +555,6 @@ public class CruiseListPage extends Composite {
 			return;
 		}
 		checkCruisesForSOCAT();
-	}
-
-	@UiHandler("archiveButton")
-	void archiveSubmitOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(false) ) {
-			SocatUploadDashboard.showMessage(UNSUBMITTED_CRUISES_SELECTED_ERROR_MSG);
-			return;
-		}
-		if ( cruiseSet.size() < 1 ) {
-			SocatUploadDashboard.showMessage(NO_CRUISES_FOR_ARCHIVE_MSG);
-			return;
-		}
-		ArchivePage.showPage(cruiseSet);
 	}
 
 	@UiHandler("deleteButton")

@@ -60,14 +60,14 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String INTRO_PROLOGUE = 
 			"<b><large>View Cruise Data</large></b>" +
 			"<br />" +
-			"Assign the type and, optionally, the missing-value for " +
-			"the data columns of this cruise." +
+			"Assign the type and the missing-value for the data columns of this cruise." +
 			"<ul>" +
 			"<li><em>(unknown)</em> data must be reassigned</li>" +
 			"<li><em>(ignore)</em> data will be completely ignored</li>" +
 			"<li><em>(supplemental)</em> data will not be checked " +
 			"or used, but will be included in SOCAT output files</li>" +
-			"<li><em>(default missing values)</em> missing data values are " +
+			"<li><em>" + CruiseDataColumn.DEFAULT_MISSING_VALUE + 
+			"</em> missing data values are " +
 			"any of <em>NaN</em>, <em>NA</em>, <em>N/A</em>, and blank</li>" +
 			"</ul>" +
 			"Cruise: <b>";
@@ -129,8 +129,7 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String CANCEL_ABORT_TEXT = "No";
 
 
-	interface CruiseDataColumnSpecsPageUiBinder 
-			extends UiBinder<Widget, DataColumnSpecsPage> {
+	interface CruiseDataColumnSpecsPageUiBinder extends UiBinder<Widget, DataColumnSpecsPage> {
 	}
 
 	private static CruiseDataColumnSpecsPageUiBinder uiBinder = 
@@ -173,7 +172,7 @@ public class DataColumnSpecsPage extends Composite {
 	 * Allows the user to update the data column types for a
 	 * cruise when populated.
 	 */
-	private DataColumnSpecsPage() {
+	DataColumnSpecsPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		username = "";
 		okayToAbortPopup = null;
