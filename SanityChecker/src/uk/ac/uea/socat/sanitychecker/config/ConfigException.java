@@ -37,6 +37,18 @@ public class ConfigException extends Exception {
 		itsFile = file;
 	}
 	
+	public ConfigException(String file, int lineNumber, String message) {
+		super(message);
+		itsFile = file;
+		itsLineNumber = lineNumber;
+	}
+	
+	public ConfigException(String file, int lineNumber, String message, Throwable cause) {
+		super(message, cause);
+		itsFile = file;
+		itsLineNumber = lineNumber;
+	}
+	
 	/**
 	 * Creates an exception for an error pertaining to a specific configuration item
 	 * @param file The path of the file being worked on when the exception occurred.

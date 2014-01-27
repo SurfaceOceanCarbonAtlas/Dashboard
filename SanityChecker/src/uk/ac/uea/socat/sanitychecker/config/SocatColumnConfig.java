@@ -188,9 +188,7 @@ public class SocatColumnConfig {
 			try {
 				String line = reader.readLine();
 				int lineCount = 1;
-				int entryCount = 0;
-
-				
+				int entryCount = 0;				
 				
 				while (null != line) {
 					if (!CheckerUtils.isComment(line)) {

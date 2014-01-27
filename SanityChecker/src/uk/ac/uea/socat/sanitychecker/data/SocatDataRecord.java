@@ -186,12 +186,12 @@ public class SocatDataRecord {
 		}
 	}
 	
-	public DateTime getDate() {
+	public DateTime getTime() {
 		int year = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
-		int month = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
-		int day = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
-		int hour = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
-		int minute = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+		int month = Integer.parseInt(getColumn(MONTH_COLUMN_NAME).getValue());
+		int day = Integer.parseInt(getColumn(DAY_COLUMN_NAME).getValue());
+		int hour = Integer.parseInt(getColumn(HOUR_COLUMN_NAME).getValue());
+		int minute = Integer.parseInt(getColumn(MINUTE_COLUMN_NAME).getValue());
 		double second = Double.parseDouble(getColumn(SECOND_COLUMN_NAME).getValue());
 		
 		int wholeSecond = (int) Math.floor(second);

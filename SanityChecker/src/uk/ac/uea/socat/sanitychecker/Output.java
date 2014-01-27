@@ -198,9 +198,9 @@ public class Output {
 		setExitFlag(message);
 	}
 	
-	public void addDataMessages(List<Message> messages) {
+	public void addMessages(List<Message> messages) {
 		itsMessages.addMessages(messages);
-		for (Message message: messages) {
+		for (Message message : messages) {
 			setExitFlag(message);
 		}
 	}
