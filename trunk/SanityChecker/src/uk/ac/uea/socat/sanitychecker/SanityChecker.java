@@ -17,6 +17,7 @@ import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigRequiredGroups;
+import uk.ac.uea.socat.sanitychecker.config.SanityCheckConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
@@ -27,6 +28,7 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataException;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
+import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
 
 /**
  * Startup class for the SOCAT Sanity Checker.
@@ -108,7 +110,7 @@ public class SanityChecker {
 		BaseConfig.getInstance();
 		MetadataConfig.getInstance();
 		SocatColumnConfig.getInstance();
-
+		SanityCheckConfig.getInstance();
 	}
 	
 	/**
@@ -182,7 +184,7 @@ public class SanityChecker {
 					itsLogger.trace("Processing record " + itsRecordCount);
 					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger, itsOutput);
 					itsOutput.addRecord(socatRecord);
-					itsOutput.addDataMessages(socatRecord.getMessages());
+					itsOutput.addMessages(socatRecord.getMessages());
 				}
 				
 				// Check for missing/out-of-range values
@@ -190,6 +192,9 @@ public class SanityChecker {
 				
 				// Generate metadata from data
 				generateMetadataFromData();
+				
+				// Run data sanity checks
+				runSanityChecks();
 			}
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
@@ -205,7 +210,26 @@ public class SanityChecker {
 		return itsOutput;
 	}
 
-	
+	private void runSanityChecks() throws ConfigException {
+		
+		List<SanityCheck> checkers = SanityCheckConfig.getInstance().getCheckers();
+		
+		// Loop through all the records
+		for (SocatDataRecord record : itsOutput.getRecords()) {
+			
+			// Loop through all known sanity checkers, and pass the record to them
+			for (SanityCheck checker : checkers) {
+				checker.processRecord(record);
+			}
+		}
+		
+		// Call the final check method for all the checkers,
+		// then get any messages and add them to the output
+		for (SanityCheck checker : checkers) {
+			checker.performFinalCheck();
+			itsOutput.addMessages(checker.getMessages());
+		}
+	}
 	
 
 	/**
@@ -389,7 +413,7 @@ public class SanityChecker {
 			}
 		}
 		
-		itsOutput.addDataMessages(messages);
+		itsOutput.addMessages(messages);
 	}
 
 	/**

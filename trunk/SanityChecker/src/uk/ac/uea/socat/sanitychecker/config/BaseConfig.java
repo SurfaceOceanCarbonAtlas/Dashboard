@@ -42,6 +42,8 @@ public class BaseConfig extends Properties {
 	 */
 	public static final String COLUMN_CONVERSION_FILE = "ColumnConversionFile";
 	
+	public static final String SANITY_CHECK_CONFIG_FILE = "SanityChecksFile";
+	
 	/**
 	 * The file containing the configuration.
 	 * Must be set via @code{init} before
@@ -145,11 +147,13 @@ public class BaseConfig extends Properties {
 		itsLogger.trace("Column specification schema file = " + loadedConfig.getColumnSpecSchemaFile());
 		itsLogger.trace("Column conversion config file = " + loadedConfig.getColumnConversionConfigFile());
 		itsLogger.trace("SOCAT data config file = " + loadedConfig.getSocatConfigFile());
+		itsLogger.trace("Sanity Check config file = " + loadedConfig.getSanityCheckConfigFile());
 
 		// Initialise the configurations specified in the base config
 		MetadataConfig.init(loadedConfig.getMetadataConfigFile(), itsLogger);
 		ColumnConversionConfig.init(loadedConfig.getColumnConversionConfigFile(), itsLogger);
 		SocatColumnConfig.init(loadedConfig.getSocatConfigFile(), itsLogger);
+		SanityCheckConfig.init(loadedConfig.getSanityCheckConfigFile(), itsLogger);
 		
 		// Store the loaded configuration as the singleton instance
 		baseConfigInstance = loadedConfig;
@@ -169,6 +173,10 @@ public class BaseConfig extends Properties {
 	 */
 	public String getSocatConfigFile() {
 		return getProperty(SOCAT_CONFIG_FILE);
+	}
+	
+	public String getSanityCheckConfigFile() {
+		return getProperty(SANITY_CHECK_CONFIG_FILE);
 	}
 	
 	/**
@@ -203,6 +211,8 @@ public class BaseConfig extends Properties {
 		
 		validateMetadataConfig();
 		validateColumnConversionConfig();
+		
+		// The SocatColumnConfig is validated in SanityChecker.initConfig, by calling its getInstance() method.
 	}
 
 	/**

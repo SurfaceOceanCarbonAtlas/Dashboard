@@ -109,12 +109,12 @@ public class Message {
 		}
 
 		if (itsItemIndex >= 0) {
-			output.append(" ITEM " + itsItemIndex + " ('" + itsItemName + "')");
+			output.append(" ITEM " + itsItemIndex + " ('" + itsItemName + "'):");
 		} else if (null != itsItemName) {
-			output.append(" ITEM '" + itsItemName + "'");
+			output.append(" ITEM '" + itsItemName + "':");
 		}
 
-		output.append(": " + itsMessage);
+		output.append(" " + itsMessage);
 		
 		if (itsProperties.size() > 0) {
 			output.append("\n");
