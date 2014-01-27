@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
@@ -77,17 +79,21 @@ public class Output {
 	 */
 	private String itsFilename;
 	
+	private Logger itsLogger;
+	
 	/**
 	 * Constructor for the output object
 	 * @param filename The filename of the original data file
 	 */
-	protected Output(String filename, int metadataLength, int dataLength) {
+	protected Output(String filename, int metadataLength, int dataLength, Logger logger) {
 		// Initialize result code to zero since flags can only be mixed in
 		itsResultCode = 0;
 		itsFilename = filename;
 		itsMetadata = new HashMap<String, MetadataItem>(metadataLength);
 		itsDataRecords = new ArrayList<SocatDataRecord>(dataLength);
 		itsMessages = new Messages();
+		
+		itsLogger = logger;
 	}
 	
 	/**
@@ -195,12 +201,14 @@ public class Output {
 	 */
 	public void addMessage(Message message) {
 		itsMessages.addMessage(message);
+		itsLogger.trace("Message added to output::-> " + message.toString());
 		setExitFlag(message);
 	}
 	
 	public void addMessages(List<Message> messages) {
 		itsMessages.addMessages(messages);
 		for (Message message : messages) {
+			itsLogger.trace("Message added to output::-> " + message.toString());
 			setExitFlag(message);
 		}
 	}
