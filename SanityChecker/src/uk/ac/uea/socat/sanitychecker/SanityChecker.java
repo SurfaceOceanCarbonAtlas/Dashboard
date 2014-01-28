@@ -384,13 +384,20 @@ public class SanityChecker {
 						
 						// Check the Required Group
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
+							// No required group, so we just report the missing value
 							itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
 							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
 						} else {
+							// We're in a required group, so check the values from the other fields.
+							// Only if they're all missing do we set the missing flag
 							List<String> requiredGroupValues = record.getRequiredGroupValues(columnConfig.getRequiredGroup());
 							if (CheckerUtils.isEmpty(requiredGroupValues)) {
-								itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-								column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
+								
+								// Only report required group columns that are in the input file
+								if (null != column.getInputColumnName()) {
+									itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
+									column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
+								}
 							}
 						}
 					}
