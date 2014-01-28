@@ -44,7 +44,7 @@ public class CheckerUtils {
 	}
 	
 	/**
-	 * Determines whether or not a line is a comment, signified by it starting with {@code #} or {@code !}
+	 * Determines whether or not a line is a comment, signified by it starting with @code{#} or @code{!} or @code{//}
 	 * @param line The line to be checked
 	 * @return {@code true} if the line is a comment; {@code false} otherwise.
 	 */
