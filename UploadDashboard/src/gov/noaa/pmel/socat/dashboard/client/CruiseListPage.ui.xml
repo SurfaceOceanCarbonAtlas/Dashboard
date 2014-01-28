@@ -24,8 +24,9 @@
 			<g:ScrollPanel addStyleNames="{style.submitscrollpanel}">
 				<g:VerticalPanel addStyleNames="{style.submitpanel}">
 					<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
-					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="dataCheckButton" />
-					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="metadataButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="viewDataButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="omeMetadataButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="addlDocsButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="qcSubmitButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="deleteButton" />

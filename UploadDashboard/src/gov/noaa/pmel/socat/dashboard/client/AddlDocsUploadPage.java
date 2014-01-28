@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class MetadataUploadPage extends Composite {
+public class AddlDocsUploadPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String LOGOUT_TEXT = "Logout";
@@ -47,42 +47,42 @@ public class MetadataUploadPage extends Composite {
 	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String MULTI_CRUISE_HTML_INTRO_PROLOGUE = 
-			"<b>Upload a Metadata Document</b>" +
+			"<b>Upload an Additional Document</b>" +
 			"<br /><br />" +
 			"Because multiple cruises were selected, you can only upload " +
-			"metadata documents.  The uploaded metadata document will be " +
-			"duplicated to uniquely associate a copy to each cruise selected, " +
-			"either as a new document or replacing an existing document. " +
+			"additional documents.  The uploaded document will be duplicated " +
+			"to uniquely associate a copy to each cruise selected, either " +
+			"as a new document or replacing an existing document. " +
 			"<br /><br />" +
-			"Upload metadata for the cruises: <b>";
+			"Upload additional documents for the cruises: <b>";
 	private static final String SINGLE_CRUISE_HTML_INTRO_PROLOGUE = 
-			"<b>Upload a Metadata Document</b>" +
+			"<b>Upload an Additional Document</b>" +
 			"<br /><br />" +
-			"Upload metadata for the cruise: <b>";
+			"Upload an additional document for the cruise: <b>";
 	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</b>";
 
 	private static final String NO_FILE_ERROR_MSG = 
-			"Please select a metadata document to upload";
+			"Please select a document to upload";
 
 	private static final String OVERWRITE_WARNING_MSG_PROLOGUE = 
-			"The following metadata documents for this cruise will be " +
+			"The following documents for this cruise will be " +
 			"overwritten: <ul>";
 	private static final String OVERWRITE_WARNING_MSG_EPILOGUE =
 			"</ul> Do you wish to proceed?";
 	private static final String OVERWRITE_YES_TEXT = "Yes";
 	private static final String OVERWRITE_NO_TEXT = "No";
 
-	interface MetadataUploadPageUiBinder extends UiBinder<Widget, MetadataUploadPage> {
+	interface AddlDocsUploadPageUiBinder extends UiBinder<Widget, AddlDocsUploadPage> {
 	}
 
-	private static MetadataUploadPageUiBinder uiBinder = 
-			GWT.create(MetadataUploadPageUiBinder.class);
+	private static AddlDocsUploadPageUiBinder uiBinder = 
+			GWT.create(AddlDocsUploadPageUiBinder.class);
 
 	@UiField Label userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
-	@UiField FileUpload metadataUpload;
+	@UiField FileUpload docUpload;
 	@UiField Hidden usernameToken;
 	@UiField Hidden passhashToken;
 	@UiField Hidden timestampToken;
@@ -97,9 +97,9 @@ public class MetadataUploadPage extends Composite {
 	private boolean okayToOverwrite;
 
 	// Singleton instance of this page
-	private static MetadataUploadPage singleton = null;
+	private static AddlDocsUploadPage singleton = null;
 
-	MetadataUploadPage() {
+	AddlDocsUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		username = "";
 		cruises = new HashSet<DashboardCruise>();
@@ -117,43 +117,36 @@ public class MetadataUploadPage extends Composite {
 	}
 
 	/**
-	 * Display the metadata upload page in the RootLayoutPanel
+	 * Display the additional documents upload page in the RootLayoutPanel
 	 * for a set of given cruises.
 	 * Adds this page to the page history.
 	 * 
 	 * @param cruises
-	 * 		add/replace the metadata in these cruises 
+	 * 		add/replace the additional documents in these cruises 
 	 */
 	static void showPage(HashSet<DashboardCruise> cruises) {
 		if ( singleton == null )
-			singleton = new MetadataUploadPage();
+			singleton = new AddlDocsUploadPage();
 		singleton.updateCruises(cruises);
 		SocatUploadDashboard.updateCurrentPage(singleton);
-		History.newItem(PagesEnum.METADATA_UPLOAD.name(), false);
+		History.newItem(PagesEnum.ADDL_DOCS_UPLOAD.name(), false);
 	}
 
 	/**
-	 * Display the metadata upload page in the RootLayoutPanel
+	 * Display the additional documents upload page in the RootLayoutPanel
 	 * for the given cruise.  Adds this page to the page history.
 	 * 
 	 * @param cruiseExpocode
-	 * 		add/replace the metadata for this cruise
-	 * @param omeFilename
-	 * 		OME metadata document filename currently 
+	 * 		add/replace the additional documents for this cruise
+	 * @param addlDocNames
+	 * 		set of additional document filenames currently
 	 * 		associated with this cruise
-	 * @param mdataNames
-	 * 		set of metadata document filenames currently
-	 * 		associated with this cruise; may or may not
-	 * 		include omeFilename 
 	 */
-	static void showPage(String cruiseExpocode, String omeFilename, 
-			TreeSet<String> mdataNames) {
+	static void showPage(String cruiseExpocode, TreeSet<String> addlDocNames) {
 		// Create a DashboardCruise using the above information
 		DashboardCruise cruise = new DashboardCruise();
 		cruise.setExpocode(cruiseExpocode);
-		cruise.setOmeFilename(omeFilename);
-		// Not a problem here if mdataNames includes omeFilename
-		cruise.setMetadataFilenames(mdataNames);
+		cruise.setAddlDocNames(addlDocNames);
 		// Create a set containing just this cruise
 		HashSet<DashboardCruise> cruiseSet = new HashSet<DashboardCruise>();
 		cruiseSet.add(cruise);
@@ -178,7 +171,7 @@ public class MetadataUploadPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.METADATA_UPLOAD.name(), false);
+				History.newItem(PagesEnum.ADDL_DOCS_UPLOAD.name(), false);
 		}
 	}
 
@@ -237,10 +230,11 @@ public class MetadataUploadPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		if ( expocodes.size() == 1 ) {
-			// Return to the metadata list page exactly as it was
-			MetadataManagerPage.redisplayPage(true);
+			// Return to the additional documents manager page exactly as it was
+			AddlDocsManagerPage.redisplayPage(true);
 		}
 		else {
+			// Return to the cruise list page exactly as it was
 			CruiseListPage.redisplayPage(true);
 		}
 	}
@@ -264,7 +258,7 @@ public class MetadataUploadPage extends Composite {
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
 		// Make sure a file was selected
-		String uploadFilename = DashboardUtils.baseName(metadataUpload.getFilename());
+		String uploadFilename = DashboardUtils.baseName(docUpload.getFilename());
 		if ( uploadFilename.isEmpty() ) {
 			event.cancel();
 			usernameToken.setValue("");
@@ -292,7 +286,7 @@ public class MetadataUploadPage extends Composite {
 						" <em>OME metadata for cruise " + SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
 				willOverwrite = true;
 			}
-			else if ( cruz.getMetadataFilenames().contains(uploadFilename) ) {
+			else if ( cruz.getAddlDocNames().contains(uploadFilename) ) {
 				message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
 						" <em>for cruise " + SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
 				willOverwrite = true;
@@ -362,7 +356,7 @@ public class MetadataUploadPage extends Composite {
 			if ( expocodes.size() == 1 ) {
 				// return to the metadata manager, having it
 				// request the updated cruise from the server 
-				MetadataManagerPage.showPage(expocodes.first());
+				AddlDocsManagerPage.showPage(expocodes.first());
 			}
 			else {
 				// return to the cruise list, having it request 

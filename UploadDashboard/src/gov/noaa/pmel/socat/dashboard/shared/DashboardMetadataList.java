@@ -9,7 +9,7 @@ import java.util.HashMap;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Represents the metadata files for a cruise requested by a user. 
+ * Represents the metadata files for a cruise. 
  * The keys of the map are the metadata filenames. 
  * 
  * @author Karl Smith

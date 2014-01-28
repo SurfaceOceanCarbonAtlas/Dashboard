@@ -149,7 +149,7 @@ public class MetadataUploadService extends HttpServlet {
 					throw new IllegalArgumentException(
 							"Cruise " + expo + " does not exist");
 				// Directly modify the metadata listing in the cruise
-				if ( cruise.getMetadataFilenames().add(metadata.getFilename()) ) {
+				if ( cruise.getAddlDocNames().add(metadata.getFilename()) ) {
 					// New metadata document added
 					cruiseHandler.saveCruiseInfoToFile(cruise, 
 							"Added metadata document " + metadata.getFilename() + 
