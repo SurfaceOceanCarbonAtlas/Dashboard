@@ -33,15 +33,18 @@ public class SocatDataColumn {
 	 * The configuration details for this column
 	 */
 	private SocatColumnConfigItem itsConfig;
+	
+	private StandardColumnInfo itsColumnInfo;
 
 	/**
 	 * Creates a new, empty data field ready to be populated
 	 * @param config
 	 */
-	public SocatDataColumn(SocatColumnConfigItem config) {
+	public SocatDataColumn(SocatColumnConfigItem config, StandardColumnInfo colInfo) {
 		itsValue = MISSING_VALUE;
 		itsFlag = SocatColumnConfigItem.GOOD_FLAG;
 		itsConfig = config;
+		itsColumnInfo = colInfo;
 	}
 	
 	/**
@@ -68,7 +71,7 @@ public class SocatDataColumn {
 						severity = Message.ERROR;
 					}
 					
-					messages.add(new Message(Message.DATA_MESSAGE, severity, record, itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
+					messages.add(new Message(Message.DATA_MESSAGE, severity, record, getInputColumnIndex(), getInputColumnName(), itsConfig.getIndex(), itsConfig.getColumnName(), message)); 
 				}
 			}
 			
@@ -191,5 +194,25 @@ public class SocatDataColumn {
 	 */
 	public boolean isEmpty() {
 		return CheckerUtils.isEmpty(itsValue);
+	}
+	
+	public int getInputColumnIndex() {
+		int result = -1;
+		
+		if (null != itsColumnInfo) {
+			result = itsColumnInfo.getInputColumnIndex();
+		}
+		
+		return result;
+	}
+	
+	public String getInputColumnName() {
+		String result = null;
+		
+		if (null != itsColumnInfo) {
+			result = itsColumnInfo.getInputColumnName();
+		}
+		
+		return result;
 	}
 }

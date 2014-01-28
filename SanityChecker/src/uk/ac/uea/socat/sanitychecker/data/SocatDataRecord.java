@@ -135,7 +135,7 @@ public class SocatDataRecord {
 		itsColumnConfig = SocatColumnConfig.getInstance();
 
 		// Build the set of data field objects ready to be populated
-		itsOutputColumns = itsColumnConfig.buildDataFields(); 
+		itsOutputColumns = itsColumnConfig.buildDataFields(itsColumnSpec); 
 
 		// Populate all the basic data columns
 		setDataValues(dataFields);
@@ -170,7 +170,7 @@ public class SocatDataRecord {
 			
 			setFieldValue(ISO_DATE_COLUMN_NAME, dateTimeHandler.formatDateTime(parsedDateTime));
 		} catch (MissingDateTimeElementException e) {
-			itsMessages.add(new Message(Message.ERROR, itsLineNumber, -1, "", e.getMessage()));
+			itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", -1, "Date/Time", e.getMessage()));
 			
 			try {
 				// Date errors will always set cascade flags
@@ -180,7 +180,7 @@ public class SocatDataRecord {
 			}
 			
 		} catch (DateTimeParseException e) {
-			itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", e.getMessage()));
+			itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", -1, "Date/Time", e.getMessage()));
 		} catch (DateTimeException e) {
 			throw new SocatDataException(itsLineNumber, -1, "Date", e);
 		}

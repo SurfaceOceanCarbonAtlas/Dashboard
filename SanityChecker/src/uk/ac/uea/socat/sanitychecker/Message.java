@@ -29,6 +29,9 @@ public class Message {
 	
 	private Properties itsProperties;
 
+	private int itsInputItemIndex;
+	
+	private String itsInputItemName;
 	
 	private int itsItemIndex;
 	
@@ -41,17 +44,22 @@ public class Message {
 		itsMessage = message;
 		itsProperties = new Properties();
 		
+		itsInputItemIndex = -1;
+		itsInputItemName = null;
 		itsItemIndex = -1;
 		itsItemName = null;
 	}
 	
-	public Message(int type, int severity, int line, int itemIndex, String itemName, String message) {
+	public Message(int type, int severity, int line, int inputItemIndex, String inputItemName, int itemIndex, String itemName, String message) {
 		itsMessageType = type;
 		itsSeverity = severity;
 		itsLine = line;
 		itsMessage = message;
 		itsProperties = new Properties();
 		
+		itsInputItemIndex = inputItemIndex;
+		itsInputItemName = inputItemName;
+
 		itsItemIndex = itemIndex;
 		itsItemName = itemName;
 	}
@@ -63,6 +71,8 @@ public class Message {
 		itsMessage = message;
 		itsProperties = new Properties();
 		
+		itsInputItemIndex = -1;
+		itsInputItemName = null;
 		itsItemIndex = -1;
 		itsItemName = name;
 	}
@@ -94,6 +104,18 @@ public class Message {
 	public int getItemIndex() {
 		return itsItemIndex;
 	}
+	
+	public String getItemName() {
+		return itsItemName;
+	}
+	
+	public int getInputItemIndex() {
+		return itsInputItemIndex;
+	}
+	
+	public String getInputItemName() {
+		return itsInputItemName;
+	}
 
 	public String toString() {
 		StringBuffer output = new StringBuffer();
@@ -108,10 +130,10 @@ public class Message {
 			output.append("LINE " + itsLine + ":");
 		}
 
-		if (itsItemIndex >= 0) {
-			output.append(" ITEM " + itsItemIndex + " ('" + itsItemName + "'):");
-		} else if (null != itsItemName) {
-			output.append(" ITEM '" + itsItemName + "':");
+		if (itsInputItemIndex >= 0) {
+			output.append(" ITEM " + itsInputItemIndex + " ('" + itsInputItemName + "'):");
+		} else if (null != itsInputItemName) {
+			output.append(" ITEM '" + itsInputItemName + "':");
 		}
 
 		output.append(" " + itsMessage);

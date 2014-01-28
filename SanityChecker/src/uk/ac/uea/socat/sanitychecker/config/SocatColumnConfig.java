@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
+import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
@@ -332,11 +333,11 @@ public class SocatColumnConfig {
 	 * Construct a set of empty SocatDataField objects ready to be populated
 	 * @return A set of empty SocatDataField objects corresponding to this configuration
 	 */
-	public Map<String, SocatDataColumn> buildDataFields() {
+	public Map<String, SocatDataColumn> buildDataFields(ColumnSpec colSpec) {
 		Map<String, SocatDataColumn> dataFields = new HashMap<String, SocatDataColumn>(itsColumns.size());
 		
 		for (String fieldName : itsColumns) {
-			dataFields.put(fieldName, new SocatDataColumn(itsColumnConfig.get(fieldName)));
+			dataFields.put(fieldName, new SocatDataColumn(itsColumnConfig.get(fieldName), colSpec.getColumnInfo(fieldName)));
 		}
 		
 		return dataFields;
