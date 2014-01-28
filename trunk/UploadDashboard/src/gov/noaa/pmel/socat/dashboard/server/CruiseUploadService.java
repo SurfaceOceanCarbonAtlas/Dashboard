@@ -297,6 +297,13 @@ public class CruiseUploadService extends HttpServlet {
 			}
 		}
 
+		// Check if an auto-generated OME metadata file already exists for this cruise
+		String omeName = OmeMetadata.generatedOmeName(expocode);
+		File omeMetadataFile = dataStore.getMetadataFileHandler()
+										.getMetadataFile(expocode, omeName);
+		if ( omeMetadataFile.exists() )
+			cruiseData.setOmeFilename(omeName);
+
 		// Save the cruise file and commit it to version control
 		String message;
 		if ( cruiseExists ) 
