@@ -95,8 +95,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 */
 	private void verifyOkayToDelete(String username, String expocode, 
 							String metaname) throws IllegalArgumentException {
-		DashboardMetadata oldMData = getMetadataInfo(expocode, metaname);
-		if ( oldMData == null )
+		// If the info file does not exist, okay to delete the metadata
+		DashboardMetadata oldMetadata = getMetadataInfo(expocode, metaname);
+		if ( oldMetadata == null )
 			return;
 		DashboardDataStore dataStore;
 		try {
@@ -105,11 +106,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected error obtaining the dashboard configuration");
 		}
-		String oldOwner = oldMData.getOwner();
+		String oldOwner = oldMetadata.getOwner();
 		if ( ! dataStore.userManagesOver(username, oldOwner) )
 			throw new IllegalArgumentException(
-					"Not permitted to update metadata document " + metaname + 
-					" for cruise " + expocode + " owned by " + oldOwner);
+					"Not permitted to update metadata document " + 
+					oldMetadata.getFilename() + " for cruise " + 
+					oldMetadata.getExpocode() + " owned by " + oldOwner);
 	}
 
 	/**
@@ -288,7 +290,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		String message;
 		if ( isUpdate ) {
-			verifyOkayToDelete(owner, destCruiseExpo, uploadName);
 			message = "Updated metadata document " + uploadName + 
 					  " for cruise " + destCruiseExpo + " and owner " + owner;
 		}
@@ -315,7 +316,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 		// Create the appropriate check-in message
 		if ( isUpdate ) {
-			verifyOkayToDelete(owner, destCruiseExpo, uploadName);
 			message = "Updated properties of metadata document " + uploadName + 
 					  " for cruise " + destCruiseExpo + " and owner " + owner;
 		}
@@ -455,36 +455,34 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @throws IllegalArgumentException 
 	 * 		if expocode or metaname is invalid, 
 	 * 		if the user is not permitted to delete the metadata document,
-	 * 		if there are problems deleting the document, or 
-	 * 		if the document or information files do not exist.
+	 * 		if there are problems deleting the document.
 	 */
 	public void removeMetadata(String username, String expocode,
 			String metaname) throws IllegalArgumentException {
-		// Verify that the metadata document exists
 		File metadataFile = getMetadataFile(expocode, metaname);
-		if ( ! metadataFile.exists() ) 
-			throw new IllegalArgumentException("Metadata file " + 
-					metadataFile.getPath() + " does not exist");
-		// Throw an exception if not allowed to overwrite
-		verifyOkayToDelete(username, expocode, metaname);
-		try {
-			deleteVersionedFile(metadataFile, 
-					"Deleted metadata document " + metadataFile.getPath());
-		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Unable to delete metadata file " + metadataFile.getPath());
-		}
 		File propsFile = new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX);
-		if ( ! propsFile.exists() ) 
-			throw new IllegalArgumentException(
-					"Metadata properties file " + propsFile.getPath() + 
-					" does not exist");
-		try {
-			deleteVersionedFile(propsFile, 
-					"Deleted metadata properties " + propsFile.getPath());
-		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Unable to delete metadata properties file " + propsFile.getPath());
+		// Do not throw an error if the props file does not exist
+		if ( propsFile.exists() ) { 
+			// Throw an exception if not allowed to overwrite
+			verifyOkayToDelete(username, expocode, metaname);
+			try {
+				deleteVersionedFile(propsFile, 
+						"Deleted metadata properties " + propsFile.getPath());
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException(
+						"Unable to delete metadata properties file " + propsFile.getPath());
+			}
+		}
+		// Do not throw an error is the metadata file does not exist,
+		// and if the props file did not exist, it is okay to delete this file
+		if ( metadataFile.exists() ) { 
+			try {
+				deleteVersionedFile(metadataFile, 
+						"Deleted metadata document " + metadataFile.getPath());
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException(
+						"Unable to delete metadata file " + metadataFile.getPath());
+			}
 		}
 	}
 

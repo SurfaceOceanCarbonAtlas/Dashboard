@@ -10,7 +10,6 @@ import gov.noaa.pmel.socat.dashboard.shared.MetadataListService;
 import gov.noaa.pmel.socat.dashboard.shared.MetadataListServiceAsync;
 
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import com.google.gwt.cell.client.CheckboxCell;
@@ -108,6 +107,7 @@ public class AddlDocsManagerPage extends Composite {
 	private String username;
 	private ListDataProvider<DashboardMetadata> listProvider;
 	private String expocode;
+	private String omeFilename;
 	private DashboardAskPopup askDeletePopup;
 
 	// The singleton instance of this page
@@ -124,6 +124,7 @@ public class AddlDocsManagerPage extends Composite {
 		buildMetadataListTable();
 		username = "";
 		expocode = "";
+		omeFilename = "";
 		askDeletePopup = null;
 
 		logoutButton.setText(LOGOUT_TEXT);
@@ -219,14 +220,13 @@ public class AddlDocsManagerPage extends Composite {
 		// Update the metadata shown by resetting the data in the data provider
 		List<DashboardMetadata> addlDocsList = listProvider.getList();
 		addlDocsList.clear();
+		omeFilename = "";
 		if ( addlDocs != null ) {
-			// Do not include the OME document in the additional documents list
-			String omeFilename = addlDocs.getOmeFilename();
-			for ( Entry<String, DashboardMetadata> entry : addlDocs.entrySet() ) {
-				if ( ! omeFilename.equals(entry.getKey()) ) {
-					addlDocsList.add(entry.getValue());
-				}
-			}
+			// Update the OME metadata filename
+			if ( addlDocs.getOmeMetadata() != null )
+				omeFilename = addlDocs.getOmeMetadata().getFilename();
+			// Update the additional documents
+			addlDocsList.addAll(addlDocs.values());
 		}
 		addlDocsGrid.setRowCount(addlDocsList.size());
 		// Make sure the table is sorted according to the last specification
@@ -252,7 +252,7 @@ public class AddlDocsManagerPage extends Composite {
 			docNames.add(addlDoc.getFilename());
 		}
 		// Show the additional documents upload page for this cruise
-		AddlDocsUploadPage.showPage(expocode, docNames);
+		AddlDocsUploadPage.showPage(expocode, omeFilename, docNames);
 	}
 
 	@UiHandler("deleteButton")

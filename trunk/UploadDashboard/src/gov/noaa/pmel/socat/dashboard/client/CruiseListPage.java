@@ -55,12 +55,12 @@ public class CruiseListPage extends Composite {
 			"upload cruise data to create a new cruise " +
 			"or replace an existing cruise";
 
-	private static final String VIEW_DATA_TEXT = "View Data";
+	private static final String VIEW_DATA_TEXT = "Review Data";
 	private static final String VIEW_DATA_HOVER_HELP =
-			"view and modify data column type assignments in the selected " +
-			"cruise, highlighting any issues with the data";
+			"review and modify data column type assignments for the " +
+			"selected cruise, highlighting any issues with the data";
 
-	private static final String OME_METADATA_TEXT = "Manage OME Metadata";
+	static final String OME_METADATA_TEXT = "Manage OME Metadata";
 	private static final String OME_METADATA_HOVER_HELP =
 			"manage the OME metadata for the selected cruise";
 
@@ -109,8 +109,8 @@ public class CruiseListPage extends Composite {
 			"Only one cruise may be selected ";
 
 	// Ends of error messages for improper cruise selections
-	private static final String FOR_VIEWING_ERR_END = 
-			"for viewing data.";
+	private static final String FOR_REVIEWING_ERR_END = 
+			"for reviewing data.";
 	private static final String FOR_OME_ERR_END =
 			"for managing OME metadata.";
 	private static final String FOR_ADDL_DOCS_ERR_END = 
@@ -515,17 +515,17 @@ public class CruiseListPage extends Composite {
 	void dataCheckOnClick(ClickEvent event) {
 		if ( ! getSelectedCruiseExpocodes(true) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_VIEWING_ERR_END);
+					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_VIEWING_ERR_END);
+					NO_CRUISE_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() > 1 ) {
 			SocatUploadDashboard.showMessage(
-					MANY_CRUISES_SELECTED_ERR_START + FOR_VIEWING_ERR_END);
+					MANY_CRUISES_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
@@ -544,8 +544,11 @@ public class CruiseListPage extends Composite {
 					NO_CRUISE_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
-		// TODO:
-		SocatUploadDashboard.showMessage("Not yet implemented");
+		if ( cruiseSet.size() > 1 ) {
+			SocatUploadDashboard.showMessage(
+					MANY_CRUISES_SELECTED_ERR_START + FOR_OME_ERR_END);
+		}
+		OmeManagerPage.showPage(cruiseSet.iterator().next());
 	}
 
 	@UiHandler("addlDocsButton")

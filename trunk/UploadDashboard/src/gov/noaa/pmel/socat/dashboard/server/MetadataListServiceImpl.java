@@ -15,6 +15,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Server side implementation of the MetadataListService
+ * 
  * @author Karl Smith
  */
 public class MetadataListServiceImpl extends RemoteServiceServlet
@@ -45,28 +46,20 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 		// Create the metadata listing to be returned
 		DashboardMetadataList mdataList = new DashboardMetadataList();
 		mdataList.setUsername(username);
-		// Assign the name of the OME metadata document
-		String omeFilename = cruise.getOmeFilename();
-		mdataList.setOmeFilename(omeFilename);
-		// Get the information for the OME metadata document and add it to the list
 		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
 		DashboardMetadata mdata;
+		// Get the information for the OME metadata document
+		String omeFilename = cruise.getOmeFilename();
 		if ( ! omeFilename.isEmpty() ) {
 			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, omeFilename);
-			if ( mdata == null ) 
-				throw new IllegalArgumentException(
-						"OME metadata file " + omeFilename + " for cruise " + 
-						cruiseExpocode + " does not exist");
-			mdataList.put(omeFilename, mdata);
+			if ( mdata != null ) 
+				mdataList.setOmeMetadata(mdata);
 		}
-		// Get the information for additional documents and add them to the list
+		// Get the information for additional documents 
 		for ( String mdataName : cruise.getAddlDocNames() ) {
 			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, mdataName);
-			if ( mdata == null )
-				throw new IllegalArgumentException(
-						"Additional document " + mdataName + " for cruise " + 
-						cruiseExpocode + " does not exist");
-			mdataList.put(mdataName, mdata);
+			if ( (mdata != null) && (! mdata.getFilename().equals(omeFilename)) ) 
+				mdataList.put(mdataName, mdata);
 		}
 		// Return the metadata listing
 		return mdataList;
@@ -74,8 +67,8 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public DashboardMetadataList removeMetadata(String username, String passhash,
-			String cruiseExpocode, TreeSet<String> metadataNames) 
-									throws IllegalArgumentException {
+							String cruiseExpocode, TreeSet<String> metadataNames) 
+												throws IllegalArgumentException {
 		// Authenticate the user
 		DashboardDataStore dataStore;
 		try {
@@ -98,13 +91,15 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 
 		// Work directly with the set of filenames in the cruise object
 		String cruiseOmeFilename = cruise.getOmeFilename();
-		TreeSet<String> cruiseMDataNames = cruise.getAddlDocNames(); 
+		TreeSet<String> addlDocNames = cruise.getAddlDocNames(); 
 		for ( String mdataName : metadataNames ) {
 			if ( cruiseOmeFilename.equals(mdataName) ) {
 				cruise.setOmeFilename(null);
 				cruiseOmeFilename = "";
+				// Should not be in addlDocNames, but just in case
+				addlDocNames.remove(mdataName);
 			}
-			else if ( ! cruiseMDataNames.remove(mdataName) )
+			else if ( ! addlDocNames.remove(mdataName) )
 				throw new IllegalArgumentException("Document " +
 						mdataName + " is not associated with cruise " +
 						cruiseExpocode);
@@ -133,23 +128,18 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 		// Create the updated metadata listing for the cruise
 		DashboardMetadataList mdataList = new DashboardMetadataList();
 		mdataList.setUsername(username);
-		mdataList.setOmeFilename(cruiseOmeFilename);
 		DashboardMetadata mdata;
 		if ( ! cruiseOmeFilename.isEmpty() ) {
 			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, cruiseOmeFilename);
-			if ( mdata == null )
-				throw new IllegalArgumentException(
-						"OME metadata file " + cruiseOmeFilename + " for cruise " + 
-						cruiseExpocode + " does not exist");
-			mdataList.put(cruiseOmeFilename, mdata);
+			mdataList.setOmeMetadata(mdata);
 		}
-		for ( String mdataName : cruiseMDataNames ) {
+		else {
+			mdataList.setOmeMetadata(null);
+		}
+		for ( String mdataName : addlDocNames ) {
 			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, mdataName);
-			if ( mdata == null )
-				throw new IllegalArgumentException(
-						"Additional document " + mdataName + " for cruise " + 
-						cruiseExpocode + " does not exist");
-			mdataList.put(mdataName, mdata);
+			if ( (mdata != null) && (! mdataName.equals(cruiseOmeFilename)) )
+				mdataList.put(mdataName, mdata);
 		}
 		// Return the updated metadata listing
 		return mdataList;

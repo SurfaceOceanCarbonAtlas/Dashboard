@@ -14,7 +14,7 @@
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
 					<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
-							ui:field="docUpload" />
+							ui:field="omeUpload" />
 					<g:Hidden name="username" ui:field="usernameToken" />
 					<g:Hidden name="passhash" ui:field="passhashToken" />
 					<g:Hidden name="timestamp" ui:field="timestampToken" /> 

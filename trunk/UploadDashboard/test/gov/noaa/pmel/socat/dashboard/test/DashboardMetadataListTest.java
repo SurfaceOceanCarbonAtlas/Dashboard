@@ -41,22 +41,25 @@ public class DashboardMetadataListTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#getOmeFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#setOmeFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#getOmeMetadata()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList#setOmeMetadata(gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata)}.
 	 */
 	@Test
-	public void testGetSetOmeFilename() {
-		String myOmeFilename = "XXXX20060515_OME.xml";
+	public void testGetSetOmeMetadata() {
+		DashboardMetadata myOmeMetadata = new DashboardMetadata();
+		myOmeMetadata.setExpocode("XXXX20060515");
+		myOmeMetadata.setFilename("XXXX20060515_OME.xml");
+		
 		DashboardMetadataList mdataList = new DashboardMetadataList();
-		assertEquals("", mdataList.getOmeFilename());
-		mdataList.setOmeFilename(myOmeFilename);
-		assertEquals(myOmeFilename, mdataList.getOmeFilename());
+		assertNull( mdataList.getOmeMetadata() );
+		mdataList.setOmeMetadata(myOmeMetadata);
+		assertEquals(myOmeMetadata, mdataList.getOmeMetadata());
 		assertEquals("", mdataList.getUsername());
 		// Actually, the OME metadata filename is suppose to refer to one 
 		// of the files in the list, so the following is a bit misleading.
 		assertEquals(0, mdataList.size());
-		mdataList.setOmeFilename(null);
-		assertEquals("", mdataList.getOmeFilename());
+		mdataList.setOmeMetadata(null);
+		assertEquals(null, mdataList.getOmeMetadata());
 	}
 
 	/**
@@ -67,7 +70,9 @@ public class DashboardMetadataListTest {
 	public void testHashCodeEquals() {
 		String myUsername = "SocatUser";
 		String myOwner = "Cathy";
-		String myOmeFilename = "CYNS20120124_OME.xml";
+		DashboardMetadata myOmeMetadata = new DashboardMetadata();
+		myOmeMetadata.setExpocode("CYNS20120124");
+		myOmeMetadata.setFilename("CYNS20120124_OME.xml");
 		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
 		String myTimestamp = "2013-12-11 10:09:08";
 		String otherFilename = "CYNS20120124_NatalieSchulte_2013.pdf";
@@ -101,10 +106,10 @@ public class DashboardMetadataListTest {
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 
-		firstMDataList.setOmeFilename(myOmeFilename);
+		firstMDataList.setOmeMetadata(myOmeMetadata);
 		assertFalse( firstMDataList.hashCode() == secondMDataList.hashCode() );
 		assertFalse( firstMDataList.equals(secondMDataList) );
-		secondMDataList.setOmeFilename(myOmeFilename);
+		secondMDataList.setOmeMetadata(myOmeMetadata);
 		assertEquals(firstMDataList.hashCode(), secondMDataList.hashCode());
 		assertEquals(firstMDataList, secondMDataList);
 
