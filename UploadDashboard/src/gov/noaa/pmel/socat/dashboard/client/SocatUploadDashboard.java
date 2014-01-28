@@ -23,7 +23,9 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		/** History tag for CruiseUploadPage */
 		CRUISE_UPLOAD,
 		/** History tag for DataColumnSpecsPage */
-		DATA_COLUMN_SPECS,
+		REVIEW_DATA,
+		/** History tag for OmeManagerPage */
+		OME_MANAGER,
 		/** History tag for AddlDocsManagerPage */
 		ADDL_DOCS_MANAGER,
 		/** History tag for AddlDocsUploadPage */
@@ -168,16 +170,20 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 			// Cruise upload page from history
 			CruiseUploadPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.DATA_COLUMN_SPECS.name()) ) {
+		else if ( token.equals(PagesEnum.REVIEW_DATA.name()) ) {
 			// Data column specs page from history
 			DataColumnSpecsPage.redisplayPage(false);
 		}
+		else if ( token.equals(PagesEnum.OME_MANAGER.name()) ) {
+			// OME metadata manager page from history
+			OmeManagerPage.redisplayPage(false);
+		}
 		else if ( token.equals(PagesEnum.ADDL_DOCS_MANAGER.name()) ) {
-			// Metadata manager page from history
+			// Additionl data manager page from history
 			AddlDocsManagerPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.ADDL_DOCS_UPLOAD.name()) ) {
-			// Metadata upload page from history
+			// Additional data upload page from history
 			AddlDocsUploadPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {

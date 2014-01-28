@@ -9,18 +9,19 @@ import java.util.HashMap;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Represents the metadata files for a cruise. 
- * The keys of the map are the metadata filenames. 
+ * Represents the OME metadata and the additional documents for a cruise. 
+ * The keys of the map are the additional document filenames.  The OME
+ * metadata file is NOT part of the additional documents list.
  * 
  * @author Karl Smith
  */
 public class DashboardMetadataList extends HashMap<String,DashboardMetadata> 
 								implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1648041641148179121L;
+	private static final long serialVersionUID = -174019076584974241L;
 
 	String username;
-	String omeFilename;
+	DashboardMetadata omeMetadata;
 
 	/**
 	 * Creates without a user and without any metadata files
@@ -28,7 +29,7 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 	public DashboardMetadataList() {
 		super();
 		username = "";
-		omeFilename = "";
+		omeMetadata = null;
 	}
 
 	/**
@@ -52,28 +53,26 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 
 	/**
 	 * @return 
-	 * 		the OME metadata filename; never null, but may be empty
+	 * 		the OME metadata; can be null
 	 */
-	public String getOmeFilename() {
-		return omeFilename;
+	public DashboardMetadata getOmeMetadata() {
+		return omeMetadata;
 	}
 
 	/**
-	 * @param username 
-	 * 		the username to set; if null, an empty string is assigned
+	 * @param omeMetadata 
+	 * 		the OME metadata to set
 	 */
-	public void setOmeFilename(String omeFilename) {
-		if ( omeFilename != null )
-			this.omeFilename = omeFilename;
-		else
-			this.omeFilename = "";
+	public void setOmeMetadata(DashboardMetadata omeMetadata) {
+		this.omeMetadata = omeMetadata;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
 		int result = username.hashCode();
-		result = result * prime + omeFilename.hashCode();
+		if ( omeMetadata != null )
+			result = result * prime + omeMetadata.hashCode();
 		result = result * prime + super.hashCode();
 		return result;
 	}
@@ -92,7 +91,11 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 		if ( ! username.equals(other.username) )
 			return false;
 
-		if ( ! omeFilename.equals(other.omeFilename) )
+		if ( omeMetadata != null ) {
+			if ( ! omeMetadata.equals(other.omeMetadata) )
+				return false;
+		}
+		else if ( other.omeMetadata != null )
 			return false;
 
 		if ( ! super.equals(other) )
@@ -105,7 +108,7 @@ public class DashboardMetadataList extends HashMap<String,DashboardMetadata>
 	public String toString() {
 		String repr = "DashboardMetadataList" +
 				"[ username=" + username +
-				",\n    omeFilename=" + omeFilename;
+				",\n    omeMetadata=" + omeMetadata;
 		for ( String expoFilename : keySet() ) {
 			repr += ",\n    " + expoFilename + ":" + get(expoFilename).toString();
 		}

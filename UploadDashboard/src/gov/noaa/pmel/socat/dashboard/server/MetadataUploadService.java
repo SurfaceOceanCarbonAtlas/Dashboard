@@ -65,6 +65,7 @@ public class MetadataUploadService extends HttpServlet {
 		String passhash = null;
 		String expocodes = null;
 		String uploadTimestamp = null;
+		String omeIndicator = null;
 		FileItem metadataItem = null;
 		try {
 			// Go through each item in the request
@@ -86,6 +87,10 @@ public class MetadataUploadService extends HttpServlet {
 					uploadTimestamp = item.getString();
 					item.delete();
 				}
+				else if ( "ometoken".equals(itemName) ) {
+					omeIndicator = item.getString();
+					item.delete();
+				}
 				else if ( "metadataupload".equals(itemName) ) {
 					metadataItem = item;
 				}
@@ -105,7 +110,8 @@ public class MetadataUploadService extends HttpServlet {
 		DashboardDataStore dataStore = DashboardDataStore.get();
 		if ( (username == null) || (passhash == null) || 
 			 (expocodes == null) || (uploadTimestamp == null) ||
-			 (metadataItem == null) || 
+			 (omeIndicator == null) || (metadataItem == null) || 
+			 ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) || 
 			 ! dataStore.validateUser(username, passhash) ) {
 			metadataItem.delete();
 			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
@@ -126,10 +132,8 @@ public class MetadataUploadService extends HttpServlet {
 			return;
 		}
 
-		MetadataFileHandler metadataHandler = 
-				dataStore.getMetadataFileHandler();
-		CruiseFileHandler cruiseHandler = 
-				dataStore.getCruiseFileHandler();
+		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		String uploadFilename = metadataItem.getName();
 
 		DashboardMetadata metadata = null;
@@ -148,12 +152,47 @@ public class MetadataUploadService extends HttpServlet {
 				if ( cruise == null )
 					throw new IllegalArgumentException(
 							"Cruise " + expo + " does not exist");
-				// Directly modify the metadata listing in the cruise
-				if ( cruise.getAddlDocNames().add(metadata.getFilename()) ) {
-					// New metadata document added
-					cruiseHandler.saveCruiseInfoToFile(cruise, 
-							"Added metadata document " + metadata.getFilename() + 
-							" to cruise " + expo);
+				if ( omeIndicator.equals("true") ) {
+					// Make sure the contents are valid OME XML
+					try {
+						new OmeMetadata(metadata);
+					} catch ( IllegalArgumentException ex ) {
+						// Problems with the file - delete it
+						// unfortunately, an previous version has been overwritten - revert instead??
+						metadataHandler.removeMetadata(username, expo, 
+														metadata.getFilename());
+						throw new IllegalArgumentException(
+								"Invalid OME metadata file:\n   " + ex.getMessage());
+					}
+					// Assign the OME metadata filename for this cruise
+					if ( ! cruise.getOmeFilename().equals(metadata.getFilename()) ) {
+						cruise.setOmeFilename(metadata.getFilename());
+						// remove this metadata filename, if present, from the additional documents
+						cruise.getAddlDocNames().remove(metadata.getFilename());
+						// save the updated cruise information
+						cruiseHandler.saveCruiseInfoToFile(cruise, 
+								"Assigned new OME metadata filename " + metadata.getFilename() + 
+								" to cruise " + expo);
+					}
+				}
+				else {
+					// Make sure this was not the OME metadata for the cruise
+					if ( cruise.getOmeFilename().equals(metadata.getFilename()) ) {
+						// unfortunately, an previous version has been overwritten - revert instead??
+						metadataHandler.removeMetadata(username, expo, 
+														metadata.getFilename());
+						throw new IllegalArgumentException(
+								"The OME metadata " + cruise.getOmeFilename() + 
+								"for cruise " + cruise.getExpocode()+ 
+								" is not permitted to also be an additional document");
+					}
+					// Directly modify the additional documents listing in the cruise
+					if ( cruise.getAddlDocNames().add(metadata.getFilename()) ) {
+						// New additional document added to the list
+						cruiseHandler.saveCruiseInfoToFile(cruise, 
+								"Added additional document " + metadata.getFilename() + 
+								" to cruise " + expo);
+					}
 				}
 			} catch ( Exception ex ) {
 				metadataItem.delete();

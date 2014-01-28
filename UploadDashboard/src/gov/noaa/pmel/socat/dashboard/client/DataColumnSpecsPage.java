@@ -58,7 +58,7 @@ public class DataColumnSpecsPage extends Composite {
 
 	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String INTRO_PROLOGUE = 
-			"<b><large>View Cruise Data</large></b>" +
+			"<b><large>Review Cruise Data</large></b>" +
 			"<br />" +
 			"Assign the type and the missing-value for the data columns of this cruise." +
 			"<ul>" +
@@ -84,14 +84,17 @@ public class DataColumnSpecsPage extends Composite {
 			"No data column has been identified as the longitude";
 	private static final String NO_LATITUDE_ERROR_MSG =
 			"No data column has been identified as the latitude";
+	private static final String NO_CO2_ERROR_MSG = 
+			"No data columns have been identified which provide " +
+			"a seawater CO<sub>2</sub> value";
 	private static final String NO_TIMESTAMP_ERROR_MSG =
-			"No data columns have been identified providing " +
+			"No data columns have been identified which provide " +
 			"the date and time of each measurement";
 	private static final String NO_DATE_ERROR_MSG =
-			"No data columns have been identified providing " +
+			"No data columns have been identified which provide " +
 			"the date of each measurement";
 	private static final String NO_TIME_ERROR_MSG =
-			"No data columns have been identified providing " +
+			"No data columns have been identified which provide " +
 			"the time of each measurement";
 	private static final String MISSING_DATE_PIECE_ERROR_MSG =
 			"The data columns identified do not completely specify " +
@@ -99,6 +102,7 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String MISSING_TIME_PIECE_ERROR_MSG =
 			"The data columns identified do not completely specify " +
 			"the time of each measurement";
+
 	private static final String DEFAULT_SECONDS_WARNING_QUESTION = 
 			"No data columns have been identified providing the seconds " +
 			"for the time of each measurement.  It is strongly recommended " +
@@ -234,7 +238,7 @@ public class DataColumnSpecsPage extends Composite {
 					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.fromUpload = fromUpload;
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
-					History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
+					History.newItem(PagesEnum.REVIEW_DATA.name(), false);
 				}
 				else {
 					SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
@@ -265,7 +269,7 @@ public class DataColumnSpecsPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.DATA_COLUMN_SPECS.name(), false);
+				History.newItem(PagesEnum.REVIEW_DATA.name(), false);
 		}
 	}
 
@@ -430,7 +434,9 @@ public class DataColumnSpecsPage extends Composite {
 		boolean hasLongitude = false;
 		// latitude given?
 		boolean hasLatitude = false;
-		// timestamp given?
+		// sea water CO2 value given?
+		boolean hasco2 = false;
+		// time stamp given?
 		boolean hasYear = false;
 		boolean hasMonth = false;
 		boolean hasDay = false;
@@ -439,7 +445,8 @@ public class DataColumnSpecsPage extends Composite {
 		boolean hasSecond = false;
 		// data still given as unknown
 		ArrayList<Integer> unknownIndices = new ArrayList<Integer>();
-		// Check the column types specified
+
+		// Check the column types 
 		int k = 0;
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
 			if ( colType == DataColumnType.UNKNOWN ) {
@@ -487,6 +494,14 @@ public class DataColumnSpecsPage extends Composite {
 			else if ( colType == DataColumnType.LATITUDE ) {
 				hasLatitude = true;
 			}
+			else if ( (colType == DataColumnType.XCO2WATER_EQU) ||
+					  (colType == DataColumnType.XCO2WATER_SST) ||
+					  (colType == DataColumnType.PCO2WATER_EQU) ||
+					  (colType == DataColumnType.PCO2WATER_SST) ||
+					  (colType == DataColumnType.FCO2WATER_EQU) ||
+					  (colType == DataColumnType.FCO2WATER_SST) ) {
+				hasco2 = true;
+			}
 			k++;
 		}
 		if ( unknownIndices.size() > 0 ) {
@@ -508,35 +523,42 @@ public class DataColumnSpecsPage extends Composite {
 			return;
 		}
 		if ( ! hasLongitude ) {
+			// no longitude - error
 			SocatUploadDashboard.showMessage(NO_LONGITUDE_ERROR_MSG);
 			return;
 		}
 		if ( ! hasLatitude ) {
+			// no latitude - error
 			SocatUploadDashboard.showMessage(NO_LATITUDE_ERROR_MSG);
 			return;
 		}
+		if ( ! hasco2 ) {
+			// no sea water CO2 - error
+			SocatUploadDashboard.showMessage(NO_CO2_ERROR_MSG);
+			return;
+		}
 		if ( ! (hasYear || hasMonth || hasDay || hasHour || hasMinute) ) {
-			// timestamp completely missing
+			// timestamp completely missing - error
 			SocatUploadDashboard.showMessage(NO_TIMESTAMP_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasYear || hasMonth || hasDay) ) {
-			// date completely missing
+			// date completely missing - error
 			SocatUploadDashboard.showMessage(NO_DATE_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasHour || hasMinute) ) {
-			// time completely missing
+			// time completely missing - error
 			SocatUploadDashboard.showMessage(NO_TIME_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasYear && hasMonth && hasDay) ) {
-			// incomplete date given
+			// incomplete date given - error
 			SocatUploadDashboard.showMessage(MISSING_DATE_PIECE_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasHour && hasMinute) ) {
-			// incomplete time given
+			// incomplete time given - error
 			SocatUploadDashboard.showMessage(MISSING_TIME_PIECE_ERROR_MSG);
 			return;
 		}
@@ -563,7 +585,8 @@ public class DataColumnSpecsPage extends Composite {
 			return;
 		}
 
-		// longitude, latitude, and some form of a timestamp is present so continue on  
+		// longitude, latitude, sea water co2, and some form of a timestamp 
+		// is present so continue on  
 		doSubmit();
 	}
 
