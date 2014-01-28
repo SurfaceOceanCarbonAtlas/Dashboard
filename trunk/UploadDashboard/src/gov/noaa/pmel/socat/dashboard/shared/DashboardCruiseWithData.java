@@ -123,7 +123,7 @@ public class DashboardCruiseWithData extends DashboardCruise
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
 				",\n    omeFilename=" + omeFilename + 
-				",\n    metadataFilenames=" + metadataFilenames.toString() +
+				",\n    addlDocNames=" + addlDocNames.toString() +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    cdiacDate=" + cdiacDate + 

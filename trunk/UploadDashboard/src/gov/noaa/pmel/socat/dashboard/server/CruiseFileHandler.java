@@ -593,7 +593,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		String omeFilename = cruise.getOmeFilename();
 		if ( ! omeFilename.isEmpty() )
 			metadataHandler.removeMetadata(username, expocode, cruise.getOmeFilename());
-		for ( String mdataName : cruise.getMetadataFilenames() )
+		for ( String mdataName : cruise.getAddlDocNames() )
 			metadataHandler.removeMetadata(username, expocode, mdataName);
 	}
 
@@ -647,7 +647,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// a little arguably-unnecessary overhead going through an ArrayList<String>
 		cruiseProps.setProperty(METADATA_FILENAMES_ID, 
 				DashboardUtils.encodeStringArrayList(new ArrayList<String>(
-						cruise.getMetadataFilenames())));
+						cruise.getAddlDocNames())));
 		// QC-submission status string
 		cruiseProps.setProperty(QC_STATUS_ID, cruise.getQcStatus());
 		// Archive status string
@@ -864,7 +864,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					METADATA_FILENAMES_ID + " given in " + infoFile.getPath());			
 		// a little arguably-unnecessary overhead going through an ArrayList<String>
-		cruise.setMetadataFilenames(new TreeSet<String>(
+		cruise.setAddlDocNames(new TreeSet<String>(
 				DashboardUtils.decodeStringArrayList(value)));
 
 		// QC status

@@ -24,10 +24,10 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		CRUISE_UPLOAD,
 		/** History tag for DataColumnSpecsPage */
 		DATA_COLUMN_SPECS,
-		/** History tag for MetadataManagerPage */
-		METADATA_MANAGER,
-		/** History tag for MetadataUploadPage */
-		METADATA_UPLOAD,
+		/** History tag for AddlDocsManagerPage */
+		ADDL_DOCS_MANAGER,
+		/** History tag for AddlDocsUploadPage */
+		ADDL_DOCS_UPLOAD,
 		/** History tag for AddToSocatPage */
 		ADD_TO_SOCAT,
 		/** History tag for DashboardLogoutPage */
@@ -172,13 +172,13 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 			// Data column specs page from history
 			DataColumnSpecsPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.METADATA_MANAGER.name()) ) {
+		else if ( token.equals(PagesEnum.ADDL_DOCS_MANAGER.name()) ) {
 			// Metadata manager page from history
-			MetadataManagerPage.redisplayPage(false);
+			AddlDocsManagerPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.METADATA_UPLOAD.name()) ) {
+		else if ( token.equals(PagesEnum.ADDL_DOCS_UPLOAD.name()) ) {
 			// Metadata upload page from history
-			MetadataUploadPage.redisplayPage(false);
+			AddlDocsUploadPage.redisplayPage(false);
 		}
 		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
 			// Add to SOCAT page from history

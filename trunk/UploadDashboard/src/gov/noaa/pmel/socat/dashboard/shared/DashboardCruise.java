@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 5964270451086258279L;
+	private static final long serialVersionUID = 7070908682547322034L;
 
 	boolean selected;
 	String version;
@@ -27,7 +27,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	String expocode;
 	String dataCheckStatus;
 	String omeFilename;
-	TreeSet<String> metadataFilenames;
+	TreeSet<String> addlDocNames;
 	String qcStatus;
 	String archiveStatus;
 	String cdiacDate;
@@ -50,7 +50,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		expocode = "";
 		dataCheckStatus = "";
 		omeFilename = "";
-		metadataFilenames = new TreeSet<String>();
+		addlDocNames = new TreeSet<String>();
 		qcStatus = "";
 		archiveStatus = "";
 		cdiacDate = "";
@@ -184,24 +184,24 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the metadata filenames associated with this cruise; 
+	 * 		the additional document filenames associated with this cruise; 
 	 * 		never null but may be empty.  The actual set of strings
 	 * 		in this object is returned.
 	 */
-	public TreeSet<String> getMetadataFilenames() {
-		return metadataFilenames;
+	public TreeSet<String> getAddlDocNames() {
+		return addlDocNames;
 	}
 
 	/**
-	 * @param metadataFilenames
+	 * @param addlDocNames
 	 * 		the set of metadata filenames for this cruise.  The set in 
 	 * 		this object is cleared and all the contents of the given set, 
 	 * 		if not null, are added. 
 	 */
-	public void setMetadataFilenames(TreeSet<String> metadataFilenames) {
-		this.metadataFilenames.clear();
-		if ( metadataFilenames != null )
-			this.metadataFilenames.addAll(metadataFilenames);
+	public void setAddlDocNames(TreeSet<String> addlDocNames) {
+		this.addlDocNames.clear();
+		if ( addlDocNames != null )
+			this.addlDocNames.addAll(addlDocNames);
 	}
 
 	/**
@@ -491,7 +491,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + expocode.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
 		result = result * prime + omeFilename.hashCode();
-		result = result * prime + metadataFilenames.hashCode();
+		result = result * prime + addlDocNames.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
 		result = result * prime + cdiacDate.hashCode();
@@ -530,7 +530,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! omeFilename.equals(other.omeFilename) )
 			return false;
-		if ( ! metadataFilenames.equals(other.metadataFilenames) )
+		if ( ! addlDocNames.equals(other.addlDocNames) )
 			return false;
 		if ( ! qcStatus.equals(other.qcStatus) )
 			return false;
@@ -568,7 +568,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
 				",\n    omeFilename=" + omeFilename + 
-				",\n    metadataFilenames=" + metadataFilenames.toString() +
+				",\n    addlDocNames=" + addlDocNames.toString() +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    cdiacDate=" + cdiacDate + 
@@ -681,11 +681,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the metadata filenames of the cruises.
+	 * Compare using the additional document filenames of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
-	public static Comparator<DashboardCruise> metadataFilenamesComparator = 
+	public static Comparator<DashboardCruise> addlDocNamesComparator = 
 			new Comparator<DashboardCruise>() {
 		@Override
 		public int compare(DashboardCruise c1, DashboardCruise c2) {
@@ -695,8 +695,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			Iterator<String> iter1 = c1.getMetadataFilenames().iterator();
-			Iterator<String> iter2 = c2.getMetadataFilenames().iterator();
+			Iterator<String> iter1 = c1.getAddlDocNames().iterator();
+			Iterator<String> iter2 = c2.getAddlDocNames().iterator();
 			while ( iter1.hasNext() && iter2.hasNext() ) {
 				int result = iter1.next().compareTo(iter2.next());
 				if ( result != 0 )
