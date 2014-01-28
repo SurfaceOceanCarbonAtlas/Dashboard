@@ -384,12 +384,12 @@ public class SanityChecker {
 						
 						// Check the Required Group
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
-							itsLogger.trace("Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'");
+							itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
 							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
 						} else {
 							List<String> requiredGroupValues = record.getRequiredGroupValues(columnConfig.getRequiredGroup());
 							if (CheckerUtils.isEmpty(requiredGroupValues)) {
-								itsLogger.trace("Missing required value on line " + record.getLineNumber() + ", column '" + columnName + "'");
+								itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
 								column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
 							}
 						}
