@@ -19,12 +19,13 @@ import org.jdom2.output.XMLOutputter;
 /**
  * Class for the one special metadata file per cruise that must be present,
  * has a known format, and contains values needed by the SOCAT database.
+ * Ideally this would extend both DashboardMetadata and SocatMetadata. 
  *  
  * @author Karl Smith
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -1547954618307071647L;
+	private static final long serialVersionUID = -8663891483597695178L;
 
 	// The following come from the OME metadata 
 	String cruiseName;
@@ -32,13 +33,10 @@ public class OmeMetadata extends DashboardMetadata {
 	String scienceGroup;
 	String origDataRef;
 
+	// TODO: add more fields when they are identified in the OME XML file.
+
 	// This may be the reference to this document to be archived
 	String metadataHRef;
-
-	// The following come from SOCAT
-	String socatDOI;
-	String socatHRef;
-	String cruiseFlag;
 
 	/**
 	 * Synthesizes an upload filename for pseudo-OME XML files
@@ -64,9 +62,6 @@ public class OmeMetadata extends DashboardMetadata {
 		scienceGroup = "";
 		origDataRef = "";
 		metadataHRef = "";
-		socatDOI = "";
-		socatHRef = "";
-		cruiseFlag = "";
 	}
 
 	/**
@@ -225,16 +220,7 @@ public class OmeMetadata extends DashboardMetadata {
 						metadataHRef += " ; " + metaVals[k];
 				}
 			}
-			else if ( "socat_doi".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) )
-					socatDOI = metaVals[k];
-			}
-			else if ( "socat_doi_href".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) )
-					socatHRef = metaVals[k];
-			}
 			// otherwise ignore the data in this column
-			// cruiseFlag is left as the default
 		}
 		if ( expocode.isEmpty() )
 			throw new IllegalArgumentException("Expocode is not given");
@@ -617,66 +603,6 @@ public class OmeMetadata extends DashboardMetadata {
 			this.metadataHRef = metadataHRef;
 	}
 
-	/**
-	 * @return 
-	 * 		the SOCAT DOI; never null but could be empty
-	 */
-	public String getSocatDOI() {
-		return socatDOI;
-	}
-
-	/**
-	 * @param socatDOI 
-	 * 		the SOCAT DOI to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setSocatDOI(String socatDOI) {
-		if ( socatDOI == null )
-			this.socatDOI = "";
-		else
-			this.socatDOI = socatDOI;
-	}
-
-	/**
-	 * @return 
-	 * 		the SOCAT http reference; never null but could be empty
-	 */
-	public String getSocatHRef() {
-		return socatHRef;
-	}
-
-	/**
-	 * @param socatDOIHRef 
-	 * 		the SOCAT http reference to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setSocatHRef(String socatHRef) {
-		if ( socatHRef == null )
-			this.socatHRef = "";
-		else
-			this.socatHRef = socatHRef;
-	}
-
-	/**
-	 * @return 
-	 * 		the cruise flag; never null but could be empty
-	 */
-	public String getCruiseFlag() {
-		return cruiseFlag;
-	}
-
-	/**
-	 * @param cruiseFlag 
-	 * 		the cruise flag to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setCruiseFlag(String cruiseFlag) {
-		if ( cruiseFlag == null )
-			this.cruiseFlag = "";
-		else
-			this.cruiseFlag = cruiseFlag;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -686,9 +612,6 @@ public class OmeMetadata extends DashboardMetadata {
 		result = result * prime + scienceGroup.hashCode();
 		result = result * prime + origDataRef.hashCode();
 		result = result * prime + metadataHRef.hashCode();
-		result = result * prime + socatDOI.hashCode();
-		result = result * prime + socatHRef.hashCode();
-		result = result * prime + cruiseFlag.hashCode();
 		return result;
 	}
 
@@ -715,12 +638,6 @@ public class OmeMetadata extends DashboardMetadata {
 			return false;
 		if ( ! metadataHRef.equals(other.metadataHRef) )
 			return false;
-		if ( ! socatDOI.equals(other.socatDOI) )
-			return false;
-		if ( ! socatHRef.equals(other.socatHRef) )
-			return false;
-		if ( ! cruiseFlag.equals(other.cruiseFlag) )
-			return false;
 		return true;
 	}
 
@@ -732,9 +649,6 @@ public class OmeMetadata extends DashboardMetadata {
 				",\n    scienceGroup=" + scienceGroup +
 				",\n    origDataRef=" + origDataRef + 
 				",\n    metadataHRef=" + metadataHRef + 
-				",\n    socatDOI=" + socatDOI + 
-				",\n    socatHRef=" + socatHRef + 
-				",\n    cruiseFlag=" + cruiseFlag + 
 				",\n    filename=" + filename + 
 				",\n    uploadTimestamp=" + uploadTimestamp + 
 				",\n    owner=" + owner + 
