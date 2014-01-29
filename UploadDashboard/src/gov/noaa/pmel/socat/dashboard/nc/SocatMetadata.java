@@ -2,6 +2,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.Serializable;
@@ -59,6 +60,24 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		socatDOI = "";
 		socatDOIHRef = "";
 		cruiseFlag = "";
+	}
+
+	/**
+	 * Generate from the data in an OmeMetadata object.
+	 * 
+	 * @param omeMData
+	 * 		initialize from this data
+	 */
+	public SocatMetadata(OmeMetadata omeMData) {
+		this();
+		expocode = omeMData.getExpocode();
+		cruiseName = omeMData.getCruiseName();
+		vesselName = omeMData.getVesselName();
+		scienceGroup = omeMData.getScienceGroup();
+		origDOI = omeMData.getOrigDataRef();
+		metadataHRef = omeMData.getMetadataHRef();
+		// TODO: add and initialize more fields when they are 
+		// identified in the OME XML file and added to OmeMetadata.
 	}
 
 	/**
@@ -376,6 +395,33 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			this.cruiseFlag = cruiseFlag;
 	}
 
+	/**
+	 * @return
+	 * 		the maximum length of String values given in the fields of this instance
+	 */
+	public int getMaxStringLength() {
+		int maxlength = -1;
+		Field[] fields = this.getClass().getDeclaredFields();
+		for (int i = 0; i < fields.length; i++) {
+			Field f = fields[i];
+			f.setAccessible(true);
+			if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers())) {
+				String s;
+				try {
+					s = (String) f.get(this);
+					if ( s.length() > maxlength ) {
+						maxlength = s.length();
+					}
+				} catch (IllegalArgumentException e) {
+					// Carry on.  The value from other strings will be fine.
+				} catch (IllegalAccessException e) {
+					// Carry on.  The value from other strings will be fine.
+				}            
+			}
+		}
+		return maxlength;
+	}
+
 	@Override 
 	public int hashCode() {
 		// Do not consider floating-point fields since they do not 
@@ -530,29 +576,5 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		if ( newName != null )
 			metadata.setScienceGroup(newName);
 	}
-
-    public int getMaxStringLength() {
-        
-        int maxlength = -1;
-        Field[] fields = this.getClass().getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            Field f = fields[i];
-            f.setAccessible(true);
-            if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers())) {
-                String s;
-                try {
-                    s = (String) f.get(this);
-                    if ( s.length() > maxlength ) {
-                        maxlength = s.length();
-                    }
-                } catch (IllegalArgumentException e) {
-                    // Carry on.  The value form other strings will be fine.
-                } catch (IllegalAccessException e) {
-                    // Carry on.  The value form other strings will be fine.
-                }            
-            }
-        }
-        return maxlength;
-    }
 
 }

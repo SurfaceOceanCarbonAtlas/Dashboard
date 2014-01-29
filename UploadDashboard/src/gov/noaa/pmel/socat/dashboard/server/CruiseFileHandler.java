@@ -49,7 +49,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String WOCE_FOUR_ROWS_ID = "wocefourrows";
 
 	private static final int MIN_NUM_DATA_COLUMNS = 6;
-	private static final String MISSING_VALUE_STRING = "NaN";
 
 	// Patterns for getting the expocode from the metadata header
 	private static final Pattern[] expocodePatterns = new Pattern[] {
@@ -363,17 +362,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						throw new IOException("Inconsistent number of data columns (" + 
 								datavals.length + " instead of " + numDataColumns + 
 								") in \n" + dataline);
-					// Convert an obvious missing values to MISSING_VALUE_STRING
-					for (int k = 0; k < datavals.length; k++) {
-						datavals[k] = datavals[k].trim();
-						if ( datavals[k].isEmpty() ||
-							 datavals[k].toLowerCase().equals("null") ||
-							 datavals[k].toLowerCase().equals("nan") ||
-							 datavals[k].toLowerCase().equals("n/a") ||
-							 datavals[k].toLowerCase().equals("na") ) {
-							datavals[k] = MISSING_VALUE_STRING;
-						}
-					}
 					dataValues.add(new ArrayList<String>(Arrays.asList(datavals)));
 					if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
 						break;

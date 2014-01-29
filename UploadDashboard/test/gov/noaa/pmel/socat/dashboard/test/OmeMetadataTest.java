@@ -110,69 +110,6 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getSocatDOI()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setSocatDOI(java.lang.String)}.
-	 */
-	@Test
-	public void testGetSetSocatDOI() {
-		final String mySocatDOI = "10.3334/CDIAC/myCruiseDOI";
-		OmeMetadata mdata = new OmeMetadata();
-		assertEquals("", mdata.getSocatDOI());
-		mdata.setSocatDOI(mySocatDOI);
-		assertEquals(mySocatDOI, mdata.getSocatDOI());
-		assertEquals("", mdata.getMetadataHRef());
-		assertEquals("", mdata.getOrigDataRef());
-		assertEquals("", mdata.getScienceGroup());
-		assertEquals("", mdata.getVesselName());
-		assertEquals("", mdata.getCruiseName());
-		mdata.setSocatDOI(null);
-		assertEquals("", mdata.getSocatDOI());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getSocatHRef()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setSocatHRef(java.lang.String)}.
-	 */
-	@Test
-	public void testGetSetSocatHRef() {
-		final String mySocatHRef = "http://www.socat.info/data/myCruiseData.tsv";
-		OmeMetadata mdata = new OmeMetadata();
-		assertEquals("", mdata.getSocatHRef());
-		mdata.setSocatHRef(mySocatHRef);
-		assertEquals(mySocatHRef, mdata.getSocatHRef());
-		assertEquals("", mdata.getSocatDOI());
-		assertEquals("", mdata.getMetadataHRef());
-		assertEquals("", mdata.getOrigDataRef());
-		assertEquals("", mdata.getScienceGroup());
-		assertEquals("", mdata.getVesselName());
-		assertEquals("", mdata.getCruiseName());
-		mdata.setSocatHRef(null);
-		assertEquals("", mdata.getSocatHRef());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getCruiseFlag()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setCruiseFlag(java.lang.String)}.
-	 */
-	@Test
-	public void testGetSetCruiseFlag() {
-		final String myCruiseFlag = "C";
-		OmeMetadata mdata = new OmeMetadata();
-		assertEquals("", mdata.getCruiseFlag());
-		mdata.setCruiseFlag(myCruiseFlag);
-		assertEquals(myCruiseFlag, mdata.getCruiseFlag());
-		assertEquals("", mdata.getSocatHRef());
-		assertEquals("", mdata.getSocatDOI());
-		assertEquals("", mdata.getMetadataHRef());
-		assertEquals("", mdata.getOrigDataRef());
-		assertEquals("", mdata.getScienceGroup());
-		assertEquals("", mdata.getVesselName());
-		assertEquals("", mdata.getCruiseName());
-		mdata.setCruiseFlag(null);
-		assertEquals("", mdata.getCruiseFlag());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#equals(java.lang.Object)}.
 	 */
@@ -184,9 +121,6 @@ public class OmeMetadataTest {
 		final String myScienceGroup = "Cosca, Catherine E.; Feely, Richard A.; Alin, Simone R.; Lebon, Geoffrey T.";
 		final String myOrigDataRef = "www.pmel.noaa.gov/co2/SH1201.csv";
 		final String myMetadataHRef = "http://www.socat.info/metadata/AR2007_10_Readme.doc";
-		final String mySocatDOI = "10.3334/CDIAC/myCruiseDOI";
-		final String mySocatHRef = "http://www.socat.info/data/myCruiseData.tsv";
-		final String myCruiseFlag = "C";
 
 		OmeMetadata mdata = new OmeMetadata();
 		assertFalse( mdata.equals(null) );
@@ -238,27 +172,6 @@ public class OmeMetadataTest {
 		other.setMetadataHRef(myMetadataHRef);
 		assertTrue( mdata.hashCode() == other.hashCode() );
 		assertTrue( mdata.equals(other) );
-
-		mdata.setSocatDOI(mySocatDOI);
-		assertFalse( mdata.hashCode() == other.hashCode() );
-		assertFalse( mdata.equals(other) );
-		other.setSocatDOI(mySocatDOI);
-		assertTrue( mdata.hashCode() == other.hashCode() );
-		assertTrue( mdata.equals(other) );
-
-		mdata.setSocatHRef(mySocatHRef);
-		assertFalse( mdata.hashCode() == other.hashCode() );
-		assertFalse( mdata.equals(other) );
-		other.setSocatHRef(mySocatHRef);
-		assertTrue( mdata.hashCode() == other.hashCode() );
-		assertTrue( mdata.equals(other) );
-
-		mdata.setCruiseFlag(myCruiseFlag);
-		assertFalse( mdata.hashCode() == other.hashCode() );
-		assertFalse( mdata.equals(other) );
-		other.setCruiseFlag(myCruiseFlag);
-		assertTrue( mdata.hashCode() == other.hashCode() );
-		assertTrue( mdata.equals(other) );
 	}
 
 	/**
@@ -293,9 +206,6 @@ public class OmeMetadataTest {
 		assertEquals(actualScienceGroup, mdata.getScienceGroup());
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
 		assertEquals(actualMetadataHRef, mdata.getMetadataHRef());
-		assertEquals("", mdata.getSocatDOI());
-		assertEquals("", mdata.getSocatHRef());
-		assertEquals("", mdata.getCruiseFlag());
 	}
 
 	/**
@@ -528,9 +438,6 @@ public class OmeMetadataTest {
 		assertEquals(actualScienceGroup, mdata.getScienceGroup());
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
 		assertEquals("", mdata.getMetadataHRef());
-		assertEquals("", mdata.getSocatDOI());
-		assertEquals("", mdata.getSocatHRef());
-		assertEquals("", mdata.getCruiseFlag());
 	}
 
 	/**
