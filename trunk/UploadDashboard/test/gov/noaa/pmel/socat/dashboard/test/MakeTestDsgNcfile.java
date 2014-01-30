@@ -1,5 +1,9 @@
-package gov.noaa.pmel.socat.dashboard.nc;
+package gov.noaa.pmel.socat.dashboard.test;
 
+
+import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
+import gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.nc.SocatMetadata;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -8,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class MakeTestNcfile {
+public class MakeTestDsgNcfile {
     static Random rand = new Random();
     /**
      * @param args
@@ -157,7 +161,7 @@ public class MakeTestNcfile {
                 }
             }
 
-            CruiseSdgncFile ncfile = new CruiseSdgncFile(metadata, data);
+            CruiseDsgNcFile ncfile = new CruiseDsgNcFile(metadata, data);
 
             ncfile.create("testDSG.nc");
         } catch (Exception e) {

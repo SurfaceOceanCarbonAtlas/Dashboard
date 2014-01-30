@@ -42,7 +42,7 @@ public abstract class VersionedFileHandler {
 	VersionedFileHandler(String filesDirName, String svnUsername, 
 						String svnPassword) throws IllegalArgumentException {
 		filesDir = new File(filesDirName);
-		// Check if this is a directory under version control
+		// Check that this is a directory under version control
 		if ( ! filesDir.isDirectory() )
 			throw new IllegalArgumentException(
 					filesDirName + " is not a directory");
