@@ -18,14 +18,14 @@ import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 
 
-public class CruiseSdgncFile {
+public class CruiseDsgNcFile {
 
     SocatMetadata metadata;
     List<SocatCruiseData> data;
     NetcdfFileWriter ncfile;
-    String version = "CruiseSdgncFile 0.1";
+    String version = "CruiseDsgNcFile 0.1";
 
-    public CruiseSdgncFile(SocatMetadata metadata, List<SocatCruiseData> data) {
+    public CruiseDsgNcFile(SocatMetadata metadata, List<SocatCruiseData> data) {
         this.metadata = metadata;
         this.data = data;
     }

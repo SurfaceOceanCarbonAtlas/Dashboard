@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertTrue;
 
-import gov.noaa.pmel.socat.dashboard.nc.CruiseSdgncFile;
+import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.nc.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -19,10 +19,10 @@ import org.junit.Test;
 /**
  * @author Karl Smith
  */
-public class CruiseSdgncFileTest {
+public class CruiseDsgNcFileTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.CruiseSdgncFile#create(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create(java.lang.String)}.
 	 */
 	@Test
 	public void testCreate() throws Exception {
@@ -92,8 +92,8 @@ public class CruiseSdgncFileTest {
 		mdata.setVesselName("Caribbean Cruiser");
 		mdata.setOrigDOI("doi:cdiac12345");
 
-		CruiseSdgncFile sdgncFile = new CruiseSdgncFile(mdata, dataList);
-		String filename = expocode + "_userdata.nc";
+		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(mdata, dataList);
+		String filename = expocode + ".nc";
 		sdgncFile.create(filename);
 		assertTrue( (new File(filename)).exists() );
 	}

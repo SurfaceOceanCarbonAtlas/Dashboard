@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -42,6 +43,7 @@ public class DashboardDataStore {
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
+	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
@@ -58,8 +60,10 @@ public class DashboardDataStore {
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
+			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
 			BaseConfig.SOCAT_CONFIG_FILE + "=/Path/To/DataColumnConfig/CSVFile \n" + 
+			BaseConfig.SANITY_CHECK_CONFIG_FILE + "/Path/To/SanityConfig/CSVFile \n" + 
 			BaseConfig.COLUMN_SPEC_SCHEMA_FILE + "=/Path/To/ColumnSpecSchema/XMLFile \n" + 
 			BaseConfig.COLUMN_CONVERSION_FILE + "=/Path/To/ColumnConversion/PropsFile \n" + 
 			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
@@ -84,6 +88,7 @@ public class DashboardDataStore {
 	private UserFileHandler userFileHandler;
 	private CruiseFileHandler cruiseFileHandler;
 	private MetadataFileHandler metadataFileHandler;
+	private DsgNcFileHandler dsgNcFileHandler;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -222,6 +227,18 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+		// Read the DSG NC files directory name
+		try {
+			propVal = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			dsgNcFileHandler = new DsgNcFileHandler(propVal);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
 		// Sanity checker initialization from this same properties file 
 		try {
 			SanityChecker.initConfig(configFile.getAbsolutePath());
@@ -318,6 +335,14 @@ public class DashboardDataStore {
 	 */
 	public MetadataFileHandler getMetadataFileHandler() {
 		return metadataFileHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the handler for NetCDF DSG files
+	 */
+	public DsgNcFileHandler getDsgNcFileHandler() {
+		return dsgNcFileHandler;
 	}
 
 	/**

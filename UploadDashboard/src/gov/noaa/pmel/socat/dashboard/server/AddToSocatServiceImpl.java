@@ -3,8 +3,10 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
@@ -39,6 +41,8 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid authentication credentials");
 
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
+		DsgNcFileHandler dsgNcHandler = dataStore.getDsgNcFileHandler();
 		HashSet<String> ingestExpos = new HashSet<String>();
 		HashSet<String> archiveExpos = new HashSet<String>();
 		HashSet<String> cdiacExpos = new HashSet<String>();
@@ -97,9 +101,20 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			}
 		}
 
-		// TODO: add ingestExpos cruises to SOCAT
+		// Add cruises in ingestExpos to SOCAT
+		for ( String expocode : ingestExpos ) {
+			DashboardCruiseWithData cruiseData = 
+					cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+			String omeName = cruiseData.getOmeFilename();
+			if ( omeName.isEmpty() )
+				throw new IllegalArgumentException(
+						"No OME metadata for cruise " + expocode);
+			OmeMetadata omeMData = new OmeMetadata(
+					metadataHandler.getMetadataInfo(expocode, omeName));
+			dsgNcHandler.saveCruise(omeMData, cruiseData); 
+		}
 
-		// TODO?: modify cruise archive info in SOCAT for archiveExpos ?
+		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 
 		// TODO: send data to CDIAC for cruises in cdiacExpos
 
