@@ -78,8 +78,10 @@ public class OmeFileGenerator {
 					if ( ! parentFile.exists() )
 						if ( ! parentFile.mkdirs() ) 
 							throw new IOException("Unable to create directory " + parentFile.getPath());
-					// Save the minimal OME XML metadata file
+					// Save the minimal OME XML metadata file; not checked in 
 					omeMData.saveAsMinimalOmeXmlDoc();
+					// Create the info file for this metadata file; not checked in
+					mdataHandler.saveMetadataInfo(omeMData, null);
 					// Get the next metadata line
 					dataline = tsvIn.readLine();
 				}
