@@ -124,15 +124,14 @@ public class DashboardUserInfo {
 	 * 		the other user info; can be null
 	 * @return
 	 * 		true if this user has manager privilege over the other user;
-	 * 		if other is null, this user must have admin privileges for 
-	 * 		this function to return true
+	 * 		if other is null, returns true.
 	 */
 	public boolean managesOver(DashboardUserInfo other) {
 		// Admin manages over everyone
 		if ( admin )
 			return true;
 		if ( other == null )
-			return false;
+			return true;
 		// User manages over himself
 		if ( username.equals(other.username) )
 			return true;
