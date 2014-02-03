@@ -373,16 +373,18 @@ public class DashboardDataStore {
 	/**
 	 * Determines if username has manager privilege over othername. 
 	 * This can be from username being an administrator, a manager
-	 * of a group othername belongs to, or having the same username,
+	 * of a group othername belongs to, having the same username,
+	 * or othername being invalid (most likely an unspecified user),
 	 * so long as username is an authorized user.
 	 * 
 	 * @param username
-	 * 		manager username to check
+	 * 		manager username to check; if not a valid user, returns false
 	 * @param othername
-	 * 		group member username to check
+	 * 		group member username to check; if not a valid user, 
+	 * 		returns true if username is a valid user
 	 * @return
 	 * 		true if username is an authorized user and has manager
-	 * 		privileges over username
+	 * 		privileges over othername
 	 */
 	public boolean userManagesOver(String username, String othername) {
 		DashboardUserInfo userInfo = userInfoMap.get(username);

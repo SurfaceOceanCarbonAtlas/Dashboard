@@ -654,7 +654,7 @@ public class DataColumnSpecsPage extends Composite {
 				sb.appendHtmlConstant("</span>");
 			}
 			else if ( cruise.getWoceThreeRowIndices().get(colNum).contains(rowIdx) ) {
-				sb.appendHtmlConstant("<span style=\"background-color:#EEB;\">");
+				sb.appendHtmlConstant("<span style=\"background-color:#CB0;\">");
 				super.render(ctx, obj, sb);
 				sb.appendHtmlConstant("</span>");
 			}
