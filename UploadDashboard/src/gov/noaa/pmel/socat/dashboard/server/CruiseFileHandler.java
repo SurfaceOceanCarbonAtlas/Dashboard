@@ -16,11 +16,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import uk.ac.uea.socat.sanitychecker.Message;
 
 /**
  * Handles storage and retrieval of cruise data in files.
@@ -31,6 +35,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 	private static final String CRUISE_DATA_FILENAME_EXTENSION = ".tsv";
 	private static final String CRUISE_INFO_FILENAME_EXTENSION = ".properties";
+	private static final String CRUISE_MSGS_FILENAME_EXTENSION = ".messages";
 	private static final String DATA_OWNER_ID = "dataowner";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
@@ -120,25 +125,42 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 	/**
 	 * @param expocode
-	 * 		cruise expocode to use
+	 * 		expocode of the cruise
 	 * @return
-	 * 		the cruise information file associated with the cruise expocode
+	 * 		the cruise information file associated with the cruise
 	 * @throws IllegalArgumentException
 	 * 		if the cruise expocode is invalid
 	 */
 	private File cruiseInfoFile(String expocode) throws IllegalArgumentException {
 		// Check that the expocode is somewhat reasonable
 		String upperExpo = checkExpocode(expocode);
-		// Get the name of the saved cruise properties file
+		// Get the name of the cruise properties file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_INFO_FILENAME_EXTENSION);
 	}
 
 	/**
+	 * 
 	 * @param expocode
-	 * 		cruise expocode to use
+	 * 		expocode of the cruise
 	 * @return
-	 * 		the cruise data file associated with the cruise expocode
+	 * 		the cruise messages file associated with the cruise
+	 * @throws IllegalArgumentException
+	 * 		if the cruise expocode is invalid
+	 */
+	private File cruiseMsgsFile(String expocode) throws IllegalArgumentException {
+		// Check that the expocode is somewhat reasonable
+		String upperExpo = checkExpocode(expocode);
+		// Get the name of the cruise messages file
+		return new File(filesDir, upperExpo.substring(0,4) + 
+				File.separatorChar + upperExpo + CRUISE_MSGS_FILENAME_EXTENSION);
+	}
+	
+	/**
+	 * @param expocode
+	 * 		expocode of the cruise
+	 * @return
+	 * 		the cruise data file associated with the cruise
 	 * @throws IllegalArgumentException
 	 * 		if the cruise expocode is invalid
 	 */
@@ -988,4 +1010,223 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		return cruise;
 	}
 
+	private static final String SCMSG_KEY_VALUE_SEP = ":";
+	private static final String SCMSG_TYPE_KEY = "SCMsgType";
+	private static final String SCMSG_SEVERITY_KEY = "SCMsgSeverity";
+	private static final String SCMSG_LINE_NUMBER_KEY = "SCMsgLineNumber";
+	private static final String SCMSG_INPUT_COLUMN_NUMBER_KEY = "SCMsgInputColumnNumber";
+	private static final String SCMSG_INPUT_COLUMN_NAME_KEY = "SCMsgInputColumnName";
+	private static final String SCMSG_OUTPUT_COLUMN_NUMBER_KEY = "SCMsgOutputColumnNumber";
+	private static final String SCMSG_OUTPUT_COLUMN_NAME_KEY = "SCMsgOutputColumnName";
+	private static final String SCMSG_MESSAGE_KEY = "SCMsgMessage";
+
+	/**
+	 * Saves the list of messages produced by the SanityChecker to file.
+	 * 
+	 * @param expocode
+	 * 		expocode of the cruise
+	 * @param messages
+	 * 		sanity checker messages for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid
+	 */
+	public void saveCruiseMessages(String expocode, List<Message> messages) 
+												throws IllegalArgumentException {
+		// Get the cruise messages file
+		File msgsFile = cruiseMsgsFile(expocode);
+		// The parent directory should exist when this method gets called
+		// Write the messages to file
+		PrintWriter msgsWriter;
+		try {
+			msgsWriter = new PrintWriter(msgsFile);
+		} catch (FileNotFoundException ex) {
+			throw new IllegalArgumentException("Unexpected error opening messages file " + 
+					msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
+		}
+		try {
+			for ( Message msg : messages ) {
+				// List of key-value strings
+				ArrayList<String> mappings = new ArrayList<String>();
+				// Message type
+				mappings.add(SCMSG_TYPE_KEY + 
+						SCMSG_KEY_VALUE_SEP + msg.getMessageType());
+				// Severity
+				mappings.add(SCMSG_SEVERITY_KEY + 
+						SCMSG_KEY_VALUE_SEP + msg.getSeverity());
+				// Line number
+				mappings.add(SCMSG_LINE_NUMBER_KEY + 
+						SCMSG_KEY_VALUE_SEP + msg.getLineIndex());
+				// Input column number
+				mappings.add(SCMSG_INPUT_COLUMN_NUMBER_KEY + 
+						SCMSG_KEY_VALUE_SEP + msg.getInputItemIndex());
+				// Input column name
+				if ( msg.getInputItemName() != null )
+					mappings.add(SCMSG_INPUT_COLUMN_NAME_KEY + 
+							SCMSG_KEY_VALUE_SEP + msg.getInputItemName());
+				// Output column number
+				mappings.add(SCMSG_OUTPUT_COLUMN_NUMBER_KEY + 
+						SCMSG_KEY_VALUE_SEP + msg.getItemIndex());
+				// Output column name
+				if ( msg.getItemName() != null )
+					mappings.add(SCMSG_OUTPUT_COLUMN_NAME_KEY + 
+							SCMSG_KEY_VALUE_SEP + msg.getItemName());
+				// Message string - should never be null
+				String msgString = msg.getMessage();
+				// Escape all newlines in the message string
+				msgString.replace("\n", "\\n");
+				mappings.add(SCMSG_MESSAGE_KEY + SCMSG_KEY_VALUE_SEP + msgString);
+				// Any additional properties
+				Enumeration<?> propNames = msg.getPropertyNames();
+				while ( propNames.hasMoreElements() ) {
+					String key = (String) propNames.nextElement();
+					String value = msg.getProperty(key);
+					mappings.add(key + SCMSG_KEY_VALUE_SEP + value);
+				}
+				// Write this array list of key-value string to file
+				msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
+			}
+		} finally {
+			msgsWriter.close();
+		}
+		try {
+			commitVersion(msgsFile, "Update of SanityChecker messages for cruise " + expocode);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException("Unexpected problems committing " +
+					"an update of SanityChecker messages" + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Reads the list of messages produced by the SanityChecker from the messages 
+	 * file written by {@link #saveCruiseMessages(String, List)}.
+	 * 
+	 * @param expocode
+	 * 		get messages for the cruise with this expocode
+	 * @return
+	 * 		the list of sanity checker messages for the cruise;
+	 * 		never null, but may be empty if there were no sanity
+	 * 		checker messages for the cruise.
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid, or 
+	 * 		if the messages file is invalid
+	 * @throws FileNotFoundException
+	 * 		if there is no messages file for the cruise
+	 */
+	public ArrayList<Message> getCruiseMessages(String expocode) 
+					throws IllegalArgumentException, FileNotFoundException {
+		// Get the cruise messages file
+		File msgsFile = cruiseMsgsFile(expocode);
+		// Open the messages file
+		BufferedReader msgReader;
+		msgReader = new BufferedReader(new FileReader(msgsFile));
+		// Create the list of messages to be returned
+		ArrayList<Message> msgList = new ArrayList<Message>();
+		// Read and parse each of the messages in the file
+		try {
+			try {
+				// Read all the key-value pairs for this messages line into a properties file
+				Properties msgProps = new Properties();
+				String msgline = msgReader.readLine();
+				while ( msgline != null ) {
+					msgProps.clear();
+					for ( String msgPart : DashboardUtils.decodeStringArrayList(msgline) ) {
+						String[] keyValue = msgPart.split(SCMSG_KEY_VALUE_SEP, 2);
+						if ( keyValue.length != 2 )
+							throw new IOException("Invalid key:value pair '" + msgPart + "'");
+						msgProps.setProperty(keyValue[0], keyValue[1]);
+					}
+					msgline = msgReader.readLine();
+				}
+				// Message type
+				String propVal = msgProps.getProperty(SCMSG_TYPE_KEY);
+				if ( propVal == null )
+					throw new IOException("Message type not given");
+				int msgType;
+				try {
+					msgType = Integer.parseInt(propVal);
+				} catch ( NumberFormatException ex ) {
+					throw new IOException("Invalid message type given in '" + propVal + "'");
+				}
+				msgProps.remove(SCMSG_TYPE_KEY);
+				// Severity
+				propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
+				if ( propVal == null )
+					throw new IOException("Severity not given");
+				int severity;
+				try {
+					severity = Integer.parseInt(propVal);
+				} catch ( NumberFormatException ex ) {
+					throw new IOException("Invalid severity given in '" + propVal + "'");
+				}
+				msgProps.remove(SCMSG_SEVERITY_KEY);
+				// Line number
+				propVal = msgProps.getProperty(SCMSG_LINE_NUMBER_KEY);
+				if ( propVal == null )
+					throw new IOException("Line number not given");
+				int lineNum;
+				try {
+					lineNum = Integer.parseInt(propVal);
+				} catch ( NumberFormatException ex ) {
+					throw new IOException("Invalid line number given in '" + propVal + "'");
+				}
+				msgProps.remove(SCMSG_LINE_NUMBER_KEY);
+				// Input column number
+				propVal = msgProps.getProperty(SCMSG_INPUT_COLUMN_NUMBER_KEY);
+				if ( propVal == null )
+					throw new IOException("Input column number not given");
+				int inputColNum;
+				try {
+					inputColNum = Integer.parseInt(propVal);
+				} catch ( NumberFormatException ex ) {
+					throw new IOException("Invalid input column number given in '" + propVal + "'");
+				}
+				msgProps.remove(SCMSG_INPUT_COLUMN_NUMBER_KEY);
+				// Input column name
+				String inputColName = msgProps.getProperty(SCMSG_INPUT_COLUMN_NAME_KEY);
+				if ( inputColName != null )
+					msgProps.remove(SCMSG_INPUT_COLUMN_NAME_KEY);
+				// Output column number
+				propVal = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
+				if ( propVal == null )
+					throw new IOException("Input column number not given");
+				int outputColNum;
+				try {
+					outputColNum = Integer.parseInt(propVal);
+				} catch ( NumberFormatException ex ) {
+					throw new IOException("Invalid output column number given in '" + propVal + "'");
+				}
+				msgProps.remove(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
+				// Output column name
+				String outputColName = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NAME_KEY);
+				if ( outputColName != null )
+					msgProps.remove(SCMSG_OUTPUT_COLUMN_NAME_KEY);
+				// Message string
+				String msgString = msgProps.getProperty(SCMSG_MESSAGE_KEY);
+				if ( msgString == null )
+					throw new IOException("Message string not given");
+				// Replace all escaped newlines in the message string
+				msgString.replace("\\n", "\n");
+				msgProps.remove(SCMSG_MESSAGE_KEY);
+				// Create the message object
+				Message msg = new Message(msgType, severity, lineNum, inputColNum, 
+						inputColName, outputColNum, outputColName, msgString);
+				// Add any additional properties remaining
+				Enumeration<?> propNames = msgProps.elements();
+				while ( propNames.hasMoreElements() ) {
+					String key = (String) propNames.nextElement();
+					msg.addProperty(key, msgProps.getProperty(key));
+				}
+				// Add this message to the list
+				msgList.add(msg);
+			} finally {
+				msgReader.close();
+			}
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected problem reading messages from " + msgsFile.getPath() +
+					"\n    " + ex.getMessage(), ex);
+		}
+
+		return msgList;
+	}
 }

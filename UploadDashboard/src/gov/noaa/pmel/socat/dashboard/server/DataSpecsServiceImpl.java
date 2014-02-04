@@ -358,7 +358,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		for ( Message msg : output.getMessages().getMessages() )
 			processMessage(cruiseData, msg, ambiguousColumnIndices);
 
-		// TODO: add the reports of any issues found
+		// Update the reports of any issues found
+		dataStore.getCruiseFileHandler().saveCruiseMessages(
+				cruiseData.getExpocode(), output.getMessages().getMessages());
 
 		// Save and commit the updated cruise columns
 		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 

@@ -649,7 +649,7 @@ public class DataColumnSpecsPage extends Composite {
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
 			if ( cruise.getWoceFourRowIndices().get(colNum).contains(rowIdx) ) {
-				sb.appendHtmlConstant("<span style=\"background-color:#FBB;\">");
+				sb.appendHtmlConstant("<span style=\"background-color:#EAA;\">");
 				super.render(ctx, obj, sb);
 				sb.appendHtmlConstant("</span>");
 			}
