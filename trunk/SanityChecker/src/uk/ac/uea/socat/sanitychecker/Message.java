@@ -153,4 +153,13 @@ public class Message {
 	public String getProperty(String name) {
 		return itsProperties.getProperty(name);
 	}
+
+	public Enumeration<?> getPropertyNames() {
+		return itsProperties.propertyNames();
+	}
+
+	public String getMessage() {
+		return itsMessage;
+	}
+
 }
