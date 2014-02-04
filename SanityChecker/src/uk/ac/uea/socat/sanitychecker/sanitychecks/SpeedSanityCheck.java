@@ -96,6 +96,6 @@ public class SpeedSanityCheck extends SanityCheck {
 	
 	private double calcHourDiff(DateTime time1, DateTime time2) {
 		Seconds diffSeconds = Seconds.secondsBetween(time1, time2);
-		return diffSeconds.getSeconds() / 3600;
+		return ((double) diffSeconds.getSeconds()) / 3600.0;
 	}
 }
