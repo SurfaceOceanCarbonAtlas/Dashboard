@@ -29,6 +29,7 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataException;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
+import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
 
 /**
  * Startup class for the SOCAT Sanity Checker.
@@ -210,7 +211,7 @@ public class SanityChecker {
 		return itsOutput;
 	}
 
-	private void runSanityChecks() throws ConfigException {
+	private void runSanityChecks() throws ConfigException, SanityCheckException {
 		
 		List<SanityCheck> checkers = SanityCheckConfig.getInstance().getCheckers();
 		

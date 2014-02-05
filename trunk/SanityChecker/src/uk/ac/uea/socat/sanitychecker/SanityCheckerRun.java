@@ -136,7 +136,6 @@ public class SanityCheckerRun {
 				SanityChecker checker = new SanityChecker(itsDataFilename, metadata, colSpec, records, itsDateFormat);
 				Output checkerOutput = checker.process();
 				
-				
 				// Print summary
 				System.out.println("Output generated? " + checkerOutput.outputGenerated());
 				
