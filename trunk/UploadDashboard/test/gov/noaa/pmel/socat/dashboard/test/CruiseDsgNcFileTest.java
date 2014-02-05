@@ -20,7 +20,7 @@ import org.junit.Test;
  * @author Karl Smith
  */
 public class CruiseDsgNcFileTest {
-
+    String filename;
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create(java.lang.String)}.
 	 */
@@ -93,9 +93,12 @@ public class CruiseDsgNcFileTest {
 		mdata.setOrigDOI("doi:cdiac12345");
 
 		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(mdata, dataList);
-		String filename = expocode + ".nc";
+		filename = expocode + ".nc";
 		sdgncFile.create(filename);
 		assertTrue( (new File(filename)).exists() );
 	}
 
+	public String getFilename() {
+	    return filename;
+	}
 }
