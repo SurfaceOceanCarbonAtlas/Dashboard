@@ -60,6 +60,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>DashboardSCMessagesServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.SCMessagesServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DashboardSCMessagesServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/SCMessagesService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.MetadataUploadService</servlet-class>
 	</servlet>

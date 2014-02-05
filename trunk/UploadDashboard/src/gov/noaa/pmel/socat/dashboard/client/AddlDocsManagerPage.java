@@ -31,6 +31,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -42,7 +43,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class AddlDocsManagerPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Logged in as: ";
+	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String INTRO_HTML_PROLOGUE = 
@@ -96,7 +97,7 @@ public class AddlDocsManagerPage extends Composite {
 	private static MetadataListServiceAsync service = 
 			GWT.create(MetadataListService.class);
 
-	@UiField Label userInfoLabel;
+	@UiField InlineLabel userInfoLabel;
 	@UiField HTML introHtml; 
 	@UiField Button logoutButton;
 	@UiField Button uploadButton;

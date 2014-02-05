@@ -1,0 +1,36 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+
+	<ui:style src="FullWidth.css" />
+
+	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
+		<g:east size="0.5">
+			<!-- Just to give uniform padding -->
+			<g:Label />
+		</g:east>
+		<g:west size="0.5">
+			<!-- Just to give uniform padding -->
+			<g:Label />
+		</g:west>
+		<g:north size="12">
+			<g:FlowPanel addStyleNames="{style.userinfopanel}">
+				<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
+			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+		</g:north>
+		<g:south size="4">
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton" />
+			</g:FlowPanel>
+		</g:south>
+		<g:center>
+			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
+				<cell:DataGrid ui:field="messagesGrid" />
+			</g:ResizeLayoutPanel>
+		</g:center>
+	</g:DockLayoutPanel>
+
+</ui:UiBinder>
