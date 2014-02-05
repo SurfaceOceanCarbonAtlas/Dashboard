@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
+import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
 
 public class SanityCheckConfig {
 	
@@ -19,7 +20,7 @@ public class SanityCheckConfig {
 	private static final String SANITY_CHECK_CLASS_TAIL = "SanityCheck";
 
 	
-	private List<SanityCheck> itsSanityChecks;
+	private List<CheckerInitData> itsSanityCheckClasses;
 	
 	private static String itsConfigFilename = null;
 	
@@ -33,7 +34,7 @@ public class SanityCheckConfig {
 			throw new ConfigException(null, "SanityCheckConfig filename has not been set - must run init first");
 		}
 		
-		itsSanityChecks = new ArrayList<SanityCheck>();
+		itsSanityCheckClasses = new ArrayList<CheckerInitData>();
 		readFile();
 	}
 	
@@ -75,11 +76,16 @@ public class SanityCheckConfig {
 							throw new ConfigException(itsConfigFilename, lineCount, "Sanity Check class name cannot be empty");
 						} else {
 							try {
+								// Instantiate the class and call the initialise method
+								// to make sure everything's OK.
 								itsLogger.trace("Initialising Sanity Check class " + fullClassName);
 								Class<?> checkClass = Class.forName(fullClassName);
 								SanityCheck checkInstance = (SanityCheck) checkClass.newInstance();
 								checkInstance.initialise(fields);
-								itsSanityChecks.add(checkInstance);
+								
+								// Add the checker class to the list of all known checkers.
+								// These will be instantiated in the @code{getInstances()} method.
+								itsSanityCheckClasses.add(new CheckerInitData(checkClass, fields));
 							} catch(ClassNotFoundException e) {
 								throw new ConfigException(itsConfigFilename, lineCount, "Sanity check class '" + fullClassName + "' does not exist");
 							} catch(Exception e) {
@@ -99,7 +105,39 @@ public class SanityCheckConfig {
 		}
 	}
 	
-	public List<SanityCheck> getCheckers() {
-		return itsSanityChecks;
+	/**
+	 * Returns a list containing fresh instances of all the configured sanity checker classes
+	 * @return A list containing fresh instances of all the configured sanity checker classes
+	 */
+	public List<SanityCheck> getCheckers() throws SanityCheckException {
+		List<SanityCheck> checkers = new ArrayList<SanityCheck>(itsSanityCheckClasses.size());
+		
+		try {
+			for (CheckerInitData checkerData: itsSanityCheckClasses) {
+				SanityCheck checkInstance = (SanityCheck) checkerData.checkerClass.newInstance();
+				checkInstance.initialise(checkerData.params);
+				checkers.add(checkInstance);
+			}
+		} catch (Exception e) {
+			if (e instanceof SanityCheckException) {
+				throw (SanityCheckException) e;
+			} else {
+				throw new SanityCheckException("Error initialising sanity checker instance", e);
+			}
+		}
+		
+		return checkers;
+	}
+
+	private class CheckerInitData {
+		
+		private Class<?> checkerClass;
+		private List<String> params;
+		
+		private CheckerInitData(Class<?> checkerClass, List<String> params) {
+			this.checkerClass = checkerClass;
+			this.params = params;
+		}
 	}
 }
+

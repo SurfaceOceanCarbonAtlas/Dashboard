@@ -3,7 +3,6 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 import java.util.List;
 
 import org.joda.time.DateTime;
-import org.joda.time.Hours;
 import org.joda.time.Seconds;
 
 import uk.ac.uea.socat.sanitychecker.Message;
