@@ -32,6 +32,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.AsyncDataProvider;
@@ -50,13 +51,15 @@ public class DataColumnSpecsPage extends Composite {
 	private static final int NUM_ROWS_PER_GRID_PAGE = 10;
 	private static final int DATA_COLUMN_WIDTH = 16;
 
+	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
+
 	private static final String SUBMIT_TEXT_FROM_UPLOAD = "OK";
 	private static final String SUBMIT_TEXT_FROM_LIST = "OK";
+
 	private static final String CANCEL_TEXT_FROM_UPLOAD = "Abort Upload";
 	private static final String CANCEL_TEXT_FROM_LIST = "Cancel";
 
-	private static final String WELCOME_INTRO = "Logged in as: ";
 	private static final String INTRO_PROLOGUE = 
 			"<b><large>Review Cruise Data</large></b>" +
 			"<br />" +
@@ -142,7 +145,7 @@ public class DataColumnSpecsPage extends Composite {
 	private static DataSpecsServiceAsync service = 
 			GWT.create(DataSpecsService.class);
 
-	@UiField Label userInfoLabel;
+	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField DataGrid<ArrayList<String>> dataGrid;
@@ -649,12 +652,12 @@ public class DataColumnSpecsPage extends Composite {
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
 			if ( cruise.getWoceFourRowIndices().get(colNum).contains(rowIdx) ) {
-				sb.appendHtmlConstant("<span style=\"background-color:#EAA;\">");
+				sb.appendHtmlConstant("<span style=\"background-color:#F66;\">");
 				super.render(ctx, obj, sb);
 				sb.appendHtmlConstant("</span>");
 			}
 			else if ( cruise.getWoceThreeRowIndices().get(colNum).contains(rowIdx) ) {
-				sb.appendHtmlConstant("<span style=\"background-color:#CB0;\">");
+				sb.appendHtmlConstant("<span style=\"background-color:#DB4;\">");
 				super.render(ctx, obj, sb);
 				sb.appendHtmlConstant("</span>");
 			}

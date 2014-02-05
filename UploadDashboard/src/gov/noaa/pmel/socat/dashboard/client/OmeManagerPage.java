@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class OmeManagerPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Logged in as: ";
+	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String UPLOAD_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
@@ -74,7 +74,7 @@ public class OmeManagerPage extends Composite {
 	private static OmeManagerPageUiBinder uiBinder = 
 			GWT.create(OmeManagerPageUiBinder.class);
 
-	@UiField Label userInfoLabel;
+	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;

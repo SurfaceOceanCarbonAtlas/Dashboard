@@ -24,6 +24,8 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		CRUISE_UPLOAD,
 		/** History tag for DataColumnSpecsPage */
 		REVIEW_DATA,
+		/** History tag for DataMessagesPage */
+		DATA_MESSAGES,
 		/** History tag for OmeManagerPage */
 		OME_MANAGER,
 		/** History tag for AddlDocsManagerPage */

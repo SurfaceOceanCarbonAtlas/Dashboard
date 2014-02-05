@@ -7,8 +7,8 @@
 	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
 		<g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.userinfopanel}">
-				<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-				<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+				<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.addinfo}" ui:field="introHtml" />
 			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">

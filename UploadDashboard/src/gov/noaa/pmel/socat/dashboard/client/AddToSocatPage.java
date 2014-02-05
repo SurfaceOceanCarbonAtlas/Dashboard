@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,7 +39,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AddToSocatPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Logged in as: ";
+	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String MORE_INFO_TEXT = "more ...";
 
@@ -139,7 +140,7 @@ public class AddToSocatPage extends Composite {
 	private static AddToSocatServiceAsync service = 
 			GWT.create(AddToSocatService.class);
 
-	@UiField Label userInfoLabel;
+	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField Label archivePlanLabel;

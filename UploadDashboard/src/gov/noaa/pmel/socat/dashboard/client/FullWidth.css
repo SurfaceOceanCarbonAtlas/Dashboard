@@ -122,11 +122,6 @@ body {
 	margin-left: 0.5em;
 }
 
-.logoutbutton {
-	display: inline;
-	margin-left: 10em;
-}
-
 .metadatapanel {
 	display: block;
 	height: 20em;
@@ -233,6 +228,9 @@ body {
 }
 .userinfolabel {
 	display: inline;
-	font-size: large;
 	margin-left: 1em;
+}
+.userlogoutbutton {
+	display: inline;
+	margin-left: 10em;
 }

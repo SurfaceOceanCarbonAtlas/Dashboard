@@ -9,8 +9,8 @@
 		<g:north size="15">
 			<g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:Label addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.logoutbutton}" ui:field="logoutButton" />
+					<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+					<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
 				</g:FlowPanel>
 				<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			</g:FlowPanel>

@@ -33,6 +33,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -47,7 +48,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class CruiseListPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Logged in as: ";
+	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String UPLOAD_TEXT = "Upload Cruise Data";
@@ -201,7 +202,7 @@ public class CruiseListPage extends Composite {
 	private static CruiseListServiceAsync service = 
 			GWT.create(CruiseListService.class);
 
-	@UiField Label userInfoLabel;
+	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField Button uploadButton;
 	@UiField Button viewDataButton;
@@ -330,7 +331,7 @@ public class CruiseListPage extends Composite {
 	 * 		if true, adds this page to the page history 
 	 */
 	static void redisplayPage(boolean addToHistory) {
-		// If never show before, or if the username does not match the 
+		// If never shown before, or if the username does not match the 
 		// current login username, show the login page instead
 		if ( (singleton == null) || 
 			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
