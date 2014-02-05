@@ -24,6 +24,8 @@ public class SocatTool extends Thread {
 
 	FerretConfig ferret = new FerretConfig();
 	String filename;
+	String message;
+	boolean error = false;
 	boolean done = false;
 	
 
@@ -49,6 +51,7 @@ public class SocatTool extends Thread {
 	@Override
 	public void run() {
 		done = false;
+		error = false;
 		PrintStream script_writer;
 		try {
 
@@ -89,23 +92,28 @@ public class SocatTool extends Thread {
             }
 
 			fullCmd[args.size()+offset] = script.getAbsolutePath();
+			
+			long timelimit = ferret.getTimeLimit();
 
-			Task task = new Task(fullCmd, ferret.getRuntimeEnvironment().getEnv(), new File(temp_dir), new File("cancel"), 36000l, ferret.getErrorKeys());
+			Task task = new Task(fullCmd, ferret.getRuntimeEnvironment().getEnv(), new File(temp_dir), new File("cancel"), timelimit, ferret.getErrorKeys());
 			task.run();
-			if ( task.getHasError() ) {
-			    logger.error(task.getErrorMessage());
-			}
-
+			error = task.getHasError();
+			message = task.getErrorMessage();
 			done = true;
 		} catch ( Exception e ) {
 			done = true;
-			logger.error(e.getMessage());
-
+			error = true;
+			message = e.getMessage();
 		} 
 
 
 	}
-
+    public boolean hasError() {
+        return error;
+    }
+    public String getErrorMessage() {
+        return message;
+    }
 	public boolean isDone() {
 		return done;
 	}
