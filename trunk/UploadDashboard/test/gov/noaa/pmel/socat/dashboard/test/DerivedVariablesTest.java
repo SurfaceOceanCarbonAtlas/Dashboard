@@ -35,6 +35,11 @@ public class DerivedVariablesTest {
                 SocatTool tool = new SocatTool();
                 tool.init(testfile.getFilename());
                 tool.run();
+                if ( tool.hasError() ) {
+                    System.err.println("Error: "+tool.getErrorMessage());
+                } else {
+                    System.out.println("File created.");
+                }
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
