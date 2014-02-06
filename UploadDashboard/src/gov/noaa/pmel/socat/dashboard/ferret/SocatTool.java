@@ -12,15 +12,10 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jfree.util.Log;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 
 public class SocatTool extends Thread {
-
-	private static final Logger logger = LoggerFactory.getLogger(SocatTool.class);
 
 	FerretConfig ferret = new FerretConfig();
 	String filename;

@@ -207,7 +207,10 @@ public class Task {
                 if (timeLimit > 0 && endTime - startTime > timeLimit * 1000) {
                     try {
                         outstream.close();
-                        errstream.close();
+                    } catch (IOException ioe) {
+                    }
+                    try {
+                    	errstream.close();
                     } catch (IOException ioe) {
                     }
                     process.destroy();
@@ -215,6 +218,14 @@ public class Task {
                             + timeLimit + " sec");
                 }
                 if (cancel != null && cancel.exists()) {
+                    try {
+                        outstream.close();
+                    } catch (IOException ioe) {
+                    }
+                    try {
+                    	errstream.close();
+                    } catch (IOException ioe) {
+                    }
                     log.debug("Backend request canceled: "+cmdString);
                     process.destroy();
                     cancel.delete();
