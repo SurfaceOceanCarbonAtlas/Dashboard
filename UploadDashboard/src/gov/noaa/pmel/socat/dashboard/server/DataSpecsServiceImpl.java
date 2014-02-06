@@ -341,10 +341,20 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 		else if ( output.hasErrors() ) {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS);
+			int numErrors = 0;
+			for ( Message msg : output.getMessages().getMessages() )
+				if ( msg.isError() )
+					numErrors++;
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
+					Integer.toString(numErrors) + " errors");
 		}
 		else if ( output.hasWarnings() ) {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_QUESTIONABLE);
+			int numWarns = 0;
+			for ( Message msg : output.getMessages().getMessages() )
+				if ( msg.isWarning() )
+					numWarns++;
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
+					Integer.toString(numWarns) + " warnings");
 		}
 		else {
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);

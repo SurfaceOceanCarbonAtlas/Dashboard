@@ -65,8 +65,8 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				String dataStatus = cruise.getDataCheckStatus();
 				String omeFilename = cruise.getOmeFilename();
 				if ( ( ! omeFilename.isEmpty() ) && 
-					 ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(dataStatus) || 
-					   DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(dataStatus) ) )
+					 ( dataStatus.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) || 
+					   dataStatus.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) )
 					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 				else
 					qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;

@@ -1,7 +1,7 @@
 @CHARSET "UTF-8";
 
 body {
-	background-color: #DEF;
+	background-color: #BBDDFF;
 	font-size: 100%;
 	margin: 0;
 	padding: 0;
@@ -27,7 +27,7 @@ body {
 }
 
 .infopanel {
-	background-color: #DDD;
+	background-color: #CCCCCC;
 	width: 25em;
 }
 .infohtml {

@@ -39,10 +39,14 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	}
 
 	// Column widths in em's
-	static double CHECKBOX_COLUMN_WIDTH = 2.5;
-	static double NARROW_COLUMN_WIDTH = 5.0;
-	static double NORMAL_COLUMN_WIDTH = 9.0;
-	static double FILENAME_COLUMN_WIDTH = 12.0;
+	static final double CHECKBOX_COLUMN_WIDTH = 2.5;
+	static final double NARROW_COLUMN_WIDTH = 5.0;
+	static final double NORMAL_COLUMN_WIDTH = 9.0;
+	static final double FILENAME_COLUMN_WIDTH = 12.0;
+
+	// Data warning and error colors
+	static final String WARNING_COLOR = "#FFCC33";
+	static final String ERROR_COLOR = "#FF8888";
 
 	// Singleton instance of this object
 	private static SocatUploadDashboard singleton = null;

@@ -51,8 +51,8 @@ public class DashboardUtils {
 
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
 	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
-	public static final String CHECK_STATUS_QUESTIONABLE = "Has questionable data";
-	public static final String CHECK_STATUS_ERRORS = "Has erroneous data";
+	public static final String CHECK_STATUS_WARNINGS_PREFIX = "Warnings:";
+	public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
 
 	public static final String QC_STATUS_NOT_SUBMITTED = "";

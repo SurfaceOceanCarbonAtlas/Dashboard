@@ -48,17 +48,17 @@ import com.google.gwt.view.client.Range;
  */
 public class DataColumnSpecsPage extends Composite {
 
-	private static final int NUM_ROWS_PER_GRID_PAGE = 10;
+	private static final int NUM_ROWS_PER_GRID_PAGE = 25;
 	private static final int DATA_COLUMN_WIDTH = 16;
 
 	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String SUBMIT_TEXT_FROM_UPLOAD = "OK";
-	private static final String SUBMIT_TEXT_FROM_LIST = "OK";
+	private static final String SUBMIT_TEXT_FROM_LIST = "Recheck Data";
 
 	private static final String CANCEL_TEXT_FROM_UPLOAD = "Abort Upload";
-	private static final String CANCEL_TEXT_FROM_LIST = "Cancel";
+	private static final String CANCEL_TEXT_FROM_LIST = "Return to Cruise List";
 
 	private static final String INTRO_PROLOGUE = 
 			"<b><large>Review Cruise Data</large></b>" +
@@ -122,9 +122,6 @@ public class DataColumnSpecsPage extends Composite {
 			"Problems updating the cruise column types";
 	private static final String MORE_DATA_FAIL_MSG = 
 			"Problems obtaining more cruise data";
-	private static final String SANITY_CHECK_FAIL_MSG = 
-			"The SanityChecker failed, indicating very serious problems " +
-			"with the data.";
 
 	private static final String ABORT_UPLOAD_MSG = 
 			"This cruise has not yet been assigned acceptable column types " +
@@ -135,6 +132,15 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String CONTINUE_ABORT_TEXT = "Yes";
 	private static final String CANCEL_ABORT_TEXT = "No";
 
+	private static final String SANITY_CHECK_FAIL_MSG = 
+			"Automatic data checking failed, " +
+			"indicating very serious problems with the data.";
+	private static final String SANITY_CHECK_ERROR_MSG = 
+			"Automatic data checking found serious problems with the data.";
+	private static final String SANITY_CHECK_WARNING_MSG = 
+			"Automatic data checking found possible problems with the data";
+	private static final String SANITY_CHECK_SUCCESS_MSG =
+			"Automatic data checking did not find any problems with the data";
 
 	interface CruiseDataColumnSpecsPageUiBinder extends UiBinder<Widget, DataColumnSpecsPage> {
 	}
@@ -425,7 +431,7 @@ public class DataColumnSpecsPage extends Composite {
 			okayToAbortPopup.askQuestion(ABORT_UPLOAD_MSG);
 		}
 		else {
-			// Change to the latest cruise listing page, which may  
+			// Return to the latest cruise listing page, which may  
 			// have been updated from previous actions on this page.
 			CruiseListPage.showPage(false);
 		}
@@ -608,14 +614,30 @@ public class DataColumnSpecsPage extends Composite {
 					return;
 				}
 				String status = specs.getDataCheckStatus();
-				if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
-					 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
-					// Stay on the page if the sanity checker had serious problems
-					SocatUploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
-					updateCruiseColumnSpecs(specs);
+				if ( fromUpload ) {
+					// Cruise uploaded; return to an updated cruise list page
+					CruiseListPage.showPage(false);
 				}
 				else {
-					CruiseListPage.showPage(false);
+					// data column information updated; stay on the page
+					updateCruiseColumnSpecs(specs);
+					if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
+						 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+						// the sanity checker had serious problems
+						SocatUploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
+					}
+					else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
+						// errors issued
+						SocatUploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
+					}
+					else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
+						// warnings issued
+						SocatUploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
+					}
+					else {
+						// no problems
+						SocatUploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
+					}
 				}
 			}
 			@Override
@@ -652,14 +674,16 @@ public class DataColumnSpecsPage extends Composite {
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
 			if ( cruise.getWoceFourRowIndices().get(colNum).contains(rowIdx) ) {
-				sb.appendHtmlConstant("<span style=\"background-color:#F66;\">");
-				super.render(ctx, obj, sb);
-				sb.appendHtmlConstant("</span>");
+				sb.appendHtmlConstant("<div style=\"background-color:" + 
+						SocatUploadDashboard.ERROR_COLOR + ";\">");
+				sb.appendEscaped(getValue(obj));
+				sb.appendHtmlConstant("</div>");
 			}
 			else if ( cruise.getWoceThreeRowIndices().get(colNum).contains(rowIdx) ) {
-				sb.appendHtmlConstant("<span style=\"background-color:#DB4;\">");
-				super.render(ctx, obj, sb);
-				sb.appendHtmlConstant("</span>");
+				sb.appendHtmlConstant("<div style=\"background-color:" + 
+						SocatUploadDashboard.WARNING_COLOR + ";\">");
+				sb.appendEscaped(getValue(obj));
+				sb.appendHtmlConstant("</div>");
 			}
 			else {
 				super.render(ctx, obj, sb);
