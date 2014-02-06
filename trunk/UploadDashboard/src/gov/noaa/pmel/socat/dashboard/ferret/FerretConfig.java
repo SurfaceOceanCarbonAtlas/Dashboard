@@ -57,10 +57,6 @@ public class FerretConfig extends Document {
      * @throws Exception
      */
     public RuntimeEnvironment getRuntimeEnvironment() throws Exception   {
-    	/*
-    	 
-    	 *
-    	 */
         HashMap<String, String> env = new HashMap<String, String>();
         Element environment = this.getRootElement().getChild("environment");
         String base_dir = getBaseDir();
@@ -69,14 +65,14 @@ public class FerretConfig extends Document {
             throw new Exception("base_dir "+base_dir+" is not a full path.");
         }
         if ( environment != null ) {
-            List variables = environment.getChildren("variable");
-            for (Iterator varIt = variables.iterator(); varIt.hasNext();) {
-                Element variable = (Element) varIt.next();
+            List<Element> variables = environment.getChildren("variable");
+            for (Iterator<Element> varIt = variables.iterator(); varIt.hasNext();) {
+                Element variable = varIt.next();
                 String name = variable.getChildTextTrim("name");
-                List values = variable.getChildren("value");
+                List<Element> values = variable.getChildren("value");
                 String value = "";
-                for (Iterator valueIt = values.iterator(); valueIt.hasNext();) {
-                    Element valueE = (Element) valueIt.next();
+                for (Iterator<Element> valueIt = values.iterator(); valueIt.hasNext();) {
+                    Element valueE = valueIt.next();
                     String val = valueE.getTextTrim();
                     if ( val.startsWith("/")) {
                        value = value + val;
@@ -139,9 +135,9 @@ public class FerretConfig extends Document {
         List<String> args = new ArrayList<String>();
         Element invoker = this.getRootElement().getChild("invoker");
         if ( invoker != null ) {
-            List configured_args = invoker.getChildren("arg");
-            for (Iterator argIt = configured_args.iterator(); argIt.hasNext();) {
-                Element arg = (Element) argIt.next();
+            List<Element> configured_args = invoker.getChildren("arg");
+            for (Iterator<Element> argIt = configured_args.iterator(); argIt.hasNext();) {
+                Element arg = argIt.next();
                 String a = arg.getTextTrim();
                 args.add(a);
             }
@@ -192,11 +188,11 @@ public class FerretConfig extends Document {
         return 10000;
     }
     public String[] getErrorKeys() {
-        List messages = getRootElement().getChild("messages").getChildren("message");
+        List<Element> messages = getRootElement().getChild("messages").getChildren("message");
         String[] errors = new String[messages.size()];
         int i = 0;
-        for (Iterator messIt = messages.iterator(); messIt.hasNext();) {
-            Element message = (Element) messIt.next();
+        for (Iterator<Element> messIt = messages.iterator(); messIt.hasNext();) {
+            Element message = messIt.next();
             errors[i] = message.getChild("key").getTextTrim();
             i++;
         }

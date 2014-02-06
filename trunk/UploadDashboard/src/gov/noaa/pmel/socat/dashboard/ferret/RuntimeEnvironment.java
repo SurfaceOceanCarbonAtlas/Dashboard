@@ -42,8 +42,8 @@ public class RuntimeEnvironment implements Cloneable{
     public String toString() {
         StringBuffer env = new StringBuffer();
         env.append(baseDir+"\n");
-        for (Iterator keyIt = parameters.keySet().iterator(); keyIt.hasNext();) {
-            String key = (String) keyIt.next();
+        for (Iterator<String> keyIt = parameters.keySet().iterator(); keyIt.hasNext();) {
+            String key = keyIt.next();
             String value = parameters.get(key);
             env.append(key+"="+value+"\n");
         }
@@ -73,9 +73,9 @@ public class RuntimeEnvironment implements Cloneable{
         int i=0;
         String [] envp = new String[size];
         
-        Iterator it = parameters.keySet().iterator();
+        Iterator<String> it = parameters.keySet().iterator();
         while(it.hasNext()){
-            String var = (String)it.next();
+            String var = it.next();
             envp[i]="" + var + "=" + parameters.get(var);
             i++;
         }
@@ -161,9 +161,9 @@ public class RuntimeEnvironment implements Cloneable{
     protected Object clone() 
     throws CloneNotSupportedException {
         RuntimeEnvironment returnVal = new RuntimeEnvironment(new HashMap<String, String>());
-        Iterator it = this.parameters.keySet().iterator();
+        Iterator<String> it = this.parameters.keySet().iterator();
         while(it.hasNext()) {
-            String key = (String)it.next();
+            String key = it.next();
             String value = this.parameters.get(key);
             returnVal.parameters.put(key, value);
         }
@@ -187,7 +187,7 @@ public class RuntimeEnvironment implements Cloneable{
     /**
      * @return Returns the parameters.
      */
-    public Map getParameters() {
+    public Map<String,String> getParameters() {
         return parameters;
     }
     /**
