@@ -473,8 +473,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 						"Unable to delete metadata properties file " + propsFile.getPath());
 			}
 		}
-		// Do not throw an error is the metadata file does not exist,
-		// and if the props file did not exist, it is okay to delete this file
+		// Do not throw an error if the metadata file does not exist.
+		// If the props file does not exist, assume it is okay to delete the metadata file.
 		if ( metadataFile.exists() ) { 
 			try {
 				deleteVersionedFile(metadataFile, 

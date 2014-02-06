@@ -4,28 +4,30 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseListService;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
+import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
@@ -889,11 +891,49 @@ public class CruiseListPage extends Composite {
 		TextColumn<DashboardCruise> dataCheckColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
-			public String getValue(DashboardCruise cruise) {
+			public String getValue(DashboardCruise cruise) { 
 				String status = cruise.getDataCheckStatus();
-				if ( status.isEmpty() )
+				if ( status.isEmpty() ) {
 					status = NO_DATA_CHECK_STATUS_STRING;
+				}
+				else if ( status.startsWith( 
+						DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) { 
+					status = status.substring(
+							DashboardUtils.CHECK_STATUS_ERRORS_PREFIX.length());
+				}
+				else if ( status.startsWith(
+						DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
+					status = status.substring(
+							DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX.length());
+				}
 				return status;
+			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				String msg = getValue(cruise);
+				if ( msg.equals(NO_DATA_CHECK_STATUS_STRING) ||
+					 msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
+					// No problems, or not checked (so no messages)
+					// render as plain text as usual
+					sb.appendHtmlConstant("<div>");
+					sb.appendEscaped(msg);
+					sb.appendHtmlConstant("</div>");
+				}
+				else if ( msg.contains("warning") ) {
+					// Only warnings - use warning background color
+					sb.appendHtmlConstant("<div style=\"background-color:" +
+							SocatUploadDashboard.WARNING_COLOR + ";\">");
+					sb.appendEscaped(msg);
+					sb.appendHtmlConstant("</div>");
+				}
+				else {
+					// Errors or unacceptable - use error background color
+					sb.appendHtmlConstant("<div style=\"background-color:" +
+							SocatUploadDashboard.ERROR_COLOR + ";\">");
+					sb.appendEscaped(msg);
+					sb.appendHtmlConstant("</div>");
+				}
 			}
 		};
 		return dataCheckColumn;
@@ -1034,8 +1074,8 @@ public class CruiseListPage extends Composite {
 						 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				cannotSubmit = true;
 			}
-			else if ( ! ( DashboardUtils.CHECK_STATUS_ACCEPTABLE.equals(status) ||
-						  DashboardUtils.CHECK_STATUS_QUESTIONABLE.equals(status) ) ) {
+			else if ( ! ( status.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ||
+						  status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) ) {
 				warnMsg += "<li>" + 
 					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				willAutofail = true;

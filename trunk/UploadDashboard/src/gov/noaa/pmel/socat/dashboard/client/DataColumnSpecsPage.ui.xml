@@ -25,6 +25,14 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:south>
+		<g:east size="0.5">
+			<!-- just to give some spacing -->
+			<g:Label />
+		</g:east>
+		<g:west size="0.5">
+			<!-- just to give some spacing -->
+			<g:Label />
+		</g:west>
 		<g:center>
 			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
 				<cell:DataGrid ui:field="dataGrid" />
