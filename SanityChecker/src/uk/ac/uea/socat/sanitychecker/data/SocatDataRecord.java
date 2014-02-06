@@ -318,6 +318,7 @@ public class SocatDataRecord {
 	 * @param flag The flag value
 	 * @throws SocatDataBaseException If the field doesn't have a flag
 	 */
+	@SuppressWarnings("unused")
 	private void setFlag(String column, int flag, List<Message> messages, int record, String message) throws SocatDataBaseException {
 		
 		SocatDataColumn flagColumn = itsOutputColumns.get(column);
