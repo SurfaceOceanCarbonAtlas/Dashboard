@@ -602,9 +602,20 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 		String omeFilename = cruise.getOmeFilename();
 		if ( ! omeFilename.isEmpty() )
-			metadataHandler.removeMetadata(username, expocode, cruise.getOmeFilename());
+			metadataHandler.removeMetadata(username, expocode, omeFilename);
 		for ( String mdataName : cruise.getAddlDocNames() )
 			metadataHandler.removeMetadata(username, expocode, mdataName);
+		// Delete the messages file if it exists
+		File msgsFile = cruiseMsgsFile(expocode);
+		if ( msgsFile.exists() ) {
+			try {
+				deleteVersionedFile(msgsFile, "Cruise messages file for " + 
+						expocode + " deleted by " + username);
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException("Unable to delete " +
+						"sanity checker messages file " + msgsFile.getPath());
+			}
+		}
 	}
 
 	/**
