@@ -70,6 +70,8 @@ public class DashboardLoginPage extends Composite {
 	DashboardLoginPage() {
 		// Create the page and set the static strings
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		welcomeHTML.setHTML(WELCOME_MSG);
 		nameLabel.setText(USERNAME_PROMPT);
 		passLabel.setText(PASSWORD_PROMPT);

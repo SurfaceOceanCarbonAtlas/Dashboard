@@ -174,6 +174,7 @@ public class AddToSocatPage extends Composite {
 	 */
 	AddToSocatPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
 
 		username = "";
 		expocodes = new HashSet<String>();

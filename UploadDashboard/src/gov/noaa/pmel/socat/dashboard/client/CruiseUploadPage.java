@@ -150,6 +150,7 @@ public class CruiseUploadPage extends Composite {
 	 */
 	CruiseUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
 
 		username = "";
 

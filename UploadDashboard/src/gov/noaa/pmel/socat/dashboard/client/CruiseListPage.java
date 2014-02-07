@@ -237,6 +237,8 @@ public class CruiseListPage extends Composite {
 	 */
 	CruiseListPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		buildCruiseListTable();
 
 		username = "";
