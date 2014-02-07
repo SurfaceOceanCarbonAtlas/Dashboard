@@ -110,6 +110,8 @@ public class AddlDocsUploadPage extends Composite {
 
 	AddlDocsUploadPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		username = "";
 		cruises = new HashSet<DashboardCruise>();
 		expocodes = new TreeSet<String>();

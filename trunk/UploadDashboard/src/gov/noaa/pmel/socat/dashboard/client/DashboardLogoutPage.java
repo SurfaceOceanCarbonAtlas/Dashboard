@@ -67,6 +67,8 @@ public class DashboardLogoutPage extends Composite {
 	 */
 	DashboardLogoutPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		goodbyeHTML.setHTML(GOODBYE_MSG);
 		reloginButton.setText(RELOGIN_TEXT);
 		socatInfoAnchor.setText(SOCAT_INFO_TEXT);

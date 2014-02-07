@@ -97,6 +97,7 @@ public class OmeManagerPage extends Composite {
 	
 	OmeManagerPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
 
 		username = "";
 		cruise = null;

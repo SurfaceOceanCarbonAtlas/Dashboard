@@ -122,6 +122,8 @@ public class AddlDocsManagerPage extends Composite {
 	 */
 	AddlDocsManagerPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		buildMetadataListTable();
 		username = "";
 		expocode = "";
