@@ -287,6 +287,14 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				// Add the index and user name element, and the units element
 				columnElement.addContent(userElement);
 				columnElement.addContent(unitsElement);
+				// Add the missing value if specified
+				String missValue = cruiseData.getMissingValues().get(k);
+				if ( ! missValue.isEmpty() ) {
+					Element missValElement = new Element(ColumnSpec.MISSING_VALUE_ELEMENT_NAME);
+					missValElement.setText(missValue);
+					columnElement.addContent(missValElement);
+				}
+				// Element specifying the missing value of the column
 				// Add this column description to the root element
 				rootElement.addContent(columnElement);
 			}

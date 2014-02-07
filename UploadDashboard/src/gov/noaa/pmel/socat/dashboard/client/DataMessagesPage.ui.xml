@@ -15,11 +15,13 @@
 			<g:Label />
 		</g:west>
 		<g:north size="12">
-			<g:FlowPanel addStyleNames="{style.userinfopanel}">
-				<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-				<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
+			<g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.userinfopanel}">
+					<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
+					<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
+				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			</g:FlowPanel>
-			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 		</g:north>
 		<g:south size="4">
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">

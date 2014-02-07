@@ -12,14 +12,14 @@ import gov.noaa.pmel.socat.dashboard.shared.SCMessagesServiceAsync;
 
 import java.util.List;
 
-import com.google.gwt.cell.client.NumberCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
@@ -42,14 +42,17 @@ public class DataMessagesPage extends Composite {
 	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String INTRO_HTML = 
-			"<b>Automatically-Detected Data Problems<b>" +
+			"<b>Automatically-Detected Data Problems</b>" +
 			"<br /><br />" +
 			"Problems automatically detected in the cruise";
-	private static final String DISMISS_BUTTON_TEXT = "OK";
+	private static final String DISMISS_BUTTON_TEXT = "Return to Cruise Data";
 
 	private static final String SEVERITY_COLUMN_NAME = "Severity";
 	private static final String ROW_NUMBER_COLUMN_NAME = "Row";
-	private static final String COLUMN_NUMBER_COLUMN_NAME = "Column";
+	private static final String TIMESTAMP_COLUMN_NAME = "Timestamp";
+	private static final String LONGITUDE_COLUMN_NAME = "Lon.";
+	private static final String LATITUDE_COLUMN_NAME = "Lat.";
+	private static final String COLUMN_NUMBER_COLUMN_NAME = "Col.";
 	private static final String COLUMN_NAME_COLUMN_NAME = "Column Name";
 	private static final String EXPLANATION_COLUMN_NAME = "Explanation";
 
@@ -88,6 +91,8 @@ public class DataMessagesPage extends Composite {
 	 */
 	DataMessagesPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		username = "";
 		logoutButton.setText(LOGOUT_TEXT);
 		buildMessageListTable();
@@ -149,6 +154,16 @@ public class DataMessagesPage extends Composite {
 		}
 	}
 
+	@UiHandler("logoutButton")
+	void logoutOnClick(ClickEvent event) {
+		DashboardLogoutPage.showPage();
+	}
+
+	@UiHandler("dismissButton")
+	void dismissOnClick(ClickEvent event) {
+		DataColumnSpecsPage.redisplayPage(true);
+	}
+
 	/**
 	 * Update the cruise expocode and sanity checker messages with 
 	 * that given in the provided SCMessageList.
@@ -168,7 +183,7 @@ public class DataMessagesPage extends Composite {
 		List<SCMessage> msgList = listProvider.getList();
 		msgList.clear();
 		msgList.addAll(msgs);
-		messagesGrid.setRowCount(msgList.size());
+		messagesGrid.setRowCount(msgList.size(), true);
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(messagesGrid, messagesGrid.getColumnSortList());
 	}
@@ -178,13 +193,19 @@ public class DataMessagesPage extends Composite {
 	 */
 	private void buildMessageListTable() {
 		TextColumn<SCMessage> severityColumn = buildSeverityColumn();
-		Column<SCMessage,Number> rowNumColumn = buildRowNumColumn();
-		Column<SCMessage,Number> colNumColumn = buildColNumColumn();
+		TextColumn<SCMessage> rowNumColumn = buildRowNumColumn();
+		TextColumn<SCMessage> timestampColumn = buildTimestampColumn();
+		TextColumn<SCMessage> longitudeColumn = buildLongitudeColumn();
+		TextColumn<SCMessage> latitudeColumn = buildLatitudeColumn();
+		TextColumn<SCMessage> colNumColumn = buildColNumColumn();
 		TextColumn<SCMessage> colNameColumn = buildColNameColumn();
 		TextColumn<SCMessage> explanationColumn = buildExplanationColumn();
 
 		messagesGrid.addColumn(severityColumn, SEVERITY_COLUMN_NAME);
 		messagesGrid.addColumn(rowNumColumn, ROW_NUMBER_COLUMN_NAME);
+		messagesGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
+		messagesGrid.addColumn(longitudeColumn, LONGITUDE_COLUMN_NAME);
+		messagesGrid.addColumn(latitudeColumn, LATITUDE_COLUMN_NAME);
 		messagesGrid.addColumn(colNumColumn, COLUMN_NUMBER_COLUMN_NAME);
 		messagesGrid.addColumn(colNameColumn, COLUMN_NAME_COLUMN_NAME);
 		messagesGrid.addColumn(explanationColumn, EXPLANATION_COLUMN_NAME);
@@ -192,9 +213,18 @@ public class DataMessagesPage extends Composite {
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
 		messagesGrid.setColumnWidth(severityColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		messagesGrid.setColumnWidth(rowNumColumn, 
 				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
-		messagesGrid.setColumnWidth(rowNumColumn, 
+		messagesGrid.setColumnWidth(timestampColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		messagesGrid.setColumnWidth(longitudeColumn, 
+				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+		messagesGrid.setColumnWidth(latitudeColumn, 
 				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(colNumColumn, 
@@ -217,6 +247,9 @@ public class DataMessagesPage extends Composite {
 		// Make the columns sortable
 		severityColumn.setSortable(true);
 		rowNumColumn.setSortable(true);
+		timestampColumn.setSortable(true);
+		longitudeColumn.setSortable(true);
+		latitudeColumn.setSortable(true);
 		colNumColumn.setSortable(true);
 		colNameColumn.setSortable(true);
 		explanationColumn.setSortable(true);
@@ -228,6 +261,12 @@ public class DataMessagesPage extends Composite {
 				SCMessage.severityComparator);
 		columnSortHandler.setComparator(rowNumColumn,
 				SCMessage.rowNumComparator);
+		columnSortHandler.setComparator(timestampColumn,
+				SCMessage.timestampComparator);
+		columnSortHandler.setComparator(longitudeColumn,
+				SCMessage.longitudeComparator);
+		columnSortHandler.setComparator(latitudeColumn,
+				SCMessage.latitudeComparator);
 		columnSortHandler.setComparator(colNumColumn,
 				SCMessage.colNumComparator);
 		columnSortHandler.setComparator(colNameColumn,
@@ -236,10 +275,10 @@ public class DataMessagesPage extends Composite {
 				SCMessage.explanationComparator);
 
 		// Add the sort handler to the table, setting the default sorting
-		// first by severity, then row number, then column number
+		// first by severity, then column number, and finally row number
 		messagesGrid.addColumnSortHandler(columnSortHandler);
-		messagesGrid.getColumnSortList().push(colNumColumn);
 		messagesGrid.getColumnSortList().push(rowNumColumn);
+		messagesGrid.getColumnSortList().push(colNumColumn);
 		messagesGrid.getColumnSortList().push(severityColumn);
 
 		// Set the contents if there are no rows
@@ -250,6 +289,11 @@ public class DataMessagesPage extends Composite {
 		messagesGrid.setSkipRowHoverFloatElementCheck(false);
 		messagesGrid.setSkipRowHoverStyleUpdate(false);
 	}
+
+	private static final NumberFormat INT_NUMBER_FORMAT = NumberFormat.getFormat(
+			NumberFormat.getDecimalFormat().getPattern()).overrideFractionDigits(0);
+	private static final NumberFormat FLT_NUMBER_FORMAT = NumberFormat.getFormat(
+			NumberFormat.getDecimalFormat().getPattern()).overrideFractionDigits(4);
 
 	private TextColumn<SCMessage> buildSeverityColumn() {
 		return new TextColumn<SCMessage>() {
@@ -267,27 +311,57 @@ public class DataMessagesPage extends Composite {
 		};
 	}
 
-	private static final NumberFormat INT_NUMBER_FORMAT = 
-			NumberFormat.getDecimalFormat().overrideFractionDigits(0);
-
-	private Column<SCMessage,Number> buildRowNumColumn() {
-		return new Column<SCMessage,Number>(new NumberCell(INT_NUMBER_FORMAT)) {
+	private TextColumn<SCMessage> buildRowNumColumn() {
+		return new TextColumn<SCMessage>() {
 			@Override
-			public Number getValue(SCMessage msg) {
-				if ( msg == null )
-					return -1;
-				return Integer.valueOf(msg.getRowNumber());
+			public String getValue(SCMessage msg) {
+				if ( (msg == null) || (msg.getRowNumber() <= 0) )
+					return "";
+				return INT_NUMBER_FORMAT.format(msg.getRowNumber());
 			}
 		};
 	}
 
-	private Column<SCMessage,Number> buildColNumColumn() {
-		return new Column<SCMessage,Number>(new NumberCell(INT_NUMBER_FORMAT)) {
+	private TextColumn<SCMessage> buildTimestampColumn() {
+		return new TextColumn<SCMessage>() {
 			@Override
-			public Number getValue(SCMessage msg) {
+			public String getValue(SCMessage msg) {
 				if ( msg == null )
-					return -1;
-				return Integer.valueOf(msg.getColNumber());
+					return "";
+				return msg.getTimestamp();
+			}
+		};
+	}
+
+	private TextColumn<SCMessage> buildLongitudeColumn() {
+		return new TextColumn<SCMessage>() {
+			@Override
+			public String getValue(SCMessage msg) {
+				if ( (msg == null) || Double.isNaN(msg.getLongitude()) )
+					return "";
+				return FLT_NUMBER_FORMAT.format(msg.getLongitude());
+			}
+		};
+	}
+
+	private TextColumn<SCMessage> buildLatitudeColumn() {
+		return new TextColumn<SCMessage>() {
+			@Override
+			public String getValue(SCMessage msg) {
+				if ( (msg == null) || Double.isNaN(msg.getLatitude()) )
+					return "";
+				return FLT_NUMBER_FORMAT.format(msg.getLatitude());
+			}
+		};
+	}
+
+	private TextColumn<SCMessage> buildColNumColumn() {
+		return new TextColumn<SCMessage>() {
+			@Override
+			public String getValue(SCMessage msg) {
+				if ( (msg == null) || (msg.getColNumber() <= 0) )
+					return "";
+				return INT_NUMBER_FORMAT.format(msg.getColNumber());
 			}
 		};
 	}

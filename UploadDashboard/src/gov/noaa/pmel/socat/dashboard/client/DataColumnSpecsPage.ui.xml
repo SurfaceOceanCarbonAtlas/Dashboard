@@ -20,6 +20,7 @@
 				<g:Label addStyleNames="{style.gridpagerlabel}" ui:field="pagerLabel" />
 				<cell:SimplePager location="CENTER" addStyleNames="{style.gridpager}" ui:field="gridPager" />
 				<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="messagesButton" />
 					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
 					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
 				</g:FlowPanel>

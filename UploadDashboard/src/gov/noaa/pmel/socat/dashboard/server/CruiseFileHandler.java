@@ -1090,8 +1090,11 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				Enumeration<?> propNames = msg.getPropertyNames();
 				while ( propNames.hasMoreElements() ) {
 					String key = (String) propNames.nextElement();
-					String value = msg.getProperty(key);
-					mappings.add(key + SCMSG_KEY_VALUE_SEP + value);
+					if ( key != null ) {
+						String value = msg.getProperty(key);
+						if ( value != null )
+							mappings.add(key + SCMSG_KEY_VALUE_SEP + value);
+					}
 				}
 				// Write this array list of key-value string to file
 				msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
@@ -1135,100 +1138,118 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Read and parse each of the messages in the file
 		try {
 			try {
-				// Read all the key-value pairs for this messages line into a properties file
 				Properties msgProps = new Properties();
 				String msgline = msgReader.readLine();
 				while ( msgline != null ) {
-					msgProps.clear();
-					for ( String msgPart : DashboardUtils.decodeStringArrayList(msgline) ) {
-						String[] keyValue = msgPart.split(SCMSG_KEY_VALUE_SEP, 2);
-						if ( keyValue.length != 2 )
-							throw new IOException("Invalid key:value pair '" + msgPart + "'");
-						msgProps.setProperty(keyValue[0], keyValue[1]);
+					if ( ! msgline.trim().isEmpty() ) {
+
+						// Read all the key-value pairs for this messages line into a properties file
+						msgProps.clear();
+						for ( String msgPart : DashboardUtils.decodeStringArrayList(msgline) ) {
+							String[] keyValue = msgPart.split(SCMSG_KEY_VALUE_SEP, 2);
+							if ( keyValue.length != 2 )
+								throw new IOException("Invalid key:value pair '" + msgPart + "'");
+							msgProps.setProperty(keyValue[0], keyValue[1]);
+						}
+
+						// Message type
+						String propVal = msgProps.getProperty(SCMSG_TYPE_KEY);
+						if ( propVal == null )
+						throw new IOException("Message type not given");
+						int msgType;
+						try {
+							msgType = Integer.parseInt(propVal);
+						} catch ( NumberFormatException ex ) {
+							throw new IOException("Invalid message type given in '" + propVal + "'");
+						}
+						msgProps.remove(SCMSG_TYPE_KEY);
+
+						// Severity
+						propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
+						if ( propVal == null )
+							throw new IOException("Severity not given");
+						int severity;
+						try {
+							severity = Integer.parseInt(propVal);
+						} catch ( NumberFormatException ex ) {
+							throw new IOException("Invalid severity given in '" + propVal + "'");
+						}
+						msgProps.remove(SCMSG_SEVERITY_KEY);
+
+						// Line number
+						propVal = msgProps.getProperty(SCMSG_LINE_NUMBER_KEY);
+						if ( propVal == null )
+							throw new IOException("Line number not given");
+						int lineNum;
+						try {
+							lineNum = Integer.parseInt(propVal);
+						} catch ( NumberFormatException ex ) {
+							throw new IOException("Invalid line number given in '" + propVal + "'");
+						}
+						msgProps.remove(SCMSG_LINE_NUMBER_KEY);
+
+						// Input column number
+						propVal = msgProps.getProperty(SCMSG_INPUT_COLUMN_NUMBER_KEY);
+						if ( propVal == null )
+							throw new IOException("Input column number not given");
+						int inputColNum;
+						try {
+							inputColNum = Integer.parseInt(propVal);
+						} catch ( NumberFormatException ex ) {
+							throw new IOException("Invalid input column number given in '" + propVal + "'");
+						}
+						msgProps.remove(SCMSG_INPUT_COLUMN_NUMBER_KEY);
+
+						// Input column name
+						String inputColName = msgProps.getProperty(SCMSG_INPUT_COLUMN_NAME_KEY);
+						if ( inputColName != null )
+							msgProps.remove(SCMSG_INPUT_COLUMN_NAME_KEY);
+
+						// Output column number
+						propVal = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
+						if ( propVal == null )
+							throw new IOException("Input column number not given");
+						int outputColNum;
+						try {
+							outputColNum = Integer.parseInt(propVal);
+						} catch ( NumberFormatException ex ) {
+							throw new IOException("Invalid output column number given in '" + propVal + "'");
+						}
+						msgProps.remove(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
+
+						// Output column name
+						String outputColName = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NAME_KEY);
+						if ( outputColName != null )
+							msgProps.remove(SCMSG_OUTPUT_COLUMN_NAME_KEY);
+
+						// Message string
+						String msgString = msgProps.getProperty(SCMSG_MESSAGE_KEY);
+						if ( msgString == null )
+							throw new IOException("Message string not given");
+						// Replace all escaped newlines in the message string
+						msgString.replace("\\n", "\n");
+						msgProps.remove(SCMSG_MESSAGE_KEY);
+
+						// Create the message object
+						Message msg = new Message(msgType, severity, lineNum, inputColNum, 
+								inputColName, outputColNum, outputColName, msgString);
+
+						// Add any additional properties remaining
+						Enumeration<?> propNames = msgProps.elements();
+						while ( propNames.hasMoreElements() ) {
+							String key = (String) propNames.nextElement();
+							if ( key != null ) {
+								String value = msgProps.getProperty(key);
+								if ( value != null )
+									msg.addProperty(key, value);
+							}
+						}
+
+						// Add this message to the list
+						msgList.add(msg);
+						msgline = msgReader.readLine();
 					}
-					msgline = msgReader.readLine();
 				}
-				// Message type
-				String propVal = msgProps.getProperty(SCMSG_TYPE_KEY);
-				if ( propVal == null )
-					throw new IOException("Message type not given");
-				int msgType;
-				try {
-					msgType = Integer.parseInt(propVal);
-				} catch ( NumberFormatException ex ) {
-					throw new IOException("Invalid message type given in '" + propVal + "'");
-				}
-				msgProps.remove(SCMSG_TYPE_KEY);
-				// Severity
-				propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
-				if ( propVal == null )
-					throw new IOException("Severity not given");
-				int severity;
-				try {
-					severity = Integer.parseInt(propVal);
-				} catch ( NumberFormatException ex ) {
-					throw new IOException("Invalid severity given in '" + propVal + "'");
-				}
-				msgProps.remove(SCMSG_SEVERITY_KEY);
-				// Line number
-				propVal = msgProps.getProperty(SCMSG_LINE_NUMBER_KEY);
-				if ( propVal == null )
-					throw new IOException("Line number not given");
-				int lineNum;
-				try {
-					lineNum = Integer.parseInt(propVal);
-				} catch ( NumberFormatException ex ) {
-					throw new IOException("Invalid line number given in '" + propVal + "'");
-				}
-				msgProps.remove(SCMSG_LINE_NUMBER_KEY);
-				// Input column number
-				propVal = msgProps.getProperty(SCMSG_INPUT_COLUMN_NUMBER_KEY);
-				if ( propVal == null )
-					throw new IOException("Input column number not given");
-				int inputColNum;
-				try {
-					inputColNum = Integer.parseInt(propVal);
-				} catch ( NumberFormatException ex ) {
-					throw new IOException("Invalid input column number given in '" + propVal + "'");
-				}
-				msgProps.remove(SCMSG_INPUT_COLUMN_NUMBER_KEY);
-				// Input column name
-				String inputColName = msgProps.getProperty(SCMSG_INPUT_COLUMN_NAME_KEY);
-				if ( inputColName != null )
-					msgProps.remove(SCMSG_INPUT_COLUMN_NAME_KEY);
-				// Output column number
-				propVal = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
-				if ( propVal == null )
-					throw new IOException("Input column number not given");
-				int outputColNum;
-				try {
-					outputColNum = Integer.parseInt(propVal);
-				} catch ( NumberFormatException ex ) {
-					throw new IOException("Invalid output column number given in '" + propVal + "'");
-				}
-				msgProps.remove(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
-				// Output column name
-				String outputColName = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NAME_KEY);
-				if ( outputColName != null )
-					msgProps.remove(SCMSG_OUTPUT_COLUMN_NAME_KEY);
-				// Message string
-				String msgString = msgProps.getProperty(SCMSG_MESSAGE_KEY);
-				if ( msgString == null )
-					throw new IOException("Message string not given");
-				// Replace all escaped newlines in the message string
-				msgString.replace("\\n", "\n");
-				msgProps.remove(SCMSG_MESSAGE_KEY);
-				// Create the message object
-				Message msg = new Message(msgType, severity, lineNum, inputColNum, 
-						inputColName, outputColNum, outputColName, msgString);
-				// Add any additional properties remaining
-				Enumeration<?> propNames = msgProps.elements();
-				while ( propNames.hasMoreElements() ) {
-					String key = (String) propNames.nextElement();
-					msg.addProperty(key, msgProps.getProperty(key));
-				}
-				// Add this message to the list
-				msgList.add(msg);
 			} finally {
 				msgReader.close();
 			}
