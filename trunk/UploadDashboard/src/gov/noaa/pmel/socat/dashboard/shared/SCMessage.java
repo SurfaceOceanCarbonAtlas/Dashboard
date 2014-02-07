@@ -14,9 +14,11 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  *  
  * @author Karl Smith
  */
-public class SCMessage implements Serializable, IsSerializable {
+public class SCMessage implements Serializable, IsSerializable, Comparable<SCMessage> {
 
-	private static final long serialVersionUID = 7328022666368906828L;
+	private static final long serialVersionUID = -1658534530855896157L;
+
+	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
 
 	/**
 	 * Enumerated type for the sanity checker message type 
@@ -40,6 +42,9 @@ public class SCMessage implements Serializable, IsSerializable {
 	SCMsgType type;
 	SCMsgSeverity severity;
 	int rowNumber;
+	String timestamp;
+	double longitude;
+	double latitude;
 	int colNumber;
 	String colName;
 	String explanation;
@@ -48,6 +53,9 @@ public class SCMessage implements Serializable, IsSerializable {
 		type = SCMsgType.UNKNOWN;
 		severity = SCMsgSeverity.UNKNOWN;
 		rowNumber = -1;
+		timestamp = "";
+		longitude = Double.NaN;
+		latitude = Double.NaN;
 		colNumber = -1;
 		colName = "";
 		explanation = "";
@@ -108,6 +116,64 @@ public class SCMessage implements Serializable, IsSerializable {
 	 */
 	public void setRowNumber(int rowNumber) {
 		this.rowNumber = rowNumber;
+	}
+
+	/**
+	 * @return 
+	 * 		the timestamp; never null but may be empty
+	 */
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * @param timestamp 
+	 * 		the timestamp to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setTimestamp(String timestamp) {
+		if ( timestamp == null )
+			this.timestamp = "";
+		else
+			this.timestamp = timestamp;
+	}
+
+	/**
+	 * @return 
+	 * 		the longitude; may be {@link Double#NaN} if missing
+	 */
+	public double getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude 
+	 * 		the longitude to set; if infinite, Double.NaN is assigned
+	 */
+	public void setLongitude(double longitude) {
+		if ( Double.isInfinite(longitude) || Double.isNaN(longitude) )
+			this.longitude = Double.NaN;
+		else
+			this.longitude = longitude;
+	}
+
+	/**
+	 * @return 
+	 * 		the latitude; may be {@link Double#NaN} if missing
+	 */
+	public double getLatitude() {
+		return latitude;
+	}
+
+	/**
+	 * @param latitude 
+	 * 		the latitude to set; if infinite, Double.NaN is assigned
+	 */
+	public void setLatitude(double latitude) {
+		if ( Double.isInfinite(latitude) || Double.isNaN(latitude) )
+			this.latitude = Double.NaN;
+		else
+			this.latitude = latitude;
 	}
 
 	/**
@@ -173,8 +239,11 @@ public class SCMessage implements Serializable, IsSerializable {
 	public int hashCode() {
 		final int prime = 37;
 		int result = type.hashCode();
+		// Do not use floating point values for the hash code
+		// since they do not have to be exactly equal
 		result = result * prime + severity.hashCode();
 		result = result * prime + rowNumber;
+		result = result * prime + timestamp.hashCode();
 		result = result * prime + colNumber;
 		result = result * prime + colName.hashCode();
 		result = result * prime + explanation.hashCode();
@@ -198,20 +267,117 @@ public class SCMessage implements Serializable, IsSerializable {
 			return false;
 		if ( rowNumber != other.rowNumber )
 			return false;
+		if ( ! timestamp.equals(other.timestamp) )
+			return false;
 		if ( colNumber != other.colNumber )
 			return false;
 		if ( ! colName.equals(other.colName) )
 			return false;
 		if ( ! explanation.equals(other.explanation) )
 			return false;
+
+		// Returns true if both NaN
+		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0, MAX_ABSOLUTE_ERROR) )
+			return false;
+
+		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
+		// NaN is checked here since we are adding values to them. 
+		if ( ! Double.isNaN(longitude) ) {
+			if ( Double.isNaN(other.longitude) )
+				return false;
+			if ( ! DashboardUtils.closeTo(longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+				if ( ! DashboardUtils.closeTo(longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+					if ( ! DashboardUtils.closeTo(longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) )
+						return false;
+		}
+		else {
+			if ( ! Double.isNaN(other.longitude) )
+				return false;
+		}
+
 		return true;
+	}
+
+	@Override
+	public int compareTo(SCMessage other) {
+		if ( other == null )
+			return 1;
+		// Compare so that consecutive rows with the same message
+		// on the same column are next to each other
+		int result;
+		// First split by type
+		result = type.compareTo(other.type);
+		if ( result != 0 )
+			return result;
+		// Same type - spit by severity
+		result = severity.compareTo(other.severity);
+		if ( result != 0 )
+			return result;
+		// Same type and severity - split by explanation
+		result = explanation.compareTo(other.explanation);
+		if ( result != 0 )
+			return result;
+		// Same type, severity, and explanation - split by column name/number
+		result = colName.compareTo(other.colName);
+		if ( result != 0 )
+			return result;
+		result = colNumber - other.colNumber;
+		if ( result != 0 )
+			return result;
+		// Same type, severity, explanation, and column - split by row timestamp/latitude/longitude/number
+		result = timestamp.compareTo(other.timestamp);
+		if ( result != 0 )
+			return result;
+		// Allow some slop in latitudes to match equals
+		if ( ! Double.isNaN(latitude) ) {
+			if ( Double.isNaN(other.latitude) ) {
+				return 1;
+			}
+			if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0, MAX_ABSOLUTE_ERROR) ) {
+				if ( latitude > other.latitude )
+					return 1;
+				else
+					return -1;
+			}
+		}
+		else {
+			if ( ! Double.isNaN(other.latitude) )
+				return -1;
+		}
+		// Allow some slop in longitudes, as well as modulo 360, to match equals 
+		if ( ! Double.isNaN(longitude) ) {
+			if ( Double.isNaN(other.longitude) ) {
+				return 1;
+			}
+			if ( ! DashboardUtils.closeTo(longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) ) {
+				if ( ! DashboardUtils.closeTo(longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) ) {
+					if ( ! DashboardUtils.closeTo(longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) ) {
+						if ( longitude > other.longitude )
+							return 1;
+						else
+							return -1;
+					}
+				}
+			}
+		}
+		else {
+			if ( ! Double.isNaN(other.longitude) )
+				return -1;
+		}
+		result = rowNumber - other.rowNumber;
+		if ( result != 0 )
+			return result;
+		
+		return 0;
 	}
 
 	@Override
 	public String toString() {
 		return "SCMessage[type=" + type + ", " + "severity=" + severity + 
-				", rowNumber=" + rowNumber + ", colNumber=" + colNumber + 
-				", colName=" + colName + ", explanation=" + explanation + "]";
+				", rowNumber=" + rowNumber + ", timestamp=" + timestamp +
+				", longitude=" + longitude + ", latitude=" + latitude +
+				", colNumber=" + colNumber + ", colName=" + colName + 
+				", explanation=" + explanation + "]";
 	}
 
 	/**
@@ -267,8 +433,91 @@ public class SCMessage implements Serializable, IsSerializable {
 				return -1;
 			if ( msg2 == null )
 				return 1;
-			return Integer.valueOf(msg1.getRowNumber())
-						  .compareTo(msg2.getRowNumber());
+			return ( msg1.getRowNumber() - msg2.getRowNumber() );
+		}
+	};
+
+	/**
+	 * Compare using the timestamp of the messages.
+	 * Note that this is inconsistent with SCMessage.equals 
+	 * in that this is only examining one field of SCMessage.
+	 */
+	public static Comparator<SCMessage> timestampComparator = 
+										new Comparator<SCMessage>() {
+		@Override
+		public int compare(SCMessage msg1, SCMessage msg2) {
+			if ( msg1 == msg2 )
+				return 0;
+			if ( msg1 == null )
+				return -1;
+			if ( msg2 == null )
+				return 1;
+			return msg1.getTimestamp().compareTo(msg2.getTimestamp());
+		}
+	};
+
+	/**
+	 * Compare using the longitude of the messages.
+	 * Note that this is inconsistent with SCMessage.equals 
+	 * in that this is only examining one field of SCMessage.
+	 * This also does not allow some "slop" for two floating
+	 * point values to be equal, nor does it take into account
+	 * the modulo 360 nature of longitudes.
+	 */
+	public static Comparator<SCMessage> longitudeComparator = 
+										new Comparator<SCMessage>() {
+		@Override
+		public int compare(SCMessage msg1, SCMessage msg2) {
+			if ( msg1 == msg2 )
+				return 0;
+			if ( msg1 == null )
+				return -1;
+			if ( msg2 == null )
+				return 1;
+			if ( Double.isNaN(msg1.getLongitude()) ) {
+				if ( Double.isNaN(msg2.getLongitude()) )
+					return 0;
+				return -1;
+			}
+			if ( Double.isNaN(msg2.getLongitude()) )
+				return 1;
+			if ( msg1.getLongitude() > msg2.getLongitude() )
+				return 1;
+			if ( msg1.getLongitude() < msg2.getLongitude() )
+				return -1;
+			return 0;
+		}
+	};
+
+	/**
+	 * Compare using the latitude of the messages.
+	 * Note that this is inconsistent with SCMessage.equals 
+	 * in that this is only examining one field of SCMessage.
+	 * This also does not allow some "slop" for two floating
+	 * point values to be equal.
+	 */
+	public static Comparator<SCMessage> latitudeComparator = 
+										new Comparator<SCMessage>() {
+		@Override
+		public int compare(SCMessage msg1, SCMessage msg2) {
+			if ( msg1 == msg2 )
+				return 0;
+			if ( msg1 == null )
+				return -1;
+			if ( msg2 == null )
+				return 1;
+			if ( Double.isNaN(msg1.getLatitude()) ) {
+				if ( Double.isNaN(msg2.getLatitude()) )
+					return 0;
+				return -1;
+			}
+			if ( Double.isNaN(msg2.getLatitude()) )
+				return 1;
+			if ( msg1.getLatitude() > msg2.getLatitude() )
+				return 1;
+			if ( msg1.getLatitude() < msg2.getLatitude() )
+				return -1;
+			return 0;
 		}
 	};
 
@@ -287,8 +536,7 @@ public class SCMessage implements Serializable, IsSerializable {
 				return -1;
 			if ( msg2 == null )
 				return 1;
-			return Integer.valueOf(msg1.getColNumber())
-						  .compareTo(msg2.getColNumber());
+			return ( msg1.getColNumber() - msg2.getColNumber() );
 		}
 	};
 

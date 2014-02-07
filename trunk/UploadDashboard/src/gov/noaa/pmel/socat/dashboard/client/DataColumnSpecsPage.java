@@ -48,11 +48,13 @@ import com.google.gwt.view.client.Range;
  */
 public class DataColumnSpecsPage extends Composite {
 
-	private static final int NUM_ROWS_PER_GRID_PAGE = 25;
+	private static final int NUM_ROWS_PER_GRID_PAGE = 50;
 	private static final int DATA_COLUMN_WIDTH = 16;
 
 	private static final String WELCOME_INTRO = "Welcome ";
 	private static final String LOGOUT_TEXT = "Logout";
+
+	private static final String MESSAGES_TEXT = "Show problems";
 
 	private static final String SUBMIT_TEXT_FROM_UPLOAD = "OK";
 	private static final String SUBMIT_TEXT_FROM_LIST = "Recheck Data";
@@ -60,7 +62,7 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String CANCEL_TEXT_FROM_UPLOAD = "Abort Upload";
 	private static final String CANCEL_TEXT_FROM_LIST = "Return to Cruise List";
 
-	private static final String INTRO_PROLOGUE = 
+	private static final String INTRO_HTML = 
 			"<b><large>Review Cruise Data</large></b>" +
 			"<br />" +
 			"Assign the type and the missing-value for the data columns of this cruise." +
@@ -73,8 +75,8 @@ public class DataColumnSpecsPage extends Composite {
 			"</em> missing data values are " +
 			"any of <em>NaN</em>, <em>NA</em>, <em>N/A</em>, and blank</li>" +
 			"</ul>" +
-			"Cruise: <b>";
-	private static final String INTRO_EPILOGUE = "</b>";
+			"Cruise: ";
+
 	private static final String PAGER_LABEL_TEXT = "Rows shown";
 
 	private static final String UNKNOWN_COLUMN_TYPE_PROLOGUE = 
@@ -155,6 +157,7 @@ public class DataColumnSpecsPage extends Composite {
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField DataGrid<ArrayList<String>> dataGrid;
+	@UiField Button messagesButton;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 	@UiField Label pagerLabel;
@@ -187,11 +190,14 @@ public class DataColumnSpecsPage extends Composite {
 	 */
 	DataColumnSpecsPage() {
 		initWidget(uiBinder.createAndBindUi(this));
+		singleton = this;
+
 		username = "";
 		okayToAbortPopup = null;
 		fromLogoutButton = false;
 		defaultSecondsPopup = null;
 		logoutButton.setText(LOGOUT_TEXT);
+		messagesButton.setText(MESSAGES_TEXT);
 		pagerLabel.setText(PAGER_LABEL_TEXT);
 		cruise = new DashboardCruise();
 		cruiseDataCols = new ArrayList<CruiseDataColumn>();
@@ -295,10 +301,12 @@ public class DataColumnSpecsPage extends Composite {
 		userInfoLabel.setText(WELCOME_INTRO + username);
 
 		if ( fromUpload ) {
+			messagesButton.setVisible(false);
 			submitButton.setText(SUBMIT_TEXT_FROM_UPLOAD);
 			cancelButton.setText(CANCEL_TEXT_FROM_UPLOAD);
 		}
 		else {
+			messagesButton.setVisible(true);
 			submitButton.setText(SUBMIT_TEXT_FROM_LIST);
 			cancelButton.setText(CANCEL_TEXT_FROM_LIST);
 		}
@@ -325,12 +333,13 @@ public class DataColumnSpecsPage extends Composite {
 		cruise.setWoceFourRowIndices(cruiseSpecs.getWoceFourRowIndices());
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
-		introHtml.setHTML(INTRO_PROLOGUE + 
+
+		introHtml.setHTML(INTRO_HTML + "<b>" + 
 				SafeHtmlUtils.htmlEscape(cruise.getExpocode()) +
-				INTRO_EPILOGUE);
+				"</b>");
 
 		// Rebuild the data grid using the provided CruiseDataColumnSpecs
-		if ( cruise.getDataColTypes().size() < 6 )
+		if ( cruise.getDataColTypes().size() < 4 )
 			throw new IllegalArgumentException(
 					"Unexpected small number of data columns: " + 
 					cruise.getDataColTypes().size());
@@ -435,6 +444,11 @@ public class DataColumnSpecsPage extends Composite {
 			// have been updated from previous actions on this page.
 			CruiseListPage.showPage(false);
 		}
+	}
+
+	@UiHandler("messagesButton") 
+	void showMessagesOnClick(ClickEvent event) {
+		DataMessagesPage.showPage(cruise.getExpocode());
 	}
 
 	@UiHandler("submitButton")
