@@ -121,6 +121,8 @@ public class SocatDataRecord {
 	 */
 	private Map<String, SocatDataColumn> itsOutputColumns;
 	
+	private int itsDateFlag = 0;
+	
 	/**
 	 * The program logger
 	 */
@@ -170,11 +172,9 @@ public class SocatDataRecord {
 			
 			setFieldValue(ISO_DATE_COLUMN_NAME, dateTimeHandler.formatDateTime(parsedDateTime));
 		} catch (MissingDateTimeElementException e) {
-			itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", -1, "Date/Time", e.getMessage()));
-			
 			try {
-				// Date errors will always set cascade flags
-				setCascadeFlags(SocatColumnConfigItem.BAD_FLAG);
+				setDateFlag(SocatColumnConfigItem.BAD_FLAG);
+				itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", -1, "Date/Time", e.getMessage()));
 			} catch(SocatDataBaseException e2) {
 				throw new SocatDataException(itsLineNumber, -1, "Date", e2);
 			}
@@ -184,6 +184,19 @@ public class SocatDataRecord {
 		} catch (DateTimeException e) {
 			throw new SocatDataException(itsLineNumber, -1, "Date", e);
 		}
+	}
+	
+	private void setDateFlag(int flag) throws SocatDataBaseException {
+		if (flag > itsDateFlag) {
+			itsDateFlag = flag;
+			
+			// Date flags always set the cascade flags
+			setCascadeFlags(flag);
+		}
+	}
+	
+	public int getDateFlag() {
+		return itsDateFlag;
 	}
 	
 	public DateTime getTime() {

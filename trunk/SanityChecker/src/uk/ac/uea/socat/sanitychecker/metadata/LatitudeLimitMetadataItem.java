@@ -5,7 +5,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
+import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
@@ -20,11 +23,6 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 	 * The value that represents a missing latitude
 	 */
 	private static final double MISSING_VALUE = -999.0;
-	
-	/**
-	 * Defines the name of the Latitude column in data records
-	 */
-	private static final String LATITUDE_COLUMN = "latitude";
 	
 	/**
 	 * Indicates whether or not a value has been set
@@ -73,9 +71,13 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 
 	@Override
 	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
-		double position = Double.parseDouble(record.getColumn(LATITUDE_COLUMN).getValue());
-		updateLimits(position);
-		hasValue = true;
+		
+		SocatDataColumn latitudeColumn = record.getColumn(SocatDataRecord.LATITUDE_COLUMN_NAME);
+		if (latitudeColumn.getFlag() != SocatColumnConfigItem.BAD_FLAG) {
+			double position = Double.parseDouble(latitudeColumn.getValue());
+			updateLimits(position);
+			hasValue = true;
+		}
 	}
 	
 	/**

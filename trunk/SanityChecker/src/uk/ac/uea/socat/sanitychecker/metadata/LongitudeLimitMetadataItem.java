@@ -9,6 +9,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
+import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
@@ -23,11 +25,6 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	 * The value that represents a missing longitude
 	 */
 	private static final double MISSING_VALUE = -999.0;
-	
-	/**
-	 * Defines the name of the Latitude column in data records
-	 */
-	private static final String LONGITUDE_COLUMN = "longitude";
 	
 	/**
 	 * Indicates whether or not a value has been set
@@ -118,25 +115,30 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 
 	@Override
 	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
-		// Get the longitude from the record - covert to 0-360 range
-		Double position = Double.parseDouble(record.getColumn(LONGITUDE_COLUMN).getValue());
-		while ( position < 0.0 ) {
-			position += 360.0;
-		}
-		while ( position >= 360.0 ) {
-			position -= 360.0;
-		}
-		
-		// Add the latitude to the list of all latitudes
-		allLons.add(position);
-		hasValue = true;
-		
-		// See if the cruise has crossed the zero line, if it hasn't already.
-		if (!crossesZero) {
-			if (lastPosition != -9999.0) {
-				lastPosition = position;
-				if (Math.abs(position - lastPosition) > 180) {
-					crossesZero = true;
+
+		SocatDataColumn longitudeColumn = record.getColumn(SocatDataRecord.LONGITUDE_COLUMN_NAME);
+		if (longitudeColumn.getFlag() != SocatColumnConfigItem.BAD_FLAG) {
+
+			// Get the longitude from the record - covert to 0-360 range
+			Double position = Double.parseDouble(longitudeColumn.getValue());
+			while ( position < 0.0 ) {
+				position += 360.0;
+			}
+			while ( position >= 360.0 ) {
+				position -= 360.0;
+			}
+			
+			// Add the latitude to the list of all latitudes
+			allLons.add(position);
+			hasValue = true;
+			
+			// See if the cruise has crossed the zero line, if it hasn't already.
+			if (!crossesZero) {
+				if (lastPosition != -9999.0) {
+					lastPosition = position;
+					if (Math.abs(position - lastPosition) > 180) {
+						crossesZero = true;
+					}
 				}
 			}
 		}
