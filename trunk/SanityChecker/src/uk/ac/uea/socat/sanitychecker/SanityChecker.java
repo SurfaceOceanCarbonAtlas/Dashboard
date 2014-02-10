@@ -192,7 +192,7 @@ public class SanityChecker {
 				checkDataValues();
 				
 				// Generate metadata from data
-				//generateMetadataFromData();
+				generateMetadataFromData();
 				
 				// Run data sanity checks
 				runSanityChecks();
