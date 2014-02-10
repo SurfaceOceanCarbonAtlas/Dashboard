@@ -2,6 +2,8 @@ package uk.ac.uea.socat.sanitychecker.config;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
+
 /**
  * This class represents a single entry in the metadata configuration for the Sanity Checker.
  *
@@ -45,8 +47,7 @@ public class MetadataConfigItem {
 	/**
 	 * The class to be used when constructing a Metadata item of this type
 	 */
-	@SuppressWarnings("rawtypes")
-	private Class itsItemClass;
+	private Class<? extends MetadataItem> itsItemClass;
 	
 	/**
 	 * The parameter to be passed to the generator function
@@ -56,9 +57,8 @@ public class MetadataConfigItem {
 	/**
 	 * Constructor for the metadata configuration object
 	 */
-	@SuppressWarnings("rawtypes")
 	public MetadataConfigItem(String name, int dataType, boolean required, boolean generate,
-			String requiredGroup, ConfigValueRange range, Class itemClass,
+			String requiredGroup, ConfigValueRange range, Class<? extends MetadataItem> itemClass,
 			String generatorParameter, Logger logger) throws ConfigException {
 		
 		logger.trace("Creating Metadata Config Item " + name);
@@ -143,8 +143,7 @@ public class MetadataConfigItem {
 	 * Returns the class to be used for the metadata item.
 	 * @return The class to be used for the metadata item
 	 */
-	@SuppressWarnings("rawtypes")
-	public Class getItemClass() {
+	public Class<? extends MetadataItem> getItemClass() {
 		return itsItemClass;
 	}
 	

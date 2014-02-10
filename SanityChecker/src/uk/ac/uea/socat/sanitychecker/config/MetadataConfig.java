@@ -167,7 +167,6 @@ public class MetadataConfig {
 	 * @throws IOException If an error occurs in accessing the file
 	 * @throws ConfigException If an error occurs while processing the config data
 	 */
-	@SuppressWarnings("unchecked")
 	private void readFile() throws ConfigException {
 
 		try {
@@ -214,9 +213,12 @@ public class MetadataConfig {
 								}
 
 								fullClassName = ITEM_CLASS_ROOT + "." + itemClassName + ITEM_CLASS_TAIL;
-								itemClass = (Class<? extends MetadataItem>) Class.forName(fullClassName);
+								Class <?> c = Class.forName(fullClassName);
+								itemClass = c.asSubclass(MetadataItem.class);
 							} catch (ClassNotFoundException e) {
 								throw new Exception("Cannot find metadata item class " + fullClassName);
+							} catch (ClassCastException e) {
+								throw new Exception("Class '" + fullClassName + "' is not a subclass of MetadataItem");
 							}
 
 							/*

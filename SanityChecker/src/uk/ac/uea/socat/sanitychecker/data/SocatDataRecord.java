@@ -325,26 +325,6 @@ public class SocatDataRecord {
 	}
 	
 	/**
-	 * Sets the flag on a specified field. If a higher (i.e. worse) flag has already been
-	 * set on the field, it will not be updated.
-	 * @param column The name of the field
-	 * @param flag The flag value
-	 * @throws SocatDataBaseException If the field doesn't have a flag
-	 */
-	@SuppressWarnings("unused")
-	private void setFlag(String column, int flag, List<Message> messages, int record, String message) throws SocatDataBaseException {
-		
-		SocatDataColumn flagColumn = itsOutputColumns.get(column);
-		flagColumn.setFlag(flag, messages, record, message);
-
-		// If this is a cascading flag field, set all the cascading targets' flags
-		int columnFlagType = flagColumn.getFlagType();
-		if (columnFlagType == SocatColumnConfigItem.CASCADING_FLAG || columnFlagType == SocatColumnConfigItem.CASCADE_TARGET_FLAG) {
-			setCascadeFlags(flag);
-		}
-	}
-	
-	/**
 	 * Set a flag on all columns that have cascade target flag
 	 */
 	private void setCascadeFlags(int flag) throws SocatDataBaseException {
