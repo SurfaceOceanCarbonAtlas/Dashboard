@@ -6,6 +6,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Seconds;
 
 import uk.ac.uea.socat.sanitychecker.Message;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
+import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 public class SpeedSanityCheck extends SanityCheck {
@@ -44,33 +46,61 @@ public class SpeedSanityCheck extends SanityCheck {
 	@Override
 	public void processRecord(SocatDataRecord record) {
 		
-		if (null != itsLastRecord) {
-			double lastLon = itsLastRecord.getLongitude();
-			double lastLat = itsLastRecord.getLatitude();
-			DateTime lastTime = itsLastRecord.getTime();
-			
-			double thisLon = record.getLongitude();
-			double thisLat = record.getLatitude();
-			DateTime thisTime = record.getTime();
-			
-			double distance = calcDistance(lastLon, lastLat, thisLon, thisLat);
-			double hourDiff = calcHourDiff(lastTime, thisTime);
-			
-			if (hourDiff <= 0.0) {
-				itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Zero or negative time between measurements: cannot calculate speed"));
-			} else {
-				double speed = distance / hourDiff;
-				if (speed > itsBadSpeedLimit) {
-					itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + speed + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
-				} else if (speed > itsQuestionableSpeedLimit) {
-					itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + speed + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
+		if (recordOK(record)) {
+		
+			if (null != itsLastRecord) {
+				double lastLon = itsLastRecord.getLongitude();
+				double lastLat = itsLastRecord.getLatitude();
+				DateTime lastTime = itsLastRecord.getTime();
+				
+				double thisLon = record.getLongitude();
+				double thisLat = record.getLatitude();
+				DateTime thisTime = record.getTime();
+				
+				double distance = calcDistance(lastLon, lastLat, thisLon, thisLat);
+				double hourDiff = calcHourDiff(lastTime, thisTime);
+				
+				if (hourDiff <= 0.0) {
+					itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Zero or negative time between measurements: cannot calculate speed"));
+				} else {
+					double speed = distance / hourDiff;
+					if (speed > itsBadSpeedLimit) {
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + speed + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
+					} else if (speed > itsQuestionableSpeedLimit) {
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + speed + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
+					}
 				}
+			}
+			
+		
+			itsLastRecord = record;
+		}
+	}
+	
+	private boolean recordOK(SocatDataRecord record) {
+		
+		boolean result = true;
+		
+		SocatDataColumn longitudeColumn = record.getColumn(SocatDataRecord.LONGITUDE_COLUMN_NAME);
+		if (longitudeColumn.getFlag() == SocatColumnConfigItem.BAD_FLAG) {
+			result = false;
+		}
+		
+		if (result) {
+			SocatDataColumn latitudeColumn = record.getColumn(SocatDataRecord.LATITUDE_COLUMN_NAME);
+			if (latitudeColumn.getFlag() == SocatColumnConfigItem.BAD_FLAG){
+				result = false;
 			}
 		}
 		
+		if (result) {
+			if (record.getDateFlag() == SocatColumnConfigItem.BAD_FLAG) {
+				result = false;
+			}
+		}
 		
+		return result;
 		
-		itsLastRecord = record;
 	}
 	
 	private double calcDistance(double lon1, double lat1, double lon2, double lat2) {
