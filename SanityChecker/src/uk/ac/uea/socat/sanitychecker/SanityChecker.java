@@ -438,7 +438,6 @@ public class SanityChecker {
 				itsLogger.trace("Unrecognised metadata item '" + name);
 				
 				Message message = new Message(Message.METADATA_MESSAGE, Message.WARNING, -1, "Unrecognised metadata item");
-				itsOutput.setExitFlag(Output.WARNINGS_FLAG);
 				itsOutput.addMessage(message);
 				itsLogger.warn("Unrecognised metadata item " + name);
 			} else {
@@ -449,7 +448,6 @@ public class SanityChecker {
 				} catch (Exception e) {
 					if (e.getCause() instanceof DateTimeException) {
 						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, name, "Invalid date format");
-						itsOutput.setExitFlag(Output.ERRORS_FLAG);
 						itsOutput.addMessage(message);
 						itsLogger.error("Invalid date format for metadata item " + name);
 					} else {
@@ -517,7 +515,6 @@ public class SanityChecker {
 					if (!metadata.containsKey(metadataName)) {
 						itsLogger.error("Required metadata item '" + metadataName + "' is missing");
 						ok = false;
-						itsOutput.setExitFlag(Output.ERRORS_FLAG);
 
 						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, metadataName, "Required metadata value is missng");
 						itsOutput.addMessage(message);
@@ -551,7 +548,6 @@ public class SanityChecker {
 			
 			if (!groupOK) {
 				itsLogger.error("At least one of " + groupedItemNames + " must be present in the metadata");
-				itsOutput.setExitFlag(Output.ERRORS_FLAG);
 				ok = false;
 				
 				Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, groupedItemNames.toString(), "At least one of these metadata items must be present");
