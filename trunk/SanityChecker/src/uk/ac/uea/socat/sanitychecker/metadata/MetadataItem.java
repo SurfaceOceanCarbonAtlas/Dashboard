@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
@@ -16,7 +16,6 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 /**
  * An object representing a metadata entry for a data file
  */
-@SuppressWarnings("deprecation")
 public abstract class MetadataItem {
 	
 	/**
@@ -110,7 +109,7 @@ public abstract class MetadataItem {
 	 * @param value The value to be set
 	 * @throws MetadataException If this metadata item does not store a date
 	 */
-	public void setValue(DateMidnight value) throws MetadataException {
+	public void setValue(DateTime value) throws MetadataException {
 		if (!(itsConfigItem.getType() == DATE_TYPE)) {
 			throw new MetadataException("Attempt to set a date value for a non-date metadata item");
 		} else {
@@ -161,7 +160,7 @@ public abstract class MetadataItem {
 		case DATE_TYPE:
 		{
 			try {
-				DateMidnight parsedDate = dateTimeHandler.parseDate(value);
+				DateTime parsedDate = dateTimeHandler.parseDate(value);
 				itsValue = new MetadataValue(parsedDate);
 			} catch (DateTimeException e) {
 				throw new SanityCheckerException("Invalid date format in metadata item '" + itsConfigItem.getName() + "'", e);
@@ -191,8 +190,6 @@ public abstract class MetadataItem {
 		{
 			// No validation can be performed on these.
 			// Note that dates will have been validated when the value was first read.
-			
-			// TODO Or should we reject dates that are in the future???
 			break;
 		}
 		case INTEGER_TYPE:
@@ -325,7 +322,7 @@ public abstract class MetadataItem {
 		/**
 		 * Contains the value if this is a date
 		 */
-		private DateMidnight itsDateValue;
+		private DateTime itsDateValue;
 		
 		/**
 		 * The data type of the value
@@ -372,7 +369,7 @@ public abstract class MetadataItem {
 		 * Constructor for a date value
 		 * @param value The value
 		 */
-		MetadataValue(DateMidnight value) {
+		MetadataValue(DateTime value) {
 			itsType = DATE_TYPE;
 			itsDateValue = value;
 		}
@@ -445,7 +442,7 @@ public abstract class MetadataItem {
 		 * Returns the date value of this item
 		 * @return The date value of this item
 		 */
-		DateMidnight getDate() {
+		DateTime getDate() {
 			return itsDateValue;
 		}
 		

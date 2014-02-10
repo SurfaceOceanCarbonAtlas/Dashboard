@@ -3,7 +3,6 @@ package uk.ac.uea.socat.sanitychecker.data.datetime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.joda.time.base.BaseDateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -28,7 +27,6 @@ import org.joda.time.format.DateTimeFormatter;
  * Any date/time string will be parsed against the three possible formats above.
  * 
  */
-@SuppressWarnings("deprecation")
 public class DateTimeHandler {
 	
 	/**
@@ -147,13 +145,13 @@ public class DateTimeHandler {
 	 * @return The date object
 	 * @throws DateTimeException If the string does not conform to the expected format
 	 */
-	private DateMidnight parseDateWorker(String date, DateTimeFormatter formatter) throws DateTimeParseException {
+	private DateTime parseDateWorker(String date, DateTimeFormatter formatter) throws DateTimeParseException {
 		
-		DateMidnight parsedDate;
+		DateTime parsedDate;
 		
 		try {
 			DateTime tempParsedDate = formatter.parseDateTime(date);
-			parsedDate = new DateMidnight(tempParsedDate.getYear(), tempParsedDate.getMonthOfYear(), tempParsedDate.getDayOfMonth());
+			parsedDate = tempParsedDate.withTimeAtStartOfDay();
 		} catch (IllegalArgumentException e) {
 			throw new DateTimeParseException("Unable to parse date string '" + date + "': " + e.getMessage());
 		}
@@ -167,7 +165,7 @@ public class DateTimeHandler {
 	 * @return The date object
 	 * @throws DateTimeException If the string does not conform to the expected format
 	 */
-	public DateMidnight parseDate(String date) throws DateTimeParseException {
+	public DateTime parseDate(String date) throws DateTimeParseException {
 		return parseDateWorker(date, itsDateOnlyFormatter);
 	}
 	
