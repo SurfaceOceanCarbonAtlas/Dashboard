@@ -245,8 +245,8 @@ public class SanityChecker {
 	 */
 	private MetadataItem createMetadataItem(String metadataItemName, String metadataValue, int line) throws ConfigException, SanityCheckerException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
 		MetadataConfigItem metadataItemConfig = MetadataConfig.getInstance().get(metadataItemName);
-		@SuppressWarnings("unchecked")
-		Class<? extends MetadataItem> itemClass = metadataItemConfig.getItemClass();
+		Class<?> c = metadataItemConfig.getItemClass();
+		Class<? extends MetadataItem> itemClass = c.asSubclass(MetadataItem.class);
 		Constructor<? extends MetadataItem> itemConstructor = itemClass.getConstructor(MetadataConfigItem.class, Integer.TYPE, Logger.class);
 		MetadataItem item = itemConstructor.newInstance(metadataItemConfig, line, itsLogger);
 		item.setValue(metadataValue, itsDateTimeHandler);
@@ -267,8 +267,8 @@ public class SanityChecker {
 		for (String metadataName : MetadataConfig.getInstance().getConfigItemNames()) {
 			MetadataConfigItem metadataItemConfig = MetadataConfig.getInstance().get(metadataName);
 
-			@SuppressWarnings("unchecked")
-			Class<? extends MetadataItem> itemClass = metadataItemConfig.getItemClass();
+			Class<?> c = metadataItemConfig.getItemClass();
+			Class<? extends MetadataItem> itemClass = c.asSubclass(MetadataItem.class);
 			Constructor<? extends MetadataItem> itemConstructor = itemClass.getConstructor(MetadataConfigItem.class, Integer.TYPE, Logger.class);
 			MetadataItem item = itemConstructor.newInstance(metadataItemConfig, -1, itsLogger);
 			
