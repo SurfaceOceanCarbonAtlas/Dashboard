@@ -93,7 +93,10 @@ public class CruiseDsgNcFileTest {
 		mdata.setOrigDOI("doi:cdiac12345");
 
 		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(mdata, dataList);
-		filename = expocode + ".nc";
+		File parentDir = new File("/var/tmp/socat");
+		if ( ! parentDir.exists() )
+			parentDir.mkdir();
+		filename = parentDir.getPath() + File.separator + expocode + ".nc";
 		sdgncFile.create(filename);
 		assertTrue( (new File(filename)).exists() );
 	}

@@ -1,0 +1,88 @@
+! sw_dist.jnl 
+! from Matlab function  matlab_sw_dist.m
+! compute distance and angle of travel given variables longitude, latitude
+! and optional units
+! 10/31/2013 ACM Ferret script
+!                The Ferret script does not compute the angle.
+!
+! function [dist,phaseangle] = sw_dist(lat,lon,units)
+
+! SW_DIST    Distance between two lat,lon coordinates
+!===================================================================
+! SW_DIST  $Id: sw_dist.m,v 1.1 2003/12/12 04:23:22 pen078 Exp $
+!          Copyright (C) CSIRO, Phil Morgan & Steve Rintoul 1992.
+!
+! USAGE:  [dist,phaseangle] = sw_dist(lat,lon {,units} )
+!
+! DESCRIPTION:
+!   Calculate distance between two positions on glode using the "Plane
+!   Sailing" method.  Also uses simple geometry to calculate the bearing of
+!   the path between position pairs.
+!
+! INPUT:
+!    lat      = decimal degrees (+ve N, -ve S) [- 90.. +90]
+!    lon      = decimal degrees (+ve E, -ve W) [-180..+180]
+!    units    = optional string specifing units of distance
+!               'nm'  = nautical miles (default)
+!               'km'  = kilometres
+!
+! OUTPUT:
+!    dist        = distance between positions in units
+!    phaseangle  = angle of line between stations with x axis (East).
+!                  Range of values are -180..+180. (E=0, N=90, S=-90)
+!
+! AUTHOR:   Phil Morgan and Steve Rintoul 92-02-10
+!
+! DISCLAIMER:
+!   This software is provided "as is" without warranty of any kind.
+!   See the file sw_copy.m for conditions of use and licence.
+!
+! REFERENCE:
+!    The PLANE SAILING method as descriibed in "CELESTIAL NAVIGATION" 1989 by
+!    Dr. P. Gormley. The Australian Antartic Division.
+!==================================================================
+
+!----------------------
+! CHECK INPUT ARGUMENTS
+!----------------------
+query/ignore $1"<sw_dist.jnl requires argument 1 longitudes"
+query/ignore $2"<sw_dist.jnl requires argument 1 longitudes"
+
+LET sw_lon = $1
+LET sw_lat = $2 
+DEFINE SYMBOL units = ($3"nm")
+
+
+!-----------------
+! DEFINE CONSTANTS
+!-----------------
+LET DEG2RAD = (2*pi/360)
+LET RAD2DEG = 1/DEG2RAD
+LET DEG2MIN = 60
+LET DEG2NM  = 60
+LET NM2KM   = 1.8520    ! Defined in Pond & Pickard p303.
+
+! BEGIN
+LET npositions = sw_lat[i=@ngd]
+
+LET sw_dlon1 = sw_lon[i=@ddf]
+LET sw_dlonsgn1 = IF sw_dlon1 LT 0 THEN (-1) ELSE 1
+LET sw_dlonsign = IF sw_dlon1 EQ 0 THEN 0 ELSE sw_dlonsgn1
+LET sw_dlon = IF ABS(sw_dlon1) GT 180 THEN sw_dlonsign*(360 - ABS(sw_dlon1)) ELSE sw_dlon1
+
+
+LET sw_latrad = ABS(sw_lat*DEG2RAD)
+LET dep    = COS( (sw_lat[i=@ddf])/2 ) * sw_dlon
+LET sw_dlat   = sw_lat[i=@ddf]
+LET dist   = DEG2NM*(sw_dlat^2 + dep^2)^0.5  ! in n.miles
+
+IF `strcmp("($units)","km") EQ 0` THEN   ! defaults to n.miles
+    dist = dist * NM2KM
+ENDIF
+
+!! CALCUALTE ANGLE TO X AXIS
+!!phaseangle  = angle(dep+sw_dlat*sqrt(-1))*RAD2DEG
+
+!--------------------------------------------------------------------
+
+
