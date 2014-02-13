@@ -3,11 +3,15 @@
  */
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -87,15 +91,31 @@ public class DsgNcFileHandler {
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);
 		// Create the NetCDF DSG file
+		CruiseDsgNcFile cruiseFile = new CruiseDsgNcFile(socatMData, socatDatalist);
 		try {
-			CruiseDsgNcFile cruiseFile = 
-					new CruiseDsgNcFile(socatMData, socatDatalist);
 			cruiseFile.create(dsgFile.getPath());
 		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Problems creating the SOCAT DSG file " + dsgFile.getName() +
 					"\n    " + ex.getMessage(), ex);
 		}
+
+		// Call Ferret to add the computed variables to the NetCDF DSG file
+		FerretConfig ferretConf;
+		try {
+			ferretConf = DashboardDataStore.get().getFerretConfig();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the Ferret configuration");
+		}
+		SocatTool tool = new SocatTool(ferretConf);
+		tool.init(dsgFile.getPath());
+		tool.run();
+		if ( tool.hasError() )
+			throw new IllegalArgumentException("Failure adding computed variables: " + 
+					tool.getErrorMessage());
+
+		// TODO: ? archive ncdump of the NetCDF DSG file ?
 	}
 	
 }

@@ -3,20 +3,27 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
@@ -43,8 +50,9 @@ public class DashboardDataStore {
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
-	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
+	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
+	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
@@ -61,6 +69,7 @@ public class DashboardDataStore {
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
+			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
 			BaseConfig.SOCAT_CONFIG_FILE + "=/Path/To/DataColumnConfig/CSVFile \n" + 
 			BaseConfig.SANITY_CHECK_CONFIG_FILE + "/Path/To/SanityConfig/CSVFile \n" + 
@@ -89,6 +98,7 @@ public class DashboardDataStore {
 	private CruiseFileHandler cruiseFileHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
+	private FerretConfig ferretConf;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -239,6 +249,27 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+		// Read the Ferret configuration filename
+		try {
+			propVal = configProps.getProperty(FERRET_CONFIG_FILE_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			// Read the Ferret configuration given in this file
+		    InputStream stream = new FileInputStream(new File(propVal));
+		    try {
+			    SAXBuilder sb = new SAXBuilder();
+		    	Document jdom = sb.build(stream);
+		    	ferretConf = new FerretConfig();
+		    	ferretConf.setRootElement((Element)jdom.getRootElement().clone());
+		    } finally {
+		    	stream.close();
+		    }
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
 		// Sanity checker initialization from this same properties file 
 		try {
 			SanityChecker.initConfig(configFile.getAbsolutePath());
@@ -343,6 +374,14 @@ public class DashboardDataStore {
 	 */
 	public DsgNcFileHandler getDsgNcFileHandler() {
 		return dsgNcFileHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the Ferret configuration
+	 */
+	public FerretConfig getFerretConfig() {
+		return ferretConf;
 	}
 
 	/**

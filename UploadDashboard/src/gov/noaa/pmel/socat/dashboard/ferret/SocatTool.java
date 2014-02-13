@@ -3,15 +3,10 @@ package gov.noaa.pmel.socat.dashboard.ferret;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 
 
 
@@ -22,27 +17,17 @@ public class SocatTool extends Thread {
 	String message;
 	boolean error = false;
 	boolean done = false;
-	
 
-	public SocatTool() throws JDOMException, IOException {
-	    
-	    ClassLoader classLoader = this.getClass().getClassLoader();
-	    SAXBuilder sb = new SAXBuilder();
-	    InputStream stream = classLoader.getResourceAsStream("FerretConfig.xml");
-	    if ( stream != null ) {
-	        Document jdom = sb.build(stream);
-	        ferret.setRootElement((Element)jdom.getRootElement().clone());
-	    } else {
-	        throw new IOException("Configuration file resource not found in the class path.");
-	    }
-	    
+
+	public SocatTool(FerretConfig ferretConf) {
+	    ferret = new FerretConfig();
+	    ferret.setRootElement((Element)ferretConf.getRootElement().clone());
 	}
 
 	public void init(String filename) {
-
 		this.filename = filename;
-
 	}
+
 	@Override
 	public void run() {
 		done = false;

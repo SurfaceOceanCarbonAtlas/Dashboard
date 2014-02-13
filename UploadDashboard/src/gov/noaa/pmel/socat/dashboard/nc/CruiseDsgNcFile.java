@@ -227,7 +227,7 @@ public class CruiseDsgNcFile {
                     CalendarDate date = CalendarDate.of(Calendar.proleptic_gregorian, year, month, day, hour, minute, sec);
                     CalendarDate base = CalendarDate.of(Calendar.proleptic_gregorian, 1970, 1, 1, 0, 0, 0);
                     long lvalue = date.getDifferenceInMsecs(base);
-                    double value = (double) lvalue;
+                    double value = (double) lvalue / 1000.0;
                     values.set(index, value);
                 }
                 ncfile.write(var, values);

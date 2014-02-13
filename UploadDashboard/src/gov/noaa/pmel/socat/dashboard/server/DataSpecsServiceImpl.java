@@ -130,6 +130,45 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		cruiseData.setDataColUnits(newSpecs.getDataColUnits());
 		cruiseData.setMissingValues(newSpecs.getMissingValues());
 
+		// Run the SanityCheck on the updated cruise.
+		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
+		Output output = checkCruise(cruiseData);
+
+		// Update the reports of any issues found
+		dataStore.getCruiseFileHandler().saveCruiseMessages(
+				cruiseData.getExpocode(), output.getMessages().getMessages());
+
+		// Save and commit the updated cruise columns
+		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
+				"Cruise data column types, units, and missing values for " + 
+				cruiseData.getExpocode() + " updated by " + username);
+		// Update the user-specific data column names to types, units, and missing values 
+		dataStore.getUserFileHandler()
+				 .updateUserDataColumnTypes(cruiseData, username);
+		
+		// Remove all but the first 25 rows of cruise data 
+		// to minimize the payload of the returned cruise data
+		int numRows = cruiseData.getNumDataRows();
+		if ( numRows > 25 )
+			cruiseData.getDataValues().subList(25, numRows).clear();
+
+		// Return the updated truncated cruise data for redisplay 
+		// in the DataColumnSpecsPage
+		return cruiseData;
+	}
+
+	/**
+	 * Runs the SanityChecker on the given cruise.  
+	 * Assigns the data check status and the WOCE-3 and WOCE-4 
+	 * data flags from the SanityChecker output.
+	 * 
+	 * @param cruiseData
+	 * 		cruise to check
+	 * @return
+	 * 		output from the SanityChecker.
+	 */
+	private Output checkCruise(DashboardCruiseWithData cruiseData) 
+											throws IllegalArgumentException {
 		// Create the metadata properties of this cruise for the sanity checker
 		Properties metadataInput = new Properties();
 		metadataInput.setProperty("EXPOCode", cruiseData.getExpocode());
@@ -376,29 +415,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		for ( Message msg : output.getMessages().getMessages() )
 			processMessage(cruiseData, msg, ambiguousColumnIndices);
 
-		// Update the reports of any issues found
-		dataStore.getCruiseFileHandler().saveCruiseMessages(
-				cruiseData.getExpocode(), output.getMessages().getMessages());
-
-		// Save and commit the updated cruise columns
-		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
-				"Cruise data column types, units, and missing values for " + 
-				cruiseData.getExpocode() + " updated by " + username);
-		// Update the user-specific data column names to types, units, and missing values 
-		dataStore.getUserFileHandler()
-				 .updateUserDataColumnTypes(cruiseData, username);
-		
-		// Remove all but the first 25 rows of cruise data 
-		// to minimize the payload of the returned cruise data
-		int numRows = cruiseData.getNumDataRows();
-		if ( numRows > 25 )
-			cruiseData.getDataValues().subList(25, numRows).clear();
-
-		// Return the updated truncated cruise data for redisplay 
-		// in the DataColumnSpecsPage
-		return cruiseData;
+		return output;
 	}
-
+	
 	/**
 	 * Assigns the WOCE-3 or WOCE-4 flag associated with this message 
 	 * to the cruise.
