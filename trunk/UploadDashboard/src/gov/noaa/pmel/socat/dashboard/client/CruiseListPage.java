@@ -588,11 +588,8 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(true) ) {
-			SocatUploadDashboard.showMessage(
-					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
-			return;
-		}
+		// With null argument, getSelectedCruises always returns true
+		getSelectedCruises(null);
 		if ( cruiseSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
 					NO_CRUISE_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);

@@ -23,6 +23,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -145,14 +146,14 @@ public class AddToSocatPage extends Composite {
 	@UiField HTML introHtml;
 	@UiField Label archivePlanLabel;
 	@UiField RadioButton socatRadio;
-	@UiField Button socatInfoButton;
+	@UiField Anchor socatInfoAnchor;
 	@UiField RadioButton cdiacRadio;
-	@UiField Button cdiacInfoButton;
+	@UiField Anchor cdiacInfoAnchor;
 	@UiField RadioButton ownerRadio;
-	@UiField Button ownerInfoButton;
+	@UiField Anchor ownerInfoAnchor;
 	@UiField HTML ownerAddnHtml;
 	@UiField CheckBox agreeShareCheckBox;
-	@UiField Button agreeShareInfoButton;
+	@UiField Anchor agreeShareInfoAnchor;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
@@ -184,20 +185,20 @@ public class AddToSocatPage extends Composite {
 
 		archivePlanLabel.setText(ARCHIVE_PLAN_INTRO);
 		socatRadio.setText(SOCAT_ARCHIVE_TEXT);
-		socatInfoButton.setText(MORE_INFO_TEXT);
+		socatInfoAnchor.setText(MORE_INFO_TEXT);
 		socatArchivePopup = null;
 
 		cdiacRadio.setText(CDIAC_ARCHIVE_TEXT);
-		cdiacInfoButton.setText(MORE_INFO_TEXT);
+		cdiacInfoAnchor.setText(MORE_INFO_TEXT);
 		cdiacInfoPopup = null;
 
 		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
-		ownerInfoButton.setText(MORE_INFO_TEXT);
+		ownerInfoAnchor.setText(MORE_INFO_TEXT);
 		ownerAddnHtml.setHTML(OWNER_ARCHIVE_ADDN_HTML);
 		ownerArchivePopup = null;
 
 		agreeShareCheckBox.setText(AGREE_SHARE_TEXT);
-		agreeShareInfoButton.setText(MORE_INFO_TEXT);
+		agreeShareInfoAnchor.setText(MORE_INFO_TEXT);
 		agreeSharePopup = null;
 
 		resubmitAskPopup = null;
@@ -356,48 +357,48 @@ public class AddToSocatPage extends Composite {
 		}
 	}
 
-	@UiHandler("socatInfoButton")
+	@UiHandler("socatInfoAnchor")
 	void socatInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
 		if ( socatArchivePopup == null ) {
 			socatArchivePopup = new DashboardInfoPopup();
 			socatArchivePopup.setInfoMessage(SOCAT_ARCHIVE_INFO_HTML);
 		}
-		// Show the popup over the info button
-		socatArchivePopup.showRelativeTo(socatInfoButton);
+		// Show the popup over the info anchor
+		socatArchivePopup.showRelativeTo(socatInfoAnchor);
 	}
 
-	@UiHandler("cdiacInfoButton")
+	@UiHandler("cdiacInfoAnchor")
 	void cdiacInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
 		if ( cdiacInfoPopup == null ) {
 			cdiacInfoPopup = new DashboardInfoPopup();
 			cdiacInfoPopup.setInfoMessage(CDIAC_ARCHIVE_INFO_HTML);
 		}
-		// Show the popup over the info button
-		cdiacInfoPopup.showRelativeTo(cdiacInfoButton);
+		// Show the popup over the info anchor
+		cdiacInfoPopup.showRelativeTo(cdiacInfoAnchor);
 	}
 
-	@UiHandler("ownerInfoButton")
+	@UiHandler("ownerInfoAnchor")
 	void ownerInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
 		if ( ownerArchivePopup == null ) {
 			ownerArchivePopup = new DashboardInfoPopup();
 			ownerArchivePopup.setInfoMessage(OWNER_ARCHIVE_INFO_HTML);
 		}
-		// Show the popup over the info button
-		ownerArchivePopup.showRelativeTo(ownerInfoButton);
+		// Show the popup over the info anchor
+		ownerArchivePopup.showRelativeTo(ownerInfoAnchor);
 	}
 
-	@UiHandler("agreeShareInfoButton")
+	@UiHandler("agreeShareInfoAnchor")
 	void agreeShareInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
 		if ( agreeSharePopup == null ) {
 			agreeSharePopup = new DashboardInfoPopup();
 			agreeSharePopup.setInfoMessage(AGREE_SHARE_INFO_HTML);
 		}
-		// Show the popup over the info button
-		agreeSharePopup.showRelativeTo(agreeShareInfoButton);
+		// Show the popup over the info anchor
+		agreeSharePopup.showRelativeTo(agreeShareInfoAnchor);
 	}
 
 	@UiHandler("cancelButton")
