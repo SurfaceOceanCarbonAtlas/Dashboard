@@ -87,12 +87,12 @@ ss,Y,,D,,,Y,,,,,C,B
 iso_date,Y,,D,,,Y,,,,,C,B
 longitude,Y,,D,,,Y,,,-360,360,C,B
 latitude,Y,,D,,,Y,,,-90,90,C,B
-depth,N,,D,,,Y,0,10,0,20,F,Q
+depth,N,,D,,,Y,-10,10,-20,20,F,Q
 temp,N,,D,,,Y,-5,40,-15,50,F,Q
 sal,N,,D,,,Y,0,40,0,45,F,Q
 temperature_equi,N,,D,,,Y,-5,35,-10,40,F,Q
-pressure_atm,N,,D,,,Y,800,1100,200,2000,F,Q
-pressure_equi,N,,D,,,Y,800,1100,200,2000,F,Q
+pressure_atm,N,,D,,,Y,900,1100,800,1200,F,Q
+pressure_equi,N,,D,,,Y,900,1100,800,1200,F,Q
 xco2water_equ_dry,Y,CO2Water,D,,,Y,250,450,0,10000,F,B
 xco2water_sst_dry,Y,CO2Water,D,,,Y,250,450,0,10000,F,B
 pco2water_equ_wet,Y,CO2Water,D,,,Y,250,450,0,10000,F,B
