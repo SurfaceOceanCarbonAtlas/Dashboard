@@ -64,12 +64,10 @@ public class SpeedSanityCheck extends SanityCheck {
 				if (hourDiff <= 0.0) {
 					try {
 						record.setDateFlag(SocatColumnConfigItem.BAD_FLAG);
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
 					} catch (SocatDataBaseException e) {
 						// Being unable to set the flag indicates a configuration problem, so we can throw it
 						throw new SanityCheckException("Unable to set date flag on record", e);
-					} finally {
-						// However, we can always record the message, for what good it does.
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
 					}
 				} else {
 					double speed = distance / hourDiff;
