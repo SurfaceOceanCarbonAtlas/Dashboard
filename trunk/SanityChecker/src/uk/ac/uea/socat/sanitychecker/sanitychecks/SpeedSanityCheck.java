@@ -7,6 +7,7 @@ import org.joda.time.Seconds;
 
 import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
+import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
@@ -61,13 +62,20 @@ public class SpeedSanityCheck extends SanityCheck {
 				double hourDiff = calcHourDiff(lastTime, thisTime);
 				
 				if (hourDiff <= 0.0) {
-					itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Zero or negative time between measurements: cannot calculate speed"));
+					try {
+						record.setDateFlag(SocatColumnConfigItem.BAD_FLAG);
+					} catch (SocatDataBaseException e) {
+						// Sadly, there's not much we can do about this exception. The date flag will remain unset.
+					} finally {
+						// However, we can always record the message
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
+					}
 				} else {
 					double speed = distance / hourDiff;
 					if (speed > itsBadSpeedLimit) {
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + speed + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
 					} else if (speed > itsQuestionableSpeedLimit) {
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + speed + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
 					}
 				}
 			}

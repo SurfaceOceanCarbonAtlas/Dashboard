@@ -188,7 +188,7 @@ public class SocatDataRecord {
 		}
 	}
 	
-	private void setDateFlag(int flag) throws SocatDataBaseException {
+	public void setDateFlag(int flag) throws SocatDataBaseException {
 		if (flag > itsDateFlag) {
 			itsDateFlag = flag;
 			
