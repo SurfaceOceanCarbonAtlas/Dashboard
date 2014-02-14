@@ -128,7 +128,7 @@ public class SocatDataRecord {
 	 */
 	private Logger itsLogger;
 
-	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger, Output output) throws ConfigException, SocatDataException {
+	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger, Output output) throws ConfigException, SocatDataException, SocatDataBaseException {
 		itsMessages = new ArrayList<Message>();
 		itsColumnSpec = colSpec;
 		itsLineNumber = lineNumber;
@@ -152,7 +152,7 @@ public class SocatDataRecord {
 		setCalculatedValues(metadata, dateTimeHandler);
 	}
 
-	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException {
+	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException, SocatDataBaseException {
 		DateColumnInfo colInfo = itsColumnSpec.getDateColumnInfo();
 		
 		try {
@@ -181,7 +181,9 @@ public class SocatDataRecord {
 			
 		} catch (DateTimeParseException e) {
 			itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, itsLineNumber, -1, "Date/Time", -1, "Date/Time", e.getMessage()));
+			setDateFlag(SocatColumnConfigItem.BAD_FLAG);
 		} catch (DateTimeException e) {
+			setDateFlag(SocatColumnConfigItem.BAD_FLAG);
 			throw new SocatDataException(itsLineNumber, -1, "Date", e);
 		}
 	}
