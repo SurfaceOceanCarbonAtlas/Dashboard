@@ -45,7 +45,7 @@ public abstract class SanityCheck {
 	 * have been processed. This method is called after all the records
 	 * have been passed to the checker via @code{processRecord}.
 	 */
-	public void performFinalCheck() {
+	public void performFinalCheck() throws SanityCheckException {
 		// Most checkers will not need a final check,
 		// so we implement a noop version for them.
 		// Because we're nice like that.
