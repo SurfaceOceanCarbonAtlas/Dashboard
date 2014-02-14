@@ -16,26 +16,26 @@
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionbutton}" 
 							name="archiveRadioGroup" ui:field="socatRadio" />
-					<g:Button addStyleNames="{style.optioninfobutton}" 
-							ui:field="socatInfoButton" />
+					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
+							ui:field="socatInfoAnchor" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionbutton}" 
 							name="archiveRadioGroup" ui:field="cdiacRadio" />
-					<g:Button addStyleNames="{style.optioninfobutton}" 
-							ui:field="cdiacInfoButton" />
+					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
+							ui:field="cdiacInfoAnchor" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionbutton}" 
 							name="archiveRadioGroup" ui:field="ownerRadio" />
-					<g:Button addStyleNames="{style.optioninfobutton}" 
-							ui:field="ownerInfoButton" />
+					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
+							ui:field="ownerInfoAnchor" />
 				</g:FlowPanel>
 				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="ownerAddnHtml" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.agreepanel}">
 				<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
-				<g:Button addStyleNames="{style.agreeinfobutton}" ui:field="agreeShareInfoButton" />
+				<g:Anchor addStyleNames="{style.optioninfoanchor}" ui:field="agreeShareInfoAnchor" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />

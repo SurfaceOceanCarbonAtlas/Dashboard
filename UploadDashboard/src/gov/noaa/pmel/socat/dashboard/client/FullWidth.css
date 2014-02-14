@@ -27,24 +27,18 @@ body {
 
 .agreepanel {
 	display: block;
-	margin-top: 0.25em;
-	margin-bottom: 1.25em;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 }
 .agreecheckbox {
 	display: inline;
 	margin-left: 3em;
 }
-.agreeinfobutton {
-	display: inline;
-	font-size: small;
-	margin-left: 1.5em;
-	margin-right: 0.25em;
-}
 
 .borderpanel {
 	display: block;
 	border-style: solid;
-	border-width: 2px;
+	border-width: 1px;
 	margin-top: 1em;
 	margin-bottom: 0em;
 	margin-left: 1em;
@@ -134,7 +128,7 @@ body {
 .optionsborderpanel {
 	display: block;
 	border-style: solid;
-	border-width: 2px;
+	border-width: 1px;
 	padding: 0.25em;
 	margin-top: 1em;
 	margin-bottom: 0em;
@@ -149,14 +143,14 @@ body {
 }
 .optionpanel {
 	display: block;
-	margin-top: 1.5em;
-	margin-bottom: 0.5em;
+	margin-top: 1em;
+	margin-bottom: 0em;
 }
 .optionbutton {
 	display: inline;
 	margin-left: 0.75em;
 }
-.optioninfobutton {
+.optioninfoanchor {
 	display: inline;
 	font-size: small;
 	margin-left: 1.5em;
@@ -166,14 +160,13 @@ body {
 	font-size: small;
 	margin-left: 2.75em;
 	margin-top: 0em;
-	margin-bottom: 1.5em;
+	margin-bottom: 1em;
 }
-
 
 .previewpanel {
 	height: 35em;
 	border-style: solid;
-	border-width: 2px;
+	border-width: 1px;
 	margin-top: 0em;
 	margin-bottom: 1em;
 	margin-left: 1em;
