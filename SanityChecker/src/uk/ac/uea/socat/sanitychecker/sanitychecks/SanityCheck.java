@@ -38,7 +38,7 @@ public abstract class SanityCheck {
 	 * These sanity checkers will be passed each record in turn.
 	 * @param record The record
 	 */
-	public abstract void processRecord(SocatDataRecord record);
+	public abstract void processRecord(SocatDataRecord record) throws SanityCheckException;
 	
 	/**
 	 * Some checkers can only complete their work once all the records
