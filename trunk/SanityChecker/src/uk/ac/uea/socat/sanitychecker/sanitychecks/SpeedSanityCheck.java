@@ -45,7 +45,7 @@ public class SpeedSanityCheck extends SanityCheck {
 	}
 
 	@Override
-	public void processRecord(SocatDataRecord record) {
+	public void processRecord(SocatDataRecord record) throws SanityCheckException {
 		
 		if (recordOK(record)) {
 		
@@ -65,9 +65,10 @@ public class SpeedSanityCheck extends SanityCheck {
 					try {
 						record.setDateFlag(SocatColumnConfigItem.BAD_FLAG);
 					} catch (SocatDataBaseException e) {
-						// Sadly, there's not much we can do about this exception. The date flag will remain unset.
+						// Being unable to set the flag indicates a configuration problem, so we can throw it
+						throw new SanityCheckException("Unable to set date flag on record", e);
 					} finally {
-						// However, we can always record the message
+						// However, we can always record the message, for what good it does.
 						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
 					}
 				} else {
