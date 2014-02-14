@@ -1,5 +1,7 @@
 package uk.ac.uea.socat.sanitychecker;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -201,7 +203,14 @@ public class SanityChecker {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
 			Message message = new Message(Message.DATA_MESSAGE, Message.ERROR, itsRecordCount, "Unhandled exception encountered");
+			message.addProperty("Exception", e.getClass().getCanonicalName());
 			message.addProperty("Error", e.getMessage());
+			
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			sw.toString();
+			message.addProperty("Stack Trace", sw.toString());
 			
 			itsOutput.addMessage(message);
 			itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
@@ -215,8 +224,12 @@ public class SanityChecker {
 		
 		List<SanityCheck> checkers = SanityCheckConfig.getInstance().getCheckers();
 		
+		// Reset the line count
+		itsRecordCount = 0;
+		
 		// Loop through all the records
 		for (SocatDataRecord record : itsOutput.getRecords()) {
+			itsRecordCount++;
 			
 			// Loop through all known sanity checkers, and pass the record to them
 			for (SanityCheck checker : checkers) {
