@@ -20,10 +20,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2900404512113576746L;
+	private static final long serialVersionUID = 3548714248034745621L;
 
 	// Jan 2, 3000 00:00:00 GMT
-	public static final Date INVALID_DATE = new Date(32503766400429L);
+	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
 
 	String expocode;
 	String cruiseName;
@@ -52,8 +52,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		eastmostLongitude = Double.NaN;
 		southmostLatitude = Double.NaN;
 		northmostLatitude = Double.NaN;
-		beginTime = INVALID_DATE;
-		endTime = INVALID_DATE;
+		beginTime = DATE_MISSING_VALUE;
+		endTime = DATE_MISSING_VALUE;
 		scienceGroup = "";
 		origDOI = "";
 		metadataHRef = "";
@@ -230,7 +230,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the beginning time for the cruise;
-	 * 		never null but could be {@link #INVALID_DATE} if not assigned.
+	 * 		never null but could be {@link #DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getBeginTime() {
 		return beginTime;
@@ -239,11 +239,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param beginTime 
 	 * 		the beginning time for the cruise to set;
-	 * 		if null, {@link #INVALID_DATE} is assigned
+	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
 	 */
 	public void setBeginTime(Date beginTime) {
 		if ( beginTime == null )
-			this.beginTime = INVALID_DATE;
+			this.beginTime = DATE_MISSING_VALUE;
 		else 
 			this.beginTime = beginTime;
 	}
@@ -251,7 +251,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the ending time for the cruise;
-	 * 		never null but could be {@link #INVALID_DATE} if not assigned.
+	 * 		never null but could be {@link #DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getEndTime() {
 		return endTime;
@@ -260,11 +260,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param endTime 
 	 * 		the ending time for the cruise to set;
-	 * 		if null, {@link #INVALID_DATE} is assigned
+	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
 	 */
 	public void setEndTime(Date endTime) {
 		if ( endTime == null )
-			this.endTime = INVALID_DATE;
+			this.endTime = DATE_MISSING_VALUE;
 		else 
 			this.endTime = endTime;
 	}

@@ -23,7 +23,7 @@ public class CruiseDsgNcFile {
     SocatMetadata metadata;
     List<SocatCruiseData> data;
     NetcdfFileWriter ncfile;
-    String version = "CruiseDsgNcFile 0.1";
+    String version = "CruiseDsgNcFile 0.2";
 
     public CruiseDsgNcFile(SocatMetadata metadata, List<SocatCruiseData> data) {
         this.metadata = metadata;
@@ -81,16 +81,16 @@ public class CruiseDsgNcFile {
                 if ( !Modifier.isStatic(f.getModifiers()) ) {
 
                     var = null;
-                    Number missVal = Double.NaN;
+                    Number missVal = SocatCruiseData.FP_MISSING_VALUE;
                     if ( type.equals(Long.class) || type.equals(Long.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
-                        missVal = Double.valueOf(-1.0);
+                        missVal = Double.valueOf(SocatCruiseData.INT_MISSING_VALUE);
                     } else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
-                        missVal = Double.NaN;
+                        missVal = SocatCruiseData.FP_MISSING_VALUE;
                     } else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
                         var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.INT, dims);
-                        missVal = Integer.valueOf(-1);
+                        missVal = SocatCruiseData.INT_MISSING_VALUE;
                     } else if ( type.equals(String.class) ) {
                         // Skip for now.
                     }
@@ -104,6 +104,7 @@ public class CruiseDsgNcFile {
                             ncfile.addVariableAttribute(var, new Attribute("long_name", description));
                         }
                         ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
+                        ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
                     }
                 }
             }
@@ -122,11 +123,11 @@ public class CruiseDsgNcFile {
             	ncfile.addGroupAttribute(null, new Attribute("NorthMostLatitude", metadata.getNorthmostLatitude()));
             if ( ! metadata.getSouthmostLatitude().isNaN() )
             	ncfile.addGroupAttribute(null, new Attribute("SouthMostLatitude", metadata.getSouthmostLatitude()));
-            if ( ! metadata.getBeginTime().equals(SocatMetadata.INVALID_DATE) ) {
+            if ( ! metadata.getBeginTime().equals(SocatMetadata.DATE_MISSING_VALUE) ) {
             	CalendarDate start = CalendarDate.of(metadata.getBeginTime());
             	ncfile.addGroupAttribute(null, new Attribute("time_coverage_start", start.toString()));
             }
-            if ( ! metadata.getEndTime().equals(SocatMetadata.INVALID_DATE) ) {
+            if ( ! metadata.getEndTime().equals(SocatMetadata.DATE_MISSING_VALUE) ) {
             	CalendarDate end = CalendarDate.of(metadata.getEndTime());
             	ncfile.addGroupAttribute(null, new Attribute("time_converage_end", end.toString()));
             }
