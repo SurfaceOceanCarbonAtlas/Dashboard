@@ -162,7 +162,7 @@ public class SocatMetadataTest {
 	@Test
 	public void testSetBeginTime() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		mdata.setBeginTime(BEGIN_TIME);
 		assertEquals(BEGIN_TIME, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
@@ -173,7 +173,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setBeginTime(null);
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 	}
 
 	/**
@@ -183,10 +183,10 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetEndTime() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		mdata.setEndTime(END_TIME);
 		assertEquals(END_TIME, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
@@ -195,7 +195,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setEndTime(null);
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 	}
 
 	/**
@@ -208,8 +208,8 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		mdata.setScienceGroup(SCIENCE_GROUP);
 		assertEquals(SCIENCE_GROUP, mdata.getScienceGroup());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
@@ -232,8 +232,8 @@ public class SocatMetadataTest {
 		mdata.setOrigDOI(ORIGINAL_DOI);
 		assertEquals(ORIGINAL_DOI, mdata.getOrigDOI());
 		assertEquals("", mdata.getScienceGroup());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
@@ -257,8 +257,8 @@ public class SocatMetadataTest {
 		assertEquals(METADATA_HREF, mdata.getMetadataHRef());
 		assertEquals("", mdata.getOrigDOI());
 		assertEquals("", mdata.getScienceGroup());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
@@ -283,8 +283,8 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getMetadataHRef());
 		assertEquals("", mdata.getOrigDOI());
 		assertEquals("", mdata.getScienceGroup());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
@@ -310,8 +310,8 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getMetadataHRef());
 		assertEquals("", mdata.getOrigDOI());
 		assertEquals("", mdata.getScienceGroup());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
@@ -338,8 +338,8 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getMetadataHRef());
 		assertEquals("", mdata.getOrigDOI());
 		assertEquals("", mdata.getScienceGroup());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getEndTime());
-		assertEquals(SocatMetadata.INVALID_DATE, mdata.getBeginTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );

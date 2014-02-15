@@ -20,10 +20,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 3506155014333889793L;
+	private static final long serialVersionUID = -5963648383310783655L;
 
 	private static final double MAX_RELATIVE_ERROR = 1.0E-6;
 	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
+	// Missing value for floating-point variables - not NaN for Ferret
+	public static final Double FP_MISSING_VALUE = -1.0E+34;
+	// Missing value for integer variables
+	public static final Integer INT_MISSING_VALUE = -1;
 
 	// Time of measurement
 	Integer year;
@@ -108,53 +112,53 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * Generates an empty SOCAT data record
 	 */
 	public SocatCruiseData() {
-		year = -1;
-		month = -1;
-		day = -1;
-		hour = -1;
-		minute = -1;
-		second = Double.NaN;
-		longitude = Double.NaN;
-		latitude = Double.NaN;
-		sampleDepth = Double.NaN;
-		sst = Double.NaN;
-		tEqu = Double.NaN;
-		sal = Double.NaN;
-		pAtm = Double.NaN;
-		pEqu = Double.NaN;
-		xCO2WaterSst = Double.NaN;
-		xCO2WaterTEqu = Double.NaN;
-		fCO2WaterSst = Double.NaN;
-		fCO2WaterTEqu = Double.NaN;
-		pCO2WaterSst = Double.NaN;
-		pCO2WaterTEqu = Double.NaN;
-		woaSss = Double.NaN;
-		ncepSlp = Double.NaN;
-		fCO2FromXCO2TEqu = Double.NaN;
-		fCO2FromXCO2Sst = Double.NaN;
-		fCO2FromPCO2TEqu = Double.NaN;
-		fCO2FromPCO2Sst = Double.NaN;
-		fCO2FromFCO2TEqu = Double.NaN;
-		fCO2FromFCO2Sst = Double.NaN;
-		fCO2FromPCO2TEquNcep = Double.NaN;
-		fCO2FromPCO2SstNcep = Double.NaN;
-		fCO2FromXCO2TEquWoa = Double.NaN;
-		fCO2FromXCO2SstWoa = Double.NaN;
-		fCO2FromXCO2TEquNcep = Double.NaN;
-		fCO2FromXCO2SstNcep = Double.NaN;
-		fCO2FromXCO2TEquNcepWoa = Double.NaN;
-		fCO2FromXCO2SstNcepWoa = Double.NaN;
-		fCO2Rec = Double.NaN;
-		fCO2Source = -1;
-		deltaT = Double.NaN;
+		year = INT_MISSING_VALUE;
+		month = INT_MISSING_VALUE;
+		day = INT_MISSING_VALUE;
+		hour = INT_MISSING_VALUE;
+		minute = INT_MISSING_VALUE;
+		second = FP_MISSING_VALUE;
+		longitude = FP_MISSING_VALUE;
+		latitude = FP_MISSING_VALUE;
+		sampleDepth = FP_MISSING_VALUE;
+		sst = FP_MISSING_VALUE;
+		tEqu = FP_MISSING_VALUE;
+		sal = FP_MISSING_VALUE;
+		pAtm = FP_MISSING_VALUE;
+		pEqu = FP_MISSING_VALUE;
+		xCO2WaterSst = FP_MISSING_VALUE;
+		xCO2WaterTEqu = FP_MISSING_VALUE;
+		fCO2WaterSst = FP_MISSING_VALUE;
+		fCO2WaterTEqu = FP_MISSING_VALUE;
+		pCO2WaterSst = FP_MISSING_VALUE;
+		pCO2WaterTEqu = FP_MISSING_VALUE;
+		woaSss = FP_MISSING_VALUE;
+		ncepSlp = FP_MISSING_VALUE;
+		fCO2FromXCO2TEqu = FP_MISSING_VALUE;
+		fCO2FromXCO2Sst = FP_MISSING_VALUE;
+		fCO2FromPCO2TEqu = FP_MISSING_VALUE;
+		fCO2FromPCO2Sst = FP_MISSING_VALUE;
+		fCO2FromFCO2TEqu = FP_MISSING_VALUE;
+		fCO2FromFCO2Sst = FP_MISSING_VALUE;
+		fCO2FromPCO2TEquNcep = FP_MISSING_VALUE;
+		fCO2FromPCO2SstNcep = FP_MISSING_VALUE;
+		fCO2FromXCO2TEquWoa = FP_MISSING_VALUE;
+		fCO2FromXCO2SstWoa = FP_MISSING_VALUE;
+		fCO2FromXCO2TEquNcep = FP_MISSING_VALUE;
+		fCO2FromXCO2SstNcep = FP_MISSING_VALUE;
+		fCO2FromXCO2TEquNcepWoa = FP_MISSING_VALUE;
+		fCO2FromXCO2SstNcepWoa = FP_MISSING_VALUE;
+		fCO2Rec = FP_MISSING_VALUE;
+		fCO2Source = INT_MISSING_VALUE;
+		deltaT = FP_MISSING_VALUE;
 		regionID = "";
-		calcSpeed = Double.NaN;
-		etopo2 = Double.NaN;
-		gvCO2 = Double.NaN;
-		distToLand = Double.NaN;
-		days1970 = Double.NaN;
-		dayOfYear = Double.NaN;
-		woceFlag = -1;
+		calcSpeed = FP_MISSING_VALUE;
+		etopo2 = FP_MISSING_VALUE;
+		gvCO2 = FP_MISSING_VALUE;
+		distToLand = FP_MISSING_VALUE;
+		days1970 = FP_MISSING_VALUE;
+		dayOfYear = FP_MISSING_VALUE;
+		woceFlag = INT_MISSING_VALUE;
 	}
 
 	/**
@@ -307,7 +311,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the year of the data measurement; 
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getYear() {
 		return year;
@@ -316,11 +320,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param year 
 	 * 		the year of the data measurement to set; 
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setYear(Integer year) {
 		if ( year == null )
-			this.year = -1;
+			this.year = INT_MISSING_VALUE;
 		else
 			this.year = year;
 	}
@@ -328,7 +332,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the month of the data measurement; 
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getMonth() {
 		return month;
@@ -337,11 +341,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param month 
 	 * 		the month of the data measurement to set; 
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setMonth(Integer month) {
 		if ( month == null )
-			this.month = -1;
+			this.month = INT_MISSING_VALUE;
 		else
 			this.month = month;
 	}
@@ -349,7 +353,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the day of the data measurement; 
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getDay() {
 		return day;
@@ -358,11 +362,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param day 
 	 * 		the day of the data measurement to set; 
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setDay(Integer day) {
 		if ( day == null )
-			this.day = -1;
+			this.day = INT_MISSING_VALUE;
 		else
 			this.day = day;
 	}
@@ -370,7 +374,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the hour of the data measurement; 
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getHour() {
 		return hour;
@@ -379,11 +383,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param hour 
 	 * 		the hour of the data measurement to set; 
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setHour(Integer hour) {
 		if ( hour == null )
-			this.hour = -1;
+			this.hour = INT_MISSING_VALUE;
 		else
 			this.hour = hour;
 	}
@@ -391,7 +395,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the minute of the data measurement; 
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getMinute() {
 		return minute;
@@ -400,11 +404,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param minute 
 	 * 		the minute of the data measurement to set; 
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setMinute(Integer minute) {
 		if ( minute == null )
-			this.minute = -1;
+			this.minute = INT_MISSING_VALUE;
 		else
 			this.minute = minute;
 	}
@@ -412,7 +416,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the second of the data measurement; 
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSecond() {
 		return second;
@@ -421,11 +425,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param second 
 	 * 		the second of the data measurement to set; 
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setSecond(Double second) {
 		if ( second == null )
-			this.second = Double.NaN;
+			this.second = FP_MISSING_VALUE;
 		else
 			this.second = second;
 	}
@@ -433,7 +437,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the longitude of the data measurement; 
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLongitude() {
 		return longitude;
@@ -442,11 +446,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param longitude 
 	 * 		the longitude of the data measurement to set; 
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setLongitude(Double longitude) {
 		if ( longitude == null )
-			this.longitude = Double.NaN;
+			this.longitude = FP_MISSING_VALUE;
 		else
 			this.longitude = longitude;
 	}
@@ -454,7 +458,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the latitude of the data measurement; 
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLatitude() {
 		return latitude;
@@ -463,11 +467,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param latitude 
 	 * 		the latitude of the data measurement to set; 
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setLatitude(Double latitude) {
 		if ( latitude == null )
-			this.latitude = Double.NaN;
+			this.latitude = FP_MISSING_VALUE;
 		else
 			this.latitude = latitude;
 	}
@@ -475,7 +479,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the sampling depth;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSampleDepth() {
 		return sampleDepth;
@@ -484,11 +488,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param sampleDepth 
 	 * 		the sampling depth to set
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setSampleDepth(Double sampleDepth) {
 		if ( sampleDepth == null )
-			this.sampleDepth = Double.NaN;
+			this.sampleDepth = FP_MISSING_VALUE;
 		else
 			this.sampleDepth = sampleDepth;
 	}
@@ -496,7 +500,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the sea surface temperature;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSst() {
 		return sst;
@@ -505,11 +509,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param sst 
 	 * 		the sea surface temperature to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setSst(Double sst) {
 		if ( sst == null )
-			this.sst = Double.NaN;
+			this.sst = FP_MISSING_VALUE;
 		else
 			this.sst = sst;
 	}
@@ -517,7 +521,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the equilibrator temperature;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getTEqu() {
 		return tEqu;
@@ -526,11 +530,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param tEqu
 	 * 		the equilibrator temperature to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setTEqu(Double tEqu) {
 		if ( tEqu == null )
-			this.tEqu = Double.NaN;
+			this.tEqu = FP_MISSING_VALUE;
 		else
 			this.tEqu = tEqu;
 	}
@@ -538,7 +542,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the sea surface salinity;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSal() {
 		return sal;
@@ -547,11 +551,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param sal
 	 * 		the sea surface salinity to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setSal(Double sal) {
 		if ( sal == null )
-			this.sal = Double.NaN;
+			this.sal = FP_MISSING_VALUE;
 		else
 			this.sal = sal;
 	}
@@ -559,7 +563,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the atmospheric pressure;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPAtm() {
 		return pAtm;
@@ -568,11 +572,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param pAtm 
 	 * 		the atmospheric pressure to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setPAtm(Double pAtm) {
 		if ( pAtm == null )
-			this.pAtm = Double.NaN;
+			this.pAtm = FP_MISSING_VALUE;
 		else
 			this.pAtm = pAtm;
 	}
@@ -580,7 +584,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the equilibrator pressure;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPEqu() {
 		return pEqu;
@@ -589,11 +593,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param pEqu
 	 * 		the equilibrator pressure to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setPEqu(Double pEqu) {
 		if ( pEqu == null )
-			this.pEqu = Double.NaN;
+			this.pEqu = FP_MISSING_VALUE;
 		else
 			this.pEqu = pEqu;
 	}
@@ -601,7 +605,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the xCO2WaterSst;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterSst() {
 		return xCO2WaterSst;
@@ -610,11 +614,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param xCO2WaterSst 
 	 * 		the xCO2WaterSst to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setXCO2WaterSst(Double xCO2WaterSst) {
 		if ( xCO2WaterSst == null )
-			this.xCO2WaterSst = Double.NaN;
+			this.xCO2WaterSst = FP_MISSING_VALUE;
 		else
 			this.xCO2WaterSst = xCO2WaterSst;
 	}
@@ -622,7 +626,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the xCO2WaterTEqu;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterTEqu() {
 		return xCO2WaterTEqu;
@@ -631,11 +635,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param xCO2WaterTEqu 
 	 * 		the xCO2WaterTEqu to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setXCO2WaterTEqu(Double xCO2WaterTEqu) {
 		if ( xCO2WaterTEqu == null )
-			this.xCO2WaterTEqu = Double.NaN;
+			this.xCO2WaterTEqu = FP_MISSING_VALUE;
 		else
 			this.xCO2WaterTEqu = xCO2WaterTEqu;
 	}
@@ -643,7 +647,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2WaterSst;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterSst() {
 		return fCO2WaterSst;
@@ -652,11 +656,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2WaterSst 
 	 * 		the fCO2WaterSst to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2WaterSst(Double fCO2WaterSst) {
 		if ( fCO2WaterSst == null )
-			this.fCO2WaterSst = Double.NaN;
+			this.fCO2WaterSst = FP_MISSING_VALUE;
 		else
 			this.fCO2WaterSst = fCO2WaterSst;
 	}
@@ -664,7 +668,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2WaterTEqu;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterTEqu() {
 		return fCO2WaterTEqu;
@@ -673,11 +677,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2WaterTEqu 
 	 * 		the fCO2WaterTEqu to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2WaterTEqu(Double fCO2WaterTEqu) {
 		if ( fCO2WaterTEqu == null )
-			this.fCO2WaterTEqu = Double.NaN;
+			this.fCO2WaterTEqu = FP_MISSING_VALUE;
 		else
 			this.fCO2WaterTEqu = fCO2WaterTEqu;
 	}
@@ -685,7 +689,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the pCO2WaterSst;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterSst() {
 		return pCO2WaterSst;
@@ -694,11 +698,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param pCO2WaterSst 
 	 * 		the pCO2WaterSst to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setPCO2WaterSst(Double pCO2WaterSst) {
 		if ( pCO2WaterSst == null )
-			this.pCO2WaterSst = Double.NaN;
+			this.pCO2WaterSst = FP_MISSING_VALUE;
 		else
 			this.pCO2WaterSst = pCO2WaterSst;
 	}
@@ -706,7 +710,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the pCO2WaterTEqu;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterTEqu() {
 		return pCO2WaterTEqu;
@@ -715,11 +719,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param pCO2WaterTEqu 
 	 * 		the pCO2WaterTEqu to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setPCO2WaterTEqu(Double pCO2WaterTEqu) {
 		if ( pCO2WaterTEqu == null )
-			this.pCO2WaterTEqu = Double.NaN;
+			this.pCO2WaterTEqu = FP_MISSING_VALUE;
 		else
 			this.pCO2WaterTEqu = pCO2WaterTEqu;
 	}
@@ -727,7 +731,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the WOA sea surface salinity;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getWoaSss() {
 		return woaSss;
@@ -736,11 +740,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woaSss 
 	 * 		the WOA sea surface salinity to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setWoaSss(Double woaSss) {
 		if ( woaSss == null )
-			this.woaSss = Double.NaN;
+			this.woaSss = FP_MISSING_VALUE;
 		else
 			this.woaSss = woaSss;
 	}
@@ -748,7 +752,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the NCEP sea level pressure;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getNcepSlp() {
 		return ncepSlp;
@@ -757,11 +761,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param ncepSlp 
 	 * 		the NCEP sea level pressure to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setNcepSlp(Double ncepSlp) {
 		if ( ncepSlp == null )
-			this.ncepSlp = Double.NaN;
+			this.ncepSlp = FP_MISSING_VALUE;
 		else
 			this.ncepSlp = ncepSlp;
 	}
@@ -769,7 +773,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 TEqu;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2TEqu() {
 		return fCO2FromXCO2TEqu;
@@ -778,11 +782,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2TEqu 
 	 * 		the fCO2 from xCO2 TEqu to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2TEqu(Double fCO2FromXCO2TEqu) {
 		if ( fCO2FromXCO2TEqu == null )
-			this.fCO2FromXCO2TEqu = Double.NaN;
+			this.fCO2FromXCO2TEqu = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2TEqu = fCO2FromXCO2TEqu;
 	}
@@ -790,7 +794,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 SST;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2Sst() {
 		return fCO2FromXCO2Sst;
@@ -799,11 +803,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2Sst 
 	 * 		the fCO2 from xCO2 SST to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2Sst(Double fCO2FromXCO2Sst) {
 		if ( fCO2FromXCO2Sst == null )
-			this.fCO2FromXCO2Sst = Double.NaN;
+			this.fCO2FromXCO2Sst = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2Sst = fCO2FromXCO2Sst;
 	}
@@ -811,7 +815,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from pCO2 TEqu;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromPCO2TEqu() {
 		return fCO2FromPCO2TEqu;
@@ -820,11 +824,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromPCO2TEqu 
 	 * 		the fCO2 from pCO2 TEqu to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromPCO2TEqu(Double fCO2FromPCO2TEqu) {
 		if ( fCO2FromPCO2TEqu == null )
-			this.fCO2FromPCO2TEqu = Double.NaN;
+			this.fCO2FromPCO2TEqu = FP_MISSING_VALUE;
 		else
 			this.fCO2FromPCO2TEqu = fCO2FromPCO2TEqu;
 	}
@@ -832,7 +836,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from pCO2 SST;
-	 * 		never null but could be {@link Double#NaN} if not assigned 
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned 
 	 */
 	public Double getFCO2FromPCO2Sst() {
 		return fCO2FromPCO2Sst;
@@ -841,11 +845,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromPCO2Sst 
 	 * 		the fCO2 from pCO2 SST to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromPCO2Sst(Double fCO2FromPCO2Sst) {
 		if ( fCO2FromPCO2Sst == null )
-			this.fCO2FromPCO2Sst = Double.NaN;
+			this.fCO2FromPCO2Sst = FP_MISSING_VALUE;
 		else
 			this.fCO2FromPCO2Sst = fCO2FromPCO2Sst;
 	}
@@ -853,7 +857,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from fCO2 TEqu;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromFCO2TEqu() {
 		return fCO2FromFCO2TEqu;
@@ -862,11 +866,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromFCO2TEqu
 	 * 		the fCO2 from fCO2 TEqu to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromFCO2TEqu(Double fCO2FromFCO2TEqu) {
 		if ( fCO2FromFCO2TEqu == null )
-			this.fCO2FromFCO2TEqu = Double.NaN;
+			this.fCO2FromFCO2TEqu = FP_MISSING_VALUE;
 		else
 			this.fCO2FromFCO2TEqu = fCO2FromFCO2TEqu;
 	}
@@ -874,7 +878,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from fCO2 SST;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromFCO2Sst() {
 		return fCO2FromFCO2Sst;
@@ -883,11 +887,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromFCO2Sst 
 	 * 		the fCO2 from fCO2 SST to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromFCO2Sst(Double fCO2FromFCO2Sst) {
 		if ( fCO2FromFCO2Sst == null )
-			this.fCO2FromFCO2Sst = Double.NaN;
+			this.fCO2FromFCO2Sst = FP_MISSING_VALUE;
 		else
 			this.fCO2FromFCO2Sst = fCO2FromFCO2Sst;
 	}
@@ -895,7 +899,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from pCO2 TEqu NCEP;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromPCO2TEquNcep() {
 		return fCO2FromPCO2TEquNcep;
@@ -904,11 +908,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromPCO2TEquNcep 
 	 * 		the fCO2 from pCO2 TEqu NCEP to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromPCO2TEquNcep(Double fCO2FromPCO2TEquNcep) {
 		if ( fCO2FromPCO2TEquNcep == null )
-			this.fCO2FromPCO2TEquNcep = Double.NaN;
+			this.fCO2FromPCO2TEquNcep = FP_MISSING_VALUE;
 		else
 			this.fCO2FromPCO2TEquNcep = fCO2FromPCO2TEquNcep;
 	}
@@ -916,7 +920,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from pCO2 SST NCEP;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromPCO2SstNcep() {
 		return fCO2FromPCO2SstNcep;
@@ -925,11 +929,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromPCO2SstNcep 
 	 * 		the fCO2 from pCO2 SST NCEP to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromPCO2SstNcep(Double fCO2FromPCO2SstNcep) {
 		if ( fCO2FromPCO2SstNcep == null )
-			this.fCO2FromPCO2SstNcep = Double.NaN;
+			this.fCO2FromPCO2SstNcep = FP_MISSING_VALUE;
 		else
 			this.fCO2FromPCO2SstNcep = fCO2FromPCO2SstNcep;
 	}
@@ -937,7 +941,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 TEqu WOA;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2TEquWoa() {
 		return fCO2FromXCO2TEquWoa;
@@ -946,11 +950,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2TEquWoa 
 	 * 		the fCO2 from xCO2 TEqu WOA to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2TEquWoa(Double fCO2FromXCO2TEquWoa) {
 		if ( fCO2FromXCO2TEquWoa == null )
-			this.fCO2FromXCO2TEquWoa = Double.NaN;
+			this.fCO2FromXCO2TEquWoa = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2TEquWoa = fCO2FromXCO2TEquWoa;
 	}
@@ -958,7 +962,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from XCO2 SST WOA;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2SstWoa() {
 		return fCO2FromXCO2SstWoa;
@@ -967,11 +971,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2SstWoa 
 	 * 		the fCO2 from xCO2 SST WOA to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2SstWoa(Double fCO2FromXCO2SstWoa) {
 		if ( fCO2FromXCO2SstWoa == null )
-			this.fCO2FromXCO2SstWoa = Double.NaN;
+			this.fCO2FromXCO2SstWoa = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2SstWoa = fCO2FromXCO2SstWoa;
 	}
@@ -979,7 +983,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 TEqu NCEP;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2TEquNcep() {
 		return fCO2FromXCO2TEquNcep;
@@ -988,11 +992,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2TEquNcep 
 	 * 		the fCO2 from xCO2 TEqu NCEP to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2TEquNcep(Double fCO2FromXCO2TEquNcep) {
 		if ( fCO2FromXCO2TEquNcep == null )
-			this.fCO2FromXCO2TEquNcep = Double.NaN;
+			this.fCO2FromXCO2TEquNcep = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2TEquNcep = fCO2FromXCO2TEquNcep;
 	}
@@ -1000,7 +1004,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 SST NCEP;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2SstNcep() {
 		return fCO2FromXCO2SstNcep;
@@ -1009,11 +1013,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2 from xCO2 SST NCEP 
 	 * 		the fCO2 from xCO2 SST NCEP to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2SstNcep(Double fCO2FromXCO2SstNcep) {
 		if ( fCO2FromXCO2SstNcep == null )
-			this.fCO2FromXCO2SstNcep = Double.NaN;
+			this.fCO2FromXCO2SstNcep = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2SstNcep = fCO2FromXCO2SstNcep;
 	}
@@ -1021,7 +1025,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 TEqu NCEP WOA;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2TEquNcepWoa() {
 		return fCO2FromXCO2TEquNcepWoa;
@@ -1030,11 +1034,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2TEquNcepWoa 
 	 * 		the fCO2 from xCO2 TEqu NCEP WOA to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2TEquNcepWoa(Double fCO2FromXCO2TEquNcepWoa) {
 		if ( fCO2FromXCO2TEquNcepWoa == null )
-			this.fCO2FromXCO2TEquNcepWoa = Double.NaN;
+			this.fCO2FromXCO2TEquNcepWoa = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2TEquNcepWoa = fCO2FromXCO2TEquNcepWoa;
 	}
@@ -1042,7 +1046,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fCO2 from xCO2 SST NCEP WOA;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2FromXCO2SstNcepWoa() {
 		return fCO2FromXCO2SstNcepWoa;
@@ -1051,11 +1055,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2FromXCO2SstNcepWoa 
 	 * 		the fCO2 from xCO2 SST NCEP WOA to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2FromXCO2SstNcepWoa(Double fCO2FromXCO2SstNcepWoa) {
 		if ( fCO2FromXCO2SstNcepWoa == null )
-			this.fCO2FromXCO2SstNcepWoa = Double.NaN;
+			this.fCO2FromXCO2SstNcepWoa = FP_MISSING_VALUE;
 		else
 			this.fCO2FromXCO2SstNcepWoa = fCO2FromXCO2SstNcepWoa;
 	}
@@ -1063,7 +1067,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the recomputed fCO2;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2Rec() {
 		return fCO2Rec;
@@ -1072,11 +1076,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2Rec 
 	 * 		the recomputed fCO2 to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2Rec(Double fCO2Rec) {
 		if ( fCO2Rec == null )
-			this.fCO2Rec = Double.NaN;
+			this.fCO2Rec = FP_MISSING_VALUE;
 		else
 			this.fCO2Rec = fCO2Rec;
 	}
@@ -1084,7 +1088,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the method used to create the recomputed fCO2;
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getFCO2Source() {
 		return fCO2Source;
@@ -1093,11 +1097,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2Source
 	 * 		the method used to create the recomputed fCO2 to set;
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2Source(Integer fCO2Source) {
 		if ( fCO2Source == null )
-			this.fCO2Source = -1;
+			this.fCO2Source = INT_MISSING_VALUE;
 		else
 			this.fCO2Source = fCO2Source;
 	}
@@ -1105,7 +1109,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the difference between sea surface and equilibrator temperature;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDeltaT() {
 		return deltaT;
@@ -1114,11 +1118,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param deltaT
 	 * 		the difference between sea surface and equilibrator temperature to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setDeltaT(Double deltaT) {
 		if ( deltaT == null )
-			this.deltaT = Double.NaN;
+			this.deltaT = FP_MISSING_VALUE;
 		else
 			this.deltaT = deltaT;
 	}
@@ -1147,7 +1151,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the calculated speed of the ship;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getCalcSpeed() {
 		return calcSpeed;
@@ -1156,11 +1160,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param calcSpeed 
 	 * 		the calculated speed of the ship to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setCalcSpeed(Double calcSpeed) {
 		if ( calcSpeed == null )
-			this.calcSpeed = Double.NaN;
+			this.calcSpeed = FP_MISSING_VALUE;
 		else
 			this.calcSpeed = calcSpeed;
 	}
@@ -1168,7 +1172,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the ETOPO2 depth;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getEtopo2() {
 		return etopo2;
@@ -1177,11 +1181,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param etopo2
 	 * 		the ETOPO2 depth to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setEtopo2(Double etopo2) {
 		if ( etopo2 == null )
-			this.etopo2 = Double.NaN;
+			this.etopo2 = FP_MISSING_VALUE;
 		else
 			this.etopo2 = etopo2;
 	}
@@ -1189,7 +1193,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the GlobablView CO2;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getGVCO2() {
 		return gvCO2;
@@ -1198,11 +1202,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param gvCO2 
 	 * 		the GlobablView CO2 to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setGVCO2(Double gvCO2) {
 		if ( gvCO2 == null )
-			this.gvCO2 = Double.NaN;
+			this.gvCO2 = FP_MISSING_VALUE;
 		else
 			this.gvCO2 = gvCO2;
 	}
@@ -1210,7 +1214,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the distance to nearest major land mass;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDistToLand() {
 		return distToLand;
@@ -1219,11 +1223,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param distToLand 
 	 * 		the distance to nearest major land mass to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setDistToLand(Double distToLand) {
 		if ( distToLand == null )
-			this.distToLand = Double.NaN;
+			this.distToLand = FP_MISSING_VALUE;
 		else
 			this.distToLand = distToLand;
 	}
@@ -1231,7 +1235,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fractional hours since Jan 1, 1970 00:00;
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDays1970() {
 		return days1970;
@@ -1240,11 +1244,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param days1970 
 	 * 		the fractional hours since Jan 1, 1970 00:00 to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setDays1970(Double days1970) {
 		if ( days1970 == null )
-			this.days1970 = Double.NaN;
+			this.days1970 = FP_MISSING_VALUE;
 		else
 			this.days1970 = days1970;
 	}
@@ -1252,7 +1256,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the fractional day of the year (0.0 == Jan 1 00:00);
-	 * 		never null but could be {@link Double#NaN} if not assigned
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDayOfYear() {
 		return dayOfYear;
@@ -1261,11 +1265,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param dayOfYear 
 	 * 		the fractional day of the year (0.0 == Jan 1 00:00) to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
 	public void setDayOfYear(Double dayOfYear) {
 		if ( dayOfYear == null )
-			this.dayOfYear = Double.NaN;
+			this.dayOfYear = FP_MISSING_VALUE;
 		else
 			this.dayOfYear = dayOfYear;
 	}
@@ -1273,7 +1277,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the WOCE flag;
-	 * 		never null but could be -1 if not assigned
+	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getWoceFlag() {
 		return woceFlag;
@@ -1282,11 +1286,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woceFlag 
 	 * 		the WOCE Flag to set;
-	 * 		if null, -1 is assigned
+	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
 	 */
 	public void setWoceFlag(Integer woceFlag) {
 		if ( woceFlag == null )
-			this.woceFlag = -1;
+			this.woceFlag = INT_MISSING_VALUE;
 		else
 			this.woceFlag = woceFlag;
 	}
@@ -1338,26 +1342,17 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		if ( ! regionID.equals(other.regionID) )
 			return false;
 
-		// Match seconds not given (NaN) with zero seconds
-		if ( ! DashboardUtils.closeTo(second, other.second, 0.0, 1.0E-3) ) {
-			if ( ! (second.isNaN() && DashboardUtils.closeTo(0.0, other.second, 0.0, 1.0E-3)) )
-				if ( ! (other.second.isNaN() && DashboardUtils.closeTo(second, 0.0, 0.0, 1.0E-3)) )
+		// Match seconds not given (FP_MISSING_VALUE) with zero seconds
+		if ( ! DashboardUtils.closeTo(second, other.second, 0.0, 1.0E-3) )
+			if ( ! (second.equals(FP_MISSING_VALUE) && DashboardUtils.closeTo(0.0, other.second, 0.0, 1.0E-3)) )
+				if ( ! (other.second.equals(FP_MISSING_VALUE) && DashboardUtils.closeTo(second, 0.0, 0.0, 1.0E-3)) )
 					return false;
-		}
 
 		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( ! longitude.isNaN() ) {
-			if ( other.longitude.isNaN() )
-				return false;
-			if ( ! DashboardUtils.closeTo(this.longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
-				if ( ! DashboardUtils.closeTo(this.longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
-					if ( ! DashboardUtils.closeTo(this.longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) )
-						return false;
-		}
-		else {
-			if ( ! other.longitude.isNaN() )
-				return false;
-		}
+		if ( ! DashboardUtils.closeTo(this.longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+			if ( ! DashboardUtils.closeTo(this.longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+				if ( ! DashboardUtils.closeTo(this.longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) )
+					return false;
 
 		// rest of the Double comparisons
 		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, MAX_ABSOLUTE_ERROR) )
