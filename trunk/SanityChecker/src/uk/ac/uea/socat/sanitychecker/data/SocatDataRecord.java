@@ -433,4 +433,8 @@ public class SocatDataRecord {
 	public Set<String> getColumnNames() {
 		return itsOutputColumns.keySet();
 	}
+	
+	public void addMessage(Message message) {
+		itsMessages.add(message);
+	}
 }
