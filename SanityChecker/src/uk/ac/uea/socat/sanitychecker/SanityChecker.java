@@ -529,7 +529,7 @@ public class SanityChecker {
 						itsLogger.error("Required metadata item '" + metadataName + "' is missing");
 						ok = false;
 
-						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, metadataName, "Required metadata value is missng");
+						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, metadataName, "Required metadata value is missing");
 						itsOutput.addMessage(message);
 					}
 				}
