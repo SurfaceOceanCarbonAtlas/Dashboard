@@ -40,6 +40,20 @@ public class SocatDataException extends Exception {
 	}
 	
 	/**
+	 * Constructor for a message and an error
+	 * @param lineNumber The line number of the input file that was being processed when the error occurred
+	 * @param inputColumn The column index of the input file that was being processed when the error occurred
+	 * @param outputColumn The name of the destination SOCAT output column
+	 * @param message The error message
+	 */
+	public SocatDataException(int lineNumber, int inputColumn, String outputColumn, String message) {
+		super(message);
+		itsLineNumber = lineNumber;
+		itsInputColumn = inputColumn;
+		itsOutputColumn = outputColumn;
+	}
+	
+	/**
 	 * Constructor for a an error only
 	 * @param lineNumber The line number of the input file that was being processed when the error occurred
 	 * @param inputColumn The column index of the input file that was being processed when the error occurred
