@@ -3,13 +3,12 @@
  */
 package gov.noaa.pmel.socat.dashboard.client;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map.Entry;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CompositeCell;
@@ -81,28 +80,14 @@ public class CruiseDataColumn {
 												new ArrayList<String>();
 
 	static {
-		// Move SUPPLEMENTAL from the tail to the head of the list.
-		// Do not move SUPPLEMENTAL in the enum list, 
-		// since we want that data to be at the end when sorted.
-		STD_TYPE_UNITS.add(
-				new TypeUnits(DataColumnType.SUPPLEMENTAL, ""));
-		// Add everything else in the enumerated type order
-		for ( Entry<DataColumnType,ArrayList<String>> entry : 
-								DashboardUtils.STD_DATA_UNITS.entrySet() ) {
-			DataColumnType type = entry.getKey();
-			if ( type != DataColumnType.SUPPLEMENTAL ) {
-				for ( String units : entry.getValue() ) {
-					STD_TYPE_UNITS.add(new TypeUnits(type, units));
-				}
-			}
-		}
-
 		// Generate the headers from the standard data column types with units
 		for ( TypeUnits descr : STD_TYPE_UNITS ) {
 			String header = DashboardUtils.STD_HEADER_NAMES.get(descr.type);
-			if ( ! descr.units.isEmpty() )
-				header += " [ " + descr.units + " ]";
-			STD_TYPE_UNITS_HEADERS.add(header);
+			if ( header != null ) {
+				if ( ! descr.units.isEmpty() )
+					header += " [ " + descr.units + " ]";
+				STD_TYPE_UNITS_HEADERS.add(header);
+			}
 		}
 	}
 

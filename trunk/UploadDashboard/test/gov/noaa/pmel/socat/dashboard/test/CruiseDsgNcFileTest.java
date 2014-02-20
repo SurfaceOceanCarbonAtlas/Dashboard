@@ -27,8 +27,8 @@ public class CruiseDsgNcFileTest {
 	@Test
 	public void testCreate() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				DataColumnType.IGNORE,
-				DataColumnType.IGNORE,
+				DataColumnType.EXPOCODE,
+				DataColumnType.CRUISE_NAME,
 				DataColumnType.MONTH, 
 				DataColumnType.DAY, 
 				DataColumnType.YEAR, 
@@ -41,7 +41,7 @@ public class CruiseDsgNcFileTest {
 				DataColumnType.XCO2WATER_SST,
 				DataColumnType.PCO2WATER_EQU,
 				DataColumnType.SEA_LEVEL_PRESSURE,
-				DataColumnType.SUPPLEMENTAL));
+				DataColumnType.SHIP_SPEED));
 		String[] dataValueStrings = {
 				"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
 				"31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3", 
