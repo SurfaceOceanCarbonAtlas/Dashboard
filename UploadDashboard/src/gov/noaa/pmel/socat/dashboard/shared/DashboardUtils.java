@@ -19,15 +19,18 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  */
 public class DashboardUtils {
 
+	// Cruise list action strings
 	public static final String REQUEST_CRUISE_LIST_ACTION = "GET CRUISE LIST";
 	public static final String REQUEST_CRUISE_DELETE_ACTION = "DELETE CRUISE";
 	public static final String REQUEST_CRUISE_ADD_ACTION = "ADD CRUISE TO LIST";
 	public static final String REQUEST_CRUISE_REMOVE_ACTION = "REMOVE CRUISE FROM LIST";
 
+	// Cruise upload action strings
 	public static final String REQUEST_PREVIEW_TAG = "REQUEST PREVIEW TAG";
 	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";
 	public static final String REQUEST_OVERWRITE_CRUISE_TAG = "REQUEST OVERWRITE CRUISE TAG";
 
+	// Cruise upload result strings
 	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
 	public static final String NO_EXPOCODE_HEADER_TAG = "NO EXPOCODE HEADER TAG";
 	public static final String FILE_EXISTS_HEADER_TAG = "FILE EXISTS HEADER TAG";
@@ -46,15 +49,18 @@ public class DashboardUtils {
 	public static final int MIN_EXPOCODE_LENGTH = 12;
 	public static final int MAX_EXPOCODE_LENGTH = 14;
 
+	// Recognized data formats
 	public static final String CRUISE_FORMAT_TAB = "tab-separated values";
 	public static final String CRUISE_FORMAT_COMMA = "comma-separated values";
 
+	// Data check strings
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
 	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
 	public static final String CHECK_STATUS_WARNINGS_PREFIX = "Warnings:";
 	public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
 
+	// Cruise QC strings
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
 	public static final String QC_STATUS_SUBMITTED = "Submitted";
 	public static final String QC_STATUS_ACCEPTED_A = "Flag A";
@@ -66,19 +72,21 @@ public class DashboardUtils {
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
 
+	// Archival options
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
 	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 
 	/**
-	 * standard header names of the standard data columns
+	 * Header names of the standard data columns that a user might provide
 	 */
 	public static final EnumMap<DataColumnType,String> STD_HEADER_NAMES = 
 			new EnumMap<DataColumnType,String>(DataColumnType.class);
 	static {
-		STD_HEADER_NAMES.put(DataColumnType.IGNORE, "(ignore)");
 		STD_HEADER_NAMES.put(DataColumnType.UNKNOWN, "(unknown)");
+		STD_HEADER_NAMES.put(DataColumnType.EXPOCODE, "expocode");
+		STD_HEADER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise name");
 		STD_HEADER_NAMES.put(DataColumnType.TIMESTAMP, "timestamp");
 		STD_HEADER_NAMES.put(DataColumnType.DATE, "date");
 		STD_HEADER_NAMES.put(DataColumnType.YEAR, "year");
@@ -95,24 +103,33 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "Tequ");
 		STD_HEADER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "Pequ");
-		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "PPPP");
+		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "SLP");
 		STD_HEADER_NAMES.put(DataColumnType.XCO2WATER_EQU, "xCO2water_equ_dry");
 		STD_HEADER_NAMES.put(DataColumnType.XCO2WATER_SST, "xCO2water_SST_dry");
 		STD_HEADER_NAMES.put(DataColumnType.PCO2WATER_EQU, "pCO2water_equ_wet");
 		STD_HEADER_NAMES.put(DataColumnType.PCO2WATER_SST, "pCO2water_SST_wet");
 		STD_HEADER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fCO2water_equ_wet");
 		STD_HEADER_NAMES.put(DataColumnType.FCO2WATER_SST, "fCO2water_SST_wet");
-		STD_HEADER_NAMES.put(DataColumnType.SUPPLEMENTAL, "(supplemental)");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM, "xCO2_air");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM, "pCO2_air");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM, "fCO2_air");
+		STD_HEADER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
+		STD_HEADER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
 	}
 
 	/**
-	 * column names used by the sanity checker
+	 * Column names used by the sanity checker corresponding the {@link #STD_HEADER_NAMES}
 	 */
 	public static final EnumMap<DataColumnType,String> CHECKER_NAMES = 
 			new EnumMap<DataColumnType,String>(DataColumnType.class);
 	static {
-		CHECKER_NAMES.put(DataColumnType.IGNORE, "");
 		CHECKER_NAMES.put(DataColumnType.UNKNOWN, "");
+		CHECKER_NAMES.put(DataColumnType.EXPOCODE, "EXPOcode");
+		CHECKER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
 		CHECKER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
 		CHECKER_NAMES.put(DataColumnType.DATE, "date");
 		CHECKER_NAMES.put(DataColumnType.YEAR, "year");
@@ -136,42 +153,53 @@ public class DashboardUtils {
 		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST, "pCO2water_sst_wet");
 		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fCO2water_equ_wet");
 		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST, "fCO2water_sst_wet");
-		CHECKER_NAMES.put(DataColumnType.SUPPLEMENTAL, "");
+		CHECKER_NAMES.put(DataColumnType.XCO2_ATM, "xCO2_air");
+		CHECKER_NAMES.put(DataColumnType.PCO2_ATM, "pCO2_air");
+		CHECKER_NAMES.put(DataColumnType.FCO2_ATM, "fCO2_air");
+		CHECKER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
+		CHECKER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
+		CHECKER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
+		CHECKER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
+		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
+		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
 	}
 
-	/**
-	 * known data units of the standard data columns (and a few more)
+	/*
+	 * known data units of the standard data columns
 	 */
 	public static final ArrayList<String> NO_UNITS = new ArrayList<String>(Arrays.asList(""));
-	public static final ArrayList<String> LONGITUDE_UNITS = new ArrayList<String>(Arrays.asList("dec.deg.E"));
-	public static final ArrayList<String> LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("dec.deg.N"));
+	public static final ArrayList<String> LONGITUDE_UNITS = new ArrayList<String>(Arrays.asList("deg.E"));
+	public static final ArrayList<String> LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("deg.N"));
 	public static final ArrayList<String> DEPTH_UNITS = new ArrayList<String>(Arrays.asList("meters"));
 	public static final ArrayList<String> SALINITY_UNITS = new ArrayList<String>(Arrays.asList("PSU"));
-	public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("deg.C"));
-	public static final ArrayList<String> PRESSURE_UNITS = new ArrayList<String>(Arrays.asList("hPa"));
+	public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("deg.C, Kelvin, deg.F"));
+	public static final ArrayList<String> PRESSURE_UNITS = new ArrayList<String>(Arrays.asList("hPa", "kPa"));
 	public static final ArrayList<String> XCO2_UNITS = new ArrayList<String>(Arrays.asList("umol/mol"));
 	public static final ArrayList<String> PCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
 	public static final ArrayList<String> FCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
+	public static final ArrayList<String> DIRECTION_UNITS = new ArrayList<String>(Arrays.asList("deg.clk.N"));
+	public static final ArrayList<String> SHIP_SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots"));
+	public static final ArrayList<String> WIND_SPEED_UNITS = new ArrayList<String>(Arrays.asList("m/s"));
 
-	public static final ArrayList<String> DISTANCE_UNITS = new ArrayList<String>(Arrays.asList("km"));
-	public static final ArrayList<String> SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots"));
-	public static final ArrayList<String> DAYS_UNITS = new ArrayList<String>(Arrays.asList("days"));
-	public static final ArrayList<String> SECONDS_UNITS = new ArrayList<String>(Arrays.asList("seconds"));
-
-	/**
+	/*
 	 * SanityChecker version of the strings for above data units when not the same strings
 	 */
 	private static final ArrayList<String> CHECKER_LONGITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
 	private static final ArrayList<String> CHECKER_LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
 	private static final ArrayList<String> CHECKER_SALINITY_UNITS = new ArrayList<String>(Arrays.asList("psu"));
-	private static final ArrayList<String> CHECKER_TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC"));
+	private static final ArrayList<String> CHECKER_TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC, Kelvin, degF"));
 	private static final ArrayList<String> CHECKER_XCO2_UNITS = new ArrayList<String>(Arrays.asList("ppm"));
 
+	/**
+	 * Available data units for the standard data columns that a user might provide.
+	 * The first unit is the standard unit.
+	 */
 	public static final EnumMap<DataColumnType,ArrayList<String>> STD_DATA_UNITS = 
 			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
 	static {
-		STD_DATA_UNITS.put(DataColumnType.IGNORE, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.UNKNOWN, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.EXPOCODE, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
 				"yyyy-mm-dd hh:mm:ss", "mm/dd/yyyy hh:mm:ss", "dd/mm/yyyy hh:mm:ss")));
 		STD_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
@@ -197,16 +225,26 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, PCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, FCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, FCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SUPPLEMENTAL, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, DIRECTION_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
 	}
+
 	/**
-	 * data units of the standard data columns used by the sanity checker
+	 * Data units used by the sanity checker corresponding to {@link #STD_DATA_UNITS}
 	 */
 	public static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
 			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
 	static {
-		CHECKER_DATA_UNITS.put(DataColumnType.IGNORE, NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.UNKNOWN, NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.EXPOCODE, NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
 				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
 		CHECKER_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
@@ -232,7 +270,181 @@ public class DashboardUtils {
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SUPPLEMENTAL, NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM, XCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM, PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM, FCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, DIRECTION_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
+	}
+
+	/**
+	 * Standard descriptions of all known column types in the standard unit.
+	 */
+	public static final EnumMap<DataColumnType,String> STD_DESCRIPTIONS =
+			new EnumMap<DataColumnType,String>(DataColumnType.class);
+	static {
+		STD_DESCRIPTIONS.put(DataColumnType.EXPOCODE, 
+				"cruise expocode");
+		STD_DESCRIPTIONS.put(DataColumnType.CRUISE_NAME, 
+				"cruise name");
+		STD_DESCRIPTIONS.put(DataColumnType.YEAR, 
+				"year of the date (UTC) of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.MONTH, 
+				"month of the date (UTC) of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.DAY, 
+				"day of the date (UTC) of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.HOUR, 
+				"hour of the time (UTC) of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.MINUTE, 
+				"minute of the time (UTC) of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.SECOND, 
+				"second of the time (UTC) of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.LATITUDE, 
+				"measurement longitude in decimal degrees East");
+		STD_DESCRIPTIONS.put(DataColumnType.LATITUDE, 
+				"measurement latitude in decimal degrees North");
+		STD_DESCRIPTIONS.put(DataColumnType.SAMPLE_DEPTH, 
+				"water sampling depth in meters");
+		STD_DESCRIPTIONS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, 
+				"measured sea surface temperature in degrees Celcius");
+		STD_DESCRIPTIONS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, 
+				"equilibrator chamber temperature in degrees Celcius");
+		STD_DESCRIPTIONS.put(DataColumnType.SALINITY, 
+				"measured salinity on the practical salinity scale");
+		STD_DESCRIPTIONS.put(DataColumnType.SEA_LEVEL_PRESSURE, 
+				"measured sea-level atmospheric pressure in hectopascals");
+		STD_DESCRIPTIONS.put(DataColumnType.EQUILIBRATOR_PRESSURE, 
+				"equilibrator chamber pressure in hectopascals");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2WATER_SST, 
+				"measured xCO2 (water) in micromoles per mole using sea surface temperature (dry air)");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2WATER_EQU, 
+				"measured xCO2 (water) in micromoles per mole using equilibrator temperature (dry air)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2WATER_SST, 
+				"measured fCO2 (water) in microatmospheres using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2WATER_EQU, 
+				"measured fCO2 (water) in microatmospheres using equilibrator temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.PCO2WATER_SST, 
+				"measured pCO2 (water) in microatmospheres using sea surface temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.PCO2WATER_EQU, 
+				"measured pCO2 (water) in microatmospheres using equilibrator temperature (wet air)");
+		STD_DESCRIPTIONS.put(DataColumnType.XCO2_ATM, 
+				"measured atmospheric xCO2 in micromoles per mole");
+		STD_DESCRIPTIONS.put(DataColumnType.PCO2_ATM, 
+				"measured atmospheric pCO2 in microatmospheres");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_ATM, 
+				"measured atmospheric fCO2 in microatmospheres");
+		STD_DESCRIPTIONS.put(DataColumnType.SHIP_SPEED, 
+				"measured ship speed in knots");
+		STD_DESCRIPTIONS.put(DataColumnType.SHIP_DIRECTION, 
+				"ship direction in degrees clockwise from north");
+		STD_DESCRIPTIONS.put(DataColumnType.WIND_SPEED_TRUE, 
+				"true wind speed in meters per second");
+		STD_DESCRIPTIONS.put(DataColumnType.WIND_SPEED_RELATIVE, 
+				"wind speed relative to the ship in meters per second");
+		STD_DESCRIPTIONS.put(DataColumnType.WIND_DIRECTION_TRUE, 
+				"true wind direction in degrees clockwise from north");
+		STD_DESCRIPTIONS.put(DataColumnType.WIND_DIRECTION_RELATIVE, 
+				"wind direction relative to the ship in degrees clockwise from north");
+		STD_DESCRIPTIONS.put(DataColumnType.DELTA_PCO2, 
+				"difference in atmospheric and water pCO2 values");
+		STD_DESCRIPTIONS.put(DataColumnType.DELTA_FCO2, 
+				"difference in atmospheric and water fCO2 values");
+		STD_DESCRIPTIONS.put(DataColumnType.WOA_SALINITY,
+				"sea surface salinity on the practical salinity scale interpolated from the World Ocean Atlas 2005 " +
+				"(see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)");
+		STD_DESCRIPTIONS.put(DataColumnType.NCEP_SEA_LEVEL_PRESSURE,
+				"sea level pressure in hectopascals interpolated from the NCEP/NCAR 40-Year Reanalysis Project " +
+				"(see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_SAL,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_SAL,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_TEQ_PEQU_SAL,
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_SST_PEQ_SAL,
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_FCO2_TEQ_PEQ_SAL,
+				"fCO2 in microatmospheres recomputed from measured fCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_FCO2_SST_PEQ_SAL,
+				"fCO2 in microatmospheres recomputed from measured fCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_TEQ_NCEP_SAL,
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using equilibrator temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_SST_NCEP_SAL,
+				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using sea surface temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_WOA,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"equilibrator pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_WOA,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"equilibrator pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_SAL,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_SAL,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"NCEP sea level pressure, and measured salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_WOA,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
+				"NCEP sea level pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_WOA,
+				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
+				"NCEP sea level pressure, and WOA sea surface salinity" +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC,
+				"fCO2 in microatmospheres recomputed from the most desireable measured CO2 data " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_SOURCE,
+				"algorithm number (1-14) for generating the fCO2Rec value " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.DELTA_TEMPERATURE,
+				"difference in temperature in degrees Celcius between the equilibrator water and the sea surface water (TEqu - SST)");
+		STD_DESCRIPTIONS.put(DataColumnType.REGION_ID,
+				"SOCAT region ID for the location of this measurement " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
+		STD_DESCRIPTIONS.put(DataColumnType.SECONDS_1970, 
+				"time of measurement in seconds since Jan 1, 1970 00:00:00 UTC");
+		STD_DESCRIPTIONS.put(DataColumnType.DAYS_1970,
+				"time of measurement in days since Jan 1, 1970 00:00:00 UTC");
+		STD_DESCRIPTIONS.put(DataColumnType.DAY_OF_YEAR,
+				"time of measurement in days since Jan 1 00:00 UTC of the year of the measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.CALC_SHIP_SPEED,
+				"calculated ship speed in knots using the previous and/or subsequent data measurement");
+		STD_DESCRIPTIONS.put(DataColumnType.ETOPO2,
+				"bathymetric depth in meters interpolated from the ETOPO2 2 arc-minute Gridded Global Relief Data " +
+				"(see: http://www.ngdc.noaa.gov/mgg/global/etopo2.html)");
+		STD_DESCRIPTIONS.put(DataColumnType.GVCO2,
+				"atmospheric xCO2 in micromoles per mole interpolated from GlobalView-CO2, 2012 1979-01-01 to 2012-01-01 data " +
+				"(see: http://www.esrl.noaa.gov/gmd/ccgg/globalview/index.html)");
+		STD_DESCRIPTIONS.put(DataColumnType.DISTANCE_TO_LAND,
+				"estimated distance in km to major land mass (up to 1000 km)");
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_WOCE_FLAG,
+				"WOCE quality-control flag (2=okay,3=questionable,4=bad) for the fCO2Rec value " +
+				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
 	}
 
 	/**

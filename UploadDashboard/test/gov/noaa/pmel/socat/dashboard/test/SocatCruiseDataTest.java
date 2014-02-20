@@ -23,8 +23,8 @@ import org.junit.Test;
 public class SocatCruiseDataTest {
 
 	static final ArrayList<DataColumnType> TEST_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
-			DataColumnType.IGNORE,
-			DataColumnType.IGNORE,
+			DataColumnType.EXPOCODE,
+			DataColumnType.CRUISE_NAME,
 			DataColumnType.MONTH, 
 			DataColumnType.DAY, 
 			DataColumnType.YEAR, 
@@ -37,7 +37,7 @@ public class SocatCruiseDataTest {
 			DataColumnType.XCO2WATER_SST,
 			DataColumnType.PCO2WATER_EQU,
 			DataColumnType.SEA_LEVEL_PRESSURE,
-			DataColumnType.SUPPLEMENTAL));
+			DataColumnType.SHIP_SPEED));
 	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
 	static final ArrayList<Integer> EXPECTED_YEARS = new ArrayList<Integer>();
 	static final ArrayList<Integer> EXPECTED_MONTHS = new ArrayList<Integer>();

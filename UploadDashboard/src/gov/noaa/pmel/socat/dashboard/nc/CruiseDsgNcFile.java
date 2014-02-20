@@ -95,7 +95,7 @@ public class CruiseDsgNcFile {
                         // Skip for now.
                     }
                     if ( var != null ) {
-                        List<String> units = Constants.UNITS.get(name);
+                        String units = Constants.UNITS.get(name);
                         if ( units != null ) {
                             ncfile.addVariableAttribute(var, new Attribute("units", units));
                         }

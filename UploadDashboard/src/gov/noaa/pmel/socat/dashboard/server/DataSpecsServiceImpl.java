@@ -337,11 +337,6 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				// Add this column description to the root element
 				rootElement.addContent(columnElement);
 			}
-			else if ( (colType == DataColumnType.SUPPLEMENTAL) ||
-					  (colType == DataColumnType.IGNORE) ) {
-				// Do not add any description of this column, thus ignoring it
-				;
-			}
 			else {
 				// DataColumnType.UNKNOWN should not be present
 				throw new IllegalArgumentException("Unexpected data column of type " + 

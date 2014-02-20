@@ -31,7 +31,7 @@ set data "($cruise_filename)"
 let lon = longitude[d=($cruise_filename)]
 let lat =  latitude[d=($cruise_filename)]
 
-let region_num = SAMPLEXY(socat3regions[d=($dmask)], longitude, latitude)
+let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask)], longitude, latitude)
 
 ! There is no region 3
 let region_codes = {"N", "T", "-", "O", "I", "A", "C", "Z", "R"}
