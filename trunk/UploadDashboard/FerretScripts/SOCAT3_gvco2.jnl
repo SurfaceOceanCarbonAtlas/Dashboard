@@ -26,7 +26,7 @@ if `STRINDEX("($gv_t0)", "1-JAN-1970") EQ 0` THEN
 endif
 
 let ttzero =  days1900(1970,1,1)
-LET dates_for_co2 = days1900(year, month, day) + hour/24 + minute/(24*60) + second/(24*60*60) - ttzero
+LET dates_for_co2 = days1900(year, month, day) + hour/24 + minute/(24*60) + second/(24*60*60) - `ttzero`
 
 ! sample CO2 at the cruise times and locations.
 let gvco2_sampled = SAMPLEXYT(co2wx,longitude,latitude,dates_for_co2)

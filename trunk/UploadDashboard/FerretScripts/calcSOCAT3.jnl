@@ -60,13 +60,13 @@ GO SOCAT3_WOA_salinity
 LET temp_k = temp+273.15
 LET Temperature_equi_k = Temperature_equi+273.15
 !pH2Os
-LET pH2O=1013.25*(exp(24.4543-67.4509*(100/temp_k)-4.8489*log(temp_k/100) -0.000544*sal))
-LET pH2O_woa=1013.25*(exp(24.4543-67.4509*(100/temp_k)-4.8489*log(temp_k/100) -0.000544*woaSss))
+LET pH2O=1013.25*(exp(24.4543-67.4509*(100/temp_k)-4.8489*LN(temp_k/100) -0.000544*sal))
+LET pH2O_woa=1013.25*(exp(24.4543-67.4509*(100/temp_k)-4.8489*LN(temp_k/100) -0.000544*woaSss))
 
 LET pH2O_eq=1013.25*(exp(24.4543-67.4509*(100/Temperature_equi_k) \
--4.8489*log(Temperature_equi_k/100) -0.000544*sal))
+-4.8489*LN(Temperature_equi_k/100) -0.000544*sal))
 LET pH2O_eq_woa=1013.25*(exp(24.4543-67.4509*(100/Temperature_equi_k) \
--4.8489*log(Temperature_equi_k/100)-0.000544*woaSss))
+-4.8489*LN(Temperature_equi_k/100)-0.000544*woaSss))
 !pressure, IF equilibrator pressure not given, use atmospheric pressure + 3
 LET press = IF Pressure_equi THEN Pressure_equi ELSE Pressure_atm+3
 !NCEP pressure + 3, for calculations
@@ -224,20 +224,19 @@ LET var3 = fCO2_from_pCO2_water_water_equi_temp
 LET var2 = fCO2_insitu_from_xCO2_water_sst_dry_ppm 
 LET var1 = fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
 
-
-LET vara = IF var1 THEN var1 ELSE var2
-LET varb = IF vara THEN vara ELSE var3
-LET varc = IF varb THEN varb ELSE var4
-LET vard = IF varc THEN varc ELSE var5
-LET vare = IF vard THEN vard ELSE var6
-LET varf = IF vare THEN vare ELSE var7
-LET varg = IF varf THEN varf ELSE var8
-LET varh = IF varg THEN varg ELSE var9
-LET vari = IF varh THEN varh ELSE var10
-LET varj = IF vari THEN vari ELSE var11
-LET vark = IF varj THEN varj ELSE var12
-LET varl = IF vark THEN vark ELSE var13
-LET fCO2_rec = IF varl THEN varl ELSE var14
+LET vara = IF var1 THEN var1 ELSE var2; load vara
+LET varb = IF vara THEN vara ELSE var3; load varb
+LET varc = IF varb THEN varb ELSE var4; load varc
+LET vard = IF varc THEN varc ELSE var5; load vard
+LET vare = IF vard THEN vard ELSE var6; load vare
+LET varf = IF vare THEN vare ELSE var7; load varf
+LET varg = IF varf THEN varf ELSE var8; load varg
+LET varh = IF varg THEN varg ELSE var9; load varh
+LET vari = IF varh THEN varh ELSE var10; load vari
+LET varj = IF vari THEN vari ELSE var11; load varj
+LET vark = IF varj THEN varj ELSE var12; load vark
+LET varl = IF vark THEN vark ELSE var13; load varl
+LET fCO2_rec = IF varl THEN varl ELSE var14; load fco2_rec
 
 ! which source was used in each instance?
 
@@ -255,7 +254,6 @@ LET src4 = IF var4 THEN  4
 LET src3 = IF var3 THEN  3
 LET src2 = IF var2 THEN  2
 LET src1 = IF var1 THEN  1
-
 
 LET srca = IF src1 THEN src1 ELSE src2
 LET srcb = IF srca THEN srca ELSE src3
@@ -301,19 +299,19 @@ let/title="Equilibrator Temp - SST"/units="`temp,return=units`" delta_temperatur
 set var/outtype=($outtype) delta_temperature
 
 ! Pressure from NCEP
-let/title="Surface Air Pressure from NCEP"/units="hPa" pressure_ncep_slp = ncep_slp[gx=year@asn]
+let/title="Surface Air Pressure from NCEP"/units="hPa" pressure_ncep_slp = ncep_slp
 set var/outtype=($outtype) pressure_ncep_slp
 define attribute/output pressure_ncep_slp.ioos_category = "Pressure"
 define attribute/output pressure_ncep_slp.standard_name = "surface_air_pressure"
 
 ! Salinity from WOA 2005
-let/title="Sea Water Salinity from WOA5"/units="PSU" woa_sss = woaSss[gx=year@asn]
+let/title="Sea Water Salinity from WOA5"/units="PSU" woa_sss = woaSss
 set var/outtype=($outtype) woa_sss
 define attribute/output woa_sss.ioos_category = "Salinity"
 define attribute/output woa_sss.standard_name = "sea_water_salinity"
 
 ! GlobalView Marine Carbon
-let/title="GlobalView CO2"/unit="micromol per mol" gvCO2 = gvCO2_sampled[gx=year@asn]
+let/title="GlobalView CO2"/unit="micromol per mol" gvCO2 = gvCO2_sampled
 set var/outtype=($outtype) gvCO2
 define attribute/output gvCO2.ioos_category = "CO2"
 
@@ -325,17 +323,17 @@ define attribute/output lon360.standard_name = "Longitude"
 define attribute/output lon360.history = "added to ($cruise_filename)"
 
 ! Ship speed
-let/title="calculated ship speed"/units="knots" calcSpeed = speed[gx=year@asn]
+let/title="calculated ship speed"/units="knots" calcSpeed = speed
 set var/outtype=($outtype) calcSpeed
 
 ! ETOPO2 Depth
-let/title="ETOPO2 depth"/units="meters" etopo2 = etopoDepth[gx=year@asn]
+let/title="ETOPO2 depth"/units="meters" etopo2 = etopoDepth
 set var/outtype=($outtype) etopo2
 define attribute/output etopo2.ioos_category = "Bathymetry"
 define attribute/output etopo2.standard_name = "sea_floor_depth"
 
 ! Distance to Land
-let/title="Distance to Land"/unit="km" distToLand = d2l[gx=year@asn]
+let/title="Distance to Land"/unit="km" distToLand = d2l
 set var/outtype=($outtype) distToLand
 
 ! Time (as seconds since 1970)
@@ -378,7 +376,7 @@ define attribute/output region_id.history = "added to ($cruise_filename)"
 ! month of year
 LET charmonths = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
 let datamonths = samplei(charmonths, month)
-let/title="month of year" tmonth = datamonths[gx=obs@asn]
+let/title="month of year" tmonth = datamonths[gx=latitude@asn]
 define attribute/output tmonth.history = "added to ($cruise_filename)"
 
 set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_equi_temp_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
@@ -433,3 +431,4 @@ save/quiet/append/file="($cruise_filename)" tmonth
 
 save/quiet/append/file="($cruise_filename)" calcSpeed
 save/quiet/append/file="($cruise_filename)" region_id
+

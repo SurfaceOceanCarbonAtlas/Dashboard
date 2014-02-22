@@ -13,7 +13,7 @@ DEFINE AXIS/T=1:12:1 monthaxis
 let monthindex_salinity = S0112AN1[d=($dwoa),z=0,gt=monthaxis@asn]
 
 ! sample salinity at the cruise times and locations.  
-let woaSss_good = SAMPLEXYT(monthindex_salinity, longitude, latitude, month)
+let woaSss_good = SAMPLEXYT_NRST(monthindex_salinity, longitude, latitude, month)
 
 
 ! plot/vs/ribbon/thick/sym=21 longitude, latitude, woaSss_good; pause
@@ -33,7 +33,10 @@ let woaSss_good = SAMPLEXYT(monthindex_salinity, longitude, latitude, month)
 let salinity_and_land = if monthindex_salinity then monthindex_salinity else 35
 
 LET/units="`S0112AN1[d=($dwoa)],return=units`"/title="`S0112AN1[d=($dwoa)],return=title`" \
- woa_and_land = SAMPLEXYT(salinity_and_land, longitude, latitude, month)
+ woa_and_land = SAMPLEXYT_NRST(salinity_and_land, longitude, latitude, month)
+
+LET/units="`S0112AN1[d=($dwoa)],return=units`"/title="`S0112AN1[d=($dwoa)],return=title`" \
+ woa_and_land = SAMPLEXYT_NRST(salinity_and_land, longitude, latitude, month)
 
 ! average over K to remove the Z axis entirely
 LET/units="`S0112AN1[d=($dwoa)],return=units`"/title="`S0112AN1[d=($dwoa)],return=title`" \
