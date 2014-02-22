@@ -4,29 +4,31 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
 		<g:FlowPanel>
-			<g:FlowPanel addStyleNames="{style.userinfopanel}">
-				<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-				<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
+			<g:FlowPanel addStyleNames="{style.titlepanel}">
+				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.addinfo}" ui:field="introHtml" />
 			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">
 				<g:Label addStyleNames="{style.optionsintro}" ui:field="archivePlanLabel" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
-					<g:RadioButton addStyleNames="{style.optionbutton}" 
+					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="socatRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
 							ui:field="socatInfoAnchor" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
-					<g:RadioButton addStyleNames="{style.optionbutton}" 
+					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="cdiacRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
 							ui:field="cdiacInfoAnchor" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
-					<g:RadioButton addStyleNames="{style.optionbutton}" 
+					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="ownerRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
 							ui:field="ownerInfoAnchor" />

@@ -50,8 +50,11 @@ public class DashboardUtils {
 	public static final int MAX_EXPOCODE_LENGTH = 14;
 
 	// Recognized data formats
-	public static final String CRUISE_FORMAT_TAB = "tab-separated values";
-	public static final String CRUISE_FORMAT_COMMA = "comma-separated values";
+	public static final String CRUISE_FORMAT_COMMA = "data are comma-separated values";
+	public static final String CRUISE_FORMAT_TAB = "data are tab-separated values";
+
+	// Maximum number of rows shown in a page of a data grid (table)
+	public static final int MAX_ROWS_PER_GRID_PAGE = 50;
 
 	// Data check strings
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
@@ -172,7 +175,7 @@ public class DashboardUtils {
 	public static final ArrayList<String> LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("deg.N"));
 	public static final ArrayList<String> DEPTH_UNITS = new ArrayList<String>(Arrays.asList("meters"));
 	public static final ArrayList<String> SALINITY_UNITS = new ArrayList<String>(Arrays.asList("PSU"));
-	public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("deg.C, Kelvin, deg.F"));
+	public static final ArrayList<String> TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("deg.C", "Kelvin", "deg.F"));
 	public static final ArrayList<String> PRESSURE_UNITS = new ArrayList<String>(Arrays.asList("hPa", "kPa"));
 	public static final ArrayList<String> XCO2_UNITS = new ArrayList<String>(Arrays.asList("umol/mol"));
 	public static final ArrayList<String> PCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
@@ -187,8 +190,9 @@ public class DashboardUtils {
 	private static final ArrayList<String> CHECKER_LONGITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
 	private static final ArrayList<String> CHECKER_LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
 	private static final ArrayList<String> CHECKER_SALINITY_UNITS = new ArrayList<String>(Arrays.asList("psu"));
-	private static final ArrayList<String> CHECKER_TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC, Kelvin, degF"));
+	private static final ArrayList<String> CHECKER_TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC", "Kelvin", "degF"));
 	private static final ArrayList<String> CHECKER_XCO2_UNITS = new ArrayList<String>(Arrays.asList("ppm"));
+	private static final ArrayList<String> CHECKER_DIRECTION_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
 
 	/**
 	 * Available data units for the standard data columns that a user might provide.
@@ -274,11 +278,11 @@ public class DashboardUtils {
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM, PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM, FCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, DIRECTION_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, CHECKER_DIRECTION_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, CHECKER_DIRECTION_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, CHECKER_DIRECTION_UNITS);
 	}
 
 	/**
@@ -287,6 +291,8 @@ public class DashboardUtils {
 	public static final EnumMap<DataColumnType,String> STD_DESCRIPTIONS =
 			new EnumMap<DataColumnType,String>(DataColumnType.class);
 	static {
+		STD_DESCRIPTIONS.put(DataColumnType.UNKNOWN, 
+				"unknown data to be identified");
 		STD_DESCRIPTIONS.put(DataColumnType.EXPOCODE, 
 				"cruise expocode");
 		STD_DESCRIPTIONS.put(DataColumnType.CRUISE_NAME, 

@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
@@ -16,15 +15,6 @@ import org.junit.Test;
  * @author Karl Smith
  */
 public class DashboardMetadataTest {
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#DashboardMetadata()}.
-	 */
-	@Test
-	public void testDashboardMetadata() {
-		DashboardMetadata mdata = new DashboardMetadata();
-		assertNotNull( mdata );
-	}
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#isSelected()}
@@ -39,6 +29,22 @@ public class DashboardMetadataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getExpocode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setExpocode(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetExpocode() {
+		String myExpocode = "CYNS20120124";
+		DashboardMetadata mdata = new DashboardMetadata();
+		assertEquals("", mdata.getExpocode());
+		mdata.setExpocode(myExpocode);
+		assertEquals(myExpocode, mdata.getExpocode());
+		assertFalse( mdata.isSelected() );
+		mdata.setExpocode(null);
+		assertEquals("", mdata.getExpocode());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getOwner()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setOwner(java.lang.String)}.
 	 */
@@ -49,8 +55,9 @@ public class DashboardMetadataTest {
 		assertEquals("", mdata.getOwner());
 		mdata.setOwner(myOwner);
 		assertEquals(myOwner, mdata.getOwner());
-		mdata.setOwner(null);
+		assertEquals("", mdata.getExpocode());
 		assertFalse( mdata.isSelected() );
+		mdata.setOwner(null);
 		assertEquals("", mdata.getOwner());
 	}
 
@@ -60,12 +67,13 @@ public class DashboardMetadataTest {
 	 */
 	@Test
 	public void testGetSetFilename() {
-		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
+		String myFilename = "NatalieSchulte_2013.doc";
 		DashboardMetadata mdata = new DashboardMetadata();
 		assertEquals("", mdata.getFilename());
 		mdata.setFilename(myFilename);
 		assertEquals(myFilename, mdata.getFilename());
 		assertEquals("", mdata.getOwner());
+		assertEquals("", mdata.getExpocode());
 		assertFalse( mdata.isSelected() );
 		mdata.setFilename(null);
 		assertEquals("", mdata.getFilename());
@@ -76,14 +84,15 @@ public class DashboardMetadataTest {
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setUploadTimestamp(java.lang.String)}.
 	 */
 	@Test
-	public void testGetUploadTimestamp() {
-		String myTimestamp = "2013-12-11 10:09:08";
+	public void testGetSetUploadTimestamp() {
+		String myTimestamp = "2013-12-11 10:09";
 		DashboardMetadata mdata = new DashboardMetadata();
 		assertEquals("", mdata.getUploadTimestamp());
 		mdata.setUploadTimestamp(myTimestamp);
 		assertEquals(myTimestamp, mdata.getUploadTimestamp());
 		assertEquals("", mdata.getFilename());
 		assertEquals("", mdata.getOwner());
+		assertEquals("", mdata.getExpocode());
 		assertFalse( mdata.isSelected() );
 		mdata.setUploadTimestamp(null);
 		assertEquals("", mdata.getUploadTimestamp());
@@ -95,9 +104,10 @@ public class DashboardMetadataTest {
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
+		String myExpocode = "CYNS20120124";
 		String myOwner = "SocatUser";
-		String myFilename = "CYNS20120124_NatalieSchulte_2013.doc";
-		String myTimestamp = "2013-12-11 10:09:08";
+		String myFilename = "NatalieSchulte_2013.doc";
+		String myTimestamp = "2013-12-11 10:09";
 
 		DashboardMetadata firstMData = new DashboardMetadata();
 		assertFalse( firstMData.equals(null) );
@@ -110,6 +120,13 @@ public class DashboardMetadataTest {
 		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
 		assertFalse( firstMData.equals(secondMData) );
 		secondMData.setSelected(true);
+		assertEquals(firstMData.hashCode(), secondMData.hashCode());
+		assertEquals(firstMData, secondMData);
+
+		firstMData.setExpocode(myExpocode);
+		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
+		assertFalse( firstMData.equals(secondMData) );
+		secondMData.setExpocode(myExpocode);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
 
@@ -133,6 +150,42 @@ public class DashboardMetadataTest {
 		secondMData.setUploadTimestamp(myTimestamp);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getAddlDocsTitle()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#splitAddlDocsTitle(java.lang.String)}
+	 */
+	@Test
+	public void testGetAddnDocsTitle() {
+		String myExpocode = "CYNS20120124";
+		String myOwner = "SocatUser";
+		String myFilename = "NatalieSchulte_2013.doc";
+		String myTimestamp = "2013-12-11 10:09";
+
+		DashboardMetadata mdata = new DashboardMetadata();
+		assertEquals("", mdata.getAddlDocsTitle());
+		String[] nameTimePair = DashboardMetadata.splitAddlDocsTitle(mdata.getAddlDocsTitle());
+		assertEquals(2, nameTimePair.length);
+		assertEquals("", nameTimePair[0]);
+		assertEquals("", nameTimePair[1]);
+		mdata.setSelected(true);
+		mdata.setExpocode(myExpocode);
+		mdata.setOwner(myOwner);
+		assertEquals("", mdata.getAddlDocsTitle());
+		mdata.setFilename(myFilename);
+		assertEquals(myFilename, mdata.getAddlDocsTitle());
+		nameTimePair = DashboardMetadata.splitAddlDocsTitle(mdata.getAddlDocsTitle());
+		assertEquals(2, nameTimePair.length);
+		assertEquals(myFilename, nameTimePair[0]);
+		assertEquals("", nameTimePair[1]);
+		mdata.setUploadTimestamp(myTimestamp);
+		nameTimePair = DashboardMetadata.splitAddlDocsTitle(mdata.getAddlDocsTitle());
+		assertEquals(2, nameTimePair.length);
+		assertEquals(myFilename, nameTimePair[0]);
+		assertEquals(myTimestamp, nameTimePair[1]);
+		mdata.setFilename(null);
+		assertEquals("", mdata.getAddlDocsTitle());
 	}
 
 }

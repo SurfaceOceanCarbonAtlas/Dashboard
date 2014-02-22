@@ -134,7 +134,20 @@ public class MetadataUploadService extends HttpServlet {
 
 		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		String uploadFilename = metadataItem.getName();
+		String uploadFilename;
+		if ( omeIndicator.equals("true") ) {
+			uploadFilename = OmeMetadata.OME_FILENAME;
+		}
+		else {
+			uploadFilename = DashboardUtils.baseName(metadataItem.getName());
+			if ( uploadFilename.equals(OmeMetadata.OME_FILENAME) ) {
+				metadataItem.delete();
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+						"Name of the uploaded file cannot be " + 
+								OmeMetadata.OME_FILENAME + 
+						"\n    Please rename the file and try again.");
+			}
+		}
 
 		DashboardMetadata metadata = null;
 		for ( String expo : cruiseExpocodes ) {
@@ -154,41 +167,27 @@ public class MetadataUploadService extends HttpServlet {
 							"Cruise " + expo + " does not exist");
 				if ( omeIndicator.equals("true") ) {
 					// Make sure the contents are valid OME XML
+					OmeMetadata omedata;
 					try {
-						new OmeMetadata(metadata);
+						omedata = new OmeMetadata(metadata);
 					} catch ( IllegalArgumentException ex ) {
 						// Problems with the file - delete it
-						// unfortunately, an previous version has been overwritten - revert instead??
 						metadataHandler.removeMetadata(username, expo, 
 														metadata.getFilename());
 						throw new IllegalArgumentException(
 								"Invalid OME metadata file:\n   " + ex.getMessage());
 					}
-					// Assign the OME metadata filename for this cruise
-					if ( ! cruise.getOmeFilename().equals(metadata.getFilename()) ) {
-						cruise.setOmeFilename(metadata.getFilename());
-						// remove this metadata filename, if present, from the additional documents
-						cruise.getAddlDocNames().remove(metadata.getFilename());
-						// save the updated cruise information
+					// Assign the OME metadata timestamp for this cruise and save
+					if ( ! cruise.getOmeTimestamp().equals(omedata.getUploadTimestamp()) ) {
+						cruise.setOmeTimestamp(omedata.getUploadTimestamp());
 						cruiseHandler.saveCruiseInfoToFile(cruise, 
-								"Assigned new OME metadata filename " + metadata.getFilename() + 
-								" to cruise " + expo);
+								"Assigned new OME metadata file timestamp " + 
+								cruise.getOmeTimestamp() + " to cruise " + expo);
 					}
 				}
 				else {
-					// Make sure this was not the OME metadata for the cruise
-					if ( cruise.getOmeFilename().equals(metadata.getFilename()) ) {
-						// unfortunately, an previous version has been overwritten - revert instead??
-						metadataHandler.removeMetadata(username, expo, 
-														metadata.getFilename());
-						throw new IllegalArgumentException(
-								"The OME metadata " + cruise.getOmeFilename() + 
-								"for cruise " + cruise.getExpocode()+ 
-								" is not permitted to also be an additional document");
-					}
-					// Directly modify the additional documents listing in the cruise
-					if ( cruise.getAddlDocNames().add(metadata.getFilename()) ) {
-						// New additional document added to the list
+					// Directly modify the additional documents listing in the cruise and save
+					if ( cruise.getAddlDocs().add(metadata.getAddlDocsTitle()) ) {
 						cruiseHandler.saveCruiseInfoToFile(cruise, 
 								"Added additional document " + metadata.getFilename() + 
 								" to cruise " + expo);

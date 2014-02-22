@@ -16,7 +16,15 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2671704405016542399L;
+	private static final long serialVersionUID = -4927750215946978468L;
+
+	/**
+	 * The "upload filename" for all OME metadata files.  (The name of the 
+	 * actual file on the server has the expocode prefixed to this name.)
+	 */
+	public static final String OME_FILENAME = "OME.xml";
+
+	private static final String TITLE_SEPARATOR = "; ";
 
 	protected boolean selected;
 	protected String expocode;
@@ -33,6 +41,42 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		filename = "";
 		uploadTimestamp = "";
 		owner = "";
+	}
+
+	/**
+	 * Returns the additional documents title for this metadata.
+	 * Normally this title is the filename, followed by a semicolon, 
+	 * a space, and the upload timestamp.  If the filename is empty,
+	 * this title is empty.  If the upload timestamp is empty, the 
+	 * title is just the filename.
+	 */
+	public String getAddlDocsTitle() {
+		if ( filename.isEmpty() )
+			return "";
+		if ( uploadTimestamp.isEmpty() )
+			return filename;
+		return filename + TITLE_SEPARATOR + uploadTimestamp;
+	}
+
+	/**
+	 * Returns the metadata filename and the upload timestamp
+	 * given in the document title.
+	 * 
+	 * @param docTitle
+	 * 		document title to parse
+	 * @return
+	 * 		string array of length two with the filename as the
+	 * 		first string and the timestamp as the second filename.
+	 * 		If the title is empty, both strings in the returned 
+	 * 		array will be empty.
+	 * 		If the title does not have a timestamp, the timestamp
+	 * 		in the returned array will be empty.
+	 */
+	public static String[] splitAddlDocsTitle(String docTitle) {
+		String[] pieces = docTitle.split(TITLE_SEPARATOR, 2);
+		if ( pieces.length == 1 )
+			pieces = new String[] { docTitle, "" };
+		return pieces;
 	}
 
 	/**

@@ -95,44 +95,44 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getOmeFilename()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setOmeFilename(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getOmeTimestamp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setOmeTimestamp(java.lang.String)}.
 	 */
 	@Test
-	public void testSetGetOmeFilename() {
-		String myOmeFilename = "ABCD20050728_OME.xml";
+	public void testSetGetOmeTimestamp() {
+		String myOmeFilename = "2014-02-21 9:22";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getOmeFilename());
-		cruise.setOmeFilename(myOmeFilename);
-		assertEquals(myOmeFilename, cruise.getOmeFilename());
+		assertEquals("", cruise.getOmeTimestamp());
+		cruise.setOmeTimestamp(myOmeFilename);
+		assertEquals(myOmeFilename, cruise.getOmeTimestamp());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setOmeFilename(null);
-		assertEquals("", cruise.getOmeFilename());
+		cruise.setOmeTimestamp(null);
+		assertEquals("", cruise.getOmeTimestamp());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getAddlDocNames()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setAddlDocNames(java.util.TreeSet)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getAddlDocs()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setAddlDocs(java.util.TreeSet)}.
 	 */
 	@Test
 	public void testSetGetAddlDocNames() {
 		TreeSet<String> myMetaNames = new TreeSet<String>(Arrays.asList(
-				"ABCD20050728_metadata.xml", 
-				"ABCD20050728_metadata_2.doc", 
-				"ABCD20050728_metadata_3.pdf"));
+				"ABCD20050728.txt; 2014-02-21 9:23", 
+				"ABCD20050728_2.doc; 2014-02-21 9:24", 
+				"ABCD20050728_3.pdf; 2014-02-21 9:25"));
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getAddlDocNames().size());
-		cruise.setAddlDocNames(myMetaNames);
-		assertEquals(myMetaNames, cruise.getAddlDocNames());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		cruise.setAddlDocs(myMetaNames);
+		assertEquals(myMetaNames, cruise.getAddlDocs());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setAddlDocNames(null);
-		assertEquals(0, cruise.getAddlDocNames().size());
+		cruise.setAddlDocs(null);
+		assertEquals(0, cruise.getAddlDocs().size());
 	}
 
 	/**
@@ -146,8 +146,8 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getQcStatus());
 		cruise.setQcStatus(myQCStatus);
 		assertEquals(myQCStatus, cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -168,8 +168,8 @@ public class DashboardCruiseTest {
 		cruise.setArchiveStatus(myArchiveStatus);
 		assertEquals(myArchiveStatus, cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -191,8 +191,8 @@ public class DashboardCruiseTest {
 		assertEquals(myFilename, cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -215,8 +215,8 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -247,8 +247,8 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -274,8 +274,8 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -302,8 +302,8 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
@@ -331,14 +331,69 @@ public class DashboardCruiseTest {
 		assertEquals("", cruise.getUploadFilename());
 		assertEquals("", cruise.getArchiveStatus());
 		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocNames().size());
-		assertEquals("", cruise.getOmeFilename());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
 		assertEquals("", cruise.getDataCheckStatus());
 		assertEquals("", cruise.getExpocode() );
 		assertEquals("", cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setMissingValues(null);
 		assertEquals(0, cruise.getMissingValues().size());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumErrorMsgs()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumErrorMsgs(int)}.
+	 */
+	@Test
+	public void testSetGetNumErrorMsgsText() {
+		int myNumErrorMsgs = 4;
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals(0, cruise.getNumErrorMsgs());
+		cruise.setNumErrorMsgs(myNumErrorMsgs);
+		assertEquals(myNumErrorMsgs, cruise.getNumErrorMsgs());
+		assertEquals(0, cruise.getMissingValues().size());
+		assertEquals(0, cruise.getDataColUnits().size());
+		assertEquals(0, cruise.getUserColNames().size());
+		assertEquals(0, cruise.getDataColTypes().size());
+		assertEquals(0, cruise.getNumDataRows());
+		assertEquals("", cruise.getUploadFilename());
+		assertEquals("", cruise.getArchiveStatus());
+		assertEquals("", cruise.getQcStatus());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
+		assertFalse( cruise.isSelected() );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumWarnMsgs()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumWarnMsgs(int)}.
+	 */
+	@Test
+	public void testSetGetNumWarnMsgsText() {
+		int myNumWarnMsgs = 14;
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals(0, cruise.getNumWarnMsgs());
+		cruise.setNumWarnMsgs(myNumWarnMsgs);
+		assertEquals(myNumWarnMsgs, cruise.getNumWarnMsgs());
+		assertEquals(0, cruise.getNumErrorMsgs());
+		assertEquals(0, cruise.getMissingValues().size());
+		assertEquals(0, cruise.getDataColUnits().size());
+		assertEquals(0, cruise.getUserColNames().size());
+		assertEquals(0, cruise.getDataColTypes().size());
+		assertEquals(0, cruise.getNumDataRows());
+		assertEquals("", cruise.getUploadFilename());
+		assertEquals("", cruise.getArchiveStatus());
+		assertEquals("", cruise.getQcStatus());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
+		assertFalse( cruise.isSelected() );
 	}
 
 	/**
@@ -350,15 +405,17 @@ public class DashboardCruiseTest {
 		String myOwner = "SocatUser";
 		String myExpocode = "ABCD20050728";
 		String myDataStatus = "Acceptable";
-		String myOmeFilename = "ABCD20050728_OME.xml";
+		String myOmeTimestamp = "2014-02-21 9:22";
 		TreeSet<String> myMetaNames = new TreeSet<String>(Arrays.asList(
-				"ABCD20050728_metadata.xml", 
-				"ABCD20050728_metadata_2.doc", 
-				"ABCD20050728_metadata_3.pdf"));
+				"ABCD20050728.txt; 2014-02-21 9:23", 
+				"ABCD20050728_2.doc; 2014-02-21 9:24", 
+				"ABCD20050728_3.pdf; 2014-02-21 9:25"));
 		String myQCStatus = "Submitted";
 		String myArchiveStatus = "Next SOCAT release";
 		String myFilename = "myUploadFilename.tsv";
 		int myNumDataRows = 2581;
+		int myNumErrorMsgs = 4;
+		int myNumWarnMsgs = 14;
 		ArrayList<DataColumnType> myDataColTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
 					DataColumnType.TIMESTAMP,
@@ -411,17 +468,17 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setOmeFilename(myOmeFilename);
+		firstCruise.setOmeTimestamp(myOmeTimestamp);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setOmeFilename(myOmeFilename);
+		secondCruise.setOmeTimestamp(myOmeTimestamp);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setAddlDocNames(myMetaNames);
+		firstCruise.setAddlDocs(myMetaNames);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setAddlDocNames(myMetaNames);
+		secondCruise.setAddlDocs(myMetaNames);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
@@ -450,6 +507,20 @@ public class DashboardCruiseTest {
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
 		secondCruise.setNumDataRows(myNumDataRows);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setNumErrorMsgs(myNumErrorMsgs);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setNumErrorMsgs(myNumErrorMsgs);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setNumWarnMsgs(myNumWarnMsgs);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setNumWarnMsgs(myNumWarnMsgs);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 

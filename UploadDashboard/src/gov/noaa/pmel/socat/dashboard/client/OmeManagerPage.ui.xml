@@ -4,11 +4,13 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:ScrollPanel addStyleNames="{style.fullwidthcontainer}">
+	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
 		<g:FlowPanel>
-			<g:FlowPanel addStyleNames="{style.userinfopanel}">
-				<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-				<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
+			<g:FlowPanel addStyleNames="{style.titlepanel}">
+				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			<g:FormPanel ui:field="uploadForm">

@@ -63,8 +63,8 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				 qcStatus.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ) { 
 				// Update the QC status for this cruise
 				String dataStatus = cruise.getDataCheckStatus();
-				String omeFilename = cruise.getOmeFilename();
-				if ( ( ! omeFilename.isEmpty() ) && 
+				String omeTimestamp = cruise.getOmeTimestamp();
+				if ( ( ! omeTimestamp.isEmpty() ) && 
 					 ( dataStatus.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) || 
 					   dataStatus.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) )
 					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
@@ -105,12 +105,8 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 		for ( String expocode : ingestExpos ) {
 			DashboardCruiseWithData cruiseData = 
 					cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-			String omeName = cruiseData.getOmeFilename();
-			if ( omeName.isEmpty() )
-				throw new IllegalArgumentException(
-						"No OME metadata for cruise " + expocode);
 			OmeMetadata omeMData = new OmeMetadata(
-					metadataHandler.getMetadataInfo(expocode, omeName));
+					metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
 			dsgNcHandler.saveCruise(omeMData, cruiseData); 
 		}
 

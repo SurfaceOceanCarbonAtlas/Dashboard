@@ -101,7 +101,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double distToLand;
 	// days since Jan 1, 1970 00:00:00
 	Double days1970;
-	// days since Jan 1 of that year; 0.0 - 367.0, 0.0 == Jan 1 00:00
+	// days since Jan 1 of that year; 1.0 == Jan 1 00:00
 	Double dayOfYear;
 	// overall data WOCE flag; 
 	// may be assigned by the SanityChecker for questionable (3) or bad (4) data

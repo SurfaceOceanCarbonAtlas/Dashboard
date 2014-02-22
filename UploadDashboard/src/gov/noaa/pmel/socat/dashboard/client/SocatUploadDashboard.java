@@ -19,21 +19,19 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		/** History tag for DashboardLoginPage */
 		LOGIN,
 		/** History tag for CruiseListPage */
-		CRUISE_LIST,
+		SHOW_DATASETS,
 		/** History tag for CruiseUploadPage */
-		CRUISE_UPLOAD,
+		UPLOAD_DATASETS,
 		/** History tag for DataColumnSpecsPage */
-		REVIEW_DATA,
+		IDENTIFY_COLUMNS,
 		/** History tag for DataMessagesPage */
-		DATA_MESSAGES,
+		SHOW_DATA_MESSAGES,
 		/** History tag for OmeManagerPage */
-		OME_MANAGER,
+		EDIT_METADATA,
 		/** History tag for AddlDocsManagerPage */
-		ADDL_DOCS_MANAGER,
-		/** History tag for AddlDocsUploadPage */
-		ADDL_DOCS_UPLOAD,
+		MANAGE_DOCUMENTS,
 		/** History tag for AddToSocatPage */
-		ADD_TO_SOCAT,
+		SUBMIT_FOR_QC,
 		/** History tag for DashboardLogoutPage */
 		LOGOUT
 	}
@@ -168,31 +166,27 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 			// Login page from history
 			DashboardLoginPage.showPage(false);
 		}
-		else if ( token.equals(PagesEnum.CRUISE_LIST.name()) ) {
+		else if ( token.equals(PagesEnum.SHOW_DATASETS.name()) ) {
 			// Cruise list page from history
 			CruiseListPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.CRUISE_UPLOAD.name()) ) {
+		else if ( token.equals(PagesEnum.UPLOAD_DATASETS.name()) ) {
 			// Cruise upload page from history
 			CruiseUploadPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.REVIEW_DATA.name()) ) {
+		else if ( token.equals(PagesEnum.IDENTIFY_COLUMNS.name()) ) {
 			// Data column specs page from history
 			DataColumnSpecsPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.OME_MANAGER.name()) ) {
+		else if ( token.equals(PagesEnum.EDIT_METADATA.name()) ) {
 			// OME metadata manager page from history
 			OmeManagerPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.ADDL_DOCS_MANAGER.name()) ) {
+		else if ( token.equals(PagesEnum.MANAGE_DOCUMENTS.name()) ) {
 			// Additionl data manager page from history
 			AddlDocsManagerPage.redisplayPage(false);
 		}
-		else if ( token.equals(PagesEnum.ADDL_DOCS_UPLOAD.name()) ) {
-			// Additional data upload page from history
-			AddlDocsUploadPage.redisplayPage(false);
-		}
-		else if ( token.equals(PagesEnum.ADD_TO_SOCAT.name()) ) {
+		else if ( token.equals(PagesEnum.SUBMIT_FOR_QC.name()) ) {
 			// Add to SOCAT page from history
 			AddToSocatPage.redisplayPage(false);
 		}

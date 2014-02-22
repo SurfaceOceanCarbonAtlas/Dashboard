@@ -9,6 +9,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadataList;
 import gov.noaa.pmel.socat.dashboard.shared.MetadataListService;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.TreeSet;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -49,16 +50,19 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
 		DashboardMetadata mdata;
 		// Get the information for the OME metadata document
-		String omeFilename = cruise.getOmeFilename();
-		if ( ! omeFilename.isEmpty() ) {
-			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, omeFilename);
+		String omeTimestamp = cruise.getOmeTimestamp();
+		if ( ! omeTimestamp.isEmpty() ) {
+			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, 
+												 OmeMetadata.OME_FILENAME);
 			if ( mdata != null ) 
 				mdataList.setOmeMetadata(mdata);
 		}
 		// Get the information for additional documents 
-		for ( String mdataName : cruise.getAddlDocNames() ) {
+		for ( String docTitle : cruise.getAddlDocs() ) {
+			// Get the filename from the title string
+			String mdataName = DashboardMetadata.splitAddlDocsTitle(docTitle)[0];
 			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, mdataName);
-			if ( (mdata != null) && (! mdata.getFilename().equals(omeFilename)) ) 
+			if ( mdata != null ) 
 				mdataList.put(mdataName, mdata);
 		}
 		// Return the metadata listing
@@ -89,20 +93,29 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 										  .getCruiseFromInfoFile(cruiseExpocode);
 		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
 
-		// Work directly with the set of filenames in the cruise object
-		String cruiseOmeFilename = cruise.getOmeFilename();
-		TreeSet<String> addlDocNames = cruise.getAddlDocNames(); 
+		// Directly modify the additional documents list in this cruise
+		TreeSet<String> addlDocs = cruise.getAddlDocs();
+		// Create a map of additional document names to titles
+		HashMap<String,String> addlDocsMap = new HashMap<String,String>();
+		for ( String docTitle : addlDocs ) {
+			addlDocsMap.put(DashboardMetadata.splitAddlDocsTitle(docTitle)[0], docTitle);
+		}
 		for ( String mdataName : metadataNames ) {
-			if ( cruiseOmeFilename.equals(mdataName) ) {
-				cruise.setOmeFilename(null);
-				cruiseOmeFilename = "";
-				// Should not be in addlDocNames, but just in case
-				addlDocNames.remove(mdataName);
+			if ( OmeMetadata.OME_FILENAME.equals(mdataName) ) {
+				// No more OME metadata for this cruise
+				cruise.setOmeTimestamp(null);
 			}
-			else if ( ! addlDocNames.remove(mdataName) )
-				throw new IllegalArgumentException("Document " +
-						mdataName + " is not associated with cruise " +
-						cruiseExpocode);
+			else {
+				// Remove this additional document from this cruise
+				String docTitle = addlDocsMap.get(mdataName);
+				if ( (docTitle == null) || ! addlDocs.remove(docTitle) )
+					throw new IllegalArgumentException("Document " +
+							mdataName + " is not associated with cruise " +
+							cruiseExpocode);
+				// Remove it from the names to titles map as well
+				addlDocsMap.remove(mdataName);
+			}
+			// Delete this OME metadata or additional documents file on the server
 			mdataHandler.removeMetadata(username, cruiseExpocode, mdataName);
 		}
 
@@ -128,17 +141,17 @@ public class MetadataListServiceImpl extends RemoteServiceServlet
 		// Create the updated metadata listing for the cruise
 		DashboardMetadataList mdataList = new DashboardMetadataList();
 		mdataList.setUsername(username);
-		DashboardMetadata mdata;
-		if ( ! cruiseOmeFilename.isEmpty() ) {
-			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, cruiseOmeFilename);
+		// Assign the OME file if it is present
+		if ( ! cruise.getOmeTimestamp().isEmpty() ) {
+			DashboardMetadata mdata = mdataHandler.getMetadataInfo(
+					cruiseExpocode, OmeMetadata.OME_FILENAME);
 			mdataList.setOmeMetadata(mdata);
 		}
-		else {
-			mdataList.setOmeMetadata(null);
-		}
-		for ( String mdataName : addlDocNames ) {
-			mdata = mdataHandler.getMetadataInfo(cruiseExpocode, mdataName);
-			if ( (mdata != null) && (! mdataName.equals(cruiseOmeFilename)) )
+		// Add any remaining additional documents
+		for ( String mdataName : addlDocsMap.keySet() ) {
+			DashboardMetadata mdata = mdataHandler.getMetadataInfo(
+					cruiseExpocode, mdataName);
+			if ( mdata != null )
 				mdataList.put(mdataName, mdata);
 		}
 		// Return the updated metadata listing

@@ -423,7 +423,11 @@ public class OmeMetadataTest {
 		final String actualExpocode = "332220120220";
 		final String actualCruiseName = "SH1201";
 		final String actualVesselName = "Bell M. Shimada";
-		final String actualScienceGroup = "Cosca, Catherine E.; Feely, Richard A.; Alin, Simone R.; Lebon, Geoffrey T.";
+		final String actualScienceGroup = 
+				"Cosca, Catherine E." + OmeMetadata.OME_PIS_SEPARATOR + 
+				"Feely, Richard A." + OmeMetadata.OME_PIS_SEPARATOR + 
+				"Alin, Simone R." + OmeMetadata.OME_PIS_SEPARATOR + 
+				"Lebon, Geoffrey T.";
 		final String actualOrigDataRef = "www.pmel.noaa.gov/co2/SH1201.csv";
 
 		Document omeDoc = (new SAXBuilder()).build(

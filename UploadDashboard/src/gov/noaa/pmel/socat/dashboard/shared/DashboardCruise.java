@@ -19,21 +19,23 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7070908682547322034L;
+	private static final long serialVersionUID = 1054195413459242498L;
 
 	boolean selected;
 	String version;
 	String owner;
 	String expocode;
 	String dataCheckStatus;
-	String omeFilename;
-	TreeSet<String> addlDocNames;
+	String omeTimestamp;
+	TreeSet<String> addlDocs;
 	String qcStatus;
 	String archiveStatus;
 	String cdiacDate;
 	String uploadFilename;
 	String uploadTimestamp;
 	int numDataRows;
+	int numErrorMsgs;
+	int numWarnMsgs;
 	ArrayList<String> userColNames;
 	ArrayList<DataColumnType> dataColTypes;
 	ArrayList<String> dataColUnits;
@@ -49,14 +51,16 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		owner = "";
 		expocode = "";
 		dataCheckStatus = "";
-		omeFilename = "";
-		addlDocNames = new TreeSet<String>();
+		omeTimestamp = "";
+		addlDocs = new TreeSet<String>();
 		qcStatus = "";
 		archiveStatus = "";
 		cdiacDate = "";
 		uploadFilename = "";
 		uploadTimestamp = "";
 		numDataRows = 0;
+		numErrorMsgs = 0;
+		numWarnMsgs = 0;
 		dataColTypes = new ArrayList<DataColumnType>();
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
@@ -164,44 +168,44 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the OME metadata filename; never null but may be empty
+	 * 		the OME metadata timestamp; never null but may be empty
 	 */
-	public String getOmeFilename() {
-		return omeFilename;
+	public String getOmeTimestamp() {
+		return omeTimestamp;
 	}
 
 	/**
-	 * @param omeFilename 
-	 * 		the OME metadata filename to set;
+	 * @param omeTimestamp 
+	 * 		the OME metadata timestamp to set;
 	 * 		if null, sets to an empty string
 	 */
-	public void setOmeFilename(String omeFilename) {
-		if ( omeFilename == null )
-			this.omeFilename = "";
+	public void setOmeTimestamp(String omeTimestamp) {
+		if ( omeTimestamp == null )
+			this.omeTimestamp = "";
 		else
-			this.omeFilename = omeFilename;
+			this.omeTimestamp = omeTimestamp;
 	}
 
 	/**
 	 * @return 
-	 * 		the additional document filenames associated with this cruise; 
-	 * 		never null but may be empty.  The actual set of strings
-	 * 		in this object is returned.
+	 * 		the additional document "filename; timestamp" strings 
+	 * 		associated with this cruise; never null but may be empty.  
+	 * 		The actual set of strings in this object is returned.
 	 */
-	public TreeSet<String> getAddlDocNames() {
-		return addlDocNames;
+	public TreeSet<String> getAddlDocs() {
+		return addlDocs;
 	}
 
 	/**
 	 * @param addlDocNames
-	 * 		the set of metadata filenames for this cruise.  The set in 
-	 * 		this object is cleared and all the contents of the given set, 
-	 * 		if not null, are added. 
+	 * 		the set of additional document "filename; timestamp" strings
+	 * 		for this cruise.  The set in this object is cleared and all 
+	 * 		the contents of the given set, if not null, are added. 
 	 */
-	public void setAddlDocNames(TreeSet<String> addlDocNames) {
-		this.addlDocNames.clear();
-		if ( addlDocNames != null )
-			this.addlDocNames.addAll(addlDocNames);
+	public void setAddlDocs(TreeSet<String> addlDocs) {
+		this.addlDocs.clear();
+		if ( addlDocs != null )
+			this.addlDocs.addAll(addlDocs);
 	}
 
 	/**
@@ -320,6 +324,38 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 */
 	public void setNumDataRows(int numDataRows) {
 		this.numDataRows = numDataRows;
+	}
+
+	/**
+	 * @return 
+	 * 		the number of error messages from the sanity checker
+	 */
+	public int getNumErrorMsgs() {
+		return numErrorMsgs;
+	}
+
+	/**
+	 * @param numErrorMsgs 
+	 * 		the number of error messages from the sanity checker to set
+	 */
+	public void setNumErrorMsgs(int numErrorMsgs) {
+		this.numErrorMsgs = numErrorMsgs;
+	}
+
+	/**
+	 * @return 
+	 * 		the number of warning messages from the sanity checker
+	 */
+	public int getNumWarnMsgs() {
+		return numWarnMsgs;
+	}
+
+	/**
+	 * @param numWarnMsgs 
+	 * 		the number of warning messages from the sanity checker to set
+	 */
+	public void setNumWarnMsgs(int numWarnMsgs) {
+		this.numWarnMsgs = numWarnMsgs;
 	}
 
 	/**
@@ -490,14 +526,16 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + owner.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + dataCheckStatus.hashCode();
-		result = result * prime + omeFilename.hashCode();
-		result = result * prime + addlDocNames.hashCode();
+		result = result * prime + omeTimestamp.hashCode();
+		result = result * prime + addlDocs.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
 		result = result * prime + cdiacDate.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + numDataRows;
+		result = result * prime + numErrorMsgs;
+		result = result * prime + numWarnMsgs;
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
 		result = result * prime + dataColUnits.hashCode();
@@ -528,9 +566,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! dataCheckStatus.equals(other.dataCheckStatus) )
 			return false;
-		if ( ! omeFilename.equals(other.omeFilename) )
+		if ( ! omeTimestamp.equals(other.omeTimestamp) )
 			return false;
-		if ( ! addlDocNames.equals(other.addlDocNames) )
+		if ( ! addlDocs.equals(other.addlDocs) )
 			return false;
 		if ( ! qcStatus.equals(other.qcStatus) )
 			return false;
@@ -543,6 +581,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
 			return false;
 		if ( numDataRows != other.numDataRows )
+			return false;
+		if ( numErrorMsgs != other.numErrorMsgs )
+			return false;
+		if ( numWarnMsgs != other.numWarnMsgs )
 			return false;
 		if ( ! userColNames.equals(other.userColNames) )
 			return false;
@@ -567,14 +609,16 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    owner=" + owner + 
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
-				",\n    omeFilename=" + omeFilename + 
-				",\n    addlDocNames=" + addlDocNames.toString() +
+				",\n    omeTimestamp=" + omeTimestamp + 
+				",\n    addlDocs=" + addlDocs.toString() +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
 				",\n    cdiacDate=" + cdiacDate + 
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
+				",\n    numErrorMsgs=" + Integer.toString(numErrorMsgs) +
+				",\n    numWarnMsgs=" + Integer.toString(numWarnMsgs) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +
@@ -662,11 +706,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
-	 * Compare using the OME metadata filename of the cruises.
+	 * Compare using the OME metadata timestamp of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
 	 */
-	public static Comparator<DashboardCruise> omeFilenameComparator = 
+	public static Comparator<DashboardCruise> omeTimestampComparator = 
 			new Comparator<DashboardCruise>() {
 		@Override
 		public int compare(DashboardCruise c1, DashboardCruise c2) {
@@ -676,16 +720,17 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			return c1.getOmeFilename().compareTo(c2.getOmeFilename());
+			return c1.getOmeTimestamp().compareTo(c2.getOmeTimestamp());
 		}
 	};
 
 	/**
-	 * Compare using the additional document filenames of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
+	 * Compare using the additional document "filename; timestamp" 
+	 * strings of the cruises.  Note that this is inconsistent with 
+	 * DashboardCruise.equals in that this is only examining one 
+	 * field of DashboardCruise.
 	 */
-	public static Comparator<DashboardCruise> addlDocNamesComparator = 
+	public static Comparator<DashboardCruise> addlDocsComparator = 
 			new Comparator<DashboardCruise>() {
 		@Override
 		public int compare(DashboardCruise c1, DashboardCruise c2) {
@@ -695,8 +740,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				return -1;
 			if ( c2 == null )
 				return 1;
-			Iterator<String> iter1 = c1.getAddlDocNames().iterator();
-			Iterator<String> iter2 = c2.getAddlDocNames().iterator();
+			Iterator<String> iter1 = c1.getAddlDocs().iterator();
+			Iterator<String> iter2 = c2.getAddlDocs().iterator();
 			while ( iter1.hasNext() && iter2.hasNext() ) {
 				int result = iter1.next().compareTo(iter2.next());
 				if ( result != 0 )
