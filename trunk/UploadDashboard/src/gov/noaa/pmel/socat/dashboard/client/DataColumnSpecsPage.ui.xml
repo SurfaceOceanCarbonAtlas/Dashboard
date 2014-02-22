@@ -5,40 +5,35 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:north size="15">
+	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+		<g:FlowPanel>
 			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
+				<g:FlowPanel addStyleNames="{style.titlepanel}">
+					<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+					<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+					<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+					<g:Label addStyleNames="{style.titlereset}" />
 				</g:FlowPanel>
 				<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			</g:FlowPanel>
-		</g:north>
-		<g:south size="8">
+			<cell:DataGrid addStyleNames="{style.datagrid}" ui:field="dataGrid" />
 			<g:FlowPanel>
-				<g:Label addStyleNames="{style.gridpagerlabel}" ui:field="pagerLabel" />
-				<cell:SimplePager location="CENTER" addStyleNames="{style.gridpager}" ui:field="gridPager" />
+				<g:FlowPanel addStyleNames="{style.datamsgpanel}" >
+					<g:InlineLabel addStyleNames="{style.datapagerlabel}" ui:field="pagerLabel" />
+					<g:InlineLabel addStyleNames="{style.datamsglabel}" ui:field="messagesLabel" />
+					<g:Label addStyleNames="{style.datamsgreset}" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.datamsgpanel}" >
+					<cell:SimplePager location="CENTER" addStyleNames="{style.datapager}" ui:field="gridPager" />
+					<g:Button addStyleNames="{style.datamsgbutton}" ui:field="messagesButton" />
+					<g:Label addStyleNames="{style.datamsgreset}" />
+				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="messagesButton" />
 					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
 					<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
 				</g:FlowPanel>
 			</g:FlowPanel>
-		</g:south>
-		<g:east size="0.5">
-			<!-- just to give some spacing -->
-			<g:Label />
-		</g:east>
-		<g:west size="0.5">
-			<!-- just to give some spacing -->
-			<g:Label />
-		</g:west>
-		<g:center>
-			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid ui:field="dataGrid" />
-			</g:ResizeLayoutPanel>
-		</g:center>
-	</g:DockLayoutPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder> 

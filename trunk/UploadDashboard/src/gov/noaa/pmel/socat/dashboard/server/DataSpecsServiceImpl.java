@@ -36,7 +36,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * @author Karl Smith
  */
 public class DataSpecsServiceImpl extends RemoteServiceServlet
-									implements DataSpecsService {
+												implements DataSpecsService {
 
 	private static final long serialVersionUID = -7106452856622957624L;
 
@@ -55,9 +55,10 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 			throw new IllegalArgumentException(
 					"Invalid authentication credentials");
 
-		// Get the cruise with the first 25 rows of data
+		// Get the cruise with the first maximum-needed number of rows
 		DashboardCruiseWithData cruiseData = dataStore.getCruiseFileHandler()
-									.getCruiseDataFromFiles(expocode, 0, 25);
+				.getCruiseDataFromFiles(expocode, 0, 
+						DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 		if ( cruiseData == null )
 			throw new IllegalArgumentException(
 					"cruise " + expocode + " does not exist");
@@ -146,11 +147,13 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		dataStore.getUserFileHandler()
 				 .updateUserDataColumnTypes(cruiseData, username);
 		
-		// Remove all but the first 25 rows of cruise data 
+		// Remove all but the first maximum-needed number of rows of cruise data 
 		// to minimize the payload of the returned cruise data
 		int numRows = cruiseData.getNumDataRows();
-		if ( numRows > 25 )
-			cruiseData.getDataValues().subList(25, numRows).clear();
+		if ( numRows > DashboardUtils.MAX_ROWS_PER_GRID_PAGE )
+			cruiseData.getDataValues()
+					  .subList(DashboardUtils.MAX_ROWS_PER_GRID_PAGE, numRows)
+					  .clear();
 
 		// Return the updated truncated cruise data for redisplay 
 		// in the DataColumnSpecsPage
@@ -166,6 +169,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 	 * 		cruise to check
 	 * @return
 	 * 		output from the SanityChecker.
+	 * @throws IllegalArgumentException
+	 * 		if a data column type is unknown, or
+	 * 		if the sanity checker throws an exception
 	 */
 	private Output checkCruise(DashboardCruiseWithData cruiseData) 
 											throws IllegalArgumentException {
@@ -196,7 +202,13 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		int k = -1;
 		for ( DataColumnType colType : cruiseData.getDataColTypes() ) {
 			k++;
-			if ( colType == DataColumnType.TIMESTAMP ) {
+			if ( colType == DataColumnType.UNKNOWN ) {
+				// Might happen in multiple file upload
+				throw new IllegalArgumentException(
+						"Data type not defined for column " + Integer.toString(k+1) + 
+						": " + cruiseData.getUserColNames().get(k));
+			}
+			else if ( colType == DataColumnType.TIMESTAMP ) {
 				// Element specifying the index and user name of the column
 				Element userElement = new Element(ColumnSpec.SINGLE_DATE_TIME_ELEMENT);
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
@@ -337,11 +349,55 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				// Add this column description to the root element
 				rootElement.addContent(columnElement);
 			}
+			else if ( (colType == DataColumnType.EXPOCODE) || 
+					  (colType == DataColumnType.CRUISE_NAME) || 
+					  (colType == DataColumnType.XCO2_ATM) || 
+					  (colType == DataColumnType.PCO2_ATM) || 
+					  (colType == DataColumnType.FCO2_ATM) || 
+					  (colType == DataColumnType.SHIP_SPEED) || 
+					  (colType == DataColumnType.SHIP_DIRECTION) || 
+					  (colType == DataColumnType.WIND_SPEED_TRUE) || 
+					  (colType == DataColumnType.WIND_SPEED_RELATIVE) || 
+					  (colType == DataColumnType.WIND_DIRECTION_TRUE) || 
+					  (colType == DataColumnType.WIND_DIRECTION_RELATIVE) || 
+					  (colType == DataColumnType.DELTA_PCO2) || 
+					  (colType == DataColumnType.DELTA_FCO2) || 
+					  (colType == DataColumnType.WOA_SALINITY) || 
+					  (colType == DataColumnType.NCEP_SEA_LEVEL_PRESSURE) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_PCO2_TEQ_PEQU_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_PCO2_SST_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_FCO2_TEQ_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_FCO2_SST_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_PCO2_TEQ_NCEP_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_PCO2_SST_NCEP_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_WOA) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_WOA) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_SAL) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_WOA) || 
+					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_WOA) || 
+					  (colType == DataColumnType.FCO2REC) || 
+					  (colType == DataColumnType.FCO2REC_SOURCE) || 
+					  (colType == DataColumnType.DELTA_TEMPERATURE) || 
+					  (colType == DataColumnType.REGION_ID) || 
+					  (colType == DataColumnType.SECONDS_1970) || 
+					  (colType == DataColumnType.DAYS_1970) || 
+					  (colType == DataColumnType.DAY_OF_YEAR) || 
+					  (colType == DataColumnType.CALC_SHIP_SPEED) || 
+					  (colType == DataColumnType.ETOPO2) || 
+					  (colType == DataColumnType.GVCO2) || 
+					  (colType == DataColumnType.DISTANCE_TO_LAND) || 
+					  (colType == DataColumnType.FCO2REC_WOCE_FLAG) ) {
+				// Unchecked column types at this time - just ignore their presence
+				;
+			}
 			else {
-				// DataColumnType.UNKNOWN should not be present
-				throw new IllegalArgumentException("Unexpected data column of type " + 
-						DashboardUtils.STD_HEADER_NAMES.get(colType) + "\n" + 
-						" for column " + Integer.toString(k+1) + ": " + 
+				// Should never happen
+				throw new IllegalArgumentException(
+						"Unexpected data column of type " +	colType + "\n" +
+						"    for column " + Integer.toString(k+1) + ": " + 
 						cruiseData.getUserColNames().get(k));
 			}
 		}
@@ -380,13 +436,21 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
 		if ( ! output.processedOK() ) {
+			cruiseData.setNumErrorMsgs(0);
+			cruiseData.setNumWarnMsgs(0);
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 		else if ( output.hasErrors() ) {
 			int numErrors = 0;
-			for ( Message msg : output.getMessages().getMessages() )
+			int numWarns = 0;
+			for ( Message msg : output.getMessages().getMessages() ) {
 				if ( msg.isError() )
 					numErrors++;
+				else if ( msg.isWarning() )
+					numWarns++;
+			}
+			cruiseData.setNumErrorMsgs(numErrors);
+			cruiseData.setNumWarnMsgs(numWarns);
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
 					Integer.toString(numErrors) + " errors");
 		}
@@ -395,10 +459,14 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 			for ( Message msg : output.getMessages().getMessages() )
 				if ( msg.isWarning() )
 					numWarns++;
+			cruiseData.setNumErrorMsgs(0);
+			cruiseData.setNumWarnMsgs(numWarns);
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
 					Integer.toString(numWarns) + " warnings");
 		}
 		else {
+			cruiseData.setNumErrorMsgs(0);
+			cruiseData.setNumWarnMsgs(0);
 			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 		}
 
@@ -470,9 +538,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		}
 		else {
 			// Should never happen
-			throw new IllegalArgumentException("Unexpected " +
-					"message that is neither an error nor a warning:" +
-					"\n    " + msg.toString());
+			throw new IllegalArgumentException(
+					"Unexpected message that is neither an error nor a warning:\n" +
+					"    " + msg.toString());
 		}
 	}
 

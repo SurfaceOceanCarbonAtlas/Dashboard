@@ -34,37 +34,34 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class OmeManagerPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String TITLE_TEXT = "Edit Metadata";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String UPLOAD_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
-			"<b>Manage OME Metadata</b>" +
-			"<br /><br />" +
-			"At this time we can only upload OME metadata files generated " +
+			"At this time we can only upload metadata files generated " +
 			"from the CDIAC OME site.  Please: " +
 			"<ul>" +
 			"<li>in a new browser tab or window, go to the CDIAC OME site <br />" +
-			"<a href=\"http://mercury-ops2.ornl.gov/OceanOME/newForm.htm\">" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://mercury-ops2.ornl.gov/OceanOME/newForm.htm\">" +
 			"http://mercury-ops2.ornl.gov/OceanOME/newForm.htm</a></li>" +
 			"<li>fill in the appropriate metadata</li>" +
 			"<li><em>Save Locally</em> (the button above the CAPTCHA)</li>" +
 			"</ul>" +
-			"This will generate an OME metadata file on your system that " +
+			"This will generate an metadata file on your system that " +
 			"can be uploaded here. " +
 			"<br /><br />" +
-			"Upload OME metadata for the cruise: <b>";
-	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</b>";
+			"Dataset: <ul><li>";
+	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul>";
 
 	private static final String NO_FILE_ERROR_MSG = 
-			"Please select an OME metadata file to upload";
+			"Please select an metadata file to upload";
 
-	private static final String OVERWRITE_WARNING_MSG_PROLOGUE = 
-			"The following documents for the cruise will be " +
-			"removed or overwritten: <ul>";
-	private static final String OVERWRITE_WARNING_MSG_EPILOGUE =
-			"</ul> Do you wish to proceed?";
+	private static final String OVERWRITE_WARNING_MSG = 
+			"The metadata for this dataset will be " +
+			"overwritten.  Do you wish to proceed?";
 	private static final String OVERWRITE_YES_TEXT = "Yes";
 	private static final String OVERWRITE_NO_TEXT = "No";
 
@@ -74,6 +71,7 @@ public class OmeManagerPage extends Composite {
 	private static OmeManagerPageUiBinder uiBinder = 
 			GWT.create(OmeManagerPageUiBinder.class);
 
+	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
@@ -104,6 +102,7 @@ public class OmeManagerPage extends Composite {
 		askOverwritePopup = null;
 		okayToOverwrite = false;
 
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
@@ -126,7 +125,7 @@ public class OmeManagerPage extends Composite {
 			singleton = new OmeManagerPage();
 		singleton.updateCruise(cruise);
 		SocatUploadDashboard.updateCurrentPage(singleton);
-		History.newItem(PagesEnum.OME_MANAGER.name(), false);
+		History.newItem(PagesEnum.EDIT_METADATA.name(), false);
 	}
 
 	/**
@@ -146,7 +145,7 @@ public class OmeManagerPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.OME_MANAGER.name(), false);
+				History.newItem(PagesEnum.EDIT_METADATA.name(), false);
 		}
 	}
 
@@ -230,26 +229,9 @@ public class OmeManagerPage extends Composite {
 			return;
 		}
 
-		// Check for any overwrite that will happen
-		String message = OVERWRITE_WARNING_MSG_PROLOGUE;
-		boolean willOverwrite = false;
-		if ( ! cruise.getOmeFilename().isEmpty() ) {
-			message += "<li>" + SafeHtmlUtils.htmlEscape(cruise.getOmeFilename()) + 
-					"<br />&nbsp;&nbsp;&nbsp;&nbsp;<em>OME metadata for cruise " + 
-					SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</em></li>";
-			willOverwrite = true;
-		}
-		if ( cruise.getAddlDocNames().contains(uploadFilename) ) {
-			message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
-					"<br />&nbsp;&nbsp;&nbsp;&nbsp;<em>addl document for cruise " + 
-					SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</em></li>";
-			willOverwrite = true;
-		}
-
 		// If an overwrite will occur, cancel this submit and ask for confirmation
-		if ( willOverwrite ) {
+		if ( ! cruise.getOmeTimestamp().isEmpty() ) {
 			event.cancel();
-			message += OVERWRITE_WARNING_MSG_EPILOGUE;
 			if ( askOverwritePopup == null ) {
 				askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT, 
 						OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
@@ -276,7 +258,7 @@ public class OmeManagerPage extends Composite {
 					}
 				});
 			}
-			askOverwritePopup.askQuestion(message);
+			askOverwritePopup.askQuestion(OVERWRITE_WARNING_MSG);
 			return;
 		}
 
@@ -297,7 +279,7 @@ public class OmeManagerPage extends Composite {
 		String resultMsg = event.getResults();
 		if ( resultMsg == null ) {
 			SocatUploadDashboard.showMessage(
-					"Unexpected null result from submit complete");
+					"Unexpected null result from metadata upload");
 			return;
 		}
 

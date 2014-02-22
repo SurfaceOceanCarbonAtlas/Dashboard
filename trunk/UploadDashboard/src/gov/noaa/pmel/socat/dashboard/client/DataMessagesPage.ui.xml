@@ -5,34 +5,24 @@
 
 	<ui:style src="FullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
-		<g:east size="0.5">
-			<!-- Just to give uniform padding -->
-			<g:Label />
-		</g:east>
-		<g:west size="0.5">
-			<!-- Just to give uniform padding -->
-			<g:Label />
-		</g:west>
-		<g:north size="12">
-			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="{style.userinfopanel}">
-					<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-					<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
-				</g:FlowPanel>
-				<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.titlepanel}">
+				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
-		</g:north>
-		<g:south size="4">
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<cell:DataGrid addStyleNames="{style.datagrid}" ui:field="messagesGrid" />
+			<g:FlowPanel addStyleNames="{style.datamsgpanel}" >
+				<cell:SimplePager location="CENTER" addStyleNames="{style.datapager}" ui:field="messagesPager" />
+				<g:Label addStyleNames="{style.datamsgreset}" />
+			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton" />
 			</g:FlowPanel>
-		</g:south>
-		<g:center>
-			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid ui:field="messagesGrid" />
-			</g:ResizeLayoutPanel>
-		</g:center>
-	</g:DockLayoutPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
 
 </ui:UiBinder>

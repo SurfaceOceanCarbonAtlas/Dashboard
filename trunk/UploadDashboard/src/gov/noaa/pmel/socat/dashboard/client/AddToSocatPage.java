@@ -40,16 +40,13 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AddToSocatPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String TITLE_TEXT = "Submit Datasets for QC / Manage Archival";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String MORE_INFO_TEXT = "more ...";
 
 	private static final String INTRO_HTML_PROLOGUE =
-			"<b>Submit Cruises to the QC System / Manage Archival</b>" +
-			"<br /><br />" +
-			"Add the following cruises to the SOCAT collection for policy (QC) " +
-			"assessment, or modify the archival of already-submitted cruises." +
-			"<ul>";
+			"Datasets: <ul>";
 	private static final String INTRO_HTML_EPILOGUE = 
 			"</ul>";
 
@@ -63,24 +60,23 @@ public class AddToSocatPage extends Composite {
 			")</em>";
 
 	private static final String ARCHIVE_PLAN_INTRO = 
-			"Archival plan for the uploaded data and metadata of these cruises: ";
+			"Archival plan for the uploaded files for these datasets: ";
 	private static final String SOCAT_ARCHIVE_TEXT = 
 			"archive at CDIAC at the time of the next SOCAT public release";
 	private static final String SOCAT_ARCHIVE_INFO_HTML = 
-			"By selecting this option I am giving permission for my uploaded cruise " +
-			"files and metadata for these cruises to be archived at CDIAC.  This will " +
-			"occur, for cruises deemed acceptable, at the time of the next SOCAT public " +
+			"By selecting this option I am giving permission for my uploaded files " +
+			"for these datasets to be archived at CDIAC.  This will occur, for " +
+			"datasets deemed acceptable, at the time of the next SOCAT public " +
 			"release, after which the files will be made accessible to the public " +
 			"through the CDIAC Web site.";
 
 	private static final String CDIAC_ARCHIVE_TEXT = 
 			"archive at CDIAC as soon as possible";
 	private static final String CDIAC_ARCHIVE_INFO_HTML =
-			"By selecting this option I am requesting that my uploaded cruise files " +
-			"and metadata for these cruise be archived at CDIAC as soon as possible.  " +
-			"When CDIAC provides a DOI, or other reference, for these archived files, " +
-			"I will insure these references are in the metadata supplied to SOCAT for " +
-			"the cruises.";
+			"By selecting this option I am requesting that my uploaded files for " +
+			"these datasets be archived at CDIAC as soon as possible.  When CDIAC " +
+			"provides a DOI, or other reference, for these archived files, please " +
+			"verify these references are in the metadata in SOCAT for these datasets.";
 
 	private static final String OWNER_ARCHIVE_TEXT =
 			"do not archive at CDIAC; I will manage archival myself";
@@ -88,46 +84,44 @@ public class AddToSocatPage extends Composite {
 			"<em>(and I understand it is my responsibility to include DOIs " +
 			"in SOCAT metadata)</em>";
 	private static final String OWNER_ARCHIVE_INFO_HTML = 
-			"By selecting this option I am agreeing to archive the uploaded cruise " +
-			"files and metadata for these cruises at a data center of my choice before " +
-			"the SOCAT public release containing these cruises.  If I am provided a " +
-			"DOI or other reference for these archived files, I will include these " +
-			"references in the metadata supplied to SOCAT for the cruises.";
+			"By selecting this option I am agreeing to archive the uploaded files " +
+			"for these datasets at a data center of my choice before the SOCAT public " +
+			"release containing these datasets.  If I am provided a DOI or other " +
+			"reference for these archived files, I will include these references " +
+			"in the metadata supplied to SOCAT for these datasets.";
 
 	private static final String ALREADY_SENT_CDIAC_HTML =
-			"<b>WARNING</b>" +
-			"<br /><br />" +
-			"Some or all of these cruises were earlier sent to CDIAC for archival. " +
-			"Normally you do not want to change the archival option for these cruises. " +
-			"<br /><br />" +
-			"If you are managing the archival of a mix of cruises that have and have " +
+			"<h2>WARNING</h2>" +
+			"<p>The files for some or all of these dataset were earlier sent to CDIAC " +
+			"for archival.  Normally you do not want to change the archival option " +
+			"for these datasets. </p>" +
+			"<p>If you are managing the archival of a mix of datasets that have and have " +
 			"not been sent to CDIAC, we strongly recommend you cancel this action and " +
-			"manage only those cruises that have not been sent to CDIAC.";
+			"manage only those datasets that have not been sent to CDIAC.</p>";
 
 	private static final String RESEND_CDIAC_QUESTION = 
-			"Some or all of these cruises were earlier sent to CDIAC for archival.  " +
-			"Do you want to send these cruises <em>again<em>?" +
-			"<br /><br />" +
-			"<em>If you send these cruises again, you should contact CDIAC to " +
-			"explain the reason for this repeated request for archival.</em>";
+			"<p>Some or all of these datasets were earlier sent to CDIAC for archival.  " +
+			"Do you want to send the files for these datasets <b>again<b>?</p>" +
+			"<p><em>If you send the files for these datasets again, you should contact " +
+			"CDIAC to explain the reason for this repeated request for archival.</em></p>";
 	private static final String YES_RESEND_TEXT = "Yes, send";
 	private static final String NO_CANCEL_TEXT = "No, cancel";
 
 	private static final String AGREE_SHARE_TEXT = 
-			"I give permission for these cruises to be shared for policy (QC) assessment.";
+			"I give permission for these datasets to be shared for QC assessment.";
 	private static final String AGREE_SHARE_INFO_HTML =
-			"By checking this box I am giving permission for my uploaded cruise files " +
-			"to be shared for purposes of policy (QC) assessment.  I understand that " +
-			"data so-released will be used only for that narrow purpose and will not " +
-			"be further distributed until the next official publication of SOCAT, if " +
-			"the cruise was deemed acceptable. ";
+			"By checking this box I am giving permission for my uploaded files for " +
+			"these datasets to be shared for purposes of assessing data quality.  " +
+			"I understand that data so-released will be used only for that narrow " +
+			"purpose and will not be further distributed except as indicated in the " +
+			"above selected archival option.";
 
 	private static final String AGREE_SHARE_REQUIRED_MSG =
-			"You must give permission to shared the cruise data for policy " +
-			"(QC) assessment before the cruises can be added to the QC system.";
+			"You must give permission to share the datasets for QC " +
+			"assessment before the cruises can be submitted for QC.";
 
 	private static final String SUBMIT_FAILURE_MSG = 
-			"Unexpected failure with submitting cruises to SOCAT: ";
+			"Unexpected failure with submitting datasets for QC: ";
 
 	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Cancel";
@@ -141,6 +135,7 @@ public class AddToSocatPage extends Composite {
 	private static AddToSocatServiceAsync service = 
 			GWT.create(AddToSocatService.class);
 
+	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
@@ -181,6 +176,7 @@ public class AddToSocatPage extends Composite {
 		expocodes = new HashSet<String>();
 		hasSentCruise = false;
 
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
 		archivePlanLabel.setText(ARCHIVE_PLAN_INTRO);
@@ -215,7 +211,7 @@ public class AddToSocatPage extends Composite {
 			singleton = new AddToSocatPage();
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		singleton.updateCruises(cruises);
-		History.newItem(PagesEnum.ADD_TO_SOCAT.name(), false);
+		History.newItem(PagesEnum.SUBMIT_FOR_QC.name(), false);
 	}
 
 	/**
@@ -235,7 +231,7 @@ public class AddToSocatPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )	
-				History.newItem(PagesEnum.ADD_TO_SOCAT.name(), false);
+				History.newItem(PagesEnum.SUBMIT_FOR_QC.name(), false);
 		}
 	}
 

@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -297,12 +298,12 @@ public class CruiseUploadService extends HttpServlet {
 			}
 		}
 
-		// Check if an auto-generated OME metadata file already exists for this cruise
-		String omeName = OmeMetadata.generatedOmeName(expocode);
-		File omeMetadataFile = dataStore.getMetadataFileHandler()
-										.getMetadataFile(expocode, omeName);
-		if ( omeMetadataFile.exists() )
-			cruiseData.setOmeFilename(omeName);
+		// Check if an OME metadata file already exists for this cruise
+		DashboardMetadata mdata = dataStore.getMetadataFileHandler()
+				.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME);
+		if ( mdata != null ) {
+			cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());
+		}
 
 		// Save the cruise file and commit it to version control
 		String message;

@@ -108,7 +108,6 @@ public class AddlDocsManagerPage extends Composite {
 	private String username;
 	private ListDataProvider<DashboardMetadata> listProvider;
 	private String expocode;
-	private String omeFilename;
 	private DashboardAskPopup askDeletePopup;
 
 	// The singleton instance of this page
@@ -127,7 +126,6 @@ public class AddlDocsManagerPage extends Composite {
 		buildMetadataListTable();
 		username = "";
 		expocode = "";
-		omeFilename = "";
 		askDeletePopup = null;
 
 		logoutButton.setText(LOGOUT_TEXT);
@@ -161,7 +159,7 @@ public class AddlDocsManagerPage extends Composite {
 						singleton = new AddlDocsManagerPage();
 					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.updateAddlDocs(cruiseExpocode, addnDocs);
-					History.newItem(PagesEnum.ADDL_DOCS_MANAGER.name(), false);
+					History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 				}
 				else {
 					SocatUploadDashboard.showMessage(ADDL_DOCS_LIST_FAIL_MSG + 
@@ -192,7 +190,7 @@ public class AddlDocsManagerPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.ADDL_DOCS_MANAGER.name(), false);
+				History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 		}
 	}
 
@@ -223,11 +221,7 @@ public class AddlDocsManagerPage extends Composite {
 		// Update the metadata shown by resetting the data in the data provider
 		List<DashboardMetadata> addlDocsList = listProvider.getList();
 		addlDocsList.clear();
-		omeFilename = "";
 		if ( addlDocs != null ) {
-			// Update the OME metadata filename
-			if ( addlDocs.getOmeMetadata() != null )
-				omeFilename = addlDocs.getOmeMetadata().getFilename();
 			// Update the additional documents
 			addlDocsList.addAll(addlDocs.values());
 		}
@@ -249,13 +243,6 @@ public class AddlDocsManagerPage extends Composite {
 
 	@UiHandler("uploadButton")
 	void uploadOnClick(ClickEvent event) {
-		// Get all the metdata filenames for this cruise
-		TreeSet<String> docNames = new TreeSet<String>();
-		for ( DashboardMetadata addlDoc : listProvider.getList() ) {
-			docNames.add(addlDoc.getFilename());
-		}
-		// Show the additional documents upload page for this cruise
-		AddlDocsUploadPage.showPage(expocode, omeFilename, docNames);
 	}
 
 	@UiHandler("deleteButton")

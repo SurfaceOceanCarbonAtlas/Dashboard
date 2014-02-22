@@ -1,43 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
-	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" 
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
+			 xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
 
 	<ui:style src="FullWidth.css" />
 
-	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullwidthcontainer}">
+	<g:DockLayoutPanel unit="EM" addStyleNames="{style.fullpagecontainer}">
+		<g:north size="4">
+			<g:FlowPanel addStyleNames="{style.titlepanel}">
+				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+				<g:Label addStyleNames="{style.titlereset}" />
+			</g:FlowPanel>
+		</g:north>
 		<g:east size="0.5">
-			<!-- Just to give uniform padding -->
+			<!-- Just to give some padding -->
 			<g:Label />
 		</g:east>
 		<g:south size="0.5">
-			<!-- Just to give uniform padding -->
+			<!-- Just to give some padding -->
 			<g:Label />
 		</g:south>
-		<g:north size="4">
-			<g:FlowPanel addStyleNames="{style.userinfopanel}">
-				<g:InlineLabel addStyleNames="{style.userinfolabel}" ui:field="userInfoLabel" />
-				<g:Button addStyleNames="{style.userlogoutbutton}" ui:field="logoutButton" />
-			</g:FlowPanel>
-		</g:north>
 		<g:west size="9">
 			<g:ScrollPanel addStyleNames="{style.submitscrollpanel}">
-				<g:VerticalPanel addStyleNames="{style.submitpanel}">
-					<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
+				<g:FlowPanel addStyleNames="{style.submitpanel}">
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="uploadButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="viewDataButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="omeMetadataButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="addlDocsButton" />
-					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="qcSubmitButton" />
+					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="reviewButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="deleteButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="addToListButton" />
 					<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="removeFromListButton" />
-				</g:VerticalPanel>
+				</g:FlowPanel>
 			</g:ScrollPanel>
 		</g:west>
 		<g:center>
 			<g:ResizeLayoutPanel addStyleNames="{style.gridresizepanel}">
-				<cell:DataGrid ui:field="uploadsGrid" />
+				<cell:DataGrid ui:field="datasetsGrid" />
 			</g:ResizeLayoutPanel>
 		</g:center>
 	</g:DockLayoutPanel>

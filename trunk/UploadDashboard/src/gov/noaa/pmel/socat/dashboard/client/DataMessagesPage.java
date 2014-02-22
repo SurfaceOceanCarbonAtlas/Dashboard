@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessagesService;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessagesServiceAsync;
@@ -23,6 +24,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -39,13 +41,16 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class DataMessagesPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String TITLE_TEXT = "Data-Problem Messages";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String INTRO_HTML = 
-			"<b>Automatically-Detected Data Problems</b>" +
-			"<br /><br />" +
-			"Problems automatically detected in the cruise";
-	private static final String DISMISS_BUTTON_TEXT = "Return to Cruise Data";
+
+	private static final String INTRO_HTML_PROLOGUE = 
+			"Dataset: <ul><li>";
+	private static final String INTRO_HTML_EPILOGUE = 
+			"</li></ul>";
+
+	private static final String DISMISS_BUTTON_TEXT = "Back";
 
 	private static final String SEVERITY_COLUMN_NAME = "Severity";
 	private static final String ROW_NUMBER_COLUMN_NAME = "Row";
@@ -71,11 +76,13 @@ public class DataMessagesPage extends Composite {
 	private static SCMessagesServiceAsync service = 
 			GWT.create(SCMessagesService.class);
 
+	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField DataGrid<SCMessage> messagesGrid;
 	@UiField Button dismissButton;
+	@UiField SimplePager messagesPager;
 	
 	private String username;
 	private ListDataProvider<SCMessage> listProvider;
@@ -94,9 +101,13 @@ public class DataMessagesPage extends Composite {
 		singleton = this;
 
 		username = "";
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 		buildMessageListTable();
 		dismissButton.setText(DISMISS_BUTTON_TEXT);
+
+		// Assign the pager controlling which rows of the the messages grid are shown
+		messagesPager.setDisplay(messagesGrid);
 	}
 
 	/**
@@ -114,20 +125,20 @@ public class DataMessagesPage extends Composite {
 					 msgList.getUsername().isEmpty() || 
 					 ! msgList.getUsername().equals(
 							 DashboardLoginPage.getUsername()) ) {
-					SocatUploadDashboard.showMessage("Unexpected sanity " +
-							"checker data problems list was returned");
+					SocatUploadDashboard.showMessage(
+							"Unexpected data-problems list was returned");
 					return;
 				}
 				if ( singleton == null )
 					singleton = new DataMessagesPage();
 				SocatUploadDashboard.updateCurrentPage(singleton);
 				singleton.updateMessages(msgList);
-				History.newItem(PagesEnum.DATA_MESSAGES.name(), false);
+				History.newItem(PagesEnum.SHOW_DATA_MESSAGES.name(), false);
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage("Unexpected failure " +
-						"obtaining the sanity checker data problems", ex);
+				SocatUploadDashboard.showFailureMessage(
+						"Unexpected failure obtaining the data-problems list", ex);
 			}
 		});
 
@@ -150,7 +161,7 @@ public class DataMessagesPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )	
-				History.newItem(PagesEnum.DATA_MESSAGES.name(), false);
+				History.newItem(PagesEnum.SHOW_DATA_MESSAGES.name(), false);
 		}
 	}
 
@@ -175,10 +186,9 @@ public class DataMessagesPage extends Composite {
 		// Assign the username and introduction message
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
-		introHtml.setHTML(INTRO_HTML + 
-				"<ul><li>" + 
+		introHtml.setHTML(INTRO_HTML_PROLOGUE + 
 				SafeHtmlUtils.htmlEscape(msgs.getExpocode()) + 
-				"</li></ul>");
+				INTRO_HTML_EPILOGUE);
 		// Update the table by resetting the data in the data provider
 		List<SCMessage> msgList = listProvider.getList();
 		msgList.clear();
@@ -186,6 +196,9 @@ public class DataMessagesPage extends Composite {
 		messagesGrid.setRowCount(msgList.size(), true);
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(messagesGrid, messagesGrid.getColumnSortList());
+		// Set the number of data rows to display in the grid.
+		// This will refresh the view.
+		messagesGrid.setPageSize(DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 	}
 
 	/**
@@ -360,7 +373,7 @@ public class DataMessagesPage extends Composite {
 			@Override
 			public String getValue(SCMessage msg) {
 				if ( (msg == null) || (msg.getColNumber() <= 0) )
-					return "";
+					return " --- ";
 				return INT_NUMBER_FORMAT.format(msg.getColNumber());
 			}
 		};
@@ -370,8 +383,8 @@ public class DataMessagesPage extends Composite {
 		return new TextColumn<SCMessage>() {
 			@Override
 			public String getValue(SCMessage msg) {
-				if ( msg == null )
-					return "";
+				if ( (msg == null) || msg.getColName().isEmpty() )
+					return " --- ";
 				return msg.getColName();
 			}
 		};

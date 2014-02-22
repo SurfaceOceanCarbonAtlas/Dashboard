@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
@@ -41,39 +42,26 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class AddlDocsUploadPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String TITLE_TEXT = "Manage Ancillary Documents";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String UPLOAD_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
 
-	private static final String MULTI_CRUISE_HTML_INTRO_PROLOGUE = 
-			"<b>Upload an Additional Document</b>" +
-			"<br /><br />" +
-			"Because multiple cruises were selected, you can only upload " +
-			"additional documents.  The uploaded document will be duplicated " +
-			"to uniquely associate a copy to each cruise selected, either " +
-			"as a new document or replacing an existing document. " +
-			"<br /><br />" +
-			"Upload additional documents for the cruises: <b>";
-	private static final String SINGLE_CRUISE_HTML_INTRO_PROLOGUE = 
-			"<b>Upload an Additional Document</b>" +
-			"<br /><br />" +
-			"Upload an additional document for the cruise: <b>";
-	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</b>";
-
+	private static final String INTRO_HTML_PROLOGUE = 
+			"Current ancillary documents for datasets:<ul>";
+	private static final String INTRO_HTML_EPILOGUE =
+			"</ul>";
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a document to upload";
 
-	private static final String NO_OVERWRITE_ERROR_PROLOGUE =
-			"This file will overwrite the OME metadata file " +
-			"for the following cruises: <ul>";
-	private static final String NO_OVERWRITE_ERROR_EPILOGUE = 
-			"</ul> This is not permitted.  Use the '" + 
-			CruiseListPage.OME_METADATA_TEXT + 
-			"' button to modify the OME metadata for a cruise.";
+	private static final String NO_OME_OVERWRITE_ERROR_MSG =
+			"Documents with the name " + DashboardMetadata.OME_FILENAME + 
+			" cannot to uploaded as ancillary documents.  Please upload " +
+			"the file under a different name.";
 
 	private static final String OVERWRITE_WARNING_MSG_PROLOGUE = 
-			"The documents for the following cruises will be " +
+			"The documents for the following datasets will be " +
 			"overwritten: <ul>";
 	private static final String OVERWRITE_WARNING_MSG_EPILOGUE =
 			"</ul> Do you wish to proceed?";
@@ -86,6 +74,7 @@ public class AddlDocsUploadPage extends Composite {
 	private static AddlDocsUploadPageUiBinder uiBinder = 
 			GWT.create(AddlDocsUploadPageUiBinder.class);
 
+	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
@@ -117,6 +106,7 @@ public class AddlDocsUploadPage extends Composite {
 		expocodes = new TreeSet<String>();
 		askOverwritePopup = null;
 
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
@@ -129,8 +119,7 @@ public class AddlDocsUploadPage extends Composite {
 
 	/**
 	 * Display the additional documents upload page in the RootLayoutPanel
-	 * for a set of given cruises.
-	 * Adds this page to the page history.
+	 * for a set of given cruises.  Adds this page to the page history.
 	 * 
 	 * @param cruises
 	 * 		add/replace the additional documents in these cruises 
@@ -140,33 +129,7 @@ public class AddlDocsUploadPage extends Composite {
 			singleton = new AddlDocsUploadPage();
 		singleton.updateCruises(cruises);
 		SocatUploadDashboard.updateCurrentPage(singleton);
-		History.newItem(PagesEnum.ADDL_DOCS_UPLOAD.name(), false);
-	}
-
-	/**
-	 * Display the additional documents upload page in the RootLayoutPanel
-	 * for the given cruise.  Adds this page to the page history.
-	 * 
-	 * @param cruiseExpocode
-	 * 		add/replace the additional documents for this cruise
-	 * @param omeFilename
-	 * 		OME metadata filename for the cruise
-	 * @param addlDocNames
-	 * 		set of additional document filenames currently
-	 * 		associated with this cruise
-	 */
-	static void showPage(String cruiseExpocode, String omeFilename,
-							TreeSet<String> addlDocNames) {
-		// Create a DashboardCruise using the above information
-		DashboardCruise cruise = new DashboardCruise();
-		cruise.setExpocode(cruiseExpocode);
-		cruise.setOmeFilename(omeFilename);
-		cruise.setAddlDocNames(addlDocNames);
-		// Create a set containing just this cruise
-		HashSet<DashboardCruise> cruiseSet = new HashSet<DashboardCruise>();
-		cruiseSet.add(cruise);
-		// Show the page using this cruise set
-		showPage(cruiseSet);
+		History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 	}
 
 	/**
@@ -186,7 +149,7 @@ public class AddlDocsUploadPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.ADDL_DOCS_UPLOAD.name(), false);
+				History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 		}
 	}
 
@@ -212,19 +175,10 @@ public class AddlDocsUploadPage extends Composite {
 
 		// Update the HTML intro naming the cruises
 		StringBuilder sb = new StringBuilder();
-		if ( expocodes.size() > 1 )
-			sb.append(MULTI_CRUISE_HTML_INTRO_PROLOGUE);
-		else
-			sb.append(SINGLE_CRUISE_HTML_INTRO_PROLOGUE);
-		boolean first = true;
-		for ( String expo : expocodes ) {
-			if ( first )
-				first = false;
-			else
-				sb.append(",  ");
-			sb.append(SafeHtmlUtils.htmlEscape(expo));
-		}
-		sb.append(CRUISE_HTML_INTRO_EPILOGUE);
+		sb.append(INTRO_HTML_PROLOGUE);
+		for ( String expo : expocodes )
+			sb.append("<li>" + SafeHtmlUtils.htmlEscape(expo) + "</li>");
+		sb.append(INTRO_HTML_EPILOGUE);
 		introHtml.setHTML(sb.toString());
 
 		// Clear the hidden tokens just to be safe
@@ -288,25 +242,8 @@ public class AddlDocsUploadPage extends Composite {
 			return;
 		}
 
-		// If this is a resubmit with overwriting, let the submit go through
-		// (event is not cancelled)
-		if ( okayToOverwrite ) {
-			okayToOverwrite = false;
-			return;
-		}
-
 		// Disallow any overwrite of an OME file
-		String message = NO_OVERWRITE_ERROR_PROLOGUE;
-		boolean willOverwrite = false;
-		for ( DashboardCruise cruz : cruises ) {
-			if ( cruz.getOmeFilename().equals(uploadFilename) ) {
-				message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
-						"<br />&nbsp;&nbsp;&nbsp;&nbsp;<em>OME metadata for cruise " + 
-						SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
-				willOverwrite = true;
-			}
-		}
-		if ( willOverwrite ) {
+		if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ) {
 			event.cancel();
 			usernameToken.setValue("");
 			passhashToken.setValue("");
@@ -314,20 +251,29 @@ public class AddlDocsUploadPage extends Composite {
 			expocodesToken.setValue("");
 			omeToken.setValue("");
 			okayToOverwrite = false;
-			message += NO_OVERWRITE_ERROR_EPILOGUE;
-			SocatUploadDashboard.showMessage(message);
+			SocatUploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
+			return;
+		}
+
+		// If this is a resubmit with overwriting, let the submit go through
+		// (event is not cancelled)
+		if ( okayToOverwrite ) {
+			okayToOverwrite = false;
 			return;
 		}
 
 		// Check for any overwrites that will happen
-		message = OVERWRITE_WARNING_MSG_PROLOGUE;
-		willOverwrite = false;
+		String message = OVERWRITE_WARNING_MSG_PROLOGUE;
+		boolean willOverwrite = false;
 		for ( DashboardCruise cruz : cruises ) {
-			if ( cruz.getAddlDocNames().contains(uploadFilename) ) {
-				message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
-						"<br />&nbsp;&nbsp;&nbsp;&nbsp;<em>addl document for cruise " + 
-						SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
-				willOverwrite = true;
+			for ( String addlDocTitle : cruz.getAddlDocs() ) {
+				String docName = DashboardMetadata.splitAddlDocsTitle(addlDocTitle)[0];
+				if ( uploadFilename.equals(docName) ) {
+					message += "<li>" + SafeHtmlUtils.htmlEscape(uploadFilename) + 
+							"<br />&nbsp;&nbsp;&nbsp;&nbsp;<em>for dataset " + 
+							SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</em></li>";
+					willOverwrite = true;
+				}
 			}
 		}
 
@@ -382,7 +328,7 @@ public class AddlDocsUploadPage extends Composite {
 		String resultMsg = event.getResults();
 		if ( resultMsg == null ) {
 			SocatUploadDashboard.showMessage(
-					"Unexpected null result from submit complete");
+					"Unexpected null result from upload of an ancillary document");
 			return;
 		}
 

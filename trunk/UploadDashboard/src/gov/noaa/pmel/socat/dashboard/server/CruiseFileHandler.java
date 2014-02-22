@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
@@ -40,12 +41,14 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
-	private static final String OME_FILENAME_ID = "omefilename";
-	private static final String METADATA_FILENAMES_ID = "metadatafilenames";
+	private static final String OME_TIMESTAMP_ID = "ometimestamp";
+	private static final String ADDL_DOC_TITLES_ID = "addldoctitles";
 	private static final String QC_STATUS_ID = "qcstatus";
 	private static final String ARCHIVE_STATUS_ID = "archivestatus";
 	private static final String CDIAC_DATE_ID = "cdiacdate";
 	private static final String NUM_DATA_ROWS_ID = "numdatarows";
+	private static final String NUM_ERROR_MSGS_ID = "numerrormsgs";
+	private static final String NUM_WARN_MSGS_ID = "numwarnmsgs";
 	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes";
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
@@ -600,11 +603,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to obtain the metadata file handler");
 		}
-		String omeFilename = cruise.getOmeFilename();
-		if ( ! omeFilename.isEmpty() )
-			metadataHandler.removeMetadata(username, expocode, omeFilename);
-		for ( String mdataName : cruise.getAddlDocNames() )
-			metadataHandler.removeMetadata(username, expocode, mdataName);
+		String omeTimestamp = cruise.getOmeTimestamp();
+		if ( ! omeTimestamp.isEmpty() )
+			metadataHandler.removeMetadata(username, expocode, 
+					OmeMetadata.OME_FILENAME);
+		for ( String mdataTitle : cruise.getAddlDocs() )
+			metadataHandler.removeMetadata(username, expocode, 
+					DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
 		// Delete the messages file if it exists
 		File msgsFile = cruiseMsgsFile(expocode);
 		if ( msgsFile.exists() ) {
@@ -663,12 +668,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Data-check status string
 		cruiseProps.setProperty(DATA_CHECK_STATUS_ID, cruise.getDataCheckStatus());
 		// OME metadata filename
-		cruiseProps.setProperty(OME_FILENAME_ID, cruise.getOmeFilename());
+		cruiseProps.setProperty(OME_TIMESTAMP_ID, cruise.getOmeTimestamp());
 		// Metadata documents
 		// a little arguably-unnecessary overhead going through an ArrayList<String>
-		cruiseProps.setProperty(METADATA_FILENAMES_ID, 
+		cruiseProps.setProperty(ADDL_DOC_TITLES_ID, 
 				DashboardUtils.encodeStringArrayList(new ArrayList<String>(
-						cruise.getAddlDocNames())));
+						cruise.getAddlDocs())));
 		// QC-submission status string
 		cruiseProps.setProperty(QC_STATUS_ID, cruise.getQcStatus());
 		// Archive status string
@@ -678,6 +683,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Total number of data measurements (rows of data)
 		cruiseProps.setProperty(NUM_DATA_ROWS_ID, 
 				Integer.toString(cruise.getNumDataRows()));
+		// Number of data error messages
+		cruiseProps.setProperty(NUM_ERROR_MSGS_ID, 
+				Integer.toString(cruise.getNumErrorMsgs()));
+		// Number of data warning messages
+		cruiseProps.setProperty(NUM_WARN_MSGS_ID, 
+				Integer.toString(cruise.getNumWarnMsgs()));
 		// Data column types - encoded using the enumerated names
 		ArrayList<String> colTypeNames = 
 				new ArrayList<String>(cruise.getDataColTypes().size());
@@ -873,19 +884,19 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruise.setDataCheckStatus(value);
 
 		// OME metadata filename
-		value = cruiseProps.getProperty(OME_FILENAME_ID);
+		value = cruiseProps.getProperty(OME_TIMESTAMP_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
-					OME_FILENAME_ID + " given in " + infoFile.getPath());			
-		cruise.setOmeFilename(value);
+					OME_TIMESTAMP_ID + " given in " + infoFile.getPath());			
+		cruise.setOmeTimestamp(value);
 
 		// Metadata documents
-		value = cruiseProps.getProperty(METADATA_FILENAMES_ID);
+		value = cruiseProps.getProperty(ADDL_DOC_TITLES_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
-					METADATA_FILENAMES_ID + " given in " + infoFile.getPath());			
+					ADDL_DOC_TITLES_ID + " given in " + infoFile.getPath());			
 		// a little arguably-unnecessary overhead going through an ArrayList<String>
-		cruise.setAddlDocNames(new TreeSet<String>(
+		cruise.setAddlDocs(new TreeSet<String>(
 				DashboardUtils.decodeStringArrayList(value)));
 
 		// QC status
@@ -916,6 +927,28 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					NUM_DATA_ROWS_ID + " given in " + infoFile.getPath());
 		try {
 			cruise.setNumDataRows(Integer.parseInt(value));
+		} catch ( NumberFormatException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
+
+		// Number of error messages
+		value = cruiseProps.getProperty(NUM_ERROR_MSGS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					NUM_ERROR_MSGS_ID + " given in " + infoFile.getPath());
+		try {
+			cruise.setNumErrorMsgs(Integer.parseInt(value));
+		} catch ( NumberFormatException ex ) {
+			throw new IllegalArgumentException(ex);
+		}
+
+		// Number of warning messages
+		value = cruiseProps.getProperty(NUM_WARN_MSGS_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					NUM_WARN_MSGS_ID + " given in " + infoFile.getPath());
+		try {
+			cruise.setNumWarnMsgs(Integer.parseInt(value));
 		} catch ( NumberFormatException ex ) {
 			throw new IllegalArgumentException(ex);
 		}

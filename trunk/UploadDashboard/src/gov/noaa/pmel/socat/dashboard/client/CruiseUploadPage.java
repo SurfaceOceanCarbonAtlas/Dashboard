@@ -17,6 +17,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -28,7 +29,7 @@ import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -38,74 +39,89 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class CruiseUploadPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String TITLE_TEXT = "Upload Data Files";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String CREATE_TEXT = "Add Cruise";
-	private static final String CREATE_HOVER_HELP = 
-			"upload the data as a new cruise";
-	private static final String OVERWRITE_TEXT = "Update Cruise";
-	private static final String OVERWRITE_HOVER_HELP = 
-			"upload the data as revised data for an existing cruise";
-	private static final String CANCEL_TEXT = "Cancel";
-	private static final String CANCEL_HOVER_HELP =
-			"returns to the list of cruises";
-	private static final String HIDE_ADVANCED_TEXT = "Hide Advanced Settings";
-	private static final String SHOW_ADVANCED_TEXT = "Show Advanced Settings";
 
-	private static final String INTRO_HTML_MSG = 
-			"<b>Upload Cruise Data</b><br />" +
-			"Select a cruise data file to upload.";
+	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
-	private static final String FORMAT_TEXT = "Cruise data format:";
+	private static final String COMMA_FORMAT_HELP = 
+			"the data file starts with lines of metadata, " +
+			"then have a line of comma-separated column headers, and finally " +
+			"a line of comma-separated data values for each data sample";
+	private static final String TAB_FORMAT_HELP =
+			"the data file starts with lines of metadata, " +
+			"then have a line of tab-separated column headers, and finally " +
+			"a line of tab-separated data values for each data sample";
+
+	private static final String HIDE_ADVANCED_TEXT = "Hide Advanced";
+	private static final String SHOW_ADVANCED_TEXT = "Show Advanced";
 
 	private static final String ADVANCED_HTML_MSG = 
-			"<b>Select a character set encoding for this file.</b>" +
+			"Select a character set encoding for this file." +
 			"<ul>" +
-			"<li>If you are unsure of the encoding, UTF-8, or either of the ISO " +
-			"encodings, should work fine.  The main differences in the UTF-8 " +
-			"and ISO encodings are in the \"extended\" characters.</li>" +
+			"<li>If you are unsure of the encoding, UTF-8 should work fine.</li>" +
+			"<li>The main differences in UTF-8 and ISO encodings are the " +
+			"\"extended\" characters.</li>" +
 			"<li>Use UTF-16 only if you know your file is encoded in that format, " +
 			"but be aware that only Western European characters can be " +
-			"properly handled.  Use the Window encoding only for files " +
-			"produced by older Window programs. </li>" +
+			"properly handled.</li>" +
+			"<li>Use the Window encoding only for files produced by older " +
+			"Window programs. </li>" +
 			"<li>The preview button will show the beginning of the file as it will " +
-			"be seen by SOCAT using the given encoding.  Note that this uploads " +
-			"the entire file only for the purpose of creating the preview.</li>" +
+			"be seen by SOCAT using the given encoding.</li>" +
 			"</ul>";
 	private static final String ENCODING_TEXT = "File encoding:";
 	private static final String[] KNOWN_ENCODINGS = {
 		"ISO-8859-1", "ISO-8859-15", "UTF-8", "UTF-16", "Windows-1252"
 	};
-	private static final String PREVIEW_TEXT = "Preview Cruise File";
+	private static final String PREVIEW_TEXT = "Preview Data File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
 
+	private static final String CREATE_TEXT = "create a new dataset";
+	private static final String CREATE_HOVER_HELP = 
+			"the data uploaded must create a new dataset to be successful";
+	private static final String OVERWRITE_TEXT = "update an existing dataset";
+	private static final String OVERWRITE_HOVER_HELP = 
+			"the data uploaded must replace an existing dataset to be successful";
+
+	private static final String SUBMIT_TEXT = "Upload";
+	private static final String CANCEL_TEXT = "Cancel";
+
 	private static final String NO_FILE_ERROR_MSG = 
-			"Please select a cruise data file to upload";
+			"Please select a data file to upload";
 	private static final String UNKNOWN_FAIL_MSG = 
-			"<b>Upload failed.</b>  See the preview on the page for more information.";
+			"<h2>Upload failed.</h2>" +
+			"<p>See the preview on the page for more information.</p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<b>No cruise expocode found.</b>  The data file needs to contain the " +
-			"cruise expocode in the metadata preamble to the data as a line that " +
-			"looks like \"expocode = \" followed by the expocode.  The expocode is " +
-			"the NODC code for the ship follow by the year, month, and day of " +
-			"departure for the cruise. " +
-			"<br /><br />" +
-			"The preview on the page contains the beginning of the file as it " +
+			"<h2>No cruise expocode found.</h2>" +
+			"<p>The data file needs to contain the cruise expocode in the metadata " +
+			"preamble to the data.  This expocode metadata line should look " +
+			"something like<br />" +
+			"expocode = 49P120101218<br />" +
+			"The 12 character expocode is the NODC code for the vessel carrying " +
+			"the instrumentation followed by the numeric year, month, and day of " +
+			"departure or initial measurement.  For example, 49P120101218 indicates " +
+			"a cruise on the Japanese (49) ship of opportunity Pyxis (P1) with the " +
+			"first day of the cruise on 18 December 2010.</p>" +
+			"<p>The preview on the page contains the beginning of the file as it " +
 			"appears to SOCAT.  If the contents look very strange, you might need " +
-			"to change the character encoding in the advanced settings.";
+			"to change the character encoding in the advanced settings.</p>";
 	private static final String FILE_EXISTS_FAIL_HTML = 
-			"<b>A cruise already exists with this expocode.</b>  The preview contains " +
-			"the beginning of the existing cruise data.  Use the <em>" + 
-			OVERWRITE_TEXT + "</em> button if this is an update of the existing " +
-			"cruise.";
+			"<h2>A dataset already exists with this expocode.</h2>" +
+			"<p>The beginning of the existing dataset is given in the preview " +
+			"window.  Select the <em>" + OVERWRITE_TEXT + "</em> setting if this " +
+			"is an update to this existing dataset.";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG = 
-			"<b>A cruise with this expocode already exists which has been submitted " +
-			"to SOCAT or does not below to you.</b>  The preview on this page " +
-			"contains the beginning of the existing cruise data.";
+			"<h2>A dataset already exists with this expocode.</h2>" +
+			"<p>The existing dataset cannot be overwritten because it either has " +
+			"been submitted to for QC or does not belong to you.  The beginning of " +
+			"the existing dataset is given in the preview window.";
 	private static final String FILE_DOES_NOT_EXIST_FAIL_HTML = 
-			"<b>A cruise with this expocode does not exist.</b>  If the expocode in " +
-			"the cruise file is correct, use the <em>" + CREATE_TEXT + 
-			"</em> button to create a new cruise.";
+			"<h2>A dataset with this expocode does not exist.</h2>  " +
+			"The beginning of the uploaded dataset is given in the preview window.  " +
+			"If the expocode in the data file is correct, use the <em>" + CREATE_TEXT + 
+			"</em> setting to create a new dataset.";
 
 	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, CruiseUploadPage> {
 	}
@@ -113,29 +129,31 @@ public class CruiseUploadPage extends Composite {
 	private static DashboardCruiseUploadPageUiBinder uiBinder = 
 			GWT.create(DashboardCruiseUploadPageUiBinder.class);
 
+	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload cruiseUpload;
-	@UiField Label formatLabel;
-	@UiField ListBox formatListBox;
 	@UiField Hidden usernameToken;
 	@UiField Hidden passhashToken;
 	@UiField Hidden timestampToken;
 	@UiField Hidden actionToken;
 	@UiField Hidden encodingToken;
+	@UiField Hidden formatToken;
+	@UiField CaptionPanel settingsPanel;
+	@UiField RadioButton commaRadio;
+	@UiField RadioButton tabRadio;
 	@UiField Button advancedButton;
-	@UiField Button createButton;
-	@UiField Button overwriteButton;
-	@UiField Button cancelButton;
 	@UiField FlowPanel advancedPanel;
 	@UiField HTML advancedHtml;
 	@UiField Label encodingLabel;
 	@UiField ListBox encodingListBox;
-	@UiField ScrollPanel previewPanel;
 	@UiField Button previewButton;
 	@UiField HTML previewHtml;
+	@UiField RadioButton createRadio;
+	@UiField RadioButton overwriteRadio;
+	@UiField Button submitButton;
+	@UiField Button cancelButton;
 
 	private String username;
 	private boolean advancedShown; 
@@ -154,24 +172,31 @@ public class CruiseUploadPage extends Composite {
 
 		username = "";
 
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
-
-		introHtml.setHTML(INTRO_HTML_MSG);
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
 		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
 
-		formatLabel.setText(FORMAT_TEXT);
-		formatListBox.addItem(DashboardUtils.CRUISE_FORMAT_TAB);
-		formatListBox.addItem(DashboardUtils.CRUISE_FORMAT_COMMA);
+		settingsPanel.setCaptionText(SETTINGS_CAPTION_TEXT);
 
-		createButton.setText(CREATE_TEXT);
-		createButton.setTitle(CREATE_HOVER_HELP);
-		overwriteButton.setText(OVERWRITE_TEXT);
-		overwriteButton.setTitle(OVERWRITE_HOVER_HELP);
+		commaRadio.setText(DashboardUtils.CRUISE_FORMAT_COMMA);
+		commaRadio.setTitle(COMMA_FORMAT_HELP);
+		tabRadio.setText(DashboardUtils.CRUISE_FORMAT_TAB);
+		tabRadio.setTitle(TAB_FORMAT_HELP);
+		commaRadio.setValue(false, false);
+		tabRadio.setValue(true, false);
+
+		createRadio.setText(CREATE_TEXT);
+		createRadio.setTitle(CREATE_HOVER_HELP);
+		overwriteRadio.setText(OVERWRITE_TEXT);
+		overwriteRadio.setTitle(OVERWRITE_HOVER_HELP);
+		overwriteRadio.setValue(false, false);
+		createRadio.setValue(true, false);
+
+		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
-		cancelButton.setTitle(CANCEL_HOVER_HELP);
 
 		advancedHtml.setHTML(ADVANCED_HTML_MSG);
 		encodingLabel.setText(ENCODING_TEXT);
@@ -196,13 +221,14 @@ public class CruiseUploadPage extends Composite {
 		singleton.usernameToken.setValue("");
 		singleton.passhashToken.setValue("");
 		singleton.timestampToken.setValue("");
-		singleton.encodingToken.setValue("");
 		singleton.actionToken.setValue("");
+		singleton.encodingToken.setValue("");
+		singleton.formatToken.setValue("");
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
 		singleton.encodingListBox.setSelectedIndex(2);
 		singleton.hideAdvancedOptions();
 		SocatUploadDashboard.updateCurrentPage(singleton);
-		History.newItem(PagesEnum.CRUISE_UPLOAD.name(), false);
+		History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
 	}
 
 	/**
@@ -222,7 +248,7 @@ public class CruiseUploadPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.CRUISE_UPLOAD.name(), false);
+				History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
 		}
 	}
 
@@ -232,7 +258,6 @@ public class CruiseUploadPage extends Composite {
 	private void hideAdvancedOptions() {
 		advancedButton.setText(SHOW_ADVANCED_TEXT);
 		advancedPanel.setVisible(false);
-		previewPanel.setVisible(false);
 		advancedShown = false;
 	}
 
@@ -242,7 +267,6 @@ public class CruiseUploadPage extends Composite {
 	private void showAdvancedOptions() {
 		advancedButton.setText(HIDE_ADVANCED_TEXT);
 		advancedPanel.setVisible(true);
-		previewPanel.setVisible(true);
 		advancedShown = true;
 	}
 
@@ -268,14 +292,18 @@ public class CruiseUploadPage extends Composite {
 				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
 		timestampToken.setValue(localTimestamp);
+		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
 		encodingToken.setValue(
 				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
-		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
+		if ( commaRadio.getValue() )
+			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_COMMA);
+		else
+			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_TAB);
 		// Submit the form
 		uploadForm.submit();
 	}
 
-	@UiHandler("createButton") 
+	@UiHandler("submitButton") 
 	void createButtonOnClick(ClickEvent event) {
 		// Assign the "hidden" values
 		usernameToken.setValue(DashboardLoginPage.getUsername());
@@ -284,25 +312,16 @@ public class CruiseUploadPage extends Composite {
 				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
 		timestampToken.setValue(localTimestamp);
+		if ( overwriteRadio.getValue() )
+			actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
+		else
+			actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
 		encodingToken.setValue(
 				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
-		actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
-		// Submit the form
-		uploadForm.submit();
-	}
-
-	@UiHandler("overwriteButton") 
-	void overwriteButtonOnClick(ClickEvent event) {
-		// Assign the "hidden" values
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
-		timestampToken.setValue(localTimestamp);
-		encodingToken.setValue(
-				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
-		actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
+		if ( commaRadio.getValue() )
+			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_COMMA);
+		else
+			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_TAB);
 		// Submit the form
 		uploadForm.submit();
 	}
@@ -329,8 +348,9 @@ public class CruiseUploadPage extends Composite {
 		usernameToken.setValue("");
 		passhashToken.setValue("");
 		timestampToken.setValue("");
-		encodingToken.setValue("");
 		actionToken.setValue("");
+		encodingToken.setValue("");
+		formatToken.setValue("");
 
 		// Check the returned results
 		String resultMsg = event.getResults();
@@ -348,7 +368,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
 				previewMsg = "<pre>" + resultMsg + "</pre>";
-			previewPanel.setVisible(true);
+			advancedPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(UNKNOWN_FAIL_MSG);
 		}
@@ -369,7 +389,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			previewPanel.setVisible(true);
+			advancedPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(NO_EXPOCODE_FAIL_MSG);
 		}
@@ -381,7 +401,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			previewPanel.setVisible(true);
+			advancedPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(FILE_EXISTS_FAIL_HTML);
 		}
@@ -393,7 +413,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			previewPanel.setVisible(true);
+			advancedPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(CANNOT_OVERWRITE_FAIL_MSG);
 		}
@@ -405,7 +425,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			previewPanel.setVisible(true);
+			advancedPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(FILE_DOES_NOT_EXIST_FAIL_HTML);
 		}
@@ -413,13 +433,13 @@ public class CruiseUploadPage extends Composite {
 			String expocode = tagMsg[0].substring(
 					DashboardUtils.FILE_CREATED_HEADER_TAG.length()).trim();
 			// go to the data column specifications page
-			DataColumnSpecsPage.showPage(expocode, true);
+			DataColumnSpecsPage.showPage(expocode);
 		}
 		else if ( tagMsg[0].startsWith(DashboardUtils.FILE_UPDATED_HEADER_TAG) ) {
 			String expocode = tagMsg[0].substring(
 					DashboardUtils.FILE_UPDATED_HEADER_TAG.length()).trim();
 			// go to the data column specifications page
-			DataColumnSpecsPage.showPage(expocode, true);
+			DataColumnSpecsPage.showPage(expocode);
 		}
 		else {
 			// Unknown response with a newline, display the whole message in the preview
@@ -428,7 +448,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
 				previewMsg = "<pre>" + resultMsg + "</pre>";
-			previewPanel.setVisible(true);
+			advancedPanel.setVisible(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(UNKNOWN_FAIL_MSG);
 		}

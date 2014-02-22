@@ -70,9 +70,8 @@ public class OmeFileGenerator {
 					// Get the OME metadata from the metadata line
 					OmeMetadata omeMData = new OmeMetadata(headers, dataline, timestamp);
 					// Get the abstract name of the OME XML file to be created
-					String expocode = omeMData.getExpocode();
-					File omeFile = mdataHandler.getMetadataFile(expocode, 
-												OmeMetadata.generatedOmeName(expocode));
+					File omeFile = mdataHandler.getMetadataFile(
+							omeMData.getExpocode(), OmeMetadata.OME_FILENAME);
 					// Make sure the parent directory for the OME XML metadata exists
 					File parentFile = omeFile.getParentFile();
 					if ( ! parentFile.exists() )

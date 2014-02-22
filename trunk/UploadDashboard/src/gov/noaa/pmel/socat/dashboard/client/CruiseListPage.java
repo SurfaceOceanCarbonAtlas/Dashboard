@@ -8,6 +8,7 @@ import gov.noaa.pmel.socat.dashboard.shared.CruiseListService;
 import gov.noaa.pmel.socat.dashboard.shared.CruiseListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.HashSet;
@@ -17,9 +18,11 @@ import java.util.TreeSet;
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -50,150 +53,155 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class CruiseListPage extends Composite {
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
-	private static final String UPLOAD_TEXT = "Upload Cruise Data";
+	private static final String TITLE_TEXT = "List of Datasets";
+	
+	private static final String UPLOAD_TEXT = "Upload Datasets";
 	private static final String UPLOAD_HOVER_HELP = 
-			"upload cruise data to create a new cruise " +
-			"or replace an existing cruise";
+			"upload data to create a new data set " +
+			"or replace an existing data set";
 
-	private static final String VIEW_DATA_TEXT = "Review Data";
+	private static final String VIEW_DATA_TEXT = "Identify Columns";
 	private static final String VIEW_DATA_HOVER_HELP =
 			"review and modify data column type assignments for the " +
-			"selected cruise, highlighting any issues with the data";
+			"selected data set; highlights issues in the data";
 
-	static final String OME_METADATA_TEXT = "Manage OME Metadata";
+	static final String OME_METADATA_TEXT = "Edit Metadata";
 	private static final String OME_METADATA_HOVER_HELP =
-			"manage the OME metadata for the selected cruise";
+			"edit the metadata for the selected data set";
 
-	private static final String ADDL_DOCS_TEXT = "Manage Additional Documents";
+	private static final String ADDL_DOCS_TEXT = "Manage Documents";
 	private static final String ADDL_DOCS_HOVER_HELP =
-			"manage additional (ancillary) documents for the selected cruise(s)";
+			"manage ancillary documents for the selected data set";
 
-	private static final String REVIEW_TEXT = "Preview in QC System";
-	private static final String REVIEW_HOVER_HELP =
-			"examine the selected cruises in the cruise viewer " +
-			"aside other SOCAT cruises";
-
-	private static final String QC_SUBMIT_TEXT = "Send to QC System";
+	private static final String QC_SUBMIT_TEXT = "Submit for QC";
 	private static final String QC_SUBMIT_HOVER_HELP =
-			"submit the selected cruises for policy (quality control) " +
-			"assessment";
+			"submit the selected data sets for quality control assessment";
 
-	private static final String DELETE_TEXT = "Delete Cruise";
+	private static final String REVIEW_TEXT = "Preview Dataset";
+	private static final String REVIEW_HOVER_HELP =
+			"examine the selected data sets in the data set viewer " +
+			"aside other SOCAT data sets";
+
+	private static final String DELETE_TEXT = "Delete Datasets";
 	private static final String DELETE_HOVER_HELP =
-			"delete the selected cruises, including the cruise data";
+			"delete the selected data set, " +
+			"including its metadata and ancillary documents";
 
 	private static final String ADD_TO_LIST_TEXT = 
-			"Add Cruise to List";
+			"Add to List";
 	private static final String ADD_TO_LIST_HOVER_HELP = 
-			"add an existing cruise to this list of cruises";
+			"add an existing data set to this list of data sets";
 
 	private static final String REMOVE_FROM_LIST_TEXT = 
-			"Remove Cruise from List";
+			"Remove from List";
 	private static final String REMOVE_FROM_LIST_HOVER_HELP =
-			"remove the selected cruises from this list of cruises; " +
-			"this will NOT remove the cruise data";
+			"remove the selected data sets from this list of data sets; " +
+			"this will NOT delete the data set from the system";
 
 	// Error messages when the request for the latest cruise list fails
 	private static final String LOGIN_ERROR_MSG = 
 			"Sorry, your login failed";
 	private static final String GET_CRUISE_LIST_ERROR_MSG = 
-			"Problems obtaining the latest cruise listing";
+			"Problems obtaining the latest data set listing";
 
 	// Starts of error messages for improper cruise selections
 	private static final String SUBMITTED_CRUISES_SELECTED_ERR_START = 
-			"Only include cruises which have not been added to the QC system, " +
+			"Only data sets which have not been submitted for QC, " +
 			"or which have been suspended or failed, may be selected ";
 	private static final String NO_CRUISE_SELECTED_ERR_START = 
-			"No cruise is select ";
+			"No data set is select ";
 	private static final String MANY_CRUISES_SELECTED_ERR_START = 
-			"Only one cruise may be selected ";
+			"Only one data set may be selected ";
 
 	// Ends of error messages for improper cruise selections
 	private static final String FOR_REVIEWING_ERR_END = 
 			"for reviewing data.";
 	private static final String FOR_OME_ERR_END =
-			"for managing OME metadata.";
+			"for managing metadata.";
 	private static final String FOR_ADDL_DOCS_ERR_END = 
-			"for managing additional documents.";
+			"for managing ancillary documents.";
 	private static final String FOR_QC_SUBMIT_ERR_END =
-			"for adding to the QC system.";
+			"for submitting for QC.";
 	private static final String FOR_DELETE_ERR_END = 
 			"for deletion from the system.";
 	private static final String FOR_REMOVE_ERR_END = 
 			"for removal from your personal list of cruises.";
 
-	private static final String METADATA_AUTOFAIL_HTML_PROLOGUE = 
-			"The following cruises do not have an OME metadata document: <ul>";
+	private static final String NO_METADATA_HTML_PROLOGUE = 
+			"The following data sets do not have appropriate metadata" +
+			"and thus cannot be submitted for QC: <ul>";
+	private static final String NO_METADATA_HTML_EPILOGUE = 
+			"</ul>";
 	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
-			"The following cruises have data that have not been checked, " +
-			"or have very serious errors detected by the automated data " +
-			"checker: <ul>";
+			"The following data sets have not been checked, or have very " +
+			"serious errors detected by the automated data checker: <ul>";
 	private static final String CANNOT_SUBMIT_HTML_EPILOGUE =
-			"</ul> These cruises cannot be added to SOCAT until these " +
-			"problems have been resolved.";
+			"</ul> These data sets cannot be submitted for QC " +
+			"until these problems have been resolved.";
 	private static final String DATA_AUTOFAIL_HTML_PROLOGUE = 
-			"The following cruises have data with serious errors detected " +
+			"The following data sets have errors detected " +
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
-			"</ul> These cruises can be added to SOCAT, but will be given " +
-			"a QC Flag F when added.  Do you want to continue? ";
+			"</ul> These data sets can be submitted for QC, " +
+			"but will be given a QC Flag F when added.  " +
+			"Do you want to continue? ";
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String DELETE_CRUISE_HTML_PROLOGUE = 
-			"All cruise data and metadata will be deleted for the " +
-			"following cruises: <ul>";
+			"All data, metadata, and ancillary docuemnts will be deleted " +
+			"for the following data sets: <ul>";
 	private static final String DELETE_CRUISE_HTML_EPILOGUE =
 			"</ul> Do you wish to proceed?";
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
 	private static final String DELETE_CRUISE_FAIL_MSG = 
-			"Unable to delete the cruise(s)";
+			"Unable to delete the data sets";
 
 	private static final String EXPOCODE_TO_ADD_MSG = 
-			"Enter the expocode of the cruise to wish to add " +
-			"to your personal list of cruises";
+			"Enter the expocode of the data set to wish to add " +
+			"to your personal list of data sets";
 	private static final String ADD_CRUISE_FAIL_MSG = 
-			"Unable to add the specified cruise " +
-			"to your personal list of cruises";
+			"Unable to add the specified data set " +
+			"to your personal list of data sets";
 
 	private static final String REMOVE_CRUISE_HTML_PROLOGUE = 
-			"The following cruises will be removed from your personal " +
-			"list of cruises; the cruise data and metadata files will " +
-			"<b>not</b> be removed: <ul>";
+			"The following data sets will be removed from your personal " +
+			"list of data sets; the data, metadata, and ancillary documents " +
+			"will <b>not</b> be removed: <ul>";
 	private static final String REMOVE_CRUISE_HTML_EPILOGUE = 
 			"</ul> Do you wish to proceed?";
 	private static final String REMOVE_YES_TEXT = "Yes";
 	private static final String REMOVE_NO_TEXT = "No";
 	private static final String REMOVE_CRUISE_FAIL_MSG = 
-			"Unable to remove the selected cruise(s) " +
-			"from your personal list of cruises";
+			"Unable to remove the selected data sets " +
+			"from your personal list of data sets";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
 	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
-	private static final String OME_METADATA_COLUMN_NAME = "OME Metadata";
-	private static final String ADDL_DOCS_COLUMN_NAME = "Addl Documents";
-	private static final String SUBMITTED_COLUMN_NAME = "QC Status";
+	private static final String OME_METADATA_COLUMN_NAME = "Metadata";
+	private static final String SUBMITTED_COLUMN_NAME = "Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
-	private static final String OWNER_COLUMN_NAME = "Owner";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
+	private static final String ADDL_DOCS_COLUMN_NAME = "Addl Documents";
+	// private static final String OWNER_COLUMN_NAME = "Owner";
 
 	// Replacement strings for empty or null values
 	private static final String EMPTY_TABLE_TEXT = "(no uploaded cruises)";
 	private static final String NO_EXPOCODE_STRING = "(unknown)";
 	private static final String NO_TIMESTAMP_STRING = "(unknown)";
-	private static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
+	static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
 	private static final String NO_OME_METADATA_STATUS_STRING = "(no metadata)";
-	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
 	private static final String NO_QC_STATUS_STRING = "(private)";
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not specified)";
-	private static final String NO_OWNER_STRING = "(unknown)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
+	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
+	// private static final String NO_OWNER_STRING = "(unknown)";
 
 	interface DashboardCruiseListPageUiBinder extends UiBinder<Widget, CruiseListPage> {
 	}
@@ -206,16 +214,17 @@ public class CruiseListPage extends Composite {
 
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
+	@UiField Label titleLabel;
 	@UiField Button uploadButton;
 	@UiField Button viewDataButton;
 	@UiField Button omeMetadataButton;
 	@UiField Button addlDocsButton;
-	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
+	@UiField Button reviewButton;
 	@UiField Button deleteButton;
 	@UiField Button addToListButton;
 	@UiField Button removeFromListButton;
-	@UiField DataGrid<DashboardCruise> uploadsGrid;
+	@UiField DataGrid<DashboardCruise> datasetsGrid;
 
 	private String username;
 	private ListDataProvider<DashboardCruise> listProvider;
@@ -223,7 +232,6 @@ public class CruiseListPage extends Composite {
 	private DashboardAskPopup askRemovePopup;
 	private HashSet<DashboardCruise> cruiseSet;
 	private HashSet<String> expocodeSet;
-	private DashboardAskPopup askMetaAutofailPopup;
 	private DashboardAskPopup askDataAutofailPopup;
 
 	// The singleton instance of this page
@@ -246,6 +254,7 @@ public class CruiseListPage extends Composite {
 		cruiseSet = new HashSet<DashboardCruise>();
 		expocodeSet = new HashSet<String>();
 
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadButton.setText(UPLOAD_TEXT);
@@ -260,11 +269,11 @@ public class CruiseListPage extends Composite {
 		addlDocsButton.setText(ADDL_DOCS_TEXT);
 		addlDocsButton.setTitle(ADDL_DOCS_HOVER_HELP);
 
-		reviewButton.setText(REVIEW_TEXT);
-		reviewButton.setTitle(REVIEW_HOVER_HELP);
-
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
+
+		reviewButton.setText(REVIEW_TEXT);
+		reviewButton.setTitle(REVIEW_HOVER_HELP);
 
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
@@ -275,7 +284,6 @@ public class CruiseListPage extends Composite {
 		removeFromListButton.setText(REMOVE_FROM_LIST_TEXT);
 		removeFromListButton.setTitle(REMOVE_FROM_LIST_HOVER_HELP);
 
-		askMetaAutofailPopup = null;
 		askDataAutofailPopup = null;
 
 		uploadButton.setFocus(true);
@@ -313,7 +321,7 @@ public class CruiseListPage extends Composite {
 						singleton = new CruiseListPage();
 					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.updateCruises(cruises);
-					History.newItem(PagesEnum.CRUISE_LIST.name(), false);
+					History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
 				}
 				else {
 					SocatUploadDashboard.showMessage(errMsg + 
@@ -344,7 +352,7 @@ public class CruiseListPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.CRUISE_LIST.name(), false);
+				History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
 		}
 	}
 
@@ -359,6 +367,7 @@ public class CruiseListPage extends Composite {
 		// Update the username
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
+		// Only a manager has the need to see the cruise owner column
 		if ( cruises.isManager() ) {
 			addToListButton.setVisible(true);
 			removeFromListButton.setVisible(true);
@@ -373,9 +382,9 @@ public class CruiseListPage extends Composite {
 		if ( cruises != null ) {
 			cruiseList.addAll(cruises.values());
 		}
-		uploadsGrid.setRowCount(cruiseList.size());
+		datasetsGrid.setRowCount(cruiseList.size());
 		// Make sure the table is sorted according to the last specification
-		ColumnSortEvent.fire(uploadsGrid, uploadsGrid.getColumnSortList());
+		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
 	}
 
 	/**
@@ -403,7 +412,7 @@ public class CruiseListPage extends Composite {
 				}
 				else {
 					SocatUploadDashboard.showMessage(errMsg + 
-							" (unexpected invalid cruise list)");
+							" (unexpected invalid data set list)");
 				}
 			}
 			@Override
@@ -411,42 +420,6 @@ public class CruiseListPage extends Composite {
 				SocatUploadDashboard.showFailureMessage(errMsg, ex);
 			}
 		});
-	}
-
-	/**
-	 * Submit a request to the server to delete cruises, 
-	 * but do not display this updated page or show errors.
-	 * 
-	 * @param expoSet
-	 * 		expocodes of the cruises to be deleted
-	 */
-	static boolean updating = false;
-	static void deleteCruises(HashSet<String> expoSet) {
-		updating = true;
-		service.updateCruiseList(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), 
-				DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, expoSet,
-				new AsyncCallback<DashboardCruiseList>() {
-			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
-				updating = false;
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				updating = false;
-			}
-		});
-	}
-	/**
-	 * This should only be called after calling {@link #deleteCruises(HashSet)}.
-	 * @return
-	 * 		false if the deletion of cruises is still in progress 
-	 * 		(the callback has not yet been made); otherwise true.
-	 */
-	static boolean deleteCruisesDone() {
-		if ( updating )
-			return false;
-		return true;
 	}
 
 	/**
@@ -534,7 +507,7 @@ public class CruiseListPage extends Composite {
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
-		DataColumnSpecsPage.showPage(expocode, false);
+		DataColumnSpecsPage.showPage(expocode);
 	}
 
 	@UiHandler("omeMetadataButton")
@@ -579,13 +552,6 @@ public class CruiseListPage extends Composite {
 		}
 	}
 
-	@UiHandler("reviewButton")
-	void reviewOnClick(ClickEvent event) {
-		// TODO:
-		SocatUploadDashboard.showMessage("Not yet implemented");
-		return;
-	}
-
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
 		// With null argument, getSelectedCruises always returns true
@@ -596,6 +562,13 @@ public class CruiseListPage extends Composite {
 			return;
 		}
 		checkCruisesForSOCAT();
+	}
+
+	@UiHandler("reviewButton")
+	void reviewOnClick(ClickEvent event) {
+		// TODO:
+		SocatUploadDashboard.showMessage("Not yet implemented");
+		return;
 	}
 
 	@UiHandler("deleteButton")
@@ -648,14 +621,14 @@ public class CruiseListPage extends Composite {
 			if ( (expoLen < DashboardUtils.MIN_EXPOCODE_LENGTH) ||
 				 (expoLen > DashboardUtils.MAX_EXPOCODE_LENGTH) ) {
 				badExpo = true;
-				errMsg += " (Invalid cruise Expocode length)";
+				errMsg += " (Invalid Expocode length)";
 			}
 			else {
 				for (int k = 0; k < expoLen; k++) {
 					if ( ! DashboardUtils.VALID_EXPOCODE_CHARACTERS
 										 .contains(expocode.substring(k, k+1)) ) {
 						badExpo = true;
-						errMsg += " (Invalid characters in the cruise Expocode)";
+						errMsg += " (Invalid characters in the Expocode)";
 						break;
 					}
 				}
@@ -716,64 +689,64 @@ public class CruiseListPage extends Composite {
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
 		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
 		TextColumn<DashboardCruise> omeMetadataColumn = buildOmeMetadataColumn();
-		TextColumn<DashboardCruise> addlDocsColumn = buildAddnDocsColumn();
 		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
 		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
 		TextColumn<DashboardCruise> timestampColumn = buildTimestampColumn();
-		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
+		Column<DashboardCruise,SafeHtml> addlDocsColumn = buildAddnDocsColumn();
+		// TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
-		uploadsGrid.addColumn(selectedColumn, "");
-		uploadsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
-		uploadsGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
-		uploadsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
-		uploadsGrid.addColumn(omeMetadataColumn, OME_METADATA_COLUMN_NAME);
-		uploadsGrid.addColumn(addlDocsColumn, ADDL_DOCS_COLUMN_NAME);
-		uploadsGrid.addColumn(qcStatusColumn, SUBMITTED_COLUMN_NAME);
-		uploadsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
-		uploadsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
-		uploadsGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
+		datasetsGrid.addColumn(selectedColumn, "");
+		datasetsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
+		datasetsGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
+		datasetsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
+		datasetsGrid.addColumn(omeMetadataColumn, OME_METADATA_COLUMN_NAME);
+		datasetsGrid.addColumn(qcStatusColumn, SUBMITTED_COLUMN_NAME);
+		datasetsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
+		datasetsGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
+		datasetsGrid.addColumn(addlDocsColumn, ADDL_DOCS_COLUMN_NAME);
+		// datasetsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
 
 		// Set the minimum widths of the columns
-		double tableWidth = 0.0;
-		uploadsGrid.setColumnWidth(selectedColumn, 
+		double minTableWidth = 0.0;
+		datasetsGrid.setColumnWidth(selectedColumn, 
 				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(expocodeColumn, 
+		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(expocodeColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(timestampColumn, 
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(timestampColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(dataCheckColumn, 
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(dataCheckColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(omeMetadataColumn, 
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(omeMetadataColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(qcStatusColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(archiveStatusColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(filenameColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(addlDocsColumn, 
+		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(addlDocsColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(qcStatusColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(archiveStatusColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(ownerColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-		uploadsGrid.setColumnWidth(filenameColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+		// datasetsGrid.setColumnWidth(ownerColumn, 
+		// 		SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		// minTableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
-		uploadsGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
+		datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
 
 		// Create the data provider for this table
 		listProvider = new ListDataProvider<DashboardCruise>();
-		listProvider.addDataDisplay(uploadsGrid);
+		listProvider.addDataDisplay(datasetsGrid);
 
 		// Make the columns sortable
 		selectedColumn.setSortable(true);
@@ -781,11 +754,11 @@ public class CruiseListPage extends Composite {
 		timestampColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
 		omeMetadataColumn.setSortable(true);
-		addlDocsColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
-		ownerColumn.setSortable(true);
 		filenameColumn.setSortable(true);
+		addlDocsColumn.setSortable(true);
+		// ownerColumn.setSortable(true);
 
 		// Add a column sorting handler for these columns
 		ListHandler<DashboardCruise> columnSortHandler = 
@@ -799,29 +772,29 @@ public class CruiseListPage extends Composite {
 		columnSortHandler.setComparator(dataCheckColumn, 
 				DashboardCruise.dataCheckComparator);
 		columnSortHandler.setComparator(omeMetadataColumn, 
-				DashboardCruise.omeFilenameComparator);
-		columnSortHandler.setComparator(addlDocsColumn, 
-				DashboardCruise.addlDocNamesComparator);
+				DashboardCruise.omeTimestampComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
 				DashboardCruise.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
 				DashboardCruise.archiveStatusComparator);
-		columnSortHandler.setComparator(ownerColumn, 
-				DashboardCruise.ownerComparator);
 		columnSortHandler.setComparator(filenameColumn, 
 				DashboardCruise.filenameComparator);
+		columnSortHandler.setComparator(addlDocsColumn, 
+				DashboardCruise.addlDocsComparator);
+		// columnSortHandler.setComparator(ownerColumn, 
+		// 		DashboardCruise.ownerComparator);
 
 		// Add the sort handler to the table, and sort by expocode by default
-		uploadsGrid.addColumnSortHandler(columnSortHandler);
-		uploadsGrid.getColumnSortList().push(expocodeColumn);
+		datasetsGrid.addColumnSortHandler(columnSortHandler);
+		datasetsGrid.getColumnSortList().push(expocodeColumn);
 
 		// Set the contents if there are no rows
-		uploadsGrid.setEmptyTableWidget(new Label(EMPTY_TABLE_TEXT));
+		datasetsGrid.setEmptyTableWidget(new Label(EMPTY_TABLE_TEXT));
 
 		// Following recommended to improve efficiency with IE
-		uploadsGrid.setSkipRowHoverCheck(false);
-		uploadsGrid.setSkipRowHoverFloatElementCheck(false);
-		uploadsGrid.setSkipRowHoverStyleUpdate(false);
+		datasetsGrid.setSkipRowHoverCheck(false);
+		datasetsGrid.setSkipRowHoverFloatElementCheck(false);
+		datasetsGrid.setSkipRowHoverStyleUpdate(false);
 	}
 
 	/**
@@ -946,39 +919,13 @@ public class CruiseListPage extends Composite {
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
-				String omeFilename = cruise.getOmeFilename();
-				if ( omeFilename.isEmpty() )
-					omeFilename = NO_OME_METADATA_STATUS_STRING;
-				return omeFilename;
+				String omeTimestamp = cruise.getOmeTimestamp();
+				if ( omeTimestamp.isEmpty() )
+					omeTimestamp = NO_OME_METADATA_STATUS_STRING;
+				return omeTimestamp;
 			}
 		};
 		return omeMetadataColumn;
-	}
-
-	/**
-	 * Creates the additional metadata files column for the table
-	 */
-	private TextColumn<DashboardCruise> buildAddnDocsColumn() {
-		TextColumn<DashboardCruise> addnDocsColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				TreeSet<String> filenames = cruise.getAddlDocNames();
-				if ( filenames.size() == 0 )
-					return NO_ADDL_DOCS_STATUS_STRING;
-				StringBuilder sb = new StringBuilder();
-				boolean firstEntry = true;
-				for ( String name : filenames ) {
-					if ( firstEntry )
-						firstEntry = false;
-					else
-						sb.append("; ");
-					sb.append(name);
-				}
-				return sb.toString();
-			}
-		};
-		return addnDocsColumn;
 	}
 
 	/**
@@ -1016,23 +963,6 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the owner column for the table
-	 */
-	private TextColumn<DashboardCruise> buildOwnerColumn() {
-		TextColumn<DashboardCruise> ownerColumn = 
-				new TextColumn<DashboardCruise> () {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				String owner = cruise.getOwner();
-				if ( owner.isEmpty() )
-					owner = NO_OWNER_STRING;
-				return owner;
-			}
-		};
-		return ownerColumn;
-	}
-
-	/**
 	 * Creates the filename column for the table
 	 */
 	private TextColumn<DashboardCruise> buildFilenameColumn() {
@@ -1050,20 +980,90 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Checks the cruises given in cruiseSet in this instance for
-	 * data compatibility for adding to SOCAT.  If the data has 
-	 * not been checked or is unacceptable, this method presents an
-	 * error message and returns.  If the data has serious issues
-	 * to cause an automatic F flag, asks the user if the submit
-	 * should be continued.  If the answer is yes, or if there
-	 * were no serious data issues, continues the submission to
-	 * SOCAT by calling {@link #continueCheckCruisesForSOCAT()}.
+	 * Creates the additional metadata files column for the table
+	 */
+	private Column<DashboardCruise,SafeHtml> buildAddnDocsColumn() {
+		Column<DashboardCruise,SafeHtml> addnDocsColumn = 
+				new Column<DashboardCruise,SafeHtml>(new SafeHtmlCell()) {
+			@Override
+			public SafeHtml getValue(DashboardCruise cruise) {
+				TreeSet<String> addlDocTitles = cruise.getAddlDocs();
+				if ( addlDocTitles.size() == 0 )
+					return SafeHtmlUtils.fromSafeConstant(NO_ADDL_DOCS_STATUS_STRING);
+				SafeHtmlBuilder sb = new SafeHtmlBuilder();
+				boolean firstEntry = true;
+				for ( String title : addlDocTitles ) {
+					if ( firstEntry )
+						firstEntry = false;
+					else
+						sb.appendHtmlConstant("<br />");
+					String[] pieces = DashboardMetadata.splitAddlDocsTitle(title);
+					sb.appendEscaped(pieces[0]);
+					sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;&nbsp;&nbsp;");
+					sb.appendEscaped(pieces[1]);
+					sb.appendHtmlConstant("</small>");
+				}
+				return sb.toSafeHtml();
+			}
+		};
+		return addnDocsColumn;
+	}
+
+	/*
+	 * Creates the owner column for the table
+	 *
+	 * private TextColumn<DashboardCruise> buildOwnerColumn() {
+	 * 	TextColumn<DashboardCruise> ownerColumn = 
+	 * 			new TextColumn<DashboardCruise> () {
+	 * 		@Override
+	 * 		public String getValue(DashboardCruise cruise) {
+	 * 			String owner = cruise.getOwner();
+	 * 			if ( owner.isEmpty() )
+	 * 				owner = NO_OWNER_STRING;
+	 * 			return owner;
+	 * 		}
+	 * 	};
+	 * 	return ownerColumn;
+	 * }
+	*/
+
+	/**
+	 * Checks the cruises given in cruiseSet in this instance for metadata 
+	 * compatibility for adding to SOCAT.  At this time this only checks 
+	 * that an OME metadata document is associated with each cruise.
+	 * 
+	 * Then checks the cruises given in cruiseSet in this instance for data 
+	 * compatibility for adding to SOCAT.  If the data has not been checked 
+	 * or is unacceptable, this method presents an error message and returns.  
+	 * If the data has serious issues to cause an automatic F flag, asks the 
+	 * user if the submit should be continued.  If the answer is yes, or if 
+	 * there were no serious data issues, continues the submission to SOCAT 
+	 * by calling {@link AddToSocatPage#showPage(java.util.HashSet)}.
 	 */
 	private void checkCruisesForSOCAT() {
-		// Check that the cruise data is checked and reasonable
-		String errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
-		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
+		// Check if the cruises have metadata documents
+		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;
+		for ( DashboardCruise cruise : cruiseSet ) {
+			// At this time, just check that a metadata file exists
+			// and do not worry about the contents
+			if ( cruise.getOmeTimestamp().isEmpty() ) {
+				errMsg += "<li>" + 
+						SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
+				cannotSubmit = true;
+			}
+		}
+
+		// If missing metadata, cannot submit
+		if ( cannotSubmit ) {
+			errMsg += NO_METADATA_HTML_EPILOGUE;
+			SocatUploadDashboard.showMessage(errMsg);
+			return;
+		}
+
+		// Check that the cruise data is checked and reasonable
+		errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
+		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
 		boolean willAutofail = false;
 		for ( DashboardCruise cruise : cruiseSet ) {
 			String status = cruise.getDataCheckStatus();
@@ -1098,7 +1098,7 @@ public class CruiseListPage extends Composite {
 					public void onSuccess(Boolean result) {
 						// Only proceed if yes; ignore if no or null
 						if ( result == true )
-							continueCheckCruisesForSOCAT();
+							AddToSocatPage.showPage(cruiseSet);
 					}
 					@Override
 					public void onFailure(Throwable ex) {
@@ -1110,55 +1110,7 @@ public class CruiseListPage extends Composite {
 			askDataAutofailPopup.askQuestion(warnMsg);
 			return;
 		}
-		continueCheckCruisesForSOCAT();		
-	}
-
-	/**
-	 * Checks the cruises given in cruiseSet in this instance for
-	 * metadata compatibility for adding to SOCAT.  At this time
-	 * this only checks that an OME metadata document is associated
-	 * with each cruise.  If not, thus causing an automatic F flag, 
-	 * asks the user if the submit should be continued.  If the 
-	 * answer is yes, or if all the cruises have OME metadata 
-	 * documents, continues the submission to SOCAT by calling 
-	 * {@link AddToSocatPage#showPage(HashSet)}.
-	 */
-	private void continueCheckCruisesForSOCAT() {
-		// Check if the cruises have metadata documents
-		String warnMsg = METADATA_AUTOFAIL_HTML_PROLOGUE;
-		boolean willAutofail = false;
-		for ( DashboardCruise cruise : cruiseSet ) {
-			if ( cruise.getOmeFilename().isEmpty() ) {
-				warnMsg += "<li>" + 
-						SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
-				willAutofail = true;
-			}
-		}
-
-		// If missing metadata, ask to continue
-		if ( willAutofail ) {
-			warnMsg += AUTOFAIL_HTML_EPILOGUE;
-			if ( askMetaAutofailPopup == null ) {
-				askMetaAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
-						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
-					@Override
-					public void onSuccess(Boolean result) {
-						// Only proceed if yes; ignore if no or null
-						if ( result == true )
-							AddToSocatPage.showPage(cruiseSet);
-					}
-					@Override
-					public void onFailure(Throwable ex) {
-						// Never called
-						;
-					}
-				});
-			}
-			askMetaAutofailPopup.askQuestion(warnMsg);
-			return;
-		}
-
-		// All cruises have metadata; continue on
+		// No problems; continue on
 		AddToSocatPage.showPage(cruiseSet);
 	}
 

@@ -12,7 +12,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
@@ -27,7 +26,6 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -41,50 +39,34 @@ import com.google.gwt.view.client.Range;
 
 /**
  * Page for specifying the data column types in a DashboardCruiseWithData.
- * A new page needs to be created each time since the number of data columns
- * can vary with each cruise. 
  * 
  * @author Karl Smith
  */
 public class DataColumnSpecsPage extends Composite {
 
-	private static final int NUM_ROWS_PER_GRID_PAGE = 50;
 	private static final int DATA_COLUMN_WIDTH = 16;
 
-	private static final String WELCOME_INTRO = "Welcome ";
+	private static final String TITLE_TEXT = "Identify Data Columns";
+	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
-	private static final String MESSAGES_TEXT = "Show problems";
+	private static final String MESSAGES_TEXT = "Show data-problem messages";
 
-	private static final String SUBMIT_TEXT_FROM_UPLOAD = "OK";
-	private static final String SUBMIT_TEXT_FROM_LIST = "Recheck Data";
+	private static final String SUBMIT_TEXT = "Check Data";
 
-	private static final String CANCEL_TEXT_FROM_UPLOAD = "Abort Upload";
-	private static final String CANCEL_TEXT_FROM_LIST = "Return to Cruise List";
+	private static final String CANCEL_TEXT = "Done";
 
-	private static final String INTRO_HTML = 
-			"<b><large>Review Cruise Data</large></b>" +
-			"<br />" +
-			"Assign the type and the missing-value for the data columns of this cruise." +
-			"<ul>" +
-			"<li><em>(unknown)</em> data must be reassigned</li>" +
-			"<li><em>(ignore)</em> data will be completely ignored</li>" +
-			"<li><em>(supplemental)</em> data will not be checked " +
-			"or used, but will be included in SOCAT output files</li>" +
-			"<li><em>" + CruiseDataColumn.DEFAULT_MISSING_VALUE + 
-			"</em> missing data values are " +
-			"any of <em>NaN</em>, <em>NA</em>, <em>N/A</em>, and blank</li>" +
-			"</ul>" +
-			"Cruise: ";
+	private static final String INTRO_HTML_PROLOGUE = "Dataset: <ul><li>";
+	private static final String INTRO_HTML_EPILOGUE = "</li></ul>";
 
 	private static final String PAGER_LABEL_TEXT = "Rows shown";
+
+	private static final String NOT_CHECKED_MSG = "(data values not checked)";
 
 	private static final String UNKNOWN_COLUMN_TYPE_PROLOGUE = 
 			" data columns:<ul>";
 	private static final String UNKNOWN_COLUMN_TYPE_EPILOGUE = 
-			"</ul> are still <em>(unknown)</em> and need to be specified.  " +
-			"<em>(ignore)</em> or <em>(supplemental)</em> can be used to " +
-			"specify data not needed by SOCAT.";
+			"</ul> are still <em>(unknown)</em> and need to be specified.";
 	private static final String NO_LONGITUDE_ERROR_MSG = 
 			"No data column has been identified as the longitude";
 	private static final String NO_LATITUDE_ERROR_MSG =
@@ -119,20 +101,11 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String NO_DEFAULT_SECONDS_TEXT = "No";
 
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
-			"Problems obtaining the cruise column types";
+			"Problems obtaining the data column types";
 	private static final String SUBMIT_FAIL_MSG = 
-			"Problems updating the cruise column types";
+			"Problems updating the data column types";
 	private static final String MORE_DATA_FAIL_MSG = 
-			"Problems obtaining more cruise data";
-
-	private static final String ABORT_UPLOAD_MSG = 
-			"This cruise has not yet been assigned acceptable column types " +
-			"and will be not be saved.  Are you sure you want to abort? ";
-	private static final String LOGOUT_UPLOAD_MSG = 
-			"This cruise has not yet been assigned acceptable column types " +
-			"and will be not be saved.  Are you sure you want to logout? ";
-	private static final String CONTINUE_ABORT_TEXT = "Yes";
-	private static final String CANCEL_ABORT_TEXT = "No";
+			"Problems obtaining more data from the dataset";
 
 	private static final String SANITY_CHECK_FAIL_MSG = 
 			"Automatic data checking failed, " +
@@ -153,28 +126,24 @@ public class DataColumnSpecsPage extends Composite {
 	private static DataSpecsServiceAsync service = 
 			GWT.create(DataSpecsService.class);
 
+	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField DataGrid<ArrayList<String>> dataGrid;
+	@UiField Label pagerLabel;
+	@UiField Label messagesLabel;
+	@UiField SimplePager gridPager;
 	@UiField Button messagesButton;
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
-	@UiField Label pagerLabel;
-	@UiField SimplePager gridPager;
 
 	// Username associated with this page
 	private String username;
-	// Popup to confirm aborting the cruise "upload"
-	private DashboardAskPopup okayToAbortPopup;
-	// Boolean indicating this abort is coming from a logout
-	boolean fromLogoutButton;
 	// Popup to confirm continue with default zero seconds
 	private DashboardAskPopup defaultSecondsPopup;
 	// Cruise associated with and updated by this page
 	private DashboardCruise cruise;
-	// Was this page called from the cruise upload page?
-	private boolean fromUpload;
 	// List of CruiseDataColumn objects associated with the column Headers
 	private ArrayList<CruiseDataColumn> cruiseDataCols;
 	// Asynchronous data provider for the data grid 
@@ -193,14 +162,18 @@ public class DataColumnSpecsPage extends Composite {
 		singleton = this;
 
 		username = "";
-		okayToAbortPopup = null;
-		fromLogoutButton = false;
 		defaultSecondsPopup = null;
+
+		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 		messagesButton.setText(MESSAGES_TEXT);
 		pagerLabel.setText(PAGER_LABEL_TEXT);
+		submitButton.setText(SUBMIT_TEXT);
+		cancelButton.setText(CANCEL_TEXT);
+
 		cruise = new DashboardCruise();
 		cruiseDataCols = new ArrayList<CruiseDataColumn>();
+
 		// Create the asynchronous data provider for the data grid
 		dataProvider = new AsyncDataProvider<ArrayList<String>>() {
 			@Override
@@ -237,11 +210,8 @@ public class DataColumnSpecsPage extends Composite {
 	 * 
 	 * @param expocode
 	 * 		show the specifications for this cruise
-	 * @param fromUpload
-	 * 		was this called from the cruise upload page?  This is used 
-	 * 		to determine the actions to take if this page is cancelled.
 	 */
-	static void showPage(String expocode, final boolean fromUpload) {
+	static void showPage(String expocode) {
 		service.getCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
 								DashboardLoginPage.getPasshash(), expocode, 
 								new AsyncCallback<DashboardCruiseWithData>() {
@@ -251,9 +221,8 @@ public class DataColumnSpecsPage extends Composite {
 					if ( singleton == null )
 						singleton = new DataColumnSpecsPage();
 					SocatUploadDashboard.updateCurrentPage(singleton);
-					singleton.fromUpload = fromUpload;
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
-					History.newItem(PagesEnum.REVIEW_DATA.name(), false);
+					History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 				}
 				else {
 					SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
@@ -284,7 +253,7 @@ public class DataColumnSpecsPage extends Composite {
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
-				History.newItem(PagesEnum.REVIEW_DATA.name(), false);
+				History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 		}
 	}
 
@@ -300,15 +269,31 @@ public class DataColumnSpecsPage extends Composite {
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
 
-		if ( fromUpload ) {
-			messagesButton.setVisible(false);
-			submitButton.setText(SUBMIT_TEXT_FROM_UPLOAD);
-			cancelButton.setText(CANCEL_TEXT_FROM_UPLOAD);
+		String status = cruiseSpecs.getDataCheckStatus();
+		if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
+			 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+			messagesLabel.setText(NOT_CHECKED_MSG);
+			messagesButton.setEnabled(false);
 		}
 		else {
-			messagesButton.setVisible(true);
-			submitButton.setText(SUBMIT_TEXT_FROM_LIST);
-			cancelButton.setText(CANCEL_TEXT_FROM_LIST);
+			String msgText;
+			int numErrors = cruiseSpecs.getNumErrorMsgs();
+			if ( numErrors == 0 )
+				msgText = "no";
+			else
+				msgText = Integer.toString(numErrors);
+			msgText += " errors; ";
+			int numWarns = cruiseSpecs.getNumWarnMsgs();
+			if ( numWarns == 0 )
+				msgText += "no";
+			else
+				msgText += Integer.toString(numWarns);
+			msgText += " warnings";
+			messagesLabel.setText(msgText);
+			if ( (numErrors == 0) && (numWarns == 0) )
+				messagesButton.setEnabled(false);
+			else
+				messagesButton.setEnabled(true);
 		}
 
 		// Clear the expocode in case the data provider gets called while clearing
@@ -334,9 +319,9 @@ public class DataColumnSpecsPage extends Composite {
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 
-		introHtml.setHTML(INTRO_HTML + "<b>" + 
-				SafeHtmlUtils.htmlEscape(cruise.getExpocode()) +
-				"</b>");
+		introHtml.setHTML(INTRO_HTML_PROLOGUE +  
+				SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + 
+				INTRO_HTML_EPILOGUE);
 
 		// Rebuild the data grid using the provided CruiseDataColumnSpecs
 		if ( cruise.getDataColTypes().size() < 4 )
@@ -365,85 +350,19 @@ public class DataColumnSpecsPage extends Composite {
 		dataProvider.updateRowData(0, cruiseSpecs.getDataValues());
 		// Set the number of data rows to display in the grid.
 		// This will refresh the view.
-		dataGrid.setPageSize(NUM_ROWS_PER_GRID_PAGE);
-	}
-
-	private void createAbortPopup() {
-		okayToAbortPopup = new DashboardAskPopup(CONTINUE_ABORT_TEXT, 
-				CANCEL_ABORT_TEXT, new AsyncCallback<Boolean>() {
-			@Override
-			public void onSuccess(Boolean continueAbort) {
-				// Only delete the cruise if the answer was to continue 
-				// the abort; do nothing if the answer was to cancel the
-				// abort or null (window closed somehow)
-				if ( continueAbort ) {
-					HashSet<String> cruiseSet = new HashSet<String>();
-					cruiseSet.add(cruise.getExpocode());
-					// Delete the cruise and update the CruiseListPage
-					CruiseListPage.deleteCruises(cruiseSet);
-					if ( fromLogoutButton ) {
-						// Go to the logout page and logout
-						DashboardLogoutPage.showPage();
-					}
-					else {
-						// Wait (up to 15 sec) for the deletion to complete.
-						(new Timer() {
-							int count = 0;
-							@Override
-							public void run() {
-								count++;
-								if ( (count > 15) || 
-									 CruiseListPage.deleteCruisesDone() ) {
-									// Delete done or waiting too long
-									// return to the cruise list page
-									cancel();
-									CruiseListPage.showPage(false);
-								}
-							}
-						}).scheduleRepeating(1000);
-					}
-				}
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				// Never called
-				;
-			}
-		});
+		dataGrid.setPageSize(DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		fromLogoutButton = true;
-		if ( fromUpload ) {
-			// From the cruise upload page; ask if the cruise should be deleted.
-			if ( okayToAbortPopup == null ) 
-				createAbortPopup();
-			// Assign and show the question
-			okayToAbortPopup.askQuestion(LOGOUT_UPLOAD_MSG);
-		}
-		else {
-			// Proceed with the logout
-			DashboardLogoutPage.showPage();
-		}
+		DashboardLogoutPage.showPage();
 	}
 
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
-		fromLogoutButton = false;
-		if ( fromUpload ) {
-			// From the cruise upload page;
-			// ask if the cruise should be deleted.
-			if ( okayToAbortPopup == null ) 
-				createAbortPopup();
-			// Assign and show the question
-			okayToAbortPopup.askQuestion(ABORT_UPLOAD_MSG);
-		}
-		else {
-			// Return to the latest cruise listing page, which may  
-			// have been updated from previous actions on this page.
-			CruiseListPage.showPage(false);
-		}
+		// Return to the latest cruise listing page, which may  
+		// have been updated from previous actions on this page.
+		CruiseListPage.showPage(false);
 	}
 
 	@UiHandler("messagesButton") 
@@ -627,31 +546,24 @@ public class DataColumnSpecsPage extends Composite {
 							" (unexpected null cruise information returned)");
 					return;
 				}
+				updateCruiseColumnSpecs(specs);
 				String status = specs.getDataCheckStatus();
-				if ( fromUpload ) {
-					// Cruise uploaded; return to an updated cruise list page
-					CruiseListPage.showPage(false);
+				if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
+					 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+					// the sanity checker had serious problems
+					SocatUploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
+				}
+				else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
+					// errors issued
+					SocatUploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
+				}
+				else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
+					// warnings issued
+					SocatUploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
 				}
 				else {
-					// data column information updated; stay on the page
-					updateCruiseColumnSpecs(specs);
-					if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
-						 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
-						// the sanity checker had serious problems
-						SocatUploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
-					}
-					else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
-						// errors issued
-						SocatUploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
-					}
-					else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
-						// warnings issued
-						SocatUploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
-					}
-					else {
-						// no problems
-						SocatUploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
-					}
+					// no problems
+					SocatUploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
 				}
 			}
 			@Override
