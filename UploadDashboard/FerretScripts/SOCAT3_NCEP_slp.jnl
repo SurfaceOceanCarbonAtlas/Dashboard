@@ -6,20 +6,32 @@
 !!!!!!!!!!!!!!!!!!!! NCEP sea level pressure !!!!!!!!!!!!!!!!!!!! 
 ! Open ncep SLP 6-hour data. 
 use ncep_slp
+
 define symbol dncep = `slp,return=dsetnum`
 set data "($cruise_filename)"
 
 
 ! Reconcile the time data in the socat data with the time axis of ncep slp
 
-! times in cruise datset, hours since start of 1900
-!LET dates_for_ncep = 24* days1900(year, month, day) + hour/24 + minute/(24*60)! + second/(24*60*60)
-
 define axis/t="1-jan-1900:00:00:00":"1-jan-1900:01:00:00":1/units=hours/t0="`slp[d=($dncep)],return=t0`" time_to_zero
 let ttzero = t[gt=time_to_zero,L=1]
 
-! Redefine times in cruise datset, hours since start of 0000 to match the time axis of ncep slp
-LET dates_for_ncep = 24* days1900(year, month, day) + hour/24 + minute/(24*60) + second/(24*60*60) + ttzero
+! Times in cruise datset, hours since start of 0001 to match the time axis of ncep slp
+
+! NOTE the Matlab scripts make a correction of 2 days when computing the dates for NCEP data,
+! which uses the mixed Julian/Gregorian calendar axis of UDUNITS.
+!
+!   NCEP_base_time=24.*(datenum('0001-01-01 00:00:00', 'yyyy-mm-dd HH:MM:SS')-2);
+!
+! However the ncep pressure data in the old .mat.txt files, and cruise data from SOCAT 2 
+! compare best with the result from this script, if I use this:
+!
+!  LET dates_for_ncep = 24* (days1900(year, month, day)+2) ...
+!
+! indicating that perhaps that 2-day correction wasn't applied in the data we were using?
+
+
+LET dates_for_ncep = 24* days1900(year, month, day) + hour + minute/60 + second/(60*60) + `ttzero`
 
 ! Load just the range of time we will need in the call to SAMPLEXYT
 let data_t_lo = INT(dates_for_ncep[i=@min)] - 10) 
@@ -27,6 +39,4 @@ let data_t_hi = INT(dates_for_ncep[i=@max)] + 10)
 
 ! sample SLP at the cruise times and locations.  Convert to HectoPascals.
 let/units="hPa"/title="NCEP sea level pressure" ncep_slp = \
- 0.01* SAMPLEXYT(slp[d=($dncep),t=`data_t_lo`:`data_t_hi`],longitude, latitude, dates_for_ncep)
-
-! plot/vs/ribbon/thick/sym=21 longitude, latitude, ncep_slp
+ 0.01* SAMPLEXYT_NRST(slp[d=($dncep),t=`data_t_lo`:`data_t_hi`],longitude, latitude, dates_for_ncep)
