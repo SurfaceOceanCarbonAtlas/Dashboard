@@ -186,12 +186,28 @@ public class MetadataUploadService extends HttpServlet {
 					}
 				}
 				else {
-					// Directly modify the additional documents listing in the cruise and save
-					if ( cruise.getAddlDocs().add(metadata.getAddlDocsTitle()) ) {
-						cruiseHandler.saveCruiseInfoToFile(cruise, 
-								"Added additional document " + metadata.getFilename() + 
-								" to cruise " + expo);
+					// Work directly on the additional documents list in the cruise object
+					TreeSet<String> addlDocTitles = cruise.getAddlDocs();
+					String titleToDelete = null;
+					for ( String title : addlDocTitles ) {
+						if ( uploadFilename.equals(
+								(DashboardMetadata.splitAddlDocsTitle(title))[0]) ) {
+							titleToDelete = title;
+							break;
+						}
 					}
+					String commitMsg; 
+					if ( titleToDelete != null ) {
+						addlDocTitles.remove(titleToDelete);
+						commitMsg = "Update additional document " + uploadFilename + 
+									" (" + uploadTimestamp + ") for cruise " + expo;
+					}
+					else {
+						commitMsg = "Add additional document " + uploadFilename + 
+									" (" + uploadTimestamp + ") to cruise " + expo;
+					}
+					addlDocTitles.add(metadata.getAddlDocsTitle());
+					cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
 				}
 			} catch ( Exception ex ) {
 				metadataItem.delete();
