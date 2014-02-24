@@ -91,7 +91,7 @@ public class AddToSocatPage extends Composite {
 			"in the metadata supplied to SOCAT for these datasets.";
 
 	private static final String ALREADY_SENT_CDIAC_HTML =
-			"<h2>WARNING</h2>" +
+			"<h3>WARNING</h3>" +
 			"<p>The files for some or all of these dataset were earlier sent to CDIAC " +
 			"for archival.  Normally you do not want to change the archival option " +
 			"for these datasets. </p>" +

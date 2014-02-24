@@ -28,16 +28,18 @@ import com.google.gwt.user.client.ui.Widget;
 public class DashboardLogoutPage extends Composite {
 
 	private static final String GOODBYE_MSG = 
+			"<p>" +
 			"Thank you for contributing cruise data to SOCAT.  Please consider, " +
 			"if you are not already a member, joining our group of reviewers as " +
 			"well as joining the SOCAT E-mail list (Google group).  Contact " +
 			"socat.support@noaa.gov for more information on joining these groups. " +
-			"<br /><br />" +
+			"</p><p>" +
 			"If you experienced problems working with this product, please contact " +
 			"socat.support@noaa.gov with details explaining what you were trying to " +
 			"accomplish and the problem you encountered. " +
-			"<br /><br />" +
-			"Goodbye.";
+			"</p><p>" +
+			"Goodbye." +
+			"</p>";
 	private static final String RELOGIN_TEXT = "Log in again";
 	private static final String SOCAT_INFO_TEXT = "Return to socat.info";
 	private static final String SOCAT_INFO_LINK = "http://www.socat.info";

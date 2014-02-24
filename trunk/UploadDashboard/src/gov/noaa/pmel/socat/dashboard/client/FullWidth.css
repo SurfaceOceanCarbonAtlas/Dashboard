@@ -72,25 +72,25 @@ body {
 }
 
 .datagrid {
-	height: 30em;
+	height: 27em;
 	margin: 1em;
+}
+.datapagerlabel {
+	margin-left: 7em;
+	float: left;
+}
+.datapager {
+	margin-left: 3em;
+	float: left;
 }
 .datamsgpanel {
 	display: block;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
-.datapagerlabel {
-	margin-left: 7em;
-	float: left;
-}
 .datamsglabel {
 	margin-right: 3em;
 	float: right;
-}
-.datapager {
-	margin-left: 3em;
-	float: left;
 }
 .datamsgbutton {
 	font-size: small;
@@ -101,12 +101,11 @@ body {
 	clear: both;
 }
 
-.fullpagecontainer {
-	width: 100%;
-	height: 100%;
+.datasetsgrid {
+	margin-right: 0.5em;
 }
 
-.gridresizepanel {
+.fullpagecontainer {
 	width: 100%;
 	height: 100%;
 }
@@ -199,15 +198,17 @@ body {
 	padding: 0.25em;
 }
 
-.submitscrollpanel {
-	margin-top: 1.5em;
-	margin-bottom: 0em;
-	margin-left: 0.5em;
-	margin-right: 1em;
+.submitdockpanel {
+	width: 100%;
+	height: 32em;
 }
 .submitpanel {
 	background-color: #AACCEE;
 	padding: 0.5em;
+	margin-top: 1.75em;
+	margin-bottom: 0em;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
 }
 .submitpanelbutton {
 	display: block;

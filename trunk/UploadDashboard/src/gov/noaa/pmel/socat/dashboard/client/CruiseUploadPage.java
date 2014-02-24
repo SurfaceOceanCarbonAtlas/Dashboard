@@ -91,14 +91,14 @@ public class CruiseUploadPage extends Composite {
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a data file to upload";
 	private static final String UNKNOWN_FAIL_MSG = 
-			"<h2>Upload failed.</h2>" +
+			"<h3>Upload failed.</h3>" +
 			"<p>See the preview on the page for more information.</p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<h2>No cruise expocode found.</h2>" +
-			"<p>The data file needs to contain the cruise expocode in the metadata " +
-			"preamble to the data.  This expocode metadata line should look " +
-			"something like<br />" +
-			"expocode = 49P120101218<br />" +
+			"<h3>No cruise expocode found.</h3>" +
+			"<p>The data file needs to contain the dataset expocode in the lines " +
+			"of metadata preceding the data.  This expocode metadata line should " +
+			"look something like<br />" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218<br />" +
 			"The 12 character expocode is the NODC code for the vessel carrying " +
 			"the instrumentation followed by the numeric year, month, and day of " +
 			"departure or initial measurement.  For example, 49P120101218 indicates " +
@@ -108,17 +108,17 @@ public class CruiseUploadPage extends Composite {
 			"appears to SOCAT.  If the contents look very strange, you might need " +
 			"to change the character encoding in the advanced settings.</p>";
 	private static final String FILE_EXISTS_FAIL_HTML = 
-			"<h2>A dataset already exists with this expocode.</h2>" +
+			"<h3>A dataset already exists with this expocode.</h3>" +
 			"<p>The beginning of the existing dataset is given in the preview " +
 			"window.  Select the <em>" + OVERWRITE_TEXT + "</em> setting if this " +
 			"is an update to this existing dataset.";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG = 
-			"<h2>A dataset already exists with this expocode.</h2>" +
+			"<h3>A dataset already exists with this expocode.</h3>" +
 			"<p>The existing dataset cannot be overwritten because it either has " +
 			"been submitted to for QC or does not belong to you.  The beginning of " +
 			"the existing dataset is given in the preview window.";
 	private static final String FILE_DOES_NOT_EXIST_FAIL_HTML = 
-			"<h2>A dataset with this expocode does not exist.</h2>  " +
+			"<h3>A dataset with this expocode does not exist.</h3>  " +
 			"The beginning of the uploaded dataset is given in the preview window.  " +
 			"If the expocode in the data file is correct, use the <em>" + CREATE_TEXT + 
 			"</em> setting to create a new dataset.";
@@ -368,7 +368,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
 				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setVisible(true);
+			showAdvancedOptions();
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(UNKNOWN_FAIL_MSG);
 		}
@@ -389,7 +389,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			advancedPanel.setVisible(true);
+			showAdvancedOptions();
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(NO_EXPOCODE_FAIL_MSG);
 		}
@@ -401,7 +401,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			advancedPanel.setVisible(true);
+			showAdvancedOptions();
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(FILE_EXISTS_FAIL_HTML);
 		}
@@ -413,7 +413,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			advancedPanel.setVisible(true);
+			showAdvancedOptions();
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(CANNOT_OVERWRITE_FAIL_MSG);
 		}
@@ -425,7 +425,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
 			else
 				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			advancedPanel.setVisible(true);
+			showAdvancedOptions();
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(FILE_DOES_NOT_EXIST_FAIL_HTML);
 		}
@@ -448,7 +448,7 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
 				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setVisible(true);
+			showAdvancedOptions();
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(UNKNOWN_FAIL_MSG);
 		}

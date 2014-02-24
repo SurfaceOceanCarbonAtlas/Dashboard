@@ -189,7 +189,7 @@ public class CruiseListPage extends Composite {
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
 	private static final String ADDL_DOCS_COLUMN_NAME = "Addl Documents";
-	// private static final String OWNER_COLUMN_NAME = "Owner";
+	private static final String OWNER_COLUMN_NAME = "Owner";
 
 	// Replacement strings for empty or null values
 	private static final String EMPTY_TABLE_TEXT = "(no uploaded cruises)";
@@ -201,7 +201,7 @@ public class CruiseListPage extends Composite {
 	private static final String NO_ARCHIVE_STATUS_STRING = "(not specified)";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
-	// private static final String NO_OWNER_STRING = "(unknown)";
+	private static final String NO_OWNER_STRING = "(unknown)";
 
 	interface DashboardCruiseListPageUiBinder extends UiBinder<Widget, CruiseListPage> {
 	}
@@ -233,6 +233,9 @@ public class CruiseListPage extends Composite {
 	private HashSet<DashboardCruise> cruiseSet;
 	private HashSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
+	private TextColumn<DashboardCruise> ownerColumn;
+	private boolean ownerColumnShown;
+	private double minTableWidth;
 
 	// The singleton instance of this page
 	private static CruiseListPage singleton;
@@ -367,14 +370,29 @@ public class CruiseListPage extends Composite {
 		// Update the username
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
-		// Only a manager has the need to see the cruise owner column
 		if ( cruises.isManager() ) {
-			addToListButton.setVisible(true);
-			removeFromListButton.setVisible(true);
+			if ( ! ownerColumnShown ) {
+				// Add manager-specific buttons and column
+				addToListButton.setVisible(true);
+				removeFromListButton.setVisible(true);
+				datasetsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
+				datasetsGrid.setColumnWidth(ownerColumn, 
+						SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+				minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
+				ownerColumnShown = true;
+			}
 		}
 		else {
-			addToListButton.setVisible(false);
-			removeFromListButton.setVisible(false);
+			if ( ownerColumnShown ) {
+				// Remove manager-specific buttons and column
+				addToListButton.setVisible(false);
+				removeFromListButton.setVisible(false);
+				datasetsGrid.removeColumn(ownerColumn);
+				minTableWidth -= SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
+				ownerColumnShown = false;
+			}
 		}
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
@@ -694,7 +712,7 @@ public class CruiseListPage extends Composite {
 		TextColumn<DashboardCruise> timestampColumn = buildTimestampColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 		Column<DashboardCruise,SafeHtml> addlDocsColumn = buildAddnDocsColumn();
-		// TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
+		ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
 		datasetsGrid.addColumn(selectedColumn, "");
@@ -706,10 +724,11 @@ public class CruiseListPage extends Composite {
 		datasetsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
 		datasetsGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
 		datasetsGrid.addColumn(addlDocsColumn, ADDL_DOCS_COLUMN_NAME);
-		// datasetsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
+		datasetsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
+		ownerColumnShown = true;
 
 		// Set the minimum widths of the columns
-		double minTableWidth = 0.0;
+		minTableWidth = 0.0;
 		datasetsGrid.setColumnWidth(selectedColumn, 
 				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
@@ -737,9 +756,9 @@ public class CruiseListPage extends Composite {
 		datasetsGrid.setColumnWidth(addlDocsColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
-		// datasetsGrid.setColumnWidth(ownerColumn, 
-		// 		SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		// minTableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(ownerColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
@@ -758,7 +777,7 @@ public class CruiseListPage extends Composite {
 		archiveStatusColumn.setSortable(true);
 		filenameColumn.setSortable(true);
 		addlDocsColumn.setSortable(true);
-		// ownerColumn.setSortable(true);
+		ownerColumn.setSortable(true);
 
 		// Add a column sorting handler for these columns
 		ListHandler<DashboardCruise> columnSortHandler = 
@@ -781,8 +800,8 @@ public class CruiseListPage extends Composite {
 				DashboardCruise.filenameComparator);
 		columnSortHandler.setComparator(addlDocsColumn, 
 				DashboardCruise.addlDocsComparator);
-		// columnSortHandler.setComparator(ownerColumn, 
-		// 		DashboardCruise.ownerComparator);
+		columnSortHandler.setComparator(ownerColumn, 
+				DashboardCruise.ownerComparator);
 
 		// Add the sort handler to the table, and sort by expocode by default
 		datasetsGrid.addColumnSortHandler(columnSortHandler);
@@ -999,9 +1018,9 @@ public class CruiseListPage extends Composite {
 						sb.appendHtmlConstant("<br />");
 					String[] pieces = DashboardMetadata.splitAddlDocsTitle(title);
 					sb.appendEscaped(pieces[0]);
-					sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;&nbsp;&nbsp;");
+					sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;(");
 					sb.appendEscaped(pieces[1]);
-					sb.appendHtmlConstant("</small>");
+					sb.appendHtmlConstant(")</small>");
 				}
 				return sb.toSafeHtml();
 			}
@@ -1009,23 +1028,22 @@ public class CruiseListPage extends Composite {
 		return addnDocsColumn;
 	}
 
-	/*
+	/**
 	 * Creates the owner column for the table
-	 *
-	 * private TextColumn<DashboardCruise> buildOwnerColumn() {
-	 * 	TextColumn<DashboardCruise> ownerColumn = 
-	 * 			new TextColumn<DashboardCruise> () {
-	 * 		@Override
-	 * 		public String getValue(DashboardCruise cruise) {
-	 * 			String owner = cruise.getOwner();
-	 * 			if ( owner.isEmpty() )
-	 * 				owner = NO_OWNER_STRING;
-	 * 			return owner;
-	 * 		}
-	 * 	};
-	 * 	return ownerColumn;
-	 * }
-	*/
+	 */
+	 private TextColumn<DashboardCruise> buildOwnerColumn() {
+	 	TextColumn<DashboardCruise> myOwnerColumn = 
+	 			new TextColumn<DashboardCruise> () {
+	 		@Override
+	 		public String getValue(DashboardCruise cruise) {
+	 			String owner = cruise.getOwner();
+	 			if ( owner.isEmpty() )
+	 				owner = NO_OWNER_STRING;
+	 			return owner;
+	 		}
+	 	};
+	 	return myOwnerColumn;
+	 }
 
 	/**
 	 * Checks the cruises given in cruiseSet in this instance for metadata 
