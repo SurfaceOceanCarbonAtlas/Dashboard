@@ -6,21 +6,12 @@
 
 	<!-- Servlets -->
 	<servlet>
-		<servlet-name>DashboardAddToSocatServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.AddToSocatServiceImpl</servlet-class>
+		<servlet-name>DashboardListServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardListServiceImpl</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>DashboardAddToSocatServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/AddToSocatService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>DashboardCruiseListServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.CruiseListServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DashboardCruiseListServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/CruiseListService</url-pattern>
+		<servlet-name>DashboardListServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/DashboardListService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -42,39 +33,21 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DashboardLogoutServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.LogoutServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DashboardLogoutServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/LogoutService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>DashboardMetadataListServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.MetadataListServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DashboardMetadataListServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/MetadataListService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>DashboardSCMessagesServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.SCMessagesServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DashboardSCMessagesServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/SCMessagesService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.MetadataUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
 		<url-pattern>/SocatUploadDashboard/MetadataUploadService</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>DashboardAddToSocatServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.AddToSocatServiceImpl</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DashboardAddToSocatServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/AddToSocatService</url-pattern>
 	</servlet-mapping>
 
 	<!-- Default page to serve -->
