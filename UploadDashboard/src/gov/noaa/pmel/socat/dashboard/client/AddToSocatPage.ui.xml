@@ -12,7 +12,7 @@
 				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
-			<g:HTML addStyleNames="{style.addinfo}" ui:field="introHtml" />
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">
 				<g:Label addStyleNames="{style.optionsintro}" ui:field="archivePlanLabel" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">

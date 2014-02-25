@@ -264,9 +264,11 @@ public class AddlDocsManagerPage extends Composite {
 				addlDocsList.add(mdata);
 			}
 		}
-		addlDocsGrid.setRowCount(addlDocsList.size());
+		addlDocsGrid.setRowCount(addlDocsList.size(), true);
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(addlDocsGrid, addlDocsGrid.getColumnSortList());
+		// No pager (not needed); just set the page size and refresh the view
+		addlDocsGrid.setPageSize(DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 	}
 
 	@UiHandler("logoutButton")
@@ -341,7 +343,7 @@ public class AddlDocsManagerPage extends Composite {
 				String[] nameTime = DashboardMetadata.splitAddlDocsTitle(addlDocTitle);
 				if ( uploadFilename.equals(nameTime[0]) ) {
 					message += "<li>" + SafeHtmlUtils.htmlEscape(nameTime[0]) + 
-							" (" + SafeHtmlUtils.htmlEscape(nameTime[1]) + 
+							"<br />&nbsp;&nbsp;(uploaded " + SafeHtmlUtils.htmlEscape(nameTime[1]) + 
 							")<br />&nbsp;&nbsp;for dataset " + 
 							SafeHtmlUtils.htmlEscape(cruz.getExpocode()) + "</li>";
 					willOverwrite = true;
@@ -561,7 +563,8 @@ public class AddlDocsManagerPage extends Composite {
 				final String deleteFilename = mdata.getFilename();
 				final String deleteExpocode = mdata.getExpocode();
 				String message = DELETE_DOC_HTML_PROLOGUE + 
-						SafeHtmlUtils.htmlEscape(deleteFilename) + " (" + 
+						SafeHtmlUtils.htmlEscape(deleteFilename) + 
+						"<br />&nbsp;&nbsp;(uploaded " + 
 						SafeHtmlUtils.htmlEscape(mdata.getUploadTimestamp()) + 
 						")<br />&nbsp;&nbsp;for dataset " + 
 						SafeHtmlUtils.htmlEscape(deleteExpocode) + 

@@ -13,8 +13,8 @@
 				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
-			<g:HTML addStyleNames="{style.cruisenamesintro}" ui:field="introHtml" />
-			<cell:DataGrid ui:field="addlDocsGrid" />
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<cell:DataGrid addStyleNames="{style.addldocsgrid}" ui:field="addlDocsGrid" />
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
 					<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"

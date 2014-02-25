@@ -21,6 +21,7 @@ import org.junit.Test;
  */
 public class CruiseDsgNcFileTest {
     String filename;
+    String expocode;
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create(java.lang.String)}.
 	 */
@@ -69,6 +70,7 @@ public class CruiseDsgNcFileTest {
 				"31B520060606,GM0606,6,11,2006,0,11,29.0641,-92.7641,29.9,33.14,404,386,1009.26,7.1", 
 				"31B520060606,GM0606,6,11,2006,0,12,29.0634,-92.766,29.89,32.97,402.9,384.9,1009.237,7.1"
 			};
+		expocode = "31B520060606";
 		ArrayList<ArrayList<String>> testValues = new ArrayList<ArrayList<String>>();
 		for ( String valsString : dataValueStrings ) {
 			ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",",-1)));
@@ -84,7 +86,6 @@ public class CruiseDsgNcFileTest {
 		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
 
 		// Create the SocatMetadata for this cruise
-		String expocode = "31B520060606";
 		SocatMetadata mdata = new SocatMetadata();
 		mdata.setExpocode(expocode);
 		mdata.setCruiseName("GM0606");
@@ -103,5 +104,8 @@ public class CruiseDsgNcFileTest {
 
 	public String getFilename() {
 	    return filename;
+	}
+	public String getExpocode() {
+		return expocode;
 	}
 }

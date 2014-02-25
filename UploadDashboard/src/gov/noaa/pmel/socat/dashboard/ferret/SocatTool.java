@@ -1,7 +1,5 @@
 package gov.noaa.pmel.socat.dashboard.ferret;
 
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
@@ -14,18 +12,25 @@ public class SocatTool extends Thread {
 
 	FerretConfig ferret = new FerretConfig();
 	String filename;
+	String expocode;
 	String message;
-	boolean error = false;
-	boolean done = false;
+	boolean error;
+	boolean done;
 
 
 	public SocatTool(FerretConfig ferretConf) {
 	    ferret = new FerretConfig();
 	    ferret.setRootElement((Element)ferretConf.getRootElement().clone());
+	    filename = null;
+	    expocode = null;
+	    message = null;
+	    error = false;
+	    done = false;
 	}
 
-	public void init(String filename) {
+	public void init(String filename, String expocode) {
 		this.filename = filename;
+		this.expocode = expocode;
 	}
 
 	@Override
@@ -44,13 +49,12 @@ public class SocatTool extends Thread {
 			if ( !temp.exists() ) {
 				temp.mkdirs();
 			}
-			String fileKey = DashboardUtils.passhashFromPlainText(filename, filename);
 
-			File script = new File(temp_dir, "ferret_operation_"+fileKey+".jnl");			
+			File script = new File(temp_dir, "ferret_operation_" + expocode + ".jnl");			
 			
 			script_writer = new PrintStream(script);
 
-			script_writer.println("go " +driver+" "+"\""+filename+"\"");
+			script_writer.println("go " + driver + " " + "\"" + filename + "\"");
 			List<String> args = ferret.getArgs();
 		    String interpreter = ferret.getInterpreter();
 		    String executable = ferret.getExecutable();
@@ -75,11 +79,14 @@ public class SocatTool extends Thread {
 			
 			long timelimit = ferret.getTimeLimit();
 
-			Task task = new Task(fullCmd, ferret.getRuntimeEnvironment().getEnv(), new File(temp_dir), new File("cancel"), timelimit, ferret.getErrorKeys());
+			Task task = new Task(fullCmd, ferret.getRuntimeEnvironment().getEnv(), 
+					new File(temp_dir), new File("cancel"), timelimit, ferret.getErrorKeys());
 			task.run();
 			error = task.getHasError();
 			message = task.getErrorMessage();
 			done = true;
+			if ( ! error )
+				script.delete();
 		} catch ( Exception e ) {
 			done = true;
 			error = true;
