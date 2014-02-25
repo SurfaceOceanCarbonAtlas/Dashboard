@@ -4,8 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseListService;
-import gov.noaa.pmel.socat.dashboard.shared.CruiseListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -209,8 +209,8 @@ public class CruiseListPage extends Composite {
 	private static DashboardCruiseListPageUiBinder uiBinder = 
 			GWT.create(DashboardCruiseListPageUiBinder.class);
 
-	private static CruiseListServiceAsync service = 
-			GWT.create(CruiseListService.class);
+	private static DashboardListServiceAsync service = 
+			GWT.create(DashboardListService.class);
 
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
@@ -311,10 +311,8 @@ public class CruiseListPage extends Composite {
 		else
 			errMsg = GET_CRUISE_LIST_ERROR_MSG;
 		// Request the latest cruise list
-		service.updateCruiseList(DashboardLoginPage.getUsername(), 
+		service.getCruiseList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
-								 DashboardUtils.REQUEST_CRUISE_LIST_ACTION, 
-								 new HashSet<String>(),
 								 new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
@@ -403,41 +401,6 @@ public class CruiseListPage extends Composite {
 		datasetsGrid.setRowCount(cruiseList.size());
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
-	}
-
-	/**
-	 * Update the currently displayed cruise list page with the latest 
-	 * information from the server after performing the specified action.
-	 * 
-	 * @param action
-	 * 		cruise list action to perform
-	 * @param expocodes
-	 * 		cruise expocodes to act upon (if appropriate)
-	 * @param errMsg
-	 * 		if fails, safe HTML message to show, along with some explanation 
-	 */
-	private void updatePage(String action, HashSet<String> expocodes, 
-													final String errMsg) {
-		service.updateCruiseList(DashboardLoginPage.getUsername(), 
-								 DashboardLoginPage.getPasshash(), 
-								 action, expocodes,
-								 new AsyncCallback<DashboardCruiseList>() {
-			@Override
-			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardLoginPage.getUsername()
-										.equals(cruises.getUsername()) ) {
-					CruiseListPage.this.updateCruises(cruises);
-				}
-				else {
-					SocatUploadDashboard.showMessage(errMsg + 
-							" (unexpected invalid data set list)");
-				}
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(errMsg, ex);
-			}
-		});
 	}
 
 	/**
@@ -559,15 +522,7 @@ public class CruiseListPage extends Composite {
 					NO_CRUISE_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
 			return;
 		}
-		if ( cruiseSet.size() == 1 ) {
-			// Single cruise selected; go to the additional documents manager page
-			AddlDocsManagerPage.showPage(
-					cruiseSet.iterator().next().getExpocode());
-		}
-		else {
-			// Multiple cruises selected; go to the additional documents upload page
-			AddlDocsUploadPage.showPage(cruiseSet);
-		}
+		AddlDocsManagerPage.showPage(cruiseSet);
 	}
 
 	@UiHandler("qcSubmitButton")
@@ -611,10 +566,9 @@ public class CruiseListPage extends Composite {
 					DELETE_NO_TEXT, new AsyncCallback<Boolean>() {
 				@Override
 				public void onSuccess(Boolean okay) {
-					// Only proceed if okay
+					// Only proceed only if yes button was selected
 					if ( okay ) {
-						updatePage(DashboardUtils.REQUEST_CRUISE_DELETE_ACTION, 
-								expocodeSet, DELETE_CRUISE_FAIL_MSG);
+						continueDeleteCruises();
 					}
 				}
 				@Override
@@ -625,6 +579,32 @@ public class CruiseListPage extends Composite {
 			});
 		}
 		askDeletePopup.askQuestion(message);
+	}
+
+	/**
+	 * Makes the request to delete the currently selected cruises,
+	 * and processes the results.
+	 */
+	private void continueDeleteCruises() {
+		service.deleteCruises(DashboardLoginPage.getUsername(), 
+				DashboardLoginPage.getPasshash(), expocodeSet,
+				new AsyncCallback<DashboardCruiseList>() {
+			@Override
+			public void onSuccess(DashboardCruiseList cruises) {
+				if ( DashboardLoginPage.getUsername()
+						.equals(cruises.getUsername()) ) {
+					CruiseListPage.this.updateCruises(cruises);
+				}
+				else {
+					SocatUploadDashboard.showMessage(DELETE_CRUISE_FAIL_MSG + 
+							" (unexpected invalid data set list)");
+				}
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				SocatUploadDashboard.showFailureMessage(DELETE_CRUISE_FAIL_MSG, ex);
+			}
+		});
 	}
 
 	@UiHandler("addToListButton")
@@ -655,10 +635,25 @@ public class CruiseListPage extends Composite {
 				SocatUploadDashboard.showMessage(errMsg);
 			}
 			else {
-				expocodeSet.clear();
-				expocodeSet.add(expocode);
-				updatePage(DashboardUtils.REQUEST_CRUISE_ADD_ACTION,
-										expocodeSet, errMsg);
+				service.addCruiseToList(DashboardLoginPage.getUsername(), 
+						 DashboardLoginPage.getPasshash(), expocode, 
+						 new AsyncCallback<DashboardCruiseList>() {
+					@Override
+					public void onSuccess(DashboardCruiseList cruises) {
+						if ( DashboardLoginPage.getUsername()
+								.equals(cruises.getUsername()) ) {
+							CruiseListPage.this.updateCruises(cruises);
+						}
+						else {
+							SocatUploadDashboard.showMessage(ADD_CRUISE_FAIL_MSG + 
+									" (unexpected invalid data set list)");
+						}
+					}
+					@Override
+					public void onFailure(Throwable ex) {
+						SocatUploadDashboard.showFailureMessage(ADD_CRUISE_FAIL_MSG, ex);
+					}
+				});
 			}
 		}
 	}
@@ -683,8 +678,7 @@ public class CruiseListPage extends Composite {
 				public void onSuccess(Boolean result) {
 					// Only proceed if yes; ignore if no or null
 					if ( result == true )
-						updatePage(DashboardUtils.REQUEST_CRUISE_REMOVE_ACTION,
-								expocodeSet, REMOVE_CRUISE_FAIL_MSG);
+						continueRemoveCruisesFromList();
 				}
 				@Override
 				public void onFailure(Throwable ex) {
@@ -694,6 +688,32 @@ public class CruiseListPage extends Composite {
 			});
 		}
 		askRemovePopup.askQuestion(message);
+	}
+
+	/**
+	 * Makes the request to remove cruises from a user's list,
+	 * and processes the results.
+	 */
+	private void continueRemoveCruisesFromList() {
+		service.removeCruisesFromList(DashboardLoginPage.getUsername(), 
+				DashboardLoginPage.getPasshash(), expocodeSet, 
+				new AsyncCallback<DashboardCruiseList>() {
+			@Override
+			public void onSuccess(DashboardCruiseList cruises) {
+				if ( DashboardLoginPage.getUsername()
+						.equals(cruises.getUsername()) ) {
+					CruiseListPage.this.updateCruises(cruises);
+				}
+				else {
+					SocatUploadDashboard.showMessage(REMOVE_CRUISE_FAIL_MSG + 
+							" (unexpected invalid data set list)");
+				}
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				SocatUploadDashboard.showFailureMessage(REMOVE_CRUISE_FAIL_MSG, ex);
+			}
+		});
 	}
 
 	/**

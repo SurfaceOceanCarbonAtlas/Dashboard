@@ -19,12 +19,6 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  */
 public class DashboardUtils {
 
-	// Cruise list action strings
-	public static final String REQUEST_CRUISE_LIST_ACTION = "GET CRUISE LIST";
-	public static final String REQUEST_CRUISE_DELETE_ACTION = "DELETE CRUISE";
-	public static final String REQUEST_CRUISE_ADD_ACTION = "ADD CRUISE TO LIST";
-	public static final String REQUEST_CRUISE_REMOVE_ACTION = "REMOVE CRUISE FROM LIST";
-
 	// Cruise upload action strings
 	public static final String REQUEST_PREVIEW_TAG = "REQUEST PREVIEW TAG";
 	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";

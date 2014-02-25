@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -325,10 +324,8 @@ public class CruiseUploadService extends HttpServlet {
 
 		// Update the list of cruises for the user
 		try {
-			HashSet<String> expocodeSet = new HashSet<String>();
-			expocodeSet.add(expocode);
 			dataStore.getUserFileHandler()
-					 .addCruisesToListing(expocodeSet, username);
+					 .addCruiseToListing(expocode, username);
 		} catch (IllegalArgumentException ex) {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
 					"Error processing the request: " + ex.getMessage());
