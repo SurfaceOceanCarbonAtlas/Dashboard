@@ -109,7 +109,7 @@ public class DsgNcFileHandler {
 					"Unexpected failure to get the Ferret configuration");
 		}
 		SocatTool tool = new SocatTool(ferretConf);
-		tool.init(dsgFile.getPath());
+		tool.init(dsgFile.getPath(), cruiseData.getExpocode());
 		tool.run();
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure adding computed variables: " + 

@@ -284,10 +284,10 @@ GO SOCAT3_gvco2
 cancel mode upcase
 
 
-! fCO2 recomputed
-let/title="fCO2 Recomputed"/units="uatm" fCO2_recomputed = fco2_rec
-set var/outtype=($outtype) fCO2_recomputed
-define attribute/output fCO2_recomputed.ioos_category = "CO2"
+! fCO2 recommended
+let/title="fCO2 Recommended"/units="uatm" fCO2_recommended = fco2_rec
+set var/outtype=($outtype) fCO2_recommended
+define attribute/output fCO2_recommended.ioos_category = "CO2"
 
 ! fCO2 Source
 let/title="fCO2 Source Type"/bad=-1 fco2_source = fCO2_src
@@ -379,20 +379,20 @@ let datamonths = samplei(charmonths, month)
 let/title="month of year" tmonth = datamonths[gx=latitude@asn]
 define attribute/output tmonth.history = "added to ($cruise_filename)"
 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_equi_temp_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_sst_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
-set var/outtype=($outtype)/title="fCO2_rec  pCO2_water_equi_temp, Pressure_equi, sal"  fCO2_from_pCO2_water_water_equi_temp 
-set var/outtype=($outtype)/title="fCO2_rec  pCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm
-set var/outtype=($outtype)/title="fCO2_rec  fCO2_water_equi_tem, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_equi_uatm 
-set var/outtype=($outtype)/title="fCO2_rec  fCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm
-set var/outtype=($outtype)/title="fCO2_rec  pCO2_water_equi_temp, ncepSlp, sal"  fCO2_from_pCO2_water_water_equi_temp_ncep  
-set var/outtype=($outtype)/title="fCO2_rec  pCO2_water_sst_100humidity_uatm, ncepSlp, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_equi_temp_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_sst_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_equi_temp_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_sst_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_equi_temp_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
-set var/outtype=($outtype)/title="fCO2_rec  xCO2_water_sst_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa 
+set var/outtype=($outtype)/title="fCO2_rec xCO2_water_equi_temp_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
+set var/outtype=($outtype)/title="fCO2_rec xCO2_water_sst_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
+set var/outtype=($outtype)/title="fCO2 rec pCO2_water_equi_temp, Pressure_equi, sal"  fCO2_from_pCO2_water_water_equi_temp 
+set var/outtype=($outtype)/title="fCO2 rec pCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm
+set var/outtype=($outtype)/title="fCO2 rec fCO2_water_equi_tem, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_equi_uatm 
+set var/outtype=($outtype)/title="fCO2 rec fCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm
+set var/outtype=($outtype)/title="fCO2 rec pCO2_water_equi_temp, ncepSlp, sal"  fCO2_from_pCO2_water_water_equi_temp_ncep  
+set var/outtype=($outtype)/title="fCO2 rec pCO2_water_sst_100humidity_uatm, ncepSlp, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep
+set var/outtype=($outtype)/title="fCO2 rec xCO2_water_equi_temp_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa 
+set var/outtype=($outtype)/title="fCO2 rec xCO2_water_sst_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
+set var/outtype=($outtype)/title="fCO2 rec xCO2_water_equi_temp_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
+set var/outtype=($outtype)/title="fCO2 rec xCO2_water_sst_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
+set var/outtype=($outtype)/title="fCO2 rec xCO2_water_equi_temp_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
+set var/outtype=($outtype)/title="fCO2 rec xCO2_water_sst_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa 
 
 
 ! Save to the input files; variables will overwrite the nominal values already there
@@ -415,7 +415,7 @@ save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry
 save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
 save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa
 
-save/quiet/append/file="($cruise_filename)" fCO2_recomputed
+save/quiet/append/file="($cruise_filename)" fCO2_recommended
 save/quiet/append/file="($cruise_filename)" fco2_source
 save/quiet/append/file="($cruise_filename)" gvCO2
 
