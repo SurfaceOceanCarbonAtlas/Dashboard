@@ -109,8 +109,40 @@ public class StandardColumnInfo {
 	public String convert(String value) throws ConversionException {
 		String result = value;
 		
-		if (null != itsConverter) {
+			
+		/*
+		 * Only run the conversion if:
+		 * (a) There is a converter defined
+		 * (b) There is no missing value defined, or 
+		 */
+		if (null != itsConverter && !isMissingValue(value)) {
 			result = itsConverter.convert(value, itsInputUnits);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Determines whether or not a given field value is equal to the Missing Value for the column
+	 * @param value The value to be tested
+	 * @return @code{true} if the value is the Missing Value; @code{false} otherwise.
+	 */
+	public boolean isMissingValue(String value) {
+		boolean result = false;
+		
+		if (null != value) {
+			if (value.equals(SocatDataColumn.MISSING_VALUE)) {
+				result = true;
+			} else if (hasMissingValue()) {
+				try {
+					if (Double.parseDouble(value) == itsMissingValue.doubleValue()) {
+						result = true;
+					}
+				} catch (NumberFormatException e) {
+					// We ignore this - non-numeric values will have been detected
+					// before getting to this point.
+				}
+			}
 		}
 		
 		return result;
