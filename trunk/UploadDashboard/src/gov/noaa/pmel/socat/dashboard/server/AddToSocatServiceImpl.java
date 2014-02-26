@@ -72,7 +72,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 					qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;
 				cruise.setQcStatus(qcStatus);
 				changed = true;
-				commitMsg += " add with QC status '" + qcStatus + "'";
+				commitMsg += " submit with QC status '" + qcStatus + "'";
 				ingestExpos.add(expocode);
 			}
 

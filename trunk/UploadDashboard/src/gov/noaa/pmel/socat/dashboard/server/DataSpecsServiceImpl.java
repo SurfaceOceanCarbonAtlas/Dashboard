@@ -364,22 +364,22 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 					  (colType == DataColumnType.DELTA_FCO2) || 
 					  (colType == DataColumnType.WOA_SALINITY) || 
 					  (colType == DataColumnType.NCEP_SEA_LEVEL_PRESSURE) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_PCO2_TEQ_PEQU_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_PCO2_SST_PEQ_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_FCO2_TEQ_PEQ_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_FCO2_SST_PEQ_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_PCO2_TEQ_NCEP_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_PCO2_SST_NCEP_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_WOA) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_WOA) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_SAL) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_WOA) || 
-					  (colType == DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_WOA) || 
-					  (colType == DataColumnType.FCO2REC) || 
-					  (colType == DataColumnType.FCO2REC_SOURCE) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_TEQ_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_SST_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_PCO2_TEQ_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_PCO2_SST_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_FCO2_TEQ_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_FCO2_SST_PEQ_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_PCO2_TEQ_NCP_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_PCO2_SST_NCP_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_TEQ_PEQ_WOA) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_SST_PEQ_WOA) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_TEQ_NCP_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_SST_NCP_SAL) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_TEQ_NCP_WOA) || 
+					  (colType == DataColumnType.FCO2_FROM_XCO2_SST_NCP_WOA) || 
+					  (colType == DataColumnType.FCO2_REC) || 
+					  (colType == DataColumnType.FCO2_REC_SOURCE) || 
 					  (colType == DataColumnType.DELTA_TEMPERATURE) || 
 					  (colType == DataColumnType.REGION_ID) || 
 					  (colType == DataColumnType.SECONDS_1970) || 
@@ -389,7 +389,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 					  (colType == DataColumnType.ETOPO2) || 
 					  (colType == DataColumnType.GVCO2) || 
 					  (colType == DataColumnType.DISTANCE_TO_LAND) || 
-					  (colType == DataColumnType.FCO2REC_WOCE_FLAG) ) {
+					  (colType == DataColumnType.FCO2_REC_WOCE_FLAG) ) {
 				// Unchecked column types at this time - just ignore their presence
 				;
 			}
