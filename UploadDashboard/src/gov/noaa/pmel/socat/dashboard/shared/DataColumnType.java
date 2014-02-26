@@ -15,9 +15,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public enum DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * The unknown data type indicates data that the user 
-	 * needs specify as one of the other standard types.
+	 * needs specify as one of the other user-provided types.
 	 */
 	UNKNOWN, 
+
 	EXPOCODE,
 	CRUISE_NAME,
 	/**
@@ -61,27 +62,28 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	WIND_SPEED_RELATIVE,
 	WIND_DIRECTION_TRUE,
 	WIND_DIRECTION_RELATIVE,
-	// The following are computed fields and are not usually provided by the user
+
+	// The following are computed fields and are not provided by the user
 	DELTA_PCO2,
 	DELTA_FCO2,
 	WOA_SALINITY, 
 	NCEP_SEA_LEVEL_PRESSURE, 
-	FCO2REC_FROM_XCO2_TEQ_PEQ_SAL, 
-	FCO2REC_FROM_XCO2_SST_PEQ_SAL, 
-	FCO2REC_FROM_PCO2_TEQ_PEQU_SAL, 
-	FCO2REC_FROM_PCO2_SST_PEQ_SAL, 
-	FCO2REC_FROM_FCO2_TEQ_PEQ_SAL, 
-	FCO2REC_FROM_FCO2_SST_PEQ_SAL, 
-	FCO2REC_FROM_PCO2_TEQ_NCEP_SAL, 
-	FCO2REC_FROM_PCO2_SST_NCEP_SAL, 
-	FCO2REC_FROM_XCO2_TEQ_PEQ_WOA, 
-	FCO2REC_FROM_XCO2_SST_PEQ_WOA, 
-	FCO2REC_FROM_XCO2_TEQ_NCEP_SAL, 
-	FCO2REC_FROM_XCO2_SST_NCEP_SAL, 
-	FCO2REC_FROM_XCO2_TEQ_NCEP_WOA, 
-	FCO2REC_FROM_XCO2_SST_NCEP_WOA, 
-	FCO2REC, 
-	FCO2REC_SOURCE, 
+	FCO2_FROM_XCO2_TEQ_PEQ_SAL, 
+	FCO2_FROM_XCO2_SST_PEQ_SAL, 
+	FCO2_FROM_PCO2_TEQ_PEQ_SAL, 
+	FCO2_FROM_PCO2_SST_PEQ_SAL, 
+	FCO2_FROM_FCO2_TEQ_PEQ_SAL, 
+	FCO2_FROM_FCO2_SST_PEQ_SAL, 
+	FCO2_FROM_PCO2_TEQ_NCP_SAL, 
+	FCO2_FROM_PCO2_SST_NCP_SAL, 
+	FCO2_FROM_XCO2_TEQ_PEQ_WOA, 
+	FCO2_FROM_XCO2_SST_PEQ_WOA, 
+	FCO2_FROM_XCO2_TEQ_NCP_SAL, 
+	FCO2_FROM_XCO2_SST_NCP_SAL, 
+	FCO2_FROM_XCO2_TEQ_NCP_WOA, 
+	FCO2_FROM_XCO2_SST_NCP_WOA, 
+	FCO2_REC, 
+	FCO2_REC_SOURCE, 
 	DELTA_TEMPERATURE, 
 	REGION_ID, 
 	SECONDS_1970, 
@@ -91,5 +93,5 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	ETOPO2, 
 	GVCO2, 
 	DISTANCE_TO_LAND, 
-	FCO2REC_WOCE_FLAG,
+	FCO2_REC_WOCE_FLAG,
 }

@@ -359,66 +359,66 @@ public class DashboardUtils {
 		STD_DESCRIPTIONS.put(DataColumnType.NCEP_SEA_LEVEL_PRESSURE,
 				"sea level pressure in hectopascals interpolated from the NCEP/NCAR 40-Year Reanalysis Project " +
 				"(see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_TEQ_PEQ_SAL,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
 				"equilibrator pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_SST_PEQ_SAL,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
 				"equilibrator pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_TEQ_PEQU_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_PCO2_TEQ_PEQ_SAL,
 				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using equilibrator temperature, " +
 				"equilibrator pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_SST_PEQ_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_PCO2_SST_PEQ_SAL,
 				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using sea surface temperature, " +
 				"equilibrator pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_FCO2_TEQ_PEQ_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_FCO2_TEQ_PEQ_SAL,
 				"fCO2 in microatmospheres recomputed from measured fCO2 (water) using equilibrator temperature, " +
 				"equilibrator pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_FCO2_SST_PEQ_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_FCO2_SST_PEQ_SAL,
 				"fCO2 in microatmospheres recomputed from measured fCO2 (water) using sea surface temperature, " +
 				"equilibrator pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_TEQ_NCEP_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_PCO2_TEQ_NCP_SAL,
 				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using equilibrator temperature, " +
 				"NCEP sea level pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_PCO2_SST_NCEP_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_PCO2_SST_NCP_SAL,
 				"fCO2 in microatmospheres recomputed from measured pCO2 (water) using sea surface temperature, " +
 				"NCEP sea level pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_PEQ_WOA,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_TEQ_PEQ_WOA,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
 				"equilibrator pressure, and WOA sea surface salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_PEQ_WOA,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_SST_PEQ_WOA,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
 				"equilibrator pressure, and WOA sea surface salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_TEQ_NCP_SAL,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
 				"NCEP sea level pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_SAL,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_SST_NCP_SAL,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
 				"NCEP sea level pressure, and measured salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_TEQ_NCEP_WOA,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_TEQ_NCP_WOA,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using equilibrator temperature, " +
 				"NCEP sea level pressure, and WOA sea surface salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_FROM_XCO2_SST_NCEP_WOA,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_FROM_XCO2_SST_NCP_WOA,
 				"fCO2 in microatmospheres recomputed from measured xCO2 (water) using sea surface temperature, " +
 				"NCEP sea level pressure, and WOA sea surface salinity" +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_REC,
 				"fCO2 in microatmospheres recomputed from the most desireable measured CO2 data " +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_SOURCE,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_REC_SOURCE,
 				"algorithm number (1-14) for generating the fCO2Rec value " +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
 		STD_DESCRIPTIONS.put(DataColumnType.DELTA_TEMPERATURE,
@@ -442,7 +442,7 @@ public class DashboardUtils {
 				"(see: http://www.esrl.noaa.gov/gmd/ccgg/globalview/index.html)");
 		STD_DESCRIPTIONS.put(DataColumnType.DISTANCE_TO_LAND,
 				"estimated distance in km to major land mass (up to 1000 km)");
-		STD_DESCRIPTIONS.put(DataColumnType.FCO2REC_WOCE_FLAG,
+		STD_DESCRIPTIONS.put(DataColumnType.FCO2_REC_WOCE_FLAG,
 				"WOCE quality-control flag (2=okay,3=questionable,4=bad) for the fCO2Rec value " +
 				"(see: doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/)");
 	}
