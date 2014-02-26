@@ -60,12 +60,10 @@ public class CruiseDsgNcFile {
 		for (int i = 0; i < metafields.length; i++) {
 			Field f = metafields[i];
 			if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers()) ) {
-
 				Variable var = ncfile.addVariable(null, f.getName(), DataType.CHAR, trajdimsChar);
 				if ( f.getName().equals("expocode")) {
 					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
 				}
-
 			}
 		}
 		Variable var = ncfile.addVariable(null, "rowSize", DataType.DOUBLE, trajdims);

@@ -117,11 +117,34 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String SANITY_CHECK_SUCCESS_MSG =
 			"Automatic data checking did not find any problems with the data";
 
-	interface CruiseDataColumnSpecsPageUiBinder extends UiBinder<Widget, DataColumnSpecsPage> {
+	private static final String DATA_NEVER_CHECKED_HTML = 
+			"<h3>Data has not been checked.</h3>" +
+			"<p>You will need need to check the data in a dataset before you " +
+			"can submit the dataset for QC.  This data check will identify " +
+			"problematic data and discover incorrectly identified or unknown " +
+			"data columns.  Although this data check can be run any time before " +
+			"submitting a dataset, we recommend running it immediately after " +
+			"uploading a dataset so that any incorrectly identified or unknown " +
+			"data columns are correctly identified for subsequent dataset " +
+			"uploads.</p>" +
+			"<p>Any you sure you want to continue without checking the data " +
+			"in this dataset?</p>";
+	private static final String CHANGES_NOT_SAVED_HTML =
+			"<h3>Data has not been checked since change.</h3>" +
+			"<p>Changes to data column types, units, and missing values are not " +
+			"saved until the data has been checked with the updated data column " +
+			"information.  If you wish to save the changes you have made, cancel " +
+			"out of this dialog and check the data before leaving this page.</p>" +
+			"<p>Any you sure you want to lose the changes you have made to the " +
+			"data column information?</p>";
+	private static final String RETURN_TO_CRUISE_LIST_TEXT = "Yes";
+	private static final String STAY_ON_THIS_PAGE_TEXT = "No";
+
+	interface DataColumnSpecsPageUiBinder extends UiBinder<Widget, DataColumnSpecsPage> {
 	}
 
-	private static CruiseDataColumnSpecsPageUiBinder uiBinder = 
-			GWT.create(CruiseDataColumnSpecsPageUiBinder.class);
+	private static DataColumnSpecsPageUiBinder uiBinder = 
+			GWT.create(DataColumnSpecsPageUiBinder.class);
 
 	private static DataSpecsServiceAsync service = 
 			GWT.create(DataSpecsService.class);
@@ -148,6 +171,12 @@ public class DataColumnSpecsPage extends Composite {
 	private ArrayList<CruiseDataColumn> cruiseDataCols;
 	// Asynchronous data provider for the data grid 
 	private AsyncDataProvider<ArrayList<String>> dataProvider;
+	// Dialog warning that data has never been checked or changes have not been saved
+	private DashboardAskPopup notCheckedPopup;
+	// Flag indicating if the cruise data was ever checked
+	private boolean cruiseNeverChecked;
+	// Flag indicating if a logout generated the above warnings
+	private boolean wasLoggingOut;
 
 	// Singleton instance of this page
 	private static DataColumnSpecsPage singleton = null;
@@ -163,6 +192,9 @@ public class DataColumnSpecsPage extends Composite {
 
 		username = "";
 		defaultSecondsPopup = null;
+		notCheckedPopup = null;
+		cruiseNeverChecked = false;
+		wasLoggingOut = false;
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -272,10 +304,12 @@ public class DataColumnSpecsPage extends Composite {
 		String status = cruiseSpecs.getDataCheckStatus();
 		if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
 			 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+			cruiseNeverChecked = true;
 			messagesLabel.setText(NOT_CHECKED_MSG);
 			messagesButton.setEnabled(false);
 		}
 		else {
+			cruiseNeverChecked = false;
 			String msgText;
 			int numErrors = cruiseSpecs.getNumErrorMsgs();
 			if ( numErrors == 0 )
@@ -355,14 +389,88 @@ public class DataColumnSpecsPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
+		// Check if any changes have been made
+		boolean hasChanged = false;
+		for ( CruiseDataColumn dataCol : cruiseDataCols ) {
+			if ( dataCol.hasChanged() ) {
+				hasChanged = true;
+				break;
+			}
+		}
+		if ( hasChanged ) {
+			// Ask before logging out
+			wasLoggingOut = true;
+			if ( notCheckedPopup == null )
+				makeNotCheckedPopup();
+			notCheckedPopup.askQuestion(CHANGES_NOT_SAVED_HTML);
+		}
+		else {
+			// No changes; just log out
+			DashboardLogoutPage.showPage();
+		}
 	}
 
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
-		// Return to the latest cruise listing page, which may  
-		// have been updated from previous actions on this page.
-		CruiseListPage.showPage(false);
+		// Check if any changes have been made
+		boolean hasChanged = false;
+		for ( CruiseDataColumn dataCol : cruiseDataCols ) {
+			if ( dataCol.hasChanged() ) {
+				hasChanged = true;
+				break;
+			}
+		}
+		if ( hasChanged ) {
+			// Ask before returning to the cruise list
+			wasLoggingOut = false;
+			if ( notCheckedPopup == null )
+				makeNotCheckedPopup();
+			notCheckedPopup.askQuestion(CHANGES_NOT_SAVED_HTML);
+		}
+		else if ( cruiseNeverChecked ) {
+			// Ask before returning to the cruise list
+			wasLoggingOut = false;
+			if ( notCheckedPopup == null )
+				makeNotCheckedPopup();
+			notCheckedPopup.askQuestion(DATA_NEVER_CHECKED_HTML);
+		}
+		else {
+			// No changes; return to the latest cruise listing page, which 
+			// may have been updated from previous actions on this page.
+			CruiseListPage.showPage(false);
+		}
+	}
+
+	/**
+	 * Generate the question popup warning that the data has never been checked
+	 */
+	private void makeNotCheckedPopup() {
+		notCheckedPopup = new DashboardAskPopup(RETURN_TO_CRUISE_LIST_TEXT, 
+				STAY_ON_THIS_PAGE_TEXT, new AsyncCallback<Boolean>() {
+			@Override
+			public void onSuccess(Boolean result) {
+				if ( result ) {
+					if ( wasLoggingOut ) {
+						wasLoggingOut = false;
+						DashboardLogoutPage.showPage();
+					}
+					else {
+						// Return to the latest cruise listing page, which may  
+						// have been updated from previous actions on this page.
+						CruiseListPage.showPage(false);
+					}
+				}
+				else {
+					// Just stay on this page
+					wasLoggingOut = false;
+				}
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				// never called
+				;
+			}
+		});
 	}
 
 	@UiHandler("messagesButton") 
