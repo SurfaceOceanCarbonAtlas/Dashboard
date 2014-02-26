@@ -105,6 +105,8 @@ public class CruiseDataColumn {
 	private int columnIndex;
 	// Header associated with this instance
 	private Header<CruiseDataColumn> columnHeader;
+	// Flag that something in the column header has hasChanged
+	private boolean hasChanged;
 
 	/**
 	 * Specifies a data column of a DashboardCruise.
@@ -118,6 +120,7 @@ public class CruiseDataColumn {
 		this.cruise = cruise;
 		this.columnIndex = columnIndex;
 		this.columnHeader = createHeader();
+		this.hasChanged = false;
 	}
 
 	/**
@@ -129,6 +132,14 @@ public class CruiseDataColumn {
 	 */
 	Header<CruiseDataColumn> getHeader() {
 		return columnHeader;
+	}
+
+	/**
+	 * @return
+	 * 		if the values shown in this header have changed
+	 */
+	boolean hasChanged() {
+		return hasChanged;
 	}
 
 	/**
@@ -199,10 +210,14 @@ public class CruiseDataColumn {
 						TypeUnits descr = STD_TYPE_UNITS.get(idx);
 						// Assign the data type and units directly in the lists 
 						// for the cruise instance
-						dataCol.cruise.getDataColTypes()
-									  .set(dataCol.columnIndex, descr.type);
-						dataCol.cruise.getDataColUnits()
-									  .set(dataCol.columnIndex, descr.units);
+						DataColumnType oldType = dataCol.cruise.getDataColTypes()
+								.set(dataCol.columnIndex, descr.type);
+						if ( ! descr.type.equals(oldType) )
+							hasChanged = true;
+						String oldUnits = dataCol.cruise.getDataColUnits()
+								.set(dataCol.columnIndex, descr.units);
+						if ( ! descr.units.equals(oldUnits) )
+							hasChanged = true;
 					}
 				};
 			}
@@ -233,7 +248,7 @@ public class CruiseDataColumn {
 			@Override
 			public TextInputCell getCell() {
 				return new TextInputCell();
-				// TODO: capture events with starting to edit to erase DEFAULT_MISSING_VALUE
+				// TODO: capture start-edit events to erase DEFAULT_MISSING_VALUE
 			}
 			@Override
 			public FieldUpdater<CruiseDataColumn,String> getFieldUpdater() {
@@ -249,8 +264,10 @@ public class CruiseDataColumn {
 						value = value.trim();
 						if ( value.equals(DEFAULT_MISSING_VALUE) )
 							value = "";
-						dataCol.cruise.getMissingValues()
+						String oldValue = dataCol.cruise.getMissingValues()
 									  .set(dataCol.columnIndex, value);
+						if ( ! value.equals(oldValue) )
+							hasChanged = true;
 					}
 				};
 			}

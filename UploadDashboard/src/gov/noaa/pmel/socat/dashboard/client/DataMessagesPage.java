@@ -42,8 +42,6 @@ import com.google.gwt.view.client.ListDataProvider;
 public class DataMessagesPage extends Composite {
 
 	private static final String TITLE_TEXT = "Data-Problem Messages";
-	private static final String WELCOME_INTRO = "Logged in as ";
-	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String INTRO_HTML_PROLOGUE = 
 			"Dataset: <ul><li>";
@@ -77,8 +75,6 @@ public class DataMessagesPage extends Composite {
 			GWT.create(DashboardListService.class);
 
 	@UiField InlineLabel titleLabel;
-	@UiField InlineLabel userInfoLabel;
-	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField DataGrid<SCMessage> messagesGrid;
 	@UiField Button dismissButton;
@@ -102,7 +98,6 @@ public class DataMessagesPage extends Composite {
 
 		username = "";
 		titleLabel.setText(TITLE_TEXT);
-		logoutButton.setText(LOGOUT_TEXT);
 		buildMessageListTable();
 		dismissButton.setText(DISMISS_BUTTON_TEXT);
 
@@ -165,11 +160,6 @@ public class DataMessagesPage extends Composite {
 		}
 	}
 
-	@UiHandler("logoutButton")
-	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
-	}
-
 	@UiHandler("dismissButton")
 	void dismissOnClick(ClickEvent event) {
 		DataColumnSpecsPage.redisplayPage(true);
@@ -185,7 +175,6 @@ public class DataMessagesPage extends Composite {
 	private void updateMessages(SCMessageList msgs) {
 		// Assign the username and introduction message
 		username = DashboardLoginPage.getUsername();
-		userInfoLabel.setText(WELCOME_INTRO + username);
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + 
 				SafeHtmlUtils.htmlEscape(msgs.getExpocode()) + 
 				INTRO_HTML_EPILOGUE);
