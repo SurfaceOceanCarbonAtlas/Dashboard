@@ -129,7 +129,7 @@ public class SanityCheckerRun {
 		}
 		
 		if (ok) {
-			System.out.println("FILE: " + itsDataFilename);
+			//System.out.println("FILE: " + itsDataFilename);
 			
 			try {
 				// Create the Sanity Checker and process the file
@@ -137,17 +137,18 @@ public class SanityCheckerRun {
 				Output checkerOutput = checker.process();
 				
 				// Print summary
-				System.out.println("Output generated? " + checkerOutput.outputGenerated());
+				//System.out.println("Output generated? " + checkerOutput.outputGenerated());
 				
 				if (checkerOutput.outputGenerated()) {
-					System.out.println("Metadata Items: " + checkerOutput.getMetadataCount());
-					System.out.println("Records: " + checkerOutput.getRecordCount());
+					//System.out.println("Metadata Items: " + checkerOutput.getMetadataCount());
+					//System.out.println("Records: " + checkerOutput.getRecordCount());
 				}
 				
 				Messages messages = checkerOutput.getMessages();
 				if (messages != null) {
-					System.out.println("Metadata messages: " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.WARNING) + " warnings");
-					System.out.println("Data messages: " + messages.getMessageCount(Message.DATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.DATA_MESSAGE, Message.WARNING) + " warnings");
+					//System.out.println("Metadata messages: " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.WARNING) + " warnings");
+					//System.out.println("Data messages: " + messages.getMessageCount(Message.DATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.DATA_MESSAGE, Message.WARNING) + " warnings");
+					System.out.println(itsDataFilename + "," + checkerOutput.getRecordCount() + "," + messages.getMessageCount(Message.METADATA_MESSAGE, Message.ERROR) + "," + messages.getMessageCount(Message.METADATA_MESSAGE, Message.WARNING) + "," + messages.getMessageCount(Message.DATA_MESSAGE, Message.ERROR) + "," + messages.getMessageCount(Message.DATA_MESSAGE, Message.WARNING));
 				
 					// Write complete messages to file
 					try {
