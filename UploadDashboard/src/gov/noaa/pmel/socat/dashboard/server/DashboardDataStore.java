@@ -370,7 +370,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		the checker for cruise data and metadata
 	 */
-	public DashboardCruiseChecker getDashboardCruiseChecer() {
+	public DashboardCruiseChecker getDashboardCruiseChecker() {
 		return cruiseChecker;
 	}
 
