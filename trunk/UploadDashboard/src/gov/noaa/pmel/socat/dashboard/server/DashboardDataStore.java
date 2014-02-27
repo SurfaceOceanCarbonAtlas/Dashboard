@@ -25,7 +25,6 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
 
-import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 
 import com.googlecode.gwt.crypto.bouncycastle.DataLengthException;
@@ -99,6 +98,7 @@ public class DashboardDataStore {
 	private MetadataFileHandler metadataFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
+	private DashboardCruiseChecker cruiseChecker;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -272,11 +272,9 @@ public class DashboardDataStore {
 		}
 		// Sanity checker initialization from this same properties file 
 		try {
-			SanityChecker.initConfig(configFile.getAbsolutePath());
-		} catch ( Exception ex ) {
-			throw new IOException("Invalid SanityChecker configuration" + 
-					" values specified in " + configFile.getPath() + "\n" + 
-					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+			cruiseChecker = new DashboardCruiseChecker(configFile);
+		} catch ( IOException ex ) {
+			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
@@ -366,6 +364,14 @@ public class DashboardDataStore {
 	 */
 	public MetadataFileHandler getMetadataFileHandler() {
 		return metadataFileHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the checker for cruise data and metadata
+	 */
+	public DashboardCruiseChecker getDashboardCruiseChecer() {
+		return cruiseChecker;
 	}
 
 	/**
