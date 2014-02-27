@@ -42,6 +42,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
+		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
 		DsgNcFileHandler dsgNcHandler = dataStore.getDsgNcFileHandler();
 		HashSet<String> ingestExpos = new HashSet<String>();
 		HashSet<String> archiveExpos = new HashSet<String>();
@@ -61,12 +62,20 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
 				 qcStatus.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
 				 qcStatus.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ) { 
+				// Get the complete cruise data in standard units
+				DashboardCruiseWithData cruiseData = 
+						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+				cruiseChecker.standardizeCruiseData(cruiseData);
+				// Get the OME metadata for this cruise
+				OmeMetadata omeMData = new OmeMetadata(
+						metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
+				// Generate the NetCDF DSG file for this cruise
+				dsgNcHandler.saveCruise(omeMData, cruiseData); 
 				// Update the QC status for this cruise
-				String dataStatus = cruise.getDataCheckStatus();
-				String omeTimestamp = cruise.getOmeTimestamp();
-				if ( ( ! omeTimestamp.isEmpty() ) && 
-					 ( dataStatus.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) || 
-					   dataStatus.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) )
+				String dataStatus = cruiseData.getDataCheckStatus();
+				cruise.setDataCheckStatus(dataStatus);
+				if ( dataStatus.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) || 
+					 dataStatus.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) )
 					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 				else
 					qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;
@@ -101,14 +110,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 			}
 		}
 
-		// Add cruises in ingestExpos to SOCAT
-		for ( String expocode : ingestExpos ) {
-			DashboardCruiseWithData cruiseData = 
-					cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-			OmeMetadata omeMData = new OmeMetadata(
-					metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
-			dsgNcHandler.saveCruise(omeMData, cruiseData); 
-		}
+		// TODO: notify ERDDAP of new/updated cruises given in ingestExpos
 
 		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 

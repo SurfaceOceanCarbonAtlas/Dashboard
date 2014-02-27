@@ -117,7 +117,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-		Output output = dataStore.getDashboardCruiseChecer()
+		Output output = dataStore.getDashboardCruiseChecker()
 								 .checkCruise(cruiseData);
 
 		// Update the reports of any issues found
