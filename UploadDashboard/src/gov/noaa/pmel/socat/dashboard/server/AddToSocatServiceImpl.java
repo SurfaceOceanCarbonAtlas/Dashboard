@@ -10,7 +10,10 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+
+import uk.ac.uea.socat.sanitychecker.Output;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -56,7 +59,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				throw new IllegalArgumentException("Unknown cruise " + expocode);
 
 			boolean changed = false;
-			String commitMsg = "Cruise '" + expocode + "'";
+			String commitMsg = "Expocode " + expocode;
 
 			String qcStatus = cruise.getQcStatus();
 			if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
@@ -65,7 +68,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				// Get the complete cruise data in standard units
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-				cruiseChecker.standardizeCruiseData(cruiseData);
+				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
 						metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
@@ -73,13 +76,24 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				dsgNcHandler.saveCruise(omeMData, cruiseData); 
 				// Update the QC status for this cruise
 				String dataStatus = cruiseData.getDataCheckStatus();
-				cruise.setDataCheckStatus(dataStatus);
 				if ( dataStatus.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) || 
 					 dataStatus.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) )
 					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 				else
 					qcStatus = DashboardUtils.QC_STATUS_UNACCEPTABLE;
 				cruise.setQcStatus(qcStatus);
+				// Update cruise with the any updates from the SanityChecker
+				cruise.setDataCheckStatus(dataStatus);
+				cruise.setNumErrorMsgs(cruiseData.getNumErrorMsgs());
+				cruise.setNumWarnMsgs(cruiseData.getNumWarnMsgs());
+				// subList in case year, month,day, hour, minute, seconds columns were added
+				int numDataCols = cruise.getDataColTypes().size();
+				cruise.setWoceThreeRowIndices(new ArrayList<HashSet<Integer>>(
+						cruiseData.getWoceThreeRowIndices().subList(0, numDataCols)));
+				cruise.setWoceFourRowIndices(new ArrayList<HashSet<Integer>>(
+						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
+				cruiseHandler.saveCruiseMessages(
+						cruise.getExpocode(), output.getMessages().getMessages());
 				changed = true;
 				commitMsg += " submit with QC status '" + qcStatus + "'";
 				ingestExpos.add(expocode);
