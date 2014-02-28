@@ -139,7 +139,6 @@ public class AddlDocsManagerPage extends Composite {
 	private TreeSet<String> expocodes;
 	private DashboardAskPopup askOverwritePopup;
 	private boolean okayToOverwrite;
-	private DashboardAskPopup askDeletePopup;
 
 	// The singleton instance of this page
 	private static AddlDocsManagerPage singleton;
@@ -161,7 +160,6 @@ public class AddlDocsManagerPage extends Composite {
 		expocodes = new TreeSet<String>();
 		askOverwritePopup = null;
 		okayToOverwrite = false;
-		askDeletePopup = null;
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -569,24 +567,20 @@ public class AddlDocsManagerPage extends Composite {
 						")<br />&nbsp;&nbsp;for dataset " + 
 						SafeHtmlUtils.htmlEscape(deleteExpocode) + 
 						DELETE_DOC_HTML_EPILOGUE;
-				if ( askDeletePopup == null ) {
-					askDeletePopup = new DashboardAskPopup(DELETE_YES_TEXT, DELETE_NO_TEXT, 
-							new AsyncCallback<Boolean>() {
-						@Override
-						public void onSuccess(Boolean result) {
-							// Only continue if yes returned; ignore if no or null
-							if ( result == true )
-								continueDelete(deleteFilename, deleteExpocode);
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							// Never called
-							;
-						}
-					});
-				}
-				askDeletePopup.askQuestion(message);
-				
+				new DashboardAskPopup(DELETE_YES_TEXT, DELETE_NO_TEXT, 
+						new AsyncCallback<Boolean>() {
+					@Override
+					public void onSuccess(Boolean result) {
+						// Only continue if yes returned; ignore if no or null
+						if ( result == true )
+							continueDelete(deleteFilename, deleteExpocode);
+					}
+					@Override
+					public void onFailure(Throwable caught) {
+						// Never called
+						;
+					}
+				}).askQuestion(message);
 			}
 		});
 		return deleteColumn;

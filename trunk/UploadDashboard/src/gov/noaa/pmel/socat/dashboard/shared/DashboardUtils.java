@@ -118,49 +118,6 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
 	}
 
-	/**
-	 * Column names used by the sanity checker corresponding the {@link #STD_HEADER_NAMES}
-	 */
-	public static final EnumMap<DataColumnType,String> CHECKER_NAMES = 
-			new EnumMap<DataColumnType,String>(DataColumnType.class);
-	static {
-		CHECKER_NAMES.put(DataColumnType.UNKNOWN, "");
-		CHECKER_NAMES.put(DataColumnType.EXPOCODE, "EXPOcode");
-		CHECKER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
-		CHECKER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
-		CHECKER_NAMES.put(DataColumnType.DATE, "date");
-		CHECKER_NAMES.put(DataColumnType.YEAR, "year");
-		CHECKER_NAMES.put(DataColumnType.MONTH, "month");
-		CHECKER_NAMES.put(DataColumnType.DAY, "day");
-		CHECKER_NAMES.put(DataColumnType.TIME, "time");
-		CHECKER_NAMES.put(DataColumnType.HOUR, "hour");
-		CHECKER_NAMES.put(DataColumnType.MINUTE, "minute");
-		CHECKER_NAMES.put(DataColumnType.SECOND, "second");
-		CHECKER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
-		CHECKER_NAMES.put(DataColumnType.LATITUDE, "latitude");
-		CHECKER_NAMES.put(DataColumnType.SAMPLE_DEPTH, "depth");
-		CHECKER_NAMES.put(DataColumnType.SALINITY, "sal");
-		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "temperature_equi");
-		CHECKER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "temp");
-		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "pressure_equi");
-		CHECKER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "pressure_atm");
-		CHECKER_NAMES.put(DataColumnType.XCO2WATER_EQU, "xCO2water_equ_dry");
-		CHECKER_NAMES.put(DataColumnType.XCO2WATER_SST, "xCO2water_sst_dry");
-		CHECKER_NAMES.put(DataColumnType.PCO2WATER_EQU, "pCO2water_equ_wet");
-		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST, "pCO2water_sst_wet");
-		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fCO2water_equ_wet");
-		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST, "fCO2water_sst_wet");
-		CHECKER_NAMES.put(DataColumnType.XCO2_ATM, "xCO2_air");
-		CHECKER_NAMES.put(DataColumnType.PCO2_ATM, "pCO2_air");
-		CHECKER_NAMES.put(DataColumnType.FCO2_ATM, "fCO2_air");
-		CHECKER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
-		CHECKER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
-		CHECKER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
-		CHECKER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
-		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
-		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
-	}
-
 	/*
 	 * known data units of the standard data columns
 	 */
@@ -175,18 +132,8 @@ public class DashboardUtils {
 	public static final ArrayList<String> PCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
 	public static final ArrayList<String> FCO2_UNITS = new ArrayList<String>(Arrays.asList("uatm"));
 	public static final ArrayList<String> DIRECTION_UNITS = new ArrayList<String>(Arrays.asList("deg.clk.N"));
-	public static final ArrayList<String> SHIP_SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots"));
+	public static final ArrayList<String> SHIP_SPEED_UNITS = new ArrayList<String>(Arrays.asList("knots", "km/h", "mph"));
 	public static final ArrayList<String> WIND_SPEED_UNITS = new ArrayList<String>(Arrays.asList("m/s"));
-
-	/*
-	 * SanityChecker version of the strings for above data units when not the same strings
-	 */
-	private static final ArrayList<String> CHECKER_LONGITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
-	private static final ArrayList<String> CHECKER_LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
-	private static final ArrayList<String> CHECKER_SALINITY_UNITS = new ArrayList<String>(Arrays.asList("psu"));
-	private static final ArrayList<String> CHECKER_TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC", "Kelvin", "degF"));
-	private static final ArrayList<String> CHECKER_XCO2_UNITS = new ArrayList<String>(Arrays.asList("ppm"));
-	private static final ArrayList<String> CHECKER_DIRECTION_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
 
 	/**
 	 * Available data units for the standard data columns that a user might provide.
@@ -232,51 +179,6 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
-	}
-
-	/**
-	 * Data units used by the sanity checker corresponding to {@link #STD_DATA_UNITS}
-	 */
-	public static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
-			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
-	static {
-		CHECKER_DATA_UNITS.put(DataColumnType.UNKNOWN, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.EXPOCODE, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
-		CHECKER_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
-		CHECKER_DATA_UNITS.put(DataColumnType.YEAR, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.MONTH, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.DAY, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.TIME, new ArrayList<String>(Arrays.asList("HH:MM:SS")));
-		CHECKER_DATA_UNITS.put(DataColumnType.HOUR, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.MINUTE, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SECOND, NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.LONGITUDE, CHECKER_LONGITUDE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.LATITUDE, CHECKER_LATITUDE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, DEPTH_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SALINITY, CHECKER_SALINITY_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, CHECKER_TEMPERATURE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, CHECKER_TEMPERATURE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU, CHECKER_XCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_SST, CHECKER_XCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU, PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM, XCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM, PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM, FCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, CHECKER_DIRECTION_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, CHECKER_DIRECTION_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, CHECKER_DIRECTION_UNITS);
 	}
 
 	/**
