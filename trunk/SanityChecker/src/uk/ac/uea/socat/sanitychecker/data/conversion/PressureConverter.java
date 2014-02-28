@@ -3,7 +3,7 @@ package uk.ac.uea.socat.sanitychecker.data.conversion;
 import java.util.ArrayList;
 
 /**
- * Performs temperature conversions
+ * Performs pressure conversions
  */
 public class PressureConverter extends SpecifiedUnitsConverter {
 
