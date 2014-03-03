@@ -1135,12 +1135,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		} finally {
 			msgsWriter.close();
 		}
-		try {
-			commitVersion(msgsFile, "Update of SanityChecker messages for cruise " + expocode);
-		} catch ( Exception ex ) {
-			throw new IllegalArgumentException("Unexpected problems committing " +
-					"an update of SanityChecker messages" + ex.getMessage());
-		}
+		// Do NOT commit this file
 	}
 
 	/**
