@@ -193,8 +193,8 @@ body {
 
 .titlepanel {
 	display: block;
-	margin-top: 1em;
-	margin-bottom: 1em;
+	margin-top: 1.5em;
+	margin-bottom: 1.5em;
 }
 .titlepagelabel {
 	display: inline;
@@ -219,6 +219,16 @@ body {
 }
 .titlereset {
 	clear: both;
+}
+.titleimage {
+	display: block;
+	height: 44px;
+	width: 75px;
+	position: absolute;
+	top: 0;
+	left: 50%;
+	margin-top: -5px;
+	margin-left: -25px;
 }
 
 .uploadfile {

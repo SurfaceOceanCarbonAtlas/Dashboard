@@ -38,6 +38,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,11 +54,11 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class CruiseListPage extends Composite {
 
+	private static final String TITLE_TEXT_PROLOGUE = "My SOCAT version ";
+	private static final String TITLE_TEXT_EPILOGUE = " Datasets";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
-	private static final String TITLE_TEXT = "List of Datasets";
-	
 	private static final String UPLOAD_TEXT = "Upload Datasets";
 	private static final String UPLOAD_HOVER_HELP = 
 			"upload data to create a new data set " +
@@ -104,16 +105,16 @@ public class CruiseListPage extends Composite {
 	// Error messages when the request for the latest cruise list fails
 	private static final String LOGIN_ERROR_MSG = 
 			"Sorry, your login failed";
-	private static final String GET_CRUISE_LIST_ERROR_MSG = 
+	private static final String GET_DATASET_LIST_ERROR_MSG = 
 			"Problems obtaining the latest data set listing";
 
 	// Starts of error messages for improper cruise selections
-	private static final String SUBMITTED_CRUISES_SELECTED_ERR_START = 
+	private static final String SUBMITTED_DATASETS_SELECTED_ERR_START = 
 			"Only data sets which have not been submitted for QC, " +
 			"or which have been suspended or failed, may be selected ";
-	private static final String NO_CRUISE_SELECTED_ERR_START = 
+	private static final String NO_DATASET_SELECTED_ERR_START = 
 			"No data set is select ";
-	private static final String MANY_CRUISES_SELECTED_ERR_START = 
+	private static final String MANY_DATASETS_SELECTED_ERR_START = 
 			"Only one data set may be selected ";
 
 	// Ends of error messages for improper cruise selections
@@ -128,7 +129,7 @@ public class CruiseListPage extends Composite {
 	private static final String FOR_DELETE_ERR_END = 
 			"for deletion from the system.";
 	private static final String FOR_REMOVE_ERR_END = 
-			"for removal from your personal list of cruises.";
+			"for removal from your personal list of datasets.";
 
 	private static final String NO_METADATA_HTML_PROLOGUE = 
 			"The following data sets do not have appropriate metadata" +
@@ -151,32 +152,32 @@ public class CruiseListPage extends Composite {
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
-	private static final String DELETE_CRUISE_HTML_PROLOGUE = 
+	private static final String DELETE_DATASET_HTML_PROLOGUE = 
 			"All data, metadata, and ancillary docuemnts will be deleted " +
 			"for the following data sets: <ul>";
-	private static final String DELETE_CRUISE_HTML_EPILOGUE =
+	private static final String DELETE_DATASET_HTML_EPILOGUE =
 			"</ul> Do you wish to proceed?";
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
-	private static final String DELETE_CRUISE_FAIL_MSG = 
+	private static final String DELETE_DATASET_FAIL_MSG = 
 			"Unable to delete the data sets";
 
 	private static final String EXPOCODE_TO_ADD_MSG = 
 			"Enter the expocode of the data set to wish to add " +
 			"to your personal list of data sets";
-	private static final String ADD_CRUISE_FAIL_MSG = 
+	private static final String ADD_DATASET_FAIL_MSG = 
 			"Unable to add the specified data set " +
 			"to your personal list of data sets";
 
-	private static final String REMOVE_CRUISE_HTML_PROLOGUE = 
+	private static final String REMOVE_DATASET_HTML_PROLOGUE = 
 			"The following data sets will be removed from your personal " +
 			"list of data sets; the data, metadata, and ancillary documents " +
 			"will <b>not</b> be removed: <ul>";
-	private static final String REMOVE_CRUISE_HTML_EPILOGUE = 
+	private static final String REMOVE_DATASET_HTML_EPILOGUE = 
 			"</ul> Do you wish to proceed?";
 	private static final String REMOVE_YES_TEXT = "Yes";
 	private static final String REMOVE_NO_TEXT = "No";
-	private static final String REMOVE_CRUISE_FAIL_MSG = 
+	private static final String REMOVE_DATASET_FAIL_MSG = 
 			"Unable to remove the selected data sets " +
 			"from your personal list of data sets";
 
@@ -192,7 +193,7 @@ public class CruiseListPage extends Composite {
 	private static final String OWNER_COLUMN_NAME = "Owner";
 
 	// Replacement strings for empty or null values
-	private static final String EMPTY_TABLE_TEXT = "(no uploaded cruises)";
+	private static final String EMPTY_TABLE_TEXT = "(no uploaded datasets)";
 	private static final String NO_EXPOCODE_STRING = "(unknown)";
 	private static final String NO_TIMESTAMP_STRING = "(unknown)";
 	static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
@@ -203,18 +204,22 @@ public class CruiseListPage extends Composite {
 	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
 	private static final String NO_OWNER_STRING = "(unknown)";
 
-	interface DashboardCruiseListPageUiBinder extends UiBinder<Widget, CruiseListPage> {
+	interface CruiseListPageUiBinder extends UiBinder<Widget, CruiseListPage> {
 	}
 
-	private static DashboardCruiseListPageUiBinder uiBinder = 
-			GWT.create(DashboardCruiseListPageUiBinder.class);
+	private static CruiseListPageUiBinder uiBinder = 
+			GWT.create(CruiseListPageUiBinder.class);
+
+	private static DashboardResources resources = 
+			GWT.create(DashboardResources.class);
 
 	private static DashboardListServiceAsync service = 
 			GWT.create(DashboardListService.class);
 
+	@UiField Label titleLabel;
+	@UiField Image titleImage;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField Label titleLabel;
 	@UiField Button uploadButton;
 	@UiField Button viewDataButton;
 	@UiField Button omeMetadataButton;
@@ -257,7 +262,7 @@ public class CruiseListPage extends Composite {
 		cruiseSet = new HashSet<DashboardCruise>();
 		expocodeSet = new HashSet<String>();
 
-		titleLabel.setText(TITLE_TEXT);
+		titleImage.setResource(resources.getSocatCatPng());
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadButton.setText(UPLOAD_TEXT);
@@ -309,7 +314,7 @@ public class CruiseListPage extends Composite {
 		if ( loggingIn )
 			errMsg = LOGIN_ERROR_MSG;
 		else
-			errMsg = GET_CRUISE_LIST_ERROR_MSG;
+			errMsg = GET_DATASET_LIST_ERROR_MSG;
 		// Request the latest cruise list
 		service.getCruiseList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
@@ -326,7 +331,7 @@ public class CruiseListPage extends Composite {
 				}
 				else {
 					SocatUploadDashboard.showMessage(errMsg + 
-							" (unexpected invalid cruise list)");
+							" (unexpected invalid dataset list)");
 				}
 			}
 			@Override
@@ -365,7 +370,9 @@ public class CruiseListPage extends Composite {
 	 * 		cruises to display
 	 */
 	private void updateCruises(DashboardCruiseList cruises) {
-		// Update the username
+		// Update the title and username
+		titleLabel.setText(TITLE_TEXT_PROLOGUE + 
+				cruises.getSocatVersion() + TITLE_TEXT_EPILOGUE);
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
 		if ( cruises.isManager() ) {
@@ -474,17 +481,17 @@ public class CruiseListPage extends Composite {
 	void dataCheckOnClick(ClickEvent event) {
 		if ( ! getSelectedCruiseExpocodes(true) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
+					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() > 1 ) {
 			SocatUploadDashboard.showMessage(
-					MANY_CRUISES_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
+					MANY_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		String expocode = expocodeSet.iterator().next();
@@ -495,17 +502,17 @@ public class CruiseListPage extends Composite {
 	void omeOnClick(ClickEvent event) {
 		if ( ! getSelectedCruises(true) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_OME_ERR_END);
+					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_OME_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() > 1 ) {
 			SocatUploadDashboard.showMessage(
-					MANY_CRUISES_SELECTED_ERR_START + FOR_OME_ERR_END);
+					MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 		}
 		OmeManagerPage.showPage(cruiseSet.iterator().next());
 	}
@@ -514,12 +521,12 @@ public class CruiseListPage extends Composite {
 	void addlDocsOnClick(ClickEvent event) {
 		if ( ! getSelectedCruises(true) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
+					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
 			return;
 		}
 		AddlDocsManagerPage.showPage(cruiseSet);
@@ -531,7 +538,7 @@ public class CruiseListPage extends Composite {
 		getSelectedCruises(null);
 		if ( cruiseSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
 		checkCruisesForSOCAT();
@@ -548,19 +555,19 @@ public class CruiseListPage extends Composite {
 	void deleteCruiseOnClick(ClickEvent event) {
 		if ( ! getSelectedCruiseExpocodes(true) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_CRUISES_SELECTED_ERR_START + FOR_DELETE_ERR_END);
+					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_DELETE_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
 		}
 		// Confirm cruises to be deleted
-		String message = DELETE_CRUISE_HTML_PROLOGUE;
+		String message = DELETE_DATASET_HTML_PROLOGUE;
 		for ( String expocode : expocodeSet )
 			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
-		message += DELETE_CRUISE_HTML_EPILOGUE;
+		message += DELETE_DATASET_HTML_EPILOGUE;
 		if ( askDeletePopup == null ) {
 			askDeletePopup = new DashboardAskPopup(DELETE_YES_TEXT, 
 					DELETE_NO_TEXT, new AsyncCallback<Boolean>() {
@@ -596,13 +603,13 @@ public class CruiseListPage extends Composite {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
-					SocatUploadDashboard.showMessage(DELETE_CRUISE_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
 							" (unexpected invalid data set list)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(DELETE_CRUISE_FAIL_MSG, ex);
+				SocatUploadDashboard.showFailureMessage(DELETE_DATASET_FAIL_MSG, ex);
 			}
 		});
 	}
@@ -614,7 +621,7 @@ public class CruiseListPage extends Composite {
 			expocode = expocode.trim().toUpperCase();
 			// Quick local check if the expocode is obviously invalid
 			boolean badExpo = false;
-			String errMsg = ADD_CRUISE_FAIL_MSG;
+			String errMsg = ADD_DATASET_FAIL_MSG;
 			int expoLen = expocode.length();
 			if ( (expoLen < DashboardUtils.MIN_EXPOCODE_LENGTH) ||
 				 (expoLen > DashboardUtils.MAX_EXPOCODE_LENGTH) ) {
@@ -645,13 +652,13 @@ public class CruiseListPage extends Composite {
 							CruiseListPage.this.updateCruises(cruises);
 						}
 						else {
-							SocatUploadDashboard.showMessage(ADD_CRUISE_FAIL_MSG + 
+							SocatUploadDashboard.showMessage(ADD_DATASET_FAIL_MSG + 
 									" (unexpected invalid data set list)");
 						}
 					}
 					@Override
 					public void onFailure(Throwable ex) {
-						SocatUploadDashboard.showFailureMessage(ADD_CRUISE_FAIL_MSG, ex);
+						SocatUploadDashboard.showFailureMessage(ADD_DATASET_FAIL_MSG, ex);
 					}
 				});
 			}
@@ -663,14 +670,14 @@ public class CruiseListPage extends Composite {
 		getSelectedCruiseExpocodes(null);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
-					NO_CRUISE_SELECTED_ERR_START + FOR_REMOVE_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_REMOVE_ERR_END);
 			return;
 		}
 		// Confirm cruises to be removed
-		String message = REMOVE_CRUISE_HTML_PROLOGUE;
+		String message = REMOVE_DATASET_HTML_PROLOGUE;
 		for ( String expocode : expocodeSet )
 			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
-		message += REMOVE_CRUISE_HTML_EPILOGUE;
+		message += REMOVE_DATASET_HTML_EPILOGUE;
 		if ( askRemovePopup == null ) {
 			askRemovePopup = new DashboardAskPopup(REMOVE_YES_TEXT, 
 					REMOVE_NO_TEXT, new AsyncCallback<Boolean>() {
@@ -705,13 +712,13 @@ public class CruiseListPage extends Composite {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
-					SocatUploadDashboard.showMessage(REMOVE_CRUISE_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(REMOVE_DATASET_FAIL_MSG + 
 							" (unexpected invalid data set list)");
 				}
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(REMOVE_CRUISE_FAIL_MSG, ex);
+				SocatUploadDashboard.showFailureMessage(REMOVE_DATASET_FAIL_MSG, ex);
 			}
 		});
 	}
