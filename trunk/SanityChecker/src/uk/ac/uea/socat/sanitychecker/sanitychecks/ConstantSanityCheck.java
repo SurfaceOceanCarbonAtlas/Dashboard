@@ -93,16 +93,19 @@ public class ConstantSanityCheck extends SanityCheck {
 	
 	private void doDurationCheck() throws SanityCheckException {
 
-		double secondsDifference = Seconds.secondsBetween(itsFirstRecord.getTime(), itsLastRecord.getTime()).getSeconds();
-		double minutesDifference = secondsDifference / 60.0;
+		if (null != itsFirstRecord && null != itsLastRecord) {
 		
-		
-		if (minutesDifference > itsMaxDuration) {
-			try {
-				String message = "Value for column is constant for longer than " + itsMaxDuration + " minutes";
-				itsLastRecord.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsLastRecord.getLineNumber(), message);
-			} catch (SocatDataBaseException e) {
-				throw new SanityCheckException ("Error while setting flag on record", e);
+			double secondsDifference = Seconds.secondsBetween(itsFirstRecord.getTime(), itsLastRecord.getTime()).getSeconds();
+			double minutesDifference = secondsDifference / 60.0;
+			
+			
+			if (minutesDifference > itsMaxDuration) {
+				try {
+					String message = "Value for column is constant for longer than " + itsMaxDuration + " minutes";
+					itsLastRecord.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsLastRecord.getLineNumber(), message);
+				} catch (SocatDataBaseException e) {
+					throw new SanityCheckException ("Error while setting flag on record", e);
+				}
 			}
 		}
 	}
