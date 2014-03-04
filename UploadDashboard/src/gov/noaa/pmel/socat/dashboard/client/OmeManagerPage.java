@@ -41,8 +41,12 @@ public class OmeManagerPage extends Composite {
 	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
-			"At this time we can only upload metadata files generated " +
-			"from the CDIAC OME site.  Please: " +
+			"<p>At this time metadata is preloaded for all expected datasets, " +
+			"so normally you should not need to do anything here.  This " +
+			"page is supplied only as a test of uploading metadata files " +
+			"generated from the CDIAC OME site." +
+			"</p><p>" +
+			"To generate a metadata file to upload: " +
 			"<ul>" +
 			"<li>in a new browser tab or window, go to the CDIAC OME site <br />" +
 			"&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"http://mercury-ops2.ornl.gov/OceanOME/newForm.htm\">" +
@@ -50,7 +54,7 @@ public class OmeManagerPage extends Composite {
 			"<li>fill in the appropriate metadata</li>" +
 			"<li><em>Save Locally</em> (the button above the CAPTCHA)</li>" +
 			"</ul>" +
-			"This will generate an metadata file on your system that " +
+			"This will generate a metadata file on your system that " +
 			"can be uploaded here. " +
 			"<br /><br />" +
 			"Dataset: <ul><li>";

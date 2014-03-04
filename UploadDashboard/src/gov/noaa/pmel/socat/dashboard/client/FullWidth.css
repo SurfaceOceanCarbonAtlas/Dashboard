@@ -85,6 +85,7 @@ body {
 }
 
 .datasetsgrid {
+	margin-top: 1em;
 	margin-right: 0.5em;
 }
 
@@ -178,11 +179,20 @@ body {
 }
 .submitpanel {
 	background-color: #AACCEE;
-	padding: 0.5em;
-	margin-top: 1.75em;
+	padding-top: 0em;
+	padding-bottom: 0.5em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	margin-top: 0em;
 	margin-bottom: 0em;
 	margin-left: 0.5em;
 	margin-right: 0.5em;
+}
+.submitpanelmainbutton {
+	display: block;
+	width: 6.5em;
+	margin-top: 0em;
+	margin-bottom: 2.5em;
 }
 .submitpanelbutton {
 	display: block;
@@ -195,6 +205,16 @@ body {
 	display: block;
 	margin-top: 1.5em;
 	margin-bottom: 1.5em;
+}
+.titlemainpanel {
+	dislay: block;
+	background-color: #AACCEE;
+	margin-top: 0.5em;
+	margin-bottom: 0em;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+	padding-top: 1.0em;
+	padding-bottom: 1.5em;
 }
 .titlepagelabel {
 	display: inline;
@@ -225,9 +245,8 @@ body {
 	height: 44px;
 	width: 75px;
 	position: absolute;
-	top: 0;
+	top: 0.5em;
 	left: 50%;
-	margin-top: -5px;
 	margin-left: -25px;
 }
 

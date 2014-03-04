@@ -47,25 +47,25 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
 /**
- * Page for managing ancillary documents for a cruise.  
+ * Page for managing supplemental documents for a cruise.  
  *  
  * @author Karl Smith
  */
 public class AddlDocsManagerPage extends Composite {
 
-	private static final String TITLE_TEXT = "Manage Ancillary Documents";
+	private static final String TITLE_TEXT = "Supplemental Documents";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String INTRO_HTML_PROLOGUE = 
-			"Ancillary documents associated with the datasets: <ul>";
+			"Supplemental documents associated with the datasets: <ul>";
 	private static final String INTRO_HTML_EPILOGUE = 
 			"</ul>";
 
 	private static final String UPLOAD_TEXT = "Upload";
 	private static final String UPLOAD_HOVER_HELP = 
-			"upload a file that will be added as a new ancillary document, " +
-			"or replace an existing ancillary document, for the datasets";
+			"upload a file that will be added as a new supplemental document, " +
+			"or replace an existing supplemental document, for the datasets";
 
 	private static final String DISMISS_TEXT = "Done";
 
@@ -74,15 +74,15 @@ public class AddlDocsManagerPage extends Composite {
 
 	private static final String NO_OME_OVERWRITE_ERROR_MSG =
 			"Documents with the name " + DashboardMetadata.OME_FILENAME + 
-			" cannot to uploaded as ancillary documents.  Please upload " +
+			" cannot to uploaded as supplemental documents.  Please upload " +
 			"the file under a different name.";
 
 	private static final String ADDL_DOCS_LIST_FAIL_MSG = 
-			"Unexpected problems obtaining the updated ancillary " +
+			"Unexpected problems obtaining the updated supplemental " +
 			"documents for the datasets";
 
 	private static final String OVERWRITE_WARNING_MSG_PROLOGUE = 
-			"This will overwrite the ancillary documents: <ul>";
+			"This will overwrite the supplemental documents: <ul>";
 	private static final String OVERWRITE_WARNING_MSG_EPILOGUE =
 			"</ul> Do you wish to proceed?";
 	private static final String OVERWRITE_YES_TEXT = "Yes";
@@ -91,18 +91,18 @@ public class AddlDocsManagerPage extends Composite {
 	private static final String DELETE_BUTTON_TEXT = "Delete";
 
 	private static final String DELETE_DOC_HTML_PROLOGUE =
-			"This will deleted the ancillary document: <ul><li>";
+			"This will deleted the supplemental document: <ul><li>";
 	private static final String DELETE_DOC_HTML_EPILOGUE =
 			"</li></ul> Do you wish to proceed?";
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
 
 	private static final String DELETE_DOCS_FAIL_MSG =
-			"Problems deleting ancillary document";
+			"Problems deleting supplemental document";
 
 	// Replacement strings for empty or null values
 	private static final String EMPTY_TABLE_TEXT = 
-			"No ancillary documents";
+			"No supplemental documents";
 
 	// Column header strings
 	private static final String FILENAME_COLUMN_NAME = "Filename";
@@ -175,7 +175,7 @@ public class AddlDocsManagerPage extends Composite {
 	}
 
 	/**
-	 * Display this page in the RootLayoutPanel with the list of ancillary 
+	 * Display this page in the RootLayoutPanel with the list of supplemental 
 	 * documents in the given cruises.  Note that any uploaded documents 
 	 * are added to all the cruises by replicating the documents.  
 	 * Adds this page to the page history list.
@@ -214,7 +214,7 @@ public class AddlDocsManagerPage extends Composite {
 
 	/**
 	 * Updates the this page with the given cruises and their 
-	 * ancillary documents.
+	 * supplemental documents.
 	 * 
 	 * @param cruiseSet
 	 * 		set of cruises to use 
@@ -400,7 +400,7 @@ public class AddlDocsManagerPage extends Composite {
 		String resultMsg = event.getResults();
 		if ( resultMsg == null ) {
 			SocatUploadDashboard.showMessage(
-					"Unexpected null result from upload of an ancillary document");
+					"Unexpected null result from upload of an supplemental document");
 			return;
 		}
 
@@ -419,7 +419,7 @@ public class AddlDocsManagerPage extends Composite {
 			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
 		}
 		// Contact the server to obtain the latest set 
-		// of ancillary documents for the current cruises
+		// of supplemental documents for the current cruises
 		// Send the request to the server
 		service.getUpdatedCruises(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodes, 
