@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.Message;
@@ -212,7 +213,7 @@ public class SocatDataRecord {
 		int wholeSecond = (int) Math.floor(second);
 		int millisecond = (int) Math.floor((second - wholeSecond) * 1000);
 		
-		return new DateTime(year, month, day, hour, minute, wholeSecond, millisecond);
+		return new DateTime(year, month, day, hour, minute, wholeSecond, millisecond, DateTimeZone.UTC);
 	}
 	
 	public double getLongitude() {
