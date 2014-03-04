@@ -184,7 +184,13 @@ public class Output {
 	 * @return The number of data records processed from the original file.
 	 */
 	public int getRecordCount() {
-		return itsDataRecords.size();
+		int result = 0;
+		
+		if (null != itsDataRecords) {
+			result = itsDataRecords.size();
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -262,7 +268,13 @@ public class Output {
 	 * @return The number of metadata items
 	 */
 	public int getMetadataCount() {
-		return itsMetadata.size();
+		int result = 0;
+		
+		if (null != itsMetadata) {
+			result = itsMetadata.size();
+		}
+		
+		return result;
 	}
 	
 	public Messages getMessages() {
