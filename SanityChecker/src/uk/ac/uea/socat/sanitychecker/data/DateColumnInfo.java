@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
@@ -198,7 +199,7 @@ public class DateColumnInfo {
 					int millisecond = (int) Math.floor((second - wholeSecond) * 1000);
 					
 				
-					result = new DateTime(year, month, day, hour, minute, wholeSecond, millisecond);
+					result = new DateTime(year, month, day, hour, minute, wholeSecond, millisecond, DateTimeZone.UTC);
 				} catch (Exception e) {
 					throw new DateTimeParseException(e);
 				}
