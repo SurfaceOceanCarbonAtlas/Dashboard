@@ -4,10 +4,10 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -19,6 +19,7 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,6 +33,7 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -54,7 +56,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class CruiseListPage extends Composite {
 
-	private static final String TITLE_TEXT_PROLOGUE = "My SOCAT version ";
+	private static final String TITLE_TEXT_PROLOGUE = "My SOCAT Version ";
 	private static final String TITLE_TEXT_EPILOGUE = " Datasets";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
@@ -73,9 +75,9 @@ public class CruiseListPage extends Composite {
 	private static final String OME_METADATA_HOVER_HELP =
 			"edit the metadata for the selected data set";
 
-	private static final String ADDL_DOCS_TEXT = "Manage Documents";
+	private static final String ADDL_DOCS_TEXT = "Supplemental Documents";
 	private static final String ADDL_DOCS_HOVER_HELP =
-			"manage ancillary documents for the selected data set";
+			"manage supplemental documents for the selected data sets";
 
 	private static final String QC_SUBMIT_TEXT = "Submit for QC";
 	private static final String QC_SUBMIT_HOVER_HELP =
@@ -89,7 +91,7 @@ public class CruiseListPage extends Composite {
 	private static final String DELETE_TEXT = "Delete Datasets";
 	private static final String DELETE_HOVER_HELP =
 			"delete the selected data set, " +
-			"including its metadata and ancillary documents";
+			"including its metadata and supplemental documents";
 
 	private static final String ADD_TO_LIST_TEXT = 
 			"Add to List";
@@ -123,7 +125,7 @@ public class CruiseListPage extends Composite {
 	private static final String FOR_OME_ERR_END =
 			"for managing metadata.";
 	private static final String FOR_ADDL_DOCS_ERR_END = 
-			"for managing ancillary documents.";
+			"for managing supplemental documents.";
 	private static final String FOR_QC_SUBMIT_ERR_END =
 			"for submitting for QC.";
 	private static final String FOR_DELETE_ERR_END = 
@@ -153,8 +155,8 @@ public class CruiseListPage extends Composite {
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String DELETE_DATASET_HTML_PROLOGUE = 
-			"All data, metadata, and ancillary docuemnts will be deleted " +
-			"for the following data sets: <ul>";
+			"All data, metadata, and supplemental documents " +
+			"will be deleted for the following data sets: <ul>";
 	private static final String DELETE_DATASET_HTML_EPILOGUE =
 			"</ul> Do you wish to proceed?";
 	private static final String DELETE_YES_TEXT = "Yes";
@@ -171,8 +173,8 @@ public class CruiseListPage extends Composite {
 
 	private static final String REMOVE_DATASET_HTML_PROLOGUE = 
 			"The following data sets will be removed from your personal " +
-			"list of data sets; the data, metadata, and ancillary documents " +
-			"will <b>not</b> be removed: <ul>";
+			"list of data sets; the data, metadata, and supplemental " +
+			"documents will <b>not</b> be removed: <ul>";
 	private static final String REMOVE_DATASET_HTML_EPILOGUE = 
 			"</ul> Do you wish to proceed?";
 	private static final String REMOVE_YES_TEXT = "Yes";
@@ -404,6 +406,35 @@ public class CruiseListPage extends Composite {
 		cruiseList.clear();
 		if ( cruises != null ) {
 			cruiseList.addAll(cruises.values());
+		}
+		datasetsGrid.setRowCount(cruiseList.size());
+		// Make sure the table is sorted according to the last specification
+		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
+	}
+
+	/**
+	 * Selects or unselects cruises in the cruise list.
+	 * 
+	 * @param selected
+	 * 		if true, all cruises will be selected;
+	 * 		otherwise, all cruises will be unselected
+	 * @param onlyUnsubmitted
+	 * 		if true, the above selection only applies to cruises
+	 * 		not actively being QC-ed; otherwise, the above selection 
+	 * 		applies to all cruises
+	 */
+	private void selectAllCruises(boolean selected, boolean onlyUnsubmitted) {
+		List<DashboardCruise> cruiseList = listProvider.getList();
+		for ( DashboardCruise cruise : cruiseList ) {
+			if ( onlyUnsubmitted ) {
+				String status = cruise.getQcStatus();
+				if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
+						 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+						 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ||
+						 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ) )
+					continue;
+			}
+			cruise.setSelected(selected);
 		}
 		datasetsGrid.setRowCount(cruiseList.size());
 		// Make sure the table is sorted according to the last specification
@@ -728,7 +759,8 @@ public class CruiseListPage extends Composite {
 	 * to be populated using {@link #updateCruises(DashboardCruiseList)}.
 	 */
 	private void buildCruiseListTable() {
-		
+		Header<Boolean> selectedHeader = buildSelectedHeader();
+
 		// Create the columns for this table
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
@@ -742,7 +774,7 @@ public class CruiseListPage extends Composite {
 		ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
-		datasetsGrid.addColumn(selectedColumn, "");
+		datasetsGrid.addColumn(selectedColumn, selectedHeader);
 		datasetsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
 		datasetsGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
 		datasetsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
@@ -843,12 +875,33 @@ public class CruiseListPage extends Composite {
 		datasetsGrid.setSkipRowHoverStyleUpdate(false);
 	}
 
+	private Header<Boolean> buildSelectedHeader() {
+		Header<Boolean> selectedHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
+			@Override
+			public Boolean getValue() {
+				for ( DashboardCruise cruise : listProvider.getList() )
+					if ( ! cruise.isSelected() )
+						return false;
+				return true;
+			}
+		};
+		selectedHeader.setUpdater(new ValueUpdater<Boolean>() {
+			@Override
+			public void update(Boolean selected) {
+				if ( selected == null )
+					return;
+				selectAllCruises(selected, false);
+			}
+		});
+		return selectedHeader;
+	}
+
 	/**
 	 * Creates the selection column for the table
 	 */
 	private Column<DashboardCruise,Boolean> buildSelectedColumn() {
 		Column<DashboardCruise,Boolean> selectedColumn = 
-				new Column<DashboardCruise,Boolean>(new CheckboxCell()) {
+				new Column<DashboardCruise,Boolean>(new CheckboxCell(true, true)) {
 			@Override
 			public Boolean getValue(DashboardCruise cruise) {
 				return cruise.isSelected();
@@ -857,11 +910,11 @@ public class CruiseListPage extends Composite {
 		selectedColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,Boolean>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, Boolean value) {
-				if ( value == null ) {
+				if ( ! value ) {
 					cruise.setSelected(false);
 				}
 				else {
-					cruise.setSelected(value);
+					cruise.setSelected(true);
 				}
 			}
 		});

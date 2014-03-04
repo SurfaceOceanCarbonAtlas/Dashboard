@@ -108,7 +108,8 @@ public class AddToSocatPage extends Composite {
 	private static final String NO_CANCEL_TEXT = "No, cancel";
 
 	private static final String AGREE_SHARE_TEXT = 
-			"I give permission for these datasets to be shared for QC assessment.";
+			"I give permission for these datasets to be shared for QC assessment " +
+			"and archived as indicated above.";
 	private static final String AGREE_SHARE_INFO_HTML =
 			"By checking this box I am giving permission for my uploaded files for " +
 			"these datasets to be shared for purposes of assessing data quality.  " +
@@ -333,11 +334,11 @@ public class AddToSocatPage extends Composite {
 			socatRadio.setValue(true, true);
 		}
 
-		// Select the agree-to-share check boxes
-		agreeShareCheckBox.setValue(true, true);
+		// Unselect the agree-to-share check box
+		agreeShareCheckBox.setValue(false, true);
 
-		// Reset the focus on the submit button
-		submitButton.setFocus(true);
+		// Reset the focus on the agree-to-share check box
+		agreeShareCheckBox.setFocus(true);
 	}
 
 	@UiHandler("logoutButton")

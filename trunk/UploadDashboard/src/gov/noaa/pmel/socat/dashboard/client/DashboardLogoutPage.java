@@ -23,20 +23,14 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Logout page with buttons to login again and to go to socat.info
+ * 
  * @author Karl Smith
  */
 public class DashboardLogoutPage extends Composite {
 
 	private static final String GOODBYE_MSG = 
 			"<p>" +
-			"Thank you for contributing cruise data to SOCAT.  Please consider, " +
-			"if you are not already a member, joining our group of reviewers as " +
-			"well as joining the SOCAT E-mail list (Google group).  Contact " +
-			"socat.support@noaa.gov for more information on joining these groups. " +
-			"</p><p>" +
-			"If you experienced problems working with this product, please contact " +
-			"socat.support@noaa.gov with details explaining what you were trying to " +
-			"accomplish and the problem you encountered. " +
+			"Thank you for contributing data to SOCAT. " +
 			"</p><p>" +
 			"Goodbye." +
 			"</p>";

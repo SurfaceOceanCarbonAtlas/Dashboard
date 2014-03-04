@@ -8,7 +8,7 @@
 
 	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
 		<g:FlowPanel>
-			<g:FlowPanel addStyleNames="{style.titlepanel}">
+			<g:FlowPanel addStyleNames="{style.titlemainpanel}">
 				<g:Image addStyleNames="{style.titleimage}" ui:field="titleImage" />
 				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
 				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
@@ -18,7 +18,7 @@
 			<g:DockLayoutPanel unit="EM" addStyleNames="{style.submitdockpanel}">
 				<g:west size="7.5">
 					<g:FlowPanel addStyleNames="{style.submitpanel}">
-						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="uploadButton" />
+						<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="viewDataButton" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="omeMetadataButton" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="addlDocsButton" />
