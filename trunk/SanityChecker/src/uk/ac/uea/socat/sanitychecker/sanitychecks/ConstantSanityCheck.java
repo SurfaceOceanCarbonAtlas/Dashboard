@@ -2,10 +2,12 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.joda.time.Seconds;
 
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
+import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 public class ConstantSanityCheck extends SanityCheck {
@@ -34,6 +36,18 @@ public class ConstantSanityCheck extends SanityCheck {
 		} catch(NumberFormatException e) {
 			throw new SanityCheckException("All speed parameters must be numeric");
 		}
+	}
+	
+	@Override
+	public boolean checkParameters(ColumnSpec colSpec, Logger logger) throws SanityCheckException {
+		boolean result = true;
+		
+		if (null == colSpec.getColumnInfo(itsColumnName)) {
+			logger.fatal("Bad configuration for Constant sanity checker - unknown column '" + itsColumnName + "'");
+			result = false;
+		}
+		
+		return result;
 	}
 
 	@Override
