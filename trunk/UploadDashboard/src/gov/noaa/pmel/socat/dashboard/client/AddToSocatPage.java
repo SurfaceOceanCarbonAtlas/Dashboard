@@ -101,7 +101,7 @@ public class AddToSocatPage extends Composite {
 
 	private static final String RESEND_CDIAC_QUESTION = 
 			"<p>Some or all of these datasets were earlier sent to CDIAC for archival.  " +
-			"Do you want to send the files for these datasets <b>again<b>?</p>" +
+			"Do you want to send the files for these datasets <b>again</b>?</p>" +
 			"<p><em>If you send the files for these datasets again, you should contact " +
 			"CDIAC to explain the reason for this repeated request for archival.</em></p>";
 	private static final String YES_RESEND_TEXT = "Yes, send";
