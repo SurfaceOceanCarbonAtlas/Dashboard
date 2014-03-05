@@ -57,23 +57,26 @@ public class SpeedSanityCheck extends SanityCheck {
 				double thisLat = record.getLatitude();
 				DateTime thisTime = record.getTime();
 				
-				double distance = calcDistance(lastLon, lastLat, thisLon, thisLat);
-				double hourDiff = calcHourDiff(lastTime, thisTime);
+				if (null != lastTime && null != thisTime) {
 				
-				if (hourDiff <= 0.0) {
-					try {
-						record.setDateFlag(SocatColumnConfigItem.BAD_FLAG);
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
-					} catch (SocatDataBaseException e) {
-						// Being unable to set the flag indicates a configuration problem, so we can throw it
-						throw new SanityCheckException("Unable to set date flag on record", e);
-					}
-				} else {
-					double speed = distance / hourDiff;
-					if (speed > itsBadSpeedLimit) {
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
-					} else if (speed > itsQuestionableSpeedLimit) {
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
+					double distance = calcDistance(lastLon, lastLat, thisLon, thisLat);
+					double hourDiff = calcHourDiff(lastTime, thisTime);
+					
+					if (hourDiff <= 0.0) {
+						try {
+							record.setDateFlag(SocatColumnConfigItem.BAD_FLAG);
+							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
+						} catch (SocatDataBaseException e) {
+							// Being unable to set the flag indicates a configuration problem, so we can throw it
+							throw new SanityCheckException("Unable to set date flag on record", e);
+						}
+					} else {
+						double speed = distance / hourDiff;
+						if (speed > itsBadSpeedLimit) {
+							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
+						} else if (speed > itsQuestionableSpeedLimit) {
+							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
+						}
 					}
 				}
 			}
