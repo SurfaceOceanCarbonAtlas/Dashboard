@@ -2,12 +2,12 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.joda.time.Seconds;
 
+import uk.ac.uea.socat.sanitychecker.config.ConfigException;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
-import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 public class ConstantSanityCheck extends SanityCheck {
@@ -29,6 +29,15 @@ public class ConstantSanityCheck extends SanityCheck {
 		itsColumnName = parameters.get(0);
 		
 		try {
+			SocatColumnConfig columnConfig = SocatColumnConfig.getInstance();
+			if (null == columnConfig.getColumnConfig(itsColumnName)) {
+				throw new SanityCheckException("Unrecognised column name '" + itsColumnName + "' in parameter to ConstantSanityCheck");
+			}
+		} catch (ConfigException e) {
+			throw new SanityCheckException("Unhandled error while checking ConstantSanityCheck parameters", e);
+		}
+		
+		try {
 			itsMaxDuration = Integer.parseInt(parameters.get(1));
 			if (itsMaxDuration <= 0) {
 				throw new SanityCheckException("Max duration must be larger than zero");
@@ -38,18 +47,6 @@ public class ConstantSanityCheck extends SanityCheck {
 		}
 	}
 	
-	@Override
-	public boolean checkParameters(ColumnSpec colSpec, Logger logger) throws SanityCheckException {
-		boolean result = true;
-		
-		if (null == colSpec.getColumnInfo(itsColumnName)) {
-			logger.fatal("Bad configuration for Constant sanity checker - unknown column '" + itsColumnName + "'");
-			result = false;
-		}
-		
-		return result;
-	}
-
 	@Override
 	public void processRecord(SocatDataRecord record) throws SanityCheckException {
 		

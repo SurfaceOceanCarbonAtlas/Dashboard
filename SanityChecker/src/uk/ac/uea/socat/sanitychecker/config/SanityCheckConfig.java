@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
-import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
 
@@ -28,7 +27,6 @@ public class SanityCheckConfig {
 	private static Logger itsLogger = null;
 	
 	private static SanityCheckConfig sanityCheckConfigInstance = null;
-	
 	
 	public SanityCheckConfig() throws ConfigException {
 		if (itsConfigFilename == null) {
@@ -130,19 +128,6 @@ public class SanityCheckConfig {
 		return checkers;
 	}
 	
-	public boolean checkCheckerParameters(ColumnSpec colSpec, Logger logger) throws SanityCheckException {
-		boolean result = true;
-		
-		List<SanityCheck> checkers = getCheckers();
-		for (SanityCheck checker : checkers) {
-			if (!checker.checkParameters(colSpec, logger)) {
-				result = false;
-			}
-		}
-		
-		return result;
-	}
-
 	private class CheckerInitData {
 		
 		private Class<?> checkerClass;
