@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 import uk.ac.uea.socat.sanitychecker.Message;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -63,6 +65,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Validate and get the dashboard data store
 		validateUser(username, passhash);
 		getServletContext().removeAttribute("JSESSIONID");
+		Logger.getLogger("CruiseListService").info("logged out " + username);
 		return true;
 	}
 
@@ -71,6 +74,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 			throws IllegalArgumentException {
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);
+		Logger.getLogger("CruiseListService").info("cruise list returned for " + username);
 		// Return the current list of cruises for this user
 		return dataStore.getUserFileHandler().getCruiseListing(username);
 	}
