@@ -499,6 +499,30 @@ public class SocatColumnConfigItem {
 		
 		return result;
 	}
+	
+	public double getBadRangeMin() {
+		return itsBadRangeMin;
+	}
+	
+	public double getBadRangeMax() {
+		return itsBadRangeMax;
+	}
+	
+	public double getQuestionableRangeMin() {
+		return itsQuestionableRangeMin;
+	}
+	
+	public double getQuestionableRangeMax() {
+		return itsQuestionableRangeMax;
+	}
+	
+	public boolean hasBadRange() {
+		return itHasBadRange;
+	}
+	
+	public boolean hasQuestionableRange() {
+		return itHasQuestionableRange;
+	}
 
 	public int getOutputMessageFlag(int columnFlag) {
 		int result = -1;
