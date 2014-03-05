@@ -190,15 +190,23 @@ body {
 }
 .submitpanelmainbutton {
 	display: block;
-	width: 7em;
-	margin-top: 0em;
-	margin-bottom: 2.5em;
+	width: 7.25em;
+	margin-top: 0.5em;
+	margin-bottom: 0.75em;
 }
 .submitpanelbutton {
 	display: block;
-	width: 7em;
+	width: 7.25em;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
+}
+.submitpanelseparator {
+	display: block;
+	height: 0px;
+	border-style: solid;
+	border-width: 1px;
+	margin-top: 0.75em;
+	margin-bottom: 0.75em;
 }
 
 .titlepanel {

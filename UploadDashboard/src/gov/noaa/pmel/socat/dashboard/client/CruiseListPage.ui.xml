@@ -19,6 +19,7 @@
 				<g:west size="8">
 					<g:FlowPanel addStyleNames="{style.submitpanel}">
 						<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
+						<g:Label addStyleNames="{style.submitpanelseparator}" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="viewDataButton" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="omeMetadataButton" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="addlDocsButton" />

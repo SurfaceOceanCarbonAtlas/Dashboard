@@ -836,7 +836,7 @@ public class CruiseListPage extends Composite {
 		listProvider.addDataDisplay(datasetsGrid);
 
 		// Make the columns sortable
-		selectedColumn.setSortable(true);
+		// selectedColumn.setSortable(true);
 		expocodeColumn.setSortable(true);
 		timestampColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
@@ -885,7 +885,7 @@ public class CruiseListPage extends Composite {
 	}
 
 	private Header<Boolean> buildSelectedHeader() {
-		Header<Boolean> selectedHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
+		Header<Boolean> selectedHeader = new Header<Boolean>(new CheckboxCell(true, false)) {
 			@Override
 			public Boolean getValue() {
 				for ( DashboardCruise cruise : listProvider.getList() )
@@ -910,7 +910,7 @@ public class CruiseListPage extends Composite {
 	 */
 	private Column<DashboardCruise,Boolean> buildSelectedColumn() {
 		Column<DashboardCruise,Boolean> selectedColumn = 
-				new Column<DashboardCruise,Boolean>(new CheckboxCell(true, true)) {
+				new Column<DashboardCruise,Boolean>(new CheckboxCell(true, false)) {
 			@Override
 			public Boolean getValue(DashboardCruise cruise) {
 				return cruise.isSelected();
