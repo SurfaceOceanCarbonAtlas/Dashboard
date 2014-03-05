@@ -203,17 +203,24 @@ public class SocatDataRecord {
 	}
 	
 	public DateTime getTime() {
-		int year = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
-		int month = Integer.parseInt(getColumn(MONTH_COLUMN_NAME).getValue());
-		int day = Integer.parseInt(getColumn(DAY_COLUMN_NAME).getValue());
-		int hour = Integer.parseInt(getColumn(HOUR_COLUMN_NAME).getValue());
-		int minute = Integer.parseInt(getColumn(MINUTE_COLUMN_NAME).getValue());
-		double second = Double.parseDouble(getColumn(SECOND_COLUMN_NAME).getValue());
+		DateTime result = null;
 		
-		int wholeSecond = (int) Math.floor(second);
-		int millisecond = (int) Math.floor((second - wholeSecond) * 1000);
+		if (getDateFlag() != SocatColumnConfigItem.BAD_FLAG) {
 		
-		return new DateTime(year, month, day, hour, minute, wholeSecond, millisecond, DateTimeZone.UTC);
+			int year = Integer.parseInt(getColumn(YEAR_COLUMN_NAME).getValue());
+			int month = Integer.parseInt(getColumn(MONTH_COLUMN_NAME).getValue());
+			int day = Integer.parseInt(getColumn(DAY_COLUMN_NAME).getValue());
+			int hour = Integer.parseInt(getColumn(HOUR_COLUMN_NAME).getValue());
+			int minute = Integer.parseInt(getColumn(MINUTE_COLUMN_NAME).getValue());
+			double second = Double.parseDouble(getColumn(SECOND_COLUMN_NAME).getValue());
+			
+			int wholeSecond = (int) Math.floor(second);
+			int millisecond = (int) Math.floor((second - wholeSecond) * 1000);
+			
+			result = new DateTime(year, month, day, hour, minute, wholeSecond, millisecond, DateTimeZone.UTC);
+		}
+		
+		return result;
 	}
 	
 	public double getLongitude() {
