@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.IllegalFieldValueException;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
@@ -187,6 +188,7 @@ public class DateColumnInfo {
 			if (CheckerUtils.isEmpty(yearString, monthString, dayString, hourString, minuteString, secondString)) {
 				throw new MissingDateTimeElementException();
 			} else {
+				
 				try {
 					int year = Integer.parseInt(yearString);
 					int month = Integer.parseInt(monthString);
@@ -200,6 +202,10 @@ public class DateColumnInfo {
 					
 				
 					result = new DateTime(year, month, day, hour, minute, wholeSecond, millisecond, DateTimeZone.UTC);
+				} catch (NumberFormatException e) {
+					throw new DateTimeParseException("Invalid date " + yearString + "/" + monthString + "/" + dayString + " " + hourString + ":" + minuteString + ":" + secondString);
+				} catch (IllegalFieldValueException e) {
+					throw new DateTimeParseException("Invalid date " + yearString + "/" + monthString + "/" + dayString + " " + hourString + ":" + minuteString + ":" + secondString);
 				} catch (Exception e) {
 					throw new DateTimeParseException(e);
 				}
