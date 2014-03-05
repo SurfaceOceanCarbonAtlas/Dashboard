@@ -425,9 +425,34 @@ public class SanityChecker {
 						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
 
 						if (SocatColumnConfigItem.GOOD_FLAG != rangeCheckFlag) {
-							String message = "Value is out of range on line " + record.getLineNumber() + ", column '" + columnName + "'";
+							StringBuffer rangeDetails = new StringBuffer("[");
+							if (columnConfig.hasBadRange()) {
+								rangeDetails.append(columnConfig.getBadRangeMin());
+							}
+							
+							if (columnConfig.hasQuestionableRange()) {
+								rangeDetails.append("(");
+								rangeDetails.append(columnConfig.getQuestionableRangeMin());
+								rangeDetails.append(")");
+							}
+							
+							rangeDetails.append("-");
+							
+							if (columnConfig.hasQuestionableRange()) {
+								rangeDetails.append("(");
+								rangeDetails.append(columnConfig.getQuestionableRangeMax());
+								rangeDetails.append(")");
+							}
+							
+							if (columnConfig.hasBadRange()) {
+								rangeDetails.append(columnConfig.getBadRangeMax());
+							}
+							rangeDetails.append("]");
+							
+							
+							String message = "Value " + column.getValue() + " is out of range " + rangeDetails + " on line " + record.getLineNumber() + ", column '" + columnName + "'";
 							itsLogger.trace(message);
-							column.setFlag(rangeCheckFlag, messages, currentRecord, "Value out of range");
+							column.setFlag(rangeCheckFlag, messages, currentRecord, "Value " + column.getValue() + " out of range " + rangeDetails);
 						}
 					}
 				}
