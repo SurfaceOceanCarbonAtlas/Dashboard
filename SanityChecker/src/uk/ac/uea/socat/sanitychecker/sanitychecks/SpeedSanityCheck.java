@@ -2,11 +2,13 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
+import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
@@ -41,6 +43,10 @@ public class SpeedSanityCheck extends SanityCheck {
 		if (itsQuestionableSpeedLimit > itsBadSpeedLimit) {
 			throw new SanityCheckException("Bad speed limit must be >= Questionable speed limit"); 
 		}
+	}
+	
+	public boolean checkParameters(ColumnSpec colSpec, Logger logger) {
+		return true;
 	}
 
 	@Override

@@ -144,9 +144,13 @@ public class SanityChecker {
 			itsLogger.fatal("Base Configuration has not been initialised - call initBaseConfig first!");
 			throw new SanityCheckerException("Base Configuration has not been initialised - call initBaseConfig first!");
 		}
-
-
+		
 		try {
+			// Check the Sanity Checker parameters against the provided column specification
+			if (!SanityCheckConfig.getInstance().checkCheckerParameters(colSpec, itsLogger)) {
+				throw new SanityCheckerException("Sanity Checker parameter checks failed - see log");
+			}
+
 			// Initialise the output object
 			itsInputMetadata = metadataInput;
 			itsInputData = dataInput;
