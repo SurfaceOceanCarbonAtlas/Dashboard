@@ -16,7 +16,7 @@
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<g:DockLayoutPanel unit="EM" addStyleNames="{style.submitdockpanel}">
-				<g:west size="7.5">
+				<g:west size="8">
 					<g:FlowPanel addStyleNames="{style.submitpanel}">
 						<g:Button addStyleNames="{style.submitpanelmainbutton}" ui:field="uploadButton" />
 						<g:Button addStyleNames="{style.submitpanelbutton}" ui:field="viewDataButton" />

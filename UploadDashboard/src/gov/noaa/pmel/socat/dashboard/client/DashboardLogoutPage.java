@@ -29,11 +29,8 @@ import com.google.gwt.user.client.ui.Widget;
 public class DashboardLogoutPage extends Composite {
 
 	private static final String GOODBYE_MSG = 
-			"<p>" +
-			"Thank you for contributing data to SOCAT. " +
-			"</p><p>" +
-			"Goodbye." +
-			"</p>";
+			"<p>Thank you for contributing data to SOCAT.</p>" +
+			"<p>Goodbye.</p>";
 	private static final String RELOGIN_TEXT = "Log in again";
 	private static final String SOCAT_INFO_TEXT = "Return to socat.info";
 	private static final String SOCAT_INFO_LINK = "http://www.socat.info";

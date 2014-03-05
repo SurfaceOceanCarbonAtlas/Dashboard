@@ -190,13 +190,13 @@ body {
 }
 .submitpanelmainbutton {
 	display: block;
-	width: 6.5em;
+	width: 7em;
 	margin-top: 0em;
 	margin-bottom: 2.5em;
 }
 .submitpanelbutton {
 	display: block;
-	width: 6.5em;
+	width: 7em;
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 }
@@ -252,6 +252,7 @@ body {
 
 .uploadfile {
 	display: block;
+	width: 90%;
 	font-size: 100%;
 	margin: 2em;
 }

@@ -41,7 +41,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class DataMessagesPage extends Composite {
 
-	private static final String TITLE_TEXT = "Data-Problem Messages";
+	private static final String TITLE_TEXT = "Data Errors and Warnings";
 
 	private static final String INTRO_HTML_PROLOGUE = 
 			"Dataset: <ul><li>";
@@ -121,7 +121,7 @@ public class DataMessagesPage extends Composite {
 					 ! msgList.getUsername().equals(
 							 DashboardLoginPage.getUsername()) ) {
 					SocatUploadDashboard.showMessage(
-							"Unexpected data-problems list was returned");
+							"Unexpected list of data problems returned");
 					return;
 				}
 				if ( singleton == null )
@@ -133,7 +133,7 @@ public class DataMessagesPage extends Composite {
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(
-						"Unexpected failure obtaining the data-problems list", ex);
+						"Unexpected failure obtaining the list of data problems", ex);
 			}
 		});
 

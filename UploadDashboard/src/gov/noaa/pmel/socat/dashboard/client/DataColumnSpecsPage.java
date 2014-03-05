@@ -50,7 +50,7 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
-	private static final String MESSAGES_TEXT = "Show data-problem messages";
+	private static final String MESSAGES_TEXT = "Show errors/warnings";
 
 	private static final String SUBMIT_TEXT = "Check Data";
 
@@ -108,35 +108,31 @@ public class DataColumnSpecsPage extends Composite {
 			"Problems obtaining more data from the dataset";
 
 	private static final String SANITY_CHECK_FAIL_MSG = 
-			"Automatic data checking failed, " +
-			"indicating very serious problems with the data.";
+			"The data check failed, indicating very serious errors in the data.";
 	private static final String SANITY_CHECK_ERROR_MSG = 
-			"Automatic data checking found serious problems with the data.";
+			"The data check found serious errors in the data.";
 	private static final String SANITY_CHECK_WARNING_MSG = 
-			"Automatic data checking found possible problems with the data";
+			"The data check found possible errors (warnings) in the data";
 	private static final String SANITY_CHECK_SUCCESS_MSG =
-			"Automatic data checking did not find any problems with the data";
+			"The data check did not find any problems in the data";
 
 	private static final String DATA_NEVER_CHECKED_HTML = 
-			"<h3>Data has not been checked.</h3>" +
+			"<h3>Warning: Data has not been checked.</h3>" +
 			"<p>You will need need to check the data in a dataset before you " +
 			"can submit the dataset for QC.  This data check will identify " +
-			"problematic data and discover incorrectly identified or unknown " +
+			"errors in the data and discover incorrectly identified or unknown " +
 			"data columns.  Although this data check can be run any time before " +
 			"submitting a dataset, we recommend running it immediately after " +
 			"uploading a dataset so that any incorrectly identified or unknown " +
 			"data columns are correctly identified for subsequent dataset " +
 			"uploads.</p>" +
-			"<p>Any you sure you want to continue without checking the data " +
-			"in this dataset?</p>";
+			"<p>Leave this page without checking the data?</p>";
 	private static final String CHANGES_NOT_SAVED_HTML =
-			"<h3>Data has not been checked since change.</h3>" +
+			"<h3>Warning: Column settings not saved.</h3>" +
 			"<p>Changes to data column types, units, and missing values are not " +
-			"saved until the data has been checked with the updated data column " +
-			"information.  If you wish to save the changes you have made, cancel " +
-			"out of this dialog and check the data before leaving this page.</p>" +
-			"<p>Any you sure you want to lose the changes you have made to the " +
-			"data column information?</p>";
+			"saved until the data has been checked with this updated data column " +
+			"information.</p>" +
+			"<p>Leave this page and lose the changes you have made?</p>";
 	private static final String RETURN_TO_CRUISE_LIST_TEXT = "Yes";
 	private static final String STAY_ON_THIS_PAGE_TEXT = "No";
 

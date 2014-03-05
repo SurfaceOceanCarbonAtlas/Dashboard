@@ -19,8 +19,12 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -39,6 +43,9 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
 public class DashboardDataStore {
 
 	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
+	private static final String LOGGER_CONFIG_RELATIVE_FILENAME = "content" +
+			File.separator + SERVER_APP_NAME + File.separator + 
+			"log4j.properties";
 	private static final String CONFIG_RELATIVE_FILENAME = "content" + 
 			File.separator + SERVER_APP_NAME + File.separator + 
 			"SocatUploadDashboard.properties";
@@ -88,6 +95,8 @@ public class DashboardDataStore {
 	private static final AtomicReference<DashboardDataStore> singleton = 
 			new AtomicReference<DashboardDataStore>();
 
+	private File configFile;
+	private long configFileTimestamp;
 	private TripleDesCipher cipher;
 	private String encryptionSalt;
 	// Map of username to user info
@@ -116,9 +125,14 @@ public class DashboardDataStore {
 		// The following is just for debugging under Eclipse
 		if ( baseDir == null ) 
 			baseDir = System.getProperty("user.home");
+		Logger itsLogger = Logger.getLogger(SERVER_APP_NAME);
+		// Configure the log4j logger
+		PropertyConfigurator.configure(baseDir + File.separator + 
+				LOGGER_CONFIG_RELATIVE_FILENAME);
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
-		File configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
+		configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
+		configFileTimestamp = configFile.lastModified();
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(configFile));
@@ -265,6 +279,7 @@ public class DashboardDataStore {
 		    } finally {
 		    	stream.close();
 		    }
+		    itsLogger.info("read Ferret configuration file " + propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -320,6 +335,9 @@ public class DashboardDataStore {
 						configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
 			}
 		}
+		itsLogger.info("read configuration file " + configFile.getPath());
+		// Watch for changes to the configuration file
+		watchConfigFile();
 	}
 
 	/**
@@ -332,6 +350,34 @@ public class DashboardDataStore {
 		if ( singleton.get() == null )
 			singleton.compareAndSet(null, new DashboardDataStore());
 		return singleton.get();
+	}
+
+	/**
+	 * Monitors the configuration file creating the current DashboardDataStore 
+	 * singleton object.  If the configuration file has changed, sets the 
+	 * current DashboardDataStore singleton object to null and stops monitoring
+	 * the configuration file.  Thus, the next time the DashboardDataStore
+	 * is needed, the configuration file will be reread and this monitor 
+	 * will be restarted.
+	 */
+	private static final long MINUTES_CHECK_INTERVAL = 15;
+	private static void watchConfigFile() {
+		// Just create a time to monitor the last modified timestamp every fifteen 
+		// minutes (don't bother with a separate thread running a watcher)
+		(new Timer()).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				DashboardDataStore dataStore = singleton.get();
+				if ( dataStore == null ) {
+					cancel(); 
+				}
+				else if ( dataStore.configFile.lastModified() != 
+							dataStore.configFileTimestamp ) {
+					singleton.set(null);
+					cancel();
+				}
+			}
+		}, MINUTES_CHECK_INTERVAL * 60 * 1000, MINUTES_CHECK_INTERVAL * 60 * 1000);
 	}
 
 	/**
@@ -474,7 +520,7 @@ public class DashboardDataStore {
 	}
 
 	/**
-	 * Adds the username and username/password hash to the standard configuration file.
+	 * Adds the username and password hash to the standard configuration file.
 	 * 
 	 * @param args
 	 * 		(username)  (password)
@@ -485,8 +531,9 @@ public class DashboardDataStore {
 			 args[1].trim().isEmpty() ) {
 			System.err.println();
 			System.err.println("arguments:  <username>  <password>");
-			System.err.println("Adds the username and username/password hash ");
-			System.err.println("to the standard configuration file");
+			System.err.println();
+			System.err.println("Adds the username and password hash to the standard configuration file");
+			System.err.println();
 			System.exit(1);
 		}
 		String username = args[0];
@@ -499,13 +546,8 @@ public class DashboardDataStore {
 		try {
 			DashboardDataStore dataStore = DashboardDataStore.get();
 			String computedHash = dataStore.spicedHash(username, passhash);
-			String baseDir = System.getProperty("catalina.base");
-			// The following is just for debugging under Eclipse
-			if ( baseDir == null ) 
-				baseDir = System.getProperty("user.home");
-			File configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
 			PrintWriter writer = new PrintWriter(
-					new BufferedWriter(new FileWriter(configFile, true)));
+					new BufferedWriter(new FileWriter(dataStore.configFile, true)));
 			writer.println(AUTHENTICATION_NAME_TAG_PREFIX + username + "=" + computedHash);
 			writer.close();
 		} catch (IOException ex) {
