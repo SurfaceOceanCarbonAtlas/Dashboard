@@ -52,7 +52,7 @@ public class DashboardUtils {
 
 	// Data check strings
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
-	public static final String CHECK_STATUS_ACCEPTABLE = "Acceptable";
+	public static final String CHECK_STATUS_ACCEPTABLE = "No warnings";
 	public static final String CHECK_STATUS_WARNINGS_PREFIX = "Warnings:";
 	public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";

@@ -30,7 +30,11 @@ import org.joda.time.DateTime;
 import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
+import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
+import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
+import uk.ac.uea.socat.sanitychecker.config.SanityCheckConfig;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
@@ -141,9 +145,25 @@ public class DashboardCruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, CHECKER_DIRECTION_UNITS);
 	}
 
+	/**
+	 * Initializes the SanityChecker using the configuration files names
+	 * in the given properties files.
+	 * 
+	 * @param configFile
+	 * 		properties file giving the names of the configuration files 
+	 * 		for each SanityChecker component
+	 * @throws IOException
+	 * 		If the SanityChecker has problems with a configuration file
+	 */
 	public DashboardCruiseChecker(File configFile) throws IOException {
-		// Initialize the SanityChecker from the configuration file
 		try {
+			// Clear any previous configuration
+			SanityCheckConfig.destroy();
+			SocatColumnConfig.destroy();
+			ColumnConversionConfig.destroy();
+			MetadataConfig.destroy();
+			BaseConfig.destroy();
+			// Initialize the SanityChecker from the configuration file
 			SanityChecker.initConfig(configFile.getAbsolutePath());
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid SanityChecker configuration" + 

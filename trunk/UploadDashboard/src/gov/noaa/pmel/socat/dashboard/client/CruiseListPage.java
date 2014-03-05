@@ -69,7 +69,7 @@ public class CruiseListPage extends Composite {
 	private static final String VIEW_DATA_TEXT = "Identify Columns";
 	private static final String VIEW_DATA_HOVER_HELP =
 			"review and modify data column type assignments for the " +
-			"selected data set; highlights issues in the data";
+			"selected data set; identify issues in the data";
 
 	static final String OME_METADATA_TEXT = "Edit Metadata";
 	private static final String OME_METADATA_HOVER_HELP =
@@ -85,12 +85,12 @@ public class CruiseListPage extends Composite {
 
 	private static final String REVIEW_TEXT = "Preview Dataset";
 	private static final String REVIEW_HOVER_HELP =
-			"examine the selected data sets in the data set viewer " +
+			"examine the selected data set in the data set viewer " +
 			"aside other SOCAT data sets";
 
 	private static final String DELETE_TEXT = "Delete Datasets";
 	private static final String DELETE_HOVER_HELP =
-			"delete the selected data set, " +
+			"delete the selected data sets, " +
 			"including its metadata and supplemental documents";
 
 	private static final String ADD_TO_LIST_TEXT = 
@@ -186,22 +186,22 @@ public class CruiseListPage extends Composite {
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
 	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
-	private static final String DATA_CHECK_COLUMN_NAME = "Data status";
+	private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
 	private static final String OME_METADATA_COLUMN_NAME = "Metadata";
 	private static final String SUBMITTED_COLUMN_NAME = "Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
-	private static final String ADDL_DOCS_COLUMN_NAME = "Addl Documents";
+	private static final String ADDL_DOCS_COLUMN_NAME = "Supplemental<br />Documents";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 
 	// Replacement strings for empty or null values
 	private static final String EMPTY_TABLE_TEXT = "(no uploaded datasets)";
 	private static final String NO_EXPOCODE_STRING = "(unknown)";
 	private static final String NO_TIMESTAMP_STRING = "(unknown)";
-	static final String NO_DATA_CHECK_STATUS_STRING = "(not checked)";
+	private static final String NO_DATA_CHECK_STATUS_STRING = "Not checked";
 	private static final String NO_OME_METADATA_STATUS_STRING = "(no metadata)";
-	private static final String NO_QC_STATUS_STRING = "(private)";
-	private static final String NO_ARCHIVE_STATUS_STRING = "(not specified)";
+	private static final String NO_QC_STATUS_STRING = "Private";
+	private static final String NO_ARCHIVE_STATUS_STRING = "Not specified";
 	private static final String NO_UPLOAD_FILENAME_STRING = "(unknown)";
 	private static final String NO_ADDL_DOCS_STATUS_STRING = "(no documents)";
 	private static final String NO_OWNER_STRING = "(unknown)";
@@ -775,15 +775,24 @@ public class CruiseListPage extends Composite {
 
 		// Add the columns, with headers, to the table
 		datasetsGrid.addColumn(selectedColumn, selectedHeader);
-		datasetsGrid.addColumn(expocodeColumn, EXPOCODE_COLUMN_NAME);
-		datasetsGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
-		datasetsGrid.addColumn(dataCheckColumn, DATA_CHECK_COLUMN_NAME);
-		datasetsGrid.addColumn(omeMetadataColumn, OME_METADATA_COLUMN_NAME);
-		datasetsGrid.addColumn(qcStatusColumn, SUBMITTED_COLUMN_NAME);
-		datasetsGrid.addColumn(archiveStatusColumn, ARCHIVED_COLUMN_NAME);
-		datasetsGrid.addColumn(filenameColumn, FILENAME_COLUMN_NAME);
-		datasetsGrid.addColumn(addlDocsColumn, ADDL_DOCS_COLUMN_NAME);
-		datasetsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
+		datasetsGrid.addColumn(expocodeColumn, 
+				SafeHtmlUtils.fromSafeConstant(EXPOCODE_COLUMN_NAME));
+		datasetsGrid.addColumn(timestampColumn, 
+				SafeHtmlUtils.fromSafeConstant(TIMESTAMP_COLUMN_NAME));
+		datasetsGrid.addColumn(dataCheckColumn, 
+				SafeHtmlUtils.fromSafeConstant(DATA_CHECK_COLUMN_NAME));
+		datasetsGrid.addColumn(omeMetadataColumn, 
+				SafeHtmlUtils.fromSafeConstant(OME_METADATA_COLUMN_NAME));
+		datasetsGrid.addColumn(qcStatusColumn, 
+				SafeHtmlUtils.fromSafeConstant(SUBMITTED_COLUMN_NAME));
+		datasetsGrid.addColumn(archiveStatusColumn, 
+				SafeHtmlUtils.fromSafeConstant(ARCHIVED_COLUMN_NAME));
+		datasetsGrid.addColumn(filenameColumn, 
+				SafeHtmlUtils.fromSafeConstant(FILENAME_COLUMN_NAME));
+		datasetsGrid.addColumn(addlDocsColumn, 
+				SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
+		datasetsGrid.addColumn(ownerColumn, 
+				SafeHtmlUtils.fromSafeConstant(OWNER_COLUMN_NAME));
 		ownerColumnShown = true;
 
 		// Set the minimum widths of the columns
