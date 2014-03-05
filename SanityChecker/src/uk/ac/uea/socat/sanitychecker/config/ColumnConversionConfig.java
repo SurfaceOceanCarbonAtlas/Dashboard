@@ -72,12 +72,18 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 		}
 		
 		try {
-			Properties config = new Properties();
-			config.load(new FileReader(new File(itsFilename)));
-			buildMap(config, itsLogger);
+			FileReader reader = new FileReader(new File(itsFilename));
+			try {
+				Properties config = new Properties();
+				config.load(reader);
+				buildMap(config, itsLogger);
+			} finally {
+				reader.close();
+			}
 		} catch (IOException e) {
 			throw new ConfigException(itsFilename, e.getMessage(), e);
 		}
+		itsLogger.info("read ColumnConversionConfig configuration file " + itsFilename);
 	}
 	
 	/**

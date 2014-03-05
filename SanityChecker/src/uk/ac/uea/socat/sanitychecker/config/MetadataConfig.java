@@ -261,6 +261,7 @@ public class MetadataConfig {
 		} catch (IOException e) {
 			throw new ConfigException(itsConfigFilename, "I/O Error while reading from file", e);
 		}
+		itsLogger.info("read MetadataConfig configuration file " + itsConfigFilename);
 	}
 	
 	/**

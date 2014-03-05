@@ -327,6 +327,8 @@ public class SocatColumnConfig {
 		} catch (IOException e) {
 			throw new ConfigException(itsConfigFilename, "I/O Error while reading file", e);
 		}
+		itsLogger.info("read SocatColumnConfig configuration file " + itsConfigFilename);
+
 	}
 	
 	/**

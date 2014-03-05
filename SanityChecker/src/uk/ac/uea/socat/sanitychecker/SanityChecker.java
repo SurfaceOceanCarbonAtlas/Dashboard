@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
+import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
@@ -91,7 +92,7 @@ public class SanityChecker {
 	 * @param filename The location of the @code{BaseConfig} file. 
 	 */
 	public static void initConfig(String filename) throws ConfigException, SanityCheckerException {
-		Logger initLogger = Logger.getLogger("SanityChecker - Configuration init");
+		Logger initLogger = Logger.getLogger("SanityChecker");
 		BaseConfig.init(filename, initLogger);
 		
 		// Two-digit dates are handled, but only up to a certain time point. After that we must
@@ -112,6 +113,7 @@ public class SanityChecker {
 		// we start trying to process files.
 		BaseConfig.getInstance();
 		MetadataConfig.getInstance();
+		ColumnConversionConfig.getInstance();
 		SocatColumnConfig.getInstance();
 		SanityCheckConfig.getInstance();
 	}
