@@ -3,10 +3,7 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import uk.ac.uea.socat.sanitychecker.Message;
-import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 /**
@@ -35,13 +32,6 @@ public abstract class SanityCheck {
 	 * @throws SanityCheckException
 	 */
 	public abstract void initialise(List<String> parameters) throws SanityCheckException;
-	
-	/**
-	 * Checks that the parameters are valid.
-	 * @return @code{true} if the parameters are OK; @code{false} otherwise
-	 * @throws SanityCheckException
-	 */
-	public abstract boolean checkParameters(ColumnSpec colSpec, Logger logger) throws SanityCheckException;
 	
 	/**
 	 * Processes a single record from the input data file.

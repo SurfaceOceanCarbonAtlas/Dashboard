@@ -2,11 +2,10 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
+import uk.ac.uea.socat.sanitychecker.config.ConfigException;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
-import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 public class FixedValueSanityCheck extends SanityCheck {
@@ -22,20 +21,16 @@ public class FixedValueSanityCheck extends SanityCheck {
 		}
 		
 		itsColumnName = parameters.get(0);
-	}
 
-	@Override
-	public boolean checkParameters(ColumnSpec colSpec, Logger logger) throws SanityCheckException {
-		boolean result = true;
-		
-		if (null == colSpec.getColumnInfo(itsColumnName)) {
-			logger.fatal("Bad configuration for Fixed Value sanity checker - unknown column '" + itsColumnName + "'");
-			result = false;
+		try {
+			SocatColumnConfig columnConfig = SocatColumnConfig.getInstance();
+			if (null == columnConfig.getColumnConfig(itsColumnName)) {
+				throw new SanityCheckException("Unrecognised column name '" + itsColumnName + "' in parameter to FixedValueSanityCheck");
+			}
+		} catch (ConfigException e) {
+			throw new SanityCheckException("Unhandled error while checking ConstantSanityCheck parameters", e);
 		}
-		
-		return result;
 	}
-
 
 	@Override
 	public void processRecord(SocatDataRecord record)
