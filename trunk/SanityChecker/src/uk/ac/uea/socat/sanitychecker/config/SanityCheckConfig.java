@@ -102,6 +102,7 @@ public class SanityCheckConfig {
 		} catch (IOException e) {
 			throw new ConfigException(itsConfigFilename, "I/O Error while reading file", e);
 		}
+		itsLogger.info("read SanityCheckConfig configuration file " + itsConfigFilename);
 	}
 	
 	/**
