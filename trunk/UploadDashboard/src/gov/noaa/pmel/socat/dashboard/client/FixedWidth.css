@@ -8,7 +8,7 @@ body {
 }
 
 .fixedwidthcontainer {
-	width: 35em;
+	width: 30em;
 }
 
 .horizontalpanel {
@@ -21,9 +21,23 @@ body {
 	margin-right: 3.5em;
 }
 
+.introtitle {
+	display: block;
+	font-size: large;
+	font-weight: bold;
+	text-align: center;
+	padding-top: 2em;
+	padding-bottom: 0.5em;
+	padding-left: 2em;
+	padding-right: 2em;
+}
 .introhtml {
+	display: block;
 	text-align: justify;
-	padding: 2em;
+	padding-top: 0.5em;
+	padding-bottom: 2em;
+	padding-left: 2em;
+	padding-right: 2em;
 }
 
 .infopanel {
@@ -50,7 +64,7 @@ body {
 	margin-right: 0.25em;
 }
 .labeledtextbox {
-	width: 20em;
+	width: 16em;
 	margin-left: 0.25em;
 }
 
@@ -58,7 +72,7 @@ body {
 	display: block;
 	font-weight: bold;
 	font-size: large;
-	width: 10em;
+	width: 8em;
 	margin-top: 2em;
 	margin-bottom: 2em;
 }
