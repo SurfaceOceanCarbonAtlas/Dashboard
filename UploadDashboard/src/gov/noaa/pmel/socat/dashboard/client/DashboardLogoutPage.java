@@ -28,9 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardLogoutPage extends Composite {
 
-	private static final String GOODBYE_MSG = 
-			"<p>Thank you for contributing data to SOCAT.</p>" +
-			"<p>Goodbye.</p>";
+	private static final String GOODBYE_TITLE = 
+			"Thank you for contributing data to SOCAT.";
 	private static final String RELOGIN_TEXT = "Log in again";
 	private static final String SOCAT_INFO_TEXT = "Return to socat.info";
 	private static final String SOCAT_INFO_LINK = "http://www.socat.info";
@@ -46,7 +45,7 @@ public class DashboardLogoutPage extends Composite {
 	private static DashboardListServiceAsync service = 
 			GWT.create(DashboardListService.class);
 
-	@UiField HTML goodbyeHTML;
+	@UiField HTML goodbyeTitle;
 	@UiField Button reloginButton;
 	@UiField Anchor socatInfoAnchor;
 
@@ -62,7 +61,7 @@ public class DashboardLogoutPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		goodbyeHTML.setHTML(GOODBYE_MSG);
+		goodbyeTitle.setHTML(GOODBYE_TITLE);
 		reloginButton.setText(RELOGIN_TEXT);
 		socatInfoAnchor.setText(SOCAT_INFO_TEXT);
 		socatInfoAnchor.setHref(SOCAT_INFO_LINK);

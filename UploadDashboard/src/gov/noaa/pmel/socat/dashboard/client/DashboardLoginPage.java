@@ -29,12 +29,13 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class DashboardLoginPage extends Composite {
 
-	private static final String WELCOME_MSG = 
-			"Welcome to the SOCAT data contribution site.  In order " +
-			"to contribute data, you will need to be an authorized " +
-			"contributor.  If you are not an authorized contributor, " +
-			"contact socat.support@noaa.gov for approval and " +
-			"authorization credentials.";
+	private static final String WELCOME_TITLE = 
+			"Welcome to the SOCAT data contribution site.";
+	private static final String WELCOME_MSG =
+			"In order to contribute data, you will need to be an " +
+			"authorized contributor.  If you are not an authorized " +
+			"contributor, contact socat.support@noaa.gov for approval " +
+			"and authorization credentials.";
 	private static final String USERNAME_PROMPT = "Username:";
 	private static final String PASSWORD_PROMPT = "Password:";
 	private static final String LOGIN_TEXT = "Login";
@@ -47,7 +48,8 @@ public class DashboardLoginPage extends Composite {
 	private static DashboardLoginPageUiBinder uiBinder = 
 			GWT.create(DashboardLoginPageUiBinder.class);
 
-	@UiField HTML welcomeHTML;
+	@UiField HTML welcomeTitle;
+	@UiField HTML welcomeHtml;
 	@UiField Label nameLabel;
 	@UiField TextBox nameText;
 	@UiField Label passLabel;
@@ -72,7 +74,8 @@ public class DashboardLoginPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		welcomeHTML.setHTML(WELCOME_MSG);
+		welcomeTitle.setHTML(WELCOME_TITLE);
+		welcomeHtml.setHTML(WELCOME_MSG);
 		nameLabel.setText(USERNAME_PROMPT);
 		passLabel.setText(PASSWORD_PROMPT);
 		loginButton.setText(LOGIN_TEXT);

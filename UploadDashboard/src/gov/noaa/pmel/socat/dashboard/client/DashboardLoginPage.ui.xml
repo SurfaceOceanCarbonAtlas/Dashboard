@@ -5,7 +5,8 @@
 	<ui:style src="FixedWidth.css" />
 
 	<g:VerticalPanel addStyleNames="{style.fixedwidthcontainer}" horizontalAlignment="ALIGN_CENTER">
-		<g:HTML addStyleNames="{style.introhtml}" ui:field="welcomeHTML" />
+		<g:HTML addStyleNames="{style.introtitle}" ui:field="welcomeTitle" />
+		<g:HTML addStyleNames="{style.introhtml}" ui:field="welcomeHtml" />
 		<g:HorizontalPanel addStyleNames="{style.labeledtextpanel}" verticalAlignment="ALIGN_MIDDLE">
 			<g:Label addStyleNames="{style.labeledtextlabel}" ui:field="nameLabel" />
 			<g:TextBox addStyleNames="{style.labeledtextbox}" ui:field="nameText" />
