@@ -8,6 +8,9 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
+import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
+import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,7 +20,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -25,7 +27,13 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import uk.ac.uea.socat.sanitychecker.Message;
+import uk.ac.uea.socat.sanitychecker.Output;
+import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 /**
  * Handles storage and retrieval of cruise data in files.
@@ -1057,25 +1065,28 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String SCMSG_KEY_VALUE_SEP = ":";
 	private static final String SCMSG_TYPE_KEY = "SCMsgType";
 	private static final String SCMSG_SEVERITY_KEY = "SCMsgSeverity";
-	private static final String SCMSG_LINE_NUMBER_KEY = "SCMsgLineNumber";
-	private static final String SCMSG_INPUT_COLUMN_NUMBER_KEY = "SCMsgInputColumnNumber";
-	private static final String SCMSG_INPUT_COLUMN_NAME_KEY = "SCMsgInputColumnName";
-	private static final String SCMSG_OUTPUT_COLUMN_NUMBER_KEY = "SCMsgOutputColumnNumber";
-	private static final String SCMSG_OUTPUT_COLUMN_NAME_KEY = "SCMsgOutputColumnName";
+	private static final String SCMSG_ROW_NUMBER_KEY = "SCMsgRowNumber";
+	private static final String SCMSG_LONGITUDE_KEY = "SCMsgLongitude";
+	private static final String SCMSG_LATITUDE_KEY = "SCMsgLatitude";
+	private static final String SCMSG_TIMESTAMP_KEY = "SCMsgTimestamp";
+	private static final String SCMSG_COLUMN_NUMBER_KEY = "SCMsgColumnNumber";
+	private static final String SCMSG_COLUMN_NAME_KEY = "SCMsgColumnName";
 	private static final String SCMSG_MESSAGE_KEY = "SCMsgMessage";
+	private static final DateTimeFormatter DATETIME_FORMATTER = 
+			DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
 
 	/**
 	 * Saves the list of messages produced by the SanityChecker to file.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise
-	 * @param messages
-	 * 		sanity checker messages for the cruise
+	 * @param output
+	 * 		output object returned from checking the cruise by the SanityChecker
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 */
-	public void saveCruiseMessages(String expocode, List<Message> messages) 
-												throws IllegalArgumentException {
+	public void saveCruiseMessages(String expocode, Output output) 
+											throws IllegalArgumentException {
 		// Get the cruise messages file
 		File msgsFile = cruiseMsgsFile(expocode);
 		// The parent directory should exist when this method gets called
@@ -1084,51 +1095,83 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		try {
 			msgsWriter = new PrintWriter(msgsFile);
 		} catch (FileNotFoundException ex) {
-			throw new IllegalArgumentException("Unexpected error opening messages file " + 
+			throw new IllegalArgumentException(
+					"Unexpected error opening messages file " + 
 					msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
 		}
 		try {
-			for ( Message msg : messages ) {
-				// List of key-value strings
+			List<SocatDataRecord> dataRecs = output.getRecords();
+			int numRecs = dataRecs.size();
+			for ( Message msg : output.getMessages().getMessages() ) {
+				// Generate a list of key-value strings describing this message
 				ArrayList<String> mappings = new ArrayList<String>();
-				// Message type
-				mappings.add(SCMSG_TYPE_KEY + 
-						SCMSG_KEY_VALUE_SEP + msg.getMessageType());
-				// Severity
-				mappings.add(SCMSG_SEVERITY_KEY + 
-						SCMSG_KEY_VALUE_SEP + msg.getSeverity());
-				// Line number
-				mappings.add(SCMSG_LINE_NUMBER_KEY + 
-						SCMSG_KEY_VALUE_SEP + msg.getLineIndex());
-				// Input column number
-				mappings.add(SCMSG_INPUT_COLUMN_NUMBER_KEY + 
-						SCMSG_KEY_VALUE_SEP + msg.getInputItemIndex());
-				// Input column name
-				if ( msg.getInputItemName() != null )
-					mappings.add(SCMSG_INPUT_COLUMN_NAME_KEY + 
-							SCMSG_KEY_VALUE_SEP + msg.getInputItemName());
-				// Output column number
-				mappings.add(SCMSG_OUTPUT_COLUMN_NUMBER_KEY + 
-						SCMSG_KEY_VALUE_SEP + msg.getItemIndex());
-				// Output column name
-				if ( msg.getItemName() != null )
-					mappings.add(SCMSG_OUTPUT_COLUMN_NAME_KEY + 
-							SCMSG_KEY_VALUE_SEP + msg.getItemName());
-				// Message string - should never be null
-				String msgString = msg.getMessage();
-				// Escape all newlines in the message string
-				msgString.replace("\n", "\\n");
-				mappings.add(SCMSG_MESSAGE_KEY + SCMSG_KEY_VALUE_SEP + msgString);
-				// Any additional properties
-				Enumeration<?> propNames = msg.getPropertyNames();
-				while ( propNames.hasMoreElements() ) {
-					String key = (String) propNames.nextElement();
-					if ( key != null ) {
-						String value = msg.getProperty(key);
-						if ( value != null )
-							mappings.add(key + SCMSG_KEY_VALUE_SEP + value);
+
+				int intVal = msg.getMessageType();
+				if ( intVal == Message.DATA_MESSAGE )
+					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
+							SCMsgType.DATA.name());
+				else if ( intVal == Message.METADATA_MESSAGE )
+					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
+							SCMsgType.METADATA.name());
+
+				intVal = msg.getSeverity();
+				if ( intVal == Message.ERROR )
+					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
+							SCMsgSeverity.ERROR.name());
+				else if ( intVal == Message.WARNING )
+					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
+							SCMsgSeverity.WARNING.name());
+
+				int rowNum = msg.getLineIndex();
+				if ( (rowNum > 0) && (rowNum <= numRecs) ) {
+					mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
+							Integer.toString(rowNum));
+
+					SocatDataRecord stdData = dataRecs.get(rowNum - 1);
+					try {
+						double longitude = stdData.getLongitude();
+						if ( ! Double.isNaN(longitude) )
+							mappings.add(SCMSG_LONGITUDE_KEY + SCMSG_KEY_VALUE_SEP + 
+									Double.toString(longitude));
+					} catch ( Exception ex ) {
+						// no entry
+						;
+					}
+					try {
+						double latitude = stdData.getLatitude();
+						if ( ! Double.isNaN(latitude) )
+							mappings.add(SCMSG_LATITUDE_KEY + SCMSG_KEY_VALUE_SEP + 
+									Double.toString(latitude));
+					} catch ( Exception ex ) {
+						// no entry
+						;
+					}
+					try {
+						DateTime timestamp = stdData.getTime();
+						if ( timestamp != null )
+							mappings.add(SCMSG_TIMESTAMP_KEY + SCMSG_KEY_VALUE_SEP +
+									DATETIME_FORMATTER.print(timestamp));
+					} catch ( Exception ex ) {
+						// no entry
+						;
 					}
 				}
+
+				intVal = msg.getInputItemIndex();
+				if ( intVal > 0 )
+					mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
+							Integer.toString(intVal));
+
+				String strVal = msg.getInputItemName();
+				if ( strVal != null )
+					mappings.add(SCMSG_COLUMN_NAME_KEY + SCMSG_KEY_VALUE_SEP + strVal);
+
+				// Message string - should never be null
+				strVal = msg.getMessage();
+				// Escape all newlines in the message string
+				strVal = strVal.replace("\n", "\\n");
+				mappings.add(SCMSG_MESSAGE_KEY + SCMSG_KEY_VALUE_SEP + strVal);
+
 				// Write this array list of key-value string to file
 				msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
 			}
@@ -1140,7 +1183,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Reads the list of messages produced by the SanityChecker from the messages 
-	 * file written by {@link #saveCruiseMessages(String, List)}.
+	 * file written by {@link #saveCruiseMessages(String, Output)}.
 	 * 
 	 * @param expocode
 	 * 		get messages for the cruise with this expocode
@@ -1154,25 +1197,21 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * @throws FileNotFoundException
 	 * 		if there is no messages file for the cruise
 	 */
-	public ArrayList<Message> getCruiseMessages(String expocode) 
+	public ArrayList<SCMessage> getCruiseMessages(String expocode) 
 					throws IllegalArgumentException, FileNotFoundException {
-		// Get the cruise messages file
+		// Create the list of messages to be returned
+		ArrayList<SCMessage> msgList = new ArrayList<SCMessage>();
+		// Read the cruise messages file
 		File msgsFile = cruiseMsgsFile(expocode);
-		// Open the messages file
 		BufferedReader msgReader;
 		msgReader = new BufferedReader(new FileReader(msgsFile));
-		// Create the list of messages to be returned
-		ArrayList<Message> msgList = new ArrayList<Message>();
-		// Read and parse each of the messages in the file
 		try {
 			try {
-				Properties msgProps = new Properties();
 				String msgline = msgReader.readLine();
 				while ( msgline != null ) {
 					if ( ! msgline.trim().isEmpty() ) {
 
-						// Read all the key-value pairs for this messages line into a properties file
-						msgProps.clear();
+						Properties msgProps = new Properties();
 						for ( String msgPart : DashboardUtils.decodeStringArrayList(msgline) ) {
 							String[] keyValue = msgPart.split(SCMSG_KEY_VALUE_SEP, 2);
 							if ( keyValue.length != 2 )
@@ -1180,101 +1219,78 @@ public class CruiseFileHandler extends VersionedFileHandler {
 							msgProps.setProperty(keyValue[0], keyValue[1]);
 						}
 
-						// Message type
+						SCMessage msg = new SCMessage();
+
 						String propVal = msgProps.getProperty(SCMSG_TYPE_KEY);
-						if ( propVal == null )
-						throw new IOException("Message type not given");
-						int msgType;
 						try {
-							msgType = Integer.parseInt(propVal);
-						} catch ( NumberFormatException ex ) {
-							throw new IOException("Invalid message type given in '" + propVal + "'");
+							msg.setType(SCMsgType.valueOf(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default SCMsgType.UNKNOWN
+							;
 						}
-						msgProps.remove(SCMSG_TYPE_KEY);
 
-						// Severity
 						propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
-						if ( propVal == null )
-							throw new IOException("Severity not given");
-						int severity;
 						try {
-							severity = Integer.parseInt(propVal);
-						} catch ( NumberFormatException ex ) {
-							throw new IOException("Invalid severity given in '" + propVal + "'");
+							msg.setSeverity(SCMsgSeverity.valueOf(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default SCMsgSeverity.UNKNOWN
+							;
 						}
-						msgProps.remove(SCMSG_SEVERITY_KEY);
 
-						// Line number
-						propVal = msgProps.getProperty(SCMSG_LINE_NUMBER_KEY);
-						if ( propVal == null )
-							throw new IOException("Line number not given");
-						int lineNum;
+						propVal = msgProps.getProperty(SCMSG_ROW_NUMBER_KEY);
 						try {
-							lineNum = Integer.parseInt(propVal);
-						} catch ( NumberFormatException ex ) {
-							throw new IOException("Invalid line number given in '" + propVal + "'");
+							msg.setRowNumber(Integer.parseInt(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default -1
+							;
 						}
-						msgProps.remove(SCMSG_LINE_NUMBER_KEY);
 
-						// Input column number
-						propVal = msgProps.getProperty(SCMSG_INPUT_COLUMN_NUMBER_KEY);
-						if ( propVal == null )
-							throw new IOException("Input column number not given");
-						int inputColNum;
+						propVal = msgProps.getProperty(SCMSG_LONGITUDE_KEY);
 						try {
-							inputColNum = Integer.parseInt(propVal);
-						} catch ( NumberFormatException ex ) {
-							throw new IOException("Invalid input column number given in '" + propVal + "'");
+							msg.setLongitude(Double.valueOf(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default Double.NaN
+							;
 						}
-						msgProps.remove(SCMSG_INPUT_COLUMN_NUMBER_KEY);
 
-						// Input column name
-						String inputColName = msgProps.getProperty(SCMSG_INPUT_COLUMN_NAME_KEY);
-						if ( inputColName != null )
-							msgProps.remove(SCMSG_INPUT_COLUMN_NAME_KEY);
-
-						// Output column number
-						propVal = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
-						if ( propVal == null )
-							throw new IOException("Input column number not given");
-						int outputColNum;
+						propVal = msgProps.getProperty(SCMSG_LATITUDE_KEY);
 						try {
-							outputColNum = Integer.parseInt(propVal);
-						} catch ( NumberFormatException ex ) {
-							throw new IOException("Invalid output column number given in '" + propVal + "'");
-						}
-						msgProps.remove(SCMSG_OUTPUT_COLUMN_NUMBER_KEY);
-
-						// Output column name
-						String outputColName = msgProps.getProperty(SCMSG_OUTPUT_COLUMN_NAME_KEY);
-						if ( outputColName != null )
-							msgProps.remove(SCMSG_OUTPUT_COLUMN_NAME_KEY);
-
-						// Message string
-						String msgString = msgProps.getProperty(SCMSG_MESSAGE_KEY);
-						if ( msgString == null )
-							throw new IOException("Message string not given");
-						// Replace all escaped newlines in the message string
-						msgString.replace("\\n", "\n");
-						msgProps.remove(SCMSG_MESSAGE_KEY);
-
-						// Create the message object
-						Message msg = new Message(msgType, severity, lineNum, inputColNum, 
-								inputColName, outputColNum, outputColName, msgString);
-
-						// Add any additional properties remaining
-						Enumeration<?> propNames = msgProps.elements();
-						while ( propNames.hasMoreElements() ) {
-							String key = (String) propNames.nextElement();
-							if ( key != null ) {
-								String value = msgProps.getProperty(key);
-								if ( value != null )
-									msg.addProperty(key, value);
-							}
+							msg.setLatitude(Double.valueOf(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default Double.NaN
+							;
 						}
 
-						// Add this message to the list
+						propVal = msgProps.getProperty(SCMSG_TIMESTAMP_KEY);
+						if ( propVal != null ) {
+							msg.setTimestamp(propVal);
+						}
+						// default timestamp is an empty string
+
+						propVal = msgProps.getProperty(SCMSG_COLUMN_NUMBER_KEY);
+						try {
+							msg.setColNumber(Integer.parseInt(propVal));
+						} catch ( Exception ex ) {
+							// leave as the default -1
+							;
+						}
+
+						propVal = msgProps.getProperty(SCMSG_COLUMN_NAME_KEY);
+						if ( propVal != null ) {
+							msg.setColName(propVal);
+						}
+						// default column name is an empty string 
+
+						propVal = msgProps.getProperty(SCMSG_MESSAGE_KEY);
+						if ( propVal != null ) {
+							// Replace all escaped newlines in the message string
+							propVal = propVal.replace("\\n", "\n");
+							msg.setExplanation(propVal);
+						}
+						// default explanation is an empty string
+
 						msgList.add(msg);
+
 						msgline = msgReader.readLine();
 					}
 				}

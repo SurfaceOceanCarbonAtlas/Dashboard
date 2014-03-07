@@ -28,7 +28,8 @@ import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
  * @author Karl Smith
  */
 public class SanityCheckerTest {
-	
+	private static final String CONFIG_FILENAME = 
+			"/home/ksmith/workspace/SocatUploadDashboard/test/gov/noaa/pmel/socat/dashboard/test/SanityChecker.properties";
 	@Test
 	public void testSanityChecker() throws Exception {
 		final String expocode = "33RO20030715";
@@ -182,7 +183,7 @@ public class SanityCheckerTest {
 		Properties metadataInput = new Properties();
 		metadataInput.setProperty("EXPOCode", expocode);
 
-		SanityChecker.initConfig("/home/ksmith/workspace/SocatUploadDashboard/test/gov/noaa/pmel/socat/dashboard/test/SanityChecker.properties");
+		SanityChecker.initConfig(CONFIG_FILENAME);
 
 		ColumnConversionConfig convConfig = ColumnConversionConfig.getInstance();
 

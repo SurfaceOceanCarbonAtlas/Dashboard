@@ -9,8 +9,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
-import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,8 +17,6 @@ import java.util.HashSet;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-
-import uk.ac.uea.socat.sanitychecker.Message;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -193,7 +189,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);
 		// Get the list of saved sanity checker Message objects for this cruise
-		ArrayList<Message> cruiseMsgs;
+		ArrayList<SCMessage> cruiseMsgs;
 		try {
 			cruiseMsgs = dataStore.getCruiseFileHandler()
 								  .getCruiseMessages(expocode);
@@ -206,36 +202,8 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		SCMessageList scMsgList = new SCMessageList();
 		scMsgList.setUsername(username);
 		scMsgList.setExpocode(expocode);
-		for ( Message msg : cruiseMsgs ) {
-			// Ignore messages that are not about data
-			if ( msg.getMessageType() != Message.DATA_MESSAGE )
-				continue;
-			// Get the severity
-			SCMsgSeverity severity;
-			switch( msg.getSeverity() ) {
-			case Message.WARNING:
-				severity = SCMsgSeverity.WARNING;
-				break;
-			case Message.ERROR:
-				severity = SCMsgSeverity.ERROR;
-				break;
-			default:
-				severity = SCMsgSeverity.UNKNOWN;
-			}
-			// Ignore messages with an unknown severity (should not be any)
-			if ( severity == SCMsgSeverity.UNKNOWN )
-				continue;
-			// Create the SCMessage from the sanity checker Message
-			SCMessage scMsg = new SCMessage();
-			scMsg.setType(SCMsgType.DATA);
-			scMsg.setSeverity(severity);
-			scMsg.setRowNumber(msg.getLineIndex());
-			scMsg.setColNumber(msg.getInputItemIndex());
-			scMsg.setColName(msg.getInputItemName());
-			scMsg.setExplanation(msg.getMessage());
-			// Add this SCMessage to the list
-			scMsgList.add(scMsg);
-		}
+		scMsgList.addAll(cruiseMsgs);
+
 		return scMsgList;
 	}
 
