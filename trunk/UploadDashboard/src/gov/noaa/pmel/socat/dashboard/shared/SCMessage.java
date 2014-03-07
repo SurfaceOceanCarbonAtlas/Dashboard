@@ -49,6 +49,9 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 	String colName;
 	String explanation;
 
+	/**
+	 * Create an empty message of an unknown type and severity
+	 */
 	public SCMessage() {
 		type = SCMsgType.UNKNOWN;
 		severity = SCMsgSeverity.UNKNOWN;
@@ -373,7 +376,7 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 
 	@Override
 	public String toString() {
-		return "SCMessage[type=" + type + ", " + "severity=" + severity + 
+		return "SCMessage[type=" + type + ", severity=" + severity + 
 				", rowNumber=" + rowNumber + ", timestamp=" + timestamp +
 				", longitude=" + longitude + ", latitude=" + latitude +
 				", colNumber=" + colNumber + ", colName=" + colName + 

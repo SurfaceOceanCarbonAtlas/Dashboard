@@ -92,8 +92,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 						cruiseData.getWoceThreeRowIndices().subList(0, numDataCols)));
 				cruise.setWoceFourRowIndices(new ArrayList<HashSet<Integer>>(
 						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
-				cruiseHandler.saveCruiseMessages(
-						cruise.getExpocode(), output.getMessages().getMessages());
+				cruiseHandler.saveCruiseMessages(cruise.getExpocode(), output);
 				changed = true;
 				commitMsg += " submit with QC status '" + qcStatus + "'";
 				ingestExpos.add(expocode);

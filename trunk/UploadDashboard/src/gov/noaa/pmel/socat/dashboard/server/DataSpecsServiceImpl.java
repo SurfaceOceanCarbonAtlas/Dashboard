@@ -121,8 +121,8 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 								 .checkCruise(cruiseData);
 
 		// Update the reports of any issues found
-		dataStore.getCruiseFileHandler().saveCruiseMessages(
-				cruiseData.getExpocode(), output.getMessages().getMessages());
+		dataStore.getCruiseFileHandler()
+				.saveCruiseMessages(cruiseData.getExpocode(), output);
 
 		// Save and commit the updated cruise columns
 		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
