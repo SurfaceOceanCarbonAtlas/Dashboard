@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
@@ -29,7 +30,10 @@ import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
  */
 public class SanityCheckerTest {
 	private static final String CONFIG_FILENAME = 
-			"/home/ksmith/workspace/SocatUploadDashboard/test/gov/noaa/pmel/socat/dashboard/test/SanityChecker.properties";
+			"/home/ksmith/content/SocatUploadDashboard/SocatUploadDashboard.properties";
+	private static final String LOG4J_PROPERTIES_FILENAME = 
+			"/home/ksmith/content/SocatUploadDashboard/log4j.properties";
+
 	@Test
 	public void testSanityChecker() throws Exception {
 		final String expocode = "33RO20030715";
@@ -38,11 +42,11 @@ public class SanityCheckerTest {
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 				"<Expocode_" + expocode + ">" + 
 					"<socat_column name=\"longitude\">" +
-						"<input_column index=\"10\">longitude [dec.deg.E]</input_column>" +
+						"<input_column index=\"10\">longitude [deg.E]</input_column>" +
 						"<input_units>decimal_degrees</input_units>" +
 					"</socat_column>" +
 					"<socat_column name=\"latitude\">" +
-						"<input_column index=\"11\">latitude [dec.deg.N]</input_column>" +
+						"<input_column index=\"11\">latitude [deg.N]</input_column>" +
 						"<input_units>decimal_degress</input_units>" +
 					"</socat_column>" +
 					"<socat_column name=\"depth\">" +
@@ -119,13 +123,13 @@ public class SanityCheckerTest {
 		String[] questionableCruiseDataStrings = {
 				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t15\t00\t342.76300\t32.48200\t5.\t36.550\t20.440\t21.020\t1017.860\t1017.600\t36.749\t1018.500\t3553.\t663.\t371.151\t396.070\tNaN\tNaN\tNaN\tNaN\t378.410\t377.552\t1\t2",
 				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t20\t00\t342.74500\t32.47400\t5.\t36.560\t20.230\t20.760\t1017.480\t1017.430\t36.749\t1018.500\t3553.\t663.\t371.151\t384.430\tNaN\tNaN\tNaN\tNaN\t368.120\t367.309\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t24\t00\t342.72900\t32.46600\t5.\t36.590\t19.960\t20.610\t1017.440\t1017.490\t36.749\t1018.500\t3803.\t663.\t371.151\t578.350\tNaN\tNaN\tNaN\tNaN\t360.740\t359.769\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t29\t00\t342.71201\t32.45900\t5.\t36.530\t20.060\t20.410\t1017.460\t1017.400\t36.749\t1018.500\t3803.\t664.\t371.151\t574.490\tNaN\tNaN\tNaN\tNaN\t361.200\t360.716\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t45\t00\t342.64700\t32.43000\t5.\t36.550\t20.690\t20.900\t1017.440\t1017.450\t36.749\t1018.500\t3929.\t665.\t371.151\t575.110\tNaN\tNaN\tNaN\tNaN\t363.510\t363.222\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t50\t00\t342.62900\t32.42300\t5.\t36.550\t20.770\t21.010\t1017.630\t1017.460\t36.749\t1018.500\t3947.\t666.\t371.151\t576.850\tNaN\tNaN\tNaN\tNaN\t364.720\t364.389\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t54\t00\t342.60999\t32.41500\t5.\t36.550\t20.740\t21.030\t1017.440\t1017.530\t36.749\t1018.500\t3947.\t666.\t371.150\t577.920\tNaN\tNaN\tNaN\tNaN\t365.180\t364.666\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t59\t00\t342.59299\t32.40800\t5.\t36.540\t20.770\t20.970\t1017.510\t1017.520\t36.749\t1018.500\t3987.\t667.\t371.150\t577.520\tNaN\tNaN\tNaN\tNaN\t366.070\t365.698\t1\t2",
-				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t17\t15\t00\t342.52301\t32.38300\t5.\t36.600\t21.250\t21.420\t1017.440\t1017.480\t36.749\t1018.500\t4087.\t669.\t371.150\t579.350\tNaN\tNaN\tNaN\tNaN\t367.980\t367.678\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t24\t00\t342.72900\t32.46600\t5.\t36.590\t19.960\t20.610\t1017.440\t1017.490\t36.749\t1018.500\t3803.\t663.\t371.151\t78.350\tNaN\tNaN\tNaN\tNaN\t360.740\t359.769\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t29\t00\t342.71201\t32.45900\t5.\t36.530\t20.060\t20.410\t1017.460\t1017.400\t36.749\t1018.500\t3803.\t664.\t371.151\t74.490\tNaN\tNaN\tNaN\tNaN\t361.200\t360.716\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t45\t00\t342.64700\t32.43000\t5.\t36.550\t20.690\t20.900\t1017.440\t1017.450\t36.749\t1018.500\t3929.\t665.\t371.151\t75.110\tNaN\tNaN\tNaN\tNaN\t363.510\t363.222\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t50\t00\t342.62900\t32.42300\t5.\t36.550\t20.770\t21.010\t1017.630\t1017.460\t36.749\t1018.500\t3947.\t666.\t371.151\t76.850\tNaN\tNaN\tNaN\tNaN\t364.720\t364.389\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t54\t00\t342.60999\t32.41500\t5.\t36.550\t20.740\t21.030\t1017.440\t1017.530\t36.749\t1018.500\t3947.\t666.\t371.150\t77.920\tNaN\tNaN\tNaN\tNaN\t365.180\t364.666\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t16\t59\t00\t342.59299\t32.40800\t5.\t36.540\t20.770\t20.970\t1017.510\t1017.520\t36.749\t1018.500\t3987.\t667.\t371.150\t77.520\tNaN\tNaN\tNaN\tNaN\t366.070\t365.698\t1\t2",
+				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t17\t15\t00\t342.52301\t32.38300\t5.\t36.600\t21.250\t21.420\t1017.440\t1017.480\t36.749\t1018.500\t4087.\t669.\t371.150\t79.350\tNaN\tNaN\tNaN\tNaN\t367.980\t367.678\t1\t2",
 				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t17\t20\t00\t342.50400\t32.37600\t5.\t36.610\t21.590\t21.670\t1017.540\t1017.470\t36.749\t1018.500\t4087.\t669.\t371.150\t381.540\tNaN\tNaN\tNaN\tNaN\t371.160\t371.067\t1\t2",
 				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t17\t24\t00\t342.48599\t32.37000\t5.\t36.650\t21.790\t21.880\t1017.500\t1017.440\t36.749\t1018.500\t4139.\t670.\t371.150\t385.330\tNaN\tNaN\tNaN\tNaN\t374.620\t374.463\t1\t2",
 				"33RO20030715\tdoi:10.1594/PANGAEA.813525\t11\t2003\t07\t15\t17\t29\t00\t342.46899\t32.36300\t5.\t36.650\t21.980\t22.070\t1017.610\t1017.480\t36.749\t1018.500\t4199.\t671.\t371.150\t388.780\tNaN\tNaN\tNaN\tNaN\t377.840\t377.719\t1\t2",
@@ -183,12 +187,13 @@ public class SanityCheckerTest {
 		Properties metadataInput = new Properties();
 		metadataInput.setProperty("EXPOCode", expocode);
 
+		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILENAME);
 		SanityChecker.initConfig(CONFIG_FILENAME);
 
 		ColumnConversionConfig convConfig = ColumnConversionConfig.getInstance();
 
 		File name = new File(expocode);
-		Logger logger = Logger.getLogger("Sanity Checker - " + expocode);
+		Logger logger = Logger.getLogger("Sanity Checker");
 		ColumnSpec colSpec = new ColumnSpec(name, cruiseDoc, convConfig, logger);
 
 		SanityChecker checker = new SanityChecker(expocode, metadataInput, 
