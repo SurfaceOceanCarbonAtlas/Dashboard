@@ -51,12 +51,12 @@ public class DataMessagesPage extends Composite {
 	private static final String DISMISS_BUTTON_TEXT = "Back";
 
 	private static final String SEVERITY_COLUMN_NAME = "Type";
-	private static final String ROW_NUMBER_COLUMN_NAME = "Row";
-	private static final String TIMESTAMP_COLUMN_NAME = "Timestamp";
-	private static final String LONGITUDE_COLUMN_NAME = "Lon.";
-	private static final String LATITUDE_COLUMN_NAME = "Lat.";
 	private static final String COLUMN_NUMBER_COLUMN_NAME = "Col.";
 	private static final String COLUMN_NAME_COLUMN_NAME = "Column Name";
+	private static final String ROW_NUMBER_COLUMN_NAME = "Row";
+	private static final String TIMESTAMP_COLUMN_NAME = "Time";
+	private static final String LONGITUDE_COLUMN_NAME = "Lon.";
+	private static final String LATITUDE_COLUMN_NAME = "Lat.";
 	private static final String EXPLANATION_COLUMN_NAME = "Explanation";
 
 	private static final String ERROR_SEVERITY_TEXT = "Error";
@@ -195,21 +195,21 @@ public class DataMessagesPage extends Composite {
 	 */
 	private void buildMessageListTable() {
 		TextColumn<SCMessage> severityColumn = buildSeverityColumn();
+		TextColumn<SCMessage> colNumColumn = buildColNumColumn();
+		TextColumn<SCMessage> colNameColumn = buildColNameColumn();
 		TextColumn<SCMessage> rowNumColumn = buildRowNumColumn();
 		TextColumn<SCMessage> timestampColumn = buildTimestampColumn();
 		TextColumn<SCMessage> longitudeColumn = buildLongitudeColumn();
 		TextColumn<SCMessage> latitudeColumn = buildLatitudeColumn();
-		TextColumn<SCMessage> colNumColumn = buildColNumColumn();
-		TextColumn<SCMessage> colNameColumn = buildColNameColumn();
 		TextColumn<SCMessage> explanationColumn = buildExplanationColumn();
 
 		messagesGrid.addColumn(severityColumn, SEVERITY_COLUMN_NAME);
+		messagesGrid.addColumn(colNumColumn, COLUMN_NUMBER_COLUMN_NAME);
+		messagesGrid.addColumn(colNameColumn, COLUMN_NAME_COLUMN_NAME);
 		messagesGrid.addColumn(rowNumColumn, ROW_NUMBER_COLUMN_NAME);
 		messagesGrid.addColumn(timestampColumn, TIMESTAMP_COLUMN_NAME);
 		messagesGrid.addColumn(longitudeColumn, LONGITUDE_COLUMN_NAME);
 		messagesGrid.addColumn(latitudeColumn, LATITUDE_COLUMN_NAME);
-		messagesGrid.addColumn(colNumColumn, COLUMN_NUMBER_COLUMN_NAME);
-		messagesGrid.addColumn(colNameColumn, COLUMN_NAME_COLUMN_NAME);
 		messagesGrid.addColumn(explanationColumn, EXPLANATION_COLUMN_NAME);
 
 		// Set the minimum widths of the columns
@@ -217,6 +217,12 @@ public class DataMessagesPage extends Composite {
 		messagesGrid.setColumnWidth(severityColumn, 
 				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+		messagesGrid.setColumnWidth(colNumColumn, 
+				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+		messagesGrid.setColumnWidth(colNameColumn, 
+				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(rowNumColumn, 
 				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
@@ -229,12 +235,6 @@ public class DataMessagesPage extends Composite {
 		messagesGrid.setColumnWidth(latitudeColumn, 
 				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
-		messagesGrid.setColumnWidth(colNumColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
-		messagesGrid.setColumnWidth(colNameColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(explanationColumn, 
 				2 * SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += 2 * SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
@@ -248,12 +248,12 @@ public class DataMessagesPage extends Composite {
 
 		// Make the columns sortable
 		severityColumn.setSortable(true);
+		colNumColumn.setSortable(true);
+		colNameColumn.setSortable(true);
 		rowNumColumn.setSortable(true);
 		timestampColumn.setSortable(true);
 		longitudeColumn.setSortable(true);
 		latitudeColumn.setSortable(true);
-		colNumColumn.setSortable(true);
-		colNameColumn.setSortable(true);
 		explanationColumn.setSortable(true);
 
 		// Add a column sorting handler for these columns
@@ -261,6 +261,10 @@ public class DataMessagesPage extends Composite {
 				new ListHandler<SCMessage>(listProvider.getList());
 		columnSortHandler.setComparator(severityColumn,
 				SCMessage.severityComparator);
+		columnSortHandler.setComparator(colNumColumn,
+				SCMessage.colNumComparator);
+		columnSortHandler.setComparator(colNameColumn,
+				SCMessage.colNameComparator);
 		columnSortHandler.setComparator(rowNumColumn,
 				SCMessage.rowNumComparator);
 		columnSortHandler.setComparator(timestampColumn,
@@ -269,10 +273,6 @@ public class DataMessagesPage extends Composite {
 				SCMessage.longitudeComparator);
 		columnSortHandler.setComparator(latitudeColumn,
 				SCMessage.latitudeComparator);
-		columnSortHandler.setComparator(colNumColumn,
-				SCMessage.colNumComparator);
-		columnSortHandler.setComparator(colNameColumn,
-				SCMessage.colNameComparator);
 		columnSortHandler.setComparator(explanationColumn,
 				SCMessage.explanationComparator);
 
@@ -309,6 +309,28 @@ public class DataMessagesPage extends Composite {
 				if ( severity == SCMsgSeverity.ERROR )
 					return ERROR_SEVERITY_TEXT;
 				return UNKNOWN_SEVERITY_TEXT;
+			}
+		};
+	}
+
+	private TextColumn<SCMessage> buildColNumColumn() {
+		return new TextColumn<SCMessage>() {
+			@Override
+			public String getValue(SCMessage msg) {
+				if ( (msg == null) || (msg.getColNumber() <= 0) )
+					return " --- ";
+				return INT_NUMBER_FORMAT.format(msg.getColNumber());
+			}
+		};
+	}
+
+	private TextColumn<SCMessage> buildColNameColumn() {
+		return new TextColumn<SCMessage>() {
+			@Override
+			public String getValue(SCMessage msg) {
+				if ( (msg == null) || msg.getColName().isEmpty() )
+					return " --- ";
+				return msg.getColName();
 			}
 		};
 	}
@@ -353,28 +375,6 @@ public class DataMessagesPage extends Composite {
 				if ( (msg == null) || Double.isNaN(msg.getLatitude()) )
 					return "";
 				return FLT_NUMBER_FORMAT.format(msg.getLatitude());
-			}
-		};
-	}
-
-	private TextColumn<SCMessage> buildColNumColumn() {
-		return new TextColumn<SCMessage>() {
-			@Override
-			public String getValue(SCMessage msg) {
-				if ( (msg == null) || (msg.getColNumber() <= 0) )
-					return " --- ";
-				return INT_NUMBER_FORMAT.format(msg.getColNumber());
-			}
-		};
-	}
-
-	private TextColumn<SCMessage> buildColNameColumn() {
-		return new TextColumn<SCMessage>() {
-			@Override
-			public String getValue(SCMessage msg) {
-				if ( (msg == null) || msg.getColName().isEmpty() )
-					return " --- ";
-				return msg.getColName();
 			}
 		};
 	}
