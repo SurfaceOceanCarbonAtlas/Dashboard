@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.ValueUpdater;
@@ -764,7 +765,7 @@ public class CruiseListPage extends Composite {
 		// Create the columns for this table
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
-		TextColumn<DashboardCruise> dataCheckColumn = buildDataCheckColumn();
+		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
 		TextColumn<DashboardCruise> omeMetadataColumn = buildOmeMetadataColumn();
 		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
 		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
@@ -967,9 +968,9 @@ public class CruiseListPage extends Composite {
 	/**
 	 * Creates the data-check status column for the table
 	 */
-	private TextColumn<DashboardCruise> buildDataCheckColumn() {
-		TextColumn<DashboardCruise> dataCheckColumn = 
-				new TextColumn<DashboardCruise> () {
+	private Column<DashboardCruise,String> buildDataCheckColumn() {
+		Column<DashboardCruise,String> dataCheckColumn = 
+				new Column<DashboardCruise,String> (new ClickableTextCell()) {
 			@Override
 			public String getValue(DashboardCruise cruise) { 
 				String status = cruise.getDataCheckStatus();
@@ -996,26 +997,32 @@ public class CruiseListPage extends Composite {
 					 msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
 					// No problems, or not checked (so no messages)
 					// render as plain text as usual
-					sb.appendHtmlConstant("<div>");
+					sb.appendHtmlConstant("<div><u><em>");
 					sb.appendEscaped(msg);
-					sb.appendHtmlConstant("</div>");
+					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else if ( msg.contains("warning") ) {
 					// Only warnings - use warning background color
 					sb.appendHtmlConstant("<div style=\"background-color:" +
-							SocatUploadDashboard.WARNING_COLOR + ";\">");
+							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
-					sb.appendHtmlConstant("</div>");
+					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else {
 					// Errors or unacceptable - use error background color
 					sb.appendHtmlConstant("<div style=\"background-color:" +
-							SocatUploadDashboard.ERROR_COLOR + ";\">");
+							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
-					sb.appendHtmlConstant("</div>");
+					sb.appendHtmlConstant("</em></u></div>");
 				}
 			}
 		};
+		dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, String value) {
+				DataColumnSpecsPage.showPage(cruise.getExpocode());
+			}
+		});
 		return dataCheckColumn;
 	}
 
