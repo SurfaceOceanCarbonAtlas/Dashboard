@@ -50,7 +50,7 @@ public class DataMessagesPage extends Composite {
 
 	private static final String DISMISS_BUTTON_TEXT = "Back";
 
-	private static final String SEVERITY_COLUMN_NAME = "Severity";
+	private static final String SEVERITY_COLUMN_NAME = "Type";
 	private static final String ROW_NUMBER_COLUMN_NAME = "Row";
 	private static final String TIMESTAMP_COLUMN_NAME = "Timestamp";
 	private static final String LONGITUDE_COLUMN_NAME = "Lon.";
@@ -215,8 +215,8 @@ public class DataMessagesPage extends Composite {
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
 		messagesGrid.setColumnWidth(severityColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(rowNumColumn, 
 				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
