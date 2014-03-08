@@ -54,7 +54,7 @@ public class DashboardCruiseChecker {
 			new EnumMap<DataColumnType,String>(DataColumnType.class);
 	static {
 		CHECKER_NAMES.put(DataColumnType.UNKNOWN, "");
-		CHECKER_NAMES.put(DataColumnType.EXPOCODE, "EXPOCode");
+		CHECKER_NAMES.put(DataColumnType.EXPOCODE, "expocode");
 		CHECKER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
 		CHECKER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
 		CHECKER_NAMES.put(DataColumnType.DATE, "date");
@@ -318,7 +318,9 @@ public class DashboardCruiseChecker {
 				// Save the index of this date/time column for message processing
 				ambiguousColumnIndices.add(k);
 			}
-			else if ( colType.equals(DataColumnType.LONGITUDE) || 
+			else if ( colType.equals(DataColumnType.EXPOCODE) || 
+					  colType.equals(DataColumnType.CRUISE_NAME) || 
+					  colType.equals(DataColumnType.LONGITUDE) || 
 					  colType.equals(DataColumnType.LATITUDE) || 
 					  colType.equals(DataColumnType.SAMPLE_DEPTH) || 
 					  colType.equals(DataColumnType.SALINITY) || 
@@ -369,9 +371,7 @@ public class DashboardCruiseChecker {
 				// Add this column description to the root element
 				rootElement.addContent(columnElement);
 			}
-			else if ( colType.equals(DataColumnType.EXPOCODE) || 
-					  colType.equals(DataColumnType.CRUISE_NAME) || 
-					  colType.equals(DataColumnType.DELTA_PCO2) || 
+			else if ( colType.equals(DataColumnType.DELTA_PCO2) || 
 					  colType.equals(DataColumnType.DELTA_FCO2) || 
 					  colType.equals(DataColumnType.WOA_SALINITY) || 
 					  colType.equals(DataColumnType.NCEP_SEA_LEVEL_PRESSURE) || 
@@ -401,7 +401,7 @@ public class DashboardCruiseChecker {
 					  colType.equals(DataColumnType.GVCO2) || 
 					  colType.equals(DataColumnType.DISTANCE_TO_LAND) || 
 					  colType.equals(DataColumnType.FCO2_REC_WOCE_FLAG) ) {
-				// Unchecked column types at this time - just ignore their presence
+				// Computed data column types - unchecked at this time - just ignore their presence
 				;
 			}
 			else {

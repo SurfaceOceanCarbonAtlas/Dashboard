@@ -320,7 +320,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Only the expocodes (keys) are saved in the cruise list
 		if ( cruiseList.put(expocode, cruise) == null ) {
 			saveCruiseListing(cruiseList, "added cruise " + 
-					expocode + "to the listing for " + username);
+					expocode + " to the listing for " + username);
 		}
 		return cruiseList;
 	}

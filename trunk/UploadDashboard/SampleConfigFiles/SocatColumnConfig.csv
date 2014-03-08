@@ -78,6 +78,8 @@
 #
 
 #Field,Required,RequiredGroup,Source,Metadata_Name,Calc_Class,Numeric,Questionable_Range_Min,Questionable_Range_Max,Bad_Range_Min,Bad_Range_Max,Flag,MissingFlag
+expocode,N,,D,,,N,,,,,F,B
+cruise_name,N,,D,,,N,,,,,F,B
 yr,Y,,D,,,Y,,,,,C,B
 mon,Y,,D,,,Y,,,,,C,B
 day,Y,,D,,,Y,,,,,C,B

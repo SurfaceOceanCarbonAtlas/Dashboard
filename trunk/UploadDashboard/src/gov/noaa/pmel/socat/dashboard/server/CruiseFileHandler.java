@@ -621,10 +621,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Delete the messages file if it exists
 		File msgsFile = cruiseMsgsFile(expocode);
 		if ( msgsFile.exists() ) {
-			try {
-				deleteVersionedFile(msgsFile, "Cruise messages file for " + 
-						expocode + " deleted by " + username);
-			} catch ( Exception ex ) {
+			if ( ! msgsFile.delete() ) {
 				throw new IllegalArgumentException("Unable to delete " +
 						"sanity checker messages file " + msgsFile.getPath());
 			}
@@ -769,8 +766,19 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Create the NODC subdirectory if it does not exist 
 		// Should be the same as the info file, but just in case not
 		File parentFile = dataFile.getParentFile();
-		if ( ! parentFile.exists() )
+		if ( ! parentFile.exists() ) {
 			parentFile.mkdirs();
+		}
+		else {
+			// Delete the messages file (for old data) if it exists
+			File msgsFile = cruiseMsgsFile(expocode);
+			if ( msgsFile.exists() ) {
+				if ( ! msgsFile.delete() ) {
+					throw new IllegalArgumentException("Unable to delete " +
+							"sanity checker messages file " + msgsFile.getPath());
+				}
+			}
+		}
 		// Print the cruise data to the data file
 		try {
 			PrintWriter writer = new PrintWriter(dataFile);
