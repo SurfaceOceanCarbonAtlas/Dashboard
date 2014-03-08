@@ -378,6 +378,8 @@ public class DataColumnSpecsPage extends Composite {
 		// Update the data provider with the data in the CruiseDataColumnSpecs
 		dataProvider.updateRowCount(cruise.getNumDataRows(), true);
 		dataProvider.updateRowData(0, cruiseSpecs.getDataValues());
+		// Reset shown rows to the start of the data
+		dataGrid.setPageStart(0);
 		// Set the number of data rows to display in the grid.
 		// This will refresh the view.
 		dataGrid.setPageSize(DashboardUtils.MAX_ROWS_PER_GRID_PAGE);

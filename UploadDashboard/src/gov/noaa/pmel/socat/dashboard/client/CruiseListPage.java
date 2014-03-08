@@ -993,23 +993,22 @@ public class CruiseListPage extends Composite {
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
 				String msg = getValue(cruise);
-				if ( msg.equals(NO_DATA_CHECK_STATUS_STRING) ||
-					 msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
-					// No problems, or not checked (so no messages)
-					// render as plain text as usual
+				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
+					// No problems - render as plain text as usual
 					sb.appendHtmlConstant("<div><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
-				else if ( msg.contains("warning") ) {
-					// Only warnings - use warning background color
+				else if ( msg.contains("warnings") || (msg.contains("errors") && 
+						(cruise.getNumErrorMsgs() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
+					// Only warnings or a few errors - use warning background color
 					sb.appendHtmlConstant("<div style=\"background-color:" +
 							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else {
-					// Errors or unacceptable - use error background color
+					// Many errors, unacceptable, or not checked - use error background color
 					sb.appendHtmlConstant("<div style=\"background-color:" +
 							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);

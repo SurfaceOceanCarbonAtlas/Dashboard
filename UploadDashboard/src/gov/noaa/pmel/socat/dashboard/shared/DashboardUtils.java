@@ -50,6 +50,9 @@ public class DashboardUtils {
 	// Maximum number of rows shown in a page of a data grid (table)
 	public static final int MAX_ROWS_PER_GRID_PAGE = 50;
 
+	// Maximum number of error messages in an acceptable cruise
+	public static final int MAX_ACCEPTABLE_ERRORS = 49;
+
 	// Data check strings
 	public static final String CHECK_STATUS_NOT_CHECKED = "";
 	public static final String CHECK_STATUS_ACCEPTABLE = "No warnings";
