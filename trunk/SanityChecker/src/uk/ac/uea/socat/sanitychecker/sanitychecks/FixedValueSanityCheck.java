@@ -28,7 +28,7 @@ public class FixedValueSanityCheck extends SanityCheck {
 				throw new SanityCheckException("Unrecognised column name '" + itsColumnName + "' in parameter to FixedValueSanityCheck");
 			}
 		} catch (ConfigException e) {
-			throw new SanityCheckException("Unhandled error while checking ConstantSanityCheck parameters", e);
+			throw new SanityCheckException("Unhandled error while checking FixedValueSanityCheck parameters", e);
 		}
 	}
 
