@@ -9,6 +9,8 @@ import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +88,7 @@ public class DsgNcFileHandler {
 		}
 
 		// Get the metadata needed for creating the DSG file
-		SocatMetadata socatMData = new SocatMetadata(omeMData);
+		SocatMetadata socatMData = omeMData.createSocatMetadata();
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);

@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,28 +19,22 @@ import org.jdom2.output.XMLOutputter;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
- * has a known format, and contains values needed by the SOCAT database.
- * Ideally this would extend both DashboardMetadata and SocatMetadata. 
+ * has a known format, and contains user-provided values needed by the SOCAT 
+ * database.  
  *  
  * @author Karl Smith
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 3030376135083874816L;
+	private static final long serialVersionUID = -9016402934889508892L;
 
-	public static final String OME_PIS_SEPARATOR = "; ";
-	public static final String OME_HREFS_SEPARATOR = " ; ";
-
-	// The following come from the OME metadata 
+	// data values from the OME metadata 
 	String cruiseName;
 	String vesselName;
 	String scienceGroup;
 	String origDataRef;
 
 	// TODO: add more fields when they are identified in the OME XML file.
-
-	// This may be the reference to this document to be archived
-	String metadataHRef;
 
 	/**
 	 * Creates an empty OME metadata document
@@ -50,7 +45,6 @@ public class OmeMetadata extends DashboardMetadata {
 		vesselName = "";
 		scienceGroup = "";
 		origDataRef = "";
-		metadataHRef = "";
 	}
 
 	/**
@@ -161,7 +155,7 @@ public class OmeMetadata extends DashboardMetadata {
 					if ( scienceGroup.isEmpty() )
 						scienceGroup = metaVals[k];
 					else
-						scienceGroup += OME_PIS_SEPARATOR + metaVals[k];
+						scienceGroup += SocatMetadata.PIS_SEPARATOR + metaVals[k];
 				}
 			}
 			else if ( "PI_2".equals(colNames[k]) ||
@@ -170,7 +164,7 @@ public class OmeMetadata extends DashboardMetadata {
 					if ( scienceGroup.isEmpty() )
 						scienceGroup = metaVals[k];
 					else
-						scienceGroup += OME_PIS_SEPARATOR + metaVals[k];
+						scienceGroup += SocatMetadata.PIS_SEPARATOR + metaVals[k];
 				}
 			}
 			else if ( "PI_3".equals(colNames[k]) ||
@@ -179,40 +173,13 @@ public class OmeMetadata extends DashboardMetadata {
 					if ( scienceGroup.isEmpty() )
 						scienceGroup = metaVals[k];
 					else
-						scienceGroup += OME_PIS_SEPARATOR + metaVals[k];
+						scienceGroup += SocatMetadata.PIS_SEPARATOR + metaVals[k];
 				}
 			}
 			else if ( "doi".equals(colNames[k]) ||
 					  "orig_doi".equals(colNames[k]) )  {
 				if ( ! "NaN".equals(metaVals[k]) )
 					origDataRef = metaVals[k];
-			}
-			else if ( "metadata_hyperlink".equals(colNames[k]) ||
-					  "Metadata".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) ) {
-					if ( metadataHRef.isEmpty() )
-						metadataHRef = metaVals[k];
-					else
-						metadataHRef += OME_HREFS_SEPARATOR + metaVals[k];
-				}
-			}
-			else if ( "Metadata_hyperlink_2".equals(colNames[k]) ||
-					  "Metadata 2".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) ) {
-					if ( metadataHRef.isEmpty() )
-						metadataHRef = metaVals[k];
-					else
-						metadataHRef += OME_HREFS_SEPARATOR + metaVals[k];
-				}
-			}
-			else if ( "Metadata_hyperlink_3".equals(colNames[k]) ||
-					  "Metadata 3".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) ) {
-					if ( metadataHRef.isEmpty() )
-						metadataHRef = metaVals[k];
-					else
-						metadataHRef += OME_HREFS_SEPARATOR + metaVals[k];
-				}
 			}
 			// otherwise ignore the data in this column
 		}
@@ -361,7 +328,7 @@ public class OmeMetadata extends DashboardMetadata {
 			if ( scienceGroup.isEmpty() )
 				scienceGroup = name;
 			else
-				scienceGroup += OME_PIS_SEPARATOR + name;
+				scienceGroup += SocatMetadata.PIS_SEPARATOR + name;
 		}
 		if ( ! investigatorFound )
 			throw new IllegalArgumentException(
@@ -434,7 +401,7 @@ public class OmeMetadata extends DashboardMetadata {
 		rootElem.addContent(cruiseInfoElem);
 
 		// names in scienceGroup go in separate <Investigator><Name>
-		String[] piNames = scienceGroup.split(OME_PIS_SEPARATOR);
+		String[] piNames = scienceGroup.split(SocatMetadata.PIS_SEPARATOR);
 		for ( String name : piNames ) {
 			Element nameElem = new Element("Name");
 			nameElem.setText(name);
@@ -495,6 +462,20 @@ public class OmeMetadata extends DashboardMetadata {
 		} finally {
 			out.close();
 		}
+	}
+
+	/**
+	 * Create a SocatMatadata object from the data in this object.
+	 */
+	public SocatMetadata createSocatMetadata() {
+		SocatMetadata scMData = new SocatMetadata();
+		scMData.setExpocode(expocode);
+		scMData.setCruiseName(cruiseName);
+		scMData.setVesselName(vesselName);
+		scMData.setScienceGroup(scienceGroup);
+		scMData.setOrigDataRef(origDataRef);
+		// TODO: add and initialize more fields when they are identified in the OME XML file
+		return scMData;
 	}
 
 	/**
@@ -566,7 +547,7 @@ public class OmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * @param origDOI 
+	 * @param origDataRef 
 	 * 		the DOI of the original cruise data to set;
 	 * 		if null, an empty string is assigned
 	 */
@@ -577,26 +558,6 @@ public class OmeMetadata extends DashboardMetadata {
 			this.origDataRef = origDataRef;
 	}
 
-	/**
-	 * @return 
-	 * 		the metadata http reference; never null but could be empty
-	 */
-	public String getMetadataHRef() {
-		return metadataHRef;
-	}
-
-	/**
-	 * @param metadataHRef 
-	 * 		the metadata http reference to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setMetadataHRef(String metadataHRef) {
-		if ( metadataHRef == null )
-			this.metadataHRef = "";
-		else
-			this.metadataHRef = metadataHRef;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -605,7 +566,6 @@ public class OmeMetadata extends DashboardMetadata {
 		result = result * prime + vesselName.hashCode();
 		result = result * prime + scienceGroup.hashCode();
 		result = result * prime + origDataRef.hashCode();
-		result = result * prime + metadataHRef.hashCode();
 		return result;
 	}
 
@@ -630,8 +590,6 @@ public class OmeMetadata extends DashboardMetadata {
 			return false;
 		if ( ! origDataRef.equals(other.origDataRef) )
 			return false;
-		if ( ! metadataHRef.equals(other.metadataHRef) )
-			return false;
 		return true;
 	}
 
@@ -642,13 +600,11 @@ public class OmeMetadata extends DashboardMetadata {
 				",\n    vesselName=" + vesselName + 
 				",\n    scienceGroup=" + scienceGroup +
 				",\n    origDataRef=" + origDataRef + 
-				",\n    metadataHRef=" + metadataHRef + 
 				",\n    filename=" + filename + 
 				",\n    uploadTimestamp=" + uploadTimestamp + 
 				",\n    owner=" + owner + 
 				",\n    selected=" + selected + 
 				" ]";
 	}
-
 
 }

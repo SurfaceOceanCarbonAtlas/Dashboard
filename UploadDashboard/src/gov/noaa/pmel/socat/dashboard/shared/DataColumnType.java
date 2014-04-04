@@ -14,31 +14,36 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public enum DataColumnType implements Serializable, IsSerializable {
 	/**
-	 * The unknown data type indicates data that the user 
-	 * needs specify as one of the other user-provided types.
+	 * UNKNOWN needs to be respecified as one of the (other) user-provided types.
 	 */
 	UNKNOWN, 
-
+	/**
+	 * EXPOCODE is the NODC ship code, start date year, month, day 
+	 */
 	EXPOCODE,
+	/**
+	 * CRUISE_NAME is the user-provided name for the cruise
+	 */
 	CRUISE_NAME,
 	/**
-	 * The timestamp data type has both date and time.
+	 * TIMESTAMP has both date and time.
 	 */
 	TIMESTAMP, 
 	/**
-	 * The date data type has only the date; no time.
+	 * DATE has only the date; no time.
 	 */
 	DATE, 
 	YEAR, 
 	MONTH, 
 	DAY, 
 	/**
-	 * The time data type has only the time; no date.
+	 * TIME has only the time; no date.
 	 */
 	TIME, 
 	HOUR, 
 	MINUTE, 
 	SECOND, 
+
 	LONGITUDE, 
 	LATITUDE, 
 	SAMPLE_DEPTH, 
@@ -53,9 +58,9 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	PCO2WATER_SST, 
 	FCO2WATER_EQU, 
 	FCO2WATER_SST, 
-	XCO2_ATM, 
-	PCO2_ATM, 
-	FCO2_ATM, 
+	XCO2AIR, 
+	PCO2AIR, 
+	FCO2AIR, 
 	SHIP_SPEED, 
 	SHIP_DIRECTION, 
 	WIND_SPEED_TRUE,
@@ -63,35 +68,29 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	WIND_DIRECTION_TRUE,
 	WIND_DIRECTION_RELATIVE,
 
-	// The following are computed fields and are not provided by the user
-	DELTA_PCO2,
-	DELTA_FCO2,
-	WOA_SALINITY, 
-	NCEP_SEA_LEVEL_PRESSURE, 
-	FCO2_FROM_XCO2_TEQ_PEQ_SAL, 
-	FCO2_FROM_XCO2_SST_PEQ_SAL, 
-	FCO2_FROM_PCO2_TEQ_PEQ_SAL, 
-	FCO2_FROM_PCO2_SST_PEQ_SAL, 
-	FCO2_FROM_FCO2_TEQ_PEQ_SAL, 
-	FCO2_FROM_FCO2_SST_PEQ_SAL, 
-	FCO2_FROM_PCO2_TEQ_NCP_SAL, 
-	FCO2_FROM_PCO2_SST_NCP_SAL, 
-	FCO2_FROM_XCO2_TEQ_PEQ_WOA, 
-	FCO2_FROM_XCO2_SST_PEQ_WOA, 
-	FCO2_FROM_XCO2_TEQ_NCP_SAL, 
-	FCO2_FROM_XCO2_SST_NCP_SAL, 
-	FCO2_FROM_XCO2_TEQ_NCP_WOA, 
-	FCO2_FROM_XCO2_SST_NCP_WOA, 
-	FCO2_REC, 
-	FCO2_REC_SOURCE, 
-	DELTA_TEMPERATURE, 
-	REGION_ID, 
-	SECONDS_1970, 
-	DAYS_1970, 
-	DAY_OF_YEAR, 
-	CALC_SHIP_SPEED, 
-	ETOPO2, 
-	GVCO2, 
-	DISTANCE_TO_LAND, 
-	FCO2_REC_WOCE_FLAG,
+	// WOCE flags
+	TIMESTAMP_WOCE,
+	LONGITUDE_WOCE,
+	LATITUDE_WOCE,
+	DEPTH_WOCE,
+	SALINITY_WOCE,
+	EQUILIBRATOR_TEMPERATURE_WOCE,
+	SEA_SURFACE_TEMPERATURE_WOCE,
+	EQUILIBRATOR_PRESSURE_WOCE,
+	SEA_LEVEL_PRESSURE_WOCE,
+	XCO2WATER_EQU_WOCE,
+	XCO2WATER_SST_WOCE,
+	PCO2WATER_EQU_WOCE,
+	PCO2WATER_SST_WOCE,
+	FCO2WATER_EQU_WOCE,
+	FCO2WATER_SST_WOCE,
+	XCO2AIR_WOCE, 
+	PCO2AIR_WOCE, 
+	FCO2AIR_WOCE, 
+	
+	/**
+	 * COMMENT is a user-provided comment about this data point measurements,
+	 * and will be saved as a WOCE flag comment.
+	 */
+	COMMENT,
 }
