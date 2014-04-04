@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,25 +92,6 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getMetadataHRef()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setMetadataHRef(java.lang.String)}.
-	 */
-	@Test
-	public void testGetSetMetadataHRef() {
-		final String actualMetadataHRef = "http://www.socat.info/metadata/AR2007_10_Readme.doc";
-		OmeMetadata mdata = new OmeMetadata();
-		assertEquals("", mdata.getMetadataHRef());
-		mdata.setMetadataHRef(actualMetadataHRef);
-		assertEquals(actualMetadataHRef, mdata.getMetadataHRef());
-		assertEquals("", mdata.getOrigDataRef());
-		assertEquals("", mdata.getScienceGroup());
-		assertEquals("", mdata.getVesselName());
-		assertEquals("", mdata.getCruiseName());
-		mdata.setMetadataHRef(null);
-		assertEquals("", mdata.getMetadataHRef());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#equals(java.lang.Object)}.
 	 */
@@ -120,7 +102,6 @@ public class OmeMetadataTest {
 		final String myVesselName = "Bell M. Shimada";
 		final String myScienceGroup = "Cosca, Catherine E.; Feely, Richard A.; Alin, Simone R.; Lebon, Geoffrey T.";
 		final String myOrigDataRef = "www.pmel.noaa.gov/co2/SH1201.csv";
-		final String myMetadataHRef = "http://www.socat.info/metadata/AR2007_10_Readme.doc";
 
 		OmeMetadata mdata = new OmeMetadata();
 		assertFalse( mdata.equals(null) );
@@ -165,13 +146,6 @@ public class OmeMetadataTest {
 		other.setOrigDataRef(myOrigDataRef);
 		assertTrue( mdata.hashCode() == other.hashCode() );
 		assertTrue( mdata.equals(other) );
-
-		mdata.setMetadataHRef(myMetadataHRef);
-		assertFalse( mdata.hashCode() == other.hashCode() );
-		assertFalse( mdata.equals(other) );
-		other.setMetadataHRef(myMetadataHRef);
-		assertTrue( mdata.hashCode() == other.hashCode() );
-		assertTrue( mdata.equals(other) );
 	}
 
 	/**
@@ -197,7 +171,6 @@ public class OmeMetadataTest {
 		final String actualVesselName = "Albert Rickmers";
 		final String actualScienceGroup = "Richard Feely";
 		final String actualOrigDataRef = "10.3334/CDIAC/otg.VOS_Albert_Rickmers_2007";
-		final String actualMetadataHRef = "http://www.socat.info/metadata/AR2007_10_Readme.doc";
 
 		OmeMetadata mdata = new OmeMetadata(actualMetadataHeaders, actualMetadataString, uploadTimestamp);
 		assertEquals(actualCruiseExpocode, mdata.getExpocode());
@@ -205,7 +178,6 @@ public class OmeMetadataTest {
 		assertEquals(actualVesselName, mdata.getVesselName());
 		assertEquals(actualScienceGroup, mdata.getScienceGroup());
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
-		assertEquals(actualMetadataHRef, mdata.getMetadataHRef());
 	}
 
 	/**
@@ -424,9 +396,9 @@ public class OmeMetadataTest {
 		final String actualCruiseName = "SH1201";
 		final String actualVesselName = "Bell M. Shimada";
 		final String actualScienceGroup = 
-				"Cosca, Catherine E." + OmeMetadata.OME_PIS_SEPARATOR + 
-				"Feely, Richard A." + OmeMetadata.OME_PIS_SEPARATOR + 
-				"Alin, Simone R." + OmeMetadata.OME_PIS_SEPARATOR + 
+				"Cosca, Catherine E." + SocatMetadata.PIS_SEPARATOR + 
+				"Feely, Richard A." + SocatMetadata.PIS_SEPARATOR + 
+				"Alin, Simone R." + SocatMetadata.PIS_SEPARATOR + 
 				"Lebon, Geoffrey T.";
 		final String actualOrigDataRef = "www.pmel.noaa.gov/co2/SH1201.csv";
 
@@ -441,7 +413,6 @@ public class OmeMetadataTest {
 		assertEquals(actualVesselName, mdata.getVesselName());
 		assertEquals(actualScienceGroup, mdata.getScienceGroup());
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
-		assertEquals("", mdata.getMetadataHRef());
 	}
 
 	/**
@@ -471,9 +442,6 @@ public class OmeMetadataTest {
 			other.setFilename(mdata.getFilename());
 			other.setUploadTimestamp(uploadTimestamp);
 			other.assignFromOmeXmlDoc(minOmeDoc);
-
-			// Does not save the metadata http references
-			other.setMetadataHRef(mdata.getMetadataHRef());
 
 			assertEquals(mdata, other);
 	}

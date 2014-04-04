@@ -6,16 +6,18 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.nc.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Test;
+
 /**
  * @author Karl Smith
  */
@@ -91,7 +93,14 @@ public class CruiseDsgNcFileTest {
 		mdata.setCruiseName("GM0606");
 		mdata.setScienceGroup("Public, Nancy S.; Public, John Q.");
 		mdata.setVesselName("Caribbean Cruiser");
-		mdata.setOrigDOI("doi:cdiac12345");
+		mdata.setOrigDataRef("doi:cdiac12345");
+		mdata.setSouthmostLatitude(20.04);
+		mdata.setNorthmostLatitude(29.07);
+		mdata.setWestmostLongitude(-92.77);
+		mdata.setEastmostLongitude(-92.74);
+		SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+		mdata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC"));
+		mdata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC"));
 
 		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(mdata, dataList);
 		File parentDir = new File("/var/tmp/socat");

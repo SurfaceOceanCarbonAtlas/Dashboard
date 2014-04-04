@@ -1,29 +1,38 @@
 /**
  */
-package gov.noaa.pmel.socat.dashboard.nc;
-
-import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Date;
 import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Class for working with metadata values of interest from SOCAT. 
+ * Class for working with metadata values of interest from SOCAT,
+ * including those derived from cruise data.
  * 
  * @author Karl Smith
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 3548714248034745621L;
+	private static final long serialVersionUID = -2220771960303150153L;
 
-	// Jan 2, 3000 00:00:00 GMT
+	/**
+	 * Date used as a missing value; 
+	 * corresponds to Jan 2, 3000 00:00:00 GMT
+	 */
 	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
+
+	/**
+	 * String separating individual PI's listed in the science group String
+	 */
+	public static final String PIS_SEPARATOR = "; ";
+
+	/**
+	 * Value for no cruise QC flag.
+	 */
+	public static final Character NO_CRUISE_FLAG = ' ';
 
 	String expocode;
 	String cruiseName;
@@ -35,11 +44,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	Date beginTime;
 	Date endTime;
 	String scienceGroup;
-	String origDOI;
-	String metadataHRef;
+	String origDataRef;
 	String socatDOI;
 	String socatDOIHRef;
-	String cruiseFlag;
+	Character cruiseFlag;
 
 	/**
 	 * Generates an empty SocatMetadata object.
@@ -55,29 +63,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		beginTime = DATE_MISSING_VALUE;
 		endTime = DATE_MISSING_VALUE;
 		scienceGroup = "";
-		origDOI = "";
-		metadataHRef = "";
+		origDataRef = "";
 		socatDOI = "";
 		socatDOIHRef = "";
-		cruiseFlag = "";
-	}
-
-	/**
-	 * Generate from the data in an OmeMetadata object.
-	 * 
-	 * @param omeMData
-	 * 		initialize from this data
-	 */
-	public SocatMetadata(OmeMetadata omeMData) {
-		this();
-		expocode = omeMData.getExpocode();
-		cruiseName = omeMData.getCruiseName();
-		vesselName = omeMData.getVesselName();
-		scienceGroup = omeMData.getScienceGroup();
-		origDOI = omeMData.getOrigDataRef();
-		metadataHRef = omeMData.getMetadataHRef();
-		// TODO: add and initialize more fields when they are 
-		// identified in the OME XML file and added to OmeMetadata.
+		cruiseFlag = NO_CRUISE_FLAG;
 	}
 
 	/**
@@ -292,44 +281,23 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the original data DOI associated with this instance; 
+	 * 		the original data reference associated with this instance; 
 	 * 		never null but could be empty if not assigned
 	 */
-	public String getOrigDOI() {
-		return origDOI;
+	public String getOrigRef() {
+		return origDataRef;
 	}
 
 	/**
-	 * @param origDOI 
-	 * 		the original data DOI to set; 
+	 * @param origDataRef 
+	 * 		the original data reference to set; 
 	 * 		if null, an empty string is assigned
 	 */
-	public void setOrigDOI(String origDOI) {
-		if ( origDOI == null )
-			this.origDOI = "";
+	public void setOrigDataRef(String origDataRef) {
+		if ( origDataRef == null )
+			this.origDataRef = "";
 		else
-			this.origDOI = origDOI;
-	}
-
-	/**
-	 * @return
-	 * 		the metadata href(s) associated with this instance; 
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getMetadataHRef() {
-		return metadataHRef;
-	}
-
-	/**
-	 * @param metadataHRef 
-	 * 		the metadata href(s) to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setMetadataHRef(String metadataHRef) {
-		if ( metadataHRef == null )
-			this.metadataHRef = "";
-		else
-			this.metadataHRef = metadataHRef;
+			this.origDataRef = origDataRef;
 	}
 
 	/**
@@ -377,20 +345,20 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the cruise flag value associated with this instance;
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link #NO_CRUISE_FLAG} if not assigned
 	 */
-	public String getCruiseFlag() {
+	public Character getCruiseFlag() {
 		return cruiseFlag;
 	}
 
 	/**
 	 * @param cruiseFlag 
 	 * 		the cruise flag value to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link #NO_CRUISE_FLAG} is assigned
 	 */
-	public void setCruiseFlag(String cruiseFlag) {
+	public void setCruiseFlag(Character cruiseFlag) {
 		if ( cruiseFlag == null )
-			this.cruiseFlag = "";
+			this.cruiseFlag = NO_CRUISE_FLAG;
 		else
 			this.cruiseFlag = cruiseFlag;
 	}
@@ -400,26 +368,20 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		the maximum length of String values given in the fields of this instance
 	 */
 	public int getMaxStringLength() {
-		int maxlength = -1;
-		Field[] fields = this.getClass().getDeclaredFields();
-		for (int i = 0; i < fields.length; i++) {
-			Field f = fields[i];
-			f.setAccessible(true);
-			if ( f.getType().equals(String.class) && !Modifier.isStatic(f.getModifiers())) {
-				String s;
-				try {
-					s = (String) f.get(this);
-					if ( s.length() > maxlength ) {
-						maxlength = s.length();
-					}
-				} catch (IllegalArgumentException e) {
-					// Carry on.  The value from other strings will be fine.
-				} catch (IllegalAccessException e) {
-					// Carry on.  The value from other strings will be fine.
-				}            
-			}
-		}
-		return maxlength;
+		int maxLength = expocode.length();
+		if ( maxLength < cruiseName.length() ) 
+			maxLength = cruiseName.length();
+		if ( maxLength < vesselName.length() ) 
+			maxLength = vesselName.length();
+		if ( maxLength < scienceGroup.length() ) 
+			maxLength = scienceGroup.length();
+		if ( maxLength < origDataRef.length() ) 
+			maxLength = origDataRef.length();
+		if ( maxLength < socatDOI.length() ) 
+			maxLength = socatDOI.length();
+		if ( maxLength < socatDOIHRef.length() ) 
+			maxLength = socatDOIHRef.length();
+		return maxLength;
 	}
 
 	@Override 
@@ -433,8 +395,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		result = result * prime + beginTime.hashCode();
 		result = result * prime + endTime.hashCode();
 		result = result * prime + scienceGroup.hashCode();
-		result = result * prime + origDOI.hashCode();
-		result = result * prime + metadataHRef.hashCode();
+		result = result * prime + origDataRef.hashCode();
 		result = result * prime + socatDOI.hashCode();
 		result = result * prime + socatDOIHRef.hashCode();
 		result = result * prime + cruiseFlag.hashCode();
@@ -472,10 +433,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		if ( ! scienceGroup.equals(other.scienceGroup) )
 			return false;
 
-		if ( ! origDOI.equals(other.origDOI) ) 
-			return false;
-
-		if ( ! metadataHRef.equals(other.metadataHRef) )
+		if ( ! origDataRef.equals(other.origDataRef) ) 
 			return false;
 
 		if ( ! socatDOI.equals(other.socatDOI) )
@@ -515,11 +473,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    northmostLatitude=" + northmostLatitude.toString() + 
 				",\n    beginTime=" + beginTime.toString() + 
 				",\n    endTime=" + endTime.toString() + 
-				",\n    origDOI=" + origDOI + 
-				",\n    metadataHRef=" + metadataHRef + 
+				",\n    scienceGroup=" + scienceGroup + 
+				",\n    origDataRef=" + origDataRef + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    socatDOIHRef=" + socatDOIHRef + 
-				",\n    cruiseFlag=" + cruiseFlag + 
+				",\n    cruiseFlag=" + cruiseFlag.toString() + 
 				" ]";
 	}
 

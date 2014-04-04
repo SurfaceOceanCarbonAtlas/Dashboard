@@ -6,9 +6,9 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +54,6 @@ public class SocatCruiseDataTest {
 
 	static {
 		// No seconds, and pressure is in kPa instead of hPa, but shouldn't matter for these tests
-		// First two "ignores" are Expocode and Cruise ID, last "supplemental" is ship speed in knots.
 		// The last line is a fake entry to test missing values.
 		String[] dataValueStrings = {
 			"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,100.9281,0.3", 
@@ -103,8 +102,8 @@ public class SocatCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#SocatCruiseData(java.util.List, java.util.List)}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#dataListFromDashboardCruise(gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#SocatCruiseData(java.util.List, java.util.List)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#dataListFromDashboardCruise(gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData)}.
 	 */
 	@Test
 	public void testSocatCruiseDataList() {
@@ -124,7 +123,7 @@ public class SocatCruiseDataTest {
 			assertEquals(EXPECTED_SALS.get(k), dataList.get(k).getSal());
 			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), dataList.get(k).getXCO2WaterSst());
 			assertEquals(EXPECTED_PCO2WATER_EQUS.get(k), dataList.get(k).getPCO2WaterTEqu());
-			assertEquals(EXPECTED_SLPS.get(k), dataList.get(k).getPAtm());
+			assertEquals(EXPECTED_SLPS.get(k), dataList.get(k).getSlp());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getSecond());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getSampleDepth());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getTEqu());
@@ -152,19 +151,18 @@ public class SocatCruiseDataTest {
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2Rec());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getDeltaT());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getCalcSpeed());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getEtopo2());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getEtopo2Depth());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getGVCO2());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getDistToLand());
 			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataList.get(k).getFCO2Source());
-			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataList.get(k).getWoceFlag());
-			assertEquals("", dataList.get(k).getRegionID());
+			assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, dataList.get(k).getRegionID());
 		}
 	}
 
 	static final Integer YEAR = 2014;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getYear()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setYear(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getYear()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setYear(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetYear() {
@@ -178,8 +176,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer MONTH = 1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getMonth()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setMonth(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getMonth()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setMonth(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetMonth() {
@@ -194,8 +192,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer DAY = 13;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getDay()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setDay(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getDay()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setDay(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetDay() {
@@ -211,8 +209,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer HOUR = 19;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getHour()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setHour(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getHour()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setHour(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetHour() {
@@ -229,8 +227,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer MINUTE = 35;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getMinute()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setMinute(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getMinute()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setMinute(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetMinute() {
@@ -248,8 +246,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SECOND = 18.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getSecond()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setSecond(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSecond()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSecond(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSecond() {
@@ -268,8 +266,8 @@ public class SocatCruiseDataTest {
 
 	static final Double LONGITUDE = -125.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getLongitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetLongitude() {
@@ -289,8 +287,8 @@ public class SocatCruiseDataTest {
 
 	static final Double LATITUDE = 46.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getLatitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetLatitude() {
@@ -311,8 +309,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SAMPLE_DEPTH = 5.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getSampleDepth()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setSampleDepth(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSampleDepth()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSampleDepth(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSampleDepth() {
@@ -334,8 +332,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SST = 15.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSst() {
@@ -358,8 +356,8 @@ public class SocatCruiseDataTest {
 
 	static final Double T_EQU = 16.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetTEqu() {
@@ -383,8 +381,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SAL = 31.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getSal()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setSal(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSal()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSal(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSal() {
@@ -409,15 +407,15 @@ public class SocatCruiseDataTest {
 
 	static final Double P_ATM = 1003.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getPAtm()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setPAtm(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSlp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSlp(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPAtm() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
-		data.setPAtm(P_ATM);
-		assertEquals(P_ATM, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
+		data.setSlp(P_ATM);
+		assertEquals(P_ATM, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -430,14 +428,14 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setPAtm(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		data.setSlp(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 	}
 
 	static final Double P_EQU = 1003.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getPEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setPEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getPEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setPEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPEqu() {
@@ -445,7 +443,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
 		data.setPEqu(P_EQU);
 		assertEquals(P_EQU, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -464,8 +462,8 @@ public class SocatCruiseDataTest {
 
 	static final Double X_CO2_WATER_SST = 451.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getXCO2WaterSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setXCO2WaterSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getXCO2WaterSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setXCO2WaterSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetXCO2WaterSst() {
@@ -474,7 +472,7 @@ public class SocatCruiseDataTest {
 		data.setXCO2WaterSst(X_CO2_WATER_SST);
 		assertEquals(X_CO2_WATER_SST, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -493,8 +491,8 @@ public class SocatCruiseDataTest {
 
 	static final Double X_CO2_WATER_T_EQU = 450.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getXCO2WaterTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setXCO2WaterTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getXCO2WaterTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setXCO2WaterTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetXCO2WaterTEqu() {
@@ -504,7 +502,7 @@ public class SocatCruiseDataTest {
 		assertEquals(X_CO2_WATER_T_EQU, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -523,8 +521,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_WATER_SST = 451.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2WaterSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2WaterSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2WaterSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2WaterSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2WaterSst() {
@@ -535,7 +533,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -554,8 +552,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_WATER_T_EQU = 451.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2WaterTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2WaterTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2WaterTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2WaterTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2WaterTEqu() {
@@ -567,7 +565,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -586,8 +584,8 @@ public class SocatCruiseDataTest {
 
 	static final Double P_CO2_WATER_SST = 451.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getPCO2WaterSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setPCO2WaterSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getPCO2WaterSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setPCO2WaterSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPCO2WaterSst() {
@@ -600,7 +598,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -619,8 +617,8 @@ public class SocatCruiseDataTest {
 
 	static final Double P_CO2_WATER_T_EQU = 451.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getPCO2WaterTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setPCO2WaterTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getPCO2WaterTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setPCO2WaterTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPCO2WaterTEqu() {
@@ -634,7 +632,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -653,8 +651,8 @@ public class SocatCruiseDataTest {
 
 	static final Double WOA_SSS = 31.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getWoaSss()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setWoaSss(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getWoaSss()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setWoaSss(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWoaSss() {
@@ -669,7 +667,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -688,8 +686,8 @@ public class SocatCruiseDataTest {
 
 	static final Double NCEP_SLP = 1003.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getNcepSlp()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setNcepSlp(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getNcepSlp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setNcepSlp(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetNcepSlp() {
@@ -705,7 +703,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -724,8 +722,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU = 452.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEqu() {
@@ -742,7 +740,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -761,8 +759,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST = 452.1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2Sst() {
@@ -780,7 +778,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -799,8 +797,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_T_EQU = 452.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromPCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromPCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2TEqu() {
@@ -819,7 +817,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -838,8 +836,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_SST = 452.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromPCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromPCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2Sst() {
@@ -859,7 +857,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -878,8 +876,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_F_CO2_T_EQU = 452.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromFCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromFCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromFCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromFCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testSetFCO2FromFCO2TEqu() {
@@ -900,7 +898,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -919,8 +917,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_F_CO2_SST = 452.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromFCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromFCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromFCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromFCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromFCO2Sst() {
@@ -942,7 +940,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -961,8 +959,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_T_EQU_NCEP = 452.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromPCO2TEquNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromPCO2TEquNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2TEquNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2TEquNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2TEquNcep() {
@@ -985,7 +983,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1004,8 +1002,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_SST_NCEP = 452.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromPCO2SstNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromPCO2SstNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2SstNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2SstNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2SstNcep() {
@@ -1029,7 +1027,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1048,8 +1046,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_WOA = 452.8;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2TEquWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2TEquWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEquWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEquWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquWoa() {
@@ -1074,7 +1072,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1093,8 +1091,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST_WOA = 452.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2SstWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2SstWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2SstWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2SstWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstWoa() {
@@ -1120,7 +1118,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1139,8 +1137,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_NCEP = 453.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2TEquNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2TEquNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEquNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEquNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquNcsp() {
@@ -1167,7 +1165,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1186,8 +1184,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST_NCEP = 453.1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2SstNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2SstNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2SstNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2SstNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstNcep() {
@@ -1215,7 +1213,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1234,8 +1232,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA = 453.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2TEquNcepWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2TEquNcepWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEquNcepWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEquNcepWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquNcepWoa() {
@@ -1264,7 +1262,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1283,8 +1281,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST_NCEP_WOA = 453.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2FromXCO2SstNcepWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2FromXCO2SstNcepWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2SstNcepWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2SstNcepWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstNcepWoa() {
@@ -1314,7 +1312,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1333,8 +1331,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_REC = 453.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2Rec()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2Rec(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2Rec()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2Rec(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2Rec() {
@@ -1365,7 +1363,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1384,8 +1382,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer F_CO2_SOURCE = 15;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getFCO2Source()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setFCO2Source(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2Source()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2Source(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetFCO2Source() {
@@ -1417,7 +1415,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1436,8 +1434,8 @@ public class SocatCruiseDataTest {
 
 	static final Double DELTA_T = 0.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getDeltaT()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setDeltaT(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getDeltaT()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setDeltaT(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDeltaT() {
@@ -1470,7 +1468,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1487,15 +1485,15 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 	}
 
-	static final String REGION_ID = "C";
+	static final Character REGION_ID = 'C';
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getRegionID()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setRegionID(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getRegionID()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setRegionID(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetRegionID() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals("", data.getRegionID());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		data.setRegionID(REGION_ID);
 		assertEquals(REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
@@ -1524,7 +1522,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1538,13 +1536,13 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
 		data.setRegionID(null);
-		assertEquals("", data.getRegionID());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 	}
 
 	static final Double CALC_SPEED = 2.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getCalcSpeed()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setCalcSpeed(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getCalcSpeed()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setCalcSpeed(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetCalcSpeed() {
@@ -1552,7 +1550,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
 		data.setCalcSpeed(CALC_SPEED);
 		assertEquals(CALC_SPEED, data.getCalcSpeed());
-		assertEquals("", data.getRegionID());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
@@ -1579,7 +1577,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1598,17 +1596,17 @@ public class SocatCruiseDataTest {
 
 	static final Double ETOPO2 = 293.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getEtopo2()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setEtopo2(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getEtopo2Depth()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setEtopo2Depth(java.lang.Double)}.
 	 */
 	@Test
-	public void testGetSetEtopo2() {
+	public void testGetSetEtopo2Depth() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2());
-		data.setEtopo2(ETOPO2);
-		assertEquals(ETOPO2, data.getEtopo2());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
+		data.setEtopo2Depth(ETOPO2);
+		assertEquals(ETOPO2, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals("", data.getRegionID());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
@@ -1635,7 +1633,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1648,14 +1646,14 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setEtopo2(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2());
+		data.setEtopo2Depth(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 	}
 
 	static final Double GVCO2 = 428.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getGVCO2()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setGVCO2(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getGVCO2()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setGVCO2(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetGVCO2() {
@@ -1663,9 +1661,9 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGVCO2());
 		data.setGVCO2(GVCO2);
 		assertEquals(GVCO2, data.getGVCO2());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals("", data.getRegionID());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
@@ -1692,7 +1690,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1711,8 +1709,8 @@ public class SocatCruiseDataTest {
 
 	static final Double DIST_TO_LAND = 232.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getDistToLand()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setDistToLand(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getDistToLand()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setDistToLand(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDistToLand() {
@@ -1721,9 +1719,9 @@ public class SocatCruiseDataTest {
 		data.setDistToLand(DIST_TO_LAND);
 		assertEquals(DIST_TO_LAND, data.getDistToLand());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGVCO2());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals("", data.getRegionID());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
@@ -1750,7 +1748,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
@@ -1767,68 +1765,9 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDistToLand());
 	}
 
-	static final Integer WOCE_FLAG = 3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#getWoceFlag()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#setWoceFlag(java.lang.Integer)}.
-	 */
-	@Test
-	public void testGetSetWoceFlag() {
-		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getWoceFlag() );
-		data.setWoceFlag(WOCE_FLAG);
-		assertEquals(WOCE_FLAG, data.getWoceFlag());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDistToLand());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGVCO2());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals("", data.getRegionID());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPAtm());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLongitude());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSecond());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMinute());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getHour());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setWoceFlag(null);
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getWoceFlag() );
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#hashCode()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.nc.SocatCruiseData#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#hashCode()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
@@ -1932,10 +1871,10 @@ public class SocatCruiseDataTest {
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setPAtm(P_ATM);
+		data.setSlp(P_ATM);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setPAtm(P_ATM);
+		other.setSlp(P_ATM);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
@@ -2162,10 +2101,10 @@ public class SocatCruiseDataTest {
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setEtopo2(ETOPO2);
+		data.setEtopo2Depth(ETOPO2);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setEtopo2(ETOPO2);
+		other.setEtopo2Depth(ETOPO2);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
@@ -2182,13 +2121,6 @@ public class SocatCruiseDataTest {
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
 		other.setDistToLand(DIST_TO_LAND);
-		assertEquals(data.hashCode(), other.hashCode());
-		assertTrue( data.equals(other) );
-
-		data.setWoceFlag(WOCE_FLAG);
-		assertFalse( data.hashCode() == other.hashCode() );
-		assertFalse( data.equals(other) );
-		other.setWoceFlag(WOCE_FLAG);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 	}

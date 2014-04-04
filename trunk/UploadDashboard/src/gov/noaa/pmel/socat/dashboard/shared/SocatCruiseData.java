@@ -1,10 +1,7 @@
 /**
  */
-package gov.noaa.pmel.socat.dashboard.nc;
+package gov.noaa.pmel.socat.dashboard.shared;
 
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,21 +10,30 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Class for working with data values of interest 
- * from a SOCAT cruise data measurement.
+ * Class for working with data values of interest, both PI-provided
+ * values and computed values, from a SOCAT cruise data measurement.
  * 
  * @author Karl Smith
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5963648383310783655L;
+	private static final long serialVersionUID = -9113258429689025721L;
 
 	private static final double MAX_RELATIVE_ERROR = 1.0E-6;
 	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
-	// Missing value for floating-point variables - not NaN for Ferret
+
+	/**
+	 *  Missing value for floating-point variables - not NaN for Ferret
+	 */
 	public static final Double FP_MISSING_VALUE = -1.0E+34;
-	// Missing value for integer variables
+	/**
+	 *  Missing value for integer variables
+	 */
 	public static final Integer INT_MISSING_VALUE = -1;
+	/**
+	 *  Missing value for single character variables (regionID, all the WOCE flags)
+	 */
+	public static final Character CHAR_MISSING_VALUE = ' ';
 
 	// Time of measurement
 	Integer year;
@@ -42,28 +48,66 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double latitude;
 	// Sampling depth for the measurement
 	Double sampleDepth;
+	// salinity
+	Double sal;
 	// Sea surface temperature
 	Double sst;
 	// Equilibrator temperature
 	Double tEqu;
-	// salinity
-	Double sal;
 	// Atmospheric pressure / sea level pressure
-	Double pAtm;
+	Double slp;
 	// Equilibrator pressure
 	Double pEqu;
-	// Six possible CO2 measurements reported; 
+	// Six possible water CO2 measurements reported; 
 	// typically only one or two actually reported
 	Double xCO2WaterSst;
 	Double xCO2WaterTEqu;
-	Double fCO2WaterSst;
-	Double fCO2WaterTEqu;
 	Double pCO2WaterSst;
 	Double pCO2WaterTEqu;
+	Double fCO2WaterSst;
+	Double fCO2WaterTEqu;
+	// Three possible air CO2 measurements reported;
+	// typically one or none actually reported
+	Double xCO2Air;
+	Double pCO2Air;
+	Double fCO2Air;
+	// Ship speed in knots
+	Double shipSpeed; 
+	// Ship direction in degrees clockwise from N
+	Double shipDirection; 
+	// Wind speed in m/s
+	Double windSpeedTrue;
+	Double windSpeedRelative;
+	// Wind direction is degrees clockwise from N
+	Double windDirectionTrue;
+	Double windDirectionRelative;
+	// WOCE flags
+	Character timestampWoce;
+	Character longitudeWoce;
+	Character latitudeWoce;
+	Character depthWoce;
+	Character salinityWoce;
+	Character tEquWoce;
+	Character sstWoce;
+	Character pEquWoce;
+	Character slpWoce;
+	Character xCO2WaterEquWoce;
+	Character xCO2WaterSSTWoce;
+	Character pCO2WaterEquWoce;
+	Character pCO2WaterSSTWoce;
+	Character fCO2WaterEquWoce;
+	Character fCO2WaterSSTWoce;
+	Character xCO2AirWoce;
+	Character pCO2AirWoce;
+	Character fCO2AirWoce;
 
 	// The following are provided by Ferret calculations using the above data
 
-	// WOA Sea Surface Salinity at this measurement's time and location
+	// Difference between air and water CO2 values
+	Double deltaXCO2;
+	Double deltaPCO2;
+	Double deltaFCO2;
+	 // WOA Sea Surface Salinity at this measurement's time and location
 	Double woaSss;
 	// NCEP sea level pressure at this measurement's time and location
 	Double ncepSlp;
@@ -89,12 +133,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Integer fCO2Source;
 	// TEqu - SST
 	Double deltaT;
-	// one-letter ID of the cruise region in which this measurement lies
-	String regionID;
+	// ID of the cruise region in which this measurement lies
+	Character regionID;
 	// calculated ship speed from adjacent measurements
 	Double calcSpeed;
 	// ETOPO2 depth
-	Double etopo2;
+	Double etopo2Depth;
 	// GlobalView xCO2 value
 	Double gvCO2;
 	// distance to closest land mass (up to 1000 km)
@@ -103,10 +147,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double days1970;
 	// days since Jan 1 of that year; 1.0 == Jan 1 00:00
 	Double dayOfYear;
-	// overall data WOCE flag; 
-	// may be assigned by the SanityChecker for questionable (3) or bad (4) data
-	// and to be assigned by QC'ers
-	Integer woceFlag;
 
 	/**
 	 * Generates an empty SOCAT data record
@@ -121,10 +161,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		longitude = FP_MISSING_VALUE;
 		latitude = FP_MISSING_VALUE;
 		sampleDepth = FP_MISSING_VALUE;
+		sal = FP_MISSING_VALUE;
 		sst = FP_MISSING_VALUE;
 		tEqu = FP_MISSING_VALUE;
-		sal = FP_MISSING_VALUE;
-		pAtm = FP_MISSING_VALUE;
+		slp = FP_MISSING_VALUE;
 		pEqu = FP_MISSING_VALUE;
 		xCO2WaterSst = FP_MISSING_VALUE;
 		xCO2WaterTEqu = FP_MISSING_VALUE;
@@ -132,6 +172,36 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		fCO2WaterTEqu = FP_MISSING_VALUE;
 		pCO2WaterSst = FP_MISSING_VALUE;
 		pCO2WaterTEqu = FP_MISSING_VALUE;
+		xCO2Air = FP_MISSING_VALUE;
+		pCO2Air = FP_MISSING_VALUE;
+		fCO2Air = FP_MISSING_VALUE;
+		shipSpeed = FP_MISSING_VALUE; 
+		shipDirection = FP_MISSING_VALUE; 
+		windSpeedTrue = FP_MISSING_VALUE;
+		windSpeedRelative = FP_MISSING_VALUE;
+		windDirectionTrue = FP_MISSING_VALUE;
+		windDirectionRelative = FP_MISSING_VALUE;
+		timestampWoce = CHAR_MISSING_VALUE;
+		longitudeWoce = CHAR_MISSING_VALUE;
+		latitudeWoce = CHAR_MISSING_VALUE;
+		depthWoce = CHAR_MISSING_VALUE;
+		salinityWoce = CHAR_MISSING_VALUE;
+		tEquWoce = CHAR_MISSING_VALUE;
+		sstWoce = CHAR_MISSING_VALUE;
+		pEquWoce = CHAR_MISSING_VALUE;
+		slpWoce = CHAR_MISSING_VALUE;
+		xCO2WaterEquWoce = CHAR_MISSING_VALUE;
+		xCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		pCO2WaterEquWoce = CHAR_MISSING_VALUE;
+		pCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		fCO2WaterEquWoce = CHAR_MISSING_VALUE;
+		fCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		xCO2AirWoce = CHAR_MISSING_VALUE;
+		pCO2AirWoce = CHAR_MISSING_VALUE;
+		fCO2AirWoce = CHAR_MISSING_VALUE;
+		deltaXCO2 = FP_MISSING_VALUE;
+		deltaPCO2 = FP_MISSING_VALUE;
+		deltaFCO2 = FP_MISSING_VALUE;
 		woaSss = FP_MISSING_VALUE;
 		ncepSlp = FP_MISSING_VALUE;
 		fCO2FromXCO2TEqu = FP_MISSING_VALUE;
@@ -151,21 +221,20 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		fCO2Rec = FP_MISSING_VALUE;
 		fCO2Source = INT_MISSING_VALUE;
 		deltaT = FP_MISSING_VALUE;
-		regionID = "";
+		regionID = CHAR_MISSING_VALUE;
 		calcSpeed = FP_MISSING_VALUE;
-		etopo2 = FP_MISSING_VALUE;
+		etopo2Depth = FP_MISSING_VALUE;
 		gvCO2 = FP_MISSING_VALUE;
 		distToLand = FP_MISSING_VALUE;
 		days1970 = FP_MISSING_VALUE;
 		dayOfYear = FP_MISSING_VALUE;
-		woceFlag = INT_MISSING_VALUE;
 	}
 
 	/**
 	 * Generates a SOCAT cruise data objects from a list of data column 
 	 * types and matching data strings.  This assumes the data in the 
 	 * strings are in the standard units for each type, and the missing
-	 * value is "NaN", and empty string, or null.  The data column types 
+	 * value is "NaN", an empty string, or null.  The data column types 
 	 * {@link DataColumnType#TIMESTAMP}, {@link DataColumnType#DATE}, 
 	 * and {@link DataColumnType#TIME} are ignored; the date and time 
 	 * must be given using the {@link DataColumnType#YEAR}, 
@@ -194,75 +263,166 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		// Add values to the empty record
 		for (int k = 0; k < numColumns; k++) {
 			// Skip over missing values since the empty data record
-			// initialized to the missing value for that type.
-			// The string should always be "NaN", but allow some flexibility
+			// is initialized to the missing value for that type.
 			String value = dataValues.get(k);
 			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
 				continue;
-			// Only pay attention to the column types needed
 			DataColumnType type = columnTypes.get(k);
 			try {
-				if ( type == DataColumnType.YEAR ) {
+				if ( type.equals(DataColumnType.EXPOCODE) ||
+					 type.equals(DataColumnType.CRUISE_NAME) ||
+					 type.equals(DataColumnType.TIMESTAMP) ||
+					 type.equals(DataColumnType.DATE) ||
+					 type.equals(DataColumnType.TIME) ||
+					 type.equals(DataColumnType.COMMENT) ) {
+					// Ignore these column types
+					;
+				}
+				else if ( type.equals(DataColumnType.YEAR) ) {
 					this.year = Integer.valueOf(value);
 				}
-				else if ( type == DataColumnType.MONTH ) {
+				else if ( type.equals(DataColumnType.MONTH) ) {
 					this.month = Integer.valueOf(value);
 				}
-				else if ( type == DataColumnType.DAY ) {
+				else if ( type.equals(DataColumnType.DAY) ) {
 					this.day = Integer.valueOf(value);
 				}
-				else if ( type == DataColumnType.HOUR ) {
+				else if ( type.equals(DataColumnType.HOUR) ) {
 					this.hour = Integer.valueOf(value);
 				}
-				else if ( type == DataColumnType.MINUTE ) {
+				else if ( type.equals(DataColumnType.MINUTE) ) {
 					this.minute = Integer.valueOf(value);
 				}
-				else if ( type == DataColumnType.SECOND ) {
+				else if ( type.equals(DataColumnType.SECOND) ) {
 					this.second = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.LONGITUDE ) {
+				else if ( type.equals(DataColumnType.LONGITUDE) ) {
 					this.longitude = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.LATITUDE ) {
+				else if ( type.equals(DataColumnType.LATITUDE) ) {
 					this.latitude = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.SAMPLE_DEPTH ) {
+				else if ( type.equals(DataColumnType.SAMPLE_DEPTH) ) {
 					this.sampleDepth = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.SALINITY ) {
+				else if ( type.equals(DataColumnType.SALINITY) ) {
 					this.sal = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.EQUILIBRATOR_TEMPERATURE ) {
+				else if ( type.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) ) {
 					this.tEqu = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.SEA_SURFACE_TEMPERATURE ) {
+				else if ( type.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) ) {
 					this.sst = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.EQUILIBRATOR_PRESSURE ) {
+				else if ( type.equals(DataColumnType.EQUILIBRATOR_PRESSURE) ) {
 					this.pEqu = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.SEA_LEVEL_PRESSURE ) {
-					this.pAtm = Double.valueOf(value);
+				else if ( type.equals(DataColumnType.SEA_LEVEL_PRESSURE) ) {
+					this.slp = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.XCO2WATER_EQU ) {
+				else if ( type.equals(DataColumnType.XCO2WATER_EQU) ) {
 					this.xCO2WaterTEqu = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.XCO2WATER_SST ) {
+				else if ( type.equals(DataColumnType.XCO2WATER_SST) ) {
 					this.xCO2WaterSst = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.PCO2WATER_EQU ) {
+				else if ( type.equals(DataColumnType.PCO2WATER_EQU) ) {
 					this.pCO2WaterTEqu = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.PCO2WATER_SST ) {
+				else if ( type.equals(DataColumnType.PCO2WATER_SST) ) {
 					this.pCO2WaterSst = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.FCO2WATER_EQU ) {
+				else if ( type.equals(DataColumnType.FCO2WATER_EQU) ) {
 					this.fCO2WaterTEqu = Double.valueOf(value);
 				}
-				else if ( type == DataColumnType.FCO2WATER_SST ) {
+				else if ( type.equals(DataColumnType.FCO2WATER_SST) ) {
 					this.fCO2WaterSst = Double.valueOf(value);
 				}
-				// Ignore it if not one of the above types
+				else if ( type.equals(DataColumnType.XCO2AIR) ) {
+					this.xCO2Air = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.PCO2AIR) ) {
+					this.pCO2Air = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.FCO2AIR) ) {
+					this.fCO2Air = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.SHIP_SPEED) ) {
+					this.shipSpeed = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.SHIP_DIRECTION) ) {
+					this.shipDirection = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.WIND_SPEED_TRUE) ) {
+					this.windSpeedTrue = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.WIND_SPEED_RELATIVE) ) {
+					this.windSpeedRelative = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.WIND_DIRECTION_TRUE) ) {
+					this.windDirectionTrue = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
+					this.windDirectionRelative = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.TIMESTAMP_WOCE) ) {
+					this.timestampWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.LONGITUDE_WOCE) ) {
+					this.longitudeWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.LATITUDE_WOCE) ) {
+					this.latitudeWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.DEPTH_WOCE) ) {
+					this.depthWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.SALINITY_WOCE) ) {
+					this.salinityWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE_WOCE) ) {
+					this.tEquWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.SEA_SURFACE_TEMPERATURE_WOCE) ) {
+					this.sstWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.EQUILIBRATOR_PRESSURE_WOCE) ) {
+					this.pEquWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.SEA_LEVEL_PRESSURE_WOCE) ) {
+					this.slpWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.XCO2WATER_EQU_WOCE) ) {
+					this.xCO2WaterEquWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.XCO2WATER_SST_WOCE) ) {
+					this.xCO2WaterSSTWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.PCO2WATER_EQU_WOCE) ) {
+					this.pCO2WaterEquWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.PCO2WATER_SST_WOCE) ) {
+					this.pCO2WaterSSTWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.FCO2WATER_EQU_WOCE) ) {
+					this.fCO2WaterEquWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.FCO2WATER_SST_WOCE) ) {
+					this.fCO2WaterSSTWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.XCO2AIR_WOCE) ) {
+					this.xCO2AirWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.PCO2AIR_WOCE) ) {
+					this.pCO2AirWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.FCO2AIR_WOCE) ) {
+					this.fCO2AirWoce = value.charAt(0);
+				}
+				else {
+					throw new IllegalArgumentException(
+							"Unexpected data column type of " + type.name());
+				}
 			} catch (NumberFormatException ex) {
 				throw new IllegalArgumentException("Unable to parse '" + 
 						value + "' as a value of type " + type.name() + 
@@ -499,6 +659,27 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the sea surface salinity;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getSal() {
+		return sal;
+	}
+
+	/**
+	 * @param sal
+	 * 		the sea surface salinity to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setSal(Double sal) {
+		if ( sal == null )
+			this.sal = FP_MISSING_VALUE;
+		else
+			this.sal = sal;
+	}
+
+	/**
+	 * @return 
 	 * 		the sea surface temperature;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
@@ -541,44 +722,23 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the sea surface salinity;
+	 * 		the atmospheric sea-level pressure;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
-	public Double getSal() {
-		return sal;
+	public Double getSlp() {
+		return slp;
 	}
 
 	/**
-	 * @param sal
-	 * 		the sea surface salinity to set;
+	 * @param slp 
+	 * 		the atmospheric sea-level pressure to set;
 	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
-	public void setSal(Double sal) {
-		if ( sal == null )
-			this.sal = FP_MISSING_VALUE;
+	public void setSlp(Double slp) {
+		if ( slp == null )
+			this.slp = FP_MISSING_VALUE;
 		else
-			this.sal = sal;
-	}
-
-	/**
-	 * @return 
-	 * 		the atmospheric pressure;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getPAtm() {
-		return pAtm;
-	}
-
-	/**
-	 * @param pAtm 
-	 * 		the atmospheric pressure to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setPAtm(Double pAtm) {
-		if ( pAtm == null )
-			this.pAtm = FP_MISSING_VALUE;
-		else
-			this.pAtm = pAtm;
+			this.slp = slp;
 	}
 
 	/**
@@ -726,6 +886,636 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			this.pCO2WaterTEqu = FP_MISSING_VALUE;
 		else
 			this.pCO2WaterTEqu = pCO2WaterTEqu;
+	}
+
+	/**
+	 * @return 
+	 * 		the atmospheric xCO2;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getXCO2Air() {
+		return xCO2Air;
+	}
+
+	/**
+	 * @param xCO2Air 
+	 * 		the atmospheric xCO2 to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setXCO2Air(Double xCO2Air) {
+		if ( xCO2Air == null )
+			this.xCO2Air = FP_MISSING_VALUE;
+		else
+			this.xCO2Air = xCO2Air;
+	}
+
+	/**
+	 * @return 
+	 * 		the atmospheric pCO2;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getPCO2Air() {
+		return pCO2Air;
+	}
+
+	/**
+	 * @param pCO2Air 
+	 * 		the atmospheric pCO2 to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setPCO2Air(Double pCO2Air) {
+		if ( pCO2Air == null )
+			this.pCO2Air = FP_MISSING_VALUE;
+		else
+			this.pCO2Air = pCO2Air;
+	}
+
+	/**
+	 * @return 
+	 * 		the atmospheric fCO2;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getFCO2Air() {
+		return fCO2Air;
+	}
+
+	/**
+	 * @param fCO2Air 
+	 * 		the atmospheric fCO2 to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setFCO2Air(Double fCO2Air) {
+		if ( fCO2Air == null )
+			this.fCO2Air = FP_MISSING_VALUE;
+		else
+			this.fCO2Air = fCO2Air;
+	}
+
+	/**
+	 * @return 
+	 * 		the ship speed in knots;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getShipSpeed() {
+		return shipSpeed;
+	}
+
+	/**
+	 * @param shipSpeed 
+	 * 		the ship speed in knots to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setShipSpeed(Double shipSpeed) {
+		if ( shipSpeed == null )
+			this.shipSpeed = FP_MISSING_VALUE;
+		else
+			this.shipSpeed = shipSpeed;
+	}
+
+	/**
+	 * @return 
+	 * 		the ship direction in degrees clockwise from N;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getShipDirection() {
+		return shipDirection;
+	}
+
+	/**
+	 * @param shipDirection 
+	 * 		the ship direction in degrees clockwise from N to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setShipDirection(Double shipDirection) {
+		if ( shipDirection == null )
+			this.shipDirection = FP_MISSING_VALUE;
+		else
+			this.shipDirection = shipDirection;
+	}
+
+	/**
+	 * @return 
+	 * 		the true wind speed in m/s;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getWindSpeedTrue() {
+		return windSpeedTrue;
+	}
+
+	/**
+	 * @param windSpeedTrue 
+	 * 		the true wind speed in m/s to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setWindSpeedTrue(Double windSpeedTrue) {
+		if ( windSpeedTrue == null )
+			this.windSpeedTrue = FP_MISSING_VALUE;
+		else
+			this.windSpeedTrue = windSpeedTrue;
+	}
+
+	/**
+	 * @return 
+	 * 		the relative wind speed in m/s;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getWindSpeedRelative() {
+		return windSpeedRelative;
+	}
+
+	/**
+	 * @param windSpeedRelative
+	 * 		the relative wind speed in m/s to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setWindSpeedRelative(Double windSpeedRelative) {
+		if ( windSpeedRelative == null )
+			this.windSpeedRelative = FP_MISSING_VALUE;
+		else
+			this.windSpeedRelative = windSpeedRelative;
+	}
+
+	/**
+	 * @return 
+	 * 		the true wind direction in degrees clockwise from N;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getWindDirectionTrue() {
+		return windDirectionTrue;
+	}
+
+	/**
+	 * @param windDirectionTrue 
+	 * 		the true wind direction in degrees clockwise from N to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setWindDirectionTrue(Double windDirectionTrue) {
+		if ( windDirectionTrue == null )
+			this.windDirectionTrue = FP_MISSING_VALUE;
+		else
+			this.windDirectionTrue = windDirectionTrue;
+	}
+
+	/**
+	 * @return 
+	 * 		the relative wind direction in degrees clockwise from N;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getWindDirectionRelative() {
+		return windDirectionRelative;
+	}
+
+	/**
+	 * @param windDirectionRelative 
+	 * 		the relative wind direction in degrees clockwise from N to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setWindDirectionRelative(Double windDirectionRelative) {
+		if ( windDirectionRelative == null )
+			this.windDirectionRelative = FP_MISSING_VALUE;
+		else
+			this.windDirectionRelative = windDirectionRelative;
+	}
+
+	/**
+	 * @return 
+	 * 		the timestamp WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getTimestampWoce() {
+		return timestampWoce;
+	}
+
+	/**
+	 * @param timestampWoce 
+	 * 		the timestamp WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setTimestampWoce(Character timestampWoce) {
+		if ( timestampWoce == null )
+			this.timestampWoce = CHAR_MISSING_VALUE;
+		else
+			this.timestampWoce = timestampWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the longitude WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getLongitudeWoce() {
+		return longitudeWoce;
+	}
+
+	/**
+	 * @param longitudeWoce 
+	 * 		the longitude WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setLongitudeWoce(Character longitudeWoce) {
+		if ( longitudeWoce == null )
+			this.longitudeWoce = CHAR_MISSING_VALUE;
+		else
+			this.longitudeWoce = longitudeWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the latitude WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getLatitudeWoce() {
+		return latitudeWoce;
+	}
+
+	/**
+	 * @param latitudeWoce 
+	 * 		the latitude WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setLatitudeWoce(Character latitudeWoce) {
+		if ( latitudeWoce == null )
+			this.latitudeWoce = CHAR_MISSING_VALUE;
+		else
+			this.latitudeWoce = latitudeWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the depth WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getDepthWoce() {
+		return depthWoce;
+	}
+
+	/**
+	 * @param depthWoce 
+	 * 		the depth WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setDepthWoce(Character depthWoce) {
+		if ( depthWoce == null )
+			this.depthWoce = CHAR_MISSING_VALUE;
+		else
+			this.depthWoce = depthWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the salinity WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getSalinityWoce() {
+		return salinityWoce;
+	}
+
+	/**
+	 * @param salinityWoce 
+	 * 		the salinity WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setSalinityWoce(Character salinityWoce) {
+		if ( salinityWoce == null )
+			this.salinityWoce = CHAR_MISSING_VALUE;
+		else
+			this.salinityWoce = salinityWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the equilibrator temperature WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getTEquWoce() {
+		return tEquWoce;
+	}
+
+	/**
+	 * @param tEquWoce 
+	 * 		the equilibrator temperature WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setTEquWoce(Character tEquWoce) {
+		if ( tEquWoce == null )
+			this.tEquWoce = CHAR_MISSING_VALUE;
+		else
+			this.tEquWoce = tEquWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the SST WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getSstWoce() {
+		return sstWoce;
+	}
+
+	/**
+	 * @param sstWoce 
+	 * 		the SST WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setSstWoce(Character sstWoce) {
+		if ( sstWoce == null )
+			this.sstWoce = CHAR_MISSING_VALUE;
+		else
+			this.sstWoce = sstWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the equilibrator pressure WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getPEquWoce() {
+		return pEquWoce;
+	}
+
+	/**
+	 * @param pEquWoce 
+	 * 		the equilibrator pressure WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setPEquWoce(Character pEquWoce) {
+		if ( pEquWoce == null )
+			this.pEquWoce = CHAR_MISSING_VALUE;
+		else
+			this.pEquWoce = pEquWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the SLP WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getSlpWoce() {
+		return slpWoce;
+	}
+
+	/**
+	 * @param slpWoce 
+	 * 		the SLP WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setSlpWoce(Character slpWoce) {
+		if ( slpWoce == null )
+			this.slpWoce = CHAR_MISSING_VALUE;
+		else
+			this.slpWoce = slpWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the xCO2WaterEqu WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getXCO2WaterEquWoce() {
+		return xCO2WaterEquWoce;
+	}
+
+	/**
+	 * @param xCO2WaterEquWoce 
+	 * 		the xCO2WaterEqu WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setXCO2WaterEquWoce(Character xCO2WaterEquWoce) {
+		if ( xCO2WaterEquWoce == null )
+			this.xCO2WaterEquWoce = CHAR_MISSING_VALUE;
+		else
+			this.xCO2WaterEquWoce = xCO2WaterEquWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the xCO2WaterSST WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getXCO2WaterSSTWoce() {
+		return xCO2WaterSSTWoce;
+	}
+
+	/**
+	 * @param xCO2WaterSSTWoce 
+	 * 		the xCO2WaterSST WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setXCO2WaterSSTWoce(Character xCO2WaterSSTWoce) {
+		if ( xCO2WaterSSTWoce == null )
+			this.xCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		else
+			this.xCO2WaterSSTWoce = xCO2WaterSSTWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the pCO2WaterEqu WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getPCO2WaterEquWoce() {
+		return pCO2WaterEquWoce;
+	}
+
+	/**
+	 * @param pCO2WaterEquWoce 
+	 * 		the pCO2WaterEqu WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setPCO2WaterEquWoce(Character pCO2WaterEquWoce) {
+		if ( pCO2WaterEquWoce == null )
+			this.pCO2WaterEquWoce = CHAR_MISSING_VALUE;
+		else
+			this.pCO2WaterEquWoce = pCO2WaterEquWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the pCO2WaterSST WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getPCO2WaterSSTWoce() {
+		return pCO2WaterSSTWoce;
+	}
+
+	/**
+	 * @param pCO2WaterSSTWoce 
+	 * 		the pCO2WaterSST WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setPCO2WaterSSTWoce(Character pCO2WaterSSTWoce) {
+		if ( pCO2WaterSSTWoce == null )
+			this.pCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		else
+			this.pCO2WaterSSTWoce = pCO2WaterSSTWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the fCO2WaterEqu WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getFCO2WaterEquWoce() {
+		return fCO2WaterEquWoce;
+	}
+
+	/**
+	 * @param fCO2WaterEquWoce 
+	 * 		the fCO2WaterEqu WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setFCO2WaterEquWoce(Character fCO2WaterEquWoce) {
+		if ( fCO2WaterEquWoce == null )
+			this.fCO2WaterEquWoce = CHAR_MISSING_VALUE;
+		else
+			this.fCO2WaterEquWoce = fCO2WaterEquWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the fCO2WaterSST WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getFCO2WaterSSTWoce() {
+		return fCO2WaterSSTWoce;
+	}
+
+	/**
+	 * @param fCO2WaterSSTWoce 
+	 * 		the fCO2WaterSST WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setFCO2WaterSSTWoce(Character fCO2WaterSSTWoce) {
+		if ( fCO2WaterSSTWoce == null )
+			this.fCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		else
+			this.fCO2WaterSSTWoce = fCO2WaterSSTWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the xCO2Air WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getXCO2AirWoce() {
+		return xCO2AirWoce;
+	}
+
+	/**
+	 * @param xCO2AirWoce 
+	 * 		the xCO2Air WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setXCO2AirWoce(Character xCO2AirWoce) {
+		if ( xCO2AirWoce == null )
+			this.xCO2AirWoce = CHAR_MISSING_VALUE;
+		else
+			this.xCO2AirWoce = xCO2AirWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the pCO2Air WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getPCO2AirWoce() {
+		return pCO2AirWoce;
+	}
+
+	/**
+	 * @param pCO2AirWoce 
+	 * 		the pCO2Air WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setPCO2AirWoce(Character pCO2AirWoce) {
+		if ( pCO2AirWoce == null )
+			this.pCO2AirWoce = CHAR_MISSING_VALUE;
+		else
+			this.pCO2AirWoce = pCO2AirWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the fCO2Air WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getFCO2AirWoce() {
+		return fCO2AirWoce;
+	}
+
+	/**
+	 * @param fCO2AirWoce 
+	 * 		the fCO2Air WOCE flag to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setFCO2AirWoce(Character fCO2AirWoce) {
+		if ( fCO2AirWoce == null )
+			this.fCO2AirWoce = CHAR_MISSING_VALUE;
+		else
+			this.fCO2AirWoce = fCO2AirWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the difference between air and water xCO2;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getDeltaXCO2() {
+		return deltaXCO2;
+	}
+
+	/**
+	 * @param deltaXCO2 
+	 * 		the difference between air and water xCO2 to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setDeltaXCO2(Double deltaXCO2) {
+		if ( deltaXCO2 == null )
+			this.deltaXCO2 = FP_MISSING_VALUE;
+		else
+			this.deltaXCO2 = deltaXCO2;
+	}
+
+	/**
+	 * @return 
+	 * 		the difference between air and water pCO2;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getDeltaPCO2() {
+		return deltaPCO2;
+	}
+
+	/**
+	 * @param deltaPCO2 
+	 * 		the difference between air and water pCO2 to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setDeltaPCO2(Double deltaPCO2) {
+		if ( deltaPCO2 == null )
+			this.deltaPCO2 = FP_MISSING_VALUE;
+		else
+			this.deltaPCO2 = deltaPCO2;
+	}
+
+	/**
+	 * @return 
+	 * 		the difference between air and water fCO2;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getDeltaFCO2() {
+		return deltaFCO2;
+	}
+
+	/**
+	 * @param deltaFCO2 
+	 * 		the difference between air and water fCO2 to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setDeltaFCO2(Double deltaFCO2) {
+		if ( deltaFCO2 == null )
+			this.deltaFCO2 = FP_MISSING_VALUE;
+		else
+			this.deltaFCO2 = deltaFCO2;
 	}
 
 	/**
@@ -1130,20 +1920,20 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the region ID;
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
 	 */
-	public String getRegionID() {
+	public Character getRegionID() {
 		return regionID;
 	}
 
 	/**
 	 * @param regionID 
 	 * 		the region ID to set;
-	 * 		if null, an empty String is assigned
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
 	 */
-	public void setRegionID(String regionID) {
+	public void setRegionID(Character regionID) {
 		if ( regionID == null )
-			this.regionID = "";
+			this.regionID = CHAR_MISSING_VALUE;
 		else
 			this.regionID = regionID;
 	}
@@ -1174,20 +1964,20 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 		the ETOPO2 depth;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
-	public Double getEtopo2() {
-		return etopo2;
+	public Double getEtopo2Depth() {
+		return etopo2Depth;
 	}
 
 	/**
-	 * @param etopo2
-	 * 		the ETOPO2 depth to set;
+	 * @param etopo2Depth
+	 * 		the ETOPO2_DEPTH depth to set;
 	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
-	public void setEtopo2(Double etopo2) {
-		if ( etopo2 == null )
-			this.etopo2 = FP_MISSING_VALUE;
+	public void setEtopo2Depth(Double etopo2Depth) {
+		if ( etopo2Depth == null )
+			this.etopo2Depth = FP_MISSING_VALUE;
 		else
-			this.etopo2 = etopo2;
+			this.etopo2Depth = etopo2Depth;
 	}
 
 	/**
@@ -1274,40 +2064,36 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			this.dayOfYear = dayOfYear;
 	}
 
-	/**
-	 * @return 
-	 * 		the WOCE flag;
-	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
-	 */
-	public Integer getWoceFlag() {
-		return woceFlag;
-	}
-
-	/**
-	 * @param woceFlag 
-	 * 		the WOCE Flag to set;
-	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
-	 */
-	public void setWoceFlag(Integer woceFlag) {
-		if ( woceFlag == null )
-			this.woceFlag = INT_MISSING_VALUE;
-		else
-			this.woceFlag = woceFlag;
-	}
-
 	@Override 
 	public int hashCode() {
 		// Do not use floating-point fields since they do not 
 		// have to be exactly the same for equals to return true.
-		final int prime = 67;
+		final int prime = 37;
 		int result = year.hashCode();
 		result = result * prime + month.hashCode();
 		result = result * prime + day.hashCode();
 		result = result * prime + hour.hashCode();
 		result = result * prime + minute.hashCode();
 		result = result * prime + fCO2Source.hashCode();
+		result = result * prime + timestampWoce.hashCode();
+		result = result * prime + longitudeWoce.hashCode();
+		result = result * prime + latitudeWoce.hashCode();
+		result = result * prime + depthWoce.hashCode();
+		result = result * prime + salinityWoce.hashCode();
+		result = result * prime + tEquWoce.hashCode();
+		result = result * prime + sstWoce.hashCode();
+		result = result * prime + pEquWoce.hashCode();
+		result = result * prime + slpWoce.hashCode();
+		result = result * prime + xCO2WaterEquWoce.hashCode();
+		result = result * prime + xCO2WaterSSTWoce.hashCode();
+		result = result * prime + pCO2WaterEquWoce.hashCode();
+		result = result * prime + pCO2WaterSSTWoce.hashCode();
+		result = result * prime + fCO2WaterEquWoce.hashCode();
+		result = result * prime + fCO2WaterSSTWoce.hashCode();
+		result = result * prime + xCO2AirWoce.hashCode();
+		result = result * prime + pCO2AirWoce.hashCode();
+		result = result * prime + fCO2AirWoce.hashCode();
 		result = result * prime + regionID.hashCode();
-		result = result * prime + woceFlag.hashCode();
 		return result;
 	}
 
@@ -1333,12 +2119,46 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! minute.equals(other.minute) )
 			return false;
+
+		// Character comparisons
 		if ( ! fCO2Source.equals(other.fCO2Source) ) 
 			return false;
-		if ( ! woceFlag.equals(other.woceFlag) )
+		if ( ! timestampWoce.equals(other.timestampWoce) ) 
 			return false;
-
-		// String comparisons
+		if ( ! longitudeWoce.equals(other.longitudeWoce) ) 
+			return false;
+		if ( ! latitudeWoce.equals(other.latitudeWoce) ) 
+			return false;
+		if ( ! depthWoce.equals(other.depthWoce) ) 
+			return false;
+		if ( ! salinityWoce.equals(other.salinityWoce) ) 
+			return false;
+		if ( ! tEquWoce.equals(other.tEquWoce) ) 
+			return false;
+		if ( ! sstWoce.equals(other.sstWoce) ) 
+			return false;
+		if ( ! pEquWoce.equals(other.pEquWoce) ) 
+			return false;
+		if ( ! slpWoce.equals(other.slpWoce) ) 
+			return false;
+		if ( ! xCO2WaterEquWoce.equals(other.xCO2WaterEquWoce) ) 
+			return false;
+		if ( ! xCO2WaterSSTWoce.equals(other.xCO2WaterSSTWoce) ) 
+			return false;
+		if ( ! pCO2WaterEquWoce.equals(other.pCO2WaterEquWoce) ) 
+			return false;
+		if ( ! pCO2WaterSSTWoce.equals(other.pCO2WaterSSTWoce) ) 
+			return false;
+		if ( ! fCO2WaterEquWoce.equals(other.fCO2WaterEquWoce) ) 
+			return false;
+		if ( ! fCO2WaterSSTWoce.equals(other.fCO2WaterSSTWoce) ) 
+			return false;
+		if ( ! xCO2AirWoce.equals(other.xCO2AirWoce) ) 
+			return false;
+		if ( ! pCO2AirWoce.equals(other.pCO2AirWoce) ) 
+			return false;
+		if ( ! fCO2AirWoce.equals(other.fCO2AirWoce) ) 
+			return false;
 		if ( ! regionID.equals(other.regionID) )
 			return false;
 
@@ -1359,13 +2179,13 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(sampleDepth, other.sampleDepth, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
+		if ( ! DashboardUtils.closeTo(sal, other.sal, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
 		if ( ! DashboardUtils.closeTo(sst, other.sst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(tEqu, other.tEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(sal, other.sal, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
-			return false;
-		if ( ! DashboardUtils.closeTo(pAtm, other.pAtm, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(slp, other.slp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(pEqu, other.pEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -1373,13 +2193,37 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(xCO2WaterTEqu, other.xCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
+		if ( ! DashboardUtils.closeTo(pCO2WaterSst, other.pCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(pCO2WaterTEqu, other.pCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
 		if ( ! DashboardUtils.closeTo(fCO2WaterSst, other.fCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(fCO2WaterTEqu, other.fCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pCO2WaterSst, other.pCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(xCO2Air, other.xCO2Air, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pCO2WaterTEqu, other.pCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(pCO2Air, other.pCO2Air, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(fCO2Air, other.fCO2Air, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(shipSpeed, other.shipSpeed, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(shipDirection, other.shipDirection, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(windSpeedTrue, other.windSpeedTrue, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(windSpeedRelative, other.windSpeedRelative, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(windDirectionTrue, other.windDirectionTrue, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(windDirectionRelative, other.windDirectionRelative, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(deltaXCO2, other.deltaXCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(deltaPCO2, other.deltaPCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(deltaFCO2, other.deltaFCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(woaSss, other.woaSss, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -1419,7 +2263,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(calcSpeed, other.calcSpeed, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(etopo2, other.etopo2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(etopo2Depth, other.etopo2Depth, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(gvCO2, other.gvCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -1444,17 +2288,47 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    longitude=" + longitude.toString() +
 				",\n    latitude=" + latitude.toString() +
 				",\n    sampleDepth=" + sampleDepth.toString() +
+				",\n    sal=" + sal.toString() +
 				",\n    sst=" + sst.toString() +
 				",\n    tEqu=" + tEqu.toString() +
-				",\n    sal=" + sal.toString() +
-				",\n    pAtm=" + pAtm.toString() +
+				",\n    slp=" + slp.toString() +
 				",\n    pEqu=" + pEqu.toString() +
 				",\n    xCO2WaterSst=" + xCO2WaterSst.toString() +
 				",\n    xCO2WaterTEqu=" + xCO2WaterTEqu.toString() +
-				",\n    fCO2WaterSst=" + fCO2WaterSst.toString() +
-				",\n    fCO2WaterTEqu=" + fCO2WaterTEqu.toString() +
 				",\n    pCO2WaterSst=" + pCO2WaterSst.toString() +
 				",\n    pCO2WaterTEqu=" + pCO2WaterTEqu.toString() +
+				",\n    fCO2WaterSst=" + fCO2WaterSst.toString() +
+				",\n    fCO2WaterTEqu=" + fCO2WaterTEqu.toString() +
+				",\n    xCO2Air=" + xCO2Air.toString() +
+				",\n    pCO2Air=" + pCO2Air.toString() +
+				",\n    fCO2Air=" + fCO2Air.toString() +
+				",\n    shipSpeed=" + shipSpeed.toString() +
+				",\n    shipDirection=" + shipDirection.toString() +
+				",\n    windSpeedTrue=" + windSpeedTrue.toString() +
+				",\n    windSpeedRelative=" + windSpeedRelative.toString() +
+				",\n    windDirectionTrue=" + windDirectionTrue.toString() +
+				",\n    windDirectionRelative=" + windDirectionRelative.toString() +
+				",\n    timestampWoce=" + timestampWoce.toString() +
+				",\n    longitudeWoce=" + longitudeWoce.toString() +
+				",\n    latitudeWoce=" + latitudeWoce.toString() +
+				",\n    depthWoce=" + depthWoce.toString() +
+				",\n    salinityWoce=" + salinityWoce.toString() +
+				",\n    tEquWoce=" + tEquWoce.toString() +
+				",\n    sstWoce=" + sstWoce.toString() +
+				",\n    pEquWoce=" + pEquWoce.toString() +
+				",\n    slpWoce=" + slpWoce.toString() +
+				",\n    xCO2WaterEquWoce=" + xCO2WaterEquWoce.toString() +
+				",\n    xCO2WaterSSTWoce=" + xCO2WaterSSTWoce.toString() +
+				",\n    pCO2WaterEquWoce=" + pCO2WaterEquWoce.toString() +
+				",\n    pCO2WaterSSTWoce=" + pCO2WaterSSTWoce.toString() +
+				",\n    fCO2WaterEquWoce=" + fCO2WaterEquWoce.toString() +
+				",\n    fCO2WaterSSTWoce=" + fCO2WaterSSTWoce.toString() +
+				",\n    xCO2AirWoce=" + xCO2AirWoce.toString() +
+				",\n    pCO2AirWoce=" + pCO2AirWoce.toString() +
+				",\n    fCO2AirWoce=" + fCO2AirWoce.toString() +
+				",\n    deltaXCO2=" + deltaXCO2.toString() +
+				",\n    deltaPCO2=" + deltaPCO2.toString() +
+				",\n    deltaFCO2=" + deltaFCO2.toString() +
 				",\n    woaSss=" + woaSss.toString() +
 				",\n    ncepSlp=" + ncepSlp.toString() +
 				",\n    fCO2FromXCO2TEqu=" + fCO2FromXCO2TEqu.toString() +
@@ -1476,12 +2350,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    deltaT=" + deltaT.toString() +
 				",\n    regionID=" + regionID +
 				",\n    calcSpeed=" + calcSpeed.toString() +
-				",\n    etopo2=" + etopo2.toString() +
+				",\n    etopo2Depth=" + etopo2Depth.toString() +
 				",\n    gvCO2=" + gvCO2.toString() +
 				",\n    distToLand=" + distToLand.toString() +
 				",\n    days1970=" + days1970.toString() +
 				",\n    dayOfYear=" + dayOfYear.toString() +
-				",\n    woceFlag=" + woceFlag.toString() +
 				" ]";
 	}
 
