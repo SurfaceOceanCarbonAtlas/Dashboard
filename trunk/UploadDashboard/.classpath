@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
+	<classpathentry kind="src" path="ingest"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/gwt-crypto-2.3.0.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/tomcat-coyote-7.0.34.jar"/>
@@ -16,5 +17,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/sanitychecker.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/netcdfAll-4.3.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SocatJavaPrograms"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

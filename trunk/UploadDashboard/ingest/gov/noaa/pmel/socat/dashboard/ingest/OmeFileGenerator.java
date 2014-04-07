@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.test;
+package gov.noaa.pmel.socat.dashboard.ingest;
 
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.MetadataFileHandler;
@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -44,8 +44,8 @@ public class OmeFileGenerator {
 		}
 		// Open the file containing the spreadsheet TSV table 
 		File tsvFile = new File(args[0]);
-		String timestamp = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
-									 .format(new Date(tsvFile.lastModified()));
+		String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm"))
+							.format(new Date(tsvFile.lastModified()));
 		String dataline = "";
 		BufferedReader tsvIn = null;
 		try {

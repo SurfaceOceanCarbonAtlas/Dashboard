@@ -79,6 +79,7 @@ public class DashboardCruiseChecker {
 		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST, "pco2water_sst_wet");
 		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fco2water_equ_wet");
 		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST, "fco2water_sst_wet");
+		CHECKER_NAMES.put(DataColumnType.HUMIDITY, "humidity");
 		CHECKER_NAMES.put(DataColumnType.XCO2AIR, "xco2_air");
 		CHECKER_NAMES.put(DataColumnType.PCO2AIR, "pco2_air");
 		CHECKER_NAMES.put(DataColumnType.FCO2AIR, "fco2_air");
@@ -103,9 +104,11 @@ public class DashboardCruiseChecker {
 		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST_WOCE, "pco2water_sst_woce");
 		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU_WOCE, "fco2water_equ_woce");
 		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST_WOCE, "fco2water_sst_woce");
+		CHECKER_NAMES.put(DataColumnType.HUMIDITY_WOCE, "humidity_woce");
 		CHECKER_NAMES.put(DataColumnType.XCO2AIR_WOCE, "xco2_atm_woce");
 		CHECKER_NAMES.put(DataColumnType.PCO2AIR_WOCE, "pco2_atm_woce");
 		CHECKER_NAMES.put(DataColumnType.FCO2AIR_WOCE, "fco2_atm_woce");
+		CHECKER_NAMES.put(DataColumnType.OVERALL_WOCE, "overall_woce");
 	}
 
 	/*
@@ -152,6 +155,7 @@ public class DashboardCruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, DashboardUtils.PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, DashboardUtils.PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.HUMIDITY, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2AIR, DashboardUtils.XCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2AIR, DashboardUtils.PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2AIR, DashboardUtils.FCO2_UNITS);
@@ -176,9 +180,11 @@ public class DashboardCruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.HUMIDITY_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2AIR_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.PCO2AIR_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.FCO2AIR_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.OVERALL_WOCE, DashboardUtils.NO_UNITS);
 	}
 
 	/**
@@ -370,6 +376,7 @@ public class DashboardCruiseChecker {
 					  colType.equals(DataColumnType.PCO2WATER_SST) ||
 					  colType.equals(DataColumnType.FCO2WATER_EQU) ||
 					  colType.equals(DataColumnType.FCO2WATER_SST) || 
+					  colType.equals(DataColumnType.HUMIDITY) || 
 					  colType.equals(DataColumnType.XCO2AIR) || 
 					  colType.equals(DataColumnType.PCO2AIR) || 
 					  colType.equals(DataColumnType.FCO2AIR) || 
@@ -394,9 +401,11 @@ public class DashboardCruiseChecker {
 					  colType.equals(DataColumnType.PCO2WATER_SST_WOCE) ||
 					  colType.equals(DataColumnType.FCO2WATER_EQU_WOCE) ||
 					  colType.equals(DataColumnType.FCO2WATER_SST_WOCE) ||
+					  colType.equals(DataColumnType.HUMIDITY_WOCE) ||
 					  colType.equals(DataColumnType.XCO2AIR_WOCE) ||
 					  colType.equals(DataColumnType.PCO2AIR_WOCE) ||
-					  colType.equals(DataColumnType.FCO2AIR_WOCE) ) {
+					  colType.equals(DataColumnType.FCO2AIR_WOCE) ||
+					  colType.equals(DataColumnType.OVERALL_WOCE) ) {
 				// Element specifying the units of the column
 				Element unitsElement = new Element(ColumnSpec.INPUT_UNITS_ELEMENT_NAME);
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
@@ -775,6 +784,7 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.PCO2WATER_SST) || 
 						  colType.equals(DataColumnType.FCO2WATER_EQU) || 
 						  colType.equals(DataColumnType.FCO2WATER_SST) || 
+						  colType.equals(DataColumnType.HUMIDITY) || 
 						  colType.equals(DataColumnType.XCO2AIR) || 
 						  colType.equals(DataColumnType.PCO2AIR) || 
 						  colType.equals(DataColumnType.FCO2AIR) || 
@@ -808,9 +818,11 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.PCO2WATER_SST_WOCE) || 
 						  colType.equals(DataColumnType.FCO2WATER_EQU_WOCE) || 
 						  colType.equals(DataColumnType.FCO2WATER_SST_WOCE) || 
+						  colType.equals(DataColumnType.HUMIDITY_WOCE) || 
 						  colType.equals(DataColumnType.XCO2AIR_WOCE) || 
 						  colType.equals(DataColumnType.PCO2AIR_WOCE) || 
 						  colType.equals(DataColumnType.FCO2AIR_WOCE) || 
+						  colType.equals(DataColumnType.OVERALL_WOCE) || 
 						  colType.equals(DataColumnType.COMMENT) ) {
 					// Column types that are never modified by the sanity checker
 					;
