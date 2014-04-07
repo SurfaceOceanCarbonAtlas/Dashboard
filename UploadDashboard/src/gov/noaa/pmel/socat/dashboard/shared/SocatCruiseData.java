@@ -66,6 +66,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double pCO2WaterTEqu;
 	Double fCO2WaterSst;
 	Double fCO2WaterTEqu;
+	// Humidity of the air
+	Double humidity;
 	// Three possible air CO2 measurements reported;
 	// typically one or none actually reported
 	Double xCO2Air;
@@ -78,7 +80,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	// Wind speed in m/s
 	Double windSpeedTrue;
 	Double windSpeedRelative;
-	// Wind direction is degrees clockwise from N
+	// Wind direction in degrees clockwise from N
 	Double windDirectionTrue;
 	Double windDirectionRelative;
 	// WOCE flags
@@ -97,9 +99,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Character pCO2WaterSSTWoce;
 	Character fCO2WaterEquWoce;
 	Character fCO2WaterSSTWoce;
+	Character humidityWoce;
 	Character xCO2AirWoce;
 	Character pCO2AirWoce;
 	Character fCO2AirWoce;
+	Character overallWoce;
 
 	// The following are provided by Ferret calculations using the above data
 
@@ -172,6 +176,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		fCO2WaterTEqu = FP_MISSING_VALUE;
 		pCO2WaterSst = FP_MISSING_VALUE;
 		pCO2WaterTEqu = FP_MISSING_VALUE;
+		humidity = FP_MISSING_VALUE;
 		xCO2Air = FP_MISSING_VALUE;
 		pCO2Air = FP_MISSING_VALUE;
 		fCO2Air = FP_MISSING_VALUE;
@@ -196,9 +201,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		pCO2WaterSSTWoce = CHAR_MISSING_VALUE;
 		fCO2WaterEquWoce = CHAR_MISSING_VALUE;
 		fCO2WaterSSTWoce = CHAR_MISSING_VALUE;
+		humidityWoce = CHAR_MISSING_VALUE;
 		xCO2AirWoce = CHAR_MISSING_VALUE;
 		pCO2AirWoce = CHAR_MISSING_VALUE;
 		fCO2AirWoce = CHAR_MISSING_VALUE;
+		overallWoce = CHAR_MISSING_VALUE;
 		deltaXCO2 = FP_MISSING_VALUE;
 		deltaPCO2 = FP_MISSING_VALUE;
 		deltaFCO2 = FP_MISSING_VALUE;
@@ -338,6 +345,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				else if ( type.equals(DataColumnType.FCO2WATER_SST) ) {
 					this.fCO2WaterSst = Double.valueOf(value);
 				}
+				else if ( type.equals(DataColumnType.HUMIDITY) ) {
+					this.humidity = Double.valueOf(value);
+				}
 				else if ( type.equals(DataColumnType.XCO2AIR) ) {
 					this.xCO2Air = Double.valueOf(value);
 				}
@@ -410,6 +420,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				else if ( type.equals(DataColumnType.FCO2WATER_SST_WOCE) ) {
 					this.fCO2WaterSSTWoce = value.charAt(0);
 				}
+				else if ( type.equals(DataColumnType.HUMIDITY_WOCE) ) {
+					this.humidityWoce = value.charAt(0);
+				}
 				else if ( type.equals(DataColumnType.XCO2AIR_WOCE) ) {
 					this.xCO2AirWoce = value.charAt(0);
 				}
@@ -418,6 +431,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				}
 				else if ( type.equals(DataColumnType.FCO2AIR_WOCE) ) {
 					this.fCO2AirWoce = value.charAt(0);
+				}
+				else if ( type.equals(DataColumnType.OVERALL_WOCE) ) {
+					this.overallWoce = value.charAt(0);
 				}
 				else {
 					throw new IllegalArgumentException(
@@ -886,6 +902,27 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			this.pCO2WaterTEqu = FP_MISSING_VALUE;
 		else
 			this.pCO2WaterTEqu = pCO2WaterTEqu;
+	}
+
+	/**
+	 * @return 
+	 * 		the humidity;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getHumidity() {
+		return humidity;
+	}
+
+	/**
+	 * @param humidity 
+	 * 		the humidity to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setHumidity(Double humidity) {
+		if ( humidity == null )
+			this.humidity = FP_MISSING_VALUE;
+		else
+			this.humidity = humidity;
 	}
 
 	/**
@@ -1394,6 +1431,27 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the humidity WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getHumidityWoce() {
+		return humidityWoce;
+	}
+
+	/**
+	 * @param humidityWoce
+	 * 		the humidity WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setHumidityWoce(Character humidityWoce) {
+		if ( humidityWoce == null )
+			this.humidityWoce = CHAR_MISSING_VALUE;
+		else
+			this.humidityWoce = humidityWoce;
+	}
+
+	/**
+	 * @return 
 	 * 		the xCO2Air WOCE flag;
 	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
 	 */
@@ -1446,13 +1504,34 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param fCO2AirWoce 
 	 * 		the fCO2Air WOCE flag to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
 	 */
 	public void setFCO2AirWoce(Character fCO2AirWoce) {
 		if ( fCO2AirWoce == null )
 			this.fCO2AirWoce = CHAR_MISSING_VALUE;
 		else
 			this.fCO2AirWoce = fCO2AirWoce;
+	}
+
+	/**
+	 * @return 
+	 * 		the overall WOCE flag;
+	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 */
+	public Character getOverallWoce() {
+		return overallWoce;
+	}
+
+	/**
+	 * @param overallWoce 
+	 * 		the overall WOCE flag to set;
+	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setOverallWoce(Character overallWoce) {
+		if ( overallWoce == null )
+			this.overallWoce = CHAR_MISSING_VALUE;
+		else
+			this.overallWoce = overallWoce;
 	}
 
 	/**
@@ -2090,9 +2169,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		result = result * prime + pCO2WaterSSTWoce.hashCode();
 		result = result * prime + fCO2WaterEquWoce.hashCode();
 		result = result * prime + fCO2WaterSSTWoce.hashCode();
+		result = result * prime + humidityWoce.hashCode();
 		result = result * prime + xCO2AirWoce.hashCode();
 		result = result * prime + pCO2AirWoce.hashCode();
 		result = result * prime + fCO2AirWoce.hashCode();
+		result = result * prime + overallWoce.hashCode();
 		result = result * prime + regionID.hashCode();
 		return result;
 	}
@@ -2153,11 +2234,15 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! fCO2WaterSSTWoce.equals(other.fCO2WaterSSTWoce) ) 
 			return false;
+		if ( ! humidityWoce.equals(other.humidityWoce) ) 
+			return false;
 		if ( ! xCO2AirWoce.equals(other.xCO2AirWoce) ) 
 			return false;
 		if ( ! pCO2AirWoce.equals(other.pCO2AirWoce) ) 
 			return false;
 		if ( ! fCO2AirWoce.equals(other.fCO2AirWoce) ) 
+			return false;
+		if ( ! overallWoce.equals(other.overallWoce) ) 
 			return false;
 		if ( ! regionID.equals(other.regionID) )
 			return false;
@@ -2200,6 +2285,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		if ( ! DashboardUtils.closeTo(fCO2WaterSst, other.fCO2WaterSst, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(fCO2WaterTEqu, other.fCO2WaterTEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(humidity, other.humidity, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(xCO2Air, other.xCO2Air, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -2299,6 +2386,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    pCO2WaterTEqu=" + pCO2WaterTEqu.toString() +
 				",\n    fCO2WaterSst=" + fCO2WaterSst.toString() +
 				",\n    fCO2WaterTEqu=" + fCO2WaterTEqu.toString() +
+				",\n    humidity=" + humidity.toString() +
 				",\n    xCO2Air=" + xCO2Air.toString() +
 				",\n    pCO2Air=" + pCO2Air.toString() +
 				",\n    fCO2Air=" + fCO2Air.toString() +
@@ -2323,9 +2411,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    pCO2WaterSSTWoce=" + pCO2WaterSSTWoce.toString() +
 				",\n    fCO2WaterEquWoce=" + fCO2WaterEquWoce.toString() +
 				",\n    fCO2WaterSSTWoce=" + fCO2WaterSSTWoce.toString() +
+				",\n    humidityWoce=" + humidityWoce.toString() +
 				",\n    xCO2AirWoce=" + xCO2AirWoce.toString() +
 				",\n    pCO2AirWoce=" + pCO2AirWoce.toString() +
 				",\n    fCO2AirWoce=" + fCO2AirWoce.toString() +
+				",\n    overallWoce=" + overallWoce.toString() +
 				",\n    deltaXCO2=" + deltaXCO2.toString() +
 				",\n    deltaPCO2=" + deltaPCO2.toString() +
 				",\n    deltaFCO2=" + deltaFCO2.toString() +

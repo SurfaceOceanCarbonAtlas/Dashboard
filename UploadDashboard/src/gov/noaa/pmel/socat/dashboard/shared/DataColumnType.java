@@ -58,6 +58,7 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	PCO2WATER_SST, 
 	FCO2WATER_EQU, 
 	FCO2WATER_SST, 
+	HUMIDITY,
 	XCO2AIR, 
 	PCO2AIR, 
 	FCO2AIR, 
@@ -84,9 +85,11 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	PCO2WATER_SST_WOCE,
 	FCO2WATER_EQU_WOCE,
 	FCO2WATER_SST_WOCE,
+	HUMIDITY_WOCE,
 	XCO2AIR_WOCE, 
 	PCO2AIR_WOCE, 
 	FCO2AIR_WOCE, 
+	OVERALL_WOCE,
 	
 	/**
 	 * COMMENT is a user-provided comment about this data point measurements,
