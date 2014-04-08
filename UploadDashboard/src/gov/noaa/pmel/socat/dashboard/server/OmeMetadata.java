@@ -7,15 +7,12 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
@@ -37,10 +34,13 @@ public class OmeMetadata extends DashboardMetadata {
 	// TODO: add more fields when they are identified in the OME XML file.
 
 	/**
-	 * Creates an empty OME metadata document
+	 * Creates an empty OME metadata document; 
+	 * only the standard OME filename is assigned.
 	 */
 	public OmeMetadata() {
 		super();
+		filename = OME_FILENAME;
+
 		cruiseName = "";
 		vesselName = "";
 		scienceGroup = "";
@@ -61,19 +61,17 @@ public class OmeMetadata extends DashboardMetadata {
 	 * 		if the contents of the metadata document are not valid
 	 */
 	public OmeMetadata(DashboardMetadata mdata) {
-		// Initialize to an empty OME metadata document
+		// Initialize to an empty OME metadata document with the standard OME filename
 		this();
 
 		if ( mdata == null )
 			throw new IllegalArgumentException("No metadata file given");
+
 		// Copy the expocode, uploadTimestamp, and owner 
 		// from the given DashboardMetadata object
 		expocode = mdata.getExpocode();
 		uploadTimestamp = mdata.getUploadTimestamp();
 		owner = mdata.getOwner();
-
-		// The filename, however, is always the OME filename
-		filename = OME_FILENAME;
 
 		// Read the metadata document as an XML file
 		MetadataFileHandler mdataHandler;
@@ -119,8 +117,11 @@ public class OmeMetadata extends DashboardMetadata {
 	 * 		of column names or if the expocode is not defined
 	 */
 	public OmeMetadata(String[] colNames, String metadataLine, String timestamp) {
-		// Initialize to an empty OME metadata document
+		// Initialize to an empty OME metadata document 
+		// with the standard OME filename and the given timestamp
 		this();
+		uploadTimestamp = timestamp;
+		// Leave the owner blank so anyone can take possession of it
 
 		// Parse the metadata string - split on tabs
 		String[] metaVals = metadataLine.split("\\t", -1);
@@ -185,19 +186,12 @@ public class OmeMetadata extends DashboardMetadata {
 		}
 		if ( expocode.isEmpty() )
 			throw new IllegalArgumentException("Expocode is not given");
-		// Assign the standard OME "upload filename"
-		filename = OME_FILENAME;  
-		// Use the current server time for the upload timestamp
-		uploadTimestamp = timestamp;
-		// Leave the owner blank so anyone can take possession of it
 	}
 
 	/**
 	 * Validates that the expocode given for this metadata object matches the 
-	 * expocode given in the given OME XML document, then assigns cruiseName, 
-	 * vesselName, scienceGroup, and origDataRef from this document.  The 
-	 * metadataHRef, socatDOI, socatHRef, and cruiseFlag are not modified
-	 * by this method.
+	 * expocode given in the given OME XML document, then assigns the fields
+	 * in this object from this document.
 	 * 
 	 * @param omeDoc
 	 * 		OME XML Document to use
@@ -361,12 +355,9 @@ public class OmeMetadata extends DashboardMetadata {
 	/**
 	 * Generated an pseudo-OME XML document that contains the contents
 	 * of the fields read by {@link #assignFromOmeXmlDoc(Document)}.
-	 * Fields not read by that methos are not saved in the document
+	 * Fields not read by that method are not saved in the document
 	 * produced by this method.
-	 * <b>
-	 * This is intended to be used only for generating pseudo-OME XML 
-	 * metadata documents from Benjamin's metadata spreadsheet TSV table. 
-	 * </b>
+	 * 
 	 * @return
 	 * 		the generated pseudo-OME XML document
 	 */
@@ -423,45 +414,6 @@ public class OmeMetadata extends DashboardMetadata {
 
 		// Return the document created from the root element
 		return new Document(rootElem);
-	}
-
-	/**
-	 * Save the pseudo-OME XML document (created by 
-	 * {@link #createMinimalOmeXmlDoc()}) as the document file for this 
-	 * metadata.  The parent directory for this file is expected to exist 
-	 * and this will overwrite any existing metadata file.
-	 * <b>
-	 * This is intended to be used only for generating pseudo-OME XML 
-	 * metadata documents from Benjamin's metadata spreadsheet TSV table. 
-	 * </b>
-	 * @throws IOException
-	 * 		if opening for writing, or writing to, the metadata document 
-	 * 		file generates one
-	 * @throws IllegalArgumentException
-	 * 		if the expocode or uploadFilename in this object is invalid
-	 */
-	public void saveAsMinimalOmeXmlDoc() 
-							throws IOException, IllegalArgumentException {
-		// Get the metadata document file
-		MetadataFileHandler mdataHandler;
-		try {
-			mdataHandler = DashboardDataStore.get().getMetadataFileHandler();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the metadata handler");
-		}
-		File mdataFile = mdataHandler.getMetadataFile(expocode, filename);
-
-		// Generate the pseudo-OME XML document
-		Document omeDoc = createMinimalOmeXmlDoc();
-
-		// Save the XML document to the metadata document file
-		FileOutputStream out = new FileOutputStream(mdataFile);
-		try {
-			(new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, out);
-		} finally {
-			out.close();
-		}
 	}
 
 	/**
