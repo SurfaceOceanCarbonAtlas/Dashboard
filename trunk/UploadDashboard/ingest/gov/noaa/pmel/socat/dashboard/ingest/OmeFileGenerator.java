@@ -69,18 +69,11 @@ public class OmeFileGenerator {
 				while ( dataline != null ) {
 					// Get the OME metadata from the metadata line
 					OmeMetadata omeMData = new OmeMetadata(headers, dataline, timestamp);
-					// Get the abstract name of the OME XML file to be created
-					File omeFile = mdataHandler.getMetadataFile(
-							omeMData.getExpocode(), OmeMetadata.OME_FILENAME);
-					// Make sure the parent directory for the OME XML metadata exists
-					File parentFile = omeFile.getParentFile();
-					if ( ! parentFile.exists() )
-						if ( ! parentFile.mkdirs() ) 
-							throw new IOException("Unable to create directory " + parentFile.getPath());
-					// Save the minimal OME XML metadata file; not checked in 
-					omeMData.saveAsMinimalOmeXmlDoc();
-					// Create the info file for this metadata file; not checked in
+					// Create the info file for this metadata file; not checked in.
+					// This creates the parent directory if it does not exist.
 					mdataHandler.saveMetadataInfo(omeMData, null);
+					// Save the minimal OME XML metadata file; not checked in 
+					mdataHandler.saveAsMinimalOmeXmlDoc(omeMData, null);
 					// Get the next metadata line
 					dataline = tsvIn.readLine();
 				}
@@ -91,7 +84,7 @@ public class OmeFileGenerator {
 			System.err.println("IO Problems: " + ex.getMessage());
 			System.exit(1);
 		} catch (IllegalArgumentException ex) {
-			System.err.println("Invalid metadata line: " + dataline + 
+			System.err.println("Problems with: " + dataline + 
 					"\n    " + ex.getMessage());
 			System.exit(1);
 		}

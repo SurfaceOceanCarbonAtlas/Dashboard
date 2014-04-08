@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.tmatesoft.svn.core.SVNException;
 
 /**
@@ -483,6 +486,64 @@ public class MetadataFileHandler extends VersionedFileHandler {
 				throw new IllegalArgumentException(
 						"Unable to delete metadata file " + metadataFile.getPath());
 			}
+		}
+	}
+
+	/**
+	 * Save the pseudo-OME XML document created by {@link #createMinimalOmeXmlDoc()} 
+	 * from the given OmeDocument as the document file for this metadata.  
+	 * The parent directory for this file is expected to exist and this method will 
+	 * overwrite any existing OME metadata file.
+	 * 
+	 * @param mdata
+	 * 		OME metadata to save as a pseudo-OME XML document
+	 * @param message
+	 * 		version control commit message; if null, the commit is not
+	 * 		performed
+	 * @throws IllegalArgumentException
+	 * 		if the expocode or uploadFilename in this object is invalid, or
+	 * 		writing the metadata document file generates one.
+	 */
+	public void saveAsMinimalOmeXmlDoc(OmeMetadata mdata, String message) 
+											throws IllegalArgumentException {
+		// Get the metadata document file
+		MetadataFileHandler mdataHandler;
+		try {
+			mdataHandler = DashboardDataStore.get().getMetadataFileHandler();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the metadata handler");
+		}
+		File mdataFile = mdataHandler.getMetadataFile(mdata.getExpocode(), 
+													  mdata.getFilename());
+
+		// Generate the pseudo-OME XML document
+		Document omeDoc = mdata.createMinimalOmeXmlDoc();
+
+		// Save the XML document to the metadata document file
+		try {
+			FileOutputStream out = new FileOutputStream(mdataFile);
+			try {
+				(new XMLOutputter(Format.getPrettyFormat())).output(omeDoc, out);
+			} finally {
+				out.close();
+			}
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Problems writing the OME metadata document: " +
+					ex.getMessage());
+		}
+
+		if ( (message == null) || message.trim().isEmpty() )
+			return;
+
+		// Submit the updated information file to version control
+		try {
+			commitVersion(mdataFile, message);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems committing updated pseudo-OME metadata information " + 
+					mdataFile.getPath() + ":\n    " + ex.getMessage());
 		}
 	}
 

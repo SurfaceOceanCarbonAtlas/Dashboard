@@ -8,14 +8,17 @@ import gov.noaa.pmel.socat.SocatDataValues;
 import gov.noaa.pmel.socat.SocatLogFiles;
 import gov.noaa.pmel.socat.SocatMetaValues;
 import gov.noaa.pmel.socat.SocatUtils;
+import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -33,6 +36,8 @@ public class Socat2Transfer {
 	SocatLogFiles logFiles;
 	SocatCruises socat2Cruises;
 	SimpleDateFormat timestamper;
+	CruiseFileHandler cruiseHandler;
+	MetadataFileHandler metadataHandler;
 
 	/**
 	 * @param catConn
@@ -41,12 +46,17 @@ public class Socat2Transfer {
 	 * 		log messages here
 	 * @throws SQLException
 	 * 		if unable to create a PreparedStatement using this connection 
+	 * @throws IOException 
+	 * 		if unable to obtain the Dashboard data store
 	 */
 	public Socat2Transfer(Connection catConn, SocatLogFiles logFiles) 
-													throws SQLException {
+										throws SQLException, IOException {
 		this.logFiles = logFiles;
 		socat2Cruises = new SocatCruises(catConn, "metadata", "data", "WOCE_flags");
 		timestamper = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		DashboardDataStore dataStore = DashboardDataStore.get();
+		cruiseHandler = dataStore.getCruiseFileHandler();
+		metadataHandler = dataStore.getMetadataFileHandler();
 	}
 
 	/**
@@ -62,8 +72,11 @@ public class Socat2Transfer {
 	 * 		the cruise QC flag, or null if there was an error
 	 * @throws SQLException
 	 * 		if reading from the v2 database throws one
+	 * @throws IllegalArgumentException 
+	 * 		if there are problems saving the dashboard files
 	 */
-	public String transferV2DataToDashboard(String expocode, String owner) throws SQLException {
+	public String transferV2DataToDashboard(String expocode, String owner) 
+							throws SQLException, IllegalArgumentException {
 		// Read the cruise data from the v2 database
 		SocatMetaValues socat2Metadata;
 		try {
@@ -85,7 +98,6 @@ public class Socat2Transfer {
 		OmeMetadata cruiseMetadata = new OmeMetadata();
 		cruiseMetadata.setExpocode(expocode);
 		cruiseMetadata.setOwner(owner);
-		cruiseMetadata.setFilename(DashboardMetadata.OME_FILENAME);
 		cruiseMetadata.setUploadTimestamp(timestamp);
 		cruiseMetadata.setCruiseName(socat2Metadata.getCruiseName());
 		cruiseMetadata.setVesselName(socat2Metadata.getVesselName());
@@ -253,94 +265,94 @@ public class Socat2Transfer {
 			ArrayList<String> thisData = new ArrayList<String>(columnTypes.size());
 			for ( DataColumnType type : columnTypes ) {
 				if ( type.equals(DataColumnType.YEAR) ) {
-					thisData.add(dataVals.getYr().toString());
+					thisData.add(stringFromSocat2Int(dataVals.getYr()));
 				}
 				else if ( type.equals(DataColumnType.MONTH) ) {
-					thisData.add(dataVals.getMon().toString());
+					thisData.add(stringFromSocat2Int(dataVals.getMon()));
 				}
 				else if ( type.equals(DataColumnType.DAY) ) {
-					thisData.add(dataVals.getDay().toString());
+					thisData.add(stringFromSocat2Int(dataVals.getDay()));
 				}
 				else if ( type.equals(DataColumnType.HOUR) ) {
-					thisData.add(dataVals.getHh().toString());
+					thisData.add(stringFromSocat2Int(dataVals.getHh()));
 				}
 				else if ( type.equals(DataColumnType.MINUTE) ) {
-					thisData.add(dataVals.getMm().toString());
+					thisData.add(stringFromSocat2Int(dataVals.getMm()));
 				}
 				else if ( type.equals(DataColumnType.SECOND) ) {
-					thisData.add(dataVals.getSs().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getSs()));
 				}
 				else if ( type.equals(DataColumnType.LONGITUDE) ) {
-					thisData.add(dataVals.getLongitude().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getLongitude()));
 				}
 				else if ( type.equals(DataColumnType.LATITUDE) ) {
-					thisData.add(dataVals.getLatitude().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getLatitude()));
 				}
 				else if ( type.equals(DataColumnType.SAMPLE_DEPTH) ) {
-					thisData.add(dataVals.getDepth().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getDepth()));
 				}
 				else if ( type.equals(DataColumnType.SALINITY) ) {
-					thisData.add(dataVals.getSal().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getSal()));
 				}
 				else if ( type.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) ) {
-					thisData.add(dataVals.getTemp().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getTemp()));
 				}
 				else if ( type.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) ) {
-					thisData.add(dataVals.getTemperature_equi().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getTemperature_equi()));
 				}
 				else if ( type.equals(DataColumnType.SEA_LEVEL_PRESSURE) ) {
-					thisData.add(dataVals.getPressure_atm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getPressure_atm()));
 				}
 				else if ( type.equals(DataColumnType.EQUILIBRATOR_PRESSURE) ) {
-					thisData.add(dataVals.getPressure_equi().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getPressure_equi()));
 				}
 				else if ( type.equals(DataColumnType.XCO2WATER_SST) ) {
-					thisData.add(dataVals.getxCO2_water_sst_dry_ppm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getxCO2_water_sst_dry_ppm()));
 				}
 				else if ( type.equals(DataColumnType.XCO2WATER_EQU) ) {
-					thisData.add(dataVals.getxCO2_water_equi_temp_dry_ppm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getxCO2_water_equi_temp_dry_ppm()));
 				}
 				else if ( type.equals(DataColumnType.PCO2WATER_SST) ) {
-					thisData.add(dataVals.getpCO2_water_sst_100humidity_uatm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getpCO2_water_sst_100humidity_uatm()));
 				}
 				else if ( type.equals(DataColumnType.PCO2WATER_EQU) ) {
-					thisData.add(dataVals.getpCO2_water_equi_temp().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getpCO2_water_equi_temp()));
 				}
 				else if ( type.equals(DataColumnType.FCO2WATER_SST) ) {
-					thisData.add(dataVals.getfCO2_water_sst_100humidity_uatm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getfCO2_water_sst_100humidity_uatm()));
 				}
 				else if ( type.equals(DataColumnType.FCO2WATER_EQU)) {
-					thisData.add(dataVals.getfCO2_water_equi_uatm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getfCO2_water_equi_uatm()));
 				}
 				else if ( type.equals(DataColumnType.HUMIDITY) ) {
-					thisData.add(dataVals.getHumidity().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getHumidity()));
 				}
 				else if ( type.equals(DataColumnType.XCO2AIR) ) {
-					thisData.add(dataVals.getxCO2_atm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getxCO2_atm()));
 				}
 				else if ( type.equals(DataColumnType.PCO2AIR) ) {
-					thisData.add(dataVals.getpCO2_atm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getpCO2_atm()));
 				}
 				else if ( type.equals(DataColumnType.FCO2AIR) ) {
-					thisData.add(dataVals.getfCO2_atm().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getfCO2_atm()));
 				}
 				else if ( type.equals(DataColumnType.SHIP_SPEED) ) {
-					thisData.add(dataVals.getShip_speed().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getShip_speed()));
 				}
 				else if ( type.equals(DataColumnType.SHIP_DIRECTION) ) {
-					thisData.add(dataVals.getShip_direc().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getShip_direc()));
 				}
 				else if ( type.equals(DataColumnType.WIND_SPEED_TRUE) ) {
-					thisData.add(dataVals.getWind_speed_true().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getWind_speed_true()));
 				}
 				else if ( type.equals(DataColumnType.WIND_SPEED_RELATIVE) ) {
-					thisData.add(dataVals.getWind_speed_rel().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getWind_speed_rel()));
 				}
 				else if ( type.equals(DataColumnType.WIND_DIRECTION_TRUE) ) {
-					thisData.add(dataVals.getWind_direc_true().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getWind_direc_true()));
 				}
 				else if ( type.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
-					thisData.add(dataVals.getWind_direc_rel().toString());
+					thisData.add(stringFromSocat2Double(dataVals.getWind_direc_rel()));
 				}
 				else if ( type.equals(DataColumnType.OVERALL_WOCE) ) {
 					short woceFlag = dataVals.getWoceFlag();
@@ -359,9 +371,51 @@ public class Socat2Transfer {
 		}
 		cruiseData.setNumDataRows(dataLists.size());
 
-		// Add the cruise data and metadata to the dashboard
+		// Save the cruise data and metadata to the dashboard repository
+		String commitMessage = "Cruise added from SOCAT v2 database on " + timestamp; 
+		cruiseHandler.saveCruiseInfoToFile(cruiseData, commitMessage);
+		cruiseHandler.saveCruiseDataToFile(cruiseData, commitMessage);
+		metadataHandler.saveMetadataInfo(cruiseMetadata, commitMessage);
+		metadataHandler.saveAsMinimalOmeXmlDoc(cruiseMetadata, commitMessage);
 
 		return qcFlag;
+	}
+
+	/**
+	 * Returns a string representation of a Integer value from the SOCAT v2
+	 * database.  If the value is null or -1, an empty string is returned.
+	 *   
+	 * @param socat2Val
+	 * 		SOCAT v2 value to be used
+	 * @return
+	 * 		string representation of the value
+	 */
+	public static String stringFromSocat2Int(Integer socat2Val) {
+		String valStr;
+		if ( (socat2Val == null) || (socat2Val == -1) )
+			valStr = "";
+		else
+			valStr = socat2Val.toString();
+		return valStr;
+	}
+
+	/**
+	 * Returns a string representation of a Double value from the SOCAT v2
+	 * database.  If the value is null, NaN, or infinite, an empty string
+	 * is returned.
+	 *   
+	 * @param socat2Val
+	 * 		SOCAT v2 value to be used
+	 * @return
+	 * 		string representation of the value
+	 */
+	public static String stringFromSocat2Double(Double socat2Val) {
+		String valStr;
+		if ( (socat2Val == null) || socat2Val.isNaN() || socat2Val.isInfinite() )
+			valStr = "";
+		else
+			valStr = String.format("%#.6f", socat2Val);
+		return valStr;
 	}
 
 	/**
@@ -386,7 +440,7 @@ public class Socat2Transfer {
 				"\n" +
 				"You will be prompted for the database user password.  Results are \n" +
 				"logged to files in logdir, a directory which will be created. \n");
-			return;
+			System.exit(1);
 		}
 
 		String catalog = args[0];
@@ -395,15 +449,15 @@ public class Socat2Transfer {
 		String owner = args[3];
 		File logDir = new File(args[4]);
 
-		SocatLogFiles logFiles;
+		SocatLogFiles logFiles = null;
 		try {
 			logFiles = new SocatLogFiles(logDir);
 		} catch (IllegalArgumentException ex) {
 			System.err.println(ex.getMessage());
-			return;
+			System.exit(1);
 		} catch (FileNotFoundException ex) {
 			System.err.println("Problems opening one of the standard log file: " + ex.getMessage());
-			return;
+			System.exit(1);
 		}
 
 		Connection catConn = null;
@@ -411,7 +465,7 @@ public class Socat2Transfer {
 			catConn = SocatUtils.createSocatConnection(catalog, username);
 			if ( catConn == null ) {
 				// Error message already printed to System.err
-				return;
+				System.exit(1);
 			}
 
 			try {
@@ -419,16 +473,16 @@ public class Socat2Transfer {
 				String qcFlag = transfer.transferV2DataToDashboard(expocode, owner);
 				if ( qcFlag == null ) {
 					// Error message already printed to log files
-					return;
+					System.exit(1);
 				}
 			} catch (SQLException ex) {
 				logFiles.logToSummary(ex.getMessage());
 				logFiles.logToSummary("SQLException raised in Socat2Transfer for catalog " + catalog);
-				return;
+				System.exit(1);
 			} catch (Exception ex) {
 				logFiles.logStackTrace(ex);
 				logFiles.logToSummary("Unexpected Exception raised");
-				return;
+				System.exit(1);
 			}
 
 		} finally {
@@ -442,6 +496,7 @@ public class Socat2Transfer {
 			}
 			logFiles.closeLogFiles();
 		}
+		System.exit(0);
 	}
 
 }

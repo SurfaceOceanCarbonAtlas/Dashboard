@@ -68,9 +68,9 @@ public class DashboardDataStore {
 			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, " +
 					"13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
-			SOCAT_VERSION_NAME_TAG + "=SomeValue \n" +
-			SVN_USER_NAME_TAG + "=SVNUsername" +
-			SVN_PASSWORD_NAME_TAG + "=SVNPasswork" +
+			SOCAT_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			SVN_USER_NAME_TAG + "=SVNUsername \n" +
+			SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +

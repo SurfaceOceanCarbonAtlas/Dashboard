@@ -1003,7 +1003,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					"number of data column units different from " +
 					"number of data column types");
 
-		// Missing valeues for each data column
+		// Missing values for each data column
 		value = cruiseProps.getProperty(MISSING_VALUES_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
