@@ -48,143 +48,110 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 public class DashboardCruiseChecker {
 
 	/**
-	 * Column names used by the sanity checker corresponding the {@link #STD_HEADER_NAMES}
-	 */
-	public static final EnumMap<DataColumnType,String> CHECKER_NAMES = 
-			new EnumMap<DataColumnType,String>(DataColumnType.class);
-	static {
-		CHECKER_NAMES.put(DataColumnType.UNKNOWN, "");
-		CHECKER_NAMES.put(DataColumnType.EXPOCODE, "expocode");
-		CHECKER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
-		CHECKER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
-		CHECKER_NAMES.put(DataColumnType.DATE, "date");
-		CHECKER_NAMES.put(DataColumnType.YEAR, "year");
-		CHECKER_NAMES.put(DataColumnType.MONTH, "month");
-		CHECKER_NAMES.put(DataColumnType.DAY, "day");
-		CHECKER_NAMES.put(DataColumnType.TIME, "time");
-		CHECKER_NAMES.put(DataColumnType.HOUR, "hour");
-		CHECKER_NAMES.put(DataColumnType.MINUTE, "minute");
-		CHECKER_NAMES.put(DataColumnType.SECOND, "second");
-		CHECKER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
-		CHECKER_NAMES.put(DataColumnType.LATITUDE, "latitude");
-		CHECKER_NAMES.put(DataColumnType.SAMPLE_DEPTH, "depth");
-		CHECKER_NAMES.put(DataColumnType.SALINITY, "sal");
-		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "temperature_equi");
-		CHECKER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "temp");
-		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "pressure_equi");
-		CHECKER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "pressure_atm");
-		CHECKER_NAMES.put(DataColumnType.XCO2WATER_EQU, "xco2water_equ_dry");
-		CHECKER_NAMES.put(DataColumnType.XCO2WATER_SST, "xco2water_sst_dry");
-		CHECKER_NAMES.put(DataColumnType.PCO2WATER_EQU, "pco2water_equ_wet");
-		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST, "pco2water_sst_wet");
-		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU, "fco2water_equ_wet");
-		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST, "fco2water_sst_wet");
-		CHECKER_NAMES.put(DataColumnType.HUMIDITY, "humidity");
-		CHECKER_NAMES.put(DataColumnType.XCO2AIR, "xco2_air");
-		CHECKER_NAMES.put(DataColumnType.PCO2AIR, "pco2_air");
-		CHECKER_NAMES.put(DataColumnType.FCO2AIR, "fco2_air");
-		CHECKER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
-		CHECKER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
-		CHECKER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
-		CHECKER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
-		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
-		CHECKER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
-		CHECKER_NAMES.put(DataColumnType.TIMESTAMP_WOCE, "time_woce");
-		CHECKER_NAMES.put(DataColumnType.LONGITUDE_WOCE, "lon_woce");
-		CHECKER_NAMES.put(DataColumnType.LATITUDE_WOCE, "lat_woce");
-		CHECKER_NAMES.put(DataColumnType.DEPTH_WOCE, "depth_woce");
-		CHECKER_NAMES.put(DataColumnType.SALINITY_WOCE, "sal_woce");
-		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE_WOCE, "teq_woce");
-		CHECKER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE_WOCE, "sst_woce");
-		CHECKER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE_WOCE, "peq_woce");
-		CHECKER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE_WOCE, "slp_woce");
-		CHECKER_NAMES.put(DataColumnType.XCO2WATER_EQU_WOCE, "xco2water_equ_woce");
-		CHECKER_NAMES.put(DataColumnType.XCO2WATER_SST_WOCE, "xco2water_sst_woce");
-		CHECKER_NAMES.put(DataColumnType.PCO2WATER_EQU_WOCE, "pco2water_equ_woce");
-		CHECKER_NAMES.put(DataColumnType.PCO2WATER_SST_WOCE, "pco2water_sst_woce");
-		CHECKER_NAMES.put(DataColumnType.FCO2WATER_EQU_WOCE, "fco2water_equ_woce");
-		CHECKER_NAMES.put(DataColumnType.FCO2WATER_SST_WOCE, "fco2water_sst_woce");
-		CHECKER_NAMES.put(DataColumnType.HUMIDITY_WOCE, "humidity_woce");
-		CHECKER_NAMES.put(DataColumnType.XCO2AIR_WOCE, "xco2_atm_woce");
-		CHECKER_NAMES.put(DataColumnType.PCO2AIR_WOCE, "pco2_atm_woce");
-		CHECKER_NAMES.put(DataColumnType.FCO2AIR_WOCE, "fco2_atm_woce");
-		CHECKER_NAMES.put(DataColumnType.OVERALL_WOCE, "overall_woce");
-	}
-
-	/*
-	 * SanityChecker version of the strings for above data units when not the same strings
-	 */
-	private static final ArrayList<String> CHECKER_LONGITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
-	private static final ArrayList<String> CHECKER_LATITUDE_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
-	private static final ArrayList<String> CHECKER_SALINITY_UNITS = new ArrayList<String>(Arrays.asList("psu"));
-	private static final ArrayList<String> CHECKER_TEMPERATURE_UNITS = new ArrayList<String>(Arrays.asList("degC", "Kelvin", "degF"));
-	private static final ArrayList<String> CHECKER_XCO2_UNITS = new ArrayList<String>(Arrays.asList("ppm"));
-	private static final ArrayList<String> CHECKER_DIRECTION_UNITS = new ArrayList<String>(Arrays.asList("decimal_degrees"));
-
-	/**
 	 * Data units used by the sanity checker corresponding to {@link #STD_DATA_UNITS}
 	 */
 	public static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
 			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
 	static {
-		CHECKER_DATA_UNITS.put(DataColumnType.UNKNOWN, DashboardUtils.NO_UNITS);
+		final ArrayList<String> checkerDateUnits = 
+				new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY"));
+		final ArrayList<String> checkerTimeUnits =
+				new ArrayList<String>(Arrays.asList("HH:MM:SS"));
+		final ArrayList<String> checkerLongitudeUnits = 
+				new ArrayList<String>(Arrays.asList("decimal_degrees"));
+		final ArrayList<String> checkerLatitudeUnits = 
+				new ArrayList<String>(Arrays.asList("decimal_degrees"));
+		final ArrayList<String> checkerSalinityUnits = 
+				new ArrayList<String>(Arrays.asList("psu"));
+		final ArrayList<String> checkerTemperatureUnits = 
+				new ArrayList<String>(Arrays.asList("degC", "Kelvin", "degF"));
+		final ArrayList<String> checkerXCO2Units = 
+				new ArrayList<String>(Arrays.asList("ppm"));
+		final ArrayList<String> checkerDirectionUnits = 
+				new ArrayList<String>(Arrays.asList("decimal_degrees"));
+
+		// UNKNOWN should not be processed by the sanity checker
+
 		CHECKER_DATA_UNITS.put(DataColumnType.EXPOCODE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.CRUISE_NAME, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
-		CHECKER_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
-				"YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY")));
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_NAME, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.GROUP_NAME, DashboardUtils.NO_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, checkerDateUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.DATE, checkerDateUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.YEAR, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.MONTH, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.DAY, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.TIME, new ArrayList<String>(Arrays.asList("HH:MM:SS")));
+		CHECKER_DATA_UNITS.put(DataColumnType.TIME, checkerTimeUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.HOUR, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.MINUTE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SECOND, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.LONGITUDE, CHECKER_LONGITUDE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.LATITUDE, CHECKER_LATITUDE_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.DAY_OF_YEAR, DashboardUtils.DAY_OF_YEAR_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.LONGITUDE, checkerLongitudeUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.LATITUDE, checkerLatitudeUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, DashboardUtils.DEPTH_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SALINITY, CHECKER_SALINITY_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, CHECKER_TEMPERATURE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, CHECKER_TEMPERATURE_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SALINITY, checkerSalinityUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, checkerTemperatureUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, checkerTemperatureUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, DashboardUtils.PRESSURE_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, DashboardUtils.PRESSURE_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU, CHECKER_XCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_SST, CHECKER_XCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.HUMIDITY, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2AIR, DashboardUtils.XCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2AIR, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2AIR, DashboardUtils.FCO2_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU, checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST, checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_WATER_TEQU, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_WATER_SST, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_WATER_TEQU, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_WATER_SST, DashboardUtils.PCO2_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM, checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM, DashboardUtils.FCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_XCO2, checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_PCO2, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_FCO2, DashboardUtils.FCO2_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_SPEED, DashboardUtils.SHIP_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, CHECKER_DIRECTION_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, checkerDirectionUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, DashboardUtils.WIND_SPEED_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, DashboardUtils.WIND_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, CHECKER_DIRECTION_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, CHECKER_DIRECTION_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.LONGITUDE_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.LATITUDE_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.DEPTH_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, checkerDirectionUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, checkerDirectionUnits);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.GEOPOSITION_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SALINITY_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE_WOCE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_EQU_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2WATER_SST_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_EQU_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2WATER_SST_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_EQU_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2WATER_SST_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.HUMIDITY_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2AIR_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2AIR_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2AIR_WOCE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.OVERALL_WOCE, DashboardUtils.NO_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_WATER_TEQU_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_WATER_SST_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_WATER_TEQU_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_WATER_SST_WOCE, DashboardUtils.NO_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_XCO2_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_PCO2_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_FCO2_WOCE, DashboardUtils.NO_UNITS);
+
+		CHECKER_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_SPEED_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE_WOCE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE_WOCE, DashboardUtils.NO_UNITS);
+
+		// COMMENT, OTHER, and FCO2_REC_WOCE should not be processed by the sanity checker
 	}
 
 	/**
@@ -362,6 +329,10 @@ public class DashboardCruiseChecker {
 			}
 			else if ( colType.equals(DataColumnType.EXPOCODE) || 
 					  colType.equals(DataColumnType.CRUISE_NAME) || 
+					  colType.equals(DataColumnType.SHIP_NAME) || 
+					  colType.equals(DataColumnType.GROUP_NAME) || 
+
+					  colType.equals(DataColumnType.DAY_OF_YEAR) ||
 					  colType.equals(DataColumnType.LONGITUDE) || 
 					  colType.equals(DataColumnType.LATITUDE) || 
 					  colType.equals(DataColumnType.SAMPLE_DEPTH) || 
@@ -370,42 +341,60 @@ public class DashboardCruiseChecker {
 					  colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) || 
 					  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) || 
 					  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) || 
-					  colType.equals(DataColumnType.XCO2WATER_EQU) ||
-					  colType.equals(DataColumnType.XCO2WATER_SST) ||
-					  colType.equals(DataColumnType.PCO2WATER_EQU) ||
-					  colType.equals(DataColumnType.PCO2WATER_SST) ||
-					  colType.equals(DataColumnType.FCO2WATER_EQU) ||
-					  colType.equals(DataColumnType.FCO2WATER_SST) || 
-					  colType.equals(DataColumnType.HUMIDITY) || 
-					  colType.equals(DataColumnType.XCO2AIR) || 
-					  colType.equals(DataColumnType.PCO2AIR) || 
-					  colType.equals(DataColumnType.FCO2AIR) || 
+
+					  colType.equals(DataColumnType.XCO2_WATER_TEQU) ||
+					  colType.equals(DataColumnType.XCO2_WATER_SST) ||
+					  colType.equals(DataColumnType.PCO2_WATER_TEQU) ||
+					  colType.equals(DataColumnType.PCO2_WATER_SST) ||
+					  colType.equals(DataColumnType.FCO2_WATER_TEQU) ||
+					  colType.equals(DataColumnType.FCO2_WATER_SST) || 
+
+					  colType.equals(DataColumnType.XCO2_ATM) || 
+					  colType.equals(DataColumnType.PCO2_ATM) || 
+					  colType.equals(DataColumnType.FCO2_ATM) || 
+					  colType.equals(DataColumnType.DELTA_XCO2) || 
+					  colType.equals(DataColumnType.DELTA_PCO2) || 
+					  colType.equals(DataColumnType.DELTA_FCO2) || 
+
+					  colType.equals(DataColumnType.RELATIVE_HUMIDITY) || 
+					  colType.equals(DataColumnType.SPECIFIC_HUMIDITY) || 
 					  colType.equals(DataColumnType.SHIP_SPEED) || 
 					  colType.equals(DataColumnType.SHIP_DIRECTION) || 
 					  colType.equals(DataColumnType.WIND_SPEED_TRUE) || 
 					  colType.equals(DataColumnType.WIND_SPEED_RELATIVE) || 
 					  colType.equals(DataColumnType.WIND_DIRECTION_TRUE) || 
 					  colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ||
-					  colType.equals(DataColumnType.TIMESTAMP_WOCE) ||
-					  colType.equals(DataColumnType.LONGITUDE_WOCE) ||
-					  colType.equals(DataColumnType.LATITUDE_WOCE) ||
-					  colType.equals(DataColumnType.DEPTH_WOCE) ||
+
+					  colType.equals(DataColumnType.GEOPOSITION_WOCE) ||
+					  colType.equals(DataColumnType.SAMPLE_DEPTH_WOCE) ||
 					  colType.equals(DataColumnType.SALINITY_WOCE) ||
 					  colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE_WOCE) ||
 					  colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE_WOCE) ||
 					  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE_WOCE) ||
 					  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE_WOCE) ||
-					  colType.equals(DataColumnType.XCO2WATER_EQU_WOCE) ||
-					  colType.equals(DataColumnType.XCO2WATER_SST_WOCE) ||
-					  colType.equals(DataColumnType.PCO2WATER_EQU_WOCE) ||
-					  colType.equals(DataColumnType.PCO2WATER_SST_WOCE) ||
-					  colType.equals(DataColumnType.FCO2WATER_EQU_WOCE) ||
-					  colType.equals(DataColumnType.FCO2WATER_SST_WOCE) ||
-					  colType.equals(DataColumnType.HUMIDITY_WOCE) ||
-					  colType.equals(DataColumnType.XCO2AIR_WOCE) ||
-					  colType.equals(DataColumnType.PCO2AIR_WOCE) ||
-					  colType.equals(DataColumnType.FCO2AIR_WOCE) ||
-					  colType.equals(DataColumnType.OVERALL_WOCE) ) {
+
+					  colType.equals(DataColumnType.XCO2_WATER_TEQU_WOCE) ||
+					  colType.equals(DataColumnType.XCO2_WATER_SST_WOCE) ||
+					  colType.equals(DataColumnType.PCO2_WATER_TEQU_WOCE) ||
+					  colType.equals(DataColumnType.PCO2_WATER_SST_WOCE) ||
+					  colType.equals(DataColumnType.FCO2_WATER_TEQU_WOCE) ||
+					  colType.equals(DataColumnType.FCO2_WATER_SST_WOCE) ||
+
+					  colType.equals(DataColumnType.XCO2_ATM_WOCE) ||
+					  colType.equals(DataColumnType.PCO2_ATM_WOCE) ||
+					  colType.equals(DataColumnType.FCO2_ATM_WOCE) ||
+					  colType.equals(DataColumnType.DELTA_XCO2_WOCE) ||
+					  colType.equals(DataColumnType.DELTA_PCO2_WOCE) ||
+					  colType.equals(DataColumnType.DELTA_FCO2_WOCE) ||
+
+					  colType.equals(DataColumnType.RELATIVE_HUMIDITY_WOCE) || 
+					  colType.equals(DataColumnType.SPECIFIC_HUMIDITY_WOCE) || 
+					  colType.equals(DataColumnType.SHIP_SPEED_WOCE) || 
+					  colType.equals(DataColumnType.SHIP_DIRECTION_WOCE) || 
+					  colType.equals(DataColumnType.WIND_SPEED_TRUE_WOCE) || 
+					  colType.equals(DataColumnType.WIND_SPEED_RELATIVE_WOCE) || 
+					  colType.equals(DataColumnType.WIND_DIRECTION_TRUE_WOCE) || 
+					  colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE_WOCE) ) {
 				// Element specifying the units of the column
 				Element unitsElement = new Element(ColumnSpec.INPUT_UNITS_ELEMENT_NAME);
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
@@ -419,7 +408,7 @@ public class DashboardCruiseChecker {
 				// Standard SOCAT column name for the checker
 				Element columnElement = new Element(ColumnSpec.SOCAT_COLUMN_ELEMENT); 
 				columnElement.setAttribute(ColumnSpec.SOCAT_COLUMN_NAME_ATTRIBUTE, 
-						CHECKER_NAMES.get(colType));
+						DashboardUtils.STD_HEADER_NAMES.get(colType));
 				// Add the index and user name element, and the units element
 				columnElement.addContent(userElement);
 				columnElement.addContent(unitsElement);
@@ -434,8 +423,13 @@ public class DashboardCruiseChecker {
 				// Add this column description to the root element
 				rootElement.addContent(columnElement);
 			}
-			else if ( colType.equals(DataColumnType.COMMENT) ) {
+			else if ( colType.equals(DataColumnType.COMMENT) ||
+					  colType.equals(DataColumnType.OTHER) ) {
 				// Unchecked data that is not added to the DSG file
+				;
+			}
+			else if ( colType.equals(DataColumnType.FCO2_REC_WOCE) ) {
+				// Unchecked data that came from SOCAT v2 database
 				;
 			}
 			else {
@@ -772,29 +766,37 @@ public class DashboardCruiseChecker {
 				else if ( colType.equals(DataColumnType.LATITUDE) ) {
 					rowData.set(k, Double.toString(stdVals.getLatitude()));
 				}
-				else if ( colType.equals(DataColumnType.SAMPLE_DEPTH) || 
+				else if ( colType.equals(DataColumnType.DAY_OF_YEAR) || 
+						  colType.equals(DataColumnType.SAMPLE_DEPTH) || 
 						  colType.equals(DataColumnType.SALINITY) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) || 
 						  colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) || 
 						  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) || 
-						  colType.equals(DataColumnType.XCO2WATER_EQU) || 
-						  colType.equals(DataColumnType.XCO2WATER_SST) || 
-						  colType.equals(DataColumnType.PCO2WATER_EQU) || 
-						  colType.equals(DataColumnType.PCO2WATER_SST) || 
-						  colType.equals(DataColumnType.FCO2WATER_EQU) || 
-						  colType.equals(DataColumnType.FCO2WATER_SST) || 
-						  colType.equals(DataColumnType.HUMIDITY) || 
-						  colType.equals(DataColumnType.XCO2AIR) || 
-						  colType.equals(DataColumnType.PCO2AIR) || 
-						  colType.equals(DataColumnType.FCO2AIR) || 
+
+						  colType.equals(DataColumnType.XCO2_WATER_TEQU) || 
+						  colType.equals(DataColumnType.XCO2_WATER_SST) || 
+						  colType.equals(DataColumnType.PCO2_WATER_TEQU) || 
+						  colType.equals(DataColumnType.PCO2_WATER_SST) || 
+						  colType.equals(DataColumnType.FCO2_WATER_TEQU) || 
+						  colType.equals(DataColumnType.FCO2_WATER_SST) || 
+
+						  colType.equals(DataColumnType.XCO2_ATM) || 
+						  colType.equals(DataColumnType.PCO2_ATM) || 
+						  colType.equals(DataColumnType.FCO2_ATM) || 
+						  colType.equals(DataColumnType.DELTA_XCO2) || 
+						  colType.equals(DataColumnType.DELTA_PCO2) || 
+						  colType.equals(DataColumnType.DELTA_FCO2) || 
+
+						  colType.equals(DataColumnType.RELATIVE_HUMIDITY) || 
+						  colType.equals(DataColumnType.SPECIFIC_HUMIDITY) || 
 						  colType.equals(DataColumnType.SHIP_SPEED) || 
 						  colType.equals(DataColumnType.SHIP_DIRECTION) || 
 						  colType.equals(DataColumnType.WIND_SPEED_TRUE) || 
 						  colType.equals(DataColumnType.WIND_SPEED_RELATIVE) || 
 						  colType.equals(DataColumnType.WIND_DIRECTION_TRUE) || 
 						  colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
-					String chkName = CHECKER_NAMES.get(colType);
+					String chkName = DashboardUtils.STD_HEADER_NAMES.get(colType);
 					SocatDataColumn stdCol = stdVals.getColumn(chkName);
 					if ( stdCol == null )
 						throw new NullPointerException("SocatDataColumn not found for " + chkName + " (column type " + colType + ")");
@@ -803,28 +805,45 @@ public class DashboardCruiseChecker {
 				}
 				else if ( colType.equals(DataColumnType.EXPOCODE) || 
 						  colType.equals(DataColumnType.CRUISE_NAME) || 
-						  colType.equals(DataColumnType.TIMESTAMP_WOCE) || 
-						  colType.equals(DataColumnType.LONGITUDE_WOCE) || 
-						  colType.equals(DataColumnType.LATITUDE_WOCE) || 
-						  colType.equals(DataColumnType.DEPTH_WOCE) || 
+						  colType.equals(DataColumnType.SHIP_NAME) || 
+						  colType.equals(DataColumnType.GROUP_NAME) || 
+
+						  colType.equals(DataColumnType.GEOPOSITION_WOCE) || 
+						  colType.equals(DataColumnType.SAMPLE_DEPTH_WOCE) || 
 						  colType.equals(DataColumnType.SALINITY_WOCE) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE_WOCE) || 
 						  colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE_WOCE) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE_WOCE) || 
 						  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE_WOCE) || 
-						  colType.equals(DataColumnType.XCO2WATER_EQU_WOCE) || 
-						  colType.equals(DataColumnType.XCO2WATER_SST_WOCE) || 
-						  colType.equals(DataColumnType.PCO2WATER_EQU_WOCE) || 
-						  colType.equals(DataColumnType.PCO2WATER_SST_WOCE) || 
-						  colType.equals(DataColumnType.FCO2WATER_EQU_WOCE) || 
-						  colType.equals(DataColumnType.FCO2WATER_SST_WOCE) || 
-						  colType.equals(DataColumnType.HUMIDITY_WOCE) || 
-						  colType.equals(DataColumnType.XCO2AIR_WOCE) || 
-						  colType.equals(DataColumnType.PCO2AIR_WOCE) || 
-						  colType.equals(DataColumnType.FCO2AIR_WOCE) || 
-						  colType.equals(DataColumnType.OVERALL_WOCE) || 
-						  colType.equals(DataColumnType.COMMENT) ) {
+
+						  colType.equals(DataColumnType.XCO2_WATER_TEQU_WOCE) || 
+						  colType.equals(DataColumnType.XCO2_WATER_SST_WOCE) || 
+						  colType.equals(DataColumnType.PCO2_WATER_TEQU_WOCE) || 
+						  colType.equals(DataColumnType.PCO2_WATER_SST_WOCE) || 
+						  colType.equals(DataColumnType.FCO2_WATER_TEQU_WOCE) || 
+						  colType.equals(DataColumnType.FCO2_WATER_SST_WOCE) || 
+
+						  colType.equals(DataColumnType.XCO2_ATM_WOCE) || 
+						  colType.equals(DataColumnType.PCO2_ATM_WOCE) || 
+						  colType.equals(DataColumnType.FCO2_ATM_WOCE) || 
+						  colType.equals(DataColumnType.DELTA_XCO2_WOCE) || 
+						  colType.equals(DataColumnType.DELTA_PCO2_WOCE) || 
+						  colType.equals(DataColumnType.DELTA_FCO2_WOCE) || 
+
+						  colType.equals(DataColumnType.RELATIVE_HUMIDITY_WOCE) || 
+						  colType.equals(DataColumnType.SPECIFIC_HUMIDITY_WOCE) || 
+						  colType.equals(DataColumnType.SHIP_SPEED_WOCE) || 
+						  colType.equals(DataColumnType.SHIP_DIRECTION_WOCE) || 
+						  colType.equals(DataColumnType.WIND_SPEED_TRUE_WOCE) || 
+						  colType.equals(DataColumnType.WIND_SPEED_RELATIVE_WOCE) || 
+						  colType.equals(DataColumnType.WIND_DIRECTION_TRUE_WOCE) || 
+						  colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE_WOCE) || 
+
+						  colType.equals(DataColumnType.COMMENT) ||
+						  colType.equals(DataColumnType.OTHER) ||
+						  colType.equals(DataColumnType.FCO2_REC_WOCE) ) {
 					// Column types that are never modified by the sanity checker
+					// They may or may not have been checked.
 					;
 				}
 				else {

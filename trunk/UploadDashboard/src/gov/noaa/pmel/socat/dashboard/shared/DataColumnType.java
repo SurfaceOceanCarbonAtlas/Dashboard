@@ -18,13 +18,23 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	 */
 	UNKNOWN, 
 	/**
-	 * EXPOCODE is the NODC ship code, start date year, month, day 
+	 * EXPOCODE is NODCYYYYMMDD where NODC is the ship code and 
+	 * YYYY-MM-DD is the start date (metadata)
 	 */
 	EXPOCODE,
 	/**
-	 * CRUISE_NAME is the user-provided name for the cruise
+	 * CRUISE_NAME is the user-provided name for the cruise or dataset (metadata)
 	 */
 	CRUISE_NAME,
+	/**
+	 * SHIP_NAME is the name of the ship or vessel (metadata)
+	 */
+	SHIP_NAME,
+	/**
+	 * GROUP_NAME is the user-provided name of the group (metadata)
+	 */
+	GROUP_NAME,
+
 	/**
 	 * TIMESTAMP has both date and time.
 	 */
@@ -43,6 +53,10 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	HOUR, 
 	MINUTE, 
 	SECOND, 
+	/**
+	 * DAY_OF_YEAR is floating point with time
+	 */
+	DAY_OF_YEAR,
 
 	LONGITUDE, 
 	LATITUDE, 
@@ -52,16 +66,23 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	SEA_SURFACE_TEMPERATURE, 
 	EQUILIBRATOR_PRESSURE, 
 	SEA_LEVEL_PRESSURE, 
-	XCO2WATER_EQU, 
-	XCO2WATER_SST, 
-	PCO2WATER_EQU, 
-	PCO2WATER_SST, 
-	FCO2WATER_EQU, 
-	FCO2WATER_SST, 
-	HUMIDITY,
-	XCO2AIR, 
-	PCO2AIR, 
-	FCO2AIR, 
+
+	XCO2_WATER_TEQU, 
+	XCO2_WATER_SST, 
+	PCO2_WATER_TEQU, 
+	PCO2_WATER_SST, 
+	FCO2_WATER_TEQU, 
+	FCO2_WATER_SST, 
+
+	XCO2_ATM, 
+	PCO2_ATM, 
+	FCO2_ATM, 
+	DELTA_XCO2,
+	DELTA_PCO2,
+	DELTA_FCO2,
+
+	RELATIVE_HUMIDITY,
+	SPECIFIC_HUMIDITY,
 	SHIP_SPEED, 
 	SHIP_DIRECTION, 
 	WIND_SPEED_TRUE,
@@ -69,31 +90,58 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	WIND_DIRECTION_TRUE,
 	WIND_DIRECTION_RELATIVE,
 
-	// WOCE flags
-	TIMESTAMP_WOCE,
-	LONGITUDE_WOCE,
-	LATITUDE_WOCE,
-	DEPTH_WOCE,
+	/**
+	 * GEOPOSITION_WOCE is a WOCE flag on the longitude, latitude, date, and time
+	 */
+	GEOPOSITION_WOCE,
+	SAMPLE_DEPTH_WOCE,
 	SALINITY_WOCE,
 	EQUILIBRATOR_TEMPERATURE_WOCE,
 	SEA_SURFACE_TEMPERATURE_WOCE,
 	EQUILIBRATOR_PRESSURE_WOCE,
 	SEA_LEVEL_PRESSURE_WOCE,
-	XCO2WATER_EQU_WOCE,
-	XCO2WATER_SST_WOCE,
-	PCO2WATER_EQU_WOCE,
-	PCO2WATER_SST_WOCE,
-	FCO2WATER_EQU_WOCE,
-	FCO2WATER_SST_WOCE,
-	HUMIDITY_WOCE,
-	XCO2AIR_WOCE, 
-	PCO2AIR_WOCE, 
-	FCO2AIR_WOCE, 
-	OVERALL_WOCE,
+
+	XCO2_WATER_TEQU_WOCE,
+	XCO2_WATER_SST_WOCE,
+	PCO2_WATER_TEQU_WOCE,
+	PCO2_WATER_SST_WOCE,
+	FCO2_WATER_TEQU_WOCE,
+	FCO2_WATER_SST_WOCE,
+
+	XCO2_ATM_WOCE, 
+	PCO2_ATM_WOCE, 
+	FCO2_ATM_WOCE,
+	DELTA_XCO2_WOCE,
+	DELTA_PCO2_WOCE,
+	DELTA_FCO2_WOCE,
+
+	RELATIVE_HUMIDITY_WOCE,
+	SPECIFIC_HUMIDITY_WOCE,
+	SHIP_SPEED_WOCE,
+	SHIP_DIRECTION_WOCE,
+	WIND_SPEED_TRUE_WOCE,
+	WIND_SPEED_RELATIVE_WOCE,
+	WIND_DIRECTION_TRUE_WOCE,
+	WIND_DIRECTION_RELATIVE_WOCE,
 	
 	/**
 	 * COMMENT is a user-provided comment about this data point measurements,
-	 * and will be saved as a WOCE flag comment.
+	 * and (if not empty) will be saved as a WOCE no-flag comment that includes
+	 * the user's column name.  The contents of this column are not validated.
+	 * Multiple columns may have this type.
 	 */
 	COMMENT,
+	/**
+	 * OTHER is for supplementary data in the user's original data file but 
+	 * not part of SOCAT.  A description of each column with this type must 
+	 * be part of the metadata, but the values are not validated or used. 
+	 * Multiple columns may have this type.
+	 */
+	OTHER,
+	/**
+	 * FCO2_REC_WOCE is for transferring the fCO2_rec WOCE flag from SOCAT v2.
+	 * Since fCO2_REC is a computed field and not user-supplied, this type is
+	 * not available for normal user-specification of column types.
+	 */
+	FCO2_REC_WOCE
 }

@@ -8,14 +8,11 @@ import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -520,7 +517,7 @@ public class DashboardDataStore {
 	}
 
 	/**
-	 * Adds the username and password hash to the standard configuration file.
+	 * Prints out the username and password hash for the configuration file.
 	 * 
 	 * @param args
 	 * 		(username)  (password)
@@ -532,7 +529,7 @@ public class DashboardDataStore {
 			System.err.println();
 			System.err.println("arguments:  <username>  <password>");
 			System.err.println();
-			System.err.println("Adds the username and password hash to the standard configuration file");
+			System.err.println("Prints out the username and password hash for the configuration file");
 			System.err.println();
 			System.exit(1);
 		}
@@ -546,14 +543,12 @@ public class DashboardDataStore {
 		try {
 			DashboardDataStore dataStore = DashboardDataStore.get();
 			String computedHash = dataStore.spicedHash(username, passhash);
-			PrintWriter writer = new PrintWriter(
-					new BufferedWriter(new FileWriter(dataStore.configFile, true)));
-			writer.println(AUTHENTICATION_NAME_TAG_PREFIX + username + "=" + computedHash);
-			writer.close();
+			System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + username + "=" + computedHash);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			System.exit(1);
 		}
+		System.exit(0);
 	}
 
 }

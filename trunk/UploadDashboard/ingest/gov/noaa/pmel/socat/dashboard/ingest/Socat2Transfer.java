@@ -127,10 +127,13 @@ public class Socat2Transfer {
 		boolean haspCO2WaterTEqu = false;
 		boolean hasfCO2WaterSst = false;
 		boolean hasfCO2WaterTEqu = false;
-		boolean hasHumidity = false;
 		boolean hasxCO2Air = false;
 		boolean haspCO2Air = false;
 		boolean hasfCO2Air = false;
+		// No delta xCO2 in v2
+		boolean hasDeltaPCO2 = false;
+		boolean hasDeltaFCO2 = false;
+		// Ignore humidity at this time as it is a mix of relative and specific
 		boolean hasShipSpeed = false;
 		boolean hasShipDir = false;
 		boolean hasWindSpeedTrue = false;
@@ -164,14 +167,16 @@ public class Socat2Transfer {
 				hasfCO2WaterSst = true;
 			if ( ! dataVals.getfCO2_water_equi_uatm().isNaN() )
 				hasfCO2WaterTEqu = true;
-			if ( ! dataVals.getHumidity().isNaN() )
-				hasHumidity = true;
 			if ( ! dataVals.getxCO2_atm().isNaN() )
 				hasxCO2Air = true;
 			if ( ! dataVals.getpCO2_atm().isNaN() )
 				haspCO2Air = true;
 			if ( ! dataVals.getfCO2_atm().isNaN() )
 				hasfCO2Air = true;
+			if ( ! dataVals.getDpCO2().isNaN() )
+				hasDeltaPCO2 = true;
+			if ( ! dataVals.getDfCO2().isNaN() )
+				hasDeltaFCO2 = true;
 			if ( ! dataVals.getShip_speed().isNaN() )
 				hasShipSpeed = true;
 			if ( ! dataVals.getShip_direc().isNaN() )
@@ -214,25 +219,27 @@ public class Socat2Transfer {
 		if ( hasPEqu )
 			columnTypes.add(DataColumnType.EQUILIBRATOR_PRESSURE);
 		if ( hasxCO2WaterSst )
-			columnTypes.add(DataColumnType.XCO2WATER_SST);
+			columnTypes.add(DataColumnType.XCO2_WATER_SST);
 		if ( hasxCO2WaterTEqu )
-			columnTypes.add(DataColumnType.XCO2WATER_EQU);
+			columnTypes.add(DataColumnType.XCO2_WATER_TEQU);
 		if ( haspCO2WaterSst )
-			columnTypes.add(DataColumnType.PCO2WATER_SST);
+			columnTypes.add(DataColumnType.PCO2_WATER_SST);
 		if ( haspCO2WaterTEqu )
-			columnTypes.add(DataColumnType.PCO2WATER_EQU);
+			columnTypes.add(DataColumnType.PCO2_WATER_TEQU);
 		if ( hasfCO2WaterSst )
-			columnTypes.add(DataColumnType.FCO2WATER_SST);
+			columnTypes.add(DataColumnType.FCO2_WATER_SST);
 		if ( hasfCO2WaterTEqu )
-			columnTypes.add(DataColumnType.FCO2WATER_EQU);
-		if ( hasHumidity )
-			columnTypes.add(DataColumnType.HUMIDITY);
+			columnTypes.add(DataColumnType.FCO2_WATER_TEQU);
 		if ( hasxCO2Air )
-			columnTypes.add(DataColumnType.XCO2AIR);
+			columnTypes.add(DataColumnType.XCO2_ATM);
 		if ( haspCO2Air )
-			columnTypes.add(DataColumnType.PCO2AIR);
+			columnTypes.add(DataColumnType.PCO2_ATM);
 		if ( hasfCO2Air )
-			columnTypes.add(DataColumnType.FCO2AIR);
+			columnTypes.add(DataColumnType.FCO2_ATM);
+		if ( hasDeltaPCO2 )
+			columnTypes.add(DataColumnType.DELTA_PCO2);
+		if ( hasDeltaFCO2 )
+			columnTypes.add(DataColumnType.DELTA_FCO2);
 		if ( hasShipSpeed )
 			columnTypes.add(DataColumnType.SHIP_SPEED);
 		if ( hasShipDir )
@@ -245,7 +252,6 @@ public class Socat2Transfer {
 			columnTypes.add(DataColumnType.WIND_DIRECTION_TRUE);
 		if ( hasWindDirRel )
 			columnTypes.add(DataColumnType.WIND_DIRECTION_RELATIVE);
-		columnTypes.add(DataColumnType.OVERALL_WOCE);
 
 		ArrayList<String> columnNames = cruiseData.getUserColNames();
 		ArrayList<String> columnUnits = cruiseData.getDataColUnits();
@@ -259,6 +265,13 @@ public class Socat2Transfer {
 			woceThreeRows.add(new HashSet<Integer>());
 			woceFourRows.add(new HashSet<Integer>());
 		}
+
+		columnTypes.add(DataColumnType.FCO2_REC_WOCE);
+		columnNames.add("fCO2_rec_woce");
+		columnUnits.add("");
+		missValues.add("");
+		woceThreeRows.add(new HashSet<Integer>());
+		woceFourRows.add(new HashSet<Integer>());
 
 		ArrayList<ArrayList<String>> dataLists = cruiseData.getDataValues();
 		for ( SocatDataValues dataVals : socat2DataList ) {
@@ -306,35 +319,38 @@ public class Socat2Transfer {
 				else if ( type.equals(DataColumnType.EQUILIBRATOR_PRESSURE) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getPressure_equi()));
 				}
-				else if ( type.equals(DataColumnType.XCO2WATER_SST) ) {
+				else if ( type.equals(DataColumnType.XCO2_WATER_SST) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getxCO2_water_sst_dry_ppm()));
 				}
-				else if ( type.equals(DataColumnType.XCO2WATER_EQU) ) {
+				else if ( type.equals(DataColumnType.XCO2_WATER_TEQU) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getxCO2_water_equi_temp_dry_ppm()));
 				}
-				else if ( type.equals(DataColumnType.PCO2WATER_SST) ) {
+				else if ( type.equals(DataColumnType.PCO2_WATER_SST) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getpCO2_water_sst_100humidity_uatm()));
 				}
-				else if ( type.equals(DataColumnType.PCO2WATER_EQU) ) {
+				else if ( type.equals(DataColumnType.PCO2_WATER_TEQU) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getpCO2_water_equi_temp()));
 				}
-				else if ( type.equals(DataColumnType.FCO2WATER_SST) ) {
+				else if ( type.equals(DataColumnType.FCO2_WATER_SST) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getfCO2_water_sst_100humidity_uatm()));
 				}
-				else if ( type.equals(DataColumnType.FCO2WATER_EQU)) {
+				else if ( type.equals(DataColumnType.FCO2_WATER_TEQU)) {
 					thisData.add(stringFromSocat2Double(dataVals.getfCO2_water_equi_uatm()));
 				}
-				else if ( type.equals(DataColumnType.HUMIDITY) ) {
-					thisData.add(stringFromSocat2Double(dataVals.getHumidity()));
-				}
-				else if ( type.equals(DataColumnType.XCO2AIR) ) {
+				else if ( type.equals(DataColumnType.XCO2_ATM) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getxCO2_atm()));
 				}
-				else if ( type.equals(DataColumnType.PCO2AIR) ) {
+				else if ( type.equals(DataColumnType.PCO2_ATM) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getpCO2_atm()));
 				}
-				else if ( type.equals(DataColumnType.FCO2AIR) ) {
+				else if ( type.equals(DataColumnType.FCO2_ATM) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getfCO2_atm()));
+				}
+				else if ( type.equals(DataColumnType.DELTA_PCO2) ) {
+					thisData.add(stringFromSocat2Double(dataVals.getDpCO2()));
+				}
+				else if ( type.equals(DataColumnType.DELTA_FCO2) ) {
+					thisData.add(stringFromSocat2Double(dataVals.getDfCO2()));
 				}
 				else if ( type.equals(DataColumnType.SHIP_SPEED) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getShip_speed()));
@@ -354,7 +370,7 @@ public class Socat2Transfer {
 				else if ( type.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
 					thisData.add(stringFromSocat2Double(dataVals.getWind_direc_rel()));
 				}
-				else if ( type.equals(DataColumnType.OVERALL_WOCE) ) {
+				else if ( type.equals(DataColumnType.FCO2_REC_WOCE) ) {
 					short woceFlag = dataVals.getWoceFlag();
 					if ( woceFlag == 0 ) {
 						thisData.add("");
