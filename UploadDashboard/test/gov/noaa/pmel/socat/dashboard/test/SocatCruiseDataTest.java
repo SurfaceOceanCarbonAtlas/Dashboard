@@ -34,8 +34,8 @@ public class SocatCruiseDataTest {
 			DataColumnType.LONGITUDE, 
 			DataColumnType.SEA_SURFACE_TEMPERATURE,
 			DataColumnType.SALINITY,
-			DataColumnType.XCO2WATER_SST,
-			DataColumnType.PCO2WATER_EQU,
+			DataColumnType.XCO2_WATER_SST,
+			DataColumnType.PCO2_WATER_TEQU,
 			DataColumnType.SEA_LEVEL_PRESSURE,
 			DataColumnType.SHIP_SPEED));
 	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
@@ -120,41 +120,41 @@ public class SocatCruiseDataTest {
 			assertEquals(EXPECTED_LATITUDES.get(k), dataList.get(k).getLatitude());
 			assertEquals(EXPECTED_LONGITUDES.get(k), dataList.get(k).getLongitude());
 			assertEquals(EXPECTED_SSTS.get(k), dataList.get(k).getSst());
-			assertEquals(EXPECTED_SALS.get(k), dataList.get(k).getSal());
-			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), dataList.get(k).getXCO2WaterSst());
-			assertEquals(EXPECTED_PCO2WATER_EQUS.get(k), dataList.get(k).getPCO2WaterTEqu());
+			assertEquals(EXPECTED_SALS.get(k), dataList.get(k).getSalinity());
+			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), dataList.get(k).getxCO2WaterSst());
+			assertEquals(EXPECTED_PCO2WATER_EQUS.get(k), dataList.get(k).getpCO2WaterTEqu());
 			assertEquals(EXPECTED_SLPS.get(k), dataList.get(k).getSlp());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getSecond());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getSampleDepth());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getTEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getPEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getXCO2WaterTEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2WaterSst());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2WaterTEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getPCO2WaterSst());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).gettEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getpEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getxCO2WaterTEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2WaterSst());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2WaterTEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getpCO2WaterSst());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getWoaSss());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getNcepSlp());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2TEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2Sst());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromPCO2TEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromPCO2Sst());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromFCO2TEqu());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromFCO2Sst());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromPCO2TEquNcep());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromPCO2SstNcep());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2TEquWoa());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2SstWoa());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2TEquNcep());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2SstNcep());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2TEquNcepWoa());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2FromXCO2SstNcepWoa());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getFCO2Rec());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2TEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2Sst());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromPCO2TEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromPCO2Sst());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromFCO2TEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromFCO2Sst());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromPCO2TEquNcep());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromPCO2SstNcep());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2TEquWoa());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2SstWoa());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2TEquNcep());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2SstNcep());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2TEquNcepWoa());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2FromXCO2SstNcepWoa());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getfCO2Rec());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getDeltaT());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getCalcSpeed());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getEtopo2Depth());
-			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getGVCO2());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getGvCO2());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getDistToLand());
-			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataList.get(k).getFCO2Source());
+			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataList.get(k).getfCO2Source());
 			assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, dataList.get(k).getRegionID());
 		}
 	}
@@ -356,15 +356,15 @@ public class SocatCruiseDataTest {
 
 	static final Double T_EQU = 16.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#gettEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#settEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetTEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
-		data.setTEqu(T_EQU);
-		assertEquals(T_EQU, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
+		data.settEqu(T_EQU);
+		assertEquals(T_EQU, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -375,22 +375,22 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setTEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		data.settEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 	}
 
 	static final Double SAL = 31.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSal()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSal(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSalinity()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSalinity(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSal() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		data.setSal(SAL);
-		assertEquals(SAL, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		data.setSalinity(SAL);
+		assertEquals(SAL, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -401,8 +401,8 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setSal(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
+		data.setSalinity(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
 	}
 
 	static final Double P_ATM = 1003.3;
@@ -416,8 +416,8 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
 		data.setSlp(P_ATM);
 		assertEquals(P_ATM, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -434,18 +434,18 @@ public class SocatCruiseDataTest {
 
 	static final Double P_EQU = 1003.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getPEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setPEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getpEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setpEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
-		data.setPEqu(P_EQU);
-		assertEquals(P_EQU, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
+		data.setpEqu(P_EQU);
+		assertEquals(P_EQU, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -456,25 +456,25 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setPEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		data.setpEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 	}
 
 	static final Double X_CO2_WATER_SST = 451.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getXCO2WaterSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setXCO2WaterSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getxCO2WaterSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setxCO2WaterSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetXCO2WaterSst() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		data.setXCO2WaterSst(X_CO2_WATER_SST);
-		assertEquals(X_CO2_WATER_SST, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		data.setxCO2WaterSst(X_CO2_WATER_SST);
+		assertEquals(X_CO2_WATER_SST, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -485,26 +485,26 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setXCO2WaterSst(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
+		data.setxCO2WaterSst(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
 	}
 
 	static final Double X_CO2_WATER_T_EQU = 450.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getXCO2WaterTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setXCO2WaterTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getxCO2WaterTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setxCO2WaterTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetXCO2WaterTEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		data.setXCO2WaterTEqu(X_CO2_WATER_T_EQU);
-		assertEquals(X_CO2_WATER_T_EQU, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		data.setxCO2WaterTEqu(X_CO2_WATER_T_EQU);
+		assertEquals(X_CO2_WATER_T_EQU, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -515,27 +515,27 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setXCO2WaterTEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
+		data.setxCO2WaterTEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
 	}
 
 	static final Double F_CO2_WATER_SST = 451.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2WaterSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2WaterSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2WaterSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2WaterSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2WaterSst() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		data.setFCO2WaterSst(F_CO2_WATER_SST);
-		assertEquals(F_CO2_WATER_SST, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		data.setfCO2WaterSst(F_CO2_WATER_SST);
+		assertEquals(F_CO2_WATER_SST, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -546,28 +546,28 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2WaterSst(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
+		data.setfCO2WaterSst(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
 	}
 
 	static final Double F_CO2_WATER_T_EQU = 451.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2WaterTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2WaterTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2WaterTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2WaterTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2WaterTEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		data.setFCO2WaterTEqu(F_CO2_WATER_T_EQU);
-		assertEquals(F_CO2_WATER_T_EQU, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		data.setfCO2WaterTEqu(F_CO2_WATER_T_EQU);
+		assertEquals(F_CO2_WATER_T_EQU, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -578,29 +578,29 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2WaterTEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
+		data.setfCO2WaterTEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
 	}
 
 	static final Double P_CO2_WATER_SST = 451.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getPCO2WaterSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setPCO2WaterSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getpCO2WaterSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setpCO2WaterSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPCO2WaterSst() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		data.setPCO2WaterSst(P_CO2_WATER_SST);
-		assertEquals(P_CO2_WATER_SST, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		data.setpCO2WaterSst(P_CO2_WATER_SST);
+		assertEquals(P_CO2_WATER_SST, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -611,30 +611,30 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setPCO2WaterSst(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
+		data.setpCO2WaterSst(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
 	}
 
 	static final Double P_CO2_WATER_T_EQU = 451.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getPCO2WaterTEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setPCO2WaterTEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getpCO2WaterTEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setpCO2WaterTEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPCO2WaterTEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		data.setPCO2WaterTEqu(P_CO2_WATER_T_EQU);
-		assertEquals(P_CO2_WATER_T_EQU, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		data.setpCO2WaterTEqu(P_CO2_WATER_T_EQU);
+		assertEquals(P_CO2_WATER_T_EQU, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -645,8 +645,8 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setPCO2WaterTEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
+		data.setpCO2WaterTEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
 	}
 
 	static final Double WOA_SSS = 31.5;
@@ -660,16 +660,16 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
 		data.setWoaSss(WOA_SSS);
 		assertEquals(WOA_SSS, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -696,16 +696,16 @@ public class SocatCruiseDataTest {
 		data.setNcepSlp(NCEP_SLP);
 		assertEquals(NCEP_SLP, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -722,27 +722,27 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU = 452.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
-		data.setFCO2FromXCO2TEqu(F_CO2_FROM_X_CO2_T_EQU);
-		assertEquals(F_CO2_FROM_X_CO2_T_EQU, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
+		data.setfCO2FromXCO2TEqu(F_CO2_FROM_X_CO2_T_EQU);
+		assertEquals(F_CO2_FROM_X_CO2_T_EQU, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -753,34 +753,34 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2TEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		data.setfCO2FromXCO2TEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_SST = 452.1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2Sst() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		data.setFCO2FromXCO2Sst(F_CO2_FROM_X_CO2_SST);
-		assertEquals(F_CO2_FROM_X_CO2_SST, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		data.setfCO2FromXCO2Sst(F_CO2_FROM_X_CO2_SST);
+		assertEquals(F_CO2_FROM_X_CO2_SST, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -791,35 +791,35 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2Sst(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
+		data.setfCO2FromXCO2Sst(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
 	}
 
 	static final Double F_CO2_FROM_P_CO2_T_EQU = 452.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2TEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		data.setFCO2FromPCO2TEqu(F_CO2_FROM_P_CO2_T_EQU);
-		assertEquals(F_CO2_FROM_P_CO2_T_EQU, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		data.setfCO2FromPCO2TEqu(F_CO2_FROM_P_CO2_T_EQU);
+		assertEquals(F_CO2_FROM_P_CO2_T_EQU, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -830,36 +830,36 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromPCO2TEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
+		data.setfCO2FromPCO2TEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
 	}
 
 	static final Double F_CO2_FROM_P_CO2_SST = 452.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2Sst() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		data.setFCO2FromPCO2Sst(F_CO2_FROM_P_CO2_SST);
-		assertEquals(F_CO2_FROM_P_CO2_SST, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		data.setfCO2FromPCO2Sst(F_CO2_FROM_P_CO2_SST);
+		assertEquals(F_CO2_FROM_P_CO2_SST, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -870,37 +870,37 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromPCO2Sst(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
+		data.setfCO2FromPCO2Sst(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
 	}
 
 	static final Double F_CO2_FROM_F_CO2_T_EQU = 452.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromFCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromFCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromFCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromFCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testSetFCO2FromFCO2TEqu() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		data.setFCO2FromFCO2TEqu(F_CO2_FROM_F_CO2_T_EQU);
-		assertEquals(F_CO2_FROM_F_CO2_T_EQU, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		data.setfCO2FromFCO2TEqu(F_CO2_FROM_F_CO2_T_EQU);
+		assertEquals(F_CO2_FROM_F_CO2_T_EQU, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -911,38 +911,38 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromFCO2TEqu(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
+		data.setfCO2FromFCO2TEqu(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
 	}
 
 	static final Double F_CO2_FROM_F_CO2_SST = 452.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromFCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromFCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromFCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromFCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromFCO2Sst() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		data.setFCO2FromFCO2Sst(F_CO2_FROM_F_CO2_SST);
-		assertEquals(F_CO2_FROM_F_CO2_SST, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		data.setfCO2FromFCO2Sst(F_CO2_FROM_F_CO2_SST);
+		assertEquals(F_CO2_FROM_F_CO2_SST, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -953,39 +953,39 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromFCO2Sst(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
+		data.setfCO2FromFCO2Sst(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
 	}
 
 	static final Double F_CO2_FROM_P_CO2_T_EQU_NCEP = 452.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2TEquNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2TEquNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2TEquNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2TEquNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2TEquNcep() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		data.setFCO2FromPCO2TEquNcep(F_CO2_FROM_P_CO2_T_EQU_NCEP);
-		assertEquals(F_CO2_FROM_P_CO2_T_EQU_NCEP, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		data.setfCO2FromPCO2TEquNcep(F_CO2_FROM_P_CO2_T_EQU_NCEP);
+		assertEquals(F_CO2_FROM_P_CO2_T_EQU_NCEP, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -996,40 +996,40 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromPCO2TEquNcep(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
+		data.setfCO2FromPCO2TEquNcep(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
 	}
 
 	static final Double F_CO2_FROM_P_CO2_SST_NCEP = 452.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromPCO2SstNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromPCO2SstNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2SstNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2SstNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2SstNcep() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		data.setFCO2FromPCO2SstNcep(F_CO2_FROM_P_CO2_SST_NCEP);
-		assertEquals(F_CO2_FROM_P_CO2_SST_NCEP, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		data.setfCO2FromPCO2SstNcep(F_CO2_FROM_P_CO2_SST_NCEP);
+		assertEquals(F_CO2_FROM_P_CO2_SST_NCEP, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1040,41 +1040,41 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromPCO2SstNcep(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
+		data.setfCO2FromPCO2SstNcep(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_WOA = 452.8;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEquWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEquWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEquWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEquWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquWoa() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		data.setFCO2FromXCO2TEquWoa(F_CO2_FROM_X_CO2_T_EQU_WOA);
-		assertEquals(F_CO2_FROM_X_CO2_T_EQU_WOA, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		data.setfCO2FromXCO2TEquWoa(F_CO2_FROM_X_CO2_T_EQU_WOA);
+		assertEquals(F_CO2_FROM_X_CO2_T_EQU_WOA, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1085,42 +1085,42 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2TEquWoa(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
+		data.setfCO2FromXCO2TEquWoa(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_SST_WOA = 452.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2SstWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2SstWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2SstWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2SstWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstWoa() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		data.setFCO2FromXCO2SstWoa(F_CO2_FROM_X_CO2_SST_WOA);
-		assertEquals(F_CO2_FROM_X_CO2_SST_WOA, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		data.setfCO2FromXCO2SstWoa(F_CO2_FROM_X_CO2_SST_WOA);
+		assertEquals(F_CO2_FROM_X_CO2_SST_WOA, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1131,43 +1131,43 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2SstWoa(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
+		data.setfCO2FromXCO2SstWoa(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_NCEP = 453.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEquNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEquNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEquNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEquNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquNcsp() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		data.setFCO2FromXCO2TEquNcep(F_CO2_FROM_X_CO2_T_EQU_NCEP);
-		assertEquals(F_CO2_FROM_X_CO2_T_EQU_NCEP, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		data.setfCO2FromXCO2TEquNcep(F_CO2_FROM_X_CO2_T_EQU_NCEP);
+		assertEquals(F_CO2_FROM_X_CO2_T_EQU_NCEP, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1178,44 +1178,44 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2TEquNcep(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
+		data.setfCO2FromXCO2TEquNcep(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_SST_NCEP = 453.1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2SstNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2SstNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2SstNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2SstNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstNcep() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		data.setFCO2FromXCO2SstNcep(F_CO2_FROM_X_CO2_SST_NCEP);
-		assertEquals(F_CO2_FROM_X_CO2_SST_NCEP, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		data.setfCO2FromXCO2SstNcep(F_CO2_FROM_X_CO2_SST_NCEP);
+		assertEquals(F_CO2_FROM_X_CO2_SST_NCEP, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1226,45 +1226,45 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2SstNcep(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
+		data.setfCO2FromXCO2SstNcep(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA = 453.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2TEquNcepWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2TEquNcepWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEquNcepWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEquNcepWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquNcepWoa() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		data.setFCO2FromXCO2TEquNcepWoa(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA);
-		assertEquals(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		data.setfCO2FromXCO2TEquNcepWoa(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA);
+		assertEquals(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1275,46 +1275,46 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2TEquNcepWoa(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
+		data.setfCO2FromXCO2TEquNcepWoa(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
 	}
 
 	static final Double F_CO2_FROM_X_CO2_SST_NCEP_WOA = 453.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2FromXCO2SstNcepWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2FromXCO2SstNcepWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2SstNcepWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2SstNcepWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstNcepWoa() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		data.setFCO2FromXCO2SstNcepWoa(F_CO2_FROM_X_CO2_SST_NCEP_WOA);
-		assertEquals(F_CO2_FROM_X_CO2_SST_NCEP_WOA, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		data.setfCO2FromXCO2SstNcepWoa(F_CO2_FROM_X_CO2_SST_NCEP_WOA);
+		assertEquals(F_CO2_FROM_X_CO2_SST_NCEP_WOA, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1325,47 +1325,47 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2FromXCO2SstNcepWoa(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
+		data.setfCO2FromXCO2SstNcepWoa(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
 	}
 
 	static final Double F_CO2_REC = 453.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2Rec()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2Rec(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2Rec()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2Rec(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2Rec() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		data.setFCO2Rec(F_CO2_REC);
-		assertEquals(F_CO2_REC, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		data.setfCO2Rec(F_CO2_REC);
+		assertEquals(F_CO2_REC, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1376,48 +1376,48 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2Rec(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
+		data.setfCO2Rec(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
 	}
 
 	static final Integer F_CO2_SOURCE = 15;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getFCO2Source()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setFCO2Source(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2Source()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2Source(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetFCO2Source() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		data.setFCO2Source(F_CO2_SOURCE);
-		assertEquals(F_CO2_SOURCE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		data.setfCO2Source(F_CO2_SOURCE);
+		assertEquals(F_CO2_SOURCE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1428,8 +1428,8 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setFCO2Source(null);
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
+		data.setfCO2Source(null);
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
 	}
 
 	static final Double DELTA_T = 0.3;
@@ -1443,34 +1443,34 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		data.setDeltaT(DELTA_T);
 		assertEquals(DELTA_T, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1497,34 +1497,34 @@ public class SocatCruiseDataTest {
 		data.setRegionID(REGION_ID);
 		assertEquals(REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1552,34 +1552,34 @@ public class SocatCruiseDataTest {
 		assertEquals(CALC_SPEED, data.getCalcSpeed());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1608,34 +1608,34 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1652,47 +1652,47 @@ public class SocatCruiseDataTest {
 
 	static final Double GVCO2 = 428.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getGVCO2()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setGVCO2(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getGvCO2()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setGvCO2(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetGVCO2() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGVCO2());
-		data.setGVCO2(GVCO2);
-		assertEquals(GVCO2, data.getGVCO2());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGvCO2());
+		data.setGvCO2(GVCO2);
+		assertEquals(GVCO2, data.getGvCO2());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1703,8 +1703,8 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getDay());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
-		data.setGVCO2(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGVCO2());
+		data.setGvCO2(null);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGvCO2());
 	}
 
 	static final Double DIST_TO_LAND = 232.5;
@@ -1718,39 +1718,39 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDistToLand());
 		data.setDistToLand(DIST_TO_LAND);
 		assertEquals(DIST_TO_LAND, data.getDistToLand());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGVCO2());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGvCO2());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getFCO2Source());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2Rec());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcepWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2SstWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEquWoa());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2SstNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEquNcep());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromFCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromPCO2TEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2Sst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2FromXCO2TEqu());
+		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcepWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2SstWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEquWoa());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2SstNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEquNcep());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromFCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromPCO2TEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2Sst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2FromXCO2TEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getNcepSlp());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getWoaSss());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getFCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterTEqu());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getXCO2WaterSst());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getPEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getpEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSlp());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSal());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.gettEqu());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSst());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getSampleDepth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getLatitude());
@@ -1855,18 +1855,18 @@ public class SocatCruiseDataTest {
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setTEqu(T_EQU);
+		data.settEqu(T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setTEqu(T_EQU);
+		other.settEqu(T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setSal(SAL);
+		data.setSalinity(SAL);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setSal(SAL);
+		other.setSalinity(SAL);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
@@ -1879,58 +1879,58 @@ public class SocatCruiseDataTest {
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setPEqu(P_EQU);
+		data.setpEqu(P_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setPEqu(P_EQU);
+		other.setpEqu(P_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setXCO2WaterSst(X_CO2_WATER_SST);
+		data.setxCO2WaterSst(X_CO2_WATER_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setXCO2WaterSst(X_CO2_WATER_SST);
+		other.setxCO2WaterSst(X_CO2_WATER_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setXCO2WaterTEqu(X_CO2_WATER_T_EQU);
+		data.setxCO2WaterTEqu(X_CO2_WATER_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setXCO2WaterTEqu(X_CO2_WATER_T_EQU);
+		other.setxCO2WaterTEqu(X_CO2_WATER_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2WaterSst(F_CO2_WATER_SST);
+		data.setfCO2WaterSst(F_CO2_WATER_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2WaterSst(F_CO2_WATER_SST);
+		other.setfCO2WaterSst(F_CO2_WATER_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2WaterTEqu(F_CO2_WATER_T_EQU);
+		data.setfCO2WaterTEqu(F_CO2_WATER_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2WaterTEqu(F_CO2_WATER_T_EQU);
+		other.setfCO2WaterTEqu(F_CO2_WATER_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setPCO2WaterSst(P_CO2_WATER_SST);
+		data.setpCO2WaterSst(P_CO2_WATER_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setPCO2WaterSst(P_CO2_WATER_SST);
+		other.setpCO2WaterSst(P_CO2_WATER_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setPCO2WaterTEqu(P_CO2_WATER_T_EQU);
+		data.setpCO2WaterTEqu(P_CO2_WATER_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setPCO2WaterTEqu(P_CO2_WATER_T_EQU);
+		other.setpCO2WaterTEqu(P_CO2_WATER_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
@@ -1951,129 +1951,129 @@ public class SocatCruiseDataTest {
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2TEqu(F_CO2_FROM_X_CO2_T_EQU);
+		data.setfCO2FromXCO2TEqu(F_CO2_FROM_X_CO2_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2TEqu(F_CO2_FROM_X_CO2_T_EQU);
+		other.setfCO2FromXCO2TEqu(F_CO2_FROM_X_CO2_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2Sst(F_CO2_FROM_X_CO2_SST);
+		data.setfCO2FromXCO2Sst(F_CO2_FROM_X_CO2_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2Sst(F_CO2_FROM_X_CO2_SST);
+		other.setfCO2FromXCO2Sst(F_CO2_FROM_X_CO2_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromPCO2TEqu(F_CO2_FROM_P_CO2_T_EQU);
+		data.setfCO2FromPCO2TEqu(F_CO2_FROM_P_CO2_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromPCO2TEqu(F_CO2_FROM_P_CO2_T_EQU);
+		other.setfCO2FromPCO2TEqu(F_CO2_FROM_P_CO2_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromPCO2Sst(F_CO2_FROM_P_CO2_SST);
+		data.setfCO2FromPCO2Sst(F_CO2_FROM_P_CO2_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromPCO2Sst(F_CO2_FROM_P_CO2_SST);
+		other.setfCO2FromPCO2Sst(F_CO2_FROM_P_CO2_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromFCO2TEqu(F_CO2_FROM_F_CO2_T_EQU);
+		data.setfCO2FromFCO2TEqu(F_CO2_FROM_F_CO2_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromFCO2TEqu(F_CO2_FROM_F_CO2_T_EQU);
+		other.setfCO2FromFCO2TEqu(F_CO2_FROM_F_CO2_T_EQU);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromFCO2Sst(F_CO2_FROM_F_CO2_SST);
+		data.setfCO2FromFCO2Sst(F_CO2_FROM_F_CO2_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromFCO2Sst(F_CO2_FROM_F_CO2_SST);
+		other.setfCO2FromFCO2Sst(F_CO2_FROM_F_CO2_SST);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromPCO2TEquNcep(F_CO2_FROM_P_CO2_T_EQU_NCEP);
+		data.setfCO2FromPCO2TEquNcep(F_CO2_FROM_P_CO2_T_EQU_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromPCO2TEquNcep(F_CO2_FROM_P_CO2_T_EQU_NCEP);
+		other.setfCO2FromPCO2TEquNcep(F_CO2_FROM_P_CO2_T_EQU_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromPCO2SstNcep(F_CO2_FROM_P_CO2_SST_NCEP);
+		data.setfCO2FromPCO2SstNcep(F_CO2_FROM_P_CO2_SST_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromPCO2SstNcep(F_CO2_FROM_P_CO2_SST_NCEP);
+		other.setfCO2FromPCO2SstNcep(F_CO2_FROM_P_CO2_SST_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2TEquWoa(F_CO2_FROM_X_CO2_T_EQU_WOA);
+		data.setfCO2FromXCO2TEquWoa(F_CO2_FROM_X_CO2_T_EQU_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2TEquWoa(F_CO2_FROM_X_CO2_T_EQU_WOA);
+		other.setfCO2FromXCO2TEquWoa(F_CO2_FROM_X_CO2_T_EQU_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2SstWoa(F_CO2_FROM_X_CO2_SST_WOA);
+		data.setfCO2FromXCO2SstWoa(F_CO2_FROM_X_CO2_SST_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2SstWoa(F_CO2_FROM_X_CO2_SST_WOA);
+		other.setfCO2FromXCO2SstWoa(F_CO2_FROM_X_CO2_SST_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2TEquNcep(F_CO2_FROM_X_CO2_T_EQU_NCEP);
+		data.setfCO2FromXCO2TEquNcep(F_CO2_FROM_X_CO2_T_EQU_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2TEquNcep(F_CO2_FROM_X_CO2_T_EQU_NCEP);
+		other.setfCO2FromXCO2TEquNcep(F_CO2_FROM_X_CO2_T_EQU_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2SstNcep(F_CO2_FROM_X_CO2_SST_NCEP);
+		data.setfCO2FromXCO2SstNcep(F_CO2_FROM_X_CO2_SST_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2SstNcep(F_CO2_FROM_X_CO2_SST_NCEP);
+		other.setfCO2FromXCO2SstNcep(F_CO2_FROM_X_CO2_SST_NCEP);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2TEquNcepWoa(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA);
+		data.setfCO2FromXCO2TEquNcepWoa(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2TEquNcepWoa(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA);
+		other.setfCO2FromXCO2TEquNcepWoa(F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2FromXCO2SstNcepWoa(F_CO2_FROM_X_CO2_SST_NCEP_WOA);
+		data.setfCO2FromXCO2SstNcepWoa(F_CO2_FROM_X_CO2_SST_NCEP_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2FromXCO2SstNcepWoa(F_CO2_FROM_X_CO2_SST_NCEP_WOA);
+		other.setfCO2FromXCO2SstNcepWoa(F_CO2_FROM_X_CO2_SST_NCEP_WOA);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setFCO2Rec(F_CO2_REC);
+		data.setfCO2Rec(F_CO2_REC);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setFCO2Rec(F_CO2_REC);
+		other.setfCO2Rec(F_CO2_REC);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
-		data.setFCO2Source(F_CO2_SOURCE);
+		data.setfCO2Source(F_CO2_SOURCE);
 		assertFalse( data.hashCode() == other.hashCode() );
 		assertFalse( data.equals(other) );
-		other.setFCO2Source(F_CO2_SOURCE);
+		other.setfCO2Source(F_CO2_SOURCE);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 
@@ -2109,10 +2109,10 @@ public class SocatCruiseDataTest {
 		assertTrue( data.equals(other) );
 
 		// hashCode ignores floating-point values
-		data.setGVCO2(GVCO2);
+		data.setGvCO2(GVCO2);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertFalse( data.equals(other) );
-		other.setGVCO2(GVCO2);
+		other.setGvCO2(GVCO2);
 		assertEquals(data.hashCode(), other.hashCode());
 		assertTrue( data.equals(other) );
 

@@ -12,6 +12,8 @@ import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 import com.google.gwt.cell.client.Cell;
 import com.google.gwt.core.client.GWT;
@@ -89,6 +91,8 @@ public class DataColumnSpecsPage extends Composite {
 	private static final String MISSING_TIME_PIECE_ERROR_MSG =
 			"The data columns identified do not completely specify " +
 			"the time of each measurement";
+	private static final String MULTIPLE_COLUMN_TYPES_ERROR_MSG =
+			"More than one column has the type: ";
 
 	private static final String DEFAULT_SECONDS_WARNING_QUESTION = 
 			"No data columns have been identified providing the seconds " +
@@ -542,12 +546,12 @@ public class DataColumnSpecsPage extends Composite {
 			else if ( colType == DataColumnType.LATITUDE ) {
 				hasLatitude = true;
 			}
-			else if ( (colType == DataColumnType.XCO2WATER_EQU) ||
-					  (colType == DataColumnType.XCO2WATER_SST) ||
-					  (colType == DataColumnType.PCO2WATER_EQU) ||
-					  (colType == DataColumnType.PCO2WATER_SST) ||
-					  (colType == DataColumnType.FCO2WATER_EQU) ||
-					  (colType == DataColumnType.FCO2WATER_SST) ) {
+			else if ( (colType == DataColumnType.XCO2_WATER_TEQU) ||
+					  (colType == DataColumnType.XCO2_WATER_SST) ||
+					  (colType == DataColumnType.PCO2_WATER_TEQU) ||
+					  (colType == DataColumnType.PCO2_WATER_SST) ||
+					  (colType == DataColumnType.FCO2_WATER_TEQU) ||
+					  (colType == DataColumnType.FCO2_WATER_SST) ) {
 				hasco2 = true;
 			}
 			k++;
@@ -608,6 +612,34 @@ public class DataColumnSpecsPage extends Composite {
 		if ( ! (hasHour && hasMinute) ) {
 			// incomplete time given - error
 			SocatUploadDashboard.showMessage(MISSING_TIME_PIECE_ERROR_MSG);
+			return;
+		}
+
+		// Make sure there is no more than one of most column types
+		HashSet<DataColumnType> typeSet = new HashSet<DataColumnType>();
+		TreeSet<DataColumnType> duplicates = new TreeSet<DataColumnType>();
+		for ( DataColumnType colType : cruise.getDataColTypes() ) {
+			if ( colType.equals(DataColumnType.COMMENT) || 
+				 colType.equals(DataColumnType.OTHER) ) {
+				// Multiple COMMENT or OTHER column types are allowed
+				;
+			}
+			else if ( ! typeSet.add(colType) ) {
+				duplicates.add(colType);
+			}
+		}
+		if ( duplicates.size() > 0 ) {
+			String errMsg = MULTIPLE_COLUMN_TYPES_ERROR_MSG;
+			int cnt = 0;
+			for ( DataColumnType colType : duplicates ) {
+				cnt++;
+				if ( (cnt == 5) && (unknownIndices.size() > 5) ) {
+					errMsg += "<li> ... </li>";
+					break;
+				}
+				errMsg += "<li>" + DashboardUtils.STD_HEADER_NAMES.get(colType) + "</li>";
+			}
+			SocatUploadDashboard.showMessage(errMsg);
 			return;
 		}
 

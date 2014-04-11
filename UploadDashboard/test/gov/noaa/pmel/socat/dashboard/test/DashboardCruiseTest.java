@@ -237,7 +237,7 @@ public class DashboardCruiseTest {
 					DataColumnType.SALINITY,
 					DataColumnType.EQUILIBRATOR_TEMPERATURE,
 					DataColumnType.EQUILIBRATOR_PRESSURE,
-					DataColumnType.XCO2WATER_EQU
+					DataColumnType.XCO2_WATER_TEQU
 				));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getDataColTypes().size());
@@ -264,7 +264,7 @@ public class DashboardCruiseTest {
 	@Test
 	public void testSetGetUserColNames() {
 		ArrayList<String> myUserColNames = new ArrayList<String>(
-				Arrays.asList("time", "lon", "lat", "sal", "temp", "pres", "xco2")); 
+				Arrays.asList("time", "lon", "lat", "salinity", "temp", "pres", "xco2")); 
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getUserColNames().size());
 		cruise.setUserColNames(myUserColNames);
@@ -424,10 +424,10 @@ public class DashboardCruiseTest {
 					DataColumnType.SALINITY,
 					DataColumnType.EQUILIBRATOR_TEMPERATURE,
 					DataColumnType.EQUILIBRATOR_PRESSURE,
-					DataColumnType.XCO2WATER_EQU
+					DataColumnType.XCO2_WATER_TEQU
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
-				Arrays.asList("time", "lon", "lat", "sal", "temp", "pres", "xco2")); 
+				Arrays.asList("time", "lon", "lat", "salinity", "temp", "pres", "xco2")); 
 		ArrayList<String> myDataColUnits = new ArrayList<String>(
 				Arrays.asList("UTC", "deg E", "deg N", "PSU", "deg C", "mm Hg", "umol/mol")); 
 		ArrayList<String> myMissingValues = new ArrayList<String>(

@@ -49,36 +49,36 @@ public class SanityCheckerTest {
 						"<input_column index=\"11\">latitude [deg.N]</input_column>" +
 						"<input_units>decimal_degress</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"depth\">" +
+					"<socat_column name=\"sample_depth\">" +
 						"<input_column index=\"12\">sample_depth [m]</input_column>" +
 						"<input_units>meters</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"sal\">" +
-						"<input_column index=\"13\">sal</input_column>" +
+					"<socat_column name=\"salinity\">" +
+						"<input_column index=\"13\">salinity</input_column>" +
 						"<input_units>psu</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"temp\">" +
+					"<socat_column name=\"SST\">" +
 						"<input_column index=\"14\">SST [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"temperature_equi\">" +
+					"<socat_column name=\"T_equ\">" +
 						"<input_column index=\"15\">Tequ [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"pressure_atm\">" +
+					"<socat_column name=\"SLP\">" +
 						"<input_column index=\"16\">PPPP [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"pressure_equi\">" +
+					"<socat_column name=\"P_equ\">" +
 						"<input_column index=\"17\">Pequ [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"xco2water_equ_dry\">" +
-						"<input_column index=\"23\">xCO2water_equ_dry [umol/mol]</input_column>" +
+					"<socat_column name=\"xCO2_water_Tequ_dry\">" +
+						"<input_column index=\"23\">xCO2_water_Tequ_dry [umol/mol]</input_column>" +
 						"<input_units>ppm</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"fco2water_sst_wet\">" +
-						"<input_column index=\"28\">fCO2water_SST_wet [uatm]</input_column>" +
+					"<socat_column name=\"fCO2_water_SST_wet\">" +
+						"<input_column index=\"28\">fCO2_water_SST_wet [uatm]</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +
 					"<date_columns>" +
