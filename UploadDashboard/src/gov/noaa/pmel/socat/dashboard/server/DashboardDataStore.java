@@ -543,9 +543,10 @@ public class DashboardDataStore {
 			 args[0].trim().isEmpty() || 
 			 args[1].trim().isEmpty() ) {
 			System.err.println();
-			System.err.println("arguments:  <username>  <password>");
+			System.err.println("arguments:  username  password");
 			System.err.println();
-			System.err.println("Prints out the username and password hash for the configuration file");
+			System.err.println("Prints out the username and password hash " +
+					"for the dashboard configuration file");
 			System.err.println();
 			System.exit(1);
 		}
