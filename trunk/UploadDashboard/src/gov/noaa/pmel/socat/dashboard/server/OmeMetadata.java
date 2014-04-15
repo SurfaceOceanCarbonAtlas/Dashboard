@@ -573,7 +573,7 @@ public class OmeMetadata extends DashboardMetadata {
 		}
 		if ( ! endDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
 			Element endElem = new Element("End_Date");
-			endElem.addContent(DATE_FORMATTER.format(startDate));
+			endElem.addContent(DATE_FORMATTER.format(endDate));
 			timeElem.addContent(endElem);
 			somethingAdded = true;
 		}

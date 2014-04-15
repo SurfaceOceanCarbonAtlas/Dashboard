@@ -249,7 +249,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param startDate 
+	 * @param beginTime 
 	 * 		the beginning time for the cruise to set;
 	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
 	 */
@@ -270,7 +270,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param endDate 
+	 * @param endTime 
 	 * 		the ending time for the cruise to set;
 	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
 	 */
