@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2220771960303150153L;
+	private static final long serialVersionUID = 3013666093176935461L;
 
 	/**
 	 * Date used as a missing value; 
@@ -37,6 +37,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	String expocode;
 	String cruiseName;
 	String vesselName;
+	String organization;
 	Double westmostLongitude;
 	Double eastmostLongitude;
 	Double southmostLatitude;
@@ -56,6 +57,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		expocode = "";
 		cruiseName = "";
 		vesselName = "";
+		organization = "";
 		westmostLongitude = Double.NaN;
 		eastmostLongitude = Double.NaN;
 		southmostLatitude = Double.NaN;
@@ -71,7 +73,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the expocode associated with this instance;
+	 * 		the expocode;
 	 * 		never null but could be empty if not assigned
 	 */
 	public String getExpocode() {
@@ -92,7 +94,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the cruise name associated with this instance;
+	 * 		the cruise/dataset name;
 	 * 		never null but could be empty if not assigned
 	 */
 	public String getCruiseName() {
@@ -113,7 +115,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the vessel (ship) name associated with this instance; 
+	 * 		the vessel (ship) name; 
 	 * 		never null but could be empty if not assigned
 	 */
 	public String getVesselName() {
@@ -130,6 +132,27 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			this.vesselName = "";
 		else
 			this.vesselName = vesselName;
+	}
+
+	/**
+	 * @return 
+	 * 		the organization/institution;
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getOrganization() {
+		return organization;
+	}
+
+	/**
+	 * @param organization 
+	 * 		the organization/institution to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setOrganization(String organization) {
+		if ( organization == null )
+			this.organization = "";
+		else
+			this.organization = organization;
 	}
 
 	/**
@@ -226,7 +249,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param beginTime 
+	 * @param startDate 
 	 * 		the beginning time for the cruise to set;
 	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
 	 */
@@ -247,7 +270,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param endTime 
+	 * @param endDate 
 	 * 		the ending time for the cruise to set;
 	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
 	 */
@@ -284,7 +307,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		the original data reference associated with this instance; 
 	 * 		never null but could be empty if not assigned
 	 */
-	public String getOrigRef() {
+	public String getOrigDataRef() {
 		return origDataRef;
 	}
 
@@ -392,6 +415,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		int result = expocode.hashCode();
 		result = result * prime + cruiseName.hashCode();
 		result = result * prime + vesselName.hashCode();
+		result = result * prime + organization.hashCode();
 		result = result * prime + beginTime.hashCode();
 		result = result * prime + endTime.hashCode();
 		result = result * prime + scienceGroup.hashCode();
@@ -428,6 +452,9 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			return false;
 
 		if ( ! vesselName.equals(other.vesselName) )
+			return false;
+
+		if ( ! organization.equals(other.organization) )
 			return false;
 
 		if ( ! scienceGroup.equals(other.scienceGroup) )
@@ -467,12 +494,13 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		return "SocatMetadata[ expocode=" + expocode +
 				",\n    cruiseName=" + cruiseName +
 				",\n    vesselName=" + vesselName + 
+				",\n    organization=" + organization + 
 				",\n    westmostLongitude=" + westmostLongitude.toString() + 
 				",\n    eastmostLongitude=" + eastmostLongitude.toString() + 
 				",\n    southmostLatitude=" + southmostLatitude.toString() + 
 				",\n    northmostLatitude=" + northmostLatitude.toString() + 
-				",\n    beginTime=" + beginTime.toString() + 
-				",\n    endTime=" + endTime.toString() + 
+				",\n    startDate=" + beginTime.toString() + 
+				",\n    endDate=" + endTime.toString() + 
 				",\n    scienceGroup=" + scienceGroup + 
 				",\n    origDataRef=" + origDataRef + 
 				",\n    socatDOI=" + socatDOI + 

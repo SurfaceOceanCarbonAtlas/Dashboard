@@ -37,6 +37,8 @@ set mem/siz=300 ! for sampling from etopo2
 
 
 use "($cruise_filename)"
+define symbol keep_history = `..History`
+define symbol keep_conventions = `..conventions`
 
 ! If seconds field is missing, set it to zero.
 
@@ -284,7 +286,7 @@ GO SOCAT3_gvco2
 cancel mode upcase
 
 
-! fCO2 recommended
+! fCO2 recomputed
 let/title="fCO2 Recommended"/units="uatm" fCO2_recommended = fco2_rec
 set var/outtype=($outtype) fCO2_recommended
 define attribute/output fCO2_recommended.ioos_category = "CO2"
@@ -295,8 +297,8 @@ set var/outtype=int fco2_source
 define attribute/output fco2_source.ioos_category = "Identifier"
 
 ! Delta temperature
-let/title="Equilibrator Temp - SST"/units="`temp,return=units`" delta_temperature = temperature_equi - temp
-set var/outtype=($outtype) delta_temperature
+let/title="Equilibrator Temp - SST"/units="`temp,return=units`" delta_temp = temperature_equi - temp
+set var/outtype=($outtype) delta_temp
 
 ! Pressure from NCEP
 let/title="Surface Air Pressure from NCEP"/units="hPa" pressure_ncep_slp = ncep_slp
@@ -323,18 +325,19 @@ define attribute/output lon360.standard_name = "Longitude"
 define attribute/output lon360.history = "added to ($cruise_filename)"
 
 ! Ship speed
-let/title="calculated ship speed"/units="knots" calcSpeed = speed
-set var/outtype=($outtype) calcSpeed
+let/title="calculated ship speed"/units="knots" calc_speed = speed
+set var/outtype=($outtype) calc_speed
 
 ! ETOPO2 Depth
-let/title="ETOPO2 depth"/units="meters" etopo2 = etopoDepth
+let/title="ETOPO2 depth"/units="meters" etopo2 = -1.0 * etopoDepth
 set var/outtype=($outtype) etopo2
+define attribute/output etopo2.positive = "down"
 define attribute/output etopo2.ioos_category = "Bathymetry"
 define attribute/output etopo2.standard_name = "sea_floor_depth"
 
 ! Distance to Land
-let/title="Distance to Land"/unit="km" distToLand = d2l
-set var/outtype=($outtype) distToLand
+let/title="Distance to Land"/unit="km" dist_to_land = d2l
+set var/outtype=($outtype) dist_to_land
 
 ! Time (as seconds since 1970)
 ! days-since will be in the input datset
@@ -350,9 +353,9 @@ define attribute/output time.ioos_category = "Time"
 define attribute/output time.standard_name = "time"
 define attribute/output time.time_origin = "01-JAN-1970 00:00:00"
 
-let/units="days since 1970-01-01T00:00:00Z"/title="Days 1970" days1970 = \
+let/units="days since 1970-01-01T00:00:00Z"/title="Days 1970" days_1970 = \
  time / (24.0*60.0*60.0)
-set var/outtype=($outtype) days1970
+set var/outtype=($outtype) days_1970
 define attribute/output time.ioos_category = "Time"
 define attribute/output time.standard_name = "time"
 define attribute/output time.time_origin = "01-JAN-1970 00:00:00"
@@ -364,9 +367,10 @@ LET dayn = INT(`datenum[i=@min],prec=12` + 2)
 define axis/t=`day1,prec=12`:`dayn,prec=12`:1/units=days/t0=1-jan-1900 dayaxis
 LET ttday = t[gt=dayaxis]
 
-let/title="Day of Year"/units=days dayOfYear = tax_jday(day_and_year, ttday)
-set var/outtype=($outtype) dayOfYear
-define attribute/output dayOfYear.ioos_category = "Time"
+let/title="Day of Year"/units=days day_of_year = tax_jday(day_and_year, ttday) + \
+ (hour * 60 * 60 + minute * 60 + second) / (24.0 * 60.0 * 60.0)
+set var/outtype=($outtype) day_of_year
+define attribute/output day_of_year.ioos_category = "Time"
 
 ! Region ID
 let/title="Region ID" region_id = regionid[gx=year@asn]
@@ -379,56 +383,61 @@ let datamonths = samplei(charmonths, month)
 let/title="month of year" tmonth = datamonths[gx=latitude@asn]
 define attribute/output tmonth.history = "added to ($cruise_filename)"
 
-set var/outtype=($outtype)/title="fCO2_rec xCO2_water_equi_temp_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
-set var/outtype=($outtype)/title="fCO2_rec xCO2_water_sst_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
-set var/outtype=($outtype)/title="fCO2 rec pCO2_water_equi_temp, Pressure_equi, sal"  fCO2_from_pCO2_water_water_equi_temp 
-set var/outtype=($outtype)/title="fCO2 rec pCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm
-set var/outtype=($outtype)/title="fCO2 rec fCO2_water_equi_tem, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_equi_uatm 
-set var/outtype=($outtype)/title="fCO2 rec fCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm
-set var/outtype=($outtype)/title="fCO2 rec pCO2_water_equi_temp, ncepSlp, sal"  fCO2_from_pCO2_water_water_equi_temp_ncep  
-set var/outtype=($outtype)/title="fCO2 rec pCO2_water_sst_100humidity_uatm, ncepSlp, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep
-set var/outtype=($outtype)/title="fCO2 rec xCO2_water_equi_temp_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa 
-set var/outtype=($outtype)/title="fCO2 rec xCO2_water_sst_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
-set var/outtype=($outtype)/title="fCO2 rec xCO2_water_equi_temp_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
-set var/outtype=($outtype)/title="fCO2 rec xCO2_water_sst_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
-set var/outtype=($outtype)/title="fCO2 rec xCO2_water_equi_temp_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
-set var/outtype=($outtype)/title="fCO2 rec xCO2_water_sst_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, Temperature_equi, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
+set var/outtype=($outtype)/title="fCO2 from pCO2_water_equi_temp, Pressure_equi, sal"  fCO2_from_pCO2_water_water_equi_temp 
+set var/outtype=($outtype)/title="fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm
+set var/outtype=($outtype)/title="fCO2 from fCO2_water_equi_tem, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_equi_uatm 
+set var/outtype=($outtype)/title="fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm
+set var/outtype=($outtype)/title="fCO2 from pCO2_water_equi_temp, ncepSlp, sal"  fCO2_from_pCO2_water_water_equi_temp_ncep  
+set var/outtype=($outtype)/title="fCO2 from pCO2_water_sst_100humidity_uatm, ncepSlp, sal"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, ncepSlp, sal"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_equi_temp_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
+set var/outtype=($outtype)/title="fCO2 from xCO2_water_sst_dry_ppm, ncepSlp, woa_sss"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa 
 
 
 ! Save to the input files; variables will overwrite the nominal values already there
 
-save/quiet/append/file="($cruise_filename)" woa_sss
-save/quiet/append/file="($cruise_filename)" pressure_ncep_slp
+save/keep/quiet/append/file="($cruise_filename)" woa_sss
+save/keep/quiet/append/file="($cruise_filename)" pressure_ncep_slp
 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
-save/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_water_equi_temp 
-save/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_sst_100humidity_uatm 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_fCO2_water_equi_uatm 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm 
-save/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_water_equi_temp_ncep  
-save/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
-save/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_water_equi_temp 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_sst_100humidity_uatm 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_fCO2_water_equi_uatm 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_fCO2_water_sst_100humidty_uatm 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_water_equi_temp_ncep  
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_from_pCO2_water_sst_100humidity_uatm_ncep 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa 
+save/keep/quiet/append/file="($cruise_filename)"  fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa
 
-save/quiet/append/file="($cruise_filename)" fCO2_recommended
-save/quiet/append/file="($cruise_filename)" fco2_source
-save/quiet/append/file="($cruise_filename)" gvCO2
+save/keep/quiet/append/file="($cruise_filename)" fCO2_recommended
+save/keep/quiet/append/file="($cruise_filename)" fco2_source
+save/keep/quiet/append/file="($cruise_filename)" gvCO2
 
-save/quiet/append/file="($cruise_filename)" delta_temperature
+save/keep/quiet/append/file="($cruise_filename)" delta_temp
 
-save/quiet/append/file="($cruise_filename)" lon360 
-save/quiet/append/file="($cruise_filename)" etopo2
-save/quiet/append/file="($cruise_filename)" distToLand
-save/quiet/append/file="($cruise_filename)" time
-save/quiet/append/file="($cruise_filename)" days1970
-save/quiet/append/file="($cruise_filename)" dayOfYear
-save/quiet/append/file="($cruise_filename)" tmonth
+save/keep/quiet/append/file="($cruise_filename)" lon360 
+save/keep/quiet/append/file="($cruise_filename)" etopo2
+save/keep/quiet/append/file="($cruise_filename)" dist_to_land
+save/keep/quiet/append/file="($cruise_filename)" time
+save/keep/quiet/append/file="($cruise_filename)" days_1970
+save/keep/quiet/append/file="($cruise_filename)" day_of_year
+save/keep/quiet/append/file="($cruise_filename)" tmonth
 
-save/quiet/append/file="($cruise_filename)" calcSpeed
-save/quiet/append/file="($cruise_filename)" region_id
+save/keep/quiet/append/file="($cruise_filename)" calc_speed
+save/keep/quiet/append/file="($cruise_filename)" region_id
 
+
+let edit_global = NCO_ATTR("($cruise_filename)","global","History","c","o","($keep_history)")
+load edit_global
+let edit_global = NCO_ATTR("($cruise_filename)","global","Conventions","c","o","($keep_conventions)")
+load edit_global

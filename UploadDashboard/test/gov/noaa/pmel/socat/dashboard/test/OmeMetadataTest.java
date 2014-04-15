@@ -6,12 +6,17 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.TimeZone;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
@@ -57,20 +62,171 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getScienceGroup()
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setScienceGroup(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getInvestigators()
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setInvestigators(java.util.ArrayList)}.
 	 */
 	@Test
-	public void testGetSetScienceGroup() {
-		final String actualScienceGroup = "Cosca, Catherine E.; Feely, Richard A.; Alin, Simone R.; Lebon, Geoffrey T.";
+	public void testGetSetInvestigators() {
+		final ArrayList<String> actualInvestigators = new ArrayList<String>(Arrays.asList(
+				"Cosca, Catherine E.", "Feely, Richard A.", "Alin, Simone R.", "Lebon, Geoffrey T."));
 		OmeMetadata mdata = new OmeMetadata();
-		assertEquals("", mdata.getScienceGroup());
-		mdata.setScienceGroup(actualScienceGroup);
-		assertEquals(actualScienceGroup, mdata.getScienceGroup());
+		assertEquals(0, mdata.getInvestigators().size());
+		mdata.setInvestigators(actualInvestigators);
+		assertEquals(actualInvestigators, mdata.getInvestigators());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
-		mdata.setScienceGroup(null);
-		assertEquals("", mdata.getScienceGroup());
+		mdata.setInvestigators(null);
+		assertEquals(0, mdata.getInvestigators().size());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getOrganizations()
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setOrganizations(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testGetSetOrganizations() {
+		final ArrayList<String> actualOrganizations = new ArrayList<String>(Arrays.asList(
+				"PMEL", "PMEL", "PMEL", ""));
+		OmeMetadata mdata = new OmeMetadata();
+		assertEquals(0, mdata.getOrganizations().size());
+		mdata.setOrganizations(actualOrganizations);
+		assertEquals(actualOrganizations, mdata.getOrganizations());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setOrganizations(null);
+		assertEquals(0, mdata.getOrganizations().size());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getWestmostLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setWestmostLongitude(java.lang.Double)}.
+	 */
+	@Test
+	public void testGetSetWestmostLongitude() {
+		final double westmostLongitude = -125.702;
+		OmeMetadata mdata = new OmeMetadata();
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		mdata.setWestmostLongitude(westmostLongitude);
+		assertEquals(westmostLongitude, mdata.getWestmostLongitude(), 1.0E-4);
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setWestmostLongitude(null);
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getEastmostLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setEastmostLongitude(java.lang.Double)}.
+	 */
+	@Test
+	public void testGetSetEastmostLongitude() {
+		final double eastmostLongitude = -122.978;
+		OmeMetadata mdata = new OmeMetadata();
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		mdata.setEastmostLongitude(eastmostLongitude);
+		assertEquals(eastmostLongitude, mdata.getEastmostLongitude(), 1.0E-4);
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setEastmostLongitude(null);
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getSouthmostLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setSouthmostLatitude(java.lang.Double)}.
+	 */
+	@Test
+	public void testGetSetSouthmostLatitude() {
+		final double southmostLatitude = 48.183;
+		OmeMetadata mdata = new OmeMetadata();
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		mdata.setSouthmostLatitude(southmostLatitude);
+		assertEquals(southmostLatitude, mdata.getSouthmostLatitude(), 1.0E-4);
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setSouthmostLatitude(null);
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getNorthmostLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setNorthmostLatitude(java.lang.Double)}.
+	 */
+	@Test
+	public void testGetSetNorthmostLatitude() {
+		final double northmostLatitude = 49.027;
+		OmeMetadata mdata = new OmeMetadata();
+		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		mdata.setNorthmostLatitude(northmostLatitude);
+		assertEquals(northmostLatitude, mdata.getNorthmostLatitude(), 1.0E-4);
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setNorthmostLatitude(null);
+		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getStartDate()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setStartDate(java.util.Date)}.
+	 * @throws ParseException 
+	 */
+	@Test
+	public void testGetSetStartDate() throws ParseException {
+		final Date myStartDate = (new SimpleDateFormat("yyyyMMddZ")).parse("20120220+0000");
+		OmeMetadata mdata = new OmeMetadata();
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getStartDate());
+		mdata.setStartDate(myStartDate);
+		assertEquals(myStartDate, mdata.getStartDate());
+		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setStartDate(null);
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getStartDate());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#getEndDate()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#setEndDate(java.util.Date)}.
+	 * @throws ParseException 
+	 */
+	@Test
+	public void testGetSetEndDate() throws ParseException {
+		final Date myEndDate = (new SimpleDateFormat("yyyyMMddZ")).parse("20120229+0000");
+		OmeMetadata mdata = new OmeMetadata();
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndDate());
+		mdata.setEndDate(myEndDate);
+		assertEquals(myEndDate, mdata.getEndDate());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getStartDate());
+		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		mdata.setEndDate(null);
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndDate());
 	}
 
 	/**
@@ -84,7 +240,14 @@ public class OmeMetadataTest {
 		assertEquals("", mdata.getOrigDataRef());
 		mdata.setOrigDataRef(actualOrigDataRef);
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
-		assertEquals("", mdata.getScienceGroup());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndDate());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getStartDate());
+		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals(0, mdata.getOrganizations().size());
+		assertEquals(0, mdata.getInvestigators().size());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		mdata.setOrigDataRef(null);
@@ -94,13 +257,23 @@ public class OmeMetadataTest {
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.server.OmeMetadata#equals(java.lang.Object)}.
+	 * @throws ParseException 
 	 */
 	@Test
-	public void testHashCodeEqualsObject() {
+	public void testHashCodeEqualsObject() throws ParseException {
 		final String myExpocode = "332220120220";
 		final String myCruiseName = "SH1201";
 		final String myVesselName = "Bell M. Shimada";
-		final String myScienceGroup = "Cosca, Catherine E.; Feely, Richard A.; Alin, Simone R.; Lebon, Geoffrey T.";
+		final ArrayList<String> myInvestigators = new ArrayList<String>(Arrays.asList(
+				"Cosca, Catherine E.", "Feely, Richard A.", "Alin, Simone R.", "Lebon, Geoffrey T."));
+		final ArrayList<String> myOrganizations = new ArrayList<String>(Arrays.asList( 
+				"NOAA", "NOAA", "NOAA", ""));
+		final double myWestmostLongitude = -125.702;
+		final double myEastmostLongitude = -122.978;
+		final double mySouthmostLatitude = 48.183;
+		final double myNorthmostLatitude = 49.027;
+		final Date myStartDate = (new SimpleDateFormat("yyyyMMddZ")).parse("20120220+0000");
+		final Date myEndDate = (new SimpleDateFormat("yyyyMMddZ")).parse("20120229+0000");
 		final String myOrigDataRef = "www.pmel.noaa.gov/co2/SH1201.csv";
 
 		OmeMetadata mdata = new OmeMetadata();
@@ -133,10 +306,63 @@ public class OmeMetadataTest {
 		assertTrue( mdata.hashCode() == other.hashCode() );
 		assertTrue( mdata.equals(other) );
 
-		mdata.setScienceGroup(myScienceGroup);
+		mdata.setInvestigators(myInvestigators);
 		assertFalse( mdata.hashCode() == other.hashCode() );
 		assertFalse( mdata.equals(other) );
-		other.setScienceGroup(myScienceGroup);
+		other.setInvestigators(myInvestigators);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setOrganizations(myOrganizations);
+		assertFalse( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setOrganizations(myOrganizations);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setWestmostLongitude(myWestmostLongitude);
+		// Floating point values not used in hashCode
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setWestmostLongitude(myWestmostLongitude);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setEastmostLongitude(myEastmostLongitude);
+		// Floating point values not used in hashCode
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setEastmostLongitude(myEastmostLongitude);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setSouthmostLatitude(mySouthmostLatitude);
+		// Floating point values not used in hashCode
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setSouthmostLatitude(mySouthmostLatitude);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setNorthmostLatitude(myNorthmostLatitude);
+		// Floating point values not used in hashCode
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setNorthmostLatitude(myNorthmostLatitude);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setStartDate(myStartDate);
+		assertFalse( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setStartDate(myStartDate);
+		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertTrue( mdata.equals(other) );
+
+		mdata.setEndDate(myEndDate);
+		assertFalse( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.equals(other) );
+		other.setEndDate(myEndDate);
 		assertTrue( mdata.hashCode() == other.hashCode() );
 		assertTrue( mdata.equals(other) );
 
@@ -169,14 +395,22 @@ public class OmeMetadataTest {
 		final String actualCruiseExpocode = "54WA20060923";
 		final String actualCruiseName = "AR2007_09";
 		final String actualVesselName = "Albert Rickmers";
-		final String actualScienceGroup = "Richard Feely";
+		final ArrayList<String> actualInvestigators = new ArrayList<String>(Arrays.asList("Richard Feely"));
+		final ArrayList<String> actualOrganizations = new ArrayList<String>(Arrays.asList(""));
 		final String actualOrigDataRef = "10.3334/CDIAC/otg.VOS_Albert_Rickmers_2007";
 
 		OmeMetadata mdata = new OmeMetadata(actualMetadataHeaders, actualMetadataString, uploadTimestamp);
 		assertEquals(actualCruiseExpocode, mdata.getExpocode());
 		assertEquals(actualCruiseName, mdata.getCruiseName());
 		assertEquals(actualVesselName, mdata.getVesselName());
-		assertEquals(actualScienceGroup, mdata.getScienceGroup());
+		assertEquals(actualInvestigators, mdata.getInvestigators());
+		assertEquals(actualOrganizations, mdata.getOrganizations());
+		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getStartDate());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndDate());
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
 	}
 
@@ -199,27 +433,25 @@ public class OmeMetadataTest {
 				"  </User>" +
 				"  <Investigator>" +
 				"    <Name>Cosca, Catherine E.</Name>" +
-				"    <Organization>...</Organization>" +
+				"    <Organization>PMEL</Organization>" +
 				"    <Address>...</Address>" +
 				"    <Phone>...</Phone>" +
 				"    <Email>...</Email>" +
 				"  </Investigator>" +
 				"  <Investigator>" +
 				"    <Name>Feely, Richard A.</Name>" +
-				"    <Organization>...</Organization>" +
+				"    <Organization>PMEL</Organization>" +
 				"    <Address>...</Address>" +
 				"    <Phone>...</Phone>" +
 				"    <Email>...</Email>" +
 				"  </Investigator>" +
 				"  <Investigator>" +
 				"    <Name>Alin, Simone R.</Name>" +
-				"    <Organization>...</Organization>" +
+				"    <Organization>PMEL</Organization>" +
 				"    <Address>...</Address>" +
 				"  </Investigator>" +
 				"  <Investigator>" +
 				"    <Name>Lebon, Geoffrey T.</Name>" +
-				"    <Organization>...</Organization>" +
-				"    <Address>...</Address>" +
 				"  </Investigator>" +
 				"  <Dataset_Info>" +
 				"    <Funding_Info>NOAA Oceanic and Atmospheric Research</Funding_Info>" +
@@ -395,11 +627,16 @@ public class OmeMetadataTest {
 		final String actualExpocode = "332220120220";
 		final String actualCruiseName = "SH1201";
 		final String actualVesselName = "Bell M. Shimada";
-		final String actualScienceGroup = 
-				"Cosca, Catherine E." + SocatMetadata.PIS_SEPARATOR + 
-				"Feely, Richard A." + SocatMetadata.PIS_SEPARATOR + 
-				"Alin, Simone R." + SocatMetadata.PIS_SEPARATOR + 
-				"Lebon, Geoffrey T.";
+		final ArrayList<String> actualInvestigators = new ArrayList<String>(Arrays.asList( 
+				"Cosca, Catherine E.", "Feely, Richard A.", "Alin, Simone R.", "Lebon, Geoffrey T."));
+		final ArrayList<String> actualOrganizations = new ArrayList<String>(Arrays.asList( 
+				"PMEL", "PMEL", "PMEL", ""));
+		final double actualWestLon = -125.702;
+		final double actualEastLon = -122.978;
+		final double actualSouthLat = 48.183;
+		final double actualNorthLat = 49.027;
+		final String actualStartString = "20120220";
+		final String actualEndString = "20120229";
 		final String actualOrigDataRef = "www.pmel.noaa.gov/co2/SH1201.csv";
 
 		Document omeDoc = (new SAXBuilder()).build(
@@ -411,8 +648,18 @@ public class OmeMetadataTest {
 		assertEquals(actualExpocode, mdata.getExpocode());
 		assertEquals(actualCruiseName, mdata.getCruiseName());
 		assertEquals(actualVesselName, mdata.getVesselName());
-		assertEquals(actualScienceGroup, mdata.getScienceGroup());
+		assertEquals(actualInvestigators, mdata.getInvestigators());
+		assertEquals(actualOrganizations, mdata.getOrganizations());
+		assertEquals(actualWestLon, mdata.getWestmostLongitude(), 1.0E-4);
+		assertEquals(actualEastLon, mdata.getEastmostLongitude(), 1.0E-4);
+		assertEquals(actualSouthLat, mdata.getSouthmostLatitude(), 1.0E-4);
+		assertEquals(actualNorthLat, mdata.getNorthmostLatitude(), 1.0E-4);
 		assertEquals(actualOrigDataRef, mdata.getOrigDataRef());
+
+		SimpleDateFormat dateFrmt = new SimpleDateFormat("yyyyMMdd");
+		dateFrmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+		assertEquals(actualStartString, dateFrmt.format(mdata.getStartDate()));
+		assertEquals(actualEndString, dateFrmt.format(mdata.getEndDate()));
 	}
 
 	/**
