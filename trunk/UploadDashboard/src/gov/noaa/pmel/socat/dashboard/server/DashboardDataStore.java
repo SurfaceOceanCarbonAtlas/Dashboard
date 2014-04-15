@@ -448,7 +448,7 @@ public class DashboardDataStore {
 			return false;
 		if ( (passhash == null) || passhash.isEmpty() )
 			return false;
-		DashboardUserInfo userInfo = userInfoMap.get(username);
+		DashboardUserInfo userInfo = userInfoMap.get(cleanUsername(username));
 		if ( userInfo == null )
 			return false;
 		String computedHash = spicedHash(username, passhash);
@@ -475,10 +475,10 @@ public class DashboardDataStore {
 	 * 		privileges over othername
 	 */
 	public boolean userManagesOver(String username, String othername) {
-		DashboardUserInfo userInfo = userInfoMap.get(username);
+		DashboardUserInfo userInfo = userInfoMap.get(cleanUsername(username));
 		if ( userInfo == null )
 			return false;
-		return userInfo.managesOver(userInfoMap.get(othername));
+		return userInfo.managesOver(userInfoMap.get(cleanUsername(othername)));
 	}
 
 	/**
@@ -489,10 +489,26 @@ public class DashboardDataStore {
 	 * 		(regardless of whether there is anyone else in the group)
 	 */
 	public boolean isManager(String username) {
-		DashboardUserInfo userInfo = userInfoMap.get(username);
+		DashboardUserInfo userInfo = userInfoMap.get(cleanUsername(username));
 		if ( userInfo == null )
 			return false;
 		return userInfo.isManager();
+	}
+
+	/**
+	 * "Cleans" a username for use with UserInfoMap by substituting 
+	 * characters that are problematic for a key in a properties file 
+	 * (such as space characters).
+	 * 
+	 * @param username
+	 * 		username to clean
+	 * @return
+	 * 		clean version of username
+	 */
+	private static String cleanUsername(String username) {
+		if ( username == null )
+			return "";
+		return username.replace(' ', '_');
 	}
 
 	/**
@@ -543,7 +559,8 @@ public class DashboardDataStore {
 		try {
 			DashboardDataStore dataStore = DashboardDataStore.get();
 			String computedHash = dataStore.spicedHash(username, passhash);
-			System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + username + "=" + computedHash);
+			System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + 
+					cleanUsername(username) + "=" + computedHash);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			System.exit(1);

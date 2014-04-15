@@ -101,7 +101,19 @@ public class Socat2Transfer {
 		cruiseMetadata.setUploadTimestamp(timestamp);
 		cruiseMetadata.setCruiseName(socat2Metadata.getCruiseName());
 		cruiseMetadata.setVesselName(socat2Metadata.getVesselName());
-		cruiseMetadata.setScienceGroup(socat2Metadata.getScienceGroup());
+		// Directly modify the lists in cruiseMetadata
+		ArrayList<String> investigators = cruiseMetadata.getInvestigators();
+		ArrayList<String> organizations = cruiseMetadata.getOrganizations();
+		for ( String name : socat2Metadata.getScienceGroup().split("; ") ) {
+			investigators.add(name);
+			organizations.add("");
+		}
+		cruiseMetadata.setWestmostLongitude(socat2Metadata.getWestmostLongitude());
+		cruiseMetadata.setEastmostLongitude(socat2Metadata.getEastmostLongitude());
+		cruiseMetadata.setSouthmostLatitude(socat2Metadata.getSouthmostLatitude());
+		cruiseMetadata.setNorthmostLatitude(socat2Metadata.getNorthmostLatitude());
+		cruiseMetadata.setStartDate(socat2Metadata.getBeginTime());
+		cruiseMetadata.setEndDate(socat2Metadata.getEndTime());
 		cruiseMetadata.setOrigDataRef(socat2Metadata.getOrigDOI());
 		String qcFlag = socat2Metadata.getFlag();
 

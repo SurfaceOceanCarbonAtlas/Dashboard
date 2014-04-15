@@ -4,10 +4,16 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashSet;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -23,12 +29,24 @@ import org.jdom2.input.SAXBuilder;
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -9016402934889508892L;
+	private static final long serialVersionUID = -3905881094341061538L;
+
+	private static final SimpleDateFormat DATE_PARSER = 
+			new SimpleDateFormat("yyyyMMdd HH:mmZ");
+	private static final SimpleDateFormat DATE_FORMATTER =
+			new SimpleDateFormat("yyyyMMdd");
 
 	// data values from the OME metadata 
 	String cruiseName;
 	String vesselName;
-	String scienceGroup;
+	ArrayList<String> investigators;
+	ArrayList<String> organizations;
+	Double westmostLongitude;
+	Double eastmostLongitude;
+	Double southmostLatitude;
+	Double northmostLatitude;
+	Date startDate;
+	Date endDate;
 	String origDataRef;
 
 	// TODO: add more fields when they are identified in the OME XML file.
@@ -43,7 +61,14 @@ public class OmeMetadata extends DashboardMetadata {
 
 		cruiseName = "";
 		vesselName = "";
-		scienceGroup = "";
+		investigators = new ArrayList<String>();
+		organizations = new ArrayList<String>();
+		westmostLongitude = Double.NaN;
+		eastmostLongitude = Double.NaN;
+		southmostLatitude = Double.NaN;
+		northmostLatitude = Double.NaN;
+		startDate = SocatMetadata.DATE_MISSING_VALUE;
+		endDate = SocatMetadata.DATE_MISSING_VALUE;
 		origDataRef = "";
 	}
 
@@ -91,8 +116,7 @@ public class OmeMetadata extends DashboardMetadata {
 					":\n    " + ex.getMessage());
 		}
 
-		// Verify expocode, and assign cruiseName, vesselName, scienceGroup, 
-		// and origDataRef from the OME XML contents
+		// Verify expocode and assign from the OME XML contents
 		try {
 			assignFromOmeXmlDoc(omeDoc);
 		} catch ( IllegalArgumentException ex ) {
@@ -153,28 +177,22 @@ public class OmeMetadata extends DashboardMetadata {
 			}
 			else if ( "PI".equals(colNames[k]) )  {
 				if ( ! "NaN".equals(metaVals[k]) ) {
-					if ( scienceGroup.isEmpty() )
-						scienceGroup = metaVals[k];
-					else
-						scienceGroup += SocatMetadata.PIS_SEPARATOR + metaVals[k];
+					investigators.add(metaVals[k]);
+					organizations.add("");
 				}
 			}
 			else if ( "PI_2".equals(colNames[k]) ||
 					  "PI 2".equals(colNames[k]) )  {
 				if ( ! "NaN".equals(metaVals[k]) ) {
-					if ( scienceGroup.isEmpty() )
-						scienceGroup = metaVals[k];
-					else
-						scienceGroup += SocatMetadata.PIS_SEPARATOR + metaVals[k];
+					investigators.add(metaVals[k]);
+					organizations.add("");
 				}
 			}
 			else if ( "PI_3".equals(colNames[k]) ||
 					  "PI 3".equals(colNames[k]) )  {
 				if ( ! "NaN".equals(metaVals[k]) ) {
-					if ( scienceGroup.isEmpty() )
-						scienceGroup = metaVals[k];
-					else
-						scienceGroup += SocatMetadata.PIS_SEPARATOR + metaVals[k];
+					investigators.add(metaVals[k]);
+					organizations.add("");
 				}
 			}
 			else if ( "doi".equals(colNames[k]) ||
@@ -183,6 +201,7 @@ public class OmeMetadata extends DashboardMetadata {
 					origDataRef = metaVals[k];
 			}
 			// otherwise ignore the data in this column
+			// longitude/latitude/time limits are derived from the data
 		}
 		if ( expocode.isEmpty() )
 			throw new IllegalArgumentException("Expocode is not given");
@@ -204,7 +223,7 @@ public class OmeMetadata extends DashboardMetadata {
 		 * <x_tags>
 		 *   ...
 		 *   <Investigator>
- 		 *    <Name>Last, First M.</Name>
+ 		 *     <Name>Last, First M.</Name>
 		 *     <Organization>...</Organization>
 		 *     <Address>...</Address>
 		 *     <Phone>...</Phone>
@@ -256,6 +275,7 @@ public class OmeMetadata extends DashboardMetadata {
 		 * </x_tags>
 		 * ------------------------------------------------
 		 */
+
 		Element rootElem = omeDoc.getRootElement();
 		// Validate the expocode from <Cruise_Info><Experiment><Cruise><Cruise_ID>
 		Element cruiseInfoElem = rootElem.getChild("Cruise_Info");
@@ -266,12 +286,12 @@ public class OmeMetadata extends DashboardMetadata {
 		if ( experimentElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Experiment element in the OME XML contents");
-		Element childElem = experimentElem.getChild("Cruise");
-		if ( childElem == null )
+		Element cruiseElem = experimentElem.getChild("Cruise");
+		if ( cruiseElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Experiment->Cruise " +
 					"element in the OME XML contents");
-		String name = childElem.getChildTextTrim("Cruise_ID"); 
+		String name = cruiseElem.getChildTextTrim("Cruise_ID"); 
 		if ( name == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Experiment->Cruise->Cruise_ID " +
@@ -293,7 +313,7 @@ public class OmeMetadata extends DashboardMetadata {
 		cruiseName = name;
 
 		// Get the vessel name from <Cruise_Info><Vessel><Vessel_Name>
-		childElem = cruiseInfoElem.getChild("Vessel");
+		Element childElem = cruiseInfoElem.getChild("Vessel");
 		if ( childElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Vessel element in the OME XML contents");
@@ -307,8 +327,10 @@ public class OmeMetadata extends DashboardMetadata {
 					"No ship/vessel name given in the OME document");
 		vesselName = name;
 
-		// Get the science group from <Investigator><Name>
-		scienceGroup = "";
+		// Get the science group from <Investigator><Name> and 
+		// the organization from <Investigator><Organization>
+		investigators.clear();
+		organizations.clear();
 		boolean investigatorFound = false;
 		for ( Element investElem : rootElem.getChildren("Investigator") ) {
 			investigatorFound = true;
@@ -319,20 +341,98 @@ public class OmeMetadata extends DashboardMetadata {
 			if ( name.isEmpty() )
 				throw new IllegalArgumentException("No name given for " +
 						"an investigator in the OME document");
-			if ( scienceGroup.isEmpty() )
-				scienceGroup = name;
-			else
-				scienceGroup += SocatMetadata.PIS_SEPARATOR + name;
+			investigators.add(name);
+			// Okay to have no organization given, but keep the lists matched
+			name = investElem.getChildTextTrim("Organization");
+			if ( name == null )
+				name = "";
+			organizations.add(name);
 		}
 		if ( ! investigatorFound )
 			throw new IllegalArgumentException(
 					"No Investigator element in the OME XML contents");
-		if ( scienceGroup.isEmpty() )
+		if ( investigators.isEmpty() )
 			throw new IllegalArgumentException(
 					"No investigator names given in the OME document");
 
+		// Okay to have these missing; may be (re)assigned from the data
+		westmostLongitude = Double.NaN;
+		eastmostLongitude = Double.NaN;
+		southmostLatitude = Double.NaN;
+		northmostLatitude = Double.NaN;
+		childElem = cruiseElem.getChild("Geographical_Coverage");
+		if ( childElem != null ) {
+			childElem = childElem.getChild("Bounds");
+			if ( childElem != null ) {
+				name = childElem.getChildTextTrim("Westernmost_Longitude");
+				if ( (name != null) && ! name.isEmpty() ) {
+					try {
+						westmostLongitude = Double.valueOf(name);
+					} catch ( NumberFormatException ex ) {
+						throw new IllegalArgumentException(
+								"Invalid value for <Westernmost_Longitude>");
+					}
+				}
+				name = childElem.getChildTextTrim("Easternmost_Longitude");
+				if ( (name != null) && ! name.isEmpty() ) {
+					try {
+						eastmostLongitude = Double.valueOf(name);
+					} catch ( NumberFormatException ex ) {
+						throw new IllegalArgumentException(
+								"Invalid value for <Easternmost_Longitude>");
+					}
+				}
+				name = childElem.getChildTextTrim("Southernmost_Latitude");
+				if ( (name != null) && ! name.isEmpty() ) {
+					try {
+						southmostLatitude = Double.valueOf(name);
+					} catch ( NumberFormatException ex ) {
+						throw new IllegalArgumentException(
+								"Invalid value for <Southernmost_Latitude>");
+					}
+				}
+				name = childElem.getChildTextTrim("Northernmost_Latitude");
+				if ( (name != null) && ! name.isEmpty() ) {
+					try {
+						northmostLatitude = Double.valueOf(name);
+					} catch ( NumberFormatException ex ) {
+						throw new IllegalArgumentException(
+								"Invalid value for <Northernmost_Latitude>");
+					}
+				}
+			}
+		}
+
+		// Okay to have these missing; may be (re)assigned from the data
+		startDate = SocatMetadata.DATE_MISSING_VALUE;
+		endDate = SocatMetadata.DATE_MISSING_VALUE;
+		childElem = cruiseElem.getChild("Temporal_Coverage");
+		if ( childElem != null ) {
+			name = childElem.getChildTextTrim("Start_Date");
+			if ( (name != null) && ! name.isEmpty() ) {
+				try {
+					// Just the UTC date, so set the time to 00:00
+					startDate = DATE_PARSER.parse(name + " 00:00+0000");
+				} catch ( ParseException ex ) {
+					throw new IllegalArgumentException(
+							"Invalid value for <Start_Date>");
+				}
+			}
+			name = childElem.getChildTextTrim("End_Date");
+			if ( (name != null) && ! name.isEmpty() ) {
+				try {
+					// Just the UTC date, so set the time to 23:59
+					endDate = DATE_PARSER.parse(name + " 23:59+0000");
+				} catch ( ParseException ex ) {
+					throw new IllegalArgumentException(
+							"Invalid value for <End_Date>");
+				}
+			}
+		}
+
 		// Get the original data http reference from <Data_Set_Link><URL> and <Data_Link><URL>
 		// Note that it is very likely there is not an original data reference
+		// TODO: this might need adjusting
 		origDataRef = "";
 		childElem = rootElem.getChild("Data_Set_Link");
 		if ( childElem != null ) {
@@ -362,11 +462,124 @@ public class OmeMetadata extends DashboardMetadata {
 	 * 		the generated pseudo-OME XML document
 	 */
 	public Document createMinimalOmeXmlDoc() {
+		/*
+		 * Example contents of the OME XML file:
+		 * ------------------------------------------------
+		 * <?xml version="1.0" encoding="UTF-8"?>
+		 * <x_tags>
+		 *   ...
+		 *   <Investigator>
+ 		 *     <Name>Last, First M.</Name>
+		 *     <Organization>...</Organization>
+		 *     <Address>...</Address>
+		 *     <Phone>...</Phone>
+		 *     <Email>...</Email>
+		 *   </Investigator>
+		 *   ... (more Investigator elements) ...
+		 *   <Cruise_Info>
+		 *     <Experiment>
+		 *       <Experiment_Name>SH1201</Experiment_Name>
+		 *       <Experiment_Type>VOS Lines</Experiment_Type>
+		 *       <Cruise>
+		 *         <Cruise_ID>332220120220</Cruise_ID>
+		 *         <Geographical_Coverage>
+		 *           <Geographical_Region>North American West Coast</Geographical_Region>
+		 *           <Bounds>
+		 *             <Westernmost_Longitude>-125.702</Westernmost_Longitude>
+		 *             <Easternmost_Longitude>-122.978</Easternmost_Longitude>
+		 *             <Northernmost_Latitude>49.027</Northernmost_Latitude>
+		 *             <Southernmost_Latitude>48.183</Southernmost_Latitude>
+		 *           </Bounds>
+		 *         </Geographical_Coverage>
+		 *         <Temporal_Coverage>
+		 *           <Start_Date>20120220</Start_Date>
+		 *           <End_Date>20120229</End_Date>
+		 *         </Temporal_Coverage>
+		 *       </Cruise>
+		 *     </Experiment>
+		 *     <Vessel>
+		 *       <Vessel_Name>Bell M. Shimada</Vessel_Name>
+		 *       <Vessel_ID>3322</Vessel_ID>
+		 *       <Vessel_Owner>NOAA</Vessel_Owner>
+		 *     </Vessel>
+		 *   </Cruise_Info>
+		 *   <Variables_Info>
+		 *     ... 
+		 *   </Variables_Info>
+		 *   <Method_Description>
+		 *     ...
+		 *   </Method_Description>
+		 *   <Citation>...</Citation>
+		 *   <Data_Set_Link>
+		 *     <URL>www.pmel.noaa.gov/co2/</URL>
+		 *     <Label>PMEL Underway pCO2 data</Label>
+		 *   </Data_Set_Link>
+		 *   <Data_Link>
+		 *     <URL>SH1201.csv</URL>
+		 *   </Data_Link>
+		 *   <form_type>underway</form_type>
+		 * </x_tags>
+		 * ------------------------------------------------
+		 */
+
+		Element cruiseElem = new Element("Cruise");
+
 		// expocode goes in <Cruise_Info><Experiment><Cruise><Cruise_ID>
 		Element cruiseIdElem = new Element("Cruise_ID");
 		cruiseIdElem.setText(expocode);
-		Element cruiseElem = new Element("Cruise");
 		cruiseElem.addContent(cruiseIdElem);
+
+		// Bounds on longitude and latitude go in <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+		Element boundsElem = new Element("Bounds");
+		boolean somethingAdded = false;
+		if ( ! westmostLongitude.isNaN() ) { 
+			Element westElem = new Element("Westernmost_Longitude");
+			westElem.setText(String.format("%#.3f", westmostLongitude));
+			boundsElem.addContent(westElem);
+			somethingAdded = true;
+		}
+		if ( ! eastmostLongitude.isNaN() ) { 
+			Element eastElem = new Element("Easternmost_Longitude");
+			eastElem.setText(String.format("%#.3f", eastmostLongitude));
+			boundsElem.addContent(eastElem);
+			somethingAdded = true;
+		}
+		if ( ! southmostLatitude.isNaN() ) { 
+			Element eastElem = new Element("Southernmost_Latitude");
+			eastElem.setText(String.format("%#.3f", southmostLatitude));
+			boundsElem.addContent(eastElem);
+			somethingAdded = true;
+		}
+		if ( ! northmostLatitude.isNaN() ) { 
+			Element eastElem = new Element("Northernmost_Latitude");
+			eastElem.setText(String.format("%#.3f", northmostLatitude));
+			boundsElem.addContent(eastElem);
+			somethingAdded = true;
+		}
+		if ( somethingAdded ) {
+			Element geoElem = new Element("Geographical_Coverage");
+			geoElem.addContent(boundsElem);
+			cruiseElem.addContent(geoElem);
+		}
+
+		// Start and end date go in <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
+		Element timeElem = new Element("Temporal_Coverage");
+		somethingAdded = false;
+		if ( ! startDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
+			Element startElem = new Element("Start_Date");
+			startElem.addContent(DATE_FORMATTER.format(startDate));
+			timeElem.addContent(startElem);
+			somethingAdded = true;
+		}
+		if ( ! endDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
+			Element endElem = new Element("End_Date");
+			endElem.addContent(DATE_FORMATTER.format(startDate));
+			timeElem.addContent(endElem);
+			somethingAdded = true;
+		}
+		if ( somethingAdded ) {
+			cruiseElem.addContent(timeElem);
+		}
 
 		Element experimentElem = new Element("Experiment");
 		experimentElem.addContent(cruiseElem);
@@ -374,7 +587,6 @@ public class OmeMetadata extends DashboardMetadata {
 		// cruiseName goes in <Cruise_Info><Experiment><Experiment_Name>
 		Element experimentNameElem = new Element("Experiment_Name");
 		experimentNameElem.setText(cruiseName);
-
 		experimentElem.addContent(experimentNameElem);
 
 		Element cruiseInfoElem = new Element("Cruise_Info");
@@ -385,24 +597,36 @@ public class OmeMetadata extends DashboardMetadata {
 		vesselNameElem.setText(vesselName);
 		Element vesselElem = new Element("Vessel");
 		vesselElem.addContent(vesselNameElem);
-
 		cruiseInfoElem.addContent(vesselElem);
-
+		
 		Element rootElem = new Element("x_tags");
 		rootElem.addContent(cruiseInfoElem);
 
-		// names in scienceGroup go in separate <Investigator><Name>
-		String[] piNames = scienceGroup.split(SocatMetadata.PIS_SEPARATOR);
-		for ( String name : piNames ) {
+		// names in investigators and organizations go in <Name> and <Organization>
+		// under separate <Investigator> elements
+		for (int k = 0; k < investigators.size(); k++) {
+			String piName = investigators.get(k);
+			String orgName;
+			try {
+				orgName = organizations.get(k);
+			} catch ( IndexOutOfBoundsException ex) {
+				orgName = "";
+			}
+
 			Element nameElem = new Element("Name");
-			nameElem.setText(name);
+			nameElem.setText(piName);
+			Element orgElem = new Element("Organization");
+			orgElem.setText(orgName);
+
 			Element investigatorElem = new Element("Investigator");
 			investigatorElem.addContent(nameElem);
+			investigatorElem.addContent(orgElem);
 
 			rootElem.addContent(investigatorElem);
 		}
 
 		// Put origDataRef, if there is one, in <Data_Link><URL>
+		// TODO: this might need adjusting
 		if ( ! origDataRef.isEmpty() ) {
 			Element urlElem = new Element("URL");
 			urlElem.setText(origDataRef);
@@ -424,8 +648,31 @@ public class OmeMetadata extends DashboardMetadata {
 		scMData.setExpocode(expocode);
 		scMData.setCruiseName(cruiseName);
 		scMData.setVesselName(vesselName);
-		scMData.setScienceGroup(scienceGroup);
+		scMData.setWestmostLongitude(westmostLongitude);
+		scMData.setEastmostLongitude(eastmostLongitude);
+		scMData.setSouthmostLatitude(southmostLatitude);
+		scMData.setNorthmostLatitude(northmostLatitude);
+		scMData.setBeginTime(startDate);
+		scMData.setEndTime(endDate);
 		scMData.setOrigDataRef(origDataRef);
+		// PIs as a single string
+		String scienceGroup = "";
+		for ( String piName : investigators ) {
+			if ( scienceGroup.isEmpty() )
+				scienceGroup = piName;
+			else
+				scienceGroup += SocatMetadata.PIS_SEPARATOR + piName;
+		}
+		scMData.setScienceGroup(scienceGroup);
+		// Organizations as a single string
+		// Order unique organizations as given; no longer one-to-one with PIs
+		String orgGroup = "";
+		for ( String orgName : new LinkedHashSet<String>(organizations) ) {
+			if ( orgGroup.isEmpty() )
+				orgGroup = orgName;
+			else
+				orgGroup += SocatMetadata.PIS_SEPARATOR + orgName;
+		}
 		// TODO: add and initialize more fields when they are identified in the OME XML file
 		return scMData;
 	}
@@ -472,22 +719,169 @@ public class OmeMetadata extends DashboardMetadata {
 
 	/**
 	 * @return 
-	 * 		the science group; never null but could be empty
+	 * 		the list of PIs; never null but could be empty.
+	 * 		The actual list in this instance is returned.
 	 */
-	public String getScienceGroup() {
-		return scienceGroup;
+	public ArrayList<String> getInvestigators() {
+		return investigators;
 	}
 
 	/**
-	 * @param scienceGroup 
-	 * 		the science group to set;
-	 * 		if null, an empty string is assigned
+	 * @param investigators 
+	 * 		the list of PIs to set;
+	 * 		if null, an empty list is assigned
 	 */
-	public void setScienceGroup(String scienceGroup) {
-		if ( scienceGroup == null )
-			this.scienceGroup = "";
+	public void setInvestigators(ArrayList<String> investigators) {
+		this.investigators.clear();
+		if ( investigators != null )
+			this.investigators.addAll(investigators);
+	}
+
+	/**
+	 * @return 
+	 * 		the list of organizations/institutions;
+	 * 		never null but could be empty if not assigned.
+	 * 		The actual list in this instance is returned.
+	 */
+	public ArrayList<String> getOrganizations() {
+		return organizations;
+	}
+
+	/**
+	 * @param organizations 
+	 * 		the list of organizations/institutions to set;
+	 * 		if null, an empty list is assigned.
+	 */
+	public void setOrganizations(ArrayList<String> organizations) {
+		this.organizations.clear();
+		if ( organizations != null )
+			this.organizations.addAll(organizations);
+	}
+
+	/**
+	 * @return
+	 * 		the west-most longitude for the cruise;
+	 * 		never null could be Double.NaN if not assigned.
+	 */
+	public Double getWestmostLongitude() {
+		return westmostLongitude;
+	}
+
+	/**
+	 * @param westmostLongitude 
+	 * 		the west-most longitude to set;
+	 * 		if null, {@link Double#NaN} is assigned
+	 */
+	public void setWestmostLongitude(Double westmostLongitude) {
+		if ( westmostLongitude == null )
+			this.westmostLongitude = Double.NaN;
+		else 
+			this.westmostLongitude = westmostLongitude;
+	}
+
+	/**
+	 * @return
+	 * 		the east-most longitude for the cruise;
+	 * 		never null but could be Double.NaN if not assigned.
+	 */
+	public Double getEastmostLongitude() {
+		return eastmostLongitude;
+	}
+
+	/**
+	 * @param eastmostLongitude 
+	 * 		the east-most longitude to set;
+	 * 		if null, {@link Double#NaN} is assigned
+	 */
+	public void setEastmostLongitude(Double eastmostLongitude) {
+		if ( eastmostLongitude == null )
+			this.eastmostLongitude = Double.NaN;
 		else
-			this.scienceGroup = scienceGroup;
+			this.eastmostLongitude = eastmostLongitude;
+	}
+
+	/**
+	 * @return
+	 * 		the south-most latitude for the cruise;
+	 * 		never null but could be Double.NaN if not assigned.
+	 */
+	public Double getSouthmostLatitude() {
+		return southmostLatitude;
+	}
+
+	/**
+	 * @param southmostLatitude 
+	 * 		the south-most latitude to set;
+	 * 		if null, {@link Double#NaN} is assigned
+	 */
+	public void setSouthmostLatitude(Double southmostLatitude) {
+		if ( southmostLatitude == null )
+			this.southmostLatitude = Double.NaN;
+		else
+			this.southmostLatitude = southmostLatitude;
+	}
+
+	/**
+	 * @return
+	 * 		the south-most latitude for the cruise;
+	 * 		never null but could be Double.NaN if not assigned.
+	 */
+	public Double getNorthmostLatitude() {
+		return northmostLatitude;
+	}
+
+	/**
+	 * @param northmostLatitude 
+	 * 		the north-most latitude to set;
+	 * 		if null, {@link Double#NaN} is assigned
+	 */
+	public void setNorthmostLatitude(Double northmostLatitude) {
+		if ( northmostLatitude == null )
+			this.northmostLatitude = Double.NaN;
+		else
+			this.northmostLatitude = northmostLatitude;
+	}
+
+	/**
+	 * @return
+	 * 		the start date for the cruise;
+	 * 		never null but could be {@link SocatMetadata#DATE_MISSING_VALUE} if not assigned.
+	 */
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	/**
+	 * @param startDate 
+	 * 		the start date for the cruise to set;
+	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned
+	 */
+	public void setStartDate(Date startDate) {
+		if ( startDate == null )
+			this.startDate = SocatMetadata.DATE_MISSING_VALUE;
+		else 
+			this.startDate = startDate;
+	}
+
+	/**
+	 * @return
+	 * 		the ending date for the cruise;
+	 * 		never null but could be {@link SocatMetadata#DATE_MISSING_VALUE} if not assigned.
+	 */
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	/**
+	 * @param endDate 
+	 * 		the ending date for the cruise to set;
+	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned
+	 */
+	public void setEndDate(Date endDate) {
+		if ( endDate == null )
+			this.endDate = SocatMetadata.DATE_MISSING_VALUE;
+		else 
+			this.endDate = endDate;
 	}
 
 	/**
@@ -516,7 +910,10 @@ public class OmeMetadata extends DashboardMetadata {
 		int result = super.hashCode();
 		result = result * prime + cruiseName.hashCode();
 		result = result * prime + vesselName.hashCode();
-		result = result * prime + scienceGroup.hashCode();
+		result = result * prime + investigators.hashCode();
+		result = result * prime + organizations.hashCode();
+		result = result * prime + startDate.hashCode();
+		result = result * prime + endDate.hashCode();
 		result = result * prime + origDataRef.hashCode();
 		return result;
 	}
@@ -534,14 +931,37 @@ public class OmeMetadata extends DashboardMetadata {
 
 		if ( ! super.equals(other) )
 			return false;
+		// Date comparisons
+		if ( ! startDate.equals(other.startDate) )
+			return false;
+		if ( ! endDate.equals(other.endDate) )
+			return false;
+		// String comparisons
 		if ( ! cruiseName.equals(other.cruiseName) )
 			return false;
 		if ( ! vesselName.equals(other.vesselName) )
 			return false;
-		if ( ! scienceGroup.equals(other.scienceGroup) )
-			return false;
 		if ( ! origDataRef.equals(other.origDataRef) )
 			return false;
+		// ArrayList<String> comparisons
+		if ( ! investigators.equals(other.investigators) )
+			return false;
+		if ( ! organizations.equals(other.organizations) )
+			return false;
+		// Double comparisons
+		if ( ! DashboardUtils.closeTo(westmostLongitude, 
+				other.westmostLongitude, 0.0, 1.0E-4) )
+			return false;
+		if ( ! DashboardUtils.closeTo(eastmostLongitude, 
+				other.eastmostLongitude, 0.0, 1.0E-4) )
+			return false;
+		if ( ! DashboardUtils.closeTo(southmostLatitude, 
+				other.southmostLatitude, 0.0, 1.0E-4) )
+			return false;
+		if ( ! DashboardUtils.closeTo(northmostLatitude, 
+				other.northmostLatitude, 0.0, 1.0E-4) )
+			return false;
+
 		return true;
 	}
 
@@ -550,7 +970,14 @@ public class OmeMetadata extends DashboardMetadata {
 		return "OmeMetadata[ expocode=" + expocode + 
 				",\n    cruiseName=" + cruiseName + 
 				",\n    vesselName=" + vesselName + 
-				",\n    scienceGroup=" + scienceGroup +
+				",\n    investigators=" + investigators.toString() +
+				",\n    organizations=" + organizations.toString() + 
+				",\n    westmostLongitude=" + westmostLongitude.toString() + 
+				",\n    eastmostLongitude=" + eastmostLongitude.toString() + 
+				",\n    southmostLatitude=" + southmostLatitude.toString() + 
+				",\n    northmostLatitude=" + northmostLatitude.toString() + 
+				",\n    startDate=" + startDate.toString() + 
+				",\n    endDate=" + endDate.toString() + 
 				",\n    origDataRef=" + origDataRef + 
 				",\n    filename=" + filename + 
 				",\n    uploadTimestamp=" + uploadTimestamp + 

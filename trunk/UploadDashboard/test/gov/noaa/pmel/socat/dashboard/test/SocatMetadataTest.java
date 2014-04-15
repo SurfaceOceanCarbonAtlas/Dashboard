@@ -23,6 +23,7 @@ public class SocatMetadataTest {
 	static final String EXPOCODE = "XXXX20140113";
 	static final String CRUISE_NAME = "My Cruise";
 	static final String VESSEL_NAME = "My Vessel";
+	static final String ORGANIZATION_NAME = "PMEL/NOAA";
 	static final Double WESTMOST_LONGITUDE = -160.0;
 	static final Double EASTMOST_LONGITUDE = -135.0;
 	static final Double SOUTHMOST_LATITUDE = 15.0;
@@ -82,6 +83,23 @@ public class SocatMetadataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getOrganization()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setOrganization(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetOrganization() {
+		SocatMetadata mdata = new SocatMetadata();
+		assertEquals("", mdata.getOrganization());
+		mdata.setOrganization(ORGANIZATION_NAME);
+		assertEquals(ORGANIZATION_NAME, mdata.getOrganization());
+		assertEquals("", mdata.getVesselName());
+		assertEquals("", mdata.getCruiseName());
+		assertEquals("", mdata.getExpocode());
+		mdata.setOrganization(null);
+		assertEquals("", mdata.getOrganization());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getWestmostLongitude()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setWestmostLongitude(java.lang.Double)}.
 	 */
@@ -91,6 +109,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
 		mdata.setWestmostLongitude(WESTMOST_LONGITUDE);
 		assertEquals(WESTMOST_LONGITUDE, mdata.getWestmostLongitude());
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -128,6 +147,7 @@ public class SocatMetadataTest {
 		assertEquals(SOUTHMOST_LATITUDE, mdata.getSouthmostLatitude());
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -148,6 +168,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -169,6 +190,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -191,6 +213,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -214,6 +237,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -222,15 +246,15 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getOrigRef()}
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#getOrigDataRef()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setOrigDataRef(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetOrigDOI() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertEquals("", mdata.getOrigRef());
+		assertEquals("", mdata.getOrigDataRef());
 		mdata.setOrigDataRef(ORIGINAL_DOI);
-		assertEquals(ORIGINAL_DOI, mdata.getOrigRef());
+		assertEquals(ORIGINAL_DOI, mdata.getOrigDataRef());
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
@@ -238,11 +262,12 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setOrigDataRef(null);
-		assertEquals("", mdata.getOrigRef());
+		assertEquals("", mdata.getOrigDataRef());
 	}
 
 	/**
@@ -255,7 +280,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getSocatDOI());
 		mdata.setSocatDOI(SOCAT_DOI);
 		assertEquals(SOCAT_DOI, mdata.getSocatDOI());
-		assertEquals("", mdata.getOrigRef());
+		assertEquals("", mdata.getOrigDataRef());
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
@@ -263,6 +288,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -281,7 +307,7 @@ public class SocatMetadataTest {
 		mdata.setSocatDOIHRef(SOCAT_DOI_HREF);
 		assertEquals(SOCAT_DOI_HREF, mdata.getSocatDOIHRef());
 		assertEquals("", mdata.getSocatDOI());
-		assertEquals("", mdata.getOrigRef());
+		assertEquals("", mdata.getOrigDataRef());
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
@@ -289,6 +315,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -308,7 +335,7 @@ public class SocatMetadataTest {
 		assertEquals(CRUISE_FLAG, mdata.getCruiseFlag());
 		assertEquals("", mdata.getSocatDOIHRef());
 		assertEquals("", mdata.getSocatDOI());
-		assertEquals("", mdata.getOrigRef());
+		assertEquals("", mdata.getOrigDataRef());
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
@@ -316,6 +343,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
@@ -355,6 +383,13 @@ public class SocatMetadataTest {
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
 		other.setVesselName(VESSEL_NAME);
+		assertEquals(mdata.hashCode(), other.hashCode());
+		assertTrue( mdata.equals(other) );
+
+		mdata.setOrganization(ORGANIZATION_NAME);
+		assertFalse( mdata.hashCode() == other.hashCode());
+		assertFalse( mdata.equals(other) );
+		other.setOrganization(ORGANIZATION_NAME);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
