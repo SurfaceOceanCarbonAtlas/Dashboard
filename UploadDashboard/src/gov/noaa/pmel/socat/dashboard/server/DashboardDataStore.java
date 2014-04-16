@@ -86,8 +86,7 @@ public class DashboardDataStore {
 			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
 			"# ------------------------------ \n" +
 			"The EncryptionKey should be 24 random integer values in [-128,127] \n" +
-			"The hashes for users can be added using the main method \n" +
-			"of gov.noaa.pmel.socat.dashboard.server.DashboardDataStore \n";
+			"The hexidecimal keys for users can be generated using the mkpasshash.sh script. \n";
 
 	private static final AtomicReference<DashboardDataStore> singleton = 
 			new AtomicReference<DashboardDataStore>();
@@ -298,6 +297,7 @@ public class DashboardDataStore {
 			if ( ! username.startsWith(AUTHENTICATION_NAME_TAG_PREFIX) )
 				continue;
 			username = username.substring(AUTHENTICATION_NAME_TAG_PREFIX.length());
+			username = DashboardUtils.cleanUsername(username);
 			String hash = (String) entry.getValue();
 			DashboardUserInfo userInfo;
 			try {
@@ -318,6 +318,7 @@ public class DashboardDataStore {
 			if ( ! username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
 				continue;
 			username = username.substring(USER_ROLE_NAME_TAG_PREFIX.length());
+			username = DashboardUtils.cleanUsername(username);
 			String rolesString = (String) entry.getValue();
 			DashboardUserInfo userInfo = userInfoMap.get(username);
 			if ( userInfo == null )
@@ -448,10 +449,11 @@ public class DashboardDataStore {
 			return false;
 		if ( (passhash == null) || passhash.isEmpty() )
 			return false;
-		DashboardUserInfo userInfo = userInfoMap.get(cleanUsername(username));
+		String name = DashboardUtils.cleanUsername(username);
+		DashboardUserInfo userInfo = userInfoMap.get(name);
 		if ( userInfo == null )
 			return false;
-		String computedHash = spicedHash(username, passhash);
+		String computedHash = spicedHash(name, passhash);
 		if ( (computedHash == null) || computedHash.isEmpty() )
 			return false;
 		return computedHash.equals(userInfo.getAuthorizationHash());
@@ -475,10 +477,12 @@ public class DashboardDataStore {
 	 * 		privileges over othername
 	 */
 	public boolean userManagesOver(String username, String othername) {
-		DashboardUserInfo userInfo = userInfoMap.get(cleanUsername(username));
+		DashboardUserInfo userInfo = userInfoMap.get(
+				DashboardUtils.cleanUsername(username));
 		if ( userInfo == null )
 			return false;
-		return userInfo.managesOver(userInfoMap.get(cleanUsername(othername)));
+		return userInfo.managesOver(userInfoMap.get(
+				DashboardUtils.cleanUsername(othername)));
 	}
 
 	/**
@@ -489,26 +493,11 @@ public class DashboardDataStore {
 	 * 		(regardless of whether there is anyone else in the group)
 	 */
 	public boolean isManager(String username) {
-		DashboardUserInfo userInfo = userInfoMap.get(cleanUsername(username));
+		DashboardUserInfo userInfo = userInfoMap.get(
+				DashboardUtils.cleanUsername(username));
 		if ( userInfo == null )
 			return false;
 		return userInfo.isManager();
-	}
-
-	/**
-	 * "Cleans" a username for use with UserInfoMap by substituting 
-	 * characters that are problematic for a key in a properties file 
-	 * (such as space characters).
-	 * 
-	 * @param username
-	 * 		username to clean
-	 * @return
-	 * 		clean version of username
-	 */
-	private static String cleanUsername(String username) {
-		if ( username == null )
-			return "";
-		return username.replace(' ', '_');
 	}
 
 	/**
@@ -561,7 +550,7 @@ public class DashboardDataStore {
 			DashboardDataStore dataStore = DashboardDataStore.get();
 			String computedHash = dataStore.spicedHash(username, passhash);
 			System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + 
-					cleanUsername(username) + "=" + computedHash);
+					DashboardUtils.cleanUsername(username) + "=" + computedHash);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			System.exit(1);
