@@ -294,6 +294,22 @@ public class DashboardUtils {
 	}
 
 	/**
+	 * "Cleans" a username for use by substituting characters that are  
+	 * problematic (such as space characters).  
+	 * Also converts all alphabetic characters to lowercase.
+	 * 
+	 * @param username
+	 * 		username to clean
+	 * @return
+	 * 		clean version of username
+	 */
+	public static String cleanUsername(String username) {
+		if ( username == null )
+			return "";
+		return username.replace(' ', '_').toLowerCase();
+	}
+
+	/**
 	 * Generate the encrypted password for a given plain-text username 
 	 * and password.  This is intended to only be a first level of
 	 * encryption.
@@ -306,17 +322,18 @@ public class DashboardUtils {
 	 * 		encrypted password, or an empty string if an error occurs 
 	 */
 	public static String passhashFromPlainText(String username, String password) {
-		// Make sure something reasonable Strings are given
-		if ( (username.length() < 4) || (password.length() < 7) ) {
-			return "";
-		}
-
 		// This salt is just to make sure the keys are long enough
 		String salt = "4z#Ni!q?F7b0m9nK(uDF[g%T3pD_";
 
+		// Make sure something reasonable Strings are given
+		if ( (username.length() < 7) || (password.length() < 7) ) {
+			return "";
+		}
+		String name = cleanUsername(username);
+
 		// Encrypt the password
 		TripleDesCipher cipher = new TripleDesCipher();
-		cipher.setKey((username.substring(0,4) + password + salt)
+		cipher.setKey((name.substring(0,6) + password + salt)
 			  .substring(0,24).getBytes());
 		String passhash;
 		try {
