@@ -241,8 +241,7 @@ public class CruiseListPage extends Composite {
 	private HashSet<DashboardCruise> cruiseSet;
 	private HashSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
-	private TextColumn<DashboardCruise> ownerColumn;
-	private boolean ownerColumnShown;
+	private boolean managerButtonsShown;
 	private double minTableWidth;
 
 	// The singleton instance of this page
@@ -295,8 +294,8 @@ public class CruiseListPage extends Composite {
 		removeFromListButton.setText(REMOVE_FROM_LIST_TEXT);
 		removeFromListButton.setTitle(REMOVE_FROM_LIST_HOVER_HELP);
 
+		managerButtonsShown = true;
 		askDataAutofailPopup = null;
-
 		uploadButton.setFocus(true);
 	}
 
@@ -379,27 +378,19 @@ public class CruiseListPage extends Composite {
 		username = DashboardLoginPage.getUsername();
 		userInfoLabel.setText(WELCOME_INTRO + username);
 		if ( cruises.isManager() ) {
-			if ( ! ownerColumnShown ) {
-				// Add manager-specific buttons and column
+			if ( ! managerButtonsShown ) {
+				// Add manager-specific buttons
 				addToListButton.setVisible(true);
 				removeFromListButton.setVisible(true);
-				datasetsGrid.addColumn(ownerColumn, OWNER_COLUMN_NAME);
-				datasetsGrid.setColumnWidth(ownerColumn, 
-						SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-				minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-				datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
-				ownerColumnShown = true;
+				managerButtonsShown = true;
 			}
 		}
 		else {
-			if ( ownerColumnShown ) {
-				// Remove manager-specific buttons and column
+			if ( managerButtonsShown ) {
+				// Remove manager-specific buttons
 				addToListButton.setVisible(false);
 				removeFromListButton.setVisible(false);
-				datasetsGrid.removeColumn(ownerColumn);
-				minTableWidth -= SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
-				datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
-				ownerColumnShown = false;
+				managerButtonsShown = false;
 			}
 		}
 		// Update the cruises shown by resetting the data in the data provider
@@ -772,7 +763,7 @@ public class CruiseListPage extends Composite {
 		TextColumn<DashboardCruise> timestampColumn = buildTimestampColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 		Column<DashboardCruise,SafeHtml> addlDocsColumn = buildAddnDocsColumn();
-		ownerColumn = buildOwnerColumn();
+		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
 		datasetsGrid.addColumn(selectedColumn, selectedHeader);
@@ -794,7 +785,6 @@ public class CruiseListPage extends Composite {
 				SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
 		datasetsGrid.addColumn(ownerColumn, 
 				SafeHtmlUtils.fromSafeConstant(OWNER_COLUMN_NAME));
-		ownerColumnShown = true;
 
 		// Set the minimum widths of the columns
 		minTableWidth = 0.0;

@@ -16,6 +16,18 @@ public class Constants {
 	public static final Map<String, String> SHORT_NAME;
 	static {
 		Map<String, String> shortNameMap = new HashMap<String, String>();
+
+		shortNameMap.put("expocode", "expocode");
+		shortNameMap.put("cruiseName", "dataset_name");
+		shortNameMap.put("vesselName", "vessel_name");
+		shortNameMap.put("organization", "organization");
+		shortNameMap.put("scienceGroup", "investigators");
+		shortNameMap.put("origDataRef", "original_data_reference");
+		shortNameMap.put("socatDOI", "socat_data_doi");
+		shortNameMap.put("socatDOIHRef", "socat_data_reference");
+		shortNameMap.put("socatVersion", "socat_version");
+		shortNameMap.put("qcFlag", "qc_flag");
+
 		shortNameMap.put("year", "year");
 		shortNameMap.put("month", "month");
 		shortNameMap.put("day", "day");
@@ -142,6 +154,18 @@ public class Constants {
 	public static final Map<String, String> LONG_NAME;
 	static {
 		Map<String, String> longNameMap = new HashMap<String, String>();
+
+		longNameMap.put("expocode", "expocode");
+		longNameMap.put("cruiseName", "dataset name");
+		longNameMap.put("vesselName", "vessel name");
+		longNameMap.put("organization", "organization");
+		longNameMap.put("scienceGroup", "investigators");
+		longNameMap.put("origDataRef", "original data reference");
+		longNameMap.put("socatDOI", "SOCAT data DOI");
+		longNameMap.put("socatDOIHRef", "SOCAT data reference");
+		longNameMap.put("socatVersion", "SOCAT version");
+		longNameMap.put("qcFlag", "QC flag");
+
 		longNameMap.put("year", "year");
 		longNameMap.put("month", "month of year");
 		longNameMap.put("day", "day of month");
@@ -351,6 +375,9 @@ public class Constants {
 	public static final Map<String, String> STANDARD_NAMES;
 	static {
 		Map<String, String> stdNamesMap = new HashMap<String, String>();
+
+		stdNamesMap.put("vesselName", "platform_name");
+
 		stdNamesMap.put("longitude", "longitude");
 		stdNamesMap.put("latitude", "latitude");
 		stdNamesMap.put("sampleDepth", "depth");
@@ -368,8 +395,6 @@ public class Constants {
 		stdNamesMap.put("xCO2Atm", "mole_fraction_of_carbon_dioxide_in_air");
 		stdNamesMap.put("pCO2Atm", "surface_partial_pressure_of_carbon_dioxide_in_air");
 		stdNamesMap.put("fCO2Atm", "surface_partial_pressure_of_carbon_dioxide_in_air");
-
-		// TODO: check standard names for delta-CO2 and humidity values
 
 		stdNamesMap.put("relativeHumidity", "relative_humidity");
 		stdNamesMap.put("specificHumidity", "specific_humidity");
@@ -418,7 +443,6 @@ public class Constants {
 		String humidity_category = "Humidity";
 		String identifier_category = "Identifier";
 		String location_category = "Location";
-		String other_category = "Other";
 		String pressure_category = "Pressure";
 		String quality_category = "Quality";
 		String salinity_category = "Salinity";
@@ -427,6 +451,18 @@ public class Constants {
 		String wind_category = "Wind";
 
 		Map<String, String> ioosCatMap = new HashMap<String, String>();
+
+		ioosCatMap.put("expocode", identifier_category);
+		ioosCatMap.put("cruiseName", identifier_category);
+		ioosCatMap.put("vesselName", identifier_category);
+		ioosCatMap.put("organization", identifier_category);
+		ioosCatMap.put("scienceGroup", identifier_category);
+		ioosCatMap.put("origDataRef", identifier_category);
+		ioosCatMap.put("socatDOI", identifier_category);
+		ioosCatMap.put("socatDOIHRef", identifier_category);
+		ioosCatMap.put("socatVersion", identifier_category);
+		ioosCatMap.put("qcFlag", quality_category);
+
 		ioosCatMap.put("year", time_category);
 		ioosCatMap.put("month", time_category);
 		ioosCatMap.put("day", time_category);
@@ -459,8 +495,6 @@ public class Constants {
 
 		ioosCatMap.put("relativeHumidity", humidity_category);
 		ioosCatMap.put("specificHumidity", humidity_category);
-		ioosCatMap.put("shipSpeed", other_category); 
-		ioosCatMap.put("shipDirection", other_category);
 		ioosCatMap.put("windSpeedTrue", wind_category);
 		ioosCatMap.put("windSpeedRelative", wind_category);
 		ioosCatMap.put("windDirectionTrue", wind_category);
@@ -519,7 +553,6 @@ public class Constants {
 		ioosCatMap.put("fCO2Source", identifier_category);
 		ioosCatMap.put("deltaT", temperature_category);
 		ioosCatMap.put("regionID", identifier_category);
-		ioosCatMap.put("calcSpeed", other_category);
 		ioosCatMap.put("etopo2Depth", bathymetry_category);
 		ioosCatMap.put("gvCO2", co2_category);
 		ioosCatMap.put("distToLand", location_category);

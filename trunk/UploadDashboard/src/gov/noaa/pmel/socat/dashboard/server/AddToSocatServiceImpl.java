@@ -86,7 +86,8 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 				cruise.setDataCheckStatus(dataStatus);
 				cruise.setNumErrorMsgs(cruiseData.getNumErrorMsgs());
 				cruise.setNumWarnMsgs(cruiseData.getNumWarnMsgs());
-				// subList in case year, month,day, hour, minute, seconds columns were added
+				// Remove woce flag sets for any year, month,day, 
+				// hour, minute, or seconds columns that were added
 				int numDataCols = cruise.getDataColTypes().size();
 				cruise.setWoceThreeRowIndices(new ArrayList<HashSet<Integer>>(
 						cruiseData.getWoceThreeRowIndices().subList(0, numDataCols)));
