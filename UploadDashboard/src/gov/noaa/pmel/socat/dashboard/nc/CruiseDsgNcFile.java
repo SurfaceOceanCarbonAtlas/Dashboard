@@ -66,7 +66,7 @@ public class CruiseDsgNcFile {
 
 		Dimension traj = ncfile.addDimension(null, "trajectory", 1);
 
-		// There will be 9 trajectory variables of type character from the metadata.
+		// There will be a number of trajectory variables of type character from the metadata.
 		// Which is the longest?
 		int maxchar = metadata.getMaxStringLength();
 		Dimension stringlen = ncfile.addDimension(null, "string_length", maxchar);
@@ -96,9 +96,24 @@ public class CruiseDsgNcFile {
 		// Make character netCDF variables of all the string metadata.
 		for ( Field f : metaFields ) {
 			if ( f.getType().equals(String.class) && ! Modifier.isStatic(f.getModifiers()) ) {
-				Variable var = ncfile.addVariable(null, f.getName(), DataType.CHAR, trajdimsChar);
-				if ( f.getName().equals("expocode")) {
+				String name = f.getName();
+				String varName = Constants.SHORT_NAME.get(name);
+				Variable var = ncfile.addVariable(null, varName, DataType.CHAR, trajdimsChar);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to add the variable " + 
+							varName + " for metadata field " + name);
+				String longName = Constants.LONG_NAME.get(name);
+				ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
+				if ( name.equals("expocode")) {
 					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
+				}
+				String stdName = Constants.STANDARD_NAMES.get(name);
+				if ( stdName != null ) {
+					ncfile.addVariableAttribute(var, new Attribute("standard_name", stdName));
+				}
+				String category = Constants.IOOS_CATEGORIES.get(name);
+				if ( category != null ) {
+					ncfile.addVariableAttribute(var, new Attribute("ioos_category", category));
 				}
 			}
 		}
@@ -110,26 +125,28 @@ public class CruiseDsgNcFile {
 		for ( Field f : dataFields ) {
 			if ( ! Modifier.isStatic(f.getModifiers()) ) {
 				String name = f.getName();
+				String varName = Constants.SHORT_NAME.get(name);
 				var = null;
 				Number missVal = null;
 				Class<?> type = f.getType();
 				if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-					var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.DOUBLE, dims);
+					var = ncfile.addVariable(null, varName, DataType.DOUBLE, dims);
 					missVal = SocatCruiseData.FP_MISSING_VALUE;
 				} 
 				else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
-					var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.INT, dims);
+					var = ncfile.addVariable(null, varName, DataType.INT, dims);
 					missVal = SocatCruiseData.INT_MISSING_VALUE;
 				} 
 				else if ( type.equals(Character.class) || type.equals(Character.TYPE) ) {
-					var = ncfile.addVariable(null, Constants.SHORT_NAME.get(name), DataType.CHAR, charVarDims);
+					var = ncfile.addVariable(null, varName, DataType.CHAR, charVarDims);
 					missVal = null;
 				} 
 				else
 					throw new RuntimeException("Unexpected data field type " + 
 							type.getSimpleName() + " for variable " + name);
 				if ( var == null )
-					throw new RuntimeException("Unexpected failure to add the data variable " + name);
+					throw new RuntimeException("Unexpected failure to add the variable " + 
+							varName + " for data field " + name);
 
 				if ( missVal != null ) {
 					ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
@@ -137,9 +154,10 @@ public class CruiseDsgNcFile {
 				}
 				String units = Constants.UNITS.get(name);
 				if ( units != null ) {
-					ncfile.addVariableAttribute(var, new Attribute("units", Constants.UNITS.get(name)));
+					ncfile.addVariableAttribute(var, new Attribute("units", units));
 				}
-				ncfile.addVariableAttribute(var, new Attribute("long_name", Constants.LONG_NAME.get(name)));
+				String longName = Constants.LONG_NAME.get(name);
+				ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
 				if ( name.endsWith("Depth") ) {
 					ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
 				}
@@ -189,10 +207,10 @@ public class CruiseDsgNcFile {
 
 		for ( Field f : metaFields ) {
 			if ( f.getType().equals(String.class) && ! Modifier.isStatic(f.getModifiers()) ) {
-				String name = f.getName();
-				var = ncfile.findVariable(name);
+				String varName = Constants.SHORT_NAME.get(f.getName());
+				var = ncfile.findVariable(varName);
 				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + name);
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
 				ArrayChar.D2 values = new ArrayChar.D2(1, maxchar);
 				values.setString(0, (String) f.get(metadata));
 				ncfile.write(var, values);
@@ -208,10 +226,10 @@ public class CruiseDsgNcFile {
 
 		for ( Field f : dataFields ) {
 			if ( ! Modifier.isStatic(f.getModifiers()) ) {
-				String name = f.getName();
-				var = ncfile.findVariable(Constants.SHORT_NAME.get(name));
+				String varName = Constants.SHORT_NAME.get(f.getName());
+				var = ncfile.findVariable(varName);
 				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + name);
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
 				Class<?> type = f.getType();
 				if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
 					ArrayDouble.D1 dvar = new ArrayDouble.D1(data.size());
@@ -242,7 +260,7 @@ public class CruiseDsgNcFile {
 				}
 				else
 					throw new RuntimeException("Unexpected data field type " + 
-							type.getSimpleName() + " for variable " + name);
+							type.getSimpleName() + " for variable " + varName);
 			}
 		}
 

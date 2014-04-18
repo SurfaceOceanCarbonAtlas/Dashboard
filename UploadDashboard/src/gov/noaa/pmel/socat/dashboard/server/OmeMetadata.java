@@ -643,7 +643,7 @@ public class OmeMetadata extends DashboardMetadata {
 	/**
 	 * Create a SocatMatadata object from the data in this object.
 	 */
-	public SocatMetadata createSocatMetadata() {
+	public SocatMetadata createSocatMetadata(String socatVersion) {
 		SocatMetadata scMData = new SocatMetadata();
 		scMData.setExpocode(expocode);
 		scMData.setCruiseName(cruiseName);
@@ -661,7 +661,7 @@ public class OmeMetadata extends DashboardMetadata {
 			if ( scienceGroup.isEmpty() )
 				scienceGroup = piName;
 			else
-				scienceGroup += SocatMetadata.PIS_SEPARATOR + piName;
+				scienceGroup += SocatMetadata.NAMES_SEPARATOR + piName;
 		}
 		scMData.setScienceGroup(scienceGroup);
 		// Organizations as a single string
@@ -671,8 +671,9 @@ public class OmeMetadata extends DashboardMetadata {
 			if ( orgGroup.isEmpty() )
 				orgGroup = orgName;
 			else
-				orgGroup += SocatMetadata.PIS_SEPARATOR + orgName;
+				orgGroup += SocatMetadata.NAMES_SEPARATOR + orgName;
 		}
+		scMData.setSocatVersion(socatVersion);
 		// TODO: add and initialize more fields when they are identified in the OME XML file
 		return scMData;
 	}

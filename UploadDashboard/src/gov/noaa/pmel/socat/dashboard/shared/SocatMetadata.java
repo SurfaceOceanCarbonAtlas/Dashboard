@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 3013666093176935461L;
+	private static final long serialVersionUID = -7958723082421235116L;
 
 	/**
 	 * Date used as a missing value; 
@@ -25,14 +25,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
 
 	/**
-	 * String separating individual PI's listed in the science group String
+	 * String separating each PI listed in scienceGroup, each organization 
+	 * listed in organizations, and each document listed in addlDocs.
 	 */
-	public static final String PIS_SEPARATOR = "; ";
-
-	/**
-	 * Value for no cruise QC flag.
-	 */
-	public static final Character NO_CRUISE_FLAG = ' ';
+	public static final String NAMES_SEPARATOR = " ; ";
 
 	String expocode;
 	String cruiseName;
@@ -46,9 +42,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	Date endTime;
 	String scienceGroup;
 	String origDataRef;
+	String addlDocs;
 	String socatDOI;
 	String socatDOIHRef;
-	Character cruiseFlag;
+	String socatVersion;
+	String qcFlag;
 
 	/**
 	 * Generates an empty SocatMetadata object.
@@ -66,9 +64,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		endTime = DATE_MISSING_VALUE;
 		scienceGroup = "";
 		origDataRef = "";
+		addlDocs = "";
 		socatDOI = "";
 		socatDOIHRef = "";
-		cruiseFlag = NO_CRUISE_FLAG;
+		socatVersion = "";
+		qcFlag = "";
 	}
 
 	/**
@@ -325,6 +325,27 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
+	 * 		the additional document names associated with this instance; 
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getAddlDocs() {
+		return addlDocs;
+	}
+
+	/**
+	 * @param addlDocs 
+	 * 		the additional document names to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setAddlDocs(String addlDocs) {
+		if ( addlDocs == null )
+			this.addlDocs = "";
+		else
+			this.addlDocs = addlDocs;
+	}
+
+	/**
+	 * @return
 	 * 		the SOCAT enhanced data DOI associated with this instance; 
 	 * 		never null but could be empty if not assigned
 	 */
@@ -368,22 +389,43 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the cruise flag value associated with this instance;
-	 * 		never null but could be {@link #NO_CRUISE_FLAG} if not assigned
+	 * 		never null but could be empty if not assigned
 	 */
-	public Character getCruiseFlag() {
-		return cruiseFlag;
+	public String getSocatVersion() {
+		return socatVersion;
 	}
 
 	/**
-	 * @param cruiseFlag 
+	 * @param qcFlag 
 	 * 		the cruise flag value to set; 
-	 * 		if null, {@link #NO_CRUISE_FLAG} is assigned
+	 * 		if null, an empty string is assigned
 	 */
-	public void setCruiseFlag(Character cruiseFlag) {
-		if ( cruiseFlag == null )
-			this.cruiseFlag = NO_CRUISE_FLAG;
+	public void setSocatVersion(String socatVersion) {
+		if ( socatVersion == null )
+			this.socatVersion = "";
 		else
-			this.cruiseFlag = cruiseFlag;
+			this.socatVersion = socatVersion;
+	}
+
+	/**
+	 * @return
+	 * 		the QC flag;
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getQcFlag() {
+		return qcFlag;
+	}
+
+	/**
+	 * @param qcFlag 
+	 * 		the QC flag to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setQcFlag(String qcFlag) {
+		if ( qcFlag == null )
+			this.qcFlag = "";
+		else
+			this.qcFlag = qcFlag;
 	}
 
 	/**
@@ -400,10 +442,16 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			maxLength = scienceGroup.length();
 		if ( maxLength < origDataRef.length() ) 
 			maxLength = origDataRef.length();
+		if ( maxLength < addlDocs.length() )
+			maxLength = addlDocs.length();
 		if ( maxLength < socatDOI.length() ) 
 			maxLength = socatDOI.length();
 		if ( maxLength < socatDOIHRef.length() ) 
 			maxLength = socatDOIHRef.length();
+		if ( maxLength < socatVersion.length() )
+			maxLength = socatVersion.length();
+		if ( maxLength < qcFlag.length() )
+			maxLength = qcFlag.length();
 		return maxLength;
 	}
 
@@ -420,9 +468,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		result = result * prime + endTime.hashCode();
 		result = result * prime + scienceGroup.hashCode();
 		result = result * prime + origDataRef.hashCode();
+		result = result * prime + addlDocs.hashCode();
 		result = result * prime + socatDOI.hashCode();
 		result = result * prime + socatDOIHRef.hashCode();
-		result = result * prime + cruiseFlag.hashCode();
+		result = result * prime + socatVersion.hashCode();
+		result = result * prime + qcFlag.hashCode();
 		return result;
 	}
 
@@ -440,36 +490,31 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		// Date comparisons
 		if ( ! beginTime.equals(other.beginTime) )
 			return false;
-
 		if ( ! endTime.equals(other.endTime) )
 			return false;
 
 		// String comparisons
 		if ( ! expocode.equals(other.expocode) )
 			return false;
-
 		if ( ! cruiseName.equals(other.cruiseName) )
 			return false;
-
 		if ( ! vesselName.equals(other.vesselName) )
 			return false;
-
 		if ( ! organization.equals(other.organization) )
 			return false;
-
 		if ( ! scienceGroup.equals(other.scienceGroup) )
 			return false;
-
 		if ( ! origDataRef.equals(other.origDataRef) ) 
 			return false;
-
+		if ( ! addlDocs.equals(other.addlDocs) )
+			return false;
 		if ( ! socatDOI.equals(other.socatDOI) )
 			return false;
-
 		if ( ! socatDOIHRef.equals(other.socatDOIHRef) )
 			return false;
-
-		if ( ! cruiseFlag.equals(other.cruiseFlag) )
+		if ( ! socatVersion.equals(other.socatVersion) )
+			return false;
+		if ( ! qcFlag.equals(other.qcFlag) )
 			return false;
 
 		// Floating-point comparisons
@@ -503,9 +548,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    endDate=" + endTime.toString() + 
 				",\n    scienceGroup=" + scienceGroup + 
 				",\n    origDataRef=" + origDataRef + 
+				",\n    addlDocs=" + addlDocs + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    socatDOIHRef=" + socatDOIHRef + 
-				",\n    cruiseFlag=" + cruiseFlag.toString() + 
+				",\n    socatVersion=" + socatVersion + 
+				",\n    qcFlag=" + qcFlag + 
 				" ]";
 	}
 

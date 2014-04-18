@@ -39,6 +39,11 @@ public class Socat2Transfer {
 	CruiseFileHandler cruiseHandler;
 	MetadataFileHandler metadataHandler;
 
+	public class UnassignedInfo {
+		String qcFlag = "";
+		String metadataHRef = "";
+	}
+
 	/**
 	 * @param catConn
 	 * 		connection to a SOCAT v2 database
@@ -75,8 +80,8 @@ public class Socat2Transfer {
 	 * @throws IllegalArgumentException 
 	 * 		if there are problems saving the dashboard files
 	 */
-	public String transferV2DataToDashboard(String expocode, String owner) 
-							throws SQLException, IllegalArgumentException {
+	public UnassignedInfo transferV2DataToDashboard(String expocode, String owner) 
+									throws SQLException, IllegalArgumentException {
 		// Read the cruise data from the v2 database
 		SocatMetaValues socat2Metadata;
 		try {
@@ -115,11 +120,14 @@ public class Socat2Transfer {
 		cruiseMetadata.setStartDate(socat2Metadata.getBeginTime());
 		cruiseMetadata.setEndDate(socat2Metadata.getEndTime());
 		cruiseMetadata.setOrigDataRef(socat2Metadata.getOrigDOI());
-		String qcFlag = socat2Metadata.getFlag();
+
+		UnassignedInfo addlInfo = new UnassignedInfo();
+		addlInfo.qcFlag = socat2Metadata.getFlag();
+		addlInfo.metadataHRef = socat2Metadata.getMetadataHRef();
 
 		// Generate the DashboardCruiseWithData from the v2 data
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		cruiseData.setVersion("2");
+		cruiseData.setVersion(socat2Metadata.getVersion());
 		cruiseData.setExpocode(expocode);
 		cruiseData.setOwner(owner);
 		cruiseData.setUploadFilename(expocode + "_from_v2.tsv");
@@ -406,7 +414,7 @@ public class Socat2Transfer {
 		metadataHandler.saveMetadataInfo(cruiseMetadata, commitMessage);
 		metadataHandler.saveAsMinimalOmeXmlDoc(cruiseMetadata, commitMessage);
 
-		return qcFlag;
+		return addlInfo;
 	}
 
 	/**
@@ -488,6 +496,7 @@ public class Socat2Transfer {
 			System.exit(1);
 		}
 
+		UnassignedInfo addlInfo = null;
 		Connection catConn = null;
 		try {
 			catConn = SocatUtils.createSocatConnection(catalog, username);
@@ -498,8 +507,8 @@ public class Socat2Transfer {
 
 			try {
 				Socat2Transfer transfer = new Socat2Transfer(catConn, logFiles);
-				String qcFlag = transfer.transferV2DataToDashboard(expocode, owner);
-				if ( qcFlag == null ) {
+				addlInfo = transfer.transferV2DataToDashboard(expocode, owner);
+				if ( addlInfo == null ) {
 					// Error message already printed to log files
 					System.exit(1);
 				}
@@ -524,6 +533,7 @@ public class Socat2Transfer {
 			}
 			logFiles.closeLogFiles();
 		}
+
 		System.exit(0);
 	}
 
