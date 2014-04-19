@@ -24,7 +24,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	 */
 	public static final String OME_FILENAME = "OME.xml";
 
-	private static final String TITLE_SEPARATOR = "; ";
+	private static final String TITLE_SEPARATOR = " ; ";
 
 	protected boolean selected;
 	protected String expocode;

@@ -8,12 +8,14 @@ import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 /**
  * NetCDF DSG file handler for the SOCAT upload dashboard.
@@ -68,12 +70,14 @@ public class DsgNcFileHandler {
 	 * 		metadata for the cruise
 	 * @param cruiseData
 	 * 		data for the cruise
+	 * @param qcFlag
+	 * 		cruise QC flag to assign
 	 * @throws IllegalArgumentException
 	 * 		if there are problems with the metadata or data given, or
 	 * 		if there are problems creating or writing the NetCDF DSG file
 	 */
-	public void saveCruise(OmeMetadata omeMData, DashboardCruiseWithData cruiseData)
-											throws IllegalArgumentException {
+	public void saveCruise(OmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
+									String qcFlag) throws IllegalArgumentException {
 		DashboardDataStore dataStore;
 		try {
 			dataStore = DashboardDataStore.get();
@@ -94,9 +98,14 @@ public class DsgNcFileHandler {
 						parentDir.getPath());
 		}
 
+		// Get just the filenames from the set of addition document
+		TreeSet<String> addlDocs = new TreeSet<String>();
+		for ( String docInfo : cruiseData.getAddlDocs() ) {
+			addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
+		}
 		// Get the metadata needed for creating the DSG file
-		SocatMetadata socatMData = 
-				omeMData.createSocatMetadata(dataStore.getSocatVersion());
+		SocatMetadata socatMData = omeMData.createSocatMetadata(
+				cruiseData.getVersion(), addlDocs, qcFlag);
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);

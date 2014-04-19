@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -641,9 +642,19 @@ public class OmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Create a SocatMatadata object from the data in this object.
+	 * Create a SocatMetadata object from the data in this object.
+	 * 
+	 * @param socatVersion
+	 * 		SOCAT version to assign
+	 * @param addlDocs
+	 * 		additional documents to assign
+	 * @param qcFlag
+	 * 		dataset QC flag to assign
+	 * @return
+	 *		created SocatMetadata object 
 	 */
-	public SocatMetadata createSocatMetadata(String socatVersion) {
+	public SocatMetadata createSocatMetadata(String socatVersion, 
+							Set<String> addlDocs, String qcFlag) {
 		SocatMetadata scMData = new SocatMetadata();
 		scMData.setExpocode(expocode);
 		scMData.setCruiseName(cruiseName);
@@ -673,8 +684,24 @@ public class OmeMetadata extends DashboardMetadata {
 			else
 				orgGroup += SocatMetadata.NAMES_SEPARATOR + orgName;
 		}
-		scMData.setSocatVersion(socatVersion);
+		scMData.setOrganization(orgGroup);
+
 		// TODO: add and initialize more fields when they are identified in the OME XML file
+
+		// Add names of any ancillary documents
+		String docsString = "";
+		for ( String docName : addlDocs ) {
+			if ( docsString.isEmpty() )
+				docsString = docName;
+			else
+				docsString += SocatMetadata.NAMES_SEPARATOR + docName;
+		}
+		scMData.setAddlDocs(docsString);
+
+		// Add SOCAT version and QC flag
+		scMData.setSocatVersion(socatVersion);
+		scMData.setQcFlag(qcFlag);
+
 		return scMData;
 	}
 

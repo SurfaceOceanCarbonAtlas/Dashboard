@@ -77,6 +77,7 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
 	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
+	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
 	/**
 	 * Header names of the standard data columns that a user might provide
