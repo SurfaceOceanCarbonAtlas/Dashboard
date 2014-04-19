@@ -408,18 +408,20 @@ public class CruiseListPage extends Composite {
 	 * Selects or unselects cruises in the cruise list.
 	 * 
 	 * @param selected
-	 * 		if true, all cruises will be selected;
+	 * 		if true, all unsubmitted or failed cruises will be selected;
 	 * 		otherwise, all cruises will be unselected
-	 * @param onlyUnsubmitted
-	 * 		if true, the above selection only applies to cruises
-	 * 		not actively being QC-ed; otherwise, the above selection 
-	 * 		applies to all cruises
 	 */
-	private void selectAllCruises(boolean selected, boolean onlyUnsubmitted) {
+	private void selectAllCruises(boolean selected) {
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		for ( DashboardCruise cruise : cruiseList ) {
-			if ( onlyUnsubmitted ) {
-				String status = cruise.getQcStatus();
+			if ( selected ) {
+				String status = cruise.getArchiveStatus();
+				if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
+						 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
+						 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
+						 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) ) 
+					continue;
+				status = cruise.getQcStatus();
 				if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
 						 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
 						 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ||
@@ -437,32 +439,32 @@ public class CruiseListPage extends Composite {
 	 * Assigns cruiseSet in this instance with the set of selected cruises. 
 	 * Succeeds only if all the cruises fit the desired criterion.
 	 *  
-	 * @param unsubmitted
+	 * @param onlyUnsubmitted
 	 * 		if true, fails if a submitted cruise is selected;
-	 * 		if false, fails if an unsubmitted cruise is selected;
-	 * 		if null, no restriction and always succeeds.
+	 * 		if false, no restriction and always succeeds.
 	 * @return
 	 * 		if successful
 	 */
-	private boolean getSelectedCruises(Boolean unsubmitted) {
+	private boolean getSelectedCruises(boolean onlyUnsubmitted) {
 		cruiseSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
-				cruiseSet.add(cruise);
-				if ( unsubmitted != null ){
-					String status = cruise.getQcStatus();
-					if ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-						 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-						 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-						 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) {
-						if ( unsubmitted == false )
-							return false;
-					}
-					else {
-						if ( unsubmitted == true )
-							return false;
-					}
+				// Always ignore cruises from previous SOCAT versions
+				String status = cruise.getArchiveStatus();
+				if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
+						 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
+						 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
+						 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) ) 
+					continue;
+				if ( onlyUnsubmitted ) {
+					status = cruise.getQcStatus();
+					if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
+							 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+							 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+							 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) )  ) 
+						return false;
 				}
+				cruiseSet.add(cruise);
 			}
 		}
 		return true;
@@ -473,15 +475,14 @@ public class CruiseListPage extends Composite {
 	 * then assigns expocodeSet in this instance with the expocodes of these 
 	 * cruises.  Succeeds only if all the cruises fit the desired criterion.
 	 *  
-	 * @param unsubmitted
+	 * @param onlyUnsubmitted
 	 * 		if true, fails if a submitted cruise is selected;
-	 * 		if false, fails if an unsubmitted cruise is selected;
-	 * 		if null, no restriction and always succeeds.
+	 * 		if false, no restriction and always succeeds.
 	 * @return
 	 * 		if successful
 	 */
-	private boolean getSelectedCruiseExpocodes(Boolean unsubmitted) {
-		boolean success = getSelectedCruises(unsubmitted);
+	private boolean getSelectedCruiseExpocodes(boolean onlyUnsubmitted) {
+		boolean success = getSelectedCruises(onlyUnsubmitted);
 		if ( ! success )
 			return false;
 		expocodeSet.clear();
@@ -557,8 +558,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		// With null argument, getSelectedCruises always returns true
-		getSelectedCruises(null);
+		getSelectedCruises(false);
 		if ( cruiseSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
@@ -690,7 +690,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("removeFromListButton")
 	void removeFromListOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes(null);
+		getSelectedCruiseExpocodes(false);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_REMOVE_ERR_END);
@@ -890,7 +890,7 @@ public class CruiseListPage extends Composite {
 			public void update(Boolean selected) {
 				if ( selected == null )
 					return;
-				selectAllCruises(selected, false);
+				selectAllCruises(selected);
 			}
 		});
 		return selectedHeader;

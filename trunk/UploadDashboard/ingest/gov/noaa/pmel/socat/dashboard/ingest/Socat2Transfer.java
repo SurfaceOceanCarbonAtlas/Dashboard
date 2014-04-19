@@ -9,6 +9,7 @@ import gov.noaa.pmel.socat.SocatLogFiles;
 import gov.noaa.pmel.socat.SocatMetaValues;
 import gov.noaa.pmel.socat.SocatUtils;
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
@@ -33,11 +34,14 @@ import java.util.TreeSet;
  */
 public class Socat2Transfer {
 
+	private static final String SUBMITTER_NAME = "Socat2Transfer"; 
+
 	SocatLogFiles logFiles;
 	SocatCruises socat2Cruises;
 	SimpleDateFormat timestamper;
 	CruiseFileHandler cruiseHandler;
 	MetadataFileHandler metadataHandler;
+	DashboardCruiseSubmitter cruiseSubmitter;
 
 	public class UnassignedInfo {
 		String qcFlag = "";
@@ -62,6 +66,7 @@ public class Socat2Transfer {
 		DashboardDataStore dataStore = DashboardDataStore.get();
 		cruiseHandler = dataStore.getCruiseFileHandler();
 		metadataHandler = dataStore.getMetadataFileHandler();
+		cruiseSubmitter = new DashboardCruiseSubmitter(dataStore);
 	}
 
 	/**
@@ -80,21 +85,21 @@ public class Socat2Transfer {
 	 * @throws IllegalArgumentException 
 	 * 		if there are problems saving the dashboard files
 	 */
-	public UnassignedInfo transferV2DataToDashboard(String expocode, String owner) 
+	public boolean transferV2DataToDashboard(String expocode, String owner) 
 									throws SQLException, IllegalArgumentException {
+		TreeSet<String> expocodesSet = new TreeSet<String>(Arrays.asList(expocode));
 		// Read the cruise data from the v2 database
 		SocatMetaValues socat2Metadata;
 		try {
-			TreeSet<String> expocodesSet = new TreeSet<String>(Arrays.asList(expocode));
 			socat2Metadata = socat2Cruises.readMetadata(expocodesSet, logFiles).first();
 		} catch (Exception ex) {
 			logFiles.logToSummary("Problems reading the v2 metadata for " + expocode);
-			return null;
+			return false;
 		}
 		ArrayList<SocatDataValues> socat2DataList = socat2Cruises.getDatabaseData(socat2Metadata, logFiles);
 		if ( socat2DataList.size() < 1 ) {
 			logFiles.logToSummary("No data values read for " + expocode);
-			return null;
+			return false;
 		}
 
 		String timestamp = timestamper.format(new Date());
@@ -414,7 +419,13 @@ public class Socat2Transfer {
 		metadataHandler.saveMetadataInfo(cruiseMetadata, commitMessage);
 		metadataHandler.saveAsMinimalOmeXmlDoc(cruiseMetadata, commitMessage);
 
-		return addlInfo;
+		// Run the data through the sanity checker and submit for QC, 
+		// but mark as archived, give a QC flag, and saved the metadata http reference(s)
+		cruiseSubmitter.submitCruises(expocodesSet, 
+				DashboardUtils.ARCHIVE_STATUS_ARCHIVED, timestamp, false, 
+				SUBMITTER_NAME, addlInfo.qcFlag, addlInfo.metadataHRef);
+
+		return true;
 	}
 
 	/**
@@ -496,7 +507,6 @@ public class Socat2Transfer {
 			System.exit(1);
 		}
 
-		UnassignedInfo addlInfo = null;
 		Connection catConn = null;
 		try {
 			catConn = SocatUtils.createSocatConnection(catalog, username);
@@ -507,8 +517,7 @@ public class Socat2Transfer {
 
 			try {
 				Socat2Transfer transfer = new Socat2Transfer(catConn, logFiles);
-				addlInfo = transfer.transferV2DataToDashboard(expocode, owner);
-				if ( addlInfo == null ) {
+				if ( ! transfer.transferV2DataToDashboard(expocode, owner) ) {
 					// Error message already printed to log files
 					System.exit(1);
 				}

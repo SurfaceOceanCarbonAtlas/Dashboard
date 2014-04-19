@@ -257,8 +257,6 @@ public class AddToSocatPage extends Composite {
 		TreeSet<String> cruiseIntros = new TreeSet<String>();
 		for ( DashboardCruise cruise : cruisesSet ) {
 			String expo = cruise.getExpocode();
-			// Add the expocode of this cruise to the list for the server 
-			expocodes.add(expo);
 			// Add the status of this cruise to the counts 
 			String archiveStatus = cruise.getArchiveStatus();
 			if ( archiveStatus.equals(
@@ -276,11 +274,12 @@ public class AddToSocatPage extends Composite {
 				// Owner will archive
 				numOwner++;
 			}
-			else if ( ! archiveStatus.equals(
-					DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ) {
-				// unknown status - should not happen
-				Window.alert("Unexpected archive status: " + archiveStatus);
+			else if ( ! archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ) {
+				Window.alert("Unexpected archive status of '" + archiveStatus + "'");
+				continue;
 			}
+			expocodes.add(expo);
+
 			// Add this cruise to the intro list
 			String submitStatus = cruise.getQcStatus();
 			String cdiacDate = cruise.getCdiacDate();
