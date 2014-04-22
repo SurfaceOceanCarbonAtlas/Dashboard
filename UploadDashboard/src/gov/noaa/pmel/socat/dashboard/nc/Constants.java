@@ -22,9 +22,10 @@ public class Constants {
 		shortNameMap.put("vesselName", "vessel_name");
 		shortNameMap.put("organization", "organization");
 		shortNameMap.put("scienceGroup", "investigators");
-		shortNameMap.put("origDataRef", "original_data_reference");
+		shortNameMap.put("origDataRef", "orig_data_ref");
+		shortNameMap.put("addlDocs", "addl_docs");
 		shortNameMap.put("socatDOI", "socat_data_doi");
-		shortNameMap.put("socatDOIHRef", "socat_data_reference");
+		shortNameMap.put("socatDOIHRef", "socat_data_ref");
 		shortNameMap.put("socatVersion", "socat_version");
 		shortNameMap.put("qcFlag", "qc_flag");
 
@@ -161,6 +162,7 @@ public class Constants {
 		longNameMap.put("organization", "organization");
 		longNameMap.put("scienceGroup", "investigators");
 		longNameMap.put("origDataRef", "original data reference");
+		longNameMap.put("addlDocs", "additional documents");
 		longNameMap.put("socatDOI", "SOCAT data DOI");
 		longNameMap.put("socatDOIHRef", "SOCAT data reference");
 		longNameMap.put("socatVersion", "SOCAT version");
