@@ -898,13 +898,17 @@ public class DashboardCruiseChecker {
 	}
 
 	/**
-	 * 
+	 * Sanity-checks and standardizes the units in the data values,
+	 * stored as strings, in the given cruise.  The year, month, day,
+	 * hour, minute, and second data columns are appended to each 
+	 * data measurement (row, outer array) if not already present.
+	 *  
 	 * @param cruiseData
+	 * 		cruise data to be standardized
 	 * @return
-	 * @throws IllegalArgumentException
+	 * 		standardized cruise data
 	 */
-	public Output standardizeCruiseData(DashboardCruiseWithData cruiseData) 
-											throws IllegalArgumentException {
+	public Output standardizeCruiseData(DashboardCruiseWithData cruiseData) {
 		// Run the SanityChecker to get the standardized data
 		Output output = checkCruise(cruiseData);
 		List<SocatDataRecord> stdRowVals = output.getRecords();
@@ -1113,7 +1117,7 @@ public class DashboardCruiseChecker {
 					String chkName = DashboardUtils.STD_HEADER_NAMES.get(colType);
 					SocatDataColumn stdCol = stdVals.getColumn(chkName);
 					if ( stdCol == null )
-						throw new NullPointerException("SocatDataColumn not found for " + 
+						throw new IllegalArgumentException("SocatDataColumn not found for " + 
 								chkName + " (column type " + colType + ")");
 					String value = stdCol.getValue();
 					rowData.set(k, value);

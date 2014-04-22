@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -598,6 +599,248 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				new ArrayList<SocatCruiseData>(dataValsTable.size());
 		for ( ArrayList<String> dataVals : dataValsTable ) {
 			socatDataList.add(new SocatCruiseData(dataTypes, dataVals));
+		}
+		// Assign the WOCE flags in the SocatCruiseData objects
+		// assigned by the SanityChecker (and includes user-provided WOCE flags) 
+		ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
+		ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
+		int k = -1;
+		for ( DataColumnType colType : cruise.getDataColTypes() ) {
+			k++;
+			if ( colType.equals(DataColumnType.TIMESTAMP) ||
+				 colType.equals(DataColumnType.DATE) ||
+				 colType.equals(DataColumnType.YEAR) ||
+				 colType.equals(DataColumnType.MONTH) ||
+				 colType.equals(DataColumnType.DAY) ||
+				 colType.equals(DataColumnType.TIME) ||
+				 colType.equals(DataColumnType.HOUR) ||
+				 colType.equals(DataColumnType.MINUTE) ||
+				 colType.equals(DataColumnType.SECOND) ||
+				 colType.equals(DataColumnType.DAY_OF_YEAR) ||
+				 colType.equals(DataColumnType.LONGITUDE) | 
+				 colType.equals(DataColumnType.LATITUDE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					// The WOCE flags for all of these columns should be the same
+					// but just in case not...
+					SocatCruiseData rowData = socatDataList.get(rowIdx);
+					if ( ! rowData.geopositionWoce.equals('4') )
+						rowData.geopositionWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).geopositionWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SAMPLE_DEPTH) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).sampleDepthWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).sampleDepthWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SALINITY) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).salinityWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).salinityWoce = '4';
+				}
+			}
+			else if ( 	 colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).tEquWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).tEquWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).sstWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).sstWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).pEquWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).pEquWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).slpWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).slpWoce = '4';
+				}
+			}
+
+			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).xCO2WaterTEquWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).xCO2WaterTEquWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.XCO2_WATER_SST) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).xCO2WaterSstWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).xCO2WaterSstWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.PCO2_WATER_TEQU) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).pCO2WaterTEquWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).pCO2WaterTEquWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.PCO2_WATER_SST) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).pCO2WaterSstWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).pCO2WaterSstWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.FCO2_WATER_TEQU) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).fCO2WaterTEquWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).fCO2WaterTEquWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.FCO2_WATER_SST) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).fCO2WaterSstWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).fCO2WaterSstWoce = '4';
+				}
+			}
+
+			else if ( colType.equals(DataColumnType.XCO2_ATM) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).xCO2AtmWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).xCO2AtmWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.PCO2_ATM) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).pCO2AtmWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).pCO2AtmWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.FCO2_ATM) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).fCO2AtmWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).fCO2AtmWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.DELTA_XCO2) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).deltaXCO2Woce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).deltaXCO2Woce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.DELTA_PCO2) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).deltaPCO2Woce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).deltaPCO2Woce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.DELTA_FCO2) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).deltaFCO2Woce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).deltaFCO2Woce = '4';
+				}
+			}
+
+			else if ( colType.equals(DataColumnType.RELATIVE_HUMIDITY) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).relativeHumidityWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).relativeHumidityWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SPECIFIC_HUMIDITY) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).specificHumidityWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).specificHumidityWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SHIP_SPEED) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).shipSpeedWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).shipSpeedWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.SHIP_DIRECTION) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).shipDirectionWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).shipDirectionWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.WIND_SPEED_TRUE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).windSpeedTrueWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).windSpeedTrueWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.WIND_SPEED_RELATIVE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).windSpeedRelativeWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).windSpeedRelativeWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.WIND_DIRECTION_TRUE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).windDirectionTrueWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).windDirectionTrueWoce = '4';
+				}
+			}
+			else if ( colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
+				for ( Integer rowIdx : woceThrees.get(k) ) {
+					socatDataList.get(rowIdx).windDirectionRelativeWoce = '3';
+				}
+				for ( Integer rowIdx : woceFours.get(k) ) {
+					socatDataList.get(rowIdx).windDirectionRelativeWoce = '4';
+				}
+			}
 		}
 		return socatDataList;
 	}

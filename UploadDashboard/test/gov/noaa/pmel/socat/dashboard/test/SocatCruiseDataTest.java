@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -49,8 +50,10 @@ public class SocatCruiseDataTest {
 	static final ArrayList<Double> EXPECTED_SSTS = new ArrayList<Double>();
 	static final ArrayList<Double> EXPECTED_SALS = new ArrayList<Double>();
 	static final ArrayList<Double> EXPECTED_XCO2WATER_SSTS = new ArrayList<Double>();
-	static final ArrayList<Double> EXPECTED_PCO2WATER_EQUS = new ArrayList<Double>();
+	static final ArrayList<Double> EXPECTED_PCO2WATER_TEQUS = new ArrayList<Double>();
 	static final ArrayList<Double> EXPECTED_SLPS = new ArrayList<Double>();
+	static final int BAD_ROW_INDEX;
+	static final int[] BAD_COLUMN_INDICES;
 
 	static {
 		// No seconds, and pressure is in kPa instead of hPa, but shouldn't matter for these tests
@@ -96,9 +99,11 @@ public class SocatCruiseDataTest {
 			EXPECTED_SSTS.add(Double.valueOf(dataVals.get(9)));
 			EXPECTED_SALS.add(Double.valueOf(dataVals.get(10)));
 			EXPECTED_XCO2WATER_SSTS.add(Double.valueOf(dataVals.get(11)));
-			EXPECTED_PCO2WATER_EQUS.add(Double.valueOf(dataVals.get(12)));
+			EXPECTED_PCO2WATER_TEQUS.add(Double.valueOf(dataVals.get(12)));
 			EXPECTED_SLPS.add(Double.valueOf(dataVals.get(13)));
 		}
+		BAD_ROW_INDEX = TEST_VALUES.size() - 1;
+		BAD_COLUMN_INDICES = new int[] { 7, 8, 9, 10, 11, 12, 13 };
 	}
 
 	/**
@@ -110,8 +115,18 @@ public class SocatCruiseDataTest {
 		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
 		cruise.setDataColTypes(TEST_TYPES);
 		cruise.setDataValues(TEST_VALUES);
-		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
+		ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
+		ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
 		for (int k = 0; k < TEST_TYPES.size(); k++) {
+			woceThrees.add(new HashSet<Integer>());
+			woceFours.add(new HashSet<Integer>());
+		}
+		for ( int badColIdx : BAD_COLUMN_INDICES ) {
+			woceFours.get(badColIdx).add(BAD_ROW_INDEX);
+		}
+		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
+		Character noWoce = new Character(' ');
+		for (int k = 0; k < BAD_ROW_INDEX; k++) {
 			assertEquals(EXPECTED_YEARS.get(k), dataList.get(k).getYear());
 			assertEquals(EXPECTED_MONTHS.get(k), dataList.get(k).getMonth());
 			assertEquals(EXPECTED_DAYS.get(k), dataList.get(k).getDay());
@@ -122,7 +137,7 @@ public class SocatCruiseDataTest {
 			assertEquals(EXPECTED_SSTS.get(k), dataList.get(k).getSst());
 			assertEquals(EXPECTED_SALS.get(k), dataList.get(k).getSalinity());
 			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), dataList.get(k).getxCO2WaterSst());
-			assertEquals(EXPECTED_PCO2WATER_EQUS.get(k), dataList.get(k).getpCO2WaterTEqu());
+			assertEquals(EXPECTED_PCO2WATER_TEQUS.get(k), dataList.get(k).getpCO2WaterTEqu());
 			assertEquals(EXPECTED_SLPS.get(k), dataList.get(k).getSlp());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getSecond());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getSampleDepth());
@@ -156,7 +171,28 @@ public class SocatCruiseDataTest {
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataList.get(k).getDistToLand());
 			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataList.get(k).getfCO2Source());
 			assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, dataList.get(k).getRegionID());
+			assertEquals(noWoce, dataList.get(k).getGeopositionWoce());
+			assertEquals(noWoce, dataList.get(k).getSstWoce());
+			assertEquals(noWoce, dataList.get(k).getSalinityWoce());
+			assertEquals(noWoce, dataList.get(k).getxCO2WaterSstWoce());
+			assertEquals(noWoce, dataList.get(k).getpCO2WaterTEquWoce());
+			assertEquals(noWoce, dataList.get(k).getSlpWoce());
 		}
+		SocatCruiseData badRowData = dataList.get(BAD_ROW_INDEX);
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getLatitude());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getLongitude());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getSalinity());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getxCO2WaterSst());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getpCO2WaterTEqu());
+		assertEquals(SocatCruiseData.FP_MISSING_VALUE, badRowData.getSlp());
+		Character badWoce = new Character('4');
+		assertEquals(badWoce, badRowData.getGeopositionWoce());
+		assertEquals(badWoce, badRowData.getSstWoce());
+		assertEquals(badWoce, badRowData.getSalinityWoce());
+		assertEquals(badWoce, badRowData.getxCO2WaterSstWoce());
+		assertEquals(badWoce, badRowData.getpCO2WaterTEquWoce());
+		assertEquals(badWoce, badRowData.getSlpWoce());
 	}
 
 	static final Integer YEAR = 2014;

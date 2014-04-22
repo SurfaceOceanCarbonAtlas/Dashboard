@@ -70,11 +70,11 @@ public class DashboardCruiseSubmitter {
 				else {
 					flag = "U";
 				}
-				// Get the complete cruise data in standard units;
-				// standardizing adds year, month, day, hour, minute, and seconds columns if not present 
+				// Get the complete cruise data in standard units
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
+				// TODO: if QC flag not given, check geoposition WOCE flags and, if any are four, set QC flag to 'F'
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
 						metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
@@ -91,7 +91,7 @@ public class DashboardCruiseSubmitter {
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorMsgs(cruiseData.getNumErrorMsgs());
 				cruise.setNumWarnMsgs(cruiseData.getNumWarnMsgs());
-				// cruiseData may have added year, month, day, hour, minute, and second columns
+				// Save the WOCE flags for the columns in the original cruise data
 				int numDataCols = cruise.getDataColTypes().size();
 				cruise.setWoceThreeRowIndices(new ArrayList<HashSet<Integer>>(
 						cruiseData.getWoceThreeRowIndices().subList(0, numDataCols)));
@@ -99,7 +99,7 @@ public class DashboardCruiseSubmitter {
 						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
 				cruiseHandler.saveCruiseMessages(cruise.getExpocode(), output);
 				changed = true;
-				// TODO: add QC flag/comment with suggested QC flag from SanityChecker results
+				// TODO: add QC comment with suggested QC flag from SanityChecker results
 				commitMsg += " submit with QC flag '" + flag + "'";
 				ingestExpos.add(expocode);
 			}
@@ -125,7 +125,7 @@ public class DashboardCruiseSubmitter {
 			if ( changed ) {
 				// Commit this update of the cruise properties
 				commitMsg += " by user '" + submitter + "'";
-				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);				
+				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
 			}
 		}
 
