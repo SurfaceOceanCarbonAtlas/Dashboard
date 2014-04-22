@@ -98,11 +98,15 @@ public class CruiseDsgNcFile {
 			if ( f.getType().equals(String.class) && ! Modifier.isStatic(f.getModifiers()) ) {
 				String name = f.getName();
 				String varName = Constants.SHORT_NAME.get(name);
+				if ( varName == null )
+					throw new RuntimeException("Unexpected missing short name for " + name);
 				Variable var = ncfile.addVariable(null, varName, DataType.CHAR, trajdimsChar);
 				if ( var == null )
 					throw new RuntimeException("Unexpected failure to add the variable " + 
 							varName + " for metadata field " + name);
 				String longName = Constants.LONG_NAME.get(name);
+				if ( longName == null )
+					throw new RuntimeException("Unexpected missing long name for " + name);
 				ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
 				if ( name.equals("expocode")) {
 					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
@@ -126,6 +130,8 @@ public class CruiseDsgNcFile {
 			if ( ! Modifier.isStatic(f.getModifiers()) ) {
 				String name = f.getName();
 				String varName = Constants.SHORT_NAME.get(name);
+				if ( varName == null )
+					throw new RuntimeException("Unexpected missing short name for " + name);
 				var = null;
 				Number missVal = null;
 				Class<?> type = f.getType();
@@ -157,6 +163,8 @@ public class CruiseDsgNcFile {
 					ncfile.addVariableAttribute(var, new Attribute("units", units));
 				}
 				String longName = Constants.LONG_NAME.get(name);
+				if ( longName == null )
+					throw new RuntimeException("Unexpected missing long name for " + name);
 				ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
 				if ( name.endsWith("Depth") ) {
 					ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
