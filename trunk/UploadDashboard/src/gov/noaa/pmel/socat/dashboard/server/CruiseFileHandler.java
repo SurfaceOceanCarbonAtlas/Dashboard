@@ -55,8 +55,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String ARCHIVE_STATUS_ID = "archivestatus";
 	private static final String CDIAC_DATE_ID = "cdiacdate";
 	private static final String NUM_DATA_ROWS_ID = "numdatarows";
-	private static final String NUM_ERROR_MSGS_ID = "numerrormsgs";
-	private static final String NUM_WARN_MSGS_ID = "numwarnmsgs";
+	private static final String NUM_ERROR_ROWS_ID = "numerrrows";
+	private static final String NUM_WARN_ROWS_ID = "numwarnrows";
 	private static final String DATA_COLUMN_TYPES_ID = "datacolumntypes";
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
@@ -688,12 +688,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Total number of data measurements (rows of data)
 		cruiseProps.setProperty(NUM_DATA_ROWS_ID, 
 				Integer.toString(cruise.getNumDataRows()));
-		// Number of data error messages
-		cruiseProps.setProperty(NUM_ERROR_MSGS_ID, 
-				Integer.toString(cruise.getNumErrorMsgs()));
-		// Number of data warning messages
-		cruiseProps.setProperty(NUM_WARN_MSGS_ID, 
-				Integer.toString(cruise.getNumWarnMsgs()));
+		// Number of data rows with error messages
+		cruiseProps.setProperty(NUM_ERROR_ROWS_ID, 
+				Integer.toString(cruise.getNumErrorRows()));
+		// Number of data rows with warning messages
+		cruiseProps.setProperty(NUM_WARN_ROWS_ID, 
+				Integer.toString(cruise.getNumWarnRows()));
 		// Data column types - encoded using the enumerated names
 		ArrayList<String> colTypeNames = 
 				new ArrayList<String>(cruise.getDataColTypes().size());
@@ -948,23 +948,23 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 
 		// Number of error messages
-		value = cruiseProps.getProperty(NUM_ERROR_MSGS_ID);
+		value = cruiseProps.getProperty(NUM_ERROR_ROWS_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
-					NUM_ERROR_MSGS_ID + " given in " + infoFile.getPath());
+					NUM_ERROR_ROWS_ID + " given in " + infoFile.getPath());
 		try {
-			cruise.setNumErrorMsgs(Integer.parseInt(value));
+			cruise.setNumErrorRows(Integer.parseInt(value));
 		} catch ( NumberFormatException ex ) {
 			throw new IllegalArgumentException(ex);
 		}
 
 		// Number of warning messages
-		value = cruiseProps.getProperty(NUM_WARN_MSGS_ID);
+		value = cruiseProps.getProperty(NUM_WARN_ROWS_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
-					NUM_WARN_MSGS_ID + " given in " + infoFile.getPath());
+					NUM_WARN_ROWS_ID + " given in " + infoFile.getPath());
 		try {
-			cruise.setNumWarnMsgs(Integer.parseInt(value));
+			cruise.setNumWarnRows(Integer.parseInt(value));
 		} catch ( NumberFormatException ex ) {
 			throw new IllegalArgumentException(ex);
 		}

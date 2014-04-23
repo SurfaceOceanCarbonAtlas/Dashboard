@@ -990,7 +990,7 @@ public class CruiseListPage extends Composite {
 					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else if ( msg.contains("warnings") || (msg.contains("errors") && 
-						(cruise.getNumErrorMsgs() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
+						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
 					// Only warnings or a few errors - use warning background color
 					sb.appendHtmlConstant("<div style=\"background-color:" +
 							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");

@@ -617,7 +617,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				 colType.equals(DataColumnType.MINUTE) ||
 				 colType.equals(DataColumnType.SECOND) ||
 				 colType.equals(DataColumnType.DAY_OF_YEAR) ||
-				 colType.equals(DataColumnType.LONGITUDE) | 
+				 colType.equals(DataColumnType.LONGITUDE) || 
 				 colType.equals(DataColumnType.LATITUDE) ) {
 				for ( Integer rowIdx : woceThrees.get(k) ) {
 					// The WOCE flags for all of these columns should be the same

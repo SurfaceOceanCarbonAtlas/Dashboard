@@ -130,8 +130,8 @@ public class DashboardCruiseWithData extends DashboardCruise
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
-				",\n    numErrorMsgs=" + Integer.toString(numErrorMsgs) +
-				",\n    numWarnMsgs=" + Integer.toString(numWarnMsgs) +
+				",\n    numErrorRows=" + Integer.toString(numErrorRows) +
+				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +

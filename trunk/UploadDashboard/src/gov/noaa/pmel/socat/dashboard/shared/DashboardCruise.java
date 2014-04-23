@@ -34,8 +34,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	String uploadFilename;
 	String uploadTimestamp;
 	int numDataRows;
-	int numErrorMsgs;
-	int numWarnMsgs;
+	int numErrorRows;
+	int numWarnRows;
 	ArrayList<String> userColNames;
 	ArrayList<DataColumnType> dataColTypes;
 	ArrayList<String> dataColUnits;
@@ -59,8 +59,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		uploadFilename = "";
 		uploadTimestamp = "";
 		numDataRows = 0;
-		numErrorMsgs = 0;
-		numWarnMsgs = 0;
+		numErrorRows = 0;
+		numWarnRows = 0;
 		dataColTypes = new ArrayList<DataColumnType>();
 		userColNames = new ArrayList<String>();
 		dataColUnits = new ArrayList<String>();
@@ -328,34 +328,34 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the number of error messages from the sanity checker
+	 * 		the number of data rows with error messages from the sanity checker
 	 */
-	public int getNumErrorMsgs() {
-		return numErrorMsgs;
+	public int getNumErrorRows() {
+		return numErrorRows;
 	}
 
 	/**
-	 * @param numErrorMsgs 
-	 * 		the number of error messages from the sanity checker to set
+	 * @param numErrorRows 
+	 * 		the number of data rows with error messages from the sanity checker to set
 	 */
-	public void setNumErrorMsgs(int numErrorMsgs) {
-		this.numErrorMsgs = numErrorMsgs;
+	public void setNumErrorRows(int numErrorRows) {
+		this.numErrorRows = numErrorRows;
 	}
 
 	/**
 	 * @return 
-	 * 		the number of warning messages from the sanity checker
+	 * 		the number of data rows with warning messages from the sanity checker
 	 */
-	public int getNumWarnMsgs() {
-		return numWarnMsgs;
+	public int getNumWarnRows() {
+		return numWarnRows;
 	}
 
 	/**
-	 * @param numWarnMsgs 
-	 * 		the number of warning messages from the sanity checker to set
+	 * @param numWarnRows 
+	 * 		the number of data rows with warning messages from the sanity checker to set
 	 */
-	public void setNumWarnMsgs(int numWarnMsgs) {
-		this.numWarnMsgs = numWarnMsgs;
+	public void setNumWarnRows(int numWarnRows) {
+		this.numWarnRows = numWarnRows;
 	}
 
 	/**
@@ -534,8 +534,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + numDataRows;
-		result = result * prime + numErrorMsgs;
-		result = result * prime + numWarnMsgs;
+		result = result * prime + numErrorRows;
+		result = result * prime + numWarnRows;
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
 		result = result * prime + dataColUnits.hashCode();
@@ -582,9 +582,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( numDataRows != other.numDataRows )
 			return false;
-		if ( numErrorMsgs != other.numErrorMsgs )
+		if ( numErrorRows != other.numErrorRows )
 			return false;
-		if ( numWarnMsgs != other.numWarnMsgs )
+		if ( numWarnRows != other.numWarnRows )
 			return false;
 		if ( ! userColNames.equals(other.userColNames) )
 			return false;
@@ -617,8 +617,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
-				",\n    numErrorMsgs=" + Integer.toString(numErrorMsgs) +
-				",\n    numWarnMsgs=" + Integer.toString(numWarnMsgs) +
+				",\n    numErrorRows=" + Integer.toString(numErrorRows) +
+				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
 				",\n    dataColUnits=" + dataColUnits.toString() +
