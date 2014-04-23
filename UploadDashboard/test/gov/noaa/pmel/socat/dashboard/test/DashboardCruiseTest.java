@@ -342,16 +342,16 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumErrorMsgs()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumErrorMsgs(int)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumErrorRows()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumErrorRows(int)}.
 	 */
 	@Test
-	public void testSetGetNumErrorMsgsText() {
+	public void testSetGetNumErrorRows() {
 		int myNumErrorMsgs = 4;
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getNumErrorMsgs());
-		cruise.setNumErrorMsgs(myNumErrorMsgs);
-		assertEquals(myNumErrorMsgs, cruise.getNumErrorMsgs());
+		assertEquals(0, cruise.getNumErrorRows());
+		cruise.setNumErrorRows(myNumErrorMsgs);
+		assertEquals(myNumErrorMsgs, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getMissingValues().size());
 		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -369,17 +369,17 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumWarnMsgs()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumWarnMsgs(int)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumWarnRows()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumWarnRows(int)}.
 	 */
 	@Test
-	public void testSetGetNumWarnMsgsText() {
+	public void testSetGetNumWarnRows() {
 		int myNumWarnMsgs = 14;
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getNumWarnMsgs());
-		cruise.setNumWarnMsgs(myNumWarnMsgs);
-		assertEquals(myNumWarnMsgs, cruise.getNumWarnMsgs());
-		assertEquals(0, cruise.getNumErrorMsgs());
+		assertEquals(0, cruise.getNumWarnRows());
+		cruise.setNumWarnRows(myNumWarnMsgs);
+		assertEquals(myNumWarnMsgs, cruise.getNumWarnRows());
+		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getMissingValues().size());
 		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -510,17 +510,17 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setNumErrorMsgs(myNumErrorMsgs);
+		firstCruise.setNumErrorRows(myNumErrorMsgs);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setNumErrorMsgs(myNumErrorMsgs);
+		secondCruise.setNumErrorRows(myNumErrorMsgs);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setNumWarnMsgs(myNumWarnMsgs);
+		firstCruise.setNumWarnRows(myNumWarnMsgs);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setNumWarnMsgs(myNumWarnMsgs);
+		secondCruise.setNumWarnRows(myNumWarnMsgs);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 

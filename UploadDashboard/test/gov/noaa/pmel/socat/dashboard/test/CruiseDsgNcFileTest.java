@@ -15,6 +15,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -83,6 +84,12 @@ public class CruiseDsgNcFileTest {
 		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
 		cruise.setDataColTypes(testTypes);
 		cruise.setDataValues(testValues);
+		ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
+		ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
+		for (int k = 0; k < testTypes.size(); k++) {
+			woceThrees.add(new HashSet<Integer>());
+			woceFours.add(new HashSet<Integer>());
+		}
 
 		// Create the list of SocatCruiseData from the DashboardCruiseWithData
 		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);

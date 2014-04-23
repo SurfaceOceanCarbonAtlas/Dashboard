@@ -560,40 +560,6 @@ public class DashboardCruiseChecker {
 
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
-		if ( ! output.processedOK() ) {
-			cruiseData.setNumErrorMsgs(0);
-			cruiseData.setNumWarnMsgs(0);
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
-		}
-		else if ( output.hasErrors() ) {
-			int numErrors = 0;
-			int numWarns = 0;
-			for ( Message msg : output.getMessages().getMessages() ) {
-				if ( msg.isError() )
-					numErrors++;
-				else if ( msg.isWarning() )
-					numWarns++;
-			}
-			cruiseData.setNumErrorMsgs(numErrors);
-			cruiseData.setNumWarnMsgs(numWarns);
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
-					Integer.toString(numErrors) + " errors");
-		}
-		else if ( output.hasWarnings() ) {
-			int numWarns = 0;
-			for ( Message msg : output.getMessages().getMessages() )
-				if ( msg.isWarning() )
-					numWarns++;
-			cruiseData.setNumErrorMsgs(0);
-			cruiseData.setNumWarnMsgs(numWarns);
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
-					Integer.toString(numWarns) + " warnings");
-		}
-		else {
-			cruiseData.setNumErrorMsgs(0);
-			cruiseData.setNumWarnMsgs(0);
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
-		}
 
 		// Clear all WOCE flags, then set those from the current set of messages
 		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceThreeRowIndices() )
@@ -602,6 +568,33 @@ public class DashboardCruiseChecker {
 			rowIdxSet.clear();
 		for ( Message msg : output.getMessages().getMessages() )
 			processMessage(cruiseData, msg, colIndcs);
+
+		// Assign the number of data rows with errors and with only warnings from the sanity checker
+		HashSet<Integer> errRows = new HashSet<Integer>();
+		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceFourRowIndices() )
+			errRows.addAll(rowIdxSet);
+		cruiseData.setNumErrorRows(errRows.size());
+		HashSet<Integer> warnRows = new HashSet<Integer>();
+		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceThreeRowIndices() )
+			warnRows.addAll(rowIdxSet);
+		warnRows.removeAll(errRows);
+		cruiseData.setNumWarnRows(warnRows.size());
+
+		// Assign the data-check status message using the results of the sanity check
+		if ( ! output.processedOK() ) {
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
+		}
+		else if ( output.hasErrors() ) {
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
+					Integer.toString(cruiseData.getNumErrorRows()) + " errors");
+		}
+		else if ( output.hasWarnings() ) {
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
+					Integer.toString(cruiseData.getNumWarnRows()) + " warnings");
+		}
+		else {
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
+		}
 
 		// Add any user-provided WOCE-3 and WOCE-4 flags - very likely there are none
 		k = -1;

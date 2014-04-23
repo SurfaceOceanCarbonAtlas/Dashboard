@@ -311,13 +311,13 @@ public class DataColumnSpecsPage extends Composite {
 		else {
 			cruiseNeverChecked = false;
 			String msgText;
-			int numErrors = cruiseSpecs.getNumErrorMsgs();
+			int numErrors = cruiseSpecs.getNumErrorRows();
 			if ( numErrors == 0 )
 				msgText = "no";
 			else
 				msgText = Integer.toString(numErrors);
 			msgText += " errors; ";
-			int numWarns = cruiseSpecs.getNumWarnMsgs();
+			int numWarns = cruiseSpecs.getNumWarnRows();
 			if ( numWarns == 0 )
 				msgText += "no";
 			else

@@ -96,8 +96,8 @@ public class DashboardCruiseSubmitter {
 				cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 				// Update cruise with the any updates from the SanityChecker
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
-				cruise.setNumErrorMsgs(cruiseData.getNumErrorMsgs());
-				cruise.setNumWarnMsgs(cruiseData.getNumWarnMsgs());
+				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
+				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
 				// Save the WOCE flags for the columns in the original cruise data
 				int numDataCols = cruise.getDataColTypes().size();
 				cruise.setWoceThreeRowIndices(new ArrayList<HashSet<Integer>>(
