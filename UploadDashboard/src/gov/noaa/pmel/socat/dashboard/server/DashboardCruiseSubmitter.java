@@ -74,7 +74,14 @@ public class DashboardCruiseSubmitter {
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
-				// TODO: if QC flag not given, check geoposition WOCE flags and, if any are four, set QC flag to 'F'
+				// Reset an "N" or "U" flag to an "F" flag if the cruise has major issues
+				if ( qcFlag == null ) {
+					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+						// Either checker failed, or geoposition WOCE flag of 4
+						// Presumably this should never happen.
+						flag = "F";
+					}
+				}
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
 						metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
