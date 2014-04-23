@@ -672,6 +672,10 @@ public class DashboardCruiseChecker {
 								woceFlags.get(colIndcs.secondIndex).add(rowIdx);
 							if ( colIndcs.dayOfYearIndex >= 0 )
 								woceFlags.get(colIndcs.dayOfYearIndex).add(rowIdx);
+							if ( colIndcs.longitudeIndex >= 0 )
+								woceFlags.get(colIndcs.longitudeIndex).add(rowIdx);
+							if ( colIndcs.latitudeIndex >= 0 )
+								woceFlags.get(colIndcs.latitudeIndex).add(rowIdx);
 						}
 						else if ( colType.equals(DataColumnType.SAMPLE_DEPTH_WOCE) ) {
 							if ( colIndcs.sampleDepthIndex >= 0 )
@@ -790,6 +794,36 @@ public class DashboardCruiseChecker {
 		for ( HashSet<Integer> woceThrees : cruiseData.getWoceThreeRowIndices() ) {
 			k++;
 			woceThrees.removeAll(cruiseData.getWoceFourRowIndices().get(k));
+		}
+
+		// If there are any geoposition WOCE-4 flags (date/time, lat, or lon)
+		// set the data check status to UNACCEPTABLE
+		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
+		if ( ( (colIndcs.timestampIndex >= 0) && 
+				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||
+			 ( (colIndcs.timeIndex >= 0) && 
+				! woceFourSets.get(colIndcs.timeIndex).isEmpty() ) ||
+			 ( (colIndcs.yearIndex >= 0) &&
+				! woceFourSets.get(colIndcs.yearIndex).isEmpty() ) ||
+			 ( (colIndcs.monthIndex >= 0) &&
+				! woceFourSets.get(colIndcs.monthIndex).isEmpty() ) ||
+			 ( (colIndcs.dayIndex >= 0) &&
+				! woceFourSets.get(colIndcs.dayIndex).isEmpty() ) ||
+			 ( (colIndcs.timeIndex >= 0) &&
+				! woceFourSets.get(colIndcs.timeIndex).isEmpty() ) ||
+			 ( (colIndcs.hourIndex >= 0) &&
+				! woceFourSets.get(colIndcs.hourIndex).isEmpty() ) ||
+			 ( (colIndcs.minuteIndex >= 0) &&
+				! woceFourSets.get(colIndcs.minuteIndex).isEmpty() ) ||
+			 ( (colIndcs.secondIndex >= 0) &&
+				! woceFourSets.get(colIndcs.secondIndex).isEmpty() ) ||
+			 ( (colIndcs.dayOfYearIndex >= 0) &&
+				! woceFourSets.get(colIndcs.dayOfYearIndex).isEmpty() ) ||
+			 ( (colIndcs.longitudeIndex >= 0) &&
+				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
+			 ( (colIndcs.latitudeIndex >= 0) &&
+				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
+			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 
 		return output;
