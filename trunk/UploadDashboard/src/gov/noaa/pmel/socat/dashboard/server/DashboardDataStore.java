@@ -7,7 +7,6 @@ import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -56,6 +55,7 @@ public class DashboardDataStore {
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
+	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
@@ -73,6 +73,7 @@ public class DashboardDataStore {
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
+			DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" + 
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
 			BaseConfig.SOCAT_CONFIG_FILE + "=/Path/To/DataColumnConfig/CSVFile \n" + 
 			BaseConfig.SANITY_CHECK_CONFIG_FILE + "/Path/To/SanityConfig/CSVFile \n" + 
@@ -104,6 +105,7 @@ public class DashboardDataStore {
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
 	private DashboardCruiseChecker cruiseChecker;
+	private DatabaseRequestHandler databaseRequestHandler;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -129,9 +131,9 @@ public class DashboardDataStore {
 		Properties configProps = new Properties();
 		configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
 		configFileTimestamp = configFile.lastModified();
-		BufferedReader reader;
+		FileReader reader;
 		try {
-			reader = new BufferedReader(new FileReader(configFile));
+			reader = new FileReader(configFile);
 			try {
 				configProps.load(reader);
 			} finally {
@@ -278,6 +280,19 @@ public class DashboardDataStore {
 		    itsLogger.info("read Ferret configuration file " + propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// Read the Database configuration filename
+		try {
+			propVal = configProps.getProperty(DATABASE_CONFIG_FILE_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			databaseRequestHandler = new DatabaseRequestHandler(propVal);
+		    itsLogger.info("read Database configuration file " + propVal);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + DATABASE_CONFIG_FILE_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -432,6 +447,14 @@ public class DashboardDataStore {
 	 */
 	public FerretConfig getFerretConfig() {
 		return ferretConf;
+	}
+
+	/**
+	 * @return
+	 * 		the database request handler
+	 */
+	public DatabaseRequestHandler getDatabaseRequestHandler() {
+		return databaseRequestHandler;
 	}
 
 	/**
