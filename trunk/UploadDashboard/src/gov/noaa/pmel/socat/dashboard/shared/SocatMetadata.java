@@ -45,7 +45,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	String addlDocs;
 	String socatDOI;
 	String socatDOIHRef;
-	String socatVersion;
+	Double socatVersion;
 	String qcFlag;
 
 	/**
@@ -67,7 +67,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		addlDocs = "";
 		socatDOI = "";
 		socatDOIHRef = "";
-		socatVersion = "";
+		socatVersion = 0.0;
 		qcFlag = "";
 	}
 
@@ -388,21 +388,21 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the cruise flag value associated with this instance;
-	 * 		never null but could be empty if not assigned
+	 * 		the SOCAT version associated with this instance;
+	 * 		never null but could be zero if not assigned
 	 */
-	public String getSocatVersion() {
+	public Double getSocatVersion() {
 		return socatVersion;
 	}
 
 	/**
-	 * @param qcFlag 
-	 * 		the cruise flag value to set; 
-	 * 		if null, an empty string is assigned
+	 * @param socatVersion 
+	 * 		the SOCAT version to set; 
+	 * 		if null or negative, zero is assigned
 	 */
-	public void setSocatVersion(String socatVersion) {
-		if ( socatVersion == null )
-			this.socatVersion = "";
+	public void setSocatVersion(Double socatVersion) {
+		if ( (socatVersion == null) || (socatVersion < 0.0) )
+			this.socatVersion = 0.0;
 		else
 			this.socatVersion = socatVersion;
 	}
@@ -448,8 +448,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			maxLength = socatDOI.length();
 		if ( maxLength < socatDOIHRef.length() ) 
 			maxLength = socatDOIHRef.length();
-		if ( maxLength < socatVersion.length() )
-			maxLength = socatVersion.length();
 		if ( maxLength < qcFlag.length() )
 			maxLength = qcFlag.length();
 		return maxLength;
@@ -551,7 +549,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    addlDocs=" + addlDocs + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    socatDOIHRef=" + socatDOIHRef + 
-				",\n    socatVersion=" + socatVersion + 
+				",\n    socatVersion=" + socatVersion.toString() + 
 				",\n    qcFlag=" + qcFlag + 
 				" ]";
 	}

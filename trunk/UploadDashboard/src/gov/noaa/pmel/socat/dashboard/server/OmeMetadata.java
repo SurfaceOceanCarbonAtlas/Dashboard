@@ -653,7 +653,7 @@ public class OmeMetadata extends DashboardMetadata {
 	 * @return
 	 *		created SocatMetadata object 
 	 */
-	public SocatMetadata createSocatMetadata(String socatVersion, 
+	public SocatMetadata createSocatMetadata(Double socatVersion, 
 							Set<String> addlDocs, String qcFlag) {
 		SocatMetadata scMData = new SocatMetadata();
 		scMData.setExpocode(expocode);
