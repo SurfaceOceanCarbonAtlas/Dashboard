@@ -188,7 +188,7 @@ public class CruiseDsgNcFile {
 		ncfile.addVariableAttribute(var, new Attribute("standard_name", "time"));
 		ncfile.addVariableAttribute(var, new Attribute("ioos_category", "Time"));
 
-		ncfile.addGroupAttribute(null, new Attribute("History", VERSION));
+		ncfile.addGroupAttribute(null, new Attribute("history", VERSION));
 		ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
 		ncfile.addGroupAttribute(null, new Attribute("Conventions", "CF-1.6"));
 

@@ -35,7 +35,7 @@ public class SocatMetadataTest {
 	static final String ADDL_DOCS = "MySupplementalDoc1.doc ; MySupplementalDoc2.pdf";
 	static final String SOCAT_DOI = "doi:pangaea12345";
 	static final String SOCAT_DOI_HREF = "http://www.socat.info/doi/xxxx20140113.html";
-	static final String SOCAT_VERSION = "3";
+	static final Double SOCAT_VERSION = 3.0;
 	static final String CRUISE_FLAG = "C";
 
 	/**
@@ -359,9 +359,9 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetSocatVersion() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertEquals("", mdata.getSocatVersion());
+		assertEquals(0.0, mdata.getSocatVersion(), 1.0E-6);
 		mdata.setSocatVersion(SOCAT_VERSION);
-		assertEquals(SOCAT_VERSION, mdata.getSocatVersion());
+		assertEquals(SOCAT_VERSION, mdata.getSocatVersion(), 1.0E-6);
 		assertEquals("", mdata.getSocatDOIHRef());
 		assertEquals("", mdata.getSocatDOI());
 		assertEquals("", mdata.getAddlDocs());
@@ -378,7 +378,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setSocatVersion(null);
-		assertEquals("", mdata.getSocatVersion());
+		assertEquals(0.0, mdata.getSocatVersion(), 1.0E-6);
 	}
 
 	/**
@@ -391,7 +391,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getQcFlag());
 		mdata.setQcFlag(CRUISE_FLAG);
 		assertEquals(CRUISE_FLAG, mdata.getQcFlag());
-		assertEquals("", mdata.getSocatVersion());
+		assertEquals(0.0, mdata.getSocatVersion(), 1.0E-6);
 		assertEquals("", mdata.getSocatDOIHRef());
 		assertEquals("", mdata.getSocatDOI());
 		assertEquals("", mdata.getAddlDocs());

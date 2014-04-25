@@ -22,7 +22,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	private static final long serialVersionUID = 1054195413459242498L;
 
 	boolean selected;
-	String version;
+	Double version;
 	String owner;
 	String expocode;
 	String dataCheckStatus;
@@ -47,7 +47,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	public DashboardCruise() {
 		selected = false;
-		version = "";
+		version = 0.0;
 		owner = "";
 		expocode = "";
 		dataCheckStatus = "";
@@ -87,22 +87,22 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise version; never null
+	 * 		the cruise version; never null, but could be zero if not assigned
 	 */
-	public String getVersion() {
+	public Double getVersion() {
 		return version;
 	}
 
 	/**
 	 * @param version 
-	 * 		the cruise version (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		the cruise version to set;
+	 * 		if null or negative, assigns zero
 	 */
-	public void setVersion(String version) {
-		if ( version == null )
-			this.version = "";
+	public void setVersion(Double version) {
+		if ( (version == null) || (version < 0.0) )
+			this.version = 0.0;
 		else
-			this.version = version.trim();
+			this.version = version;
 	}
 
 	/**
@@ -605,7 +605,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	public String toString() {
 		return "DashboardCruise" +
 				"[ selected=" + Boolean.toString(selected) + 
-				",\n    version = " + version +
+				",\n    version = " + version.toString() +
 				",\n    owner=" + owner + 
 				",\n    expocode=" + expocode + 
 				",\n    dataCheckStatus=" + dataCheckStatus +
