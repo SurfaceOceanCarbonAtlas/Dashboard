@@ -30,10 +30,9 @@ public class TimeGapSanityCheck extends SanityCheck {
 		if (null != itsLastTime) {
 			DateTime recordTime = record.getTime();
 			double gap = calcDayDiff(itsLastTime, recordTime);
-			System.out.println(gap);
 			
 			if (gap > itsGapLimit) {
-				itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Records are more than " + itsGapLimit + " days apart."));
+				itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Records are more than " + itsGapLimit + " days apart."));
 			}
 		}
 		
