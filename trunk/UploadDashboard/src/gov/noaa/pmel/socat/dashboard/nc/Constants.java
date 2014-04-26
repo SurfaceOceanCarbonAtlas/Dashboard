@@ -21,6 +21,12 @@ public class Constants {
 		shortNameMap.put("cruiseName", "dataset_name");
 		shortNameMap.put("vesselName", "vessel_name");
 		shortNameMap.put("organization", "organization");
+		shortNameMap.put("westmostLongitude", "geospatial_lon_min");
+		shortNameMap.put("eastmostLongitude", "geospatial_lon_max");
+		shortNameMap.put("southmostLatitude", "geospatial_lat_min");
+		shortNameMap.put("northmostLatitude", "geospatial_lat_max");
+		shortNameMap.put("beginTime", "time_coverage_start");
+		shortNameMap.put("endTime", "time_converage_end");
 		shortNameMap.put("scienceGroup", "investigators");
 		shortNameMap.put("origDataRef", "orig_data_ref");
 		shortNameMap.put("addlDocs", "addl_docs");
@@ -118,7 +124,7 @@ public class Constants {
 		shortNameMap.put("fCO2FromXCO2SstNcepWoa", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
 
 		shortNameMap.put("fCO2Rec", "fCO2_recommended");
-		shortNameMap.put("fCO2Source", "fco2_source");
+		shortNameMap.put("fCO2Source", "fCO2_source");
 		shortNameMap.put("deltaT", "delta_temp");
 		shortNameMap.put("regionID", "region_id");
 		shortNameMap.put("calcSpeed", "calc_speed");
@@ -160,6 +166,12 @@ public class Constants {
 		longNameMap.put("cruiseName", "dataset name");
 		longNameMap.put("vesselName", "vessel name");
 		longNameMap.put("organization", "organization");
+		longNameMap.put("westmostLongitude", "westernmost longitude");
+		longNameMap.put("eastmostLongitude", "easternmost longitude");
+		longNameMap.put("southmostLatitude", "southernmost latitude");
+		longNameMap.put("northmostLatitude", "northernmost latitude");
+		longNameMap.put("beginTime", "beginning time");
+		longNameMap.put("endTime", "ending time");
 		longNameMap.put("scienceGroup", "investigators");
 		longNameMap.put("origDataRef", "original data reference");
 		longNameMap.put("addlDocs", "additional documents");
@@ -307,10 +319,18 @@ public class Constants {
 		final String wind_speed_units = "m/s";
 		final String direction_units = "degrees";
 		final String distance_units = "km";
-		final String day_time_units = "days since 1970-01-01 00:00";
+		final String seconds_time_units = "seconds since 1970-01-01T00:00:00Z";
+		final String day_time_units = "days since 1970-01-01T00:00:00Z";
 		final String days_units = "days";
 
 		Map<String, String> unitsMap = new HashMap<String, String>();
+		unitsMap.put("westmostLongitude", longitude_units);
+		unitsMap.put("eastmostLongitude", longitude_units);
+		unitsMap.put("southmostLatitude", latitude_units);
+		unitsMap.put("northmostLatitude", latitude_units);
+		unitsMap.put("beginTime", seconds_time_units);
+		unitsMap.put("endTime", seconds_time_units);
+
 		unitsMap.put("longitude", longitude_units);
 		unitsMap.put("latitude", latitude_units);
 		unitsMap.put("sampleDepth", depth_units);
@@ -379,6 +399,12 @@ public class Constants {
 		Map<String, String> stdNamesMap = new HashMap<String, String>();
 
 		stdNamesMap.put("vesselName", "platform_name");
+		stdNamesMap.put("westmostLongitude", "geospatial_lon_min");
+		stdNamesMap.put("eastmostLongitude", "geospatial_lon_max");
+		stdNamesMap.put("southmostLatitude", "geospatial_lat_min");
+		stdNamesMap.put("northmostLatitude", "geospatial_lat_max");
+		stdNamesMap.put("beginTime", "time_coverage_start");
+		stdNamesMap.put("endTime", "time_converage_end");
 
 		stdNamesMap.put("longitude", "longitude");
 		stdNamesMap.put("latitude", "latitude");
@@ -458,6 +484,12 @@ public class Constants {
 		ioosCatMap.put("cruiseName", identifier_category);
 		ioosCatMap.put("vesselName", identifier_category);
 		ioosCatMap.put("organization", identifier_category);
+		ioosCatMap.put("westmostLongitude", location_category);
+		ioosCatMap.put("eastmostLongitude", location_category);
+		ioosCatMap.put("southmostLatitude", location_category);
+		ioosCatMap.put("northmostLatitude", location_category);
+		ioosCatMap.put("beginTime", time_category);
+		ioosCatMap.put("endTime", time_category);
 		ioosCatMap.put("scienceGroup", identifier_category);
 		ioosCatMap.put("origDataRef", identifier_category);
 		ioosCatMap.put("socatDOI", identifier_category);

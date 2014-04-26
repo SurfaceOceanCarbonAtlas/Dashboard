@@ -292,9 +292,9 @@ set var/outtype=($outtype) fCO2_recommended
 define attribute/output fCO2_recommended.ioos_category = "CO2"
 
 ! fCO2 Source
-let/title="fCO2 Source Type"/bad=-1 fco2_source = fCO2_src
-set var/outtype=int fco2_source
-define attribute/output fco2_source.ioos_category = "Identifier"
+let/title="fCO2 Source Type"/bad=-1 fCO2_source = fCO2_src
+set var/outtype=int fCO2_source
+define attribute/output fCO2_source.ioos_category = "Identifier"
 
 ! Delta temperature
 let/title="Equilibrator Temp - SST"/units="`temp,return=units`" delta_temp = temperature_equi - temp

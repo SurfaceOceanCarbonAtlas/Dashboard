@@ -6,6 +6,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ucar.ma2.ArrayChar;
@@ -70,21 +71,21 @@ public class CruiseDsgNcFile {
 		// Which is the longest?
 		int maxchar = metadata.getMaxStringLength();
 		Dimension stringlen = ncfile.addDimension(null, "string_length", maxchar);
-		List<Dimension> trajdimsChar = new ArrayList<Dimension>();
-		trajdimsChar.add(traj);
-		trajdimsChar.add(stringlen);
+		List<Dimension> trajStringDims = new ArrayList<Dimension>();
+		trajStringDims.add(traj);
+		trajStringDims.add(stringlen);
 
-		List<Dimension> trajdims = new ArrayList<Dimension>();
-		trajdims.add(traj);
+		List<Dimension> trajDims = new ArrayList<Dimension>();
+		trajDims.add(traj);
 
-		Dimension d = ncfile.addDimension(null, "obs", data.size());
-		List<Dimension> dims = new ArrayList<Dimension>();
-		dims.add(d);
+		Dimension obslen = ncfile.addDimension(null, "obs", data.size());
+		List<Dimension> dataDims = new ArrayList<Dimension>();
+		dataDims.add(obslen);
 
-		Dimension charDim = ncfile.addDimension(null, "char_length", 1);
-		List<Dimension> charVarDims = new ArrayList<Dimension>();
-		charVarDims.add(d);
-		charVarDims.add(charDim);
+		Dimension charlen = ncfile.addDimension(null, "char_length", 1);
+		List<Dimension> charDataDims = new ArrayList<Dimension>();
+		charDataDims.add(obslen);
+		charDataDims.add(charlen);
 
 		Field[] metaFields = metadata.getClass().getDeclaredFields();
 		for ( Field f : metaFields )
@@ -93,17 +94,51 @@ public class CruiseDsgNcFile {
 		for ( Field f : dataFields )
 			f.setAccessible(true);
 
-		// Make character netCDF variables of all the string metadata.
+		ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
+		ncfile.addGroupAttribute(null, new Attribute("Conventions", "CF-1.6"));
+		ncfile.addGroupAttribute(null, new Attribute("history", VERSION));
+
+		Variable var = ncfile.addVariable(null, "num_obs", DataType.DOUBLE, trajDims);
+		ncfile.addVariableAttribute(var, new Attribute("sample_dimension", "obs"));
+		ncfile.addVariableAttribute(var, new Attribute("long_name", "Number of Observations"));
+
+		// Make netCDF variables of all the metadata.
 		for ( Field f : metaFields ) {
-			if ( f.getType().equals(String.class) && ! Modifier.isStatic(f.getModifiers()) ) {
+			if ( ! Modifier.isStatic(f.getModifiers()) ) {
 				String name = f.getName();
 				String varName = Constants.SHORT_NAME.get(name);
 				if ( varName == null )
 					throw new RuntimeException("Unexpected missing short name for " + name);
-				Variable var = ncfile.addVariable(null, varName, DataType.CHAR, trajdimsChar);
+				var = null;
+				Number missVal = null;
+				Class<?> type = f.getType();
+				if ( type.equals(String.class) ) {
+					var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
+					missVal = null;
+				} 
+				else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
+					var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
+					missVal = SocatCruiseData.FP_MISSING_VALUE;
+				} 
+				else if ( type.equals(Date.class) ) {
+					var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
+					missVal = Double.valueOf(SocatMetadata.DATE_MISSING_VALUE.getTime() / 1000.0);
+				}
+				else
+					throw new RuntimeException("Unexpected metadata field type " + 
+							type.getSimpleName() + " for variable " + name);
 				if ( var == null )
 					throw new RuntimeException("Unexpected failure to add the variable " + 
 							varName + " for metadata field " + name);
+
+				if ( missVal != null ) {
+					ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
+					ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
+				}
+				String units = Constants.UNITS.get(name);
+				if ( units != null ) {
+					ncfile.addVariableAttribute(var, new Attribute("units", units));
+				}
 				String longName = Constants.LONG_NAME.get(name);
 				if ( longName == null )
 					throw new RuntimeException("Unexpected missing long name for " + name);
@@ -122,10 +157,7 @@ public class CruiseDsgNcFile {
 			}
 		}
 
-		Variable var = ncfile.addVariable(null, "rowSize", DataType.DOUBLE, trajdims);
-		ncfile.addVariableAttribute(var, new Attribute("sample_dimension", "obs"));
-		ncfile.addVariableAttribute(var, new Attribute("long_name", "Number of Observations"));
-
+		// Make netCDF variables of all the data.
 		for ( Field f : dataFields ) {
 			if ( ! Modifier.isStatic(f.getModifiers()) ) {
 				String name = f.getName();
@@ -136,15 +168,15 @@ public class CruiseDsgNcFile {
 				Number missVal = null;
 				Class<?> type = f.getType();
 				if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-					var = ncfile.addVariable(null, varName, DataType.DOUBLE, dims);
+					var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
 					missVal = SocatCruiseData.FP_MISSING_VALUE;
 				} 
 				else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
-					var = ncfile.addVariable(null, varName, DataType.INT, dims);
+					var = ncfile.addVariable(null, varName, DataType.INT, dataDims);
 					missVal = SocatCruiseData.INT_MISSING_VALUE;
 				} 
 				else if ( type.equals(Character.class) || type.equals(Character.TYPE) ) {
-					var = ncfile.addVariable(null, varName, DataType.CHAR, charVarDims);
+					var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
 					missVal = null;
 				} 
 				else
@@ -180,57 +212,56 @@ public class CruiseDsgNcFile {
 			}
 		}
 
-		var = ncfile.addVariable(null, "time", DataType.DOUBLE, dims);
+		var = ncfile.addVariable(null, "time", DataType.DOUBLE, dataDims);
 		ncfile.addVariableAttribute(var, new Attribute("missing_value", SocatCruiseData.FP_MISSING_VALUE));
 		ncfile.addVariableAttribute(var, new Attribute("_FillValue", SocatCruiseData.FP_MISSING_VALUE));
-		ncfile.addVariableAttribute(var, new Attribute("units", "seconds since 1970-01-01 00:00:00"));
+		ncfile.addVariableAttribute(var, new Attribute("units", "seconds since 1970-01-01T00:00:00Z"));
 		ncfile.addVariableAttribute(var, new Attribute("long_name", "time"));
 		ncfile.addVariableAttribute(var, new Attribute("standard_name", "time"));
 		ncfile.addVariableAttribute(var, new Attribute("ioos_category", "Time"));
 
-		ncfile.addGroupAttribute(null, new Attribute("history", VERSION));
-		ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
-		ncfile.addGroupAttribute(null, new Attribute("Conventions", "CF-1.6"));
-
-		// Add remaining (non-String) metadata as attributes
-		if ( ! metadata.getWestmostLongitude().isNaN() )
-			ncfile.addGroupAttribute(null, new Attribute("geospatial_lon_min", metadata.getWestmostLongitude()));
-		if ( ! metadata.getEastmostLongitude().isNaN() )
-			ncfile.addGroupAttribute(null, new Attribute("geospatial_lon_max", metadata.getEastmostLongitude()));
-		if ( ! metadata.getSouthmostLatitude().isNaN() )
-			ncfile.addGroupAttribute(null, new Attribute("geospatial_lat_min", metadata.getSouthmostLatitude()));
-		if ( ! metadata.getNorthmostLatitude().isNaN() )
-			ncfile.addGroupAttribute(null, new Attribute("geospatial_lat_max", metadata.getNorthmostLatitude()));
-		if ( ! metadata.getBeginTime().equals(SocatMetadata.DATE_MISSING_VALUE) ) {
-			CalendarDate start = CalendarDate.of(metadata.getBeginTime());
-			ncfile.addGroupAttribute(null, new Attribute("time_coverage_start", start.toString()));
-		}
-		if ( ! metadata.getEndTime().equals(SocatMetadata.DATE_MISSING_VALUE) ) {
-			CalendarDate end = CalendarDate.of(metadata.getEndTime());
-			ncfile.addGroupAttribute(null, new Attribute("time_converage_end", end.toString()));
-		}
-
 		ncfile.create();
+
 		// The header has been created.  Now let's fill it up.
 
+		var = ncfile.findVariable("num_obs");
+		if ( var == null )
+			throw new RuntimeException("Unexpected failure to find ncfile variable num_obs");
+		ArrayDouble.D1 obscount = new ArrayDouble.D1(1);
+		obscount.set(0, (double) data.size());
+		ncfile.write(var, obscount);
+
 		for ( Field f : metaFields ) {
-			if ( f.getType().equals(String.class) && ! Modifier.isStatic(f.getModifiers()) ) {
+			if ( ! Modifier.isStatic(f.getModifiers()) ) {
 				String varName = Constants.SHORT_NAME.get(f.getName());
 				var = ncfile.findVariable(varName);
 				if ( var == null )
 					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				ArrayChar.D2 values = new ArrayChar.D2(1, maxchar);
-				values.setString(0, (String) f.get(metadata));
-				ncfile.write(var, values);
+				Class<?> type = f.getType();
+				if ( type.equals(String.class) ) {
+					ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
+					mvar.setString(0, (String) f.get(metadata));
+					ncfile.write(var, mvar);
+				}
+				else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
+					ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
+					Double dvalue = (Double) f.get(metadata);
+					if ( dvalue.isNaN() )
+						dvalue = SocatCruiseData.FP_MISSING_VALUE;
+					mvar.set(0, dvalue);
+					ncfile.write(var, mvar);
+				}
+				else if ( type.equals(Date.class) ) {
+					ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
+					Date dateVal = (Date) f.get(metadata);
+					mvar.set(0, Double.valueOf(dateVal.getTime() / 1000.0));
+					ncfile.write(var, mvar);
+				}
+				else
+					throw new RuntimeException("Unexpected metadata field type " + 
+							type.getSimpleName() + " for variable " + varName);
 			}
 		}
-
-		var = ncfile.findVariable("rowSize");
-		if ( var == null )
-			throw new RuntimeException("Unexpected failure to find ncfile variable rowSize");
-		ArrayDouble.D1 obscount = new ArrayDouble.D1(1);
-		obscount.set(0, (double) data.size());
-		ncfile.write(var, obscount);
 
 		for ( Field f : dataFields ) {
 			if ( ! Modifier.isStatic(f.getModifiers()) ) {
@@ -244,6 +275,8 @@ public class CruiseDsgNcFile {
 					for (int index = 0; index < data.size(); index++) {
 						SocatCruiseData datarow = (SocatCruiseData) data.get(index);
 						Double dvalue = (Double) f.get(datarow);
+						if ( dvalue.isNaN() )
+							dvalue = SocatCruiseData.FP_MISSING_VALUE;
 						dvar.set(index, dvalue);
 					}
 					ncfile.write(var, dvar);
@@ -298,8 +331,7 @@ public class CruiseDsgNcFile {
 				 (minute != SocatCruiseData.INT_MISSING_VALUE) ) {
 				try {
 					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, minute, sec);
-					long lvalue = date.getDifferenceInMsecs(BASE_DATE);
-					double value = (double) lvalue / 1000.0;
+					double value = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
 					values.set(index, value);
 				} catch (Exception ex) {
 					values.set(index, SocatCruiseData.FP_MISSING_VALUE);

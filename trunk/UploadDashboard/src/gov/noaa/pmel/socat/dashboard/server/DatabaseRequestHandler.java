@@ -95,51 +95,79 @@ public class DatabaseRequestHandler {
 		}
 
 		// Verify the values by making the database connections
-		String grants;
+		boolean canSelect = false;
 		Connection selectConn = makeConnection(false);
 		try {
-			ResultSet result = selectConn.prepareStatement("SHOW GRANTS;").executeQuery();
+			ResultSet result = 
+					selectConn.prepareStatement("SHOW GRANTS;").executeQuery();
 			try {
-				if ( ! result.first() )
-					throw new SQLException("No grants results");
-				grants = result.getString(1);
-				if ( grants == null )
-					throw new SQLException("No grants results");
+				while ( result.next() ) {
+					String grants = result.getString(1);
+					if ( grants.contains("ON `" + catalogName + "`.*") || 
+						 grants.contains("ON *.*") ) { 
+						if ( grants.contains("ALL PRIVILEGES") || 
+							 grants.contains("SELECT") ) {
+							canSelect = true;
+							break;
+						}
+					}
+				}
 			} finally {
 				result.close();
 			}
 		} finally {
 			selectConn.close();
 		}
-		if ( ! grants.contains("SELECT") )
+		if ( ! canSelect )
 			throw new IllegalArgumentException(
 					"The select-only user does not have SELECT privileges");
 
+		canSelect = false;
+		boolean canUpdate = false;
+		boolean canInsert = false;
+		boolean canDelete = false;
 		selectConn = makeConnection(true);
 		try {
-			ResultSet result = selectConn.prepareStatement("SHOW GRANTS;").executeQuery();
+			ResultSet result = 
+					selectConn.prepareStatement("SHOW GRANTS;").executeQuery();
 			try {
-				if ( ! result.first() )
-					throw new SQLException("No grants results");
-				grants = result.getString(1);
-				if ( grants == null )
-					throw new SQLException("No grants results");
+				while ( result.next() ) {
+					String grants = result.getString(1);
+					if ( grants.contains("ON `" + catalogName + "`.*") || 
+						 grants.contains("ON *.*") ) { 
+						if ( grants.contains("ALL PRIVILEGES") ) {
+							canSelect = true;
+							canUpdate = true;
+							canInsert = true;
+							canDelete = true;
+							break;
+						}
+						if ( grants.contains("SELECT") )
+							canSelect = true;
+						if ( grants.contains("UPDATE") )
+							canUpdate = true;
+						if ( grants.contains("INSERT") )
+							canInsert = true;
+						if ( grants.contains("DELETE") )
+							canDelete = true;
+					}
+				}
 			} finally {
 				result.close();
 			}
 		} finally {
 			selectConn.close();
 		}
-		if ( ! grants.contains("SELECT") )
+		if ( ! canSelect )
 			throw new IllegalArgumentException(
 					"The update user does not have SELECT privileges");
-		if ( ! grants.contains("UPDATE") )
+		if ( ! canUpdate )
 			throw new IllegalArgumentException(
 					"The update user does not have UPDATE privileges");
-		if ( ! grants.contains("INSERT") )
+		if ( ! canInsert )
 			throw new IllegalArgumentException(
 					"The update user does not have INSERT privileges");
-		if ( ! grants.contains("DELETE") )
+		if ( ! canDelete )
 			throw new IllegalArgumentException(
 					"The update user does not have DELETE privileges");
 	}
@@ -195,7 +223,7 @@ public class DatabaseRequestHandler {
 	 * 		if accessing or updating the database throws one, or
 	 * 		if the reviewer username cannot be found in the reviewers table
 	 */
-	public boolean addQCFlag(String qcFlag, String expocode, String socatVersion,
+	public boolean addQCFlag(String qcFlag, String expocode, Double socatVersion,
 			String regionID, Timestamp flagDate, String username, String comment) 
 															throws SQLException {
 		boolean wasSuccessful = false;
@@ -218,7 +246,7 @@ public class DatabaseRequestHandler {
 			prepStmt = catConn.prepareStatement(SET_QC_FLAG_SQL);
 			prepStmt.setString(1, qcFlag);
 			prepStmt.setString(2, expocode);
-			prepStmt.setString(3, socatVersion);
+			prepStmt.setDouble(3, socatVersion);
 			prepStmt.setString(4, regionID);
 			if ( flagDate != null )
 				prepStmt.setTimestamp(5, flagDate);
