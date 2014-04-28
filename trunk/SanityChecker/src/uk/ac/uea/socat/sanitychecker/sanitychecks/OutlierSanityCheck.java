@@ -80,7 +80,7 @@ public class OutlierSanityCheck extends SanityCheck {
 			
 			if (diffFromMean > (itsStdev * itsStdevLimit)) {
 				try {
-					String message = "Value is outside " + itsStdevLimit + " standard deviations from mean";
+					String message = "Value (" + recordValue.value + ") is outside " + itsStdevLimit + " standard deviations from mean";
 					SocatDataRecord record = recordValue.record;
 					record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
 				} catch (SocatDataBaseException e) {
