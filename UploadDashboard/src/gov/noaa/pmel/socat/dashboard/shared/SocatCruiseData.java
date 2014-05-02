@@ -20,8 +20,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = -4839643565178804765L;
 
-	private static final double MAX_RELATIVE_ERROR = 1.0E-6;
-	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
+	static final double MAX_RELATIVE_ERROR = 1.0E-6;
+	static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
 
 	/**
 	 *  Missing value for floating-point variables - not NaN for Ferret
