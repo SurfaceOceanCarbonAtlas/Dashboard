@@ -3,6 +3,9 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -24,13 +28,6 @@ public class DatabaseRequestHandler {
 	private static final String SELECT_PASS_TAG = "selectpass";
 	private static final String UPDATE_USER_TAG = "updateuser";
 	private static final String UPDATE_PASS_TAG = "updatepass";
-
-	private static final String GET_REVIEWER_ID_SQL = 
-			"SELECT `reviewer_id` FROM `reviewers` where `username` = ?;";
-	private static final String SET_QC_FLAG_SQL = 
-			"INSERT INTO `qcflags` (`qc_flag`, `expocode`, `socat_version`, " +
-			"`region_id`, `flag_date`, `reviewer_id`, `qc_comment`) " +
-			"VALUES(?, ?, ?, ?, ?, ?, ?)";
 
 	String catalogName;
 	String selectUser;
@@ -199,62 +196,57 @@ public class DatabaseRequestHandler {
 		return catConn;
 	}
 
+	private static final String GET_REVIEWER_ID_SQL = 
+			"SELECT `reviewer_id` FROM `reviewers` where `username` = ?;";
+
+	private static final String SET_QC_FLAG_SQL = 
+			"INSERT INTO `qcflags` (`qc_flag`, `expocode`, `socat_version`, " +
+			"`region_id`, `flag_date`, `reviewer_id`, `qc_comment`) " +
+			"VALUES(?, ?, ?, ?, ?, ?, ?)";
+
 	/**
-	 * Assigns a QC flag along with a comment for a cruise region
+	 * Assigns a cruise QC flag
 	 * 
 	 * @param qcFlag
 	 * 		QC flag to assign
-	 * @param expocode
-	 * 		expocode of the cruise
-	 * @param socatVersion
-	 * 		SOCAT version of the cruise
-	 * @param regionID
-	 * 		region ID for this QC flag
-	 * @param flagDate
-	 * 		date/time of this QC flag assignment;
-	 * 		if null, the current time is used
-	 * @param username
-	 * 		username of the reviewer assigning this QC flag
-	 * @param comment
-	 * 		comment to go with this QC flag
 	 * @return
 	 * 		true if successful
 	 * @throws SQLException
 	 * 		if accessing or updating the database throws one, or
-	 * 		if the reviewer username cannot be found in the reviewers table
+	 * 		if the reviewer cannot be found in the reviewers table
 	 */
-	public boolean addQCFlag(String qcFlag, String expocode, Double socatVersion,
-			String regionID, Timestamp flagDate, String username, String comment) 
-															throws SQLException {
+	public boolean addQCFlag(SocatQCFlag qcFlag) throws SQLException {
 		boolean wasSuccessful = false;
 		Connection catConn = makeConnection(true);
 		try {
-			// Get the reviewer_id from the username
+			// Get the reviewer_id from the reviewer name
+			String reviewer = qcFlag.getReviewer();
 			PreparedStatement prepStmt = 
 					catConn.prepareStatement(GET_REVIEWER_ID_SQL);
-			prepStmt.setString(1, username);
+			prepStmt.setString(1, reviewer);
 			ResultSet results = prepStmt.executeQuery();
 			if ( ! results.first() )
 				throw new SQLException(
-						"Reviewer username '" + username + "' not found");
+						"Reviewer '" + reviewer + "' not found");
 			int reviewerID = results.getInt(1);
 			if ( reviewerID <= 0 )
-				throw new SQLException("Reviewer ID for username '" + 
-						username + "' not found");
+				throw new SQLException(
+						"ID for reviewer '" + reviewer + "' not found");
 			results.close();
+
 			// Assign the QC flag
 			prepStmt = catConn.prepareStatement(SET_QC_FLAG_SQL);
-			prepStmt.setString(1, qcFlag);
-			prepStmt.setString(2, expocode);
-			prepStmt.setDouble(3, socatVersion);
-			prepStmt.setString(4, regionID);
-			if ( flagDate != null )
-				prepStmt.setTimestamp(5, flagDate);
+			prepStmt.setString(1, qcFlag.getFlag().toString());
+			prepStmt.setString(2, qcFlag.getExpocode());
+			prepStmt.setDouble(3, qcFlag.getSocatVersion());
+			prepStmt.setString(4, qcFlag.getRegionID().toString());
+			Date flagDate = qcFlag.getFlagDate();
+			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
+				prepStmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
 			else
-				prepStmt.setTimestamp(5, 
-						new Timestamp(System.currentTimeMillis()));
+				prepStmt.setTimestamp(5, new Timestamp(flagDate.getTime()));
 			prepStmt.setInt(6, reviewerID);
-			prepStmt.setString(7, comment);
+			prepStmt.setString(7, qcFlag.getComment());
 			prepStmt.execute();
 			if ( prepStmt.getUpdateCount() == 1 )
 				wasSuccessful = true;

@@ -469,7 +469,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		result = result * prime + addlDocs.hashCode();
 		result = result * prime + socatDOI.hashCode();
 		result = result * prime + socatDOIHRef.hashCode();
-		result = result * prime + socatVersion.hashCode();
 		result = result * prime + qcFlag.hashCode();
 		return result;
 	}
@@ -510,24 +509,28 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			return false;
 		if ( ! socatDOIHRef.equals(other.socatDOIHRef) )
 			return false;
-		if ( ! socatVersion.equals(other.socatVersion) )
-			return false;
 		if ( ! qcFlag.equals(other.qcFlag) )
 			return false;
 
 		// Floating-point comparisons
-		if ( ! DashboardUtils.closeTo(westmostLongitude, 
-				other.westmostLongitude, 0.0, 1.0E-4) )
-			return false;
-		if ( ! DashboardUtils.closeTo(eastmostLongitude, 
-				other.eastmostLongitude, 0.0, 1.0E-4) )
+		if ( ! socatVersion.equals(other.socatVersion) )
 			return false;
 		if ( ! DashboardUtils.closeTo(southmostLatitude, 
-				other.southmostLatitude, 0.0, 1.0E-4) )
+				other.southmostLatitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(northmostLatitude, 
-				other.northmostLatitude, 0.0, 1.0E-4) )
+				other.northmostLatitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
 			return false;
+
+		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
+		if ( ! DashboardUtils.closeTo(westmostLongitude, other.westmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+			if ( ! DashboardUtils.closeTo(westmostLongitude + 360.0, other.westmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+				if ( ! DashboardUtils.closeTo(westmostLongitude, other.westmostLongitude + 360.0, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+					return false;
+		if ( ! DashboardUtils.closeTo(eastmostLongitude, other.eastmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+			if ( ! DashboardUtils.closeTo(eastmostLongitude + 360.0, other.eastmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+				if ( ! DashboardUtils.closeTo(eastmostLongitude, other.eastmostLongitude + 360.0, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+					return false;
 
 		return true;
 	}
