@@ -27,7 +27,8 @@ public class SocatQCFlagTest {
 	private static final Double MY_SOCAT_VERSION = 3.0;
 	private static final Character MY_REGION_ID = 'T';
 	private static final Date MY_FLAG_DATE = new Date();
-	private static final String MY_REVIEWER = "Karl.Smith";
+	private static final String MY_USERNAME = "Karl.Smith";
+	private static final String MY_REALNAME = "Karl M. Smith";
 	private static final String MY_COMMENT = "from SocatQCFlag unit test";
 
 	/**
@@ -111,22 +112,42 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getReviewer()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setReviewer(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getUsername()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setUsername(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetReviewer() {
+	public void testGetSetUsername() {
 		SocatQCFlag myflag = new SocatQCFlag();
-		assertEquals("", myflag.getReviewer());
-		myflag.setReviewer(MY_REVIEWER);
-		assertEquals(MY_REVIEWER, myflag.getReviewer());
+		assertEquals("", myflag.getUsername());
+		myflag.setUsername(MY_USERNAME);
+		assertEquals(MY_USERNAME, myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
-		myflag.setReviewer(null);
-		assertEquals("", myflag.getReviewer());
+		myflag.setUsername(null);
+		assertEquals("", myflag.getUsername());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getRealname()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setRealname(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetRealname() {
+		SocatQCFlag myflag = new SocatQCFlag();
+		assertEquals("", myflag.getRealname());
+		myflag.setRealname(MY_REALNAME);
+		assertEquals(MY_REALNAME, myflag.getRealname());
+		assertEquals("", myflag.getUsername());
+		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getExpocode());
+		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		myflag.setRealname(null);
+		assertEquals("", myflag.getRealname());
 	}
 
 	/**
@@ -139,7 +160,8 @@ public class SocatQCFlagTest {
 		assertEquals("", myflag.getComment());
 		myflag.setComment(MY_COMMENT);
 		assertEquals(MY_COMMENT, myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -200,10 +222,17 @@ public class SocatQCFlagTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
-		myflag.setReviewer(MY_REVIEWER);
+		myflag.setUsername(MY_USERNAME);
 		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
-		otherflag.setReviewer(MY_REVIEWER);
+		otherflag.setUsername(MY_USERNAME);
+		assertTrue( myflag.hashCode() == otherflag.hashCode() );
+		assertTrue( myflag.equals(otherflag) );
+
+		myflag.setRealname(MY_REALNAME);
+		assertFalse( myflag.hashCode() == otherflag.hashCode() );
+		assertFalse( myflag.equals(otherflag) );
+		otherflag.setRealname(MY_REALNAME);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

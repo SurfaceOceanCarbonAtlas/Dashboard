@@ -63,7 +63,7 @@ public class SocatWoceFlag extends SocatQCFlag
 
 	/**
 	 * @return 
-	 * 		the longitude; 
+	 * 		the longitude in the range [-180.0, 180.0)
 	 * 		never null but may be {@link SocatCruiseData#FP_MISSING_VALUE}
 	 */
 	public Double getLongitude() {
@@ -72,14 +72,20 @@ public class SocatWoceFlag extends SocatQCFlag
 
 	/**
 	 * @param longitude 
-	 * 		the longitude to set;
+	 * 		the longitude to set, which will be adjust the range [-180.0, 180.0);
 	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned.
 	 */
 	public void setLongitude(Double longitude) {
-		if ( longitude == null )
+		if ( longitude == null ) {
 			this.longitude = SocatCruiseData.FP_MISSING_VALUE;
-		else
+		}
+		else {
 			this.longitude = longitude;
+			while ( this.longitude >= 180.0 )
+				this.longitude -= 180.0;
+			while ( this.longitude < -180.0 )
+				this.longitude += 180.0;
+		}
 	}
 
 	/**
@@ -249,7 +255,8 @@ public class SocatWoceFlag extends SocatQCFlag
 				",\n    columnName=" + columnName + 
 				",\n    dataValue=" + String.format("%#.6f", dataValue) + 
 				",\n    flagDate=" + flagDate.toString() + 
-				",\n    reviewer=" + reviewer + 
+				",\n    username=" + username + 
+				",\n    realname=" + realname + 
 				",\n    comment=" + comment + 
 				"]";
 	}

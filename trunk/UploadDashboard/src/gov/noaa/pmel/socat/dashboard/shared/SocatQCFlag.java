@@ -16,14 +16,15 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatQCFlag implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -8566869393964074443L;
+	private static final long serialVersionUID = -6641479500583523549L;
 
 	Character flag;
 	String expocode;
 	Double socatVersion;
 	Character regionID;
 	Date flagDate;
-	String reviewer;
+	String username;
+	String realname;
 	String comment;
 
 	/**
@@ -35,7 +36,8 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 		socatVersion = 0.0;
 		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
 		flagDate = SocatMetadata.DATE_MISSING_VALUE;
-		reviewer = "";
+		username = "";
+		realname = "";
 		comment = "";
 	}
 
@@ -137,21 +139,40 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the reviewer; never null but may be empty
+	 * 		the reviewer username; never null but may be empty
 	 */
-	public String getReviewer() {
-		return reviewer;
+	public String getUsername() {
+		return username;
 	}
 
 	/**
-	 * @param reviewer 
-	 * 		the reviewer to set; if null, an empty string is assigned
+	 * @param username 
+	 * 		the reviewer username to set; if null, an empty string is assigned
 	 */
-	public void setReviewer(String reviewer) {
-		if ( reviewer == null )
-			this.reviewer = "";
+	public void setUsername(String username) {
+		if ( username == null )
+			this.username = "";
 		else
-			this.reviewer = reviewer;
+			this.username = username;
+	}
+
+	/**
+	 * @return 
+	 * 		the reviewer's actual name; never null but may be empty
+	 */
+	public String getRealname() {
+		return realname;
+	}
+
+	/**
+	 * @param realname 
+	 * 		the reviewer's actual name to set; if null, an empty string is assigned
+	 */
+	public void setRealname(String realname) {
+		if ( realname == null )
+			this.realname = "";
+		else
+			this.realname = realname;
 	}
 
 	/**
@@ -181,7 +202,8 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 		// Ignore socatVersion as it is floating point and does not have to be exact
 		result = result * prime + regionID.hashCode();
 		result = result * prime + flagDate.hashCode();
-		result = result * prime + reviewer.hashCode();
+		result = result * prime + username.hashCode();
+		result = result * prime + realname.hashCode();
 		result = result * prime + comment.hashCode();
 		return result;
 	}
@@ -205,7 +227,9 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 			return false;
 		if ( ! regionID.equals(other.regionID) )
 			return false;
-		if ( ! reviewer.equals(other.reviewer) )
+		if ( ! username.equals(other.username) )
+			return false;
+		if ( ! realname.equals(other.realname) )
 			return false;
 		if ( ! comment.equals(other.comment) )
 			return false;
@@ -223,7 +247,8 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 				",\n    socatVersion=" + String.format("%#.1f", socatVersion) + 
 				",\n    regionID='" + regionID.toString() + "'" + 
 				",\n    flagDate=" + flagDate.toString() + 
-				",\n    reviewer=" + reviewer + 
+				",\n    username=" + username + 
+				",\n    realname=" + realname + 
 				",\n    comment=" + comment + 
 				"]";
 	}
