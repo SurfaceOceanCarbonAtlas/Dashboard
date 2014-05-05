@@ -1,32 +1,24 @@
 DROP TABLE IF EXISTS `reviewers`;
 CREATE TABLE `reviewers` (
   `reviewer_id` INT(4) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `username` VARCHAR(64) NOT NULL,
-  `realname` VARCHAR(64) NOT NULL,
-  `email` VARCHAR(256) DEFAULT NULL,
+  `username` VARCHAR(64) NOT NULL DEFAULT '',
+  `realname` VARCHAR(64) NOT NULL DEFAULT '',
+  `email` VARCHAR(256) NOT NULL DEFAULT '',
   PRIMARY KEY USING BTREE (`reviewer_id`),
   UNIQUE KEY `username` USING BTREE (`username`),
   UNIQUE KEY `realname` USING BTREE (`realname`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
-DROP TABLE IF EXISTS `regions`;
-CREATE TABLE `regions` (
-  `region_id` char(1) NOT NULL,
-  `region` varchar(32) NOT NULL,
-  PRIMARY KEY USING BTREE (`region_id`),
-  UNIQUE KEY `region` USING BTREE (`region`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `qcflags`;
 CREATE TABLE `qcflags` (
   `qc_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `qc_flag` CHAR(1) NOT NULL DEFAULT ' ',
-  `expocode` CHAR(14) NOT NULL,
-  `socat_version` FLOAT(3,1) NOT NULL,
-  `region_id` CHAR(1) NOT NULL,
-  `flag_date` DATETIME NOT NULL,
-  `reviewer_id` INT(4) UNSIGNED NOT NULL,
-  `qc_comment` VARCHAR(1024) NOT NULL,
+  `expocode` VARCHAR(16) NOT NULL DEFAULT '',
+  `socat_version` FLOAT(3,1) NOT NULL DEFAULT '0.0',
+  `region_id` CHAR(1) NOT NULL DEFAULT ' ',
+  `flag_date` DATETIME NOT NULL DEFAULT '1900-01-01 00:00:00',
+  `reviewer_id` INT(4) UNSIGNED NOT NULL DEFAULT '0',
+  `qc_comment` VARCHAR(1024) NOT NULL DEFAULT '',
   PRIMARY KEY USING BTREE (`qc_id`),
   KEY `qc_flag` USING BTREE (`qc_flag`),
   KEY `expocode` USING BTREE (`expocode`),
@@ -40,18 +32,19 @@ DROP TABLE IF EXISTS `woceflags`;
 CREATE TABLE `woceflags` (
   `woce_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `woce_flag` SMALLINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  `expocode` CHAR(14) NOT NULL,
-  `socat_version` FLOAT(3,1) NOT NULL,
-  `region_id` CHAR(1) NOT NULL,
-  `data_row` INT(6) UNSIGNED NOT NULL,
-  `data_longitude` FLOAT(12,6) NOT NULL,
-  `data_latitude` FLOAT(12,6) NOT NULL,
-  `data_time` BIGINT NOT NULL,
-  `data_name` VARCHAR(64) NOT NULL,
+  `expocode` VARCHAR(16) NOT NULL DEFAULT '',
+  `socat_version` FLOAT(3,1) NOT NULL DEFAULT '0.0',
+  `region_id` CHAR(1) NOT NULL DEFAULT ' ',
+  `data_row` INT(6) UNSIGNED DEFAULT NULL,
+  `data_longitude` FLOAT(12,6) DEFAULT NULL,
+  `data_latitude` FLOAT(12,6) DEFAULT NULL,
+  `data_time` BIGINT DEFAULT NULL,
+  `data_type` VARCHAR(32) DEFAULT NULL,
+  `data_name` VARCHAR(64) DEFAULT NULL,
   `data_value` FLOAT(12,6) DEFAULT NULL,
-  `flag_date` DATETIME NOT NULL,
-  `reviewer_id` INT(4) UNSIGNED NOT NULL,
-  `woce_comment` VARCHAR(1024) NOT NULL,
+  `flag_date` DATETIME NOT NULL DEFAULT '1900-01-01 00:00:00',
+  `reviewer_id` INT(4) UNSIGNED NOT NULL DEFAULT 0,
+  `woce_comment` VARCHAR(1024) NOT NULL DEFAULT '',
   PRIMARY KEY USING BTREE (`woce_id`),
   KEY `woce_flag` USING BTREE (`woce_flag`),
   KEY `expocode` USING BTREE (`expocode`),
@@ -61,6 +54,7 @@ CREATE TABLE `woceflags` (
   KEY `data_longitude` USING BTREE (`data_longitude`),
   KEY `data_latitude` USING BTREE (`data_latitude`),
   KEY `data_time` USING BTREE (`data_time`),
+  KEY `data_type` USING BTREE (`data_type`),
   KEY `data_name` USING BTREE (`data_name`),
   KEY `flag_date` USING BTREE (`flag_date`),
   KEY `reviewer_id` USING BTREE (`reviewer_id`)

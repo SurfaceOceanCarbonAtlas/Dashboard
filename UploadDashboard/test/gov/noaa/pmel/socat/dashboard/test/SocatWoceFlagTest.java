@@ -45,7 +45,8 @@ public class SocatWoceFlagTest {
 	private static final String MY_COLUMN_NAME = "P_atm";
 	private static final Double MY_DATA_VALUE = 1002.97;
 	private static final Date MY_FLAG_DATE = new Date();
-	private static final String MY_REVIEWER = "Karl.Smith";
+	private static final String MY_USERNAME = "Karl.Smith";
+	private static final String MY_REALNAME = "Karl M. Smith";
 	private static final String MY_COMMENT = "from SocatWoceFlag unit test";
 
 	/**
@@ -59,7 +60,8 @@ public class SocatWoceFlagTest {
 		myflag.setRowNumber(MY_ROW_NUMBER);
 		assertEquals(MY_ROW_NUMBER, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -81,7 +83,8 @@ public class SocatWoceFlagTest {
 		assertEquals(MY_LONGITUDE, myflag.getLongitude());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -104,7 +107,8 @@ public class SocatWoceFlagTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -128,7 +132,8 @@ public class SocatWoceFlagTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -153,7 +158,8 @@ public class SocatWoceFlagTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -179,7 +185,8 @@ public class SocatWoceFlagTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -206,7 +213,8 @@ public class SocatWoceFlagTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals("", myflag.getComment());
-		assertEquals("", myflag.getReviewer());
+		assertEquals("", myflag.getRealname());
+		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
@@ -266,10 +274,17 @@ public class SocatWoceFlagTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
-		myflag.setReviewer(MY_REVIEWER);
+		myflag.setUsername(MY_USERNAME);
 		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
-		otherflag.setReviewer(MY_REVIEWER);
+		otherflag.setUsername(MY_USERNAME);
+		assertTrue( myflag.hashCode() == otherflag.hashCode() );
+		assertTrue( myflag.equals(otherflag) );
+
+		myflag.setRealname(MY_REALNAME);
+		assertFalse( myflag.hashCode() == otherflag.hashCode() );
+		assertFalse( myflag.equals(otherflag) );
+		otherflag.setRealname(MY_REALNAME);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

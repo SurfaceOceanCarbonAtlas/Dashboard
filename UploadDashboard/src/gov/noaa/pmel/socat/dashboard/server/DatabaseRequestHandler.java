@@ -3,8 +3,10 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceFlag;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,6 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 
@@ -196,19 +199,41 @@ public class DatabaseRequestHandler {
 		return catConn;
 	}
 
-	private static final String GET_REVIEWER_ID_SQL = 
-			"SELECT `reviewer_id` FROM `reviewers` where `username` = ?;";
-
-	private static final String SET_QC_FLAG_SQL = 
-			"INSERT INTO `qcflags` (`qc_flag`, `expocode`, `socat_version`, " +
-			"`region_id`, `flag_date`, `reviewer_id`, `qc_comment`) " +
-			"VALUES(?, ?, ?, ?, ?, ?, ?)";
+	/**
+	 * Get the ID for a reviewer from the reviewers database table.
+	 * 
+	 * @param catConn
+	 * 		connection to the database
+	 * @param reviewerName
+	 * 		name of the reviewer
+	 * @return
+	 * 		ID of the reviewer
+	 * @throws SQLException
+	 * 		if accessing the database throws one, or
+	 * 		if the reviewer name cannot be found
+	 */
+	private int getReviewerId(Connection catConn, String reviewerName) 
+													throws SQLException {
+		PreparedStatement prepStmt = catConn.prepareStatement(
+				"SELECT `reviewer_id` FROM `reviewers` WHERE `username` = ?");
+		prepStmt.setString(1, reviewerName);
+		ResultSet results = prepStmt.executeQuery();
+		if ( ! results.first() )
+			throw new SQLException(
+					"Reviewer '" + reviewerName + "' not found");
+		int reviewerId = results.getInt(1);
+		if ( reviewerId <= 0 )
+			throw new SQLException(
+					"ID for reviewer '" + reviewerName + "' not found");
+		results.close();
+		return reviewerId;
+	}
 
 	/**
-	 * Assigns a cruise QC flag
+	 * Adds a new QC flag for a dataset.
 	 * 
 	 * @param qcFlag
-	 * 		QC flag to assign
+	 * 		QC flag to add
 	 * @return
 	 * 		true if successful
 	 * @throws SQLException
@@ -219,23 +244,12 @@ public class DatabaseRequestHandler {
 		boolean wasSuccessful = false;
 		Connection catConn = makeConnection(true);
 		try {
-			// Get the reviewer_id from the reviewer name
-			String reviewer = qcFlag.getReviewer();
-			PreparedStatement prepStmt = 
-					catConn.prepareStatement(GET_REVIEWER_ID_SQL);
-			prepStmt.setString(1, reviewer);
-			ResultSet results = prepStmt.executeQuery();
-			if ( ! results.first() )
-				throw new SQLException(
-						"Reviewer '" + reviewer + "' not found");
-			int reviewerID = results.getInt(1);
-			if ( reviewerID <= 0 )
-				throw new SQLException(
-						"ID for reviewer '" + reviewer + "' not found");
-			results.close();
-
-			// Assign the QC flag
-			prepStmt = catConn.prepareStatement(SET_QC_FLAG_SQL);
+			int reviewerId = getReviewerId(catConn, qcFlag.getUsername());
+			PreparedStatement prepStmt = catConn.prepareStatement(
+					"INSERT INTO `qcflags` (`qc_flag`, `expocode`, " +
+					"`socat_version`, `region_id`, " +
+					"`flag_date`, `reviewer_id`, `qc_comment`) " +
+					"VALUES(?, ?, ?, ?, ?, ?, ?)");
 			prepStmt.setString(1, qcFlag.getFlag().toString());
 			prepStmt.setString(2, qcFlag.getExpocode());
 			prepStmt.setDouble(3, qcFlag.getSocatVersion());
@@ -245,7 +259,7 @@ public class DatabaseRequestHandler {
 				prepStmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
 			else
 				prepStmt.setTimestamp(5, new Timestamp(flagDate.getTime()));
-			prepStmt.setInt(6, reviewerID);
+			prepStmt.setInt(6, reviewerId);
 			prepStmt.setString(7, qcFlag.getComment());
 			prepStmt.execute();
 			if ( prepStmt.getUpdateCount() == 1 )
@@ -254,6 +268,216 @@ public class DatabaseRequestHandler {
 			catConn.close();
 		}
 		return wasSuccessful;
+	}
+
+	/**
+	 * Creates a SocatQCFlag from the values in the current row of a ResultSet.
+	 * 
+	 * @param results
+	 * 		assign values from the current row of this ResultSet; must 
+	 * 		include columns with names qc_flag, expocode, socat_version, 
+	 * 		region_id, flag_date, username, realname, and qc_comment.
+	 * @returns
+	 * 		created QC flag
+	 * @throws SQLException
+	 * 		if getting values from the ResultSet throws one
+	 */
+	private SocatQCFlag createQCFlag(ResultSet results) throws SQLException {
+		SocatQCFlag qcFlag = new SocatQCFlag();
+		try {
+			qcFlag.setFlag(results.getString("qc_flag").charAt(0));
+		} catch (NullPointerException ex) {
+			throw new SQLException("Unexpected NULL qc_flag");
+		} catch (IndexOutOfBoundsException ex) {
+			throw new SQLException("Unexpected empty qc_flag");
+		}
+		qcFlag.setExpocode(results.getString("expocode"));
+		qcFlag.setSocatVersion(results.getDouble("socat_version"));
+		try {
+			qcFlag.setRegionID(results.getString("region_id").charAt(0));
+		} catch (NullPointerException ex) {
+			throw new SQLException("Unexpected NULL region_id");
+		} catch (IndexOutOfBoundsException ex) {
+			throw new SQLException("Unexpected empty region_id");
+		}
+		try {
+			qcFlag.setFlagDate(
+					new Date(results.getTimestamp("flag_date").getTime()));
+		} catch (NullPointerException ex) {
+			throw new SQLException("Unexpected NULL flag_date");
+		}
+		qcFlag.setUsername(results.getString("username"));
+		qcFlag.setRealname(results.getString("realname"));
+		qcFlag.setComment(results.getString("qc_comment"));
+		return qcFlag;
+	}
+
+	/**
+	 * Retrieves the current list of QC flags for a dataset.
+	 * 
+	 * @param expocode
+	 * 		get the flags for the dataset with this expocode 
+	 * @return
+	 * 		list of QC flags for the dataset
+	 * @throws SQLException
+	 * 		if accessing the database or reading the results throws one
+	 */
+	public ArrayList<SocatQCFlag> getQCFlags(String expocode) throws SQLException {
+		Connection catConn = makeConnection(false);
+		PreparedStatement prepStmt = catConn.prepareStatement(
+				"SELECT * FROM `qcflags` JOIN `reviewers` " +
+				"ON qcflags.reviewer_id = reviewers.reviewer_id " +
+				"WHERE qcflags.expocode = ? ORDER BY qcflags.qc_id;");
+		prepStmt.setString(1, expocode);
+		ResultSet results = prepStmt.executeQuery();
+		ArrayList<SocatQCFlag> flagsList = new ArrayList<SocatQCFlag>();
+		while ( results.next() ) {
+			flagsList.add(createQCFlag(results));
+		}
+		return flagsList;
+	}
+
+	/**
+	 * Adds a new WOCE flag for a datapoint.
+	 * 
+	 * @param woceFlag
+	 * 		WOCE flag to add
+	 * @return
+	 * 		true if successful
+	 * @throws SQLException
+	 * 		if accessing or updating the database throws one, or
+	 * 		if the reviewer cannot be found in the reviewers table
+	 */
+	public boolean addWoceFlag(SocatWoceFlag woceFlag) throws SQLException {
+		boolean wasSuccessful = false;
+		Connection catConn = makeConnection(true);
+		try {
+			int reviewerId = getReviewerId(catConn, woceFlag.getUsername());
+			PreparedStatement prepStmt = catConn.prepareStatement(
+					"INSERT INTO `woceflags` (`woce_flag`, `expocode`, " +
+					"`socat_version`, `region_id`, " +
+					"`data_row`, `data_longitude`, `data_latitude`, " +
+					"`data_time`, `data_name`, `data_value`, " +
+					"`flag_date`, `reviewer_id`, `qc_comment`) " +
+					"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			prepStmt.setString(1, woceFlag.getFlag().toString());
+			prepStmt.setString(2, woceFlag.getExpocode());
+			prepStmt.setDouble(3, woceFlag.getSocatVersion());
+			prepStmt.setString(4, woceFlag.getRegionID().toString());
+			prepStmt.setInt(5, woceFlag.getRowNumber());
+			prepStmt.setDouble(6, woceFlag.getLongitude());
+			prepStmt.setDouble(7, woceFlag.getLatitude());
+			prepStmt.setLong(8, Math.round(woceFlag.getDataDate().getTime() / 1000.0));
+			prepStmt.setString(9, woceFlag.getColumnName());
+			prepStmt.setDouble(10, woceFlag.getDataValue());
+			Date flagDate = woceFlag.getFlagDate();
+			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
+				prepStmt.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
+			else
+				prepStmt.setTimestamp(11, new Timestamp(flagDate.getTime()));
+			prepStmt.setInt(12, reviewerId);
+			prepStmt.setString(13, woceFlag.getComment());
+			prepStmt.execute();
+			if ( prepStmt.getUpdateCount() == 1 )
+				wasSuccessful = true;
+		} finally {
+			catConn.close();
+		}
+		return wasSuccessful;
+	}
+
+	/**
+	 * Creates a SocatQCFlag from the values in the current row of a ResultSet.
+	 * 
+	 * @param results
+	 * 		assign values from the current row of this ResultSet; must 
+	 * 		include columns with names woce_flag, expocode, socat_version, 
+	 * 		region_id, data_row, data_longitude, data_latitude, data_time,
+	 * 		data_type, data_name, data_value, flag_date, username, realname, 
+	 * 		and woce_comment.
+	 * @returns
+	 * 		created QC flag
+	 * @throws SQLException
+	 * 		if getting values from the ResultSet throws one
+	 */
+	private SocatWoceFlag createWoceFlag(ResultSet results) throws SQLException {
+		SocatWoceFlag woceFlag = new SocatWoceFlag();
+		try {
+			woceFlag.setFlag(results.getString("woce_flag").charAt(0));
+		} catch (NullPointerException ex) {
+			throw new SQLException("Unexpected NULL woce_flag");
+		} catch (IndexOutOfBoundsException ex) {
+			throw new SQLException("Unexpected empty woce_flag");
+		}
+		woceFlag.setExpocode(results.getString("expocode"));
+		woceFlag.setSocatVersion(results.getDouble("socat_version"));
+		try {
+			woceFlag.setRegionID(results.getString("region_id").charAt(0));
+		} catch (NullPointerException ex) {
+			throw new SQLException("Unexpected NULL region_id");
+		} catch (IndexOutOfBoundsException ex) {
+			throw new SQLException("Unexpected empty region_id");
+		}
+		woceFlag.setRowNumber(results.getInt("data_row"));
+		if ( results.wasNull() )
+			woceFlag.setRowNumber(null);
+		woceFlag.setLongitude(results.getDouble("data_longitude"));
+		if ( results.wasNull() )
+			woceFlag.setLongitude(null);
+		woceFlag.setLatitude(results.getDouble("data_latitude"));
+		if ( results.wasNull() )
+			woceFlag.setLatitude(null);
+		woceFlag.setDataDate(new Date(results.getLong("data_time") * 1000));
+		if ( results.wasNull() )
+			woceFlag.setDataDate(null);
+		try {
+			woceFlag.setDataType(
+					DataColumnType.valueOf(results.getString("data_type")));
+		} catch (NullPointerException ex) {
+			woceFlag.setDataType(null);
+		} catch (IllegalArgumentException ex) {
+			throw new SQLException("Unexpected unknown data type '" + 
+					results.getString("data_type") + "'");
+		}
+		woceFlag.setColumnName(results.getString("data_name"));
+		woceFlag.setDataValue(results.getDouble("data_value"));
+		if ( results.wasNull() )
+			woceFlag.setDataValue(null);
+		try {
+			woceFlag.setFlagDate(
+					new Date(results.getTimestamp("flag_date").getTime()));
+		} catch (NullPointerException ex) {
+			throw new SQLException("Unexpected NULL flag_date");
+		}
+		woceFlag.setUsername(results.getString("username"));
+		woceFlag.setRealname(results.getString("realname"));
+		woceFlag.setComment(results.getString("woce_comment"));
+		return woceFlag;
+	}
+
+	/**
+	 * Retrieves the current list of WOCE flags for a dataset.
+	 * 
+	 * @param expocode
+	 * 		get the flags for the dataset with this expocode 
+	 * @return
+	 * 		list of WOCE flags for the dataset
+	 * @throws SQLException
+	 * 		if accessing the database or reading the results throws one
+	 */
+	public ArrayList<SocatWoceFlag> getWoceFlags(String expocode) throws SQLException {
+		Connection catConn = makeConnection(false);
+		PreparedStatement prepStmt = catConn.prepareStatement(
+				"SELECT * FROM `woceflags` JOIN `reviewers` " +
+				"ON woceflags.reviewer_id = reviewers.reviewer_id " +
+				"WHERE woceflags.expocode = ? ORDER BY woceflags.woce_id;");
+		prepStmt.setString(1, expocode);
+		ResultSet results = prepStmt.executeQuery();
+		ArrayList<SocatWoceFlag> flagsList = new ArrayList<SocatWoceFlag>();
+		while ( results.next() ) {
+			flagsList.add(createWoceFlag(results));
+		}
+		return flagsList;
 	}
 
 }
