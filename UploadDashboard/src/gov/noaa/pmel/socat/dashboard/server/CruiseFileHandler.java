@@ -46,6 +46,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String CRUISE_INFO_FILENAME_EXTENSION = ".properties";
 	private static final String CRUISE_MSGS_FILENAME_EXTENSION = ".messages";
 	private static final String DATA_OWNER_ID = "dataowner";
+	private static final String SOCAT_VERSION_ID = "socatversion";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
@@ -354,13 +355,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( assignCruiseInfo ) {
 			// Assign the data column types, units, and missing values 
 			// from the data column names
+			DashboardDataStore dataStore;
 			try {
-				DashboardDataStore.get().getUserFileHandler()
-										.assignDataColumnTypes(cruiseData);
+				dataStore = DashboardDataStore.get();
 			} catch ( IOException ex ) {
 				throw new IOException(
-						"Unexpected failure to get the user file handler");
+						"Unexpected failure to get the dashboard configuration");
 			}
+			dataStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
+			cruiseData.setVersion(dataStore.getSocatVersion());
 			// Set all WOCE-3 row index sets to empty
 			ArrayList<HashSet<Integer>> woceFlags = 
 									cruiseData.getWoceThreeRowIndices();
@@ -666,6 +669,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		Properties cruiseProps = new Properties();
 		// Owner of the cruise
 		cruiseProps.setProperty(DATA_OWNER_ID, cruise.getOwner());
+		// SOCAT version 
+		cruiseProps.setProperty(SOCAT_VERSION_ID, String.format("%#.1f", cruise.getVersion()));
 		// Upload filename
 		cruiseProps.setProperty(UPLOAD_FILENAME_ID, cruise.getUploadFilename());
 		// Upload timestamp
@@ -877,6 +882,18 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					DATA_OWNER_ID + " given in " + infoFile.getPath());
 		cruise.setOwner(value);
+
+		// SOCAT version 
+		value = cruiseProps.getProperty(SOCAT_VERSION_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					SOCAT_VERSION_ID + " given in " + infoFile.getPath());	
+		try {
+			cruise.setVersion(Double.valueOf(value));
+		} catch (NumberFormatException ex) {
+			throw new IllegalArgumentException("Invalid property value for " +
+					SOCAT_VERSION_ID + " given in " + infoFile.getPath());	
+		}
 
 		// Name of uploaded file
 		value = cruiseProps.getProperty(UPLOAD_FILENAME_ID);

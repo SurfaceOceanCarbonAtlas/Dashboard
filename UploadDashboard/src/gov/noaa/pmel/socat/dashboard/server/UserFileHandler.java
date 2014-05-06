@@ -178,7 +178,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Create the cruise list (map) for these cruises
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
-		cruiseList.setSocatVersion(dataStore.getSocatVersion());
+		cruiseList.setSocatVersion(String.format("%#.1f", dataStore.getSocatVersion()));
 		for ( String expocode : expocodeSet ) {
 			// Create the DashboardCruise from the info file
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);

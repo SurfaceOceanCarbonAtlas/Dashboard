@@ -244,7 +244,7 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 		return "SocatQCFlag" +
 				"[\n    flag='" + flag.toString() + "'" +
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + String.format("%#.1f", socatVersion) + 
+				",\n    socatVersion=" + socatVersion.toString() + 
 				",\n    regionID='" + regionID.toString() + "'" + 
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    username=" + username + 
