@@ -83,7 +83,7 @@ public class SanityCheckConfig {
 								checkInstance.initialise(fields);
 								
 								// Add the checker class to the list of all known checkers.
-								// These will be instantiated in the @code{getInstances()} method.
+								// These will be instantiated in the getInstances() method.
 								itsSanityCheckClasses.add(new CheckerInitData(checkClass, fields));
 							} catch(ClassNotFoundException e) {
 								throw new ConfigException(itsConfigFilename, lineCount, "Sanity check class '" + fullClassName + "' does not exist");

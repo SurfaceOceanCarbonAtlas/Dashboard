@@ -66,8 +66,8 @@ public class SocatDataRecord {
 	public static final String SECOND_COLUMN_NAME = "ss";
 	
 	/**
-	 * The list of date column headers. These columns will always return @code{false}
-	 * to the @code{isRequired()} function
+	 * The list of date column headers. These columns will always return {@code false}
+	 * to the {@link uk.ac.uea.socat.sanitychecker.data.ColumnSpec#isRequired(String)} function.
 	 */
 	public static final String DATE_COLUMN_NAMES[] = {"yr", "mon", "day", "hh", "mm", "ss", "iso_date"};
 	
