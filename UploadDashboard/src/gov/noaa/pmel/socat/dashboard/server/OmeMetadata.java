@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -30,12 +31,17 @@ import org.jdom2.input.SAXBuilder;
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -3905881094341061538L;
+	private static final long serialVersionUID = 5352480159918565845L;
 
 	private static final SimpleDateFormat DATE_PARSER = 
-			new SimpleDateFormat("yyyyMMdd HH:mmZ");
+			new SimpleDateFormat("yyyyMMdd HH:mm");
 	private static final SimpleDateFormat DATE_FORMATTER =
 			new SimpleDateFormat("yyyyMMdd");
+	static {
+		TimeZone gmtTz = TimeZone.getTimeZone("GMT");
+		DATE_PARSER.setTimeZone(gmtTz);
+		DATE_FORMATTER.setTimeZone(gmtTz);
+	}
 
 	// data values from the OME metadata 
 	String cruiseName;
@@ -124,88 +130,6 @@ public class OmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException(
 					ex.getMessage() + " in " + mdataFile.getPath(), ex);
 		}
-	}
-
-	/**
-	 * Creates from a line of tab-separated values from Benjamin's 
-	 * metadata spreadsheet TSV table.  The owner of the metadata 
-	 * is left empty so anyone can take possession of it.
-	 * 
-	 * @param colNames 
-	 * 		array of column names for the metadata in dataLine
-	 * @param metadataLine 
-	 * 		metadata for a cruise as a string of tab-separated values
-	 * @param timestamp
-	 * 		upload time-stamp string to use 
-	 * @throws IllegalArgumentException
-	 * 		if the number of metadata values does not match the number 
-	 * 		of column names or if the expocode is not defined
-	 */
-	public OmeMetadata(String[] colNames, String metadataLine, String timestamp) {
-		// Initialize to an empty OME metadata document 
-		// with the standard OME filename and the given timestamp
-		this();
-		uploadTimestamp = timestamp;
-		// Leave the owner blank so anyone can take possession of it
-
-		// Parse the metadata string - split on tabs
-		String[] metaVals = metadataLine.split("\\t", -1);
-		if ( metaVals.length != colNames.length ) {
-			throw new IllegalArgumentException("Number of metadata values (" + 
-					Integer.toString(metaVals.length) + 
-					") does not match the number of column names (" + 
-					Integer.toString(colNames.length) + ")");
-		}
-		// Interpret the data based on the column names
-		for (int k = 0; k < metaVals.length; k++) {
-			metaVals[k] = metaVals[k].trim();
-			// Treat blank entries the same as "NaN" entries
-			if ( metaVals[k].isEmpty() )
-				metaVals[k] = "NaN";
-			if ( "Expocode created".equals(colNames[k]) ||
-				 "Expocode".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) )
-					expocode = metaVals[k];
-			}
-			else if ( "Cruise Label".equals(colNames[k]) ||
-					  "Cruise".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) )
-					cruiseName = metaVals[k];
-			}
-			else if ( "ship/platform".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) )
-					vesselName = metaVals[k];
-			}
-			else if ( "PI".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) ) {
-					investigators.add(metaVals[k]);
-					organizations.add("");
-				}
-			}
-			else if ( "PI_2".equals(colNames[k]) ||
-					  "PI 2".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) ) {
-					investigators.add(metaVals[k]);
-					organizations.add("");
-				}
-			}
-			else if ( "PI_3".equals(colNames[k]) ||
-					  "PI 3".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) ) {
-					investigators.add(metaVals[k]);
-					organizations.add("");
-				}
-			}
-			else if ( "doi".equals(colNames[k]) ||
-					  "orig_doi".equals(colNames[k]) )  {
-				if ( ! "NaN".equals(metaVals[k]) )
-					origDataRef = metaVals[k];
-			}
-			// otherwise ignore the data in this column
-			// longitude/latitude/time limits are derived from the data
-		}
-		if ( expocode.isEmpty() )
-			throw new IllegalArgumentException("Expocode is not given");
 	}
 
 	/**
@@ -413,7 +337,7 @@ public class OmeMetadata extends DashboardMetadata {
 			if ( (name != null) && ! name.isEmpty() ) {
 				try {
 					// Just the UTC date, so set the time to 00:00
-					startDate = DATE_PARSER.parse(name + " 00:00+0000");
+					startDate = DATE_PARSER.parse(name + " 00:00");
 				} catch ( ParseException ex ) {
 					throw new IllegalArgumentException(
 							"Invalid value for <Start_Date>");
@@ -423,7 +347,7 @@ public class OmeMetadata extends DashboardMetadata {
 			if ( (name != null) && ! name.isEmpty() ) {
 				try {
 					// Just the UTC date, so set the time to 23:59
-					endDate = DATE_PARSER.parse(name + " 23:59+0000");
+					endDate = DATE_PARSER.parse(name + " 23:59");
 				} catch ( ParseException ex ) {
 					throw new IllegalArgumentException(
 							"Invalid value for <End_Date>");
