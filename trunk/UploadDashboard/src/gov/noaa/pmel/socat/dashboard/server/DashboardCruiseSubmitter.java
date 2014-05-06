@@ -3,18 +3,21 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 import uk.ac.uea.socat.sanitychecker.Output;
-
-import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 /**
  * Submits Dashboard cruise for SOCAT QC
@@ -27,6 +30,7 @@ public class DashboardCruiseSubmitter {
 	MetadataFileHandler metadataHandler;
 	DashboardCruiseChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
+	DatabaseRequestHandler databaseHandler;
 
 	/**
 	 * Create with the file handlers and data checker in the given data store.
@@ -36,6 +40,7 @@ public class DashboardCruiseSubmitter {
 		metadataHandler = dataStore.getMetadataFileHandler();
 		cruiseChecker = dataStore.getDashboardCruiseChecker();
 		dsgNcHandler = dataStore.getDsgNcFileHandler();
+		databaseHandler = dataStore.getDatabaseRequestHandler();
 	}
 
 	public void submitCruises(Set<String> cruiseExpocodes, 
@@ -105,8 +110,29 @@ public class DashboardCruiseSubmitter {
 				cruise.setWoceFourRowIndices(new ArrayList<HashSet<Integer>>(
 						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
 				cruiseHandler.saveCruiseMessages(cruise.getExpocode(), output);
+				// Create a SocatQCFlag for the cruise with the number of data rows with errors, warnings
+				SocatQCFlag comment = new SocatQCFlag();
+				comment.setFlag(null);
+				comment.setExpocode(expocode);
+				comment.setSocatVersion(cruise.getVersion());
+				comment.setRegionID(null);
+				comment.setFlagDate(new Date());
+				comment.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+				comment.setComment("Automated data check detected " + 
+						Integer.toString(cruiseData.getNumErrorRows()) + 
+						" data points with errors and " + 
+						Integer.toString(cruiseData.getNumWarnRows()) + 
+						" data points with warnings.");
+				try {
+					databaseHandler.addQCFlag(comment);
+				} catch (SQLException ex) {
+					throw new IllegalArgumentException(
+							"Unable to add a QC comment with the Sanity Checker results:\n" +
+							ex.getMessage());
+				}
+				// Set up to save changes to version control
 				changed = true;
-				// TODO: add QC comment with suggested QC flag from SanityChecker results
 				commitMsg += " submit with QC flag '" + flag + "'";
 				ingestExpos.add(expocode);
 			}
