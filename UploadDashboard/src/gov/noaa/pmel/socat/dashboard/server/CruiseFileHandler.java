@@ -1147,7 +1147,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
 							SCMsgSeverity.WARNING.name());
 
-				int rowNum = msg.getLineIndex();
+				int rowNum = msg.getLineNumber();
 				if ( (rowNum > 0) && (rowNum <= numRecs) ) {
 					mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 							Integer.toString(rowNum));

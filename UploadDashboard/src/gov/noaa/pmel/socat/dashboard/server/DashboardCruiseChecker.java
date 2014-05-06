@@ -835,17 +835,18 @@ public class DashboardCruiseChecker {
 	 */
 	private void processMessage(DashboardCruiseWithData cruiseData, 
 								Message msg, ColumnIndices colIndcs) {
-		int rowIdx = msg.getLineIndex();
+		int rowIdx = msg.getLineNumber();
 		if ( (rowIdx <= 0) || (rowIdx > cruiseData.getNumDataRows()) )
 			throw new RuntimeException("Unexpected row number of " + 
 					Integer.toString(rowIdx) + " in the sanity checker message\n" +
 					"    " + msg.toString());
 		// Change row number to row index
 		rowIdx--;
+
 		int colIdx = msg.getInputItemIndex();
 		if ( (colIdx == 0) || (colIdx > cruiseData.getDataColTypes().size()) )
 			throw new RuntimeException("Unexpected input column number of " + 
-					Integer.toString(rowIdx) + " in the sanity checker message\n" +
+					Integer.toString(colIdx) + " in the sanity checker message\n" +
 					"    " + msg.toString());
 		// Change column number to column index; 
 		// negative numbers indicate an ambiguous source of error
