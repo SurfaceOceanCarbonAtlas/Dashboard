@@ -96,8 +96,8 @@ public class MetadataConfig {
 	
 	/**
 	 * The location of the metadata config file.
-	 * Must be set via @code{init} before calling
-	 * @code{getInstance}
+	 * Must be set via {@link #init(String, Logger)} before calling
+	 * {@link #getInstance()}.
 	 */
 	private static String itsConfigFilename = null;
 

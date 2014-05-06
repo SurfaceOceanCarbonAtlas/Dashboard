@@ -46,8 +46,8 @@ public class BaseConfig extends Properties {
 	
 	/**
 	 * The file containing the configuration.
-	 * Must be set via @code{init} before
-	 * calling @code{getInstance}.
+	 * Must be set via {@link #init(String, Logger)} before
+	 * calling {@link #getInstance()}.
 	 */
 	private static String itsConfigFile = null;
 	
@@ -63,9 +63,9 @@ public class BaseConfig extends Properties {
 	
 
 	/**
-	 * Constructs an empty @code{BaseConfig} object.
-	 * This only exists to ensure that @code{BaseConfig}
-	 * objects cannot be created except through the @code{getInstance}
+	 * Constructs an empty {@link BaseConfig} object.
+	 * This only exists to ensure that {@link BaseConfig}
+	 * objects cannot be created except through the {@link #getInstance()}
 	 * method. 
 	 */
 	private BaseConfig() {
@@ -91,8 +91,8 @@ public class BaseConfig extends Properties {
 	}
 	
 	/**
-	 * Set the location of the @code{BaseConfig} file.
-	 * @param filename The location of the @code{BaseConfig} file.
+	 * Set the location of the {@link BaseConfig} file.
+	 * @param filename The location of the {@link BaseConfig} file.
 	 */
 	public static void init(String filename, Logger logger) {
 		itsConfigFile = filename;
@@ -100,10 +100,10 @@ public class BaseConfig extends Properties {
 	}
 	
 	/**
-	 * Checks to see if the @code{BaseConfig} has been initialised with a filename.
+	 * Checks to see if the {@link BaseConfig} has been initialised with a filename.
 	 * This does not guarantee that the configuration is valid.
 	 * 
-	 * @return @code{true} if the @code{BaseConfig} has been initialised; @code{false} if it hasn't.
+	 * @return {@code true} if the {@link BaseConfig} has been initialised; {@code false} if it hasn't.
 	 */
 	public static boolean isInitialised() {
 		return (itsConfigFile != null);

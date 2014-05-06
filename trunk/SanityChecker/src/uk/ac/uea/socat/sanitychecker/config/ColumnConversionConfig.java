@@ -33,8 +33,8 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	
 	/**
 	 * The name of the configuration file.
-	 * Must be set via @code{init} before calling
-	 * @code{getInstance}.
+	 * Must be set via {@link #init(String, Logger)} before calling
+	 * {@link #getInstance()}.
 	 */
 	private static String itsFilename = null;
 	

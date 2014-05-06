@@ -125,7 +125,7 @@ public class StandardColumnInfo {
 	/**
 	 * Determines whether or not a given field value is equal to the Missing Value for the column
 	 * @param value The value to be tested
-	 * @return @code{true} if the value is the Missing Value; @code{false} otherwise.
+	 * @return {@code true} if the value is the Missing Value; {@code false} otherwise.
 	 */
 	public boolean isMissingValue(String value) {
 		boolean result = false;
