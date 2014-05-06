@@ -245,15 +245,15 @@ public class SocatWoceFlag extends SocatQCFlag
 		return "SocatWoceFlag" +
 				"[\n    flag='" + flag.toString() + "'" +
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + String.format("%#.1f", socatVersion) + 
+				",\n    socatVersion=" + socatVersion.toString() + 
 				",\n    regionID='" + regionID.toString() + "'" + 
 				",\n    rowNumber=" + rowNumber.toString() + 
-				",\n    longitude=" + String.format("%#.6f", longitude) + 
-				",\n    latitude=" + String.format("%#.6f", latitude) + 
+				",\n    longitude=" + longitude.toString() + 
+				",\n    latitude=" + latitude.toString() + 
 				",\n    dataDate=" + dataDate.toString() + 
 				",\n    dataType=" + dataType.toString() + 
 				",\n    columnName=" + columnName + 
-				",\n    dataValue=" + String.format("%#.6f", dataValue) + 
+				",\n    dataValue=" + dataValue.toString() + 
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 

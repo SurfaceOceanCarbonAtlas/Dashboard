@@ -98,7 +98,7 @@ public class DashboardDataStore {
 	private String encryptionSalt;
 	// Map of username to user info
 	private HashMap<String,DashboardUserInfo> userInfoMap;
-	private String socatVersion;
+	private Double socatVersion;
 	private UserFileHandler userFileHandler;
 	private CruiseFileHandler cruiseFileHandler;
 	private MetadataFileHandler metadataFileHandler;
@@ -184,7 +184,11 @@ public class DashboardDataStore {
 			propVal = propVal.trim();
 			if ( propVal.isEmpty() )
 				throw new IllegalArgumentException("blank value");
-			socatVersion = propVal;
+			try {
+				socatVersion = Double.valueOf(propVal);
+			} catch (NumberFormatException ex) {
+				throw new IllegalArgumentException(ex);
+			}
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + SOCAT_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -397,7 +401,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		the SOCAT version
 	 */
-	public String getSocatVersion() {
+	public Double getSocatVersion() {
 		return socatVersion;
 	}
 
