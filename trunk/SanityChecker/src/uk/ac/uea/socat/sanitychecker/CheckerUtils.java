@@ -13,8 +13,8 @@ public class CheckerUtils {
 	/**
 	 * Processes all items in a list of strings, trimming them and converting them
 	 * to lower case
-	 * @param source The list of strings to be converted 
-	 * @return The list of converted strings
+	 * @param source The strings to be converted 
+	 * @return The converted strings
 	 */
 	public static List<String> trimAndLowerList(List<String> source) {
 		
@@ -29,8 +29,8 @@ public class CheckerUtils {
 	
 	/**
 	 * Trims all items in a list of strings
-	 * @param source The list of strings to be converted 
-	 * @return The list of converted strings
+	 * @param source The strings to be converted 
+	 * @return The converted strings
 	 */
 	public static List<String> trimList(List<String> source) {
 		
@@ -44,7 +44,7 @@ public class CheckerUtils {
 	}
 	
 	/**
-	 * Determines whether or not a line is a comment, signified by it starting with @code{#} or @code{!} or @code{//}
+	 * Determines whether or not a line is a comment, signified by it starting with {@code #} or {@code !} or {@code //}
 	 * @param line The line to be checked
 	 * @return {@code true} if the line is a comment; {@code false} otherwise.
 	 */
@@ -91,9 +91,9 @@ public class CheckerUtils {
 	}
 	
 	/**
-	 * Determines whether or not all of a list of string values is empty. NA or NaN qualifies as empty.
-	 * @param value The value to be checked.
-	 * @return {@code true} if the value is empty; {@code false} otherwise.
+	 * Determines whether or not all of a list of string values is empty. {@code NA} or {@code NaN} qualifies as empty.
+	 * @param values The values to be checked.
+	 * @return {@code true} if the values are all empty; {@code false} otherwise.
 	 */
 	public static boolean isEmpty(List<String> values) {
 		boolean result = true;
@@ -108,9 +108,9 @@ public class CheckerUtils {
 	}
 	
 	/**
-	 * Determines whether or not all of a set of string values is empty. NA or NaN qualifies as empty.
-	 * @param value The value to be checked.
-	 * @return {@code true} if the value is empty; {@code false} otherwise.
+	 * Determines whether or not all of a set of string values is empty. {@code NA} or {@code NaN} qualifies as empty.
+	 * @param values The values to be checked.
+	 * @return {@code true} if the values are all empty; {@code false} otherwise.
 	 */
 	public static boolean isEmpty(String... values) {
 		return isEmpty(Arrays.asList(values));
