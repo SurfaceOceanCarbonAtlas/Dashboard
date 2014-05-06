@@ -3,7 +3,7 @@ package uk.ac.uea.socat.sanitychecker;
 /**
  * Exception class for unhandled errors in the Sanity Checker.
  * 
- * This will primarily be thrown if the input to the @code{SanityChecker}
+ * This will primarily be thrown if the input to the {@link SanityChecker}
  * constructor is invalid.
  * 
  * After that it should never be thrown, but it's the ultimate fallback.

@@ -89,7 +89,7 @@ public class SanityChecker {
 	/**
 	 * Initialise the configuration of the Sanity Checker
 	 * 
-	 * @param filename The location of the @code{BaseConfig} file. 
+	 * @param filename The location of the {@link BaseConfig} file. 
 	 */
 	public static void initConfig(String filename) throws ConfigException, SanityCheckerException {
 		Logger initLogger = Logger.getLogger("SanityChecker");
@@ -122,7 +122,7 @@ public class SanityChecker {
 	 * Base constructor for an instance of the Sanity Checker. This must be called for each
 	 * data file individually.
 	 * 
-	 * The @code{dateFormat} parameter is required to specify the format of dates in the metadata, and also
+	 * The {@code dateTimeFormat} parameter is required to specify the format of dates in the metadata, and also
 	 * in the data fields if the date is specified as a single date or date/time field. In the unlikely
 	 * event that the data provider has given dates in different formats in the metadata and the data,
 	 * one or the other will not be parsed properly and errors will be raised. 
@@ -161,6 +161,10 @@ public class SanityChecker {
 		}
 	}
 
+	/**
+	 * Processes the data file.
+	 * @return The output of the processing.
+	 */
 	public Output process() {
 
 		try {
@@ -221,6 +225,11 @@ public class SanityChecker {
 		return itsOutput;
 	}
 
+	/**
+	 * Runs the individual sanity check modules over the processed data.
+	 * @throws ConfigException If the Sanity Checker modules are badly configured.
+	 * @throws SanityCheckException If errors are encountered while performing the sanity checks.
+	 */
 	private void runSanityChecks() throws ConfigException, SanityCheckException {
 		
 		List<SanityCheck> checkers = SanityCheckConfig.getInstance().getCheckers();
@@ -317,7 +326,12 @@ public class SanityChecker {
 	}
 	
 	/**
-	 * Checks the read in data for missing, invalid and out-of-range values
+	 * Checks the read in data for missing, invalid and out-of-range values.
+	 * 
+	 * There is code here that attempts to auto-detect the value that indicates
+	 * missing data (e.g. -999), but it is currently disabled. It may be reinstated
+	 * at a later date if automatically detecting this is better than asking users
+	 * to specify it.
 	 */
 	private void checkDataValues() throws ConfigException, SocatDataBaseException {
 		/*

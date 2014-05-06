@@ -166,6 +166,11 @@ public class SanityCheckerRun {
 		}
 	}
 	
+	/**
+	 * Writes a set of messages to an output file.
+	 * @param messages The messages to be written
+	 * @throws IOException If writing to the file fails.
+	 */
 	private void writeMessages(Messages messages) throws IOException {
 		String messagesFilename = itsDataFilename + ".messages.txt";
 		PrintWriter writer = new PrintWriter(new File(itsOutputDir, messagesFilename));
@@ -184,7 +189,13 @@ public class SanityCheckerRun {
 		writer.close();
 	}
 	
-	
+	/**
+	 * Opens an input file and extracts the metadata and data records from it.
+	 * @param metadata The object where the extracted metadata will be stored
+	 * @param records The object where the extracted data records will be stored
+	 * @throws FileNotFoundException If the input file (specified on the command line) doesn't exist
+	 * @throws IOException If reading the input file fails.
+	 */
 	private void readInputFile(Properties metadata, ArrayList<ArrayList<String>> records) throws FileNotFoundException, IOException {
 		
 		File inputFile = new File(itsInputDir, itsDataFilename);
@@ -311,7 +322,7 @@ public class SanityCheckerRun {
 	 * Check that the command line arguments are OK. Directories exist, that kind of thing.
 	 * A false result indicates that we can't make any further progress.
 	 * 
-	 * @return @code{true} if they're fine; @code{false} otherwise.
+	 * @return {@code true} if they're fine; {@code false} otherwise.
 	 */
 	private boolean checkCommandArgs() {
 		boolean result = true;
@@ -366,6 +377,9 @@ public class SanityCheckerRun {
 	}
 	
 	/**
+	 * The main method. This does nothing except call {@link #SanityCheckerRun(String[])}.
+	 * 
+	 * There is optional (commented out) code to wait while a remote debugger/profiler is attached.
 	 * @param args
 	 */
 	public static void main(String[] args) {

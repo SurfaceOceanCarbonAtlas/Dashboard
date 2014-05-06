@@ -116,7 +116,7 @@ public class Output {
 	
 	/**
 	 * Indicates whether or not the file has been successfully processed.
-	 * @return @code{true} If processing was successful; @code{false} if the processing failed.
+	 * @return {@code true} If processing was successful; {@code false} if the processing failed.
 	 */
 	public boolean processedOK() {
 		if ((itsResultCode & INVALID_INPUT_FLAG) > 0 || (itsResultCode & INTERNAL_ERROR_FLAG) > 0) {
@@ -128,7 +128,7 @@ public class Output {
 	
 	/**
 	 * Indicates whether or not the processing generated any error messages.
-	 * @return @code{true} if error messages were generated; @code{false} if no errors were generated.
+	 * @return {@code true} if error messages were generated; {@code false} if no errors were generated.
 	 */
 	public boolean hasErrors() {
 		return (itsResultCode & ERRORS_FLAG) > 0;
@@ -136,7 +136,7 @@ public class Output {
 	
 	/**
 	 * Indicates whether or not the processing generated any warning messages.
-	 * @return @code{true} if warning messages were generated; @code{false} if no warnings were generated.
+	 * @return {@code true} if warning messages were generated; {@code false} if no warnings were generated.
 	 */
 	public boolean hasWarnings() {
 		return (itsResultCode & WARNINGS_FLAG) > 0;
@@ -144,7 +144,7 @@ public class Output {
 	
 	/**
 	 * Indicates whether or not the processing generated either error or warning messages.
-	 * @return @code{true} if error or warning messages were generated; @code{false} if no errors or warnings were generated.
+	 * @return {@code true} if error or warning messages were generated; {@code false} if no errors or warnings were generated.
 	 */
 	public boolean hasErrorsOrWarnings() {
 		return (hasErrors() || hasWarnings());
@@ -155,7 +155,7 @@ public class Output {
 	 * Certain error conditions in the input data can mean that the sanity checker cannot
 	 * produce valid output.
 	 * 
-	 * @return @code{true} if output was successfully generated; @code{false} if output could not be generated. 
+	 * @return {@code true} if output was successfully generated; {@code false} if output could not be generated. 
 	 */
 	public boolean outputGenerated() {
 		return !((itsResultCode & NO_OUTPUT_FLAG) > 0);
@@ -235,7 +235,7 @@ public class Output {
 	 * the messages are likely to be rendered irrelevant (e.g. if unhandled exceptions occur).
 	 * This should be used with caution.
 	 * 
-	 * @param setNoOutputFlag States whether or not the @code{NO_OUTPUT_FLAG} should be set.
+	 * @param setNoOutputFlag States whether or not the {@link #NO_OUTPUT_FLAG} should be set.
 	 * @param clearMessages States whether or not error and warning message should be removed.
 	 */
 	public void clear(boolean setNoOutputFlag) {
@@ -277,6 +277,10 @@ public class Output {
 		return result;
 	}
 	
+	/**
+	 * Return the collection of messages generated while processing the data file.
+	 * @return The collection of messages.
+	 */
 	public Messages getMessages() {
 		return itsMessages;
 	}
