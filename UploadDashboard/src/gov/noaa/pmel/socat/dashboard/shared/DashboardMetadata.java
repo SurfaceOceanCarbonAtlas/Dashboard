@@ -170,6 +170,16 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		else
 			this.owner = "";
 	}
+	
+	/**
+	 * Indicates whether or not there are any conflicts detected in the metadata object.
+	 * Here, the method always returns {@code false}, but inheriting classes may make use of it.
+	 * 
+	 * @return {@code true} if conflicts have been detected in the metadata; {@code false} otherwise.
+	 */
+	public boolean hasConflicts() {
+		return false;
+	}
 
 	@Override
 	public int hashCode() {
@@ -312,5 +322,4 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			return m1.getOwner().compareTo(m2.getOwner());
 		}
 	};
-
 }
