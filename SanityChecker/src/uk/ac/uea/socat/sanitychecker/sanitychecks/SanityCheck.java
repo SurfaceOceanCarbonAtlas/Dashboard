@@ -43,7 +43,7 @@ public abstract class SanityCheck {
 	/**
 	 * Some checkers can only complete their work once all the records
 	 * have been processed. This method is called after all the records
-	 * have been passed to the checker via @code{processRecord}.
+	 * have been passed to the checker via {@link #processRecord(SocatDataRecord)}.
 	 */
 	public void performFinalCheck() throws SanityCheckException {
 		// Most checkers will not need a final check,
