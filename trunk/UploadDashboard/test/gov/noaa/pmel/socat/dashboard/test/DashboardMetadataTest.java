@@ -99,6 +99,25 @@ public class DashboardMetadataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#isConflicted()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setConflicted(boolean)}.
+	 */
+	@Test
+	public void testIsSetConflicted() {
+		DashboardMetadata mdata = new DashboardMetadata();
+		assertEquals(false, mdata.isConflicted());
+		mdata.setConflicted(true);
+		assertEquals(true, mdata.isConflicted());
+		assertEquals("", mdata.getUploadTimestamp());
+		assertEquals("", mdata.getFilename());
+		assertEquals("", mdata.getOwner());
+		assertEquals("", mdata.getExpocode());
+		assertFalse( mdata.isSelected() );
+		mdata.setConflicted(false);
+		assertEquals(false, mdata.isConflicted());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#equals(java.lang.Object)}.
 	 */
@@ -148,6 +167,13 @@ public class DashboardMetadataTest {
 		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
 		assertFalse( firstMData.equals(secondMData) );
 		secondMData.setUploadTimestamp(myTimestamp);
+		assertEquals(firstMData.hashCode(), secondMData.hashCode());
+		assertEquals(firstMData, secondMData);
+
+		firstMData.setConflicted(true);
+		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
+		assertFalse( firstMData.equals(secondMData) );
+		secondMData.setConflicted(true);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
 	}

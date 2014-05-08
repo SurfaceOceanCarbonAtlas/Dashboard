@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4927750215946978468L;
+	private static final long serialVersionUID = 8390215646094878787L;
 
 	/**
 	 * The "upload filename" for all OME metadata files.  (The name of the 
@@ -31,6 +31,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	protected String filename;
 	protected String uploadTimestamp;
 	protected String owner;
+	protected boolean conflicted;
 
 	/**
 	 * Creates an empty metadata document record
@@ -41,6 +42,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		filename = "";
 		uploadTimestamp = "";
 		owner = "";
+		conflicted = false;
 	}
 
 	/**
@@ -170,15 +172,21 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		else
 			this.owner = "";
 	}
-	
+
 	/**
-	 * Indicates whether or not there are any conflicts detected in the metadata object.
-	 * Here, the method always returns {@code false}, but inheriting classes may make use of it.
-	 * 
-	 * @return {@code true} if conflicts have been detected in the metadata; {@code false} otherwise.
+	 * @return 
+	 *		{@code true} if conflicts have been detected in the metadata; {@code false} otherwise.
 	 */
-	public boolean hasConflicts() {
-		return false;
+	public boolean isConflicted() {
+		return conflicted;
+	}
+
+	/**
+	 * @param conflicted 
+	 * 		set whether or not there are any conflicts detected in the metadata object.
+	 */
+	public void setConflicted(boolean conflicted) {
+		this.conflicted = conflicted;
 	}
 
 	@Override
@@ -189,6 +197,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		result = result * prime + filename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + owner.hashCode();
+		result = result * prime + Boolean.valueOf(conflicted).hashCode();
 		return result;
 	}
 
@@ -213,6 +222,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			return false;
 		if ( ! owner.equals(other.owner) )
 			return false;
+		if ( conflicted != other.conflicted )
+			return false;
 		return true;
 	}
 
@@ -224,6 +235,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 				",\n  filename=" + filename +
 				",\n  uploadTimestamp=" + uploadTimestamp +
 				",\n  owner=" + owner + 
+				",\n  conflicted=" + conflicted + 
 				" ]";
 	}
 
