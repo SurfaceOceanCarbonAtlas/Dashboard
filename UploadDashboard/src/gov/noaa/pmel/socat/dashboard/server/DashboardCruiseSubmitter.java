@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import uk.ac.uea.socat.sanitychecker.Output;
+import gov.noaa.pmel.socat.dashboard.server.OmeMetadata.OmeMetadata;
 
 /**
  * Submits Dashboard cruise for SOCAT QC

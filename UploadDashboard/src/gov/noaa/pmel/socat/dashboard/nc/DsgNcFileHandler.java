@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.nc;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
-import gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.OmeMetadata.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
