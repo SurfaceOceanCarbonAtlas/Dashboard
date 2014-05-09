@@ -9,20 +9,18 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Class for a SOCAT QC flag. 
- * Also the parent class for a SOCAT WOCE flag.
+ * Base class for SocatQCEvent and SocatWoceEvent. 
  * 
  * @author Karl Smith
  */
-public class SocatQCFlag implements Serializable, IsSerializable {
+public class SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -6641479500583523549L;
+	private static final long serialVersionUID = -8623810089759833896L;
 
 	Character flag;
+	Date flagDate;
 	String expocode;
 	Double socatVersion;
-	Character regionID;
-	Date flagDate;
 	String username;
 	String realname;
 	String comment;
@@ -30,12 +28,11 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 	/**
 	 * Creates an empty flag
 	 */
-	public SocatQCFlag() {
+	public SocatEvent() {
 		flag = SocatCruiseData.CHAR_MISSING_VALUE;
+		flagDate = SocatMetadata.DATE_MISSING_VALUE;
 		expocode = "";
 		socatVersion = 0.0;
-		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
-		flagDate = SocatMetadata.DATE_MISSING_VALUE;
 		username = "";
 		realname = "";
 		comment = "";
@@ -58,6 +55,26 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 			this.flag = SocatCruiseData.CHAR_MISSING_VALUE;
 		else
 			this.flag = flag;
+	}
+
+	/**
+	 * @return 
+	 * 		the date of the flag; never null 
+	 * 		but may be {@link SocatMetadata#DATE_MISSING_VALUE}
+	 */
+	public Date getFlagDate() {
+		return flagDate;
+	}
+
+	/**
+	 * @param flagDate 
+	 * 		the date of the flag to set; if null, {@link SocatMetadata#DATE_MISSING_VALUE}
+	 */
+	public void setFlagDate(Date flagDate) {
+		if ( flagDate == null )
+			this.flagDate = SocatMetadata.DATE_MISSING_VALUE;
+		else
+			this.flagDate = flagDate;
 	}
 
 	/**
@@ -96,45 +113,6 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 			this.socatVersion = 0.0;
 		else
 			this.socatVersion = socatVersion;
-	}
-
-	/**
-	 * @return 
-	 * 		the region ID; never null but may be {@link SocatCruiseData#CHAR_MISSING_VALUE}
-	 */
-	public Character getRegionID() {
-		return regionID;
-	}
-
-	/**
-	 * @param regionID 
-	 * 		the region ID to set; if null, {@link SocatCruiseData#CHAR_MISSING_VALUE} is assigned
-	 */
-	public void setRegionID(Character regionID) {
-		if ( regionID == null )
-			this.regionID = SocatCruiseData.CHAR_MISSING_VALUE;
-		else
-			this.regionID = regionID;
-	}
-
-	/**
-	 * @return 
-	 * 		the date of the flag; never null 
-	 * 		but may be {@link SocatMetadata#DATE_MISSING_VALUE}
-	 */
-	public Date getFlagDate() {
-		return flagDate;
-	}
-
-	/**
-	 * @param flagDate 
-	 * 		the date of the flag to set; if null, {@link SocatMetadata#DATE_MISSING_VALUE}
-	 */
-	public void setFlagDate(Date flagDate) {
-		if ( flagDate == null )
-			this.flagDate = SocatMetadata.DATE_MISSING_VALUE;
-		else
-			this.flagDate = flagDate;
 	}
 
 	/**
@@ -200,7 +178,6 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 		int result = flag.hashCode();
 		result = result * prime + expocode.hashCode();
 		// Ignore socatVersion as it is floating point and does not have to be exact
-		result = result * prime + regionID.hashCode();
 		result = result * prime + flagDate.hashCode();
 		result = result * prime + username.hashCode();
 		result = result * prime + realname.hashCode();
@@ -215,17 +192,15 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatQCFlag) )
+		if ( ! (obj instanceof SocatEvent) )
 			return false;
-		SocatQCFlag other = (SocatQCFlag) obj;
+		SocatEvent other = (SocatEvent) obj;
 
 		if ( ! flagDate.equals(other.flagDate) )
 			return false;
 		if ( ! flag.equals(other.flag) )
 			return false;
 		if ( ! expocode.equals(other.expocode) )
-			return false;
-		if ( ! regionID.equals(other.regionID) )
 			return false;
 		if ( ! username.equals(other.username) )
 			return false;
@@ -241,11 +216,10 @@ public class SocatQCFlag implements Serializable, IsSerializable {
 
 	@Override
 	public String toString() {
-		return "SocatQCFlag" +
+		return "SocatEvent" +
 				"[\n    flag='" + flag.toString() + "'" +
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 
-				",\n    regionID='" + regionID.toString() + "'" + 
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 

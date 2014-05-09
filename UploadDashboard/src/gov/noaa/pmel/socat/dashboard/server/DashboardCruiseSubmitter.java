@@ -4,10 +4,11 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import uk.ac.uea.socat.sanitychecker.Output;
-import gov.noaa.pmel.socat.dashboard.server.OmeMetadata.OmeMetadata;
 
 /**
  * Submits Dashboard cruise for SOCAT QC
@@ -111,8 +111,8 @@ public class DashboardCruiseSubmitter {
 				cruise.setWoceFourRowIndices(new ArrayList<HashSet<Integer>>(
 						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
 				cruiseHandler.saveCruiseMessages(cruise.getExpocode(), output);
-				// Create a SocatQCFlag for the cruise with the number of data rows with errors, warnings
-				SocatQCFlag comment = new SocatQCFlag();
+				// Create a SocatQCEvent for the cruise with the number of data rows with errors, warnings
+				SocatQCEvent comment = new SocatQCEvent();
 				comment.setFlag(null);
 				comment.setExpocode(expocode);
 				comment.setSocatVersion(cruise.getVersion());
@@ -126,7 +126,7 @@ public class DashboardCruiseSubmitter {
 						Integer.toString(cruiseData.getNumWarnRows()) + 
 						" data points with warnings.");
 				try {
-					databaseHandler.addQCFlag(comment);
+					databaseHandler.addQCEvent(comment);
 				} catch (SQLException ex) {
 					throw new IllegalArgumentException(
 							"Unable to add a QC comment with the Sanity Checker results:\n" +

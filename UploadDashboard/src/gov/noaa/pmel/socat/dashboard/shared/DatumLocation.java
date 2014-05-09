@@ -9,35 +9,54 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Class for a SOCAT WOCE flag.
+ * The location of a data point with a data value at that location.
+ * Used for indicating locations for WOCE flag events which describes 
+ * the data set and data column for this location and value.
  * 
  * @author Karl Smith
  */
-public class SocatWoceFlag extends SocatQCFlag 
-							implements Serializable, IsSerializable {
+public class DatumLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2064190756274447892L;
+	private static final long serialVersionUID = -8485668478232679181L;
 
+	Character regionID;
 	Integer rowNumber;
+	Date dataDate;
 	Double longitude;
 	Double latitude;
-	Date dataDate;
-	DataColumnType dataType;
-	String columnName;
 	Double dataValue;
 
 	/**
 	 * Creates an empty flag.
 	 */
-	public SocatWoceFlag() {
-		super();
+	public DatumLocation() {
+		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
 		rowNumber = SocatCruiseData.INT_MISSING_VALUE;
+		dataDate = SocatMetadata.DATE_MISSING_VALUE;
 		longitude = SocatCruiseData.FP_MISSING_VALUE;
 		latitude = SocatCruiseData.FP_MISSING_VALUE;
-		dataDate = SocatMetadata.DATE_MISSING_VALUE;
-		dataType = DataColumnType.UNKNOWN;
-		columnName = "";
 		dataValue = SocatCruiseData.FP_MISSING_VALUE;
+	}
+
+	/**
+	 * @return 
+	 * 		the region ID for this WOCE flag; 
+	 * 		never null but may be {@link SocatCruiseData#CHAR_MISSING_VALUE}
+	 */
+	public Character getRegionID() {
+		return regionID;
+	}
+
+	/**
+	 * @param regionID 
+	 * 		the region ID to set for this WOCE flag; 
+	 * 		if null, {@link SocatCruiseData#CHAR_MISSING_VALUE} is assigned
+	 */
+	public void setRegionID(Character regionID) {
+		if ( regionID == null )
+			this.regionID = SocatCruiseData.CHAR_MISSING_VALUE;
+		else
+			this.regionID = regionID;
 	}
 
 	/**
@@ -59,6 +78,27 @@ public class SocatWoceFlag extends SocatQCFlag
 			this.rowNumber = SocatCruiseData.INT_MISSING_VALUE;
 		else
 			this.rowNumber = rowNumber;
+	}
+
+	/**
+	 * @return 
+	 * 		the data date;
+	 * 		never null but may be {@link SocatMetadata#DATE_MISSING_VALUE}
+	 */
+	public Date getDataDate() {
+		return dataDate;
+	}
+
+	/**
+	 * @param dataDate 
+	 * 		the data date to set;
+	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned.
+	 */
+	public void setDataDate(Date dataDate) {
+		if ( dataDate == null )
+			this.dataDate = SocatMetadata.DATE_MISSING_VALUE;
+		else
+			this.dataDate = dataDate;
 	}
 
 	/**
@@ -111,69 +151,6 @@ public class SocatWoceFlag extends SocatQCFlag
 
 	/**
 	 * @return 
-	 * 		the data date;
-	 * 		never null but may be {@link SocatMetadata#DATE_MISSING_VALUE}
-	 */
-	public Date getDataDate() {
-		return dataDate;
-	}
-
-	/**
-	 * @param dataDate 
-	 * 		the data date to set;
-	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned.
-	 */
-	public void setDataDate(Date dataDate) {
-		if ( dataDate == null )
-			this.dataDate = SocatMetadata.DATE_MISSING_VALUE;
-		else
-			this.dataDate = dataDate;
-	}
-
-	/**
-	 * @return 
-	 * 		the data type; 
-	 * 		never null but may be {@link DataColumnType#UNKNOWN}
-	 */
-	public DataColumnType getDataType() {
-		return dataType;
-	}
-
-	/**
-	 * @param dataType 
-	 * 		the data type to set;
-	 * 		if null, {@link DataColumnType#UNKNOWN} is assigned.
-	 */
-	public void setDataType(DataColumnType dataType) {
-		if ( dataType == null )
-			this.dataType = DataColumnType.UNKNOWN;
-		else
-			this.dataType = dataType;
-	}
-
-	/**
-	 * @return 
-	 * 		the data column name;
-	 * 		never null but may be empty
-	 */
-	public String getColumnName() {
-		return columnName;
-	}
-
-	/**
-	 * @param columnName 
-	 * 		the data column name to set;
-	 * 		if null, an empty string is assigned.
-	 */
-	public void setColumnName(String columnName) {
-		if ( columnName == null )
-			this.columnName = "";
-		else
-			this.columnName = columnName;
-	}
-
-	/**
-	 * @return 
 	 * 		the data value;
 	 * 		never null but may be {@link SocatCruiseData#FP_MISSING_VALUE}
 	 */
@@ -196,12 +173,10 @@ public class SocatWoceFlag extends SocatQCFlag
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = super.hashCode();
+		int result = regionID.hashCode();
 		result = result * prime + rowNumber.hashCode();
-		// Ignore floating point as they do not have to be exactly the same for equals
 		result = result * prime + dataDate.hashCode();
-		result = result * prime + dataType.hashCode();
-		result = result * prime + columnName.hashCode();
+		// Ignore floating point values as they do not have to be exactly the same for equals
 		return result;
 	}
 
@@ -212,19 +187,15 @@ public class SocatWoceFlag extends SocatQCFlag
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatWoceFlag) )
+		if ( ! (obj instanceof DatumLocation) )
 			return false;
-		SocatWoceFlag other = (SocatWoceFlag) obj;
+		DatumLocation other = (DatumLocation) obj;
 
-		if ( ! super.equals(other) )
+		if ( ! regionID.equals(other.regionID) )
 			return false;
 		if ( ! rowNumber.equals(other.rowNumber) )
 			return false;
 		if ( ! dataDate.equals(other.dataDate) )
-			return false;
-		if ( ! dataType.equals(other.dataType) )
-			return false;
-		if ( ! columnName.equals(other.columnName) )
 			return false;
 
 		if ( ! DashboardUtils.closeTo(dataValue, other.dataValue, SocatCruiseData.MAX_RELATIVE_ERROR, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
@@ -242,22 +213,13 @@ public class SocatWoceFlag extends SocatQCFlag
 
 	@Override
 	public String toString() {
-		return "SocatWoceFlag" +
-				"[\n    flag='" + flag.toString() + "'" +
-				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
-				",\n    regionID='" + regionID.toString() + "'" + 
-				",\n    rowNumber=" + rowNumber.toString() + 
-				",\n    longitude=" + longitude.toString() + 
-				",\n    latitude=" + latitude.toString() + 
-				",\n    dataDate=" + dataDate.toString() + 
-				",\n    dataType=" + dataType.toString() + 
-				",\n    columnName=" + columnName + 
-				",\n    dataValue=" + dataValue.toString() + 
-				",\n    flagDate=" + flagDate.toString() + 
-				",\n    username=" + username + 
-				",\n    realname=" + realname + 
-				",\n    comment=" + comment + 
+		return "DatumLocation" +
+				"[ regionID='" + regionID.toString() + "'" + 
+				", rowNumber=" + rowNumber.toString() + 
+				", dataDate=" + dataDate.toString() + 
+				", longitude=" + longitude.toString() + 
+				", latitude=" + latitude.toString() + 
+				", dataValue=" + dataValue.toString() + 
 				"]";
 	}
 

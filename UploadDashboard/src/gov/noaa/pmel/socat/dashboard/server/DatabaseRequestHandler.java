@@ -4,9 +4,11 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceFlag;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.DatumLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -16,7 +18,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
@@ -98,8 +99,7 @@ public class DatabaseRequestHandler {
 		boolean canSelect = false;
 		Connection selectConn = makeConnection(false);
 		try {
-			ResultSet result = 
-					selectConn.prepareStatement("SHOW GRANTS;").executeQuery();
+			ResultSet result = selectConn.createStatement().executeQuery("SHOW GRANTS;");
 			try {
 				while ( result.next() ) {
 					String grants = result.getString(1);
@@ -128,8 +128,7 @@ public class DatabaseRequestHandler {
 		boolean canDelete = false;
 		selectConn = makeConnection(true);
 		try {
-			ResultSet result = 
-					selectConn.prepareStatement("SHOW GRANTS;").executeQuery();
+			ResultSet result = selectConn.createStatement().executeQuery("SHOW GRANTS;");
 			try {
 				while ( result.next() ) {
 					String grants = result.getString(1);
@@ -214,270 +213,361 @@ public class DatabaseRequestHandler {
 	 */
 	private int getReviewerId(Connection catConn, String reviewerName) 
 													throws SQLException {
+		int reviewerId;
 		PreparedStatement prepStmt = catConn.prepareStatement(
-				"SELECT `reviewer_id` FROM `reviewers` WHERE `username` = ?");
+				"SELECT `reviewer_id` FROM `Reviewers` WHERE `username` = ?");
 		prepStmt.setString(1, reviewerName);
 		ResultSet results = prepStmt.executeQuery();
-		if ( ! results.first() )
-			throw new SQLException(
-					"Reviewer '" + reviewerName + "' not found");
-		int reviewerId = results.getInt(1);
-		if ( reviewerId <= 0 )
-			throw new SQLException(
-					"ID for reviewer '" + reviewerName + "' not found");
-		results.close();
+		try {
+			if ( ! results.first() )
+				throw new SQLException(
+						"Reviewer username '" + reviewerName + "' not found");
+			reviewerId = results.getInt(1);
+			if ( reviewerId <= 0 )
+				throw new SQLException(
+						"ID for reviewer username '" + reviewerName + "' not found");
+		} finally {
+			results.close();
+		}
 		return reviewerId;
 	}
 
 	/**
-	 * Adds a new QC flag for a dataset.
+	 * Adds a new QC event for a dataset.
 	 * 
-	 * @param qcFlag
-	 * 		QC flag to add
-	 * @return
-	 * 		true if successful
+	 * @param qcEvent
+	 * 		the QC event to add
 	 * @throws SQLException
 	 * 		if accessing or updating the database throws one, or
-	 * 		if the reviewer cannot be found in the reviewers table
+	 * 		if the reviewer cannot be found in the reviewers table, or
+	 * 		if a problem occurs with adding the QC event.
 	 */
-	public boolean addQCFlag(SocatQCFlag qcFlag) throws SQLException {
-		boolean wasSuccessful = false;
+	public void addQCEvent(SocatQCEvent qcEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
-			int reviewerId = getReviewerId(catConn, qcFlag.getUsername());
+			int reviewerId = getReviewerId(catConn, qcEvent.getUsername());
+			// Add the QC event
 			PreparedStatement prepStmt = catConn.prepareStatement(
-					"INSERT INTO `qcflags` (`qc_flag`, `expocode`, " +
-					"`socat_version`, `region_id`, " +
-					"`flag_date`, `reviewer_id`, `qc_comment`) " +
+					"INSERT INTO `QCEvents` (`qc_flag`, `qc_time`, `expocode`, " +
+					"`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES(?, ?, ?, ?, ?, ?, ?)");
-			prepStmt.setString(1, qcFlag.getFlag().toString());
-			prepStmt.setString(2, qcFlag.getExpocode());
-			prepStmt.setDouble(3, qcFlag.getSocatVersion());
-			prepStmt.setString(4, qcFlag.getRegionID().toString());
-			Date flagDate = qcFlag.getFlagDate();
+			prepStmt.setString(1, qcEvent.getFlag().toString());
+			Date flagDate = qcEvent.getFlagDate();
 			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
-				prepStmt.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+				prepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
 			else
-				prepStmt.setTimestamp(5, new Timestamp(flagDate.getTime()));
+				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
+			prepStmt.setString(3, qcEvent.getExpocode());
+			prepStmt.setDouble(4, qcEvent.getSocatVersion());
+			prepStmt.setString(5, qcEvent.getRegionID().toString());
 			prepStmt.setInt(6, reviewerId);
-			prepStmt.setString(7, qcFlag.getComment());
+			prepStmt.setString(7, qcEvent.getComment());
 			prepStmt.execute();
-			if ( prepStmt.getUpdateCount() == 1 )
-				wasSuccessful = true;
+			if ( prepStmt.getUpdateCount() != 1 )
+				throw new SQLException("Adding the QC event was unsuccessful");
 		} finally {
 			catConn.close();
 		}
-		return wasSuccessful;
 	}
 
 	/**
-	 * Creates a SocatQCFlag from the values in the current row of a ResultSet.
+	 * Creates a SocatQCEvent object from the values in the current row 
+	 * of a ResultSet.
 	 * 
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
-	 * 		include columns with names qc_flag, expocode, socat_version, 
-	 * 		region_id, flag_date, username, realname, and qc_comment.
+	 * 		include columns with names qc_flag, qc_time, expocode, 
+	 * 		socat_version, region_id, username, realname, and qc_comment.
 	 * @returns
-	 * 		created QC flag
+	 * 		the created QC flag
 	 * @throws SQLException
 	 * 		if getting values from the ResultSet throws one
 	 */
-	private SocatQCFlag createQCFlag(ResultSet results) throws SQLException {
-		SocatQCFlag qcFlag = new SocatQCFlag();
+	private SocatQCEvent createQCEvent(ResultSet results) throws SQLException {
+		SocatQCEvent qcEvent = new SocatQCEvent();
 		try {
-			qcFlag.setFlag(results.getString("qc_flag").charAt(0));
+			qcEvent.setFlag(results.getString("qc_flag").charAt(0));
 		} catch (NullPointerException ex) {
 			throw new SQLException("Unexpected NULL qc_flag");
 		} catch (IndexOutOfBoundsException ex) {
 			throw new SQLException("Unexpected empty qc_flag");
 		}
-		qcFlag.setExpocode(results.getString("expocode"));
-		qcFlag.setSocatVersion(results.getDouble("socat_version"));
+		qcEvent.setFlagDate(new Date(results.getLong("qc_time") * 1000L));
+		if ( results.wasNull() )
+			qcEvent.setFlagDate(null);
+		qcEvent.setExpocode(results.getString("expocode"));
+		qcEvent.setSocatVersion(results.getDouble("socat_version"));
+		if ( results.wasNull() )
+			qcEvent.setSocatVersion(null);
 		try {
-			qcFlag.setRegionID(results.getString("region_id").charAt(0));
+			qcEvent.setRegionID(results.getString("region_id").charAt(0));
 		} catch (NullPointerException ex) {
 			throw new SQLException("Unexpected NULL region_id");
 		} catch (IndexOutOfBoundsException ex) {
 			throw new SQLException("Unexpected empty region_id");
 		}
-		try {
-			qcFlag.setFlagDate(
-					new Date(results.getTimestamp("flag_date").getTime()));
-		} catch (NullPointerException ex) {
-			throw new SQLException("Unexpected NULL flag_date");
-		}
-		qcFlag.setUsername(results.getString("username"));
-		qcFlag.setRealname(results.getString("realname"));
-		qcFlag.setComment(results.getString("qc_comment"));
-		return qcFlag;
+		qcEvent.setUsername(results.getString("username"));
+		qcEvent.setRealname(results.getString("realname"));
+		qcEvent.setComment(results.getString("qc_comment"));
+		return qcEvent;
 	}
 
 	/**
-	 * Retrieves the current list of QC flags for a dataset.
+	 * Retrieves the current list of QC events for a dataset.
 	 * 
 	 * @param expocode
-	 * 		get the flags for the dataset with this expocode 
+	 * 		get the QC events for the dataset with this expocode 
 	 * @return
-	 * 		list of QC flags for the dataset
+	 * 		the list of QC events for the dataset, ordered by the date
+	 * 		of the event (latest event first)
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<SocatQCFlag> getQCFlags(String expocode) throws SQLException {
+	public ArrayList<SocatQCEvent> getQCEvents(String expocode) throws SQLException {
+		ArrayList<SocatQCEvent> eventsList = new ArrayList<SocatQCEvent>();
 		Connection catConn = makeConnection(false);
-		PreparedStatement prepStmt = catConn.prepareStatement(
-				"SELECT * FROM `qcflags` JOIN `reviewers` " +
-				"ON qcflags.reviewer_id = reviewers.reviewer_id " +
-				"WHERE qcflags.expocode = ? ORDER BY qcflags.qc_id;");
-		prepStmt.setString(1, expocode);
-		ResultSet results = prepStmt.executeQuery();
-		ArrayList<SocatQCFlag> flagsList = new ArrayList<SocatQCFlag>();
-		while ( results.next() ) {
-			flagsList.add(createQCFlag(results));
-		}
-		return flagsList;
-	}
-
-	/**
-	 * Adds a new WOCE flag for a datapoint.
-	 * 
-	 * @param woceFlag
-	 * 		WOCE flag to add
-	 * @return
-	 * 		true if successful
-	 * @throws SQLException
-	 * 		if accessing or updating the database throws one, or
-	 * 		if the reviewer cannot be found in the reviewers table
-	 */
-	public boolean addWoceFlag(SocatWoceFlag woceFlag) throws SQLException {
-		boolean wasSuccessful = false;
-		Connection catConn = makeConnection(true);
 		try {
-			int reviewerId = getReviewerId(catConn, woceFlag.getUsername());
 			PreparedStatement prepStmt = catConn.prepareStatement(
-					"INSERT INTO `woceflags` (`woce_flag`, `expocode`, " +
-					"`socat_version`, `region_id`, " +
-					"`data_row`, `data_longitude`, `data_latitude`, " +
-					"`data_time`, `data_name`, `data_value`, " +
-					"`flag_date`, `reviewer_id`, `qc_comment`) " +
-					"VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-			prepStmt.setString(1, woceFlag.getFlag().toString());
-			prepStmt.setString(2, woceFlag.getExpocode());
-			prepStmt.setDouble(3, woceFlag.getSocatVersion());
-			prepStmt.setString(4, woceFlag.getRegionID().toString());
-			prepStmt.setInt(5, woceFlag.getRowNumber());
-			prepStmt.setDouble(6, woceFlag.getLongitude());
-			prepStmt.setDouble(7, woceFlag.getLatitude());
-			prepStmt.setLong(8, Math.round(woceFlag.getDataDate().getTime() / 1000.0));
-			prepStmt.setString(9, woceFlag.getColumnName());
-			prepStmt.setDouble(10, woceFlag.getDataValue());
-			Date flagDate = woceFlag.getFlagDate();
-			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
-				prepStmt.setTimestamp(11, new Timestamp(System.currentTimeMillis()));
-			else
-				prepStmt.setTimestamp(11, new Timestamp(flagDate.getTime()));
-			prepStmt.setInt(12, reviewerId);
-			prepStmt.setString(13, woceFlag.getComment());
-			prepStmt.execute();
-			if ( prepStmt.getUpdateCount() == 1 )
-				wasSuccessful = true;
+					"SELECT * FROM `QCEvents` JOIN `Reviewers` " +
+							"ON QCEvents.reviewer_id = Reviewers.reviewer_id " +
+					"WHERE QCEvents.expocode = ? ORDER BY QCEvents.qc_time DESC;");
+			prepStmt.setString(1, expocode);
+			ResultSet results = prepStmt.executeQuery();
+			try {
+				while ( results.next() ) {
+					eventsList.add(createQCEvent(results));
+				}
+			} finally {
+				results.close();
+			}
 		} finally {
 			catConn.close();
 		}
-		return wasSuccessful;
+		return eventsList;
 	}
 
 	/**
-	 * Creates a SocatQCFlag from the values in the current row of a ResultSet.
+	 * Adds a new WOCE event for a dataset.  This includes assigning
+	 * the DatumLocations to the WOCELocations table.
+	 * 
+	 * @param woceEvent
+	 * 		the WOCE event to add
+	 * @throws SQLException
+	 * 		if accessing or updating the database throws one, or
+	 * 		if the reviewer cannot be found in the reviewers table, or
+	 * 		if a problem occurs adding the WOCE event
+	 */
+	public void addWoceEvent(SocatWoceEvent woceEvent) throws SQLException {
+		Connection catConn = makeConnection(true);
+		try {
+			int reviewerId = getReviewerId(catConn, woceEvent.getUsername());
+			// Add the WOCE event
+			PreparedStatement prepStmt = catConn.prepareStatement(
+					"INSERT INTO `WOCEEvents` (`woce_flag`, `woce_time`, " +
+					"`expocode`, `socat_version`, `data_type`, " +
+					"`data_name`, `reviewer_id`, `qc_comment`) " +
+					"VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
+			prepStmt.setString(1, woceEvent.getFlag().toString());
+			Date flagDate = woceEvent.getFlagDate();
+			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
+				prepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
+			else
+				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
+			prepStmt.setString(3, woceEvent.getExpocode());
+			prepStmt.setDouble(4, woceEvent.getSocatVersion());
+			prepStmt.setString(5, woceEvent.getDataType().toString());
+			prepStmt.setString(6, woceEvent.getColumnName());
+			prepStmt.setInt(7, reviewerId);
+			prepStmt.setString(8, woceEvent.getComment());
+			prepStmt.execute();
+			if ( prepStmt.getUpdateCount() != 1 )
+				throw new SQLException("Adding the WOCE event was unsuccessful");
+			// Get the woce_id for the added WOCE event
+			long woceId;
+			ResultSet results = catConn.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
+			try {
+				if ( ! results.first() )
+					throw new SQLException("Unexpected failure to get the woce_id for an added WOCE event");
+				woceId = results.getLong(1);
+				if ( woceId <= 0 )
+					throw new SQLException("Unexpected invalid woce_id for an added WOCE event");
+			} finally {
+				results.close();
+			}
+			// Add the DatumLocations to the WOCELocations table
+			prepStmt = catConn.prepareStatement("INSERT INTO `WOCELocations` " +
+					"(`woce_id`, `region_id`, `row_num`, `longitude`, " +
+					"`latitude`, `data_time`, `data_value`) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?);");
+			for (DatumLocation location : woceEvent.getLocations() ) {
+				prepStmt.setLong(1, woceId);
+				prepStmt.setString(2, location.getRegionID().toString());
+				Integer intVal = location.getRowNumber();
+				if ( intVal.equals(SocatCruiseData.INT_MISSING_VALUE) )
+					prepStmt.setNull(3, java.sql.Types.INTEGER);
+				else
+					prepStmt.setInt(3, intVal);
+				Double dblVal = location.getLongitude();
+				if ( dblVal.equals(SocatCruiseData.FP_MISSING_VALUE) )
+					prepStmt.setNull(4, java.sql.Types.DOUBLE);
+				else
+					prepStmt.setDouble(4, dblVal);
+				dblVal = location.getLatitude();
+				if ( dblVal.equals(SocatCruiseData.FP_MISSING_VALUE) )
+					prepStmt.setNull(5, java.sql.Types.DOUBLE);
+				else
+					prepStmt.setDouble(5, dblVal);
+				Date dateVal = location.getDataDate();
+				if ( dateVal.equals(SocatMetadata.DATE_MISSING_VALUE) )
+					prepStmt.setNull(6, java.sql.Types.BIGINT);
+				else
+					prepStmt.setLong(6, Math.round(dateVal.getTime() / 1000.0));
+				dblVal = location.getDataValue();
+				if ( dblVal.equals(SocatCruiseData.FP_MISSING_VALUE) )
+					prepStmt.setNull(7, java.sql.Types.DOUBLE);
+				else
+					prepStmt.setDouble(7, dblVal);
+				prepStmt.execute();
+				if ( prepStmt.getUpdateCount() != 1 ) 
+					throw new SQLException("Adding the WOCE location was unsuccessful");
+			}
+		} finally {
+			catConn.close();
+		}
+	}
+
+	/**
+	 * Creates a SocatWoceEvent without any locations 
+	 * from the values in the current row of a ResultSet.
 	 * 
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
-	 * 		include columns with names woce_flag, expocode, socat_version, 
-	 * 		region_id, data_row, data_longitude, data_latitude, data_time,
-	 * 		data_type, data_name, data_value, flag_date, username, realname, 
+	 * 		include columns with names woce_flag, woce_time, expocode, 
+	 * 		socat_version, data_type, data_name, username, realname, 
 	 * 		and woce_comment.
 	 * @returns
-	 * 		created QC flag
+	 * 		the created WOCE event
 	 * @throws SQLException
 	 * 		if getting values from the ResultSet throws one
 	 */
-	private SocatWoceFlag createWoceFlag(ResultSet results) throws SQLException {
-		SocatWoceFlag woceFlag = new SocatWoceFlag();
+	private SocatWoceEvent createWoceEvent(ResultSet results) throws SQLException {
+		SocatWoceEvent woceEvent = new SocatWoceEvent();
 		try {
-			woceFlag.setFlag(results.getString("woce_flag").charAt(0));
+			woceEvent.setFlag(results.getString("woce_flag").charAt(0));
 		} catch (NullPointerException ex) {
 			throw new SQLException("Unexpected NULL woce_flag");
 		} catch (IndexOutOfBoundsException ex) {
 			throw new SQLException("Unexpected empty woce_flag");
 		}
-		woceFlag.setExpocode(results.getString("expocode"));
-		woceFlag.setSocatVersion(results.getDouble("socat_version"));
+		woceEvent.setFlagDate(new Date(results.getLong("woce_time") * 1000L));
+		if ( results.wasNull() )
+			woceEvent.setFlagDate(null);
+		woceEvent.setExpocode(results.getString("expocode"));
+		woceEvent.setSocatVersion(results.getDouble("socat_version"));
+		if ( results.wasNull() )
+			woceEvent.setSocatVersion(null);
 		try {
-			woceFlag.setRegionID(results.getString("region_id").charAt(0));
+			woceEvent.setDataType(DataColumnType.valueOf(results.getString("data_type")));
+		} catch (NullPointerException ex) {
+			woceEvent.setDataType(null);
+		} catch (IllegalArgumentException ex) {
+			throw new SQLException("Unexpected unknown data type '" + 
+					results.getString("data_type") + "'");
+		}
+		woceEvent.setColumnName(results.getString("data_name"));
+		woceEvent.setUsername(results.getString("username"));
+		woceEvent.setRealname(results.getString("realname"));
+		woceEvent.setComment(results.getString("woce_comment"));
+		return woceEvent;
+	}
+
+	/**
+	 * Creates a DatumLocation from the values in the current row of a ResultSet.
+	 * 
+	 * @param results
+	 * 		assign values from the current row of this ResultSet; must include 
+	 * 		columns with names region_id, row_num, longitude, latitude, data_time, 
+	 * 		and data_value.
+	 * @return
+	 * 		the created DatumLocation 
+	 * @throws SQLException
+	 */
+	private DatumLocation createWoceLocation(ResultSet results) throws SQLException {
+		DatumLocation location = new DatumLocation();
+		try {
+			location.setRegionID(results.getString("region_id").charAt(0));
 		} catch (NullPointerException ex) {
 			throw new SQLException("Unexpected NULL region_id");
 		} catch (IndexOutOfBoundsException ex) {
 			throw new SQLException("Unexpected empty region_id");
 		}
-		woceFlag.setRowNumber(results.getInt("data_row"));
+		location.setRowNumber(results.getInt("row_num"));
 		if ( results.wasNull() )
-			woceFlag.setRowNumber(null);
-		woceFlag.setLongitude(results.getDouble("data_longitude"));
+			location.setRowNumber(null);
+		location.setLongitude(results.getDouble("longitude"));
 		if ( results.wasNull() )
-			woceFlag.setLongitude(null);
-		woceFlag.setLatitude(results.getDouble("data_latitude"));
+			location.setLongitude(null);
+		location.setLatitude(results.getDouble("latitude"));
+		if ( results.wasNull() ) 
+			location.setLatitude(null);
+		location.setDataDate(new Date(results.getLong("data_time") * 1000L));
 		if ( results.wasNull() )
-			woceFlag.setLatitude(null);
-		woceFlag.setDataDate(new Date(results.getLong("data_time") * 1000));
-		if ( results.wasNull() )
-			woceFlag.setDataDate(null);
-		try {
-			woceFlag.setDataType(
-					DataColumnType.valueOf(results.getString("data_type")));
-		} catch (NullPointerException ex) {
-			woceFlag.setDataType(null);
-		} catch (IllegalArgumentException ex) {
-			throw new SQLException("Unexpected unknown data type '" + 
-					results.getString("data_type") + "'");
-		}
-		woceFlag.setColumnName(results.getString("data_name"));
-		woceFlag.setDataValue(results.getDouble("data_value"));
-		if ( results.wasNull() )
-			woceFlag.setDataValue(null);
-		try {
-			woceFlag.setFlagDate(
-					new Date(results.getTimestamp("flag_date").getTime()));
-		} catch (NullPointerException ex) {
-			throw new SQLException("Unexpected NULL flag_date");
-		}
-		woceFlag.setUsername(results.getString("username"));
-		woceFlag.setRealname(results.getString("realname"));
-		woceFlag.setComment(results.getString("woce_comment"));
-		return woceFlag;
+			location.setDataDate(null);
+		location.setDataValue(results.getDouble("data_value"));
+		if ( results.wasNull() ) 
+			location.setDataValue(null);
+		return location;
 	}
 
 	/**
-	 * Retrieves the current list of WOCE flags for a dataset.
+	 * Retrieves the current list of WOCE events for a dataset.
 	 * 
 	 * @param expocode
-	 * 		get the flags for the dataset with this expocode 
+	 * 		get the WOCE events for the dataset with this expocode 
 	 * @return
-	 * 		list of WOCE flags for the dataset
+	 * 		list of WOCE events for the dataset, ordered by the date
+	 * 		of the event (latest event first)
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<SocatWoceFlag> getWoceFlags(String expocode) throws SQLException {
+	public ArrayList<SocatWoceEvent> getWoceFlags(String expocode) throws SQLException {
+		ArrayList<SocatWoceEvent> eventsList = new ArrayList<SocatWoceEvent>();
 		Connection catConn = makeConnection(false);
-		PreparedStatement prepStmt = catConn.prepareStatement(
-				"SELECT * FROM `woceflags` JOIN `reviewers` " +
-				"ON woceflags.reviewer_id = reviewers.reviewer_id " +
-				"WHERE woceflags.expocode = ? ORDER BY woceflags.woce_id;");
-		prepStmt.setString(1, expocode);
-		ResultSet results = prepStmt.executeQuery();
-		ArrayList<SocatWoceFlag> flagsList = new ArrayList<SocatWoceFlag>();
-		while ( results.next() ) {
-			flagsList.add(createWoceFlag(results));
+		try {
+			PreparedStatement prepStmt = catConn.prepareStatement(
+					"SELECT * FROM `WOCEEvents` JOIN `Reviewers` " +
+							"ON WOCEEvents.reviewer_id = Reviewers.reviewer_id " +
+					"WHERE WOCEEvents.expocode = ? ORDER BY WOCEEvents.woce_time DESC;");
+			prepStmt.setString(1, expocode);
+			ArrayList<Long> woceIds = new ArrayList<Long>();
+			ResultSet results = prepStmt.executeQuery();
+			try {
+				while ( results.next() ) {
+					eventsList.add(createWoceEvent(results));
+					woceIds.add(results.getLong("woce_id"));
+				}
+			} finally {
+				results.close();
+			}
+			prepStmt = catConn.prepareStatement("SELECT * FROM `WOCELocations` " +
+					"WHERE `woce_id` = ? ORDER BY `row_num`;");
+			for (int k = 0; k < woceIds.size(); k++) {
+				// Directly modify the list of locations in the WOCE event
+				ArrayList<DatumLocation> locations = eventsList.get(k).getLocations();
+				prepStmt.setLong(1, woceIds.get(k));
+				results = prepStmt.executeQuery();
+				try {
+					while ( results.next() ) {
+						locations.add(createWoceLocation(results));
+					}
+				} finally {
+					results.close();
+				}
+			}
+		} finally {
+			catConn.close();
 		}
-		return flagsList;
+		return eventsList;
 	}
 
 }
