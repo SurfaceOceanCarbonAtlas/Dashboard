@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
+package gov.noaa.pmel.socat.dashboard.ome;
 
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.MetadataFileHandler;
@@ -26,21 +26,18 @@ import org.jdom2.input.SAXBuilder;
  * Class for the one special metadata file per cruise that must be present,
  * has a known format, and contains user-provided values needed by the SOCAT 
  * database.  
- *  
+ * 
+ * @author Steve Jones
  * @author Karl Smith
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 5352480159918565845L;
+	private static final long serialVersionUID = 8071671406430066418L;
 
 	private static final SimpleDateFormat DATE_PARSER = 
-			new SimpleDateFormat("yyyyMMdd HH:mm");
-	private static final SimpleDateFormat DATE_FORMATTER =
-			new SimpleDateFormat("yyyyMMdd");
+			new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 	static {
-		TimeZone gmtTz = TimeZone.getTimeZone("GMT");
-		DATE_PARSER.setTimeZone(gmtTz);
-		DATE_FORMATTER.setTimeZone(gmtTz);
+		DATE_PARSER.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
 	// data values from the OME metadata 
@@ -1113,13 +1110,13 @@ public class OmeMetadata extends DashboardMetadata {
 		}
 		
 		try {
-			scMData.setBeginTime(DATE_PARSER.parse(temporalCoverageStartDate.getValue() + " 00:00"));
+			scMData.setBeginTime(DATE_PARSER.parse(temporalCoverageStartDate.getValue() + " 00:00:00"));
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("The Start Date cannot be parsed", e);
 		}
 
 		try {
-			scMData.setEndTime(DATE_PARSER.parse(temporalCoverageEndDate.getValue() + " 00:00"));
+			scMData.setEndTime(DATE_PARSER.parse(temporalCoverageEndDate.getValue() + " 23:59:59"));
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("The End Date cannot be parsed", e);
 		}

@@ -1,4 +1,4 @@
-package gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
+package gov.noaa.pmel.socat.dashboard.ome;
 
 import java.util.ArrayList;
 import java.util.Iterator;

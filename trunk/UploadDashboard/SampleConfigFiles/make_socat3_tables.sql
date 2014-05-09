@@ -1,62 +1,74 @@
-DROP TABLE IF EXISTS `reviewers`;
-CREATE TABLE `reviewers` (
+DROP TABLE IF EXISTS `WOCELocations`;
+DROP TABLE IF EXISTS `WOCEEvents`;
+DROP TABLE IF EXISTS `QCEvents`;
+DROP TABLE IF EXISTS `Reviewers`;
+
+CREATE TABLE `Reviewers` (
   `reviewer_id` INT(4) UNSIGNED NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(64) NOT NULL DEFAULT '',
   `realname` VARCHAR(64) NOT NULL DEFAULT '',
   `email` VARCHAR(256) NOT NULL DEFAULT '',
-  PRIMARY KEY USING BTREE (`reviewer_id`),
-  UNIQUE KEY `username` USING BTREE (`username`),
-  UNIQUE KEY `realname` USING BTREE (`realname`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`reviewer_id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `realname` (`realname`)
+) DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `qcflags`;
-CREATE TABLE `qcflags` (
+CREATE TABLE `QCEvents` (
   `qc_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `qc_flag` CHAR(1) NOT NULL DEFAULT ' ',
+  `qc_time` BIGINT DEFAULT NULL,
   `expocode` VARCHAR(16) NOT NULL DEFAULT '',
   `socat_version` FLOAT(3,1) NOT NULL DEFAULT '0.0',
   `region_id` CHAR(1) NOT NULL DEFAULT ' ',
-  `flag_date` DATETIME NOT NULL DEFAULT '1900-01-01 00:00:00',
   `reviewer_id` INT(4) UNSIGNED NOT NULL DEFAULT '0',
   `qc_comment` VARCHAR(1024) NOT NULL DEFAULT '',
-  PRIMARY KEY USING BTREE (`qc_id`),
-  KEY `qc_flag` USING BTREE (`qc_flag`),
-  KEY `expocode` USING BTREE (`expocode`),
-  KEY `socat_version` USING BTREE (`socat_version`),
-  KEY `region_id` USING BTREE (`region_id`),
-  KEY `flag_date` USING BTREE (`flag_date`),
-  KEY `reviewer_id` USING BTREE (`reviewer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`qc_id`),
+  KEY `qc_flag` (`qc_flag`),
+  KEY `qc_time` (`qc_time`),
+  KEY `expocode` (`expocode`),
+  KEY `socat_version` (`socat_version`),
+  KEY `region_id` (`region_id`),
+  KEY `reviewer_id` (`reviewer_id`),
+  CONSTRAINT `QCEvents_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `Reviewers` (`reviewer_id`)
+) DEFAULT CHARSET=latin1;
 
-DROP TABLE IF EXISTS `woceflags`;
-CREATE TABLE `woceflags` (
+CREATE TABLE `WOCEEvents` (
   `woce_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `woce_flag` SMALLINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `woce_time` BIGINT DEFAULT NULL,
   `expocode` VARCHAR(16) NOT NULL DEFAULT '',
   `socat_version` FLOAT(3,1) NOT NULL DEFAULT '0.0',
-  `region_id` CHAR(1) NOT NULL DEFAULT ' ',
-  `data_row` INT(6) UNSIGNED DEFAULT NULL,
-  `data_longitude` FLOAT(12,6) DEFAULT NULL,
-  `data_latitude` FLOAT(12,6) DEFAULT NULL,
-  `data_time` BIGINT DEFAULT NULL,
-  `data_type` VARCHAR(32) DEFAULT NULL,
-  `data_name` VARCHAR(64) DEFAULT NULL,
-  `data_value` FLOAT(12,6) DEFAULT NULL,
-  `flag_date` DATETIME NOT NULL DEFAULT '1900-01-01 00:00:00',
+  `data_type` VARCHAR(64) NOT NULL DEFAULT '',
+  `data_name` VARCHAR(64) NOT NULL DEFAULT '',
   `reviewer_id` INT(4) UNSIGNED NOT NULL DEFAULT 0,
   `woce_comment` VARCHAR(1024) NOT NULL DEFAULT '',
-  PRIMARY KEY USING BTREE (`woce_id`),
-  KEY `woce_flag` USING BTREE (`woce_flag`),
-  KEY `expocode` USING BTREE (`expocode`),
-  KEY `socat_version` USING BTREE (`socat_version`),
-  KEY `region_id` USING BTREE (`region_id`),
-  KEY `data_row` USING BTREE (`data_row`),
-  KEY `data_longitude` USING BTREE (`data_longitude`),
-  KEY `data_latitude` USING BTREE (`data_latitude`),
-  KEY `data_time` USING BTREE (`data_time`),
-  KEY `data_type` USING BTREE (`data_type`),
-  KEY `data_name` USING BTREE (`data_name`),
-  KEY `flag_date` USING BTREE (`flag_date`),
-  KEY `reviewer_id` USING BTREE (`reviewer_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`woce_id`),
+  KEY `woce_flag` (`woce_flag`),
+  KEY `woce_time` (`woce_time`),
+  KEY `expocode` (`expocode`),
+  KEY `socat_version` (`socat_version`),
+  KEY `data_type` (`data_type`),
+  KEY `data_name` (`data_name`),
+  KEY `reviewer_id` (`reviewer_id`),
+  CONSTRAINT `WOCEEvents_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `Reviewers` (`reviewer_id`)
+) DEFAULT CHARSET=latin1;
+
+CREATE TABLE `WOCELocations` (
+  `wloc_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `woce_id` BIGINT UNSIGNED NOT NULL DEFAULT '0',
+  `region_id` CHAR(1) NOT NULL DEFAULT ' ',
+  `row_num` INT(6) UNSIGNED DEFAULT NULL,
+  `longitude` FLOAT(12,6) DEFAULT NULL,
+  `latitude` FLOAT(12,6) DEFAULT NULL,
+  `data_time` BIGINT DEFAULT NULL,
+  `data_value` FLOAT(12,6) DEFAULT NULL,
+  PRIMARY KEY (`wloc_id`),
+  KEY `woce_id` (`woce_id`),
+  KEY `region_id` (`region_id`),
+  KEY `row_num` (`row_num`),
+  KEY `longitude` (`longitude`),
+  KEY `latitude` (`latitude`),
+  KEY `data_time` (`data_time`),
+  CONSTRAINT `WOCEPoints_woce_id` FOREIGN KEY (`woce_id`) REFERENCES `WOCEEvents` (`woce_id`)
+) DEFAULT CHARSET=latin1;
 

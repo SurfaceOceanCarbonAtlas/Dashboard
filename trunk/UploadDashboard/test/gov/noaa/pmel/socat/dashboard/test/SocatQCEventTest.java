@@ -8,19 +8,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceFlag;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.util.Date;
 
 import org.junit.Test;
 
 /**
- * Tests for methods in SocatQCFlag
+ * Tests for methods in SocatQCEvent
  * @author Karl Smith
  */
-public class SocatQCFlagTest {
+public class SocatQCEventTest {
 
 	private static final Character MY_QC_FLAG = 'B';
 	private static final String MY_EXPOCODE = "26NA20140427";
@@ -29,15 +29,15 @@ public class SocatQCFlagTest {
 	private static final Date MY_FLAG_DATE = new Date();
 	private static final String MY_USERNAME = "Karl.Smith";
 	private static final String MY_REALNAME = "Karl M. Smith";
-	private static final String MY_COMMENT = "from SocatQCFlag unit test";
+	private static final String MY_COMMENT = "from SocatQCEvent unit test";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getQcFlag()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setQcFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getFlag()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setFlag(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetQcFlag() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setFlag(MY_QC_FLAG);
 		assertEquals(MY_QC_FLAG, myflag.getFlag());
@@ -46,12 +46,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getExpocode()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getExpocode()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setExpocode(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetExpocode() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals("", myflag.getExpocode());
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
@@ -61,12 +61,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getSocatVersion()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setSocatVersion(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getSocatVersion()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setSocatVersion(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSocatVersion() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		myflag.setSocatVersion(MY_SOCAT_VERSION);
 		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion(), 1.0E-6);
@@ -77,12 +77,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getRegionID()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setRegionID(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#getRegionID()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#setRegionID(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetRegionID() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
 		myflag.setRegionID(MY_REGION_ID);
 		assertEquals(MY_REGION_ID, myflag.getRegionID());
@@ -94,12 +94,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getFlagDate()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setFlagDate(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getFlagDate()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setFlagDate(java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetFlagDate() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		myflag.setFlagDate(MY_FLAG_DATE);
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
@@ -112,12 +112,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getUsername()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setUsername(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getUsername()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setUsername(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetUsername() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals("", myflag.getUsername());
 		myflag.setUsername(MY_USERNAME);
 		assertEquals(MY_USERNAME, myflag.getUsername());
@@ -131,12 +131,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getRealname()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setRealname(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getRealname()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setRealname(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetRealname() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals("", myflag.getRealname());
 		myflag.setRealname(MY_REALNAME);
 		assertEquals(MY_REALNAME, myflag.getRealname());
@@ -151,12 +151,12 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#getComment()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#setComment(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getComment()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setComment(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetComment() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals("", myflag.getComment());
 		myflag.setComment(MY_COMMENT);
 		assertEquals(MY_COMMENT, myflag.getComment());
@@ -172,17 +172,16 @@ public class SocatQCFlagTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCFlag#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
-		SocatQCFlag myflag = new SocatQCFlag();
+		SocatQCEvent myflag = new SocatQCEvent();
 		assertFalse( myflag.equals(null) );
-		assertFalse( myflag.equals(MY_QC_FLAG) );
-		assertTrue( myflag.equals(new SocatWoceFlag()) );
+		assertFalse( myflag.equals(new SocatEvent()) );
 
-		SocatQCFlag otherflag = new SocatQCFlag();
+		SocatQCEvent otherflag = new SocatQCEvent();
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

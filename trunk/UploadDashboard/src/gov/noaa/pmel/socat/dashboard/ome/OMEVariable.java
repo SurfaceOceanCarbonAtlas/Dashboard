@@ -1,4 +1,4 @@
-package gov.noaa.pmel.socat.dashboard.server.OmeMetadata;
+package gov.noaa.pmel.socat.dashboard.ome;
 
 import org.jdom2.Element;
 
