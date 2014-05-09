@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
@@ -12,8 +11,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -44,19 +43,185 @@ public class OmeMetadata extends DashboardMetadata {
 	}
 
 	// data values from the OME metadata 
-	String cruiseName;
-	String vesselName;
-	ArrayList<String> investigators;
-	ArrayList<String> organizations;
-	Double westmostLongitude;
-	Double eastmostLongitude;
-	Double southmostLatitude;
-	Double northmostLatitude;
-	Date startDate;
-	Date endDate;
-	String origDataRef;
+	
+	/*
+	 * The following are inherited from DashboardMetadata:
+	 * 
+	 * 	expocode
+	 *  filename
+	 *  uploadTimestamp
+	 *  owner
+	 *  
+	 *  The inherited Owner maps to <User><Name> in the OME XML.
+	 */
+	
+	// <User>
+	private OMEVariable userName = null;
+	private OMEVariable userOrganization = null;
+	private OMEVariable userAddress = null;
+	private OMEVariable userPhone = null;
+	private OMEVariable userEmail = null;
+	
+	// <Investigator>
+	private List<OMECompositeVariable> investigators = new ArrayList<OMECompositeVariable>();
+	
+	// <Dataset Info>
+	private OMEVariable datasetID = null;
+	private OMEVariable fundingInfo = null;
+	
+	// <DatasetInfo><Submission_Dates>
+	private OMEVariable initialSubmission = null;
+	private OMEVariable revisedSubmission = null;
+	
+	// <Cruise_Info><Experiment>
+	private OMEVariable experimentName = null;
+	private OMEVariable experimentType = null;
+	private OMEVariable platformType = null;
+	private OMEVariable co2InstrumentType = null;
+	private OMEVariable mooringId = null;
+	
+	// <Cruise_Info><Experiment><Cruise>
+	private OMEVariable cruiseID = null;
+	private OMEVariable cruiseInfo = null;
+	private OMEVariable section = null;
 
-	// TODO: add more fields when they are identified in the OME XML file.
+	// These two come after Temporal_Coverage in the XML
+	private OMEVariable cruiseStartDate = null;
+	private OMEVariable cruiseEndDate = null;
+	
+	// Cruise_Info><Experiment><Cruise><Geographical_Coverage>
+	private OMEVariable geographicalRegion = null;
+	
+	// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+	private OMEVariable westmostLongitude = null;
+	private OMEVariable eastmostLongitude = null;
+	private OMEVariable northmostLatitude = null;
+	private OMEVariable southmostLatitude = null;
+	
+	// <Cruse_Info><Experiment><Cruise><Temporal_Coverage>
+	private OMEVariable temporalCoverageStartDate = null;
+	private OMEVariable temporalCoverageEndDate = null;
+	
+	
+	// <Cruise_Info><Vessel>
+	private OMEVariable vesselName = null;
+	private OMEVariable vesselID = null;
+	private OMEVariable country = null;
+	private OMEVariable vesselOwner = null;
+	
+	// <Variables_Info>
+	List<OMECompositeVariable> variablesInfo = new ArrayList<OMECompositeVariable>();
+	
+	// Units stuff: <CO2_Data_Info><xxx><Unit>
+	private OMEVariable xCO2WaterEquDryUnit = null;
+	private OMEVariable xCO2WaterSSTDryUnit = null;
+	private OMEVariable pCO2WaterEquWetUnit = null;
+	private OMEVariable pCO2WaterSSTWetUnit = null;
+	private OMEVariable fCO2WaterEquWetUnit = null;
+	private OMEVariable fCO2WaterSSTWetUnit = null;
+	private OMEVariable xCO2AirDryUnit = null;
+	private OMEVariable pCO2AirWetUnit = null;
+	private OMEVariable fCO2AirWetUnit = null;
+	private OMEVariable xCO2AirDryInterpolatedUnit = null;
+	private OMEVariable pCO2AirWetInterpolatedUnit = null;
+	private OMEVariable fCO2AirWetInterpolatedUnit = null;
+	
+	// <Method_Description><Equilibrator_Design>
+	private OMEVariable depthOfSeaWaterIntake = null;
+	private OMEVariable locationOfSeaWaterIntake = null;
+	private OMEVariable equilibratorType = null;
+	private OMEVariable equilibratorVolume = null;
+	private OMEVariable waterFlowRate = null;
+	private OMEVariable headspaceGasFlowRate = null;
+	private OMEVariable vented = null;
+	private OMEVariable dryingMethodForCO2InWater = null;
+	private OMEVariable equAdditionalInformation = null;
+	
+	// <Method_Description><CO2_in_Marine_Air>
+	private OMEVariable co2InMarineAirMeasurement = null;
+	private OMEVariable co2InMarineAirLocationAndHeight = null;
+	private OMEVariable co2InMarineAirDryingMethod = null;
+	
+	// <Method_Description><CO2_Sensors><CO2_Sensor>
+	private OMEVariable co2MeasurementMethod = null;
+	private OMEVariable co2Manufacturer = null;
+	private OMEVariable co2Model = null;
+	private OMEVariable co2Frequency = null;
+	private OMEVariable co2ResolutionWater = null;
+	private OMEVariable co2UncertaintyWater = null;
+	private OMEVariable co2ResolutionAir = null;
+	private OMEVariable co2UncertaintyAir = null;
+	private OMEVariable co2ManufacturerOfCalibrationGas = null;
+	private OMEVariable co2SensorCalibration = null;
+	private OMEVariable co2EnvironmentalControl = null;
+	private OMEVariable co2MethodReferences = null;
+	private OMEVariable detailsOfCO2Sensing = null;
+	private OMEVariable analysisOfCO2Comparison = null;
+	private OMEVariable measuredCO2Params = null;
+	
+	// <Method_Description><Sea_Surface_Temperature>
+	private OMEVariable sstLocation = null;
+	private OMEVariable sstManufacturer = null;
+	private OMEVariable sstModel = null;
+	private OMEVariable sstAccuracy = null;
+	private OMEVariable sstPrecision = null;
+	private OMEVariable sstCalibration = null;
+	private OMEVariable sstOtherComments = null;
+	
+	// <Method_Description><Equilibrator_Temperature>
+	private OMEVariable eqtLocation = null;
+	private OMEVariable eqtManufacturer = null;
+	private OMEVariable eqtModel = null;
+	private OMEVariable eqtAccuracy = null;
+	private OMEVariable eqtPrecision = null;
+	private OMEVariable eqtCalibration = null;
+	private OMEVariable eqtWarming = null;
+	private OMEVariable eqtOtherComments = null;
+
+	// <Method_Description><Equilibrator_Pressure>
+	private OMEVariable eqpLocation = null;
+	private OMEVariable eqpManufacturer = null;
+	private OMEVariable eqpModel = null;
+	private OMEVariable eqpAccuracy = null;
+	private OMEVariable eqpPrecision = null;
+	private OMEVariable eqpCalibration = null;
+	private OMEVariable eqpOtherComments = null;
+	private OMEVariable eqpNormalized = null;
+	
+	// <Method_Description><Atmospheric_Pressure>
+	private OMEVariable atpLocation = null;
+	private OMEVariable atpManufacturer = null;
+	private OMEVariable atqpModel = null;
+	private OMEVariable atpAccuracy = null;
+	private OMEVariable atpPrecision = null;
+	private OMEVariable atpCalibration = null;
+	private OMEVariable atpOtherComments = null;
+	
+	// <Method_Description><Sea_Surface_Salinity>
+	private OMEVariable sssLocation = null;
+	private OMEVariable sssManufacturer = null;
+	private OMEVariable sssModel = null;
+	private OMEVariable sssAccuracy = null;
+	private OMEVariable sssPrecision = null;
+	private OMEVariable sssCalibration = null;
+	private OMEVariable sssOtherComments = null;
+	
+	// <Method_Description><Other_Sensors>
+	private List<OMECompositeVariable> otherSensors = new ArrayList<OMECompositeVariable>();
+	
+	// Root element
+	private OMEVariable dataSetReferences = null;
+	private OMEVariable additionalInformation = null;
+	private OMEVariable citation = null;
+	private OMEVariable measurementAndCalibrationReport = null;
+	private OMEVariable preliminaryQualityControl = null;
+	
+	private List<OMECompositeVariable> dataSetLinks = new ArrayList<OMECompositeVariable>();
+	
+	private OMEVariable status = null;
+	private OMEVariable form_type = null;
+	private OMEVariable recordID = null;
+	
 
 	/**
 	 * Creates an empty OME metadata document; 
@@ -65,18 +230,6 @@ public class OmeMetadata extends DashboardMetadata {
 	public OmeMetadata() {
 		super();
 		filename = OME_FILENAME;
-
-		cruiseName = "";
-		vesselName = "";
-		investigators = new ArrayList<String>();
-		organizations = new ArrayList<String>();
-		westmostLongitude = Double.NaN;
-		eastmostLongitude = Double.NaN;
-		southmostLatitude = Double.NaN;
-		northmostLatitude = Double.NaN;
-		startDate = SocatMetadata.DATE_MISSING_VALUE;
-		endDate = SocatMetadata.DATE_MISSING_VALUE;
-		origDataRef = "";
 	}
 
 	/**
@@ -141,240 +294,427 @@ public class OmeMetadata extends DashboardMetadata {
 	 * 		OME XML Document to use
 	 */
 	public void assignFromOmeXmlDoc(Document omeDoc) {
-		/*
-		 * Example contents of the OME XML file:
-		 * ------------------------------------------------
-		 * <?xml version="1.0" encoding="UTF-8"?>
-		 * <x_tags>
-		 *   ...
-		 *   <Investigator>
- 		 *     <Name>Last, First M.</Name>
-		 *     <Organization>...</Organization>
-		 *     <Address>...</Address>
-		 *     <Phone>...</Phone>
-		 *     <Email>...</Email>
-		 *   </Investigator>
-		 *   ... (more Investigator elements) ...
-		 *   <Cruise_Info>
-		 *     <Experiment>
-		 *       <Experiment_Name>SH1201</Experiment_Name>
-		 *       <Experiment_Type>VOS Lines</Experiment_Type>
-		 *       <Cruise>
-		 *         <Cruise_ID>332220120220</Cruise_ID>
-		 *         <Geographical_Coverage>
-		 *           <Geographical_Region>North American West Coast</Geographical_Region>
-		 *           <Bounds>
-		 *             <Westernmost_Longitude>-125.702</Westernmost_Longitude>
-		 *             <Easternmost_Longitude>-122.978</Easternmost_Longitude>
-		 *             <Northernmost_Latitude>49.027</Northernmost_Latitude>
-		 *             <Southernmost_Latitude>48.183</Southernmost_Latitude>
-		 *           </Bounds>
-		 *         </Geographical_Coverage>
-		 *         <Temporal_Coverage>
-		 *           <Start_Date>20120220</Start_Date>
-		 *           <End_Date>20120229</End_Date>
-		 *         </Temporal_Coverage>
-		 *       </Cruise>
-		 *     </Experiment>
-		 *     <Vessel>
-		 *       <Vessel_Name>Bell M. Shimada</Vessel_Name>
-		 *       <Vessel_ID>3322</Vessel_ID>
-		 *       <Vessel_Owner>NOAA</Vessel_Owner>
-		 *     </Vessel>
-		 *   </Cruise_Info>
-		 *   <Variables_Info>
-		 *     ... 
-		 *   </Variables_Info>
-		 *   <Method_Description>
-		 *     ...
-		 *   </Method_Description>
-		 *   <Citation>...</Citation>
-		 *   <Data_Set_Link>
-		 *     <URL>www.pmel.noaa.gov/co2/</URL>
-		 *     <Label>PMEL Underway pCO2 data</Label>
-		 *   </Data_Set_Link>
-		 *   <Data_Link>
-		 *     <URL>SH1201.csv</URL>
-		 *   </Data_Link>
-		 *   <form_type>underway</form_type>
-		 * </x_tags>
-		 * ------------------------------------------------
-		 */
 
+		
 		Element rootElem = omeDoc.getRootElement();
-		// Validate the expocode from <Cruise_Info><Experiment><Cruise><Cruise_ID>
+		Path rootPath = new Path(rootElem.getName());
+
+		/*
+		 * First we extract the EXPO Code, which is the Cruise_ID. If we don't have this
+		 * then we can't get anywhere.
+		 * 
+		 * This is the only element that's accessed out of order.
+		 * All the others are done in the order they appear in the XML.
+		 */
 		Element cruiseInfoElem = rootElem.getChild("Cruise_Info");
+		Path cruiseInfoPath = new Path(rootPath, "Cruise_Info");
 		if ( cruiseInfoElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info element in the OME XML contents");
+
 		Element experimentElem = cruiseInfoElem.getChild("Experiment");
+		Path experimentPath = new Path(cruiseInfoPath, "Experiment");
 		if ( experimentElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Experiment element in the OME XML contents");
+		
 		Element cruiseElem = experimentElem.getChild("Cruise");
+		Path cruisePath = new Path(experimentPath, "Cruise");
 		if ( cruiseElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Experiment->Cruise " +
 					"element in the OME XML contents");
-		String name = cruiseElem.getChildTextTrim("Cruise_ID"); 
-		if ( name == null )
+		
+		String cruiseIDText = cruiseElem.getChildTextTrim("Cruise_ID");
+		if ( cruiseIDText == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info->Experiment->Cruise->Cruise_ID " +
 					"element in the OME XML contents");
-		if ( ! expocode.equals(name.toUpperCase()) )
+		
+		if ( expocode.length() == 0) {
+			expocode = cruiseIDText.toUpperCase();
+		} else if ( ! expocode.equals(cruiseIDText.toUpperCase()) )
 			throw new IllegalArgumentException("Expocode of cruise (" + 
 					expocode + ") does not match that the Cruise ID in " +
-					"the OME document (" + name + ")");
+					"the OME document (" + cruiseID + ")");
+		
+		cruiseID = new OMEVariable(new Path(cruisePath, "Cruise_ID"), cruiseIDText);
+		
+		/*
+		 * So now we've got the EXPO code (aka Cruise_ID), we can extract everything else.
+		 * We don't care if anything is missing, and we assume everything is a String.
+		 * 
+		 * Elements can always be missing from the XML, in which case getChild will return null.
+		 * This is handled automatically by the methods that build the variable objects, so you won't see
+		 * many null checks here!
+		 */
+		
+		// <User>
+		Element userElem = rootElem.getChild("User");
+		Path userPath = new Path(rootPath, "User");
+			
+		userName = new OMEVariable(userPath, userElem, "Name");
+		userOrganization = new OMEVariable(userPath, userElem, "Organization");
+		userAddress = new OMEVariable(userPath, userElem, "Address");
+		userPhone = new OMEVariable(userPath, userElem, "Phone");
+		userEmail = new OMEVariable(userPath, userElem, "Email");
+		
+		// End <User>
 
-		// Get the cruise name from <Cruise_Info><Experiment><Experiment_Name>
-		name = experimentElem.getChildTextTrim("Experiment_Name");
-		if ( name == null )
-			throw new IllegalArgumentException(
-					"No Cruise_Info->Experiment->Experiment_Name " +
-					"element in the OME XML contents");
-		if ( name.isEmpty() )
-			throw new IllegalArgumentException(
-					"No cruise name given in the OME document");
-		cruiseName = name;
-
-		// Get the vessel name from <Cruise_Info><Vessel><Vessel_Name>
-		Element childElem = cruiseInfoElem.getChild("Vessel");
-		if ( childElem == null )
-			throw new IllegalArgumentException(
-					"No Cruise_Info->Vessel element in the OME XML contents");
-		name = childElem.getChildTextTrim("Vessel_Name");
-		if ( name == null )
-			throw new IllegalArgumentException(
-					"No Cruise_Info->Vessel->Vessel_Name " +
-					"element in the OME XML contents");
-		if ( name.isEmpty() ) 
-			throw new IllegalArgumentException(
-					"No ship/vessel name given in the OME document");
-		vesselName = name;
-
-		// Get the science group from <Investigator><Name> and 
-		// the organization from <Investigator><Organization>
-		investigators.clear();
-		organizations.clear();
-		boolean investigatorFound = false;
-		for ( Element investElem : rootElem.getChildren("Investigator") ) {
-			investigatorFound = true;
-			name = investElem.getChildTextTrim("Name");
-			if ( name == null )
-				throw new IllegalArgumentException("No Name element for " +
-						"an Investigator element in the OME XML contents");
-			if ( name.isEmpty() )
-				throw new IllegalArgumentException("No name given for " +
-						"an investigator in the OME document");
-			investigators.add(name);
-			// Okay to have no organization given, but keep the lists matched
-			name = investElem.getChildTextTrim("Organization");
-			if ( name == null )
-				name = "";
-			organizations.add(name);
+		// <Investigator> (repeating element)
+		Path investigatorPath = new Path(rootPath, "Investigator");
+		for (Element invElem : rootElem.getChildren("Investigator")) {
+			
+			OMECompositeVariable invDetails = new OMECompositeVariable(investigatorPath, "Email");
+			invDetails.addValue("Name", invElem);
+			invDetails.addValue("Organization", invElem);
+			invDetails.addValue("Address", invElem);
+			invDetails.addValue("Phone", invElem);
+			invDetails.addValue("Email", invElem);
+			
+			investigators.add(invDetails);
 		}
-		if ( ! investigatorFound )
-			throw new IllegalArgumentException(
-					"No Investigator element in the OME XML contents");
-		if ( investigators.isEmpty() )
-			throw new IllegalArgumentException(
-					"No investigator names given in the OME document");
+		// End <Investigator>
+		
+		// <DataSet_Info>
+		Element dataSetInfoElem = rootElem.getChild("Dataset_Info");
+		
+		Path dataSetInfoPath = new Path(rootPath, "Dataset_Info");
+		
+		datasetID = new OMEVariable(dataSetInfoPath, dataSetInfoElem, "Dataset_ID");
+		fundingInfo = new OMEVariable(dataSetInfoPath, dataSetInfoElem, "Funding_Info");
+		
+		// <DataSet_Info><Submission_Dates>
+		Element submissionDatesElem = null;
+		if (null != dataSetInfoElem) {
+			submissionDatesElem = dataSetInfoElem.getChild("Submission_Dates");
+		}
+		Path submissionDatesPath = new Path(dataSetInfoPath, "Submission_Dates");
+		
+		initialSubmission = new OMEVariable(submissionDatesPath, submissionDatesElem, "Initial_Submission");
+		revisedSubmission = new OMEVariable(submissionDatesPath, submissionDatesElem, "Revised_Submission");
 
-		// Okay to have these missing; may be (re)assigned from the data
-		westmostLongitude = Double.NaN;
-		eastmostLongitude = Double.NaN;
-		southmostLatitude = Double.NaN;
-		northmostLatitude = Double.NaN;
-		childElem = cruiseElem.getChild("Geographical_Coverage");
-		if ( childElem != null ) {
-			childElem = childElem.getChild("Bounds");
-			if ( childElem != null ) {
-				name = childElem.getChildTextTrim("Westernmost_Longitude");
-				if ( (name != null) && ! name.isEmpty() ) {
-					try {
-						westmostLongitude = Double.valueOf(name);
-					} catch ( NumberFormatException ex ) {
-						throw new IllegalArgumentException(
-								"Invalid value for <Westernmost_Longitude>");
-					}
-				}
-				name = childElem.getChildTextTrim("Easternmost_Longitude");
-				if ( (name != null) && ! name.isEmpty() ) {
-					try {
-						eastmostLongitude = Double.valueOf(name);
-					} catch ( NumberFormatException ex ) {
-						throw new IllegalArgumentException(
-								"Invalid value for <Easternmost_Longitude>");
-					}
-				}
-				name = childElem.getChildTextTrim("Southernmost_Latitude");
-				if ( (name != null) && ! name.isEmpty() ) {
-					try {
-						southmostLatitude = Double.valueOf(name);
-					} catch ( NumberFormatException ex ) {
-						throw new IllegalArgumentException(
-								"Invalid value for <Southernmost_Latitude>");
-					}
-				}
-				name = childElem.getChildTextTrim("Northernmost_Latitude");
-				if ( (name != null) && ! name.isEmpty() ) {
-					try {
-						northmostLatitude = Double.valueOf(name);
-					} catch ( NumberFormatException ex ) {
-						throw new IllegalArgumentException(
-								"Invalid value for <Northernmost_Latitude>");
-					}
-				}
+		// End <DataSet_Info></Submission_Dates<
+		
+		// End <DataSet_Info>
+		
+		// <Cruise_Info>
+		// <Cruise_Info><Experiment>
+		
+		// The Cruise_Info and Experiment elements were created above to get the EXPO code
+		// We know they exist, otherwise we wouldn't have got this far.
+		
+		experimentName = new OMEVariable(experimentPath, experimentElem, "Experiment_Name");
+		experimentType = new OMEVariable(experimentPath, experimentElem, "Experiment_Type");
+		platformType = new OMEVariable(experimentPath, experimentElem, "Platform_Type");
+		co2InstrumentType = new OMEVariable(experimentPath, experimentElem, "Co2_Intstrument_type");
+		mooringId = new OMEVariable(experimentPath, experimentElem, "Mooring_ID");
+		
+		// <Cruise_Info><Experiment><Cruise>
+		
+		// CruiseID has already been assigned above
+		cruiseInfo = new OMEVariable(cruisePath, cruiseElem, "Cruise_Info");
+		section = new OMEVariable(cruisePath, cruiseElem, "section");
+		
+		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
+		Element geogCoverageElem = cruiseElem.getChild("Geographical_Coverage");
+		Path geogCoveragePath = new Path(cruisePath, "Geographical_Coverage");
+		
+		geographicalRegion = new OMEVariable(geogCoveragePath, geogCoverageElem, "Geographical_Region");
+			
+		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+		if (null != geogCoverageElem) {
+			Element boundsElem = geogCoverageElem.getChild("Bounds");
+			Path boundsPath = new Path(geogCoveragePath, "Bounds");
+			
+			westmostLongitude = new OMEVariable(boundsPath, boundsElem, "Westernmost_Longitude");
+			eastmostLongitude = new OMEVariable(boundsPath, boundsElem, "Easternmost_Longitude");
+			northmostLatitude = new OMEVariable(boundsPath, boundsElem, "Northernmost_Latitude");
+			southmostLatitude = new OMEVariable(boundsPath, boundsElem, "Southernmost_Latitude");
+		}
+	
+		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+		
+		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
+		
+		// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
+		Element tempCoverageElem = cruiseElem.getChild("Temporal_Coverage");
+		Path tempCoveragePath = new Path(cruisePath, "Temporal_Coverage");
+		
+		temporalCoverageStartDate = new OMEVariable(tempCoveragePath, tempCoverageElem, "Start_Date");
+		temporalCoverageEndDate = new OMEVariable(tempCoveragePath, tempCoverageElem, "End_Date");
+		// End <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
+		
+		cruiseStartDate = new OMEVariable(cruisePath, cruiseElem, "Start_Date");
+		cruiseEndDate = new OMEVariable(cruisePath, cruiseElem, "End_Date");
+		
+		// End <Cruise_Info><Experiment><Cruise>
+		
+		// End <Cruise_Info><Experiment>
+		
+		// <Cruise_Info><Vessel>
+		
+		Element vesselElem = cruiseInfoElem.getChild("Vessel");
+		Path vesselPath = new Path(cruiseInfoPath, "Vessel");
+		
+		vesselName = new OMEVariable(vesselPath, vesselElem, "Vessel_Name");
+		vesselID = new OMEVariable(vesselPath, vesselElem, "Vessel_ID");
+		country = new OMEVariable(vesselPath, vesselElem, "Country");
+		vesselOwner = new OMEVariable(vesselPath, vesselElem, "Vessel_Owner");
+		
+		// <Variables_Info>
+		
+		// The contents of this are a repeating sub-element, so live in a list of OMECompositeVariables.
+		Element varsInfoElem = rootElem.getChild("Variables_Info");
+		if (null != varsInfoElem) {
+			Path varsInfoPath = new Path(rootPath, "Variables_Info");
+			
+			Path variablePath = new Path(varsInfoPath, "Variable");
+			for (Element variableElem : rootElem.getChildren("Variable")) {
+				
+				OMECompositeVariable varDetails = new OMECompositeVariable(variablePath, "Variable_Name");
+				varDetails.addValue("Variable_Name", variableElem);
+				varDetails.addValue("Description_of_Variable", variableElem);
+				
+				variablesInfo.add(varDetails);
 			}
 		}
+		
+		// End <Variables_Info>
+		
+		// <CO2_Data_Info>
+		Element co2DataInfoElem = rootElem.getChild("CO2_Data_Info");
+		Path co2DataInfoPath = new Path(rootPath, "CO2_Data_Info");
+		
+		// If the co2DataInfoElem is null, this is handled by extractSubElement
+		xCO2WaterEquDryUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "xCO2water_equ_dry", "Unit");
+		xCO2WaterSSTDryUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "xCO2water_SST_dry", "Unit");
+		pCO2WaterEquWetUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "pCO2water_equ_wet", "Unit");
+		pCO2WaterSSTWetUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "pCO2water_SST_wet", "Unit");
+		fCO2WaterEquWetUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "fCO2water_equ_wet", "Unit");
+		fCO2WaterSSTWetUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "fCO2water_SST_wet", "Unit");
+		xCO2AirDryUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "xCO2air_dry", "Unit");
+		pCO2AirWetUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "pCO2air_wet", "Unit");
+		fCO2AirWetUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "fCO2air_wet", "Unit");
+		xCO2AirDryInterpolatedUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "xCO2air_dry_interpolated", "Unit");
+		pCO2AirWetInterpolatedUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "pCO2air_wet_interpolated", "Unit");
+		fCO2AirWetInterpolatedUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "fCO2air_wet_interpolated", "Unit");
+		
+		// End <CO2_Data_Info>
+		
+		// <Method_Description>
+		Element methodDescriptionElem = rootElem.getChild("Method_Description");
+		Path methodDescriptionPath = new Path(rootPath, "Method_Description");
 
-		// Okay to have these missing; may be (re)assigned from the data
-		startDate = SocatMetadata.DATE_MISSING_VALUE;
-		endDate = SocatMetadata.DATE_MISSING_VALUE;
-		childElem = cruiseElem.getChild("Temporal_Coverage");
-		if ( childElem != null ) {
-			name = childElem.getChildTextTrim("Start_Date");
-			if ( (name != null) && ! name.isEmpty() ) {
-				try {
-					// Just the UTC date, so set the time to 00:00
-					startDate = DATE_PARSER.parse(name + " 00:00");
-				} catch ( ParseException ex ) {
-					throw new IllegalArgumentException(
-							"Invalid value for <Start_Date>");
-				}
-			}
-			name = childElem.getChildTextTrim("End_Date");
-			if ( (name != null) && ! name.isEmpty() ) {
-				try {
-					// Just the UTC date, so set the time to 23:59
-					endDate = DATE_PARSER.parse(name + " 23:59");
-				} catch ( ParseException ex ) {
-					throw new IllegalArgumentException(
-							"Invalid value for <End_Date>");
-				}
-			}
+		// <Method_Description><Equilibrator_Design>
+		Element equDesignElement = null;
+		Path equDesignPath = new Path(methodDescriptionPath, "Equilibrator_Design");
+		if (null != methodDescriptionElem) {
+			equDesignElement = methodDescriptionElem.getChild("Equilibrator_Design");
 		}
 
-		// Get the original data http reference from <Data_Set_Link><URL> and <Data_Link><URL>
-		// Note that it is very likely there is not an original data reference
-		// TODO: this might need adjusting
-		origDataRef = "";
-		childElem = rootElem.getChild("Data_Set_Link");
-		if ( childElem != null ) {
-			name = childElem.getChildTextTrim("URL");
-			if ( name != null )
-				origDataRef = name;
+		depthOfSeaWaterIntake = new OMEVariable(equDesignPath, equDesignElement, "Depth_of_Sea_Water_Intake");
+		locationOfSeaWaterIntake = new OMEVariable(equDesignPath, equDesignElement, "Location_of_Sea_Water_Intake");
+		equilibratorType = new OMEVariable(equDesignPath, equDesignElement, "Equilibrator_Type");
+		equilibratorVolume = new OMEVariable(equDesignPath, equDesignElement, "Equilibrator_Volume");
+		waterFlowRate = new OMEVariable(equDesignPath, equDesignElement, "Water_Flow_Rate");
+		headspaceGasFlowRate = new OMEVariable(equDesignPath, equDesignElement, "Headspace_Gas_Flow_Rate");
+		vented = new OMEVariable(equDesignPath, equDesignElement, "Vented");
+		dryingMethodForCO2InWater = new OMEVariable(equDesignPath, equDesignElement, "Drying_Method_for_CO2_in_water");
+		equAdditionalInformation = new OMEVariable(equDesignPath, equDesignElement, "Additional_Information");
+		
+		// End <Method_Description><Equilibrator_Design>
+
+		// <Method_Description><CO2_in_Marine_Air>
+		Element co2MarineAirElem = null;
+		Path co2MarineAirPath = new Path(methodDescriptionPath, "CO2_in_Marine_Air");
+		if (null != methodDescriptionElem) {
+			co2MarineAirElem = methodDescriptionElem.getChild("CO2_in_Marine_Air");
 		}
-		childElem = rootElem.getChild("Data_Link");
-		if ( childElem != null ) {
-			name = childElem.getChildTextTrim("URL");
-			if ( name != null ) {
-				if ( origDataRef.isEmpty() || origDataRef.endsWith("/") )  
-					origDataRef += name;
-				else 
-					origDataRef += "/" + name;
+
+		co2InMarineAirMeasurement = new OMEVariable(co2MarineAirPath, co2MarineAirElem, "Measurement");
+		co2InMarineAirLocationAndHeight = new OMEVariable(co2MarineAirPath, co2MarineAirElem, "Location_and_Height");
+		co2InMarineAirDryingMethod = new OMEVariable(co2MarineAirPath, co2MarineAirElem, "Drying_Method");
+		
+		// End <Method_Description><CO2_in_Marine_Air>
+
+		// <Method_Description><CO2_Sensors>
+		Element co2SensorsElem = null;
+		Path co2SensorsPath = new Path(methodDescriptionPath, "CO2_Sensors");
+
+		if (null != methodDescriptionElem) {
+			co2SensorsElem = methodDescriptionElem.getChild("CO2_Sensors");
+		}
+		
+		// <Method_Description><CO2_Sensors><CO2_Sensor>
+		Element co2SensorElem = null;
+		Path co2SensorPath = new Path(co2SensorsPath, "CO2_Sensor");
+		if (null != co2SensorsElem) {
+			co2SensorElem = co2SensorsElem.getChild("CO2_Sensor");
+		}
+
+		co2MeasurementMethod = new OMEVariable(co2SensorPath, co2SensorElem, "Measurement_Method");
+		co2Manufacturer = new OMEVariable(co2SensorPath, co2SensorElem, "Manufacturer");
+		co2Model = new OMEVariable(co2SensorPath, co2SensorElem, "Model");
+		co2Frequency = new OMEVariable(co2SensorPath, co2SensorElem, "Frequency");
+		co2ResolutionWater = new OMEVariable(co2SensorPath, co2SensorElem, "Resolution_Water");
+		co2UncertaintyWater = new OMEVariable(co2SensorPath, co2SensorElem, "Uncertainty_Water");
+		co2ResolutionAir = new OMEVariable(co2SensorPath, co2SensorElem, "Resolution_Air");
+		co2UncertaintyAir = new OMEVariable(co2SensorPath, co2SensorElem, "Uncertainty_Air");
+		co2ManufacturerOfCalibrationGas = new OMEVariable(co2SensorPath, co2SensorElem, "Manufacturer_of_Calibration_Gas");
+		co2SensorCalibration = new OMEVariable(co2SensorPath, co2SensorElem, "CO2_Sensor_Calibration");
+		co2EnvironmentalControl = new OMEVariable(co2SensorPath, co2SensorElem, "Environmental_Control");
+		co2MethodReferences = new OMEVariable(co2SensorPath, co2SensorElem, "Method_References");
+		detailsOfCO2Sensing = new OMEVariable(co2SensorPath, co2SensorElem, "Details_Co2_Sensing");
+		analysisOfCO2Comparison = new OMEVariable(co2SensorPath, co2SensorElem, "Analysis_of_Co2_Comparision");
+		measuredCO2Params = new OMEVariable(co2SensorPath, co2SensorElem, "Measured_Co2_Params");
+
+		// End <Method_Description><CO2_Sensors><CO2_Sensor>
+		// End <Method_Description><CO2_Sensors>
+		
+		// <Method_Description><Sea_Surface_Temperature>
+		Element sstElem = null;
+		Path sstPath = new Path(methodDescriptionPath, "Sea_Surface_Temperature");
+		if (null != methodDescriptionElem) {
+			sstElem = methodDescriptionElem.getChild("Sea_Surface_Temperature");
+		}
+		
+		sstLocation = new OMEVariable(sstPath, sstElem, "Location");
+		sstManufacturer = new OMEVariable(sstPath, sstElem, "Manufacturer");
+		sstModel = new OMEVariable(sstPath, sstElem, "Model");
+		sstAccuracy = new OMEVariable(sstPath, sstElem, "Accuracy");
+		sstPrecision = new OMEVariable(sstPath, sstElem, "Precision");
+		sstCalibration = new OMEVariable(sstPath, sstElem, "Calibration");
+		sstOtherComments = new OMEVariable(sstPath, sstElem, "Other_Comments");
+		
+		// End <Method_Description><Sea_Surface_Temperature>
+		
+		// <Method_Description><Equilibrator_Temperature>
+		Element eqtElem = null;
+		Path eqtPath = new Path(methodDescriptionPath, "Equilibrator_Temperature");
+		if (null != methodDescriptionElem) {
+			eqtElem = methodDescriptionElem.getChild("Equilibrator_Temperature");
+		}
+				
+		eqtLocation = new OMEVariable(eqtPath, eqtElem, "Location");
+		eqtManufacturer = new OMEVariable(eqtPath, eqtElem, "Manufacturer");
+		eqtModel = new OMEVariable(eqtPath, eqtElem, "Model");
+		eqtAccuracy = new OMEVariable(eqtPath, eqtElem, "Accuracy");
+		eqtPrecision = new OMEVariable(eqtPath, eqtElem, "Precision");
+		eqtCalibration = new OMEVariable(eqtPath, eqtElem, "Calibration");
+		eqtWarming = new OMEVariable(eqtPath, eqtElem, "Warming");
+		eqtOtherComments = new OMEVariable(eqtPath, eqtElem, "Other_Comments");
+
+		// End <Method_Description><Equilibrator_Temperature>
+		
+		// <Method_Description><Equilibrator_Pressure>
+		Element eqpElem = null;
+		Path eqpPath = new Path(methodDescriptionPath, "Equilibrator_Pressure");
+
+		if (null != methodDescriptionElem) {
+			eqpElem = methodDescriptionElem.getChild("Equilibrator_Pressure");
+		}
+				
+		eqpLocation = new OMEVariable(eqpPath, eqpElem, "Location");
+		eqpManufacturer = new OMEVariable(eqpPath, eqpElem, "Manufacturer");
+		eqpModel = new OMEVariable(eqpPath, eqpElem, "Model");
+		eqpAccuracy = new OMEVariable(eqpPath, eqpElem, "Accuracy");
+		eqpPrecision = new OMEVariable(eqpPath, eqpElem, "Precision");
+		eqpCalibration = new OMEVariable(eqpPath, eqpElem, "Calibration");
+		eqpOtherComments = new OMEVariable(eqpPath, eqpElem, "Other_Comments");
+		eqpNormalized = new OMEVariable(eqpPath, eqpElem, "Normalized");
+		
+		// End <Method_Description><Equilibrator_Pressure>
+		
+		// <Method_Description><Atmospheric_Pressure>
+		Element atpElem = null;
+		Path atpPath = new Path(methodDescriptionPath, "Atmospheric_Pressure");
+		if (null != methodDescriptionElem) {
+			atpElem = methodDescriptionElem.getChild("Atmospheric_Pressure");
+		}
+				
+		atpLocation = new OMEVariable(atpPath, atpElem, "Location");
+		atpManufacturer = new OMEVariable(atpPath, atpElem, "Manufacturer");
+		atqpModel = new OMEVariable(atpPath, atpElem, "Model");
+		atpAccuracy = new OMEVariable(atpPath, atpElem, "Accuracy");
+		atpPrecision = new OMEVariable(atpPath, atpElem, "Precision");
+		atpCalibration = new OMEVariable(atpPath, atpElem, "Calibration");
+		atpOtherComments = new OMEVariable(atpPath, atpElem, "Other_Comments");
+
+		// End <Method_Description><Atmospheric_Pressure>
+		
+		// <Method_Description><Sea_Surface_Salinity>
+		Element sssElem = null;
+		Path sssPath = new Path(methodDescriptionPath, "Sea_Surface_Salinity");
+		if (null != methodDescriptionElem) {
+			sssElem = methodDescriptionElem.getChild("Sea_Surface_Salinity");
+		}
+				
+		sssLocation = new OMEVariable(sssPath, sssElem, "Location");
+		sssManufacturer = new OMEVariable(sssPath, sssElem, "Manufacturer");
+		sssModel = new OMEVariable(sssPath, sssElem, "Model");
+		sssAccuracy = new OMEVariable(sssPath, sssElem, "Accuracy");
+		sssPrecision = new OMEVariable(sssPath, sssElem, "Precision");
+		sssCalibration = new OMEVariable(sssPath, sssElem, "Calibration");
+		sssOtherComments = new OMEVariable(sssPath, sssElem, "Other_Comments");
+
+		// End <Method_Description><Sea_Surface_Salinity>
+		
+		// <Method_Description><Other_Sensors>
+		Element otherSensorsElem = null;
+		Path otherSensorsPath = new Path(methodDescriptionPath, "Other_Sensors");
+		if (null != methodDescriptionElem) {
+			otherSensorsElem = methodDescriptionElem.getChild("Other_Sensors");
+		}
+		
+		if (null != otherSensorsElem) {
+			Path sensorPath = new Path(otherSensorsPath, "Sensor");
+			for (Element sensorElem : otherSensorsElem.getChildren("Sensor")) {
+				
+				List<String> idList = new ArrayList<String>(2);
+				idList.add("Manufacturer");
+				idList.add("Model");
+				OMECompositeVariable sensorDetails = new OMECompositeVariable(sensorPath, idList);
+				sensorDetails.addValue("Manufacturer", sensorElem);
+				sensorDetails.addValue("Accuracy", sensorElem);
+				sensorDetails.addValue("Model", sensorElem);
+				sensorDetails.addValue("Resolution", sensorElem);
+				sensorDetails.addValue("Calibration", sensorElem);
+				sensorDetails.addValue("Other_Comments", sensorElem);
+				
+				otherSensors.add(sensorDetails);
 			}
 		}
+		
+		// End <Method_Description><Other_Sensors>
+		// End <Method_Description>
+		
+		
+		// Miscellaneous tags under the root element
+		
+		dataSetReferences = new OMEVariable(rootPath, rootElem, "Data_set_References");
+		additionalInformation = new OMEVariable(rootPath, rootElem, "Additional_Information");
+		citation = new OMEVariable(rootPath, rootElem, "Citation");
+		measurementAndCalibrationReport = new OMEVariable(rootPath, rootElem, "Measurement_and_Calibration_Report");
+		preliminaryQualityControl = new OMEVariable(rootPath, rootElem, "Preliminary_Quality_control");
+		
+		// <Data_Set_Link>s
+		Path dataSetLinkPath = new Path(rootPath, "Data_Set_Link");
+		for (Element dataSetLinkElem : rootElem.getChildren("Data_Set_Link")) {
+			
+			OMECompositeVariable dataSetLinkDetails = new OMECompositeVariable(dataSetLinkPath, "URL");
+			dataSetLinkDetails.addValue("URL", dataSetLinkElem);
+			dataSetLinkDetails.addValue("Label", dataSetLinkElem);
+			dataSetLinkDetails.addValue("Link_Note", dataSetLinkElem);
+			
+			dataSetLinks.add(dataSetLinkDetails);
+		}
+		
+		// More miscellaneous root tags
+		status = new OMEVariable(rootPath, rootElem, "status");
+		form_type = new OMEVariable(rootPath, rootElem, "form_type");
+		recordID = new OMEVariable(rootPath, rootElem, "record_id");
+		
 	}
 
 	/**
@@ -387,181 +727,337 @@ public class OmeMetadata extends DashboardMetadata {
 	 * 		the generated pseudo-OME XML document
 	 */
 	public Document createMinimalOmeXmlDoc() {
-		/*
-		 * Example contents of the OME XML file:
-		 * ------------------------------------------------
-		 * <?xml version="1.0" encoding="UTF-8"?>
-		 * <x_tags>
-		 *   ...
-		 *   <Investigator>
- 		 *     <Name>Last, First M.</Name>
-		 *     <Organization>...</Organization>
-		 *     <Address>...</Address>
-		 *     <Phone>...</Phone>
-		 *     <Email>...</Email>
-		 *   </Investigator>
-		 *   ... (more Investigator elements) ...
-		 *   <Cruise_Info>
-		 *     <Experiment>
-		 *       <Experiment_Name>SH1201</Experiment_Name>
-		 *       <Experiment_Type>VOS Lines</Experiment_Type>
-		 *       <Cruise>
-		 *         <Cruise_ID>332220120220</Cruise_ID>
-		 *         <Geographical_Coverage>
-		 *           <Geographical_Region>North American West Coast</Geographical_Region>
-		 *           <Bounds>
-		 *             <Westernmost_Longitude>-125.702</Westernmost_Longitude>
-		 *             <Easternmost_Longitude>-122.978</Easternmost_Longitude>
-		 *             <Northernmost_Latitude>49.027</Northernmost_Latitude>
-		 *             <Southernmost_Latitude>48.183</Southernmost_Latitude>
-		 *           </Bounds>
-		 *         </Geographical_Coverage>
-		 *         <Temporal_Coverage>
-		 *           <Start_Date>20120220</Start_Date>
-		 *           <End_Date>20120229</End_Date>
-		 *         </Temporal_Coverage>
-		 *       </Cruise>
-		 *     </Experiment>
-		 *     <Vessel>
-		 *       <Vessel_Name>Bell M. Shimada</Vessel_Name>
-		 *       <Vessel_ID>3322</Vessel_ID>
-		 *       <Vessel_Owner>NOAA</Vessel_Owner>
-		 *     </Vessel>
-		 *   </Cruise_Info>
-		 *   <Variables_Info>
-		 *     ... 
-		 *   </Variables_Info>
-		 *   <Method_Description>
-		 *     ...
-		 *   </Method_Description>
-		 *   <Citation>...</Citation>
-		 *   <Data_Set_Link>
-		 *     <URL>www.pmel.noaa.gov/co2/</URL>
-		 *     <Label>PMEL Underway pCO2 data</Label>
-		 *   </Data_Set_Link>
-		 *   <Data_Link>
-		 *     <URL>SH1201.csv</URL>
-		 *   </Data_Link>
-		 *   <form_type>underway</form_type>
-		 * </x_tags>
-		 * ------------------------------------------------
-		 */
-
-		Element cruiseElem = new Element("Cruise");
-
-		// expocode goes in <Cruise_Info><Experiment><Cruise><Cruise_ID>
-		Element cruiseIdElem = new Element("Cruise_ID");
-		cruiseIdElem.setText(expocode);
-		cruiseElem.addContent(cruiseIdElem);
-
-		// Bounds on longitude and latitude go in <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
-		Element boundsElem = new Element("Bounds");
-		boolean somethingAdded = false;
-		if ( ! westmostLongitude.isNaN() ) { 
-			Element westElem = new Element("Westernmost_Longitude");
-			westElem.setText(String.format("%#.3f", westmostLongitude));
-			boundsElem.addContent(westElem);
-			somethingAdded = true;
-		}
-		if ( ! eastmostLongitude.isNaN() ) { 
-			Element eastElem = new Element("Easternmost_Longitude");
-			eastElem.setText(String.format("%#.3f", eastmostLongitude));
-			boundsElem.addContent(eastElem);
-			somethingAdded = true;
-		}
-		if ( ! southmostLatitude.isNaN() ) { 
-			Element eastElem = new Element("Southernmost_Latitude");
-			eastElem.setText(String.format("%#.3f", southmostLatitude));
-			boundsElem.addContent(eastElem);
-			somethingAdded = true;
-		}
-		if ( ! northmostLatitude.isNaN() ) { 
-			Element eastElem = new Element("Northernmost_Latitude");
-			eastElem.setText(String.format("%#.3f", northmostLatitude));
-			boundsElem.addContent(eastElem);
-			somethingAdded = true;
-		}
-		if ( somethingAdded ) {
-			Element geoElem = new Element("Geographical_Coverage");
-			geoElem.addContent(boundsElem);
-			cruiseElem.addContent(geoElem);
-		}
-
-		// Start and end date go in <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
-		Element timeElem = new Element("Temporal_Coverage");
-		somethingAdded = false;
-		if ( ! startDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
-			Element startElem = new Element("Start_Date");
-			startElem.addContent(DATE_FORMATTER.format(startDate));
-			timeElem.addContent(startElem);
-			somethingAdded = true;
-		}
-		if ( ! endDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
-			Element endElem = new Element("End_Date");
-			endElem.addContent(DATE_FORMATTER.format(endDate));
-			timeElem.addContent(endElem);
-			somethingAdded = true;
-		}
-		if ( somethingAdded ) {
-			cruiseElem.addContent(timeElem);
-		}
-
-		Element experimentElem = new Element("Experiment");
-		experimentElem.addContent(cruiseElem);
-
-		// cruiseName goes in <Cruise_Info><Experiment><Experiment_Name>
-		Element experimentNameElem = new Element("Experiment_Name");
-		experimentNameElem.setText(cruiseName);
-		experimentElem.addContent(experimentNameElem);
-
-		Element cruiseInfoElem = new Element("Cruise_Info");
-		cruiseInfoElem.addContent(experimentElem);
-
-		// vesselName goes in <Cruise_Info><Vessel><Vessel_Name>
-		Element vesselNameElem = new Element("Vessel_Name");
-		vesselNameElem.setText(vesselName);
-		Element vesselElem = new Element("Vessel");
-		vesselElem.addContent(vesselNameElem);
-		cruiseInfoElem.addContent(vesselElem);
 		
 		Element rootElem = new Element("x_tags");
-		rootElem.addContent(cruiseInfoElem);
+		
+		// <User>
+		Element userElem = new Element("User");
+		userElem.addContent(userName.getElement());
+		userElem.addContent(userOrganization.getElement());
+		userElem.addContent(userAddress.getElement());
+		userElem.addContent(userPhone.getElement());
+		userElem.addContent(userEmail.getElement());
 
-		// names in investigators and organizations go in <Name> and <Organization>
-		// under separate <Investigator> elements
-		for (int k = 0; k < investigators.size(); k++) {
-			String piName = investigators.get(k);
-			String orgName;
-			try {
-				orgName = organizations.get(k);
-			} catch ( IndexOutOfBoundsException ex) {
-				orgName = "";
+		rootElem.addContent(userElem);
+		// End <User>
+		
+		// <Investigator> (multiple)
+		for (OMECompositeVariable investigator : investigators) {
+			Element invElem = new Element("Investigator");
+			while (investigator.hasMoreValues()) {
+				invElem.addContent(investigator.getNextValueElement());
 			}
-
-			Element nameElem = new Element("Name");
-			nameElem.setText(piName);
-			Element orgElem = new Element("Organization");
-			orgElem.setText(orgName);
-
-			Element investigatorElem = new Element("Investigator");
-			investigatorElem.addContent(nameElem);
-			investigatorElem.addContent(orgElem);
-
-			rootElem.addContent(investigatorElem);
+			rootElem.addContent(invElem);
 		}
 
-		// Put origDataRef, if there is one, in <Data_Link><URL>
-		// TODO: this might need adjusting
-		if ( ! origDataRef.isEmpty() ) {
-			Element urlElem = new Element("URL");
-			urlElem.setText(origDataRef);
-			Element dataLinkElem = new Element("Data_Link");
-			dataLinkElem.addContent(urlElem);
+		// End <Investigator>
+		
+		// <Dataset_Info>
+		Element datasetInfoElem = new Element("Dataset_Info");
+		datasetInfoElem.addContent(datasetID.getElement());
+		datasetInfoElem.addContent(fundingInfo.getElement());
+		
+		// <Dataset_Info><Submission_Dates>
+		Element submissionElem = new Element("Submission_Dates");
+		submissionElem.addContent(initialSubmission.getElement());
+		submissionElem.addContent(revisedSubmission.getElement());
+		datasetInfoElem.addContent(submissionElem);
+		
+		// End <Dataset_Info><Submission_Dates>
+		
+		rootElem.addContent(datasetInfoElem);
+		// End <Dataset_Info>
+		
+		// <Cruise_Info>
+		Element cruiseInfoElem = new Element("Cruise_Info");
+		
+		// <Cruise_Info><Experiment>
+		Element experimentElem = new Element("Experiment");
+		
+		experimentElem.addContent(experimentName.getElement());
+		experimentElem.addContent(experimentType.getElement());
+		experimentElem.addContent(platformType.getElement());
+		experimentElem.addContent(co2InstrumentType.getElement());
+		experimentElem.addContent(mooringId.getElement());
+		
+		// <Cruise_Info><Experiment><Cruise>
+		Element cruiseElem = new Element("Cruise");
+		
+		cruiseElem.addContent(cruiseID.getElement());
+		cruiseElem.addContent(cruiseInfo.getElement());
+		cruiseElem.addContent(section.getElement());
+		
+		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
+		Element geoCoverageElem = new Element("Geographical_Coverage");
+		
+		geoCoverageElem.addContent(geographicalRegion.getElement());
+		
+		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+		Element boundsElem = new Element("Bounds");
+		
+		boundsElem.addContent(westmostLongitude.getElement());
+		boundsElem.addContent(eastmostLongitude.getElement());
+		boundsElem.addContent(northmostLatitude.getElement());
+		boundsElem.addContent(southmostLatitude.getElement());
+		
+		
+		geoCoverageElem.addContent(boundsElem);
+		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+		
+		cruiseElem.addContent(geoCoverageElem);
+		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
+		
+		// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
+		Element tempCoverageElem = new Element("Temporal_Coverage");
+		
+		tempCoverageElem.addContent(temporalCoverageStartDate.getElement());
+		tempCoverageElem.addContent(temporalCoverageEndDate.getElement());
+		
+		cruiseElem.addContent(tempCoverageElem);
+		// End <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
+		
+		cruiseElem.addContent(cruiseStartDate.getElement());
+		cruiseElem.addContent(cruiseEndDate.getElement());
+		
+		experimentElem.addContent(cruiseElem);
+		// End <Cruise_Info><Experiment><Cruise>
+		
+		cruiseInfoElem.addContent(experimentElem);
+		// End <Cruise_Info><Experiment>
+		
 
-			rootElem.addContent(dataLinkElem);
+		// <Cruise_Info><Vessel>
+		Element vesselElem = new Element("Vessel");
+		
+		vesselElem.addContent(vesselName.getElement());
+		vesselElem.addContent(vesselID.getElement());
+		vesselElem.addContent(country.getElement());
+		vesselElem.addContent(vesselOwner.getElement());
+		
+		cruiseInfoElem.addContent(vesselElem);
+		// End <Cruise_Info><Vessel>
+		
+		
+		rootElem.addContent(cruiseInfoElem);
+		// End <Cruise_Info>
+		
+
+		// <Variables_Info>
+		Element varsInfoElem = new Element("Variables_Info");
+		for (OMECompositeVariable varInfo : variablesInfo) {
+			
+			// <Variables_Info><Variable>
+			Element varElement = new Element("Variable");
+			
+			while (varInfo.hasMoreValues()) {
+				varElement.addContent(varInfo.getNextValueElement());
+			}
+			
+			varsInfoElem.addContent(varElement);
+			// End <Variables_Info><Variable>
 		}
+		
+		rootElem.addContent(varsInfoElem);
+		// End <Variables_Info>
+		
+		
+		// <CO2_Data_Info>
+		Element co2DataInfoElem = new Element("CO2_Data_Info");
+		
+		co2DataInfoElem.addContent(buildSubElement(xCO2WaterEquDryUnit));
+		co2DataInfoElem.addContent(buildSubElement(xCO2WaterSSTDryUnit));
+		co2DataInfoElem.addContent(buildSubElement(pCO2WaterEquWetUnit));
+		co2DataInfoElem.addContent(buildSubElement(pCO2WaterSSTWetUnit));
+		co2DataInfoElem.addContent(buildSubElement(fCO2WaterEquWetUnit));
+		co2DataInfoElem.addContent(buildSubElement(fCO2WaterSSTWetUnit));
+		co2DataInfoElem.addContent(buildSubElement(xCO2AirDryUnit));
+		co2DataInfoElem.addContent(buildSubElement(pCO2AirWetUnit));
+		co2DataInfoElem.addContent(buildSubElement(fCO2AirWetUnit));
+		co2DataInfoElem.addContent(buildSubElement(xCO2AirDryInterpolatedUnit));
+		co2DataInfoElem.addContent(buildSubElement(pCO2AirWetInterpolatedUnit));
+		co2DataInfoElem.addContent(buildSubElement(fCO2AirWetInterpolatedUnit));
+		
+		rootElem.addContent(co2DataInfoElem);
+		// End <CO2_Data_Info>
+		
+		// <Method_Description>
+		Element methodDescElem = new Element("Method_Description");
+		
+		// <Method_Description><Equilibrator_Design>
+		Element eqDesignElem = new Element("Equilibrator_Design");
+		
+		eqDesignElem.addContent(depthOfSeaWaterIntake.getElement());
+		eqDesignElem.addContent(locationOfSeaWaterIntake.getElement());
+		eqDesignElem.addContent(equilibratorType.getElement());
+		eqDesignElem.addContent(equilibratorVolume.getElement());
+		eqDesignElem.addContent(waterFlowRate.getElement());
+		eqDesignElem.addContent(headspaceGasFlowRate.getElement());
+		eqDesignElem.addContent(vented.getElement());
+		eqDesignElem.addContent(dryingMethodForCO2InWater.getElement());
+		eqDesignElem.addContent(equAdditionalInformation.getElement());
+		
+		
+		methodDescElem.addContent(eqDesignElem);
+		// End <Method_Description><Equilibrator_Design>
+		
+		// <Method_Description><CO2_in_Marine_Air>
+		Element co2MarineAirElem = new Element("CO2_in_Marine_Air");
+		
+		co2MarineAirElem.addContent(co2InMarineAirMeasurement.getElement());
+		co2MarineAirElem.addContent(co2InMarineAirLocationAndHeight.getElement());
+		co2MarineAirElem.addContent(co2InMarineAirDryingMethod.getElement());
 
-		// Return the document created from the root element
+		methodDescElem.addContent(co2MarineAirElem);
+		// End <Method_Description><CO2_in_Marine_Air>
+		
+		// <Method_Description><CO2_Sensors>
+		Element co2SensorsElem = new Element("CO2_Sensors");
+		
+		// <Method_Description><CO2_Sensors><CO2_Sensor>
+		Element co2SensorElem = new Element("CO2_Sensor");
+		
+		co2SensorElem.addContent(co2MeasurementMethod.getElement());
+		co2SensorElem.addContent(co2Manufacturer.getElement());
+		co2SensorElem.addContent(co2Model.getElement());
+		co2SensorElem.addContent(co2Frequency.getElement());
+		co2SensorElem.addContent(co2ResolutionWater.getElement());
+		co2SensorElem.addContent(co2UncertaintyWater.getElement());
+		co2SensorElem.addContent(co2ResolutionAir.getElement());
+		co2SensorElem.addContent(co2UncertaintyAir.getElement());
+		co2SensorElem.addContent(co2ManufacturerOfCalibrationGas.getElement());
+		co2SensorElem.addContent(co2SensorCalibration.getElement());
+		co2SensorElem.addContent(co2EnvironmentalControl.getElement());
+		co2SensorElem.addContent(co2MethodReferences.getElement());
+		co2SensorElem.addContent(detailsOfCO2Sensing.getElement());
+		co2SensorElem.addContent(analysisOfCO2Comparison.getElement());
+		co2SensorElem.addContent(measuredCO2Params.getElement());
+		
+		co2SensorsElem.addContent(co2SensorElem);
+		// End <Method_Description><CO2_Sensors><CO2_Sensor>
+		
+		methodDescElem.addContent(co2SensorsElem);
+		// End <Method_Description><CO2_Sensors>
+		
+		
+		// <Method_Description><Sea_Surface_Temperature>
+		Element sstElem = new Element("Sea_Surface_Temperature");
+		
+		sstElem.addContent(sstLocation.getElement());
+		sstElem.addContent(sstManufacturer.getElement());
+		sstElem.addContent(sstModel.getElement());
+		sstElem.addContent(sstAccuracy.getElement());
+		sstElem.addContent(sstPrecision.getElement());
+		sstElem.addContent(sstCalibration.getElement());
+		sstElem.addContent(sstOtherComments.getElement());
+		
+		methodDescElem.addContent(sstElem);
+		// End <Method_Description><Sea_Surface_Temperature>
+		
+		// <Method_Description><Equilibrator_Temperature>
+		Element eqtElem = new Element("Equilibrator_Temperature");
+		
+		eqtElem.addContent(eqtLocation.getElement());
+		eqtElem.addContent(eqtManufacturer.getElement());
+		eqtElem.addContent(eqtModel.getElement());
+		eqtElem.addContent(eqtAccuracy.getElement());
+		eqtElem.addContent(eqtPrecision.getElement());
+		eqtElem.addContent(eqtCalibration.getElement());
+		eqtElem.addContent(eqtWarming.getElement());
+		eqtElem.addContent(eqtOtherComments.getElement());
+		
+		methodDescElem.addContent(eqtElem);
+		// End <Method_Description><Equilibrator_Temperature>
+	
+		// <Method_Description><Equilibrator_Pressure>
+		Element eqpElem = new Element("Equilibrator_Pressure");
+		
+		eqpElem.addContent(eqpLocation.getElement());
+		eqpElem.addContent(eqpManufacturer.getElement());
+		eqpElem.addContent(eqpModel.getElement());
+		eqpElem.addContent(eqpAccuracy.getElement());
+		eqpElem.addContent(eqpPrecision.getElement());
+		eqpElem.addContent(eqpCalibration.getElement());
+		eqpElem.addContent(eqpOtherComments.getElement());
+		eqpElem.addContent(eqpNormalized.getElement());
+		
+		methodDescElem.addContent(eqpElem);
+		// End <Method_Description><Equilibrator_Pressure>
+
+		// <Method_Description><Atmospheric_Pressure>
+		Element atpElem = new Element("Atmospheric_Pressure");
+		
+		atpElem.addContent(atpLocation.getElement());
+		atpElem.addContent(atpManufacturer.getElement());
+		atpElem.addContent(atqpModel.getElement());
+		atpElem.addContent(atpAccuracy.getElement());
+		atpElem.addContent(atpPrecision.getElement());
+		atpElem.addContent(atpCalibration.getElement());
+		atpElem.addContent(atpOtherComments.getElement());
+		
+		methodDescElem.addContent(atpElem);
+		// End <Method_Description><Atmospheric_Pressure>
+		
+		// <Method_Description><Sea_Surface_Salinity>
+		Element sssElem = new Element("Sea_Surface_Salinity");
+		
+		sssElem.addContent(sssLocation.getElement());
+		sssElem.addContent(sssManufacturer.getElement());
+		sssElem.addContent(sssModel.getElement());
+		sssElem.addContent(sssAccuracy.getElement());
+		sssElem.addContent(sssPrecision.getElement());
+		sssElem.addContent(sssCalibration.getElement());
+		sssElem.addContent(sssOtherComments.getElement());
+		
+		methodDescElem.addContent(sssElem);
+		// End <Method_Description><Sea_Surface_Salinity>
+		
+		// <Method_Description><Other_Sensors>
+		Element otherSensorsElem = new Element("Other_Sensors");
+		for (OMECompositeVariable sensorInfo : otherSensors) {
+			
+			// <Method_Description><Other_Sensors><Sensor>
+			Element sensorElem = new Element("Sensor");
+			
+			while (sensorInfo.hasMoreValues()) {
+				sensorElem.addContent(sensorInfo.getNextValueElement());
+			}
+			
+			otherSensorsElem.addContent(sensorElem);
+			// End <Method_Description><Other_Sensors><Sensor>
+		}
+		
+		
+		methodDescElem.addContent(otherSensorsElem);
+		// End <Method_Description><Other_Sensors>
+		
+		
+		rootElem.addContent(methodDescElem);
+		// End <Method_Description>
+		
+		// Some misc root-level elements
+		rootElem.addContent(dataSetReferences.getElement());
+		rootElem.addContent(additionalInformation.getElement());
+		rootElem.addContent(citation.getElement());
+		rootElem.addContent(measurementAndCalibrationReport.getElement());
+		rootElem.addContent(preliminaryQualityControl.getElement());
+		
+		// <Data_Set_Link> (multiple)
+		for (OMECompositeVariable dataSetLink : dataSetLinks) {
+			Element dataSetLinkElem = new Element("Data_Set_Link");
+			while (dataSetLink.hasMoreValues()) {
+				dataSetLinkElem.addContent(dataSetLink.getNextValueElement());
+			}
+			rootElem.addContent(dataSetLinkElem);
+		}
+		
+		// End <Data_Set_Link>
+		
+		// More misc root-level elements
+		rootElem.addContent(status.getElement());
+		rootElem.addContent(form_type.getElement());
+		rootElem.addContent(recordID.getElement());
+		
+		
 		return new Document(rootElem);
 	}
 
@@ -578,39 +1074,90 @@ public class OmeMetadata extends DashboardMetadata {
 	 *		created SocatMetadata object 
 	 */
 	public SocatMetadata createSocatMetadata(Double socatVersion, 
-							Set<String> addlDocs, String qcFlag) {
+							Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
+		
+		// We cannot create a SocatMetadata object if there are conflicts
+		if (isConflicted()) {
+			throw new IllegalArgumentException("The Metadata contains conflicts");
+		}
+		
 		SocatMetadata scMData = new SocatMetadata();
+		
 		scMData.setExpocode(expocode);
-		scMData.setCruiseName(cruiseName);
-		scMData.setVesselName(vesselName);
-		scMData.setWestmostLongitude(westmostLongitude);
-		scMData.setEastmostLongitude(eastmostLongitude);
-		scMData.setSouthmostLatitude(southmostLatitude);
-		scMData.setNorthmostLatitude(northmostLatitude);
-		scMData.setBeginTime(startDate);
-		scMData.setEndTime(endDate);
-		scMData.setOrigDataRef(origDataRef);
-		// PIs as a single string
-		String scienceGroup = "";
-		for ( String piName : investigators ) {
-			if ( scienceGroup.isEmpty() )
-				scienceGroup = piName;
-			else
-				scienceGroup += SocatMetadata.NAMES_SEPARATOR + piName;
-		}
-		scMData.setScienceGroup(scienceGroup);
-		// Organizations as a single string
-		// Order unique organizations as given; no longer one-to-one with PIs
-		String orgGroup = "";
-		for ( String orgName : new LinkedHashSet<String>(organizations) ) {
-			if ( orgGroup.isEmpty() )
-				orgGroup = orgName;
-			else
-				orgGroup += SocatMetadata.NAMES_SEPARATOR + orgName;
-		}
-		scMData.setOrganization(orgGroup);
+		scMData.setCruiseName(experimentName.getValue());
+		scMData.setVesselName(vesselName.getValue());
 
-		// TODO: add and initialize more fields when they are identified in the OME XML file
+		try {
+			scMData.setWestmostLongitude(Double.parseDouble(westmostLongitude.getValue()));
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("The Westernmost_Longitude entry is not numeric", e);
+		}
+
+		try {
+			scMData.setEastmostLongitude(Double.parseDouble(eastmostLongitude.getValue()));
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("The Easternmost_Longitude entry is not numeric", e);
+		}
+
+		try {
+			scMData.setSouthmostLatitude(Double.parseDouble(southmostLatitude.getValue()));
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("The Westernmost_Longitude entry is not numeric", e);
+		}
+
+		try {
+			scMData.setNorthmostLatitude(Double.parseDouble(northmostLatitude.getValue()));
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("The Westernmost_Longitude entry is not numeric", e);
+		}
+		
+		try {
+			scMData.setBeginTime(DATE_PARSER.parse(temporalCoverageStartDate.getValue() + " 00:00"));
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("The Start Date cannot be parsed", e);
+		}
+
+		try {
+			scMData.setEndTime(DATE_PARSER.parse(temporalCoverageEndDate.getValue() + " 00:00"));
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("The End Date cannot be parsed", e);
+		}
+		
+		String firstDataSetLink = "";
+		if (dataSetLinks.size() > 0) {
+			OMECompositeVariable dataSetLink = dataSetLinks.get(0);
+			firstDataSetLink = dataSetLink.getValue("URL");
+		}
+		scMData.setOrigDataRef(firstDataSetLink);
+		
+		StringBuffer scienceGroup = new StringBuffer();
+		List<String> usedOrganizations = new ArrayList<String>(investigators.size());
+		StringBuffer orgGroup = new StringBuffer();
+		
+		for (OMECompositeVariable investigator : investigators) {
+			if (scienceGroup.length() == 0) {
+				scienceGroup.append(investigator.getValue("Name"));
+			} else {
+				scienceGroup.append(SocatMetadata.NAMES_SEPARATOR);
+				scienceGroup.append(investigator.getValue("Name"));
+			}
+			
+			String organization = investigator.getValue("Organization");
+			if (!usedOrganizations.contains(organization)) {
+				usedOrganizations.add(organization);
+				
+				if (orgGroup.length() == 0) {
+					orgGroup.append(organization);
+				} else {
+					orgGroup.append(SocatMetadata.NAMES_SEPARATOR);
+					orgGroup.append(organization);
+				}
+				
+			}
+		}
+		
+		scMData.setScienceGroup(scienceGroup.toString());
+		scMData.setOrganization(orgGroup.toString());
 
 		// Add names of any ancillary documents
 		String docsString = "";
@@ -628,314 +1175,174 @@ public class OmeMetadata extends DashboardMetadata {
 
 		return scMData;
 	}
+	
+	
+	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName) {
+		Path path = new Path(parentPath, elementName);
+	
+		// The OMEVariable constructor is quite happy to treat the null element
+		// as an empty value. So we can leave it as null here if the parent element is also null.
+		Element subElement = null;
+		if (null != parentElement) {
+			subElement = parentElement.getChild(elementName);
+		}
+		
+		return new OMEVariable(path, subElement, subElementName);
+	}
+	
+	private Element buildSubElement(OMEVariable variable) {
+		Path varPath = variable.getPath();
+		Element elem = new Element(varPath.getParent().getElementName());
+		elem.addContent(variable.getElement());
+		
+		return elem;
+	}
+}
 
-	/**
-	 * @return 
-	 * 		the cruise name; never null but could be empty
-	 */
-	public String getCruiseName() {
-		return cruiseName;
+class Path {
+	String itsElementName;
+	Path itsParent = null;
+	
+	protected Path(String elementName) {
+		itsElementName = elementName;
+	}
+	
+	protected Path(Path parent, String elementName) {
+		itsElementName = elementName;
+		itsParent = parent;
+	}
+	
+	protected String getElementName() {
+		return itsElementName;
+	}
+	
+	protected Path getParent() {
+		return itsParent;
+	}
+}
+
+class OMEVariable {
+
+	private Path itsPath;
+	private String itsValue;
+	
+	protected OMEVariable(Path parentPath, Element parentElement, String name) {
+		itsPath = new Path(parentPath, name);
+		if (null != parentElement) {
+			itsValue = parentElement.getChildTextTrim(name);
+		}
+	}
+	
+	protected OMEVariable(Path path, String value) {
+		itsPath = path;
+		itsValue = value;
+	}
+	
+	protected String getValue() {
+		String result = itsValue;
+		if (null == result) {
+			result = "";
+		}
+		
+		return itsValue;
+	}
+	
+	protected Path getPath() {
+		return itsPath;
+	}
+	
+	protected Element getElement() {
+		Element elem = new Element(itsPath.getElementName());
+		if (null != itsValue) {
+			elem.setText(itsValue);
+		}
+		
+		return elem;
+	}
+}
+
+class OMECompositeVariable {
+	private Path itsPath;
+	private List<String> itsId;
+	private List<Value> itsValues = new ArrayList<Value>();
+	private Iterator<Value> itsValuesIterator;
+	
+	protected OMECompositeVariable(Path parentPath, String idElement) {
+		itsPath = parentPath;
+		itsId = new ArrayList<String>();
+		itsId.add(idElement);
+	}
+	
+	protected OMECompositeVariable(Path parentPath, List<String> idElements) {
+		itsPath = parentPath;
+		itsId = idElements;
 	}
 
-	/**
-	 * @param cruiseName 
-	 * 		the cruise name to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setCruiseName(String cruiseName) {
-		if ( cruiseName == null )
-			this.cruiseName = "";
-		else
-			this.cruiseName = cruiseName;
+	protected void addValue(String name, Element element) {
+		String value = null;
+		if (null != element) {
+			value = element.getChildTextTrim(name);
+		}
+		
+		itsValues.add(new Value(name, value));
 	}
-
-	/**
-	 * @return 
-	 * 		the vessel name; never null but could be empty
-	 */
-	public String getVesselName() {
-		return vesselName;
+	
+	protected boolean hasMoreValues() {
+		if (null == itsValuesIterator) {
+			itsValuesIterator = itsValues.iterator();
+		}
+		
+		return itsValuesIterator.hasNext();
 	}
-
-	/**
-	 * @param vesselName 
-	 * 		the vessel name to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setVesselName(String vesselName) {
-		if ( vesselName == null )
-			this.vesselName = "";
-		else
-			this.vesselName = vesselName;
+	
+	protected Element getNextValueElement() {
+		if (null == itsValuesIterator) {
+			itsValuesIterator = itsValues.iterator();
+		}
+		
+		Value nextValue = itsValuesIterator.next();
+		
+		Element elem = new Element(nextValue.name);
+		elem.setText(nextValue.value);
+		
+		return elem;
 	}
-
-	/**
-	 * @return 
-	 * 		the list of PIs; never null but could be empty.
-	 * 		The actual list in this instance is returned.
-	 */
-	public ArrayList<String> getInvestigators() {
-		return investigators;
+	
+	private Value getNextValue() {
+		if (null == itsValuesIterator) {
+			itsValuesIterator = itsValues.iterator();
+		}
+		
+		return itsValuesIterator.next();
 	}
-
-	/**
-	 * @param investigators 
-	 * 		the list of PIs to set;
-	 * 		if null, an empty list is assigned
-	 */
-	public void setInvestigators(ArrayList<String> investigators) {
-		this.investigators.clear();
-		if ( investigators != null )
-			this.investigators.addAll(investigators);
-	}
-
-	/**
-	 * @return 
-	 * 		the list of organizations/institutions;
-	 * 		never null but could be empty if not assigned.
-	 * 		The actual list in this instance is returned.
-	 */
-	public ArrayList<String> getOrganizations() {
-		return organizations;
-	}
-
-	/**
-	 * @param organizations 
-	 * 		the list of organizations/institutions to set;
-	 * 		if null, an empty list is assigned.
-	 */
-	public void setOrganizations(ArrayList<String> organizations) {
-		this.organizations.clear();
-		if ( organizations != null )
-			this.organizations.addAll(organizations);
-	}
-
-	/**
-	 * @return
-	 * 		the west-most longitude for the cruise;
-	 * 		never null could be Double.NaN if not assigned.
-	 */
-	public Double getWestmostLongitude() {
-		return westmostLongitude;
-	}
-
-	/**
-	 * @param westmostLongitude 
-	 * 		the west-most longitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
-	 */
-	public void setWestmostLongitude(Double westmostLongitude) {
-		if ( westmostLongitude == null )
-			this.westmostLongitude = Double.NaN;
-		else 
-			this.westmostLongitude = westmostLongitude;
-	}
-
-	/**
-	 * @return
-	 * 		the east-most longitude for the cruise;
-	 * 		never null but could be Double.NaN if not assigned.
-	 */
-	public Double getEastmostLongitude() {
-		return eastmostLongitude;
-	}
-
-	/**
-	 * @param eastmostLongitude 
-	 * 		the east-most longitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
-	 */
-	public void setEastmostLongitude(Double eastmostLongitude) {
-		if ( eastmostLongitude == null )
-			this.eastmostLongitude = Double.NaN;
-		else
-			this.eastmostLongitude = eastmostLongitude;
-	}
-
-	/**
-	 * @return
-	 * 		the south-most latitude for the cruise;
-	 * 		never null but could be Double.NaN if not assigned.
-	 */
-	public Double getSouthmostLatitude() {
-		return southmostLatitude;
-	}
-
-	/**
-	 * @param southmostLatitude 
-	 * 		the south-most latitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
-	 */
-	public void setSouthmostLatitude(Double southmostLatitude) {
-		if ( southmostLatitude == null )
-			this.southmostLatitude = Double.NaN;
-		else
-			this.southmostLatitude = southmostLatitude;
-	}
-
-	/**
-	 * @return
-	 * 		the south-most latitude for the cruise;
-	 * 		never null but could be Double.NaN if not assigned.
-	 */
-	public Double getNorthmostLatitude() {
-		return northmostLatitude;
-	}
-
-	/**
-	 * @param northmostLatitude 
-	 * 		the north-most latitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
-	 */
-	public void setNorthmostLatitude(Double northmostLatitude) {
-		if ( northmostLatitude == null )
-			this.northmostLatitude = Double.NaN;
-		else
-			this.northmostLatitude = northmostLatitude;
-	}
-
-	/**
-	 * @return
-	 * 		the start date for the cruise;
-	 * 		never null but could be {@link SocatMetadata#DATE_MISSING_VALUE} if not assigned.
-	 */
-	public Date getStartDate() {
-		return startDate;
-	}
-
-	/**
-	 * @param startDate 
-	 * 		the start date for the cruise to set;
-	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned
-	 */
-	public void setStartDate(Date startDate) {
-		if ( startDate == null )
-			this.startDate = SocatMetadata.DATE_MISSING_VALUE;
-		else 
-			this.startDate = startDate;
-	}
-
-	/**
-	 * @return
-	 * 		the ending date for the cruise;
-	 * 		never null but could be {@link SocatMetadata#DATE_MISSING_VALUE} if not assigned.
-	 */
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	/**
-	 * @param endDate 
-	 * 		the ending date for the cruise to set;
-	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned
-	 */
-	public void setEndDate(Date endDate) {
-		if ( endDate == null )
-			this.endDate = SocatMetadata.DATE_MISSING_VALUE;
-		else 
-			this.endDate = endDate;
-	}
-
-	/**
-	 * @return 
-	 * 		the DOI of the original cruise data; never null but could be empty
-	 */
-	public String getOrigDataRef() {
-		return origDataRef;
-	}
-
-	/**
-	 * @param origDataRef 
-	 * 		the DOI of the original cruise data to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setOrigDataRef(String origDataRef) {
-		if ( origDataRef == null )
-			this.origDataRef = "";
-		else
-			this.origDataRef = origDataRef;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 37;
-		int result = super.hashCode();
-		result = result * prime + cruiseName.hashCode();
-		result = result * prime + vesselName.hashCode();
-		result = result * prime + investigators.hashCode();
-		result = result * prime + organizations.hashCode();
-		result = result * prime + startDate.hashCode();
-		result = result * prime + endDate.hashCode();
-		result = result * prime + origDataRef.hashCode();
+	
+	protected String getValue(String valueName) {
+		String result = "";
+		
+		Iterator<Value> iterator = itsValues.iterator();
+		boolean foundValue = false;
+		while (!foundValue && iterator.hasNext()) {
+			Value value = iterator.next();
+			if (value.name.equals(valueName)) {
+				result = value.value;
+				foundValue = true;
+			}
+		}
+		
 		return result;
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( this == obj )
-			return true;
-		if ( obj == null )
-			return false;
-
-		if ( ! ( obj instanceof OmeMetadata ) )
-			return false;
-		OmeMetadata other = (OmeMetadata) obj;
-
-		if ( ! super.equals(other) )
-			return false;
-		// Date comparisons
-		if ( ! startDate.equals(other.startDate) )
-			return false;
-		if ( ! endDate.equals(other.endDate) )
-			return false;
-		// String comparisons
-		if ( ! cruiseName.equals(other.cruiseName) )
-			return false;
-		if ( ! vesselName.equals(other.vesselName) )
-			return false;
-		if ( ! origDataRef.equals(other.origDataRef) )
-			return false;
-		// ArrayList<String> comparisons
-		if ( ! investigators.equals(other.investigators) )
-			return false;
-		if ( ! organizations.equals(other.organizations) )
-			return false;
-		// Double comparisons
-		if ( ! DashboardUtils.closeTo(westmostLongitude, 
-				other.westmostLongitude, 0.0, 1.0E-4) )
-			return false;
-		if ( ! DashboardUtils.closeTo(eastmostLongitude, 
-				other.eastmostLongitude, 0.0, 1.0E-4) )
-			return false;
-		if ( ! DashboardUtils.closeTo(southmostLatitude, 
-				other.southmostLatitude, 0.0, 1.0E-4) )
-			return false;
-		if ( ! DashboardUtils.closeTo(northmostLatitude, 
-				other.northmostLatitude, 0.0, 1.0E-4) )
-			return false;
-
-		return true;
+	
+	protected void resetIterator() {
+		itsValuesIterator = null;
 	}
-
-	@Override
-	public String toString() {
-		return "OmeMetadata[ expocode=" + expocode + 
-				",\n    cruiseName=" + cruiseName + 
-				",\n    vesselName=" + vesselName + 
-				",\n    investigators=" + investigators.toString() +
-				",\n    organizations=" + organizations.toString() + 
-				",\n    westmostLongitude=" + westmostLongitude.toString() + 
-				",\n    eastmostLongitude=" + eastmostLongitude.toString() + 
-				",\n    southmostLatitude=" + southmostLatitude.toString() + 
-				",\n    northmostLatitude=" + northmostLatitude.toString() + 
-				",\n    startDate=" + startDate.toString() + 
-				",\n    endDate=" + endDate.toString() + 
-				",\n    origDataRef=" + origDataRef + 
-				",\n    filename=" + filename + 
-				",\n    uploadTimestamp=" + uploadTimestamp + 
-				",\n    owner=" + owner + 
-				",\n    selected=" + selected + 
-				" ]";
+	
+	private class Value {
+		private String name;
+		private String value;
+		
+		private Value(String name, String value) {
+			this.name = name;
+			this.value = value;
+		}
 	}
-
 }
