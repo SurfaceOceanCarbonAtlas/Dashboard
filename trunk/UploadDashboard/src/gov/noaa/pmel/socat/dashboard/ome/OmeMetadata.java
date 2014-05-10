@@ -1141,7 +1141,7 @@ public class OmeMetadata extends DashboardMetadata {
 			}
 			
 			String organization = investigator.getValue("Organization");
-			if (!usedOrganizations.contains(organization)) {
+			if ( (null != organization) && ! usedOrganizations.contains(organization) ) {
 				usedOrganizations.add(organization);
 				
 				if (orgGroup.length() == 0) {
