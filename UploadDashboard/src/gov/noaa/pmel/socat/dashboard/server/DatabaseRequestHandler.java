@@ -200,32 +200,54 @@ public class DatabaseRequestHandler {
 
 	/**
 	 * Get the ID for a reviewer from the reviewers database table.
+	 * Users the username for the reviewer unless it is empty, in 
+	 * which case it uses the realname of the reviewer.
 	 * 
 	 * @param catConn
 	 * 		connection to the database
-	 * @param reviewerName
-	 * 		name of the reviewer
+	 * @param username
+	 * 		username of the reviewer
+	 * @param realname
+	 * 		realname of the reviewer
 	 * @return
 	 * 		ID of the reviewer
 	 * @throws SQLException
 	 * 		if accessing the database throws one, or
 	 * 		if the reviewer name cannot be found
 	 */
-	private int getReviewerId(Connection catConn, String reviewerName) 
-													throws SQLException {
+	private int getReviewerId(Connection catConn, 
+						String username, String realname) throws SQLException {
 		int reviewerId;
-		PreparedStatement prepStmt = catConn.prepareStatement(
+		PreparedStatement prepStmt;
+		if ( ! username.isEmpty() ) {
+			prepStmt = catConn.prepareStatement(
 				"SELECT `reviewer_id` FROM `Reviewers` WHERE `username` = ?");
-		prepStmt.setString(1, reviewerName);
+			prepStmt.setString(1, username);
+		}
+		else {
+			prepStmt = catConn.prepareStatement(
+					"SELECT `reviewer_id` FROM `Reviewers` WHERE `realname` = ?");
+			prepStmt.setString(1, realname);
+		}
 		ResultSet results = prepStmt.executeQuery();
 		try {
-			if ( ! results.first() )
-				throw new SQLException(
-						"Reviewer username '" + reviewerName + "' not found");
+			if ( ! results.first() ) {
+				if ( ! username.isEmpty() )
+					throw new SQLException(
+							"Reviewer username '" + username + "' not found");
+				else 
+					throw new SQLException(
+							"Reviewer realname '" + realname + "' not found");
+			}
 			reviewerId = results.getInt(1);
-			if ( reviewerId <= 0 )
-				throw new SQLException(
-						"ID for reviewer username '" + reviewerName + "' not found");
+			if ( reviewerId <= 0 ) {
+				if ( ! username.isEmpty() )
+					throw new SQLException(
+							"ID for reviewer username '" + username + "' not found");
+				else
+					throw new SQLException(
+							"ID for reviewer realname '" + realname + "' not found");
+			}
 		} finally {
 			results.close();
 		}
@@ -245,7 +267,8 @@ public class DatabaseRequestHandler {
 	public void addQCEvent(SocatQCEvent qcEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
-			int reviewerId = getReviewerId(catConn, qcEvent.getUsername());
+			int reviewerId = getReviewerId(catConn, 
+					qcEvent.getUsername(), qcEvent.getRealname());
 			// Add the QC event
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"INSERT INTO `QCEvents` (`qc_flag`, `qc_time`, `expocode`, " +
@@ -360,7 +383,8 @@ public class DatabaseRequestHandler {
 	public void addWoceEvent(SocatWoceEvent woceEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
-			int reviewerId = getReviewerId(catConn, woceEvent.getUsername());
+			int reviewerId = getReviewerId(catConn, 
+					woceEvent.getUsername(), woceEvent.getRealname());
 			// Add the WOCE event
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"INSERT INTO `WOCEEvents` (`woce_flag`, `woce_time`, " +
@@ -536,7 +560,7 @@ public class DatabaseRequestHandler {
 		try {
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"SELECT * FROM `WOCEEvents` JOIN `Reviewers` " +
-							"ON WOCEEvents.reviewer_id = Reviewers.reviewer_id " +
+					"ON WOCEEvents.reviewer_id = Reviewers.reviewer_id " +
 					"WHERE WOCEEvents.expocode = ? ORDER BY WOCEEvents.woce_time DESC;");
 			prepStmt.setString(1, expocode);
 			ArrayList<Long> woceIds = new ArrayList<Long>();
