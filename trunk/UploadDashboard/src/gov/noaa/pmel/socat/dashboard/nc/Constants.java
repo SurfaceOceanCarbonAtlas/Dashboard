@@ -255,20 +255,20 @@ public class Constants {
 		longNameMap.put("woaSss", "salinity from World Ocean Atlas 2005");
 		longNameMap.put("ncepSlp", "sea level air pressure from NCEP/NCAR reanalysis");
 
-		longNameMap.put("fCO2FromXCO2TEqu", "fco2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromXCO2Sst", "fco2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromPCO2TEqu", "fco2 from pCO2_water_equi_temp, Pressure_equi, sal");
-		longNameMap.put("fCO2FromPCO2Sst", "fco2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromFCO2TEqu", "fco2 from fCO2_water_equi_temp, Pressure_equi, sal");
-		longNameMap.put("fCO2FromFCO2Sst", "fco2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromPCO2TEquNcep", "fco2 from pCO2_water_equi_temp, NCEP SLP, sal");
-		longNameMap.put("fCO2FromPCO2SstNcep", "fco2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal");
-		longNameMap.put("fCO2FromXCO2TEquWoa", "fco2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS");
-		longNameMap.put("fCO2FromXCO2SstWoa", "fco2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS");
-		longNameMap.put("fCO2FromXCO2TEquNcep", "fco2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal");
-		longNameMap.put("fCO2FromXCO2SstNcep", "fco2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal");
-		longNameMap.put("fCO2FromXCO2TEquNcepWoa", "fco2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS");
-		longNameMap.put("fCO2FromXCO2SstNcepWoa", "fco2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS");
+		longNameMap.put("fCO2FromXCO2TEqu", "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal");
+		longNameMap.put("fCO2FromXCO2Sst", "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal");
+		longNameMap.put("fCO2FromPCO2TEqu", "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal");
+		longNameMap.put("fCO2FromPCO2Sst", "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
+		longNameMap.put("fCO2FromFCO2TEqu", "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal");
+		longNameMap.put("fCO2FromFCO2Sst", "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
+		longNameMap.put("fCO2FromPCO2TEquNcep", "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal");
+		longNameMap.put("fCO2FromPCO2SstNcep", "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal");
+		longNameMap.put("fCO2FromXCO2TEquWoa", "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS");
+		longNameMap.put("fCO2FromXCO2SstWoa", "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS");
+		longNameMap.put("fCO2FromXCO2TEquNcep", "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal");
+		longNameMap.put("fCO2FromXCO2SstNcep", "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal");
+		longNameMap.put("fCO2FromXCO2TEquNcepWoa", "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS");
+		longNameMap.put("fCO2FromXCO2SstNcepWoa", "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS");
 
 		longNameMap.put("fCO2Rec", "fCO2 recommended");
 		longNameMap.put("fCO2Source", "Algorithm number for recommended fCO2");
