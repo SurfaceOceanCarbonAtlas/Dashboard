@@ -4,8 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -14,9 +12,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.TimeZone;
 
 import org.jdom2.Document;
@@ -237,11 +234,15 @@ public class OmeMetadataTest {
 	private static final String ACTUAL_EXPOCODE = "332220120220";
 	private static final String ACTUAL_CRUISE_NAME = "SH1201";
 	private static final String ACTUAL_VESSEL_NAME = "Bell M. Shimada";
+	private static final String ACTUAL_INVESTIGATORS_STRING = 
+			"Cosca, Catherine E. ; Feely, Richard A. ; Alin, Simone R. ; Lebon, Geoffrey T.";
+/*
 	private static final ArrayList<String> ACTUAL_INVESTIGATORS = 
-			new ArrayList<String>(Arrays.asList(
-					"Cosca, Catherine E.", "Feely, Richard A.", "Alin, Simone R.", "Lebon, Geoffrey T."));
+			new ArrayList<String>(Arrays.asList(ACTUAL_INVESTIGATORS_STRING.split(" ; ")));
 	private static final ArrayList<String> ACTUAL_ORGANIZATIONS = 
 			new ArrayList<String>(Arrays.asList("PMEL", "PMEL", "PMEL", ""));
+*/
+	private static final String ACTUAL_ORGANIZATIONS_STRING = "PMEL";
 	private static final double ACTUAL_WEST_LON = -125.702;
 	private static final double ACTUAL_EAST_LON = -122.978;
 	private static final double ACTUAL_SOUTH_LAT = 48.183;
@@ -252,16 +253,17 @@ public class OmeMetadataTest {
 	static {
 		DATE_FRMT.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
-	private static final String ACTUAL_ORIG_DATA_REF = "www.pmel.noaa.gov/co2/SH1201.csv";
+	// private static final String ACTUAL_ORIG_DATA_REF = "www.pmel.noaa.gov/co2/SH1201.csv";
+	private static final String ACTUAL_ORIG_DATA_REF = "www.pmel.noaa.gov/co2/";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getCruiseName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setCruiseName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getCruiseName()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setCruiseName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetCruiseName() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertEquals("", mdata.getCruiseName());
 		mdata.setCruiseName(ACTUAL_CRUISE_NAME);
 		assertEquals(ACTUAL_CRUISE_NAME, mdata.getCruiseName());
@@ -271,13 +273,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getVesselName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setVesselName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getVesselName()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setVesselName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetVesselName() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertEquals("", mdata.getVesselName());
 		mdata.setVesselName(ACTUAL_VESSEL_NAME);
 		assertEquals(ACTUAL_VESSEL_NAME, mdata.getVesselName());
@@ -288,13 +290,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getInvestigators()
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setInvestigators(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getInvestigators()
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setInvestigators(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testGetSetInvestigators() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertEquals(0, mdata.getInvestigators().size());
 		mdata.setInvestigators(ACTUAL_INVESTIGATORS);
 		assertEquals(ACTUAL_INVESTIGATORS, mdata.getInvestigators());
@@ -306,13 +308,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getOrganizations()
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setOrganizations(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getOrganizations()
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setOrganizations(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testGetSetOrganizations() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertEquals(0, mdata.getOrganizations().size());
 		mdata.setOrganizations(ACTUAL_ORGANIZATIONS);
 		assertEquals(ACTUAL_ORGANIZATIONS, mdata.getOrganizations());
@@ -325,13 +327,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getWestmostLongitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setWestmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getWestmostLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setWestmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWestmostLongitude() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertTrue( mdata.getWestmostLongitude().isNaN() );
 		mdata.setWestmostLongitude(ACTUAL_WEST_LON);
 		assertEquals(ACTUAL_WEST_LON, mdata.getWestmostLongitude(), 1.0E-4);
@@ -345,13 +347,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getEastmostLongitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setEastmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getEastmostLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setEastmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetEastmostLongitude() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertTrue( mdata.getEastmostLongitude().isNaN() );
 		mdata.setEastmostLongitude(ACTUAL_EAST_LON);
 		assertEquals(ACTUAL_EAST_LON, mdata.getEastmostLongitude(), 1.0E-4);
@@ -366,13 +368,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getSouthmostLatitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setSouthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getSouthmostLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setSouthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSouthmostLatitude() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertTrue( mdata.getSouthmostLatitude().isNaN() );
 		mdata.setSouthmostLatitude(ACTUAL_SOUTH_LAT);
 		assertEquals(ACTUAL_SOUTH_LAT, mdata.getSouthmostLatitude(), 1.0E-4);
@@ -388,13 +390,13 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getNorthmostLatitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setNorthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getNorthmostLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setNorthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetNorthmostLatitude() {
-		OmeMetadata mdata = new OmeMetadata();
 /*
+		OmeMetadata mdata = new OmeMetadata();
 		assertTrue( mdata.getNorthmostLatitude().isNaN() );
 		mdata.setNorthmostLatitude(ACTUAL_NORTH_LAT);
 		assertEquals(ACTUAL_NORTH_LAT, mdata.getNorthmostLatitude(), 1.0E-4);
@@ -411,15 +413,15 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getStartDate()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setStartDate(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getStartDate()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setStartDate(java.util.Date)}.
 	 * @throws ParseException 
 	 */
 	@Test
 	public void testGetSetStartDate() throws ParseException {
+/*
 		final Date myStartDate = DATE_FRMT.parse(ACTUAL_START_STRING);
 		OmeMetadata mdata = new OmeMetadata();
-/*
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getStartDate());
 		mdata.setStartDate(myStartDate);
 		assertEquals(myStartDate, mdata.getStartDate());
@@ -437,15 +439,15 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getEndDate()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setEndDate(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getEndDate()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setEndDate(java.util.Date)}.
 	 * @throws ParseException 
 	 */
 	@Test
 	public void testGetSetEndDate() throws ParseException {
+/*
 		final Date myEndDate = DATE_FRMT.parse(ACTUAL_END_STRING);
 		OmeMetadata mdata = new OmeMetadata();
-/*
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndDate());
 		mdata.setEndDate(myEndDate);
 		assertEquals(myEndDate, mdata.getEndDate());
@@ -464,8 +466,8 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#getOrigDataRef()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#setOrigDataRef(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#getOrigDataRef()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#setOrigDataRef(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetOrigDataRef() {
@@ -490,8 +492,8 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.ome#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#equals(java.lang.Object)}.
 	 * @throws ParseException 
 	 */
 	@Test
@@ -600,7 +602,7 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#assignFromOmeXmlDoc(org.jdom2.Document)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#assignFromOmeXmlDoc(org.jdom2.Document)}.
 	 * @throws IOException 
 	 * @throws JDOMException 
 	 */
@@ -629,7 +631,7 @@ public class OmeMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome#createMinimalOmeXmlDoc()}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#createMinimalOmeXmlDoc()}.
 	 * @throws IOException 
 	 * @throws JDOMException 
 	 */
@@ -655,4 +657,41 @@ public class OmeMetadataTest {
 */
 	}
 	
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.ome.OmeMetadata#createSocatMetadata()}.
+	 * @throws IOException 
+	 * @throws JDOMException 
+	 */
+	@Test
+	public void testCreateSocatMetadata() throws IOException, JDOMException {
+		final String uploadTimestamp = "2012-04-23 11:24 -0800";
+		final Double socatVersion = 3.0;
+		final String addlDocs = "addlDoc1.doc ; addlDoc2.pdf";
+		final LinkedHashSet<String> addlDocsSet = 
+				new LinkedHashSet<String>(Arrays.asList(addlDocs.split(" ; ")));
+		final String qcFlag = "C";
+
+		Document omeDoc = (new SAXBuilder()).build(
+				new ByteArrayInputStream(ACTUAL_OME_XML.getBytes()));
+		OmeMetadata mdata = new OmeMetadata();
+		mdata.setExpocode(ACTUAL_EXPOCODE);
+		mdata.setUploadTimestamp(uploadTimestamp);
+		mdata.assignFromOmeXmlDoc(omeDoc);
+		SocatMetadata socatMData = mdata.createSocatMetadata(socatVersion, addlDocsSet, qcFlag);
+		assertEquals(socatVersion, socatMData.getSocatVersion(), 1.0E-4);
+		assertEquals(addlDocs, socatMData.getAddlDocs());
+		assertEquals(ACTUAL_EXPOCODE, socatMData.getExpocode());
+		assertEquals(ACTUAL_CRUISE_NAME, socatMData.getCruiseName());
+		assertEquals(ACTUAL_VESSEL_NAME, socatMData.getVesselName());
+		assertEquals(ACTUAL_INVESTIGATORS_STRING, socatMData.getScienceGroup());
+		assertEquals(ACTUAL_ORGANIZATIONS_STRING, socatMData.getOrganization());
+		assertEquals(ACTUAL_WEST_LON, socatMData.getWestmostLongitude(), 1.0E-6);
+		assertEquals(ACTUAL_EAST_LON, socatMData.getEastmostLongitude(), 1.0E-6);
+		assertEquals(ACTUAL_SOUTH_LAT, socatMData.getSouthmostLatitude(), 1.0E-6);
+		assertEquals(ACTUAL_NORTH_LAT, socatMData.getNorthmostLatitude(), 1.0E-6);
+		assertEquals(ACTUAL_START_STRING, DATE_FRMT.format(socatMData.getBeginTime()));
+		assertEquals(ACTUAL_END_STRING, DATE_FRMT.format(socatMData.getEndTime()));
+		assertEquals(ACTUAL_ORIG_DATA_REF, socatMData.getOrigDataRef());
+	}
+
 }
