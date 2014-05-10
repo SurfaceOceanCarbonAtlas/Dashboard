@@ -53,14 +53,6 @@ class OMECompositeVariable {
 		return elem;
 	}
 	
-	private Value getNextValue() {
-		if (null == itsValuesIterator) {
-			itsValuesIterator = itsValues.iterator();
-		}
-		
-		return itsValuesIterator.next();
-	}
-	
 	protected String getValue(String valueName) {
 		String result = "";
 		
