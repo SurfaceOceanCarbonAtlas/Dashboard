@@ -32,6 +32,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	private static final String METADATA_INFOFILE_SUFFIX = ".properties";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String METADATA_OWNER_ID = "metadataowner";
+	private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
 
 	/**
 	 * Handles storage and retrieval of metadata files 
@@ -383,6 +384,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Owner
 		value = metaProps.getProperty(METADATA_OWNER_ID);
 		metadata.setOwner(value);
+		// Conflicted flag
+		value = metaProps.getProperty(METADATA_CONFLICTED_ID);
+		metadata.setConflicted(Boolean.valueOf(value));
 
 		return metadata;
 	}
@@ -418,6 +422,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		metaProps.setProperty(UPLOAD_TIMESTAMP_ID, metadata.getUploadTimestamp());
 		// Owner 
 		metaProps.setProperty(METADATA_OWNER_ID, metadata.getOwner());
+		// Conflicted flag
+		metaProps.setProperty(METADATA_CONFLICTED_ID, Boolean.toString(metadata.isConflicted()));
 		// Save the properties to the metadata properties file
 		try {
 			FileWriter propsWriter = new FileWriter(propsFile);
