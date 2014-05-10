@@ -1174,7 +1174,30 @@ public class OmeMetadata extends DashboardMetadata {
 		return scMData;
 	}
 	
-	
+	/**
+	 * Some elements of the OME XML have a single child. This is a shortcut method to
+	 * extract the element and its child in one step. For example, there are a set of
+	 * elements like this:
+	 * 
+	 * {@code 		<pCO2water_equ_wet>
+			<Unit></Unit>
+		</pCO2water_equ_wet>
+		<pCO2water_SST_wet>
+			<Unit></Unit>
+		</pCO2water_SST_wet>}
+
+	 * This method allows the parent and child elements to be processed in one call.
+	 * 
+	 * The two elements are known as the element ({@code <pCO2water_equ_wet>}) and
+	 * the subElement ({@code <Unit>}). The parent element is the element at the level
+	 * above these.
+	 * 
+	 * @param parentPath The Path object representing the parent element
+	 * @param parentElement The XML elemenet of the parent
+	 * @param elementName The name of the element
+	 * @param subElementName The name of the sub-element
+	 * @return The variable containing details of the extracted sub-element
+	 */
 	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName) {
 		Path path = new Path(parentPath, elementName);
 	
@@ -1188,6 +1211,14 @@ public class OmeMetadata extends DashboardMetadata {
 		return new OMEVariable(path, subElement, subElementName);
 	}
 	
+	/**
+	 * This method constructs an XML Element object for a variable that
+	 * represents a single sub-element (see {@link #extractSubElement(Path, Element, String, String)}
+	 * for details of these special elements).
+	 * 
+	 * @param variable The variable object
+	 * @return The XML element containing its sub-element.
+	 */
 	private Element buildSubElement(OMEVariable variable) {
 		Path varPath = variable.getPath();
 		Element elem = new Element(varPath.getParent().getElementName());
