@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/netcdfAll-4.3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mysql-connector-java-5.1.17.jar"/>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT"/>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
