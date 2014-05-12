@@ -255,6 +255,76 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
+	 * Retrieves the actual name for a reviewer from the Reviewers table
+	 * using the reviewer's username.
+	 * 
+	 * @param username
+	 * 		username for a reviewer
+	 * @return
+	 * 		actual name of the reviewer
+	 * @throws SQLException
+	 * 		if accessing the database throws one 
+	 */
+	public String getReviewerRealname(String username) throws SQLException {
+		String realname = null;
+		Connection catConn = makeConnection(false);
+		try {
+			PreparedStatement prepStmt = catConn.prepareStatement(
+					"SELECT `realname` FROM `Reviewers` WHERE `username` = ?");
+			prepStmt.setString(1, username);
+			ResultSet results = prepStmt.executeQuery();
+			try {
+				while ( results.next() ) {
+					if ( realname != null ) 
+						throw new SQLException(
+								"More than one realname for " + username);
+					realname = results.getString(1);
+				}
+			} finally {
+				results.close();
+			}
+		} finally {
+			catConn.close();
+		}
+		return realname;
+	}
+
+	/**
+	 * Retrieves the username for a reviewer from the Reviewers table
+	 * using the reviewer's actual name.
+	 * 
+	 * @param realname
+	 * 		actual name of the reviewer
+	 * @return
+	 * 		username for a reviewer
+	 * @throws SQLException
+	 * 		if accessing the database throws one 
+	 */
+	public String getReviewerUsername(String realname) throws SQLException {
+		String username = null;
+		Connection catConn = makeConnection(false);
+		try {
+			PreparedStatement prepStmt = catConn.prepareStatement(
+					"SELECT `username` FROM `Reviewers` WHERE `realname` = ?");
+			prepStmt.setString(1, realname);
+			ResultSet results = prepStmt.executeQuery();
+			try {
+				while ( results.next() ) {
+					if ( username != null ) 
+						throw new SQLException(
+								"More than one username for " + realname);
+					username = results.getString(1);
+				}
+			} finally {
+				results.close();
+			}
+		} finally {
+			catConn.close();
+		}
+		return username;
+	}
+
+	/**
 	 * Adds a new QC event for a dataset.
 	 * 
 	 * @param qcEvent
