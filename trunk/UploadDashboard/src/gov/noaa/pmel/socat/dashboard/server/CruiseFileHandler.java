@@ -228,6 +228,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * Cruise Expocode :
 	 * Cruise Expocode =
 	 * </pre>
+	 * Alternatively, the expocode can be given in an expocode data column.
+	 * In this case, only the first expocode in the column is used.
+	 * 
 	 * The first line containing at least {@value #MIN_NUM_DATA_COLUMNS}
 	 * tab- or comma-separated (depending on dataForm) non-blank values 
 	 * will be taken to be the line of data column headers.  No data 
@@ -265,15 +268,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		if reading from cruiseReader throws one,
 	 * 		if there is a blank data column header, 
 	 * 		if there is an inconsistent number of data values, 
-	 * 		if there are no data columns recognized, or
-	 * 		if the dataFormat string is not recognized. 
+	 * 		if there are no data columns recognized, 
+	 * 		if the dataFormat string is not recognized, or
+	 * 		if different expocodes are given in the header and in a column 
 	 */
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
 			String dataFormat, BufferedReader cruiseReader, int firstDataRow, 
 			int numDataRows, boolean assignCruiseInfo) throws IOException {
-		boolean expocodeFound = false;
-		int numDataColumns = 0;
-
 		String separator;
 		if ( DashboardUtils.CRUISE_FORMAT_TAB.equals(dataFormat) )
 			separator = "\t";
@@ -287,39 +288,43 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		preamble.clear();
 
 		// Read the metadata preamble
+		boolean expocodeFound = false;
+		int numDataColumns = 0;
 		String dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
 			// Check if we have gotten to non-blank header values 
 			String[] datavals = dataline.split(separator, -1);
-			if ( (   datavals.length >= MIN_NUM_DATA_COLUMNS ) &&
-				 ( ! datavals[0].trim().isEmpty() ) &&
-				 ( ! datavals[1].trim().isEmpty() ) &&
-				 ( ! datavals[2].trim().isEmpty() ) &&
-				 ( ! datavals[3].trim().isEmpty() ) &&
-				 ( ! datavals[4].trim().isEmpty() ) &&
-				 ( ! datavals[5].trim().isEmpty() ) ) {
-				// These are the column headers;
+			if ( datavals.length >= MIN_NUM_DATA_COLUMNS ) {
+				// These could be the column headers;
 				// clean them up and make sure there are no blank values
+				numDataColumns = 0;
 				for (int k = 0; k < datavals.length; k++) {
+					numDataColumns++;
 					datavals[k] = datavals[k].trim();
 					if ( datavals[k].isEmpty() )
-						throw new IOException("Data column header " + 
-												(k+1) + " is blank");
+						break;
 				}
-				numDataColumns = datavals.length;
-				if ( assignCruiseInfo ) {
-					// Just directly add the column names to the list in cruiseData
-					ArrayList<String> colNames = cruiseData.getUserColNames();
-					colNames.clear();
-					colNames.addAll(Arrays.asList(datavals));
+				if ( numDataColumns == datavals.length ) {
+					// These indeed are the column headers
+					if ( assignCruiseInfo ) {
+						// Just directly add the column names to the list in cruiseData
+						ArrayList<String> colNames = cruiseData.getUserColNames();
+						colNames.clear();
+						colNames.addAll(Arrays.asList(datavals));
+					}
+					else if ( cruiseData.getUserColNames().size() != numDataColumns ) {
+						throw new IOException("Unexpected number of data columns (" + 
+								numDataColumns + " instead of " + 
+								cruiseData.getUserColNames().size()  + ")");
+					}
+					// Treat the rest of the lines as data value lines
+					break;
 				}
-				else if ( cruiseData.getUserColNames().size() != numDataColumns ) {
-					throw new IOException("Unexpected number of data columns (" + 
-							numDataColumns + " instead of " + 
-							cruiseData.getUserColNames().size()  + ")");
+				else if ( numDataColumns > MIN_NUM_DATA_COLUMNS ) {
+					// Blank header after MIN_NUM_DATA_COLUMNS non-blank headers
+					throw new IOException("Data column header " + 
+										numDataColumns + " is blank");
 				}
-				// Treat the rest of the lines as tab-separated data value lines
-				break;
 			}
 			if ( ! dataline.trim().isEmpty() ) {
 				if ( ! expocodeFound ) {
@@ -353,6 +358,45 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IOException(
 					"No data columns found, possibly due to incorrect format");
 
+		// Get the next non-blank line;
+		// probably data but maybe a second header line with units
+		dataline = cruiseReader.readLine();
+		while ( (dataline != null) && dataline.trim().isEmpty() ) {
+			dataline = cruiseReader.readLine();
+		}
+		if ( dataline != null ) {
+			String[] datavals = dataline.split(separator, -1);
+			if ( datavals.length != numDataColumns )
+				throw new IOException("Inconsistent number of data columns (" + 
+						datavals.length + " instead of " + numDataColumns + 
+						") in \n" + dataline);
+			// Check if there is anything numeric (thus not a units header)
+			boolean hasNumber = false;
+			for (String strVal : datavals) {
+				try {
+					Double.valueOf(strVal);
+					hasNumber = true;
+					break;
+				} catch (NumberFormatException ex) {
+					continue;
+				}
+			}
+			if ( ! hasNumber ) {
+				// The current data line is a second header line of units
+				if ( assignCruiseInfo ) {
+					// Add the units to the column header names
+					ArrayList<String> colNames = cruiseData.getUserColNames();
+					for (int k = 0; k < colNames.size(); k++) {
+						String units = datavals[k].trim();
+						if ( ! units.isEmpty() )
+							colNames.set(k, colNames.get(k) + " [" + units + "]");
+					}
+				}
+				// Go to the next line which now must be data
+				dataline = cruiseReader.readLine();
+			}
+		}
+
 		if ( assignCruiseInfo ) {
 			// Assign the data column types, units, and missing values 
 			// from the data column names
@@ -378,8 +422,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				woceFlags.add(new HashSet<Integer>());
 		}
 
-		// Read the tab-separated column values
-		// Just directly add them to the list in cruiseData
+		// Read the data column values;
+		// just directly add them to the list in cruiseData
 		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
 		dataValues.clear();
 		if ( numDataRows == 0 ) {
@@ -388,7 +432,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			return;
 		}
 		int dataRowNum = 0;
-		dataline = cruiseReader.readLine();
 		while ( dataline != null ) {
 			// Ignore blank lines
 			if ( ! dataline.trim().isEmpty() ) {
@@ -410,6 +453,27 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 		if ( assignCruiseInfo )
 			cruiseData.setNumDataRows(dataValues.size());
+
+		// Check if there was an expocode column
+		String expocode = "";
+		ArrayList<DataColumnType> colTypes = cruiseData.getDataColTypes();
+		for (int k = 0; k < colTypes.size(); k++) {
+			if ( DataColumnType.EXPOCODE.equals(colTypes.get(k)) ) {
+				expocode = cruiseData.getDataValues().get(0).get(k)
+									 .trim().toUpperCase();
+				break;
+			}
+			k++;
+		}
+		if ( ! expocode.isEmpty() ) {
+			if ( assignCruiseInfo && ! expocodeFound ) {
+				cruiseData.setExpocode(expocode);
+			}
+			else if ( ! expocode.equals(cruiseData.getExpocode()) ){
+				throw new IOException("First expocode given in the expocode data " +
+						"column does not match the expocode given for the dataset");
+			}
+		}
 	}
 
 	/**
