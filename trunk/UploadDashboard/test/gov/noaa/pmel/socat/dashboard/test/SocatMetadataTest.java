@@ -535,7 +535,8 @@ public class SocatMetadataTest {
 		assertTrue( mdata.equals(other) );
 
 		mdata.setSocatVersion(SOCAT_VERSION);
-		assertFalse( mdata.hashCode() == other.hashCode() );
+		// SOCAT version is ignored in hashCode (floating point value)
+		assertTrue( mdata.hashCode() == other.hashCode() );
 		assertFalse( mdata.equals(other) );
 		other.setSocatVersion(SOCAT_VERSION);
 		assertEquals(mdata.hashCode(), other.hashCode());
