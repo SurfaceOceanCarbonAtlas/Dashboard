@@ -9,15 +9,15 @@ public class DayOfYearConverter extends SpecifiedUnitsConverter {
 
 	public DayOfYearConverter() {
 		itsSupportedUnits = new ArrayList<String>();
-		itsSupportedUnits.add("Jan1=1.0");
-		itsSupportedUnits.add("Jan1=0.0");
+		itsSupportedUnits.add("jan1=1.0");
+		itsSupportedUnits.add("jan1=0.0");
 	}
 	
 	@Override
 	public String convert(String value, String units) throws ConversionException {
 		String result = value;
 		
-		if (units.equalsIgnoreCase("Jan1=0.0")) {
+		if (units.equalsIgnoreCase("jan1=0.0")) {
 			try {
 				Double doubleValue = Double.parseDouble(value);
 				result = Double.toString(doubleValue + 1.0);
