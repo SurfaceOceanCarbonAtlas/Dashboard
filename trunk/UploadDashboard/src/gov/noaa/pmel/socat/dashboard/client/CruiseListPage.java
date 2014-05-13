@@ -135,8 +135,8 @@ public class CruiseListPage extends Composite {
 			"for removal from your personal list of datasets.";
 
 	private static final String NO_METADATA_HTML_PROLOGUE = 
-			"The following data sets do not have appropriate metadata" +
-			"and thus cannot be submitted for QC: <ul>";
+			"The following data sets do not have appropriate metadata " +
+			"and cannot be submitted for QC: <ul>";
 	private static final String NO_METADATA_HTML_EPILOGUE = 
 			"</ul>";
 	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
@@ -150,7 +150,7 @@ public class CruiseListPage extends Composite {
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
 			"</ul> These data sets can be submitted for QC, " +
-			"but will be given a QC Flag F when added.  " +
+			"but a QC Flag F will be recommended when added.  " +
 			"Do you want to continue? ";
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
