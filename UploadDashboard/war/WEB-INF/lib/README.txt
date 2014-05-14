@@ -12,4 +12,5 @@ The jar files:
 were obtained from the SVNKit (version 1.7.11) site http://svnkit.com/
 The jar file netcdfAll-4.3.jar was obtained from the Unidata netCDF downloads site http://www.unidata.ucar.edu/downloads/netcdf/
 The jar file mysql-connector-java-5.1.17.jar was obtained as part of the RHEL-6 distribution, but can be obtained from https://dev.mysql.com/downloads/connector/j/
-(The jar file sanitychecker.jar is built as part of this project and added to this location.)
+The jar file org.moxieapps.gwt.uploader-1.1.0.jar was obtained from the MoxieGroup site http://www.moxiegroup.com/moxieapps/gwt-uploader/download.jsp
+The jar file sanitychecker.jar is built as part of this project and added to this location.
