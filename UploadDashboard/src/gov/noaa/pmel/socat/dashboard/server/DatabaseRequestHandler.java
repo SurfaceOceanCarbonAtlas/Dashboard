@@ -459,7 +459,7 @@ public class DatabaseRequestHandler {
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"INSERT INTO `WOCEEvents` (`woce_flag`, `woce_time`, " +
 					"`expocode`, `socat_version`, `data_type`, " +
-					"`data_name`, `reviewer_id`, `qc_comment`) " +
+					"`data_name`, `reviewer_id`, `woce_comment`) " +
 					"VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
 			prepStmt.setString(1, woceEvent.getFlag().toString());
 			Date flagDate = woceEvent.getFlagDate();

@@ -54,9 +54,14 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	MINUTE, 
 	SECOND, 
 	/**
-	 * DAY_OF_YEAR is floating point with time
+	 * DAY_OF_YEAR is possibly floating point with time.
 	 */
 	DAY_OF_YEAR,
+	/**
+	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
+	 * be used to specify date and time.
+	 */
+	SECOND_OF_DAY,
 
 	LONGITUDE, 
 	LATITUDE, 
@@ -139,9 +144,17 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	 */
 	OTHER,
 	/**
-	 * FCO2_REC_WOCE is for transferring the fCO2_rec WOCE flag from SOCAT v2.
-	 * Since fCO2_REC is a computed field and not user-supplied, this type is
-	 * not available for normal user-specification of column types.
+	 * FCO2_REC is for the recommended recomputed fCO2 values column.  
+	 * Setting a WOCE flag on this column prevents any recalculation of
+	 * the recommended recomputed fCO2 value.  Since this is a computed 
+	 * field and not user-supplied, this type is not available for normal 
+	 * user-specification of column types.
 	 */
-	FCO2_REC_WOCE
+	FCO2_REC,
+	/**
+	 * FCO2_REC_WOCE is for transferring the fCO2_rec WOCE flag from SOCAT v2.
+	 * Since fCO2_REC is a computed field and not user-supplied, FCO2_REC_WOCE 
+	 * is not available for normal user-specification of column types.
+	 */
+	FCO2_REC_WOCE,
 }

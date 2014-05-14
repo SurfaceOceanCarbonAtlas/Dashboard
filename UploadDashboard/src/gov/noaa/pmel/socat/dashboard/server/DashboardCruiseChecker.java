@@ -61,6 +61,7 @@ public class DashboardCruiseChecker {
 		int minuteIndex = -1;
 		int secondIndex = -1;
 		int dayOfYearIndex = -1;
+		int secondOfDayIndex = -1;
 		int longitudeIndex = -1;
 		int latitudeIndex = -1;
 		int sampleDepthIndex = -1;
@@ -131,6 +132,7 @@ public class DashboardCruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.MINUTE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SECOND, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.DAY_OF_YEAR, DashboardUtils.DAY_OF_YEAR_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.SECOND_OF_DAY, DashboardUtils.NO_UNITS);
 
 		CHECKER_DATA_UNITS.put(DataColumnType.LONGITUDE, checkerLongitudeUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.LATITUDE, checkerLatitudeUnits);
@@ -356,6 +358,7 @@ public class DashboardCruiseChecker {
 					  colType.equals(DataColumnType.GROUP_NAME) || 
 
 					  colType.equals(DataColumnType.DAY_OF_YEAR) ||
+					  colType.equals(DataColumnType.SECOND_OF_DAY) ||
 					  colType.equals(DataColumnType.LONGITUDE) || 
 					  colType.equals(DataColumnType.LATITUDE) || 
 					  colType.equals(DataColumnType.SAMPLE_DEPTH) || 
@@ -448,6 +451,8 @@ public class DashboardCruiseChecker {
 				// Record indices of user-provided data columns that could have WOCE flags
 				if ( colType.equals(DataColumnType.DAY_OF_YEAR) )
 					colIndcs.dayOfYearIndex = k;
+				else if ( colType.equals(DataColumnType.SECOND_OF_DAY) )
+					colIndcs.secondOfDayIndex = k;
 				else if ( colType.equals(DataColumnType.LONGITUDE) )
 					colIndcs.longitudeIndex = k;
 				else if ( colType.equals(DataColumnType.LATITUDE) )
@@ -510,12 +515,10 @@ public class DashboardCruiseChecker {
 
 			}
 			else if ( colType.equals(DataColumnType.COMMENT) ||
-					  colType.equals(DataColumnType.OTHER) ) {
-				// Unchecked data that is not added to the DSG file
-				;
-			}
-			else if ( colType.equals(DataColumnType.FCO2_REC_WOCE) ) {
-				// Unchecked data that came from SOCAT v2 database
+					  colType.equals(DataColumnType.OTHER) ||
+					  colType.equals(DataColumnType.FCO2_REC) ||
+					  colType.equals(DataColumnType.FCO2_REC_WOCE) ) {
+				// Unchecked data 
 				;
 			}
 			else {
@@ -1113,6 +1116,7 @@ public class DashboardCruiseChecker {
 					rowData.set(k, Double.toString(stdVals.getLatitude()));
 				}
 				else if ( colType.equals(DataColumnType.DAY_OF_YEAR) || 
+						  colType.equals(DataColumnType.SECOND_OF_DAY) || 
 						  colType.equals(DataColumnType.SAMPLE_DEPTH) || 
 						  colType.equals(DataColumnType.SALINITY) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) || 
@@ -1188,6 +1192,7 @@ public class DashboardCruiseChecker {
 
 						  colType.equals(DataColumnType.COMMENT) ||
 						  colType.equals(DataColumnType.OTHER) ||
+						  colType.equals(DataColumnType.FCO2_REC) || 
 						  colType.equals(DataColumnType.FCO2_REC_WOCE) ) {
 					// Column types that are never modified by the sanity checker
 					// They may or may not have been checked.
