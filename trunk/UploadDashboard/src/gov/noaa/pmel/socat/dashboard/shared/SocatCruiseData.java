@@ -351,6 +351,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			String value = dataValues.get(k);
 			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
 				continue;
+			double secondOfDay = 0.0;
 			DataColumnType type = columnTypes.get(k);
 			try {
 				if ( type.equals(DataColumnType.EXPOCODE) ||
@@ -385,6 +386,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				}
 				else if ( type.equals(DataColumnType.DAY_OF_YEAR) ) {
 					this.dayOfYear = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.SECOND_OF_DAY) ) {
+					secondOfDay = Double.valueOf(value);
 				}
 				else if ( type.equals(DataColumnType.LONGITUDE) ) {
 					this.longitude = Double.valueOf(value);
@@ -554,6 +558,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				else if ( type.equals(DataColumnType.FCO2_REC_WOCE) ) {
 					this.fCO2RecWoce = value.charAt(0);
 				}
+				else if ( type.equals(DataColumnType.FCO2_REC) ) {
+					// Ignore the value - it will be recalculated
+					;
+				}
 				else {
 					throw new IllegalArgumentException(
 							"Unexpected data column type of " + type.name());
@@ -563,6 +571,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 						value + "' as a value of type " + type.name() + 
 						"\n    " + ex.getMessage());
 			}
+			// Add any second-of-day value to the day-of-year value
+			this.dayOfYear += secondOfDay / (24.0 * 60.0 * 60.0);
 		}
 	}
 
@@ -617,6 +627,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				 colType.equals(DataColumnType.MINUTE) ||
 				 colType.equals(DataColumnType.SECOND) ||
 				 colType.equals(DataColumnType.DAY_OF_YEAR) ||
+				 colType.equals(DataColumnType.SECOND_OF_DAY) || 
 				 colType.equals(DataColumnType.LONGITUDE) || 
 				 colType.equals(DataColumnType.LATITUDE) ) {
 				for ( Integer rowIdx : woceThrees.get(k) ) {

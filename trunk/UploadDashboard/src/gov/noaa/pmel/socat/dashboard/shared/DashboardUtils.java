@@ -105,6 +105,7 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.MINUTE, "minute");
 		STD_HEADER_NAMES.put(DataColumnType.SECOND, "second");
 		STD_HEADER_NAMES.put(DataColumnType.DAY_OF_YEAR, "day_of_year");
+		STD_HEADER_NAMES.put(DataColumnType.SECOND_OF_DAY, "sec_of_day");
 
 		STD_HEADER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
 		STD_HEADER_NAMES.put(DataColumnType.LATITUDE, "latitude");
@@ -230,6 +231,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.MINUTE, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SECOND, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DAY_OF_YEAR, DAY_OF_YEAR_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SECOND_OF_DAY, NO_UNITS);
 
 		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, LONGITUDE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.LATITUDE, LATITUDE_UNITS);
