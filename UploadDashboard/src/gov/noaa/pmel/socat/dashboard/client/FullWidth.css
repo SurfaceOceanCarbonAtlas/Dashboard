@@ -265,13 +265,20 @@ body {
 	margin: 2em;
 }
 
-.uploadpanel {
+.uploaderpanel {
 	display: block;
-	width: 4em;
-	padding-left: 1.5em;
-	padding-right: 1.5em;
+	margin-left: 1.5em;
+	margin-right: 1.5em;
 }
-.uploadpanelbutton {
+.uploader {
+	display: block;
 	margin-top: 1.5em;
+	margin-bottom: 0.5em;
+}
+.uploaderprogress {
+	display: block;
+	margin-top: 0.5em;
 	margin-bottom: 1.5em;
+	margin-left: 1.5em;
+	margin-right: 1.5em;
 }

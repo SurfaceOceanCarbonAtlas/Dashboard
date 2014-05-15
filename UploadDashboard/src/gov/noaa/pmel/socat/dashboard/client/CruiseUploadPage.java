@@ -8,10 +8,16 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
 
+import org.moxieapps.gwt.uploader.client.Uploader;
+import org.moxieapps.gwt.uploader.client.events.UploadCompleteEvent;
+import org.moxieapps.gwt.uploader.client.events.UploadCompleteHandler;
+import org.moxieapps.gwt.uploader.client.events.UploadProgressEvent;
+import org.moxieapps.gwt.uploader.client.events.UploadProgressHandler;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -19,13 +25,8 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -132,14 +133,8 @@ public class CruiseUploadPage extends Composite {
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField FormPanel uploadForm;
-	@UiField FileUpload cruiseUpload;
-	@UiField Hidden usernameToken;
-	@UiField Hidden passhashToken;
-	@UiField Hidden timestampToken;
-	@UiField Hidden actionToken;
-	@UiField Hidden encodingToken;
-	@UiField Hidden formatToken;
+	@UiField Uploader filesUploader;
+	@UiField Label progressLabel;
 	@UiField CaptionPanel settingsPanel;
 	@UiField RadioButton commaRadio;
 	@UiField RadioButton tabRadio;
@@ -157,6 +152,7 @@ public class CruiseUploadPage extends Composite {
 
 	private String username;
 	private boolean advancedShown; 
+	private boolean continueUpload;
 
 	// Singleton instance of this page
 	private static CruiseUploadPage singleton = null;
@@ -175,9 +171,29 @@ public class CruiseUploadPage extends Composite {
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
-		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
-		uploadForm.setMethod(FormPanel.METHOD_POST);
-		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
+		filesUploader.setUploadURL(GWT.getModuleBaseURL() + "CruiseUploadService");
+		filesUploader.setUploadProgressHandler(new UploadProgressHandler() {
+			@Override
+			public boolean onUploadProgress(UploadProgressEvent evnt) {
+				// Update the progress label
+				progressLabel.setText("File " + evnt.getFile().getName() + " " + 
+						NumberFormat.getPercentFormat().format(
+								evnt.getBytesComplete() / (double) evnt.getBytesTotal()) + 
+						" complete");
+				return true;
+			}
+		});
+		filesUploader.setUploadCompleteHandler(new UploadCompleteHandler() {
+			@Override
+			public boolean onUploadComplete(UploadCompleteEvent uploadCompleteEvent) {
+				progressLabel.setText("");
+				if ( continueUpload ) {
+					// start the next file upload, if 
+					filesUploader.startUpload();
+				}
+				return true;
+			}
+		});
 
 		settingsPanel.setCaptionText(SETTINGS_CAPTION_TEXT);
 
@@ -218,15 +234,11 @@ public class CruiseUploadPage extends Composite {
 		singleton.username = DashboardLoginPage.getUsername();
 		singleton.userInfoLabel.setText(WELCOME_INTRO + 
 				singleton.username);
-		singleton.usernameToken.setValue("");
-		singleton.passhashToken.setValue("");
-		singleton.timestampToken.setValue("");
-		singleton.actionToken.setValue("");
-		singleton.encodingToken.setValue("");
-		singleton.formatToken.setValue("");
+		singleton.clearPostOptions();
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
 		singleton.encodingListBox.setSelectedIndex(2);
 		singleton.hideAdvancedOptions();
+		singleton.continueUpload = true;
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
 	}
@@ -246,6 +258,7 @@ public class CruiseUploadPage extends Composite {
 			DashboardLoginPage.showPage(true);
 		}
 		else {
+			singleton.continueUpload = true;
 			SocatUploadDashboard.updateCurrentPage(singleton);
 			if ( addToHistory )
 				History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
@@ -270,6 +283,42 @@ public class CruiseUploadPage extends Composite {
 		advancedShown = true;
 	}
 
+	/**
+	 * Sets the POST parameters contained in filesUploader.
+	 * 
+	 * @param action
+	 * 		cruiseaction value to assign
+	 */
+	private void assignPostOptions(String action) {
+		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
+											  .format(new Date());
+		String encoding = KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()];
+		String format;
+		if ( commaRadio.getValue() )
+			format = DashboardUtils.CRUISE_FORMAT_COMMA;
+		else
+			format = DashboardUtils.CRUISE_FORMAT_TAB;
+
+		filesUploader.setOption("/post_params/username", DashboardLoginPage.getUsername());
+		filesUploader.setOption("/post_params/passhash", DashboardLoginPage.getPasshash());
+		filesUploader.setOption("/post_params/timestamp", localTimestamp);
+		filesUploader.setOption("/post_params/cruiseaction", action);
+		filesUploader.setOption("/post_params/cruiseencoding", encoding);
+		filesUploader.setOption("/post_params/cruiseformat", format); 
+	}
+
+	/**
+	 * Clears the POST parameters contained in filesUploader.
+	 */
+	private void clearPostOptions() {
+		filesUploader.setOption("/post_params/username", "");
+		filesUploader.setOption("/post_params/passhash", "");
+		filesUploader.setOption("/post_params/timestamp", "");
+		filesUploader.setOption("/post_params/cruiseaction", "");
+		filesUploader.setOption("/post_params/cruiseencoding", "");
+		filesUploader.setOption("/post_params/cruiseformat", ""); 
+	}
+
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
@@ -285,45 +334,31 @@ public class CruiseUploadPage extends Composite {
 
 	@UiHandler("previewButton") 
 	void previewButtonOnClick(ClickEvent event) {
-		// Assign the "hidden" values
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
-		timestampToken.setValue(localTimestamp);
-		actionToken.setValue(DashboardUtils.REQUEST_PREVIEW_TAG);
-		encodingToken.setValue(
-				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
-		if ( commaRadio.getValue() )
-			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_COMMA);
-		else
-			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_TAB);
+		// Check if any files have been selected
+		if ( filesUploader.getStats().getFilesQueued() < 1 ) {
+			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			return;
+		}
+		// Assign the additional POST options
+		assignPostOptions(DashboardUtils.REQUEST_PREVIEW_TAG);
 		// Submit the form
-		uploadForm.submit();
+		filesUploader.startUpload();
 	}
 
 	@UiHandler("submitButton") 
 	void createButtonOnClick(ClickEvent event) {
-		// Assign the "hidden" values
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
-		timestampToken.setValue(localTimestamp);
+		// Check if any files have been selected
+		if ( filesUploader.getStats().getFilesQueued() < 1 ) {
+			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			return;
+		}
+		// Assign the additional POST options
 		if ( overwriteRadio.getValue() )
-			actionToken.setValue(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
+			assignPostOptions(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
 		else
-			actionToken.setValue(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
-		encodingToken.setValue(
-				KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()]);
-		if ( commaRadio.getValue() )
-			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_COMMA);
-		else
-			formatToken.setValue(DashboardUtils.CRUISE_FORMAT_TAB);
+			assignPostOptions(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
 		// Submit the form
-		uploadForm.submit();
+		filesUploader.startUpload();
 	}
 
 	@UiHandler("cancelButton")
@@ -332,16 +367,7 @@ public class CruiseUploadPage extends Composite {
 		CruiseListPage.showPage(false);
 	}
 
-	@UiHandler("uploadForm")
-	void uploadFormOnSubmit(SubmitEvent event) {
-		// Make sure a file was selected
-		String cruiseFilename = cruiseUpload.getFilename();
-		if ( (cruiseFilename == null) || cruiseFilename.trim().isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
-			event.cancel();
-		}
-	}
-
+/*
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
 		// Clear the "hidden" values
@@ -453,5 +479,6 @@ public class CruiseUploadPage extends Composite {
 			SocatUploadDashboard.showMessage(UNKNOWN_FAIL_MSG);
 		}
 	}
+*/
 
 }
