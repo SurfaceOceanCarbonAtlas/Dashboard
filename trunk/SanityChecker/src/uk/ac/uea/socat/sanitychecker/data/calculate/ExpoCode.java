@@ -24,14 +24,19 @@ public class ExpoCode implements DataCalculator {
 		try {
 			String result = null;
 			
+			MetadataItem expocode = metadata.get("expocode");
 			MetadataItem shipCode = metadata.get("nodccode");
 			MetadataItem startDate = metadata.get("startdate");
 			
-			if (null == shipCode || null == startDate) {
-				Message message = new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Cannot calculate EXPO Code: Ship Code or Start Date are missing from metadata");
-				record.addMessage(message);
-			} else { 
-				result = shipCode.getValue(dateTimeHandler) + startDate.getValue(dateTimeHandler);
+			if (null != expocode) {
+				result = expocode.getValue(dateTimeHandler);
+			} else {
+				if (null == shipCode || null == startDate) {
+					Message message = new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Cannot calculate EXPO Code: Ship Code or Start Date are missing from metadata");
+					record.addMessage(message);
+				} else { 
+					result = shipCode.getValue(dateTimeHandler) + startDate.getValue(dateTimeHandler);
+				}
 			}
 			
 			return result;
