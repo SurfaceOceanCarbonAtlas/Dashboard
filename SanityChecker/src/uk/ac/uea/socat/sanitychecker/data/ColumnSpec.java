@@ -104,7 +104,25 @@ public class ColumnSpec {
 	 */
 	public static final String SECOND_ELEMENT = "second";
 	
+	/**
+	 * The name of the element containing the details for the year column in a year/day/second setup
+	 */
+	public static final String YDS_YEAR_ELEMENT = "yds_year";
+
+	/**
+	 * The name of the element containing the details for the year column in a year/day/second setup
+	 */
+	public static final String YDS_DAY_ELEMENT = "yds_day";
+
+	/**
+	 * The name of the element containing the details for the year column in a year/day/second setup
+	 */
+	public static final String YDS_SECOND_ELEMENT = "yds_second";
 	
+	/**
+	 * The name of the element that states which number represents the 1st January
+	 */
+	public static final String JAN_FIRST_INDEX_ELEMENT = "jan_first_index";
 	
 	/**
 	 * Lookup table of column specifications for non-date columns
