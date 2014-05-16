@@ -1,12 +1,14 @@
 package uk.ac.uea.socat.sanitychecker.data;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
 import org.joda.time.IllegalFieldValueException;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
@@ -34,6 +36,11 @@ public class DateColumnInfo {
 	 * Indicates that separate elements are used for each element of the date and time
 	 */
 	public static final int INDIVIDUAL_ELEMENTS_TYPE = 3;
+	
+	/**
+	 * Indicates that the date is specified as year, day, second
+	 */
+	public static final int YEAR_DAY_SECOND_TYPE = 4;
 	
 	/**
 	 * Indicates which type of date column setup is being used
@@ -86,6 +93,11 @@ public class DateColumnInfo {
 	private ColInfo itsSecondInfo = null;
 	
 	/**
+	 * Indicates which day index to use as 1st January
+	 */
+	private int itsJanFirstIndex = 0;
+	
+	/**
 	 * Takes an XML column spec date element and parses it.
 	 * @param dateElement The date element.
 	 * @param logger The program logger
@@ -109,6 +121,7 @@ public class DateColumnInfo {
 		 * 1. A single date_time element
 		 * 2. Separate date and time elements
 		 * 3. Separate y/m/d/h/m/s elements
+		 * 4. Year, Day of year, Second of day
 		 * 
 		 * We can tell which we need to do by how many child elements there are
 		 */
@@ -123,6 +136,11 @@ public class DateColumnInfo {
 		case 2:
 		{
 			processDateTimeElements(dateElement, logger);
+			break;
+		}
+		case 4:
+		{
+			processYearDaySecondElements(dateElement, logger);
 			break;
 		}
 		case 5:
@@ -210,6 +228,61 @@ public class DateColumnInfo {
 					throw new DateTimeParseException(e);
 				}
 			}
+			break;
+		}
+		case YEAR_DAY_SECOND_TYPE: {
+			
+			String yearString = dataFields.get(getYearColumnIndex() - 1);
+			String dayString = dataFields.get(getDayColumnIndex() - 1);
+			String secondString = dataFields.get(getSecondColumnIndex() - 1);
+			
+			String invalidDateMessage = "Invalid date " + yearString + " " + dayString + " " + secondString;
+			
+			if (CheckerUtils.isEmpty(yearString, dayString, secondString)) {
+				throw new MissingDateTimeElementException();
+			} else {
+				try {
+					int year = Integer.parseInt(yearString);
+					int day = Integer.parseInt(dayString);
+					int second = Integer.parseInt(secondString);
+
+					// Set the 1st Jan to day zero
+					day = day - itsJanFirstIndex;
+					
+					// Build the date, checking values as we go
+					DateTime calculationDate = new DateTime(year, 1, 1, 0, 0, 0);
+					
+					if (day < 0) {
+						throw new DateTimeParseException(invalidDateMessage);
+					} else if (calculationDate.year().isLeap() && day > 366) {
+						throw new DateTimeParseException(invalidDateMessage);
+					} else if (day > 365) {
+						throw new DateTimeParseException(invalidDateMessage);
+					}
+					
+					calculationDate = calculationDate.plusDays(day);
+					
+					if (second < 0) {
+						throw new DateTimeParseException(invalidDateMessage);
+					} else if (second > 86400) {
+						throw new DateTimeParseException(invalidDateMessage);
+					}
+					
+					calculationDate = calculationDate.plusSeconds(second);
+					
+					result = calculationDate;
+					
+					
+				} catch (NumberFormatException e) {
+					throw new DateTimeParseException(invalidDateMessage);
+				} catch (IllegalFieldValueException e) {
+					throw new DateTimeParseException(invalidDateMessage);
+				} catch (Exception e) {
+					throw new DateTimeParseException(e);
+				}
+			}
+			
+			break;
 		}
 		}
 		
@@ -256,6 +329,35 @@ public class DateColumnInfo {
 		columnName = child.getTextTrim();
 		logger.trace("Date column spec: Time column '" + columnName + "' (" + columnIndex + ")");
 		itsTimeInfo = new ColInfo(columnIndex, columnName);
+	}
+	
+	private void processYearDaySecondElements(Element parent, Logger logger) {
+		itsElementType = YEAR_DAY_SECOND_TYPE;
+		
+		int columnIndex;
+		String columnName;
+		Element child;
+		
+		child = parent.getChild(ColumnSpec.YDS_YEAR_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Year column '" + columnName + "' (" + columnIndex + ")");
+		itsYearInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YDS_DAY_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Day of Year column '" + columnName + "' (" + columnIndex + ")");
+		itsDayInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YDS_SECOND_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Second of Day column '" + columnName + "' (" + columnIndex + ")");
+		itsSecondInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.JAN_FIRST_INDEX_ELEMENT, parent.getNamespace());
+		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
 	}
 	
 	/**
@@ -333,6 +435,10 @@ public class DateColumnInfo {
 			result = itsYearInfo.index;
 			break;
 		}
+		case YEAR_DAY_SECOND_TYPE: {
+			result = itsYearInfo.index;
+			break;
+		}
 		}
 		
 		return result;
@@ -382,6 +488,10 @@ public class DateColumnInfo {
 			break;
 		}
 		case INDIVIDUAL_ELEMENTS_TYPE: {
+			result = itsDayInfo.index;
+			break;
+		}
+		case YEAR_DAY_SECOND_TYPE: {
 			result = itsDayInfo.index;
 			break;
 		}
@@ -464,6 +574,10 @@ public class DateColumnInfo {
 				result = itsSecondInfo.index;
 			else
 				result = -1;
+			break;
+		}
+		case YEAR_DAY_SECOND_TYPE: {
+			result = itsSecondInfo.index;
 			break;
 		}
 		}
