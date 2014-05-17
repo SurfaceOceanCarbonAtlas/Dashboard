@@ -100,7 +100,7 @@ public class CruiseUploadService extends HttpServlet {
 					action = item.getString();
 					item.delete();
 				}
-				else if ( "cruiseupload".equals(itemName) ) {
+				else if ( "Filedata".equals(itemName) ) {
 					cruiseItem = item;
 				}
 				else {
@@ -160,7 +160,7 @@ public class CruiseUploadService extends HttpServlet {
 			cruiseItem.delete();
 
 			// Respond with some info and the interpreted contents
-			response.setStatus(HttpServletResponse.SC_ACCEPTED);
+			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter respWriter = response.getWriter();
 			respWriter.println(DashboardUtils.FILE_PREVIEW_HEADER_TAG);
@@ -209,7 +209,7 @@ public class CruiseUploadService extends HttpServlet {
 			cruiseExists = cruiseHandler.cruiseDataFileExists(expocode);
 		} catch ( IllegalArgumentException ex ) {
 			// Invalid expocode - respond with an error message containing partial file contents
-			response.setStatus(HttpServletResponse.SC_ACCEPTED);
+			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("text/html;charset=UTF-8");
 			PrintWriter respWriter = response.getWriter();
 			respWriter.println(DashboardUtils.NO_EXPOCODE_HEADER_TAG);
@@ -247,7 +247,7 @@ public class CruiseUploadService extends HttpServlet {
 					// just report the error without data
 					existingCruiseData = null;
 				}
-				response.setStatus(HttpServletResponse.SC_ACCEPTED);
+				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter respWriter = response.getWriter();
 				if ( owner == null ) {
@@ -281,7 +281,7 @@ public class CruiseUploadService extends HttpServlet {
 			// If the cruise file does not exist, make sure the request was for a new file
 			if ( ! DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ) {
 				// Respond with an error message containing the partial file contents
-				response.setStatus(HttpServletResponse.SC_ACCEPTED);
+				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("text/html;charset=UTF-8");
 				PrintWriter respWriter = response.getWriter();
 				respWriter.println(DashboardUtils.NO_FILE_HEADER_TAG);
@@ -333,7 +333,7 @@ public class CruiseUploadService extends HttpServlet {
 		}
 
 		// Send the success response
-		response.setStatus(HttpServletResponse.SC_CREATED);
+		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();
 		if ( cruiseExists )
