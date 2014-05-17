@@ -13,31 +13,32 @@
 				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="{style.uploaderpanel}">
-				<mox:Uploader addStyleNames="{style.uploader}" ui:field="filesUploader" />
-				<g:Label addStyleNames="{style.uploaderprogress}" ui:field="progressLabel" />
-			</g:FlowPanel>
+			<mox:Uploader addStyleNames="{style.uploader}" ui:field="filesUploader" />
+			<g:ScrollPanel addStyleNames="{style.uploaderpanel}" >
+				<g:FlowPanel ui:field="filesPanel" />
+			</g:ScrollPanel>
 			<g:CaptionPanel addStyleNames="{style.captionpanel}" ui:field="settingsPanel">
 				<g:FlowPanel>
 					<g:RadioButton addStyleNames="{style.captionradiobutton}" 
 							name="formatRadioGroup" ui:field="commaRadio" />
 					<g:RadioButton addStyleNames="{style.captionradiobutton}" 
 							name="formatRadioGroup" ui:field="tabRadio" />
-					<g:Button addStyleNames="{style.advancedbutton}" ui:field="advancedButton" />
-					<!-- The following FlowPanel is only shown in advanced settings -->
-					<g:FlowPanel addStyleNames="{style.advancedpanel}" ui:field="advancedPanel">
-						<g:HTML addStyleNames="{style.introhtml}" ui:field="advancedHtml"/>
-						<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
-							<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="encodingLabel" />
-							<g:ListBox addStyleNames="{style.labeledlistbox}" ui:field="encodingListBox" />
+					<g:DisclosurePanel addStyleNames="{style.advancedpanel}" ui:field="advancedPanel">
+						<g:header>Advanced Options</g:header>
+						<g:FlowPanel>
+							<g:HTML addStyleNames="{style.introhtml}" ui:field="advancedHtml"/>
+							<g:FlowPanel addStyleNames="{style.labeledlistpanel}">
+								<g:Label addStyleNames="{style.labeledlistlabel}" ui:field="encodingLabel" />
+								<g:ListBox addStyleNames="{style.labeledlistbox}" ui:field="encodingListBox" />
+							</g:FlowPanel>
+							<g:Button addStyleNames="{style.previewbutton}" ui:field="previewButton" />
+							<g:CaptionPanel addStyleNames="{style.captionpanel}">
+								<g:ScrollPanel addStyleNames="{style.previewpanel}">
+									<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
+								</g:ScrollPanel>
+							</g:CaptionPanel>
 						</g:FlowPanel>
-						<g:Button addStyleNames="{style.advancedbutton}" ui:field="previewButton" />
-						<g:CaptionPanel addStyleNames="{style.captionpanel}">
-							<g:ScrollPanel addStyleNames="{style.previewpanel}">
-								<g:HTML addStyleNames="{style.previewhtml}" ui:field="previewHtml" />
-							</g:ScrollPanel>
-						</g:CaptionPanel>
-					</g:FlowPanel>
+					</g:DisclosurePanel>
 					<g:RadioButton addStyleNames="{style.captionradiobutton}"
 							name="actionRadioGroup" ui:field="createRadio" />
 					<g:RadioButton addStyleNames="{style.captionradiobutton}"

@@ -18,12 +18,6 @@ body {
 .advancedpanel {
 	display: block;
 }
-.advancedbutton {
-	display: block;
-	font-size: small;
-	width: 10em;
-	margin: 2em;
-}
 
 .agreepanel {
 	display: block;
@@ -87,6 +81,25 @@ body {
 .datasetsgrid {
 	margin-top: 1em;
 	margin-right: 0.5em;
+}
+
+.fileuploadpanel {
+	display: block;
+}
+.fileuploadbutton {
+	display: inline;
+	width: 8em;
+	margin-left: 2.5em;
+	margin-right: 0.5em;
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+}
+.fileuploadlabel {
+	display: inline;
+	margin-left: 0.5em;
+	margin-right: 2.5em;
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
 }
 
 .fullpagecontainer {
@@ -168,6 +181,12 @@ body {
 
 .previewpanel {
 	height: 25em;
+}
+.previewbutton {
+	display: block;
+	font-size: small;
+	width: 10em;
+	margin: 2em;
 }
 .previewhtml {
 	padding: 0.25em;
@@ -265,20 +284,19 @@ body {
 	margin: 2em;
 }
 
-.uploaderpanel {
-	display: block;
-	margin-left: 1.5em;
-	margin-right: 1.5em;
-}
 .uploader {
 	display: block;
+	background: #EEEEEE;
+	cursor: arrow;
+	margin-left: 1.5em;
+	margin-right: 1.5em;
 	margin-top: 1.5em;
 	margin-bottom: 0.5em;
 }
-.uploaderprogress {
+.uploaderpanel {
 	display: block;
+	width: 100%;
+	height: 10em;
 	margin-top: 0.5em;
 	margin-bottom: 1.5em;
-	margin-left: 1.5em;
-	margin-right: 1.5em;
 }
