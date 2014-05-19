@@ -191,12 +191,12 @@ public class CruiseUploadPage extends Composite {
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
-		filesUploader.setUploadURL(GWT.getModuleBaseURL() + "CruiseUploadService");
-		filesUploader.setButtonText("Select files to upload");
-		filesUploader.setButtonHeight(24);
-		filesUploader.setButtonWidth(160);
-		filesUploader.setButtonTextTopPadding(4);
-		filesUploader.setButtonTextLeftPadding(6);
+		filesUploader.setUploadURL(
+				GWT.getModuleBaseURL() + "CruiseUploadService");
+		filesUploader.setButtonImageURL(SocatUploadDashboard.resources
+						.getUploadButtonsPng().getSafeUri().asString());
+		filesUploader.setButtonWidth(192);
+		filesUploader.setButtonHeight(32);
 		filesUploader.setButtonCursor(Uploader.Cursor.HAND);
 		filesUploader.setFileQueuedHandler(new FileQueuedHandler() {
 			@Override
