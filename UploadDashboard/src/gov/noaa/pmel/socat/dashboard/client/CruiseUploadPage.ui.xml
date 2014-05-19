@@ -14,10 +14,12 @@
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<mox:Uploader addStyleNames="{style.uploader}" ui:field="filesUploader" />
-			<g:ScrollPanel addStyleNames="{style.uploaderpanel}" >
-				<g:FlowPanel ui:field="filesPanel" />
-			</g:ScrollPanel>
-			<g:CaptionPanel addStyleNames="{style.captionpanel}" ui:field="settingsPanel">
+			<g:CaptionPanel addStyleNames="{style.captionpanel}" ui:field="filesCaption">
+				<g:ScrollPanel addStyleNames="{style.uploaderscroll}" >
+					<g:FlowPanel ui:field="filesPanel" />
+				</g:ScrollPanel>
+			</g:CaptionPanel>
+			<g:CaptionPanel addStyleNames="{style.captionpanel}" ui:field="settingsCaption">
 				<g:FlowPanel>
 					<g:RadioButton addStyleNames="{style.captionradiobutton}" 
 							name="formatRadioGroup" ui:field="commaRadio" />
