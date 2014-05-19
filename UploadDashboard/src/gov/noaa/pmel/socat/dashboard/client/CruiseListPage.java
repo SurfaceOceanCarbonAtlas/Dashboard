@@ -213,9 +213,6 @@ public class CruiseListPage extends Composite {
 	private static CruiseListPageUiBinder uiBinder = 
 			GWT.create(CruiseListPageUiBinder.class);
 
-	private static DashboardResources resources = 
-			GWT.create(DashboardResources.class);
-
 	private static DashboardListServiceAsync service = 
 			GWT.create(DashboardListService.class);
 
@@ -264,7 +261,7 @@ public class CruiseListPage extends Composite {
 		cruiseSet = new HashSet<DashboardCruise>();
 		expocodeSet = new HashSet<String>();
 
-		titleImage.setResource(resources.getSocatCatPng());
+		titleImage.setResource(SocatUploadDashboard.resources.getSocatCatPng());
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadButton.setText(UPLOAD_TEXT);

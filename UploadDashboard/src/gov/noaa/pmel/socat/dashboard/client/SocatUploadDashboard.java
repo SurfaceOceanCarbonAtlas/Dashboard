@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -11,6 +12,9 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.UIObject;
 
 public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<String> {
+
+	public static final DashboardResources resources = 
+			GWT.create(DashboardResources.class);
 
 	/**
 	 * Enumerated type to specify pages for browser history.
