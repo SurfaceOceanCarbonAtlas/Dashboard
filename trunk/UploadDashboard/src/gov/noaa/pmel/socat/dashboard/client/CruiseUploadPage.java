@@ -57,6 +57,7 @@ public class CruiseUploadPage extends Composite {
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
+	private static final String FILES_CAPTION_TEXT = "Files to be uploaded";
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
 	private static final String COMMA_FORMAT_HELP = 
@@ -150,7 +151,8 @@ public class CruiseUploadPage extends Composite {
 	@UiField Button logoutButton;
 	@UiField FlowPanel filesPanel;
 	@UiField Uploader filesUploader;
-	@UiField CaptionPanel settingsPanel;
+	@UiField CaptionPanel filesCaption;
+	@UiField CaptionPanel settingsCaption;
 	@UiField RadioButton commaRadio;
 	@UiField RadioButton tabRadio;
 	@UiField DisclosurePanel advancedPanel;
@@ -283,7 +285,8 @@ public class CruiseUploadPage extends Composite {
 			}
 		});
 
-		settingsPanel.setCaptionText(SETTINGS_CAPTION_TEXT);
+		filesCaption.setCaptionText(FILES_CAPTION_TEXT);
+		settingsCaption.setCaptionText(SETTINGS_CAPTION_TEXT);
 
 		commaRadio.setText(DashboardUtils.CRUISE_FORMAT_COMMA);
 		commaRadio.setTitle(COMMA_FORMAT_HELP);
