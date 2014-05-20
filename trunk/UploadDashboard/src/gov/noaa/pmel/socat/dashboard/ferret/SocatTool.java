@@ -11,8 +11,10 @@ import org.jdom2.Element;
 public class SocatTool extends Thread {
 
 	FerretConfig ferret = new FerretConfig();
-	String filename;
+	String firstFilename;
+	String secondFilename;
 	String expocode;
+	FerretConfig.Action action;
 	String message;
 	boolean error;
 	boolean done;
@@ -21,16 +23,19 @@ public class SocatTool extends Thread {
 	public SocatTool(FerretConfig ferretConf) {
 	    ferret = new FerretConfig();
 	    ferret.setRootElement((Element)ferretConf.getRootElement().clone());
-	    filename = null;
+	    firstFilename = null;
+	    secondFilename = null;
 	    expocode = null;
 	    message = null;
 	    error = false;
 	    done = false;
 	}
 
-	public void init(String filename, String expocode) {
-		this.filename = filename;
+	public void init(String firstFilename, String secondFilename, String expocode, FerretConfig.Action action) {
+		this.firstFilename = firstFilename;
+		this.secondFilename = secondFilename;
 		this.expocode = expocode;
+		this.action = action;
 	}
 
 	@Override
@@ -43,18 +48,32 @@ public class SocatTool extends Thread {
 			String temp_dir = ferret.getTempDir();
 			if ( !temp_dir.endsWith(File.separator) ) temp_dir = temp_dir + "/";
 			
-			String driver = ferret.getDriverScript();
+			String driver = ferret.getDriverScript(action);
 			
 			File temp = new File(temp_dir);
 			if ( !temp.exists() ) {
 				temp.mkdirs();
 			}
 
-			File script = new File(temp_dir, "ferret_operation_" + expocode + ".jnl");			
+			File script;
+			if ( action.equals(FerretConfig.Action.COMPUTE) ) {
+				script = new File(temp_dir, "ferret_compute_" + expocode + ".jnl");
+			}
+			else if ( action.equals(FerretConfig.Action.COMPUTE) ) {
+				script = new File(temp_dir, "ferret_decimate_" + expocode + ".jnl");
+			}
+			else
+				throw new RuntimeException("Unknown action " + action.toString());
 			
 			script_writer = new PrintStream(script);
 
-			script_writer.println("go " + driver + " " + "\"" + filename + "\"");
+			if ( secondFilename == null ) {
+				script_writer.println("go " + driver + " \"" + firstFilename + "\"");
+			}
+			else {
+				script_writer.println("go " + driver + " \"" + firstFilename + "\" \"" + secondFilename + "\"");
+			}
+
 			List<String> args = ferret.getArgs();
 		    String interpreter = ferret.getInterpreter();
 		    String executable = ferret.getExecutable();

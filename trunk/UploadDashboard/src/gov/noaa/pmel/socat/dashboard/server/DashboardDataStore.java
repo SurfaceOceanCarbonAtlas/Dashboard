@@ -54,6 +54,7 @@ public class DashboardDataStore {
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
+	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
@@ -72,6 +73,7 @@ public class DashboardDataStore {
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
+			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
 			DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" + 
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
@@ -253,16 +255,21 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// Read the DSG NC files directory name
+		// Read the DSG NC files directory names
 		try {
-			propVal = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
+			String dsgFileDirName = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
+			if ( dsgFileDirName == null )
+				throw new IllegalArgumentException(DSG_NC_FILES_DIR_NAME_TAG + " not defined");
+			dsgFileDirName = dsgFileDirName.trim();
+			propVal = configProps.getProperty(DEC_DSG_NC_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
-				throw new IllegalArgumentException("value not defined");
+				throw new IllegalArgumentException(DEC_DSG_NC_FILES_DIR_NAME_TAG + " not defined");
 			propVal = propVal.trim();
-			dsgNcFileHandler = new DsgNcFileHandler(propVal);
+			dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + 
-					" value specified in " + configFile.getPath() + "\n" + 
+					" or " + DEC_DSG_NC_FILES_DIR_NAME_TAG + " value specified in " + 
+					configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the Ferret configuration filename

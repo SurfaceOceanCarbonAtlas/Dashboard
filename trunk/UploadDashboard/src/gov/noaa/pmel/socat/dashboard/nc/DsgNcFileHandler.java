@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
@@ -24,33 +25,39 @@ import java.util.TreeSet;
  */
 public class DsgNcFileHandler {
 
-	File filesDir;
+	File dsgFilesDir;
+	File decDsgFilesDir;
 
 	/**
-	 * Handles storage and retrieval of NetCDF DSG files 
-	 * under the given directory.
+	 * Handles storage and retrieval of full and decimated NetCDF DSG files 
+	 * under the given directories.
 	 * 
-	 * @param filesDirName
-	 * 		name of the directory for the NetCDF DSG files
+	 * @param dsgFilesDirName
+	 * 		name of the directory for the full NetCDF DSG files
+	 * @param decDsgFilesDirName
+	 * 		name of the directory for the decimated NetCDF DSG files
 	 * @throws IllegalArgumentException
-	 * 		if the specified directory does not exist,
-	 * 		or is not a directory
+	 * 		if the specified directories do not exist,
+	 * 		or are not directories
 	 */
-	public DsgNcFileHandler(String filesDirName) {
-		filesDir = new File(filesDirName);
-		// Check that this is a directory
-		if ( ! filesDir.isDirectory() )
+	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName) {
+		dsgFilesDir = new File(dsgFilesDirName);
+		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(
-					filesDirName + " is not a directory");
+					dsgFilesDirName + " is not a directory");
+		decDsgFilesDir = new File(decDsgFilesDirName);
+		if ( ! decDsgFilesDir.isDirectory() )
+			throw new IllegalArgumentException(
+					decDsgFilesDirName + " is not a directory");
 	}
 
 	/**
-	 * Generates the cruise-specific NetCDF DSG file for a cruise.
+	 * Generates the cruise-specific full NetCDF DSG abstract file for a cruise.
 	 * 
 	 * @param expocode
-	 * 		expocode of the cruise associated with this metadata document
+	 * 		expocode of the cruise 
 	 * @return
-	 * 		NetCDF DSG file for the cruise
+	 * 		full NetCDF DSG abstract file for the cruise
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 */
@@ -58,13 +65,32 @@ public class DsgNcFileHandler {
 		// Check and standardize the expocode
 		String expo = CruiseFileHandler.checkExpocode(expocode);
 		// Generate the full path filename for this cruise NetCDF DSG
-		File dsgNcFile = new File(filesDir, expo.substring(0,4) +
+		File dsgNcFile = new File(dsgFilesDir, expo.substring(0,4) +
 				File.separator + expo + ".nc");
 		return dsgNcFile;
 	}
 
 	/**
-	 * Saves the cruise OME metadata and cruise data into a new NetCDF DSG file.
+	 * Generates the cruise-specific decimated NetCDF DSG abstract file for a cruise.
+	 * 
+	 * @param expocode
+	 * 		expocode of the cruise
+	 * @return
+	 * 		decimated NetCDF DSG abstract file for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid
+	 */
+	public File getDecDsgNcFile(String expocode) throws IllegalArgumentException {
+		// Check and standardize the expocode
+		String expo = CruiseFileHandler.checkExpocode(expocode);
+		// Generate the full path filename for this cruise NetCDF DSG
+		File decDsgNcFile = new File(decDsgFilesDir, expo.substring(0,4) +
+				File.separator + expo + ".nc");
+		return decDsgNcFile;
+	}
+
+	/**
+	 * Saves the cruise OME metadata and cruise data into a new full NetCDF DSG file.
 	 * 
 	 * @param omeMData
 	 * 		metadata for the cruise
@@ -121,7 +147,7 @@ public class DsgNcFileHandler {
 
 		// Call Ferret to add the computed variables to the NetCDF DSG file
 		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
-		tool.init(dsgFile.getPath(), cruiseData.getExpocode());
+		tool.init(dsgFile.getPath(), null, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
 		tool.run();
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure adding computed variables: " + 
@@ -129,5 +155,39 @@ public class DsgNcFileHandler {
 
 		// TODO: ? archive ncdump of the NetCDF DSG file ?
 	}
-	
+
+	public void decimateCruise(String expocode) throws IllegalArgumentException {
+		DashboardDataStore dataStore;
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to obtain the dashboard data store");
+		}
+
+		// Get the location and name of the full DSG file
+		File dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.canRead() )
+			throw new IllegalArgumentException(
+					"Full DSG file for " + expocode + " does not exist");
+
+		// Get the location and name for the decimated DSG file
+		File decDsgFile = getDecDsgNcFile(expocode);
+		// Make sure the parent directory exists
+		File parentDir = decDsgFile.getParentFile();
+		if ( ! parentDir.exists() ) {
+			if ( ! parentDir.mkdirs() )
+				throw new IllegalArgumentException(
+						"Unexpected problems creating the new subdirectory " + 
+						parentDir.getPath());
+		}
+
+		// Call Ferret to create the decimated DSG file from the full DSG file
+		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
+		tool.init(dsgFile.getPath(), decDsgFile.getPath(), expocode, FerretConfig.Action.DECIMATE);
+		tool.run();
+		if ( tool.hasError() )
+			throw new IllegalArgumentException("Failure decimating the full DSG file: " + 
+					tool.getErrorMessage());
+	}
 }
