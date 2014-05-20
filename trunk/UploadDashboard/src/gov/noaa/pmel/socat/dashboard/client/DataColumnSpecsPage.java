@@ -177,6 +177,8 @@ public class DataColumnSpecsPage extends Composite {
 	private boolean cruiseNeverChecked;
 	// Flag indicating if a logout generated the above warnings
 	private boolean wasLoggingOut;
+	// List of cruises to be assigned once this page is dismissed
+	private ArrayList<String> expocodes;
 
 	// Singleton instance of this page
 	private static DataColumnSpecsPage singleton = null;
@@ -205,6 +207,7 @@ public class DataColumnSpecsPage extends Composite {
 
 		cruise = new DashboardCruise();
 		cruiseDataCols = new ArrayList<CruiseDataColumn>();
+		expocodes = new ArrayList<String>();
 
 		// Create the asynchronous data provider for the data grid
 		dataProvider = new AsyncDataProvider<ArrayList<String>>() {
@@ -213,6 +216,7 @@ public class DataColumnSpecsPage extends Composite {
 				// Ignore the call if there is no expocode assigned
 				if ( cruise.getExpocode().isEmpty() )
 					return;
+				SocatUploadDashboard.showWaitCursor();
 				// Get the data for the cruise from the server
 				final Range range = display.getVisibleRange();
 				service.getCruiseData(DashboardLoginPage.getUsername(), 
@@ -222,10 +226,12 @@ public class DataColumnSpecsPage extends Composite {
 					@Override
 					public void onSuccess(ArrayList<ArrayList<String>> newData) {
 						updateRowData(range.getStart(), newData);
+						SocatUploadDashboard.showAutoCursor();
 					}
 					@Override
 					public void onFailure(Throwable ex) {
 						SocatUploadDashboard.showFailureMessage(MORE_DATA_FAIL_MSG, ex);
+						SocatUploadDashboard.showAutoCursor();
 					}
 				});
 			}
@@ -243,9 +249,14 @@ public class DataColumnSpecsPage extends Composite {
 	 * @param expocode
 	 * 		show the specifications for this cruise
 	 */
-	static void showPage(String expocode) {
+	static void showPage(ArrayList<String> expocodes) {
+		if ( singleton == null )
+			singleton = new DataColumnSpecsPage();
+		singleton.expocodes.clear();
+		singleton.expocodes.addAll(expocodes);
+		SocatUploadDashboard.showWaitCursor();
 		service.getCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
-								DashboardLoginPage.getPasshash(), expocode, 
+								DashboardLoginPage.getPasshash(), expocodes.get(0), 
 								new AsyncCallback<DashboardCruiseWithData>() {
 			@Override
 			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
@@ -260,10 +271,12 @@ public class DataColumnSpecsPage extends Composite {
 					SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
 						" (unexpected null cruise column specificiations)");
 				}
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(GET_COLUMN_SPECS_FAIL_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -437,9 +450,32 @@ public class DataColumnSpecsPage extends Composite {
 			notCheckedPopup.askQuestion(DATA_NEVER_CHECKED_HTML);
 		}
 		else {
-			// No changes; return to the latest cruise listing page, which 
-			// may have been updated from previous actions on this page.
-			CruiseListPage.showPage(false);
+			// No changes since last update
+			// If only one cruise, done
+			if ( expocodes.size() < 2 ) {
+				CruiseListPage.showPage(false);
+				return;
+			}
+			// Put up the wait cursor and send the rest of the cruises through the sanity checker
+			SocatUploadDashboard.showWaitCursor();
+			expocodes.remove(0);
+			service.updateCruiseDataColumns(DashboardLoginPage.getUsername(), 
+					DashboardLoginPage.getPasshash(), expocodes, new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					// Go to the list of cruises without comment; return to the normal cursor
+					CruiseListPage.showPage(false);
+					SocatUploadDashboard.showAutoCursor();
+					return;
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					// Go to the list of cruises without comment; return to the normal cursor
+					CruiseListPage.showPage(false);
+					SocatUploadDashboard.showAutoCursor();
+					return;
+				}
+			});
 		}
 	}
 
@@ -671,6 +707,8 @@ public class DataColumnSpecsPage extends Composite {
 	}
 
 	private void doSubmit() {
+		// Show the wait cursor
+		SocatUploadDashboard.showWaitCursor();
 		// Submit the updated data column types to the server.
 		// This update invokes the SanityChecker on the data and
 		// the results are then reported back to this page.
@@ -682,6 +720,8 @@ public class DataColumnSpecsPage extends Composite {
 				if ( specs == null ) {
 					SocatUploadDashboard.showMessage(SUBMIT_FAIL_MSG + 
 							" (unexpected null cruise information returned)");
+					// Show the normal cursor
+					SocatUploadDashboard.showAutoCursor();
 					return;
 				}
 				updateCruiseColumnSpecs(specs);
@@ -703,10 +743,14 @@ public class DataColumnSpecsPage extends Composite {
 					// no problems
 					SocatUploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
 				}
+				// Show the normal cursor
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
+				// Show the normal cursor
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}

@@ -66,7 +66,7 @@ public interface DashboardListService extends RemoteService {
 	 * 		if problems deleting a cruise
 	 */
 	DashboardCruiseList deleteCruises(String username, String passhash, 
-			HashSet<String> expocodeSet) throws IllegalArgumentException;
+			TreeSet<String> expocodeSet) throws IllegalArgumentException;
 
 	/**
 	 * After authenticating the user using the given credentials,
@@ -105,7 +105,7 @@ public interface DashboardListService extends RemoteService {
 	 * 		if problems removing a cruise
 	 */
 	DashboardCruiseList removeCruisesFromList(String username, String passhash,
-			HashSet<String> expocodeSet) throws IllegalArgumentException;
+			TreeSet<String> expocodeSet) throws IllegalArgumentException;
 
 	/**
 	 * After authenticating the user using the given credentials,

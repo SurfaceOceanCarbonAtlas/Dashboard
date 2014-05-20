@@ -22,7 +22,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DataSpecsServiceImpl extends RemoteServiceServlet
 												implements DataSpecsService {
 
-	private static final long serialVersionUID = -7106452856622957624L;
+	private static final long serialVersionUID = -7581874380636284815L;
 
 	@Override
 	public DashboardCruiseWithData getCruiseDataColumnSpecs(String username,
@@ -117,8 +117,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-		Output output = dataStore.getDashboardCruiseChecker()
-								 .checkCruise(cruiseData);
+		Output output = dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
 
 		// Update the reports of any issues found
 		dataStore.getCruiseFileHandler()
@@ -143,6 +142,55 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		// Return the updated truncated cruise data for redisplay 
 		// in the DataColumnSpecsPage
 		return cruiseData;
+	}
+
+	@Override
+	public void updateCruiseDataColumns(String username, String passhash,
+			ArrayList<String> cruiseExpocodes) throws IllegalArgumentException {
+		// Authenticate the user
+		DashboardDataStore dataStore;
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (IOException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected configuration error: " + ex.getMessage());
+		}
+		if ( ! dataStore.validateUser(username, passhash) )
+			throw new IllegalArgumentException(
+					"Invalid authentication credentials");
+
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		UserFileHandler userHandler = dataStore.getUserFileHandler();
+		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
+
+		for ( String expocode : cruiseExpocodes ) {
+			try {
+				// Retrieve all the current cruise data
+				DashboardCruiseWithData cruiseData = 
+						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+
+				// Identify the columns from stored names-to-types for this user
+				userHandler.assignDataColumnTypes(cruiseData);
+				// Save and commit these column assignments in case the sanity checker has problems
+				cruiseHandler.saveCruiseInfoToFile(cruiseData, 
+						"Column types for " + expocode + " updated by " + username + 
+						" from post-processing a multiple-dataset upload");
+			
+				// Run the SanityCheck on the updated cruise.
+				// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
+				Output output = cruiseChecker.checkCruise(cruiseData);
+				// Update the reports of any issues found
+				cruiseHandler.saveCruiseMessages(expocode, output);
+
+				// Save and commit the updated cruise information
+				cruiseHandler.saveCruiseInfoToFile(cruiseData, 
+						"Data status and WOCE flags for " + expocode + " updated by " + 
+						username + " from post-processing a multiple-dataset upload");
+			} catch (Exception ex) {
+				// Silently ignore problems (such as unidentified columns)
+				continue;
+			}
+		}
 	}
 
 }

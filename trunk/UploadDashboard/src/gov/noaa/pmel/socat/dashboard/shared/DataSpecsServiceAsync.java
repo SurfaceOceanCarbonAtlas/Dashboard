@@ -78,15 +78,35 @@ public interface DataSpecsServiceAsync {
 	 * 		this object is ignored.
 	 * @param callback
 	 * 		callback to make with the the updated cruise with  
-	 * 		(abbreviated) data after processing through the SanityChecker
- after processing through the 
-	 * 		SanityChecker.  The fail method is invoked if authentication 
-	 * 		fails, if expocode is invalid, if the cruise does not exist, 
-	 * 		or if there are problems obtaining or evaluating the data for 
-	 * 		the cruise
+	 * 		(abbreviated) data after processing through the SanityChecker 
+	 * 		after processing through the SanityChecker.  The fail method 
+	 * 		is invoked if authentication fails, if expocode is invalid, 
+	 * 		if the cruise does not exist, or if there are problems 
+	 * 		obtaining or evaluating the data for the cruise
 	 */
 	void updateCruiseDataColumnSpecs(String username, String passhash,
 			DashboardCruise newSpecs, 
 			AsyncCallback<DashboardCruiseWithData> callback);
+
+	/**
+	 * Updates the data column specifications for the cruises with the 
+	 * given expocodes.  Column types are assigned from column names-to-types
+	 * saved for this user, and the SanityChecker is run using these new
+	 * column types.  Any exceptions thrown in the column assignment or
+	 * sanity checking for a cruise only halt the process for that cruise
+	 * but otherwise is silently ignored.
+	 * 
+	 * @param username
+	 * 		authenticate using this username
+	 * @param passhash
+	 * 		authenticate using this password hash
+	 * @param cruiseExpocodes
+	 * 		process cruises with these expocodes
+	 * @param callback
+	 * 		callback to make after processing is complete.
+	 * 		The fail method is invoked if authentication fails.
+	 */
+	void updateCruiseDataColumns(String username, String passhash,
+			ArrayList<String> cruiseExpocodes, AsyncCallback<Void> callback);
 
 }

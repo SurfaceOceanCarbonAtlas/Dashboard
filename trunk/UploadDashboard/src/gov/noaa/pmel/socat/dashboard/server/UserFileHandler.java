@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /**
  * Handles storage and retrieval of user data in files.
@@ -264,7 +265,7 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		cruise listing to version control
 	 */
 	public DashboardCruiseList removeCruisesFromListing(
-							HashSet<String> expocodeSet, String username) 
+							TreeSet<String> expocodeSet, String username) 
 										throws IllegalArgumentException {
 		DashboardCruiseList cruiseList = getCruiseListing(username);
 		boolean changeMade = false;

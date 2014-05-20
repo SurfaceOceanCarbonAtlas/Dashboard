@@ -229,6 +229,7 @@ public class OmeManagerPage extends Composite {
 		// (event is not cancelled)
 		if ( okayToOverwrite ) {
 			okayToOverwrite = false;
+			SocatUploadDashboard.showWaitCursor();
 			return;
 		}
 
@@ -267,6 +268,7 @@ public class OmeManagerPage extends Composite {
 
 		// Nothing overwritten, let the submit continue
 		// (event not cancelled)
+		SocatUploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
@@ -283,6 +285,7 @@ public class OmeManagerPage extends Composite {
 		if ( resultMsg == null ) {
 			SocatUploadDashboard.showMessage(
 					"Unexpected null result from metadata upload");
+			SocatUploadDashboard.showAutoCursor();
 			return;
 		}
 
@@ -301,6 +304,7 @@ public class OmeManagerPage extends Composite {
 			// Unknown response with a newline, just display the entire message
 			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
 		}
+		SocatUploadDashboard.showAutoCursor();
 	}
 
 }

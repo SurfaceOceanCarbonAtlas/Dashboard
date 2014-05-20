@@ -216,8 +216,7 @@ public class CruiseUploadPage extends Composite {
 				if ( idx >= 0 )
 					queuedEntries.get(idx).showUploadStarted();
 				return true;
-			}
-			
+			}			
 		});
 		filesUploader.setUploadProgressHandler(new UploadProgressHandler() {
 			@Override
@@ -277,9 +276,15 @@ public class CruiseUploadPage extends Composite {
 						filesUploader.startUpload();
 					}
 					else {
-						// TODO: send the whole list of expocodes for batch processing
-						DataColumnSpecsPage.showPage(uploadedExpocodes.get(0));
+						// send the list of expocodes for processing
+						DataColumnSpecsPage.showPage(uploadedExpocodes);
+						// Return the the usual cursor
+						SocatUploadDashboard.showAutoCursor();
 					}
+				}
+				else {
+					// Switch to the normal cursor
+					SocatUploadDashboard.showAutoCursor();
 				}
 				return true;
 			}
@@ -454,6 +459,8 @@ public class CruiseUploadPage extends Composite {
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
+		// Make sure the normal cursor is shown
+		SocatUploadDashboard.showAutoCursor();
 	}
 
 	@UiHandler("previewButton") 
@@ -469,6 +476,8 @@ public class CruiseUploadPage extends Composite {
 		continueUpload = false;
 		// Submit the first file
 		filesUploader.startUpload();
+		// Show the "wait" cursor
+		SocatUploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("submitButton") 
@@ -488,6 +497,8 @@ public class CruiseUploadPage extends Composite {
 		uploadedExpocodes.clear();
 		// Submit the first file
 		filesUploader.startUpload();
+		// Switch to the "wait" cursor
+		SocatUploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("cancelButton")
@@ -496,6 +507,8 @@ public class CruiseUploadPage extends Composite {
 		continueUpload = false;
 		// Return to the cruise list page after updating the cruise list
 		CruiseListPage.showPage(false);
+		// Make sure the normal cursor is shown
+		SocatUploadDashboard.showAutoCursor();
 	}
 
 	/**
@@ -593,7 +606,7 @@ public class CruiseUploadPage extends Composite {
 					DashboardUtils.FILE_UPDATED_HEADER_TAG.length()).trim();
 		}
 		else {
-			// Unknown response with a newline, display the whole message in the preview
+			//  probably an error response with a newline, display the whole message in the preview
 			String previewMsg;
 			if ( resultMsg.contains("</pre>") )
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";

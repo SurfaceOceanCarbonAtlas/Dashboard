@@ -77,6 +77,7 @@ public class DashboardLogoutPage extends Composite {
 			singleton = new DashboardLogoutPage();
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.LOGOUT.name(), false);
+		SocatUploadDashboard.showWaitCursor();
 		service.logoutUser(DashboardLoginPage.getUsername(),
 						   DashboardLoginPage.getPasshash(),
 						   new AsyncCallback<Boolean>() {
@@ -89,10 +90,12 @@ public class DashboardLogoutPage extends Composite {
 				else {
 					SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG);
 				}
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(REQUEST_FAILED_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}

@@ -92,4 +92,24 @@ public interface DataSpecsService extends RemoteService {
 			String passhash, DashboardCruise newSpecs) 
 					throws IllegalArgumentException;
 
+	/**
+	 * Updates the data column specifications for the cruises with the 
+	 * given expocodes.  Column types are assigned from column names-to-types
+	 * saved for this user, and the SanityChecker is run using these new
+	 * column types.  Any exceptions thrown in the column assignment or
+	 * sanity checking for a cruise only halt the process for that cruise
+	 * but otherwise is silently ignored.
+	 * 
+	 * @param username
+	 * 		authenticate using this username
+	 * @param passhash
+	 * 		authenticate using this password hash
+	 * @param cruiseExpocodes
+	 * 		process cruises with these expocodes
+	 * @throws IllegalArgumentException
+	 * 		if authentication fails
+	 */
+	void updateCruiseDataColumns(String username, String passhash,
+			ArrayList<String> cruiseExpocodes) throws IllegalArgumentException;
+
 }
