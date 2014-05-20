@@ -25,14 +25,21 @@ import org.jdom2.Element;
  */
 
 public class FerretConfig extends Document {
-	/*
-	 * Any number that uniquely identifies the version of this class' code.  
-	 * The Eclipse IDE will generate it automatically for you.  We do not depend on this
-	 * since we do not serialize our code across the wire.
-	 */
-    private static final long serialVersionUID = 4074966641591379924L;
-    
-    /**
+
+	private static final long serialVersionUID = -1491908105223114494L;
+
+	public enum Action {
+		/**
+		 * Complete a DSG file by adding data computed from user-provided data.
+		 */
+		COMPUTE,
+		/**
+		 * Decimate data in a completed DSG file.
+		 */
+		DECIMATE,
+	}
+
+	/**
      * Returns the Ferret environment.
      * The environment section of the config file looks like this.
      * A relative path name (like scripts or jnls) will get resolved
@@ -227,13 +234,21 @@ public class FerretConfig extends Document {
         return "";
     }
     /**
-     * This is the first (and  only script) that will get run by the tool.
-     * @return
+     * This is the first (and only script) that will get run by the tool.
+     * 
+     * @param actionEnum
+     * 		the desired action of this configuration
      */
-    public String getDriverScript() {
+    public String getDriverScript(Action actionEnum) {
         Element invoker = this.getRootElement().getChild("invoker");
         if ( invoker != null ) {
-            String driver = invoker.getAttributeValue("driver");
+        	String driver;
+        	if ( actionEnum.equals(Action.COMPUTE) )
+        		driver = invoker.getAttributeValue("compute_driver");
+        	else if ( actionEnum.equals(Action.DECIMATE) )
+        		driver = invoker.getAttributeValue("decimate_driver");
+        	else
+        		driver = null;
             if ( driver != null ) {
                return driver;
             }

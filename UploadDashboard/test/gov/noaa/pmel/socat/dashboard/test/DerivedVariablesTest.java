@@ -36,7 +36,7 @@ public class DerivedVariablesTest {
     		stream.close();
     	}
     	SocatTool tool = new SocatTool(ferret);
-    	tool.init(testfile.getFilename(), testfile.getExpocode());
+    	tool.init(testfile.getFilename(), null, testfile.getExpocode(), FerretConfig.Action.COMPUTE);
     	tool.run();
     	assertFalse(tool.hasError());
     }
@@ -60,7 +60,7 @@ public class DerivedVariablesTest {
         		stream.close();
         	}
         	SocatTool tool = new SocatTool(ferret);
-        	tool.init(testfile.getFilename(), testfile.getExpocode());
+        	tool.init(testfile.getFilename(), null, testfile.getExpocode(), FerretConfig.Action.COMPUTE);
         	tool.run();
         	if ( tool.hasError() ) {
         		System.err.println("Error: "+tool.getErrorMessage());

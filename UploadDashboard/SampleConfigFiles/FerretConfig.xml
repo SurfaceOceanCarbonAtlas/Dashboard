@@ -6,7 +6,7 @@
             time_limit - maximum number of milliseconds a single invocation of Ferret will be allowed to run before it is killed.
             temp_dir - a directory that will get created in which temporary files will be written.
                     The Ferret script to be run is written here.
-            driver - the script that gets invoked with the NC file name as the first and only argument.
+            ..._driver - the script that gets invoked with the NC file name as the first and only argument.
                     Ferret must be able to find the data file either by adding the data directory to the FER_DATA
                     environment below or by passing the script a fully qualified path.
     -->
@@ -15,7 +15,8 @@
         executable="/home/ksmith/Ferret/bin/ferret"
         time_limit="10000"
         temp_dir="/var/tmp/socat/"
-        driver="calcSOCAT3">
+        create_driver="calcSOCAT3"
+        decimate_driver="ddsg_socat3">
         <!--
             For PyFerret use:
                 executable="/usr/bin/python2.7"
