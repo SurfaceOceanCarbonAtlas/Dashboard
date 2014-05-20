@@ -120,11 +120,18 @@ public class DashboardCruiseSubmitter {
 				comment.setFlagDate(new Date());
 				comment.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				comment.setComment("Automated data check detected " + 
-						Integer.toString(cruiseData.getNumErrorRows()) + 
-						" data points with errors and " + 
-						Integer.toString(cruiseData.getNumWarnRows()) + 
-						" data points with warnings.");
+				String recFlag;
+				if ( cruiseData.getNumErrorRows() > DashboardUtils.MAX_ACCEPTABLE_ERRORS ) {
+					recFlag = "Recommend QC flag of 'F': ";
+				}
+				else {
+					recFlag = "";
+				}
+				comment.setComment(recFlag + "Automated data check detected " + 
+							Integer.toString(cruiseData.getNumErrorRows()) + 
+							" data points with errors and " + 
+							Integer.toString(cruiseData.getNumWarnRows()) + 
+							" data points with warnings.");
 				try {
 					databaseHandler.addQCEvent(comment);
 				} catch (SQLException ex) {
