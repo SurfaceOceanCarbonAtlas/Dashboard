@@ -132,10 +132,15 @@ public class DashboardCruiseSubmitter {
 							"Unable to add a QC comment with the Sanity Checker results:\n" +
 							ex.getMessage());
 				}
+
+				// Generate the decimated-data DSG file from the full-data DSG file
+				dsgNcHandler.decimateCruise(expocode);
+
 				// Set up to save changes to version control
 				changed = true;
 				commitMsg += " submit with QC flag '" + flag + "'";
 				ingestExpos.add(expocode);
+
 			}
 
 			if ( ! archiveStatus.equals(cruise.getArchiveStatus()) ) {

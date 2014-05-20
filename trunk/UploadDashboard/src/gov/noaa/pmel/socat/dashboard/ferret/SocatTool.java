@@ -59,7 +59,7 @@ public class SocatTool extends Thread {
 			if ( action.equals(FerretConfig.Action.COMPUTE) ) {
 				script = new File(temp_dir, "ferret_compute_" + expocode + ".jnl");
 			}
-			else if ( action.equals(FerretConfig.Action.COMPUTE) ) {
+			else if ( action.equals(FerretConfig.Action.DECIMATE) ) {
 				script = new File(temp_dir, "ferret_decimate_" + expocode + ".jnl");
 			}
 			else
