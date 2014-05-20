@@ -77,7 +77,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public DashboardCruiseList deleteCruises(String username, String passhash,
-			HashSet<String> expocodeSet) throws IllegalArgumentException {
+			TreeSet<String> expocodeSet) throws IllegalArgumentException {
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);
 		// Delete each of the cruises in the given set
@@ -110,7 +110,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public DashboardCruiseList removeCruisesFromList(String username,
-			String passhash, HashSet<String> expocodeSet)
+			String passhash, TreeSet<String> expocodeSet)
 			throws IllegalArgumentException {
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);

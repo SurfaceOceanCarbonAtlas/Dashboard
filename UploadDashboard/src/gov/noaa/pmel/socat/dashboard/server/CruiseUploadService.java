@@ -59,8 +59,7 @@ public class CruiseUploadService extends HttpServlet {
 																throws IOException {
 		// Verify the post has the correct encoding
 		if ( ! ServletFileUpload.isMultipartContent(request) ) {
-			response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-					"Invalid request contents format for this service.");
+			sendErrMsg(response, "Invalid request contents format for this service.");
 			return;
 		}
 
@@ -110,8 +109,7 @@ public class CruiseUploadService extends HttpServlet {
 		} catch (Exception ex) {
 			if ( cruiseItem != null )
 				cruiseItem.delete();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-					"Error processing the request: " + ex.getMessage());
+			sendErrMsg(response, "Error processing the request: " + ex.getMessage());
 			return;
 		}
 
@@ -124,9 +122,9 @@ public class CruiseUploadService extends HttpServlet {
 			 ! ( action.equals(DashboardUtils.REQUEST_PREVIEW_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_NEW_CRUISE_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG) ) ) {
-			cruiseItem.delete();
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					"Invalid request contents for this service.");
+			if ( cruiseItem != null )
+				cruiseItem.delete();
+			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
 		}
 
@@ -151,8 +149,11 @@ public class CruiseUploadService extends HttpServlet {
 					cruiseReader.close();
 				}
 			} catch (Exception ex) {
-				response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-						"Error processing the uploaded file: " + ex.getMessage());
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.setContentType("text/html;charset=UTF-8");
+				PrintWriter respWriter = response.getWriter();
+				respWriter.println("Error processing the uploaded file: " + ex.getMessage());
+				response.flushBuffer();
 				cruiseItem.delete();
 				return;
 			}
@@ -193,9 +194,8 @@ public class CruiseUploadService extends HttpServlet {
 				cruiseReader.close();
 			}
 		} catch (Exception ex) {
-			response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-					"Error processing the uploaded file: " + ex.getMessage());
 			cruiseItem.delete();
+			sendErrMsg(response, "Error processing the uploaded file: " + ex.getMessage());
 			return;
 		}
 		// done with the uploaded data file
@@ -319,8 +319,8 @@ public class CruiseUploadService extends HttpServlet {
 			cruiseHandler.saveCruiseDataToFile(cruiseData, 
 					"Cruise data file " + message);
 		} catch (IllegalArgumentException ex) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-					"Error processing the request: " + ex.getMessage());
+			sendErrMsg(response, "Error processing the request: " + ex.getMessage());
+			return;
 		}
 
 		// Update the list of cruises for the user
@@ -328,8 +328,8 @@ public class CruiseUploadService extends HttpServlet {
 			dataStore.getUserFileHandler()
 					 .addCruiseToListing(expocode, username);
 		} catch (IllegalArgumentException ex) {
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-					"Error processing the request: " + ex.getMessage());
+			sendErrMsg(response, "Error processing the request: " + ex.getMessage());
+			return;
 		}
 
 		// Send the success response
@@ -341,6 +341,26 @@ public class CruiseUploadService extends HttpServlet {
 		else
 			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG + " " + expocode);
 		respWriter.println(message);
+		response.flushBuffer();
+	}
+
+	/**
+	 * Returns an error message in the given Response object.  The response 
+	 * number is still 200 (SC_OK) so that the message will be returned by 
+	 * moxieapps' event processing.
+	 * 
+	 * @param response
+	 * 		write the error message here
+	 * @param errMsg
+	 * 		error message to return
+	 * @throws IOException 
+	 * 		if writing to the response object throws one
+	 */
+	private void sendErrMsg(HttpServletResponse response, String errMsg) throws IOException {
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter respWriter = response.getWriter();
+		respWriter.println(errMsg);
 		response.flushBuffer();
 	}
 

@@ -421,6 +421,7 @@ public class AddlDocsManagerPage extends Composite {
 		// Contact the server to obtain the latest set 
 		// of supplemental documents for the current cruises
 		// Send the request to the server
+		SocatUploadDashboard.showWaitCursor();
 		service.getUpdatedCruises(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodes, 
 				new AsyncCallback<HashSet<DashboardCruise>>() {
@@ -428,10 +429,12 @@ public class AddlDocsManagerPage extends Composite {
 			public void onSuccess(HashSet<DashboardCruise> cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(ADDL_DOCS_LIST_FAIL_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -588,6 +591,7 @@ public class AddlDocsManagerPage extends Composite {
 
 	private void continueDelete(String deleteFilename, String deleteExpocode) {
 		// Send the request to the server
+		SocatUploadDashboard.showWaitCursor();
 		service.deleteAddlDoc(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(),
 				deleteFilename, deleteExpocode, expocodes, 
@@ -596,10 +600,12 @@ public class AddlDocsManagerPage extends Composite {
 			public void onSuccess(HashSet<DashboardCruise> cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(DELETE_DOCS_FAIL_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}

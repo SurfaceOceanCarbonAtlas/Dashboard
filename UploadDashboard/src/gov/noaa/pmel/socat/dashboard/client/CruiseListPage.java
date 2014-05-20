@@ -11,6 +11,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -236,7 +237,7 @@ public class CruiseListPage extends Composite {
 	private DashboardAskPopup askDeletePopup;
 	private DashboardAskPopup askRemovePopup;
 	private HashSet<DashboardCruise> cruiseSet;
-	private HashSet<String> expocodeSet;
+	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	private boolean managerButtonsShown;
 	private double minTableWidth;
@@ -259,7 +260,7 @@ public class CruiseListPage extends Composite {
 		username = "";
 
 		cruiseSet = new HashSet<DashboardCruise>();
-		expocodeSet = new HashSet<String>();
+		expocodeSet = new TreeSet<String>();
 
 		titleImage.setResource(SocatUploadDashboard.resources.getSocatCatPng());
 		logoutButton.setText(LOGOUT_TEXT);
@@ -314,6 +315,7 @@ public class CruiseListPage extends Composite {
 			errMsg = LOGIN_ERROR_MSG;
 		else
 			errMsg = GET_DATASET_LIST_ERROR_MSG;
+		SocatUploadDashboard.showWaitCursor();
 		// Request the latest cruise list
 		service.getCruiseList(DashboardLoginPage.getUsername(), 
 								 DashboardLoginPage.getPasshash(),
@@ -332,10 +334,12 @@ public class CruiseListPage extends Composite {
 					SocatUploadDashboard.showMessage(errMsg + 
 							" (unexpected invalid dataset list)");
 				}
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(errMsg, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -510,13 +514,7 @@ public class CruiseListPage extends Composite {
 					NO_DATASET_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
-		if ( expocodeSet.size() > 1 ) {
-			SocatUploadDashboard.showMessage(
-					MANY_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
-			return;
-		}
-		String expocode = expocodeSet.iterator().next();
-		DataColumnSpecsPage.showPage(expocode);
+		DataColumnSpecsPage.showPage(new ArrayList<String>(expocodeSet));
 	}
 
 	@UiHandler("omeMetadataButton")
@@ -613,6 +611,7 @@ public class CruiseListPage extends Composite {
 	 * and processes the results.
 	 */
 	private void continueDeleteCruises() {
+		SocatUploadDashboard.showWaitCursor();
 		service.deleteCruises(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodeSet,
 				new AsyncCallback<DashboardCruiseList>() {
@@ -626,10 +625,12 @@ public class CruiseListPage extends Composite {
 					SocatUploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
 							" (unexpected invalid data set list)");
 				}
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(DELETE_DATASET_FAIL_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -662,6 +663,7 @@ public class CruiseListPage extends Composite {
 				SocatUploadDashboard.showMessage(errMsg);
 			}
 			else {
+				SocatUploadDashboard.showWaitCursor();
 				service.addCruiseToList(DashboardLoginPage.getUsername(), 
 						 DashboardLoginPage.getPasshash(), expocode, 
 						 new AsyncCallback<DashboardCruiseList>() {
@@ -675,10 +677,12 @@ public class CruiseListPage extends Composite {
 							SocatUploadDashboard.showMessage(ADD_DATASET_FAIL_MSG + 
 									" (unexpected invalid data set list)");
 						}
+						SocatUploadDashboard.showAutoCursor();
 					}
 					@Override
 					public void onFailure(Throwable ex) {
 						SocatUploadDashboard.showFailureMessage(ADD_DATASET_FAIL_MSG, ex);
+						SocatUploadDashboard.showAutoCursor();
 					}
 				});
 			}
@@ -722,6 +726,7 @@ public class CruiseListPage extends Composite {
 	 * and processes the results.
 	 */
 	private void continueRemoveCruisesFromList() {
+		SocatUploadDashboard.showWaitCursor();
 		service.removeCruisesFromList(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodeSet, 
 				new AsyncCallback<DashboardCruiseList>() {
@@ -735,10 +740,12 @@ public class CruiseListPage extends Composite {
 					SocatUploadDashboard.showMessage(REMOVE_DATASET_FAIL_MSG + 
 							" (unexpected invalid data set list)");
 				}
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(REMOVE_DATASET_FAIL_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -982,21 +989,21 @@ public class CruiseListPage extends Composite {
 				String msg = getValue(cruise);
 				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
 					// No problems - render as plain text as usual
-					sb.appendHtmlConstant("<div><u><em>");
+					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else if ( msg.contains("warnings") || (msg.contains("errors") && 
 						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
 					// Only warnings or a few errors - use warning background color
-					sb.appendHtmlConstant("<div style=\"background-color:" +
+					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
 							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else {
 					// Many errors, unacceptable, or not checked - use error background color
-					sb.appendHtmlConstant("<div style=\"background-color:" +
+					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
 							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
@@ -1006,7 +1013,9 @@ public class CruiseListPage extends Composite {
 		dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
-				DataColumnSpecsPage.showPage(cruise.getExpocode());
+				ArrayList<String> expocodes = new ArrayList<String>(1);
+				expocodes.add(cruise.getExpocode());
+				DataColumnSpecsPage.showPage(expocodes);
 			}
 		});
 		return dataCheckColumn;

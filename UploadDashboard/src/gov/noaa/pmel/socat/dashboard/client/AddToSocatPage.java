@@ -467,6 +467,7 @@ public class AddToSocatPage extends Composite {
 
 		boolean repeatSend = true;
 		// Add the cruises to SOCAT
+		SocatUploadDashboard.showWaitCursor();
 		service.addCruisesToSocat(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodes, 
 				archiveStatus, localTimestamp, repeatSend,
@@ -475,10 +476,12 @@ public class AddToSocatPage extends Composite {
 			public void onSuccess(Void result) {
 				// Success - go back to the cruise list page
 				CruiseListPage.showPage(false);
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 	}

@@ -2,6 +2,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -147,6 +148,20 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		singleton.currentPage = newPage;
 		if ( singleton.currentPage != null )
 			RootLayoutPanel.get().add(singleton.currentPage);
+	}
+
+	/**
+	 * Displays the wait cursor over the entire page
+	 */
+	public static void showWaitCursor() {
+		RootLayoutPanel.get().getElement().getStyle().setCursor(Style.Cursor.WAIT);
+	}
+
+	/**
+	 * Return the cursor to the automatically assigned one
+	 */
+	public static void showAutoCursor() {
+		RootLayoutPanel.get().getElement().getStyle().setCursor(Style.Cursor.AUTO);
 	}
 
 	@Override

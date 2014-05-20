@@ -111,6 +111,7 @@ public class DataMessagesPage extends Composite {
 	 * Adds this page to the page history.
 	 */
 	static void showPage(String cruiseExpocode) {
+		SocatUploadDashboard.showWaitCursor();
 		service.getDataMessages(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), cruiseExpocode, 
 				new AsyncCallback<SCMessageList>() {
@@ -118,10 +119,9 @@ public class DataMessagesPage extends Composite {
 			public void onSuccess(SCMessageList msgList) {
 				if ( (msgList == null) || 
 					 msgList.getUsername().isEmpty() || 
-					 ! msgList.getUsername().equals(
-							 DashboardLoginPage.getUsername()) ) {
-					SocatUploadDashboard.showMessage(
-							"Unexpected list of data problems returned");
+					 ! msgList.getUsername().equals(DashboardLoginPage.getUsername()) ) {
+					SocatUploadDashboard.showMessage("Unexpected list of data problems returned");
+					SocatUploadDashboard.showAutoCursor();
 					return;
 				}
 				if ( singleton == null )
@@ -129,11 +129,13 @@ public class DataMessagesPage extends Composite {
 				SocatUploadDashboard.updateCurrentPage(singleton);
 				singleton.updateMessages(msgList);
 				History.newItem(PagesEnum.SHOW_DATA_MESSAGES.name(), false);
+				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(
 						"Unexpected failure obtaining the list of data problems", ex);
+				SocatUploadDashboard.showAutoCursor();
 			}
 		});
 

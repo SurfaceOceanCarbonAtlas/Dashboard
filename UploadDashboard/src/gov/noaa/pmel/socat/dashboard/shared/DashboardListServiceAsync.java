@@ -68,7 +68,7 @@ public interface DashboardListServiceAsync {
 	 * 		if problems deleting a cruise
 	 */
 	void deleteCruises(String username, String passhash, 
-			HashSet<String> expocodeSet,
+			TreeSet<String> expocodeSet,
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
@@ -112,7 +112,7 @@ public interface DashboardListServiceAsync {
 	 * 		if problems removing a cruise
 	 */	
 	void removeCruisesFromList(String username, String passhash,
-			HashSet<String> expocodeSet, 
+			TreeSet<String> expocodeSet, 
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
