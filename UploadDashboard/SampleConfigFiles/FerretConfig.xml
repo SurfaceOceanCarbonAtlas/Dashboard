@@ -15,7 +15,7 @@
         executable="/home/ksmith/Ferret/bin/ferret"
         time_limit="10000"
         temp_dir="/var/tmp/socat/"
-        create_driver="calcSOCAT3"
+        compute_driver="calcSOCAT3"
         decimate_driver="ddsg_socat3">
         <!--
             For PyFerret use:

@@ -90,7 +90,8 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Saves the cruise OME metadata and cruise data into a new full NetCDF DSG file.
+	 * Saves the cruise OME metadata and cruise data into a new full-data 
+	 * NetCDF DSG file.
 	 * 
 	 * @param omeMData
 	 * 		metadata for the cruise
@@ -100,7 +101,7 @@ public class DsgNcFileHandler {
 	 * 		cruise QC flag to assign
 	 * @throws IllegalArgumentException
 	 * 		if there are problems with the metadata or data given, or
-	 * 		if there are problems creating or writing the NetCDF DSG file
+	 * 		if there are problems creating or writing the full-data DSG file
 	 */
 	public void saveCruise(OmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
 									String qcFlag) throws IllegalArgumentException {
@@ -156,6 +157,15 @@ public class DsgNcFileHandler {
 		// TODO: ? archive ncdump of the NetCDF DSG file ?
 	}
 
+	/**
+	 * Generates the decimated-data NetCDF DSG file from the full-data NetCDF DSG file.
+	 * 
+	 * @param expocode
+	 * 		generate the decimated-data DSG file for the dataset with this expocode
+	 * @throws IllegalArgumentException
+	 * 		if there are problems reading the full-data DSG file, or
+	 * 		if there are problems creating or writing the decimated-data DSG file
+	 */
 	public void decimateCruise(String expocode) throws IllegalArgumentException {
 		DashboardDataStore dataStore;
 		try {
