@@ -528,9 +528,9 @@ public class CruiseUploadPage extends Composite {
 		}
 
 		String expocode = null;
-		String[] tagMsg = resultMsg.split("\n", 2);
-		if ( tagMsg.length < 2 ) {
-			// probably an error response; display the message in the preview
+		if ( resultMsg.startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
+			resultMsg = resultMsg.substring(DashboardUtils.FILE_PREVIEW_HEADER_TAG.length()).trim();
+			// preview file; show partial file contents in the preview
 			String previewMsg;
 			if ( resultMsg.contains("</pre>") )
 				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
@@ -538,72 +538,65 @@ public class CruiseUploadPage extends Composite {
 				previewMsg = "<pre>" + resultMsg + "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
-			SocatUploadDashboard.showMessage(SEE_PREVIEW_FAIL_MSG);
 		}
-		else if ( tagMsg[0].equals(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
-			// preview file; show partial file contents in the preview
-			String previewMsg;
-			if ( tagMsg[1].contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
-			else
-				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
-			advancedPanel.setOpen(true);
-			previewHtml.setHTML(previewMsg);
-		}
-		else if ( tagMsg[0].equals(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
+		else if ( resultMsg.startsWith(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
+			resultMsg = resultMsg.substring(DashboardUtils.NO_EXPOCODE_HEADER_TAG.length()).trim();
 			// no expocode found; show uploaded file partial contents
 			String previewMsg;
-			if ( tagMsg[1].contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+			if ( resultMsg.contains("</pre>") )
+				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
-				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewMsg = "<pre>" + resultMsg + "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(NO_EXPOCODE_FAIL_MSG);
 		}
-		else if ( tagMsg[0].equals(DashboardUtils.FILE_EXISTS_HEADER_TAG) ) {
+		else if ( resultMsg.startsWith(DashboardUtils.FILE_EXISTS_HEADER_TAG) ) {
+			resultMsg = resultMsg.substring(DashboardUtils.FILE_EXISTS_HEADER_TAG.length()).trim();
 			// cruise file exists and request was to create a new cruise; 
 			// show existing file partial contents in the preview
 			String previewMsg;
-			if ( tagMsg[1].contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+			if ( resultMsg.contains("</pre>") )
+				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
-				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewMsg = "<pre>" + resultMsg + "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(FILE_EXISTS_FAIL_HTML);
 		}
-		else if ( tagMsg[0].equals(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
+		else if ( resultMsg.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
+			resultMsg = resultMsg.substring(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim();
 			// cruise file exists and not permitted to overwrite; 
 			// show existing file partial contents in the preview
 			String previewMsg;
-			if ( tagMsg[1].contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+			if (resultMsg.contains("</pre>") )
+				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
-				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewMsg = "<pre>" + resultMsg + "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(CANNOT_OVERWRITE_FAIL_MSG);
 		}
-		else if ( tagMsg[0].equals(DashboardUtils.NO_FILE_HEADER_TAG) ) {
+		else if ( resultMsg.startsWith(DashboardUtils.NO_FILE_HEADER_TAG) ) {
+			resultMsg = resultMsg.substring(DashboardUtils.NO_FILE_HEADER_TAG.length()).trim();
 			// cruise file does not exist and request was to overwrite
 			// an existing cruise; show partial file contents in preview
 			String previewMsg;
-			if ( (tagMsg[1]).contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(tagMsg[1]) + "</pre>";
+			if ( resultMsg.contains("</pre>") )
+				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			else
-				previewMsg = "<pre>" + tagMsg[1] + "</pre>";
+				previewMsg = "<pre>" + resultMsg + "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
 			SocatUploadDashboard.showMessage(FILE_DOES_NOT_EXIST_FAIL_HTML);
 		}
-		else if ( tagMsg[0].startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
-			expocode = tagMsg[0].substring(
-					DashboardUtils.FILE_CREATED_HEADER_TAG.length()).trim();
+		else if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+			expocode = resultMsg.substring(DashboardUtils.FILE_CREATED_HEADER_TAG.length())
+					.split("\n", 2)[0].trim();
 		}
-		else if ( tagMsg[0].startsWith(DashboardUtils.FILE_UPDATED_HEADER_TAG) ) {
-			expocode = tagMsg[0].substring(
-					DashboardUtils.FILE_UPDATED_HEADER_TAG.length()).trim();
+		else if ( resultMsg.startsWith(DashboardUtils.FILE_UPDATED_HEADER_TAG) ) {
+			expocode = resultMsg.substring(DashboardUtils.FILE_UPDATED_HEADER_TAG.length())
+					.split("\n", 2)[0].trim();
 		}
 		else {
 			//  probably an error response with a newline, display the whole message in the preview
