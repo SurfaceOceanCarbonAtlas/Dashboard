@@ -525,12 +525,16 @@ public class DataColumnSpecsPage extends Composite {
 		// sea water CO2 value given?
 		boolean hasco2 = false;
 		// time stamp given?
+		boolean hasDate = false;
+		boolean hasTime = false;
 		boolean hasYear = false;
 		boolean hasMonth = false;
 		boolean hasDay = false;
 		boolean hasHour = false;
 		boolean hasMinute = false;
 		boolean hasSecond = false;
+		boolean hasDayOfYear = false;
+		boolean hasSecondOfDay = false;
 		// data still given as unknown
 		ArrayList<Integer> unknownIndices = new ArrayList<Integer>();
 
@@ -541,6 +545,7 @@ public class DataColumnSpecsPage extends Composite {
 				unknownIndices.add(k);
 			}
 			else if ( colType == DataColumnType.TIMESTAMP ) {
+				// the timestamp gives all the required date/time info
 				hasYear = true;
 				hasMonth = true;
 				hasDay = true;
@@ -549,9 +554,13 @@ public class DataColumnSpecsPage extends Composite {
 				hasSecond = true;
 			}
 			else if ( colType == DataColumnType.DATE ) {
-				hasYear = true;
-				hasMonth = true;
-				hasDay = true;
+				hasDate = true;
+			}
+			else if ( colType == DataColumnType.DAY_OF_YEAR ) {
+				hasDayOfYear = true;
+			}
+			else if ( colType == DataColumnType.SECOND_OF_DAY ) {
+				hasSecondOfDay = true;
 			}
 			else if ( colType == DataColumnType.YEAR ) {
 				hasYear = true;
@@ -563,9 +572,7 @@ public class DataColumnSpecsPage extends Composite {
 				hasDay = true;
 			}
 			else if ( colType == DataColumnType.TIME ) {
-				hasHour = true;
-				hasMinute = true;
-				hasSecond = true;
+				hasTime = true;
 			}
 			else if ( colType == DataColumnType.HOUR ) {
 				hasHour = true;
@@ -591,6 +598,25 @@ public class DataColumnSpecsPage extends Composite {
 				hasco2 = true;
 			}
 			k++;
+		}
+		// Need both date and time to have all the date/time info
+		// (date, hour, minute, and second columns is not acceptable)
+		if ( hasDate && hasTime ) {
+			hasYear = true;
+			hasMonth = true;
+			hasDay = true;
+			hasHour = true;
+			hasMinute = true;
+			hasSecond = true;
+		}
+		// Need all three year, day-of-year, and second-of-day to have all the date/time info
+		// (year, day-of-year, hour, minute, and second columns is not acceptable)
+		if ( hasYear && hasDayOfYear && hasSecondOfDay ) {
+			hasMonth = true;
+			hasDay = true;
+			hasHour = true;
+			hasMinute = true;
+			hasSecond = true;
 		}
 		if ( unknownIndices.size() > 0 ) {
 			// Unknown column data types found; put up error message and return
@@ -621,7 +647,7 @@ public class DataColumnSpecsPage extends Composite {
 			return;
 		}
 		if ( ! hasco2 ) {
-			// no sea water CO2 - error
+			// no agueous CO2 - error
 			SocatUploadDashboard.showMessage(NO_CO2_ERROR_MSG);
 			return;
 		}

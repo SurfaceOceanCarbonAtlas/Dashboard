@@ -202,7 +202,7 @@ public class DashboardUtils {
 	public static final ArrayList<String> DIRECTION_UNITS = 
 			new ArrayList<String>(Arrays.asList("deg.clk.N"));
 	public static final ArrayList<String> SHIP_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("knots", "km/h", "mph"));
+			new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
 	public static final ArrayList<String> WIND_SPEED_UNITS = 
 			new ArrayList<String>(Arrays.asList("m/s"));
 
