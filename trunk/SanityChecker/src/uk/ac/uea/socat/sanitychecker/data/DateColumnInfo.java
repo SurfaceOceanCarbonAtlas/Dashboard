@@ -1,14 +1,12 @@
 package uk.ac.uea.socat.sanitychecker.data;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom2.Element;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
 import org.joda.time.IllegalFieldValueException;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
