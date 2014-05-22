@@ -528,6 +528,7 @@ public class CruiseUploadPage extends Composite {
 		}
 
 		String expocode = null;
+		resultMsg = resultMsg.trim();
 		if ( resultMsg.startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
 			resultMsg = resultMsg.substring(DashboardUtils.FILE_PREVIEW_HEADER_TAG.length()).trim();
 			// preview file; show partial file contents in the preview
