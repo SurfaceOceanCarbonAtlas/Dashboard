@@ -474,88 +474,88 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				else if ( type.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
 					this.windDirectionRelative = Double.valueOf(value);
 				}
-				else if ( type.equals(DataColumnType.GEOPOSITION_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_GEOPOSITION) ) {
 					this.geopositionWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SAMPLE_DEPTH_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SAMPLE_DEPTH) ) {
 					this.sampleDepthWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SALINITY_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SALINITY) ) {
 					this.salinityWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_EQUILIBRATOR_TEMPERATURE) ) {
 					this.tEquWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SEA_SURFACE_TEMPERATURE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SEA_SURFACE_TEMPERATURE) ) {
 					this.sstWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.EQUILIBRATOR_PRESSURE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_EQUILIBRATOR_PRESSURE) ) {
 					this.pEquWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SEA_LEVEL_PRESSURE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SEA_LEVEL_PRESSURE) ) {
 					this.slpWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.XCO2_WATER_TEQU_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_XCO2_WATER_TEQU) ) {
 					this.xCO2WaterTEquWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.XCO2_WATER_SST_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_XCO2_WATER_SST) ) {
 					this.xCO2WaterSstWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.PCO2_WATER_TEQU_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_PCO2_WATER_TEQU) ) {
 					this.pCO2WaterTEquWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.PCO2_WATER_SST_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_PCO2_WATER_SST) ) {
 					this.pCO2WaterSstWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.FCO2_WATER_TEQU_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_FCO2_WATER_TEQU) ) {
 					this.fCO2WaterTEquWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.FCO2_WATER_SST_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_FCO2_WATER_SST) ) {
 					this.fCO2WaterSstWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.XCO2_ATM_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_XCO2_ATM) ) {
 					this.xCO2AtmWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.PCO2_ATM_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_PCO2_ATM) ) {
 					this.pCO2AtmWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.FCO2_ATM_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_FCO2_ATM) ) {
 					this.fCO2AtmWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.DELTA_XCO2_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_DELTA_XCO2) ) {
 					this.deltaXCO2Woce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.DELTA_PCO2_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_DELTA_PCO2) ) {
 					this.deltaPCO2Woce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.DELTA_FCO2_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_DELTA_FCO2) ) {
 					this.deltaFCO2Woce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.RELATIVE_HUMIDITY_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_RELATIVE_HUMIDITY) ) {
 					this.relativeHumidityWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SPECIFIC_HUMIDITY_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SPECIFIC_HUMIDITY) ) {
 					this.specificHumidityWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SHIP_SPEED_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SHIP_SPEED) ) {
 					this.shipSpeedWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.SHIP_DIRECTION_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_SHIP_DIRECTION) ) {
 					this.shipDirectionWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.WIND_SPEED_TRUE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_WIND_SPEED_TRUE) ) {
 					this.windSpeedTrueWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.WIND_SPEED_RELATIVE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_WIND_SPEED_RELATIVE) ) {
 					this.windSpeedRelativeWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.WIND_DIRECTION_TRUE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_WIND_DIRECTION_TRUE) ) {
 					this.windDirectionTrueWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.WIND_DIRECTION_RELATIVE_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_WIND_DIRECTION_RELATIVE) ) {
 					this.windDirectionRelativeWoce = value.charAt(0);
 				}
-				else if ( type.equals(DataColumnType.FCO2_REC_WOCE) ) {
+				else if ( type.equals(DataColumnType.WOCE_FCO2_REC) ) {
 					this.fCO2RecWoce = value.charAt(0);
 				}
 				else if ( type.equals(DataColumnType.FCO2_REC) ) {
