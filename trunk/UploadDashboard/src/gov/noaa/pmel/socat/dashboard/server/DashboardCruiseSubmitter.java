@@ -27,6 +27,7 @@ import uk.ac.uea.socat.sanitychecker.Output;
  */
 public class DashboardCruiseSubmitter {
 
+	DashboardDataStore dataStore;
 	CruiseFileHandler cruiseHandler;
 	MetadataFileHandler metadataHandler;
 	DashboardCruiseChecker cruiseChecker;
@@ -37,6 +38,7 @@ public class DashboardCruiseSubmitter {
 	 * Create with the file handlers and data checker in the given data store.
 	 */
 	public DashboardCruiseSubmitter(DashboardDataStore dataStore) {
+		this.dataStore = dataStore;
 		cruiseHandler = dataStore.getCruiseFileHandler();
 		metadataHandler = dataStore.getMetadataFileHandler();
 		cruiseChecker = dataStore.getDashboardCruiseChecker();
@@ -147,7 +149,6 @@ public class DashboardCruiseSubmitter {
 				changed = true;
 				commitMsg += " submit with QC flag '" + flag + "'";
 				ingestExpos.add(expocode);
-
 			}
 
 			if ( ! archiveStatus.equals(cruise.getArchiveStatus()) ) {
@@ -175,7 +176,9 @@ public class DashboardCruiseSubmitter {
 			}
 		}
 
-		// TODO: notify ERDDAP of new/updated cruises given in ingestExpos
+		// notify ERDDAP of new/updated cruises
+		if ( ! ingestExpos.isEmpty() )
+			dataStore.flagErddap();
 
 		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 
