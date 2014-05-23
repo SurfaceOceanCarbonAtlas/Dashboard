@@ -278,7 +278,7 @@ public class CruiseUploadPage extends Composite {
 					else {
 						// send the list of expocodes for processing
 						DataColumnSpecsPage.showPage(uploadedExpocodes);
-						// Return the the usual cursor
+						// Return the the normal cursor
 						SocatUploadDashboard.showAutoCursor();
 					}
 				}
@@ -380,7 +380,7 @@ public class CruiseUploadPage extends Composite {
 	 */
 	private void removeAllUploadFiles() {
 		while ( queuedFiles.size() > 0 ) {
-			removeUploadFileFromQueue(queuedFiles.get(0));
+			removeUploadFileFromQueue(queuedFiles.get(0), false);
 		}
 	}
 
@@ -390,10 +390,10 @@ public class CruiseUploadPage extends Composite {
 	 * @param uploadFile
 	 * 		file to remove
 	 */
-	static void removeUploadFile(File uploadFile) {
+	static void removeUploadFile(File uploadFile, boolean notify) {
 		if ( singleton == null )
 			return;
-		singleton.removeUploadFileFromQueue(uploadFile);
+		singleton.removeUploadFileFromQueue(uploadFile, notify);
 	}
 
 	/**
@@ -401,12 +401,15 @@ public class CruiseUploadPage extends Composite {
 	 * 
 	 * @param uploadFile
 	 * 		file to remove
+	 * @param notify
+	 * 		if true, an UploadErrorEvent will be generated 
+	 * 		if the upload is not complete.
 	 */
-	private void removeUploadFileFromQueue(File uploadFile) {
+	private void removeUploadFileFromQueue(File uploadFile, boolean notify) {
 		int idx = queuedFiles.indexOf(uploadFile);
 		if ( idx < 0 )
 			return;
-		filesUploader.cancelUpload(uploadFile.getId(), false);
+		filesUploader.cancelUpload(uploadFile.getId(), notify);
 		filesPanel.remove(queuedEntries.get(idx));
 		queuedEntries.remove(idx);
 		queuedFiles.remove(idx);

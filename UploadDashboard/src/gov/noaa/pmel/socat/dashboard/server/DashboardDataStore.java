@@ -9,6 +9,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +56,8 @@ public class DashboardDataStore {
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
+	private static final String ERDDAP_DSG_FLAG_FILE_NAME_TAG = "ErddapDsgFlagFile";
+	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
 	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
@@ -74,6 +77,8 @@ public class DashboardDataStore {
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
+			ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
+			ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/Decimated/DSG/Update \n" +
 			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
 			DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" + 
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
@@ -105,6 +110,8 @@ public class DashboardDataStore {
 	private CruiseFileHandler cruiseFileHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
+	private File erddapDsgFlagFile;
+	private File erddapDecDsgFlagFile;
 	private FerretConfig ferretConf;
 	private DashboardCruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
@@ -270,6 +277,36 @@ public class DashboardDataStore {
 			throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + 
 					" or " + DEC_DSG_NC_FILES_DIR_NAME_TAG + " value specified in " + 
 					configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// ERDDAP DSG update flag file
+		try {
+			propVal = configProps.getProperty(ERDDAP_DSG_FLAG_FILE_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			erddapDsgFlagFile = new File(propVal);
+			if ( ! erddapDsgFlagFile.getParentFile().isDirectory() )
+				throw new IllegalArgumentException("parent directory does not exist");
+		    itsLogger.info("ERDDAP DSG flag file = " + propVal);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// ERDDAP decimated DSG update flag file
+		try {
+			propVal = configProps.getProperty(ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			erddapDecDsgFlagFile = new File(propVal);
+			if ( ! erddapDecDsgFlagFile.getParentFile().isDirectory() )
+				throw new IllegalArgumentException("parent directory does not exist");
+		    itsLogger.info("ERDDAP decimated DSG flag file = " + propVal);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		// Read the Ferret configuration filename
@@ -450,6 +487,24 @@ public class DashboardDataStore {
 	 */
 	public DsgNcFileHandler getDsgNcFileHandler() {
 		return dsgNcFileHandler;
+	}
+
+	/**
+	 * Creates the two empty ERDDAP flag files to notify ERDDAP that content has changed.
+	 * 
+	 * @return
+	 * 		true if successfully created the flag files 
+	 */
+	public boolean flagErddap() {
+		try {
+			FileOutputStream touchFile = new FileOutputStream(erddapDsgFlagFile);
+			touchFile.close();
+			touchFile = new FileOutputStream(erddapDecDsgFlagFile);
+			touchFile.close();
+		} catch (IOException ex) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

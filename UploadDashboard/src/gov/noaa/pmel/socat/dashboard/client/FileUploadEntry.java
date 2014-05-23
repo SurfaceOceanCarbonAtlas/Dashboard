@@ -37,6 +37,7 @@ public class FileUploadEntry extends Composite {
 
 	File uploadFile;
 	HandlerRegistration clickRegistration;
+	boolean inProgress;
 
 	/**
 	 * Creates an file display widget for the given File.
@@ -48,31 +49,32 @@ public class FileUploadEntry extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		this.uploadFile = uploadFile;
+		inProgress = false;
 		statusButton.setText("Remove");
 		nameLabel.setText(uploadFile.getName());
 		clickRegistration = statusButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				// Remove the click handler 
 				if ( clickRegistration != null ) {
 					clickRegistration.removeHandler();
 					clickRegistration = null;
 				}
-				CruiseUploadPage.removeUploadFile(FileUploadEntry.this.uploadFile);
-				FileUploadEntry.this.uploadFile = null;
+				// Remove this entry from the list on the parent page
+				if ( FileUploadEntry.this.uploadFile != null ) {
+					CruiseUploadPage.removeUploadFile(
+							FileUploadEntry.this.uploadFile, inProgress);
+					FileUploadEntry.this.uploadFile = null;
+				}
 			}
 		});
 	}
 
 	/**
 	 * Resets the label in the status button to show the upload has started.
-	 * Also removes the click handler for the status button and the internal
-	 * reference to the file passed in the constructor. 
 	 */
 	void showUploadStarted() {
-		if ( clickRegistration != null )
-			clickRegistration.removeHandler();
-		clickRegistration = null;
-		uploadFile = null;
+		inProgress = true;
 		statusButton.setText(NumberFormat.getPercentFormat().format(0.0));
 	}
 
@@ -83,7 +85,7 @@ public class FileUploadEntry extends Composite {
 	 * 		get the progress from this event
 	 */
 	void showProgress(UploadProgressEvent evnt) {
-		// Update the progress label
+		inProgress = true;
 		statusButton.setText(NumberFormat.getPercentFormat().format(
 				evnt.getBytesComplete() / (double) evnt.getBytesTotal()));
 	}
@@ -92,6 +94,7 @@ public class FileUploadEntry extends Composite {
 	 * Reset the label in the status button to show the upload is complete.
 	 */
 	void showUploadDone() {
+		inProgress = false;
 		statusButton.setText("Done");
 	}
 
@@ -99,6 +102,7 @@ public class FileUploadEntry extends Composite {
 	 * Reset the label in the status button to show the upload failed.
 	 */
 	void showUploadFailed() {
+		inProgress = false;
 		statusButton.setText("Failed");
 	}
 
