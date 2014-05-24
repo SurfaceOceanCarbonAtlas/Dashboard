@@ -156,7 +156,7 @@ public class MetadataUploadService extends HttpServlet {
 				// Save the metadata document for this cruise
 				if ( metadata == null ) {
 					metadata = metadataHandler.saveMetadataFile(expo, 
-							username, uploadTimestamp, metadataItem);
+							username, uploadTimestamp, uploadFilename, metadataItem);
 				}
 				else {
 					metadata = metadataHandler.copyMetadataFile(expo, metadata);

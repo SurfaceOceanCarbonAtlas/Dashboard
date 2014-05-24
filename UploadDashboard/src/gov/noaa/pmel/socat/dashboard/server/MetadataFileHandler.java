@@ -130,6 +130,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		timestamp giving the time of the upload.  This should be 
 	 * 		generated on the client and sent to the server so it is 
 	 * 		in local time for the user.
+	 * @param uploadFilename
+	 * 		upload filename to use for this metadata document; 
+	 * 		may or may not match the basename of uploadFileItem.getName()
 	 * @param uploadFileItem
 	 * 		upload file item providing the metadata contents as well
 	 * 		as the name of the upload file.
@@ -142,10 +145,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		if problems committing the new metadata document to version control
 	 */
 	public DashboardMetadata saveMetadataFile(String cruiseExpocode, 
-			String owner, String uploadTimestamp, FileItem uploadFileItem) 
-											throws IllegalArgumentException {
+			String owner, String uploadTimestamp, String uploadFilename,
+			FileItem uploadFileItem) throws IllegalArgumentException {
 		// Create the metadata filename
-		String uploadFilename = DashboardUtils.baseName(uploadFileItem.getName());
 		File metadataFile = getMetadataFile(cruiseExpocode, uploadFilename);
 
 		// Make sure the parent directory exists 
