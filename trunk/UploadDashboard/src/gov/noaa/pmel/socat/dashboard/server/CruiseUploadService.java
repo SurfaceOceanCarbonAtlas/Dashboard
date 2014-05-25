@@ -70,7 +70,7 @@ public class CruiseUploadService extends HttpServlet {
 		String dataFormat = null;
 		String encoding = null;
 		String action = null;
-		FileItem cruiseItem = null;
+		ArrayList<FileItem> cruiseItems = new ArrayList<FileItem>();
 		try {
 			// Go through each item in the request
 			for ( FileItem item : cruiseUpload.parseRequest(request) ) {
@@ -99,45 +99,48 @@ public class CruiseUploadService extends HttpServlet {
 					action = item.getString();
 					item.delete();
 				}
-				else if ( "Filedata".equals(itemName) ) {
-					cruiseItem = item;
+				else if ( "cruisedata".equals(itemName) ) {
+					cruiseItems.add(item);
 				}
 				else {
 					item.delete();
 				}
 			}
 		} catch (Exception ex) {
-			if ( cruiseItem != null )
-				cruiseItem.delete();
-			sendErrMsg(response, "Error processing the request: " + ex.getMessage());
+			for ( FileItem item : cruiseItems )
+				item.delete();
+			sendErrMsg(response, "Error processing the request \n" + ex.getMessage());
 			return;
 		}
 
 		// Verify contents seem okay
+		if ( cruiseItems.isEmpty() ) {
+			sendErrMsg(response, "No upload files specified");
+			return;
+		}
 		DashboardDataStore dataStore = DashboardDataStore.get();
 		if ( (username == null) || (passhash == null) || (dataFormat == null) || 
 			 (encoding == null) || (action == null) || (timestamp == null) || 
-			 (cruiseItem == null) || 
 			 ( ! dataStore.validateUser(username, passhash) ) ||
 			 ! ( action.equals(DashboardUtils.REQUEST_PREVIEW_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_NEW_CRUISE_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG) ) ) {
-			if ( cruiseItem != null )
-				cruiseItem.delete();
+			for ( FileItem item : cruiseItems )
+				item.delete();
 			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
 		}
 
-		// name of the user's uploaded file
-		String filename = cruiseItem.getName();
-
 		if ( DashboardUtils.REQUEST_PREVIEW_TAG.equals(action) ) {
+			FileItem firstItem = cruiseItems.get(0);
+			String filename = firstItem.getName();
+
 			// if preview, just return up to 50 lines 
-			/// of interpreted contents of the uploaded file
+			// of interpreted contents of the first uploaded file
 			ArrayList<String> contentsList = new ArrayList<String>(50);
 			try {
 				BufferedReader cruiseReader = new BufferedReader(
-						new InputStreamReader(cruiseItem.getInputStream(), encoding));
+						new InputStreamReader(firstItem.getInputStream(), encoding));
 				try {
 					for (int k = 0; k < 50; k++) {
 						String dataline = cruiseReader.readLine();
@@ -149,16 +152,15 @@ public class CruiseUploadService extends HttpServlet {
 					cruiseReader.close();
 				}
 			} catch (Exception ex) {
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html;charset=UTF-8");
-				PrintWriter respWriter = response.getWriter();
-				respWriter.println("Error processing the uploaded file: " + ex.getMessage());
-				response.flushBuffer();
-				cruiseItem.delete();
+				sendErrMsg(response, "Error processing the uploaded file " + 
+						filename + "\n" + ex.getMessage());
+				for ( FileItem item : cruiseItems )
+					item.delete();
 				return;
 			}
-			// done with the uploaded file
-			cruiseItem.delete();
+			// done with the uploaded files
+			for ( FileItem item : cruiseItems )
+				item.delete();
 
 			// Respond with some info and the interpreted contents
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -178,157 +180,115 @@ public class CruiseUploadService extends HttpServlet {
 
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 
-		// Create a DashboardCruiseWithData from the contents of the uploaded data file 
-		DashboardCruiseWithData cruiseData;
-		try {
-			BufferedReader cruiseReader = new BufferedReader(
-					new InputStreamReader(cruiseItem.getInputStream(), encoding));
+		ArrayList<String> successes = new ArrayList<String>(cruiseItems.size());
+		ArrayList<String> messages = new ArrayList<String>(cruiseItems.size());
+		for ( FileItem item : cruiseItems ) {
+			String filename = item.getName();
+			// Create a DashboardCruiseWithData from the contents of the uploaded data file 
+			DashboardCruiseWithData cruiseData;
 			try {
-				cruiseData = new DashboardCruiseWithData();
-				cruiseData.setOwner(username);
-				cruiseData.setUploadFilename(filename);
-				cruiseData.setUploadTimestamp(timestamp);
-				cruiseHandler.assignCruiseDataFromInput(cruiseData, dataFormat, 
-														cruiseReader, 0, -1, true);
-			} finally {
-				cruiseReader.close();
-			}
-		} catch (Exception ex) {
-			cruiseItem.delete();
-			sendErrMsg(response, "Error processing the uploaded file: " + ex.getMessage());
-			return;
-		}
-		// done with the uploaded data file
-		cruiseItem.delete();
-
-		// Check if the cruise file exists, and in the process
-		// check if a valid expocode was obtained from the file
-		String expocode = cruiseData.getExpocode();
-		boolean cruiseExists;
-		try {
-			cruiseExists = cruiseHandler.cruiseDataFileExists(expocode);
-		} catch ( IllegalArgumentException ex ) {
-			// Invalid expocode - respond with an error message containing partial file contents
-			response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentType("text/html;charset=UTF-8");
-			PrintWriter respWriter = response.getWriter();
-			respWriter.println(DashboardUtils.NO_EXPOCODE_HEADER_TAG);
-			respWriter.println("----------------------------------------");
-			respWriter.println("Filename: " + filename);
-			respWriter.println("Encoding: " + encoding);
-			respWriter.println("(Partial) Contents:");
-			respWriter.println("----------------------------------------");
-			for ( String dataline : 
-					cruiseHandler.getPartialCruiseDataContents(cruiseData) )
-				respWriter.println(dataline);
-			response.flushBuffer();
-			return;
-		}
-
-		if ( cruiseExists ) {
-			String owner;
-			try {
-				owner = cruiseHandler.verifyOkayToDeleteCruise(expocode, username)
-									 .getOwner();
-			} catch ( Exception ex ) {
-				owner = null;
-			}
-			// If the cruise file exists, make sure the request was for an overwrite
-			// and that this user has permission to overwrite this cruise
-			if ( (owner == null) ||
-				 ( ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) ) {
-				// Respond with an error message containing partial file contents 
-				// of the existing file
-				DashboardCruiseWithData existingCruiseData;
+				BufferedReader cruiseReader = new BufferedReader(
+						new InputStreamReader(item.getInputStream(), encoding));
 				try {
-					existingCruiseData = 
-							cruiseHandler.getCruiseDataFromFiles(expocode, 0, 25);
+					cruiseData = new DashboardCruiseWithData();
+					cruiseData.setOwner(username);
+					cruiseData.setUploadFilename(filename);
+					cruiseData.setUploadTimestamp(timestamp);
+					cruiseHandler.assignCruiseDataFromInput(cruiseData, 
+							dataFormat, cruiseReader, 0, -1, true);
+				} finally {
+					cruiseReader.close();
+				}
+			} catch (Exception ex) {
+				// Mark as a failed file, and go on to the next
+				messages.add(DashboardUtils.FILE_INVALID_HEADER_TAG + " " + filename);
+				messages.add(ex.getMessage());
+				messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+				item.delete();
+				continue;
+			}
+
+			// done with the uploaded data file
+			item.delete();
+
+			// Check if the cruise file exists, and in the process
+			// check if a valid expocode was obtained from the file
+			String expocode = cruiseData.getExpocode();
+			boolean cruiseExists;
+			try {
+				cruiseExists = cruiseHandler.cruiseDataFileExists(expocode);
+			} catch ( IllegalArgumentException ex ) {
+				messages.add(DashboardUtils.NO_EXPOCODE_HEADER_TAG + " " + filename);
+				continue;
+			}
+
+			if ( cruiseExists ) {
+				String owner;
+				try {
+					owner = cruiseHandler.verifyOkayToDeleteCruise(expocode, username)
+										 .getOwner();
 				} catch ( Exception ex ) {
-					// just report the error without data
-					existingCruiseData = null;
+					owner = null;
 				}
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html;charset=UTF-8");
-				PrintWriter respWriter = response.getWriter();
-				if ( owner == null ) {
-					respWriter.println(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG);
-					if ( existingCruiseData != null )
-						owner = existingCruiseData.getOwner();
+				// If the cruise file exists, make sure the request was for an overwrite
+				// and that this user has permission to overwrite this cruise
+				if ( (owner == null) ||
+					 ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) {
+					messages.add(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG + " " + 
+								filename + " ; " + expocode + " ; " + owner);
+					continue;
 				}
+
+				// Preserve the original owner of the data
+				if ( ! owner.isEmpty() )
+					cruiseData.setOwner(owner);
+			}
+			else {
+				// If the cruise file does not exist, make sure the request was for a new file
+				if ( ! DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ) {
+					messages.add(DashboardUtils.NO_DATASET_HEADER_TAG + " " + 
+								filename + " ; " + expocode);
+					continue;
+				}
+			}
+
+			// Check if an OME metadata file already exists for this cruise
+			DashboardMetadata mdata = dataStore.getMetadataFileHandler()
+					.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME);
+			if ( mdata != null ) {
+				cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());
+			}
+
+			// Save the cruise file and commit it to version control
+			try {
+				String commitMsg;
+				if ( cruiseExists ) 
+					commitMsg = "file for " + expocode + " updated by " + 
+							username + " from uploaded file " + filename;
 				else
-					respWriter.println(DashboardUtils.FILE_EXISTS_HEADER_TAG);
-				respWriter.println("----------------------------------------");
-				respWriter.println("(Partial) Contents of existing cruise file:");
-				respWriter.println("Owned by: " + owner);
-				if ( existingCruiseData != null )
-					respWriter.println("Name of uploaded file: " + 
-							existingCruiseData.getUploadFilename());
-				respWriter.println("----------------------------------------");
-				if ( existingCruiseData != null ) {
-					for ( String dataline : 
-							cruiseHandler.getPartialCruiseDataContents(existingCruiseData) )
-						respWriter.println(dataline);
-				}
-				response.flushBuffer();
-				return;
+					commitMsg = "file for " + expocode + " added by " + 
+							username + " from uploaded file " + filename;			
+				cruiseHandler.saveCruiseInfoToFile(cruiseData, "Cruise info " + commitMsg);
+				cruiseHandler.saveCruiseDataToFile(cruiseData, "Cruise data " + commitMsg);
+			} catch (IllegalArgumentException ex) {
+				messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " + 
+							filename + " ; " + expocode);
+				messages.add(ex.getMessage());
+				messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+				continue;
 			}
 
-			// Preserve the original owner of the data
-			if ( ! owner.isEmpty() )
-				cruiseData.setOwner(owner);
-		}
-		else {
-			// If the cruise file does not exist, make sure the request was for a new file
-			if ( ! DashboardUtils.REQUEST_NEW_CRUISE_TAG.equals(action) ) {
-				// Respond with an error message containing the partial file contents
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("text/html;charset=UTF-8");
-				PrintWriter respWriter = response.getWriter();
-				respWriter.println(DashboardUtils.NO_FILE_HEADER_TAG);
-				respWriter.println("----------------------------------------");
-				respWriter.println("Filename: " + filename);
-				respWriter.println("Encoding: " + encoding);
-				respWriter.println("(Partial) Contents:");
-				respWriter.println("----------------------------------------");
-				for ( String dataline : 
-						cruiseHandler.getPartialCruiseDataContents(cruiseData) )
-					respWriter.println(dataline);
-				response.flushBuffer();
-				return;
-			}
-		}
-
-		// Check if an OME metadata file already exists for this cruise
-		DashboardMetadata mdata = dataStore.getMetadataFileHandler()
-				.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME);
-		if ( mdata != null ) {
-			cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());
-		}
-
-		// Save the cruise file and commit it to version control
-		String message;
-		if ( cruiseExists ) 
-			message = "for " + expocode + " updated by " + 
-					username + " from uploaded file " + filename;
-		else
-			message = "for " + expocode + " added by " + 
-					username + " from uploaded file " + filename;			
-		try {
-			cruiseHandler.saveCruiseInfoToFile(cruiseData, 
-					"Cruise info file " + message);
-			cruiseHandler.saveCruiseDataToFile(cruiseData, 
-					"Cruise data file " + message);
-		} catch (IllegalArgumentException ex) {
-			sendErrMsg(response, "Error processing the request: " + ex.getMessage());
-			return;
+			// Success
+			messages.add(DashboardUtils.FILE_CREATED_HEADER_TAG + " " + expocode);
+			successes.add(expocode);
 		}
 
 		// Update the list of cruises for the user
 		try {
-			dataStore.getUserFileHandler()
-					 .addCruiseToListing(expocode, username);
+			dataStore.getUserFileHandler().addCruisesToListing(successes, username);
 		} catch (IllegalArgumentException ex) {
-			sendErrMsg(response, "Error processing the request: " + ex.getMessage());
+			sendErrMsg(response, "Unexpected error updating list of cruises \n" + 
+									ex.getMessage());
 			return;
 		}
 
@@ -336,18 +296,15 @@ public class CruiseUploadService extends HttpServlet {
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();
-		if ( cruiseExists )
-			respWriter.println(DashboardUtils.FILE_UPDATED_HEADER_TAG + " " + expocode);
-		else
-			respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG + " " + expocode);
-		respWriter.println(message);
+		for ( String msg : messages )
+			respWriter.println(msg);
 		response.flushBuffer();
 	}
 
 	/**
-	 * Returns an error message in the given Response object.  The response 
-	 * number is still 200 (SC_OK) so that the message will be returned by 
-	 * moxieapps' event processing.
+	 * Returns an error message in the given Response object.  
+	 * The response number is still 200 (SC_OK) so the message 
+	 * goes through cleanly.
 	 * 
 	 * @param response
 	 * 		write the error message here

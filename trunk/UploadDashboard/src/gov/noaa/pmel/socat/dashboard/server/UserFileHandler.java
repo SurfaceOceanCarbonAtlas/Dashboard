@@ -286,21 +286,22 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Adds an entry to a user's list of cruises, and
-	 * saves the resulting list of cruises.
+	 * Adds an entry to a user's list of cruises, and saves the resulting 
+	 * list of cruises.
 	 * 
-	 * @param expocodeSet
+	 * @param expocode
 	 * 		expocode of cruise to add to the list
 	 * @param username
 	 * 		user whose cruise list is to be updated
 	 * @return
 	 * 		updated list of cruises for user
 	 * @throws IllegalArgumentException
-	 * 		if username is invalid, if expocode is invalid,
+	 * 		if username is invalid, 
+	 * 		if expocode is invalid,
 	 * 		if the cruise information file does not exist, 
-	 * 		if there was a problem saving the updated cruise 
-	 * 		listing, or if there was an error committing 
-	 * 		the updated cruise listing to version control
+	 * 		if there was a problem saving the updated cruise listing, or 
+	 * 		if there was an error committing the updated cruise listing 
+	 * 			to version control
 	 */
 	public DashboardCruiseList addCruiseToListing(String expocode, 
 						String username) throws IllegalArgumentException {
@@ -323,6 +324,51 @@ public class UserFileHandler extends VersionedFileHandler {
 			saveCruiseListing(cruiseList, "added cruise " + 
 					expocode + " to the listing for " + username);
 		}
+		return cruiseList;
+	}
+
+	/**
+	 * Adds an entries to a user's list of cruises, and saves the resulting 
+	 * list of cruises.
+	 * 
+	 * @param expocodeList
+	 * 		list of cruise expocodes to add to the list
+	 * @param username
+	 * 		user whose cruise list is to be updated
+	 * @return
+	 * 		updated list of cruises for user
+	 * @throws IllegalArgumentException
+	 * 		if username is invalid, 
+	 * 		if any of the expocodes are invalid,
+	 * 		if the cruise information file does not exist, 
+	 * 		if there was a problem saving the updated cruise listing, or 
+	 * 		if there was an error committing the updated cruise listing 
+	 * 			to version control
+	 */
+	public DashboardCruiseList addCruisesToListing(ArrayList<String> expocodeList, 
+							String username) throws IllegalArgumentException {
+		CruiseFileHandler cruiseHandler;
+		try {
+			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the cruise file handler");
+		}
+		DashboardCruiseList cruiseList = getCruiseListing(username);
+		String commitMsg = "Added cruises ";
+		// Create a cruise entry for this data
+		for ( String expocode : expocodeList) {
+			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+			if ( cruise == null ) 
+				throw new IllegalArgumentException(
+						"cruise " + expocode + " does not exist");
+			// Add or replace this cruise entry in the cruise list
+			// Only the expocodes (keys) are saved in the cruise list
+			cruiseList.put(expocode, cruise);
+			commitMsg += expocode + ", ";
+		}
+		commitMsg += " to the listing for " + username;
+		saveCruiseListing(cruiseList, commitMsg);
 		return cruiseList;
 	}
 

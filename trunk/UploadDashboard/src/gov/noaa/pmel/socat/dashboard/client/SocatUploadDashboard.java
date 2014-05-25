@@ -125,11 +125,9 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		String exceptMsg = ex.getMessage();
 		if ( exceptMsg == null )
 			exceptMsg = htmlMsg;
-		else if ( exceptMsg.contains("</pre>") )
+		else
 			exceptMsg = htmlMsg + "<br /><pre>" + 
 					SafeHtmlUtils.htmlEscape(exceptMsg) + "</pre>";
-		else
-			exceptMsg = htmlMsg + "<br /><pre>" + exceptMsg + "</pre>";
 		SocatUploadDashboard.showMessage(exceptMsg);
 	}
 

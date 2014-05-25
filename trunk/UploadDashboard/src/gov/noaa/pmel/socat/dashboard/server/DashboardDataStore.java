@@ -421,7 +421,7 @@ public class DashboardDataStore {
 	 * is needed, the configuration file will be reread and this monitor 
 	 * will be restarted.
 	 */
-	private static final long MINUTES_CHECK_INTERVAL = 15;
+	private static final long MINUTES_CHECK_INTERVAL = 5;
 	private static void watchConfigFile() {
 		// Just create a time to monitor the last modified timestamp every fifteen 
 		// minutes (don't bother with a separate thread running a watcher)

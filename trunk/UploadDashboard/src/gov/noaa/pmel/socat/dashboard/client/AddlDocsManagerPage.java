@@ -100,6 +100,15 @@ public class AddlDocsManagerPage extends Composite {
 	private static final String DELETE_DOCS_FAIL_MSG =
 			"Problems deleting supplemental document";
 
+	private static final String UNEXPLAINED_FAIL_MSG = 
+			"<h3>Upload failed.</h3>" + 
+			"<p>Unexpectedly, no explanation of the failure was given</p>";
+	private static final String EXPLAINED_FAIL_MSG_START = 
+			"<h3>Upload failed.</h3>" +
+			"<p><pre>\n";
+	private static final String EXPLAINED_FAIL_MSG_END = 
+			"</pre></p>";
+
 	// Replacement strings for empty or null values
 	private static final String EMPTY_TABLE_TEXT = 
 			"No supplemental documents";
@@ -138,7 +147,6 @@ public class AddlDocsManagerPage extends Composite {
 	private HashSet<DashboardCruise> cruises;
 	private TreeSet<String> expocodes;
 	private DashboardAskPopup askOverwritePopup;
-	private boolean okayToOverwrite;
 
 	// The singleton instance of this page
 	private static AddlDocsManagerPage singleton;
@@ -159,7 +167,8 @@ public class AddlDocsManagerPage extends Composite {
 		cruises = new HashSet<DashboardCruise>();
 		expocodes = new TreeSet<String>();
 		askOverwritePopup = null;
-		okayToOverwrite = false;
+
+		clearTokens();
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -240,14 +249,7 @@ public class AddlDocsManagerPage extends Composite {
 		introHtml.setHTML(sb.toString());
 
 		// Clear the hidden tokens just to be safe
-		usernameToken.setValue("");
-		passhashToken.setValue("");
-		timestampToken.setValue("");
-		expocodesToken.setValue("");
-		omeToken.setValue("");
-
-		// Set to ask about any overwrites
-		okayToOverwrite = false;
+		clearTokens();
 
 		// Update the metadata shown by resetting the data in the data provider
 		List<DashboardMetadata> addlDocsList = listProvider.getList();
@@ -269,6 +271,33 @@ public class AddlDocsManagerPage extends Composite {
 		addlDocsGrid.setPageSize(DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 	}
 
+	/**
+	 * Clears all the Hidden tokens on the page.
+	 */
+	private void clearTokens() {
+		usernameToken.setValue("");
+		passhashToken.setValue("");
+		timestampToken.setValue("");
+		expocodesToken.setValue("");
+		omeToken.setValue("");
+	}
+
+	/**
+	 * Assigns all the Hidden tokens on the page.
+	 */
+	private void assignTokens() {
+		usernameToken.setValue(DashboardLoginPage.getUsername());
+		passhashToken.setValue(DashboardLoginPage.getPasshash());
+		String localTimestamp = 
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
+							  .format(new Date());
+		timestampToken.setValue(localTimestamp);
+		expocodesToken.setValue(
+				DashboardUtils.encodeStringArrayList(
+						new ArrayList<String>(expocodes)));
+		omeToken.setValue("false");
+	}
+
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
@@ -282,54 +311,16 @@ public class AddlDocsManagerPage extends Composite {
 
 	@UiHandler("uploadButton") 
 	void uploadButtonOnClick(ClickEvent event) {
-		// Assign the "hidden" values
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
-		timestampToken.setValue(localTimestamp);
-		expocodesToken.setValue(
-				DashboardUtils.encodeStringArrayList(
-						new ArrayList<String>(expocodes)));
-		omeToken.setValue("false");
-		// Submit the form
-		uploadForm.submit();
-	}
-
-	@UiHandler("uploadForm")
-	void uploadFormOnSubmit(SubmitEvent event) {
 		// Make sure a file was selected
 		String uploadFilename = DashboardUtils.baseName(docUpload.getFilename());
 		if ( uploadFilename.isEmpty() ) {
-			event.cancel();
-			usernameToken.setValue("");
-			passhashToken.setValue("");
-			timestampToken.setValue("");
-			expocodesToken.setValue("");
-			omeToken.setValue("");
-			okayToOverwrite = false;
 			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 
 		// Disallow any overwrite of an OME file
 		if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ) {
-			event.cancel();
-			usernameToken.setValue("");
-			passhashToken.setValue("");
-			timestampToken.setValue("");
-			expocodesToken.setValue("");
-			omeToken.setValue("");
-			okayToOverwrite = false;
 			SocatUploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
-			return;
-		}
-
-		// If this is a resubmit with overwriting, let the submit go through
-		// (event is not cancelled)
-		if ( okayToOverwrite ) {
-			okayToOverwrite = false;
 			return;
 		}
 
@@ -349,27 +340,18 @@ public class AddlDocsManagerPage extends Composite {
 			}
 		}
 
-		// If an overwrite will occur, cancel this submit and ask for confirmation
+		// If an overwrite will occur, ask for confirmation
 		if ( willOverwrite ) {
-			event.cancel();
 			message += OVERWRITE_WARNING_MSG_EPILOGUE;
 			if ( askOverwritePopup == null ) {
 				askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT, 
 						OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
 					@Override
 					public void onSuccess(Boolean result) {
-						// Resubmit only if yes; clear tokens if no or null
+						// Submit only if yes
 						if ( result == true ) {
-							okayToOverwrite = true;
+							assignTokens();
 							uploadForm.submit();
-						}
-						else {
-							usernameToken.setValue("");
-							passhashToken.setValue("");
-							timestampToken.setValue("");
-							expocodesToken.setValue("");
-							omeToken.setValue("");
-							okayToOverwrite = false;
 						}
 					}
 					@Override
@@ -383,45 +365,22 @@ public class AddlDocsManagerPage extends Composite {
 			return;
 		}
 
-		// Nothing overwritten, let the submit continue
-		// (event not cancelled)
+		assignTokens();
+		uploadForm.submit();
+	}
+
+	@UiHandler("uploadForm")
+	void uploadFormOnSubmit(SubmitEvent event) {
+		SocatUploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
-		usernameToken.setValue("");
-		passhashToken.setValue("");
-		timestampToken.setValue("");
-		expocodesToken.setValue("");
-		omeToken.setValue("");
-		okayToOverwrite = false;
-
-		// Check the result returned
-		String resultMsg = event.getResults();
-		if ( resultMsg == null ) {
-			SocatUploadDashboard.showMessage(
-					"Unexpected null result from upload of an supplemental document");
-			return;
-		}
-
-		String[] tagMsg = resultMsg.split("\n", 2);
-		if ( tagMsg.length < 2 ) {
-			// probably an error response; just display the entire message
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
-		}
-		else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
-			// Do not show any messages on success;
-			// depend on the updated list of documents to show success
-			;
-		}
-		else {
-			// Unknown response with a newline, just display the entire message
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
-		}
+		clearTokens();
+		// Process the returned message
+		processResultMsg(event.getResults());
 		// Contact the server to obtain the latest set 
 		// of supplemental documents for the current cruises
-		// Send the request to the server
-		SocatUploadDashboard.showWaitCursor();
 		service.getUpdatedCruises(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodes, 
 				new AsyncCallback<HashSet<DashboardCruise>>() {
@@ -437,6 +396,30 @@ public class AddlDocsManagerPage extends Composite {
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});
+	}
+
+	/**
+	 * Process the message returned from the upload of a dataset.
+	 * 
+	 * @param resultMsg
+	 * 		message returned from the upload of a dataset
+	 */
+	private void processResultMsg(String resultMsg) {
+		if ( resultMsg == null ) {
+			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
+			return;
+		}
+		resultMsg = resultMsg.trim();
+		if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+			// Do not show any messages on success;
+			// depend on the updated list of documents to show success
+			;
+		}
+		else {
+			// Unknown response, just display the entire message
+			SocatUploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START + 
+					SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
+		}
 	}
 
 	/**
@@ -508,7 +491,7 @@ public class AddlDocsManagerPage extends Composite {
 	}
 
 	/**
-	 * Creates the upload filename column for the table
+	 * @return the upload filename column for the table
 	 */
 	private TextColumn<DashboardMetadata> buildFilenameColumn() {
 		TextColumn<DashboardMetadata> filenameColumn = 
@@ -522,7 +505,7 @@ public class AddlDocsManagerPage extends Composite {
 	}
 
 	/**
-	 * Creates the upload timestamp column for the table
+	 * @return the upload timestamp column for the table
 	 */
 	private TextColumn<DashboardMetadata> buildUploadTimeColumn() {
 		TextColumn<DashboardMetadata> uploadTimeColumn = 
@@ -536,7 +519,7 @@ public class AddlDocsManagerPage extends Composite {
 	}
 
 	/**
-	 * Creates the upload timestamp column for the table
+	 * @return the upload timestamp column for the table
 	 */
 	private TextColumn<DashboardMetadata> buildExpocodeColumn() {
 		TextColumn<DashboardMetadata> expocodeColumn = 
@@ -549,6 +532,9 @@ public class AddlDocsManagerPage extends Composite {
 		return expocodeColumn;
 	}
 
+	/**
+	 * @return the delete column for the tables
+	 */
 	private Column<DashboardMetadata,String> buildDeleteColumn() {
 		Column<DashboardMetadata,String> deleteColumn =
 				new Column<DashboardMetadata,String>(new ButtonCell()) {
@@ -575,8 +561,9 @@ public class AddlDocsManagerPage extends Composite {
 					@Override
 					public void onSuccess(Boolean result) {
 						// Only continue if yes returned; ignore if no or null
-						if ( result == true )
+						if ( result == true ) {
 							continueDelete(deleteFilename, deleteExpocode);
+						}
 					}
 					@Override
 					public void onFailure(Throwable caught) {
@@ -589,6 +576,14 @@ public class AddlDocsManagerPage extends Composite {
 		return deleteColumn;
 	}
 
+	/**
+	 * Calls the server to delete an ancillary document from a cruise.
+	 * 
+	 * @param deleteFilename
+	 * 		upload name of the document to delete
+	 * @param deleteExpocode
+	 * 		delete the document from the cruise with this expocode
+	 */
 	private void continueDelete(String deleteFilename, String deleteExpocode) {
 		// Send the request to the server
 		SocatUploadDashboard.showWaitCursor();

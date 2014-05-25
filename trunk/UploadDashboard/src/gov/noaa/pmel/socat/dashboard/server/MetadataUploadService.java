@@ -56,8 +56,7 @@ public class MetadataUploadService extends HttpServlet {
 																throws IOException {
 		// Verify the post has the correct encoding
 		if ( ! ServletFileUpload.isMultipartContent(request) ) {
-			response.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE,
-					"Invalid request contents format for this service.");
+			sendErrMsg(response, "Invalid request contents format for this service.");
 			return;
 		}
 
@@ -102,8 +101,7 @@ public class MetadataUploadService extends HttpServlet {
 		} catch (Exception ex) {
 			if ( metadataItem != null )
 				metadataItem.delete();
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-					"Error processing the request: " + ex.getMessage());
+			sendErrMsg(response, "Error processing the request\n" + ex.getMessage());
 			return;
 		}
 
@@ -115,8 +113,7 @@ public class MetadataUploadService extends HttpServlet {
 			 ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) || 
 			 ! dataStore.validateUser(username, passhash) ) {
 			metadataItem.delete();
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					"Invalid request contents for this service.");
+			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
 		}
 		// Extract the cruise expocodes from the expocodes string
@@ -128,8 +125,7 @@ public class MetadataUploadService extends HttpServlet {
 				throw new IllegalArgumentException();
 		} catch ( IllegalArgumentException ex ) {
 			metadataItem.delete();
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-					"Invalid request contents for this service.");
+			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
 		}
 
@@ -143,10 +139,8 @@ public class MetadataUploadService extends HttpServlet {
 			uploadFilename = DashboardUtils.baseName(metadataItem.getName());
 			if ( uploadFilename.equals(OmeMetadata.OME_FILENAME) ) {
 				metadataItem.delete();
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-						"Name of the uploaded file cannot be " + 
-								OmeMetadata.OME_FILENAME + 
-						"\n    Please rename the file and try again.");
+				sendErrMsg(response, "Name of the uploaded file cannot be " + 
+						OmeMetadata.OME_FILENAME + "\nPlease rename the file and try again.");
 			}
 		}
 
@@ -212,36 +206,36 @@ public class MetadataUploadService extends HttpServlet {
 				}
 			} catch ( Exception ex ) {
 				metadataItem.delete();
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-									ex.getMessage());
+				sendErrMsg(response, ex.getMessage());
 				return;
 			}
 		}
 
-		// Generate the message for the success response
-		StringBuffer sb = new StringBuffer();
-		sb.append("Added/updated metadata document ");
-		sb.append(uploadFilename);
-		if ( cruiseExpocodes.size() == 1 )
-			sb.append(" for cruise ");
-		else
-			sb.append(" for cruises: ");
-		boolean first = true;
-		for ( String expo : cruiseExpocodes ) {
-			if ( first )
-				first = false;
-			else
-				sb.append(", ");
-			sb.append(expo);
-		}
-		String message = sb.toString();
-
 		// Send the success response
-		response.setStatus(HttpServletResponse.SC_CREATED);
+		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter respWriter = response.getWriter();
 		respWriter.println(DashboardUtils.FILE_CREATED_HEADER_TAG);
-		respWriter.println(message);
+		response.flushBuffer();
+	}
+
+	/**
+	 * Returns an error message in the given Response object.  
+	 * The response number is still 200 (SC_OK) so the message 
+	 * goes through cleanly.
+	 * 
+	 * @param response
+	 * 		write the error message here
+	 * @param errMsg
+	 * 		error message to return
+	 * @throws IOException 
+	 * 		if writing to the response object throws one
+	 */
+	private void sendErrMsg(HttpServletResponse response, String errMsg) throws IOException {
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter respWriter = response.getWriter();
+		respWriter.println(errMsg);
 		response.flushBuffer();
 	}
 

@@ -20,12 +20,10 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -406,30 +404,50 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
+	 * @param cruise
+	 * 		cruise to check
+	 * @return
+	 * 		null if the cruise is from a previous SOCAT version,
+	 * 		false if the cruise is submitted, or
+	 * 		true if the cruise is not submitted.
+	 */
+	private Boolean isUnsubmittedCruise(DashboardCruise cruise) {
+		// null for cruises from previous SOCAT versions
+		String status = cruise.getArchiveStatus();
+		if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
+				 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
+				 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
+				 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) ) 
+			return null;
+		// false for submitted cruises
+		status = cruise.getQcStatus();
+		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
+				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
+				 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+				 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) )  ) 
+			return false;
+		// true for unsubmitted cruises
+		return true;
+	}
+
+	/**
 	 * Selects or unselects cruises in the cruise list.
 	 * 
-	 * @param selected
+	 * @param select
 	 * 		if true, all unsubmitted or failed cruises will be selected;
 	 * 		otherwise, all cruises will be unselected
 	 */
-	private void selectAllCruises(boolean selected) {
+	private void selectAllCruises(boolean select) {
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		for ( DashboardCruise cruise : cruiseList ) {
-			if ( selected ) {
-				String status = cruise.getArchiveStatus();
-				if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
-						 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
-						 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
-						 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) ) 
+			if ( select ) {
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( unsubmitted == null )
 					continue;
-				status = cruise.getQcStatus();
-				if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
-						 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-						 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ||
-						 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ) )
+				if ( ! unsubmitted )
 					continue;
 			}
-			cruise.setSelected(selected);
+			cruise.setSelected(select);
 		}
 		datasetsGrid.setRowCount(cruiseList.size());
 		// Make sure the table is sorted according to the last specification
@@ -438,31 +456,25 @@ public class CruiseListPage extends Composite {
 
 	/**
 	 * Assigns cruiseSet in this instance with the set of selected cruises. 
-	 * Succeeds only if all the cruises fit the desired criterion.
 	 *  
 	 * @param onlyUnsubmitted
 	 * 		if true, fails if a submitted cruise is selected;
-	 * 		if false, no restriction and always succeeds.
+	 * 		if false, only selected cruises from this version are collected, but always succeeds;
+	 * 		if null, all selected cruises are collected, and always succeeds
 	 * @return
 	 * 		if successful
 	 */
-	private boolean getSelectedCruises(boolean onlyUnsubmitted) {
+	private boolean getSelectedCruises(Boolean onlyUnsubmitted) {
 		cruiseSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
-				// Always ignore cruises from previous SOCAT versions
-				String status = cruise.getArchiveStatus();
-				if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
-						 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
-						 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
-						 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) ) 
-					continue;
-				if ( onlyUnsubmitted ) {
-					status = cruise.getQcStatus();
-					if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-							 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-							 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-							 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) )  ) 
+				if ( onlyUnsubmitted != null ) {
+					Boolean unsubmitted = isUnsubmittedCruise(cruise);
+					// ignore cruises from previous SOCAT versions
+					if ( (unsubmitted == null) )
+						continue;
+					// Check if unsubmitted if requested
+					if ( onlyUnsubmitted && ! unsubmitted )
 						return false;
 				}
 				cruiseSet.add(cruise);
@@ -474,15 +486,16 @@ public class CruiseListPage extends Composite {
 	/**
 	 * Assigns cruiseSet in this instance with the set of selected cruises, 
 	 * then assigns expocodeSet in this instance with the expocodes of these 
-	 * cruises.  Succeeds only if all the cruises fit the desired criterion.
+	 * cruises.
 	 *  
 	 * @param onlyUnsubmitted
 	 * 		if true, fails if a submitted cruise is selected;
-	 * 		if false, no restriction and always succeeds.
+	 * 		if false, only selected cruises from this version are collected, but always succeeds;
+	 * 		if null, all selected cruises are collected, and always succeeds
 	 * @return
 	 * 		if successful
 	 */
-	private boolean getSelectedCruiseExpocodes(boolean onlyUnsubmitted) {
+	private boolean getSelectedCruiseExpocodes(Boolean onlyUnsubmitted) {
 		boolean success = getSelectedCruises(onlyUnsubmitted);
 		if ( ! success )
 			return false;
@@ -691,7 +704,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("removeFromListButton")
 	void removeFromListOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes(false);
+		getSelectedCruiseExpocodes(null);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_REMOVE_ERR_END);
@@ -761,12 +774,12 @@ public class CruiseListPage extends Composite {
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
 		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
-		TextColumn<DashboardCruise> omeMetadataColumn = buildOmeMetadataColumn();
-		TextColumn<DashboardCruise> qcStatusColumn = buildQCStatusColumn();
-		TextColumn<DashboardCruise> archiveStatusColumn = buildArchiveStatusColumn();
+		Column<DashboardCruise,String> omeMetadataColumn = buildOmeMetadataColumn();
+		Column<DashboardCruise,String> qcStatusColumn = buildQCStatusColumn();
+		Column<DashboardCruise,String> archiveStatusColumn = buildArchiveStatusColumn();
 		TextColumn<DashboardCruise> timestampColumn = buildTimestampColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
-		Column<DashboardCruise,SafeHtml> addlDocsColumn = buildAddnDocsColumn();
+		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
@@ -879,6 +892,9 @@ public class CruiseListPage extends Composite {
 		datasetsGrid.setSkipRowHoverStyleUpdate(false);
 	}
 
+	/**
+	 * @return the selection header for the table
+	 */
 	private Header<Boolean> buildSelectedHeader() {
 		Header<Boolean> selectedHeader = new Header<Boolean>(new CheckboxCell(true, false)) {
 			@Override
@@ -901,7 +917,7 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the selection column for the table
+	 * @return the selection column for the table
 	 */
 	private Column<DashboardCruise,Boolean> buildSelectedColumn() {
 		Column<DashboardCruise,Boolean> selectedColumn = 
@@ -926,7 +942,7 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the expocode column for the table
+	 * @return the expocode column for the table
 	 */
 	private TextColumn<DashboardCruise> buildExpocodeColumn() {
 		TextColumn<DashboardCruise> expocodeColumn = 
@@ -943,7 +959,7 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the timestamp column for the table
+	 * @return the timestamp column for the table
 	 */
 	private TextColumn<DashboardCruise> buildTimestampColumn() {
 		TextColumn<DashboardCruise> timestampColumn = 
@@ -960,7 +976,7 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the data-check status column for the table
+	 * @return the data-check status column for the table
 	 */
 	private Column<DashboardCruise,String> buildDataCheckColumn() {
 		Column<DashboardCruise,String> dataCheckColumn = 
@@ -1013,20 +1029,24 @@ public class CruiseListPage extends Composite {
 		dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
-				ArrayList<String> expocodes = new ArrayList<String>(1);
-				expocodes.add(cruise.getExpocode());
-				DataColumnSpecsPage.showPage(expocodes);
+				// Respond only for cruises that have not been submitted
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( (unsubmitted != null) && unsubmitted ) {
+					ArrayList<String> expocodes = new ArrayList<String>(1);
+					expocodes.add(cruise.getExpocode());
+					DataColumnSpecsPage.showPage(expocodes);
+				}
 			}
 		});
 		return dataCheckColumn;
 	}
 
 	/**
-	 * Creates the OME metadata filename column for the table
+	 * @return the OME metadata filename column for the table
 	 */
-	private TextColumn<DashboardCruise> buildOmeMetadataColumn() {
-		TextColumn<DashboardCruise> omeMetadataColumn = 
-				new TextColumn<DashboardCruise> () {
+	private Column<DashboardCruise,String> buildOmeMetadataColumn() {
+		Column<DashboardCruise,String> omeMetadataColumn = 
+				new Column<DashboardCruise,String> (new ClickableTextCell()) {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				String omeTimestamp = cruise.getOmeTimestamp();
@@ -1034,16 +1054,32 @@ public class CruiseListPage extends Composite {
 					omeTimestamp = NO_OME_METADATA_STATUS_STRING;
 				return omeTimestamp;
 			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendEscaped(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
+			}
 		};
+		omeMetadataColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, String value) {
+				// Respond only for cruises that have not been submitted
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( (unsubmitted != null) && unsubmitted )
+					OmeManagerPage.showPage(cruise);
+			}
+		});
 		return omeMetadataColumn;
 	}
 
 	/**
-	 * Creates the QC submission status column for the table
+	 * @return the QC submission status column for the table
 	 */
-	private TextColumn<DashboardCruise> buildQCStatusColumn() {
-		TextColumn<DashboardCruise> qcStatusColumn = 
-				new TextColumn<DashboardCruise> () {
+	private Column<DashboardCruise,String> buildQCStatusColumn() {
+		Column<DashboardCruise,String> qcStatusColumn = 
+				new Column<DashboardCruise,String> (new ClickableTextCell()) {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getQcStatus();
@@ -1051,16 +1087,35 @@ public class CruiseListPage extends Composite {
 					status = NO_QC_STATUS_STRING;
 				return status;
 			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendEscaped(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
+			}
 		};
+		qcStatusColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, String value) {
+				// Respond only for cruises in this version
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( unsubmitted != null ) {
+					cruiseSet.clear();
+					cruiseSet.add(cruise);
+					checkCruisesForSOCAT();
+				}
+			}
+		});
 		return qcStatusColumn;
 	}
 
 	/**
-	 * Creates the archive submission status column for the table
+	 * @return the archive submission status column for the table
 	 */
-	private TextColumn<DashboardCruise> buildArchiveStatusColumn() {
-		TextColumn<DashboardCruise> archiveStatusColumn = 
-				new TextColumn<DashboardCruise> () {
+	private Column<DashboardCruise,String> buildArchiveStatusColumn() {
+		Column<DashboardCruise,String> archiveStatusColumn = 
+				new Column<DashboardCruise,String> (new ClickableTextCell()) {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				String status = cruise.getArchiveStatus();
@@ -1068,12 +1123,31 @@ public class CruiseListPage extends Composite {
 					status = NO_ARCHIVE_STATUS_STRING;
 				return status;
 			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendEscaped(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
+			}
 		};
+		archiveStatusColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, String value) {
+				// Respond only for cruises in this version
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( unsubmitted != null ) {
+					cruiseSet.clear();
+					cruiseSet.add(cruise);
+					checkCruisesForSOCAT();
+				}
+			}
+		});
 		return archiveStatusColumn;
 	}
 
 	/**
-	 * Creates the filename column for the table
+	 * @return the filename column for the table
 	 */
 	private TextColumn<DashboardCruise> buildFilenameColumn() {
 		TextColumn<DashboardCruise> filenameColumn = 
@@ -1090,16 +1164,16 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Creates the additional metadata files column for the table
+	 * @return the additional metadata files column for the table
 	 */
-	private Column<DashboardCruise,SafeHtml> buildAddnDocsColumn() {
-		Column<DashboardCruise,SafeHtml> addnDocsColumn = 
-				new Column<DashboardCruise,SafeHtml>(new SafeHtmlCell()) {
+	private Column<DashboardCruise,String> buildAddnDocsColumn() {
+		Column<DashboardCruise,String> addnDocsColumn = 
+				new Column<DashboardCruise,String>(new ClickableTextCell()) {
 			@Override
-			public SafeHtml getValue(DashboardCruise cruise) {
+			public String getValue(DashboardCruise cruise) {
 				TreeSet<String> addlDocTitles = cruise.getAddlDocs();
 				if ( addlDocTitles.size() == 0 )
-					return SafeHtmlUtils.fromSafeConstant(NO_ADDL_DOCS_STATUS_STRING);
+					return NO_ADDL_DOCS_STATUS_STRING;
 				SafeHtmlBuilder sb = new SafeHtmlBuilder();
 				boolean firstEntry = true;
 				for ( String title : addlDocTitles ) {
@@ -1113,14 +1187,33 @@ public class CruiseListPage extends Composite {
 					sb.appendEscaped(pieces[1]);
 					sb.appendHtmlConstant(")</small>");
 				}
-				return sb.toSafeHtml();
+				return sb.toSafeHtml().asString();
+			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendHtmlConstant(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
 			}
 		};
+		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, String value) {
+				// Respond only for cruises that have not been submitted
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( (unsubmitted != null) && unsubmitted ) {
+					cruiseSet.clear();
+					cruiseSet.add(cruise);
+					AddlDocsManagerPage.showPage(cruiseSet);
+				}
+			}
+		});
 		return addnDocsColumn;
 	}
 
 	/**
-	 * Creates the owner column for the table
+	 * @return the owner column for the table
 	 */
 	 private TextColumn<DashboardCruise> buildOwnerColumn() {
 	 	TextColumn<DashboardCruise> myOwnerColumn = 

@@ -1,8 +1,6 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
-			 xmlns:mox="urn:import:org.moxieapps.gwt.uploader.client">
-
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	<ui:style src="FullWidth.css" />
 
 	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
@@ -13,12 +11,17 @@
 				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
-			<mox:Uploader addStyleNames="{style.uploader}" ui:field="filesUploader" />
-			<g:CaptionPanel addStyleNames="{style.captionpanel}" ui:field="filesCaption">
-				<g:ScrollPanel addStyleNames="{style.uploaderscroll}" >
-					<g:FlowPanel ui:field="filesPanel" />
-				</g:ScrollPanel>
-			</g:CaptionPanel>
+			<g:FormPanel ui:field="uploadForm">
+				<g:FlowPanel>
+					<g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload" />
+					<g:Hidden name="username" ui:field="usernameToken" />
+					<g:Hidden name="passhash" ui:field="passhashToken" />
+					<g:Hidden name="timestamp" ui:field="timestampToken" /> 
+					<g:Hidden name="cruiseaction" ui:field="actionToken" />
+					<g:Hidden name="cruiseencoding" ui:field="encodingToken" />
+					<g:Hidden name="cruiseformat" ui:field="formatToken" />
+				</g:FlowPanel>
+			</g:FormPanel>
 			<g:CaptionPanel addStyleNames="{style.captionpanel}" ui:field="settingsCaption">
 				<g:FlowPanel>
 					<g:RadioButton addStyleNames="{style.captionradiobutton}" 
