@@ -20,7 +20,6 @@
 
 	<!-- Other module inherits -->
 	<inherits name='com.googlecode.gwt.crypto.Crypto' />
-	<inherits name='org.moxieapps.gwt.uploader.Uploader' />
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard' />

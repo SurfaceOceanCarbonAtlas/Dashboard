@@ -87,26 +87,6 @@ body {
 	margin-right: 0.5em;
 }
 
-.fileuploadpanel {
-	display: block;
-}
-.fileuploadbutton {
-	display: inline;
-	font-size: small;
-	width: 8em;
-	margin-left: 0.5em;
-	margin-right: 0.25em;
-	margin-top: 0.1em;
-	margin-bottom: 0.1em;
-}
-.fileuploadlabel {
-	display: inline;
-	margin-left: 0.25em;
-	margin-right: 0.5em;
-	margin-top: 0.15em;
-	margin-bottom: 0.15em;
-}
-
 .fullpagecontainer {
 	width: 100%;
 	height: 100%;
@@ -287,19 +267,4 @@ body {
 	width: 90%;
 	font-size: 100%;
 	margin: 2em;
-}
-
-.uploader {
-	display: block;
-	background: #EEEEEE;
-	cursor: arrow;
-	margin-left: 1.5em;
-	margin-right: 1.5em;
-	margin-top: 1.5em;
-	margin-bottom: 0.5em;
-}
-.uploaderscroll {
-	display: block;
-	width: 100%;
-	height: 10em;
 }

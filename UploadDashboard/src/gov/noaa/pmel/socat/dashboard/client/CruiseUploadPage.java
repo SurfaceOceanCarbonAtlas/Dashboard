@@ -9,26 +9,10 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.moxieapps.gwt.uploader.client.File;
-import org.moxieapps.gwt.uploader.client.Uploader;
-import org.moxieapps.gwt.uploader.client.events.FileQueuedEvent;
-import org.moxieapps.gwt.uploader.client.events.FileQueuedHandler;
-import org.moxieapps.gwt.uploader.client.events.UploadCompleteEvent;
-import org.moxieapps.gwt.uploader.client.events.UploadCompleteHandler;
-import org.moxieapps.gwt.uploader.client.events.UploadErrorEvent;
-import org.moxieapps.gwt.uploader.client.events.UploadErrorHandler;
-import org.moxieapps.gwt.uploader.client.events.UploadProgressEvent;
-import org.moxieapps.gwt.uploader.client.events.UploadProgressHandler;
-import org.moxieapps.gwt.uploader.client.events.UploadStartEvent;
-import org.moxieapps.gwt.uploader.client.events.UploadStartHandler;
-import org.moxieapps.gwt.uploader.client.events.UploadSuccessEvent;
-import org.moxieapps.gwt.uploader.client.events.UploadSuccessHandler;
-
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,8 +22,11 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -57,7 +44,6 @@ public class CruiseUploadPage extends Composite {
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
-	private static final String FILES_CAPTION_TEXT = "Files to be uploaded";
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
 	private static final String COMMA_FORMAT_HELP = 
@@ -103,42 +89,40 @@ public class CruiseUploadPage extends Composite {
 	private static final String NO_FILE_ERROR_MSG = 
 			"Please select a data file to upload";
 	private static final String FAIL_MSG_HEADER = 
-			"<h3>Upload failed.</h3>";
+			"<h3>";
 	private static final String UNEXPLAINED_FAIL_MSG = 
-			FAIL_MSG_HEADER + 
+			"<h3>Upload failed.</h3>" + 
 			"<p>Unexpectedly, no explanation of the failure was given</p>";
-	private static final String SEE_PREVIEW_FAIL_MSG =
-			FAIL_MSG_HEADER + 
-			"<p>See the contents of the Preview for more explanation</p>";
+	private static final String EXPLAINED_FAIL_MSG_START =
+			"<br />Upload failed.</h3>" +
+			"<p><pre>\n";
+	private static final String EXPLAINED_FAIL_MSG_END = 
+			"</pre></p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<h3>No cruise expocode found.</h3>" +
+			"<br />No expocode found.</h3>" +
 			"<p>The data file needs to contain the dataset expocode in the lines " +
-			"of metadata preceding the data.  This expocode metadata line should " +
-			"look something like<br />" +
+			"of metadata preceding the data, or in an expocode data column.  " +
+			"The expocode metadata line should look something like<br />" +
 			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218<br />" +
 			"The 12 character expocode is the NODC code for the vessel carrying " +
 			"the instrumentation followed by the numeric year, month, and day of " +
 			"departure or initial measurement.  For example, 49P120101218 indicates " +
 			"a cruise on the Japanese (49) ship of opportunity Pyxis (P1) with the " +
-			"first day of the cruise on 18 December 2010.</p>" +
-			"<p>The preview on the page contains the beginning of the file as it " +
-			"appears to SOCAT.  If the contents look very strange, you might need " +
-			"to change the character encoding in the advanced settings.</p>";
-	private static final String FILE_EXISTS_FAIL_HTML = 
-			"<h3>A dataset already exists with this expocode.</h3>" +
-			"<p>The beginning of the existing dataset is given in the preview " +
-			"window.  Select the <em>" + OVERWRITE_TEXT + "</em> setting if this " +
-			"is an update to this existing dataset.";
-	private static final String CANNOT_OVERWRITE_FAIL_MSG = 
-			"<h3>A dataset already exists with this expocode.</h3>" +
-			"<p>The existing dataset cannot be overwritten because it either has " +
-			"been submitted to for QC or does not belong to you.  The beginning of " +
-			"the existing dataset is given in the preview window.";
-	private static final String FILE_DOES_NOT_EXIST_FAIL_HTML = 
-			"<h3>A dataset with this expocode does not exist.</h3>  " +
-			"The beginning of the uploaded dataset is given in the preview window.  " +
-			"If the expocode in the data file is correct, use the <em>" + CREATE_TEXT + 
-			"</em> setting to create a new dataset.";
+			"first day of the cruise on 18 December 2010.<br />" +
+			"You might need use the preview and change the character encoding " +
+			"given under the advanced settings.</p>";
+	private static final String CANNOT_OVERWRITE_FAIL_MSG_START = 
+			"<br />A dataset already exists with this expocode.</h3>" +
+			"<p>";
+	private static final String CANNOT_OVERWRITE_FAIL_MSG_END = 
+			"<br />Either you specified that this file should create a new " +
+			"dataset, or the existing dataset with this expocode cannot be " +
+			"overwritten.  Datasets cannot be overwritten if they have been " +
+			"submitted for QC, or if they do not belong to you.</p>";
+	private static final String FILE_DOES_NOT_EXIST_FAIL_MSG = 
+			"<br />A dataset with this expocode does not exist.</h3>" +
+			"<p>You specified that this file should update an existing " +
+			"dataset; however, no dataset exists with this expocode</p>";
 
 	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, CruiseUploadPage> {
 	}
@@ -149,9 +133,14 @@ public class CruiseUploadPage extends Composite {
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField FlowPanel filesPanel;
-	@UiField Uploader filesUploader;
-	@UiField CaptionPanel filesCaption;
+	@UiField FormPanel uploadForm;
+	@UiField HTML cruiseUpload;
+	@UiField Hidden usernameToken;
+	@UiField Hidden passhashToken;
+	@UiField Hidden timestampToken;
+	@UiField Hidden actionToken;
+	@UiField Hidden encodingToken;
+	@UiField Hidden formatToken;
 	@UiField CaptionPanel settingsCaption;
 	@UiField RadioButton commaRadio;
 	@UiField RadioButton tabRadio;
@@ -167,11 +156,7 @@ public class CruiseUploadPage extends Composite {
 	@UiField Button cancelButton;
 
 	private String username;
-	private String uploadAction;
-	private boolean continueUpload;
-	private ArrayList<File> queuedFiles;
-	private ArrayList<FileUploadEntry> queuedEntries;
-	private ArrayList<String> uploadedExpocodes;
+	private Element uploadElement;
 
 	// Singleton instance of this page
 	private static CruiseUploadPage singleton = null;
@@ -186,111 +171,27 @@ public class CruiseUploadPage extends Composite {
 		singleton = this;
 
 		username = "";
-		queuedFiles = new ArrayList<File>();
-		queuedEntries = new ArrayList<FileUploadEntry>();
-		uploadedExpocodes = new ArrayList<String>();
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
-		filesUploader.setUploadURL(
-				GWT.getModuleBaseURL() + "CruiseUploadService");
-		filesUploader.setButtonImageURL(SocatUploadDashboard.resources
-						.getUploadButtonsPng().getSafeUri().asString());
-		filesUploader.setButtonWidth(192);
-		filesUploader.setButtonHeight(32);
-		filesUploader.setButtonCursor(Uploader.Cursor.HAND);
-		filesUploader.setFileQueuedHandler(new FileQueuedHandler() {
-			@Override
-			public boolean onFileQueued(FileQueuedEvent evnt) {
-				updateFilesPanel(evnt.getFile());
-				return true;
+		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
+		uploadForm.setMethod(FormPanel.METHOD_POST);
+		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
+		// Create the HTML5 multiple-file upload
+		cruiseUpload.setHTML("<input type=\"file\" name=\"cruisedata\" id=\"cruisedata\" multiple \\>");
+		// Get the multiple file input element within the HTML <div>
+		uploadElement = cruiseUpload.getElement();
+		for (int k = 0; k < uploadElement.getChildCount(); k++) {
+			Element childElem = (Element) uploadElement.getChild(k);
+			if ( "cruisedata".equals(childElem.getId()) ) {
+				uploadElement = childElem;
+				break;
 			}
-		});
-		filesUploader.setUploadStartHandler(new UploadStartHandler() {
-			@Override
-			public boolean onUploadStart(UploadStartEvent evnt) {
-				// Add the POST parameters and continue with the upload
-				assignPostOptions();
-				int idx = queuedFiles.indexOf(evnt.getFile());
-				if ( idx >= 0 )
-					queuedEntries.get(idx).showUploadStarted();
-				return true;
-			}			
-		});
-		filesUploader.setUploadProgressHandler(new UploadProgressHandler() {
-			@Override
-			public boolean onUploadProgress(UploadProgressEvent evnt) {
-				int idx = queuedFiles.indexOf(evnt.getFile());
-				if ( idx >= 0 )
-					queuedEntries.get(idx).showProgress(evnt);
-				return true;
-			}
-		});
-		filesUploader.setUploadErrorHandler(new UploadErrorHandler() {
-			@Override
-			public boolean onUploadError(UploadErrorEvent evnt) {
-				int idx = queuedFiles.indexOf(evnt.getFile());
-				if ( idx >= 0 )
-					queuedEntries.get(idx).showUploadFailed();
-				// Serious problem in the upload (not normal errors)
-				String msg = evnt.getMessage();
-				if ( msg == null ) {
-					SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
-				}
-				else {
-					SocatUploadDashboard.showMessage(FAIL_MSG_HEADER + 
-							"<p>" + SafeHtmlUtils.htmlEscape(msg) + "</p>");
-				}
-				// Stop uploading files
-				continueUpload = false;
-				return true;
-			}
-		});
-		filesUploader.setUploadSuccessHandler(new UploadSuccessHandler() {
-			@Override
-			public boolean onUploadSuccess(UploadSuccessEvent evnt) {
-				int idx = queuedFiles.indexOf(evnt.getFile());
-				if ( idx >= 0 )
-					queuedEntries.get(idx).showUploadDone();
-				// Process the returned message to get the expocode or identify an error
-				String expocode = processResultMsg(evnt.getServerData());
-				if ( expocode == null ) {
-					continueUpload = false;
-				}
-				else {
-					uploadedExpocodes.add(expocode);
-				}
-				return true;
-			}
-		});
-		filesUploader.setUploadCompleteHandler(new UploadCompleteHandler() {
-			@Override
-			public boolean onUploadComplete(UploadCompleteEvent evnt) {
-				// Clear the progress label and post parameters 
-				clearPostOptions();
-				if ( continueUpload ) {
-					// If more files queued, start the next file upload;
-					// otherwise go to the DataColumnSpecsPage.
-					if ( filesUploader.getStats().getFilesQueued() > 0 ) {
-						filesUploader.startUpload();
-					}
-					else {
-						// send the list of expocodes for processing
-						DataColumnSpecsPage.showPage(uploadedExpocodes);
-						// Return the the normal cursor
-						SocatUploadDashboard.showAutoCursor();
-					}
-				}
-				else {
-					// Switch to the normal cursor
-					SocatUploadDashboard.showAutoCursor();
-				}
-				return true;
-			}
-		});
+		}
 
-		filesCaption.setCaptionText(FILES_CAPTION_TEXT);
+		clearTokens();
+
 		settingsCaption.setCaptionText(SETTINGS_CAPTION_TEXT);
 
 		commaRadio.setText(DashboardUtils.CRUISE_FORMAT_COMMA);
@@ -330,9 +231,7 @@ public class CruiseUploadPage extends Composite {
 		singleton.username = DashboardLoginPage.getUsername();
 		singleton.userInfoLabel.setText(WELCOME_INTRO + 
 				singleton.username);
-		singleton.removeAllUploadFiles();
-		singleton.uploadedExpocodes.clear();
-		singleton.clearPostOptions();
+		singleton.clearTokens();
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
 		singleton.encodingListBox.setSelectedIndex(2);
 		singleton.advancedPanel.setOpen(false);
@@ -362,63 +261,12 @@ public class CruiseUploadPage extends Composite {
 	}
 
 	/**
-	 * Adds the given upload file to the list of queued files, and 
-	 * creates an entry in the scrolled panel of files.
+	 * Assigns the values of the Hidden tokens on the page.
 	 * 
-	 * @param uploadFile
-	 * 		upload file to add
+	 * @param cruiseAction
+	 * 		value to assign to the actionToken
 	 */
-	private void updateFilesPanel(File uploadFile) {
-		queuedFiles.add(uploadFile);
-		FileUploadEntry entry = new FileUploadEntry(uploadFile);
-		queuedEntries.add(entry);
-		filesPanel.add(entry);
-	}
-
-	/**
-	 * Removes all files from the queue of files to upload.
-	 */
-	private void removeAllUploadFiles() {
-		while ( queuedFiles.size() > 0 ) {
-			removeUploadFileFromQueue(queuedFiles.get(0), false);
-		}
-	}
-
-	/**
-	 * Removes a file from the queue of files to upload.
-	 * 
-	 * @param uploadFile
-	 * 		file to remove
-	 */
-	static void removeUploadFile(File uploadFile, boolean notify) {
-		if ( singleton == null )
-			return;
-		singleton.removeUploadFileFromQueue(uploadFile, notify);
-	}
-
-	/**
-	 * Removes a file from the queue of files to upload.
-	 * 
-	 * @param uploadFile
-	 * 		file to remove
-	 * @param notify
-	 * 		if true, an UploadErrorEvent will be generated 
-	 * 		if the upload is not complete.
-	 */
-	private void removeUploadFileFromQueue(File uploadFile, boolean notify) {
-		int idx = queuedFiles.indexOf(uploadFile);
-		if ( idx < 0 )
-			return;
-		filesUploader.cancelUpload(uploadFile.getId(), notify);
-		filesPanel.remove(queuedEntries.get(idx));
-		queuedEntries.remove(idx);
-		queuedFiles.remove(idx);
-	}
-
-	/**
-	 * Sets the POST parameters contained in filesUploader.
-	 */
-	private void assignPostOptions() {
+	private void assignTokens(String cruiseAction) {
 		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 											  .format(new Date());
 		String encoding = KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()];
@@ -427,36 +275,25 @@ public class CruiseUploadPage extends Composite {
 			format = DashboardUtils.CRUISE_FORMAT_COMMA;
 		else
 			format = DashboardUtils.CRUISE_FORMAT_TAB;
-		String lastFile;
-		if ( filesUploader.getStats().getFilesQueued() > 1 )
-			lastFile = "false";
-		else
-			lastFile = "true";
 		
-		JSONObject postParams = new JSONObject();
-		postParams.put("username", new JSONString(DashboardLoginPage.getUsername()));
-		postParams.put("passhash", new JSONString(DashboardLoginPage.getPasshash()));
-		postParams.put("timestamp", new JSONString(localTimestamp));
-		postParams.put("cruiseaction", new JSONString(uploadAction));
-		postParams.put("cruiseencoding", new JSONString(encoding));
-		postParams.put("cruiseformat", new JSONString(format)); 
-		postParams.put("lastfile", new JSONString(lastFile));
-		filesUploader.setPostParams(postParams);
+		usernameToken.setValue(DashboardLoginPage.getUsername());
+		passhashToken.setValue(DashboardLoginPage.getPasshash());
+		timestampToken.setValue(localTimestamp);
+		actionToken.setValue(cruiseAction);
+		encodingToken.setValue(encoding);
+		formatToken.setValue(format); 
 	}
 
 	/**
-	 * Clears the POST parameters contained in filesUploader.
+	 * Clears the values of the Hidden tokens on the page.
 	 */
-	private void clearPostOptions() {
-		JSONObject postParams = new JSONObject();
-		postParams.put("username", new JSONString(""));
-		postParams.put("passhash", new JSONString(""));
-		postParams.put("timestamp", new JSONString(""));
-		postParams.put("cruiseaction", new JSONString(""));
-		postParams.put("cruiseencoding", new JSONString(""));
-		postParams.put("cruiseformat", new JSONString("")); 
-		postParams.put("lastfile", new JSONString(""));
-		filesUploader.setPostParams(postParams);
+	private void clearTokens() {
+		usernameToken.setValue("");
+		passhashToken.setValue("");
+		timestampToken.setValue("");
+		actionToken.setValue("");
+		encodingToken.setValue("");
+		formatToken.setValue(""); 
 	}
 
 	@UiHandler("logoutButton")
@@ -466,51 +303,73 @@ public class CruiseUploadPage extends Composite {
 		SocatUploadDashboard.showAutoCursor();
 	}
 
+	/**
+	 * @param input
+	 * 		multiple file input HTML element
+	 * @return
+	 * 		a " ; "-separated list of the filenames given 
+	 * 		in the multiple file input HTML element
+	 */
+	private static native String getInputFileNames(Element input) /*-{
+        var namesString = "";
+
+        // Just in case not multiple
+        if ( typeof (input.files) == 'undefined' || 
+             typeof (input.files.length) == 'undefined') {
+            return input.value;
+        }
+
+        for (var k = 0; k < input.files.length; k++) {
+            if ( k > 0 ) {
+                namesString += " ; ";
+            }
+            namesString += input.files[k].name;
+        }
+        return namesString;
+	}-*/;
+
 	@UiHandler("previewButton") 
 	void previewButtonOnClick(ClickEvent event) {
-		// Check if any files have been selected
-		if ( filesUploader.getStats().getFilesQueued() < 1 ) {
+		String namesString = getInputFileNames(uploadElement).trim();
+		if (  namesString.isEmpty() ) {
 			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
-		// Assign the server action requested 
-		uploadAction = DashboardUtils.REQUEST_PREVIEW_TAG;
-		// Have it submit only the first file
-		continueUpload = false;
-		// Submit the first file
-		filesUploader.startUpload();
-		// Show the "wait" cursor
-		SocatUploadDashboard.showWaitCursor();
+		assignTokens(DashboardUtils.REQUEST_PREVIEW_TAG);
+		uploadForm.submit();
 	}
 
 	@UiHandler("submitButton") 
 	void createButtonOnClick(ClickEvent event) {
-		// Check if any files have been selected
-		if ( filesUploader.getStats().getFilesQueued() < 1 ) {
+		String namesString = getInputFileNames(uploadElement).trim();
+		if (  namesString.isEmpty() ) {
 			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 		if ( overwriteRadio.getValue() )
-			uploadAction = DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG;
+			assignTokens(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG);
 		else
-			uploadAction = DashboardUtils.REQUEST_NEW_CRUISE_TAG;
-		// Have it submit all files
-		continueUpload = true;
-		// Clear the list of uploaded dataset expocodes
-		uploadedExpocodes.clear();
-		// Submit the first file
-		filesUploader.startUpload();
-		// Switch to the "wait" cursor
-		SocatUploadDashboard.showWaitCursor();
+			assignTokens(DashboardUtils.REQUEST_NEW_CRUISE_TAG);
+		uploadForm.submit();
 	}
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
-		// Stop any uploads that may be in progress
-		continueUpload = false;
 		// Return to the cruise list page after updating the cruise list
 		CruiseListPage.showPage(false);
 		// Make sure the normal cursor is shown
+		SocatUploadDashboard.showAutoCursor();
+	}
+
+	@UiHandler("uploadForm")
+	void uploadFormOnSubmit(SubmitEvent event) {
+		SocatUploadDashboard.showWaitCursor();
+	}
+
+	@UiHandler("uploadForm")
+	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
+		clearTokens();
+		processResultMsg(event.getResults());
 		SocatUploadDashboard.showAutoCursor();
 	}
 
@@ -519,101 +378,139 @@ public class CruiseUploadPage extends Composite {
 	 * 
 	 * @param resultMsg
 	 * 		message returned from the upload of a dataset
-	 * @return
-	 * 		if unsuccessful or if a preview-only, null;
-	 * 		otherwise, the expocode of the dataset.
 	 */
-	private String processResultMsg(String resultMsg) {
+	private void processResultMsg(String resultMsg) {
 		// Check the returned results
 		if ( resultMsg == null ) {
 			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
-			return null;
+			return;
 		}
-
-		String expocode = null;
 		resultMsg = resultMsg.trim();
+
+		// Preview is a special case - the start of the first file
 		if ( resultMsg.startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
 			resultMsg = resultMsg.substring(DashboardUtils.FILE_PREVIEW_HEADER_TAG.length()).trim();
 			// preview file; show partial file contents in the preview
 			String previewMsg;
-			if ( resultMsg.contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
-			else
-				previewMsg = "<pre>" + resultMsg + "</pre>";
+			previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
+			return;
 		}
-		else if ( resultMsg.startsWith(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
-			resultMsg = resultMsg.substring(DashboardUtils.NO_EXPOCODE_HEADER_TAG.length()).trim();
-			// no expocode found; show uploaded file partial contents
-			String previewMsg;
-			if ( resultMsg.contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
-			else
-				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setOpen(true);
-			previewHtml.setHTML(previewMsg);
-			SocatUploadDashboard.showMessage(NO_EXPOCODE_FAIL_MSG);
+
+		ArrayList<String> expocodes = new ArrayList<String>();
+		ArrayList<String> errMsgs = new ArrayList<String>();
+		while ( resultMsg.length() > 0 ) {			
+			if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+				// Success
+				resultMsg = resultMsg.substring(DashboardUtils.FILE_CREATED_HEADER_TAG.length());
+				String[] splitMsg = resultMsg.split("\n", 2);
+				expocodes.add(splitMsg[0].trim());
+				if ( splitMsg.length > 1 )
+					resultMsg = splitMsg[1].trim();
+				else
+					resultMsg = "";
+			}
+			else if ( resultMsg.startsWith(DashboardUtils.FILE_INVALID_HEADER_TAG) ) {
+				// An exception was thrown while processing the input file
+				resultMsg = resultMsg.substring(DashboardUtils.FILE_INVALID_HEADER_TAG.length());
+				String[] splitMsg = resultMsg.split("\n", 2);
+				String filename = splitMsg[0].trim();
+				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + 
+						EXPLAINED_FAIL_MSG_START;
+				if ( splitMsg.length > 1 )  {
+					resultMsg = splitMsg[1].trim();
+					while ( ! resultMsg.startsWith(DashboardUtils.END_OF_ERROR_MESSAGE_TAG) ) {
+						splitMsg = resultMsg.split("\n", 2);
+						String exceptMsg = splitMsg[0].trim();
+						failMsg += SafeHtmlUtils.htmlEscape(exceptMsg) + "\n";
+						if ( splitMsg.length > 1 ) {
+							resultMsg = splitMsg[1].trim();
+						}
+						else {
+							resultMsg = DashboardUtils.END_OF_ERROR_MESSAGE_TAG;
+							break;
+						}
+					}
+					resultMsg = resultMsg.substring(DashboardUtils.END_OF_ERROR_MESSAGE_TAG.length());
+					resultMsg = resultMsg.trim();
+				}
+				else
+					resultMsg = "";
+				errMsgs.add(failMsg + EXPLAINED_FAIL_MSG_END);
+			}
+			else if ( resultMsg.startsWith(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
+				// No expocode was found in the file
+				resultMsg = resultMsg.substring(DashboardUtils.NO_EXPOCODE_HEADER_TAG.length());
+				String[] splitMsg = resultMsg.split("\n", 2);
+				String filename = splitMsg[0].trim();
+				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_EXPOCODE_FAIL_MSG);
+				if ( splitMsg.length > 1 )
+					resultMsg = splitMsg[1].trim();
+				else
+					resultMsg = "";
+			}
+			else if ( resultMsg.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
+				// Cruise file exists and not permitted to overwrite; 
+				resultMsg = resultMsg.substring(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim();
+				String[] splitMsg = resultMsg.split("\n", 2);
+				String[] info = splitMsg[0].split(" ; ", 3);
+				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(info[0]);
+				if ( info.length > 1 ) 
+					failMsg += " ( " + SafeHtmlUtils.htmlEscape(info[1]) + " )";
+				failMsg += CANNOT_OVERWRITE_FAIL_MSG_START;
+				if ( info.length > 2 )
+					failMsg += "&nbsp;&nbsp;&nbsp;&nbsp;owner = " + SafeHtmlUtils.htmlEscape(info[2]);
+				errMsgs.add(failMsg + CANNOT_OVERWRITE_FAIL_MSG_END); 
+				if ( splitMsg.length > 1 )
+					resultMsg = splitMsg[1].trim();
+				else
+					resultMsg = "";
+			}
+			else if ( resultMsg.startsWith(DashboardUtils.NO_DATASET_HEADER_TAG) ) {
+				// cruise file does not exist and request was to overwrite
+				resultMsg = resultMsg.substring(DashboardUtils.NO_DATASET_HEADER_TAG.length()).trim();
+				String[] splitMsg = resultMsg.split("\n", 2);
+				String[] info = splitMsg[0].split(" ; ", 2);
+				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(info[0]);
+				if ( info.length > 1 ) 
+					failMsg += " ( " + SafeHtmlUtils.htmlEscape(info[1]) + " )";
+				errMsgs.add(failMsg + FILE_DOES_NOT_EXIST_FAIL_MSG);
+				if ( splitMsg.length > 1 )
+					resultMsg = splitMsg[1].trim();
+				else
+					resultMsg = "";
+			}
+			else if ( resultMsg.startsWith("<script language=\"javascript\">") ) {
+				// added javascript from passing through the socat firewall - ignore it
+				while ( ! resultMsg.contains("</script>") ) {
+					String[] splitMsg = resultMsg.split("\n", 2);
+					if ( splitMsg.length > 1 ) {
+						resultMsg = splitMsg[1].trim();
+					}
+					else {
+						resultMsg = "";
+						break;
+					}
+				}
+			}
+			else {
+				//  some other error message, display the whole message and be done with it
+				errMsgs.add("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
+				resultMsg = "";
+			}
 		}
-		else if ( resultMsg.startsWith(DashboardUtils.FILE_EXISTS_HEADER_TAG) ) {
-			resultMsg = resultMsg.substring(DashboardUtils.FILE_EXISTS_HEADER_TAG.length()).trim();
-			// cruise file exists and request was to create a new cruise; 
-			// show existing file partial contents in the preview
-			String previewMsg;
-			if ( resultMsg.contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
-			else
-				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setOpen(true);
-			previewHtml.setHTML(previewMsg);
-			SocatUploadDashboard.showMessage(FILE_EXISTS_FAIL_HTML);
+		// Display any error messages from the upload
+		if ( errMsgs.size() > 0 ) {
+			String errors = "";
+			for ( String msg : errMsgs ) 
+				errors += msg;
+			SocatUploadDashboard.showMessage(errors);
 		}
-		else if ( resultMsg.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
-			resultMsg = resultMsg.substring(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim();
-			// cruise file exists and not permitted to overwrite; 
-			// show existing file partial contents in the preview
-			String previewMsg;
-			if (resultMsg.contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
-			else
-				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setOpen(true);
-			previewHtml.setHTML(previewMsg);
-			SocatUploadDashboard.showMessage(CANNOT_OVERWRITE_FAIL_MSG);
+		// If any successes, go on to the data column identification page
+		if ( ! expocodes.isEmpty() ) {
+			DataColumnSpecsPage.showPage(expocodes);
 		}
-		else if ( resultMsg.startsWith(DashboardUtils.NO_FILE_HEADER_TAG) ) {
-			resultMsg = resultMsg.substring(DashboardUtils.NO_FILE_HEADER_TAG.length()).trim();
-			// cruise file does not exist and request was to overwrite
-			// an existing cruise; show partial file contents in preview
-			String previewMsg;
-			if ( resultMsg.contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
-			else
-				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setOpen(true);
-			previewHtml.setHTML(previewMsg);
-			SocatUploadDashboard.showMessage(FILE_DOES_NOT_EXIST_FAIL_HTML);
-		}
-		else if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
-			expocode = resultMsg.substring(DashboardUtils.FILE_CREATED_HEADER_TAG.length())
-					.split("\n", 2)[0].trim();
-		}
-		else if ( resultMsg.startsWith(DashboardUtils.FILE_UPDATED_HEADER_TAG) ) {
-			expocode = resultMsg.substring(DashboardUtils.FILE_UPDATED_HEADER_TAG.length())
-					.split("\n", 2)[0].trim();
-		}
-		else {
-			//  probably an error response with a newline, display the whole message in the preview
-			String previewMsg;
-			if ( resultMsg.contains("</pre>") )
-				previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
-			else
-				previewMsg = "<pre>" + resultMsg + "</pre>";
-			advancedPanel.setOpen(true);
-			previewHtml.setHTML(previewMsg);
-			SocatUploadDashboard.showMessage(SEE_PREVIEW_FAIL_MSG);
-		}
-		return expocode;
 	}
 
 }

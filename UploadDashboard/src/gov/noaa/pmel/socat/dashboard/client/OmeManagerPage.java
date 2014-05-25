@@ -68,6 +68,15 @@ public class OmeManagerPage extends Composite {
 	private static final String OVERWRITE_YES_TEXT = "Yes";
 	private static final String OVERWRITE_NO_TEXT = "No";
 
+	private static final String UNEXPLAINED_FAIL_MSG = 
+			"<h3>Upload failed.</h3>" + 
+			"<p>Unexpectedly, no explanation of the failure was given</p>";
+	private static final String EXPLAINED_FAIL_MSG_START = 
+			"<h3>Upload failed.</h3>" +
+			"<p><pre>\n";
+	private static final String EXPLAINED_FAIL_MSG_END = 
+			"</pre></p>";
+
 	interface OmeManagerPageUiBinder extends UiBinder<Widget, OmeManagerPage> {
 	}
 
@@ -91,7 +100,6 @@ public class OmeManagerPage extends Composite {
 	private String username;
 	private DashboardCruise cruise;
 	private DashboardAskPopup askOverwritePopup;
-	private boolean okayToOverwrite;
 
 	// Singleton instance of this page
 	private static OmeManagerPage singleton;
@@ -103,7 +111,6 @@ public class OmeManagerPage extends Composite {
 		username = "";
 		cruise = null;
 		askOverwritePopup = null;
-		okayToOverwrite = false;
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -111,6 +118,8 @@ public class OmeManagerPage extends Composite {
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
 		uploadForm.setAction(GWT.getModuleBaseURL() + "MetadataUploadService");
+
+		clearTokens();
 
 		uploadButton.setText(UPLOAD_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
@@ -173,14 +182,32 @@ public class OmeManagerPage extends Composite {
 				CRUISE_HTML_INTRO_EPILOGUE);
 
 		// Clear the hidden tokens just to be safe
+		clearTokens();
+	}
+
+	/**
+	 * Clears all the Hidden tokens on the page. 
+	 */
+	private void clearTokens() {
 		usernameToken.setValue("");
 		passhashToken.setValue("");
 		timestampToken.setValue("");
 		expocodesToken.setValue("");
 		omeToken.setValue("");
+	}
 
-		// Set to ask about any overwrites
-		okayToOverwrite = false;
+	/**
+	 * Assigns all the Hidden tokens on the page. 
+	 */
+	private void assignTokens() {
+		usernameToken.setValue(DashboardLoginPage.getUsername());
+		passhashToken.setValue(DashboardLoginPage.getPasshash());
+		String localTimestamp = 
+				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
+							  .format(new Date());
+		timestampToken.setValue(localTimestamp);
+		expocodesToken.setValue("[ \"" + cruise.getExpocode() + "\" ]");
+		omeToken.setValue("true");
 	}
 
 	@UiHandler("logoutButton")
@@ -196,63 +223,24 @@ public class OmeManagerPage extends Composite {
 
 	@UiHandler("uploadButton") 
 	void uploadButtonOnClick(ClickEvent event) {
-		// Assign the "hidden" values
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
-		timestampToken.setValue(localTimestamp);
-		expocodesToken.setValue("[ \"" + cruise.getExpocode() + "\" ]");
-		omeToken.setValue("true");
-		// Submit the form
-		uploadForm.submit();
-	}
-
-	@UiHandler("uploadForm")
-	void uploadFormOnSubmit(SubmitEvent event) {
 		// Make sure a file was selected
 		String uploadFilename = DashboardUtils.baseName(omeUpload.getFilename());
 		if ( uploadFilename.isEmpty() ) {
-			event.cancel();
-			usernameToken.setValue("");
-			passhashToken.setValue("");
-			timestampToken.setValue("");
-			expocodesToken.setValue("");
-			omeToken.setValue("");
-			okayToOverwrite = false;
 			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 
-		// If this is a resubmit with overwriting, let the submit go through
-		// (event is not cancelled)
-		if ( okayToOverwrite ) {
-			okayToOverwrite = false;
-			SocatUploadDashboard.showWaitCursor();
-			return;
-		}
-
-		// If an overwrite will occur, cancel this submit and ask for confirmation
+		// If an overwrite will occur, ask for confirmation
 		if ( ! cruise.getOmeTimestamp().isEmpty() ) {
-			event.cancel();
 			if ( askOverwritePopup == null ) {
 				askOverwritePopup = new DashboardAskPopup(OVERWRITE_YES_TEXT, 
 						OVERWRITE_NO_TEXT, new AsyncCallback<Boolean>() {
 					@Override
 					public void onSuccess(Boolean result) {
-						// Resubmit only if yes; clear tokens if no or null
+						// Submit only if yes
 						if ( result == true ) {
-							okayToOverwrite = true;
+							assignTokens();
 							uploadForm.submit();
-						}
-						else {
-							usernameToken.setValue("");
-							passhashToken.setValue("");
-							timestampToken.setValue("");
-							expocodesToken.setValue("");
-							omeToken.setValue("");
-							okayToOverwrite = false;
 						}
 					}
 					@Override
@@ -266,45 +254,46 @@ public class OmeManagerPage extends Composite {
 			return;
 		}
 
-		// Nothing overwritten, let the submit continue
-		// (event not cancelled)
+		// Nothing overwritten, submit the form
+		assignTokens();
+		uploadForm.submit();
+	}
+
+	@UiHandler("uploadForm")
+	void uploadFormOnSubmit(SubmitEvent event) {
 		SocatUploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
-		usernameToken.setValue("");
-		passhashToken.setValue("");
-		timestampToken.setValue("");
-		expocodesToken.setValue("");
-		omeToken.setValue("");
-		okayToOverwrite = false;
+		clearTokens();
+		processResultMsg(event.getResults());
+		// Restore the usual cursor
+		SocatUploadDashboard.showAutoCursor();
+	}
 
-		// Check the result returned
-		String resultMsg = event.getResults();
+	/**
+	 * Process the message returned from the upload of a dataset.
+	 * 
+	 * @param resultMsg
+	 * 		message returned from the upload of a dataset
+	 */
+	private void processResultMsg(String resultMsg) {
 		if ( resultMsg == null ) {
-			SocatUploadDashboard.showMessage(
-					"Unexpected null result from metadata upload");
-			SocatUploadDashboard.showAutoCursor();
+			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
 			return;
 		}
-
-		String[] tagMsg = resultMsg.split("\n", 2);
-		if ( tagMsg.length < 2 ) {
-			// probably an error response; just display the entire message
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
-		}
-		else if ( DashboardUtils.FILE_CREATED_HEADER_TAG.equals(tagMsg[0]) ) {
-			// cruise file created or updated
-			// return to the cruise list, having it request 
-			// the updated cruises for the user from the server
+		resultMsg = resultMsg.trim();
+		if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+			// cruise file created or updated; return to the cruise list, 
+			// having it request the updated cruises for the user from the server
 			CruiseListPage.showPage(false);
 		}
 		else {
-			// Unknown response with a newline, just display the entire message
-			SocatUploadDashboard.showMessage(SafeHtmlUtils.htmlEscape(resultMsg));
+			// Unknown response, just display the entire message
+			SocatUploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START + 
+					SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
 		}
-		SocatUploadDashboard.showAutoCursor();
 	}
 
 }
