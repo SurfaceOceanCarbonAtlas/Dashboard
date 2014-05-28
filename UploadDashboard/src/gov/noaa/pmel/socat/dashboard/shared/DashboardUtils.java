@@ -24,6 +24,10 @@ public class DashboardUtils {
 	public static final String REQUEST_NEW_CRUISE_TAG = "REQUEST NEW CRUISE TAG";
 	public static final String REQUEST_OVERWRITE_CRUISE_TAG = "REQUEST OVERWRITE CRUISE TAG";
 
+	// Recognized data formats
+	public static final String CRUISE_FORMAT_COMMA = "COMMA-SEPARATED VALUES";
+	public static final String CRUISE_FORMAT_TAB = "TAB-SEPARATED VALUES";
+
 	// Cruise upload result strings
 	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
 	public static final String FILE_INVALID_HEADER_TAG = "FILE INVALID HEADER TAG";
@@ -43,10 +47,6 @@ public class DashboardUtils {
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
 	public static final int MIN_EXPOCODE_LENGTH = 12;
 	public static final int MAX_EXPOCODE_LENGTH = 14;
-
-	// Recognized data formats
-	public static final String CRUISE_FORMAT_COMMA = "data are comma-separated values";
-	public static final String CRUISE_FORMAT_TAB = "data are tab-separated values";
 
 	// Maximum number of rows shown in a page of a data grid (table)
 	public static final int MAX_ROWS_PER_GRID_PAGE = 50;
