@@ -403,7 +403,8 @@ public class CruiseUploadPage extends Composite {
 		if ( splitMsgs[0].startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
 			// show partial file contents in the preview
 			String previewMsg = "<pre>\n";
-			for (int k = 1; k < splitMsgs.length; k++) {
+			int k = 0;
+			while ( k < splitMsgs.length ) {
 				// Some clean-up: remove the javascript that is added by the socat firewall
 				if ( splitMsgs[k].contains(JAVASCRIPT_START) ) {
 					while ( ! splitMsgs[k].contains(JAVASCRIPT_CLOSE) ) { 
@@ -415,6 +416,7 @@ public class CruiseUploadPage extends Composite {
 				else {
 					previewMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
 				}
+				k++;
 			}
 			previewMsg += "</pre>";
 			advancedPanel.setOpen(true);
@@ -424,7 +426,8 @@ public class CruiseUploadPage extends Composite {
 
 		ArrayList<String> expocodes = new ArrayList<String>();
 		ArrayList<String> errMsgs = new ArrayList<String>();
-		for (int k = 0; k < splitMsgs.length; k++) {
+		int k = 0;
+		while ( k < splitMsgs.length ) {
 			String header = splitMsgs[k].trim();
 			if ( header.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
 				// Success
@@ -491,6 +494,8 @@ public class CruiseUploadPage extends Composite {
 				} while ( k < splitMsgs.length );
 				errMsgs.add(failMsg + "</pre>");
 			}
+
+			k++;
 		}
 
 		// Display any error messages from the upload
