@@ -16,7 +16,4 @@ public interface DashboardResources extends ClientBundle {
 	@Source("socat_cat.png")
 	ImageResource getSocatCatPng();
 
-	@Source("upload_buttons.png")
-	ImageResource getUploadButtonsPng();
-
 }

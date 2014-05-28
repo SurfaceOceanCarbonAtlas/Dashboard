@@ -114,8 +114,10 @@ public class CruiseListPage extends Composite {
 	private static final String SUBMITTED_DATASETS_SELECTED_ERR_START = 
 			"Only data sets which have not been submitted for QC, " +
 			"or which have been suspended or failed, may be selected ";
+	private static final String ARCHIVED_DATASETS_SELECTED_ERR_START =
+			"Only data sets which have not been archived may be selected ";
 	private static final String NO_DATASET_SELECTED_ERR_START = 
-			"No data set is select ";
+			"No data set is selected ";
 	private static final String MANY_DATASETS_SELECTED_ERR_START = 
 			"Only one data set may be selected ";
 
@@ -127,7 +129,7 @@ public class CruiseListPage extends Composite {
 	private static final String FOR_ADDL_DOCS_ERR_END = 
 			"for managing supplemental documents.";
 	private static final String FOR_QC_SUBMIT_ERR_END =
-			"for submitting for QC.";
+			"for submitting for QC and archival.";
 	private static final String FOR_DELETE_ERR_END = 
 			"for deletion from the system.";
 	private static final String FOR_REMOVE_ERR_END = 
@@ -307,12 +309,16 @@ public class CruiseListPage extends Composite {
 	 * 		the latest cruise information fails.
 	 */
 	static void showPage(boolean loggingIn) {
-		// Select the appropriate error message if the request fails 
 		final String errMsg;
-		if ( loggingIn )
+		final boolean clearExpocodes;
+		if ( loggingIn ) {
 			errMsg = LOGIN_ERROR_MSG;
-		else
+			clearExpocodes = true;
+		}
+		else {
 			errMsg = GET_DATASET_LIST_ERROR_MSG;
+			clearExpocodes = false;
+		}
 		SocatUploadDashboard.showWaitCursor();
 		// Request the latest cruise list
 		service.getCruiseList(DashboardLoginPage.getUsername(), 
@@ -322,8 +328,12 @@ public class CruiseListPage extends Composite {
 			public void onSuccess(DashboardCruiseList cruises) {
 				if ( DashboardLoginPage.getUsername()
 										.equals(cruises.getUsername()) ) {
-					if ( singleton == null )
+					if ( singleton == null ) {
 						singleton = new CruiseListPage();
+					}
+					else if ( clearExpocodes ) {
+						singleton.expocodeSet.clear();
+					}
 					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.updateCruises(cruises);
 					History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
@@ -364,6 +374,21 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
+	 * Add a cruise to the selected list when the page is displayed.
+	 * This should be called just prior to calling showPage(false).  
+	 * If no cruise with the given expocode exists in the updated 
+	 * list of cruises, this expocode will be ignored. 
+	 * 
+	 * @param expocode
+	 * 		select the cruise with this expocode
+	 */
+	static void addSelectedCruise(String expocode) {
+		if ( singleton == null )
+			singleton = new CruiseListPage();
+		singleton.expocodeSet.add(expocode);
+	}
+
+	/**
 	 * Updates the cruise list page with the current username and 
 	 * with the cruises given in the argument.
 	 * 
@@ -398,6 +423,12 @@ public class CruiseListPage extends Composite {
 		if ( cruises != null ) {
 			cruiseList.addAll(cruises.values());
 		}
+		for ( DashboardCruise cruise : cruiseList ) {
+			if ( expocodeSet.contains(cruise.getExpocode()) )
+				cruise.setSelected(true);
+			else
+				cruise.setSelected(false);
+		}
 		datasetsGrid.setRowCount(cruiseList.size());
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
@@ -425,16 +456,16 @@ public class CruiseListPage extends Composite {
 				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
 				 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
 				 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) )  ) 
-			return false;
+			return Boolean.FALSE;
 		// true for unsubmitted cruises
-		return true;
+		return Boolean.TRUE;
 	}
 
 	/**
 	 * Selects or unselects cruises in the cruise list.
 	 * 
 	 * @param select
-	 * 		if true, all unsubmitted or failed cruises will be selected;
+	 * 		if true, all (and only) unsubmitted or failed cruises will be selected;
 	 * 		otherwise, all cruises will be unselected
 	 */
 	private void selectAllCruises(boolean select) {
@@ -442,12 +473,14 @@ public class CruiseListPage extends Composite {
 		for ( DashboardCruise cruise : cruiseList ) {
 			if ( select ) {
 				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( unsubmitted == null )
-					continue;
-				if ( ! unsubmitted )
-					continue;
+				if ( Boolean.TRUE.equals(unsubmitted) )
+					cruise.setSelected(true);
+				else
+					cruise.setSelected(false);
 			}
-			cruise.setSelected(select);
+			else {
+				cruise.setSelected(false);
+			}
 		}
 		datasetsGrid.setRowCount(cruiseList.size());
 		// Make sure the table is sorted according to the last specification
@@ -455,53 +488,60 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Assigns cruiseSet in this instance with the set of selected cruises. 
+	 * @return
+	 * 		true if all (and only) unsubmitted or failed cruises are selected;
+	 * 		otherwise, false.
+	 */
+	private boolean isSelectAllCruises() {
+		// result is false if there are no selected cruises
+		boolean result = false;
+		for ( DashboardCruise cruise : listProvider.getList() ) {
+			Boolean unsubmitted = isUnsubmittedCruise(cruise);
+			if ( cruise.isSelected() ) {
+				// check that this selected cruise is part of "all"
+				if ( ! Boolean.TRUE.equals(unsubmitted) )
+					return false;
+				// there was a selected cruise, so return true if there are no problems
+				result = true;
+			}
+			else {
+				// check that this unselected cruise is not part of "all"
+				if ( Boolean.TRUE.equals(unsubmitted) )
+					return false;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Assigns cruiseSet with the set of selected cruises, and 
+	 * expocodeSet with the expocodes of these cruises. 
 	 *  
 	 * @param onlyUnsubmitted
-	 * 		if true, fails if a submitted cruise is selected;
-	 * 		if false, only selected cruises from this version are collected, but always succeeds;
-	 * 		if null, all selected cruises are collected, and always succeeds
+	 * 		if true, fails if a submitted or previous version cruise is selected;
+	 * 		if false, fails if a previous version cruise is selected;
+	 * 		if null, always succeeds.
 	 * @return
 	 * 		if successful
 	 */
 	private boolean getSelectedCruises(Boolean onlyUnsubmitted) {
 		cruiseSet.clear();
+		expocodeSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
 				if ( onlyUnsubmitted != null ) {
 					Boolean unsubmitted = isUnsubmittedCruise(cruise);
-					// ignore cruises from previous SOCAT versions
-					if ( (unsubmitted == null) )
-						continue;
-					// Check if unsubmitted if requested
+					// check if from a previous SOCAT versions
+					if ( unsubmitted == null )
+						return false;
+					// check if unsubmitted, if requested
 					if ( onlyUnsubmitted && ! unsubmitted )
 						return false;
 				}
 				cruiseSet.add(cruise);
+				expocodeSet.add(cruise.getExpocode());
 			}
 		}
-		return true;
-	}
-
-	/**
-	 * Assigns cruiseSet in this instance with the set of selected cruises, 
-	 * then assigns expocodeSet in this instance with the expocodes of these 
-	 * cruises.
-	 *  
-	 * @param onlyUnsubmitted
-	 * 		if true, fails if a submitted cruise is selected;
-	 * 		if false, only selected cruises from this version are collected, but always succeeds;
-	 * 		if null, all selected cruises are collected, and always succeeds
-	 * @return
-	 * 		if successful
-	 */
-	private boolean getSelectedCruiseExpocodes(Boolean onlyUnsubmitted) {
-		boolean success = getSelectedCruises(onlyUnsubmitted);
-		if ( ! success )
-			return false;
-		expocodeSet.clear();
-		for ( DashboardCruise cruise : cruiseSet )
-			expocodeSet.add(cruise.getExpocode());
 		return true;
 	}
 
@@ -512,12 +552,15 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("uploadButton")
 	void uploadCruiseOnClick(ClickEvent event) {
+		// Save the expocodes of the currently selected cruises
+		getSelectedCruises(null);
+		// Go to the cruise upload page
 		CruiseUploadPage.showPage();
 	}
 
 	@UiHandler("viewDataButton")
 	void dataCheckOnClick(ClickEvent event) {
-		if ( ! getSelectedCruiseExpocodes(true) ) {
+		if ( ! getSelectedCruises(true) ) {
 			SocatUploadDashboard.showMessage(
 					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
@@ -545,6 +588,7 @@ public class CruiseListPage extends Composite {
 		if ( cruiseSet.size() > 1 ) {
 			SocatUploadDashboard.showMessage(
 					MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
+			return;
 		}
 		OmeManagerPage.showPage(cruiseSet.iterator().next());
 	}
@@ -566,25 +610,29 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
-		getSelectedCruises(false);
+		if ( ! getSelectedCruises(false) ) {
+			SocatUploadDashboard.showMessage(
+					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
+			return;
+		}
 		if ( cruiseSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
-		checkCruisesForSOCAT();
+		checkCruisesForSOCAT(cruiseSet);
 	}
 
 	@UiHandler("reviewButton")
 	void reviewOnClick(ClickEvent event) {
-		// TODO:
+		// TODO: implement
 		SocatUploadDashboard.showMessage("Not yet implemented");
 		return;
 	}
 
 	@UiHandler("deleteButton")
 	void deleteCruiseOnClick(ClickEvent event) {
-		if ( ! getSelectedCruiseExpocodes(true) ) {
+		if ( ! getSelectedCruises(true) ) {
 			SocatUploadDashboard.showMessage(
 					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
@@ -677,6 +725,10 @@ public class CruiseListPage extends Composite {
 			}
 			else {
 				SocatUploadDashboard.showWaitCursor();
+				// Save the currently selected cruises
+				getSelectedCruises(null);
+				// Add the expocode to the list to be selected
+				addSelectedCruise(expocode);
 				service.addCruiseToList(DashboardLoginPage.getUsername(), 
 						 DashboardLoginPage.getPasshash(), expocode, 
 						 new AsyncCallback<DashboardCruiseList>() {
@@ -704,7 +756,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("removeFromListButton")
 	void removeFromListOnClick(ClickEvent event) {
-		getSelectedCruiseExpocodes(null);
+		getSelectedCruises(null);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_REMOVE_ERR_END);
@@ -899,10 +951,7 @@ public class CruiseListPage extends Composite {
 		Header<Boolean> selectedHeader = new Header<Boolean>(new CheckboxCell(true, false)) {
 			@Override
 			public Boolean getValue() {
-				for ( DashboardCruise cruise : listProvider.getList() )
-					if ( ! cruise.isSelected() )
-						return false;
-				return true;
+				return isSelectAllCruises();
 			}
 		};
 		selectedHeader.setUpdater(new ValueUpdater<Boolean>() {
@@ -1002,27 +1051,51 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
 				String msg = getValue(cruise);
 				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
-					// No problems - render as plain text as usual
-					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-					sb.appendEscaped(msg);
-					sb.appendHtmlConstant("</em></u></div>");
+					// No problems - use normal background
+					if ( Boolean.TRUE.equals(unsubmitted) ) {
+						sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+						sb.appendEscaped(msg);
+						sb.appendHtmlConstant("</em></u></div>");
+					}
+					else {
+						sb.appendHtmlConstant("<div>");
+						sb.appendEscaped(msg);
+						sb.appendHtmlConstant("</div>");
+					}
 				}
 				else if ( msg.contains("warnings") || (msg.contains("errors") && 
 						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
 					// Only warnings or a few errors - use warning background color
-					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
-					sb.appendEscaped(msg);
-					sb.appendHtmlConstant("</em></u></div>");
+					if ( Boolean.TRUE.equals(unsubmitted) ) {
+						sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
+								SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
+						sb.appendEscaped(msg);
+						sb.appendHtmlConstant("</em></u></div>");
+					}
+					else {
+						sb.appendHtmlConstant("<div style=\"background-color:" +
+								SocatUploadDashboard.WARNING_COLOR + ";\">");
+						sb.appendEscaped(msg);
+						sb.appendHtmlConstant("</div>");
+					}
 				}
 				else {
 					// Many errors, unacceptable, or not checked - use error background color
-					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
-					sb.appendEscaped(msg);
-					sb.appendHtmlConstant("</em></u></div>");
+					if ( Boolean.TRUE.equals(unsubmitted) ) {
+						sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
+								SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
+						sb.appendEscaped(msg);
+						sb.appendHtmlConstant("</em></u></div>");
+					}
+					else {
+						sb.appendHtmlConstant("<div style=\"background-color:" +
+								SocatUploadDashboard.ERROR_COLOR + ";\">");
+						sb.appendEscaped(msg);
+						sb.appendHtmlConstant("</div>");
+					}
 				}
 			}
 		};
@@ -1031,7 +1104,10 @@ public class CruiseListPage extends Composite {
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
 				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( (unsubmitted != null) && unsubmitted ) {
+				if ( Boolean.TRUE.equals(unsubmitted) ) {
+					// Save the currently selected cruises
+					getSelectedCruises(null);
+					// Open the data column specs page for this one cruise
 					ArrayList<String> expocodes = new ArrayList<String>(1);
 					expocodes.add(cruise.getExpocode());
 					DataColumnSpecsPage.showPage(expocodes);
@@ -1057,9 +1133,17 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-				sb.appendEscaped(getValue(cruise));
-				sb.appendHtmlConstant("</em></u></div>");
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( Boolean.TRUE.equals(unsubmitted) ) {
+					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+					sb.appendEscaped(getValue(cruise));
+					sb.appendHtmlConstant("</em></u></div>");
+				}
+				else {
+					sb.appendHtmlConstant("<div>");
+					sb.appendEscaped(getValue(cruise));
+					sb.appendHtmlConstant("</div>");
+				}
 			}
 		};
 		omeMetadataColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
@@ -1067,8 +1151,12 @@ public class CruiseListPage extends Composite {
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
 				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( (unsubmitted != null) && unsubmitted )
+				if ( Boolean.TRUE.equals(unsubmitted) ) {
+					// Save the currently selected cruises
+					getSelectedCruises(null);
+					// Show the OME metadata manager page for this one cruise
 					OmeManagerPage.showPage(cruise);
+				}
 			}
 		});
 		return omeMetadataColumn;
@@ -1090,9 +1178,17 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-				sb.appendEscaped(getValue(cruise));
-				sb.appendHtmlConstant("</em></u></div>");
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( unsubmitted != null ) {
+					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+					sb.appendEscaped(getValue(cruise));
+					sb.appendHtmlConstant("</em></u></div>");
+				}
+				else {
+					sb.appendHtmlConstant("<div>");
+					sb.appendEscaped(getValue(cruise));
+					sb.appendHtmlConstant("</div>");
+				}
 			}
 		};
 		qcStatusColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
@@ -1101,9 +1197,12 @@ public class CruiseListPage extends Composite {
 				// Respond only for cruises in this version
 				Boolean unsubmitted = isUnsubmittedCruise(cruise);
 				if ( unsubmitted != null ) {
-					cruiseSet.clear();
-					cruiseSet.add(cruise);
-					checkCruisesForSOCAT();
+					// Save the currently selected cruises (in expocodeSet)
+					getSelectedCruises(null);
+					// Go to the QC page after performing the client-side checks on this one cruise
+					HashSet<DashboardCruise> singleCruiseSet = new HashSet<DashboardCruise>();
+					singleCruiseSet.add(cruise);
+					checkCruisesForSOCAT(singleCruiseSet);
 				}
 			}
 		});
@@ -1126,9 +1225,17 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-				sb.appendEscaped(getValue(cruise));
-				sb.appendHtmlConstant("</em></u></div>");
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( unsubmitted != null ) {
+					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+					sb.appendEscaped(getValue(cruise));
+					sb.appendHtmlConstant("</em></u></div>");
+				}
+				else {
+					sb.appendHtmlConstant("<div>");
+					sb.appendEscaped(getValue(cruise));
+					sb.appendHtmlConstant("</div>");
+				}
 			}
 		};
 		archiveStatusColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
@@ -1137,9 +1244,12 @@ public class CruiseListPage extends Composite {
 				// Respond only for cruises in this version
 				Boolean unsubmitted = isUnsubmittedCruise(cruise);
 				if ( unsubmitted != null ) {
-					cruiseSet.clear();
-					cruiseSet.add(cruise);
-					checkCruisesForSOCAT();
+					// Save the currently selected cruises (in expocodeSet)
+					getSelectedCruises(null);
+					// Go to the QC page after performing the client-side checks on this one cruise
+					HashSet<DashboardCruise> singleCruiseSet = new HashSet<DashboardCruise>();
+					singleCruiseSet.add(cruise);
+					checkCruisesForSOCAT(singleCruiseSet);
 				}
 			}
 		});
@@ -1192,9 +1302,17 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-				sb.appendHtmlConstant(getValue(cruise));
-				sb.appendHtmlConstant("</em></u></div>");
+				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				if ( Boolean.TRUE.equals(unsubmitted) ) {
+					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+					sb.appendHtmlConstant(getValue(cruise));
+					sb.appendHtmlConstant("</em></u></div>");
+				}
+				else {
+					sb.appendHtmlConstant("<div>");
+					sb.appendHtmlConstant(getValue(cruise));
+					sb.appendHtmlConstant("</div>");
+				}
 			}
 		};
 		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
@@ -1202,10 +1320,14 @@ public class CruiseListPage extends Composite {
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
 				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( (unsubmitted != null) && unsubmitted ) {
-					cruiseSet.clear();
-					cruiseSet.add(cruise);
-					AddlDocsManagerPage.showPage(cruiseSet);
+				if ( Boolean.TRUE.equals(unsubmitted) ) {
+					// Save the currently selected cruises (in expocodeSet)
+					getSelectedCruises(null);
+					// Go to the additional docs page with just this one cruise
+					// Go to the QC page after performing the client-side checks on this one cruise
+					HashSet<DashboardCruise> singleCruiseSet = new HashSet<DashboardCruise>();
+					singleCruiseSet.add(cruise);
+					AddlDocsManagerPage.showPage(singleCruiseSet);
 				}
 			}
 		});
@@ -1242,11 +1364,11 @@ public class CruiseListPage extends Composite {
 	 * there were no serious data issues, continues the submission to SOCAT 
 	 * by calling {@link AddToSocatPage#showPage(java.util.HashSet)}.
 	 */
-	private void checkCruisesForSOCAT() {
+	private void checkCruisesForSOCAT(final HashSet<DashboardCruise> checkSet) {
 		// Check if the cruises have metadata documents
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;
-		for ( DashboardCruise cruise : cruiseSet ) {
+		for ( DashboardCruise cruise : checkSet ) {
 			// At this time, just check that a metadata file exists
 			// and do not worry about the contents
 			if ( cruise.getOmeTimestamp().isEmpty() ) {
@@ -1267,7 +1389,7 @@ public class CruiseListPage extends Composite {
 		errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
 		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
 		boolean willAutofail = false;
-		for ( DashboardCruise cruise : cruiseSet ) {
+		for ( DashboardCruise cruise : checkSet ) {
 			String status = cruise.getDataCheckStatus();
 			if ( DashboardUtils.CHECK_STATUS_NOT_CHECKED.equals(status) ||
 				 DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(status) ) {
@@ -1300,7 +1422,7 @@ public class CruiseListPage extends Composite {
 					public void onSuccess(Boolean result) {
 						// Only proceed if yes; ignore if no or null
 						if ( result == true )
-							AddToSocatPage.showPage(cruiseSet);
+							AddToSocatPage.showPage(checkSet);
 					}
 					@Override
 					public void onFailure(Throwable ex) {
@@ -1313,7 +1435,7 @@ public class CruiseListPage extends Composite {
 			return;
 		}
 		// No problems; continue on
-		AddToSocatPage.showPage(cruiseSet);
+		AddToSocatPage.showPage(checkSet);
 	}
 
 }

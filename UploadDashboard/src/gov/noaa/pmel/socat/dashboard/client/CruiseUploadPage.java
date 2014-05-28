@@ -76,12 +76,12 @@ public class CruiseUploadPage extends Composite {
 	private static final String PREVIEW_TEXT = "Preview Data File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
 
-	private static final String CREATE_TEXT = "create a new dataset";
+	private static final String CREATE_TEXT = "file contains a new SOCAT dataset";
 	private static final String CREATE_HOVER_HELP = 
-			"the data uploaded must create a new dataset to be successful";
-	private static final String OVERWRITE_TEXT = "update an existing dataset";
+			"the data uploaded must create a new SOCAT dataset to be successful";
+	private static final String OVERWRITE_TEXT = "file replaces an existing SOCAT dataset";
 	private static final String OVERWRITE_HOVER_HELP = 
-			"the data uploaded must replace an existing dataset to be successful";
+			"the data uploaded must replace an existing SOCAT dataset to be successful";
 
 	private static final String SUBMIT_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
@@ -99,18 +99,23 @@ public class CruiseUploadPage extends Composite {
 	private static final String EXPLAINED_FAIL_MSG_END = 
 			"</pre></p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<br />No expocode found.</h3>" +
+			"<br />No valid expocode found.</h3>" +
 			"<p>The data file needs to contain the dataset expocode in the lines " +
 			"of metadata preceding the data, or in an expocode data column.  " +
 			"The expocode metadata line should look something like<br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218<br />" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218" +
+			"</p><p>" +
 			"The 12 character expocode is the NODC code for the vessel carrying " +
 			"the instrumentation followed by the numeric year, month, and day of " +
 			"departure or initial measurement.  For example, 49P120101218 indicates " +
 			"a cruise on the Japanese (49) ship of opportunity Pyxis (P1) with the " +
-			"first day of the cruise on 18 December 2010.<br />" +
-			"You might need use the preview and change the character encoding " +
-			"given under the advanced settings.</p>";
+			"first day of the cruise on 18 December 2010." +
+			"</p><p>" +
+			"Please verify a valid expocode is given in your file.  You might want " +
+			"to click the Advanced Settings option on this page and then click the " +
+			"Preview Data File button.  This will enable you to see how your file " +
+			"appears to this system and change the file encoding type if appropriate." +
+			"</p>";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG_START = 
 			"<br />A dataset already exists with this expocode.</h3>" +
 			"<p>";
@@ -123,6 +128,10 @@ public class CruiseUploadPage extends Composite {
 			"<br />A dataset with this expocode does not exist.</h3>" +
 			"<p>You specified that this file should update an existing " +
 			"dataset; however, no dataset exists with this expocode</p>";
+
+	// Remove javascript added by the SOCAT firewall
+	private static final String JAVASCRIPT_START = "<script language=\"javascript\">";
+	private static final String JAVASCRIPT_CLOSE = "</script>";
 
 	interface DashboardCruiseUploadPageUiBinder extends UiBinder<Widget, CruiseUploadPage> {
 	}
@@ -178,8 +187,9 @@ public class CruiseUploadPage extends Composite {
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
 		uploadForm.setAction(GWT.getModuleBaseURL() + "CruiseUploadService");
-		// Create the HTML5 multiple-file upload
-		cruiseUpload.setHTML("<input type=\"file\" name=\"cruisedata\" id=\"cruisedata\" multiple \\>");
+		// Create the HTML5 multiple-file upload in the HTML <div>
+		cruiseUpload.setHTML("<input type=\"file\" name=\"cruisedata\" " +
+				"id=\"cruisedata\" style=\"width: 100%;\" multiple />");
 		// Get the multiple file input element within the HTML <div>
 		uploadElement = cruiseUpload.getElement();
 		for (int k = 0; k < uploadElement.getChildCount(); k++) {
@@ -385,14 +395,26 @@ public class CruiseUploadPage extends Composite {
 			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
 			return;
 		}
-		resultMsg = resultMsg.trim();
+		String[] splitMsgs = resultMsg.trim().split("\n");
 
-		// Preview is a special case - the start of the first file
-		if ( resultMsg.startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
-			resultMsg = resultMsg.substring(DashboardUtils.FILE_PREVIEW_HEADER_TAG.length()).trim();
-			// preview file; show partial file contents in the preview
-			String previewMsg;
-			previewMsg = "<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>";
+		// Preview is a special case - the start of the first file is returned
+		if ( splitMsgs[0].startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
+			// show partial file contents in the preview
+			String previewMsg = "<pre>\n";
+			for (int k = 1; k < splitMsgs.length; k++) {
+				// Some clean-up: remove the javascript that is added by the socat firewall
+				if ( splitMsgs[k].contains(JAVASCRIPT_START) ) {
+					while ( ! splitMsgs[k].contains(JAVASCRIPT_CLOSE) ) { 
+						k++;
+						if ( k >= splitMsgs.length )
+							break;
+					}
+				}
+				else {
+					previewMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
+				}
+			}
+			previewMsg += "</pre>";
 			advancedPanel.setOpen(true);
 			previewHtml.setHTML(previewMsg);
 			return;
@@ -400,106 +422,75 @@ public class CruiseUploadPage extends Composite {
 
 		ArrayList<String> expocodes = new ArrayList<String>();
 		ArrayList<String> errMsgs = new ArrayList<String>();
-		while ( resultMsg.length() > 0 ) {			
-			if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
+		for (int k = 0; k < splitMsgs.length; k++) {
+			String header = splitMsgs[k].trim();
+			if ( header.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
 				// Success
-				resultMsg = resultMsg.substring(DashboardUtils.FILE_CREATED_HEADER_TAG.length());
-				String[] splitMsg = resultMsg.split("\n", 2);
-				expocodes.add(splitMsg[0].trim());
-				if ( splitMsg.length > 1 )
-					resultMsg = splitMsg[1].trim();
-				else
-					resultMsg = "";
+				String expo = header.substring(
+						DashboardUtils.FILE_CREATED_HEADER_TAG.length()).trim();
+				expocodes.add(expo);
 			}
-			else if ( resultMsg.startsWith(DashboardUtils.FILE_INVALID_HEADER_TAG) ) {
+			else if ( header.startsWith(DashboardUtils.FILE_INVALID_HEADER_TAG) ) {
 				// An exception was thrown while processing the input file
-				resultMsg = resultMsg.substring(DashboardUtils.FILE_INVALID_HEADER_TAG.length());
-				String[] splitMsg = resultMsg.split("\n", 2);
-				String filename = splitMsg[0].trim();
+				String filename = header.substring(
+						DashboardUtils.FILE_INVALID_HEADER_TAG.length()).trim();
 				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + 
 						EXPLAINED_FAIL_MSG_START;
-				if ( splitMsg.length > 1 )  {
-					resultMsg = splitMsg[1].trim();
-					while ( ! resultMsg.startsWith(DashboardUtils.END_OF_ERROR_MESSAGE_TAG) ) {
-						splitMsg = resultMsg.split("\n", 2);
-						String exceptMsg = splitMsg[0].trim();
-						failMsg += SafeHtmlUtils.htmlEscape(exceptMsg) + "\n";
-						if ( splitMsg.length > 1 ) {
-							resultMsg = splitMsg[1].trim();
-						}
-						else {
-							resultMsg = DashboardUtils.END_OF_ERROR_MESSAGE_TAG;
-							break;
-						}
-					}
-					resultMsg = resultMsg.substring(DashboardUtils.END_OF_ERROR_MESSAGE_TAG.length());
-					resultMsg = resultMsg.trim();
+				for (k++; k < splitMsgs.length; k++) {
+					if ( splitMsgs[k].trim().startsWith(DashboardUtils.END_OF_ERROR_MESSAGE_TAG) )
+						break;
+					failMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
 				}
-				else
-					resultMsg = "";
 				errMsgs.add(failMsg + EXPLAINED_FAIL_MSG_END);
 			}
-			else if ( resultMsg.startsWith(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
+			else if ( header.startsWith(DashboardUtils.NO_EXPOCODE_HEADER_TAG) ) {
 				// No expocode was found in the file
-				resultMsg = resultMsg.substring(DashboardUtils.NO_EXPOCODE_HEADER_TAG.length());
-				String[] splitMsg = resultMsg.split("\n", 2);
-				String filename = splitMsg[0].trim();
+				String filename = header.substring(
+						DashboardUtils.NO_EXPOCODE_HEADER_TAG.length()).trim();
 				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_EXPOCODE_FAIL_MSG);
-				if ( splitMsg.length > 1 )
-					resultMsg = splitMsg[1].trim();
-				else
-					resultMsg = "";
 			}
-			else if ( resultMsg.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
+			else if ( header.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
 				// Cruise file exists and not permitted to overwrite; 
-				resultMsg = resultMsg.substring(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim();
-				String[] splitMsg = resultMsg.split("\n", 2);
-				String[] info = splitMsg[0].split(" ; ", 3);
-				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(info[0]);
+				String[] info = header.substring(
+						DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim().split(" ; ", 3);
+				String failMsg = FAIL_MSG_HEADER;
 				if ( info.length > 1 ) 
-					failMsg += " ( " + SafeHtmlUtils.htmlEscape(info[1]) + " )";
+					failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
+				failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
 				failMsg += CANNOT_OVERWRITE_FAIL_MSG_START;
 				if ( info.length > 2 )
-					failMsg += "&nbsp;&nbsp;&nbsp;&nbsp;owner = " + SafeHtmlUtils.htmlEscape(info[2]);
+					failMsg += "&nbsp;&nbsp;&nbsp;&nbsp;owner = " + SafeHtmlUtils.htmlEscape(info[2].trim());
 				errMsgs.add(failMsg + CANNOT_OVERWRITE_FAIL_MSG_END); 
-				if ( splitMsg.length > 1 )
-					resultMsg = splitMsg[1].trim();
-				else
-					resultMsg = "";
 			}
-			else if ( resultMsg.startsWith(DashboardUtils.NO_DATASET_HEADER_TAG) ) {
+			else if ( header.startsWith(DashboardUtils.NO_DATASET_HEADER_TAG) ) {
 				// cruise file does not exist and request was to overwrite
-				resultMsg = resultMsg.substring(DashboardUtils.NO_DATASET_HEADER_TAG.length()).trim();
-				String[] splitMsg = resultMsg.split("\n", 2);
-				String[] info = splitMsg[0].split(" ; ", 2);
-				String failMsg = FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(info[0]);
+				String[] info = header.substring(
+						DashboardUtils.NO_DATASET_HEADER_TAG.length()).trim().split(" ; ", 2);
+				String failMsg = FAIL_MSG_HEADER;
 				if ( info.length > 1 ) 
-					failMsg += " ( " + SafeHtmlUtils.htmlEscape(info[1]) + " )";
+					failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
+				failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
 				errMsgs.add(failMsg + FILE_DOES_NOT_EXIST_FAIL_MSG);
-				if ( splitMsg.length > 1 )
-					resultMsg = splitMsg[1].trim();
-				else
-					resultMsg = "";
 			}
-			else if ( resultMsg.startsWith("<script language=\"javascript\">") ) {
-				// added javascript from passing through the socat firewall - ignore it
-				while ( ! resultMsg.contains("</script>") ) {
-					String[] splitMsg = resultMsg.split("\n", 2);
-					if ( splitMsg.length > 1 ) {
-						resultMsg = splitMsg[1].trim();
-					}
-					else {
-						resultMsg = "";
+			else if ( header.contains(JAVASCRIPT_START) ) {
+				// ignore the added javascript from the socat firewall
+				while ( ! splitMsgs[k].contains(JAVASCRIPT_CLOSE) ) { 
+					k++;
+					if ( k >= splitMsgs.length )
 						break;
-					}
 				}
 			}
 			else {
 				//  some other error message, display the whole message and be done with it
-				errMsgs.add("<pre>" + SafeHtmlUtils.htmlEscape(resultMsg) + "</pre>");
-				resultMsg = "";
+				String failMsg = "<pre>";
+				do {
+					failMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
+					k++;
+				} while ( k < splitMsgs.length );
+				errMsgs.add(failMsg + "</pre>");
 			}
 		}
+
 		// Display any error messages from the upload
 		if ( errMsgs.size() > 0 ) {
 			String errors = "";
@@ -509,6 +500,9 @@ public class CruiseUploadPage extends Composite {
 		}
 		// If any successes, go on to the data column identification page
 		if ( ! expocodes.isEmpty() ) {
+			// Mark all the uploaded cruises for selection the next time the cruise list is shown
+			for ( String expo : expocodes )
+				CruiseListPage.addSelectedCruise(expo);
 			DataColumnSpecsPage.showPage(expocodes);
 		}
 	}
