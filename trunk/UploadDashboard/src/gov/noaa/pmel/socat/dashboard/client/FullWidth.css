@@ -15,8 +15,10 @@ body {
 	margin: 1em;
 }
 
-.advancedpanel {
+.advancedoptionspanel {
 	display: block;
+	margin-left: 1em;
+	margin-top: 1em;
 }
 
 .agreepanel {
@@ -27,22 +29,6 @@ body {
 .agreecheckbox {
 	display: inline;
 	margin-left: 3em;
-}
-
-.captionpanel {
-	display: block;
-	margin: 1em;
-	padding-left: 1em;
-	padding-right: 0em;
-	padding-top: 0em;
-	padding-bottom: 0em;
-}
-.captionradiobutton {
-	display: block;
-	margin-top: 1em;
-	margin-bottom: 1em;
-	margin-left: 2em;
-	margin-right: 1em;
 }
 
 .cruisespanel {
@@ -164,18 +150,46 @@ body {
 	margin-bottom: 1em;
 }
 
-.previewpanel {
-	height: 25em;
-}
 .previewbutton {
 	display: block;
 	font-size: small;
 	width: 10em;
 	margin: 2em;
 }
+.previewcaptionpanel {
+	display: block;
+	margin: 1em;
+	padding-left: 1em;
+	padding-right: 0em;
+	padding-top: 0em;
+	padding-bottom: 0em;
+}
+.previewscrollpanel {
+	height: 25em;
+}
 .previewhtml {
 	padding: 0.25em;
 }
+
+.settingscaptionpanel {
+	display: block;
+	margin: 1em;
+}
+.settingsradiopanel {
+	display: block;
+	margin: 0em;
+	border-bottom-style: groove;
+	border-width: 2px;
+	border-color: #CCCCCC;
+}
+.settingsradiobutton {
+	display: block;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 2em;
+	margin-right: 1em;
+}
+
 
 .submitdockpanel {
 	width: 100%;

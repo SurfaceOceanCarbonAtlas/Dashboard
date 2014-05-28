@@ -46,13 +46,15 @@ public class CruiseUploadPage extends Composite {
 
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
+	private static final String COMMA_FORMAT_TEXT = "file contains comma-separated values";
 	private static final String COMMA_FORMAT_HELP = 
 			"the data file starts with lines of metadata, " +
-			"then have a line of comma-separated column headers, and finally " +
+			"then has a line of comma-separated column headers, and finally " +
 			"a line of comma-separated data values for each data sample";
+	private static final String TAB_FORMAT_TEXT = "file contains tab-separated values";
 	private static final String TAB_FORMAT_HELP =
 			"the data file starts with lines of metadata, " +
-			"then have a line of tab-separated column headers, and finally " +
+			"then has a line of tab-separated column headers, and finally " +
 			"a line of tab-separated data values for each data sample";
 
 	private static final String ADVANCED_HTML_MSG = 
@@ -204,9 +206,9 @@ public class CruiseUploadPage extends Composite {
 
 		settingsCaption.setCaptionText(SETTINGS_CAPTION_TEXT);
 
-		commaRadio.setText(DashboardUtils.CRUISE_FORMAT_COMMA);
+		commaRadio.setText(COMMA_FORMAT_TEXT);
 		commaRadio.setTitle(COMMA_FORMAT_HELP);
-		tabRadio.setText(DashboardUtils.CRUISE_FORMAT_TAB);
+		tabRadio.setText(TAB_FORMAT_TEXT);
 		tabRadio.setTitle(TAB_FORMAT_HELP);
 		commaRadio.setValue(false, false);
 		tabRadio.setValue(true, false);
