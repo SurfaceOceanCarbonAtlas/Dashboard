@@ -2,6 +2,23 @@ DROP TABLE IF EXISTS `WOCELocations`;
 DROP TABLE IF EXISTS `WOCEEvents`;
 DROP TABLE IF EXISTS `QCEvents`;
 DROP TABLE IF EXISTS `Reviewers`;
+DRAP TABLE IF EXISTS `Regions`;
+
+CREATE TABLE `Regions` (
+  `region_id` CHAR(1) NOT NULL DEFAULT ' ',
+  `region_name` VARCHAR(32) NOT NULL DEFAULT '',
+  PRIMARY KEY (`region_id`)
+) DEFAULT CHARSET=latin1;
+INSERT INTO `Regions` (`region_id`, `region_name`) VALUES
+  ('A', 'North Atlantic'),
+  ('C', 'Coastal'),
+  ('G', 'Global'),
+  ('I', 'Indian'),
+  ('N', 'North Pacific'), 
+  ('O', 'Southern Ocean'),
+  ('R', 'Arctic'),
+  ('T', 'Tropical Pacific'),
+  ('Z', 'Tropical Atlantic');
 
 CREATE TABLE `Reviewers` (
   `reviewer_id` INT(4) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -29,6 +46,7 @@ CREATE TABLE `QCEvents` (
   KEY `socat_version` (`socat_version`),
   KEY `region_id` (`region_id`),
   KEY `reviewer_id` (`reviewer_id`),
+  CONSTRAINT `QCEvents_region_id` FOREIGN KEY (`region_id`) REFERENCES `Regions` (`region_id`),
   CONSTRAINT `QCEvents_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `Reviewers` (`reviewer_id`)
 ) DEFAULT CHARSET=latin1;
 
@@ -69,6 +87,7 @@ CREATE TABLE `WOCELocations` (
   KEY `longitude` (`longitude`),
   KEY `latitude` (`latitude`),
   KEY `data_time` (`data_time`),
+  CONSTRAINT `WOCEPoints_region_id` FOREIGN KEY (`region_id`) REFERENCES `Regions` (`region_id`),
   CONSTRAINT `WOCEPoints_woce_id` FOREIGN KEY (`woce_id`) REFERENCES `WOCEEvents` (`woce_id`)
 ) DEFAULT CHARSET=latin1;
 
