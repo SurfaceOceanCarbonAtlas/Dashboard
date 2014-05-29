@@ -32,6 +32,8 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.ColumnSortList;
+import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -190,7 +192,7 @@ public class CruiseListPage extends Composite {
 	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
 	private static final String OME_METADATA_COLUMN_NAME = "Metadata";
-	private static final String SUBMITTED_COLUMN_NAME = "Status";
+	private static final String SUBMITTED_COLUMN_NAME = "QC Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
 	private static final String ADDL_DOCS_COLUMN_NAME = "Supplemental<br />Documents";
@@ -241,6 +243,8 @@ public class CruiseListPage extends Composite {
 	private DashboardAskPopup askDataAutofailPopup;
 	private boolean managerButtonsShown;
 	private double minTableWidth;
+	TextColumn<DashboardCruise> timestampColumn;
+	TextColumn<DashboardCruise> expocodeColumn;
 
 	// The singleton instance of this page
 	private static CruiseListPage singleton;
@@ -386,6 +390,19 @@ public class CruiseListPage extends Composite {
 		if ( singleton == null )
 			singleton = new CruiseListPage();
 		singleton.expocodeSet.add(expocode);
+	}
+
+	/**
+	 * Resorts the cruise list table first by upload timestamp 
+	 * in descending order, then by expocode in ascending order.
+	 */
+	static void resortTable() {
+		if ( singleton == null )
+			singleton = new CruiseListPage();
+		ColumnSortList sortList = singleton.datasetsGrid.getColumnSortList();
+		sortList.push(new ColumnSortInfo(singleton.expocodeColumn, true));
+		sortList.push(new ColumnSortInfo(singleton.timestampColumn, false));
+		ColumnSortEvent.fire(singleton.datasetsGrid, sortList);
 	}
 
 	/**
@@ -824,12 +841,12 @@ public class CruiseListPage extends Composite {
 
 		// Create the columns for this table
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
-		TextColumn<DashboardCruise> expocodeColumn = buildExpocodeColumn();
+		expocodeColumn = buildExpocodeColumn();
 		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
 		Column<DashboardCruise,String> omeMetadataColumn = buildOmeMetadataColumn();
 		Column<DashboardCruise,String> qcStatusColumn = buildQCStatusColumn();
 		Column<DashboardCruise,String> archiveStatusColumn = buildArchiveStatusColumn();
-		TextColumn<DashboardCruise> timestampColumn = buildTimestampColumn();
+		timestampColumn = buildTimestampColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
@@ -931,9 +948,9 @@ public class CruiseListPage extends Composite {
 		columnSortHandler.setComparator(ownerColumn, 
 				DashboardCruise.ownerComparator);
 
-		// Add the sort handler to the table, and sort by expocode by default
+		// Add the sort handler to the table, and set the default sort order
 		datasetsGrid.addColumnSortHandler(columnSortHandler);
-		datasetsGrid.getColumnSortList().push(expocodeColumn);
+		resortTable();
 
 		// Set the contents if there are no rows
 		datasetsGrid.setEmptyTableWidget(new Label(EMPTY_TABLE_TEXT));
