@@ -403,20 +403,18 @@ public class CruiseUploadPage extends Composite {
 		if ( splitMsgs[0].startsWith(DashboardUtils.FILE_PREVIEW_HEADER_TAG) ) {
 			// show partial file contents in the preview
 			String previewMsg = "<pre>\n";
-			int k = 0;
-			while ( k < splitMsgs.length ) {
+			for (int k = 0; k < splitMsgs.length; k++) {
 				// Some clean-up: remove the javascript that is added by the socat firewall
-				if ( splitMsgs[k].contains(JAVASCRIPT_START) ) {
-					while ( ! splitMsgs[k].contains(JAVASCRIPT_CLOSE) ) { 
+				if ( splitMsgs[k].trim().startsWith(JAVASCRIPT_START) ) {
+					do {
 						k++;
 						if ( k >= splitMsgs.length )
 							break;
-					}
+					} while ( ! splitMsgs[k].trim().startsWith(JAVASCRIPT_CLOSE) );
 				}
 				else {
 					previewMsg += SafeHtmlUtils.htmlEscape(splitMsgs[k]) + "\n";
 				}
-				k++;
 			}
 			previewMsg += "</pre>";
 			advancedPanel.setOpen(true);
@@ -426,8 +424,7 @@ public class CruiseUploadPage extends Composite {
 
 		ArrayList<String> expocodes = new ArrayList<String>();
 		ArrayList<String> errMsgs = new ArrayList<String>();
-		int k = 0;
-		while ( k < splitMsgs.length ) {
+		for (int k = 0; k < splitMsgs.length; k++) {
 			String header = splitMsgs[k].trim();
 			if ( header.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
 				// Success
@@ -477,13 +474,13 @@ public class CruiseUploadPage extends Composite {
 				failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
 				errMsgs.add(failMsg + FILE_DOES_NOT_EXIST_FAIL_MSG);
 			}
-			else if ( header.contains(JAVASCRIPT_START) ) {
+			else if ( header.startsWith(JAVASCRIPT_START) ) {
 				// ignore the added javascript from the socat firewall
-				while ( ! splitMsgs[k].contains(JAVASCRIPT_CLOSE) ) { 
+				do {
 					k++;
 					if ( k >= splitMsgs.length )
 						break;
-				}
+				} while ( ! splitMsgs[k].trim().startsWith(JAVASCRIPT_CLOSE) );
 			}
 			else {
 				//  some other error message, display the whole message and be done with it
@@ -494,8 +491,6 @@ public class CruiseUploadPage extends Composite {
 				} while ( k < splitMsgs.length );
 				errMsgs.add(failMsg + "</pre>");
 			}
-
-			k++;
 		}
 
 		// Display any error messages from the upload
