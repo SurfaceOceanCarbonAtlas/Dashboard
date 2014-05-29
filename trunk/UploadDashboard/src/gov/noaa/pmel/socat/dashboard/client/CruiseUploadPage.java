@@ -500,11 +500,12 @@ public class CruiseUploadPage extends Composite {
 				errors += msg;
 			SocatUploadDashboard.showMessage(errors);
 		}
-		// If any successes, go on to the data column identification page
+
+		// Process any successes
 		if ( ! expocodes.isEmpty() ) {
-			// Mark all the uploaded cruises for selection the next time the cruise list is shown
 			for ( String expo : expocodes )
 				CruiseListPage.addSelectedCruise(expo);
+			CruiseListPage.resortTable();
 			DataColumnSpecsPage.showPage(expocodes);
 		}
 	}
