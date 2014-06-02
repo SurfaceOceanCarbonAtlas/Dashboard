@@ -12,9 +12,10 @@ use etopo2.nc
 define symbol detop = `rose,return=dsetnum`
 set data "($cruise_filename)"
 
-define symbol xreg = `MAX(longitude[x=@min]-1,-180)`:`MIN(longitude[x=@max]+1,180)`
-define symbol yreg = `MAX(latitude[x=@min]-1,-90)`:`MIN(latitude[x=@max]+1,90)`
-def sym data_rose_sample = rose[d=($detop),x=($xreg),y=($yreg)]
+define symbol xreg = ,x=`MAX(longitude[x=@min]-1,-180)`:`MIN(longitude[x=@max]+1,180)`
+IF `( MIN(longitude[x=@max]+1,180)- MAX(longitude[x=@min]-1,-180)) GT 359` THEN CANCEL SYMBOL xreg
+define symbol yreg = ,y=`MAX(latitude[x=@min]-1,-90)`:`MIN(latitude[x=@max]+1,90)`
+define symbol data_rose_sample = rose[d=($detop)($xreg)($yreg)]
 LET/units="`rose[d=($detop)],return=units`"/title="`rose[d=($detop)],return=title`"  etopoDepth = samplexy(($data_rose_sample), longitude, latitude)
 
 ! plot/vs/ribbon/thick/sym=21 longitude, latitude, etopoDepth
