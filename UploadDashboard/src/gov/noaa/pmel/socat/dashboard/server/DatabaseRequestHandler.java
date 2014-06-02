@@ -27,12 +27,15 @@ import java.util.Properties;
  */
 public class DatabaseRequestHandler {
 
+	private static final String SQL_DRIVER_CLASS_TAG = "sqldriverclass";
+	private static final String DATABASE_URL_TAG = "databaseurl";
 	private static final String CATALOG_NAME_TAG = "catalogname";
 	private static final String SELECT_USER_TAG = "selectuser";
 	private static final String SELECT_PASS_TAG = "selectpass";
 	private static final String UPDATE_USER_TAG = "updateuser";
 	private static final String UPDATE_PASS_TAG = "updatepass";
 
+	String databaseUrl;
 	String catalogName;
 	String selectUser;
 	String selectPass;
@@ -66,6 +69,12 @@ public class DatabaseRequestHandler {
 		}
 
 		// Get the values given in the configuration properties file
+		String driverClassName = configProps.getProperty(SQL_DRIVER_CLASS_TAG);
+		if ( driverClassName == null )
+			driverClassName = "com.mysql.jdbc.Driver";
+		databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
+		if ( databaseUrl == null )
+			databaseUrl = "jdbc:mysql://localhost:3306/";
 		catalogName = configProps.getProperty(CATALOG_NAME_TAG);
 		if ( catalogName == null )
 			throw new IllegalArgumentException("Value for " + CATALOG_NAME_TAG + 
@@ -87,12 +96,12 @@ public class DatabaseRequestHandler {
 			throw new IllegalArgumentException("Value for " + UPDATE_PASS_TAG + 
 					" not given in " + configFilename);
 
-		// Register the MySQL driver - no harm if already registered
+		// Register the SQL driver - no harm if already registered
 		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			Class.forName(driverClassName).newInstance();
 		} catch (Exception ex) {
-			throw new SQLException(
-					"Unable to register the MySQL driver\n" + ex.getMessage());
+			throw new SQLException("Unable to register the SQL driver " + 
+					driverClassName + "\n" + ex.getMessage());
 		}
 
 		// Verify the values by making the database connections
@@ -185,16 +194,17 @@ public class DatabaseRequestHandler {
 	 */
 	private Connection makeConnection(boolean canUpdate) throws SQLException {
 		// Open a connection to the database
-		String databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
 		Connection catConn;
 		if ( canUpdate ) {
-			catConn = DriverManager.getConnection(databaseUrl, updateUser, updatePass);
+			catConn = DriverManager.getConnection(
+					databaseUrl + catalogName, updateUser, updatePass);
 		}
 		else { 	
-			catConn = DriverManager.getConnection(databaseUrl, selectUser, selectPass);
+			catConn = DriverManager.getConnection(
+					databaseUrl + catalogName, selectUser, selectPass);
 		}
 		if ( catConn == null )
-			throw new SQLException("null MySQL connection returned");
+			throw new SQLException("null SQL connection returned");
 		return catConn;
 	}
 

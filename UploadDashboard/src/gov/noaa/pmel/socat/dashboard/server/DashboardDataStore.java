@@ -423,8 +423,8 @@ public class DashboardDataStore {
 	 */
 	private static final long MINUTES_CHECK_INTERVAL = 5;
 	private static void watchConfigFile() {
-		// Just create a time to monitor the last modified timestamp every fifteen 
-		// minutes (don't bother with a separate thread running a watcher)
+		// Just create a time to monitor the last modified timestamp 
+		// of the config file every few minutes
 		(new Timer()).schedule(new TimerTask() {
 			@Override
 			public void run() {
