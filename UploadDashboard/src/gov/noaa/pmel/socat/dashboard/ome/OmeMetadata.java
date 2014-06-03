@@ -741,13 +741,8 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// <Investigator> (multiple)
 		for (OMECompositeVariable investigator : investigators) {
-			Element invElem = new Element("Investigator");
-			while (investigator.hasMoreValues()) {
-				invElem.addContent(investigator.getNextValueElement());
-			}
-			rootElem.addContent(invElem);
+			rootElem.addContent(investigator.getElement());
 		}
-
 		// End <Investigator>
 		
 		// <Dataset_Info>
@@ -843,16 +838,7 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Variables_Info>
 		Element varsInfoElem = new Element("Variables_Info");
 		for (OMECompositeVariable varInfo : variablesInfo) {
-			
-			// <Variables_Info><Variable>
-			Element varElement = new Element("Variable");
-			
-			while (varInfo.hasMoreValues()) {
-				varElement.addContent(varInfo.getNextValueElement());
-			}
-			
-			varsInfoElem.addContent(varElement);
-			// End <Variables_Info><Variable>
+			varsInfoElem.addContent(varInfo.getElement());
 		}
 		
 		rootElem.addContent(varsInfoElem);
@@ -1012,16 +998,7 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Other_Sensors>
 		Element otherSensorsElem = new Element("Other_Sensors");
 		for (OMECompositeVariable sensorInfo : otherSensors) {
-			
-			// <Method_Description><Other_Sensors><Sensor>
-			Element sensorElem = new Element("Sensor");
-			
-			while (sensorInfo.hasMoreValues()) {
-				sensorElem.addContent(sensorInfo.getNextValueElement());
-			}
-			
-			otherSensorsElem.addContent(sensorElem);
-			// End <Method_Description><Other_Sensors><Sensor>
+			otherSensorsElem.addContent(sensorInfo.getElement());
 		}
 		
 		
@@ -1041,13 +1018,8 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// <Data_Set_Link> (multiple)
 		for (OMECompositeVariable dataSetLink : dataSetLinks) {
-			Element dataSetLinkElem = new Element("Data_Set_Link");
-			while (dataSetLink.hasMoreValues()) {
-				dataSetLinkElem.addContent(dataSetLink.getNextValueElement());
-			}
-			rootElem.addContent(dataSetLinkElem);
+			rootElem.addContent(dataSetLink.getElement());
 		}
-		
 		// End <Data_Set_Link>
 		
 		// More misc root-level elements
