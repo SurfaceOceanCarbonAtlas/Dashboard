@@ -15,9 +15,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DatumLocation implements Serializable, IsSerializable {
+public class DataLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -8485668478232679181L;
+	private static final long serialVersionUID = -269233606582484244L;
 
 	Character regionID;
 	Integer rowNumber;
@@ -29,7 +29,7 @@ public class DatumLocation implements Serializable, IsSerializable {
 	/**
 	 * Creates an empty flag.
 	 */
-	public DatumLocation() {
+	public DataLocation() {
 		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
 		rowNumber = SocatCruiseData.INT_MISSING_VALUE;
 		dataDate = SocatMetadata.DATE_MISSING_VALUE;
@@ -187,9 +187,9 @@ public class DatumLocation implements Serializable, IsSerializable {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof DatumLocation) )
+		if ( ! (obj instanceof DataLocation) )
 			return false;
-		DatumLocation other = (DatumLocation) obj;
+		DataLocation other = (DataLocation) obj;
 
 		if ( ! regionID.equals(other.regionID) )
 			return false;
@@ -213,7 +213,7 @@ public class DatumLocation implements Serializable, IsSerializable {
 
 	@Override
 	public String toString() {
-		return "DatumLocation" +
+		return "DataLocation" +
 				"[ regionID='" + regionID.toString() + "'" + 
 				", rowNumber=" + rowNumber.toString() + 
 				", dataDate=" + dataDate.toString() + 

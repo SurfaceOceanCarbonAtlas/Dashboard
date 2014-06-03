@@ -408,7 +408,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						"Unexpected failure to get the dashboard configuration");
 			}
 			dataStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
-			cruiseData.setVersion(dataStore.getSocatVersion());
+			cruiseData.setVersion(dataStore.getSocatUploadVersion());
 			// Set all WOCE-3 row index sets to empty
 			ArrayList<HashSet<Integer>> woceFlags = 
 									cruiseData.getWoceThreeRowIndices();

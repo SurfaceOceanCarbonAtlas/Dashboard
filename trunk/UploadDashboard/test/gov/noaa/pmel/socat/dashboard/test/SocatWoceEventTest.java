@@ -8,7 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socat.dashboard.shared.DatumLocation;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -31,10 +31,10 @@ public class SocatWoceEventTest {
 	private static final Double MY_SOCAT_VERSION = 3.0;
 	private static final DataColumnType MY_DATA_TYPE = DataColumnType.SEA_LEVEL_PRESSURE;
 	private static final String MY_COLUMN_NAME = "SLP";
-	private static final ArrayList<DatumLocation> MY_LOCATIONS;
+	private static final ArrayList<DataLocation> MY_LOCATIONS;
 	static {
-		MY_LOCATIONS = new ArrayList<DatumLocation>(2);
-		DatumLocation loc = new DatumLocation();
+		MY_LOCATIONS = new ArrayList<DataLocation>(2);
+		DataLocation loc = new DataLocation();
 		loc.setRegionID('T');
 		loc.setRowNumber(345);
 		loc.setDataDate(new Date(3458139048000L));
@@ -42,7 +42,7 @@ public class SocatWoceEventTest {
 		loc.setLatitude(3.5);
 		loc.setDataValue(1105.450);
 		MY_LOCATIONS.add(loc);
-		loc = new DatumLocation();
+		loc = new DataLocation();
 		loc.setRegionID('T');
 		loc.setRowNumber(346);
 		loc.setDataDate(new Date(3458139203000L));

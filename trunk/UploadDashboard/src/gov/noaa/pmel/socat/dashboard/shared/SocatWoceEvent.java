@@ -19,7 +19,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 
 	DataColumnType dataType;
 	String columnName;
-	ArrayList<DatumLocation> locations;
+	ArrayList<DataLocation> locations;
 
 	/**
 	 * Creates an empty flag
@@ -28,7 +28,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 		super();
 		dataType = DataColumnType.UNKNOWN;
 		columnName = "";
-		locations = new ArrayList<DatumLocation>();
+		locations = new ArrayList<DataLocation>();
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	 * 		never null but may be empty.  The actual ArrayList 
 	 * 		in this object is returned.
 	 */
-	public ArrayList<DatumLocation> getLocations() {
+	public ArrayList<DataLocation> getLocations() {
 		return locations;
 	}
 
@@ -89,7 +89,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	 * 		is cleared.  The actual objects in the provided list 
 	 * 		are reused (shallow copy).
 	 */
-	public void setLocations(ArrayList<DatumLocation> locations) {
+	public void setLocations(ArrayList<DataLocation> locations) {
 		this.locations.clear();
 		if ( locations != null )
 			this.locations.addAll(locations);

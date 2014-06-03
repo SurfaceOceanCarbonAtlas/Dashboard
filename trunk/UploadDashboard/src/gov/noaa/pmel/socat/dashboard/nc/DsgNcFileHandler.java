@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -199,5 +200,20 @@ public class DsgNcFileHandler {
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure decimating the full DSG file: " + 
 					tool.getErrorMessage());
+	}
+
+	/**
+	 * Update the WOCE flags in the full DSG file, as well as in the given temporary
+	 * DSG file.  In the process, complete some of the missing data in WOCE event
+	 * (row number, region ID, data type).
+	 * 
+	 * @param woceEvent
+	 * 		WOCE event to use; the expocode is used to identify the full dataset to update
+	 * @param tempDsgFile
+	 * 		temporary DSG file to also update
+	 */
+	public void updateWoceFlags(SocatWoceEvent woceEvent, File tempDsgFile) {
+		// TODO:
+		throw new RuntimeException("not implemented");
 	}
 }
