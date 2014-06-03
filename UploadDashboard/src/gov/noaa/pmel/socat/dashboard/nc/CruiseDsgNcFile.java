@@ -1,8 +1,12 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -13,6 +17,7 @@ import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
 import ucar.ma2.DataType;
+import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Attribute;
 import ucar.nc2.Dimension;
 import ucar.nc2.NetcdfFileWriter;
@@ -22,18 +27,25 @@ import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 
 
-public class CruiseDsgNcFile {
+public class CruiseDsgNcFile extends File {
+
+	private static final long serialVersionUID = -3080661796027801141L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.0";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 
-	SocatMetadata metadata;
-	List<SocatCruiseData> data;
+	/**
+	 * See {@link java.io.File#File(java.lang.String)}
+	 */
+	public CruiseDsgNcFile(String filename) {
+		super(filename);
+	}
 
 	/**
-	 * Create using the given SocatMetadata and SocatCruiseData objects.
-	 * 
+	 * Creates this NetCDF DSG file with the contents of the given 
+	 * SocatMetadata object and list of SocatCruiseData objects.
+
 	 * @param metadata
 	 * 		metadata for the cruise
 	 * @param data
@@ -41,26 +53,27 @@ public class CruiseDsgNcFile {
 	 * @throws IllegalArgumentException
 	 * 		if either argument is null, or 
 	 * 		if the list of SocatCruiseData objects is empty
+	 * 
+	 * @param dsgFilename
+	 * 		NetCDF DSG file to create
+	 * @throws IllegalArgumentException
+	 * 		if metadata or data is invalid
+	 * @throws IOException
+	 * 		if creating the NetCDF file throws one
+	 * @throws InvalidRangeException
+	 * 		if creating the NetCDF file throws one
+	 * @throws IllegalAccessException
+	 * 		if creating the NetCDF file throws one
 	 */
-	public CruiseDsgNcFile(SocatMetadata metadata, List<SocatCruiseData> data) throws IllegalArgumentException {
+	public void create(SocatMetadata metadata, List<SocatCruiseData> data) 
+			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
+
 		if ( metadata == null )
 			throw new IllegalArgumentException("Invalid SocatMetadata given to the CruiseDsgNcFile constructor");
 		if ( (data == null) || (data.size() < 1) )
 			throw new IllegalArgumentException("Invalid SocatCruiseData list given to the CruiseDsgNcFile constructor");
-		this.metadata = metadata;
-		this.data = data;
-	}
 
-	/**
-	 * Creates a NetCDF DSG file containing the contents of the SocatMetadata object 
-	 * and list of SocatCruiseData objects contained in this instance.
-	 * 
-	 * @param dsgFilename
-	 * 		NetCDF DSG file to create
-	 * @throws Exception
-	 */
-	public void create(String dsgFilename) throws Exception {
-		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, dsgFilename);
+		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 
 		// According to the CF standard if a file only has one trajectory, the the trajectory dimension is not necessary.
 		// However, who knows what would break downstream from this process without it...
@@ -344,6 +357,63 @@ public class CruiseDsgNcFile {
 		}
 
 		ncfile.close();
+	}
+
+	/**
+	 * Updates this DSG file with the given WOCE flags.
+	 * Optionally will also update the data type, region ID, and 
+	 * row number in the WOCE flags from the data in this DSG file. 
+	 * 
+	 * @param woceEvent
+	 * 		WOCE flags to set
+	 * @param updateWoceEvent
+	 * 		if true, update the WOCE flags from data in this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file or the WOCE flags are not valid
+	 * @throws IOException
+	 * 		if unable to open, read from, or write to the DSG file 
+	 */
+	public void updateWoceFlags(SocatWoceEvent woceEvent, boolean updateWoceEvent) 
+			throws IllegalArgumentException, IOException {
+
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+
+		Variable var = ncfile.findVariable("longitude");
+		if ( var == null ) 
+			throw new IllegalArgumentException("Unable to find longitude variable in " + getName());
+		ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
+
+		var = ncfile.findVariable("latitude");
+		if ( var == null )
+			throw new IllegalArgumentException("Unable to find latitude variable in " + getName());
+		ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
+
+		var = ncfile.findVariable("time");
+		if ( var == null ) 
+			throw new IllegalArgumentException("Unable to find time variable in " + getName());
+		ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
+
+		String dataname = woceEvent.getColumnName();
+		ArrayDouble.D1 datavalues;
+		if ( "geolocation".equals(dataname) ) {
+			// WOCE on longitude/latitude/time
+			datavalues = null;
+		}
+		else {
+			var = ncfile.findVariable(dataname);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find " + dataname + " variable in " + getName());
+			datavalues = (ArrayDouble.D1) var.read(); 
+		}
+
+		var = ncfile.findVariable("WOCE_" + dataname);
+		if ( var == null )
+			throw new IllegalArgumentException("Unable to find WOCE_" + dataname + " variable in " + getName());
+		ArrayChar.D2 wocevalues = (ArrayChar.D2) var.read();
+
+		for ( DataLocation dataloc : woceEvent.getLocations() ) {
+			
+		}
 	}
 
 }

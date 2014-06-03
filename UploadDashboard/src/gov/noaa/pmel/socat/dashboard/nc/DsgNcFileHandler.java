@@ -76,13 +76,11 @@ public class DsgNcFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 */
-	public File getDsgNcFile(String expocode) throws IllegalArgumentException {
+	public CruiseDsgNcFile getDsgNcFile(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
 		String expo = CruiseFileHandler.checkExpocode(expocode);
-		// Generate the full path filename for this cruise NetCDF DSG
-		File dsgNcFile = new File(dsgFilesDir, expo.substring(0,4) +
+		return new CruiseDsgNcFile(dsgFilesDir + File.separator + expo.substring(0,4) +
 				File.separator + expo + ".nc");
-		return dsgNcFile;
 	}
 
 	/**
@@ -129,7 +127,7 @@ public class DsgNcFileHandler {
 		}
 
 		// Get the location and name for the NetCDF DSG file
-		File dsgFile = getDsgNcFile(omeMData.getExpocode());
+		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
 		// Make sure the parent directory exists
 		File parentDir = dsgFile.getParentFile();
@@ -152,9 +150,8 @@ public class DsgNcFileHandler {
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);
 		// Create the NetCDF DSG file
-		CruiseDsgNcFile cruiseFile = new CruiseDsgNcFile(socatMData, socatDatalist);
 		try {
-			cruiseFile.create(dsgFile.getPath());
+			dsgFile.create(socatMData, socatDatalist);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Problems creating the SOCAT DSG file " + dsgFile.getName() +
@@ -191,7 +188,7 @@ public class DsgNcFileHandler {
 		}
 
 		// Get the location and name of the full DSG file
-		File dsgFile = getDsgNcFile(expocode);
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )
 			throw new IllegalArgumentException(
 					"Full DSG file for " + expocode + " does not exist");
@@ -245,11 +242,25 @@ public class DsgNcFileHandler {
 	 * 
 	 * @param woceEvent
 	 * 		WOCE event to use; the expocode is used to identify the full dataset to update
-	 * @param tempDsgFile
-	 * 		temporary DSG file to also update
+	 * @param tempDsgFilename
+	 * 		name of the temporary DSG file to also update
+	 * @throws IllegalArgumentException 
+	 * @throws IOException 
 	 */
-	public void updateWoceFlags(SocatWoceEvent woceEvent, File tempDsgFile) {
-		// TODO:
-		throw new RuntimeException("not implemented");
+	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename) 
+			throws IllegalArgumentException, IOException {
+		// Get the location and name for the NetCDF DSG file
+		String expocode = woceEvent.getExpocode();
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.canRead() )
+			throw new IllegalArgumentException(
+					"DSG file for " + expocode + " does not exist");
+		dsgFile.updateWoceFlags(woceEvent, true);
+		CruiseDsgNcFile tempDsgFile = new CruiseDsgNcFile(tempDsgFilename);
+		if ( ! tempDsgFile.canRead() )
+			throw new IllegalArgumentException("Temporary DSG file " + 
+					tempDsgFile.getName() + " does not exist");
+		tempDsgFile.updateWoceFlags(woceEvent, false);
 	}
+
 }
