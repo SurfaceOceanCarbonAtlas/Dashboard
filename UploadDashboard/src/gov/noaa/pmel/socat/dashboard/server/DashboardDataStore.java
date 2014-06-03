@@ -48,7 +48,8 @@ public class DashboardDataStore {
 			"SocatUploadDashboard.properties";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
-	private static final String SOCAT_VERSION_NAME_TAG = "SocatVersion";
+	private static final String SOCAT_UPLOAD_VERSION_NAME_TAG = "SocatUploadVersion";
+	private static final String SOCAT_QC_VERSION_NAME_TAG = "SocatQCVersion";
 	private static final String SVN_USER_NAME_TAG = "SVNUsername";
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
@@ -69,7 +70,8 @@ public class DashboardDataStore {
 			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, " +
 					"13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
-			SOCAT_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			SOCAT_UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			SOCAT_QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
 			SVN_USER_NAME_TAG + "=SVNUsername \n" +
 			SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
@@ -105,7 +107,8 @@ public class DashboardDataStore {
 	private String encryptionSalt;
 	// Map of username to user info
 	private HashMap<String,DashboardUserInfo> userInfoMap;
-	private Double socatVersion;
+	private Double socatUploadVersion;
+	private Double socatQCVersion;
 	private UserFileHandler userFileHandler;
 	private CruiseFileHandler cruiseFileHandler;
 	private MetadataFileHandler metadataFileHandler;
@@ -185,21 +188,38 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// Read the SOCAT version
+		// Read the SOCAT versions
 		try {
-			propVal = configProps.getProperty(SOCAT_VERSION_NAME_TAG);
+			propVal = configProps.getProperty(SOCAT_UPLOAD_VERSION_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			if ( propVal.isEmpty() )
 				throw new IllegalArgumentException("blank value");
 			try {
-				socatVersion = Double.valueOf(propVal);
+				socatUploadVersion = Double.valueOf(propVal);
 			} catch (NumberFormatException ex) {
 				throw new IllegalArgumentException(ex);
 			}
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + SOCAT_VERSION_NAME_TAG + 
+			throw new IOException("Invalid " + SOCAT_UPLOAD_VERSION_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		try {
+			propVal = configProps.getProperty(SOCAT_QC_VERSION_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			if ( propVal.isEmpty() )
+				throw new IllegalArgumentException("blank value");
+			try {
+				socatQCVersion = Double.valueOf(propVal);
+			} catch (NumberFormatException ex) {
+				throw new IllegalArgumentException(ex);
+			}
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + SOCAT_QC_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -443,10 +463,18 @@ public class DashboardDataStore {
 
 	/**
 	 * @return
-	 * 		the SOCAT version
+	 * 		the SOCAT version for uploaded data; never null
 	 */
-	public Double getSocatVersion() {
-		return socatVersion;
+	public Double getSocatUploadVersion() {
+		return socatUploadVersion;
+	}
+
+	/**
+	 * @return
+	 * 		the SOCAT version for QC flagging; never null
+	 */
+	public Double getSocatQCVersion() {
+		return socatQCVersion;
 	}
 
 	/**

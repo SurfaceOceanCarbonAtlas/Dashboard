@@ -7,7 +7,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.DatumLocation;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.FileNotFoundException;
@@ -503,7 +503,7 @@ public class DatabaseRequestHandler {
 					"(`woce_id`, `region_id`, `row_num`, `longitude`, " +
 					"`latitude`, `data_time`, `data_value`) " +
 					"VALUES (?, ?, ?, ?, ?, ?, ?);");
-			for (DatumLocation location : woceEvent.getLocations() ) {
+			for (DataLocation location : woceEvent.getLocations() ) {
 				prepStmt.setLong(1, woceId);
 				prepStmt.setString(2, location.getRegionID().toString());
 				Integer intVal = location.getRowNumber();
@@ -586,18 +586,18 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Creates a DatumLocation from the values in the current row of a ResultSet.
+	 * Creates a DataLocation from the values in the current row of a ResultSet.
 	 * 
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must include 
 	 * 		columns with names region_id, row_num, longitude, latitude, data_time, 
 	 * 		and data_value.
 	 * @return
-	 * 		the created DatumLocation 
+	 * 		the created DataLocation 
 	 * @throws SQLException
 	 */
-	private DatumLocation createWoceLocation(ResultSet results) throws SQLException {
-		DatumLocation location = new DatumLocation();
+	private DataLocation createWoceLocation(ResultSet results) throws SQLException {
+		DataLocation location = new DataLocation();
 		try {
 			location.setRegionID(results.getString("region_id").charAt(0));
 		} catch (NullPointerException ex) {
@@ -657,7 +657,7 @@ public class DatabaseRequestHandler {
 					"WHERE `woce_id` = ? ORDER BY `row_num`;");
 			for (int k = 0; k < woceIds.size(); k++) {
 				// Directly modify the list of locations in the WOCE event
-				ArrayList<DatumLocation> locations = eventsList.get(k).getLocations();
+				ArrayList<DataLocation> locations = eventsList.get(k).getLocations();
 				prepStmt.setLong(1, woceIds.get(k));
 				results = prepStmt.executeQuery();
 				try {
