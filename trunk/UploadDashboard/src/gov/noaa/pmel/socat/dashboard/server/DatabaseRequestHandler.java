@@ -54,10 +54,9 @@ public class DatabaseRequestHandler {
 	 * @throws IllegalArgumentException 
 	 * 		if the properties file has missing or invalid values
 	 * @throws SQLException 
-	 * 		if there are problems connecting
-	 * 		to the database
+	 * 		if there are problems connecting to or executing a query on the database
 	 */
-	DatabaseRequestHandler(String configFilename) throws FileNotFoundException, 
+	public DatabaseRequestHandler(String configFilename) throws FileNotFoundException, 
 						IOException, IllegalArgumentException, SQLException {
 		// Read the configuration properties file
 		Properties configProps = new Properties();
@@ -69,16 +68,10 @@ public class DatabaseRequestHandler {
 		}
 
 		// Get the values given in the configuration properties file
-		String driverClassName = configProps.getProperty(SQL_DRIVER_CLASS_TAG);
-		if ( driverClassName == null )
-			driverClassName = "com.mysql.jdbc.Driver";
 		catalogName = configProps.getProperty(CATALOG_NAME_TAG);
 		if ( catalogName == null )
 			throw new IllegalArgumentException("Value for " + CATALOG_NAME_TAG + 
 					" not given in " + configFilename);
-		databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
-		if ( databaseUrl == null )
-			databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
 		selectUser = configProps.getProperty(SELECT_USER_TAG);
 		if ( selectUser == null )
 			throw new IllegalArgumentException("Value for " + SELECT_USER_TAG + 
@@ -95,13 +88,83 @@ public class DatabaseRequestHandler {
 		if ( updatePass == null )
 			throw new IllegalArgumentException("Value for " + UPDATE_PASS_TAG + 
 					" not given in " + configFilename);
+		databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
+		if ( databaseUrl == null )
+			databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
+		testConnections(configProps.getProperty(SQL_DRIVER_CLASS_TAG));
+	}
 
+	/**
+	 * Create using the given parameters
+	 * 
+	 * @param driverClassName
+	 * 		driver class name; if null, "com.mysql.jdbc.Driver" is used
+	 * @param databaseUrl
+	 * 		database URL; if null, "jdbc:mysql://localhost:3306/" plus the catalog name is used
+	 * @param catalogName
+	 * 		database catalog name
+	 * @param selectUser
+	 * 		name of database user with SELECT privileges (read-only user)
+	 * @param selectPass
+	 * 		password of database user with SELECT privileges (read-only user)
+	 * @param updateUser
+	 * 		name of database user with SELECT, UPDATE, INSERT, DELETE privileges (read-write user)
+	 * @param updatePass
+	 * 		password of database user with SELECT, UPDATE, INSERT, DELETE privileges (read-write user)
+	 * @throws IllegalArgumentException 
+	 * 		if the given value are invalid
+	 * @throws SQLException 
+	 * 		if there are problems connecting to or executing a query on the database
+	 */
+	public DatabaseRequestHandler(String driverClassName, String databaseUrl, String catalogName, 
+			String selectUser, String selectPass, String updateUser, String updatePass) 
+					throws IllegalArgumentException, SQLException {
+		if ( catalogName == null )
+			throw new IllegalArgumentException("catalog name must be given");
+		this.catalogName = catalogName;
+		if ( selectUser == null )
+			throw new IllegalArgumentException("username for select user must be given");
+		this.selectUser = selectUser;
+		if ( selectPass == null )
+			throw new IllegalArgumentException("password for select user must be given");
+		this.selectPass = selectPass;
+		if ( updateUser == null )
+			throw new IllegalArgumentException("username for update user must be given");
+		this.updateUser = updateUser;
+		if ( updatePass == null )
+			throw new IllegalArgumentException("password for update user must be given");
+		this.updatePass = updatePass;
+		if ( databaseUrl == null )
+			this.databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
+		else
+			this.databaseUrl = databaseUrl;
+		testConnections(driverClassName);
+	}
+
+	/**
+	 * Validates the parameters in this handler.
+	 * 
+	 * @param driverClassName
+	 * 		driver class name; if null, "com.mysql.jdbc.Driver" is used
+	 * @throws IllegalArgumentException
+	 * 		if either database user does not have adequate privileges
+	 * @throws SQLException
+	 * 		if connecting to the database or executing a query
+	 * 		on the database throws one
+	 */
+	private void testConnections(String driverClassName) 
+			throws IllegalArgumentException, SQLException {
 		// Register the SQL driver - no harm if already registered
+		String driver;
+		if ( driverClassName == null )
+			driver = "com.mysql.jdbc.Driver";
+		else
+			driver = driverClassName;
 		try {
-			Class.forName(driverClassName).newInstance();
+			Class.forName(driver).newInstance();
 		} catch (Exception ex) {
 			throw new SQLException("Unable to register the SQL driver " + 
-					driverClassName + "\n" + ex.getMessage());
+					driver + "\n" + ex.getMessage());
 		}
 
 		// Verify the values by making the database connections
