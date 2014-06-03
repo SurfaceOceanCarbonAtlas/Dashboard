@@ -40,17 +40,16 @@ class OMECompositeVariable {
 		return itsValuesIterator.hasNext();
 	}
 	
-	protected Element getNextValueElement() {
-		if (null == itsValuesIterator) {
-			itsValuesIterator = itsValues.iterator();
+	protected Element getElement() {
+		Element element = new Element(itsPath.getElementName());
+		for (Value subValue : itsValues) {
+			Element subElement = new Element(subValue.name);
+			subElement.setText(subValue.value);
+			
+			element.addContent(subElement);
 		}
 		
-		Value nextValue = itsValuesIterator.next();
-		
-		Element elem = new Element(nextValue.name);
-		elem.setText(nextValue.value);
-		
-		return elem;
+		return element;
 	}
 	
 	protected String getValue(String valueName) {
