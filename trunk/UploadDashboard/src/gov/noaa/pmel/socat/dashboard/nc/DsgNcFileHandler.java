@@ -15,6 +15,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -26,8 +27,10 @@ import java.util.TreeSet;
  */
 public class DsgNcFileHandler {
 
-	File dsgFilesDir;
-	File decDsgFilesDir;
+	private File dsgFilesDir;
+	private File decDsgFilesDir;
+	private File erddapDsgFlagFile;
+	private File erddapDecDsgFlagFile;
 
 	/**
 	 * Handles storage and retrieval of full and decimated NetCDF DSG files 
@@ -41,7 +44,8 @@ public class DsgNcFileHandler {
 	 * 		if the specified directories do not exist,
 	 * 		or are not directories
 	 */
-	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName) {
+	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName,
+			String erddapDsgFlagFileName, String erddapDecDsgFlagFileName) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(
@@ -50,6 +54,16 @@ public class DsgNcFileHandler {
 		if ( ! decDsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(
 					decDsgFilesDirName + " is not a directory");
+		erddapDsgFlagFile = new File(erddapDsgFlagFileName);
+		File parentDir = erddapDsgFlagFile.getParentFile();
+		if ( (parentDir == null) || ! parentDir.isDirectory() )
+			throw new IllegalArgumentException("parent directory of " + 
+					erddapDsgFlagFile.getPath() + " is not valid");
+		erddapDecDsgFlagFile = new File(erddapDecDsgFlagFileName);
+		parentDir = erddapDecDsgFlagFile.getParentFile();
+		if ( (parentDir == null) || ! parentDir.isDirectory() )
+			throw new IllegalArgumentException("parent directory of " + 
+					erddapDecDsgFlagFile.getPath() + " is not valid");
 	}
 
 	/**
@@ -200,6 +214,28 @@ public class DsgNcFileHandler {
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure decimating the full DSG file: " + 
 					tool.getErrorMessage());
+	}
+
+	/**
+	 * Notifies ERDDAP that content has changed in the DSG files. 
+	 * 
+	 * @param flagDecDsg
+	 * 		if true, also notify ERDDAP that content has changed in the decimated DSG files.
+	 * @return
+	 * 		true if successful
+	 */
+	public boolean flagErddap(boolean flagDecDsg) {
+		try {
+			FileOutputStream touchFile = new FileOutputStream(erddapDsgFlagFile);
+			touchFile.close();
+			if ( flagDecDsg ) {
+				touchFile = new FileOutputStream(erddapDecDsgFlagFile);
+				touchFile.close();
+			}
+		} catch (IOException ex) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

@@ -9,7 +9,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,8 +112,6 @@ public class DashboardDataStore {
 	private CruiseFileHandler cruiseFileHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
-	private File erddapDsgFlagFile;
-	private File erddapDecDsgFlagFile;
 	private FerretConfig ferretConf;
 	private DashboardCruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
@@ -282,52 +279,61 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// Read the DSG NC files directory names
+		// Read the DSG files directory names and ERDDAP flag file names
+		// and create the DSG NC file handler
+		String dsgFileDirName;
 		try {
-			String dsgFileDirName = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
+			dsgFileDirName = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
 			if ( dsgFileDirName == null )
 				throw new IllegalArgumentException(DSG_NC_FILES_DIR_NAME_TAG + " not defined");
 			dsgFileDirName = dsgFileDirName.trim();
-			propVal = configProps.getProperty(DEC_DSG_NC_FILES_DIR_NAME_TAG);
-			if ( propVal == null )
-				throw new IllegalArgumentException(DEC_DSG_NC_FILES_DIR_NAME_TAG + " not defined");
-			propVal = propVal.trim();
-			dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, propVal);
+		    itsLogger.info("DSG directory = " + dsgFileDirName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + DSG_NC_FILES_DIR_NAME_TAG + 
-					" or " + DEC_DSG_NC_FILES_DIR_NAME_TAG + " value specified in " + 
-					configFile.getPath() + "\n" + 
+					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// ERDDAP DSG update flag file
+		String decDsgFileDirName;
 		try {
-			propVal = configProps.getProperty(ERDDAP_DSG_FLAG_FILE_NAME_TAG);
-			if ( propVal == null )
+			decDsgFileDirName = configProps.getProperty(DEC_DSG_NC_FILES_DIR_NAME_TAG);
+			if ( decDsgFileDirName == null )
+				throw new IllegalArgumentException(DEC_DSG_NC_FILES_DIR_NAME_TAG + " not defined");
+			decDsgFileDirName = propVal.trim();
+		    itsLogger.info("Decimated DSG directory = " + decDsgFileDirName);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + DEC_DSG_NC_FILES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		String erddapDsgFlagFileName;
+		try {
+			erddapDsgFlagFileName = configProps.getProperty(ERDDAP_DSG_FLAG_FILE_NAME_TAG);
+			if ( erddapDsgFlagFileName == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
-			erddapDsgFlagFile = new File(propVal);
-			if ( ! erddapDsgFlagFile.getParentFile().isDirectory() )
-				throw new IllegalArgumentException("parent directory does not exist");
-		    itsLogger.info("ERDDAP DSG flag file = " + propVal);
+			erddapDsgFlagFileName = propVal.trim();
+		    itsLogger.info("ERDDAP DSG flag file = " + erddapDsgFlagFileName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// ERDDAP decimated DSG update flag file
+		String erddapDecDsgFlagFileName;
 		try {
-			propVal = configProps.getProperty(ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG);
-			if ( propVal == null )
+			erddapDecDsgFlagFileName = configProps.getProperty(ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG);
+			if ( erddapDecDsgFlagFileName == null )
 				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
-			erddapDecDsgFlagFile = new File(propVal);
-			if ( ! erddapDecDsgFlagFile.getParentFile().isDirectory() )
-				throw new IllegalArgumentException("parent directory does not exist");
-		    itsLogger.info("ERDDAP decimated DSG flag file = " + propVal);
+			erddapDecDsgFlagFileName = propVal.trim();
+		    itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		try {
+			dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
+					erddapDsgFlagFileName, erddapDecDsgFlagFileName);
+		} catch ( Exception ex ) {
+			throw new IOException(ex);
 		}
 		// Read the Ferret configuration filename
 		try {
@@ -515,24 +521,6 @@ public class DashboardDataStore {
 	 */
 	public DsgNcFileHandler getDsgNcFileHandler() {
 		return dsgNcFileHandler;
-	}
-
-	/**
-	 * Creates the two empty ERDDAP flag files to notify ERDDAP that content has changed.
-	 * 
-	 * @return
-	 * 		true if successfully created the flag files 
-	 */
-	public boolean flagErddap() {
-		try {
-			FileOutputStream touchFile = new FileOutputStream(erddapDsgFlagFile);
-			touchFile.close();
-			touchFile = new FileOutputStream(erddapDecDsgFlagFile);
-			touchFile.close();
-		} catch (IOException ex) {
-			return false;
-		}
-		return true;
 	}
 
 	/**

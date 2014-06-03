@@ -72,13 +72,13 @@ public class DatabaseRequestHandler {
 		String driverClassName = configProps.getProperty(SQL_DRIVER_CLASS_TAG);
 		if ( driverClassName == null )
 			driverClassName = "com.mysql.jdbc.Driver";
-		databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
-		if ( databaseUrl == null )
-			databaseUrl = "jdbc:mysql://localhost:3306/";
 		catalogName = configProps.getProperty(CATALOG_NAME_TAG);
 		if ( catalogName == null )
 			throw new IllegalArgumentException("Value for " + CATALOG_NAME_TAG + 
 					" not given in " + configFilename);
+		databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
+		if ( databaseUrl == null )
+			databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
 		selectUser = configProps.getProperty(SELECT_USER_TAG);
 		if ( selectUser == null )
 			throw new IllegalArgumentException("Value for " + SELECT_USER_TAG + 
@@ -196,12 +196,10 @@ public class DatabaseRequestHandler {
 		// Open a connection to the database
 		Connection catConn;
 		if ( canUpdate ) {
-			catConn = DriverManager.getConnection(
-					databaseUrl + catalogName, updateUser, updatePass);
+			catConn = DriverManager.getConnection(databaseUrl, updateUser, updatePass);
 		}
 		else { 	
-			catConn = DriverManager.getConnection(
-					databaseUrl + catalogName, selectUser, selectPass);
+			catConn = DriverManager.getConnection(databaseUrl, selectUser, selectPass);
 		}
 		if ( catConn == null )
 			throw new SQLException("null SQL connection returned");
