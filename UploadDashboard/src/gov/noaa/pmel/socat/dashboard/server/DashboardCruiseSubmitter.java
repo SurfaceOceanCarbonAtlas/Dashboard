@@ -27,7 +27,6 @@ import uk.ac.uea.socat.sanitychecker.Output;
  */
 public class DashboardCruiseSubmitter {
 
-	DashboardDataStore dataStore;
 	CruiseFileHandler cruiseHandler;
 	MetadataFileHandler metadataHandler;
 	DashboardCruiseChecker cruiseChecker;
@@ -38,7 +37,6 @@ public class DashboardCruiseSubmitter {
 	 * Create with the file handlers and data checker in the given data store.
 	 */
 	public DashboardCruiseSubmitter(DashboardDataStore dataStore) {
-		this.dataStore = dataStore;
 		cruiseHandler = dataStore.getCruiseFileHandler();
 		metadataHandler = dataStore.getMetadataFileHandler();
 		cruiseChecker = dataStore.getDashboardCruiseChecker();
@@ -178,7 +176,7 @@ public class DashboardCruiseSubmitter {
 
 		// notify ERDDAP of new/updated cruises
 		if ( ! ingestExpos.isEmpty() )
-			dataStore.flagErddap();
+			dsgNcHandler.flagErddap(true);
 
 		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 
