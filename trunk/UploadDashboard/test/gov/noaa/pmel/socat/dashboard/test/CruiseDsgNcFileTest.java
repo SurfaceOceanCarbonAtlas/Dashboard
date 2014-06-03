@@ -110,13 +110,13 @@ public class CruiseDsgNcFileTest {
 		mdata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC"));
 		mdata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC"));
 
-		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(mdata, dataList);
 		File parentDir = new File("/var/tmp/socat");
 		if ( ! parentDir.exists() )
 			parentDir.mkdir();
 		filename = parentDir.getPath() + File.separator + expocode + ".nc";
-		sdgncFile.create(filename);
-		assertTrue( (new File(filename)).exists() );
+		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(filename);
+		sdgncFile.create(mdata, dataList);
+		assertTrue( sdgncFile.exists() );
 	}
 
 	public String getFilename() {
