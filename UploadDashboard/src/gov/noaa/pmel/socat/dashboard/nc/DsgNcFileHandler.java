@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import ucar.ma2.InvalidRangeException;
+
 /**
  * NetCDF DSG file handler for the SOCAT upload dashboard.
  * 
@@ -244,11 +246,15 @@ public class DsgNcFileHandler {
 	 * 		WOCE event to use; the expocode is used to identify the full dataset to update
 	 * @param tempDsgFilename
 	 * 		name of the temporary DSG file to also update
-	 * @throws IllegalArgumentException 
-	 * @throws IOException 
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file or the WOCE flags are not valid
+	 * @throws IOException
+	 * 		if opening, reading from, or writing to to the DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
 	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename) 
-			throws IllegalArgumentException, IOException {
+			throws IllegalArgumentException, IOException, InvalidRangeException {
 		// Get the location and name for the NetCDF DSG file
 		String expocode = woceEvent.getExpocode();
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);

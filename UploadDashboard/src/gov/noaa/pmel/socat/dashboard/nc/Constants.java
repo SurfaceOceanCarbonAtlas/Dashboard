@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.util.Collections;
@@ -463,7 +464,7 @@ public class Constants {
 	}
 
 	/**
-	 * Variable names for netCDF files
+	 * IOOS categories for netCDF files
 	 */
 	public static final Map<String, String> IOOS_CATEGORIES;
 	static {
@@ -615,6 +616,156 @@ public class Constants {
 		ioosCatMap.put("calcSpeedWoce", quality_category);
 
 		IOOS_CATEGORIES = Collections.unmodifiableMap(ioosCatMap);
+	}
+
+	/**
+	 * Data column types for the NetCDF file variable names.
+	 * Variables without a user-provided type will be mapped to {@link DataColumnType#OTHER}
+	 */
+	public static final Map<String, DataColumnType> VARIABLE_TYPES;
+	static {
+		HashMap<String, DataColumnType> varTypeMap = new HashMap<String, DataColumnType>();
+
+		varTypeMap.put("expocode", DataColumnType.EXPOCODE);
+		varTypeMap.put("dataset_name", DataColumnType.CRUISE_NAME);
+		varTypeMap.put("vessel_name", DataColumnType.SHIP_NAME);
+		varTypeMap.put("organization", DataColumnType.GROUP_NAME);
+		varTypeMap.put("geospatial_lon_min", DataColumnType.OTHER);
+		varTypeMap.put("geospatial_lon_max", DataColumnType.OTHER);
+		varTypeMap.put("geospatial_lat_min", DataColumnType.OTHER);
+		varTypeMap.put("geospatial_lat_max", DataColumnType.OTHER);
+		varTypeMap.put("time_coverage_start", DataColumnType.OTHER);
+		varTypeMap.put("time_converage_end", DataColumnType.OTHER);
+		varTypeMap.put("investigators", DataColumnType.GROUP_NAME);
+		varTypeMap.put("orig_data_ref", DataColumnType.OTHER);
+		varTypeMap.put("addl_docs", DataColumnType.OTHER);
+		varTypeMap.put("socat_data_doi", DataColumnType.OTHER);
+		varTypeMap.put("socat_data_ref", DataColumnType.OTHER);
+		varTypeMap.put("socat_version", DataColumnType.OTHER);
+		varTypeMap.put("qc_flag", DataColumnType.OTHER);
+
+		varTypeMap.put("year", DataColumnType.YEAR);
+		varTypeMap.put("month", DataColumnType.MONTH);
+		varTypeMap.put("day", DataColumnType.DAY);
+		varTypeMap.put("hour", DataColumnType.HOUR);
+		varTypeMap.put("minute", DataColumnType.MINUTE);
+		varTypeMap.put("second", DataColumnType.SECOND);
+
+		varTypeMap.put("longitude", DataColumnType.LONGITUDE);
+		varTypeMap.put("latitude", DataColumnType.LATITUDE);
+		varTypeMap.put("sample_depth", DataColumnType.SAMPLE_DEPTH);
+		varTypeMap.put("sal", DataColumnType.SALINITY);
+		varTypeMap.put("Temperature_equi", DataColumnType.EQUILIBRATOR_TEMPERATURE);
+		varTypeMap.put("temp", DataColumnType.SEA_SURFACE_TEMPERATURE);
+		varTypeMap.put("Pressure_equi", DataColumnType.EQUILIBRATOR_PRESSURE);
+		varTypeMap.put("Pressure_atm", DataColumnType.SEA_LEVEL_PRESSURE);
+
+		varTypeMap.put("xCO2_water_equi_temp_dry_ppm", DataColumnType.XCO2_WATER_TEQU);
+		varTypeMap.put("xCO2_water_sst_dry_ppm", DataColumnType.XCO2_WATER_SST);
+		varTypeMap.put("pCO2_water_equi_temp", DataColumnType.PCO2_WATER_TEQU);
+		varTypeMap.put("pCO2_water_sst_100humidity_uatm", DataColumnType.PCO2_WATER_SST);
+		varTypeMap.put("fCO2_water_equi_uatm", DataColumnType.FCO2_WATER_TEQU);
+		varTypeMap.put("fCO2_water_sst_100humidity_uatm", DataColumnType.FCO2_WATER_SST);
+
+		varTypeMap.put("xCO2_atm", DataColumnType.XCO2_ATM);
+		varTypeMap.put("pCO2_atm", DataColumnType.PCO2_ATM);
+		varTypeMap.put("fCO2_atm", DataColumnType.FCO2_ATM);
+		varTypeMap.put("delta_xCO2", DataColumnType.DELTA_XCO2);
+		varTypeMap.put("delta_pCO2", DataColumnType.DELTA_PCO2);
+		varTypeMap.put("delta_fCO2", DataColumnType.DELTA_FCO2);
+
+		varTypeMap.put("relative_humidity", DataColumnType.RELATIVE_HUMIDITY);
+		varTypeMap.put("specific_humidity", DataColumnType.SPECIFIC_HUMIDITY);
+		varTypeMap.put("ship_speed", DataColumnType.SHIP_SPEED); 
+		varTypeMap.put("ship_dir", DataColumnType.SHIP_DIRECTION);
+		varTypeMap.put("wind_speed_true", DataColumnType.WIND_SPEED_TRUE);
+		varTypeMap.put("wind_speed_rel", DataColumnType.WIND_SPEED_RELATIVE);
+		varTypeMap.put("wind_dir_true", DataColumnType.WIND_DIRECTION_TRUE);
+		varTypeMap.put("wind_dir_rel", DataColumnType.WIND_DIRECTION_RELATIVE);
+
+		varTypeMap.put("WOCE_geoposition", DataColumnType.WOCE_GEOPOSITION);
+		varTypeMap.put("WOCE_sample_depth", DataColumnType.WOCE_SAMPLE_DEPTH);
+		varTypeMap.put("WOCE_sal", DataColumnType.WOCE_SALINITY);
+		varTypeMap.put("WOCE_Temperature_equi", DataColumnType.WOCE_EQUILIBRATOR_TEMPERATURE);
+		varTypeMap.put("WOCE_temp", DataColumnType.WOCE_SEA_SURFACE_TEMPERATURE);
+		varTypeMap.put("WOCE_Pressure_equi", DataColumnType.WOCE_EQUILIBRATOR_PRESSURE);
+		varTypeMap.put("WOCE_Pressure_atm", DataColumnType.WOCE_SEA_LEVEL_PRESSURE);
+
+		varTypeMap.put("WOCE_xCO2_water_equi_temp_dry_ppm", DataColumnType.WOCE_XCO2_WATER_TEQU);
+		varTypeMap.put("WOCE_xCO2_water_sst_dry_ppm", DataColumnType.WOCE_XCO2_WATER_SST);
+		varTypeMap.put("WOCE_pCO2_water_equi_temp", DataColumnType.WOCE_PCO2_WATER_TEQU);
+		varTypeMap.put("WOCE_pCO2_water_sst_100humidity_uatm", DataColumnType.WOCE_PCO2_WATER_SST);
+		varTypeMap.put("WOCE_fCO2_water_equi_uatm", DataColumnType.WOCE_FCO2_WATER_TEQU);
+		varTypeMap.put("WOCE_fCO2_water_sst_100humidity_uatm", DataColumnType.WOCE_FCO2_WATER_SST);
+
+		varTypeMap.put("WOCE_xCO2_atm", DataColumnType.WOCE_XCO2_ATM);
+		varTypeMap.put("WOCE_pCO2_atm", DataColumnType.WOCE_PCO2_ATM);
+		varTypeMap.put("WOCE_fCO2_atm", DataColumnType.WOCE_FCO2_ATM);
+		varTypeMap.put("WOCE_delta_xCO2", DataColumnType.WOCE_DELTA_XCO2);
+		varTypeMap.put("WOCE_delta_pCO2", DataColumnType.WOCE_PCO2_ATM);
+		varTypeMap.put("WOCE_delta_fCO2", DataColumnType.WOCE_FCO2_ATM);
+
+		varTypeMap.put("WOCE_rel_humidity", DataColumnType.WOCE_RELATIVE_HUMIDITY);
+		varTypeMap.put("WOCE_spc_humidity", DataColumnType.WOCE_SPECIFIC_HUMIDITY);
+		varTypeMap.put("WOCE_ship_speed", DataColumnType.WOCE_SHIP_SPEED);
+		varTypeMap.put("WOCE_ship_dir", DataColumnType.WOCE_SHIP_DIRECTION);
+		varTypeMap.put("WOCE_wind_speed_true", DataColumnType.WOCE_WIND_SPEED_TRUE);
+		varTypeMap.put("WOCE_wind_speed_rel", DataColumnType.WOCE_WIND_SPEED_RELATIVE);
+		varTypeMap.put("WOCE_wind_dir_true", DataColumnType.WOCE_WIND_DIRECTION_TRUE);
+		varTypeMap.put("WOCE_wind_dir_rel", DataColumnType.WOCE_WIND_DIRECTION_RELATIVE);
+
+		varTypeMap.put("woa_sss", DataColumnType.OTHER);
+		varTypeMap.put("pressure_ncep_slp", DataColumnType.OTHER);
+
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_from_pCO2_water_water_equi_temp", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_from_pCO2_water_sst_100humidity_uatm", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_fCO2_water_equi_uatm", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_from_pCO2_water_water_equi_temp_ncep", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", DataColumnType.FCO2_REC);
+
+		varTypeMap.put("fCO2_recommended", DataColumnType.FCO2_REC);
+		varTypeMap.put("fCO2_source", DataColumnType.OTHER);
+		varTypeMap.put("delta_temp", DataColumnType.OTHER);
+		varTypeMap.put("region_id", DataColumnType.OTHER);
+		varTypeMap.put("calc_speed", DataColumnType.SHIP_SPEED);
+		varTypeMap.put("etopo2", DataColumnType.OTHER);
+		varTypeMap.put("gvCO2", DataColumnType.XCO2_ATM);
+		varTypeMap.put("dist_to_land", DataColumnType.OTHER);
+		varTypeMap.put("days_1970", DataColumnType.TIMESTAMP);
+		varTypeMap.put("day_of_year", DataColumnType.DAY);
+
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_from_pCO2_water_water_equi_temp", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_fCO2_water_equi_uatm", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_from_pCO2_water_water_equi_temp_ncep", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_fCO2_recommended", DataColumnType.WOCE_FCO2_REC);
+		varTypeMap.put("WOCE_delta_temp", DataColumnType.OTHER);
+		varTypeMap.put("WOCE_calc_speed", DataColumnType.WOCE_SHIP_SPEED);
+
+		varTypeMap.put("time", DataColumnType.TIMESTAMP);
+		varTypeMap.put("lon360", DataColumnType.LONGITUDE);
+		varTypeMap.put("tmonth", DataColumnType.MONTH);
+
+		VARIABLE_TYPES = Collections.unmodifiableMap(varTypeMap);
 	}
 
 	public static final Character NORTH_PACIFIC_REGION_ID = 'N';
