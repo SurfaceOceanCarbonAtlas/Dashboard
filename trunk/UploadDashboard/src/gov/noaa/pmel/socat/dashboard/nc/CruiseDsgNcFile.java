@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -11,6 +12,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import ucar.ma2.ArrayChar;
@@ -29,7 +31,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = -3080661796027801141L;
+	private static final long serialVersionUID = -3372957474829495590L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.0";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -371,10 +373,12 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
-	 * 		if unable to open, read from, or write to the DSG file 
+	 * 		if opening, reading from, or writing to to the DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
 	public void updateWoceFlags(SocatWoceEvent woceEvent, boolean updateWoceEvent) 
-			throws IllegalArgumentException, IOException {
+			throws IllegalArgumentException, IOException, InvalidRangeException {
 
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 
@@ -393,9 +397,20 @@ public class CruiseDsgNcFile extends File {
 			throw new IllegalArgumentException("Unable to find time variable in " + getName());
 		ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
 
+		ArrayChar.D2 regionIDs;
+		if ( updateWoceEvent ) {
+			var = ncfile.findVariable("region_id");
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find region_id variable in " + getName());
+			regionIDs = (ArrayChar.D2) var.read(); 
+		}
+		else {
+			regionIDs = null;
+		}
+
 		String dataname = woceEvent.getColumnName();
 		ArrayDouble.D1 datavalues;
-		if ( "geolocation".equals(dataname) ) {
+		if ( "geoposition".equals(dataname) ) {
 			// WOCE on longitude/latitude/time
 			datavalues = null;
 		}
@@ -406,14 +421,105 @@ public class CruiseDsgNcFile extends File {
 			datavalues = (ArrayDouble.D1) var.read(); 
 		}
 
-		var = ncfile.findVariable("WOCE_" + dataname);
-		if ( var == null )
+		// 
+		Variable wocevar = ncfile.findVariable("WOCE_" + dataname);
+		if ( wocevar == null )
 			throw new IllegalArgumentException("Unable to find WOCE_" + dataname + " variable in " + getName());
-		ArrayChar.D2 wocevalues = (ArrayChar.D2) var.read();
+		ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
 
+		char newFlag = woceEvent.getFlag();
+
+		// Identify the data points using a round-robin search 
+		// just in case there is more than one matching point
+		int startIdx = 0;
+		int arraySize = (int) times.getSize();
+		HashSet<Integer> assignedRowIndices = new HashSet<Integer>(); 
 		for ( DataLocation dataloc : woceEvent.getLocations() ) {
-			
+			boolean valueFound = false;
+			int idx;
+			for (idx = startIdx; idx < arraySize; idx++) {
+				if ( dataMatches(dataloc, longitudes, latitudes, times, datavalues, idx) ) {
+					if ( assignedRowIndices.add(idx) ) {
+						valueFound = true;
+						break;
+					}
+				}
+			}
+			if ( idx >= arraySize ) {
+				for (idx = 0; idx < startIdx; idx++) {
+					if ( dataMatches(dataloc, longitudes, latitudes, times, datavalues, idx) ) {
+						if ( assignedRowIndices.add(idx) ) {
+							valueFound = true;
+							break;
+						}
+					}
+				}
+			}
+			if ( ! valueFound ) 
+				throw new IllegalArgumentException("Unable to find data location \n" +
+						dataloc.toString() + " \n in " + getName());
+			wocevalues.set(idx, 0, newFlag);
+			if ( updateWoceEvent ) {
+				dataloc.setRowNumber(idx + 1);
+				dataloc.setRegionID(regionIDs.get(idx, 0));
+			}
+			// Start the next search from the next data point
+			startIdx = idx + 1;
 		}
+
+		if ( updateWoceEvent ) {
+			// Assign the data type of the column from the variable name
+			woceEvent.setDataType(Constants.VARIABLE_TYPES.get(woceEvent.getColumnName()));
+		}
+
+		// Save the updated WOCE flags to the DSG file
+		ncfile.write(wocevar, wocevalues);
+		ncfile.close();
+	}
+
+	/**
+	 * Compares the data location information given in a DataLocation with the
+	 * longitude, latitude, time, and (if applicable) data value at a given 
+	 * index into arrays of these values.
+	 * 
+	 * @param dataloc
+	 * 		data location to compare
+	 * @param longitudes
+	 * 		array of longitudes to use
+	 * @param latitudes
+	 * 		array of latitudes to use
+	 * @param times
+	 * 		array of times (seconds since 1970-01-01 00:00:00) to use
+	 * @param datavalues
+	 * 		if not null, array of data values to use
+	 * @param idx
+	 * 		index into the arrays of the values to compare
+	 * @return
+	 * 		true if the data locations match
+	 */
+	private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes,
+			ArrayDouble.D1 latitudes, ArrayDouble.D1 times, ArrayDouble.D1 datavalues, int idx) {
+		final double rtol = 1.0E-6;
+		final double atol = 1.0E-6;
+
+		if ( ! DashboardUtils.closeTo(dataloc.getLongitude(), longitudes.get(idx), rtol, atol) )
+			return false;
+
+		if ( ! DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), rtol, atol) )
+			return false;
+
+		if ( ! DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), rtol, atol) )
+			return false;
+
+		if ( ! DashboardUtils.closeTo(dataloc.getDataDate().getTime() / 1000.0, times.get(idx), rtol, atol) )
+			return false;
+
+		if ( datavalues != null ) {
+			if ( ! DashboardUtils.closeTo(dataloc.getDataValue(), datavalues.get(idx), rtol, atol) )
+				return false;
+		}
+
+		return true;
 	}
 
 }
