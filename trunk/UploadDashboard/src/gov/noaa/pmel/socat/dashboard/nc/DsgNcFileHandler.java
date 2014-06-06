@@ -6,8 +6,8 @@ package gov.noaa.pmel.socat.dashboard.nc;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
-import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -80,7 +80,7 @@ public class DsgNcFileHandler {
 	 */
 	public CruiseDsgNcFile getDsgNcFile(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
-		String expo = CruiseFileHandler.checkExpocode(expocode);
+		String expo = DashboardServerUtils.checkExpocode(expocode);
 		return new CruiseDsgNcFile(dsgFilesDir + File.separator + expo.substring(0,4) +
 				File.separator + expo + ".nc");
 	}
@@ -97,7 +97,7 @@ public class DsgNcFileHandler {
 	 */
 	public File getDecDsgNcFile(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
-		String expo = CruiseFileHandler.checkExpocode(expocode);
+		String expo = DashboardServerUtils.checkExpocode(expocode);
 		// Generate the full path filename for this cruise NetCDF DSG
 		File decDsgNcFile = new File(decDsgFilesDir, expo.substring(0,4) +
 				File.separator + expo + ".nc");

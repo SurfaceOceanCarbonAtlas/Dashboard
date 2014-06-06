@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `WOCELocations`;
 DROP TABLE IF EXISTS `WOCEEvents`;
 DROP TABLE IF EXISTS `QCEvents`;
 DROP TABLE IF EXISTS `Reviewers`;
-DRAP TABLE IF EXISTS `Regions`;
+DROP TABLE IF EXISTS `Regions`;
 
 CREATE TABLE `Regions` (
   `region_id` CHAR(1) NOT NULL DEFAULT ' ',
@@ -29,6 +29,8 @@ CREATE TABLE `Reviewers` (
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `realname` (`realname`)
 ) DEFAULT CHARSET=latin1;
+INSERT INTO `Reviewers` (`realname`, `username`) VALUES
+  ('automated data checker', 'automated.data.checker');
 
 CREATE TABLE `QCEvents` (
   `qc_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
