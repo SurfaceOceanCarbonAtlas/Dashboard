@@ -72,7 +72,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	public File getMetadataFile(String cruiseExpocode, String uploadName) 
 											throws IllegalArgumentException {
 		// Check and standardize the expocode
-		String expocode = CruiseFileHandler.checkExpocode(cruiseExpocode);
+		String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
 		// Remove any path from uploadName
 		String basename = DashboardUtils.baseName(uploadName);
 		if ( basename.isEmpty() )

@@ -83,9 +83,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
 				Pattern.CASE_INSENSITIVE)
 	};
-	// Pattern for checking for invalid characters in the expocode
-	private static final Pattern invalidExpocodePattern = 
-			Pattern.compile("[^" + DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]");
 
 	/**
 	 * Handles storage and retrieval of cruise data in files 
@@ -108,35 +105,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Checks and standardized a given expocode.
-	 * 
-	 * @param expocode
-	 * 		expocode to check
-	 * @return
-	 * 		standardized (uppercase) expocode
-	 * @throws IllegalArgumentException
-	 * 		if the expocode is unreasonable
-	 * 		(invalid characters, too short, too long)
-	 */
-	public static String checkExpocode(String expocode) throws IllegalArgumentException {
-		if ( expocode == null )
-			throw new IllegalArgumentException("Cruise expocode not given");
-		// Do some automatic clean-up
-		String upperExpo = expocode.trim().toUpperCase();
-		// Make sure it is the proper length
-		if ( (upperExpo.length() < DashboardUtils.MIN_EXPOCODE_LENGTH) || 
-			 (upperExpo.length() > DashboardUtils.MAX_EXPOCODE_LENGTH) )
-			throw new IllegalArgumentException(
-					"Invalid cruise Expocode length");
-		// Make sure there are no invalid characters
-		Matcher mat = invalidExpocodePattern.matcher(upperExpo);
-		if ( mat.find() )
-			throw new IllegalArgumentException(
-					"Invalid characters in the cruise Expocode");
-		return upperExpo;
-	}
-
-	/**
 	 * @param expocode
 	 * 		expocode of the cruise
 	 * @return
@@ -146,7 +114,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 */
 	private File cruiseInfoFile(String expocode) throws IllegalArgumentException {
 		// Check that the expocode is somewhat reasonable
-		String upperExpo = checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		// Get the name of the cruise properties file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_INFO_FILENAME_EXTENSION);
@@ -163,7 +131,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 */
 	private File cruiseMsgsFile(String expocode) throws IllegalArgumentException {
 		// Check that the expocode is somewhat reasonable
-		String upperExpo = checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		// Get the name of the cruise messages file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_MSGS_FILENAME_EXTENSION);
@@ -179,7 +147,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 */
 	private File cruiseDataFile(String expocode) throws IllegalArgumentException {
 		// Check that the expocode is somewhat reasonable
-		String upperExpo = checkExpocode(expocode);
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		// Get the name of the saved cruise data file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_DATA_FILENAME_EXTENSION);
