@@ -409,6 +409,12 @@ public class CruiseDsgNcFile extends File {
 		}
 
 		String dataname = woceEvent.getColumnName();
+		if ( updateWoceEvent ) {
+			dataname = Constants.VARIABLE_NAMES.get(dataname);
+			if ( dataname == null )
+				throw new IllegalArgumentException("Unknown variable name " + woceEvent.getColumnName());
+			woceEvent.setColumnName(dataname);
+		}
 		ArrayDouble.D1 datavalues;
 		if ( "geoposition".equals(dataname) ) {
 			// WOCE on longitude/latitude/time
