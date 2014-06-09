@@ -180,6 +180,12 @@ public class DashboardUtils {
 	 */
 	public static final ArrayList<String> NO_UNITS = 
 			new ArrayList<String>(Arrays.asList(""));
+	public static final ArrayList<String> TIMESTAMP_UNITS = new ArrayList<String>(Arrays.asList(
+			"yyyy-mm-dd hh:mm:ss", "mm-dd-yyyy hh:mm:ss", "dd-mm-yyyy hh:mm:ss"));
+	public static final ArrayList<String> DATE_UNITS = new ArrayList<String>(Arrays.asList(
+			"yyyy-mm-dd", "mm-dd-yyyy", "dd-mm-yyyy"));
+	public static final ArrayList<String> TIME_UNITS = 
+			new ArrayList<String>(Arrays.asList("hh:mm:ss"));
 	public static final ArrayList<String> DAY_OF_YEAR_UNITS = 
 			new ArrayList<String>(Arrays.asList("Jan1=1.0", "Jan1=0.0"));
 	public static final ArrayList<String> LONGITUDE_UNITS = 
@@ -220,14 +226,12 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.SHIP_NAME, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.GROUP_NAME, NO_UNITS);
 
-		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, new ArrayList<String>(Arrays.asList(
-				"yyyy-mm-dd hh:mm:ss", "mm/dd/yyyy hh:mm:ss", "dd/mm/yyyy hh:mm:ss")));
-		STD_DATA_UNITS.put(DataColumnType.DATE, new ArrayList<String>(Arrays.asList(
-				"yyyy-mm-dd", "mm/dd/yyyy", "dd/mm/yyyy")));
+		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, TIMESTAMP_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.DATE, DATE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.YEAR, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.MONTH, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DAY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.TIME, new ArrayList<String>(Arrays.asList("hh:mm:ss")));
+		STD_DATA_UNITS.put(DataColumnType.TIME, TIME_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.HOUR, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.MINUTE, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SECOND, NO_UNITS);

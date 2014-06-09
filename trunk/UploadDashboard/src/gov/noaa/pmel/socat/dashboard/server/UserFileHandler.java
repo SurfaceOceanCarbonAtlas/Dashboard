@@ -121,6 +121,18 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
+	 * Returns the column name key from the given column name.
+	 *   
+	 * @param columnName
+	 * 		get the key for this column name
+	 * @return
+	 * 		the key for the given column name
+	 */
+	private String keyFromColumnName(String columnName) {
+		return columnName.toLowerCase().replaceAll("[^a-z0-9]", "");
+	}
+
+	/**
 	 * Gets the list of cruises for a user
 	 * 
 	 * @param username
@@ -465,9 +477,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		boolean changed = false;
 		int k = 0;
 		for ( String colName : cruise.getUserColNames() ) {
-			// Convert the column name to the key
-			String key = colName.toLowerCase()
-								.replaceAll("[^a-z0-9]", "");
+			String key = keyFromColumnName(colName);
 			DataColumnType thisColType = colTypes.get(k);
 			DataColumnType oldType = userColNamesToTypes.put(key, thisColType);
 			if ( thisColType != oldType )
@@ -507,7 +517,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		}
 		// Create the Properties object for these mappings. 
 		Properties colProps = new Properties();
-		// Note that the keys for the two maps could no longer be identical. 
+		// Note that the keys for the maps could no longer be identical. 
 		HashSet<String> allKeys = new HashSet<String>(userColNamesToTypes.keySet());
 		allKeys.addAll(userColNamesToUnits.keySet());
 		allKeys.addAll(userColNamesToMissVals.keySet());
@@ -541,7 +551,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Commit the update version of this file
 		try {
 			commitVersion(propsFile, 
-					"Data column names to types, units, and mising values " +
+					"Data column names to types, units, and missing values " +
 					"properties file for " + cruise.getOwner() + 
 					" updated by " + username);
 		} catch (Exception ex) {
