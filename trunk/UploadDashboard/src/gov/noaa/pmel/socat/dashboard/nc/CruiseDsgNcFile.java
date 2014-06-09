@@ -506,7 +506,7 @@ public class CruiseDsgNcFile extends File {
 	private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes,
 			ArrayDouble.D1 latitudes, ArrayDouble.D1 times, ArrayDouble.D1 datavalues, int idx) {
 		final double rtol = 1.0E-6;
-		final double atol = 1.0E-6;
+		final double atol = 1.0E-4;
 
 		if ( ! DashboardUtils.closeTo(dataloc.getLongitude(), longitudes.get(idx), rtol, atol) )
 			return false;
