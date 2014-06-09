@@ -105,10 +105,10 @@ public class DashboardCruiseChecker {
 	public static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
 			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
 	static {
-		final ArrayList<String> checkerDateUnits = 
-				new ArrayList<String>(Arrays.asList("YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY"));
-		final ArrayList<String> checkerTimeUnits =
-				new ArrayList<String>(Arrays.asList("HH:MM:SS"));
+		final ArrayList<String> checkerTimestampDateUnits = 
+				new ArrayList<String>(DashboardUtils.TIMESTAMP_UNITS.size());
+		for ( String fmt : DashboardUtils.TIMESTAMP_UNITS ) 
+			checkerTimestampDateUnits.add(fmt.split(" ", 2)[0]);
 		final ArrayList<String> checkerLongitudeUnits = 
 				new ArrayList<String>(Arrays.asList("decimal_degrees"));
 		final ArrayList<String> checkerLatitudeUnits = 
@@ -129,12 +129,12 @@ public class DashboardCruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_NAME, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.GROUP_NAME, DashboardUtils.NO_UNITS);
 
-		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, checkerDateUnits);
-		CHECKER_DATA_UNITS.put(DataColumnType.DATE, checkerDateUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, checkerTimestampDateUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.DATE, DashboardUtils.DATE_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.YEAR, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.MONTH, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.DAY, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.TIME, checkerTimeUnits);
+		CHECKER_DATA_UNITS.put(DataColumnType.TIME, DashboardUtils.TIME_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.HOUR, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.MINUTE, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SECOND, DashboardUtils.NO_UNITS);
