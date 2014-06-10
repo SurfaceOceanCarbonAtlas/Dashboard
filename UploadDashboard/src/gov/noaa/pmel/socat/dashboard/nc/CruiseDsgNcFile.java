@@ -505,23 +505,22 @@ public class CruiseDsgNcFile extends File {
 	 */
 	private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes,
 			ArrayDouble.D1 latitudes, ArrayDouble.D1 times, ArrayDouble.D1 datavalues, int idx) {
-		final double rtol = 1.0E-6;
-		final double atol = 1.0E-4;
 
-		if ( ! DashboardUtils.closeTo(dataloc.getLongitude(), longitudes.get(idx), rtol, atol) )
+		// Check if longitude is within 0.001 degrees of each other
+		if ( ! DashboardUtils.closeTo(dataloc.getLongitude(), longitudes.get(idx), 0.0, 1.0E-3) )
 			return false;
 
-		if ( ! DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), rtol, atol) )
+		// Check if latitude is within 0.0001 degrees of each other
+		if ( ! DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), 0.0, 1.0E-4) )
 			return false;
 
-		if ( ! DashboardUtils.closeTo(dataloc.getLatitude(), latitudes.get(idx), rtol, atol) )
+		// Check if times are within a second of each other
+		if ( ! DashboardUtils.closeTo(dataloc.getDataDate().getTime() / 1000.0, times.get(idx), 0.0, 1.0) )
 			return false;
 
-		if ( ! DashboardUtils.closeTo(dataloc.getDataDate().getTime() / 1000.0, times.get(idx), rtol, atol) )
-			return false;
-
+		// If given, check if data values are within 1.0E-5 relative/absolute of each other
 		if ( datavalues != null ) {
-			if ( ! DashboardUtils.closeTo(dataloc.getDataValue(), datavalues.get(idx), rtol, atol) )
+			if ( ! DashboardUtils.closeTo(dataloc.getDataValue(), datavalues.get(idx), 1.0E-5, 1.0E-5) )
 				return false;
 		}
 

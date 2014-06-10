@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -609,6 +610,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 */
 	public void deleteCruiseFiles(String expocode, String username) 
 				throws IllegalArgumentException, FileNotFoundException {
+		// Verify this cruise can be deleted
 		DashboardCruise cruise;
 		try {
 			cruise = verifyOkayToDeleteCruise(expocode, username);
@@ -617,6 +619,29 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					"Not permitted to delete cruise " + expocode +
 					": " + ex.getMessage());
 		}
+
+		DashboardDataStore dataStore;
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the dashboard configuration");
+		}
+
+		// If they exist, delete the DSG files and notify ERDDAP
+		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+		if ( dsgHandler.deleteCruise(expocode) )
+			dsgHandler.flagErddap(true);
+
+		// If it exists, delete the messages file
+		File msgsFile = cruiseMsgsFile(expocode);
+		if ( msgsFile.exists() ) {
+			if ( ! msgsFile.delete() ) {
+				throw new IllegalArgumentException("Unable to delete " +
+						"the sanity checker messages file for " + expocode);
+			}
+		}
+			
 		// Delete the cruise data file
 		try {
 			deleteVersionedFile(cruiseDataFile(expocode), 
@@ -639,14 +664,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					"Problems deleting the cruise information file: " + 
 					ex.getMessage());
 		}
+
 		// Delete the metadata documents associated with this cruise
-		MetadataFileHandler metadataHandler;
-		try {
-			metadataHandler = DashboardDataStore.get().getMetadataFileHandler();
-		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to obtain the metadata file handler");
-		}
+		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
 		String omeTimestamp = cruise.getOmeTimestamp();
 		if ( ! omeTimestamp.isEmpty() )
 			metadataHandler.removeMetadata(username, expocode, 
@@ -654,14 +674,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		for ( String mdataTitle : cruise.getAddlDocs() )
 			metadataHandler.removeMetadata(username, expocode, 
 					DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
-		// Delete the messages file if it exists
-		File msgsFile = cruiseMsgsFile(expocode);
-		if ( msgsFile.exists() ) {
-			if ( ! msgsFile.delete() ) {
-				throw new IllegalArgumentException("Unable to delete " +
-						"sanity checker messages file " + msgsFile.getPath());
-			}
-		}
 	}
 
 	/**

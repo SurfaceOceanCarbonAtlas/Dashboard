@@ -87,6 +87,9 @@ public class DsgNcFileHandler {
 
 	/**
 	 * Generates the cruise-specific decimated NetCDF DSG abstract file for a cruise.
+	 * A regular File (instead of a CruiseDsgNcFile) is returned because the 
+	 * {@link CruiseDsgNcFile#create} and {@link CruiseDsgNcFile#updateWoceFlags} 
+	 * methods should not be used with the decimated data.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise
@@ -106,7 +109,10 @@ public class DsgNcFileHandler {
 
 	/**
 	 * Saves the cruise OME metadata and cruise data into a new full-data 
-	 * NetCDF DSG file.
+	 * NetCDF DSG file.  After successful creation of the DSG file, 
+	 * ERDDAP will need to be notified of changes to the DSG files. 
+	 * This notification is not done in this routine so that a single 
+	 * notification event can be made after multiple modifications.
 	 * 
 	 * @param omeMData
 	 * 		metadata for the cruise
@@ -172,7 +178,11 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Generates the decimated-data NetCDF DSG file from the full-data NetCDF DSG file.
+	 * Generates the decimated-data NetCDF DSG file from the full-data 
+	 * NetCDF DSG file.  After successful creation of the decimated DSG file, 
+	 * ERDDAP will need to be notified of changes to the decimated DSG files. 
+	 * This notification is not done in this routine so that a single 
+	 * notification event can be made after multiple modifications.
 	 * 
 	 * @param expocode
 	 * 		generate the decimated-data DSG file for the dataset with this expocode
@@ -213,6 +223,40 @@ public class DsgNcFileHandler {
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure decimating the full DSG file: " + 
 					tool.getErrorMessage());
+	}
+
+	/**
+	 * Deletes the DSG and decimated DSG files, if they exist, for a dataset.  
+	 * If a file was deleted, true is returned and ERDDAP will need to be 
+	 * notified of changes to the DSG and decimated DSG files.  This notification
+	 * is not done in this routine so that a single notification event can be
+	 * made after multiple modifications.
+	 * 
+	 * @param expocode
+	 * 		delete the DSG and decimated DSG files for the dataset with this expocode
+	 * @return
+	 * 		true if a file was deleted
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid or 
+	 * 		if unable to delete one of the files 
+	 */
+	public boolean deleteCruise(String expocode) throws IllegalArgumentException {
+		boolean fileDeleted = false;
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( dsgFile.exists() ) {
+			if ( ! dsgFile.delete() )
+				throw new IllegalArgumentException(
+						"Unable to delete the DSG file for " + expocode);
+			fileDeleted = true;
+		}
+		File decDsgFile = getDecDsgNcFile(expocode);
+		if ( decDsgFile.exists() ) {
+			if ( ! decDsgFile.delete() )
+				throw new IllegalArgumentException(
+						"Unable to delete the decimated DSG file for " + expocode);
+			fileDeleted = true;
+		}
+		return fileDeleted;
 	}
 
 	/**

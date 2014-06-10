@@ -216,7 +216,7 @@ public class DataLocation implements Serializable, IsSerializable {
 		return "DataLocation" +
 				"[ regionID='" + regionID.toString() + "'" + 
 				", rowNumber=" + rowNumber.toString() + 
-				", dataDate=" + dataDate.toString() + 
+				", dataTime=" + Double.toString((dataDate.getTime()/1000.0)) + 
 				", longitude=" + longitude.toString() + 
 				", latitude=" + latitude.toString() + 
 				", dataValue=" + dataValue.toString() + 
