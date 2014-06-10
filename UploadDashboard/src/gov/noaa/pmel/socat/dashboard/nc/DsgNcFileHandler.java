@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 import ucar.ma2.InvalidRangeException;
 
 /**
@@ -290,6 +292,8 @@ public class DsgNcFileHandler {
 	 * 		WOCE event to use; the expocode is used to identify the full dataset to update
 	 * @param tempDsgFilename
 	 * 		name of the temporary DSG file to also update
+	 * @param log
+	 * 		logger to log debug messages
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
@@ -297,7 +301,7 @@ public class DsgNcFileHandler {
 	 * @throws InvalidRangeException 
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
-	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename) 
+	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename, Logger log) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		// Get the location and name for the NetCDF DSG file
 		String expocode = woceEvent.getExpocode();
@@ -305,12 +309,12 @@ public class DsgNcFileHandler {
 		if ( ! dsgFile.canRead() )
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
-		dsgFile.updateWoceFlags(woceEvent, true);
+		dsgFile.updateWoceFlags(woceEvent, true, log);
 		CruiseDsgNcFile tempDsgFile = new CruiseDsgNcFile(tempDsgFilename);
 		if ( ! tempDsgFile.canRead() )
 			throw new IllegalArgumentException("Temporary DSG file " + 
 					tempDsgFile.getName() + " does not exist");
-		tempDsgFile.updateWoceFlags(woceEvent, false);
+		tempDsgFile.updateWoceFlags(woceEvent, false, log);
 	}
 
 }
