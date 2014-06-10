@@ -33,6 +33,8 @@ import org.jdom2.input.SAXBuilder;
 public class OmeMetadata extends DashboardMetadata {
 
 	private static final long serialVersionUID = 8071671406430066418L;
+	
+	public static final String CONFLICT_STRING = "%%CONFLICT%%";
 
 	private static final SimpleDateFormat DATE_PARSER = 
 			new SimpleDateFormat("yyyyMMdd HH:mm:ss");
@@ -295,7 +297,6 @@ public class OmeMetadata extends DashboardMetadata {
 
 		
 		Element rootElem = omeDoc.getRootElement();
-		Path rootPath = new Path(rootElem.getName());
 
 		/*
 		 * First we extract the EXPO Code, which is the Cruise_ID. If we don't have this
@@ -305,7 +306,7 @@ public class OmeMetadata extends DashboardMetadata {
 		 * All the others are done in the order they appear in the XML.
 		 */
 		Element cruiseInfoElem = rootElem.getChild("Cruise_Info");
-		Path cruiseInfoPath = new Path(rootPath, "Cruise_Info");
+		Path cruiseInfoPath = new Path(null, "Cruise_Info");
 		if ( cruiseInfoElem == null )
 			throw new IllegalArgumentException(
 					"No Cruise_Info element in the OME XML contents");
@@ -349,7 +350,7 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// <User>
 		Element userElem = rootElem.getChild("User");
-		Path userPath = new Path(rootPath, "User");
+		Path userPath = new Path(null, "User");
 			
 		userName = new OMEVariable(userPath, userElem, "Name");
 		userOrganization = new OMEVariable(userPath, userElem, "Organization");
@@ -360,7 +361,7 @@ public class OmeMetadata extends DashboardMetadata {
 		// End <User>
 
 		// <Investigator> (repeating element)
-		Path investigatorPath = new Path(rootPath, "Investigator");
+		Path investigatorPath = new Path(null, "Investigator");
 		for (Element invElem : rootElem.getChildren("Investigator")) {
 			
 			OMECompositeVariable invDetails = new OMECompositeVariable(investigatorPath, "Email");
@@ -377,7 +378,7 @@ public class OmeMetadata extends DashboardMetadata {
 		// <DataSet_Info>
 		Element dataSetInfoElem = rootElem.getChild("Dataset_Info");
 		
-		Path dataSetInfoPath = new Path(rootPath, "Dataset_Info");
+		Path dataSetInfoPath = new Path(null, "Dataset_Info");
 		
 		datasetID = new OMEVariable(dataSetInfoPath, dataSetInfoElem, "Dataset_ID");
 		fundingInfo = new OMEVariable(dataSetInfoPath, dataSetInfoElem, "Funding_Info");
@@ -465,7 +466,7 @@ public class OmeMetadata extends DashboardMetadata {
 		// The contents of this are a repeating sub-element, so live in a list of OMECompositeVariables.
 		Element varsInfoElem = rootElem.getChild("Variables_Info");
 		if (null != varsInfoElem) {
-			Path varsInfoPath = new Path(rootPath, "Variables_Info");
+			Path varsInfoPath = new Path(null, "Variables_Info");
 			
 			Path variablePath = new Path(varsInfoPath, "Variable");
 			for (Element variableElem : rootElem.getChildren("Variable")) {
@@ -482,7 +483,7 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// <CO2_Data_Info>
 		Element co2DataInfoElem = rootElem.getChild("CO2_Data_Info");
-		Path co2DataInfoPath = new Path(rootPath, "CO2_Data_Info");
+		Path co2DataInfoPath = new Path(null, "CO2_Data_Info");
 		
 		// If the co2DataInfoElem is null, this is handled by extractSubElement
 		xCO2WaterEquDryUnit = extractSubElement(co2DataInfoPath, co2DataInfoElem, "xCO2water_equ_dry", "Unit");
@@ -502,7 +503,7 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// <Method_Description>
 		Element methodDescriptionElem = rootElem.getChild("Method_Description");
-		Path methodDescriptionPath = new Path(rootPath, "Method_Description");
+		Path methodDescriptionPath = new Path(null, "Method_Description");
 
 		// <Method_Description><Equilibrator_Design>
 		Element equDesignElement = null;
@@ -690,14 +691,14 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// Miscellaneous tags under the root element
 		
-		dataSetReferences = new OMEVariable(rootPath, rootElem, "Data_set_References");
-		additionalInformation = new OMEVariable(rootPath, rootElem, "Additional_Information");
-		citation = new OMEVariable(rootPath, rootElem, "Citation");
-		measurementAndCalibrationReport = new OMEVariable(rootPath, rootElem, "Measurement_and_Calibration_Report");
-		preliminaryQualityControl = new OMEVariable(rootPath, rootElem, "Preliminary_Quality_control");
+		dataSetReferences = new OMEVariable(null, rootElem, "Data_set_References");
+		additionalInformation = new OMEVariable(null, rootElem, "Additional_Information");
+		citation = new OMEVariable(null, rootElem, "Citation");
+		measurementAndCalibrationReport = new OMEVariable(null, rootElem, "Measurement_and_Calibration_Report");
+		preliminaryQualityControl = new OMEVariable(null, rootElem, "Preliminary_Quality_control");
 		
 		// <Data_Set_Link>s
-		Path dataSetLinkPath = new Path(rootPath, "Data_Set_Link");
+		Path dataSetLinkPath = new Path(null, "Data_Set_Link");
 		for (Element dataSetLinkElem : rootElem.getChildren("Data_Set_Link")) {
 			
 			OMECompositeVariable dataSetLinkDetails = new OMECompositeVariable(dataSetLinkPath, "URL");
@@ -709,9 +710,9 @@ public class OmeMetadata extends DashboardMetadata {
 		}
 		
 		// More miscellaneous root tags
-		status = new OMEVariable(rootPath, rootElem, "status");
-		form_type = new OMEVariable(rootPath, rootElem, "form_type");
-		recordID = new OMEVariable(rootPath, rootElem, "record_id");
+		status = new OMEVariable(null, rootElem, "status");
+		form_type = new OMEVariable(null, rootElem, "form_type");
+		recordID = new OMEVariable(null, rootElem, "record_id");
 		
 	}
 
@@ -727,33 +728,35 @@ public class OmeMetadata extends DashboardMetadata {
 	public Document createMinimalOmeXmlDoc() {
 		
 		Element rootElem = new Element("x_tags");
+		ConflictElement conflictElem = new ConflictElement();
 		
 		// <User>
 		Element userElem = new Element("User");
-		userElem.addContent(userName.getElement());
-		userElem.addContent(userOrganization.getElement());
-		userElem.addContent(userAddress.getElement());
-		userElem.addContent(userPhone.getElement());
-		userElem.addContent(userEmail.getElement());
+
+		userName.generateXMLContent(userElem, conflictElem);
+		userOrganization.generateXMLContent(userElem, conflictElem);
+		userAddress.generateXMLContent(userElem, conflictElem);
+		userPhone.generateXMLContent(userElem, conflictElem);
+		userEmail.generateXMLContent(userElem, conflictElem);
 
 		rootElem.addContent(userElem);
 		// End <User>
 		
 		// <Investigator> (multiple)
 		for (OMECompositeVariable investigator : investigators) {
-			rootElem.addContent(investigator.getElement());
+			investigator.generateXMLContent(rootElem, conflictElem);
 		}
 		// End <Investigator>
 		
 		// <Dataset_Info>
 		Element datasetInfoElem = new Element("Dataset_Info");
-		datasetInfoElem.addContent(datasetID.getElement());
-		datasetInfoElem.addContent(fundingInfo.getElement());
+		datasetID.generateXMLContent(datasetInfoElem,  conflictElem);
+		fundingInfo.generateXMLContent(datasetInfoElem,  conflictElem);
 		
 		// <Dataset_Info><Submission_Dates>
 		Element submissionElem = new Element("Submission_Dates");
-		submissionElem.addContent(initialSubmission.getElement());
-		submissionElem.addContent(revisedSubmission.getElement());
+		initialSubmission.generateXMLContent(submissionElem, conflictElem);
+		revisedSubmission.generateXMLContent(submissionElem, conflictElem);
 		datasetInfoElem.addContent(submissionElem);
 		
 		// End <Dataset_Info><Submission_Dates>
@@ -767,31 +770,31 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Cruise_Info><Experiment>
 		Element experimentElem = new Element("Experiment");
 		
-		experimentElem.addContent(experimentName.getElement());
-		experimentElem.addContent(experimentType.getElement());
-		experimentElem.addContent(platformType.getElement());
-		experimentElem.addContent(co2InstrumentType.getElement());
-		experimentElem.addContent(mooringId.getElement());
+		experimentName.generateXMLContent(experimentElem, conflictElem);
+		experimentType.generateXMLContent(experimentElem, conflictElem);
+		platformType.generateXMLContent(experimentElem, conflictElem);
+		co2InstrumentType.generateXMLContent(experimentElem, conflictElem);
+		mooringId.generateXMLContent(experimentElem, conflictElem);
 		
 		// <Cruise_Info><Experiment><Cruise>
 		Element cruiseElem = new Element("Cruise");
 		
-		cruiseElem.addContent(cruiseID.getElement());
-		cruiseElem.addContent(cruiseInfo.getElement());
-		cruiseElem.addContent(section.getElement());
+		cruiseID.generateXMLContent(cruiseElem, conflictElem);
+		cruiseInfo.generateXMLContent(cruiseElem, conflictElem);
+		section.generateXMLContent(cruiseElem, conflictElem);
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
 		Element geoCoverageElem = new Element("Geographical_Coverage");
 		
-		geoCoverageElem.addContent(geographicalRegion.getElement());
+		geographicalRegion.generateXMLContent(geoCoverageElem, conflictElem);
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
 		Element boundsElem = new Element("Bounds");
 		
-		boundsElem.addContent(westmostLongitude.getElement());
-		boundsElem.addContent(eastmostLongitude.getElement());
-		boundsElem.addContent(northmostLatitude.getElement());
-		boundsElem.addContent(southmostLatitude.getElement());
+		westmostLongitude.generateXMLContent(boundsElem, conflictElem);
+		eastmostLongitude.generateXMLContent(boundsElem, conflictElem);
+		northmostLatitude.generateXMLContent(boundsElem, conflictElem);
+		southmostLatitude.generateXMLContent(boundsElem, conflictElem);
 		
 		
 		geoCoverageElem.addContent(boundsElem);
@@ -803,14 +806,14 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
 		Element tempCoverageElem = new Element("Temporal_Coverage");
 		
-		tempCoverageElem.addContent(temporalCoverageStartDate.getElement());
-		tempCoverageElem.addContent(temporalCoverageEndDate.getElement());
+		temporalCoverageStartDate.generateXMLContent(tempCoverageElem, conflictElem);
+		temporalCoverageEndDate.generateXMLContent(tempCoverageElem, conflictElem);
 		
 		cruiseElem.addContent(tempCoverageElem);
 		// End <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
 		
-		cruiseElem.addContent(cruiseStartDate.getElement());
-		cruiseElem.addContent(cruiseEndDate.getElement());
+		cruiseStartDate.generateXMLContent(cruiseElem, conflictElem);
+		cruiseEndDate.generateXMLContent(cruiseElem, conflictElem);
 		
 		experimentElem.addContent(cruiseElem);
 		// End <Cruise_Info><Experiment><Cruise>
@@ -822,23 +825,21 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Cruise_Info><Vessel>
 		Element vesselElem = new Element("Vessel");
 		
-		vesselElem.addContent(vesselName.getElement());
-		vesselElem.addContent(vesselID.getElement());
-		vesselElem.addContent(country.getElement());
-		vesselElem.addContent(vesselOwner.getElement());
+		vesselName.generateXMLContent(vesselElem, conflictElem);
+		vesselID.generateXMLContent(vesselElem, conflictElem);
+		country.generateXMLContent(vesselElem, conflictElem);
+		vesselOwner.generateXMLContent(vesselElem, conflictElem);
 		
 		cruiseInfoElem.addContent(vesselElem);
 		// End <Cruise_Info><Vessel>
 		
-		
 		rootElem.addContent(cruiseInfoElem);
 		// End <Cruise_Info>
-		
 
 		// <Variables_Info>
 		Element varsInfoElem = new Element("Variables_Info");
 		for (OMECompositeVariable varInfo : variablesInfo) {
-			varsInfoElem.addContent(varInfo.getElement());
+			varInfo.generateXMLContent(varsInfoElem, conflictElem);
 		}
 		
 		rootElem.addContent(varsInfoElem);
@@ -848,18 +849,18 @@ public class OmeMetadata extends DashboardMetadata {
 		// <CO2_Data_Info>
 		Element co2DataInfoElem = new Element("CO2_Data_Info");
 		
-		co2DataInfoElem.addContent(buildSubElement(xCO2WaterEquDryUnit));
-		co2DataInfoElem.addContent(buildSubElement(xCO2WaterSSTDryUnit));
-		co2DataInfoElem.addContent(buildSubElement(pCO2WaterEquWetUnit));
-		co2DataInfoElem.addContent(buildSubElement(pCO2WaterSSTWetUnit));
-		co2DataInfoElem.addContent(buildSubElement(fCO2WaterEquWetUnit));
-		co2DataInfoElem.addContent(buildSubElement(fCO2WaterSSTWetUnit));
-		co2DataInfoElem.addContent(buildSubElement(xCO2AirDryUnit));
-		co2DataInfoElem.addContent(buildSubElement(pCO2AirWetUnit));
-		co2DataInfoElem.addContent(buildSubElement(fCO2AirWetUnit));
-		co2DataInfoElem.addContent(buildSubElement(xCO2AirDryInterpolatedUnit));
-		co2DataInfoElem.addContent(buildSubElement(pCO2AirWetInterpolatedUnit));
-		co2DataInfoElem.addContent(buildSubElement(fCO2AirWetInterpolatedUnit));
+		co2DataInfoElem.addContent(buildSubElement(xCO2WaterEquDryUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(xCO2WaterSSTDryUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(pCO2WaterEquWetUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(pCO2WaterSSTWetUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(fCO2WaterEquWetUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(fCO2WaterSSTWetUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(xCO2AirDryUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(pCO2AirWetUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(fCO2AirWetUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(xCO2AirDryInterpolatedUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(pCO2AirWetInterpolatedUnit, conflictElem));
+		co2DataInfoElem.addContent(buildSubElement(fCO2AirWetInterpolatedUnit, conflictElem));
 		
 		rootElem.addContent(co2DataInfoElem);
 		// End <CO2_Data_Info>
@@ -870,15 +871,15 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Equilibrator_Design>
 		Element eqDesignElem = new Element("Equilibrator_Design");
 		
-		eqDesignElem.addContent(depthOfSeaWaterIntake.getElement());
-		eqDesignElem.addContent(locationOfSeaWaterIntake.getElement());
-		eqDesignElem.addContent(equilibratorType.getElement());
-		eqDesignElem.addContent(equilibratorVolume.getElement());
-		eqDesignElem.addContent(waterFlowRate.getElement());
-		eqDesignElem.addContent(headspaceGasFlowRate.getElement());
-		eqDesignElem.addContent(vented.getElement());
-		eqDesignElem.addContent(dryingMethodForCO2InWater.getElement());
-		eqDesignElem.addContent(equAdditionalInformation.getElement());
+		depthOfSeaWaterIntake.generateXMLContent(eqDesignElem, conflictElem);
+		locationOfSeaWaterIntake.generateXMLContent(eqDesignElem, conflictElem);
+		equilibratorType.generateXMLContent(eqDesignElem, conflictElem);
+		equilibratorVolume.generateXMLContent(eqDesignElem, conflictElem);
+		waterFlowRate.generateXMLContent(eqDesignElem, conflictElem);
+		headspaceGasFlowRate.generateXMLContent(eqDesignElem, conflictElem);
+		vented.generateXMLContent(eqDesignElem, conflictElem);
+		dryingMethodForCO2InWater.generateXMLContent(eqDesignElem, conflictElem);
+		equAdditionalInformation.generateXMLContent(eqDesignElem, conflictElem);
 		
 		
 		methodDescElem.addContent(eqDesignElem);
@@ -886,10 +887,10 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		// <Method_Description><CO2_in_Marine_Air>
 		Element co2MarineAirElem = new Element("CO2_in_Marine_Air");
-		
-		co2MarineAirElem.addContent(co2InMarineAirMeasurement.getElement());
-		co2MarineAirElem.addContent(co2InMarineAirLocationAndHeight.getElement());
-		co2MarineAirElem.addContent(co2InMarineAirDryingMethod.getElement());
+
+		co2InMarineAirMeasurement.generateXMLContent(co2MarineAirElem, conflictElem);
+		co2InMarineAirLocationAndHeight.generateXMLContent(co2MarineAirElem, conflictElem);
+		co2InMarineAirDryingMethod.generateXMLContent(co2MarineAirElem, conflictElem);
 
 		methodDescElem.addContent(co2MarineAirElem);
 		// End <Method_Description><CO2_in_Marine_Air>
@@ -900,21 +901,21 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><CO2_Sensors><CO2_Sensor>
 		Element co2SensorElem = new Element("CO2_Sensor");
 		
-		co2SensorElem.addContent(co2MeasurementMethod.getElement());
-		co2SensorElem.addContent(co2Manufacturer.getElement());
-		co2SensorElem.addContent(co2Model.getElement());
-		co2SensorElem.addContent(co2Frequency.getElement());
-		co2SensorElem.addContent(co2ResolutionWater.getElement());
-		co2SensorElem.addContent(co2UncertaintyWater.getElement());
-		co2SensorElem.addContent(co2ResolutionAir.getElement());
-		co2SensorElem.addContent(co2UncertaintyAir.getElement());
-		co2SensorElem.addContent(co2ManufacturerOfCalibrationGas.getElement());
-		co2SensorElem.addContent(co2SensorCalibration.getElement());
-		co2SensorElem.addContent(co2EnvironmentalControl.getElement());
-		co2SensorElem.addContent(co2MethodReferences.getElement());
-		co2SensorElem.addContent(detailsOfCO2Sensing.getElement());
-		co2SensorElem.addContent(analysisOfCO2Comparison.getElement());
-		co2SensorElem.addContent(measuredCO2Params.getElement());
+		co2MeasurementMethod.generateXMLContent(co2SensorElem, conflictElem);
+		co2Manufacturer.generateXMLContent(co2SensorElem, conflictElem);
+		co2Model.generateXMLContent(co2SensorElem, conflictElem);
+		co2Frequency.generateXMLContent(co2SensorElem, conflictElem);
+		co2ResolutionWater.generateXMLContent(co2SensorElem, conflictElem);
+		co2UncertaintyWater.generateXMLContent(co2SensorElem, conflictElem);
+		co2ResolutionAir.generateXMLContent(co2SensorElem, conflictElem);
+		co2UncertaintyAir.generateXMLContent(co2SensorElem, conflictElem);
+		co2ManufacturerOfCalibrationGas.generateXMLContent(co2SensorElem, conflictElem);
+		co2SensorCalibration.generateXMLContent(co2SensorElem, conflictElem);
+		co2EnvironmentalControl.generateXMLContent(co2SensorElem, conflictElem);
+		co2MethodReferences.generateXMLContent(co2SensorElem, conflictElem);
+		detailsOfCO2Sensing.generateXMLContent(co2SensorElem, conflictElem);
+		analysisOfCO2Comparison.generateXMLContent(co2SensorElem, conflictElem);
+		measuredCO2Params.generateXMLContent(co2SensorElem, conflictElem);
 		
 		co2SensorsElem.addContent(co2SensorElem);
 		// End <Method_Description><CO2_Sensors><CO2_Sensor>
@@ -926,13 +927,13 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Sea_Surface_Temperature>
 		Element sstElem = new Element("Sea_Surface_Temperature");
 		
-		sstElem.addContent(sstLocation.getElement());
-		sstElem.addContent(sstManufacturer.getElement());
-		sstElem.addContent(sstModel.getElement());
-		sstElem.addContent(sstAccuracy.getElement());
-		sstElem.addContent(sstPrecision.getElement());
-		sstElem.addContent(sstCalibration.getElement());
-		sstElem.addContent(sstOtherComments.getElement());
+		sstLocation.generateXMLContent(sstElem, conflictElem);
+		sstManufacturer.generateXMLContent(sstElem, conflictElem);
+		sstModel.generateXMLContent(sstElem, conflictElem);
+		sstAccuracy.generateXMLContent(sstElem, conflictElem);
+		sstPrecision.generateXMLContent(sstElem, conflictElem);
+		sstCalibration.generateXMLContent(sstElem, conflictElem);
+		sstOtherComments.generateXMLContent(sstElem, conflictElem);
 		
 		methodDescElem.addContent(sstElem);
 		// End <Method_Description><Sea_Surface_Temperature>
@@ -940,14 +941,14 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Equilibrator_Temperature>
 		Element eqtElem = new Element("Equilibrator_Temperature");
 		
-		eqtElem.addContent(eqtLocation.getElement());
-		eqtElem.addContent(eqtManufacturer.getElement());
-		eqtElem.addContent(eqtModel.getElement());
-		eqtElem.addContent(eqtAccuracy.getElement());
-		eqtElem.addContent(eqtPrecision.getElement());
-		eqtElem.addContent(eqtCalibration.getElement());
-		eqtElem.addContent(eqtWarming.getElement());
-		eqtElem.addContent(eqtOtherComments.getElement());
+		eqtLocation.generateXMLContent(eqtElem, conflictElem);
+		eqtManufacturer.generateXMLContent(eqtElem, conflictElem);
+		eqtModel.generateXMLContent(eqtElem, conflictElem);
+		eqtAccuracy.generateXMLContent(eqtElem, conflictElem);
+		eqtPrecision.generateXMLContent(eqtElem, conflictElem);
+		eqtCalibration.generateXMLContent(eqtElem, conflictElem);
+		eqtWarming.generateXMLContent(eqtElem, conflictElem);
+		eqtOtherComments.generateXMLContent(eqtElem, conflictElem);
 		
 		methodDescElem.addContent(eqtElem);
 		// End <Method_Description><Equilibrator_Temperature>
@@ -955,14 +956,14 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Equilibrator_Pressure>
 		Element eqpElem = new Element("Equilibrator_Pressure");
 		
-		eqpElem.addContent(eqpLocation.getElement());
-		eqpElem.addContent(eqpManufacturer.getElement());
-		eqpElem.addContent(eqpModel.getElement());
-		eqpElem.addContent(eqpAccuracy.getElement());
-		eqpElem.addContent(eqpPrecision.getElement());
-		eqpElem.addContent(eqpCalibration.getElement());
-		eqpElem.addContent(eqpOtherComments.getElement());
-		eqpElem.addContent(eqpNormalized.getElement());
+		eqpLocation.generateXMLContent(eqpElem, conflictElem);
+		eqpManufacturer.generateXMLContent(eqpElem, conflictElem);
+		eqpModel.generateXMLContent(eqpElem, conflictElem);
+		eqpAccuracy.generateXMLContent(eqpElem, conflictElem);
+		eqpPrecision.generateXMLContent(eqpElem, conflictElem);
+		eqpCalibration.generateXMLContent(eqpElem, conflictElem);
+		eqpOtherComments.generateXMLContent(eqpElem, conflictElem);
+		eqpNormalized.generateXMLContent(eqpElem, conflictElem);
 		
 		methodDescElem.addContent(eqpElem);
 		// End <Method_Description><Equilibrator_Pressure>
@@ -970,13 +971,13 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Atmospheric_Pressure>
 		Element atpElem = new Element("Atmospheric_Pressure");
 		
-		atpElem.addContent(atpLocation.getElement());
-		atpElem.addContent(atpManufacturer.getElement());
-		atpElem.addContent(atqpModel.getElement());
-		atpElem.addContent(atpAccuracy.getElement());
-		atpElem.addContent(atpPrecision.getElement());
-		atpElem.addContent(atpCalibration.getElement());
-		atpElem.addContent(atpOtherComments.getElement());
+		atpLocation.generateXMLContent(atpElem, conflictElem);
+		atpManufacturer.generateXMLContent(atpElem, conflictElem);
+		atqpModel.generateXMLContent(atpElem, conflictElem);
+		atpAccuracy.generateXMLContent(atpElem, conflictElem);
+		atpPrecision.generateXMLContent(atpElem, conflictElem);
+		atpCalibration.generateXMLContent(atpElem, conflictElem);
+		atpOtherComments.generateXMLContent(atpElem, conflictElem);
 		
 		methodDescElem.addContent(atpElem);
 		// End <Method_Description><Atmospheric_Pressure>
@@ -984,13 +985,13 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Sea_Surface_Salinity>
 		Element sssElem = new Element("Sea_Surface_Salinity");
 		
-		sssElem.addContent(sssLocation.getElement());
-		sssElem.addContent(sssManufacturer.getElement());
-		sssElem.addContent(sssModel.getElement());
-		sssElem.addContent(sssAccuracy.getElement());
-		sssElem.addContent(sssPrecision.getElement());
-		sssElem.addContent(sssCalibration.getElement());
-		sssElem.addContent(sssOtherComments.getElement());
+		sssLocation.generateXMLContent(sssElem, conflictElem);
+		sssManufacturer.generateXMLContent(sssElem, conflictElem);
+		sssModel.generateXMLContent(sssElem, conflictElem);
+		sssAccuracy.generateXMLContent(sssElem, conflictElem);
+		sssPrecision.generateXMLContent(sssElem, conflictElem);
+		sssCalibration.generateXMLContent(sssElem, conflictElem);
+		sssOtherComments.generateXMLContent(sssElem, conflictElem);
 		
 		methodDescElem.addContent(sssElem);
 		// End <Method_Description><Sea_Surface_Salinity>
@@ -998,7 +999,7 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Method_Description><Other_Sensors>
 		Element otherSensorsElem = new Element("Other_Sensors");
 		for (OMECompositeVariable sensorInfo : otherSensors) {
-			otherSensorsElem.addContent(sensorInfo.getElement());
+			sensorInfo.generateXMLContent(otherSensorsElem, conflictElem);
 		}
 		
 		
@@ -1010,24 +1011,27 @@ public class OmeMetadata extends DashboardMetadata {
 		// End <Method_Description>
 		
 		// Some misc root-level elements
-		rootElem.addContent(dataSetReferences.getElement());
-		rootElem.addContent(additionalInformation.getElement());
-		rootElem.addContent(citation.getElement());
-		rootElem.addContent(measurementAndCalibrationReport.getElement());
-		rootElem.addContent(preliminaryQualityControl.getElement());
+		dataSetReferences.generateXMLContent(rootElem, conflictElem);
+		additionalInformation.generateXMLContent(rootElem, conflictElem);
+		citation.generateXMLContent(rootElem, conflictElem);
+		measurementAndCalibrationReport.generateXMLContent(rootElem, conflictElem);
+		preliminaryQualityControl.generateXMLContent(rootElem, conflictElem);
 		
 		// <Data_Set_Link> (multiple)
 		for (OMECompositeVariable dataSetLink : dataSetLinks) {
-			rootElem.addContent(dataSetLink.getElement());
+			dataSetLink.generateXMLContent(rootElem, conflictElem);
 		}
 		// End <Data_Set_Link>
 		
 		// More misc root-level elements
-		rootElem.addContent(status.getElement());
-		rootElem.addContent(form_type.getElement());
-		rootElem.addContent(recordID.getElement());
+		status.generateXMLContent(rootElem, conflictElem);
+		form_type.generateXMLContent(rootElem, conflictElem);
+		recordID.generateXMLContent(rootElem, conflictElem);
 		
-		
+		// Add the CONFLICT element
+		if (conflictElem.conflictsExist()) {
+			rootElem.addContent(conflictElem);
+		}
 		return new Document(rootElem);
 	}
 
@@ -1146,6 +1150,16 @@ public class OmeMetadata extends DashboardMetadata {
 		return scMData;
 	}
 	
+	public static OmeMetadata mergeMetadata(List<OmeMetadata> metadataObjects) {
+		OmeMetadata merged = new OmeMetadata();
+		
+		
+		return merged;
+	}
+	
+	
+	
+	
 	/**
 	 * Some elements of the OME XML have a single child. This is a shortcut method to
 	 * extract the element and its child in one step. For example, there are a set of
@@ -1191,10 +1205,10 @@ public class OmeMetadata extends DashboardMetadata {
 	 * @param variable The variable object
 	 * @return The XML element containing its sub-element.
 	 */
-	private Element buildSubElement(OMEVariable variable) {
+	private Element buildSubElement(OMEVariable variable, ConflictElement conflictElem) {
 		Path varPath = variable.getPath();
 		Element elem = new Element(varPath.getParent().getElementName());
-		elem.addContent(variable.getElement());
+		variable.generateXMLContent(elem, conflictElem);
 		
 		return elem;
 	}

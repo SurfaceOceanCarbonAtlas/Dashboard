@@ -1,5 +1,7 @@
 package gov.noaa.pmel.socat.dashboard.ome;
 
+import org.jdom2.Element;
+
 class Path {
 	String itsElementName;
 	Path itsParent = null;
@@ -19,5 +21,22 @@ class Path {
 	
 	protected Path getParent() {
 		return itsParent;
+	}
+	
+	protected Element buildElementTree(String rootElementName, Element childElement) {
+		
+		Element result = null;
+		
+		if (null == itsParent) {
+			result = new Element(rootElementName);
+			result.addContent(childElement);
+		} else {
+			Element parentElement = new Element(itsParent.getElementName());
+			parentElement.addContent(childElement);
+			
+			result = itsParent.buildElementTree(rootElementName, parentElement);
+		}
+		
+		return result;
 	}
 }
