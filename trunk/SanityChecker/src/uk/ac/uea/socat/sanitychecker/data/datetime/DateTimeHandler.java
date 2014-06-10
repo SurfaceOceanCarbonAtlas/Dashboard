@@ -54,7 +54,7 @@ public class DateTimeHandler {
 	/**
 	 * The formatter used to parse dates from input data and metadata
 	 */
-	private DateTimeFormatter itsDateOnlyFormatter = null;
+	private List<DateTimeFormatter> itsDateOnlyFormatters = null;
 	
 	/**
 	 * The set of possible date-time formats that can be used to parse dates and times
@@ -77,16 +77,38 @@ public class DateTimeHandler {
 	 * Initialises all the date formats
 	 */
 	public DateTimeHandler(String dateFormat) throws DateTimeException {
-		String adjustedDateString = validateDateFormatString(dateFormat);
-		itsDateOnlyFormatter = DateTimeFormat.forPattern(adjustedDateString);
-		
-		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(5);
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + "HHmmss.SSS").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(adjustedDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
-		
+		itsDateOnlyFormatters = new ArrayList<DateTimeFormatter>(3);
+		String hyphenDateString = validateDateFormatString(dateFormat, '-');
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(hyphenDateString));
+		String slashDateString = validateDateFormatString(dateFormat, '/');
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(slashDateString));
+		String noSepDateString = validateDateFormatString(dateFormat, null);
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(noSepDateString));
+
+		// The date-time formats can come from the sanity checker combining separate date and time fields
+		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(21);
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + "HHmm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + "HHmm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + "HHmm").withPivotYear(PIVOT_YEAR));
+
 		itsOutputDateFormatter = DateTimeFormat.forPattern(DATE_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
 		itsOutputDateTimeFormatter = DateTimeFormat.forPattern(DATE_TIME_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
 	}
@@ -95,14 +117,15 @@ public class DateTimeHandler {
 	 * Ensures that a supplied date format string complies with
 	 * the requirements of this program and the JODA data library.
 	 * 
-	 * Specifically, it must contain capital YMD letters, and no others.
-	 * Allowed separators are ' -/'. Any other character will throw an exception.
+	 * Specifically, it must contain only 'y', 'Y', 'm', 'M', 'd', 'D', '-', and '/' characters.
+	 * Any other character will throw an exception.
 	 * 
 	 * @param format The supplied format
+	 * @param sep replace any separators with this character; if null, separators are removed
 	 * @return The format adjusted for use with the JODA library
 	 * @throws DateTimeException If any parts of the supplied format string are not supported
 	 */
-	private String validateDateFormatString(String format) throws DateTimeException {
+	private String validateDateFormatString(String format, Character sep) throws DateTimeException {
 
 		StringBuffer outputFormat = new StringBuffer();
 		
@@ -123,9 +146,10 @@ public class DateTimeHandler {
 		    	outputFormat.append('d');
 		    	break;
 		    }
-		    case ' ': case '/': case ':': case '-':
+		    case '/': case '-':
 		    {
-		    	outputFormat.append(format.charAt(i));
+		    	if ( sep != null )
+		    		outputFormat.append(sep);
 		    	break;
 		    }
 		    default:
@@ -139,45 +163,49 @@ public class DateTimeHandler {
 	}
 	
 	/**
-	 * Worker method for parseDate methods.
-	 * @param date The date string
-	 * @param formatter The formatter to use
-	 * @return The date object
-	 * @throws DateTimeException If the string does not conform to the expected format
-	 */
-	private DateTime parseDateWorker(String date, DateTimeFormatter formatter) throws DateTimeParseException {
-		
-		DateTime parsedDate;
-		
-		try {
-			DateTime tempParsedDate = formatter.parseDateTime(date);
-			parsedDate = tempParsedDate.withTimeAtStartOfDay();
-		} catch (IllegalArgumentException e) {
-			throw new DateTimeParseException("Unable to parse date string '" + date + "': " + e.getMessage());
-		}
-		
-		return parsedDate;
-	}
-	
-	/**
 	 * Parse a date string into a date object
 	 * @param date The date string
 	 * @return The date object
-	 * @throws DateTimeException If the string does not conform to the expected format
+	 * @throws DateTimeException If the string does not conform to one of the expected formats
 	 */
 	public DateTime parseDate(String date) throws DateTimeParseException {
-		return parseDateWorker(date, itsDateOnlyFormatter);
+		
+		DateTime parsedDate = null;
+
+		for (DateTimeFormatter formatter : itsDateOnlyFormatters) {
+			try {
+				DateTime tempParsedDate = formatter.parseDateTime(date);
+				parsedDate = tempParsedDate.withTimeAtStartOfDay();
+				break;
+			} catch (IllegalArgumentException e) {
+				continue;
+			}
+		}
+		if (null == parsedDate)
+			throw new DateTimeParseException("Unable to parse date string '" + 
+					parsedDate + "': It is not in a supported format");
+		return parsedDate;
 	}
 	
 	/**
 	 * Parse a date-time string into a DateTime object. The date must be in the format
 	 * supplied in the input data to the sanity checker. The string as a whole must be in
 	 * one of the following formats: 
-
-	 * &lt;Date&gt;HHMMSS
-	 * &lt;Date&gt; HHMMSS
-	 * &lt;Date&gt; HH:MM:SS
+	 * <pre>
 	 * &lt;Date&gt; HH:MM:SS.S
+	 * &lt;Date&gt; HH:MM:SS
+	 * &lt;Date&gt; HH:MM
+	 * &lt;Date&gt; HHMMSS
+	 * &lt;Date&gt; HHMM
+	 * &lt;Date&gt;HHMMSS
+	 * &lt;Date&gt;HHMM
+	 * </pre>
+	 * where &lt;Date&gt; is any of:
+	 * <pre>
+	 * the date format string with hyphen separators 
+	 * the date format string with slash separators 
+	 * the date format string without separators
+	 * </pre>
 	 * 
 	 * @param dateTime The string to be parsed
 	 * @return The parsed date-time object
@@ -188,20 +216,17 @@ public class DateTimeHandler {
 		DateTime parsedDateTime = null;
 
 		for (DateTimeFormatter formatter : itsDateTimeFormatters) {
-			// If the string has been successfully parsed, we don't need to keep trying
-			if (null != parsedDateTime) {
-				break;
-			}
-			
 			try {
 				parsedDateTime = formatter.parseDateTime(dateTime);
+				break;
 			} catch (IllegalArgumentException e) {
-				; // Do nothing - we will try one of the other formatters
+				continue;
 			}
 		}
 
 		if (null == parsedDateTime) {
-			throw new DateTimeParseException("Unable to parse date-time string '" + dateTime + "': It is not in a supported format");
+			throw new DateTimeParseException("Unable to parse date-time string '" + 
+					dateTime + "': It is not in a supported format");
 		}
 		
 		return parsedDateTime;
