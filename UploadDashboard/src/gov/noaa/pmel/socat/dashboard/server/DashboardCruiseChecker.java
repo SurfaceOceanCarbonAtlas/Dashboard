@@ -264,7 +264,7 @@ public class DashboardCruiseChecker {
 		}
 
 		// Specify the default date format used in this cruise
-		String dateFormat = "YYYY-MM-DD ";
+		String dateFormat = "YYYY-MM-DD";
 
 		// Save indices of data columns for assigning WOCE flags 
 		ColumnIndices colIndcs = new ColumnIndices();
@@ -911,7 +911,8 @@ public class DashboardCruiseChecker {
 				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
 			 ( (colIndcs.latitudeIndex >= 0) &&
 				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
+			//TODO: need to set to unacceptable but with messages
+			// cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 
 		return output;
