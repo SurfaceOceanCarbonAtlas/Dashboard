@@ -53,9 +53,20 @@ class OMEVariable {
 		}
 	}
 	
+	private OMEVariable(Path path) {
+		itsPath = path;
+		itsValues = new ArrayList<String>();
+	}
+	
 	protected void addValue(String value) {
 		if (!itsValues.contains(value)) {
 			itsValues.add(value);
+		}
+	}
+	
+	protected void addValues(List<String> values) {
+		for (String value : values) {
+			addValue(value);
 		}
 	}
 	
@@ -90,6 +101,10 @@ class OMEVariable {
 		}
 		
 		return result;
+	}
+	
+	protected List<String> getAllValues() {
+		return itsValues;
 	}
 	
 	protected boolean hasConflict() {
@@ -139,5 +154,14 @@ class OMEVariable {
 		if (hasConflict()) {
 			conflictParent.addContent(generateConflictElement());
 		}
+	}
+	
+	public Object clone() {
+		OMEVariable clone = new OMEVariable((Path) itsPath.clone());
+		for (String value : itsValues) {
+			clone.addValue(value);
+		}
+		
+		return clone;
 	}
 }
