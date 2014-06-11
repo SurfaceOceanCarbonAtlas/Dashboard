@@ -39,4 +39,13 @@ class Path {
 		
 		return result;
 	}
+	
+	public Object clone() {
+		Path clone = new Path(itsElementName);
+		if (null != itsParent) {
+			clone.itsParent = (Path) itsParent.clone();
+		}
+		
+		return clone;
+	}
 }

@@ -20,12 +20,18 @@ class OMECompositeVariable {
 		itsPath = parentPath;
 		itsIdFields = idElements;
 	}
+	
+	private OMECompositeVariable(Path parentPath) {
+		itsPath = parentPath;
+	}
 
 	protected void addValue(String name, Element element) throws IllegalArgumentException {
 		String valueText = null;
 		if (null != element) {
 			valueText = element.getChildTextTrim(name);
-			addValue(name, valueText);
+			if (null != valueText) {
+				addValue(name, valueText);
+			}
 		}
 	}
 	
@@ -50,7 +56,97 @@ class OMECompositeVariable {
 		}
 	}
 	
+	protected void addValues(List<Value> values) {
+		
+		for (Value value : values) {
+			
+			boolean valueStored = false;
+			for (Value existingValue : itsValues) {
+				if (existingValue.name.equals(value.name)) {
+					existingValue.addValues(value.values);
+					valueStored = true;
+					break;
+				}
+			}
+			
+			if (!valueStored) {
+				itsValues.add(value);
+			}
+			
+			
+		}
+	}
 	
+	protected static List<OMECompositeVariable> mergeVariables(List<OMECompositeVariable> dest, List<OMECompositeVariable> newValues) {
+		
+		// Copy the dest list to the output.
+		List<OMECompositeVariable> merged = new ArrayList<OMECompositeVariable>();
+		
+		// Now copy in the new values
+		for (OMECompositeVariable newValue : newValues) {
+			
+			OMECompositeVariable destVar = findById(dest, newValue);
+			if (null == destVar) {
+				merged.add((OMECompositeVariable) newValue.clone());
+			} else {
+				
+				OMECompositeVariable mergedVar = (OMECompositeVariable) destVar.clone();
+				mergedVar.addValues(newValue.getAllValues());
+				merged.add(mergedVar);
+			}
+		}
+		
+		// Anything in dest but not in new can now be added
+		for (OMECompositeVariable destValue : dest) {
+			OMECompositeVariable matchingNew = findById(newValues, destValue);
+			if (null == matchingNew) {
+				merged.add((OMECompositeVariable) destValue.clone());
+			}
+		}
+		
+		return merged;
+	}
+	
+	private List<Value> getAllValues() {
+		return itsValues;
+	}
+	
+	private static OMECompositeVariable findById(List<OMECompositeVariable> variables, OMECompositeVariable criteria) {
+		OMECompositeVariable found = null;
+		
+		for (OMECompositeVariable variable : variables) {
+			
+			boolean match = true;
+			for (String idField : variable.itsIdFields) {
+				if (!valuesEqual(variable.getValue(idField), criteria.getValue(idField))) {
+					match = false;
+				}
+			}
+			
+			if (match) {
+				found = variable;
+				break;
+			}
+		}
+		
+		return found;
+	}
+	
+	private static boolean valuesEqual(String val1, String val2) {
+		boolean result = false;
+		
+		if (null == val1 && null == val2) {
+			result = true;
+		} else if (null == val1 && null != val2 && val2.equals("")) {
+			result = true;
+		} else if (null != val1 && val1.equals("") && null == val2) {
+			result = true;
+		} else if (val1.equals(val2)) {
+			result = true;
+		}
+		
+		return result;
+	}
 		
 	private Element getElement() {
 		Element element = new Element(itsPath.getElementName());
@@ -78,7 +174,12 @@ class OMECompositeVariable {
 			
 			Element variableElement = new Element(itsPath.getElementName());
 			for (String id : itsIdFields) {
-				variableElement.setAttribute(id, getValue(id));
+				String value = getValue(id);
+				if (null == value) {
+					value = "";
+				}
+				
+				variableElement.setAttribute(id, value);
 			}
 			
 			for (Value value : itsValues) {
@@ -127,6 +228,20 @@ class OMECompositeVariable {
 		return result;
 	}
 	
+	public Object clone() {
+		OMECompositeVariable clone = new OMECompositeVariable((Path) itsPath.clone());
+		clone.itsIdFields = new ArrayList<String>();
+		for (String id : itsIdFields) {
+			clone.itsIdFields.add(id);
+		}
+		
+		for (Value value : itsValues) {
+			clone.itsValues.add((Value) value.clone());
+		}
+		
+		return clone;
+	}
+	
 	private class Value {
 		private String name;
 		private List<String> values;
@@ -137,9 +252,20 @@ class OMECompositeVariable {
 			values.add(value);
 		}
 		
+		private Value(String name) {
+			this.name = name;
+			values = new ArrayList<String>();
+		}
+		
 		private void addValue(String value) {
 			if (!values.contains(value)) {
 				values.add(value);
+			}
+		}
+		
+		private void addValues(List<String> values) {
+			for (String value: values) {
+				addValue(value);
 			}
 		}
 		
@@ -184,6 +310,15 @@ class OMECompositeVariable {
 		
 		private List<String> getAllValues() {
 			return values;
+		}
+		
+		public Object clone() {
+			Value clone = new Value(name);
+			for (String value : values) {
+				clone.values.add(value);
+			}
+			
+			return clone;
 		}
 	}
 }

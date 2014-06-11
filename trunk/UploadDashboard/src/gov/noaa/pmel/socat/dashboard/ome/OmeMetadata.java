@@ -191,7 +191,7 @@ public class OmeMetadata extends DashboardMetadata {
 	// <Method_Description><Atmospheric_Pressure>
 	private OMEVariable atpLocation = null;
 	private OMEVariable atpManufacturer = null;
-	private OMEVariable atqpModel = null;
+	private OMEVariable atpModel = null;
 	private OMEVariable atpAccuracy = null;
 	private OMEVariable atpPrecision = null;
 	private OMEVariable atpCalibration = null;
@@ -362,9 +362,12 @@ public class OmeMetadata extends DashboardMetadata {
 
 		// <Investigator> (repeating element)
 		Path investigatorPath = new Path(null, "Investigator");
+		List<String> invIdList = new ArrayList<String>(2);
+		invIdList.add("Name");
+		invIdList.add("Email");
 		for (Element invElem : rootElem.getChildren("Investigator")) {
 			
-			OMECompositeVariable invDetails = new OMECompositeVariable(investigatorPath, "Email");
+			OMECompositeVariable invDetails = new OMECompositeVariable(investigatorPath, invIdList);
 			invDetails.addValue("Name", invElem);
 			invDetails.addValue("Organization", invElem);
 			invDetails.addValue("Address", invElem);
@@ -634,7 +637,7 @@ public class OmeMetadata extends DashboardMetadata {
 				
 		atpLocation = new OMEVariable(atpPath, atpElem, "Location");
 		atpManufacturer = new OMEVariable(atpPath, atpElem, "Manufacturer");
-		atqpModel = new OMEVariable(atpPath, atpElem, "Model");
+		atpModel = new OMEVariable(atpPath, atpElem, "Model");
 		atpAccuracy = new OMEVariable(atpPath, atpElem, "Accuracy");
 		atpPrecision = new OMEVariable(atpPath, atpElem, "Precision");
 		atpCalibration = new OMEVariable(atpPath, atpElem, "Calibration");
@@ -670,10 +673,10 @@ public class OmeMetadata extends DashboardMetadata {
 			Path sensorPath = new Path(otherSensorsPath, "Sensor");
 			for (Element sensorElem : otherSensorsElem.getChildren("Sensor")) {
 				
-				List<String> idList = new ArrayList<String>(2);
-				idList.add("Manufacturer");
-				idList.add("Model");
-				OMECompositeVariable sensorDetails = new OMECompositeVariable(sensorPath, idList);
+				List<String> sensorIdList = new ArrayList<String>(2);
+				sensorIdList.add("Manufacturer");
+				sensorIdList.add("Model");
+				OMECompositeVariable sensorDetails = new OMECompositeVariable(sensorPath, sensorIdList);
 				sensorDetails.addValue("Manufacturer", sensorElem);
 				sensorDetails.addValue("Accuracy", sensorElem);
 				sensorDetails.addValue("Model", sensorElem);
@@ -973,7 +976,7 @@ public class OmeMetadata extends DashboardMetadata {
 		
 		atpLocation.generateXMLContent(atpElem, conflictElem);
 		atpManufacturer.generateXMLContent(atpElem, conflictElem);
-		atqpModel.generateXMLContent(atpElem, conflictElem);
+		atpModel.generateXMLContent(atpElem, conflictElem);
 		atpAccuracy.generateXMLContent(atpElem, conflictElem);
 		atpPrecision.generateXMLContent(atpElem, conflictElem);
 		atpCalibration.generateXMLContent(atpElem, conflictElem);
@@ -1150,16 +1153,6 @@ public class OmeMetadata extends DashboardMetadata {
 		return scMData;
 	}
 	
-	public static OmeMetadata mergeMetadata(List<OmeMetadata> metadataObjects) {
-		OmeMetadata merged = new OmeMetadata();
-		
-		
-		return merged;
-	}
-	
-	
-	
-	
 	/**
 	 * Some elements of the OME XML have a single child. This is a shortcut method to
 	 * extract the element and its child in one step. For example, there are a set of
@@ -1211,5 +1204,328 @@ public class OmeMetadata extends DashboardMetadata {
 		variable.generateXMLContent(elem, conflictElem);
 		
 		return elem;
+	}
+	
+	
+	
+	public static OmeMetadata merge(OmeMetadata... metadatas) {
+		OmeMetadata merged = null;
+		
+		if (metadatas.length == 1) {
+			merged = metadatas[0];
+		} else {
+			
+			merged = (OmeMetadata) metadatas[0].clone();
+			
+			for (int i = 1; i < metadatas.length; i++) {
+				copyValuesIn(merged, metadatas[i]);
+			}
+			
+		}
+		
+		return merged;
+	}
+	
+	private static void copyValuesIn(OmeMetadata dest, OmeMetadata newValues) {
+		dest.userName.addValues(newValues.userName.getAllValues());
+		dest.userOrganization.addValues(newValues.userOrganization.getAllValues());
+		dest.userAddress.addValues(newValues.userAddress.getAllValues());
+		dest.userPhone.addValues(newValues.userPhone.getAllValues());
+		dest.userEmail.addValues(newValues.userEmail.getAllValues());
+		
+		dest.investigators = OMECompositeVariable.mergeVariables(dest.investigators, newValues.investigators);
+		
+		dest.datasetID.addValues(newValues.datasetID.getAllValues());
+		dest.fundingInfo.addValues(newValues.fundingInfo.getAllValues());
+		
+		dest.initialSubmission.addValues(newValues.initialSubmission.getAllValues());
+		dest.revisedSubmission.addValues(newValues.revisedSubmission.getAllValues());
+		
+		dest.experimentName.addValues(newValues.experimentName.getAllValues());
+		dest.experimentType.addValues(newValues.experimentType.getAllValues());
+		dest.platformType.addValues(newValues.platformType.getAllValues());
+		dest.co2InstrumentType.addValues(newValues.co2InstrumentType.getAllValues());
+		dest.mooringId.addValues(newValues.mooringId.getAllValues());
+
+		dest.cruiseID.addValues(newValues.cruiseID.getAllValues());
+		dest.cruiseInfo.addValues(newValues.cruiseInfo.getAllValues());
+		dest.section.addValues(newValues.section.getAllValues());
+
+		dest.geographicalRegion.addValues(newValues.geographicalRegion.getAllValues());
+		
+		dest.westmostLongitude.addValues(newValues.westmostLongitude.getAllValues());
+		dest.eastmostLongitude.addValues(newValues.eastmostLongitude.getAllValues());
+		dest.northmostLatitude.addValues(newValues.northmostLatitude.getAllValues());
+		dest.southmostLatitude.addValues(newValues.southmostLatitude.getAllValues());
+
+		dest.cruiseStartDate.addValues(newValues.cruiseStartDate.getAllValues());
+		dest.cruiseEndDate.addValues(newValues.cruiseEndDate.getAllValues());
+
+		dest.vesselName.addValues(newValues.vesselName.getAllValues());
+		dest.vesselID.addValues(newValues.vesselID.getAllValues());
+		dest.country.addValues(newValues.country.getAllValues());
+		dest.vesselOwner.addValues(newValues.vesselOwner.getAllValues());
+
+		dest.variablesInfo = OMECompositeVariable.mergeVariables(dest.variablesInfo, newValues.variablesInfo);
+
+		dest.xCO2WaterEquDryUnit.addValues(newValues.xCO2WaterEquDryUnit.getAllValues());
+		dest.xCO2WaterSSTDryUnit.addValues(newValues.xCO2WaterSSTDryUnit.getAllValues());
+		dest.pCO2WaterEquWetUnit.addValues(newValues.pCO2WaterEquWetUnit.getAllValues());
+		dest.pCO2WaterSSTWetUnit.addValues(newValues.pCO2WaterSSTWetUnit.getAllValues());
+		dest.fCO2WaterEquWetUnit.addValues(newValues.fCO2WaterEquWetUnit.getAllValues());
+		dest.fCO2WaterSSTWetUnit.addValues(newValues.fCO2WaterSSTWetUnit.getAllValues());
+		dest.xCO2AirDryUnit.addValues(newValues.xCO2AirDryUnit.getAllValues());
+		dest.pCO2AirWetUnit.addValues(newValues.pCO2AirWetUnit.getAllValues());
+		dest.fCO2AirWetUnit.addValues(newValues.fCO2AirWetUnit.getAllValues());
+		dest.xCO2AirDryInterpolatedUnit.addValues(newValues.xCO2AirDryInterpolatedUnit.getAllValues());
+		dest.pCO2AirWetInterpolatedUnit.addValues(newValues.pCO2AirWetInterpolatedUnit.getAllValues());
+		dest.fCO2AirWetInterpolatedUnit.addValues(newValues.fCO2AirWetInterpolatedUnit.getAllValues());
+
+		dest.depthOfSeaWaterIntake.addValues(newValues.depthOfSeaWaterIntake.getAllValues());
+		dest.locationOfSeaWaterIntake.addValues(newValues.locationOfSeaWaterIntake.getAllValues());
+		dest.equilibratorType.addValues(newValues.equilibratorType.getAllValues());
+		dest.equilibratorVolume.addValues(newValues.equilibratorVolume.getAllValues());
+		dest.waterFlowRate.addValues(newValues.waterFlowRate.getAllValues());
+		dest.headspaceGasFlowRate.addValues(newValues.headspaceGasFlowRate.getAllValues());
+		dest.vented.addValues(newValues.vented.getAllValues());
+		dest.dryingMethodForCO2InWater.addValues(newValues.dryingMethodForCO2InWater.getAllValues());
+		dest.equAdditionalInformation.addValues(newValues.equAdditionalInformation.getAllValues());
+
+		dest.co2InMarineAirMeasurement.addValues(newValues.co2InMarineAirMeasurement.getAllValues());
+		dest.co2InMarineAirLocationAndHeight.addValues(newValues.co2InMarineAirLocationAndHeight.getAllValues());
+		dest.co2InMarineAirDryingMethod.addValues(newValues.co2InMarineAirDryingMethod.getAllValues());
+		
+		dest.co2MeasurementMethod.addValues(newValues.co2MeasurementMethod.getAllValues());
+		dest.co2Manufacturer.addValues(newValues.co2Manufacturer.getAllValues());
+		dest.co2Model.addValues(newValues.co2Model.getAllValues());
+		dest.co2Frequency.addValues(newValues.co2Frequency.getAllValues());
+		dest.co2ResolutionWater.addValues(newValues.co2ResolutionWater.getAllValues());
+		dest.co2UncertaintyWater.addValues(newValues.co2UncertaintyWater.getAllValues());
+		dest.co2ResolutionAir.addValues(newValues.co2ResolutionAir.getAllValues());
+		dest.co2UncertaintyAir.addValues(newValues.co2UncertaintyAir.getAllValues());
+		dest.co2ManufacturerOfCalibrationGas.addValues(newValues.co2ManufacturerOfCalibrationGas.getAllValues());
+		dest.co2SensorCalibration.addValues(newValues.co2SensorCalibration.getAllValues());
+		dest.co2EnvironmentalControl.addValues(newValues.co2EnvironmentalControl.getAllValues());
+		dest.co2MethodReferences.addValues(newValues.co2MethodReferences.getAllValues());
+		dest.detailsOfCO2Sensing.addValues(newValues.detailsOfCO2Sensing.getAllValues());
+		dest.analysisOfCO2Comparison.addValues(newValues.analysisOfCO2Comparison.getAllValues());
+		dest.measuredCO2Params.addValues(newValues.measuredCO2Params.getAllValues());
+
+		dest.sstLocation.addValues(newValues.sstLocation.getAllValues());
+		dest.sstManufacturer.addValues(newValues.sstManufacturer.getAllValues());
+		dest.sstModel.addValues(newValues.sstModel.getAllValues());
+		dest.sstAccuracy.addValues(newValues.sstAccuracy.getAllValues());
+		dest.sstPrecision.addValues(newValues.sstPrecision.getAllValues());
+		dest.sstCalibration.addValues(newValues.sstCalibration.getAllValues());
+		dest.sstOtherComments.addValues(newValues.sstOtherComments.getAllValues());
+
+		dest.eqtLocation.addValues(newValues.eqtLocation.getAllValues());
+		dest.eqtManufacturer.addValues(newValues.eqtManufacturer.getAllValues());
+		dest.eqtModel.addValues(newValues.eqtModel.getAllValues());
+		dest.eqtAccuracy.addValues(newValues.eqtAccuracy.getAllValues());
+		dest.eqtPrecision.addValues(newValues.eqtPrecision.getAllValues());
+		dest.eqtCalibration.addValues(newValues.eqtCalibration.getAllValues());
+		dest.eqtWarming.addValues(newValues.eqtWarming.getAllValues());
+		dest.eqtOtherComments.addValues(newValues.eqtOtherComments.getAllValues());
+
+		dest.eqpLocation.addValues(newValues.eqpLocation.getAllValues());
+		dest.eqpManufacturer.addValues(newValues.eqpManufacturer.getAllValues());
+		dest.eqpModel.addValues(newValues.eqpModel.getAllValues());
+		dest.eqpAccuracy.addValues(newValues.eqpAccuracy.getAllValues());
+		dest.eqpPrecision.addValues(newValues.eqpPrecision.getAllValues());
+		dest.eqpCalibration.addValues(newValues.eqpCalibration.getAllValues());
+		dest.eqpOtherComments.addValues(newValues.eqpOtherComments.getAllValues());
+		dest.eqpNormalized.addValues(newValues.eqpNormalized.getAllValues());
+
+		dest.atpLocation.addValues(newValues.atpLocation.getAllValues());
+		dest.atpManufacturer.addValues(newValues.atpManufacturer.getAllValues());
+		dest.atpModel.addValues(newValues.atpModel.getAllValues());
+		dest.atpAccuracy.addValues(newValues.atpAccuracy.getAllValues());
+		dest.atpPrecision.addValues(newValues.atpPrecision.getAllValues());
+		dest.atpCalibration.addValues(newValues.atpCalibration.getAllValues());
+		dest.atpOtherComments.addValues(newValues.atpOtherComments.getAllValues());
+
+		dest.sssLocation.addValues(newValues.sssLocation.getAllValues());
+		dest.sssManufacturer.addValues(newValues.sssManufacturer.getAllValues());
+		dest.sssModel.addValues(newValues.sssModel.getAllValues());
+		dest.sssAccuracy.addValues(newValues.sssAccuracy.getAllValues());
+		dest.sssPrecision.addValues(newValues.sssPrecision.getAllValues());
+		dest.sssCalibration.addValues(newValues.sssCalibration.getAllValues());
+		dest.sssOtherComments.addValues(newValues.sssOtherComments.getAllValues());
+
+		dest.otherSensors = OMECompositeVariable.mergeVariables(dest.otherSensors, newValues.otherSensors);
+		
+		dest.dataSetReferences.addValues(newValues.dataSetReferences.getAllValues());
+		dest.additionalInformation.addValues(newValues.additionalInformation.getAllValues());
+		dest.citation.addValues(newValues.citation.getAllValues());
+		dest.measurementAndCalibrationReport.addValues(newValues.measurementAndCalibrationReport.getAllValues());
+		dest.preliminaryQualityControl.addValues(newValues.preliminaryQualityControl.getAllValues());
+
+		dest.dataSetLinks = OMECompositeVariable.mergeVariables(dest.dataSetLinks, newValues.dataSetLinks);
+
+		dest.status.addValues(newValues.status.getAllValues());
+		dest.form_type.addValues(newValues.form_type.getAllValues());
+		dest.recordID.addValues(newValues.recordID.getAllValues());
+	}
+	
+	public Object clone() {
+		OmeMetadata clone = new OmeMetadata();
+		
+		clone.userName = (OMEVariable) userName.clone();
+		clone.userOrganization = (OMEVariable) userOrganization.clone();
+		clone.userAddress = (OMEVariable) userAddress.clone();
+		clone.userPhone = (OMEVariable) userPhone.clone();
+		clone.userEmail = (OMEVariable) userEmail.clone();
+		
+		clone.investigators = new ArrayList<OMECompositeVariable>(investigators.size());
+		for (OMECompositeVariable investigator : investigators) {
+			clone.investigators.add((OMECompositeVariable) investigator.clone());
+		}
+		
+		clone.datasetID = (OMEVariable) datasetID.clone();
+		clone.fundingInfo = (OMEVariable) fundingInfo.clone();
+		
+		clone.initialSubmission = (OMEVariable) initialSubmission.clone();
+		clone.revisedSubmission = (OMEVariable) revisedSubmission.clone();
+		
+		clone.experimentName = (OMEVariable) experimentName.clone();
+		clone.experimentType = (OMEVariable) experimentType.clone();
+		clone.platformType = (OMEVariable) platformType.clone();
+		clone.co2InstrumentType = (OMEVariable) co2InstrumentType.clone();
+		clone.mooringId = (OMEVariable) mooringId.clone();
+		
+		clone.cruiseID = (OMEVariable) cruiseID.clone();
+		clone.cruiseInfo = (OMEVariable) cruiseInfo.clone();
+		clone.section = (OMEVariable) section.clone();
+
+		clone.geographicalRegion = (OMEVariable) geographicalRegion.clone();
+		
+		clone.westmostLongitude = (OMEVariable) westmostLongitude.clone();
+		clone.eastmostLongitude = (OMEVariable) eastmostLongitude.clone();
+		clone.northmostLatitude = (OMEVariable) northmostLatitude.clone();
+		clone.southmostLatitude = (OMEVariable) southmostLatitude.clone();
+		
+		clone.temporalCoverageStartDate = (OMEVariable) temporalCoverageStartDate.clone();
+		clone.temporalCoverageEndDate = (OMEVariable) temporalCoverageEndDate.clone();
+
+		clone.cruiseStartDate = (OMEVariable) cruiseStartDate.clone();
+		clone.cruiseEndDate = (OMEVariable) cruiseEndDate.clone();
+
+		clone.vesselName = (OMEVariable) vesselName.clone();
+		clone.vesselID = (OMEVariable) vesselID.clone();
+		clone.country = (OMEVariable) country.clone();
+		clone.vesselOwner = (OMEVariable) vesselOwner.clone();
+		
+		clone.variablesInfo = new ArrayList<OMECompositeVariable>(variablesInfo.size());
+		for (OMECompositeVariable varInfo : variablesInfo) {
+			clone.variablesInfo.add((OMECompositeVariable) varInfo.clone());
+		}
+
+		clone.xCO2WaterEquDryUnit = (OMEVariable) xCO2WaterEquDryUnit.clone();
+		clone.xCO2WaterSSTDryUnit = (OMEVariable) xCO2WaterSSTDryUnit.clone();
+		clone.pCO2WaterEquWetUnit = (OMEVariable) pCO2WaterEquWetUnit.clone();
+		clone.pCO2WaterSSTWetUnit = (OMEVariable) pCO2WaterSSTWetUnit.clone();
+		clone.fCO2WaterEquWetUnit = (OMEVariable) fCO2WaterEquWetUnit.clone();
+		clone.fCO2WaterSSTWetUnit = (OMEVariable) fCO2WaterSSTWetUnit.clone();
+		clone.xCO2AirDryUnit = (OMEVariable) xCO2AirDryUnit.clone();
+		clone.pCO2AirWetUnit = (OMEVariable) pCO2AirWetUnit.clone();
+		clone.fCO2AirWetUnit = (OMEVariable) fCO2AirWetUnit.clone();
+		clone.xCO2AirDryInterpolatedUnit = (OMEVariable) xCO2AirDryInterpolatedUnit.clone();
+		clone.pCO2AirWetInterpolatedUnit = (OMEVariable) pCO2AirWetInterpolatedUnit.clone();
+		clone.fCO2AirWetInterpolatedUnit = (OMEVariable) fCO2AirWetInterpolatedUnit.clone();
+
+		clone.depthOfSeaWaterIntake = (OMEVariable) depthOfSeaWaterIntake.clone();
+		clone.locationOfSeaWaterIntake = (OMEVariable) locationOfSeaWaterIntake.clone();
+		clone.equilibratorType = (OMEVariable) equilibratorType.clone();
+		clone.equilibratorVolume = (OMEVariable) equilibratorVolume.clone();
+		clone.waterFlowRate = (OMEVariable) waterFlowRate.clone();
+		clone.headspaceGasFlowRate = (OMEVariable) headspaceGasFlowRate.clone();
+		clone.vented = (OMEVariable) vented.clone();
+		clone.dryingMethodForCO2InWater = (OMEVariable) dryingMethodForCO2InWater.clone();
+		clone.equAdditionalInformation = (OMEVariable) equAdditionalInformation.clone();
+
+		clone.co2InMarineAirMeasurement = (OMEVariable) co2InMarineAirMeasurement.clone();
+		clone.co2InMarineAirLocationAndHeight = (OMEVariable) co2InMarineAirLocationAndHeight.clone();
+		clone.co2InMarineAirDryingMethod = (OMEVariable) co2InMarineAirDryingMethod.clone();
+		
+		clone.co2MeasurementMethod = (OMEVariable) co2MeasurementMethod.clone();
+		clone.co2Manufacturer = (OMEVariable) co2Manufacturer.clone();
+		clone.co2Model = (OMEVariable) co2Model.clone();
+		clone.co2Frequency = (OMEVariable) co2Frequency.clone();
+		clone.co2ResolutionWater = (OMEVariable) co2ResolutionWater.clone();
+		clone.co2UncertaintyWater = (OMEVariable) co2UncertaintyWater.clone();
+		clone.co2ResolutionAir = (OMEVariable) co2ResolutionAir.clone();
+		clone.co2UncertaintyAir = (OMEVariable) co2UncertaintyAir.clone();
+		clone.co2ManufacturerOfCalibrationGas = (OMEVariable) co2ManufacturerOfCalibrationGas.clone();
+		clone.co2SensorCalibration = (OMEVariable) co2SensorCalibration.clone();
+		clone.co2EnvironmentalControl = (OMEVariable) co2EnvironmentalControl.clone();
+		clone.co2MethodReferences = (OMEVariable) co2MethodReferences.clone();
+		clone.detailsOfCO2Sensing = (OMEVariable) detailsOfCO2Sensing.clone();
+		clone.analysisOfCO2Comparison = (OMEVariable) analysisOfCO2Comparison.clone();
+		clone.measuredCO2Params = (OMEVariable) measuredCO2Params.clone();
+
+		clone.sstLocation = (OMEVariable) sstLocation.clone();
+		clone.sstManufacturer = (OMEVariable) sstManufacturer.clone();
+		clone.sstModel = (OMEVariable) sstModel.clone();
+		clone.sstAccuracy = (OMEVariable) sstAccuracy.clone();
+		clone.sstPrecision = (OMEVariable) sstPrecision.clone();
+		clone.sstCalibration = (OMEVariable) sstCalibration.clone();
+		clone.sstOtherComments = (OMEVariable) sstOtherComments.clone();
+
+		clone.eqtLocation = (OMEVariable) eqtLocation.clone();
+		clone.eqtManufacturer = (OMEVariable) eqtManufacturer.clone();
+		clone.eqtModel = (OMEVariable) eqtModel.clone();
+		clone.eqtAccuracy = (OMEVariable) eqtAccuracy.clone();
+		clone.eqtPrecision = (OMEVariable) eqtPrecision.clone();
+		clone.eqtCalibration = (OMEVariable) eqtCalibration.clone();
+		clone.eqtWarming = (OMEVariable) eqtWarming.clone();
+		clone.eqtOtherComments = (OMEVariable) eqtOtherComments.clone();
+
+		clone.eqpLocation = (OMEVariable) eqpLocation.clone();
+		clone.eqpManufacturer = (OMEVariable) eqpManufacturer.clone();
+		clone.eqpModel = (OMEVariable) eqpModel.clone();
+		clone.eqpAccuracy = (OMEVariable) eqpAccuracy.clone();
+		clone.eqpPrecision = (OMEVariable) eqpPrecision.clone();
+		clone.eqpCalibration = (OMEVariable) eqpCalibration.clone();
+		clone.eqpOtherComments = (OMEVariable) eqpOtherComments.clone();
+		clone.eqpNormalized = (OMEVariable) eqpNormalized.clone();
+
+		clone.atpLocation = (OMEVariable) atpLocation.clone();
+		clone.atpManufacturer = (OMEVariable) atpManufacturer.clone();
+		clone.atpModel = (OMEVariable) atpModel.clone();
+		clone.atpAccuracy = (OMEVariable) atpAccuracy.clone();
+		clone.atpPrecision = (OMEVariable) atpPrecision.clone();
+		clone.atpCalibration = (OMEVariable) atpCalibration.clone();
+		clone.atpOtherComments = (OMEVariable) atpOtherComments.clone();
+
+		clone.sssLocation = (OMEVariable) sssLocation.clone();
+		clone.sssManufacturer = (OMEVariable) sssManufacturer.clone();
+		clone.sssModel = (OMEVariable) sssModel.clone();
+		clone.sssAccuracy = (OMEVariable) sssAccuracy.clone();
+		clone.sssPrecision = (OMEVariable) sssPrecision.clone();
+		clone.sssCalibration = (OMEVariable) sssCalibration.clone();
+		clone.sssOtherComments = (OMEVariable) sssOtherComments.clone();
+
+		clone.otherSensors = new ArrayList<OMECompositeVariable>(otherSensors.size());
+		for (OMECompositeVariable otherSensor : otherSensors) {
+			clone.otherSensors.add((OMECompositeVariable) otherSensor.clone());
+		}
+		
+		clone.dataSetReferences = (OMEVariable) dataSetReferences.clone();
+		clone.additionalInformation = (OMEVariable) additionalInformation.clone();
+		clone.citation = (OMEVariable) citation.clone();
+		clone.measurementAndCalibrationReport = (OMEVariable) measurementAndCalibrationReport.clone();
+		clone.preliminaryQualityControl = (OMEVariable) preliminaryQualityControl.clone();
+
+		clone.dataSetLinks = new ArrayList<OMECompositeVariable>(dataSetLinks.size());
+		for (OMECompositeVariable dataSetLink : dataSetLinks) {
+			clone.dataSetLinks.add((OMECompositeVariable) dataSetLink.clone());
+		}
+		
+		clone.status = (OMEVariable) status.clone();
+		clone.form_type = (OMEVariable) form_type.clone();
+		clone.recordID = (OMEVariable) recordID.clone();
+		
+		return clone;
 	}
 }
