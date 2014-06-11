@@ -10,4 +10,4 @@ use  dist2land20_burke.nc
 define symbol ddist = `dist2land,return=dsetnum`
 set data "($cruise_filename)"
 
-let/title="Distance to Land"/unit="km" d2l = SAMPLEXY(dist2land[d=($ddist)], longitude, latitude)
+let/title="Distance to Land"/unit="km" d2l = SAMPLEXY(dist2land[d=($ddist),x=-180:180], longitude, latitude)

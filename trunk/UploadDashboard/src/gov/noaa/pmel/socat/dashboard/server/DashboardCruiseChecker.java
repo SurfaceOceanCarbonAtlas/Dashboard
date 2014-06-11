@@ -207,6 +207,8 @@ public class DashboardCruiseChecker {
 		// COMMENT, OTHER, and WOCE_FCO2_REC should not be processed by the sanity checker
 	}
 
+	private boolean lastCruiseCheckHadGeopositionErrors;
+
 	/**
 	 * Initializes the SanityChecker using the configuration files names
 	 * in the given properties files.
@@ -232,6 +234,7 @@ public class DashboardCruiseChecker {
 					" values specified in " + configFile.getPath() + 
 					"\n    " + ex.getMessage());
 		}
+		lastCruiseCheckHadGeopositionErrors = false;
 	}
 
 	/**
@@ -911,13 +914,23 @@ public class DashboardCruiseChecker {
 				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
 			 ( (colIndcs.latitudeIndex >= 0) &&
 				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
-			//TODO: need to set to unacceptable but with messages
-			// cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
+			lastCruiseCheckHadGeopositionErrors = true;
+		}
+		else {
+			lastCruiseCheckHadGeopositionErrors = false;
 		}
 
 		return output;
 	}
-	
+
+	/**
+	 * @return
+	 * 		true if the cruise last checked had geoposition errors
+	 */
+	public boolean hadGeopositionErrors() {
+		return lastCruiseCheckHadGeopositionErrors;
+	}
+
 	/**
 	 * Assigns the WOCE-3 or WOCE-4 flag associated with this message 
 	 * to the cruise.

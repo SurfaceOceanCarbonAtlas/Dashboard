@@ -44,6 +44,46 @@ public class DashboardCruiseSubmitter {
 		databaseHandler = dataStore.getDatabaseRequestHandler();
 	}
 
+	/**
+	 * Submit a dataset for SOCAT QC.  This sanity checks and generates
+	 * DSG and decimated DSG files for datasets which have a QC status 
+	 * of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED}, 
+	 * {@link DashboardUtils#QC_STATUS_UNACCEPTABLE},
+	 * {@link DashboardUtils#QC_STATUS_SUSPENDED}, or
+	 * {@link DashboardUtils#QC_STATUS_EXCLUDED}.
+	 * For all cruises, the archive status is updated to that given.
+	 * 
+	 * TODO (stubbed): If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_CDIAC},
+	 * the archive request is sent to CDIAC for dataset which have not been sent,
+	 * or for all datasets if repeatSend is true.
+	 * 
+	 * @param cruiseExpocodes
+	 * 		expocodes of the datasets to submit
+	 * @param archiveStatus
+	 * 		archive status to set for these cruises
+	 * @param localTimestamp
+	 * 		local timestamp to associate with this submission
+	 * @param repeatSend
+	 * 		re-send request to CDIAC to archive for datasets 
+	 * 		which already had a request sent?
+	 * @param submitter
+	 * 		user performing this submit 
+	 * @param qcFlag
+	 * 		if not null, flag to associate with this submit.
+	 * 		This is only for transferring v2 cruises and 
+	 * 		should be null for standard use.
+	 * @param addlDocs
+	 * 		if not null, additional documents (metadata HRefs)
+	 * 		to include.  This is only for transferring v2 cruises 
+	 * 		and should be null for standard use. 
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid, or
+	 * 		if the data or metadata is missing, or
+	 * 		if the sanity checker fails or gives a geoposition error, or
+	 * 		if the DSG files cannot be created, or
+	 * 		if there was a problem saving the updated dataset information
+	 * 		(including archive status)
+	 */
 	public void submitCruises(Set<String> cruiseExpocodes, 
 			String archiveStatus, String localTimestamp, 
 			boolean repeatSend, String submitter, String qcFlag, 
@@ -56,15 +96,16 @@ public class DashboardCruiseSubmitter {
 			// Get the properties of this cruise
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 			if ( cruise == null ) 
-				throw new IllegalArgumentException("Unknown cruise " + expocode);
+				throw new IllegalArgumentException("Unknown dataset " + expocode);
 
 			boolean changed = false;
 			String commitMsg = "Expocode " + expocode;
 
 			String qcStatus = cruise.getQcStatus();
 			if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
+				 qcStatus.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) || 
 				 qcStatus.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-				 qcStatus.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ) {
+				 qcStatus.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) {
 				// QC flag to assign with this cruise
 				String flag;
 				if ( qcFlag != null ) {
@@ -80,13 +121,14 @@ public class DashboardCruiseSubmitter {
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
-				// Reset an "N" or "U" flag to an "F" flag if the cruise has major issues
 				if ( qcFlag == null ) {
-					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
-						// Either checker failed, or geoposition WOCE flag of 4
-						// Presumably this should never happen.
-						flag = "F";
-					}
+					// Throw an exception if the cruise has unacceptable issues
+					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) )
+						throw new IllegalArgumentException(
+								"Unacceptable dataset - automated checking of data failed");
+					if ( cruiseChecker.hadGeopositionErrors() )
+						throw new IllegalArgumentException("Unacceptable dataset - automated checking " +
+								"of data detected errors with longitude, latitude, date, or time values");
 				}
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
