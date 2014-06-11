@@ -13,6 +13,7 @@
 ! +-----------+-------------------+--------+
 ! | region_ID | name              | region |
 ! +-----------+-------------------+--------+
+! |           | land              |      0 |
 ! | N         | North Pacific     |      1 |
 ! | T         | Tropical Pacific  |      2 |
 ! | O         | Southern Ocean    |      4 |
@@ -26,13 +27,16 @@
 use SOCAT_region_ids.nc
 define symbol dmask = `region_id,return=dsetnum`
 set var/name=socat3regions region_id
+
+use  dist2land20_burke.nc
+define symbol dd2land = `dist2land,return=dsetnum`
+
 set data "($cruise_filename)"
 
-let lon = longitude[d=($cruise_filename)]
-let lat =  latitude[d=($cruise_filename)]
-
-let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask)], longitude, latitude)
+let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask),x=-180:180], longitude, latitude)
+let d2land_coast = SAMPLEXY_CLOSEST(dist2land[d=($dd2land),x=-180:180], longitude, latitude)
+let region_num_fill = if d2land_coast le 50 and region_num eq 0 then 7 else region_num
 
 ! There is no region 3 and no region 9
 let region_codes = {"N", "T", "-", "O", "I", "A", "C", "Z", "-", "R"}
-let regionid = SAMPLEI(region_codes, region_num)
+let regionid = SAMPLEI(region_codes, region_num_fill)
