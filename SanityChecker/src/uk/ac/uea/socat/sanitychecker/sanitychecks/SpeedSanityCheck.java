@@ -70,7 +70,7 @@ public class SpeedSanityCheck extends SanityCheck {
 							// Being unable to set the flag indicates a configuration problem, so we can throw it
 							throw new SanityCheckException("Unable to set date flag on record", e);
 						}
-					} else {
+					} else if (calcSecondsDiff(lastTime, thisTime) > 1) {
 						double speed = distance / hourDiff;
 						if (speed > itsBadSpeedLimit) {
 							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
@@ -135,5 +135,10 @@ public class SpeedSanityCheck extends SanityCheck {
 	private double calcHourDiff(DateTime time1, DateTime time2) {
 		long difference = time2.getMillis() - time1.getMillis();
 		return (double) difference / 3600000.0;
+	}
+	
+	private double calcSecondsDiff(DateTime time1, DateTime time2) {
+		long difference = time2.getMillis() - time1.getMillis();
+		return (double) difference / 1000.0;
 	}
 }
