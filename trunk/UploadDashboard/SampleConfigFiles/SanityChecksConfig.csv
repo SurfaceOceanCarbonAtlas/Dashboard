@@ -1,4 +1,4 @@
 #Class,Option,Option....
 Speed,100,200
-FixedValue,expocode
-FixedValue,cruise_name
+FixedValue,expocode,Y
+FixedValue,cruise_name,Y
