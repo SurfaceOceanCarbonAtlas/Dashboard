@@ -794,10 +794,14 @@ public class OmeMetadata extends DashboardMetadata {
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
 		Element boundsElem = new Element("Bounds");
 		
-		westmostLongitude.generateXMLContent(boundsElem, conflictElem);
-		eastmostLongitude.generateXMLContent(boundsElem, conflictElem);
-		northmostLatitude.generateXMLContent(boundsElem, conflictElem);
-		southmostLatitude.generateXMLContent(boundsElem, conflictElem);
+		if ( null != westmostLongitude )
+			westmostLongitude.generateXMLContent(boundsElem, conflictElem);
+		if ( null != eastmostLongitude )
+			eastmostLongitude.generateXMLContent(boundsElem, conflictElem);
+		if ( null != northmostLatitude )
+			northmostLatitude.generateXMLContent(boundsElem, conflictElem);
+		if ( null != southmostLatitude )
+			southmostLatitude.generateXMLContent(boundsElem, conflictElem);
 		
 		
 		geoCoverageElem.addContent(boundsElem);
