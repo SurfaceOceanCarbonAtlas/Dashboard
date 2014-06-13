@@ -472,7 +472,7 @@ public class OmeMetadata extends DashboardMetadata {
 			Path varsInfoPath = new Path(null, "Variables_Info");
 			
 			Path variablePath = new Path(varsInfoPath, "Variable");
-			for (Element variableElem : rootElem.getChildren("Variable")) {
+			for (Element variableElem : varsInfoElem.getChildren("Variable")) {
 				
 				OMECompositeVariable varDetails = new OMECompositeVariable(variablePath, "Variable_Name");
 				varDetails.addValue("Variable_Name", variableElem);
