@@ -1208,7 +1208,7 @@ public class OmeMetadata extends DashboardMetadata {
 	
 	
 	
-	public static OmeMetadata merge(OmeMetadata... metadatas) {
+	public static OmeMetadata merge(OmeMetadata... metadatas) throws IllegalArgumentException {
 		OmeMetadata merged = null;
 		
 		if (metadatas.length == 1) {
@@ -1226,7 +1226,16 @@ public class OmeMetadata extends DashboardMetadata {
 		return merged;
 	}
 	
-	private static void copyValuesIn(OmeMetadata dest, OmeMetadata newValues) {
+	private static void copyValuesIn(OmeMetadata dest, OmeMetadata newValues) throws IllegalArgumentException {
+		
+		// The first thing to copy is the cruise ID (aka EXPO Code).
+		// If these are different, it implies that we have metadata from
+		// different cruises so they should not be merged.
+		dest.cruiseID.addValues(newValues.cruiseID.getAllValues());
+		if (dest.cruiseID.hasConflict()) {
+			throw new IllegalArgumentException("Cruise IDs do not match - cannot merge");
+		}
+		
 		dest.userName.addValues(newValues.userName.getAllValues());
 		dest.userOrganization.addValues(newValues.userOrganization.getAllValues());
 		dest.userAddress.addValues(newValues.userAddress.getAllValues());
