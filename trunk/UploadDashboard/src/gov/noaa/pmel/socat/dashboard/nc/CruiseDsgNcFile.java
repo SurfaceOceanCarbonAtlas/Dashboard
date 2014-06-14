@@ -374,7 +374,7 @@ public class CruiseDsgNcFile extends File {
 	 * @param updateWoceEvent
 	 * 		if true, update the WOCE flags from data in this DSG file
 	 * @param log
-	 * 		logger to log debug messages
+	 * 		logger to log trace messages; can be null
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
@@ -506,7 +506,7 @@ public class CruiseDsgNcFile extends File {
 	 * @param idx
 	 * 		index into the arrays of the values to compare
 	 * @param log
-	 * 		logger to log debug messages
+	 * 		logger to log trace messages; can be null
 	 * @return
 	 * 		true if the data locations match
 	 */
@@ -528,9 +528,11 @@ public class CruiseDsgNcFile extends File {
 		Double datTime = dataloc.getDataDate().getTime() / 1000.0;
 		Double datValue = dataloc.getDataValue(); 
 
-		// Try to avoid all the toString calls if not debug; but some loggers just return null
-		if ( (log.getLevel() == null) || log.getLevel().isGreaterOrEqual(Level.DEBUG) ) {
-			log.debug("\n    Comparing dataloc " +
+		// Try to avoid all the toString calls if not trace; but some loggers just return null
+		if ( (log != null) && 
+			 ( (log.getLevel() == null) || 
+				log.getLevel().isGreaterOrEqual(Level.TRACE) ) ) {
+			log.trace("\n    Comparing dataloc " +
 					  "[ lon=" + datLongitude.toString() + 
 					  ", lat=" + datLatitude.toString() + 
 					  ", time=" + datTime.toString() + 
@@ -546,31 +548,36 @@ public class CruiseDsgNcFile extends File {
 
 		// Check if longitude is within 0.001 degrees of each other
 		if ( ! DashboardUtils.closeTo(datLongitude, arrLongitude, 0.0, 0.001) ) {
-			log.debug("match failed on longitude");
+			if ( log != null )
+				log.trace("match failed on longitude");
 			return false;
 		}
 
 		// Check if latitude is within 0.0001 degrees of each other
 		if ( ! DashboardUtils.closeTo(datLatitude, arrLatitude, 0.0, 0.0001) ) {
-			log.debug("match failed on latitude");
+			if ( log != null )
+				log.trace("match failed on latitude");
 			return false;
 		}
 
 		// Check if times are within a second of each other
 		if ( ! DashboardUtils.closeTo(datTime, arrTime, 0.0, 1.0) ) {
-			log.debug("match failed on time");
+			if ( log != null )
+				log.trace("match failed on time");
 			return false;
 		}
 
 		// If given, check if data values are within 1.0E-5 relative/absolute of each other
 		if ( datavalues != null ) {
 			if ( ! DashboardUtils.closeTo(datValue, arrValue, 1.0E-5, 1.0E-5) ) {
-				log.debug("match failed on data value");
+				if ( log != null )
+					log.trace("match failed on data value");
 				return false;
 			}
 		}
 
-		log.debug("match succeeded");
+		if ( log != null )
+			log.trace("match succeeded");
 		return true;
 	}
 
