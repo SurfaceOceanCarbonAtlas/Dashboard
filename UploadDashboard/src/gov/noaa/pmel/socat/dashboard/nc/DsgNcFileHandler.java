@@ -293,7 +293,7 @@ public class DsgNcFileHandler {
 	 * @param tempDsgFilename
 	 * 		name of the temporary DSG file to also update
 	 * @param log
-	 * 		logger to log debug messages
+	 * 		logger to log trace messages; can be null
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
