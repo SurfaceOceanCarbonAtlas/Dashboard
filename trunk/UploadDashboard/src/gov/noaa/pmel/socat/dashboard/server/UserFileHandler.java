@@ -422,8 +422,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Go through the column names to assign these lists
 		for ( String colName : cruise.getUserColNames() ) {
 			// Convert the column name to the key
-			String key = colName.toLowerCase()
-								.replaceAll("[^a-z0-9]", "");
+			String key = keyFromColumnName(colName);
 			DataColumnType thisColType = userColNamesToTypes.get(key);
 			if ( thisColType == null )
 				thisColType = DataColumnType.UNKNOWN;
