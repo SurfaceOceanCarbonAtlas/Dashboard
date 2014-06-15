@@ -44,9 +44,15 @@ public class DsgNcFileHandler {
 	 * 		name of the directory for the full NetCDF DSG files
 	 * @param decDsgFilesDirName
 	 * 		name of the directory for the decimated NetCDF DSG files
+	 * @param erddapDsgFlagFileName
+	 * 		name of the flag file to create to notify ERDDAP 
+	 * 		of updates to the full NetCDF DSG files
+	 * @param erddapDecDsgFlagFileName
+	 * 		name of the flag file to create to notify ERDDAP 
+	 * 		of updates to the decimated NetCDF DSG files
 	 * @throws IllegalArgumentException
-	 * 		if the specified directories do not exist,
-	 * 		or are not directories
+	 * 		if the specified DSG directories, or the parent directories
+	 * 		of the ERDDAP flag files, do not exist or are not directories
 	 */
 	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName,
 			String erddapDsgFlagFileName, String erddapDecDsgFlagFileName) {
