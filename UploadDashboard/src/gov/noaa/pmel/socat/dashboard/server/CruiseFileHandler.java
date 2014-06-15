@@ -432,7 +432,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 									 .trim().toUpperCase();
 				break;
 			}
-			k++;
 		}
 		if ( ! expocode.isEmpty() ) {
 			if ( assignCruiseInfo && ! expocodeFound ) {
