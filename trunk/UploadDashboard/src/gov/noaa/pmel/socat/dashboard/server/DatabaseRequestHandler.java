@@ -23,20 +23,20 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
+ * Handles database requests for dealing with SOCAT flag events
+ * 
  * @author Karl Smith
  */
 public class DatabaseRequestHandler {
 
-	private static final String SQL_DRIVER_CLASS_TAG = "sqldriverclass";
+	private static final String SQL_DRIVER_TAG = "sqldriver";
 	private static final String DATABASE_URL_TAG = "databaseurl";
-	private static final String CATALOG_NAME_TAG = "catalogname";
 	private static final String SELECT_USER_TAG = "selectuser";
 	private static final String SELECT_PASS_TAG = "selectpass";
 	private static final String UPDATE_USER_TAG = "updateuser";
 	private static final String UPDATE_PASS_TAG = "updatepass";
 
 	String databaseUrl;
-	String catalogName;
 	String selectUser;
 	String selectPass;
 	String updateUser;
@@ -68,41 +68,46 @@ public class DatabaseRequestHandler {
 		}
 
 		// Get the values given in the configuration properties file
-		catalogName = configProps.getProperty(CATALOG_NAME_TAG);
-		if ( catalogName == null )
-			throw new IllegalArgumentException("Value for " + CATALOG_NAME_TAG + 
-					" not given in " + configFilename);
-		selectUser = configProps.getProperty(SELECT_USER_TAG);
-		if ( selectUser == null )
-			throw new IllegalArgumentException("Value for " + SELECT_USER_TAG + 
-					" not given in " + configFilename);
-		selectPass = configProps.getProperty(SELECT_PASS_TAG);
-		if ( selectPass == null )
-			throw new IllegalArgumentException("Value for " + SELECT_PASS_TAG + 
-					" not given in " + configFilename);
-		updateUser = configProps.getProperty(UPDATE_USER_TAG);
-		if ( updateUser == null )
-			throw new IllegalArgumentException("Value for " + UPDATE_USER_TAG + 
-					" not given in " + configFilename);
-		updatePass = configProps.getProperty(UPDATE_PASS_TAG);
-		if ( updatePass == null )
-			throw new IllegalArgumentException("Value for " + UPDATE_PASS_TAG + 
-					" not given in " + configFilename);
+		String sqlDriverName = configProps.getProperty(SQL_DRIVER_TAG);
+		if ( (sqlDriverName == null) || sqlDriverName.trim().isEmpty() )
+			throw new IllegalArgumentException("Value for " + SQL_DRIVER_TAG + 
+					", such as com.mysql.jdbc.Driver, must be given in " + configFilename);
+		sqlDriverName = sqlDriverName.trim();
 		databaseUrl = configProps.getProperty(DATABASE_URL_TAG);
-		if ( databaseUrl == null )
-			databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
-		testConnections(configProps.getProperty(SQL_DRIVER_CLASS_TAG));
+		if ( (databaseUrl == null) || databaseUrl.trim().isEmpty() )
+			throw new IllegalArgumentException("Value for " + DATABASE_URL_TAG + 
+					", such as jdbc:mysql://localhost:3306/SOCATFlags, must be given in " + configFilename);
+		databaseUrl = databaseUrl.trim();
+		selectUser = configProps.getProperty(SELECT_USER_TAG);
+		if ( (selectUser == null) || selectUser.trim().isEmpty() )
+			throw new IllegalArgumentException("Value for " + SELECT_USER_TAG + 
+					" must be given in " + configFilename);
+		selectUser = selectUser.trim();
+		selectPass = configProps.getProperty(SELECT_PASS_TAG);
+		if ( (selectPass == null) || selectPass.trim().isEmpty() )
+			throw new IllegalArgumentException("Value for " + SELECT_PASS_TAG + 
+					" must be given in " + configFilename);
+		selectPass = selectPass.trim();
+		updateUser = configProps.getProperty(UPDATE_USER_TAG);
+		if ( (updateUser == null) || updateUser.trim().isEmpty() )
+			throw new IllegalArgumentException("Value for " + UPDATE_USER_TAG + 
+					" must be given in " + configFilename);
+		updateUser = updateUser.trim();
+		updatePass = configProps.getProperty(UPDATE_PASS_TAG);
+		if ( (updatePass == null) || updatePass.trim().isEmpty() )
+			throw new IllegalArgumentException("Value for " + UPDATE_PASS_TAG + 
+					" must be given in " + configFilename);
+		updatePass = updatePass.trim();
+		testConnections(sqlDriverName);
 	}
 
 	/**
 	 * Create using the given parameters
 	 * 
-	 * @param driverClassName
-	 * 		driver class name; if null, "com.mysql.jdbc.Driver" is used
+	 * @param sqlDriverName
+	 * 		SQL driver class name, such as "com.mysql.jdbc.Driver"
 	 * @param databaseUrl
-	 * 		database URL; if null, "jdbc:mysql://localhost:3306/" plus the catalog name is used
-	 * @param catalogName
-	 * 		database catalog name
+	 * 		database URL, such as "jdbc:mysql://localhost:3306/SOCATFlags"
 	 * @param selectUser
 	 * 		name of database user with SELECT privileges (read-only user)
 	 * @param selectPass
@@ -112,135 +117,60 @@ public class DatabaseRequestHandler {
 	 * @param updatePass
 	 * 		password of database user with SELECT, UPDATE, INSERT, DELETE privileges (read-write user)
 	 * @throws IllegalArgumentException 
-	 * 		if the given value are invalid
+	 * 		if a given value is invalid (null or empty)
 	 * @throws SQLException 
 	 * 		if there are problems connecting to or executing a query on the database
 	 */
-	public DatabaseRequestHandler(String driverClassName, String databaseUrl, String catalogName, 
+	public DatabaseRequestHandler(String sqlDriverName, String databaseUrl, 
 			String selectUser, String selectPass, String updateUser, String updatePass) 
 					throws IllegalArgumentException, SQLException {
-		if ( catalogName == null )
-			throw new IllegalArgumentException("catalog name must be given");
-		this.catalogName = catalogName;
-		if ( selectUser == null )
+		if ( (sqlDriverName == null) || sqlDriverName.trim().isEmpty() )
+			throw new IllegalArgumentException("an SQL driver class name, " +
+					"such as com.mysql.jdbc.Driver, must be given");
+		if ( (databaseUrl == null) || databaseUrl.isEmpty() )
+			throw new IllegalArgumentException("an SQL database URL, " +
+					"such as jdbc:mysql://localhost:3306/SOCATFlags, must be given");
+		this.databaseUrl = databaseUrl.trim();
+		if ( (selectUser == null) || selectUser.trim().isEmpty() )
 			throw new IllegalArgumentException("username for select user must be given");
-		this.selectUser = selectUser;
-		if ( selectPass == null )
+		this.selectUser = selectUser.trim();
+		if ( (selectPass == null) || selectPass.trim().isEmpty() )
 			throw new IllegalArgumentException("password for select user must be given");
-		this.selectPass = selectPass;
-		if ( updateUser == null )
+		this.selectPass = selectPass.trim();
+		if ( (updateUser == null) || updateUser.trim().isEmpty() )
 			throw new IllegalArgumentException("username for update user must be given");
-		this.updateUser = updateUser;
-		if ( updatePass == null )
+		this.updateUser = updateUser.trim();
+		if ( (updatePass == null) || updatePass.trim().isEmpty() )
 			throw new IllegalArgumentException("password for update user must be given");
-		this.updatePass = updatePass;
-		if ( databaseUrl == null )
-			this.databaseUrl = "jdbc:mysql://localhost:3306/" + catalogName;
-		else
-			this.databaseUrl = databaseUrl;
-		testConnections(driverClassName);
+		this.updatePass = updatePass.trim();
+		testConnections(sqlDriverName.trim());
 	}
 
 	/**
 	 * Validates the parameters in this handler.
 	 * 
-	 * @param driverClassName
-	 * 		driver class name; if null, "com.mysql.jdbc.Driver" is used
+	 * @param sqlDriverName
+	 * 		SQL driver class name, such as "com.mysql.jdbc.Driver"
 	 * @throws IllegalArgumentException
 	 * 		if either database user does not have adequate privileges
 	 * @throws SQLException
-	 * 		if connecting to the database or executing a query
-	 * 		on the database throws one
+	 * 		if registering the SQL driver fails, or 
+	 * 		if connecting to the database throws one
 	 */
-	private void testConnections(String driverClassName) 
-			throws IllegalArgumentException, SQLException {
+	private void testConnections(String sqlDriverName) throws SQLException {
 		// Register the SQL driver - no harm if already registered
-		String driver;
-		if ( driverClassName == null )
-			driver = "com.mysql.jdbc.Driver";
-		else
-			driver = driverClassName;
 		try {
-			Class.forName(driver).newInstance();
+			Class.forName(sqlDriverName).newInstance();
 		} catch (Exception ex) {
 			throw new SQLException("Unable to register the SQL driver " + 
-					driver + "\n" + ex.getMessage());
+					sqlDriverName + "\n" + ex.getMessage());
 		}
 
 		// Verify the values by making the database connections
-		boolean canSelect = false;
-		Connection selectConn = makeConnection(false);
-		try {
-			ResultSet result = selectConn.createStatement().executeQuery("SHOW GRANTS;");
-			try {
-				while ( result.next() ) {
-					String grants = result.getString(1);
-					if ( grants.contains("ON `" + catalogName + "`.*") || 
-						 grants.contains("ON *.*") ) { 
-						if ( grants.contains("ALL PRIVILEGES") || 
-							 grants.contains("SELECT") ) {
-							canSelect = true;
-							break;
-						}
-					}
-				}
-			} finally {
-				result.close();
-			}
-		} finally {
-			selectConn.close();
-		}
-		if ( ! canSelect )
-			throw new IllegalArgumentException(
-					"The select-only user does not have SELECT privileges");
-
-		canSelect = false;
-		boolean canUpdate = false;
-		boolean canInsert = false;
-		boolean canDelete = false;
-		selectConn = makeConnection(true);
-		try {
-			ResultSet result = selectConn.createStatement().executeQuery("SHOW GRANTS;");
-			try {
-				while ( result.next() ) {
-					String grants = result.getString(1);
-					if ( grants.contains("ON `" + catalogName + "`.*") || 
-						 grants.contains("ON *.*") ) { 
-						if ( grants.contains("ALL PRIVILEGES") ) {
-							canSelect = true;
-							canUpdate = true;
-							canInsert = true;
-							canDelete = true;
-							break;
-						}
-						if ( grants.contains("SELECT") )
-							canSelect = true;
-						if ( grants.contains("UPDATE") )
-							canUpdate = true;
-						if ( grants.contains("INSERT") )
-							canInsert = true;
-						if ( grants.contains("DELETE") )
-							canDelete = true;
-					}
-				}
-			} finally {
-				result.close();
-			}
-		} finally {
-			selectConn.close();
-		}
-		if ( ! canSelect )
-			throw new IllegalArgumentException(
-					"The update user does not have SELECT privileges");
-		if ( ! canUpdate )
-			throw new IllegalArgumentException(
-					"The update user does not have UPDATE privileges");
-		if ( ! canInsert )
-			throw new IllegalArgumentException(
-					"The update user does not have INSERT privileges");
-		if ( ! canDelete )
-			throw new IllegalArgumentException(
-					"The update user does not have DELETE privileges");
+		Connection catConn = makeConnection(false);
+		catConn.close();
+		catConn = makeConnection(true);
+		catConn.close();
 	}
 
 	/**
