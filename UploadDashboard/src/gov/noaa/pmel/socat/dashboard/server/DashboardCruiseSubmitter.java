@@ -92,6 +92,7 @@ public class DashboardCruiseSubmitter {
 		HashSet<String> ingestExpos = new HashSet<String>();
 		HashSet<String> archiveExpos = new HashSet<String>();
 		HashSet<String> cdiacExpos = new HashSet<String>();
+		ArrayList<String> errorMsgs = new ArrayList<String>();
 		for ( String expocode : cruiseExpocodes ) {
 			// Get the properties of this cruise
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
@@ -122,13 +123,16 @@ public class DashboardCruiseSubmitter {
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
 				if ( qcFlag == null ) {
-					// Throw an exception if the cruise has unacceptable issues
-					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) )
-						throw new IllegalArgumentException(
-								"Unacceptable dataset - automated checking of data failed");
-					if ( cruiseChecker.hadGeopositionErrors() )
-						throw new IllegalArgumentException("Unacceptable dataset - automated checking " +
-								"of data detected errors with longitude, latitude, date, or time values");
+					// See if the cruise has unacceptable issues
+					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
+						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
+						continue;
+					}
+					if ( cruiseChecker.hadGeopositionErrors() ) {
+						errorMsgs.add(expocode + ": unacceptable; automated checking of data " +
+								"detected longitude, latitude, date, or time value errors");
+						continue;
+					}
 				}
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
@@ -224,5 +228,15 @@ public class DashboardCruiseSubmitter {
 
 		// TODO: send data to CDIAC for cruises in cdiacExpos
 
+		// If any cruise submit errors, return the error messages
+		// TODO: do this in a return message, not an IllegalArgumentException
+		if ( errorMsgs.size() > 0 ) {
+			StringBuilder sb = new StringBuilder();
+			for ( String msg : errorMsgs ) { 
+				sb.append(msg);
+				sb.append("\n");
+			}
+			throw new IllegalArgumentException(sb.toString());
+		}
 	}
 }
