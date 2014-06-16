@@ -1055,7 +1055,7 @@ public class OmeMetadata extends DashboardMetadata {
 	 *		created SocatMetadata object 
 	 */
 	public SocatMetadata createSocatMetadata(Double socatVersion, 
-							Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
+			Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
 		
 		// We cannot create a SocatMetadata object if there are conflicts
 		if (isConflicted()) {
@@ -1071,37 +1071,37 @@ public class OmeMetadata extends DashboardMetadata {
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(westmostLongitude.getValue()));
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("The Westernmost_Longitude entry is not numeric", e);
+			scMData.setWestmostLongitude(null);
 		}
 
 		try {
 			scMData.setEastmostLongitude(Double.parseDouble(eastmostLongitude.getValue()));
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("The Easternmost_Longitude entry is not numeric", e);
+			scMData.setEastmostLongitude(null);
 		}
 
 		try {
 			scMData.setSouthmostLatitude(Double.parseDouble(southmostLatitude.getValue()));
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("The Westernmost_Longitude entry is not numeric", e);
+			scMData.setSouthmostLatitude(null);
 		}
 
 		try {
 			scMData.setNorthmostLatitude(Double.parseDouble(northmostLatitude.getValue()));
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("The Westernmost_Longitude entry is not numeric", e);
+			scMData.setNorthmostLatitude(null);
 		}
 		
 		try {
 			scMData.setBeginTime(DATE_PARSER.parse(temporalCoverageStartDate.getValue() + " 00:00:00"));
 		} catch (ParseException e) {
-			throw new IllegalArgumentException("The Start Date cannot be parsed", e);
+			scMData.setBeginTime(null);
 		}
 
 		try {
 			scMData.setEndTime(DATE_PARSER.parse(temporalCoverageEndDate.getValue() + " 23:59:59"));
 		} catch (ParseException e) {
-			throw new IllegalArgumentException("The End Date cannot be parsed", e);
+			scMData.setEndTime(null);
 		}
 		
 		String firstDataSetLink = "";
