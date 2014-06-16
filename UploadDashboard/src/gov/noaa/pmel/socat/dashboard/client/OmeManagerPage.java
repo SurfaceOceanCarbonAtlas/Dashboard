@@ -217,8 +217,8 @@ public class OmeManagerPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
-		// Return to the cruise list page exactly as it was
-		CruiseListPage.redisplayPage(true);
+		// Return to the cruise list page which might have been updated
+		CruiseListPage.showPage(false);
 	}
 
 	@UiHandler("uploadButton") 
