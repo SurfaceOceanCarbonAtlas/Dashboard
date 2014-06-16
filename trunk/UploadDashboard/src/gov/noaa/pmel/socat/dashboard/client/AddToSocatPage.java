@@ -399,8 +399,8 @@ public class AddToSocatPage extends Composite {
 
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
-		// Return to the cruise list page exactly as it was
-		CruiseListPage.redisplayPage(true);
+		// Return to the list of cruises which could have been modified by this page
+		CruiseListPage.showPage(false);
 	}
 
 	@UiHandler("submitButton")
