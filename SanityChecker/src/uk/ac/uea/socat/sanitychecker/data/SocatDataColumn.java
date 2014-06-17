@@ -128,7 +128,18 @@ public class SocatDataColumn {
 			itsValue = MISSING_VALUE;
 		} else {
 			String trimmedValue = value.trim();
-			if (trimmedValue.length() == 0 || trimmedValue.equalsIgnoreCase("na") || trimmedValue.equalsIgnoreCase("nan")) {
+			if ( trimmedValue.length() == 0 || 
+				 trimmedValue.equalsIgnoreCase("na") || 
+				 trimmedValue.equalsIgnoreCase("nan") ||
+				 trimmedValue.equalsIgnoreCase("n/a") ||
+				 trimmedValue.equals("-999") ||
+				 trimmedValue.equals("-999.") ||
+				 trimmedValue.equals("-999.0") ||
+				 trimmedValue.equals("-999.9") ||
+				 trimmedValue.equals("-9999") ||
+				 trimmedValue.equals("-9999.") ||
+				 trimmedValue.equals("-9999.0") ||
+				 trimmedValue.equals("-9999.9") ) {
 				itsValue = MISSING_VALUE;
 			} else if (null != missingValue) {
 				try {
