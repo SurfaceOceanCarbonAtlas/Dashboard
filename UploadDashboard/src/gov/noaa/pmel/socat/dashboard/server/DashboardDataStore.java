@@ -298,7 +298,7 @@ public class DashboardDataStore {
 			decDsgFileDirName = configProps.getProperty(DEC_DSG_NC_FILES_DIR_NAME_TAG);
 			if ( decDsgFileDirName == null )
 				throw new IllegalArgumentException(DEC_DSG_NC_FILES_DIR_NAME_TAG + " not defined");
-			decDsgFileDirName = propVal.trim();
+			decDsgFileDirName = decDsgFileDirName.trim();
 		    itsLogger.info("Decimated DSG directory = " + decDsgFileDirName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + DEC_DSG_NC_FILES_DIR_NAME_TAG + 
@@ -310,7 +310,7 @@ public class DashboardDataStore {
 			erddapDsgFlagFileName = configProps.getProperty(ERDDAP_DSG_FLAG_FILE_NAME_TAG);
 			if ( erddapDsgFlagFileName == null )
 				throw new IllegalArgumentException("value not defined");
-			erddapDsgFlagFileName = propVal.trim();
+			erddapDsgFlagFileName = erddapDsgFlagFileName.trim();
 		    itsLogger.info("ERDDAP DSG flag file = " + erddapDsgFlagFileName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ERDDAP_DSG_FLAG_FILE_NAME_TAG + 
@@ -322,7 +322,7 @@ public class DashboardDataStore {
 			erddapDecDsgFlagFileName = configProps.getProperty(ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG);
 			if ( erddapDecDsgFlagFileName == null )
 				throw new IllegalArgumentException("value not defined");
-			erddapDecDsgFlagFileName = propVal.trim();
+			erddapDecDsgFlagFileName = erddapDecDsgFlagFileName.trim();
 		    itsLogger.info("ERDDAP decimated DSG flag file = " + erddapDecDsgFlagFileName);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + 
