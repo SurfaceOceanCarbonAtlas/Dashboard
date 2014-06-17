@@ -114,8 +114,9 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.SALINITY, "salinity");
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "T_equ");
 		STD_HEADER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
+		STD_HEADER_NAMES.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "P_equ");
-		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "SLP");
+		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
 
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU, "xCO2_water_Tequ_dry");
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST, "xCO2_water_SST_dry");
@@ -124,9 +125,13 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_TEQU, "fCO2_water_Tequ_wet");
 		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_SST, "fCO2_water_SST_wet");
 
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM, "xCO2_atm");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM, "pCO2_atm");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM, "fCO2_atm");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_ACTUAL, "xCO2_atm_actual");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_INTERP, "xCO2_atm_interp");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_ACTUAL, "pCO2_atm_actual");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_INTERP, "pCO2_atm_interp");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_ACTUAL, "fCO2_atm_actual");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_INTERP, "fCO2_atm_interp");
+
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_XCO2, "delta_xCO2");
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_FCO2, "delta_fCO2");
@@ -145,8 +150,9 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_SALINITY, "WOCE_salinity");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_EQUILIBRATOR_TEMPERATURE, "WOCE_T_equ");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_SEA_SURFACE_TEMPERATURE, "WOCE_SST");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_ATMOSPHERIC_TEMPERATURE, "WOCE_Temperature_atm");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_EQUILIBRATOR_PRESSURE, "WOCE_P_equ");
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_SEA_LEVEL_PRESSURE, "WOCE_SLP");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_SEA_LEVEL_PRESSURE, "WOCE_Pressure_atm");
 
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_XCO2_WATER_TEQU, "WOCE_xCO2_water_Tequ");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_XCO2_WATER_SST, "WOCE_xCO2_water_SST");
@@ -155,9 +161,13 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_FCO2_WATER_TEQU, "WOCE_fCO2_water_Tequ");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_FCO2_WATER_SST, "WOCE_fCO2_water_SST");
 
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_XCO2_ATM, "WOCE_xCO2_atm");
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_PCO2_ATM, "WOCE_pCO2_atm");
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_FCO2_ATM, "WOCE_fCO2_atm");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_XCO2_ATM_ACTUAL, "WOCE_xCO2_atm_measured");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_XCO2_ATM_INTERP, "WOCE_xCO2_atm_interp");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_PCO2_ATM_ACTUAL, "WOCE_pCO2_atm_measured");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_PCO2_ATM_INTERP, "WOCE_pCO2_atm_interp");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_FCO2_ATM_ACTUAL, "WOCE_fCO2_atm_measured");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_FCO2_ATM_INTERP, "WOCE_fCO2_atm_interp");
+
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_DELTA_XCO2, "WOCE_delta_xCO2");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_DELTA_PCO2, "WOCE_delta_pCO2");
 		STD_HEADER_NAMES.put(DataColumnType.WOCE_DELTA_FCO2, "WOCE_delta_fCO2");
@@ -181,9 +191,10 @@ public class DashboardUtils {
 	public static final ArrayList<String> NO_UNITS = 
 			new ArrayList<String>(Arrays.asList(""));
 	public static final ArrayList<String> TIMESTAMP_UNITS = new ArrayList<String>(Arrays.asList(
-			"yyyy-mm-dd hh:mm:ss", "mm-dd-yyyy hh:mm:ss", "dd-mm-yyyy hh:mm:ss"));
+			"yyyy-mm-dd hh:mm:ss", "mm-dd-yyyy hh:mm:ss", "dd-mm-yyyy hh:mm:ss",
+			"mm-dd-yy hh:mm:ss", "dd-mm-yy hh:mm:ss"));
 	public static final ArrayList<String> DATE_UNITS = new ArrayList<String>(Arrays.asList(
-			"yyyy-mm-dd", "mm-dd-yyyy", "dd-mm-yyyy"));
+			"yyyy-mm-dd", "mm-dd-yyyy", "dd-mm-yyyy", "mm-dd-yy", "dd-mm-yy"));
 	public static final ArrayList<String> TIME_UNITS = 
 			new ArrayList<String>(Arrays.asList("hh:mm:ss"));
 	public static final ArrayList<String> DAY_OF_YEAR_UNITS = 
@@ -197,7 +208,7 @@ public class DashboardUtils {
 	public static final ArrayList<String> SALINITY_UNITS = 
 			new ArrayList<String>(Arrays.asList("PSU"));
 	public static final ArrayList<String> TEMPERATURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.C", "Kelvin", "deg.F"));
+			new ArrayList<String>(Arrays.asList("deg.C"));
 	public static final ArrayList<String> PRESSURE_UNITS = 
 			new ArrayList<String>(Arrays.asList("hPa", "kPa"));
 	public static final ArrayList<String> XCO2_UNITS = 
@@ -244,6 +255,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.SALINITY, SALINITY_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, TEMPERATURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, TEMPERATURE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, TEMPERATURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
 
@@ -254,9 +266,13 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_TEQU, FCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_SST, FCO2_UNITS);
 
-		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_ACTUAL, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_INTERP, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_ACTUAL, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_INTERP, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_ACTUAL, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_INTERP, FCO2_UNITS);
+
 		STD_DATA_UNITS.put(DataColumnType.DELTA_XCO2, XCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DELTA_FCO2, FCO2_UNITS);
@@ -275,6 +291,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.WOCE_SALINITY, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_EQUILIBRATOR_TEMPERATURE, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_SEA_SURFACE_TEMPERATURE, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_ATMOSPHERIC_TEMPERATURE, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_EQUILIBRATOR_PRESSURE, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_SEA_LEVEL_PRESSURE, NO_UNITS);
 
@@ -285,9 +302,13 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.WOCE_FCO2_WATER_TEQU, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_FCO2_WATER_SST, NO_UNITS);
 
-		STD_DATA_UNITS.put(DataColumnType.WOCE_XCO2_ATM, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WOCE_PCO2_ATM, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WOCE_FCO2_ATM, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_XCO2_ATM_ACTUAL, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_XCO2_ATM_INTERP, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_PCO2_ATM_ACTUAL, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_PCO2_ATM_INTERP, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_FCO2_ATM_ACTUAL, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_FCO2_ATM_INTERP, NO_UNITS);
+
 		STD_DATA_UNITS.put(DataColumnType.WOCE_DELTA_XCO2, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_DELTA_PCO2, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.WOCE_DELTA_FCO2, NO_UNITS);
