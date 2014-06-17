@@ -18,9 +18,8 @@ import org.joda.time.format.DateTimeFormatter;
  * Date format strings must contain Ys, Ms, Ds, and maybe some of ' /-'.
  * Any other characters will be rejected.
  * 
- * We support three formats of date/time string:
+ * We support two formats of date/time string:
  * 
- * &lt;Date&gt;HHMMSS
  * &lt;Date&gt; HHMMSS
  * &lt;Date&gt; HH:MM:SS
  * 
@@ -44,12 +43,12 @@ public class DateTimeHandler {
 	/**
 	 * The output format for dates
 	 */
-	private static final String DATE_OUTPUT_FORMAT = "YYYYMMdd";
+	private static final String DATE_OUTPUT_FORMAT = "YYYY-MM-dd";
 	
 	/**
 	 * The output format for dates and times
 	 */
-	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYYMMddHHmmss.SSS";
+	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYY-MM-dd HH:mm:ss.SSS";
 	
 	/**
 	 * The formatter used to parse dates from input data and metadata
@@ -92,22 +91,16 @@ public class DateTimeHandler {
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + "HHmm").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + "HHmm").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + "HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + "HHmm").withPivotYear(PIVOT_YEAR));
 
 		itsOutputDateFormatter = DateTimeFormat.forPattern(DATE_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
 		itsOutputDateTimeFormatter = DateTimeFormat.forPattern(DATE_TIME_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
@@ -197,8 +190,6 @@ public class DateTimeHandler {
 	 * &lt;Date&gt; HH:MM
 	 * &lt;Date&gt; HHMMSS
 	 * &lt;Date&gt; HHMM
-	 * &lt;Date&gt;HHMMSS
-	 * &lt;Date&gt;HHMM
 	 * </pre>
 	 * where &lt;Date&gt; is any of:
 	 * <pre>
@@ -233,7 +224,7 @@ public class DateTimeHandler {
 	}
 	
 	/**
-	 * Output a date object formatted as a YYYYMMDD string
+	 * Output a date object formatted as a YYYY-MM-DD string
 	 * @param date The date to be formatted
 	 * @return The formatted date
 	 */
@@ -242,7 +233,7 @@ public class DateTimeHandler {
 	}
 
 	/**
-	 * Output a date/time object as a string (YYYYMMDDhhmmss)
+	 * Output a date/time object as a string (YYYY-MM-DD HH:mm:ss)
 	 * @param date The date to be formatted
 	 * @return The formatted date/time
 	 */
