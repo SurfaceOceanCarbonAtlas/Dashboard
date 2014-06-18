@@ -81,12 +81,10 @@ public class DashboardCruiseChecker {
 		int fCO2WaterSstWetIndex = -1;
 		int xCO2AtmDryActualIndex = -1;
 		int xCO2AtmDryInterpIndex = -1;
-		int xCO2AtmWetActualIndex = -1;
-		int xCO2AtmWetInterpIndex = -1;
-		int pCO2AtmWetActualIndex = -1;
-		int pCO2AtmWetInterpIndex = -1;
-		int fCO2AtmWetActualIndex = -1;
-		int fCO2AtmWetInterpIndex = -1;
+		int pCO2AtmDryActualIndex = -1;
+		int pCO2AtmDryInterpIndex = -1;
+		int fCO2AtmDryActualIndex = -1;
+		int fCO2AtmDryInterpIndex = -1;
 		int deltaXCO2Index = -1;
 		int deltaPCO2Index = -1;
 		int deltaFCO2Index = -1;
@@ -170,12 +168,10 @@ public class DashboardCruiseChecker {
 
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, checkerXCO2Units);
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_INTERP, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM_WET_ACTUAL, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_ATM_WET_INTERP, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_ACTUAL, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_INTERP, DashboardUtils.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_ACTUAL, DashboardUtils.FCO2_UNITS);
-		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_INTERP, DashboardUtils.FCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM_DRY_ACTUAL, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.PCO2_ATM_DRY_INTERP, DashboardUtils.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM_DRY_ACTUAL, DashboardUtils.FCO2_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.FCO2_ATM_DRY_INTERP, DashboardUtils.FCO2_UNITS);
 
 		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_XCO2, checkerXCO2Units);
 		CHECKER_DATA_UNITS.put(DataColumnType.DELTA_PCO2, DashboardUtils.PCO2_UNITS);
@@ -328,18 +324,14 @@ public class DashboardCruiseChecker {
 				colIndcs.xCO2AtmDryActualIndex = k;
 			else if ( colType.equals(DataColumnType.XCO2_ATM_DRY_INTERP) )
 				colIndcs.xCO2AtmDryInterpIndex = k;
-			else if ( colType.equals(DataColumnType.XCO2_ATM_WET_ACTUAL) )
-				colIndcs.xCO2AtmWetActualIndex = k;
-			else if ( colType.equals(DataColumnType.XCO2_ATM_WET_INTERP) )
-				colIndcs.xCO2AtmWetInterpIndex = k;
-			else if ( colType.equals(DataColumnType.PCO2_ATM_WET_ACTUAL) )
-				colIndcs.pCO2AtmWetActualIndex = k;
-			else if ( colType.equals(DataColumnType.PCO2_ATM_WET_INTERP) )
-				colIndcs.pCO2AtmWetInterpIndex = k;
-			else if ( colType.equals(DataColumnType.FCO2_ATM_WET_ACTUAL) )
-				colIndcs.fCO2AtmWetActualIndex = k;
-			else if ( colType.equals(DataColumnType.FCO2_ATM_WET_INTERP) )
-				colIndcs.fCO2AtmWetInterpIndex = k;
+			else if ( colType.equals(DataColumnType.PCO2_ATM_DRY_ACTUAL) )
+				colIndcs.pCO2AtmDryActualIndex = k;
+			else if ( colType.equals(DataColumnType.PCO2_ATM_DRY_INTERP) )
+				colIndcs.pCO2AtmDryInterpIndex = k;
+			else if ( colType.equals(DataColumnType.FCO2_ATM_DRY_ACTUAL) )
+				colIndcs.fCO2AtmDryActualIndex = k;
+			else if ( colType.equals(DataColumnType.FCO2_ATM_DRY_INTERP) )
+				colIndcs.fCO2AtmDryInterpIndex = k;
 
 			else if ( colType.equals(DataColumnType.DELTA_XCO2) )
 				colIndcs.deltaXCO2Index = k;
@@ -544,12 +536,10 @@ public class DashboardCruiseChecker {
 
 					  colType.equals(DataColumnType.XCO2_ATM_DRY_ACTUAL) || 
 					  colType.equals(DataColumnType.XCO2_ATM_DRY_INTERP) || 
-					  colType.equals(DataColumnType.XCO2_ATM_WET_ACTUAL) || 
-					  colType.equals(DataColumnType.XCO2_ATM_WET_INTERP) || 
-					  colType.equals(DataColumnType.PCO2_ATM_WET_ACTUAL) || 
-					  colType.equals(DataColumnType.PCO2_ATM_WET_INTERP) || 
-					  colType.equals(DataColumnType.FCO2_ATM_WET_ACTUAL) || 
-					  colType.equals(DataColumnType.FCO2_ATM_WET_INTERP) || 
+					  colType.equals(DataColumnType.PCO2_ATM_DRY_ACTUAL) || 
+					  colType.equals(DataColumnType.PCO2_ATM_DRY_INTERP) || 
+					  colType.equals(DataColumnType.FCO2_ATM_DRY_ACTUAL) || 
+					  colType.equals(DataColumnType.FCO2_ATM_DRY_INTERP) || 
 
 					  colType.equals(DataColumnType.DELTA_XCO2) || 
 					  colType.equals(DataColumnType.DELTA_PCO2) || 
@@ -718,18 +708,14 @@ public class DashboardCruiseChecker {
 								woceFlags.get(colIndcs.xCO2AtmDryActualIndex).add(rowIdx);
 							if ( colIndcs.xCO2AtmDryInterpIndex >= 0 )
 								woceFlags.get(colIndcs.xCO2AtmDryInterpIndex).add(rowIdx);
-							if ( colIndcs.xCO2AtmWetActualIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2AtmWetActualIndex).add(rowIdx);
-							if ( colIndcs.xCO2AtmWetInterpIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2AtmWetInterpIndex).add(rowIdx);
-							if ( colIndcs.pCO2AtmWetActualIndex >= 0 )
-								woceFlags.get(colIndcs.pCO2AtmWetActualIndex).add(rowIdx);
-							if ( colIndcs.pCO2AtmWetInterpIndex >= 0 )
-								woceFlags.get(colIndcs.pCO2AtmWetInterpIndex).add(rowIdx);
-							if ( colIndcs.fCO2AtmWetActualIndex >= 0 )
-								woceFlags.get(colIndcs.fCO2AtmWetActualIndex).add(rowIdx);
-							if ( colIndcs.fCO2AtmWetInterpIndex >= 0 )
-								woceFlags.get(colIndcs.fCO2AtmWetInterpIndex).add(rowIdx);
+							if ( colIndcs.pCO2AtmDryActualIndex >= 0 )
+								woceFlags.get(colIndcs.pCO2AtmDryActualIndex).add(rowIdx);
+							if ( colIndcs.pCO2AtmDryInterpIndex >= 0 )
+								woceFlags.get(colIndcs.pCO2AtmDryInterpIndex).add(rowIdx);
+							if ( colIndcs.fCO2AtmDryActualIndex >= 0 )
+								woceFlags.get(colIndcs.fCO2AtmDryActualIndex).add(rowIdx);
+							if ( colIndcs.fCO2AtmDryInterpIndex >= 0 )
+								woceFlags.get(colIndcs.fCO2AtmDryInterpIndex).add(rowIdx);
 						}
 					}
 				}
@@ -1100,12 +1086,10 @@ public class DashboardCruiseChecker {
 
 						  colType.equals(DataColumnType.XCO2_ATM_DRY_ACTUAL) || 
 						  colType.equals(DataColumnType.XCO2_ATM_DRY_INTERP) || 
-						  colType.equals(DataColumnType.XCO2_ATM_WET_ACTUAL) || 
-						  colType.equals(DataColumnType.XCO2_ATM_WET_INTERP) || 
-						  colType.equals(DataColumnType.PCO2_ATM_WET_ACTUAL) || 
-						  colType.equals(DataColumnType.PCO2_ATM_WET_INTERP) || 
-						  colType.equals(DataColumnType.FCO2_ATM_WET_ACTUAL) || 
-						  colType.equals(DataColumnType.FCO2_ATM_WET_INTERP) || 
+						  colType.equals(DataColumnType.PCO2_ATM_DRY_ACTUAL) || 
+						  colType.equals(DataColumnType.PCO2_ATM_DRY_INTERP) || 
+						  colType.equals(DataColumnType.FCO2_ATM_DRY_ACTUAL) || 
+						  colType.equals(DataColumnType.FCO2_ATM_DRY_INTERP) || 
 
 						  colType.equals(DataColumnType.DELTA_XCO2) || 
 						  colType.equals(DataColumnType.DELTA_PCO2) || 

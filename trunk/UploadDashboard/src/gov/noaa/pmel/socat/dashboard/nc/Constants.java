@@ -58,12 +58,10 @@ public class Constants {
 
 	private static final String xCO2AtmDryActual_VARNAME = "xCO2AtmDryActual";
 	private static final String xCO2AtmDryInterp_VARNAME = "xCO2AtmDryInterp";
-	private static final String xCO2AtmWetActual_VARNAME = "xCO2AtmWetActual";
-	private static final String xCO2AtmWetInterp_VARNAME = "xCO2AtmWetInterp";
-	private static final String pCO2AtmWetActual_VARNAME = "pCO2AtmWetActual";
-	private static final String pCO2AtmWetInterp_VARNAME = "pCO2AtmWetInterp";
-	private static final String fCO2AtmWetActual_VARNAME = "fCO2AtmWetActual";
-	private static final String fCO2AtmWetInterp_VARNAME = "fCO2AtmWetInterp";
+	private static final String pCO2AtmDryActual_VARNAME = "pCO2AtmDryActual";
+	private static final String pCO2AtmDryInterp_VARNAME = "pCO2AtmDryInterp";
+	private static final String fCO2AtmDryActual_VARNAME = "fCO2AtmDryActual";
+	private static final String fCO2AtmDryInterp_VARNAME = "fCO2AtmDryInterp";
 
 	private static final String deltaXCO2_VARNAME = "deltaXCO2";
 	private static final String deltaPCO2_VARNAME = "deltaPCO2";
@@ -162,12 +160,10 @@ public class Constants {
 
 		shortNameMap.put(xCO2AtmDryActual_VARNAME, "xCO2_atm_dry_actual");
 		shortNameMap.put(xCO2AtmDryInterp_VARNAME, "xCO2_atm_dry_interp");
-		shortNameMap.put(xCO2AtmWetActual_VARNAME, "xCO2_atm_wet_actual");
-		shortNameMap.put(xCO2AtmWetInterp_VARNAME, "xCO2_atm_wet_interp");
-		shortNameMap.put(pCO2AtmWetActual_VARNAME, "pCO2_atm_actual");
-		shortNameMap.put(pCO2AtmWetInterp_VARNAME, "pCO2_atm_interp");
-		shortNameMap.put(fCO2AtmWetActual_VARNAME, "fCO2_atm_actual");
-		shortNameMap.put(fCO2AtmWetInterp_VARNAME, "fCO2_atm_interp");
+		shortNameMap.put(pCO2AtmDryActual_VARNAME, "pCO2_atm_dry_actual");
+		shortNameMap.put(pCO2AtmDryInterp_VARNAME, "pCO2_atm_dry_interp");
+		shortNameMap.put(fCO2AtmDryActual_VARNAME, "fCO2_atm_dry_actual");
+		shortNameMap.put(fCO2AtmDryInterp_VARNAME, "fCO2_atm_dry_interp");
 
 		shortNameMap.put(deltaXCO2_VARNAME, "delta_xCO2");
 		shortNameMap.put(deltaPCO2_VARNAME, "delta_pCO2");
@@ -269,12 +265,10 @@ public class Constants {
 
 		longNameMap.put(xCO2AtmDryActual_VARNAME, "actual air xCO2 dry");
 		longNameMap.put(xCO2AtmDryInterp_VARNAME, "interpolated air xCO2 dry ");
-		longNameMap.put(xCO2AtmWetActual_VARNAME, "actual air xCO2 wet");
-		longNameMap.put(xCO2AtmWetInterp_VARNAME, "interpolated air xCO2 wet");
-		longNameMap.put(pCO2AtmWetActual_VARNAME, "actual air pCO2");
-		longNameMap.put(pCO2AtmWetInterp_VARNAME, "interpolated air pCO2");
-		longNameMap.put(fCO2AtmWetActual_VARNAME, "actual air fCO2");
-		longNameMap.put(fCO2AtmWetInterp_VARNAME, "interpolated air fCO2");
+		longNameMap.put(pCO2AtmDryActual_VARNAME, "actual air pCO2 dry");
+		longNameMap.put(pCO2AtmDryInterp_VARNAME, "interpolated air pCO2 dry");
+		longNameMap.put(fCO2AtmDryActual_VARNAME, "actual air fCO2 dry");
+		longNameMap.put(fCO2AtmDryInterp_VARNAME, "interpolated air fCO2 dry");
 
 		longNameMap.put(deltaXCO2_VARNAME, "water xCO2 minus atmospheric xCO2");
 		longNameMap.put(deltaPCO2_VARNAME, "water pCO2 minus atmospheric pCO2");
@@ -373,12 +367,10 @@ public class Constants {
 
 		unitsMap.put(xCO2AtmDryActual_VARNAME, xco2_units);
 		unitsMap.put(xCO2AtmDryInterp_VARNAME, xco2_units);
-		unitsMap.put(xCO2AtmWetActual_VARNAME, xco2_units);
-		unitsMap.put(xCO2AtmWetInterp_VARNAME, xco2_units);
-		unitsMap.put(pCO2AtmWetActual_VARNAME, pco2_units);
-		unitsMap.put(pCO2AtmWetInterp_VARNAME, pco2_units);
-		unitsMap.put(fCO2AtmWetActual_VARNAME, fco2_units);
-		unitsMap.put(fCO2AtmWetInterp_VARNAME, fco2_units);
+		unitsMap.put(pCO2AtmDryActual_VARNAME, pco2_units);
+		unitsMap.put(pCO2AtmDryInterp_VARNAME, pco2_units);
+		unitsMap.put(fCO2AtmDryActual_VARNAME, fco2_units);
+		unitsMap.put(fCO2AtmDryInterp_VARNAME, fco2_units);
 
 		unitsMap.put(deltaXCO2_VARNAME, xco2_units);
 		unitsMap.put(deltaPCO2_VARNAME, pco2_units);
@@ -454,12 +446,10 @@ public class Constants {
 
 		stdNamesMap.put(xCO2AtmDryActual_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
 		stdNamesMap.put(xCO2AtmDryInterp_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
-		stdNamesMap.put(xCO2AtmWetActual_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
-		stdNamesMap.put(xCO2AtmWetInterp_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
-		stdNamesMap.put(pCO2AtmWetActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
-		stdNamesMap.put(pCO2AtmWetInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
-		stdNamesMap.put(fCO2AtmWetActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
-		stdNamesMap.put(fCO2AtmWetInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(pCO2AtmDryActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(pCO2AtmDryInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(fCO2AtmDryActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(fCO2AtmDryInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
 
 		stdNamesMap.put(relativeHumidity_VARNAME, "relative_humidity");
 		stdNamesMap.put(specificHumidity_VARNAME, "specific_humidity");
@@ -560,12 +550,10 @@ public class Constants {
 
 		ioosCatMap.put(xCO2AtmDryActual_VARNAME, co2_category);
 		ioosCatMap.put(xCO2AtmDryInterp_VARNAME, co2_category);
-		ioosCatMap.put(xCO2AtmWetActual_VARNAME, co2_category);
-		ioosCatMap.put(xCO2AtmWetInterp_VARNAME, co2_category);
-		ioosCatMap.put(pCO2AtmWetActual_VARNAME, co2_category);
-		ioosCatMap.put(pCO2AtmWetInterp_VARNAME, co2_category);
-		ioosCatMap.put(fCO2AtmWetActual_VARNAME, co2_category);
-		ioosCatMap.put(fCO2AtmWetInterp_VARNAME, co2_category);
+		ioosCatMap.put(pCO2AtmDryActual_VARNAME, co2_category);
+		ioosCatMap.put(pCO2AtmDryInterp_VARNAME, co2_category);
+		ioosCatMap.put(fCO2AtmDryActual_VARNAME, co2_category);
+		ioosCatMap.put(fCO2AtmDryInterp_VARNAME, co2_category);
 
 		ioosCatMap.put(deltaXCO2_VARNAME, co2_category);
 		ioosCatMap.put(deltaPCO2_VARNAME, co2_category);
