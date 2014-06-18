@@ -589,12 +589,12 @@ public class DataColumnSpecsPage extends Composite {
 			else if ( colType == DataColumnType.LATITUDE ) {
 				hasLatitude = true;
 			}
-			else if ( (colType == DataColumnType.XCO2_WATER_TEQU) ||
-					  (colType == DataColumnType.XCO2_WATER_SST) ||
-					  (colType == DataColumnType.PCO2_WATER_TEQU) ||
-					  (colType == DataColumnType.PCO2_WATER_SST) ||
-					  (colType == DataColumnType.FCO2_WATER_TEQU) ||
-					  (colType == DataColumnType.FCO2_WATER_SST) ) {
+			else if ( (colType == DataColumnType.XCO2_WATER_TEQU_DRY) ||
+					  (colType == DataColumnType.XCO2_WATER_SST_DRY) ||
+					  (colType == DataColumnType.PCO2_WATER_TEQU_WET) ||
+					  (colType == DataColumnType.PCO2_WATER_SST_WET) ||
+					  (colType == DataColumnType.FCO2_WATER_TEQU_WET) ||
+					  (colType == DataColumnType.FCO2_WATER_SST_WET) ) {
 				hasco2 = true;
 			}
 			k++;
@@ -681,9 +681,8 @@ public class DataColumnSpecsPage extends Composite {
 		HashSet<DataColumnType> typeSet = new HashSet<DataColumnType>();
 		TreeSet<DataColumnType> duplicates = new TreeSet<DataColumnType>();
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
-			if ( colType.equals(DataColumnType.COMMENT) || 
-				 colType.equals(DataColumnType.OTHER) ) {
-				// Multiple COMMENT or OTHER column types are allowed
+			if ( colType.equals(DataColumnType.OTHER) ) {
+				// Multiple OTHER column types are allowed
 				;
 			}
 			else if ( ! typeSet.add(colType) ) {

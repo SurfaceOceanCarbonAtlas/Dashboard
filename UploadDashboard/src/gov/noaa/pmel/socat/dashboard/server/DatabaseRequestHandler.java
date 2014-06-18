@@ -3,11 +3,10 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.FileNotFoundException;
@@ -459,9 +458,8 @@ public class DatabaseRequestHandler {
 			// Add the WOCE event
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"INSERT INTO `WOCEEvents` (`woce_flag`, `woce_time`, " +
-					"`expocode`, `socat_version`, `data_type`, " +
-					"`data_name`, `reviewer_id`, `woce_comment`) " +
-					"VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
+					"`expocode`, `socat_version`, `data_name`, `reviewer_id`, " +
+					"`woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?);");
 			prepStmt.setString(1, woceEvent.getFlag().toString());
 			Date flagDate = woceEvent.getFlagDate();
 			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
@@ -470,10 +468,9 @@ public class DatabaseRequestHandler {
 				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			prepStmt.setString(3, woceEvent.getExpocode());
 			prepStmt.setDouble(4, woceEvent.getSocatVersion());
-			prepStmt.setString(5, woceEvent.getDataType().toString());
-			prepStmt.setString(6, woceEvent.getColumnName());
-			prepStmt.setInt(7, reviewerId);
-			prepStmt.setString(8, woceEvent.getComment());
+			prepStmt.setString(5, woceEvent.getColumnName());
+			prepStmt.setInt(6, reviewerId);
+			prepStmt.setString(7, woceEvent.getComment());
 			prepStmt.execute();
 			if ( prepStmt.getUpdateCount() != 1 )
 				throw new SQLException("Adding the WOCE event was unsuccessful");
@@ -561,14 +558,6 @@ public class DatabaseRequestHandler {
 		woceEvent.setSocatVersion(results.getDouble("socat_version"));
 		if ( results.wasNull() )
 			woceEvent.setSocatVersion(null);
-		try {
-			woceEvent.setDataType(DataColumnType.valueOf(results.getString("data_type")));
-		} catch (NullPointerException ex) {
-			woceEvent.setDataType(null);
-		} catch (IllegalArgumentException ex) {
-			throw new SQLException("Unexpected unknown data type '" + 
-					results.getString("data_type") + "'");
-		}
 		woceEvent.setColumnName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
 		woceEvent.setRealname(results.getString("realname"));

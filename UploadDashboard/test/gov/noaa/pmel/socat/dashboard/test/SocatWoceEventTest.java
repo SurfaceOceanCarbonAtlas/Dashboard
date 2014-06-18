@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
@@ -29,7 +28,6 @@ public class SocatWoceEventTest {
 	private static final Character MY_WOCE_FLAG = '3';
 	private static final String MY_EXPOCODE = "26NA20140427";
 	private static final Double MY_SOCAT_VERSION = 3.0;
-	private static final DataColumnType MY_DATA_TYPE = DataColumnType.SEA_LEVEL_PRESSURE;
 	private static final String MY_COLUMN_NAME = "SLP";
 	private static final ArrayList<DataLocation> MY_LOCATIONS;
 	static {
@@ -102,23 +100,6 @@ public class SocatWoceEventTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getDataType()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setDataType(gov.noaa.pmel.socat.dashboard.shared.DataColumnType)}.
-	 */
-	@Test
-	public void testGetSetDataType() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
-		myflag.setDataType(MY_DATA_TYPE);
-		assertEquals(MY_DATA_TYPE, myflag.getDataType());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
-		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
-		myflag.setDataType(null);
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getColumnName()} 
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setColumnName(java.lang.String)}.
 	 */
@@ -128,7 +109,6 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getColumnName());
 		myflag.setColumnName(MY_COLUMN_NAME);
 		assertEquals(MY_COLUMN_NAME, myflag.getColumnName());
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -147,7 +127,6 @@ public class SocatWoceEventTest {
 		myflag.setLocations(MY_LOCATIONS);
 		assertEquals(MY_LOCATIONS, myflag.getLocations());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -167,7 +146,6 @@ public class SocatWoceEventTest {
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -188,7 +166,6 @@ public class SocatWoceEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -210,7 +187,6 @@ public class SocatWoceEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -233,7 +209,6 @@ public class SocatWoceEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(DataColumnType.UNKNOWN, myflag.getDataType());
 		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -274,13 +249,6 @@ public class SocatWoceEventTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
 		otherflag.setSocatVersion(MY_SOCAT_VERSION);
-		assertTrue( myflag.hashCode() == otherflag.hashCode() );
-		assertTrue( myflag.equals(otherflag) );
-
-		myflag.setDataType(MY_DATA_TYPE);
-		assertFalse( myflag.hashCode() == otherflag.hashCode() );
-		assertFalse( myflag.equals(otherflag) );
-		otherflag.setDataType(MY_DATA_TYPE);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

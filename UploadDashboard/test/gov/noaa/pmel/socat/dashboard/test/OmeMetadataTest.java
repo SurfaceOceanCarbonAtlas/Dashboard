@@ -242,7 +242,7 @@ public class OmeMetadataTest {
 	private static final ArrayList<String> ACTUAL_ORGANIZATIONS = 
 			new ArrayList<String>(Arrays.asList("PMEL", "PMEL", "PMEL", ""));
 */
-	private static final String ACTUAL_ORGANIZATIONS_STRING = "PMEL";
+	private static final String ACTUAL_ORGANIZATIONS_STRING = "PMEL ; ";
 	private static final double ACTUAL_WEST_LON = -125.702;
 	private static final double ACTUAL_EAST_LON = -122.978;
 	private static final double ACTUAL_SOUTH_LAT = 48.183;

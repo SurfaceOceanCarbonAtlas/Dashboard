@@ -1,6 +1,5 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.util.Collections;
@@ -13,6 +12,103 @@ import java.util.Map;
  */
 public class Constants {
 
+	private static final String expocode_VARNAME = "expocode";
+	private static final String cruiseName_VARNAME = "cruiseName";
+	private static final String vesselName_VARNAME = "vesselName";
+	private static final String organization_VARNAME = "organization";
+	private static final String westmostLongitude_VARNAME = "westmostLongitude";
+	private static final String eastmostLongitude_VARNAME = "eastmostLongitude";
+	private static final String southmostLatitude_VARNAME = "southmostLatitude";
+	private static final String northmostLatitude_VARNAME = "northmostLatitude";
+	private static final String beginTime_VARNAME = "beginTime";
+	private static final String endTime_VARNAME = "endTime";
+	private static final String scienceGroup_VARNAME = "scienceGroup";
+	private static final String origDataRef_VARNAME = "origDataRef";
+	private static final String addlDocs_VARNAME = "addlDocs";
+	private static final String socatDOI_VARNAME = "socatDOI";
+	private static final String socatDOIHRef_VARNAME = "socatDOIHRef";
+	private static final String socatVersion_VARNAME = "socatVersion";
+	private static final String qcFlag_VARNAME = "qcFlag";
+
+	private static final String year_VARNAME = "year";
+	private static final String month_VARNAME = "month";
+	private static final String day_VARNAME = "day";
+	private static final String hour_VARNAME = "hour";
+	private static final String minute_VARNAME = "minute";
+	private static final String second_VARNAME = "second";
+
+	private static final String longitude_VARNAME = "longitude";
+	private static final String latitude_VARNAME = "latitude";
+	private static final String sampleDepth_VARNAME = "sampleDepth";
+	private static final String salinity_VARNAME = "salinity";
+	private static final String tEqu_VARNAME = "tEqu";
+	private static final String sst_VARNAME = "sst";
+	private static final String tAtm_VARNAME = "tAtm";
+	private static final String pEqu_VARNAME = "pEqu";
+	private static final String slp_VARNAME = "slp";
+
+	private static final String xCO2WaterTEquDry_VARNAME = "xCO2WaterTEquDry";
+	private static final String xCO2WaterSstDry_VARNAME = "xCO2WaterSstDry";
+	private static final String xCO2WaterTEquWet_VARNAME = "xCO2WaterTEquWet";
+	private static final String xCO2WaterSstWet_VARNAME = "xCO2WaterSstWet";
+	private static final String pCO2WaterTEquWet_VARNAME = "pCO2WaterTEquWet";
+	private static final String pCO2WaterSstWet_VARNAME = "pCO2WaterSstWet";
+	private static final String fCO2WaterTEquWet_VARNAME = "fCO2WaterTEquWet";
+	private static final String fCO2WaterSstWet_VARNAME = "fCO2WaterSstWet";
+
+	private static final String xCO2AtmDryActual_VARNAME = "xCO2AtmDryActual";
+	private static final String xCO2AtmDryInterp_VARNAME = "xCO2AtmDryInterp";
+	private static final String xCO2AtmWetActual_VARNAME = "xCO2AtmWetActual";
+	private static final String xCO2AtmWetInterp_VARNAME = "xCO2AtmWetInterp";
+	private static final String pCO2AtmWetActual_VARNAME = "pCO2AtmWetActual";
+	private static final String pCO2AtmWetInterp_VARNAME = "pCO2AtmWetInterp";
+	private static final String fCO2AtmWetActual_VARNAME = "fCO2AtmWetActual";
+	private static final String fCO2AtmWetInterp_VARNAME = "fCO2AtmWetInterp";
+
+	private static final String deltaXCO2_VARNAME = "deltaXCO2";
+	private static final String deltaPCO2_VARNAME = "deltaPCO2";
+	private static final String deltaFCO2_VARNAME = "deltaFCO2";
+
+	private static final String relativeHumidity_VARNAME = "relativeHumidity";
+	private static final String specificHumidity_VARNAME = "specificHumidity";
+	private static final String shipSpeed_VARNAME = "shipSpeed"; 
+	private static final String shipDirection_VARNAME = "shipDirection";
+	private static final String windSpeedTrue_VARNAME = "windSpeedTrue";
+	private static final String windSpeedRelative_VARNAME = "windSpeedRelative";
+	private static final String windDirectionTrue_VARNAME = "windDirectionTrue";
+	private static final String windDirectionRelative_VARNAME = "windDirectionRelative";
+
+	private static final String woceCO2Water_VARNAME = "woceCO2Water";
+	private static final String woceCO2Atm_VARNAME = "woceCO2Atm";
+
+	private static final String woaSss_VARNAME = "woaSss";
+	private static final String ncepSlp_VARNAME = "ncepSlp";
+
+	private static final String fCO2FromXCO2TEqu_VARNAME = "fCO2FromXCO2TEqu";
+	private static final String fCO2FromXCO2Sst_VARNAME = "fCO2FromXCO2Sst";
+	private static final String fCO2FromPCO2TEqu_VARNAME = "fCO2FromPCO2TEqu";
+	private static final String fCO2FromPCO2Sst_VARNAME = "fCO2FromPCO2Sst";
+	private static final String fCO2FromFCO2TEqu_VARNAME = "fCO2FromFCO2TEqu";
+	private static final String fCO2FromFCO2Sst_VARNAME = "fCO2FromFCO2Sst";
+	private static final String fCO2FromPCO2TEquNcep_VARNAME = "fCO2FromPCO2TEquNcep";
+	private static final String fCO2FromPCO2SstNcep_VARNAME = "fCO2FromPCO2SstNcep";
+	private static final String fCO2FromXCO2TEquWoa_VARNAME = "fCO2FromXCO2TEquWoa";
+	private static final String fCO2FromXCO2SstWoa_VARNAME = "fCO2FromXCO2SstWoa";
+	private static final String fCO2FromXCO2TEquNcep_VARNAME = "fCO2FromXCO2TEquNcep";
+	private static final String fCO2FromXCO2SstNcep_VARNAME = "fCO2FromXCO2SstNcep";
+	private static final String fCO2FromXCO2TEquNcepWoa_VARNAME = "fCO2FromXCO2TEquNcepWoa";
+	private static final String fCO2FromXCO2SstNcepWoa_VARNAME = "fCO2FromXCO2SstNcepWoa";
+
+	private static final String fCO2Rec_VARNAME = "fCO2Rec";
+	private static final String fCO2Source_VARNAME = "fCO2Source";
+	private static final String deltaT_VARNAME = "deltaT";
+	private static final String regionID_VARNAME = "regionID";
+	private static final String calcSpeed_VARNAME = "calcSpeed";
+	private static final String etopo2Depth_VARNAME = "etopo2Depth";
+	private static final String gvCO2_VARNAME = "gvCO2";
+	private static final String distToLand_VARNAME = "distToLand";
+	private static final String dayOfYear_VARNAME = "dayOfYear";
+
 	/**
 	 * Variable names for netCDF files
 	 */
@@ -20,150 +116,102 @@ public class Constants {
 	static {
 		HashMap<String, String> shortNameMap = new HashMap<String, String>();
 
-		shortNameMap.put("expocode", "expocode");
-		shortNameMap.put("cruiseName", "dataset_name");
-		shortNameMap.put("vesselName", "vessel_name");
-		shortNameMap.put("organization", "organization");
-		shortNameMap.put("westmostLongitude", "geospatial_lon_min");
-		shortNameMap.put("eastmostLongitude", "geospatial_lon_max");
-		shortNameMap.put("southmostLatitude", "geospatial_lat_min");
-		shortNameMap.put("northmostLatitude", "geospatial_lat_max");
-		shortNameMap.put("beginTime", "time_coverage_start");
-		shortNameMap.put("endTime", "time_converage_end");
-		shortNameMap.put("scienceGroup", "investigators");
-		shortNameMap.put("origDataRef", "orig_data_ref");
-		shortNameMap.put("addlDocs", "addl_docs");
-		shortNameMap.put("socatDOI", "socat_data_doi");
-		shortNameMap.put("socatDOIHRef", "socat_data_ref");
-		shortNameMap.put("socatVersion", "socat_version");
-		shortNameMap.put("qcFlag", "qc_flag");
+		shortNameMap.put(expocode_VARNAME, "expocode");
+		shortNameMap.put(cruiseName_VARNAME, "dataset_name");
+		shortNameMap.put(vesselName_VARNAME, "vessel_name");
+		shortNameMap.put(organization_VARNAME, "organization");
+		shortNameMap.put(westmostLongitude_VARNAME, "geospatial_lon_min");
+		shortNameMap.put(eastmostLongitude_VARNAME, "geospatial_lon_max");
+		shortNameMap.put(southmostLatitude_VARNAME, "geospatial_lat_min");
+		shortNameMap.put(northmostLatitude_VARNAME, "geospatial_lat_max");
+		shortNameMap.put(beginTime_VARNAME, "time_coverage_start");
+		shortNameMap.put(endTime_VARNAME, "time_converage_end");
+		shortNameMap.put(scienceGroup_VARNAME, "investigators");
+		shortNameMap.put(origDataRef_VARNAME, "orig_data_ref");
+		shortNameMap.put(addlDocs_VARNAME, "addl_docs");
+		shortNameMap.put(socatDOI_VARNAME, "socat_data_doi");
+		shortNameMap.put(socatDOIHRef_VARNAME, "socat_data_ref");
+		shortNameMap.put(socatVersion_VARNAME, "socat_version");
+		shortNameMap.put(qcFlag_VARNAME, "qc_flag");
 
-		shortNameMap.put("year", "year");
-		shortNameMap.put("month", "month");
-		shortNameMap.put("day", "day");
-		shortNameMap.put("hour", "hour");
-		shortNameMap.put("minute", "minute");
-		shortNameMap.put("second", "second");
+		shortNameMap.put(year_VARNAME, "year");
+		shortNameMap.put(month_VARNAME, "month");
+		shortNameMap.put(day_VARNAME, "day");
+		shortNameMap.put(hour_VARNAME, "hour");
+		shortNameMap.put(minute_VARNAME, "minute");
+		shortNameMap.put(second_VARNAME, "second");
 
-		shortNameMap.put("longitude", "longitude");
-		shortNameMap.put("latitude", "latitude");
-		shortNameMap.put("sampleDepth", "sample_depth");
-		shortNameMap.put("salinity", "sal");
-		shortNameMap.put("tEqu", "Temperature_equi");
-		shortNameMap.put("sst", "temp");
-		shortNameMap.put("tAtm", "Temperature_atm");
-		shortNameMap.put("pEqu", "Pressure_equi");
-		shortNameMap.put("slp", "Pressure_atm");
+		shortNameMap.put(longitude_VARNAME, "longitude");
+		shortNameMap.put(latitude_VARNAME, "latitude");
+		shortNameMap.put(sampleDepth_VARNAME, "sample_depth");
+		shortNameMap.put(salinity_VARNAME, "sal");
+		shortNameMap.put(tEqu_VARNAME, "Temperature_equi");
+		shortNameMap.put(sst_VARNAME, "temp");
+		shortNameMap.put(tAtm_VARNAME, "Temperature_atm");
+		shortNameMap.put(pEqu_VARNAME, "Pressure_equi");
+		shortNameMap.put(slp_VARNAME, "Pressure_atm");
 
-		shortNameMap.put("xCO2WaterTEqu", "xCO2_water_equi_temp_dry_ppm");
-		shortNameMap.put("xCO2WaterSst", "xCO2_water_sst_dry_ppm");
-		shortNameMap.put("pCO2WaterTEqu", "pCO2_water_equi_temp");
-		shortNameMap.put("pCO2WaterSst", "pCO2_water_sst_100humidity_uatm");
-		shortNameMap.put("fCO2WaterTEqu", "fCO2_water_equi_uatm");
-		shortNameMap.put("fCO2WaterSst", "fCO2_water_sst_100humidity_uatm");
+		shortNameMap.put(xCO2WaterTEquDry_VARNAME, "xCO2_water_equi_temp_dry_ppm");
+		shortNameMap.put(xCO2WaterSstDry_VARNAME, "xCO2_water_sst_dry_ppm");
+		shortNameMap.put(xCO2WaterTEquWet_VARNAME, "xCO2_water_equi_temp_wet_ppm");
+		shortNameMap.put(xCO2WaterSstWet_VARNAME, "xCO2_water_sst_wet_ppm");
+		shortNameMap.put(pCO2WaterTEquWet_VARNAME, "pCO2_water_equi_temp");
+		shortNameMap.put(pCO2WaterSstWet_VARNAME, "pCO2_water_sst_100humidity_uatm");
+		shortNameMap.put(fCO2WaterTEquWet_VARNAME, "fCO2_water_equi_uatm");
+		shortNameMap.put(fCO2WaterSstWet_VARNAME, "fCO2_water_sst_100humidity_uatm");
 
-		shortNameMap.put("xCO2AtmActual", "xCO2_atm_actual");
-		shortNameMap.put("xCO2AtmInterp", "xCO2_atm_interp");
-		shortNameMap.put("pCO2AtmActual", "pCO2_atm_actual");
-		shortNameMap.put("pCO2AtmInterp", "pCO2_atm_interp");
-		shortNameMap.put("fCO2AtmActual", "fCO2_atm_actual");
-		shortNameMap.put("fCO2AtmInterp", "fCO2_atm_interp");
+		shortNameMap.put(xCO2AtmDryActual_VARNAME, "xCO2_atm_dry_actual");
+		shortNameMap.put(xCO2AtmDryInterp_VARNAME, "xCO2_atm_dry_interp");
+		shortNameMap.put(xCO2AtmWetActual_VARNAME, "xCO2_atm_wet_actual");
+		shortNameMap.put(xCO2AtmWetInterp_VARNAME, "xCO2_atm_wet_interp");
+		shortNameMap.put(pCO2AtmWetActual_VARNAME, "pCO2_atm_actual");
+		shortNameMap.put(pCO2AtmWetInterp_VARNAME, "pCO2_atm_interp");
+		shortNameMap.put(fCO2AtmWetActual_VARNAME, "fCO2_atm_actual");
+		shortNameMap.put(fCO2AtmWetInterp_VARNAME, "fCO2_atm_interp");
 
-		shortNameMap.put("deltaXCO2", "delta_xCO2");
-		shortNameMap.put("deltaPCO2", "delta_pCO2");
-		shortNameMap.put("deltaFCO2", "delta_fCO2");
+		shortNameMap.put(deltaXCO2_VARNAME, "delta_xCO2");
+		shortNameMap.put(deltaPCO2_VARNAME, "delta_pCO2");
+		shortNameMap.put(deltaFCO2_VARNAME, "delta_fCO2");
 
-		shortNameMap.put("relativeHumidity", "relative_humidity");
-		shortNameMap.put("specificHumidity", "specific_humidity");
-		shortNameMap.put("shipSpeed", "ship_speed"); 
-		shortNameMap.put("shipDirection", "ship_dir");
-		shortNameMap.put("windSpeedTrue", "wind_speed_true");
-		shortNameMap.put("windSpeedRelative", "wind_speed_rel");
-		shortNameMap.put("windDirectionTrue", "wind_dir_true");
-		shortNameMap.put("windDirectionRelative", "wind_dir_rel");
+		shortNameMap.put(relativeHumidity_VARNAME, "relative_humidity");
+		shortNameMap.put(specificHumidity_VARNAME, "specific_humidity");
+		shortNameMap.put(shipSpeed_VARNAME, "ship_speed"); 
+		shortNameMap.put(shipDirection_VARNAME, "ship_dir");
+		shortNameMap.put(windSpeedTrue_VARNAME, "wind_speed_true");
+		shortNameMap.put(windSpeedRelative_VARNAME, "wind_speed_rel");
+		shortNameMap.put(windDirectionTrue_VARNAME, "wind_dir_true");
+		shortNameMap.put(windDirectionRelative_VARNAME, "wind_dir_rel");
 
-		shortNameMap.put("geopositionWoce", "WOCE_geoposition");
-		shortNameMap.put("sampleDepthWoce", "WOCE_sample_depth");
-		shortNameMap.put("salinityWoce", "WOCE_sal");
-		shortNameMap.put("tEquWoce", "WOCE_Temperature_equi");
-		shortNameMap.put("sstWoce", "WOCE_temp");
-		shortNameMap.put("tAtmWoce", "WOCE_Temperature_atm");
-		shortNameMap.put("pEquWoce", "WOCE_Pressure_equi");
-		shortNameMap.put("slpWoce", "WOCE_Pressure_atm");
+		shortNameMap.put(woceCO2Water_VARNAME, "WOCE_CO2_water");
+		shortNameMap.put(woceCO2Atm_VARNAME, "WOCE_CO2_atm");
 
-		shortNameMap.put("xCO2WaterTEquWoce", "WOCE_xCO2_water_equi_temp_dry_ppm");
-		shortNameMap.put("xCO2WaterSstWoce", "WOCE_xCO2_water_sst_dry_ppm");
-		shortNameMap.put("pCO2WaterTEquWoce", "WOCE_pCO2_water_equi_temp");
-		shortNameMap.put("pCO2WaterSstWoce", "WOCE_pCO2_water_sst_100humidity_uatm");
-		shortNameMap.put("fCO2WaterTEquWoce", "WOCE_fCO2_water_equi_uatm");
-		shortNameMap.put("fCO2WaterSstWoce", "WOCE_fCO2_water_sst_100humidity_uatm");
+		shortNameMap.put(woaSss_VARNAME, "woa_sss");
+		shortNameMap.put(ncepSlp_VARNAME, "pressure_ncep_slp");
 
-		shortNameMap.put("xCO2AtmActualWoce", "WOCE_xCO2_atm_actual");
-		shortNameMap.put("xCO2AtmInterpWoce", "WOCE_xCO2_atm_interp");
-		shortNameMap.put("pCO2AtmActualWoce", "WOCE_pCO2_atm_actual");
-		shortNameMap.put("pCO2AtmInterpWoce", "WOCE_pCO2_atm_interp");
-		shortNameMap.put("fCO2AtmActualWoce", "WOCE_fCO2_atm_actual");
-		shortNameMap.put("fCO2AtmInterpWoce", "WOCE_fCO2_atm_interp");
+		shortNameMap.put(fCO2FromXCO2TEqu_VARNAME, "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm");
+		shortNameMap.put(fCO2FromXCO2Sst_VARNAME, "fCO2_insitu_from_xCO2_water_sst_dry_ppm");
+		shortNameMap.put(fCO2FromPCO2TEqu_VARNAME, "fCO2_from_pCO2_water_water_equi_temp");
+		shortNameMap.put(fCO2FromPCO2Sst_VARNAME, "fCO2_from_pCO2_water_sst_100humidity_uatm");
+		shortNameMap.put(fCO2FromFCO2TEqu_VARNAME, "fCO2_insitu_from_fCO2_water_equi_uatm");
+		shortNameMap.put(fCO2FromFCO2Sst_VARNAME, "fCO2_insitu_from_fCO2_water_sst_100humidty_uatm");
+		shortNameMap.put(fCO2FromPCO2TEquNcep_VARNAME, "fCO2_from_pCO2_water_water_equi_temp_ncep");
+		shortNameMap.put(fCO2FromPCO2SstNcep_VARNAME, "fCO2_from_pCO2_water_sst_100humidity_uatm_ncep");
+		shortNameMap.put(fCO2FromXCO2TEquWoa_VARNAME, "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa");
+		shortNameMap.put(fCO2FromXCO2SstWoa_VARNAME, "fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa");
+		shortNameMap.put(fCO2FromXCO2TEquNcep_VARNAME, "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep");
+		shortNameMap.put(fCO2FromXCO2SstNcep_VARNAME, "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep");
+		shortNameMap.put(fCO2FromXCO2TEquNcepWoa_VARNAME, "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa");
+		shortNameMap.put(fCO2FromXCO2SstNcepWoa_VARNAME, "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
 
-		shortNameMap.put("deltaXCO2Woce", "WOCE_delta_xCO2");
-		shortNameMap.put("deltaPCO2Woce", "WOCE_delta_pCO2");
-		shortNameMap.put("deltaFCO2Woce", "WOCE_delta_fCO2");
-
-		shortNameMap.put("relativeHumidityWoce", "WOCE_rel_humidity");
-		shortNameMap.put("specificHumidityWoce", "WOCE_spc_humidity");
-		shortNameMap.put("shipSpeedWoce", "WOCE_ship_speed");
-		shortNameMap.put("shipDirectionWoce", "WOCE_ship_dir");
-		shortNameMap.put("windSpeedTrueWoce", "WOCE_wind_speed_true");
-		shortNameMap.put("windSpeedRelativeWoce", "WOCE_wind_speed_rel");
-		shortNameMap.put("windDirectionTrueWoce", "WOCE_wind_dir_true");
-		shortNameMap.put("windDirectionRelativeWoce", "WOCE_wind_dir_rel");
-
-		shortNameMap.put("woaSss", "woa_sss");
-		shortNameMap.put("ncepSlp", "pressure_ncep_slp");
-
-		shortNameMap.put("fCO2FromXCO2TEqu", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm");
-		shortNameMap.put("fCO2FromXCO2Sst", "fCO2_insitu_from_xCO2_water_sst_dry_ppm");
-		shortNameMap.put("fCO2FromPCO2TEqu", "fCO2_from_pCO2_water_water_equi_temp");
-		shortNameMap.put("fCO2FromPCO2Sst", "fCO2_from_pCO2_water_sst_100humidity_uatm");
-		shortNameMap.put("fCO2FromFCO2TEqu", "fCO2_insitu_from_fCO2_water_equi_uatm");
-		shortNameMap.put("fCO2FromFCO2Sst", "fCO2_insitu_from_fCO2_water_sst_100humidty_uatm");
-		shortNameMap.put("fCO2FromPCO2TEquNcep", "fCO2_from_pCO2_water_water_equi_temp_ncep");
-		shortNameMap.put("fCO2FromPCO2SstNcep", "fCO2_from_pCO2_water_sst_100humidity_uatm_ncep");
-		shortNameMap.put("fCO2FromXCO2TEquWoa", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa");
-		shortNameMap.put("fCO2FromXCO2SstWoa", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa");
-		shortNameMap.put("fCO2FromXCO2TEquNcep", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep");
-		shortNameMap.put("fCO2FromXCO2SstNcep", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep");
-		shortNameMap.put("fCO2FromXCO2TEquNcepWoa", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa");
-		shortNameMap.put("fCO2FromXCO2SstNcepWoa", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
-
-		shortNameMap.put("fCO2Rec", "fCO2_recommended");
-		shortNameMap.put("fCO2Source", "fCO2_source");
-		shortNameMap.put("deltaT", "delta_temp");
-		shortNameMap.put("regionID", "region_id");
-		shortNameMap.put("calcSpeed", "calc_speed");
-		shortNameMap.put("etopo2Depth", "etopo2");
-		shortNameMap.put("gvCO2", "gvCO2");
-		shortNameMap.put("distToLand", "dist_to_land");
-		shortNameMap.put("days1970", "days_1970");
-		shortNameMap.put("dayOfYear", "day_of_year");
-
-		shortNameMap.put("fCO2FromXCO2TEquWoce", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm");
-		shortNameMap.put("fCO2FromXCO2SstWoce", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm");
-		shortNameMap.put("fCO2FromPCO2TEquWoce", "WOCE_fCO2_from_pCO2_water_water_equi_temp");
-		shortNameMap.put("fCO2FromPCO2SstWoce", "WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm");
-		shortNameMap.put("fCO2FromFCO2TEquWoce", "WOCE_fCO2_insitu_from_fCO2_water_equi_uatm");
-		shortNameMap.put("fCO2FromFCO2SstWoce", "WOCE_fCO2_insitu_from_fCO2_water_sst_100humidty_uatm");
-		shortNameMap.put("fCO2FromPCO2TEquNcepWoce", "WOCE_fCO2_from_pCO2_water_water_equi_temp_ncep");
-		shortNameMap.put("fCO2FromPCO2SstNcepWoce", "WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm_ncep");
-		shortNameMap.put("fCO2FromXCO2TEquWoaWoce", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa");
-		shortNameMap.put("fCO2FromXCO2SstWoaWoce", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa");
-		shortNameMap.put("fCO2FromXCO2TEquNcepWoce", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep");
-		shortNameMap.put("fCO2FromXCO2SstNcepWoce", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep");
-		shortNameMap.put("fCO2FromXCO2TEquNcepWoaWoce", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa");
-		shortNameMap.put("fCO2FromXCO2SstNcepWoaWoce", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
-		shortNameMap.put("fCO2RecWoce", "WOCE_fCO2_recommended");
-		shortNameMap.put("deltaTWoce", "WOCE_delta_temp");
-		shortNameMap.put("calcSpeedWoce", "WOCE_calc_speed");
+		shortNameMap.put(fCO2Rec_VARNAME, "fCO2_recommended");
+		shortNameMap.put(fCO2Source_VARNAME, "fCO2_source");
+		shortNameMap.put(deltaT_VARNAME, "delta_temp");
+		shortNameMap.put(regionID_VARNAME, "region_id");
+		shortNameMap.put(calcSpeed_VARNAME, "calc_speed");
+		shortNameMap.put(etopo2Depth_VARNAME, "etopo2");
+		shortNameMap.put(gvCO2_VARNAME, "gvCO2");
+		shortNameMap.put(distToLand_VARNAME, "dist_to_land");
+		shortNameMap.put(dayOfYear_VARNAME, "day_of_year");
 
 		SHORT_NAME = Collections.unmodifiableMap(shortNameMap);
 	}
@@ -175,151 +223,102 @@ public class Constants {
 	static {
 		HashMap<String, String> longNameMap = new HashMap<String, String>();
 
-		longNameMap.put("expocode", "expocode");
-		longNameMap.put("cruiseName", "dataset name");
-		longNameMap.put("vesselName", "vessel name");
-		longNameMap.put("organization", "organization");
-		longNameMap.put("westmostLongitude", "westernmost longitude");
-		longNameMap.put("eastmostLongitude", "easternmost longitude");
-		longNameMap.put("southmostLatitude", "southernmost latitude");
-		longNameMap.put("northmostLatitude", "northernmost latitude");
-		longNameMap.put("beginTime", "beginning time");
-		longNameMap.put("endTime", "ending time");
-		longNameMap.put("scienceGroup", "investigators");
-		longNameMap.put("origDataRef", "original data reference");
-		longNameMap.put("addlDocs", "additional documents");
-		longNameMap.put("socatDOI", "SOCAT data DOI");
-		longNameMap.put("socatDOIHRef", "SOCAT data reference");
-		longNameMap.put("socatVersion", "SOCAT version");
-		longNameMap.put("qcFlag", "QC flag");
+		longNameMap.put(expocode_VARNAME, "expocode");
+		longNameMap.put(cruiseName_VARNAME, "dataset name");
+		longNameMap.put(vesselName_VARNAME, "vessel name");
+		longNameMap.put(organization_VARNAME, "organization");
+		longNameMap.put(westmostLongitude_VARNAME, "westernmost longitude");
+		longNameMap.put(eastmostLongitude_VARNAME, "easternmost longitude");
+		longNameMap.put(southmostLatitude_VARNAME, "southernmost latitude");
+		longNameMap.put(northmostLatitude_VARNAME, "northernmost latitude");
+		longNameMap.put(beginTime_VARNAME, "beginning time");
+		longNameMap.put(endTime_VARNAME, "ending time");
+		longNameMap.put(scienceGroup_VARNAME, "investigators");
+		longNameMap.put(origDataRef_VARNAME, "original data reference");
+		longNameMap.put(addlDocs_VARNAME, "additional documents");
+		longNameMap.put(socatDOI_VARNAME, "SOCAT data DOI");
+		longNameMap.put(socatDOIHRef_VARNAME, "SOCAT data reference");
+		longNameMap.put(socatVersion_VARNAME, "SOCAT version");
+		longNameMap.put(qcFlag_VARNAME, "QC flag");
 
-		longNameMap.put("year", "year");
-		longNameMap.put("month", "month of year");
-		longNameMap.put("day", "day of month");
-		longNameMap.put("hour", "hour of day");
-		longNameMap.put("minute", "minute of hour");
-		longNameMap.put("second", "second of minute");
+		longNameMap.put(year_VARNAME, "year");
+		longNameMap.put(month_VARNAME, "month of year");
+		longNameMap.put(day_VARNAME, "day of month");
+		longNameMap.put(hour_VARNAME, "hour of day");
+		longNameMap.put(minute_VARNAME, "minute of hour");
+		longNameMap.put(second_VARNAME, "second of minute");
 
-		longNameMap.put("longitude", "longitude");
-		longNameMap.put("latitude", "latitude");
-		longNameMap.put("sampleDepth", "sample depth");
-		longNameMap.put("salinity", "salinity");
-		longNameMap.put("tEqu", "equilibrator chamber temperature");
-		longNameMap.put("sst", "sea surface temperature");
-		longNameMap.put("tAtm", "sea-level air temperature");
-		longNameMap.put("pEqu", "equilibrator chamber pressure");
-		longNameMap.put("slp", "sea-level air pressure");
+		longNameMap.put(longitude_VARNAME, "longitude");
+		longNameMap.put(latitude_VARNAME, "latitude");
+		longNameMap.put(sampleDepth_VARNAME, "sample depth");
+		longNameMap.put(salinity_VARNAME, "salinity");
+		longNameMap.put(tEqu_VARNAME, "equilibrator chamber temperature");
+		longNameMap.put(sst_VARNAME, "sea surface temperature");
+		longNameMap.put(tAtm_VARNAME, "sea-level air temperature");
+		longNameMap.put(pEqu_VARNAME, "equilibrator chamber pressure");
+		longNameMap.put(slp_VARNAME, "sea-level air pressure");
 
-		longNameMap.put("xCO2WaterTEqu", "water xCO2 using equi temp");
-		longNameMap.put("xCO2WaterSst", "water xCO2 using sst");
-		longNameMap.put("pCO2WaterTEqu", "water pCO2 using equi temp");
-		longNameMap.put("pCO2WaterSst", "water pCO2 using sst");
-		longNameMap.put("fCO2WaterTEqu", "water fCO2 using equi temp");
-		longNameMap.put("fCO2WaterSst", "water fCO2 using sst");
+		longNameMap.put(xCO2WaterTEquDry_VARNAME, "water xCO2 dry using equi temp");
+		longNameMap.put(xCO2WaterSstDry_VARNAME, "water xCO2 dry using sst");
+		longNameMap.put(xCO2WaterTEquWet_VARNAME, "water xCO2 wet using equi temp");
+		longNameMap.put(xCO2WaterSstWet_VARNAME, "water xCO2 wet using sst");
+		longNameMap.put(pCO2WaterTEquWet_VARNAME, "water pCO2 wet using equi temp");
+		longNameMap.put(pCO2WaterSstWet_VARNAME, "water pCO2 wet using sst");
+		longNameMap.put(fCO2WaterTEquWet_VARNAME, "water fCO2 wet using equi temp");
+		longNameMap.put(fCO2WaterSstWet_VARNAME, "water fCO2 wet using sst");
 
-		longNameMap.put("xCO2AtmActual", "actual atmospheric xCO2");
-		longNameMap.put("xCO2AtmInterp", "interpolated atmospheric xCO2");
-		longNameMap.put("pCO2AtmActual", "actual atmospheric pCO2");
-		longNameMap.put("pCO2AtmInterp", "interpolated atmospheric pCO2");
-		longNameMap.put("fCO2AtmActual", "actual atmospheric fCO2");
-		longNameMap.put("fCO2AtmInterp", "interpolated atmospheric fCO2");
+		longNameMap.put(xCO2AtmDryActual_VARNAME, "actual air xCO2 dry");
+		longNameMap.put(xCO2AtmDryInterp_VARNAME, "interpolated air xCO2 dry ");
+		longNameMap.put(xCO2AtmWetActual_VARNAME, "actual air xCO2 wet");
+		longNameMap.put(xCO2AtmWetInterp_VARNAME, "interpolated air xCO2 wet");
+		longNameMap.put(pCO2AtmWetActual_VARNAME, "actual air pCO2");
+		longNameMap.put(pCO2AtmWetInterp_VARNAME, "interpolated air pCO2");
+		longNameMap.put(fCO2AtmWetActual_VARNAME, "actual air fCO2");
+		longNameMap.put(fCO2AtmWetInterp_VARNAME, "interpolated air fCO2");
 
-		longNameMap.put("deltaXCO2", "water xCO2 minus atmospheric xCO2");
-		longNameMap.put("deltaPCO2", "water pCO2 minus atmospheric pCO2");
-		longNameMap.put("deltaFCO2", "water fCO2 minus atmospheric fCO2");
+		longNameMap.put(deltaXCO2_VARNAME, "water xCO2 minus atmospheric xCO2");
+		longNameMap.put(deltaPCO2_VARNAME, "water pCO2 minus atmospheric pCO2");
+		longNameMap.put(deltaFCO2_VARNAME, "water fCO2 minus atmospheric fCO2");
 
-		longNameMap.put("relativeHumidity", "relative humidity");
-		longNameMap.put("specificHumidity", "specific humidity");
-		longNameMap.put("shipSpeed", "measured ship speed");
-		longNameMap.put("shipDirection", "ship direction"); 
-		longNameMap.put("windSpeedTrue", "true wind speed");
-		longNameMap.put("windSpeedRelative", "relative wind speed");
-		longNameMap.put("windDirectionTrue", "true wind direction");
-		longNameMap.put("windDirectionRelative", "relative wind direction");
+		longNameMap.put(relativeHumidity_VARNAME, "relative humidity");
+		longNameMap.put(specificHumidity_VARNAME, "specific humidity");
+		longNameMap.put(shipSpeed_VARNAME, "measured ship speed");
+		longNameMap.put(shipDirection_VARNAME, "ship direction"); 
+		longNameMap.put(windSpeedTrue_VARNAME, "true wind speed");
+		longNameMap.put(windSpeedRelative_VARNAME, "relative wind speed");
+		longNameMap.put(windDirectionTrue_VARNAME, "true wind direction");
+		longNameMap.put(windDirectionRelative_VARNAME, "relative wind direction");
 
-		longNameMap.put("geopositionWoce", "WOCE flag for date, time, longitude, latitude");
-		longNameMap.put("sampleDepthWoce", "WOCE flag for sample depth");
-		longNameMap.put("salinityWoce", "WOCE flag for salinity");
-		longNameMap.put("tEquWoce", "WOCE flag for equilibrator temperature");
-		longNameMap.put("sstWoce", "WOCE flag for sea surface temperature");
-		longNameMap.put("tAtmWoce", "WOCE flag for sea-level air temperature");
-		longNameMap.put("pEquWoce", "WOCE flag for equilibrator pressure");
-		longNameMap.put("slpWoce", "WOCE flag for sea-level air pressure");
+		longNameMap.put(woceCO2Water_VARNAME, "WOCE flag for water CO2");
+		longNameMap.put(woceCO2Atm_VARNAME, "WOCE flag for air CO2");
 
-		longNameMap.put("xCO2WaterTEquWoce", "WOCE flag for water xCO2 using equi temp");
-		longNameMap.put("xCO2WaterSstWoce", "WOCE flag for water xCO2 using sst");
-		longNameMap.put("pCO2WaterTEquWoce", "WOCE flag for water pCO2 using equi temp");
-		longNameMap.put("pCO2WaterSstWoce", "WOCE flag for water pCO2 using sst");
-		longNameMap.put("fCO2WaterTEquWoce", "WOCE flag for water fCO2 using equi temp");
-		longNameMap.put("fCO2WaterSstWoce", "WOCE flag for water fCO2 using sst");
+		longNameMap.put(woaSss_VARNAME, "salinity from World Ocean Atlas 2005");
+		longNameMap.put(ncepSlp_VARNAME, "sea level air pressure from NCEP/NCAR reanalysis");
 
-		longNameMap.put("xCO2AtmActualWoce", "WOCE flag for actual atmospheric xCO2");
-		longNameMap.put("xCO2AtmInterpWoce", "WOCE flag for interpolated atmospheric xCO2");
-		longNameMap.put("pCO2AtmActualWoce", "WOCE flag for actual atmospheric pCO2");
-		longNameMap.put("pCO2AtmInterpWoce", "WOCE flag for interpolated atmospheric pCO2");
-		longNameMap.put("fCO2AtmActualWoce", "WOCE flag for actual atmospheric fCO2");
-		longNameMap.put("fCO2AtmInterpWoce", "WOCE flag for interpolated atmospheric fCO2");
+		longNameMap.put(fCO2FromXCO2TEqu_VARNAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal");
+		longNameMap.put(fCO2FromXCO2Sst_VARNAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal");
+		longNameMap.put(fCO2FromPCO2TEqu_VARNAME, "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal");
+		longNameMap.put(fCO2FromPCO2Sst_VARNAME, "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
+		longNameMap.put(fCO2FromFCO2TEqu_VARNAME, "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal");
+		longNameMap.put(fCO2FromFCO2Sst_VARNAME, "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
+		longNameMap.put(fCO2FromPCO2TEquNcep_VARNAME, "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal");
+		longNameMap.put(fCO2FromPCO2SstNcep_VARNAME, "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal");
+		longNameMap.put(fCO2FromXCO2TEquWoa_VARNAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS");
+		longNameMap.put(fCO2FromXCO2SstWoa_VARNAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS");
+		longNameMap.put(fCO2FromXCO2TEquNcep_VARNAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal");
+		longNameMap.put(fCO2FromXCO2SstNcep_VARNAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal");
+		longNameMap.put(fCO2FromXCO2TEquNcepWoa_VARNAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS");
+		longNameMap.put(fCO2FromXCO2SstNcepWoa_VARNAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS");
 
-		longNameMap.put("deltaXCO2Woce", "WOCE flag for delta_xCO2");
-		longNameMap.put("deltaPCO2Woce", "WOCE flag for delta_pCO2");
-		longNameMap.put("deltaFCO2Woce", "WOCE flag for delta_fCO2");
-
-		longNameMap.put("relativeHumidityWoce", "WOCE flag for relative humidity");
-		longNameMap.put("specificHumidityWoce", "WOCE flag for specific humidity");
-		longNameMap.put("shipSpeedWoce", "WOCE flag for measured ship speed");
-		longNameMap.put("shipDirectionWoce", "WOCE flag for ship direction"); 
-		longNameMap.put("windSpeedTrueWoce", "WOCE flag for true wind speed");
-		longNameMap.put("windSpeedRelativeWoce", "WOCE flag for relative wind speed");
-		longNameMap.put("windDirectionTrueWoce", "WOCE flag for true wind direction");
-		longNameMap.put("windDirectionRelativeWoce", "WOCE flag for relative wind direction");
-
-		longNameMap.put("woaSss", "salinity from World Ocean Atlas 2005");
-		longNameMap.put("ncepSlp", "sea level air pressure from NCEP/NCAR reanalysis");
-
-		longNameMap.put("fCO2FromXCO2TEqu", "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromXCO2Sst", "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromPCO2TEqu", "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal");
-		longNameMap.put("fCO2FromPCO2Sst", "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromFCO2TEqu", "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal");
-		longNameMap.put("fCO2FromFCO2Sst", "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal");
-		longNameMap.put("fCO2FromPCO2TEquNcep", "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal");
-		longNameMap.put("fCO2FromPCO2SstNcep", "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal");
-		longNameMap.put("fCO2FromXCO2TEquWoa", "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS");
-		longNameMap.put("fCO2FromXCO2SstWoa", "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS");
-		longNameMap.put("fCO2FromXCO2TEquNcep", "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal");
-		longNameMap.put("fCO2FromXCO2SstNcep", "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal");
-		longNameMap.put("fCO2FromXCO2TEquNcepWoa", "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS");
-		longNameMap.put("fCO2FromXCO2SstNcepWoa", "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS");
-
-		longNameMap.put("fCO2Rec", "fCO2 recommended");
-		longNameMap.put("fCO2Source", "Algorithm number for recommended fCO2");
-		longNameMap.put("deltaT", "Equilibrator Temp - SST");
-		longNameMap.put("regionID", "SOCAT region ID");
-		longNameMap.put("calcSpeed", "calculated ship speed");
-		longNameMap.put("etopo2Depth", "bathymetry from ETOPO2");
-		longNameMap.put("gvCO2", "GlobalView xCO2");
-		longNameMap.put("distToLand", "distance to land");
-		longNameMap.put("days1970", "time");
-		longNameMap.put("dayOfYear", "day of the year");
-
-		longNameMap.put("fCO2FromXCO2TEquWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm");
-		longNameMap.put("fCO2FromXCO2SstWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_sst_dry_ppm");
-		longNameMap.put("fCO2FromPCO2TEquWoce", "WOCE flag for fCO2_from_pCO2_water_water_equi_temp");
-		longNameMap.put("fCO2FromPCO2SstWoce", "WOCE flag for fCO2_from_pCO2_water_sst_100humidity_uatm");
-		longNameMap.put("fCO2FromFCO2TEquWoce", "WOCE flag for fCO2_insitu_from_fCO2_water_equi_uatm");
-		longNameMap.put("fCO2FromFCO2SstWoce", "WOCE flag for fCO2_insitu_from_fCO2_water_sst_100humidty_uatm");
-		longNameMap.put("fCO2FromPCO2TEquNcepWoce", "WOCE flag for fCO2_from_pCO2_water_water_equi_temp_ncep");
-		longNameMap.put("fCO2FromPCO2SstNcepWoce", "WOCE flag for fCO2_from_pCO2_water_sst_100humidity_uatm_ncep");
-		longNameMap.put("fCO2FromXCO2TEquWoaWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa");
-		longNameMap.put("fCO2FromXCO2SstWoaWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa");
-		longNameMap.put("fCO2FromXCO2TEquNcepWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep");
-		longNameMap.put("fCO2FromXCO2SstNcepWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep");
-		longNameMap.put("fCO2FromXCO2TEquNcepWoaWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa");
-		longNameMap.put("fCO2FromXCO2SstNcepWoaWoce", "WOCE flag for fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
-	
-		longNameMap.put("fCO2RecWoce", "WOCE flag for fCO2_recommended");
-		longNameMap.put("deltaTWoce", "WOCE flag for delta_temp");
-		longNameMap.put("calcSpeedWoce", "WOCE flag for calculated ship speed");
+		longNameMap.put(fCO2Rec_VARNAME, "fCO2 recommended");
+		longNameMap.put(fCO2Source_VARNAME, "Algorithm number for recommended fCO2");
+		longNameMap.put(deltaT_VARNAME, "Equilibrator Temp - SST");
+		longNameMap.put(regionID_VARNAME, "SOCAT region ID");
+		longNameMap.put(calcSpeed_VARNAME, "calculated ship speed");
+		longNameMap.put(etopo2Depth_VARNAME, "bathymetry from ETOPO2");
+		longNameMap.put(gvCO2_VARNAME, "GlobalView xCO2");
+		longNameMap.put(distToLand_VARNAME, "distance to land");
+		longNameMap.put(dayOfYear_VARNAME, "day of the year");
 
 		LONG_NAME = Collections.unmodifiableMap(longNameMap);
 	}
@@ -343,78 +342,80 @@ public class Constants {
 		final String direction_units = "degrees";
 		final String distance_units = "km";
 		final String seconds_time_units = "seconds since 1970-01-01T00:00:00Z";
-		final String day_time_units = "days since 1970-01-01T00:00:00Z";
 		final String days_units = "days";
 
 		HashMap<String, String> unitsMap = new HashMap<String, String>();
-		unitsMap.put("westmostLongitude", longitude_units);
-		unitsMap.put("eastmostLongitude", longitude_units);
-		unitsMap.put("southmostLatitude", latitude_units);
-		unitsMap.put("northmostLatitude", latitude_units);
-		unitsMap.put("beginTime", seconds_time_units);
-		unitsMap.put("endTime", seconds_time_units);
+		unitsMap.put(westmostLongitude_VARNAME, longitude_units);
+		unitsMap.put(eastmostLongitude_VARNAME, longitude_units);
+		unitsMap.put(southmostLatitude_VARNAME, latitude_units);
+		unitsMap.put(northmostLatitude_VARNAME, latitude_units);
+		unitsMap.put(beginTime_VARNAME, seconds_time_units);
+		unitsMap.put(endTime_VARNAME, seconds_time_units);
 
-		unitsMap.put("longitude", longitude_units);
-		unitsMap.put("latitude", latitude_units);
-		unitsMap.put("sampleDepth", depth_units);
-		unitsMap.put("salinity", salinity_units);
-		unitsMap.put("tEqu", temperature_units);
-		unitsMap.put("sst", temperature_units);
-		unitsMap.put("tAtm", temperature_units);
-		unitsMap.put("pEqu", pressure_units);
-		unitsMap.put("slp", pressure_units);
+		unitsMap.put(longitude_VARNAME, longitude_units);
+		unitsMap.put(latitude_VARNAME, latitude_units);
+		unitsMap.put(sampleDepth_VARNAME, depth_units);
+		unitsMap.put(salinity_VARNAME, salinity_units);
+		unitsMap.put(tEqu_VARNAME, temperature_units);
+		unitsMap.put(sst_VARNAME, temperature_units);
+		unitsMap.put(tAtm_VARNAME, temperature_units);
+		unitsMap.put(pEqu_VARNAME, pressure_units);
+		unitsMap.put(slp_VARNAME, pressure_units);
 
-		unitsMap.put("xCO2WaterTEqu", xco2_units);
-		unitsMap.put("xCO2WaterSst", xco2_units);
-		unitsMap.put("pCO2WaterTEqu", pco2_units);
-		unitsMap.put("pCO2WaterSst", pco2_units);
-		unitsMap.put("fCO2WaterTEqu", fco2_units);
-		unitsMap.put("fCO2WaterSst", fco2_units);
+		unitsMap.put(xCO2WaterTEquDry_VARNAME, xco2_units);
+		unitsMap.put(xCO2WaterSstDry_VARNAME, xco2_units);
+		unitsMap.put(xCO2WaterTEquWet_VARNAME, xco2_units);
+		unitsMap.put(xCO2WaterSstWet_VARNAME, xco2_units);
+		unitsMap.put(pCO2WaterTEquWet_VARNAME, pco2_units);
+		unitsMap.put(pCO2WaterSstWet_VARNAME, pco2_units);
+		unitsMap.put(fCO2WaterTEquWet_VARNAME, fco2_units);
+		unitsMap.put(fCO2WaterSstWet_VARNAME, fco2_units);
 
-		unitsMap.put("xCO2AtmActual", xco2_units);
-		unitsMap.put("xCO2AtmInterp", xco2_units);
-		unitsMap.put("pCO2AtmActual", pco2_units);
-		unitsMap.put("pCO2AtmInterp", pco2_units);
-		unitsMap.put("fCO2AtmActual", fco2_units);
-		unitsMap.put("fCO2AtmInterp", fco2_units);
+		unitsMap.put(xCO2AtmDryActual_VARNAME, xco2_units);
+		unitsMap.put(xCO2AtmDryInterp_VARNAME, xco2_units);
+		unitsMap.put(xCO2AtmWetActual_VARNAME, xco2_units);
+		unitsMap.put(xCO2AtmWetInterp_VARNAME, xco2_units);
+		unitsMap.put(pCO2AtmWetActual_VARNAME, pco2_units);
+		unitsMap.put(pCO2AtmWetInterp_VARNAME, pco2_units);
+		unitsMap.put(fCO2AtmWetActual_VARNAME, fco2_units);
+		unitsMap.put(fCO2AtmWetInterp_VARNAME, fco2_units);
 
-		unitsMap.put("deltaXCO2", xco2_units);
-		unitsMap.put("deltaPCO2", pco2_units);
-		unitsMap.put("deltaFCO2", fco2_units);
+		unitsMap.put(deltaXCO2_VARNAME, xco2_units);
+		unitsMap.put(deltaPCO2_VARNAME, pco2_units);
+		unitsMap.put(deltaFCO2_VARNAME, fco2_units);
 
-		unitsMap.put("shipSpeed", ship_speed_units);
-		unitsMap.put("shipDirection", direction_units); 
-		unitsMap.put("windSpeedTrue", wind_speed_units);
-		unitsMap.put("windSpeedRelative", wind_speed_units);
-		unitsMap.put("windDirectionTrue", direction_units);
-		unitsMap.put("windDirectionRelative", direction_units);
+		unitsMap.put(shipSpeed_VARNAME, ship_speed_units);
+		unitsMap.put(shipDirection_VARNAME, direction_units); 
+		unitsMap.put(windSpeedTrue_VARNAME, wind_speed_units);
+		unitsMap.put(windSpeedRelative_VARNAME, wind_speed_units);
+		unitsMap.put(windDirectionTrue_VARNAME, direction_units);
+		unitsMap.put(windDirectionRelative_VARNAME, direction_units);
 
-		unitsMap.put("woaSss", salinity_units);
-		unitsMap.put("ncepSlp", pressure_units);
+		unitsMap.put(woaSss_VARNAME, salinity_units);
+		unitsMap.put(ncepSlp_VARNAME, pressure_units);
 
-		unitsMap.put("fCO2FromXCO2TEqu", fco2_units);
-		unitsMap.put("fCO2FromXCO2Sst", fco2_units);
-		unitsMap.put("fCO2FromPCO2TEqu", fco2_units);
-		unitsMap.put("fCO2FromPCO2Sst", fco2_units);
-		unitsMap.put("fCO2FromFCO2TEqu", fco2_units);
-		unitsMap.put("fCO2FromFCO2Sst", fco2_units);
-		unitsMap.put("fCO2FromPCO2TEquNcep", fco2_units);
-		unitsMap.put("fCO2FromPCO2SstNcep", fco2_units);
-		unitsMap.put("fCO2FromXCO2TEquWoa", fco2_units);
-		unitsMap.put("fCO2FromXCO2SstWoa", fco2_units);
-		unitsMap.put("fCO2FromXCO2TEquNcep", fco2_units);
-		unitsMap.put("fCO2FromXCO2SstNcep", fco2_units);
-		unitsMap.put("fCO2FromXCO2TEquNcepWoa", fco2_units);
-		unitsMap.put("fCO2FromXCO2SstNcepWoa", fco2_units);
+		unitsMap.put(fCO2FromXCO2TEqu_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2Sst_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromPCO2TEqu_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromPCO2Sst_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromFCO2TEqu_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromFCO2Sst_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromPCO2TEquNcep_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromPCO2SstNcep_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2TEquWoa_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2SstWoa_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2TEquNcep_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2SstNcep_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2TEquNcepWoa_VARNAME, fco2_units);
+		unitsMap.put(fCO2FromXCO2SstNcepWoa_VARNAME, fco2_units);
 
-		unitsMap.put("fCO2Rec", fco2_units);
-		unitsMap.put("deltaT", temperature_units);
-		unitsMap.put("calcSpeed", ship_speed_units);
-		unitsMap.put("etopo2Depth", depth_units);
-		unitsMap.put("gvCO2", xco2_units);
-		unitsMap.put("distToLand", distance_units);
-		unitsMap.put("days1970", day_time_units);
-		unitsMap.put("dayOfYear", days_units);
+		unitsMap.put(fCO2Rec_VARNAME, fco2_units);
+		unitsMap.put(deltaT_VARNAME, temperature_units);
+		unitsMap.put(calcSpeed_VARNAME, ship_speed_units);
+		unitsMap.put(etopo2Depth_VARNAME, depth_units);
+		unitsMap.put(gvCO2_VARNAME, xco2_units);
+		unitsMap.put(distToLand_VARNAME, distance_units);
+		unitsMap.put(dayOfYear_VARNAME, days_units);
 
 		UNITS = Collections.unmodifiableMap(unitsMap);
 	}
@@ -426,68 +427,71 @@ public class Constants {
 	static {
 		HashMap<String, String> stdNamesMap = new HashMap<String, String>();
 
-		stdNamesMap.put("vesselName", "platform_name");
-		stdNamesMap.put("westmostLongitude", "geospatial_lon_min");
-		stdNamesMap.put("eastmostLongitude", "geospatial_lon_max");
-		stdNamesMap.put("southmostLatitude", "geospatial_lat_min");
-		stdNamesMap.put("northmostLatitude", "geospatial_lat_max");
-		stdNamesMap.put("beginTime", "time_coverage_start");
-		stdNamesMap.put("endTime", "time_converage_end");
+		stdNamesMap.put(vesselName_VARNAME, "platform_name");
+		stdNamesMap.put(westmostLongitude_VARNAME, "geospatial_lon_min");
+		stdNamesMap.put(eastmostLongitude_VARNAME, "geospatial_lon_max");
+		stdNamesMap.put(southmostLatitude_VARNAME, "geospatial_lat_min");
+		stdNamesMap.put(northmostLatitude_VARNAME, "geospatial_lat_max");
+		stdNamesMap.put(beginTime_VARNAME, "time_coverage_start");
+		stdNamesMap.put(endTime_VARNAME, "time_converage_end");
 
-		stdNamesMap.put("longitude", "longitude");
-		stdNamesMap.put("latitude", "latitude");
-		stdNamesMap.put("sampleDepth", "depth");
-		stdNamesMap.put("salinity", "sea_surface_salinity");
-		stdNamesMap.put("sst", "sea_surface_temperature");
-		stdNamesMap.put("tAtm", "air_temperature_at_sea_level");
-		stdNamesMap.put("slp", "air_pressure_at_sea_level");
+		stdNamesMap.put(longitude_VARNAME, "longitude");
+		stdNamesMap.put(latitude_VARNAME, "latitude");
+		stdNamesMap.put(sampleDepth_VARNAME, "depth");
+		stdNamesMap.put(salinity_VARNAME, "sea_surface_salinity");
+		stdNamesMap.put(sst_VARNAME, "sea_surface_temperature");
+		stdNamesMap.put(tAtm_VARNAME, "air_temperature_at_sea_level");
+		stdNamesMap.put(slp_VARNAME, "air_pressure_at_sea_level");
 
-		stdNamesMap.put("xCO2WaterTEqu", "mole_fraction_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("xCO2WaterSst", "mole_fraction_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2WaterTEqu", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2WaterSst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("pCO2WaterTEqu", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("pCO2WaterSst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(xCO2WaterTEquDry_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(xCO2WaterSstDry_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(xCO2WaterTEquWet_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(xCO2WaterSstWet_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2WaterTEquWet_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2WaterSstWet_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(pCO2WaterTEquWet_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(pCO2WaterSstWet_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
 
-		stdNamesMap.put("xCO2AtmActual", "mole_fraction_of_carbon_dioxide_in_air");
-		stdNamesMap.put("xCO2AtmInterp", "mole_fraction_of_carbon_dioxide_in_air");
-		stdNamesMap.put("pCO2AtmActual", "surface_partial_pressure_of_carbon_dioxide_in_air");
-		stdNamesMap.put("pCO2AtmInterp", "surface_partial_pressure_of_carbon_dioxide_in_air");
-		stdNamesMap.put("fCO2AtmActual", "surface_partial_pressure_of_carbon_dioxide_in_air");
-		stdNamesMap.put("fCO2AtmInterp", "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(xCO2AtmDryActual_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
+		stdNamesMap.put(xCO2AtmDryInterp_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
+		stdNamesMap.put(xCO2AtmWetActual_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
+		stdNamesMap.put(xCO2AtmWetInterp_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
+		stdNamesMap.put(pCO2AtmWetActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(pCO2AtmWetInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(fCO2AtmWetActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
+		stdNamesMap.put(fCO2AtmWetInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
 
-		stdNamesMap.put("relativeHumidity", "relative_humidity");
-		stdNamesMap.put("specificHumidity", "specific_humidity");
-		stdNamesMap.put("shipSpeed", "platform_speed_wrt_ground"); 
-		stdNamesMap.put("shipDirection", "platform_course");
-		stdNamesMap.put("windSpeedTrue", "wind_speed");
-		stdNamesMap.put("windSpeedRelative", "wind_speed");
-		stdNamesMap.put("windDirectionTrue", "wind_from_direction");
-		stdNamesMap.put("windDirectionRelative", "wind_from_direction");
+		stdNamesMap.put(relativeHumidity_VARNAME, "relative_humidity");
+		stdNamesMap.put(specificHumidity_VARNAME, "specific_humidity");
+		stdNamesMap.put(shipSpeed_VARNAME, "platform_speed_wrt_ground"); 
+		stdNamesMap.put(shipDirection_VARNAME, "platform_course");
+		stdNamesMap.put(windSpeedTrue_VARNAME, "wind_speed");
+		stdNamesMap.put(windSpeedRelative_VARNAME, "wind_speed");
+		stdNamesMap.put(windDirectionTrue_VARNAME, "wind_from_direction");
+		stdNamesMap.put(windDirectionRelative_VARNAME, "wind_from_direction");
 
-		stdNamesMap.put("woaSss", "sea_surface_salinity");
-		stdNamesMap.put("ncepSlp", "air_pressure_at_sea_level");
+		stdNamesMap.put(woaSss_VARNAME, "sea_surface_salinity");
+		stdNamesMap.put(ncepSlp_VARNAME, "air_pressure_at_sea_level");
 
-		stdNamesMap.put("fCO2FromXCO2TEqu", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2Sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromPCO2TEqu", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromPCO2Sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromFCO2TEqu", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromFCO2Sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromPCO2TEquNcep", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromPCO2SstNcep", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2TEquWoa", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2SstWoa", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2TEquNcep", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2SstNcep", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2TEquNcepWoa", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("fCO2FromXCO2SstNcepWoa", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2TEqu_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2Sst_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromPCO2TEqu_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromPCO2Sst_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromFCO2TEqu_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromFCO2Sst_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromPCO2TEquNcep_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromPCO2SstNcep_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2TEquWoa_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2SstWoa_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2TEquNcep_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2SstNcep_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2TEquNcepWoa_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(fCO2FromXCO2SstNcepWoa_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
 
-		stdNamesMap.put("fCO2Rec", "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
-		stdNamesMap.put("calcSpeed", "platform_speed_wrt_ground");
-		stdNamesMap.put("etopo2Depth", "sea_floor_depth");
-		stdNamesMap.put("gvCO2", "mole_fraction_of_carbon_dioxide_in_air");
-		stdNamesMap.put("days1970", "time");
+		stdNamesMap.put(fCO2Rec_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_sea_water");
+		stdNamesMap.put(calcSpeed_VARNAME, "platform_speed_wrt_ground");
+		stdNamesMap.put(etopo2Depth_VARNAME, "sea_floor_depth");
+		stdNamesMap.put(gvCO2_VARNAME, "mole_fraction_of_carbon_dioxide_in_air");
 
 		STANDARD_NAMES = Collections.unmodifiableMap(stdNamesMap);
 	}
@@ -499,7 +503,6 @@ public class Constants {
 	static {
 		String bathymetry_category = "Bathymetry";
 		String co2_category = "CO2";
-		// TODO: check humidity category name
 		String humidity_category = "Humidity";
 		String identifier_category = "Identifier";
 		String location_category = "Location";
@@ -512,147 +515,98 @@ public class Constants {
 
 		HashMap<String, String> ioosCatMap = new HashMap<String, String>();
 
-		ioosCatMap.put("expocode", identifier_category);
-		ioosCatMap.put("cruiseName", identifier_category);
-		ioosCatMap.put("vesselName", identifier_category);
-		ioosCatMap.put("organization", identifier_category);
-		ioosCatMap.put("westmostLongitude", location_category);
-		ioosCatMap.put("eastmostLongitude", location_category);
-		ioosCatMap.put("southmostLatitude", location_category);
-		ioosCatMap.put("northmostLatitude", location_category);
-		ioosCatMap.put("beginTime", time_category);
-		ioosCatMap.put("endTime", time_category);
-		ioosCatMap.put("scienceGroup", identifier_category);
-		ioosCatMap.put("origDataRef", identifier_category);
-		ioosCatMap.put("socatDOI", identifier_category);
-		ioosCatMap.put("socatDOIHRef", identifier_category);
-		ioosCatMap.put("socatVersion", identifier_category);
-		ioosCatMap.put("qcFlag", quality_category);
+		ioosCatMap.put(expocode_VARNAME, identifier_category);
+		ioosCatMap.put(cruiseName_VARNAME, identifier_category);
+		ioosCatMap.put(vesselName_VARNAME, identifier_category);
+		ioosCatMap.put(organization_VARNAME, identifier_category);
+		ioosCatMap.put(westmostLongitude_VARNAME, location_category);
+		ioosCatMap.put(eastmostLongitude_VARNAME, location_category);
+		ioosCatMap.put(southmostLatitude_VARNAME, location_category);
+		ioosCatMap.put(northmostLatitude_VARNAME, location_category);
+		ioosCatMap.put(beginTime_VARNAME, time_category);
+		ioosCatMap.put(endTime_VARNAME, time_category);
+		ioosCatMap.put(scienceGroup_VARNAME, identifier_category);
+		ioosCatMap.put(origDataRef_VARNAME, identifier_category);
+		ioosCatMap.put(socatDOI_VARNAME, identifier_category);
+		ioosCatMap.put(socatDOIHRef_VARNAME, identifier_category);
+		ioosCatMap.put(socatVersion_VARNAME, identifier_category);
+		ioosCatMap.put(qcFlag_VARNAME, quality_category);
 
-		ioosCatMap.put("year", time_category);
-		ioosCatMap.put("month", time_category);
-		ioosCatMap.put("day", time_category);
-		ioosCatMap.put("hour", time_category);
-		ioosCatMap.put("minute", time_category);
-		ioosCatMap.put("second", time_category);
+		ioosCatMap.put(year_VARNAME, time_category);
+		ioosCatMap.put(month_VARNAME, time_category);
+		ioosCatMap.put(day_VARNAME, time_category);
+		ioosCatMap.put(hour_VARNAME, time_category);
+		ioosCatMap.put(minute_VARNAME, time_category);
+		ioosCatMap.put(second_VARNAME, time_category);
 
-		ioosCatMap.put("longitude", location_category);
-		ioosCatMap.put("latitude", location_category);
-		ioosCatMap.put("sampleDepth", bathymetry_category);
-		ioosCatMap.put("salinity", salinity_category);
-		ioosCatMap.put("tEqu", temperature_category);
-		ioosCatMap.put("sst", temperature_category);
-		ioosCatMap.put("tAtm", temperature_category);
-		ioosCatMap.put("pEqu", pressure_category);
-		ioosCatMap.put("slp", pressure_category);
+		ioosCatMap.put(longitude_VARNAME, location_category);
+		ioosCatMap.put(latitude_VARNAME, location_category);
+		ioosCatMap.put(sampleDepth_VARNAME, bathymetry_category);
+		ioosCatMap.put(salinity_VARNAME, salinity_category);
+		ioosCatMap.put(tEqu_VARNAME, temperature_category);
+		ioosCatMap.put(sst_VARNAME, temperature_category);
+		ioosCatMap.put(tAtm_VARNAME, temperature_category);
+		ioosCatMap.put(pEqu_VARNAME, pressure_category);
+		ioosCatMap.put(slp_VARNAME, pressure_category);
 
-		ioosCatMap.put("xCO2WaterSst", co2_category);
-		ioosCatMap.put("xCO2WaterTEqu", co2_category);
-		ioosCatMap.put("fCO2WaterSst", co2_category);
-		ioosCatMap.put("fCO2WaterTEqu", co2_category);
-		ioosCatMap.put("pCO2WaterSst", co2_category);
-		ioosCatMap.put("pCO2WaterTEqu", co2_category);
+		ioosCatMap.put(xCO2WaterSstDry_VARNAME, co2_category);
+		ioosCatMap.put(xCO2WaterTEquDry_VARNAME, co2_category);
+		ioosCatMap.put(xCO2WaterSstWet_VARNAME, co2_category);
+		ioosCatMap.put(xCO2WaterTEquWet_VARNAME, co2_category);
+		ioosCatMap.put(fCO2WaterSstWet_VARNAME, co2_category);
+		ioosCatMap.put(fCO2WaterTEquWet_VARNAME, co2_category);
+		ioosCatMap.put(pCO2WaterSstWet_VARNAME, co2_category);
+		ioosCatMap.put(pCO2WaterTEquWet_VARNAME, co2_category);
 
-		ioosCatMap.put("xCO2AtmActual", co2_category);
-		ioosCatMap.put("xCO2AtmInterp", co2_category);
-		ioosCatMap.put("pCO2AtmActual", co2_category);
-		ioosCatMap.put("pCO2AtmInterp", co2_category);
-		ioosCatMap.put("fCO2AtmActual", co2_category);
-		ioosCatMap.put("fCO2AtmInterp", co2_category);
+		ioosCatMap.put(xCO2AtmDryActual_VARNAME, co2_category);
+		ioosCatMap.put(xCO2AtmDryInterp_VARNAME, co2_category);
+		ioosCatMap.put(xCO2AtmWetActual_VARNAME, co2_category);
+		ioosCatMap.put(xCO2AtmWetInterp_VARNAME, co2_category);
+		ioosCatMap.put(pCO2AtmWetActual_VARNAME, co2_category);
+		ioosCatMap.put(pCO2AtmWetInterp_VARNAME, co2_category);
+		ioosCatMap.put(fCO2AtmWetActual_VARNAME, co2_category);
+		ioosCatMap.put(fCO2AtmWetInterp_VARNAME, co2_category);
 
-		ioosCatMap.put("deltaXCO2", co2_category);
-		ioosCatMap.put("deltaPCO2", co2_category);
-		ioosCatMap.put("deltaFCO2", co2_category);
+		ioosCatMap.put(deltaXCO2_VARNAME, co2_category);
+		ioosCatMap.put(deltaPCO2_VARNAME, co2_category);
+		ioosCatMap.put(deltaFCO2_VARNAME, co2_category);
 
-		ioosCatMap.put("relativeHumidity", humidity_category);
-		ioosCatMap.put("specificHumidity", humidity_category);
-		ioosCatMap.put("windSpeedTrue", wind_category);
-		ioosCatMap.put("windSpeedRelative", wind_category);
-		ioosCatMap.put("windDirectionTrue", wind_category);
-		ioosCatMap.put("windDirectionRelative", wind_category);
+		ioosCatMap.put(relativeHumidity_VARNAME, humidity_category);
+		ioosCatMap.put(specificHumidity_VARNAME, humidity_category);
+		ioosCatMap.put(windSpeedTrue_VARNAME, wind_category);
+		ioosCatMap.put(windSpeedRelative_VARNAME, wind_category);
+		ioosCatMap.put(windDirectionTrue_VARNAME, wind_category);
+		ioosCatMap.put(windDirectionRelative_VARNAME, wind_category);
 
-		ioosCatMap.put("geopositionWoce", quality_category);
-		ioosCatMap.put("sampleDepthWoce", quality_category);
-		ioosCatMap.put("salinityWoce", quality_category);
-		ioosCatMap.put("tEquWoce", quality_category);
-		ioosCatMap.put("sstWoce", quality_category);
-		ioosCatMap.put("tAtmWoce", quality_category);
-		ioosCatMap.put("pEquWoce", quality_category);
-		ioosCatMap.put("slpWoce", quality_category);
+		ioosCatMap.put(woceCO2Water_VARNAME, quality_category);
+		ioosCatMap.put(woceCO2Atm_VARNAME, quality_category);
 
-		ioosCatMap.put("xCO2WaterTEquWoce", quality_category);
-		ioosCatMap.put("xCO2WaterSstWoce", quality_category);
-		ioosCatMap.put("pCO2WaterTEquWoce", quality_category);
-		ioosCatMap.put("pCO2WaterSstWoce", quality_category);
-		ioosCatMap.put("fCO2WaterTEquWoce", quality_category);
-		ioosCatMap.put("fCO2WaterSstWoce", quality_category);
+		ioosCatMap.put(woaSss_VARNAME, salinity_category);
+		ioosCatMap.put(ncepSlp_VARNAME, pressure_category);
 
-		ioosCatMap.put("xCO2AtmActualWoce", quality_category);
-		ioosCatMap.put("xCO2AtmInterpWoce", quality_category);
-		ioosCatMap.put("pCO2AtmActualWoce", quality_category);
-		ioosCatMap.put("pCO2AtmInterpWoce", quality_category);
-		ioosCatMap.put("fCO2AtmActualWoce", quality_category);
-		ioosCatMap.put("fCO2AtmInterpWoce", quality_category);
+		ioosCatMap.put(fCO2FromXCO2TEqu_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2Sst_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromPCO2TEqu_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromPCO2Sst_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromFCO2TEqu_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromFCO2Sst_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromPCO2TEquNcep_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromPCO2SstNcep_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2TEquWoa_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2SstWoa_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2TEquNcep_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2SstNcep_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2TEquNcepWoa_VARNAME, co2_category);
+		ioosCatMap.put(fCO2FromXCO2SstNcepWoa_VARNAME, co2_category);
 
-		ioosCatMap.put("deltaXCO2Woce", quality_category);
-		ioosCatMap.put("deltaPCO2Woce", quality_category);
-		ioosCatMap.put("deltaFCO2Woce", quality_category);
-
-		ioosCatMap.put("relativeHumidityWoce", quality_category);
-		ioosCatMap.put("specificHumidityWoce", quality_category);
-		ioosCatMap.put("shipSpeedWoce", quality_category);
-		ioosCatMap.put("shipDirectionWoce", quality_category);
-		ioosCatMap.put("windSpeedTrueWoce", quality_category);
-		ioosCatMap.put("windSpeedRelativeWoce", quality_category);
-		ioosCatMap.put("windDirectionTrueWoce", quality_category);
-		ioosCatMap.put("windDirectionRelativeWoce", quality_category);
-
-		ioosCatMap.put("woaSss", salinity_category);
-		ioosCatMap.put("ncepSlp", pressure_category);
-
-		ioosCatMap.put("fCO2FromXCO2TEqu", co2_category);
-		ioosCatMap.put("fCO2FromXCO2Sst", co2_category);
-		ioosCatMap.put("fCO2FromPCO2TEqu", co2_category);
-		ioosCatMap.put("fCO2FromPCO2Sst", co2_category);
-		ioosCatMap.put("fCO2FromFCO2TEqu", co2_category);
-		ioosCatMap.put("fCO2FromFCO2Sst", co2_category);
-		ioosCatMap.put("fCO2FromPCO2TEquNcep", co2_category);
-		ioosCatMap.put("fCO2FromPCO2SstNcep", co2_category);
-		ioosCatMap.put("fCO2FromXCO2TEquWoa", co2_category);
-		ioosCatMap.put("fCO2FromXCO2SstWoa", co2_category);
-		ioosCatMap.put("fCO2FromXCO2TEquNcep", co2_category);
-		ioosCatMap.put("fCO2FromXCO2SstNcep", co2_category);
-		ioosCatMap.put("fCO2FromXCO2TEquNcepWoa", co2_category);
-		ioosCatMap.put("fCO2FromXCO2SstNcepWoa", co2_category);
-
-		ioosCatMap.put("fCO2Rec", co2_category);
-		ioosCatMap.put("fCO2Source", identifier_category);
-		ioosCatMap.put("deltaT", temperature_category);
-		ioosCatMap.put("regionID", identifier_category);
-		ioosCatMap.put("etopo2Depth", bathymetry_category);
-		ioosCatMap.put("gvCO2", co2_category);
-		ioosCatMap.put("distToLand", location_category);
-		ioosCatMap.put("days1970", time_category);
-		ioosCatMap.put("dayOfYear", time_category);
-
-		ioosCatMap.put("fCO2FromXCO2TEquWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2SstWoce", quality_category);
-		ioosCatMap.put("fCO2FromPCO2TEquWoce", quality_category);
-		ioosCatMap.put("fCO2FromPCO2SstWoce", quality_category);
-		ioosCatMap.put("fCO2FromFCO2TEquWoce", quality_category);
-		ioosCatMap.put("fCO2FromFCO2SstWoce", quality_category);
-		ioosCatMap.put("fCO2FromPCO2TEquNcepWoce", quality_category);
-		ioosCatMap.put("fCO2FromPCO2SstNcepWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2TEquWoaWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2SstWoaWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2TEquNcepWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2SstNcepWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2TEquNcepWoaWoce", quality_category);
-		ioosCatMap.put("fCO2FromXCO2SstNcepWoaWoce", quality_category);
-
-		ioosCatMap.put("fCO2RecWoce", quality_category);
-		ioosCatMap.put("deltaTWoce", quality_category);
-		ioosCatMap.put("calcSpeedWoce", quality_category);
+		ioosCatMap.put(fCO2Rec_VARNAME, co2_category);
+		ioosCatMap.put(fCO2Source_VARNAME, identifier_category);
+		ioosCatMap.put(deltaT_VARNAME, temperature_category);
+		ioosCatMap.put(regionID_VARNAME, identifier_category);
+		ioosCatMap.put(etopo2Depth_VARNAME, bathymetry_category);
+		ioosCatMap.put(gvCO2_VARNAME, co2_category);
+		ioosCatMap.put(distToLand_VARNAME, location_category);
+		ioosCatMap.put(dayOfYear_VARNAME, time_category);
 
 		IOOS_CATEGORIES = Collections.unmodifiableMap(ioosCatMap);
 	}
@@ -701,13 +655,17 @@ public class Constants {
 
 		varNamesMap.put("XCO2_WATER_EQUI_TEMP_DRY_PPM", "xCO2_water_equi_temp_dry_ppm");
 		varNamesMap.put("XCO2_WATER_SST_DRY_PPM", "xCO2_water_sst_dry_ppm");
+		varNamesMap.put("XCO2_WATER_EQUI_TEMP_WET_PPM", "xCO2_water_equi_temp_wet_ppm");
+		varNamesMap.put("XCO2_WATER_SST_WET_PPM", "xCO2_water_sst_wet_ppm");
 		varNamesMap.put("PCO2_WATER_EQUI_TEMP", "pCO2_water_equi_temp");
 		varNamesMap.put("PCO2_WATER_SST_100HUMIDITY_UATM", "pCO2_water_sst_100humidity_uatm");
 		varNamesMap.put("FCO2_WATER_EQUI_UATM", "fCO2_water_equi_uatm");
 		varNamesMap.put("FCO2_WATER_SST_100HUMIDITY_UATM", "fCO2_water_sst_100humidity_uatm");
 
-		varNamesMap.put("XCO2_ATM_ACTUAL", "xCO2_atm_actual");
-		varNamesMap.put("XCO2_ATM_INTERP", "xCO2_atm_interp");
+		varNamesMap.put("XCO2_ATM_DRY_ACTUAL", "xCO2_atm_dry_actual");
+		varNamesMap.put("XCO2_ATM_DRY_INTERP", "xCO2_atm_dry_interp");
+		varNamesMap.put("XCO2_ATM_WET_ACTUAL", "xCO2_atm_wet_actual");
+		varNamesMap.put("XCO2_ATM_WET_INTERP", "xCO2_atm_wet_interp");
 		varNamesMap.put("PCO2_ATM_ACTUAL", "pCO2_atm_actual");
 		varNamesMap.put("PCO2_ATM_INTERP", "pCO2_atm_interp");
 		varNamesMap.put("FCO2_ATM_ACTUAL", "fCO2_atm_actual");
@@ -726,41 +684,8 @@ public class Constants {
 		varNamesMap.put("WIND_DIR_TRUE", "wind_dir_true");
 		varNamesMap.put("WIND_DIR_REL", "wind_dir_rel");
 
-		varNamesMap.put("WOCE_GEOPOSITION", "WOCE_geoposition");
-		varNamesMap.put("WOCE_SAMPLE_DEPTH", "WOCE_sample_depth");
-		varNamesMap.put("WOCE_SAL", "WOCE_sal");
-		varNamesMap.put("WOCE_TEMPERATURE_EQUI", "WOCE_Temperature_equi");
-		varNamesMap.put("WOCE_TEMP", "WOCE_temp");
-		varNamesMap.put("WOCE_TEMPERATURE_ATM", "WOCE_Temperature_atm");
-		varNamesMap.put("WOCE_PRESSURE_EQUI", "WOCE_Pressure_equi");
-		varNamesMap.put("WOCE_PRESSURE_ATM", "WOCE_Pressure_atm");
-
-		varNamesMap.put("WOCE_XCO2_WATER_EQUI_TEMP_DRY_PPM", "WOCE_xCO2_water_equi_temp_dry_ppm");
-		varNamesMap.put("WOCE_XCO2_WATER_SST_DRY_PPM", "WOCE_xCO2_water_sst_dry_ppm");
-		varNamesMap.put("WOCE_PCO2_WATER_EQUI_TEMP", "WOCE_pCO2_water_equi_temp");
-		varNamesMap.put("WOCE_PCO2_WATER_SST_100HUMIDITY_UATM", "WOCE_pCO2_water_sst_100humidity_uatm");
-		varNamesMap.put("WOCE_FCO2_WATER_EQUI_UATM", "WOCE_fCO2_water_equi_uatm");
-		varNamesMap.put("WOCE_FCO2_WATER_SST_100HUMIDITY_UATM", "WOCE_fCO2_water_sst_100humidity_uatm");
-
-		varNamesMap.put("WOCE_XCO2_ATM_ACTUAL", "WOCE_xCO2_atm_actual");
-		varNamesMap.put("WOCE_XCO2_ATM_INTERP", "WOCE_xCO2_atm_interp");
-		varNamesMap.put("WOCE_PCO2_ATM_ACTUAL", "WOCE_pCO2_atm_actual");
-		varNamesMap.put("WOCE_PCO2_ATM_INTERP", "WOCE_pCO2_atm_interp");
-		varNamesMap.put("WOCE_FCO2_ATM_ACTUAL", "WOCE_fCO2_atm_actual");
-		varNamesMap.put("WOCE_FCO2_ATM_INTERP", "WOCE_fCO2_atm_interp");
-
-		varNamesMap.put("WOCE_DELTA_XCO2", "WOCE_delta_xCO2");
-		varNamesMap.put("WOCE_DELTA_PCO2", "WOCE_delta_pCO2");
-		varNamesMap.put("WOCE_DELTA_FCO2", "WOCE_delta_fCO2");
-
-		varNamesMap.put("WOCE_REL_HUMIDITY", "WOCE_rel_humidity");
-		varNamesMap.put("WOCE_SPC_HUMIDITY", "WOCE_spc_humidity");
-		varNamesMap.put("WOCE_SHIP_SPEED", "WOCE_ship_speed");
-		varNamesMap.put("WOCE_SHIP_DIR", "WOCE_ship_dir");
-		varNamesMap.put("WOCE_WIND_SPEED_TRUE", "WOCE_wind_speed_true");
-		varNamesMap.put("WOCE_WIND_SPEED_REL", "WOCE_wind_speed_rel");
-		varNamesMap.put("WOCE_WIND_DIR_TRUE", "WOCE_wind_dir_true");
-		varNamesMap.put("WOCE_WIND_DIR_REL", "WOCE_wind_dir_rel");
+		varNamesMap.put("WOCE_CO2_WATER", "WOCE_CO2_water");
+		varNamesMap.put("WOCE_CO2_ATM", "WOCE_CO2_atm");
 
 		varNamesMap.put("WOA_SSS", "woa_sss");
 		varNamesMap.put("PRESSURE_NCEP_SLP", "pressure_ncep_slp");
@@ -788,192 +713,13 @@ public class Constants {
 		varNamesMap.put("ETOPO2", "etopo2");
 		varNamesMap.put("GVCO2", "gvCO2");
 		varNamesMap.put("DIST_TO_LAND", "dist_to_land");
-		varNamesMap.put("DAYS_1970", "days_1970");
 		varNamesMap.put("DAY_OF_YEAR", "day_of_year");
-
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm");
-		varNamesMap.put("WOCE_FCO2_FROM_PCO2_WATER_WATER_EQUI_TEMP", "WOCE_fCO2_from_pCO2_water_water_equi_temp");
-		varNamesMap.put("WOCE_FCO2_FROM_PCO2_WATER_SST_100HUMIDITY_UATM", "WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_FCO2_WATER_EQUI_UATM", "WOCE_fCO2_insitu_from_fCO2_water_equi_uatm");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_FCO2_WATER_SST_100HUMIDTY_UATM", "WOCE_fCO2_insitu_from_fCO2_water_sst_100humidty_uatm");
-		varNamesMap.put("WOCE_FCO2_FROM_PCO2_WATER_WATER_EQUI_TEMP_NCEP", "WOCE_fCO2_from_pCO2_water_water_equi_temp_ncep");
-		varNamesMap.put("WOCE_FCO2_FROM_PCO2_WATER_SST_100HUMIDITY_UATM_NCEP", "WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm_ncep");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM_WOA", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM_WOA", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM_NCEP", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM_NCEP", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM_NCEP_WOA", "WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa");
-		varNamesMap.put("WOCE_FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM_NCEP_WOA", "WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
-		varNamesMap.put("WOCE_FCO2_RECOMMENDED", "WOCE_fCO2_recommended");
-		varNamesMap.put("WOCE_DELTA_TEMP", "WOCE_delta_temp");
-		varNamesMap.put("WOCE_CALC_SPEED", "WOCE_calc_speed");
 
 		varNamesMap.put("TIME", "time");
 		varNamesMap.put("LON360", "lon360");
 		varNamesMap.put("TMONTH", "tmonth");
 
 		VARIABLE_NAMES = Collections.unmodifiableMap(varNamesMap);
-	}
-
-	/**
-	 * Data column types for the NetCDF file variable names.
-	 * Variables without a user-provided type will be mapped to {@link DataColumnType#OTHER}
-	 */
-	public static final Map<String, DataColumnType> VARIABLE_TYPES;
-	static {
-		HashMap<String, DataColumnType> varTypeMap = new HashMap<String, DataColumnType>();
-
-		varTypeMap.put("expocode", DataColumnType.EXPOCODE);
-		varTypeMap.put("dataset_name", DataColumnType.CRUISE_NAME);
-		varTypeMap.put("vessel_name", DataColumnType.SHIP_NAME);
-		varTypeMap.put("organization", DataColumnType.GROUP_NAME);
-		varTypeMap.put("geospatial_lon_min", DataColumnType.OTHER);
-		varTypeMap.put("geospatial_lon_max", DataColumnType.OTHER);
-		varTypeMap.put("geospatial_lat_min", DataColumnType.OTHER);
-		varTypeMap.put("geospatial_lat_max", DataColumnType.OTHER);
-		varTypeMap.put("time_coverage_start", DataColumnType.OTHER);
-		varTypeMap.put("time_converage_end", DataColumnType.OTHER);
-		varTypeMap.put("investigators", DataColumnType.GROUP_NAME);
-		varTypeMap.put("orig_data_ref", DataColumnType.OTHER);
-		varTypeMap.put("addl_docs", DataColumnType.OTHER);
-		varTypeMap.put("socat_data_doi", DataColumnType.OTHER);
-		varTypeMap.put("socat_data_ref", DataColumnType.OTHER);
-		varTypeMap.put("socat_version", DataColumnType.OTHER);
-		varTypeMap.put("qc_flag", DataColumnType.OTHER);
-
-		varTypeMap.put("year", DataColumnType.YEAR);
-		varTypeMap.put("month", DataColumnType.MONTH);
-		varTypeMap.put("day", DataColumnType.DAY);
-		varTypeMap.put("hour", DataColumnType.HOUR);
-		varTypeMap.put("minute", DataColumnType.MINUTE);
-		varTypeMap.put("second", DataColumnType.SECOND);
-
-		varTypeMap.put("longitude", DataColumnType.LONGITUDE);
-		varTypeMap.put("latitude", DataColumnType.LATITUDE);
-		varTypeMap.put("sample_depth", DataColumnType.SAMPLE_DEPTH);
-		varTypeMap.put("sal", DataColumnType.SALINITY);
-		varTypeMap.put("Temperature_equi", DataColumnType.EQUILIBRATOR_TEMPERATURE);
-		varTypeMap.put("temp", DataColumnType.SEA_SURFACE_TEMPERATURE);
-		varTypeMap.put("Temperature_atm", DataColumnType.ATMOSPHERIC_TEMPERATURE);
-		varTypeMap.put("Pressure_equi", DataColumnType.EQUILIBRATOR_PRESSURE);
-		varTypeMap.put("Pressure_atm", DataColumnType.SEA_LEVEL_PRESSURE);
-
-		varTypeMap.put("xCO2_water_equi_temp_dry_ppm", DataColumnType.XCO2_WATER_TEQU);
-		varTypeMap.put("xCO2_water_sst_dry_ppm", DataColumnType.XCO2_WATER_SST);
-		varTypeMap.put("pCO2_water_equi_temp", DataColumnType.PCO2_WATER_TEQU);
-		varTypeMap.put("pCO2_water_sst_100humidity_uatm", DataColumnType.PCO2_WATER_SST);
-		varTypeMap.put("fCO2_water_equi_uatm", DataColumnType.FCO2_WATER_TEQU);
-		varTypeMap.put("fCO2_water_sst_100humidity_uatm", DataColumnType.FCO2_WATER_SST);
-
-		varTypeMap.put("xCO2_atm_actual", DataColumnType.XCO2_ATM_ACTUAL);
-		varTypeMap.put("xCO2_atm_interp", DataColumnType.XCO2_ATM_INTERP);
-		varTypeMap.put("pCO2_atm_actual", DataColumnType.PCO2_ATM_ACTUAL);
-		varTypeMap.put("pCO2_atm_interp", DataColumnType.PCO2_ATM_INTERP);
-		varTypeMap.put("fCO2_atm_actual", DataColumnType.FCO2_ATM_ACTUAL);
-		varTypeMap.put("fCO2_atm_interp", DataColumnType.FCO2_ATM_INTERP);
-
-		varTypeMap.put("delta_xCO2", DataColumnType.DELTA_XCO2);
-		varTypeMap.put("delta_pCO2", DataColumnType.DELTA_PCO2);
-		varTypeMap.put("delta_fCO2", DataColumnType.DELTA_FCO2);
-
-		varTypeMap.put("relative_humidity", DataColumnType.RELATIVE_HUMIDITY);
-		varTypeMap.put("specific_humidity", DataColumnType.SPECIFIC_HUMIDITY);
-		varTypeMap.put("ship_speed", DataColumnType.SHIP_SPEED); 
-		varTypeMap.put("ship_dir", DataColumnType.SHIP_DIRECTION);
-		varTypeMap.put("wind_speed_true", DataColumnType.WIND_SPEED_TRUE);
-		varTypeMap.put("wind_speed_rel", DataColumnType.WIND_SPEED_RELATIVE);
-		varTypeMap.put("wind_dir_true", DataColumnType.WIND_DIRECTION_TRUE);
-		varTypeMap.put("wind_dir_rel", DataColumnType.WIND_DIRECTION_RELATIVE);
-
-		varTypeMap.put("WOCE_geoposition", DataColumnType.WOCE_GEOPOSITION);
-		varTypeMap.put("WOCE_sample_depth", DataColumnType.WOCE_SAMPLE_DEPTH);
-		varTypeMap.put("WOCE_sal", DataColumnType.WOCE_SALINITY);
-		varTypeMap.put("WOCE_Temperature_equi", DataColumnType.WOCE_EQUILIBRATOR_TEMPERATURE);
-		varTypeMap.put("WOCE_temp", DataColumnType.WOCE_SEA_SURFACE_TEMPERATURE);
-		varTypeMap.put("WOCE_Temperature_atm", DataColumnType.WOCE_ATMOSPHERIC_TEMPERATURE);
-		varTypeMap.put("WOCE_Pressure_equi", DataColumnType.WOCE_EQUILIBRATOR_PRESSURE);
-		varTypeMap.put("WOCE_Pressure_atm", DataColumnType.WOCE_SEA_LEVEL_PRESSURE);
-
-		varTypeMap.put("WOCE_xCO2_water_equi_temp_dry_ppm", DataColumnType.WOCE_XCO2_WATER_TEQU);
-		varTypeMap.put("WOCE_xCO2_water_sst_dry_ppm", DataColumnType.WOCE_XCO2_WATER_SST);
-		varTypeMap.put("WOCE_pCO2_water_equi_temp", DataColumnType.WOCE_PCO2_WATER_TEQU);
-		varTypeMap.put("WOCE_pCO2_water_sst_100humidity_uatm", DataColumnType.WOCE_PCO2_WATER_SST);
-		varTypeMap.put("WOCE_fCO2_water_equi_uatm", DataColumnType.WOCE_FCO2_WATER_TEQU);
-		varTypeMap.put("WOCE_fCO2_water_sst_100humidity_uatm", DataColumnType.WOCE_FCO2_WATER_SST);
-
-		varTypeMap.put("WOCE_xCO2_atm_actual", DataColumnType.WOCE_XCO2_ATM_ACTUAL);
-		varTypeMap.put("WOCE_xCO2_atm_interp", DataColumnType.WOCE_XCO2_ATM_INTERP);
-		varTypeMap.put("WOCE_pCO2_atm_actual", DataColumnType.WOCE_PCO2_ATM_ACTUAL);
-		varTypeMap.put("WOCE_pCO2_atm_interp", DataColumnType.WOCE_PCO2_ATM_INTERP);
-		varTypeMap.put("WOCE_fCO2_atm_actual", DataColumnType.WOCE_FCO2_ATM_ACTUAL);
-		varTypeMap.put("WOCE_fCO2_atm_interp", DataColumnType.WOCE_FCO2_ATM_INTERP);
-
-		varTypeMap.put("WOCE_delta_xCO2", DataColumnType.WOCE_DELTA_XCO2);
-		varTypeMap.put("WOCE_delta_pCO2", DataColumnType.WOCE_DELTA_PCO2);
-		varTypeMap.put("WOCE_delta_fCO2", DataColumnType.WOCE_DELTA_FCO2);
-
-		varTypeMap.put("WOCE_rel_humidity", DataColumnType.WOCE_RELATIVE_HUMIDITY);
-		varTypeMap.put("WOCE_spc_humidity", DataColumnType.WOCE_SPECIFIC_HUMIDITY);
-		varTypeMap.put("WOCE_ship_speed", DataColumnType.WOCE_SHIP_SPEED);
-		varTypeMap.put("WOCE_ship_dir", DataColumnType.WOCE_SHIP_DIRECTION);
-		varTypeMap.put("WOCE_wind_speed_true", DataColumnType.WOCE_WIND_SPEED_TRUE);
-		varTypeMap.put("WOCE_wind_speed_rel", DataColumnType.WOCE_WIND_SPEED_RELATIVE);
-		varTypeMap.put("WOCE_wind_dir_true", DataColumnType.WOCE_WIND_DIRECTION_TRUE);
-		varTypeMap.put("WOCE_wind_dir_rel", DataColumnType.WOCE_WIND_DIRECTION_RELATIVE);
-
-		varTypeMap.put("woa_sss", DataColumnType.OTHER);
-		varTypeMap.put("pressure_ncep_slp", DataColumnType.OTHER);
-
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_from_pCO2_water_water_equi_temp", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_from_pCO2_water_sst_100humidity_uatm", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_fCO2_water_equi_uatm", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_from_pCO2_water_water_equi_temp_ncep", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", DataColumnType.FCO2_REC);
-
-		varTypeMap.put("fCO2_recommended", DataColumnType.FCO2_REC);
-		varTypeMap.put("fCO2_source", DataColumnType.OTHER);
-		varTypeMap.put("delta_temp", DataColumnType.OTHER);
-		varTypeMap.put("region_id", DataColumnType.OTHER);
-		varTypeMap.put("calc_speed", DataColumnType.SHIP_SPEED);
-		varTypeMap.put("etopo2", DataColumnType.OTHER);
-		varTypeMap.put("gvCO2", DataColumnType.OTHER);
-		varTypeMap.put("dist_to_land", DataColumnType.OTHER);
-		varTypeMap.put("days_1970", DataColumnType.TIMESTAMP);
-		varTypeMap.put("day_of_year", DataColumnType.DAY);
-
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_from_pCO2_water_water_equi_temp", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_fCO2_water_equi_uatm", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_from_pCO2_water_water_equi_temp_ncep", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_fCO2_recommended", DataColumnType.WOCE_FCO2_REC);
-		varTypeMap.put("WOCE_delta_temp", DataColumnType.OTHER);
-		varTypeMap.put("WOCE_calc_speed", DataColumnType.WOCE_SHIP_SPEED);
-
-		varTypeMap.put("time", DataColumnType.TIMESTAMP);
-		varTypeMap.put("lon360", DataColumnType.LONGITUDE);
-		varTypeMap.put("tmonth", DataColumnType.MONTH);
-
-		VARIABLE_TYPES = Collections.unmodifiableMap(varTypeMap);
 	}
 
 	public static final Character NORTH_PACIFIC_REGION_ID = 'N';

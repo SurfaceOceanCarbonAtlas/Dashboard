@@ -237,7 +237,7 @@ public class DashboardCruiseTest {
 					DataColumnType.SALINITY,
 					DataColumnType.EQUILIBRATOR_TEMPERATURE,
 					DataColumnType.EQUILIBRATOR_PRESSURE,
-					DataColumnType.XCO2_WATER_TEQU
+					DataColumnType.XCO2_WATER_TEQU_DRY
 				));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getDataColTypes().size());
@@ -424,7 +424,7 @@ public class DashboardCruiseTest {
 					DataColumnType.SALINITY,
 					DataColumnType.EQUILIBRATOR_TEMPERATURE,
 					DataColumnType.EQUILIBRATOR_PRESSURE,
-					DataColumnType.XCO2_WATER_TEQU
+					DataColumnType.XCO2_WATER_TEQU_DRY
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "salinity", "temp", "pres", "xco2")); 

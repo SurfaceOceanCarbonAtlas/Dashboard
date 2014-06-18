@@ -73,19 +73,23 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	EQUILIBRATOR_PRESSURE, 
 	SEA_LEVEL_PRESSURE, 
 
-	XCO2_WATER_TEQU, 
-	XCO2_WATER_SST, 
-	PCO2_WATER_TEQU, 
-	PCO2_WATER_SST, 
-	FCO2_WATER_TEQU, 
-	FCO2_WATER_SST, 
+	XCO2_WATER_TEQU_DRY, 
+	XCO2_WATER_SST_DRY, 
+	XCO2_WATER_TEQU_WET, 
+	XCO2_WATER_SST_WET, 
+	PCO2_WATER_TEQU_WET, 
+	PCO2_WATER_SST_WET, 
+	FCO2_WATER_TEQU_WET, 
+	FCO2_WATER_SST_WET, 
 
-	XCO2_ATM_ACTUAL,
-	XCO2_ATM_INTERP,
-	PCO2_ATM_ACTUAL,
-	PCO2_ATM_INTERP,
-	FCO2_ATM_ACTUAL,
-	FCO2_ATM_INTERP,
+	XCO2_ATM_DRY_ACTUAL,
+	XCO2_ATM_DRY_INTERP,
+	XCO2_ATM_WET_ACTUAL,
+	XCO2_ATM_WET_INTERP,
+	PCO2_ATM_WET_ACTUAL,
+	PCO2_ATM_WET_INTERP,
+	FCO2_ATM_WET_ACTUAL,
+	FCO2_ATM_WET_INTERP,
 
 	DELTA_XCO2,
 	DELTA_PCO2,
@@ -101,51 +105,23 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	WIND_DIRECTION_RELATIVE,
 
 	/**
-	 * WOCE_GEOPOSITION is a WOCE flag on the longitude, latitude, date, and time
+	 * WOCE flag on any/all aqueous CO2 values.
 	 */
-	WOCE_GEOPOSITION,
-	WOCE_SAMPLE_DEPTH,
-	WOCE_SALINITY,
-	WOCE_EQUILIBRATOR_TEMPERATURE,
-	WOCE_SEA_SURFACE_TEMPERATURE,
-	WOCE_ATMOSPHERIC_TEMPERATURE,
-	WOCE_EQUILIBRATOR_PRESSURE,
-	WOCE_SEA_LEVEL_PRESSURE,
-
-	WOCE_XCO2_WATER_TEQU,
-	WOCE_XCO2_WATER_SST,
-	WOCE_PCO2_WATER_TEQU,
-	WOCE_PCO2_WATER_SST,
-	WOCE_FCO2_WATER_TEQU,
-	WOCE_FCO2_WATER_SST,
-
-	WOCE_XCO2_ATM_ACTUAL,
-	WOCE_XCO2_ATM_INTERP,
-	WOCE_PCO2_ATM_ACTUAL,
-	WOCE_PCO2_ATM_INTERP,
-	WOCE_FCO2_ATM_ACTUAL,
-	WOCE_FCO2_ATM_INTERP,
-
-	WOCE_DELTA_XCO2,
-	WOCE_DELTA_PCO2,
-	WOCE_DELTA_FCO2,
-
-	WOCE_RELATIVE_HUMIDITY,
-	WOCE_SPECIFIC_HUMIDITY,
-	WOCE_SHIP_SPEED,
-	WOCE_SHIP_DIRECTION,
-	WOCE_WIND_SPEED_TRUE,
-	WOCE_WIND_SPEED_RELATIVE,
-	WOCE_WIND_DIRECTION_TRUE,
-	WOCE_WIND_DIRECTION_RELATIVE,
-	
+	WOCE_CO2_WATER,
 	/**
-	 * COMMENT is a user-provided comment about this data point measurements,
-	 * and (if not empty) will be saved as a WOCE no-flag comment that includes
-	 * the user's column name.  The contents of this column are not validated.
-	 * Multiple columns may have this type.
+	 * WOCE flag on any/all atmospheric CO2 values.
 	 */
-	COMMENT,
+	WOCE_CO2_ATM,
+
+	/**
+	 * Comment to go with the WOCE flag on aqueous CO2 values.
+	 */
+	COMMENT_WOCE_CO2_WATER,
+	/**
+	 * Comment to go with the WOCE flag on atmospheric CO2 values.
+	 */
+	COMMENT_WOCE_CO2_ATM,
+	
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
 	 * not part of SOCAT.  A description of each column with this type must 
@@ -153,18 +129,4 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	 * Multiple columns may have this type.
 	 */
 	OTHER,
-	/**
-	 * FCO2_REC is for the recommended recomputed fCO2 values column.  
-	 * Setting a WOCE flag on this column prevents any recalculation of
-	 * the recommended recomputed fCO2 value.  Since this is a computed 
-	 * field and not user-supplied, this type is not available for normal 
-	 * user-specification of column types.
-	 */
-	FCO2_REC,
-	/**
-	 * WOCE_FCO2_REC is for transferring the fCO2_rec WOCE flag from SOCAT v2.
-	 * Since fCO2_REC is a computed field and not user-supplied, WOCE_FCO2_REC 
-	 * is not available for normal user-specification of column types.
-	 */
-	WOCE_FCO2_REC,
 }

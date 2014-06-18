@@ -42,8 +42,8 @@ public class CruiseDsgNcFileTest {
 				DataColumnType.LONGITUDE, 
 				DataColumnType.SEA_SURFACE_TEMPERATURE,
 				DataColumnType.SALINITY,
-				DataColumnType.XCO2_WATER_SST,
-				DataColumnType.PCO2_WATER_TEQU,
+				DataColumnType.XCO2_WATER_SST_DRY,
+				DataColumnType.PCO2_WATER_TEQU_WET,
 				DataColumnType.SEA_LEVEL_PRESSURE,
 				DataColumnType.SHIP_SPEED));
 		String[] dataValueStrings = {
