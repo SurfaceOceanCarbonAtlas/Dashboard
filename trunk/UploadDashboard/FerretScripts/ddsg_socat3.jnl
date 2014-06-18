@@ -49,49 +49,48 @@ LET nvars =  ..nvars
 
 ! The text is too long for one Ferret command. Define two variables and concatenate them.
 
-LET varnames_list1 = {"num_obs","expocode","dataset_name","vessel_name","organization",\
-"geospatial_lon_min","geospatial_lon_max","geospatial_lat_min","geospatial_lat_max",\
-"time_coverage_start","time_converage_end","investigators","orig_data_ref","addl_docs",\
-"socat_data_doi","socat_data_ref","socat_version","qc_flag","year","month","day","hour",\
-"minute","second","longitude","latitude","sample_depth","sal","Temperature_equi",\
-"temp","Pressure_equi","Pressure_atm","xCO2_water_sst_dry_ppm","xCO2_water_equi_temp_dry_ppm",\
-"pCO2_water_sst_100humidity_uatm","pCO2_water_equi_temp","fCO2_water_sst_100humidity_uatm",\
-"fCO2_water_equi_uatm","xCO2_atm","pCO2_atm","fCO2_atm","delta_xCO2","delta_pCO2",\
-"delta_fCO2","relative_humidity","specific_humidity","ship_speed","ship_dir","wind_speed_true",\
-"wind_speed_rel","wind_dir_true","wind_dir_rel","WOCE_geoposition","WOCE_sample_depth",\
-"WOCE_sal","WOCE_Temperature_equi","WOCE_temp","WOCE_Pressure_equi","WOCE_Pressure_atm",\
-"WOCE_xCO2_water_equi_temp_dry_ppm","WOCE_xCO2_water_sst_dry_ppm","WOCE_pCO2_water_equi_temp",\
-"WOCE_pCO2_water_sst_100humidity_uatm","WOCE_fCO2_water_equi_uatm",\
-"WOCE_fCO2_water_sst_100humidity_uatm","WOCE_xCO2_atm","WOCE_pCO2_atm","WOCE_fCO2_atm",\
-"WOCE_delta_xCO2","WOCE_delta_pCO2","WOCE_delta_fCO2","WOCE_rel_humidity",\
-"WOCE_spc_humidity","WOCE_ship_speed","WOCE_ship_dir","WOCE_wind_speed_true",\
-"WOCE_wind_speed_rel","WOCE_wind_dir_true","WOCE_wind_dir_rel","woa_sss",\
-"pressure_ncep_slp","fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm",\
-"fCO2_insitu_from_xCO2_water_sst_dry_ppm","fCO2_from_pCO2_water_water_equi_temp",\
-"fCO2_from_pCO2_water_sst_100humidity_uatm","fCO2_insitu_from_fCO2_water_equi_uatm"}
+LET varnames_list1 = {\
+"num_obs","expocode","dataset_name","vessel_name","organization",\
+"geospatial_lon_min","geospatial_lon_max","geospatial_lat_min",\
+"geospatial_lat_max","time_coverage_start","time_converage_end",\
+"investigators","orig_data_ref","addl_docs","socat_data_doi",\
+"socat_data_ref","socat_version","qc_flag",\
+"year","month","day","hour","minute","second",\
+"longitude","latitude","sample_depth","sal","Temperature_equi",\
+"temp","Temperature_atm","Pressure_equi","Pressure_atm",\
+"xCO2_water_equi_temp_dry_ppm","xCO2_water_sst_dry_ppm",\
+"xCO2_water_equi_temp_wet_ppm","xCO2_water_sst_wet_ppm",\
+"pCO2_water_equi_temp","pCO2_water_sst_100humidity_uatm",\
+"fCO2_water_equi_uatm","fCO2_water_sst_100humidity_uatm",\
+"xCO2_atm_dry_actual","xCO2_atm_dry_interp",\
+"xCO2_atm_wet_actual","xCO2_atm_wet_interp",\
+"pCO2_atm_actual","pCO2_atm_interp",\
+"fCO2_atm_actual","fCO2_atm_interp",\
+"delta_xCO2","delta_pCO2","delta_fCO2",\
+"relative_humidity","specific_humidity","ship_speed","ship_dir",\
+"wind_speed_true","wind_speed_rel","wind_dir_true","wind_dir_rel",\
+"WOCE_CO2_water","WOCE_CO2_atm"\
+}
 LET varnames_list2 = {\
-"fCO2_insitu_from_fCO2_water_sst_100humidty_uatm","fCO2_from_pCO2_water_water_equi_temp_ncep",\
+"woa_sss","pressure_ncep_slp",\
+"fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm",\
+"fCO2_insitu_from_xCO2_water_sst_dry_ppm",\
+"fCO2_from_pCO2_water_water_equi_temp",\
+"fCO2_from_pCO2_water_sst_100humidity_uatm",\
+"fCO2_insitu_from_fCO2_water_equi_uatm",\
+"fCO2_insitu_from_fCO2_water_sst_100humidty_uatm",\
+"fCO2_from_pCO2_water_water_equi_temp_ncep",\
 "fCO2_from_pCO2_water_sst_100humidity_uatm_ncep",\
 "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa",\
 "fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa",\
 "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep",\
 "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep",\
 "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa",\
-"fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa","fCO2_recommended",\
-"fCO2_source","delta_temp","region_id","calc_speed","etopo2","gvCO2","dist_to_land",\
-"days_1970","day_of_year","WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm",\
-"WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm","WOCE_fCO2_from_pCO2_water_water_equi_temp",\
-"WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm","WOCE_fCO2_insitu_from_fCO2_water_equi_uatm",\
-"WOCE_fCO2_insitu_from_fCO2_water_sst_100humidty_uatm",\
-"WOCE_fCO2_from_pCO2_water_water_equi_temp_ncep",\
-"WOCE_fCO2_from_pCO2_water_sst_100humidity_uatm_ncep",\
-"WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa",\
-"WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa",\
-"WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep",\
-"WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep",\
-"WOCE_fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa",\
-"WOCE_fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa",\
-"WOCE_fCO2_recommended","WOCE_delta_temp","WOCE_calc_speed","time","lon360","tmonth"}
+"fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa",\
+"fCO2_recommended","fCO2_source","delta_temp","region_id",\
+"calc_speed","etopo2","gvCO2","dist_to_land",\
+"day_of_year","time","lon360","tmonth"\
+}
 
 LET varnames_list = XCAT(varnames_list1, varnames_list2)
 LET nlist = `varnames_list[i=@ngd]`

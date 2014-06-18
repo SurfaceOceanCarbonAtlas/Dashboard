@@ -353,14 +353,7 @@ define attribute/output time.ioos_category = "Time"
 define attribute/output time.standard_name = "time"
 define attribute/output time.time_origin = "01-JAN-1970 00:00:00"
 
-let/units="days since 1970-01-01T00:00:00Z"/title="Days 1970" days_1970 = \
- time / (24.0*60.0*60.0)
-set var/outtype=($outtype) days_1970
-define attribute/output time.ioos_category = "Time"
-define attribute/output time.standard_name = "time"
-define attribute/output time.time_origin = "01-JAN-1970 00:00:00"
-
-! Day of Year  -- we can do this from the file variable days-since-1970
+! Day of Year
 LET day_and_year = days1900(year, month, day)
 LET day1 = INT(`datenum[i=@min],prec=12` - 2)
 LET dayn = INT(`datenum[i=@min],prec=12` + 2)
@@ -429,7 +422,6 @@ save/keep/quiet/append/file="($cruise_filename)" lon360
 save/keep/quiet/append/file="($cruise_filename)" etopo2
 save/keep/quiet/append/file="($cruise_filename)" dist_to_land
 save/keep/quiet/append/file="($cruise_filename)" time
-save/keep/quiet/append/file="($cruise_filename)" days_1970
 save/keep/quiet/append/file="($cruise_filename)" day_of_year
 save/keep/quiet/append/file="($cruise_filename)" tmonth
 

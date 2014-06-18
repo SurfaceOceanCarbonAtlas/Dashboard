@@ -15,9 +15,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1150858903836366315L;
+	private static final long serialVersionUID = 4845908374436120496L;
 
-	DataColumnType dataType;
 	String columnName;
 	ArrayList<DataLocation> locations;
 
@@ -26,30 +25,8 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	 */
 	public SocatWoceEvent() {
 		super();
-		dataType = DataColumnType.UNKNOWN;
 		columnName = "";
 		locations = new ArrayList<DataLocation>();
-	}
-
-	/**
-	 * @return 
-	 * 		the data type; 
-	 * 		never null but may be {@link DataColumnType#UNKNOWN}
-	 */
-	public DataColumnType getDataType() {
-		return dataType;
-	}
-
-	/**
-	 * @param dataType 
-	 * 		the data type to set;
-	 * 		if null, {@link DataColumnType#UNKNOWN} is assigned.
-	 */
-	public void setDataType(DataColumnType dataType) {
-		if ( dataType == null )
-			this.dataType = DataColumnType.UNKNOWN;
-		else
-			this.dataType = dataType;
 	}
 
 	/**
@@ -99,7 +76,6 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
-		result = result * prime + dataType.hashCode();
 		result = result * prime + columnName.hashCode();
 		result = result * prime + locations.hashCode();
 		return result;
@@ -118,8 +94,6 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 
 		if ( ! super.equals(other) )
 			return false;
-		if ( ! dataType.equals(other.dataType) )
-			return false;
 		if ( ! columnName.equals(other.columnName) )
 			return false;
 		if ( ! locations.equals(other.locations) )
@@ -135,7 +109,6 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 
-				",\n    dataType=" + dataType.toString() + 
 				",\n    columnName=" + columnName.toString() + 
 				",\n    locations=" + locations.toString() + 
 				",\n    username=" + username + 

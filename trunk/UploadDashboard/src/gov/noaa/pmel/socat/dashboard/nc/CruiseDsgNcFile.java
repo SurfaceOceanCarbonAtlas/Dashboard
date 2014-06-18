@@ -478,11 +478,6 @@ public class CruiseDsgNcFile extends File {
 			startIdx = idx + 1;
 		}
 
-		if ( updateWoceEvent ) {
-			// Assign the data type of the column from the variable name
-			woceEvent.setDataType(Constants.VARIABLE_TYPES.get(woceEvent.getColumnName()));
-		}
-
 		// Save the updated WOCE flags to the DSG file
 		ncfile.write(wocevar, wocevalues);
 		ncfile.close();
