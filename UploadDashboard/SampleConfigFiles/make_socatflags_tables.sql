@@ -58,7 +58,6 @@ CREATE TABLE `WOCEEvents` (
   `woce_time` BIGINT DEFAULT NULL,
   `expocode` VARCHAR(16) NOT NULL DEFAULT '',
   `socat_version` FLOAT(3,1) NOT NULL DEFAULT '0.0',
-  `data_type` VARCHAR(64) NOT NULL DEFAULT '',
   `data_name` VARCHAR(64) NOT NULL DEFAULT '',
   `reviewer_id` INT(4) UNSIGNED NOT NULL DEFAULT 0,
   `woce_comment` VARCHAR(1024) NOT NULL DEFAULT '',
@@ -67,7 +66,6 @@ CREATE TABLE `WOCEEvents` (
   KEY `woce_time` (`woce_time`),
   KEY `expocode` (`expocode`),
   KEY `socat_version` (`socat_version`),
-  KEY `data_type` (`data_type`),
   KEY `data_name` (`data_name`),
   KEY `reviewer_id` (`reviewer_id`),
   CONSTRAINT `WOCEEvents_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `Reviewers` (`reviewer_id`)
