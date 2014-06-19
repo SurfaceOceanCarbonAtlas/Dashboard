@@ -57,7 +57,7 @@ LET varnames_list1 = {\
 "socat_data_ref","socat_version","qc_flag",\
 "year","month","day","hour","minute","second",\
 "longitude","latitude","sample_depth","sal","Temperature_equi",\
-"temp","Temperature_atm","Pressure_equi","Pressure_atm","xH2O_equi",\
+"temp","Temperature_atm","Pressure_equi","Pressure_atm",\
 "xCO2_water_equi_temp_dry_ppm","xCO2_water_sst_dry_ppm",\
 "xCO2_water_equi_temp_wet_ppm","xCO2_water_sst_wet_ppm",\
 "pCO2_water_equi_temp","pCO2_water_sst_100humidity_uatm",\
@@ -66,9 +66,9 @@ LET varnames_list1 = {\
 "pCO2_atm_dry_actual","pCO2_atm_dry_interp",\
 "fCO2_atm_dry_actual","fCO2_atm_dry_interp",\
 "delta_xCO2","delta_pCO2","delta_fCO2",\
-"relative_humidity","specific_humidity","ship_speed","ship_dir",\
-"wind_speed_true","wind_speed_rel","wind_dir_true","wind_dir_rel",\
-"WOCE_CO2_water","WOCE_CO2_atm"\
+"xH2O_equi","relative_humidity","specific_humidity",\
+"ship_speed","ship_dir","wind_speed_true","wind_speed_rel",\
+"wind_dir_true","wind_dir_rel","WOCE_CO2_water","WOCE_CO2_atm"\
 }
 LET varnames_list2 = {\
 "woa_sss","pressure_ncep_slp",\

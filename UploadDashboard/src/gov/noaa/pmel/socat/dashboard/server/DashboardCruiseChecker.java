@@ -304,8 +304,6 @@ public class DashboardCruiseChecker {
 				colIndcs.pEquIndex = k;
 			else if ( colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) )
 				colIndcs.slpIndex = k;
-			else if ( colType.equals(DataColumnType.XH2O_EQU) )
-				colIndcs.xH2OEquIndex = k;
 
 			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) )
 				colIndcs.xCO2WaterTEquDryIndex = k;
@@ -344,6 +342,8 @@ public class DashboardCruiseChecker {
 			else if ( colType.equals(DataColumnType.DELTA_FCO2) )
 				colIndcs.deltaFCO2Index = k;
 
+			else if ( colType.equals(DataColumnType.XH2O_EQU) )
+				colIndcs.xH2OEquIndex = k;
 			else if ( colType.equals(DataColumnType.RELATIVE_HUMIDITY) )
 				colIndcs.relativeHumidityIndex = k;
 			else if ( colType.equals(DataColumnType.SPECIFIC_HUMIDITY) )
@@ -1079,7 +1079,6 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.ATMOSPHERIC_TEMPERATURE) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) || 
 						  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) || 
-						  colType.equals(DataColumnType.XH2O_EQU) || 
 
 						  colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) || 
 						  colType.equals(DataColumnType.XCO2_WATER_SST_DRY) || 
@@ -1101,6 +1100,7 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.DELTA_PCO2) || 
 						  colType.equals(DataColumnType.DELTA_FCO2) || 
 
+						  colType.equals(DataColumnType.XH2O_EQU) || 
 						  colType.equals(DataColumnType.RELATIVE_HUMIDITY) || 
 						  colType.equals(DataColumnType.SPECIFIC_HUMIDITY) || 
 						  colType.equals(DataColumnType.SHIP_SPEED) || 
