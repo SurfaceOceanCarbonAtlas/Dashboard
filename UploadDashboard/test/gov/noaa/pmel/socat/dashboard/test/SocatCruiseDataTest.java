@@ -135,6 +135,7 @@ public class SocatCruiseDataTest {
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getSampleDepth());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.gettEqu());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getpEqu());
+			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getxH2OEqu());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getxCO2WaterTEquDry());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getxCO2WaterTEquWet());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getxCO2WaterSstWet());

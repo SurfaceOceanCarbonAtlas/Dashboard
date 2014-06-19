@@ -46,6 +46,7 @@ public class Constants {
 	private static final String tAtm_VARNAME = "tAtm";
 	private static final String pEqu_VARNAME = "pEqu";
 	private static final String slp_VARNAME = "slp";
+	private static final String xH2OEqu_VARNAME = "xH2OEqu";
 
 	private static final String xCO2WaterTEquDry_VARNAME = "xCO2WaterTEquDry";
 	private static final String xCO2WaterSstDry_VARNAME = "xCO2WaterSstDry";
@@ -148,6 +149,7 @@ public class Constants {
 		shortNameMap.put(tAtm_VARNAME, "Temperature_atm");
 		shortNameMap.put(pEqu_VARNAME, "Pressure_equi");
 		shortNameMap.put(slp_VARNAME, "Pressure_atm");
+		shortNameMap.put(xH2OEqu_VARNAME, "xH2O_equi");
 
 		shortNameMap.put(xCO2WaterTEquDry_VARNAME, "xCO2_water_equi_temp_dry_ppm");
 		shortNameMap.put(xCO2WaterSstDry_VARNAME, "xCO2_water_sst_dry_ppm");
@@ -253,6 +255,7 @@ public class Constants {
 		longNameMap.put(tAtm_VARNAME, "sea-level air temperature");
 		longNameMap.put(pEqu_VARNAME, "equilibrator chamber pressure");
 		longNameMap.put(slp_VARNAME, "sea-level air pressure");
+		longNameMap.put(xH2OEqu_VARNAME, "xH2O in equil air sample");
 
 		longNameMap.put(xCO2WaterTEquDry_VARNAME, "water xCO2 dry using equi temp");
 		longNameMap.put(xCO2WaterSstDry_VARNAME, "water xCO2 dry using sst");
@@ -355,6 +358,7 @@ public class Constants {
 		unitsMap.put(tAtm_VARNAME, temperature_units);
 		unitsMap.put(pEqu_VARNAME, pressure_units);
 		unitsMap.put(slp_VARNAME, pressure_units);
+		unitsMap.put(xH2OEqu_VARNAME, xco2_units);
 
 		unitsMap.put(xCO2WaterTEquDry_VARNAME, xco2_units);
 		unitsMap.put(xCO2WaterSstDry_VARNAME, xco2_units);
@@ -434,6 +438,7 @@ public class Constants {
 		stdNamesMap.put(sst_VARNAME, "sea_surface_temperature");
 		stdNamesMap.put(tAtm_VARNAME, "air_temperature_at_sea_level");
 		stdNamesMap.put(slp_VARNAME, "air_pressure_at_sea_level");
+		stdNamesMap.put(xH2OEqu_VARNAME, "mole_fraction_of_water_in_air");
 
 		stdNamesMap.put(xCO2WaterTEquDry_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
 		stdNamesMap.put(xCO2WaterSstDry_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
@@ -640,6 +645,7 @@ public class Constants {
 		varNamesMap.put("TEMPERATURE_ATM", "Temperature_atm");
 		varNamesMap.put("PRESSURE_EQUI", "Pressure_equi");
 		varNamesMap.put("PRESSURE_ATM", "Pressure_atm");
+		varNamesMap.put("XH2O_EQUI", "xH2O_equi");
 
 		varNamesMap.put("XCO2_WATER_EQUI_TEMP_DRY_PPM", "xCO2_water_equi_temp_dry_ppm");
 		varNamesMap.put("XCO2_WATER_SST_DRY_PPM", "xCO2_water_sst_dry_ppm");

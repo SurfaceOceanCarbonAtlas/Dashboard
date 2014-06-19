@@ -61,6 +61,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double pEqu;
 	// Atmospheric pressure / sea level pressure
 	Double slp;
+	// mole fraction water (umol/mol) in equilibrator gas sample
+	Double xH2OEqu;
 
 	// Eight possible water CO2 measurements reported
 	Double xCO2WaterTEquDry;
@@ -166,6 +168,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		tAtm = FP_MISSING_VALUE;
 		pEqu = FP_MISSING_VALUE;
 		slp = FP_MISSING_VALUE;
+		xH2OEqu = FP_MISSING_VALUE;
 
 		xCO2WaterSstDry = FP_MISSING_VALUE;
 		xCO2WaterTEquDry = FP_MISSING_VALUE;
@@ -331,6 +334,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				}
 				else if ( type.equals(DataColumnType.SEA_LEVEL_PRESSURE) ) {
 					this.slp = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.XH2O_EQU) ) {
+					this.xH2OEqu = Double.valueOf(value);
 				}
 				else if ( type.equals(DataColumnType.XCO2_WATER_TEQU_DRY) ) {
 					this.xCO2WaterTEquDry = Double.valueOf(value);
@@ -756,6 +762,27 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			this.slp = FP_MISSING_VALUE;
 		else
 			this.slp = slp;
+	}
+
+	/**
+	 * @return 
+	 * 		the xH2OEqu;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getxH2OEqu() {
+		return xH2OEqu;
+	}
+
+	/**
+	 * @param xH2OEqu 
+	 * 		the xH2OEqu to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setxH2OEqu(Double xH2OEqu) {
+		if ( xH2OEqu == null )
+			this.xH2OEqu = FP_MISSING_VALUE;
+		else
+			this.xH2OEqu = xH2OEqu;
 	}
 
 	/**
@@ -1952,6 +1979,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(slp, other.slp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
+		if ( ! DashboardUtils.closeTo(xH2OEqu, other.xH2OEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
 
 		if ( ! DashboardUtils.closeTo(xCO2WaterTEquDry, other.xCO2WaterTEquDry, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -2077,6 +2106,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    tAtm=" + tAtm.toString() +
 				",\n    pEqu=" + pEqu.toString() +
 				",\n    slp=" + slp.toString() +
+				",\n    xH2OEqu=" + xH2OEqu.toString() +
 
 				",\n    xCO2WaterTEquDry=" + xCO2WaterTEquDry.toString() +
 				",\n    xCO2WaterSstDry=" + xCO2WaterSstDry.toString() +
