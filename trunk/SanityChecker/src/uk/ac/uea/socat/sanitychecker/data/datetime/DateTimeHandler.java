@@ -43,12 +43,12 @@ public class DateTimeHandler {
 	/**
 	 * The output format for dates
 	 */
-	private static final String DATE_OUTPUT_FORMAT = "YYYY-MM-dd";
+	private static final String DATE_OUTPUT_FORMAT = "YYYYMMdd";
 	
 	/**
 	 * The output format for dates and times
 	 */
-	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYY-MM-dd HH:mm:ss.SSS";
+	private static final String DATE_TIME_OUTPUT_FORMAT = "YYYYMMddHHmmss.SSS";
 	
 	/**
 	 * The formatter used to parse dates from input data and metadata
