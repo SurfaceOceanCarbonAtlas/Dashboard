@@ -72,7 +72,6 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	ATMOSPHERIC_TEMPERATURE,
 	EQUILIBRATOR_PRESSURE, 
 	SEA_LEVEL_PRESSURE, 
-	XH2O_EQU,
 
 	XCO2_WATER_TEQU_DRY, 
 	XCO2_WATER_SST_DRY, 
@@ -94,6 +93,7 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	DELTA_PCO2,
 	DELTA_FCO2,
 
+	XH2O_EQU,
 	RELATIVE_HUMIDITY,
 	SPECIFIC_HUMIDITY,
 	SHIP_SPEED, 

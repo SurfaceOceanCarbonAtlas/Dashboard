@@ -17,7 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 5347878946239283924L;
+	private static final long serialVersionUID = -6361180208151478846L;
 
 	static final double MAX_RELATIVE_ERROR = 1.0E-6;
 	static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
@@ -61,8 +61,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double pEqu;
 	// Atmospheric pressure / sea level pressure
 	Double slp;
-	// mole fraction water (umol/mol) in equilibrator gas sample
-	Double xH2OEqu;
 
 	// Eight possible water CO2 measurements reported
 	Double xCO2WaterTEquDry;
@@ -74,7 +72,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double fCO2WaterTEquWet;
 	Double fCO2WaterSstWet;
 
-	// Eight possible air CO2 measurements reported
+	// Six possible air CO2 measurements reported
 	Double xCO2AtmDryActual;
 	Double xCO2AtmDryInterp;
 	Double pCO2AtmDryActual;
@@ -87,6 +85,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double deltaPCO2;
 	Double deltaFCO2;
 
+	// mole fraction water (umol/mol) in equilibrator gas sample
+	Double xH2OEqu;
 	// Humdity
 	Double relativeHumidity;
 	Double specificHumidity;
@@ -168,7 +168,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		tAtm = FP_MISSING_VALUE;
 		pEqu = FP_MISSING_VALUE;
 		slp = FP_MISSING_VALUE;
-		xH2OEqu = FP_MISSING_VALUE;
 
 		xCO2WaterSstDry = FP_MISSING_VALUE;
 		xCO2WaterTEquDry = FP_MISSING_VALUE;
@@ -190,6 +189,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		deltaPCO2 = FP_MISSING_VALUE;
 		deltaFCO2 = FP_MISSING_VALUE;
 
+		xH2OEqu = FP_MISSING_VALUE;
 		relativeHumidity = FP_MISSING_VALUE;
 		specificHumidity = FP_MISSING_VALUE;
 		shipSpeed = FP_MISSING_VALUE; 
@@ -335,9 +335,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				else if ( type.equals(DataColumnType.SEA_LEVEL_PRESSURE) ) {
 					this.slp = Double.valueOf(value);
 				}
-				else if ( type.equals(DataColumnType.XH2O_EQU) ) {
-					this.xH2OEqu = Double.valueOf(value);
-				}
 				else if ( type.equals(DataColumnType.XCO2_WATER_TEQU_DRY) ) {
 					this.xCO2WaterTEquDry = Double.valueOf(value);
 				}
@@ -388,6 +385,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				}
 				else if ( type.equals(DataColumnType.DELTA_FCO2) ) {
 					this.deltaFCO2 = Double.valueOf(value);
+				}
+				else if ( type.equals(DataColumnType.XH2O_EQU) ) {
+					this.xH2OEqu = Double.valueOf(value);
 				}
 				else if ( type.equals(DataColumnType.RELATIVE_HUMIDITY) ) {
 					this.relativeHumidity = Double.valueOf(value);
@@ -766,27 +766,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the xH2OEqu;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getxH2OEqu() {
-		return xH2OEqu;
-	}
-
-	/**
-	 * @param xH2OEqu 
-	 * 		the xH2OEqu to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxH2OEqu(Double xH2OEqu) {
-		if ( xH2OEqu == null )
-			this.xH2OEqu = FP_MISSING_VALUE;
-		else
-			this.xH2OEqu = xH2OEqu;
-	}
-
-	/**
-	 * @return 
 	 * 		the equilibrator pressure;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
@@ -1161,6 +1140,27 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			this.deltaFCO2 = FP_MISSING_VALUE;
 		else
 			this.deltaFCO2 = deltaFCO2;
+	}
+
+	/**
+	 * @return 
+	 * 		the xH2OEqu;
+	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
+	 */
+	public Double getxH2OEqu() {
+		return xH2OEqu;
+	}
+
+	/**
+	 * @param xH2OEqu 
+	 * 		the xH2OEqu to set;
+	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
+	 */
+	public void setxH2OEqu(Double xH2OEqu) {
+		if ( xH2OEqu == null )
+			this.xH2OEqu = FP_MISSING_VALUE;
+		else
+			this.xH2OEqu = xH2OEqu;
 	}
 
 	/**
@@ -1979,8 +1979,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(slp, other.slp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(xH2OEqu, other.xH2OEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
-			return false;
 
 		if ( ! DashboardUtils.closeTo(xCO2WaterTEquDry, other.xCO2WaterTEquDry, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -2019,6 +2017,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		if ( ! DashboardUtils.closeTo(deltaFCO2, other.deltaFCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 
+		if ( ! DashboardUtils.closeTo(xH2OEqu, other.xH2OEqu, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+			return false;
 		if ( ! DashboardUtils.closeTo(relativeHumidity, other.relativeHumidity, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(specificHumidity, other.specificHumidity, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
@@ -2106,7 +2106,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    tAtm=" + tAtm.toString() +
 				",\n    pEqu=" + pEqu.toString() +
 				",\n    slp=" + slp.toString() +
-				",\n    xH2OEqu=" + xH2OEqu.toString() +
 
 				",\n    xCO2WaterTEquDry=" + xCO2WaterTEquDry.toString() +
 				",\n    xCO2WaterSstDry=" + xCO2WaterSstDry.toString() +
@@ -2128,6 +2127,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				",\n    deltaPCO2=" + deltaPCO2.toString() +
 				",\n    deltaFCO2=" + deltaFCO2.toString() +
 
+				",\n    xH2OEqu=" + xH2OEqu.toString() +
 				",\n    relativeHumidity=" + relativeHumidity.toString() +
 				",\n    specificHumidity=" + specificHumidity.toString() +
 				",\n    shipSpeed=" + shipSpeed.toString() +

@@ -117,7 +117,6 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "P_equ");
 		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
-		STD_HEADER_NAMES.put(DataColumnType.XH2O_EQU, "xH2O_equ");
 
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_DRY, "xCO2_water_Tequ_dry");
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_DRY, "xCO2_water_SST_dry");
@@ -139,6 +138,7 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_FCO2, "delta_fCO2");
 
+		STD_HEADER_NAMES.put(DataColumnType.XH2O_EQU, "xH2O_equ");
 		STD_HEADER_NAMES.put(DataColumnType.RELATIVE_HUMIDITY, "relative_humidity");
 		STD_HEADER_NAMES.put(DataColumnType.SPECIFIC_HUMIDITY, "specific_humidity");
 		STD_HEADER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
@@ -229,7 +229,6 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, TEMPERATURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XCO2_UNITS);
 
 		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_DRY, XCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_DRY, XCO2_UNITS);
@@ -251,6 +250,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DELTA_FCO2, FCO2_UNITS);
 
+		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);

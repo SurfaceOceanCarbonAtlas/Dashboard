@@ -46,7 +46,6 @@ public class Constants {
 	private static final String tAtm_VARNAME = "tAtm";
 	private static final String pEqu_VARNAME = "pEqu";
 	private static final String slp_VARNAME = "slp";
-	private static final String xH2OEqu_VARNAME = "xH2OEqu";
 
 	private static final String xCO2WaterTEquDry_VARNAME = "xCO2WaterTEquDry";
 	private static final String xCO2WaterSstDry_VARNAME = "xCO2WaterSstDry";
@@ -68,6 +67,7 @@ public class Constants {
 	private static final String deltaPCO2_VARNAME = "deltaPCO2";
 	private static final String deltaFCO2_VARNAME = "deltaFCO2";
 
+	private static final String xH2OEqu_VARNAME = "xH2OEqu";
 	private static final String relativeHumidity_VARNAME = "relativeHumidity";
 	private static final String specificHumidity_VARNAME = "specificHumidity";
 	private static final String shipSpeed_VARNAME = "shipSpeed"; 
@@ -149,7 +149,6 @@ public class Constants {
 		shortNameMap.put(tAtm_VARNAME, "Temperature_atm");
 		shortNameMap.put(pEqu_VARNAME, "Pressure_equi");
 		shortNameMap.put(slp_VARNAME, "Pressure_atm");
-		shortNameMap.put(xH2OEqu_VARNAME, "xH2O_equi");
 
 		shortNameMap.put(xCO2WaterTEquDry_VARNAME, "xCO2_water_equi_temp_dry_ppm");
 		shortNameMap.put(xCO2WaterSstDry_VARNAME, "xCO2_water_sst_dry_ppm");
@@ -171,6 +170,7 @@ public class Constants {
 		shortNameMap.put(deltaPCO2_VARNAME, "delta_pCO2");
 		shortNameMap.put(deltaFCO2_VARNAME, "delta_fCO2");
 
+		shortNameMap.put(xH2OEqu_VARNAME, "xH2O_equi");
 		shortNameMap.put(relativeHumidity_VARNAME, "relative_humidity");
 		shortNameMap.put(specificHumidity_VARNAME, "specific_humidity");
 		shortNameMap.put(shipSpeed_VARNAME, "ship_speed"); 
@@ -255,7 +255,6 @@ public class Constants {
 		longNameMap.put(tAtm_VARNAME, "sea-level air temperature");
 		longNameMap.put(pEqu_VARNAME, "equilibrator chamber pressure");
 		longNameMap.put(slp_VARNAME, "sea-level air pressure");
-		longNameMap.put(xH2OEqu_VARNAME, "xH2O in equil air sample");
 
 		longNameMap.put(xCO2WaterTEquDry_VARNAME, "water xCO2 dry using equi temp");
 		longNameMap.put(xCO2WaterSstDry_VARNAME, "water xCO2 dry using sst");
@@ -277,6 +276,7 @@ public class Constants {
 		longNameMap.put(deltaPCO2_VARNAME, "water pCO2 minus atmospheric pCO2");
 		longNameMap.put(deltaFCO2_VARNAME, "water fCO2 minus atmospheric fCO2");
 
+		longNameMap.put(xH2OEqu_VARNAME, "xH2O in equil air sample");
 		longNameMap.put(relativeHumidity_VARNAME, "relative humidity");
 		longNameMap.put(specificHumidity_VARNAME, "specific humidity");
 		longNameMap.put(shipSpeed_VARNAME, "measured ship speed");
@@ -358,7 +358,6 @@ public class Constants {
 		unitsMap.put(tAtm_VARNAME, temperature_units);
 		unitsMap.put(pEqu_VARNAME, pressure_units);
 		unitsMap.put(slp_VARNAME, pressure_units);
-		unitsMap.put(xH2OEqu_VARNAME, xco2_units);
 
 		unitsMap.put(xCO2WaterTEquDry_VARNAME, xco2_units);
 		unitsMap.put(xCO2WaterSstDry_VARNAME, xco2_units);
@@ -380,6 +379,7 @@ public class Constants {
 		unitsMap.put(deltaPCO2_VARNAME, pco2_units);
 		unitsMap.put(deltaFCO2_VARNAME, fco2_units);
 
+		unitsMap.put(xH2OEqu_VARNAME, xco2_units);
 		unitsMap.put(shipSpeed_VARNAME, ship_speed_units);
 		unitsMap.put(shipDirection_VARNAME, direction_units); 
 		unitsMap.put(windSpeedTrue_VARNAME, wind_speed_units);
@@ -438,7 +438,6 @@ public class Constants {
 		stdNamesMap.put(sst_VARNAME, "sea_surface_temperature");
 		stdNamesMap.put(tAtm_VARNAME, "air_temperature_at_sea_level");
 		stdNamesMap.put(slp_VARNAME, "air_pressure_at_sea_level");
-		stdNamesMap.put(xH2OEqu_VARNAME, "mole_fraction_of_water_in_air");
 
 		stdNamesMap.put(xCO2WaterTEquDry_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
 		stdNamesMap.put(xCO2WaterSstDry_VARNAME, "mole_fraction_of_carbon_dioxide_in_sea_water");
@@ -456,6 +455,7 @@ public class Constants {
 		stdNamesMap.put(fCO2AtmDryActual_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
 		stdNamesMap.put(fCO2AtmDryInterp_VARNAME, "surface_partial_pressure_of_carbon_dioxide_in_air");
 
+		stdNamesMap.put(xH2OEqu_VARNAME, "mole_fraction_of_water_in_air");
 		stdNamesMap.put(relativeHumidity_VARNAME, "relative_humidity");
 		stdNamesMap.put(specificHumidity_VARNAME, "specific_humidity");
 		stdNamesMap.put(shipSpeed_VARNAME, "platform_speed_wrt_ground"); 
