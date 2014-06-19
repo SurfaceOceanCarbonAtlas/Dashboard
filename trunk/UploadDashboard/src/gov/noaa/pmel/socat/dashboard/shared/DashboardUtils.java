@@ -117,6 +117,7 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
 		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "P_equ");
 		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
+		STD_HEADER_NAMES.put(DataColumnType.XH2O_EQU, "xH2O_equ");
 
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_DRY, "xCO2_water_Tequ_dry");
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_DRY, "xCO2_water_SST_dry");
@@ -228,6 +229,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, TEMPERATURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XCO2_UNITS);
 
 		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_DRY, XCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_DRY, XCO2_UNITS);

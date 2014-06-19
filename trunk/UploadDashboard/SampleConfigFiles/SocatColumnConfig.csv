@@ -98,6 +98,7 @@ SST,N,,D,,,Y,-5,40,-15,50,F,Q
 Temperature_atm,N,,D,,,Y,-25,50,-35,60,F,Q
 P_equ,N,,D,,,Y,900,1100,800,1200,F,Q
 Pressure_atm,N,,D,,,Y,900,1100,800,1200,F,Q
+xH2O_equ,N,,D,,,Y,100,10000,0,100000,F,G
 xCO2_water_Tequ_dry,Y,CO2Water,D,,,Y,100,800,0,10000,F,Q
 xCO2_water_SST_dry,Y,CO2Water,D,,,Y,100,800,0,10000,F,Q
 xCO2_water_Tequ_wet,Y,CO2Water,D,,,Y,100,800,0,10000,F,Q

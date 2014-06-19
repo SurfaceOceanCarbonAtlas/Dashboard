@@ -57,7 +57,7 @@ LET varnames_list1 = {\
 "socat_data_ref","socat_version","qc_flag",\
 "year","month","day","hour","minute","second",\
 "longitude","latitude","sample_depth","sal","Temperature_equi",\
-"temp","Temperature_atm","Pressure_equi","Pressure_atm",\
+"temp","Temperature_atm","Pressure_equi","Pressure_atm","xH2O_equi",\
 "xCO2_water_equi_temp_dry_ppm","xCO2_water_sst_dry_ppm",\
 "xCO2_water_equi_temp_wet_ppm","xCO2_water_sst_wet_ppm",\
 "pCO2_water_equi_temp","pCO2_water_sst_100humidity_uatm",\

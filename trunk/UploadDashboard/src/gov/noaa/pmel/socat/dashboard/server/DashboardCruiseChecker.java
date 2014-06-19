@@ -71,6 +71,7 @@ public class DashboardCruiseChecker {
 		int tAtmIndex = -1;
 		int pEquIndex = -1;
 		int slpIndex = -1;
+		int xH2OEquIndex = -1;
 		int xCO2WaterTEquDryIndex = -1;
 		int xCO2WaterSstDryIndex = -1;
 		int xCO2WaterTEquWetIndex = -1;
@@ -156,6 +157,7 @@ public class DashboardCruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, checkerTemperatureUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, DashboardUtils.PRESSURE_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, DashboardUtils.PRESSURE_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.XH2O_EQU, checkerXCO2Units);
 
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_DRY, checkerXCO2Units);
 		CHECKER_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_DRY, checkerXCO2Units);
@@ -302,6 +304,8 @@ public class DashboardCruiseChecker {
 				colIndcs.pEquIndex = k;
 			else if ( colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) )
 				colIndcs.slpIndex = k;
+			else if ( colType.equals(DataColumnType.XH2O_EQU) )
+				colIndcs.xH2OEquIndex = k;
 
 			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) )
 				colIndcs.xCO2WaterTEquDryIndex = k;
@@ -524,6 +528,7 @@ public class DashboardCruiseChecker {
 					  colType.equals(DataColumnType.ATMOSPHERIC_TEMPERATURE) || 
 					  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) || 
 					  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) || 
+					  colType.equals(DataColumnType.XH2O_EQU) || 
 
 					  colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) ||
 					  colType.equals(DataColumnType.XCO2_WATER_SST_DRY) ||
@@ -1074,6 +1079,7 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.ATMOSPHERIC_TEMPERATURE) || 
 						  colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) || 
 						  colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) || 
+						  colType.equals(DataColumnType.XH2O_EQU) || 
 
 						  colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) || 
 						  colType.equals(DataColumnType.XCO2_WATER_SST_DRY) || 
