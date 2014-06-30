@@ -174,14 +174,10 @@ public class SanityCheckerRun {
 	private void writeMessages(Messages messages) throws IOException {
 		String messagesFilename = itsDataFilename + ".messages.txt";
 		PrintWriter writer = new PrintWriter(new File(itsOutputDir, messagesFilename));
-		writer.println("METADATA MESSAGES");
-		writer.println("=================");
 		List<Message> metadataMessages = messages.getMessagesByType(Message.METADATA_MESSAGE);
 		for (Message message: metadataMessages) {
 			writer.println(message.toString());
 		}
-		writer.println("\nDATA MESSAGES");
-		writer.println("=============");
 		List<Message> dataMessages = messages.getMessagesByType(Message.DATA_MESSAGE);
 		for (Message message: dataMessages) {
 			writer.println(message.toString());
