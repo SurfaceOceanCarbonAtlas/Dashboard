@@ -58,6 +58,17 @@
           <element name="yds_second" type="SanityCheckercolinfo:input_col"></element>
           <element name="jan_first_index" type="int"></element>
         </sequence>
+        <sequence>
+          <element name="ymdt_year" type="SanityCheckercolinfo:input_col"></element>
+          <element name="ymdt_month" type="SanityCheckercolinfo:input_col"></element>
+          <element name="ymdt_day" type="SanityCheckercolinfo:input_col"></element>
+          <element name="ymdt_time" type="SanityCheckercolinfo:input_col"></element>
+        </sequence>
+        <sequence>
+          <element name="ydjd_year" type="SanityCheckercolinfo:input_col"></element>
+          <element name="ydjd_decimal_jdate" type="SanityCheckercolinfo:input_col"></element>
+          <element name="ydjd_jan_first_index" type="int"></element>
+		  </sequence>
 	    </choice>
 	  </complexType>
 	  

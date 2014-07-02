@@ -1,5 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.data;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,16 @@ public class DateColumnInfo {
 	 * Indicates that the date is specified as year, day, second
 	 */
 	public static final int YEAR_DAY_SECOND_TYPE = 4;
+
+	/**
+	 * Indicates that the date is specified as year, month, day, time
+	 */
+	public static final int DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE = 5;
+	
+	/**
+	 * Indicates that the date is specified as year, decimal jdate
+	 */
+	public static final int YEAR_DECIMAL_JDATE_TYPE = 6;
 	
 	/**
 	 * Indicates which type of date column setup is being used
@@ -95,6 +106,15 @@ public class DateColumnInfo {
 	 */
 	private int itsJanFirstIndex = 0;
 	
+	private String[][] dateElementStructures = new String[][] {
+			{"processSingleElement", ColumnSpec.SINGLE_DATE_TIME_ELEMENT},
+			{"processDateTimeElements", ColumnSpec.DATE_ELEMENT, ColumnSpec.TIME_ELEMENT},
+			{"processIndividualColumnElements", ColumnSpec.YEAR_ELEMENT, ColumnSpec.MONTH_ELEMENT, ColumnSpec.DAY_ELEMENT, ColumnSpec.HOUR_ELEMENT, ColumnSpec.MINUTE_ELEMENT, ColumnSpec.SECOND_ELEMENT},
+			{"processYearDaySecondElements", ColumnSpec.YDS_YEAR_ELEMENT, ColumnSpec.YDS_DAY_ELEMENT, ColumnSpec.YDS_SECOND_ELEMENT, ColumnSpec.JAN_FIRST_INDEX_ELEMENT},
+			{"processYearJDateElements", ColumnSpec.YDJD_YEAR_ELEMENT, ColumnSpec.YDJD_DECIMAL_JDATE_ELEMENT, ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT},
+			{"processYearColsSingleTimeElements", ColumnSpec.YMDT_YEAR_ELEMENT, ColumnSpec.YMDT_MONTH_ELEMENT, ColumnSpec.YMDT_DAY_ELEMENT, ColumnSpec.YMDT_TIME_ELEMENT}	
+	};
+	
 	/**
 	 * Takes an XML column spec date element and parses it.
 	 * @param dateElement The date element.
@@ -111,48 +131,46 @@ public class DateColumnInfo {
 	 * 
 	 * @param dateElement The date XML element
 	 */
-	private void processDateElement(Element dateElement, Logger logger) throws Exception{
+	private void processDateElement(Element dateElement, Logger logger) throws Exception {
 		
-		/*
-		 * The date element contains one of the following:
-		 * 
-		 * 1. A single date_time element
-		 * 2. Separate date and time elements
-		 * 3. Separate y/m/d/h/m/s elements
-		 * 4. Year, Day of year, Second of day
-		 * 
-		 * We can tell which we need to do by how many child elements there are
-		 */
-		int childCount = dateElement.getChildren().size();
+		boolean matchedDateElementStructure = false;
 		
-		switch (childCount) {
-		case 1:
-		{
-			processSingleElement(dateElement, logger);
-			break;
+		for (int i = 0; i < dateElementStructures.length; i++) {
+			
+			String[] structure = dateElementStructures[i];
+			if (elementMatchesStructure(dateElement, structure)) {
+				
+				Method processorMethod = this.getClass().getDeclaredMethod(structure[0], Element.class, Logger.class);
+				processorMethod.invoke(this, dateElement, logger);
+				
+				matchedDateElementStructure = true;
+			}
+			
 		}
-		case 2:
-		{
-			processDateTimeElements(dateElement, logger);
-			break;
-		}
-		case 4:
-		{
-			processYearDaySecondElements(dateElement, logger);
-			break;
-		}
-		case 5:
-		case 6:
-		{
-			processIndividualColumnElements(dateElement, logger);
-			break;
-		}
-		default:
-		{
+		
+		if (!matchedDateElementStructure) {
 			// Something has gone horrifically wrong. ABORT!!!
-			throw new Exception("FATAL ERROR: Unexpected number of elements in date column specification");
+			throw new Exception("FATAL ERROR: Bad element sequence in date column specification");
 		}
+	}
+	
+	private boolean elementMatchesStructure(Element dateElement, String[] structure) {
+		boolean matches = true;
+		
+		List<Element> children = dateElement.getChildren();
+		if (children.size() != (structure.length - 1)) {
+			matches = false;
+		} else {
+			int count = 0;
+			for (Element child : children) {
+				count++;
+				if (!child.getName().equalsIgnoreCase(structure[count])) {
+					matches = false;
+				}
+			}
 		}
+		
+		return matches;
 	}
 	
 	public DateTime makeDateTime(List<String> dataFields, DateTimeHandler dateTimeHandler) throws DateTimeException {
@@ -188,6 +206,32 @@ public class DateColumnInfo {
 			break;
 		}
 		
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
+			String yearString = dataFields.get(getYearColumnIndex() - 1);
+			String monthString = dataFields.get(getMonthColumnIndex() - 1);
+			String dayString = dataFields.get(getDayColumnIndex() - 1);
+			String timeString = dataFields.get(itsTimeInfo.index - 1);
+			
+			if (CheckerUtils.isEmpty(yearString, monthString, dayString, timeString)) {
+				throw new MissingDateTimeElementException();
+			} else {
+				try {
+					DateTimeHandler handler = new DateTimeHandler("YYYYMMDD");
+					int month = Integer.parseInt(monthString);
+					int day = Integer.parseInt(dayString);
+					String fullDateTimeString = yearString + String.format("%02d", month) + String.format("%02d", day) + " " + timeString;
+					result = handler.parseDateTime(fullDateTimeString);
+
+				} catch (NumberFormatException e) {
+					throw new DateTimeParseException("Invalid date " + yearString + "/" + monthString + "/" + dayString + " " + timeString);
+				} catch (IllegalFieldValueException e) {
+					throw new DateTimeParseException("Invalid date " + yearString + "/" + monthString + "/" + dayString + " " + timeString);
+				} catch (Exception e) {
+					throw new DateTimeParseException(e);
+				}
+			}
+			break;
+		}
 		case INDIVIDUAL_ELEMENTS_TYPE: {
 			String yearString = dataFields.get(getYearColumnIndex() - 1);
 			String monthString = dataFields.get(getMonthColumnIndex() - 1);
@@ -282,6 +326,74 @@ public class DateColumnInfo {
 			
 			break;
 		}
+		case YEAR_DECIMAL_JDATE_TYPE: {
+			
+			String yearString = dataFields.get(itsYearInfo.index - 1);
+			String jdateString = dataFields.get(itsDayInfo.index - 1);
+			
+			String invalidDateMessage = "Invalid date " + yearString + " " + jdateString;
+			
+			if (CheckerUtils.isEmpty(yearString, jdateString)) {
+				throw new MissingDateTimeElementException();
+			} else {
+				try {
+					
+					int year = Integer.parseInt(yearString);
+					double jdate = Double.parseDouble(jdateString);
+					jdate = jdate - (double) itsJanFirstIndex;
+					
+					// Create a new date at Jan 1st in the specified year
+					DateTime calculationDate = new DateTime(year, 1, 1, 0, 0, 0, DateTimeZone.UTC);
+
+					if (jdate < 0) {
+						throw new DateTimeParseException(invalidDateMessage);
+					} else if (calculationDate.year().isLeap() && jdate > 366) {
+						throw new DateTimeParseException(invalidDateMessage);
+					} else if (jdate > 365) {
+						throw new DateTimeParseException(invalidDateMessage);
+					}
+					
+					/*
+					 * The jdate is a double in <day>.<dayFraction> format
+					 * 
+					 * The day is therefore just the integer floor value
+					 */
+					int days = (int) Math.floor(jdate);
+					
+					/*
+					 * The number of seconds is the dayFraction * 86400 (number of seconds in a day)
+					 * This gives a double of the form <seconds>.<secondsFraction>
+					 * 
+					 * So the seconds is the integer floor value
+					 */
+					double dayFraction = jdate - (double) days;
+					int seconds = (int) Math.floor(dayFraction * 86400);
+					
+					/*
+					 * And the milliseconds will be the first three digits after
+					 * the decimal place
+					 */
+					double secondsFraction = dayFraction - ((double)seconds / 86400.0);
+					int milliseconds = (int) Math.floor(secondsFraction * 1000.0);
+					
+					// Now add all the parts to the year
+					calculationDate = calculationDate.plusDays(days);
+					calculationDate = calculationDate.plusSeconds(seconds);
+					calculationDate = calculationDate.plusMillis(milliseconds);
+					
+					result = calculationDate;
+					
+				} catch (NumberFormatException e) {
+					throw new DateTimeParseException(invalidDateMessage);
+				} catch (IllegalFieldValueException e) {
+					throw new DateTimeParseException(invalidDateMessage);
+				} catch (Exception e) {
+					throw new DateTimeParseException(e);
+				}
+			}
+
+			break;
+		}
 		}
 		
 		if (null == result) {
@@ -356,6 +468,61 @@ public class DateColumnInfo {
 		
 		child = parent.getChild(ColumnSpec.JAN_FIRST_INDEX_ELEMENT, parent.getNamespace());
 		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
+	}
+	
+	private void processYearJDateElements(Element parent, Logger logger) {
+		itsElementType = YEAR_DECIMAL_JDATE_TYPE;
+		
+		int columnIndex;
+		String columnName;
+		Element child;
+		
+		child = parent.getChild(ColumnSpec.YDJD_YEAR_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Year column '" + columnName + "' (" + columnIndex + ")");
+		itsYearInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YDJD_DECIMAL_JDATE_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Decimal JDate column '" + columnName + "' (" + columnIndex + ")");
+		itsDayInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT, parent.getNamespace());
+		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
+	}
+	
+	private void processYearColsSingleTimeElements(Element parent, Logger logger) {
+		itsElementType = DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE;
+
+		int columnIndex;
+		String columnName;
+		Element child;
+		
+		child = parent.getChild(ColumnSpec.YMDT_YEAR_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Year column '" + columnName + "' (" + columnIndex + ")");
+		itsYearInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YMDT_MONTH_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Month column '" + columnName + "' (" + columnIndex + ")");
+		itsMonthInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YMDT_DAY_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Day column '" + columnName + "' (" + columnIndex + ")");
+		itsDayInfo = new ColInfo(columnIndex, columnName);
+		
+		child = parent.getChild(ColumnSpec.YMDT_TIME_ELEMENT, parent.getNamespace());
+		columnIndex = Integer.parseInt(child.getAttributeValue(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE));
+		columnName = child.getTextTrim();
+		logger.trace("Date column spec: Time column '" + columnName + "' (" + columnIndex + ")");
+		itsTimeInfo = new ColInfo(columnIndex, columnName);
 	}
 	
 	/**
@@ -437,6 +604,10 @@ public class DateColumnInfo {
 			result = itsYearInfo.index;
 			break;
 		}
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
+			result = itsYearInfo.index;
+			break;
+		}
 		}
 		
 		return result;
@@ -460,6 +631,10 @@ public class DateColumnInfo {
 			break;
 		}
 		case INDIVIDUAL_ELEMENTS_TYPE: {
+			result = itsMonthInfo.index;
+			break;
+		}
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
 			result = itsMonthInfo.index;
 			break;
 		}
@@ -493,6 +668,10 @@ public class DateColumnInfo {
 			result = itsDayInfo.index;
 			break;
 		}
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
+			result = itsDayInfo.index;
+			break;
+		}
 		}
 		
 		return result;
@@ -519,6 +698,10 @@ public class DateColumnInfo {
 			result = itsHourInfo.index;
 			break;
 		}
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
+			result = itsTimeInfo.index;
+			break;
+		}
 		}
 		
 		return result;
@@ -543,6 +726,10 @@ public class DateColumnInfo {
 		}
 		case INDIVIDUAL_ELEMENTS_TYPE: {
 			result = itsMinuteInfo.index;
+			break;
+		}
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
+			result = itsTimeInfo.index;
 			break;
 		}
 		}
@@ -578,170 +765,16 @@ public class DateColumnInfo {
 			result = itsSecondInfo.index;
 			break;
 		}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns the name of the column containing the year	
-	 * @return The name of the column containing the year
-	 */
-	public String getYearColumnName() {
-		String result = "";
-		
-		switch (itsElementType) {
-		case SINGLE_ELEMENT_TYPE:
-		{
-			result = itsSingleElementInfo.name;
+		case DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE: {
+			result = itsTimeInfo.index;
 			break;
 		}
-		case DATE_TIME_ELEMENT_TYPE: {
-			result = itsDateInfo.name;
-			break;
-		}
-		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsYearInfo.name;
-			break;
-		}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns the name of the column containing the month	
-	 * @return The name of the column containing the month
-	 */
-	public String getMonthColumnName() {
-		String result = "";
-		
-		switch (itsElementType) {
-		case SINGLE_ELEMENT_TYPE:
-		{
-			result = itsSingleElementInfo.name;
-			break;
-		}
-		case DATE_TIME_ELEMENT_TYPE: {
-			result = itsDateInfo.name;
-			break;
-		}
-		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsMonthInfo.name;
-			break;
-		}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns the name of the column containing the day	
-	 * @return The name of the column containing the day
-	 */
-	public String getDayColumnName() {
-		String result = "";
-		
-		switch (itsElementType) {
-		case SINGLE_ELEMENT_TYPE:
-		{
-			result = itsSingleElementInfo.name;
-			break;
-		}
-		case DATE_TIME_ELEMENT_TYPE: {
-			result = itsDateInfo.name;
-			break;
-		}
-		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsDayInfo.name;
-			break;
-		}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns the name of the column containing the hour	
-	 * @return The name of the column containing the hour
-	 */
-	public String getHourColumnName() {
-		String result = "";
-		
-		switch (itsElementType) {
-		case SINGLE_ELEMENT_TYPE:
-		{
-			result = itsSingleElementInfo.name;
-			break;
-		}
-		case DATE_TIME_ELEMENT_TYPE: {
-			result = itsTimeInfo.name;
-			break;
-		}
-		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsHourInfo.name;
-			break;
-		}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns the name of the column containing the minute	
-	 * @return The name of the column containing the minute
-	 */
-	public String getMinuteColumnName() {
-		String result = "";
-		
-		switch (itsElementType) {
-		case SINGLE_ELEMENT_TYPE:
-		{
-			result = itsSingleElementInfo.name;
-			break;
-		}
-		case DATE_TIME_ELEMENT_TYPE: {
-			result = itsTimeInfo.name;
-			break;
-		}
-		case INDIVIDUAL_ELEMENTS_TYPE: {
-			result = itsMinuteInfo.name;
-			break;
-		}
-		}
-		
-		return result;
-	}
-	
-	/**
-	 * Returns the name of the column containing the second	
-	 * @return The name of the column containing the second
-	 */
-	public String getSecondColumnName() {
-		String result = "";
-		
-		switch (itsElementType) {
-		case SINGLE_ELEMENT_TYPE:
-		{
-			result = itsSingleElementInfo.name;
-			break;
-		}
-		case DATE_TIME_ELEMENT_TYPE: {
-			result = itsTimeInfo.name;
-			break;
-		}
-		case INDIVIDUAL_ELEMENTS_TYPE: {
-			if ( itsSecondInfo != null )
-				result = itsSecondInfo.name;
-			else
-				result = null;
-			break;
-		}
-		}
-		
-		return result;
-	}
 
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Returns a list of all the date/time columns required in the data file.
 	 * The list will vary according to the specified format of the date/time columns.

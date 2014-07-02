@@ -110,7 +110,7 @@ public class ColumnSpec {
 	public static final String YDS_YEAR_ELEMENT = "yds_year";
 
 	/**
-	 * The name of the element containing the details for the year column in a year/day/second setup
+	 * The name of the element containing the details for the day column in a year/day/second setup
 	 */
 	public static final String YDS_DAY_ELEMENT = "yds_day";
 
@@ -123,7 +123,44 @@ public class ColumnSpec {
 	 * The name of the element that states which number represents the 1st January
 	 */
 	public static final String JAN_FIRST_INDEX_ELEMENT = "jan_first_index";
+
+	/**
+	 * The name of the element containing the details for the year column in a year/jdate setup
+	 */
+	public static final String YDJD_YEAR_ELEMENT = "ydjd_year";
 	
+	/**
+	 * The name of the element containing the details for the date column in a year/jdate setup
+	 */
+	public static final String YDJD_DECIMAL_JDATE_ELEMENT = "ydjd_decimal_jdate";
+
+	/**
+	 * The name of the element that states which number represents the 1st January
+	 */
+	public static final String YDJD_JAN_FIRST_INDEX_ELEMENT = "ydjd_jan_first_index";
+
+	/**
+	 * The name of the element containing the details for a separate year column
+	 */
+	public static final String YMDT_YEAR_ELEMENT = "ymdt_year";
+	
+	/**
+	 * The name of the element containing the details for a separate month column
+	 */
+	public static final String YMDT_MONTH_ELEMENT = "ymdt_month";
+	
+	/**
+	 * The name of the element containing the details for a separate day column
+	 */
+	public static final String YMDT_DAY_ELEMENT = "ymdt_day";
+	
+	/**
+	 * The name of the element containing the details for a separate time column
+	 */
+	public static final String YMDT_TIME_ELEMENT = "ymdt_time";
+	
+	
+
 	/**
 	 * Lookup table of column specifications for non-date columns
 	 */
