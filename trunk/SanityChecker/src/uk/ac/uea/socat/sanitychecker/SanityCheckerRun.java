@@ -152,7 +152,7 @@ public class SanityCheckerRun {
 				
 					// Write complete messages to file
 					try {
-						writeMessages(messages);
+						writeMessages(checkerOutput.getRecords().get(0).getColumn("cruise_id").getValue(),  messages);
 					} catch (IOException e) {
 						System.out.println("ERROR WRITING OUTPUT FILES");
 						e.printStackTrace();
@@ -171,8 +171,8 @@ public class SanityCheckerRun {
 	 * @param messages The messages to be written
 	 * @throws IOException If writing to the file fails.
 	 */
-	private void writeMessages(Messages messages) throws IOException {
-		String messagesFilename = itsDataFilename + ".messages.txt";
+	private void writeMessages(String fileRoot, Messages messages) throws IOException {
+		String messagesFilename = fileRoot + ".messages.txt";
 		PrintWriter writer = new PrintWriter(new File(itsOutputDir, messagesFilename));
 		List<Message> metadataMessages = messages.getMessagesByType(Message.METADATA_MESSAGE);
 		for (Message message: metadataMessages) {
