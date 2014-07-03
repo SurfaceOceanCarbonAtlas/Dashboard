@@ -15,21 +15,18 @@
 	<!-- Root element content -->
 	<complexType name="col_info">
 		<sequence>
-			<element name="socat_column" type="SanityCheckercolinfo:socat_column" 
+			<element name="socat_column" type="SanityCheckercolinfo:socat_column"
 				maxOccurs="unbounded" minOccurs="1" />
-
-			<element name="date_columns" type="SanityCheckercolinfo:date_cols" 
+			<element name="date_columns" type="SanityCheckercolinfo:date_cols"
 				maxOccurs="1" minOccurs="1" />
-
 		</sequence>
 	</complexType>
 
 	<!-- Contents of the socat_column elements -->
 	<complexType name="socat_column">
 		<sequence>
-			<element name="input_column" type="SanityCheckercolinfo:input_col" 
+			<element name="input_column" type="SanityCheckercolinfo:input_col"
 				maxOccurs="1" minOccurs="1" />
-
 			<element name="input_units" type="string" maxOccurs="1" minOccurs="1" />
 			<element name="missing_value" type="double" maxOccurs="1" minOccurs="0" />
 		</sequence>
@@ -57,6 +54,17 @@
 				<element name="yds_day" type="SanityCheckercolinfo:input_col" />
 				<element name="yds_second" type="SanityCheckercolinfo:input_col" />
 				<element name="jan_first_index" type="int" />
+			</sequence>
+			<sequence>
+				<element name="ymdt_year" type="SanityCheckercolinfo:input_col" />
+				<element name="ymdt_month" type="SanityCheckercolinfo:input_col" />
+				<element name="ymdt_day" type="SanityCheckercolinfo:input_col" />
+				<element name="ymdt_time" type="SanityCheckercolinfo:input_col" />
+			</sequence>
+			<sequence>
+				<element name="ydjd_year" type="SanityCheckercolinfo:input_col" />
+				<element name="ydjd_decimal_jdate" type="SanityCheckercolinfo:input_col" />
+				<element name="ydjd_jan_first_index" type="int" />
 			</sequence>
 		</choice>
 	</complexType>

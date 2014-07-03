@@ -524,28 +524,27 @@ public class DataColumnSpecsPage extends Composite {
 		boolean hasLatitude = false;
 		// sea water CO2 value given?
 		boolean hasco2 = false;
-		// time stamp given?
-		boolean hasDate = false;
-		boolean hasTime = false;
+		// date/time given?
 		boolean hasYear = false;
 		boolean hasMonth = false;
 		boolean hasDay = false;
 		boolean hasHour = false;
 		boolean hasMinute = false;
 		boolean hasSecond = false;
-		boolean hasDayOfYear = false;
-		boolean hasSecondOfDay = false;
-		// data still given as unknown
+
+		// list of data columns still given as unknown
 		ArrayList<Integer> unknownIndices = new ArrayList<Integer>();
 
 		// Check the column types 
+		// Marking what is given no longer tries to guess what the sanity checker
+		// can work with for time and date; only the possibility.
+		// Similarly with aqueous CO2 and fCO2 recomputations.
 		int k = 0;
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
 			if ( colType == DataColumnType.UNKNOWN ) {
 				unknownIndices.add(k);
 			}
 			else if ( colType == DataColumnType.TIMESTAMP ) {
-				// the timestamp gives all the required date/time info
 				hasYear = true;
 				hasMonth = true;
 				hasDay = true;
@@ -554,13 +553,22 @@ public class DataColumnSpecsPage extends Composite {
 				hasSecond = true;
 			}
 			else if ( colType == DataColumnType.DATE ) {
-				hasDate = true;
+				hasYear = true;
+				hasMonth = true;
+				hasDay = true;
 			}
 			else if ( colType == DataColumnType.DAY_OF_YEAR ) {
-				hasDayOfYear = true;
+				hasMonth = true;
+				hasDay = true;
+				// Day of year could be floating point; verification needed?
+				hasHour = true;
+				hasMinute = true;
+				hasSecond = true;
 			}
 			else if ( colType == DataColumnType.SECOND_OF_DAY ) {
-				hasSecondOfDay = true;
+				hasHour = true;
+				hasMinute = true;
+				hasSecond = true;
 			}
 			else if ( colType == DataColumnType.YEAR ) {
 				hasYear = true;
@@ -572,7 +580,9 @@ public class DataColumnSpecsPage extends Composite {
 				hasDay = true;
 			}
 			else if ( colType == DataColumnType.TIME ) {
-				hasTime = true;
+				hasHour = true;
+				hasMinute = true;
+				hasSecond = true;
 			}
 			else if ( colType == DataColumnType.HOUR ) {
 				hasHour = true;
@@ -591,6 +601,8 @@ public class DataColumnSpecsPage extends Composite {
 			}
 			else if ( (colType == DataColumnType.XCO2_WATER_TEQU_DRY) ||
 					  (colType == DataColumnType.XCO2_WATER_SST_DRY) ||
+					  (colType == DataColumnType.XCO2_WATER_TEQU_WET) ||
+					  (colType == DataColumnType.XCO2_WATER_SST_WET) ||
 					  (colType == DataColumnType.PCO2_WATER_TEQU_WET) ||
 					  (colType == DataColumnType.PCO2_WATER_SST_WET) ||
 					  (colType == DataColumnType.FCO2_WATER_TEQU_WET) ||
@@ -598,25 +610,6 @@ public class DataColumnSpecsPage extends Composite {
 				hasco2 = true;
 			}
 			k++;
-		}
-		// Need both date and time to have all the date/time info
-		// (date, hour, minute, and second columns is not acceptable)
-		if ( hasDate && hasTime ) {
-			hasYear = true;
-			hasMonth = true;
-			hasDay = true;
-			hasHour = true;
-			hasMinute = true;
-			hasSecond = true;
-		}
-		// Need all three year, day-of-year, and second-of-day to have all the date/time info
-		// (year, day-of-year, hour, minute, and second columns is not acceptable)
-		if ( hasYear && hasDayOfYear && hasSecondOfDay ) {
-			hasMonth = true;
-			hasDay = true;
-			hasHour = true;
-			hasMinute = true;
-			hasSecond = true;
 		}
 		if ( unknownIndices.size() > 0 ) {
 			// Unknown column data types found; put up error message and return
@@ -647,7 +640,7 @@ public class DataColumnSpecsPage extends Composite {
 			return;
 		}
 		if ( ! hasco2 ) {
-			// no agueous CO2 - error
+			// no aqueous CO2 - error
 			SocatUploadDashboard.showMessage(NO_CO2_ERROR_MSG);
 			return;
 		}
