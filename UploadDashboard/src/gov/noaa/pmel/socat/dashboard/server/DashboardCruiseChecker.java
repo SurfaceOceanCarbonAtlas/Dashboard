@@ -103,7 +103,9 @@ public class DashboardCruiseChecker {
 		DATETIME_TIMESTAMP,
 		DATETIME_DATE_TIME,
 		DATETIME_YEAR_DAY_SEC,
+		DATETIME_YEAR_DECIMAL_DAY,
 		DATETIME_YEAR_MON_DAY_HR_MIN_SEC,
+		DATETIME_YEAR_MON_DAY_TIME,
 	}
 
 	/**
@@ -366,14 +368,25 @@ public class DashboardCruiseChecker {
 		DateTimeType timeSpec;
 		if ( (colIndcs.yearIndex >= 0) && (colIndcs.monthIndex >= 0) && 
 			 (colIndcs.dayIndex >= 0) && (colIndcs.hourIndex >= 0) &&
-			 (colIndcs.minuteIndex >= 0) ) 
+			 (colIndcs.minuteIndex >= 0) ) {
 			timeSpec = DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC;
-		else if ( colIndcs.timestampIndex >= 0 )
-			timeSpec = DateTimeType.DATETIME_TIMESTAMP;
-		else if ( (colIndcs.dateIndex >= 0) && (colIndcs.timeIndex >= 0) )
+		}
+		else if ( (colIndcs.yearIndex >= 0) && (colIndcs.monthIndex >= 0) && 
+			 (colIndcs.dayIndex >= 0) && (colIndcs.timeIndex >= 0) ) {
+			timeSpec = DateTimeType.DATETIME_YEAR_MON_DAY_TIME;
+		}
+		else if ( (colIndcs.yearIndex >= 0) && (colIndcs.dayOfYearIndex >= 0) ) {
+			if ( colIndcs.secondOfDayIndex >= 0 )
+				timeSpec = DateTimeType.DATETIME_YEAR_DAY_SEC;
+			else
+				timeSpec = DateTimeType.DATETIME_YEAR_DECIMAL_DAY;
+		}
+		else if ( (colIndcs.dateIndex >= 0) && (colIndcs.timeIndex >= 0) ) {
 			timeSpec = DateTimeType.DATETIME_DATE_TIME;
-		else if ( colIndcs.dayOfYearIndex >= 0 )
-			timeSpec = DateTimeType.DATETIME_YEAR_DAY_SEC;
+		}
+		else if ( colIndcs.timestampIndex >= 0 ) {
+			timeSpec = DateTimeType.DATETIME_TIMESTAMP;
+		}
 		else 
 			throw new IllegalArgumentException("The date and/or time of each " +
 					"measurement is not completely specified in the data columns");
@@ -389,6 +402,7 @@ public class DashboardCruiseChecker {
 						"Data type not defined for column " + Integer.toString(k+1) + 
 						": " + cruiseData.getUserColNames().get(k));
 			}
+			// DATETIME_TIMESTAMP
 			else if ( colType.equals(DataColumnType.TIMESTAMP) && 
 					  timeSpec.equals(DateTimeType.DATETIME_TIMESTAMP) ) {
 				Element userElement = new Element(ColumnSpec.SINGLE_DATE_TIME_ELEMENT);
@@ -400,6 +414,7 @@ public class DashboardCruiseChecker {
 						cruiseData.getDataColUnits().get(k));
 				dateFormat = CHECKER_DATA_UNITS.get(colType).get(idx);
 			}
+			// DATETIME_DATA_TIME
 			else if ( colType.equals(DataColumnType.DATE) && 
 					  timeSpec.equals(DateTimeType.DATETIME_DATE_TIME) ) {
 				Element userElement = new Element(ColumnSpec.DATE_ELEMENT);
@@ -419,6 +434,7 @@ public class DashboardCruiseChecker {
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
 			}
+			// DATETIME_YEAR_DAY_SEC
 			else if ( colType.equals(DataColumnType.YEAR) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_DAY_SEC) ) {
 				Element userElement = new Element(ColumnSpec.YDS_YEAR_ELEMENT);
@@ -454,6 +470,35 @@ public class DashboardCruiseChecker {
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
 			}
+			// DATETIME_YEAR_DECIMAL_DAY
+			else if ( colType.equals(DataColumnType.YEAR) &&
+					  timeSpec.equals(DateTimeType.DATETIME_YEAR_DECIMAL_DAY) ) {
+				Element userElement = new Element(ColumnSpec.YDJD_YEAR_ELEMENT);
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
+											Integer.toString(k+1));
+				userElement.setText(cruiseData.getUserColNames().get(k));
+				timestampElement.addContent(userElement);
+			}
+			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) &&
+					  timeSpec.equals(DateTimeType.DATETIME_YEAR_DECIMAL_DAY) ) {
+				Element userElement = new Element(ColumnSpec.YDJD_DECIMAL_JDATE_ELEMENT);
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
+											Integer.toString(k+1));
+				userElement.setText(cruiseData.getUserColNames().get(k));
+				timestampElement.addContent(userElement);
+				// assign the value for Jan 1 
+				userElement = new Element(ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT);
+				String units = cruiseData.getDataColUnits().get(k);
+				if ( "Jan1=1.0".equals(units) )
+					userElement.setText("1");
+				else if ( "Jan1=0.0".equals(units) )
+					userElement.setText("0");
+				else
+					throw new IllegalArgumentException("Unexpected \"units\" of '" +
+							units + "' for day-of-year");
+				timestampElement.addContent(userElement);
+			}
+			// DATETIME_YEAR_MON_DAY_HR_MIN_SEC
 			else if ( colType.equals(DataColumnType.YEAR) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC) ) {
 				Element userElement = new Element(ColumnSpec.YEAR_ELEMENT);
@@ -502,6 +547,40 @@ public class DashboardCruiseChecker {
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElement.addContent(userElement);
 			}
+			// DATETIME_YEAR_MON_DAY_TIME
+			else if ( colType.equals(DataColumnType.YEAR) &&
+					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
+				Element userElement = new Element(ColumnSpec.YMDT_YEAR_ELEMENT);
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
+											Integer.toString(k+1));
+				userElement.setText(cruiseData.getUserColNames().get(k));
+				timestampElement.addContent(userElement);
+			}
+			else if ( colType.equals(DataColumnType.MONTH) &&
+					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
+				Element userElement = new Element(ColumnSpec.YMDT_MONTH_ELEMENT);
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
+											Integer.toString(k+1));
+				userElement.setText(cruiseData.getUserColNames().get(k));
+				timestampElement.addContent(userElement);
+			}
+			else if ( colType.equals(DataColumnType.DAY) &&
+					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
+				Element userElement = new Element(ColumnSpec.YMDT_DAY_ELEMENT);
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
+											Integer.toString(k+1));
+				userElement.setText(cruiseData.getUserColNames().get(k));
+				timestampElement.addContent(userElement);
+			}
+			else if ( colType.equals(DataColumnType.TIME) && 
+					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
+				Element userElement = new Element(ColumnSpec.YMDT_TIME_ELEMENT);
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
+											Integer.toString(k+1));
+				userElement.setText(cruiseData.getUserColNames().get(k));
+				timestampElement.addContent(userElement);
+			}
+			// Not involved with date/time specification
 			else if ( colType.equals(DataColumnType.EXPOCODE) || 
 					  colType.equals(DataColumnType.CRUISE_NAME) || 
 					  colType.equals(DataColumnType.SHIP_NAME) || 
@@ -759,9 +838,9 @@ public class DashboardCruiseChecker {
 				! woceFourSets.get(colIndcs.dayOfYearIndex).isEmpty() ) ||
 			 ( (colIndcs.secondOfDayIndex >= 0) &&
 				! woceFourSets.get(colIndcs.secondOfDayIndex).isEmpty() ) ||
-			 ( (colIndcs.longitudeIndex >= 0) &&
+			 ( (colIndcs.longitudeIndex < 0) ||
 				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
-			 ( (colIndcs.latitudeIndex >= 0) &&
+			 ( (colIndcs.latitudeIndex < 0) ||
 				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
 			lastCruiseCheckHadGeopositionErrors = true;
 		}
