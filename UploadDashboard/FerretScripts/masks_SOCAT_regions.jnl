@@ -75,6 +75,14 @@ let yy = 0*x[gx=rose[d=1],x=`xm180`:180] + y[gy=rose[d=1]]
 LET zero = 0+0*rose[d=1,x=`xm180`:180]
 LET oceanmask = if rose[d=1,x=`xm180`:180] LT 0 then 1
 
+! The land/ocean data is more detailed than in dist2land_burke. 
+! Small islands out in the ocean should not be marked as coastal but as ocean(?)
+use  dist2land20_burke.nc
+let dist2landrose = dist2land[g=rose[d=1],x=`xm180`:180]
+
+LET oceanmask = if dist2landrose GT 0 then 1
+
+
 ! SOCAT regions are drawn for /X=-180:540 to ensure coverage
 ! if the Ferret region drawn changes.
 
@@ -258,8 +266,7 @@ let/title="Southern Ocean Mask" south = if southy1 then 4 else 0
 ! overrides any of the above SOCAT regions
 ! Coastal is not used in the Arctic or Southern regions
 
-use  dist2land20_burke.nc
-let dist2landrose = dist2land[g=rose[d=1],x=`xm180`:180]
+
 let coast_s = if yy ge -30 then oceanmask else zero
 let coast_n = if arctic eq 0 then oceanmask else 0
 
@@ -287,6 +294,6 @@ shade/pal=ten_by_levels/lev=(1,11,1) arctic; go land; pause
 let sum_mask = natlantic+Indian+npacific+tpacific+tatlantic+south+arctic+coast
 
 let/title="All Masks:1=NPac,2=TPac,4=South,5=Ind,6=NAtl,7=Coast,8=Tatl,10=Arctic" region_id = if sum_mask gt 10 then 7 else sum_mask
-shade/pal=ten_by_levels/lev=(1,11,1) region_id
+shade/pal=ten_by_levels/lev=(1,11,1)/key=centerlab region_id
 
 save/clobber/file=SOCAT_region_ids.nc region_id
