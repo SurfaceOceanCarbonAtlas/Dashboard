@@ -439,6 +439,7 @@ public class DashboardDataStore {
 		return singleton.get();
 	}
 
+	private static final long MINUTES_CHECK_INTERVAL = 5;
 	/**
 	 * Monitors the configuration file creating the current DashboardDataStore 
 	 * singleton object.  If the configuration file has changed, sets the 
@@ -447,7 +448,6 @@ public class DashboardDataStore {
 	 * is needed, the configuration file will be reread and this monitor 
 	 * will be restarted.
 	 */
-	private static final long MINUTES_CHECK_INTERVAL = 5;
 	private static void watchConfigFile() {
 		// Just create a time to monitor the last modified timestamp 
 		// of the config file every few minutes
@@ -460,6 +460,11 @@ public class DashboardDataStore {
 				}
 				else if ( dataStore.configFile.lastModified() != 
 							dataStore.configFileTimestamp ) {
+					// Shutdown all the VersionsedFileHandlers
+					dataStore.userFileHandler.shutdown();
+					dataStore.cruiseFileHandler.shutdown();
+					dataStore.metadataFileHandler.shutdown();
+					// Discard this DashboardDataStore and stop this watcher
 					singleton.set(null);
 					cancel();
 				}

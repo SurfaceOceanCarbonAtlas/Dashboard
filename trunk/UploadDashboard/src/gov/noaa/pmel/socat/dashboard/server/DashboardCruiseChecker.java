@@ -196,7 +196,7 @@ public class DashboardCruiseChecker {
 		// COMMENT... and OTHER should not be processed by the sanity checker
 	}
 
-	private boolean lastCruiseCheckHadGeopositionErrors;
+	private boolean lastCheckHadGeopositionErrors;
 
 	/**
 	 * Initializes the SanityChecker using the configuration files names
@@ -223,7 +223,7 @@ public class DashboardCruiseChecker {
 					" values specified in " + configFile.getPath() + 
 					"\n    " + ex.getMessage());
 		}
-		lastCruiseCheckHadGeopositionErrors = false;
+		lastCheckHadGeopositionErrors = false;
 	}
 
 	/**
@@ -389,11 +389,12 @@ public class DashboardCruiseChecker {
 		}
 		else 
 			throw new IllegalArgumentException("The date and/or time of each " +
-					"measurement is not completely specified in the data columns");
+					"measurement is not completely specified in a way known " +
+					"to the automated data checker");
 
 		// Specify the columns in this cruise data
 		Element rootElement = new Element("Expocode_" + cruiseData.getExpocode());
-		Element timestampElement = new Element(ColumnSpec.DATE_COLUMN_ELEMENT);
+		Element[] timestampElements = new Element[] { null, null, null, null, null, null };
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
 			if ( colType.equals(DataColumnType.UNKNOWN) ) {
@@ -409,7 +410,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[0] = userElement;
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
 						cruiseData.getDataColUnits().get(k));
 				dateFormat = CHECKER_DATA_UNITS.get(colType).get(idx);
@@ -421,7 +422,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[0] = userElement;
 				int idx = DashboardUtils.STD_DATA_UNITS.get(colType).indexOf(
 						cruiseData.getDataColUnits().get(k));
 				dateFormat = CHECKER_DATA_UNITS.get(colType).get(idx);
@@ -432,7 +433,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[1] = userElement;
 			}
 			// DATETIME_YEAR_DAY_SEC
 			else if ( colType.equals(DataColumnType.YEAR) &&
@@ -441,7 +442,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[0] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_DAY_SEC) ) {
@@ -449,7 +450,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[1] = userElement;
 				// assign the value for Jan 1 
 				userElement = new Element(ColumnSpec.JAN_FIRST_INDEX_ELEMENT);
 				String units = cruiseData.getDataColUnits().get(k);
@@ -460,7 +461,7 @@ public class DashboardCruiseChecker {
 				else
 					throw new IllegalArgumentException("Unexpected \"units\" of '" +
 							units + "' for day-of-year");
-				timestampElement.addContent(userElement);
+				timestampElements[3] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.SECOND_OF_DAY) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_DAY_SEC) ) {
@@ -468,7 +469,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[2] = userElement;
 			}
 			// DATETIME_YEAR_DECIMAL_DAY
 			else if ( colType.equals(DataColumnType.YEAR) &&
@@ -477,7 +478,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[0] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_DECIMAL_DAY) ) {
@@ -485,7 +486,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[1] = userElement;
 				// assign the value for Jan 1 
 				userElement = new Element(ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT);
 				String units = cruiseData.getDataColUnits().get(k);
@@ -496,7 +497,7 @@ public class DashboardCruiseChecker {
 				else
 					throw new IllegalArgumentException("Unexpected \"units\" of '" +
 							units + "' for day-of-year");
-				timestampElement.addContent(userElement);
+				timestampElements[2] = userElement;
 			}
 			// DATETIME_YEAR_MON_DAY_HR_MIN_SEC
 			else if ( colType.equals(DataColumnType.YEAR) &&
@@ -505,7 +506,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[0] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.MONTH) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC) ) {
@@ -513,7 +514,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[1] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.DAY) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC) ) {
@@ -521,7 +522,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[2] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.HOUR) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC) ) {
@@ -529,7 +530,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[3] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.MINUTE) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC) ) {
@@ -537,7 +538,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[4] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.SECOND) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_HR_MIN_SEC) ) {
@@ -545,7 +546,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[5] = userElement;
 			}
 			// DATETIME_YEAR_MON_DAY_TIME
 			else if ( colType.equals(DataColumnType.YEAR) &&
@@ -554,7 +555,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[0] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.MONTH) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
@@ -562,7 +563,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[1] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.DAY) &&
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
@@ -570,7 +571,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[2] = userElement;
 			}
 			else if ( colType.equals(DataColumnType.TIME) && 
 					  timeSpec.equals(DateTimeType.DATETIME_YEAR_MON_DAY_TIME) ) {
@@ -578,7 +579,7 @@ public class DashboardCruiseChecker {
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
 											Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
-				timestampElement.addContent(userElement);
+				timestampElements[3] = userElement;
 			}
 			// Not involved with date/time specification
 			else if ( colType.equals(DataColumnType.EXPOCODE) || 
@@ -681,7 +682,13 @@ public class DashboardCruiseChecker {
 						cruiseData.getUserColNames().get(k));
 			}
 		}
-		// Add the completed timestamp element to the root element
+		// Add the ordered complete timestamp element to the root element
+		Element timestampElement = new Element(ColumnSpec.DATE_COLUMN_ELEMENT);
+		for (int k = 0; k < 6; k++) {
+			if ( timestampElements[k] == null )
+				break;
+			timestampElement.addContent(timestampElements[k]);
+		}
 		rootElement.addContent(timestampElement);
 		// Create the cruise column specifications document
 		Document cruiseDoc = new Document(rootElement);
@@ -814,7 +821,7 @@ public class DashboardCruiseChecker {
 			woceThreeSets.get(k).removeAll(woceFourSets.get(k));
 		}
 
-		// Set the lastCruiseCheckHadGeopositionErrors flag indicating 
+		// Set the lastCheckHadGeopositionErrors flag indicating 
 		// if there are any date/time, lat, or lon WOCE-4 flags
 		if ( ( (colIndcs.timestampIndex >= 0) && 
 				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||
@@ -842,10 +849,10 @@ public class DashboardCruiseChecker {
 				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
 			 ( (colIndcs.latitudeIndex < 0) ||
 				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
-			lastCruiseCheckHadGeopositionErrors = true;
+			lastCheckHadGeopositionErrors = true;
 		}
 		else {
-			lastCruiseCheckHadGeopositionErrors = false;
+			lastCheckHadGeopositionErrors = false;
 		}
 
 		return output;
@@ -856,7 +863,7 @@ public class DashboardCruiseChecker {
 	 * 		true if the cruise last checked had geoposition errors
 	 */
 	public boolean hadGeopositionErrors() {
-		return lastCruiseCheckHadGeopositionErrors;
+		return lastCheckHadGeopositionErrors;
 	}
 
 	/**
