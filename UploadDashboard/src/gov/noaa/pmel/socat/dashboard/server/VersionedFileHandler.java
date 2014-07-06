@@ -5,6 +5,8 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import java.io.File;
 import java.util.ArrayDeque;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
@@ -20,10 +22,13 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
  * 
  * @author Karl Smith
  */
-public abstract class VersionedFileHandler {
+public class VersionedFileHandler {
 
 	File filesDir;
 	SVNClientManager svnManager;
+	ArrayDeque<File[]> filesToCommit;
+	ArrayDeque<File> parentToUpdate;
+	ArrayDeque<String> commitMessage;
 
 	/**
 	 * Handles version control for files under the given working copy 
@@ -52,16 +57,93 @@ public abstract class VersionedFileHandler {
 		// Create the version control manager with the provided credentials
 		svnManager = SVNClientManager.newInstance(
 				SVNWCUtil.createDefaultOptions(true), svnUsername, svnPassword);
+		filesToCommit = new ArrayDeque<File[]>();
+		parentToUpdate = new ArrayDeque<File>();
+		commitMessage = new ArrayDeque<String>();
+		watchCommitQueue();
 	}
 
 	/**
-	 * Commits the working copy file to version control.  If the file is not
-	 * currently under version control, it is added.  The commit message
-	 * will include the given user name as the person responsible for the
-	 * the commit, followed by any additional details provided in message.
+	 * Adds files to queue of files to be committed.
+	 * 
+	 * @param commitFiles
+	 * 		files to be committed
+	 * @param parent
+	 * 		parent directory to be updated after the commit
+	 * @param message
+	 * 		message to accompany the commit
+	 */
+	private void addFilesToCommit(File[] commitFiles, File parent, String message) {
+		synchronized(filesToCommit) {
+			filesToCommit.addLast(commitFiles);
+			parentToUpdate.addLast(parent);
+			commitMessage.addLast(message);
+		}
+	}
+
+	// Check every 5 minutes
+	private static long MILLISECONDS_CHECK_INTERVAL = 5 * 60 * 1000L;
+	// Work for up to 30 seconds
+	private static long MILLISECONDS_WORK_INTERVAL = 30 * 1000L;
+	/**
+	 * Periodically checks the queue of files to be committed, and 
+	 * commits any files present.  Stops when filesDir is set to null.
+	 */
+	private void watchCommitQueue() {
+		(new Timer()).schedule(new TimerTask() {
+			@Override
+			public void run() {
+				File[] commitFiles;
+				File parent;
+				String message;
+				long startTime = System.currentTimeMillis();
+				do {
+					synchronized(filesToCommit) {
+						commitFiles = filesToCommit.pollFirst();
+						parent = parentToUpdate.pollFirst();
+						message = commitMessage.pollFirst();
+					}
+					if ( commitFiles != null ) {
+						if ( (parent != null) && (message != null) ) {
+							try {
+								// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
+								// and not any other updated files under any directories specified
+								svnManager.getCommitClient().doCommit(commitFiles, false, 
+										message, null, null, false, false, SVNDepth.EMPTY);
+								// Update the parent directory
+								svnManager.getUpdateClient().doUpdate(parent, 
+										SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
+							} catch (SVNException ex) {
+								// Should not happen, but nothing can be done about it if it does
+							}
+						}
+						if ( (System.currentTimeMillis() - startTime) > MILLISECONDS_WORK_INTERVAL )
+							break;
+					}
+				} while ( commitFiles != null );
+				// Check if this VersionedFileHander is no longer needed
+				if ( (filesDir == null) && (commitFiles == null) ) {
+					cancel();
+					return;
+				}
+			}
+		}, MILLISECONDS_CHECK_INTERVAL, MILLISECONDS_CHECK_INTERVAL);
+	}
+
+	/**
+	 * Marks that this file handler should perform any outstanding commits
+	 * and terminate the thread checking for commits.
+	 */
+	public void shutdown() {
+		filesDir = null;
+	}
+
+	/**
+	 * Commits the working copy file to version control.  
+	 * If the file is not currently under version control, it is added.
 	 * 
 	 * @param wcfile
-	 * 		working copy file to (add and) commit in version control
+	 * 		working copy file to add, if needed, and commit in version control
 	 * @param message
 	 * 		the commit message to use
 	 * @throws SVNException
@@ -72,8 +154,10 @@ public abstract class VersionedFileHandler {
 		try {
 			SVNStatus status = svnManager.getStatusClient()
 										 .doStatus(wcfile, false);
-			if ( (status.getContentsStatus() == SVNStatusType.STATUS_UNVERSIONED) ||
-				 (status.getContentsStatus() == SVNStatusType.STATUS_NONE) )
+			SVNStatusType contentsStatus = status.getContentsStatus();
+			if ( (contentsStatus == SVNStatusType.STATUS_UNVERSIONED) ||
+				 (contentsStatus == SVNStatusType.STATUS_DELETED) ||
+				 (contentsStatus == SVNStatusType.STATUS_NONE) )
 				needsAdd = true;
 		} catch ( SVNException ex ) {
 			// At this point, assume the parent directory is not version controlled
@@ -81,21 +165,21 @@ public abstract class VersionedFileHandler {
 		}
 
 		if ( needsAdd ) {
-			// Add the file, and any unversioned directories in its path, to version control
+			// Add the file (force), and any unversioned directories in its path, to version control
 			svnManager.getWCClient()
-					  .doAdd(wcfile, false, false, false, 
+					  .doAdd(wcfile, true, false, false, 
 							  SVNDepth.EMPTY, false, true);
 		}
 
 		// Get the list of directories, as well as the file, that need to be committed
-		ArrayDeque<File> filesToCommit = new ArrayDeque<File>();
-		filesToCommit.push(wcfile);
+		ArrayDeque<File> commitFiles = new ArrayDeque<File>();
+		commitFiles.push(wcfile);
 		// Always add the parent directory to the list to be examined
-		File parentToUpdate = wcfile.getParentFile();
-		filesToCommit.push(parentToUpdate);
+		File parent = wcfile.getParentFile();
+		commitFiles.push(parent);
 		// Work down the directory tree until we fall out 
 		// or find an unchanged directory
-		for (File currFile = parentToUpdate.getParentFile(); currFile != null; 
+		for (File currFile = parent.getParentFile(); currFile != null; 
 										currFile = currFile.getParentFile()) {
 			SVNStatus status;
 			try {
@@ -106,12 +190,12 @@ public abstract class VersionedFileHandler {
 			}
 			SVNStatusType statType = status.getContentsStatus();
 			if ( statType == SVNStatusType.STATUS_ADDED ) {
-				filesToCommit.push(currFile);
-				parentToUpdate = currFile;
+				commitFiles.push(currFile);
+				parent = currFile;
 			}
 			else if ( statType == SVNStatusType.STATUS_NORMAL ) {
 				// Normal revisioned directory in the working copy
-				parentToUpdate = currFile;
+				parent = currFile;
 				break;
 			}
 			else {
@@ -119,17 +203,8 @@ public abstract class VersionedFileHandler {
 				break;
 			}
 		}
-		File[] commitFiles = new File[filesToCommit.size()];
-		commitFiles = filesToCommit.toArray(commitFiles);
-
-		// Commit the update, including the add if applicable
-		// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
-		// and not any other updated files under any directories specified
-		svnManager.getCommitClient().doCommit(commitFiles, false, message,
-									null, null, false, false, SVNDepth.EMPTY);
-		// Update the existing parent directory
-		svnManager.getUpdateClient().doUpdate(parentToUpdate, 
-				SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
+		// schedule committing the changes
+		addFilesToCommit(commitFiles.toArray(new File[commitFiles.size()]), parent, message);
 	}
 
 	/**
@@ -144,15 +219,10 @@ public abstract class VersionedFileHandler {
 	 * 		if deleting the file or committing the deletion throws one
 	 */
 	void deleteVersionedFile(File wcFile, String message) throws SVNException {
-		// Delete the file from the working directory and
-		// schedule deletion from the repository
-		svnManager.getWCClient().doDelete(wcFile, false, true, false);
-		// Commit the deletion from the repository
-		svnManager.getCommitClient().doCommit(new File[] {wcFile}, false, message,
-									null, null, false, false, SVNDepth.EMPTY);
-		// Update the existing parent directory
-		svnManager.getUpdateClient().doUpdate(wcFile.getParentFile(), 
-				SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
+		// Delete the file (force) from the working directory and version control
+		svnManager.getWCClient().doDelete(wcFile, true, true, false);
+		// schedule committing the changes
+		addFilesToCommit(new File[] {wcFile}, wcFile.getParentFile(), message);
 	}
-
+	
 }
