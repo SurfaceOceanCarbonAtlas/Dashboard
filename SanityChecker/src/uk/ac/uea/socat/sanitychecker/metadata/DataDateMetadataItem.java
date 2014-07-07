@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -45,7 +46,7 @@ public class DataDateMetadataItem extends MetadataItem {
 			int year = Integer.parseInt(record.getColumn(SocatDataRecord.YEAR_COLUMN_NAME).getValue());
 			int month = Integer.parseInt(record.getColumn(SocatDataRecord.MONTH_COLUMN_NAME).getValue());
 			int day = Integer.parseInt(record.getColumn(SocatDataRecord.DAY_COLUMN_NAME).getValue());
-			DateTime newDate = new DateTime(year, month, day, 0, 0, 0).withTimeAtStartOfDay();
+			DateTime newDate = new DateTime(year, month, day, 0, 0, 0, DateTimeZone.UTC).withTimeAtStartOfDay();
 			
 			// If no date is currently set, then this record's date is be recorded
 			if (null == itsDate) {

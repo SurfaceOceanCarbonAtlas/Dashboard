@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -32,7 +33,7 @@ public class RevisedSubmissionMetadataItem extends MetadataItem {
 	@Override
 	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
 		// Set to today's date
-		setValue(new DateTime().withTimeAtStartOfDay());
+		setValue(new DateTime(DateTimeZone.UTC).withTimeAtStartOfDay());
 
 	}
 

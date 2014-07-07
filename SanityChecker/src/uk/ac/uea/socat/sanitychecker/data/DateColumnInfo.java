@@ -292,7 +292,7 @@ public class DateColumnInfo {
 					day = day - itsJanFirstIndex;
 					
 					// Build the date, checking values as we go
-					DateTime calculationDate = new DateTime(year, 1, 1, 0, 0, 0);
+					DateTime calculationDate = new DateTime(year, 1, 1, 0, 0, 0, DateTimeZone.UTC);
 					
 					if (day < 0) {
 						throw new DateTimeParseException(invalidDateMessage);

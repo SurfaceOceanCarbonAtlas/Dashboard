@@ -13,6 +13,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
@@ -102,7 +103,7 @@ public class SanityChecker {
 		//
 		// The relevant code for two-digit year handling is in the DateTimeHandler class
 		//
-		DateTime now = new DateTime();
+		DateTime now = new DateTime(DateTimeZone.UTC);
 		if (now.getYear() >= DateTimeHandler.FINAL_RUN_YEAR) {
 			initLogger.fatal("The Sanity Checker will no longer run, because two-digit years cannot be supported.");
 			throw new SanityCheckerException("The Sanity Checker will no longer run, because two-digit years cannot be supported.");
