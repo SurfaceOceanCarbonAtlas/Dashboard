@@ -245,7 +245,6 @@ public class CruiseListPage extends Composite {
 	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	private boolean managerButtonsShown;
-	private double minTableWidth;
 	TextColumn<DashboardCruise> timestampColumn;
 	TextColumn<DashboardCruise> expocodeColumn;
 
@@ -818,6 +817,7 @@ public class CruiseListPage extends Composite {
 		Header<Boolean> selectedHeader = buildSelectedHeader();
 
 		// Create the columns for this table
+		TextColumn<DashboardCruise> rowNumColumn = buildRowNumColumn();
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		expocodeColumn = buildExpocodeColumn();
 		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
@@ -830,6 +830,7 @@ public class CruiseListPage extends Composite {
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
+		datasetsGrid.addColumn(rowNumColumn, "");
 		datasetsGrid.addColumn(selectedColumn, selectedHeader);
 		datasetsGrid.addColumn(expocodeColumn, 
 				SafeHtmlUtils.fromSafeConstant(EXPOCODE_COLUMN_NAME));
@@ -851,7 +852,10 @@ public class CruiseListPage extends Composite {
 				SafeHtmlUtils.fromSafeConstant(OWNER_COLUMN_NAME));
 
 		// Set the minimum widths of the columns
-		minTableWidth = 0.0;
+		double minTableWidth = 0.0;
+		datasetsGrid.setColumnWidth(rowNumColumn, 
+				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(selectedColumn, 
 				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
@@ -891,7 +895,6 @@ public class CruiseListPage extends Composite {
 		listProvider.addDataDisplay(datasetsGrid);
 
 		// Make the columns sortable
-		// selectedColumn.setSortable(true);
 		expocodeColumn.setSortable(true);
 		timestampColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
@@ -905,8 +908,6 @@ public class CruiseListPage extends Composite {
 		// Add a column sorting handler for these columns
 		ListHandler<DashboardCruise> columnSortHandler = 
 				new ListHandler<DashboardCruise>(listProvider.getList());
-		columnSortHandler.setComparator(selectedColumn,
-				DashboardCruise.selectedComparator);
 		columnSortHandler.setComparator(expocodeColumn, 
 				DashboardCruise.expocodeComparator);
 		columnSortHandler.setComparator(timestampColumn, 
@@ -937,6 +938,39 @@ public class CruiseListPage extends Composite {
 		datasetsGrid.setSkipRowHoverCheck(false);
 		datasetsGrid.setSkipRowHoverFloatElementCheck(false);
 		datasetsGrid.setSkipRowHoverStyleUpdate(false);
+	}
+
+	/**
+	 * @return the row number column for the table
+	 */
+	private TextColumn<DashboardCruise> buildRowNumColumn() {
+		TextColumn<DashboardCruise> rowNumColumn = new TextColumn<DashboardCruise>() {
+			@Override
+			public String getValue(DashboardCruise cruise) {
+				String expocode = cruise.getExpocode();
+				List<DashboardCruise> cruiseList = listProvider.getList();
+				int k = 0;
+				while ( k < cruiseList.size() ) {
+					// Only check expocodes since they should be unique
+					if ( expocode.equals(cruiseList.get(k).getExpocode()) )
+						break;
+					k++;
+				}
+				return Integer.toString(k+1);
+			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				String msg = getValue(cruise);
+				sb.appendHtmlConstant("<div style=\"color: " + 
+						SocatUploadDashboard.ROW_NUMBER_COLOR + ";\">");
+				for (int k = msg.length(); k < 4; k++)
+					sb.appendHtmlConstant("&nbsp;");
+				sb.appendEscaped(msg);
+				sb.appendHtmlConstant("</div>");
+			}
+		};
+		return rowNumColumn;
 	}
 
 	/**
