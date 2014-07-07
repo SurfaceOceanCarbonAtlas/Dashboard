@@ -99,13 +99,13 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 	}
 
 	@Override
-	public DashboardCruiseList addCruiseToList(String username,
-			String passhash, String expocode) throws IllegalArgumentException {
+	public DashboardCruiseList addCruisesToList(String username,
+			String passhash, String wildExpocode) throws IllegalArgumentException {
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);
-		// Add the cruise to the user's list and return the updated list
+		// Add the cruises to the user's list and return the updated list
 		return dataStore.getUserFileHandler()
-						.addCruiseToListing(expocode, username);
+						.addCruisesToListing(wildExpocode, username);
 	}
 
 	@Override

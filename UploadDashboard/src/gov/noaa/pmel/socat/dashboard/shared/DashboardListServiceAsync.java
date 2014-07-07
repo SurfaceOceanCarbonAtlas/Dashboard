@@ -79,8 +79,8 @@ public interface DashboardListServiceAsync {
 	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
-	 * @param expocode
-	 * 		cruises to be added
+	 * @param wildExpocode
+	 * 		expocode, possibly with wildcards * and ?, to use
 	 * @return
 	 * 		the updated list of cruises for the user
 	 * @param callback
@@ -89,8 +89,8 @@ public interface DashboardListServiceAsync {
 	 * 		if authentication failed, or 
 	 * 		if the cruise to be added does not exist
 	 */
-	void addCruiseToList(String username, String passhash, 
-			String expocode,
+	void addCruisesToList(String username, String passhash, 
+			String wildExpocode,
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
