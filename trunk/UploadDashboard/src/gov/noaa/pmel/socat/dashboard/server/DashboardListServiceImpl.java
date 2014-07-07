@@ -77,14 +77,15 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 
 	@Override
 	public DashboardCruiseList deleteCruises(String username, String passhash,
-			TreeSet<String> expocodeSet) throws IllegalArgumentException {
+			TreeSet<String> expocodeSet, Boolean deleteMetadata) 
+											throws IllegalArgumentException {
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);
 		// Delete each of the cruises in the given set
 		for ( String expocode : expocodeSet ) {
 			try {
 				dataStore.getCruiseFileHandler()
-						 .deleteCruiseFiles(expocode, username);
+						 .deleteCruiseFiles(expocode, username, deleteMetadata);
 
 			} catch (FileNotFoundException ex) {
 				// Cruise already deleted? - ignore

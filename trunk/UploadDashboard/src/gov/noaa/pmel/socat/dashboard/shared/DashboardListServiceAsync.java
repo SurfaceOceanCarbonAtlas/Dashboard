@@ -59,6 +59,8 @@ public interface DashboardListServiceAsync {
 	 * 		encrypted password to use
 	 * @param expocodeSet
 	 * 		cruises to be deleted
+	 * @param deleteMetadata
+	 * 		also delete metadata and additional documents?
 	 * @return
 	 * 		the updated list of cruises for the user
 	 * @param callback
@@ -68,7 +70,7 @@ public interface DashboardListServiceAsync {
 	 * 		if problems deleting a cruise
 	 */
 	void deleteCruises(String username, String passhash, 
-			TreeSet<String> expocodeSet,
+			TreeSet<String> expocodeSet, Boolean deleteMetadata,
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**

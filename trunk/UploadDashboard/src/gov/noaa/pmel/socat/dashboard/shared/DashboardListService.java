@@ -59,6 +59,8 @@ public interface DashboardListService extends RemoteService {
 	 * 		encrypted password to use
 	 * @param expocodeSet
 	 * 		cruises to be deleted
+	 * @param deleteMetadata
+	 * 		also delete metadata and additional documents?
 	 * @return
 	 * 		the updated list of cruises for the user
 	 * @throws IllegalArgumentException
@@ -66,7 +68,8 @@ public interface DashboardListService extends RemoteService {
 	 * 		if problems deleting a cruise
 	 */
 	DashboardCruiseList deleteCruises(String username, String passhash, 
-			TreeSet<String> expocodeSet) throws IllegalArgumentException;
+			TreeSet<String> expocodeSet, Boolean deleteMetadata) 
+										throws IllegalArgumentException;
 
 	/**
 	 * After authenticating the user using the given credentials,

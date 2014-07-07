@@ -159,10 +159,12 @@ public class CruiseListPage extends Composite {
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
 	private static final String DELETE_DATASET_HTML_PROLOGUE = 
-			"All data, metadata, and supplemental documents " +
-			"will be deleted for the following data sets: <ul>";
+			"All data will be deleted for the following data sets: <ul>";
 	private static final String DELETE_DATASET_HTML_EPILOGUE =
-			"</ul> Do you wish to proceed?";
+			"</ul> Do you want to proceed?";
+	private static final String ALSO_DELETE_METADATA_HTML =
+			"Do you want to also delete any metadata and " +
+			"supplemental documents associated with these datasets?";
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
 	private static final String DELETE_DATASET_FAIL_MSG = 
@@ -170,7 +172,7 @@ public class CruiseListPage extends Composite {
 
 	private static final String EXPOCODE_TO_ADD_MSG = 
 			"Enter the expocode, possibly with wildcards * and ?, of the " +
-			"data set(s) you wish to add to your personal list of data sets";
+			"data set(s) you want to add to your personal list of data sets";
 	private static final String ADD_DATASET_FAIL_MSG = 
 			"Unable to add the specified data set(s) " +
 			"to your personal list of data sets";
@@ -180,7 +182,7 @@ public class CruiseListPage extends Composite {
 			"list of data sets; the data, metadata, and supplemental " +
 			"documents will <b>not</b> be removed: <ul>";
 	private static final String REMOVE_DATASET_HTML_EPILOGUE = 
-			"</ul> Do you wish to proceed?";
+			"</ul> Do you want to proceed?";
 	private static final String REMOVE_YES_TEXT = "Yes";
 	private static final String REMOVE_NO_TEXT = "No";
 	private static final String REMOVE_DATASET_FAIL_MSG = 
@@ -240,6 +242,7 @@ public class CruiseListPage extends Composite {
 	private String username;
 	private ListDataProvider<DashboardCruise> listProvider;
 	private DashboardAskPopup askDeletePopup;
+	private DashboardAskPopup askAlsoDeleteMetadataPopup;
 	private DashboardAskPopup askRemovePopup;
 	private HashSet<DashboardCruise> cruiseSet;
 	private TreeSet<String> expocodeSet;
@@ -299,6 +302,9 @@ public class CruiseListPage extends Composite {
 		removeFromListButton.setTitle(REMOVE_FROM_LIST_HOVER_HELP);
 
 		managerButtonsShown = true;
+		askDeletePopup = null;
+		askAlsoDeleteMetadataPopup = null;
+		askRemovePopup = null;
 		askDataAutofailPopup = null;
 		uploadButton.setFocus(true);
 	}
@@ -675,7 +681,7 @@ public class CruiseListPage extends Composite {
 				public void onSuccess(Boolean okay) {
 					// Only proceed only if yes button was selected
 					if ( okay ) {
-						continueDeleteCruises();
+						askAlsoDeleteMetadata();
 					}
 				}
 				@Override
@@ -689,14 +695,36 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
+	 * Asks whether the metadata and additional documents should 
+	 * also be deleted.  When answered, the delete request is made.
+	 */
+	private void askAlsoDeleteMetadata() {
+		if ( askAlsoDeleteMetadataPopup == null ) {
+			askAlsoDeleteMetadataPopup = new DashboardAskPopup(DELETE_YES_TEXT, 
+					DELETE_NO_TEXT, new AsyncCallback<Boolean>() {
+				@Override
+				public void onSuccess(Boolean okay) {
+					continueDeleteCruises(okay);
+				}
+				@Override
+				public void onFailure(Throwable ex) {
+					// Never called
+					;
+				}
+			});			
+		}
+		askAlsoDeleteMetadataPopup.askQuestion(ALSO_DELETE_METADATA_HTML);
+	}
+
+	/**
 	 * Makes the request to delete the currently selected cruises,
 	 * and processes the results.
 	 */
-	private void continueDeleteCruises() {
+	private void continueDeleteCruises(Boolean deleteMetadata) {
 		SocatUploadDashboard.showWaitCursor();
 		service.deleteCruises(DashboardLoginPage.getUsername(), 
 				DashboardLoginPage.getPasshash(), expocodeSet,
-				new AsyncCallback<DashboardCruiseList>() {
+				deleteMetadata, new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
 				if ( DashboardLoginPage.getUsername()
