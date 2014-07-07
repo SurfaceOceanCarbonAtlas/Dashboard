@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.base.BaseDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -78,32 +79,32 @@ public class DateTimeHandler {
 	public DateTimeHandler(String dateFormat) throws DateTimeException {
 		itsDateOnlyFormatters = new ArrayList<DateTimeFormatter>(3);
 		String hyphenDateString = validateDateFormatString(dateFormat, '-');
-		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(hyphenDateString));
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(hyphenDateString).withZone(DateTimeZone.UTC));
 		String slashDateString = validateDateFormatString(dateFormat, '/');
-		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(slashDateString));
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(slashDateString).withZone(DateTimeZone.UTC));
 		String noSepDateString = validateDateFormatString(dateFormat, null);
-		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(noSepDateString));
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(noSepDateString).withZone(DateTimeZone.UTC));
 
 		// The date-time formats can come from the sanity checker combining separate date and time fields
 		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(21);
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss.SSS").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmmss").withPivotYear(PIVOT_YEAR));
-		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmm").withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm:ss.SSS").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm:ss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HH:mm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmmss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(hyphenDateString + " HHmm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss.SSS").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm:ss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmmss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss.SSS").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmmss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HHmm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 
-		itsOutputDateFormatter = DateTimeFormat.forPattern(DATE_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
-		itsOutputDateTimeFormatter = DateTimeFormat.forPattern(DATE_TIME_OUTPUT_FORMAT).withPivotYear(PIVOT_YEAR);
+		itsOutputDateFormatter = DateTimeFormat.forPattern(DATE_OUTPUT_FORMAT).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR);
+		itsOutputDateTimeFormatter = DateTimeFormat.forPattern(DATE_TIME_OUTPUT_FORMAT).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR);
 	}
 	
 	/**
