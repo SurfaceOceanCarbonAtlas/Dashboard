@@ -450,6 +450,7 @@ public class CruiseListPage extends Composite {
 				cruise.setSelected(false);
 		}
 		datasetsGrid.setRowCount(cruiseList.size());
+		datasetsGrid.setVisibleRange(0, cruiseList.size());
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
 	}
@@ -503,6 +504,7 @@ public class CruiseListPage extends Composite {
 			}
 		}
 		datasetsGrid.setRowCount(cruiseList.size());
+		datasetsGrid.setVisibleRange(0, cruiseList.size());
 		// Make sure the table is sorted according to the last specification
 		ColumnSortEvent.fire(datasetsGrid, datasetsGrid.getColumnSortList());
 	}
