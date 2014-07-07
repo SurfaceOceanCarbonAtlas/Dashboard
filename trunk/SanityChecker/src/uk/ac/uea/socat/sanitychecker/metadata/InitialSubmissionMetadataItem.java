@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -36,7 +37,7 @@ public class InitialSubmissionMetadataItem extends MetadataItem {
 		// Otherwise we set today's date.
 		try {
 			if (null == getValue(dateTimeHandler)) {
-				setValue(new DateTime().withTimeAtStartOfDay());
+				setValue(new DateTime(DateTimeZone.UTC).withTimeAtStartOfDay());
 			}
 		} catch (DateTimeException e) {
 			throw new MetadataException(getName(), "A value already exists for the initial submission date, but it couldn't be retrieved");
