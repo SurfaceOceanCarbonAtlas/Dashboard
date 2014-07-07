@@ -656,6 +656,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		cruise to delete
 	 * @param username
 	 * 		user wanting to delete the cruise
+	 * @param deleteMetadata 
+	 * 		also delete metadata and additional documents?
 	 * @throws IllegalArgumentException
 	 * 		if the cruise expocode is not valid, if there were
 	 * 		problems access the cruise, if the user is not permitted 
@@ -664,8 +666,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * @throws FileNotFoundException
 	 * 		if the cruise information file does not exist
 	 */
-	public void deleteCruiseFiles(String expocode, String username) 
-				throws IllegalArgumentException, FileNotFoundException {
+	public void deleteCruiseFiles(String expocode, String username, 
+			Boolean deleteMetadata) throws IllegalArgumentException, 
+												FileNotFoundException {
 		// Verify this cruise can be deleted
 		DashboardCruise cruise;
 		try {
@@ -721,15 +724,17 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					ex.getMessage());
 		}
 
-		// Delete the metadata documents associated with this cruise
-		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
-		String omeTimestamp = cruise.getOmeTimestamp();
-		if ( ! omeTimestamp.isEmpty() )
-			metadataHandler.removeMetadata(username, expocode, 
-					OmeMetadata.OME_FILENAME);
-		for ( String mdataTitle : cruise.getAddlDocs() )
-			metadataHandler.removeMetadata(username, expocode, 
-					DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
+		if ( deleteMetadata ) {
+			// Delete the metadata and additional documents associated with this cruise
+			MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
+			String omeTimestamp = cruise.getOmeTimestamp();
+			if ( ! omeTimestamp.isEmpty() )
+				metadataHandler.removeMetadata(username, expocode, 
+						OmeMetadata.OME_FILENAME);
+			for ( String mdataTitle : cruise.getAddlDocs() )
+				metadataHandler.removeMetadata(username, expocode, 
+						DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
+		}
 	}
 
 	/**
