@@ -70,22 +70,22 @@ public interface DashboardListService extends RemoteService {
 
 	/**
 	 * After authenticating the user using the given credentials,
-	 * adds the indicated cruise to the user's list of cruises.
+	 * adds the indicated cruises to the user's list of cruises.
 	 * 
 	 * @param username
 	 * 		name of user making this request
 	 * @param passhash
 	 * 		encrypted password to use
-	 * @param expocode
-	 * 		cruises to be added
+	 * @param wildExpocode
+	 * 		expocode, possibly with wildcards * and ?, to use
 	 * @return
 	 * 		the updated list of cruises for the user
 	 * @throws IllegalArgumentException
 	 * 		if authentication failed, or 
 	 * 		if the cruise to be added does not exist
 	 */
-	DashboardCruiseList addCruiseToList(String username, String passhash,
-						String expocode) throws IllegalArgumentException;
+	DashboardCruiseList addCruisesToList(String username, String passhash,
+						String wildExpocode) throws IllegalArgumentException;
 
 	/**
 	 * After authenticating the user using the given credentials,

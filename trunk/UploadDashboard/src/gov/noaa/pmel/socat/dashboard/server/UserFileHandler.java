@@ -298,24 +298,24 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Adds an entry to a user's list of cruises, and saves the resulting 
+	 * Adds an entries to a user's list of cruises, and saves the resulting 
 	 * list of cruises.
 	 * 
-	 * @param expocode
-	 * 		expocode of cruise to add to the list
+	 * @param wildExpocode
+	 * 		expocode, possibly with wildcards * and ?, to use
 	 * @param username
 	 * 		user whose cruise list is to be updated
 	 * @return
 	 * 		updated list of cruises for user
 	 * @throws IllegalArgumentException
 	 * 		if username is invalid, 
-	 * 		if expocode is invalid,
+	 * 		if wildExpocode is invalid,
 	 * 		if the cruise information file does not exist, 
 	 * 		if there was a problem saving the updated cruise listing, or 
 	 * 		if there was an error committing the updated cruise listing 
 	 * 			to version control
 	 */
-	public DashboardCruiseList addCruiseToListing(String expocode, 
+	public DashboardCruiseList addCruisesToListing(String wildExpocode, 
 						String username) throws IllegalArgumentException {
 		CruiseFileHandler cruiseHandler;
 		try {
@@ -324,18 +324,30 @@ public class UserFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the cruise file handler");
 		}
-		DashboardCruiseList cruiseList = getCruiseListing(username);
-		// Create a cruise entry for this data
-		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
-		if ( cruise == null ) 
+		HashSet<String> matchExpocodes = 
+				cruiseHandler.getMatchingExpocodes(wildExpocode);
+		if ( matchExpocodes.size() == 0 ) 
 			throw new IllegalArgumentException(
-					"cruise " + expocode + " does not exist");
-		// Add or replace this cruise entry in the cruise list
-		// Only the expocodes (keys) are saved in the cruise list
-		if ( cruiseList.put(expocode, cruise) == null ) {
-			saveCruiseListing(cruiseList, "added cruise " + 
-					expocode + " to the listing for " + username);
+					"No datasets with an expocode matching " + wildExpocode);
+		DashboardCruiseList cruiseList = getCruiseListing(username);
+		String commitMsg = "Added cruise(s) ";
+		boolean needsCommit = false;
+		for ( String expocode : matchExpocodes ) {
+			// Create a cruise entry for this data
+			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+			if ( cruise == null ) 
+				throw new IllegalArgumentException("Unexpected error: dataset " +
+						expocode + " does not exist");
+			// Add or replace this cruise entry in the cruise list
+			// Only the expocodes (keys) are saved in the cruise list
+			if ( cruiseList.put(expocode, cruise) == null ) {
+				commitMsg += expocode + ", ";
+				needsCommit = true;
+			}
 		}
+		if ( needsCommit )
+			saveCruiseListing(cruiseList, 
+					commitMsg + " to the listing for " + username); 
 		return cruiseList;
 	}
 

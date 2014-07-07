@@ -16,8 +16,10 @@ import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -152,6 +155,60 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Get the name of the saved cruise data file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_DATA_FILENAME_EXTENSION);
+	}
+
+	/**
+	 * Searches all existing cruises an returns the expocodes of those that
+	 * match the given regular expression.
+	 * 
+	 * @param wildExpocode
+	 * 		expocode, possibly with wildcards * and ?, to use
+	 * @return
+	 * 		list of expocodes of existing cruises that match 
+	 * 		the given wildcard expocode; never null, but may be empty
+	 * @throws IllegalArgumentException
+	 * 		if the given expocode is invalid
+	 */
+	public HashSet<String> getMatchingExpocodes(String wildExpocode) 
+											throws IllegalArgumentException {
+		HashSet<String> matchingExpocodes = new HashSet<String>();
+		final Pattern filenamePattern;
+		try {
+			String filenameRegEx = wildExpocode.toUpperCase();
+			filenameRegEx = filenameRegEx.replace("*", 
+					"[" + DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+");
+			filenameRegEx = filenameRegEx.replace("?", 
+					"[" + DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]{1}");
+			filenameRegEx += CRUISE_INFO_FILENAME_EXTENSION;
+			filenamePattern = Pattern.compile(filenameRegEx);
+		} catch (PatternSyntaxException ex) {
+			throw new IllegalArgumentException(ex);
+		}
+		File[] subDirs = filesDir.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if ( pathname.isDirectory() )
+					return true;
+				return false;
+			}
+		});
+		for ( File subDir : subDirs ) {
+			File[] matchFiles = subDir.listFiles(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					if ( filenamePattern.matcher(name).matches() )
+						return true;
+					return false;
+				}
+			});
+			for ( File match : matchFiles ) {
+				String name = match.getName();
+				String expocode = name.substring(0, name.length() - 
+						CRUISE_INFO_FILENAME_EXTENSION.length());
+				matchingExpocodes.add(expocode);
+			}
+		}
+		return matchingExpocodes;
 	}
 
 	/**
@@ -1374,4 +1431,5 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		return msgList;
 	}
+
 }

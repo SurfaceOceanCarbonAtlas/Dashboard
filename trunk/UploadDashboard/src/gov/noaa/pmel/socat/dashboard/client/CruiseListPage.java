@@ -98,7 +98,7 @@ public class CruiseListPage extends Composite {
 	private static final String ADD_TO_LIST_TEXT = 
 			"Add to List";
 	private static final String ADD_TO_LIST_HOVER_HELP = 
-			"add an existing data set to this list of data sets";
+			"add existing data sets to this list of data sets";
 
 	private static final String REMOVE_FROM_LIST_TEXT = 
 			"Remove from List";
@@ -169,10 +169,10 @@ public class CruiseListPage extends Composite {
 			"Unable to delete the data sets";
 
 	private static final String EXPOCODE_TO_ADD_MSG = 
-			"Enter the expocode of the data set to wish to add " +
-			"to your personal list of data sets";
+			"Enter the expocode, possibly with wildcards * and ?, of the " +
+			"data set(s) you wish to add to your personal list of data sets";
 	private static final String ADD_DATASET_FAIL_MSG = 
-			"Unable to add the specified data set " +
+			"Unable to add the specified data set(s) " +
 			"to your personal list of data sets";
 
 	private static final String REMOVE_DATASET_HTML_PROLOGUE = 
@@ -186,6 +186,9 @@ public class CruiseListPage extends Composite {
 	private static final String REMOVE_DATASET_FAIL_MSG = 
 			"Unable to remove the selected data sets " +
 			"from your personal list of data sets";
+
+	private static final String UNEXPECTED_INVALID_DATESET_LIST_MSG = 
+			" (unexpected invalid data set list returned)";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
@@ -227,8 +230,8 @@ public class CruiseListPage extends Composite {
 	@UiField Button viewDataButton;
 	@UiField Button omeMetadataButton;
 	@UiField Button addlDocsButton;
-	@UiField Button qcSubmitButton;
 	@UiField Button reviewButton;
+	@UiField Button qcSubmitButton;
 	@UiField Button deleteButton;
 	@UiField Button addToListButton;
 	@UiField Button removeFromListButton;
@@ -281,11 +284,11 @@ public class CruiseListPage extends Composite {
 		addlDocsButton.setText(ADDL_DOCS_TEXT);
 		addlDocsButton.setTitle(ADDL_DOCS_HOVER_HELP);
 
-		qcSubmitButton.setText(QC_SUBMIT_TEXT);
-		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
-
 		reviewButton.setText(REVIEW_TEXT);
 		reviewButton.setTitle(REVIEW_HOVER_HELP);
+
+		qcSubmitButton.setText(QC_SUBMIT_TEXT);
+		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
 
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
@@ -344,7 +347,7 @@ public class CruiseListPage extends Composite {
 				}
 				else {
 					SocatUploadDashboard.showMessage(errMsg + 
-							" (unexpected invalid dataset list)");
+							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
 				SocatUploadDashboard.showAutoCursor();
 			}
@@ -625,6 +628,13 @@ public class CruiseListPage extends Composite {
 		AddlDocsManagerPage.showPage(cruiseSet);
 	}
 
+	@UiHandler("reviewButton")
+	void reviewOnClick(ClickEvent event) {
+		// TODO: implement
+		SocatUploadDashboard.showMessage("Not yet implemented");
+		return;
+	}
+
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
 		if ( ! getSelectedCruises(false) ) {
@@ -638,13 +648,6 @@ public class CruiseListPage extends Composite {
 			return;
 		}
 		checkCruisesForSOCAT(cruiseSet);
-	}
-
-	@UiHandler("reviewButton")
-	void reviewOnClick(ClickEvent event) {
-		// TODO: implement
-		SocatUploadDashboard.showMessage("Not yet implemented");
-		return;
 	}
 
 	@UiHandler("deleteButton")
@@ -701,7 +704,7 @@ public class CruiseListPage extends Composite {
 				}
 				else {
 					SocatUploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
-							" (unexpected invalid data set list)");
+							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
 				SocatUploadDashboard.showAutoCursor();
 			}
@@ -715,59 +718,32 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("addToListButton")
 	void addToListOnClick(ClickEvent event) {
-		String expocode = Window.prompt(EXPOCODE_TO_ADD_MSG, "");
-		if ( expocode != null ) {
-			expocode = expocode.trim().toUpperCase();
-			// Quick local check if the expocode is obviously invalid
-			boolean badExpo = false;
-			String errMsg = ADD_DATASET_FAIL_MSG;
-			int expoLen = expocode.length();
-			if ( (expoLen < DashboardUtils.MIN_EXPOCODE_LENGTH) ||
-				 (expoLen > DashboardUtils.MAX_EXPOCODE_LENGTH) ) {
-				badExpo = true;
-				errMsg += " (Invalid Expocode length)";
-			}
-			else {
-				for (int k = 0; k < expoLen; k++) {
-					if ( ! DashboardUtils.VALID_EXPOCODE_CHARACTERS
-										 .contains(expocode.substring(k, k+1)) ) {
-						badExpo = true;
-						errMsg += " (Invalid characters in the Expocode)";
-						break;
+		String wildExpocode = Window.prompt(EXPOCODE_TO_ADD_MSG, "");
+		if ( (wildExpocode != null) && ! wildExpocode.trim().isEmpty() ) {
+			SocatUploadDashboard.showWaitCursor();
+			// Save the currently selected cruises
+			getSelectedCruises(null);
+			service.addCruisesToList(DashboardLoginPage.getUsername(), 
+					DashboardLoginPage.getPasshash(), wildExpocode, 
+					new AsyncCallback<DashboardCruiseList>() {
+				@Override
+				public void onSuccess(DashboardCruiseList cruises) {
+					if ( DashboardLoginPage.getUsername()
+							.equals(cruises.getUsername()) ) {
+						CruiseListPage.this.updateCruises(cruises);
 					}
+					else {
+						SocatUploadDashboard.showMessage(ADD_DATASET_FAIL_MSG + 
+								UNEXPECTED_INVALID_DATESET_LIST_MSG);
+					}
+					SocatUploadDashboard.showAutoCursor();
 				}
-			}
-			if ( badExpo ) {
-				SocatUploadDashboard.showMessage(errMsg);
-			}
-			else {
-				SocatUploadDashboard.showWaitCursor();
-				// Save the currently selected cruises
-				getSelectedCruises(null);
-				// Add the expocode to the list to be selected
-				addSelectedCruise(expocode);
-				service.addCruiseToList(DashboardLoginPage.getUsername(), 
-						 DashboardLoginPage.getPasshash(), expocode, 
-						 new AsyncCallback<DashboardCruiseList>() {
-					@Override
-					public void onSuccess(DashboardCruiseList cruises) {
-						if ( DashboardLoginPage.getUsername()
-								.equals(cruises.getUsername()) ) {
-							CruiseListPage.this.updateCruises(cruises);
-						}
-						else {
-							SocatUploadDashboard.showMessage(ADD_DATASET_FAIL_MSG + 
-									" (unexpected invalid data set list)");
-						}
-						SocatUploadDashboard.showAutoCursor();
-					}
-					@Override
-					public void onFailure(Throwable ex) {
-						SocatUploadDashboard.showFailureMessage(ADD_DATASET_FAIL_MSG, ex);
-						SocatUploadDashboard.showAutoCursor();
-					}
-				});
-			}
+				@Override
+				public void onFailure(Throwable ex) {
+					SocatUploadDashboard.showFailureMessage(ADD_DATASET_FAIL_MSG, ex);
+					SocatUploadDashboard.showAutoCursor();
+				}
+			});
 		}
 	}
 
@@ -820,7 +796,7 @@ public class CruiseListPage extends Composite {
 				}
 				else {
 					SocatUploadDashboard.showMessage(REMOVE_DATASET_FAIL_MSG + 
-							" (unexpected invalid data set list)");
+							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
 				SocatUploadDashboard.showAutoCursor();
 			}
