@@ -4,6 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayDeque;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,7 +13,6 @@ import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
@@ -24,6 +25,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
  */
 public class VersionedFileHandler {
 
+	private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
 	File filesDir;
 	SVNClientManager svnManager;
 	ArrayDeque<File[]> filesToCommit;
@@ -81,10 +83,10 @@ public class VersionedFileHandler {
 		}
 	}
 
-	// Check every 5 minutes
-	private static long MILLISECONDS_CHECK_INTERVAL = 5 * 60 * 1000L;
-	// Work for up to 30 seconds
-	private static long MILLISECONDS_WORK_INTERVAL = 30 * 1000L;
+	// Check every minute
+	private static long MILLISECONDS_CHECK_INTERVAL = 60 * 1000L;
+	// Keep working while less than 3 seconds have passed
+	private static long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;
 	/**
 	 * Periodically checks the queue of files to be committed, and 
 	 * commits any files present.  Stops when filesDir is set to null.
@@ -106,6 +108,7 @@ public class VersionedFileHandler {
 					if ( commitFiles != null ) {
 						if ( (parent != null) && (message != null) ) {
 							try {
+								/*
 								// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
 								// and not any other updated files under any directories specified
 								svnManager.getCommitClient().doCommit(commitFiles, false, 
@@ -113,7 +116,17 @@ public class VersionedFileHandler {
 								// Update the parent directory
 								svnManager.getUpdateClient().doUpdate(parent, 
 										SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
-							} catch (SVNException ex) {
+								*/
+								// For v3, just write the svn commands to file to be dealt with manually
+								PrintWriter cmdsWriter = new PrintWriter(new FileWriter(
+										new File(filesDir, SVN_COMMIT_COMMANDS_FILENAME), true));
+								cmdsWriter.print("svn commit --depth=empty -m '" + message + "'");
+								for ( File svnfile : commitFiles )
+									cmdsWriter.print(" " + svnfile.getPath());
+								cmdsWriter.println();
+								cmdsWriter.println("svn update --depth=infinity " + parent.getPath());
+								cmdsWriter.close();
+							} catch (Exception ex) {
 								// Should not happen, but nothing can be done about it if it does
 							}
 						}
@@ -167,19 +180,16 @@ public class VersionedFileHandler {
 		if ( needsAdd ) {
 			// Add the file (force), and any unversioned directories in its path, to version control
 			svnManager.getWCClient()
-					  .doAdd(wcfile, true, false, false, 
-							  SVNDepth.EMPTY, false, true);
+					  .doAdd(wcfile, true, false, false, SVNDepth.EMPTY, false, true);
 		}
 
 		// Get the list of directories, as well as the file, that need to be committed
 		ArrayDeque<File> commitFiles = new ArrayDeque<File>();
 		commitFiles.push(wcfile);
-		// Always add the parent directory to the list to be examined
-		File parent = wcfile.getParentFile();
-		commitFiles.push(parent);
 		// Work down the directory tree until we fall out 
 		// or find an unchanged directory
-		for (File currFile = parent.getParentFile(); currFile != null; 
+		File parent = wcfile;
+		for (File currFile = wcfile.getParentFile(); currFile != null; 
 										currFile = currFile.getParentFile()) {
 			SVNStatus status;
 			try {
@@ -189,17 +199,19 @@ public class VersionedFileHandler {
 				break;
 			}
 			SVNStatusType statType = status.getContentsStatus();
-			if ( statType == SVNStatusType.STATUS_ADDED ) {
+			if ( (statType == SVNStatusType.STATUS_ADDED) ||
+				 (statType == SVNStatusType.STATUS_MODIFIED) ||
+				 (statType == SVNStatusType.STATUS_REPLACED) ) {
 				commitFiles.push(currFile);
 				parent = currFile;
 			}
 			else if ( statType == SVNStatusType.STATUS_NORMAL ) {
-				// Normal revisioned directory in the working copy
+				// An unmodified directory under version control 
 				parent = currFile;
 				break;
 			}
 			else {
-				// Unknown or non-revisioned directory
+				// A directory outside version control
 				break;
 			}
 		}

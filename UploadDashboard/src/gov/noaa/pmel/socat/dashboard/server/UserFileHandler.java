@@ -198,7 +198,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			if ( cruise == null ) {
 				// Remove this expocode from the saved list
 				needsCommit = true;
-				commitMessage += "remove invalid cruise " + expocode + "; ";
+				commitMessage += "remove cruise " + expocode + "; ";
 			}
 			else {
 				cruiseList.put(expocode, cruise);
