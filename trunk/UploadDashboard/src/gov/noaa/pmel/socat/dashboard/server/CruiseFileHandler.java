@@ -468,7 +468,10 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						throw new IOException("Inconsistent number of data columns (" + 
 								datavals.length + " instead of " + numDataColumns + 
 								") in \n" + dataline);
-					dataValues.add(new ArrayList<String>(Arrays.asList(datavals)));
+					ArrayList<String> dataList = new ArrayList<String>(datavals.length);
+					for (int k = 0; k < datavals.length; k++)
+						dataList.add(datavals[k].trim());
+					dataValues.add(dataList);
 					if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
 						break;
 				}
