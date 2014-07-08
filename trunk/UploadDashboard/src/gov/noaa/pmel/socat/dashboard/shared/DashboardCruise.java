@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1054195413459242498L;
+	private static final long serialVersionUID = 1065583765156989184L;
 
 	boolean selected;
 	Double version;
@@ -197,7 +197,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param addlDocNames
+	 * @param addlDocs
 	 * 		the set of additional document "filename; timestamp" strings
 	 * 		for this cruise.  The set in this object is cleared and all 
 	 * 		the contents of the given set, if not null, are added. 

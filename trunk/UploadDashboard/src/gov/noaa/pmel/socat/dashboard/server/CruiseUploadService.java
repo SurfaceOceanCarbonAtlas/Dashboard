@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -252,12 +253,19 @@ public class CruiseUploadService extends HttpServlet {
 				}
 			}
 
-			// Check if an OME metadata file already exists for this cruise
-			DashboardMetadata mdata = dataStore.getMetadataFileHandler()
-					.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME);
-			if ( mdata != null ) {
-				cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());
+			// Check if an OME metadata file or supplemental documents already exist for this cruise
+			ArrayList<DashboardMetadata> mdataList = 
+					dataStore.getMetadataFileHandler().getMetadataFiles(expocode);
+			TreeSet<String> addlDocs = new TreeSet<String>();
+			for ( DashboardMetadata mdata : mdataList ) {
+				if ( OmeMetadata.OME_FILENAME.equals(mdata.getFilename())) {
+					cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());					
+				}
+				else {
+					addlDocs.add(mdata.getAddlDocsTitle());
+				}
 			}
+			cruiseData.setAddlDocs(addlDocs);
 
 			// Save the cruise file and commit it to version control
 			try {
