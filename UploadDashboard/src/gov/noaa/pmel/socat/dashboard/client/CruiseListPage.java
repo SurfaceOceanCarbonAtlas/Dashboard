@@ -162,9 +162,6 @@ public class CruiseListPage extends Composite {
 			"All data will be deleted for the following data sets: <ul>";
 	private static final String DELETE_DATASET_HTML_EPILOGUE =
 			"</ul> Do you want to proceed?";
-	private static final String ALSO_DELETE_METADATA_HTML =
-			"Do you want to also delete any metadata and " +
-			"supplemental documents associated with these datasets?";
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
 	private static final String DELETE_DATASET_FAIL_MSG = 
@@ -242,7 +239,6 @@ public class CruiseListPage extends Composite {
 	private String username;
 	private ListDataProvider<DashboardCruise> listProvider;
 	private DashboardAskPopup askDeletePopup;
-	private DashboardAskPopup askAlsoDeleteMetadataPopup;
 	private DashboardAskPopup askRemovePopup;
 	private HashSet<DashboardCruise> cruiseSet;
 	private TreeSet<String> expocodeSet;
@@ -303,7 +299,6 @@ public class CruiseListPage extends Composite {
 
 		managerButtonsShown = true;
 		askDeletePopup = null;
-		askAlsoDeleteMetadataPopup = null;
 		askRemovePopup = null;
 		askDataAutofailPopup = null;
 		uploadButton.setFocus(true);
@@ -681,7 +676,8 @@ public class CruiseListPage extends Composite {
 				public void onSuccess(Boolean okay) {
 					// Only proceed only if yes button was selected
 					if ( okay ) {
-						askAlsoDeleteMetadata();
+						// never delete the metadata or supplemental documents
+						continueDeleteCruises(false);
 					}
 				}
 				@Override
@@ -692,28 +688,6 @@ public class CruiseListPage extends Composite {
 			});
 		}
 		askDeletePopup.askQuestion(message);
-	}
-
-	/**
-	 * Asks whether the metadata and additional documents should 
-	 * also be deleted.  When answered, the delete request is made.
-	 */
-	private void askAlsoDeleteMetadata() {
-		if ( askAlsoDeleteMetadataPopup == null ) {
-			askAlsoDeleteMetadataPopup = new DashboardAskPopup(DELETE_YES_TEXT, 
-					DELETE_NO_TEXT, new AsyncCallback<Boolean>() {
-				@Override
-				public void onSuccess(Boolean okay) {
-					continueDeleteCruises(okay);
-				}
-				@Override
-				public void onFailure(Throwable ex) {
-					// Never called
-					;
-				}
-			});			
-		}
-		askAlsoDeleteMetadataPopup.askQuestion(ALSO_DELETE_METADATA_HTML);
 	}
 
 	/**
