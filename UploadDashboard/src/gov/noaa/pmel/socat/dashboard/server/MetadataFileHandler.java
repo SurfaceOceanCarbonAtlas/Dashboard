@@ -13,7 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -82,6 +84,52 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		File metadataFile = new File(filesDir, expocode.substring(0,4) +
 				File.separator + expocode + "_" + basename);
 		return metadataFile;
+	}
+
+	/**
+	 * Returns the list of metadata (including supplemental) documents associated
+	 * with the given expocode.
+	 * 
+	 * @param cruiseExpocode
+	 * 		get metadata documents for this expocode
+	 * @return
+	 * 		list of metadata documents; never null but may be empty
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid
+	 */
+	public ArrayList<DashboardMetadata> getMetadataFiles(String cruiseExpocode)
+											throws IllegalArgumentException {
+		ArrayList<DashboardMetadata> metadataList = new ArrayList<DashboardMetadata>();
+		// Check and standardize the expocode
+		final String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
+		// Get the parent directory for these metadata documents;
+		// if it does not exist, return the empty list
+		File parentDir = new File(filesDir, expocode.substring(0,4));
+		if ( ! parentDir.isDirectory() )
+			return metadataList;
+		// Get all the metadata files for this expocode 
+		File[] metafiles = parentDir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				if ( name.startsWith(expocode + "_") && 
+					 name.endsWith(METADATA_INFOFILE_SUFFIX) )
+					return true;
+				return false;
+			}
+		});
+		// Add the metadata info for all the metadata files (may be an empty array)
+		for ( File mfile : metafiles ) {
+			String basename = mfile.getName().substring(expocode.length() + 1, 
+					mfile.getName().length() - METADATA_INFOFILE_SUFFIX.length());
+			try {
+				DashboardMetadata mdata = getMetadataInfo(expocode, basename);
+				if ( mdata != null )
+					metadataList.add(mdata);
+			} catch ( Exception ex ) {
+				// Ignore this entry if there are problems
+			}
+		}
+		return metadataList;
 	}
 
 	/**
