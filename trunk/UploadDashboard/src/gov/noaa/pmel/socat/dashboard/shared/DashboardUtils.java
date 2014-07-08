@@ -129,10 +129,10 @@ public class DashboardUtils {
 
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, "xCO2_atm_dry_actual");
 		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_INTERP, "xCO2_atm_dry_interp");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_DRY_ACTUAL, "pCO2_atm_dry_actual");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_DRY_INTERP, "pCO2_atm_dry_interp");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_DRY_ACTUAL, "fCO2_atm_dry_actual");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_DRY_INTERP, "fCO2_atm_dry_interp");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_ACTUAL, "pCO2_atm_wet_actual");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_INTERP, "pCO2_atm_wet_interp");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_ACTUAL, "fCO2_atm_wet_actual");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_INTERP, "fCO2_atm_wet_interp");
 
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_XCO2, "delta_xCO2");
 		STD_HEADER_NAMES.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
@@ -241,10 +241,10 @@ public class DashboardUtils {
 
 		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, XCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_INTERP, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_DRY_ACTUAL, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_DRY_INTERP, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_DRY_ACTUAL, FCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_DRY_INTERP, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_ACTUAL, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_INTERP, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_ACTUAL, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_INTERP, FCO2_UNITS);
 
 		STD_DATA_UNITS.put(DataColumnType.DELTA_XCO2, XCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);

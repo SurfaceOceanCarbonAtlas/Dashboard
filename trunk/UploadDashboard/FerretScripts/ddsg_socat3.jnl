@@ -63,8 +63,8 @@ LET varnames_list1 = {\
 "pCO2_water_equi_temp","pCO2_water_sst_100humidity_uatm",\
 "fCO2_water_equi_uatm","fCO2_water_sst_100humidity_uatm",\
 "xCO2_atm_dry_actual","xCO2_atm_dry_interp",\
-"pCO2_atm_dry_actual","pCO2_atm_dry_interp",\
-"fCO2_atm_dry_actual","fCO2_atm_dry_interp",\
+"pCO2_atm_wet_actual","pCO2_atm_wet_interp",\
+"fCO2_atm_wet_actual","fCO2_atm_wet_interp",\
 "delta_xCO2","delta_pCO2","delta_fCO2",\
 "xH2O_equi","relative_humidity","specific_humidity",\
 "ship_speed","ship_dir","wind_speed_true","wind_speed_rel",\

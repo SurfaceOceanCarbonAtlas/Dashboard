@@ -17,7 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -6361180208151478846L;
+	private static final long serialVersionUID = 46434937472989443L;
 
 	static final double MAX_RELATIVE_ERROR = 1.0E-6;
 	static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
@@ -75,10 +75,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	// Six possible air CO2 measurements reported
 	Double xCO2AtmDryActual;
 	Double xCO2AtmDryInterp;
-	Double pCO2AtmDryActual;
-	Double pCO2AtmDryInterp;
-	Double fCO2AtmDryActual;
-	Double fCO2AtmDryInterp;
+	Double pCO2AtmWetActual;
+	Double pCO2AtmWetInterp;
+	Double fCO2AtmWetActual;
+	Double fCO2AtmWetInterp;
 
 	// CO2Water - (interpolated) CO2Atm; only user-provided
 	Double deltaXCO2;
@@ -180,10 +180,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 		xCO2AtmDryActual = FP_MISSING_VALUE;
 		xCO2AtmDryInterp = FP_MISSING_VALUE;
-		pCO2AtmDryActual = FP_MISSING_VALUE;
-		pCO2AtmDryInterp = FP_MISSING_VALUE;
-		fCO2AtmDryActual = FP_MISSING_VALUE;
-		fCO2AtmDryInterp = FP_MISSING_VALUE;
+		pCO2AtmWetActual = FP_MISSING_VALUE;
+		pCO2AtmWetInterp = FP_MISSING_VALUE;
+		fCO2AtmWetActual = FP_MISSING_VALUE;
+		fCO2AtmWetInterp = FP_MISSING_VALUE;
 
 		deltaXCO2 = FP_MISSING_VALUE;
 		deltaPCO2 = FP_MISSING_VALUE;
@@ -365,17 +365,17 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 				else if ( type.equals(DataColumnType.XCO2_ATM_DRY_INTERP) ) {
 					this.xCO2AtmDryInterp = Double.valueOf(value);
 				}
-				else if ( type.equals(DataColumnType.PCO2_ATM_DRY_ACTUAL) ) {
-					this.pCO2AtmDryActual = Double.valueOf(value);
+				else if ( type.equals(DataColumnType.PCO2_ATM_WET_ACTUAL) ) {
+					this.pCO2AtmWetActual = Double.valueOf(value);
 				}
-				else if ( type.equals(DataColumnType.PCO2_ATM_DRY_INTERP) ) {
-					this.pCO2AtmDryInterp = Double.valueOf(value);
+				else if ( type.equals(DataColumnType.PCO2_ATM_WET_INTERP) ) {
+					this.pCO2AtmWetInterp = Double.valueOf(value);
 				}
-				else if ( type.equals(DataColumnType.FCO2_ATM_DRY_ACTUAL) ) {
-					this.fCO2AtmDryActual = Double.valueOf(value);
+				else if ( type.equals(DataColumnType.FCO2_ATM_WET_ACTUAL) ) {
+					this.fCO2AtmWetActual = Double.valueOf(value);
 				}
-				else if ( type.equals(DataColumnType.FCO2_ATM_DRY_INTERP) ) {
-					this.fCO2AtmDryInterp = Double.valueOf(value);
+				else if ( type.equals(DataColumnType.FCO2_ATM_WET_INTERP) ) {
+					this.fCO2AtmWetInterp = Double.valueOf(value);
 				}
 				else if ( type.equals(DataColumnType.DELTA_XCO2) ) {
 					this.deltaXCO2 = Double.valueOf(value);
@@ -997,86 +997,86 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the pCO2AtmDryActual;
+	 * 		the pCO2AtmWetActual;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
-	public Double getpCO2AtmDryActual() {
-		return pCO2AtmDryActual;
+	public Double getpCO2AtmWetActual() {
+		return pCO2AtmWetActual;
 	}
 
 	/**
-	 * @param pCO2AtmDryActual 
-	 * 		the pCO2AtmDryActual to set;
+	 * @param pCO2AtmWetActual 
+	 * 		the pCO2AtmWetActual to set;
 	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
-	public void setpCO2AtmDryActual(Double pCO2AtmDryActual) {
-		if ( pCO2AtmDryActual == null )
-			this.pCO2AtmDryActual = FP_MISSING_VALUE;
+	public void setpCO2AtmWetActual(Double pCO2AtmWetActual) {
+		if ( pCO2AtmWetActual == null )
+			this.pCO2AtmWetActual = FP_MISSING_VALUE;
 		else
-			this.pCO2AtmDryActual = pCO2AtmDryActual;
+			this.pCO2AtmWetActual = pCO2AtmWetActual;
 	}
 
 	/**
 	 * @return 
-	 * 		the pCO2AtmDryInterp;
+	 * 		the pCO2AtmWetInterp;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
-	public Double getpCO2AtmDryInterp() {
-		return pCO2AtmDryInterp;
+	public Double getpCO2AtmWetInterp() {
+		return pCO2AtmWetInterp;
 	}
 
 	/**
-	 * @param pCO2AtmDryInterp 
-	 * 		the pCO2AtmDryInterp to set;
+	 * @param pCO2AtmWetInterp 
+	 * 		the pCO2AtmWetInterp to set;
 	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
-	public void setpCO2AtmDryInterp(Double pCO2AtmDryInterp) {
-		if ( pCO2AtmDryInterp == null )
-			this.pCO2AtmDryInterp = FP_MISSING_VALUE;
+	public void setpCO2AtmWetInterp(Double pCO2AtmWetInterp) {
+		if ( pCO2AtmWetInterp == null )
+			this.pCO2AtmWetInterp = FP_MISSING_VALUE;
 		else
-			this.pCO2AtmDryInterp = pCO2AtmDryInterp;
+			this.pCO2AtmWetInterp = pCO2AtmWetInterp;
 	}
 
 	/**
 	 * @return 
-	 * 		the fCO2AtmDryActual;
+	 * 		the fCO2AtmWetActual;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
-	public Double getfCO2AtmDryActual() {
-		return fCO2AtmDryActual;
+	public Double getfCO2AtmWetActual() {
+		return fCO2AtmWetActual;
 	}
 
 	/**
-	 * @param fCO2AtmDryActual 
-	 * 		the fCO2AtmDryActual to set;
+	 * @param fCO2AtmWetActual 
+	 * 		the fCO2AtmWetActual to set;
 	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
-	public void setfCO2AtmDryActual(Double fCO2AtmDryActual) {
-		if ( fCO2AtmDryActual == null )
-			this.fCO2AtmDryActual = FP_MISSING_VALUE;
+	public void setfCO2AtmWetActual(Double fCO2AtmWetActual) {
+		if ( fCO2AtmWetActual == null )
+			this.fCO2AtmWetActual = FP_MISSING_VALUE;
 		else
-			this.fCO2AtmDryActual = fCO2AtmDryActual;
+			this.fCO2AtmWetActual = fCO2AtmWetActual;
 	}
 
 	/**
 	 * @return 
-	 * 		the fCO2AtmDryInterp;
+	 * 		the fCO2AtmWetInterp;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
-	public Double getfCO2AtmDryInterp() {
-		return fCO2AtmDryInterp;
+	public Double getfCO2AtmWetInterp() {
+		return fCO2AtmWetInterp;
 	}
 
 	/**
-	 * @param fCO2AtmDryInterp 
-	 * 		the fCO2AtmDryInterp to set;
+	 * @param fCO2AtmWetInterp 
+	 * 		the fCO2AtmWetInterp to set;
 	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
 	 */
-	public void setfCO2AtmDryInterp(Double fCO2AtmDryInterp) {
-		if ( fCO2AtmDryInterp == null )
-			this.fCO2AtmDryInterp = FP_MISSING_VALUE;
+	public void setfCO2AtmWetInterp(Double fCO2AtmWetInterp) {
+		if ( fCO2AtmWetInterp == null )
+			this.fCO2AtmWetInterp = FP_MISSING_VALUE;
 		else
-			this.fCO2AtmDryInterp = fCO2AtmDryInterp;
+			this.fCO2AtmWetInterp = fCO2AtmWetInterp;
 	}
 
 	/**
@@ -2001,13 +2001,13 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(xCO2AtmDryInterp, other.xCO2AtmDryInterp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pCO2AtmDryActual, other.pCO2AtmDryActual, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(pCO2AtmWetActual, other.pCO2AtmWetActual, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(pCO2AtmDryInterp, other.pCO2AtmDryInterp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(pCO2AtmWetInterp, other.pCO2AtmWetInterp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2AtmDryActual, other.fCO2AtmDryActual, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(fCO2AtmWetActual, other.fCO2AtmWetActual, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(fCO2AtmDryInterp, other.fCO2AtmDryInterp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(fCO2AtmWetInterp, other.fCO2AtmWetInterp, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		if ( ! DashboardUtils.closeTo(deltaXCO2, other.deltaXCO2, MAX_RELATIVE_ERROR, MAX_ABSOLUTE_ERROR) )
@@ -2118,10 +2118,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 				",\n    xCO2AtmDryActual=" + xCO2AtmDryActual.toString() +
 				",\n    xCO2AtmDryInterp=" + xCO2AtmDryInterp.toString() +
-				",\n    pCO2AtmDryActual=" + pCO2AtmDryActual.toString() +
-				",\n    pCO2AtmDryInterp=" + pCO2AtmDryInterp.toString() +
-				",\n    fCO2AtmDryActual=" + fCO2AtmDryActual.toString() +
-				",\n    fCO2AtmDryInterp=" + fCO2AtmDryInterp.toString() +
+				",\n    pCO2AtmWetActual=" + pCO2AtmWetActual.toString() +
+				",\n    pCO2AtmWetInterp=" + pCO2AtmWetInterp.toString() +
+				",\n    fCO2AtmWetActual=" + fCO2AtmWetActual.toString() +
+				",\n    fCO2AtmWetInterp=" + fCO2AtmWetInterp.toString() +
 
 				",\n    deltaXCO2=" + deltaXCO2.toString() +
 				",\n    deltaPCO2=" + deltaPCO2.toString() +
