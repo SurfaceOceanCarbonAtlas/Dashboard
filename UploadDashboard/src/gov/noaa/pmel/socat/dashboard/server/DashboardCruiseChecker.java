@@ -1229,4 +1229,128 @@ public class DashboardCruiseChecker {
 		return output;
 	}
 
+	public void removeMissingLonLatDateTimeData(DashboardCruiseWithData cruiseData) {
+		// Get all lon/lat/date/time indices
+		ColumnIndices colIndcs = new ColumnIndices();
+		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
+		for (int k = 0; k < columnTypes.size(); k++) {
+			DataColumnType colType = columnTypes.get(k);
+			if ( colType.equals(DataColumnType.TIMESTAMP) )
+				colIndcs.timestampIndex = k;
+			else if ( colType.equals(DataColumnType.DATE) )
+				colIndcs.dateIndex = k;
+			else if ( colType.equals(DataColumnType.YEAR) )
+				colIndcs.yearIndex = k;
+			else if ( colType.equals(DataColumnType.MONTH) )
+				colIndcs.monthIndex = k;
+			else if ( colType.equals(DataColumnType.DAY) )
+				colIndcs.dayIndex = k;
+			else if ( colType.equals(DataColumnType.TIME) )
+				colIndcs.timeIndex = k;
+			else if ( colType.equals(DataColumnType.HOUR) )
+				colIndcs.hourIndex = k;
+			else if ( colType.equals(DataColumnType.MINUTE) )
+				colIndcs.minuteIndex = k;
+			else if ( colType.equals(DataColumnType.SECOND) )
+				colIndcs.secondIndex = k;
+			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) )
+				colIndcs.dayOfYearIndex = k;
+			else if ( colType.equals(DataColumnType.SECOND_OF_DAY) )
+				colIndcs.secondOfDayIndex = k;
+			else if ( colType.equals(DataColumnType.LONGITUDE) )
+				colIndcs.longitudeIndex = k;
+			else if ( colType.equals(DataColumnType.LATITUDE) )
+				colIndcs.latitudeIndex = k;
+		}
+		int numRows = cruiseData.getNumDataRows();
+		// Directly modify the data rows and data row indices for the WOCE flags
+		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
+		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
+		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
+		int k = 0;
+		while ( k < numRows ) {
+			if ( ( (colIndcs.timestampIndex >= 0) && 
+					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.timestampIndex)) ) ||
+				 ( (colIndcs.dateIndex >= 0) && 
+					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.dateIndex)) ) ||
+				 ( (colIndcs.timeIndex >= 0) && 
+					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.timeIndex)) ) ||
+				 ( (colIndcs.longitudeIndex >= 0) && 
+					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.longitudeIndex)) ) ||
+				 ( (colIndcs.latitudeIndex >= 0) && 
+					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.latitudeIndex)) ) ) {
+				// Remove this data row index from the WOCE flags, and decrement subsequent data row indices
+				for ( HashSet<Integer> woceFourRows : woceFourSets ) {
+					woceFourRows.remove(k);
+					for (int j = k+1; j < numRows; j++) {
+						if ( woceFourRows.remove(j) )
+							woceFourRows.add(j-1);
+					}
+				}
+				for ( HashSet<Integer> woceThreeRows : woceThreeSets ) {
+					woceThreeRows.remove(k);
+					for (int j = k+1; j < numRows; j++) {
+						if ( woceThreeRows.remove(j) )
+							woceThreeRows.add(j-1);
+					}
+				}
+				// Remove this data row
+				dataVals.remove(k);
+				numRows--;
+			}
+			else {
+				k++;
+			}
+		}
+		
+		// Update the total number of data rows, and assign the number 
+		// of data rows with errors and with only warnings from the sanity checker
+		cruiseData.setNumDataRows(numRows);
+		HashSet<Integer> errRows = new HashSet<Integer>();
+		for ( HashSet<Integer> woceFourRows : woceFourSets )
+			errRows.addAll(woceFourRows);
+		cruiseData.setNumErrorRows(errRows.size());
+		HashSet<Integer> warnRows = new HashSet<Integer>();
+		for ( HashSet<Integer> woceThreeRows : woceThreeSets )
+			warnRows.addAll(woceThreeRows);
+		warnRows.removeAll(errRows);
+		cruiseData.setNumWarnRows(warnRows.size());
+
+		// Set the lastCheckHadGeopositionErrors flag indicating 
+		// if there are any date/time, lat, or lon WOCE-4 flags
+		if ( ( (colIndcs.timestampIndex >= 0) && 
+				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||
+			 ( (colIndcs.dateIndex >= 0) && 
+				! woceFourSets.get(colIndcs.dateIndex).isEmpty() ) ||
+			 ( (colIndcs.yearIndex >= 0) &&
+				! woceFourSets.get(colIndcs.yearIndex).isEmpty() ) ||
+			 ( (colIndcs.monthIndex >= 0) &&
+				! woceFourSets.get(colIndcs.monthIndex).isEmpty() ) ||
+			 ( (colIndcs.dayIndex >= 0) &&
+				! woceFourSets.get(colIndcs.dayIndex).isEmpty() ) ||
+			 ( (colIndcs.timeIndex >= 0) &&
+				! woceFourSets.get(colIndcs.timeIndex).isEmpty() ) ||
+			 ( (colIndcs.hourIndex >= 0) &&
+				! woceFourSets.get(colIndcs.hourIndex).isEmpty() ) ||
+			 ( (colIndcs.minuteIndex >= 0) &&
+				! woceFourSets.get(colIndcs.minuteIndex).isEmpty() ) ||
+			 ( (colIndcs.secondIndex >= 0) &&
+				! woceFourSets.get(colIndcs.secondIndex).isEmpty() ) ||
+			 ( (colIndcs.dayOfYearIndex >= 0) &&
+				! woceFourSets.get(colIndcs.dayOfYearIndex).isEmpty() ) ||
+			 ( (colIndcs.secondOfDayIndex >= 0) &&
+				! woceFourSets.get(colIndcs.secondOfDayIndex).isEmpty() ) ||
+			 ( (colIndcs.longitudeIndex < 0) ||
+				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
+			 ( (colIndcs.latitudeIndex < 0) ||
+				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
+			lastCheckHadGeopositionErrors = true;
+		}
+		else {
+			lastCheckHadGeopositionErrors = false;
+		}
+
+		// Update the status message
+	}
+
 }
