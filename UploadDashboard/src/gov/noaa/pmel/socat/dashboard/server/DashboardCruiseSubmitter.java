@@ -122,6 +122,9 @@ public class DashboardCruiseSubmitter {
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
+				// Remove data lines with missing values in any columns of type 
+				// longitude, latitude, date, time, or timestamp
+				cruiseChecker.removeMissingLonLatDateTimeData(cruiseData, output.processedOK());
 				if ( qcFlag == null ) {
 					// See if the cruise has unacceptable issues
 					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
@@ -162,7 +165,7 @@ public class DashboardCruiseSubmitter {
 				comment.setFlag(null);
 				comment.setExpocode(expocode);
 				comment.setSocatVersion(cruise.getVersion());
-				comment.setRegionID(null);
+				comment.setRegionID('G');
 				comment.setFlagDate(new Date());
 				comment.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
@@ -173,11 +176,12 @@ public class DashboardCruiseSubmitter {
 				else {
 					recFlag = "";
 				}
-				comment.setComment(recFlag + "Automated data check detected " + 
-							Integer.toString(cruiseData.getNumErrorRows()) + 
-							" data points with errors and " + 
-							Integer.toString(cruiseData.getNumWarnRows()) + 
-							" data points with warnings.");
+				comment.setComment(recFlag + "Automated data check, " +
+						"plus any user-provided WOCE flags, gave " + 
+						Integer.toString(cruiseData.getNumErrorRows()) + 
+						" data points with errors and " + 
+						Integer.toString(cruiseData.getNumWarnRows()) + 
+						" data points with warnings.");
 				try {
 					databaseHandler.addQCEvent(comment);
 				} catch (SQLException ex) {
