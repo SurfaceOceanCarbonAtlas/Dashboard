@@ -79,11 +79,11 @@ public class DateTimeHandler {
 	public DateTimeHandler(String dateFormat) throws DateTimeException {
 		itsDateOnlyFormatters = new ArrayList<DateTimeFormatter>(3);
 		String hyphenDateString = validateDateFormatString(dateFormat, '-');
-		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(hyphenDateString).withZone(DateTimeZone.UTC));
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(hyphenDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		String slashDateString = validateDateFormatString(dateFormat, '/');
-		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(slashDateString).withZone(DateTimeZone.UTC));
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(slashDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		String noSepDateString = validateDateFormatString(dateFormat, null);
-		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(noSepDateString).withZone(DateTimeZone.UTC));
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(noSepDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 
 		// The date-time formats can come from the sanity checker combining separate date and time fields
 		itsDateTimeFormatters = new ArrayList<DateTimeFormatter>(21);
