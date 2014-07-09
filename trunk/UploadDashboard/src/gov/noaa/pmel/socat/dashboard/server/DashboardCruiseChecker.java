@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
@@ -97,6 +98,122 @@ public class DashboardCruiseChecker {
 		int windSpeedRelIndex = -1;
 		int windDirTrueIndex = -1;
 		int windDirRelIndex = -1;
+	}
+
+	/**
+	 * Creates and returns a ColumnIndices assigned with the indices
+	 * of the given data column types.
+	 * 
+	 * @param columnTypes
+	 * 		data column types to use
+	 * @return
+	 * 		assigned data column indices
+	 */
+	private ColumnIndices getColumnIndices(ArrayList<DataColumnType> columnTypes) {
+		// Save indices of data columns for assigning WOCE flags 
+		ColumnIndices colIndcs = new ColumnIndices();
+
+		for (int k = 0; k < columnTypes.size(); k++) {
+			DataColumnType colType = columnTypes.get(k);
+			if ( colType.equals(DataColumnType.TIMESTAMP) )
+				colIndcs.timestampIndex = k;
+			else if ( colType.equals(DataColumnType.DATE) )
+				colIndcs.dateIndex = k;
+			else if ( colType.equals(DataColumnType.YEAR) )
+				colIndcs.yearIndex = k;
+			else if ( colType.equals(DataColumnType.MONTH) )
+				colIndcs.monthIndex = k;
+			else if ( colType.equals(DataColumnType.DAY) )
+				colIndcs.dayIndex = k;
+			else if ( colType.equals(DataColumnType.TIME) )
+				colIndcs.timeIndex = k;
+			else if ( colType.equals(DataColumnType.HOUR) )
+				colIndcs.hourIndex = k;
+			else if ( colType.equals(DataColumnType.MINUTE) )
+				colIndcs.minuteIndex = k;
+			else if ( colType.equals(DataColumnType.SECOND) )
+				colIndcs.secondIndex = k;
+			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) )
+				colIndcs.dayOfYearIndex = k;
+			else if ( colType.equals(DataColumnType.SECOND_OF_DAY) )
+				colIndcs.secondOfDayIndex = k;
+
+			else if ( colType.equals(DataColumnType.LONGITUDE) )
+				colIndcs.longitudeIndex = k;
+			else if ( colType.equals(DataColumnType.LATITUDE) )
+				colIndcs.latitudeIndex = k;
+			else if ( colType.equals(DataColumnType.SAMPLE_DEPTH) )
+				colIndcs.sampleDepthIndex = k;
+			else if ( colType.equals(DataColumnType.SALINITY) )
+				colIndcs.salinityIndex = k;
+			else if ( colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) )
+				colIndcs.tEquIndex = k;
+			else if ( colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) )
+				colIndcs.sstIndex = k;
+			else if ( colType.equals(DataColumnType.ATMOSPHERIC_TEMPERATURE) )
+				colIndcs.tAtmIndex = k;
+			else if ( colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) )
+				colIndcs.pEquIndex = k;
+			else if ( colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) )
+				colIndcs.slpIndex = k;
+
+			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) )
+				colIndcs.xCO2WaterTEquDryIndex = k;
+			else if ( colType.equals(DataColumnType.XCO2_WATER_SST_DRY) )
+				colIndcs.xCO2WaterSstDryIndex = k;
+			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU_WET) )
+				colIndcs.xCO2WaterTEquWetIndex = k;
+			else if ( colType.equals(DataColumnType.XCO2_WATER_SST_WET) )
+				colIndcs.xCO2WaterSstWetIndex = k;
+			else if ( colType.equals(DataColumnType.PCO2_WATER_TEQU_WET) )
+				colIndcs.pCO2WaterTEquWetIndex = k;
+			else if ( colType.equals(DataColumnType.PCO2_WATER_SST_WET) )
+				colIndcs.pCO2WaterSstWetIndex = k;
+			else if ( colType.equals(DataColumnType.FCO2_WATER_TEQU_WET) )
+				colIndcs.fCO2WaterTEquWetIndex = k;
+			else if ( colType.equals(DataColumnType.FCO2_WATER_SST_WET) )
+				colIndcs.fCO2WaterSstWetIndex = k;
+
+			else if ( colType.equals(DataColumnType.XCO2_ATM_DRY_ACTUAL) )
+				colIndcs.xCO2AtmDryActualIndex = k;
+			else if ( colType.equals(DataColumnType.XCO2_ATM_DRY_INTERP) )
+				colIndcs.xCO2AtmDryInterpIndex = k;
+			else if ( colType.equals(DataColumnType.PCO2_ATM_WET_ACTUAL) )
+				colIndcs.pCO2AtmWetActualIndex = k;
+			else if ( colType.equals(DataColumnType.PCO2_ATM_WET_INTERP) )
+				colIndcs.pCO2AtmWetInterpIndex = k;
+			else if ( colType.equals(DataColumnType.FCO2_ATM_WET_ACTUAL) )
+				colIndcs.fCO2AtmWetActualIndex = k;
+			else if ( colType.equals(DataColumnType.FCO2_ATM_WET_INTERP) )
+				colIndcs.fCO2AtmWetInterpIndex = k;
+
+			else if ( colType.equals(DataColumnType.DELTA_XCO2) )
+				colIndcs.deltaXCO2Index = k;
+			else if ( colType.equals(DataColumnType.DELTA_PCO2) )
+				colIndcs.deltaPCO2Index = k;
+			else if ( colType.equals(DataColumnType.DELTA_FCO2) )
+				colIndcs.deltaFCO2Index = k;
+
+			else if ( colType.equals(DataColumnType.XH2O_EQU) )
+				colIndcs.xH2OEquIndex = k;
+			else if ( colType.equals(DataColumnType.RELATIVE_HUMIDITY) )
+				colIndcs.relativeHumidityIndex = k;
+			else if ( colType.equals(DataColumnType.SPECIFIC_HUMIDITY) )
+				colIndcs.specificHumidityIndex = k;
+			else if ( colType.equals(DataColumnType.SHIP_SPEED) )
+				colIndcs.shipSpeedIndex = k;
+			else if ( colType.equals(DataColumnType.SHIP_DIRECTION) )
+				colIndcs.shipDirIndex = k;
+			else if ( colType.equals(DataColumnType.WIND_SPEED_TRUE) )
+				colIndcs.windSpeedTrueIndex = k;
+			else if ( colType.equals(DataColumnType.WIND_SPEED_RELATIVE) )
+				colIndcs.windSpeedRelIndex = k;
+			else if ( colType.equals(DataColumnType.WIND_DIRECTION_TRUE) )
+				colIndcs.windDirTrueIndex = k;
+			else if ( colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) )
+				colIndcs.windDirRelIndex = k;
+		}
+		return colIndcs;
 	}
 
 	enum DateTimeType {
@@ -259,110 +376,8 @@ public class DashboardCruiseChecker {
 		String dateFormat = "YYYY-MM-DD";
 
 		// Save indices of data columns for assigning WOCE flags 
-		ColumnIndices colIndcs = new ColumnIndices();
-
-		// determine how the date/time is specified - in the process assign colIndcs
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
-		for (int k = 0; k < columnTypes.size(); k++) {
-			DataColumnType colType = columnTypes.get(k);
-			if ( colType.equals(DataColumnType.TIMESTAMP) )
-				colIndcs.timestampIndex = k;
-			else if ( colType.equals(DataColumnType.DATE) )
-				colIndcs.dateIndex = k;
-			else if ( colType.equals(DataColumnType.YEAR) )
-				colIndcs.yearIndex = k;
-			else if ( colType.equals(DataColumnType.MONTH) )
-				colIndcs.monthIndex = k;
-			else if ( colType.equals(DataColumnType.DAY) )
-				colIndcs.dayIndex = k;
-			else if ( colType.equals(DataColumnType.TIME) )
-				colIndcs.timeIndex = k;
-			else if ( colType.equals(DataColumnType.HOUR) )
-				colIndcs.hourIndex = k;
-			else if ( colType.equals(DataColumnType.MINUTE) )
-				colIndcs.minuteIndex = k;
-			else if ( colType.equals(DataColumnType.SECOND) )
-				colIndcs.secondIndex = k;
-			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) )
-				colIndcs.dayOfYearIndex = k;
-			else if ( colType.equals(DataColumnType.SECOND_OF_DAY) )
-				colIndcs.secondOfDayIndex = k;
-
-			else if ( colType.equals(DataColumnType.LONGITUDE) )
-				colIndcs.longitudeIndex = k;
-			else if ( colType.equals(DataColumnType.LATITUDE) )
-				colIndcs.latitudeIndex = k;
-			else if ( colType.equals(DataColumnType.SAMPLE_DEPTH) )
-				colIndcs.sampleDepthIndex = k;
-			else if ( colType.equals(DataColumnType.SALINITY) )
-				colIndcs.salinityIndex = k;
-			else if ( colType.equals(DataColumnType.EQUILIBRATOR_TEMPERATURE) )
-				colIndcs.tEquIndex = k;
-			else if ( colType.equals(DataColumnType.SEA_SURFACE_TEMPERATURE) )
-				colIndcs.sstIndex = k;
-			else if ( colType.equals(DataColumnType.ATMOSPHERIC_TEMPERATURE) )
-				colIndcs.tAtmIndex = k;
-			else if ( colType.equals(DataColumnType.EQUILIBRATOR_PRESSURE) )
-				colIndcs.pEquIndex = k;
-			else if ( colType.equals(DataColumnType.SEA_LEVEL_PRESSURE) )
-				colIndcs.slpIndex = k;
-
-			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU_DRY) )
-				colIndcs.xCO2WaterTEquDryIndex = k;
-			else if ( colType.equals(DataColumnType.XCO2_WATER_SST_DRY) )
-				colIndcs.xCO2WaterSstDryIndex = k;
-			else if ( colType.equals(DataColumnType.XCO2_WATER_TEQU_WET) )
-				colIndcs.xCO2WaterTEquWetIndex = k;
-			else if ( colType.equals(DataColumnType.XCO2_WATER_SST_WET) )
-				colIndcs.xCO2WaterSstWetIndex = k;
-			else if ( colType.equals(DataColumnType.PCO2_WATER_TEQU_WET) )
-				colIndcs.pCO2WaterTEquWetIndex = k;
-			else if ( colType.equals(DataColumnType.PCO2_WATER_SST_WET) )
-				colIndcs.pCO2WaterSstWetIndex = k;
-			else if ( colType.equals(DataColumnType.FCO2_WATER_TEQU_WET) )
-				colIndcs.fCO2WaterTEquWetIndex = k;
-			else if ( colType.equals(DataColumnType.FCO2_WATER_SST_WET) )
-				colIndcs.fCO2WaterSstWetIndex = k;
-
-			else if ( colType.equals(DataColumnType.XCO2_ATM_DRY_ACTUAL) )
-				colIndcs.xCO2AtmDryActualIndex = k;
-			else if ( colType.equals(DataColumnType.XCO2_ATM_DRY_INTERP) )
-				colIndcs.xCO2AtmDryInterpIndex = k;
-			else if ( colType.equals(DataColumnType.PCO2_ATM_WET_ACTUAL) )
-				colIndcs.pCO2AtmWetActualIndex = k;
-			else if ( colType.equals(DataColumnType.PCO2_ATM_WET_INTERP) )
-				colIndcs.pCO2AtmWetInterpIndex = k;
-			else if ( colType.equals(DataColumnType.FCO2_ATM_WET_ACTUAL) )
-				colIndcs.fCO2AtmWetActualIndex = k;
-			else if ( colType.equals(DataColumnType.FCO2_ATM_WET_INTERP) )
-				colIndcs.fCO2AtmWetInterpIndex = k;
-
-			else if ( colType.equals(DataColumnType.DELTA_XCO2) )
-				colIndcs.deltaXCO2Index = k;
-			else if ( colType.equals(DataColumnType.DELTA_PCO2) )
-				colIndcs.deltaPCO2Index = k;
-			else if ( colType.equals(DataColumnType.DELTA_FCO2) )
-				colIndcs.deltaFCO2Index = k;
-
-			else if ( colType.equals(DataColumnType.XH2O_EQU) )
-				colIndcs.xH2OEquIndex = k;
-			else if ( colType.equals(DataColumnType.RELATIVE_HUMIDITY) )
-				colIndcs.relativeHumidityIndex = k;
-			else if ( colType.equals(DataColumnType.SPECIFIC_HUMIDITY) )
-				colIndcs.specificHumidityIndex = k;
-			else if ( colType.equals(DataColumnType.SHIP_SPEED) )
-				colIndcs.shipSpeedIndex = k;
-			else if ( colType.equals(DataColumnType.SHIP_DIRECTION) )
-				colIndcs.shipDirIndex = k;
-			else if ( colType.equals(DataColumnType.WIND_SPEED_TRUE) )
-				colIndcs.windSpeedTrueIndex = k;
-			else if ( colType.equals(DataColumnType.WIND_SPEED_RELATIVE) )
-				colIndcs.windSpeedRelIndex = k;
-			else if ( colType.equals(DataColumnType.WIND_DIRECTION_TRUE) )
-				colIndcs.windDirTrueIndex = k;
-			else if ( colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) )
-				colIndcs.windDirRelIndex = k;
-		}
+		ColumnIndices colIndcs = getColumnIndices(columnTypes);
 
 		// Decide where to get the date and time for each measurement
 		DateTimeType timeSpec;
@@ -722,40 +737,17 @@ public class DashboardCruiseChecker {
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
 
+		// Directly modify the lists in the cruise data
+		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
+		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
+
 		// Clear all WOCE flags, then set those from the current set of messages
-		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceThreeRowIndices() )
+		for ( HashSet<Integer> rowIdxSet : woceFourSets )
 			rowIdxSet.clear();
-		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceFourRowIndices() )
+		for ( HashSet<Integer> rowIdxSet : woceThreeSets )
 			rowIdxSet.clear();
 		for ( Message msg : output.getMessages().getMessages() )
 			processMessage(cruiseData, msg, colIndcs);
-
-		// Assign the number of data rows with errors and with only warnings from the sanity checker
-		HashSet<Integer> errRows = new HashSet<Integer>();
-		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceFourRowIndices() )
-			errRows.addAll(rowIdxSet);
-		cruiseData.setNumErrorRows(errRows.size());
-		HashSet<Integer> warnRows = new HashSet<Integer>();
-		for ( HashSet<Integer> rowIdxSet : cruiseData.getWoceThreeRowIndices() )
-			warnRows.addAll(rowIdxSet);
-		warnRows.removeAll(errRows);
-		cruiseData.setNumWarnRows(warnRows.size());
-
-		// Assign the data-check status message using the results of the sanity check
-		if ( ! output.processedOK() ) {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
-		}
-		else if ( output.hasErrors() ) {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
-					Integer.toString(cruiseData.getNumErrorRows()) + " errors");
-		}
-		else if ( output.hasWarnings() ) {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
-					Integer.toString(cruiseData.getNumWarnRows()) + " warnings");
-		}
-		else {
-			cruiseData.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
-		}
 
 		// Add any user-provided WOCE-3 and WOCE-4 flags
 		for (int k = 0; k < columnTypes.size(); k++) {
@@ -767,9 +759,9 @@ public class DashboardCruiseChecker {
 					try {
 						int value = Integer.parseInt(cruiseData.getDataValues().get(rowIdx).get(k));
 						if ( value == 4 )
-							woceFlags = cruiseData.getWoceFourRowIndices();
+							woceFlags = woceFourSets;
 						else if ( value == 3 )
-							woceFlags = cruiseData.getWoceThreeRowIndices();
+							woceFlags = woceThreeSets;
 						else
 							woceFlags = null;
 					} catch (NumberFormatException ex) {
@@ -813,57 +805,16 @@ public class DashboardCruiseChecker {
 			}
 		}
 
-		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
-		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
-
 		// Remove any WOCE-3 flags on data values that also have a WOCE-4 flag
 		for (int k = 0; k < woceThreeSets.size(); k++) {
 			woceThreeSets.get(k).removeAll(woceFourSets.get(k));
 		}
 
-		// Set the lastCheckHadGeopositionErrors flag indicating 
-		// if there are any date/time, lat, or lon WOCE-4 flags
-		if ( ( (colIndcs.timestampIndex >= 0) && 
-				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||
-			 ( (colIndcs.dateIndex >= 0) && 
-				! woceFourSets.get(colIndcs.dateIndex).isEmpty() ) ||
-			 ( (colIndcs.yearIndex >= 0) &&
-				! woceFourSets.get(colIndcs.yearIndex).isEmpty() ) ||
-			 ( (colIndcs.monthIndex >= 0) &&
-				! woceFourSets.get(colIndcs.monthIndex).isEmpty() ) ||
-			 ( (colIndcs.dayIndex >= 0) &&
-				! woceFourSets.get(colIndcs.dayIndex).isEmpty() ) ||
-			 ( (colIndcs.timeIndex >= 0) &&
-				! woceFourSets.get(colIndcs.timeIndex).isEmpty() ) ||
-			 ( (colIndcs.hourIndex >= 0) &&
-				! woceFourSets.get(colIndcs.hourIndex).isEmpty() ) ||
-			 ( (colIndcs.minuteIndex >= 0) &&
-				! woceFourSets.get(colIndcs.minuteIndex).isEmpty() ) ||
-			 ( (colIndcs.secondIndex >= 0) &&
-				! woceFourSets.get(colIndcs.secondIndex).isEmpty() ) ||
-			 ( (colIndcs.dayOfYearIndex >= 0) &&
-				! woceFourSets.get(colIndcs.dayOfYearIndex).isEmpty() ) ||
-			 ( (colIndcs.secondOfDayIndex >= 0) &&
-				! woceFourSets.get(colIndcs.secondOfDayIndex).isEmpty() ) ||
-			 ( (colIndcs.longitudeIndex < 0) ||
-				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
-			 ( (colIndcs.latitudeIndex < 0) ||
-				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
-			lastCheckHadGeopositionErrors = true;
-		}
-		else {
-			lastCheckHadGeopositionErrors = false;
-		}
+		// Count the rows of data with errors and only warnings, check if there 
+		// were lon/lat/date/time problems and assign the data check status
+		countWoceFlags(cruiseData, colIndcs, output.processedOK());
 
 		return output;
-	}
-
-	/**
-	 * @return
-	 * 		true if the cruise last checked had geoposition errors
-	 */
-	public boolean hadGeopositionErrors() {
-		return lastCheckHadGeopositionErrors;
 	}
 
 	/**
@@ -897,13 +848,16 @@ public class DashboardCruiseChecker {
 		if ( colIdx > 0 )
 			colIdx--;
 
+		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
+		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
+
 		if ( msg.isError() ) {
 			// Erroneous data value
 			if ( colIdx < 0 ) {
 				// TODO: Disambiguate errors with no column index
 				// Associate ambiguous errors with time indices; 
 				// could be timestamp issue or calculated speed issue
-				ArrayList<HashSet<Integer>> woceFlags = cruiseData.getWoceFourRowIndices();
+				ArrayList<HashSet<Integer>> woceFlags = woceFourSets;
 				if ( colIndcs.timestampIndex >= 0 )
 					woceFlags.get(colIndcs.timestampIndex).add(rowIdx);
 				if ( colIndcs.timeIndex >= 0 )
@@ -926,7 +880,7 @@ public class DashboardCruiseChecker {
 					woceFlags.get(colIndcs.dayOfYearIndex).add(rowIdx);
 			}
 			else {
-				cruiseData.getWoceFourRowIndices().get(colIdx).add(rowIdx);
+				woceFourSets.get(colIdx).add(rowIdx);
 			}
 		}
 		else if ( msg.isWarning() ) {
@@ -935,7 +889,7 @@ public class DashboardCruiseChecker {
 				// TODO: Disambiguate warnings with no column index
 				// Associate ambiguous warnings with time indices; 
 				// could be timestamp issue or calculated speed issue
-				ArrayList<HashSet<Integer>> woceFlags = cruiseData.getWoceThreeRowIndices();
+				ArrayList<HashSet<Integer>> woceFlags = woceThreeSets;
 				if ( colIndcs.timestampIndex >= 0 )
 					woceFlags.get(colIndcs.timestampIndex).add(rowIdx);
 				if ( colIndcs.timeIndex >= 0 )
@@ -958,7 +912,7 @@ public class DashboardCruiseChecker {
 					woceFlags.get(colIndcs.dayOfYearIndex).add(rowIdx);
 			}
 			else {
-				cruiseData.getWoceThreeRowIndices().get(colIdx).add(rowIdx);
+				woceThreeSets.get(colIdx).add(rowIdx);
 			}
 		}
 		else {
@@ -1229,56 +1183,55 @@ public class DashboardCruiseChecker {
 		return output;
 	}
 
-	public void removeMissingLonLatDateTimeData(DashboardCruiseWithData cruiseData) {
-		// Get all lon/lat/date/time indices
-		ColumnIndices colIndcs = new ColumnIndices();
-		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
-		for (int k = 0; k < columnTypes.size(); k++) {
-			DataColumnType colType = columnTypes.get(k);
-			if ( colType.equals(DataColumnType.TIMESTAMP) )
-				colIndcs.timestampIndex = k;
-			else if ( colType.equals(DataColumnType.DATE) )
-				colIndcs.dateIndex = k;
-			else if ( colType.equals(DataColumnType.YEAR) )
-				colIndcs.yearIndex = k;
-			else if ( colType.equals(DataColumnType.MONTH) )
-				colIndcs.monthIndex = k;
-			else if ( colType.equals(DataColumnType.DAY) )
-				colIndcs.dayIndex = k;
-			else if ( colType.equals(DataColumnType.TIME) )
-				colIndcs.timeIndex = k;
-			else if ( colType.equals(DataColumnType.HOUR) )
-				colIndcs.hourIndex = k;
-			else if ( colType.equals(DataColumnType.MINUTE) )
-				colIndcs.minuteIndex = k;
-			else if ( colType.equals(DataColumnType.SECOND) )
-				colIndcs.secondIndex = k;
-			else if ( colType.equals(DataColumnType.DAY_OF_YEAR) )
-				colIndcs.dayOfYearIndex = k;
-			else if ( colType.equals(DataColumnType.SECOND_OF_DAY) )
-				colIndcs.secondOfDayIndex = k;
-			else if ( colType.equals(DataColumnType.LONGITUDE) )
-				colIndcs.longitudeIndex = k;
-			else if ( colType.equals(DataColumnType.LATITUDE) )
-				colIndcs.latitudeIndex = k;
-		}
-		int numRows = cruiseData.getNumDataRows();
+	/**
+	 * Default missing values used for detecting missing lon/lat/date/time/timestamp
+	 */
+	private static final HashSet<String> DEFAULT_MISSING_VALUES = new HashSet<String>();
+	static {
+		DEFAULT_MISSING_VALUES.add("");
+		DEFAULT_MISSING_VALUES.add("NULL");
+		DEFAULT_MISSING_VALUES.add("NA");
+		DEFAULT_MISSING_VALUES.add("N/A");
+		DEFAULT_MISSING_VALUES.add("NAN");
+		DEFAULT_MISSING_VALUES.add("-999");
+		DEFAULT_MISSING_VALUES.add("-999.");
+		DEFAULT_MISSING_VALUES.add("-999.0");
+		DEFAULT_MISSING_VALUES.add("-999.9");
+		DEFAULT_MISSING_VALUES.add("-9999");
+		DEFAULT_MISSING_VALUES.add("-9999.");
+		DEFAULT_MISSING_VALUES.add("-9999.0");
+		DEFAULT_MISSING_VALUES.add("-9999.9");
+	}
+
+	/**
+	 * @param cruiseData
+	 * 		cruise to use
+	 * @param processedOK
+	 * 		did the SanityCheck run successfully?
+	 */
+	public void removeMissingLonLatDateTimeData(
+			DashboardCruiseWithData cruiseData, boolean processedOK) {
+		ColumnIndices colIndcs = getColumnIndices(cruiseData.getDataColTypes());
+
 		// Directly modify the data rows and data row indices for the WOCE flags
 		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
 		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
 		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
+
 		int k = 0;
+		int numRows = cruiseData.getNumDataRows();
 		while ( k < numRows ) {
-			if ( ( (colIndcs.timestampIndex >= 0) && 
-					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.timestampIndex)) ) ||
+			ArrayList<String> dataRow = dataVals.get(k);
+			if ( ( (colIndcs.timestampIndex >= 0) &&
+					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.timestampIndex).toUpperCase()) ) || 
 				 ( (colIndcs.dateIndex >= 0) && 
-					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.dateIndex)) ) ||
+					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.dateIndex).toUpperCase()) ) || 
 				 ( (colIndcs.timeIndex >= 0) && 
-					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.timeIndex)) ) ||
+					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.timeIndex).toUpperCase()) ) || 
 				 ( (colIndcs.longitudeIndex >= 0) && 
-					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.longitudeIndex)) ) ||
+					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.longitudeIndex).toUpperCase()) ) || 
 				 ( (colIndcs.latitudeIndex >= 0) && 
-					SocatDataColumn.MISSING_VALUE.equals(dataVals.get(k).get(colIndcs.latitudeIndex)) ) ) {
+					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.latitudeIndex).toUpperCase()) ) ) {
 				// Remove this data row index from the WOCE flags, and decrement subsequent data row indices
 				for ( HashSet<Integer> woceFourRows : woceFourSets ) {
 					woceFourRows.remove(k);
@@ -1302,19 +1255,27 @@ public class DashboardCruiseChecker {
 				k++;
 			}
 		}
-		
-		// Update the total number of data rows, and assign the number 
-		// of data rows with errors and with only warnings from the sanity checker
-		cruiseData.setNumDataRows(numRows);
-		HashSet<Integer> errRows = new HashSet<Integer>();
-		for ( HashSet<Integer> woceFourRows : woceFourSets )
-			errRows.addAll(woceFourRows);
-		cruiseData.setNumErrorRows(errRows.size());
-		HashSet<Integer> warnRows = new HashSet<Integer>();
-		for ( HashSet<Integer> woceThreeRows : woceThreeSets )
-			warnRows.addAll(woceThreeRows);
-		warnRows.removeAll(errRows);
-		cruiseData.setNumWarnRows(warnRows.size());
+
+		// Count the rows of data with errors and only warnings, check if there 
+		// were lon/lat/date/time problems and assign the data check status
+		countWoceFlags(cruiseData, colIndcs, processedOK);
+	}
+
+	/**
+	 * Counts and assigns the number of data rows with errors and with only warnings.
+	 * Also assigns the lastChecHadGeopositionErrors flag.  Assigns the data check status.
+	 * 
+	 * @param cruise
+	 * 		cruise to use
+	 * @param colIndcs
+	 * 		data column indices for the cruise
+	 * @param processedOK
+	 * 		did the SanityCheck run successfully?
+	 */
+	private void countWoceFlags(DashboardCruise cruise, 
+								ColumnIndices colIndcs, boolean processedOK) {
+		ArrayList<HashSet<Integer>> woceFourSets = cruise.getWoceFourRowIndices();
+		ArrayList<HashSet<Integer>> woceThreeSets = cruise.getWoceThreeRowIndices();
 
 		// Set the lastCheckHadGeopositionErrors flag indicating 
 		// if there are any date/time, lat, or lon WOCE-4 flags
@@ -1350,7 +1311,42 @@ public class DashboardCruiseChecker {
 			lastCheckHadGeopositionErrors = false;
 		}
 
-		// Update the status message
+		// Assign the number of data rows with errors and with only warnings
+		HashSet<Integer> errRows = new HashSet<Integer>();
+		for ( HashSet<Integer> rowIdxSet : woceFourSets )
+			errRows.addAll(rowIdxSet);
+		int numErrorRows = errRows.size();
+		cruise.setNumErrorRows(numErrorRows);
+		HashSet<Integer> warnRows = new HashSet<Integer>();
+		for ( HashSet<Integer> rowIdxSet : woceThreeSets )
+			warnRows.addAll(rowIdxSet);
+		warnRows.removeAll(errRows);
+		int numWarnRows = warnRows.size();
+		cruise.setNumWarnRows(numWarnRows);
+
+		// Assign the data-check status message using the results of the sanity check
+		if ( ! processedOK ) {
+			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
+		}
+		else if ( numErrorRows > 0 ) {
+			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
+					Integer.toString(numErrorRows) + " errors");
+		}
+		else if ( numWarnRows > 0 ) {
+			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX +
+					Integer.toString(numWarnRows) + " warnings");
+		}
+		else {
+			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
+		}
+	}
+
+	/**
+	 * @return
+	 * 		true if the cruise last checked had longitude, latitude, or date/time errors
+	 */
+	public boolean hadGeopositionErrors() {
+		return lastCheckHadGeopositionErrors;
 	}
 
 }
