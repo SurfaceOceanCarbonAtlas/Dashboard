@@ -95,7 +95,7 @@ LET varnames_list = XCAT(varnames_list1, varnames_list2)
 LET nlist = `varnames_list[i=@ngd]`
 IF `nvars NE nlist` THEN
    say List of variables in the script does not match list in the dataset 
-   say ($infile)
+   say ($infile) has `nvars` variables, script list has `nlist`
    exit/script
 ENDIF
 
@@ -106,19 +106,16 @@ ENDIF
 LET vdiff = 0
 REPEAT/range=1:`nvars`/name=v (DEFINE SYMBOL  vv = `v`;\
  DEFINE SYMBOL name1 = `varnames[i=($vv)]`;\
- DEFINE SYMBOL name2 = `varnames_list[i=($vv)]`;\
- IF `STRCMP("($name1)", "($name2)") NE 0` THEN LET vdiff = `v`;\
+ IF `IS_ELEMENT_OF_STR_N(varnames_list, "($name1)") EQ 0` THEN LET vdiff = `v`;\
  IF `vdiff GT 0` THEN EXIT/LOOP;\
  IF `STRCMP("($name1)", "qc_flag") EQ 0` THEN LET indx_meta = `v`;\
  SET VAR/NAME=($name1)_in ($name1))
 
 IF `vdiff GT 0` THEN
    say List of variables in the script does not match list in the dataset ($infile)
-   say Dataset has `varnames[i=vdiff]`
-   say Script  has `varnames_list[i=vdiff]`
+   say Dataset has variable *** ($name1) *** which is not in variable-name list in script
    exit/script
 ENDIF
-
 
 ! Which longitude to use for decimating: lon360 or longitude
 
