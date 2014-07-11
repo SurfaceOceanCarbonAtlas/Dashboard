@@ -195,7 +195,7 @@ public class DashboardUtils {
 	public static final ArrayList<String> WIND_SPEED_UNITS = 
 			new ArrayList<String>(Arrays.asList("m/s"));
 	public static final ArrayList<String> XH2O_UNITS = 
-			new ArrayList<String>(Arrays.asList("mmol/mol"));
+			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
 
 	/**
 	 * Available data units for the standard data columns that a user might provide.
