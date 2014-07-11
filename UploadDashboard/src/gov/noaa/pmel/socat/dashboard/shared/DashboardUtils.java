@@ -194,6 +194,8 @@ public class DashboardUtils {
 			new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
 	public static final ArrayList<String> WIND_SPEED_UNITS = 
 			new ArrayList<String>(Arrays.asList("m/s"));
+	public static final ArrayList<String> XH2O_UNITS = 
+			new ArrayList<String>(Arrays.asList("mmol/mol"));
 
 	/**
 	 * Available data units for the standard data columns that a user might provide.
@@ -250,7 +252,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DELTA_FCO2, FCO2_UNITS);
 
-		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XH2O_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);

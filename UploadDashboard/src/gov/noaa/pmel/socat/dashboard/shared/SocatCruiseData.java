@@ -85,7 +85,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double deltaPCO2;
 	Double deltaFCO2;
 
-	// mole fraction water (umol/mol) in equilibrator gas sample
+	// mole fraction water (mmol/mol) in equilibrator gas sample
 	Double xH2OEqu;
 	// Humdity
 	Double relativeHumidity;
