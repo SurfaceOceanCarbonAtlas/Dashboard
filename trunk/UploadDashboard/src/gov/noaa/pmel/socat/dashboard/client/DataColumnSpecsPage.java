@@ -319,7 +319,6 @@ public class DataColumnSpecsPage extends Composite {
 			 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
 			cruiseNeverChecked = true;
 			messagesLabel.setText(NOT_CHECKED_MSG);
-			messagesButton.setEnabled(false);
 		}
 		else {
 			cruiseNeverChecked = false;
@@ -337,10 +336,6 @@ public class DataColumnSpecsPage extends Composite {
 				msgText += Integer.toString(numWarns);
 			msgText += " warnings";
 			messagesLabel.setText(msgText);
-			if ( (numErrors == 0) && (numWarns == 0) )
-				messagesButton.setEnabled(false);
-			else
-				messagesButton.setEnabled(true);
 		}
 
 		// Clear the expocode in case the data provider gets called while clearing
