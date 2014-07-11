@@ -750,6 +750,7 @@ public class DashboardCruiseChecker {
 			processMessage(cruiseData, msg, colIndcs);
 
 		// Add any user-provided WOCE-3 and WOCE-4 flags
+		/* TODO: what to do with user-provided WOCE flags - not really associated with any data column
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
 			if ( colType.equals(DataColumnType.WOCE_CO2_WATER) ||
@@ -804,6 +805,7 @@ public class DashboardCruiseChecker {
 				}
 			}
 		}
+		*/
 
 		// Remove any WOCE-3 flags on data values that also have a WOCE-4 flag
 		for (int k = 0; k < woceThreeSets.size(); k++) {
@@ -854,30 +856,7 @@ public class DashboardCruiseChecker {
 		if ( msg.isError() ) {
 			// Erroneous data value
 			if ( colIdx < 0 ) {
-				// TODO: Disambiguate errors with no column index
-				// Associate ambiguous errors with time indices; 
-				// could be timestamp issue or calculated speed issue
-				ArrayList<HashSet<Integer>> woceFlags = woceFourSets;
-				if ( colIndcs.timestampIndex >= 0 )
-					woceFlags.get(colIndcs.timestampIndex).add(rowIdx);
-				if ( colIndcs.timeIndex >= 0 )
-					woceFlags.get(colIndcs.timeIndex).add(rowIdx);
-				if ( colIndcs.yearIndex >= 0 )
-					woceFlags.get(colIndcs.yearIndex).add(rowIdx);
-				if ( colIndcs.monthIndex >= 0 )
-					woceFlags.get(colIndcs.monthIndex).add(rowIdx);
-				if ( colIndcs.dayIndex >= 0 )
-					woceFlags.get(colIndcs.dayIndex).add(rowIdx);
-				if ( colIndcs.timeIndex >= 0 )
-					woceFlags.get(colIndcs.timeIndex).add(rowIdx);
-				if ( colIndcs.hourIndex >= 0 )
-					woceFlags.get(colIndcs.hourIndex).add(rowIdx);
-				if ( colIndcs.minuteIndex >= 0 )
-					woceFlags.get(colIndcs.minuteIndex).add(rowIdx);
-				if ( colIndcs.secondIndex >= 0 )
-					woceFlags.get(colIndcs.secondIndex).add(rowIdx);
-				if ( colIndcs.dayOfYearIndex >= 0 )
-					woceFlags.get(colIndcs.dayOfYearIndex).add(rowIdx);
+				// TODO: What to do with an error message with no data columns
 			}
 			else {
 				woceFourSets.get(colIdx).add(rowIdx);
@@ -886,30 +865,7 @@ public class DashboardCruiseChecker {
 		else if ( msg.isWarning() ) {
 			// Questionable data value
 			if ( colIdx < 0 ) {
-				// TODO: Disambiguate warnings with no column index
-				// Associate ambiguous warnings with time indices; 
-				// could be timestamp issue or calculated speed issue
-				ArrayList<HashSet<Integer>> woceFlags = woceThreeSets;
-				if ( colIndcs.timestampIndex >= 0 )
-					woceFlags.get(colIndcs.timestampIndex).add(rowIdx);
-				if ( colIndcs.timeIndex >= 0 )
-					woceFlags.get(colIndcs.timeIndex).add(rowIdx);
-				if ( colIndcs.yearIndex >= 0 )
-					woceFlags.get(colIndcs.yearIndex).add(rowIdx);
-				if ( colIndcs.monthIndex >= 0 )
-					woceFlags.get(colIndcs.monthIndex).add(rowIdx);
-				if ( colIndcs.dayIndex >= 0 )
-					woceFlags.get(colIndcs.dayIndex).add(rowIdx);
-				if ( colIndcs.timeIndex >= 0 )
-					woceFlags.get(colIndcs.timeIndex).add(rowIdx);
-				if ( colIndcs.hourIndex >= 0 )
-					woceFlags.get(colIndcs.hourIndex).add(rowIdx);
-				if ( colIndcs.minuteIndex >= 0 )
-					woceFlags.get(colIndcs.minuteIndex).add(rowIdx);
-				if ( colIndcs.secondIndex >= 0 )
-					woceFlags.get(colIndcs.secondIndex).add(rowIdx);
-				if ( colIndcs.dayOfYearIndex >= 0 )
-					woceFlags.get(colIndcs.dayOfYearIndex).add(rowIdx);
+				// TODO: What to do with a warning message with no data columns
 			}
 			else {
 				woceThreeSets.get(colIdx).add(rowIdx);

@@ -241,6 +241,7 @@ public class CruiseListPage extends Composite {
 	private DashboardAskPopup askDeletePopup;
 	private DashboardAskPopup askRemovePopup;
 	private HashSet<DashboardCruise> cruiseSet;
+	private HashSet<DashboardCruise> checkSet;
 	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	private boolean managerButtonsShown;
@@ -265,6 +266,7 @@ public class CruiseListPage extends Composite {
 		username = "";
 
 		cruiseSet = new HashSet<DashboardCruise>();
+		checkSet = new HashSet<DashboardCruise>();
 		expocodeSet = new TreeSet<String>();
 
 		titleImage.setResource(SocatUploadDashboard.resources.getSocatCatPng());
@@ -649,7 +651,9 @@ public class CruiseListPage extends Composite {
 					NO_DATASET_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
-		checkCruisesForSOCAT(cruiseSet);
+		checkSet.clear();
+		checkSet.addAll(cruiseSet);
+		checkCruisesForSocat();
 	}
 
 	@UiHandler("deleteButton")
@@ -1231,9 +1235,9 @@ public class CruiseListPage extends Composite {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
-					HashSet<DashboardCruise> singleCruiseSet = new HashSet<DashboardCruise>();
-					singleCruiseSet.add(cruise);
-					checkCruisesForSOCAT(singleCruiseSet);
+					checkSet.clear();
+					checkSet.add(cruise);
+					checkCruisesForSocat();
 				}
 			}
 		});
@@ -1278,9 +1282,9 @@ public class CruiseListPage extends Composite {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
-					HashSet<DashboardCruise> singleCruiseSet = new HashSet<DashboardCruise>();
-					singleCruiseSet.add(cruise);
-					checkCruisesForSOCAT(singleCruiseSet);
+					checkSet.clear();
+					checkSet.add(cruise);
+					checkCruisesForSocat();
 				}
 			}
 		});
@@ -1356,9 +1360,9 @@ public class CruiseListPage extends Composite {
 					getSelectedCruises(null);
 					// Go to the additional docs page with just this one cruise
 					// Go to the QC page after performing the client-side checks on this one cruise
-					HashSet<DashboardCruise> singleCruiseSet = new HashSet<DashboardCruise>();
-					singleCruiseSet.add(cruise);
-					AddlDocsManagerPage.showPage(singleCruiseSet);
+					checkSet.clear();
+					checkSet.add(cruise);
+					AddlDocsManagerPage.showPage(checkSet);
 				}
 			}
 		});
@@ -1383,11 +1387,11 @@ public class CruiseListPage extends Composite {
 	 }
 
 	/**
-	 * Checks the cruises given in cruiseSet in this instance for metadata 
+	 * Checks the cruises given in checkSet in this instance for metadata 
 	 * compatibility for adding to SOCAT.  At this time this only checks 
 	 * that an OME metadata document is associated with each cruise.
 	 * 
-	 * Then checks the cruises given in cruiseSet in this instance for data 
+	 * Then checks the cruises given in checkSet in this instance for data 
 	 * compatibility for adding to SOCAT.  If the data has not been checked 
 	 * or is unacceptable, this method presents an error message and returns.  
 	 * If the data has serious issues to cause an automatic F flag, asks the 
@@ -1395,7 +1399,7 @@ public class CruiseListPage extends Composite {
 	 * there were no serious data issues, continues the submission to SOCAT 
 	 * by calling {@link AddToSocatPage#showPage(java.util.HashSet)}.
 	 */
-	private void checkCruisesForSOCAT(final HashSet<DashboardCruise> checkSet) {
+	private void checkCruisesForSocat() {
 		// Check if the cruises have metadata documents
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;
@@ -1428,8 +1432,13 @@ public class CruiseListPage extends Composite {
 						 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				cannotSubmit = true;
 			}
-			else if ( ! ( status.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ||
-						  status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) ) {
+			else if ( status.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ||
+					  status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ||
+					  ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) &&
+						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS) ) ) {
+				// Acceptable
+			}
+			else {
 				warnMsg += "<li>" + 
 					 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				willAutofail = true;
@@ -1450,9 +1459,9 @@ public class CruiseListPage extends Composite {
 				askDataAutofailPopup = new DashboardAskPopup(AUTOFAIL_YES_TEXT,
 						AUTOFAIL_NO_TEXT, new AsyncCallback<Boolean>() {
 					@Override
-					public void onSuccess(Boolean result) {
+					public void onSuccess(Boolean okay) {
 						// Only proceed if yes; ignore if no or null
-						if ( result == true )
+						if ( okay )
 							AddToSocatPage.showPage(checkSet);
 					}
 					@Override
