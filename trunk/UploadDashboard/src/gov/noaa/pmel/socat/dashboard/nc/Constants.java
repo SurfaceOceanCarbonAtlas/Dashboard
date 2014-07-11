@@ -334,6 +334,7 @@ public class Constants {
 		final String xco2_units = "umol/mol";
 		final String pco2_units = "uatm";
 		final String fco2_units = "uatm";
+		final String xh2o_units = "mmol/mol";
 		final String ship_speed_units = "knots";
 		final String wind_speed_units = "m/s";
 		final String direction_units = "degrees";
@@ -379,7 +380,7 @@ public class Constants {
 		unitsMap.put(deltaPCO2_VARNAME, pco2_units);
 		unitsMap.put(deltaFCO2_VARNAME, fco2_units);
 
-		unitsMap.put(xH2OEqu_VARNAME, xco2_units);
+		unitsMap.put(xH2OEqu_VARNAME, xh2o_units);
 		unitsMap.put(shipSpeed_VARNAME, ship_speed_units);
 		unitsMap.put(shipDirection_VARNAME, direction_units); 
 		unitsMap.put(windSpeedTrue_VARNAME, wind_speed_units);
@@ -564,6 +565,7 @@ public class Constants {
 		ioosCatMap.put(deltaPCO2_VARNAME, co2_category);
 		ioosCatMap.put(deltaFCO2_VARNAME, co2_category);
 
+		ioosCatMap.put(xH2OEqu_VARNAME, humidity_category);
 		ioosCatMap.put(relativeHumidity_VARNAME, humidity_category);
 		ioosCatMap.put(specificHumidity_VARNAME, humidity_category);
 		ioosCatMap.put(windSpeedTrue_VARNAME, wind_category);
@@ -667,6 +669,7 @@ public class Constants {
 		varNamesMap.put("DELTA_PCO2", "delta_pCO2");
 		varNamesMap.put("DELTA_FCO2", "delta_fCO2");
 
+		varNamesMap.put("XH2O_EQUI", "xH2O_equi");
 		varNamesMap.put("RELATIVE_HUMIDITY", "relative_humidity");
 		varNamesMap.put("SPECIFIC_HUMIDITY", "specific_humidity");
 		varNamesMap.put("SHIP_SPEED", "ship_speed"); 
