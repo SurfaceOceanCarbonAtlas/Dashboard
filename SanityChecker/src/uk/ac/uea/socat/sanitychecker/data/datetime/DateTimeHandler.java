@@ -82,6 +82,8 @@ public class DateTimeHandler {
 		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(hyphenDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		String slashDateString = validateDateFormatString(dateFormat, '/');
 		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(slashDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		String dotDateString = validateDateFormatString(dateFormat, '.');
+		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(dotDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		String noSepDateString = validateDateFormatString(dateFormat, null);
 		itsDateOnlyFormatters.add(DateTimeFormat.forPattern(noSepDateString).withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 
@@ -97,6 +99,11 @@ public class DateTimeHandler {
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HH:mm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmmss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(slashDateString + " HHmm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(dotDateString + " HH:mm:ss.SSS").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(dotDateString + " HH:mm:ss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(dotDateString + " HH:mm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(dotDateString + " HHmmss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
+		itsDateTimeFormatters.add(DateTimeFormat.forPattern(dotDateString + " HHmm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss.SSS").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm:ss").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
 		itsDateTimeFormatters.add(DateTimeFormat.forPattern(noSepDateString + " HH:mm").withZone(DateTimeZone.UTC).withPivotYear(PIVOT_YEAR));
@@ -111,7 +118,7 @@ public class DateTimeHandler {
 	 * Ensures that a supplied date format string complies with
 	 * the requirements of this program and the JODA data library.
 	 * 
-	 * Specifically, it must contain only 'y', 'Y', 'm', 'M', 'd', 'D', '-', and '/' characters.
+	 * Specifically, it must contain only 'y', 'Y', 'm', 'M', 'd', 'D', '-', '/', and '.' characters.
 	 * Any other character will throw an exception.
 	 * 
 	 * @param format The supplied format
@@ -140,7 +147,7 @@ public class DateTimeHandler {
 		    	outputFormat.append('d');
 		    	break;
 		    }
-		    case '/': case '-':
+		    case '/': case '-': case '.':
 		    {
 		    	if ( sep != null )
 		    		outputFormat.append(sep);
