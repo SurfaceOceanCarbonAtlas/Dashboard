@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -149,17 +148,13 @@ public class MetadataUploadService extends HttpServlet {
 			try {
 				// Save the metadata document for this cruise
 				if ( metadata == null ) {
-					metadata = metadataHandler.saveMetadataFile(expo, 
+					metadata = metadataHandler.saveMetadataFileItem(expo, 
 							username, uploadTimestamp, uploadFilename, metadataItem);
 				}
 				else {
 					metadata = metadataHandler.copyMetadataFile(expo, metadata);
 				}
 				// Update the metadata documents associated with this cruise
-				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expo);
-				if ( cruise == null )
-					throw new IllegalArgumentException(
-							"Cruise " + expo + " does not exist");
 				if ( omeIndicator.equals("true") ) {
 					// Make sure the contents are valid OME XML
 					OmeMetadata omedata;
@@ -172,37 +167,10 @@ public class MetadataUploadService extends HttpServlet {
 						throw new IllegalArgumentException(
 								"Invalid OME metadata file:\n   " + ex.getMessage());
 					}
-					// Assign the OME metadata timestamp for this cruise and save
-					if ( ! cruise.getOmeTimestamp().equals(omedata.getUploadTimestamp()) ) {
-						cruise.setOmeTimestamp(omedata.getUploadTimestamp());
-						cruiseHandler.saveCruiseInfoToFile(cruise, 
-								"Assigned new OME metadata file timestamp " + 
-								cruise.getOmeTimestamp() + " to cruise " + expo);
-					}
+					cruiseHandler.addAddlDocToCruise(expo, omedata);
 				}
 				else {
-					// Work directly on the additional documents list in the cruise object
-					TreeSet<String> addlDocTitles = cruise.getAddlDocs();
-					String titleToDelete = null;
-					for ( String title : addlDocTitles ) {
-						if ( uploadFilename.equals(
-								(DashboardMetadata.splitAddlDocsTitle(title))[0]) ) {
-							titleToDelete = title;
-							break;
-						}
-					}
-					String commitMsg; 
-					if ( titleToDelete != null ) {
-						addlDocTitles.remove(titleToDelete);
-						commitMsg = "Update additional document " + uploadFilename + 
-									" (" + uploadTimestamp + ") for cruise " + expo;
-					}
-					else {
-						commitMsg = "Add additional document " + uploadFilename + 
-									" (" + uploadTimestamp + ") to cruise " + expo;
-					}
-					addlDocTitles.add(metadata.getAddlDocsTitle());
-					cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
+					cruiseHandler.addAddlDocToCruise(expo, metadata);
 				}
 			} catch ( Exception ex ) {
 				metadataItem.delete();

@@ -158,11 +158,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Searches all existing cruises an returns the expocodes of those that
-	 * match the given regular expression.
+	 * Searches all existing cruises and returns the expocodes of those that
+	 * match the given expocode with wildcards and/or regular expressions.
 	 * 
 	 * @param wildExpocode
-	 * 		expocode, possibly with wildcards * and ?, to use
+	 * 		expocode, possibly with wildcards * and ?, to use;
+	 * 		any characters are converted to uppercase,
+	 * 		"*" is turned in the regular expression "[(expocodechars)]+", and
+	 * 		"?" is turned in the regular expression "[(expocodechars)]{1}", where
+	 * 		(expocodechars) are all valid expocode characters
 	 * @return
 	 * 		list of expocodes of existing cruises that match 
 	 * 		the given wildcard expocode; never null, but may be empty
@@ -647,6 +651,74 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Problems reading cruise information for " + 
 							expocode + ": " + ex.getMessage());
+		}
+		return cruise;
+	}
+
+	/**
+	 * Adds an OME metadata document or a supplemental document to a cruise.
+	 * 
+	 * @param expocode
+	 * 		add the document to the cruise with this expocode
+	 * @param addlDoc
+	 * 		document to add to the cruise; if an instance of OmeMetadata,
+	 * 		this will be added as the OME metadata document for the cruise
+	 * 		(just sets the OmeTimestamp for the cruise), otherwise adds
+	 * 		the document as an additional document to the cruise (adds the 
+	 * 		upload filename and timestamp to the additional documents list)
+	 * @return
+	 * 		the updated cruise information, or 
+	 * 		null if there is no cruise with this expocode
+	 * @throws IllegalArgumentException
+	 * 		if the cruise exists and ...
+	 * 		if the expocode is invalid,
+	 * 		if there are problems accessing the information file for the cruise,
+	 * 		if there are problems updating and committing the cruise information,
+	 * 		if the filename of the addition document is the OME filename but 
+	 * 		the additional document is not an instance of OmeMetadata
+	 */
+	public DashboardCruise addAddlDocToCruise(String expocode, 
+			DashboardMetadata addlDoc) throws IllegalArgumentException {
+		// Check if the cruise exists
+		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
+		if ( cruise == null )
+			return null;
+		String timestamp = addlDoc.getUploadTimestamp();
+		if ( addlDoc instanceof OmeMetadata ) {
+			// Assign the OME metadata timestamp for this cruise and save
+			if ( ! cruise.getOmeTimestamp().equals(timestamp) ) {
+				cruise.setOmeTimestamp(timestamp);
+				saveCruiseInfoToFile(cruise, "Assigned new OME metadata file " +
+						"timestamp '" + timestamp + "' to cruise " + expocode);
+			}
+		}
+		else {
+			String uploadFilename = addlDoc.getFilename();
+			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) )
+				throw new IllegalArgumentException("Supplemental documents cannot " +
+						"have the upload filename of " + DashboardMetadata.OME_FILENAME);
+			// Work directly on the additional documents list in the cruise object
+			TreeSet<String> addlDocTitles = cruise.getAddlDocs();
+			String titleToDelete = null;
+			for ( String title : addlDocTitles ) {
+				if ( uploadFilename.equals(
+						(DashboardMetadata.splitAddlDocsTitle(title))[0]) ) {
+					titleToDelete = title;
+					break;
+				}
+			}
+			String commitMsg; 
+			if ( titleToDelete != null ) {
+				addlDocTitles.remove(titleToDelete);
+				commitMsg = "Update additional document " + uploadFilename + 
+							" (" + timestamp + ") for cruise " + expocode;
+			}
+			else {
+				commitMsg = "Add additional document " + uploadFilename + 
+							" (" + timestamp + ") to cruise " + expocode;
+			}
+			addlDocTitles.add(addlDoc.getAddlDocsTitle());
+			saveCruiseInfoToFile(cruise, commitMsg);
 		}
 		return cruise;
 	}
