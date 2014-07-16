@@ -1142,11 +1142,13 @@ public class OmeMetadata extends DashboardMetadata {
 
 		// Add names of any ancillary documents
 		String docsString = "";
-		for ( String docName : addlDocs ) {
-			if ( docsString.isEmpty() )
-				docsString = docName;
-			else
-				docsString += SocatMetadata.NAMES_SEPARATOR + docName;
+		if ( addlDocs != null ) {
+			for ( String docName : addlDocs ) {
+				if ( docsString.isEmpty() )
+					docsString = docName;
+				else
+					docsString += SocatMetadata.NAMES_SEPARATOR + docName;
+			}
 		}
 		scMData.setAddlDocs(docsString);
 
