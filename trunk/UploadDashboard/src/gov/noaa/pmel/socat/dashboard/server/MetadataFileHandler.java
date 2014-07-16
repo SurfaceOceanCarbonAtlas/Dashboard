@@ -182,17 +182,17 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		upload filename to use for this metadata document; 
 	 * 		may or may not match the basename of uploadFileItem.getName()
 	 * @param uploadFileItem
-	 * 		upload file item providing the metadata contents as well
-	 * 		as the name of the upload file.
+	 * 		upload file item providing the metadata contents
 	 * @return
-	 * 		a DashboardMetadata describing the new or updated metadata document 
+	 * 		a DashboardMetadata describing the new or updated metadata 
+	 * 		document; never null 
 	 * @throws IllegalArgumentException
-	 * 		if unable to create the metadata document,
+	 * 		if the expocode is invalid,
 	 * 		if problems reading from the file upload stream,
 	 * 		if problems writing to the new metadata document, or
 	 * 		if problems committing the new metadata document to version control
 	 */
-	public DashboardMetadata saveMetadataFile(String cruiseExpocode, 
+	public DashboardMetadata saveMetadataFileItem(String cruiseExpocode, 
 			String owner, String uploadTimestamp, String uploadFilename,
 			FileItem uploadFileItem) throws IllegalArgumentException {
 		// Create the metadata filename
@@ -278,13 +278,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param srcMetadata
 	 * 		metadata document to be copied
 	 * @return
-	 * 		a DashboardMetadata describing the new or updated 
-	 * 		metadata document copied from the another cruise
+	 * 		a DashboardMetadata describing the new or updated metadata 
+	 * 		document copied from the another cruise; never null
 	 * @throws IllegalArgumentException
-	 * 		if the metadata document to be copied does not exist, or
-	 * 		if there were problems reading from the source metadata
-	 * 		document, or if there were problems writing to the 
-	 * 		destination metadata document.
+	 * 		if the expocode is invalid, 
+	 * 		if the metadata document to be copied does not exist,
+	 * 		if there were problems reading from the source metadata document, or 
+	 * 		if there were problems writing to the destination metadata document.
 	 */
 	public DashboardMetadata copyMetadataFile(String destCruiseExpo,
 			DashboardMetadata srcMetadata) throws IllegalArgumentException {
@@ -292,12 +292,40 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		String uploadName = srcMetadata.getFilename();
 		// Get the source metadata document
 		File srcFile = getMetadataFile(srcMetadata.getExpocode(), uploadName);
+		return saveMetadataFile(destCruiseExpo, owner, uploadName, 
+				srcMetadata.getUploadTimestamp(), srcFile);
+	}
+
+	/**
+	 * Create or update a dashboard metadata document from the given file.
+	 * 
+	 * @param cruiseExpocode
+	 * 		expocode of the cruise associated with this metadata document.
+	 * @param owner
+	 * 		owner of this metadata document.
+	 * @param origName
+	 * 		"original" or "upload" filename to use for this metadata document
+	 * @param timestamp
+	 * 		"upload" timestamp to assign for this metadata document
+	 * @param srcFile
+	 * 		metadata file to copy
+	 * @return
+	 * 		a DashboardMetadata describing the new or updated metadata 
+	 * 		document; never null 
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid,
+	 * 		if problems reading the given metadata file,
+	 * 		if problems writing to the new metadata document, or
+	 * 		if problems committing the new metadata document to version control
+	 */
+	public DashboardMetadata saveMetadataFile(String cruiseExpocode, 
+			String owner, String origName, String timestamp, File srcFile) 
+											throws IllegalArgumentException {
 		if ( ! srcFile.exists() )
 			throw new IllegalArgumentException("Source metadata file " + 
 					srcFile.getPath() + " does not exist");
-
 		// Get the destination metadata document 
-		File destFile = getMetadataFile(destCruiseExpo, uploadName);
+		File destFile = getMetadataFile(cruiseExpocode, origName);
 		File parentDir = destFile.getParentFile();
 		if ( ! parentDir.exists() ) {
 			if ( ! parentDir.mkdirs() )
@@ -309,7 +337,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Check if this will overwrite existing metadata
 		boolean isUpdate;
 		if ( destFile.exists() ) {
-			verifyOkayToDelete(owner, destCruiseExpo, uploadName);
+			verifyOkayToDelete(owner, cruiseExpocode, origName);
 			isUpdate = true;
 		}
 		else {
@@ -345,12 +373,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		String message;
 		if ( isUpdate ) {
-			message = "Updated metadata document " + uploadName + 
-					  " for cruise " + destCruiseExpo + " and owner " + owner;
+			message = "Updated metadata document " + origName + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
-			message = "Added metadata document " + uploadName + 
-					  " for cruise " + destCruiseExpo + " and owner " + owner;
+			message = "Added metadata document " + origName + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 
 		// Commit the new/updated metadata document to version control
@@ -364,19 +392,19 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		metadata.setExpocode(destCruiseExpo);
-		metadata.setFilename(uploadName);
-		metadata.setUploadTimestamp(srcMetadata.getUploadTimestamp());
+		metadata.setExpocode(cruiseExpocode);
+		metadata.setFilename(origName);
+		metadata.setUploadTimestamp(timestamp);
 		metadata.setOwner(owner);
 
 		// Create the appropriate check-in message
 		if ( isUpdate ) {
-			message = "Updated properties of metadata document " + uploadName + 
-					  " for cruise " + destCruiseExpo + " and owner " + owner;
+			message = "Updated properties of metadata document " + origName + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
-			message = "Added properties of metadata document " + uploadName + 
-					  " for cruise " + destCruiseExpo + " and owner " + owner;
+			message = "Added properties of metadata document " + origName + 
+					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 
 		// Save the metadata properties
