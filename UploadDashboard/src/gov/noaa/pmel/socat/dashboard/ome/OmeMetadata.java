@@ -1070,25 +1070,25 @@ public class OmeMetadata extends DashboardMetadata {
 
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(westmostLongitude.getValue()));
-		} catch (NumberFormatException e) {
-			scMData.setWestmostLongitude(null);
+		} catch (NumberFormatException | NullPointerException e) {
+			scMData.setWestmostLongitude(null);				
 		}
 
 		try {
 			scMData.setEastmostLongitude(Double.parseDouble(eastmostLongitude.getValue()));
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			scMData.setEastmostLongitude(null);
 		}
 
 		try {
 			scMData.setSouthmostLatitude(Double.parseDouble(southmostLatitude.getValue()));
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			scMData.setSouthmostLatitude(null);
 		}
 
 		try {
 			scMData.setNorthmostLatitude(Double.parseDouble(northmostLatitude.getValue()));
-		} catch (NumberFormatException e) {
+		} catch (NumberFormatException | NullPointerException e) {
 			scMData.setNorthmostLatitude(null);
 		}
 		
