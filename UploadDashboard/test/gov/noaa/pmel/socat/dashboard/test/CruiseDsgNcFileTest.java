@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
@@ -23,9 +24,9 @@ import org.junit.Test;
  * @author Karl Smith
  */
 public class CruiseDsgNcFileTest {
-    String filename;
-    String expocode;
-	/**
+    CruiseDsgNcFile dsgNcFile = null;
+ 
+    /**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create(java.lang.String)}.
 	 */
 	@Test
@@ -73,7 +74,7 @@ public class CruiseDsgNcFileTest {
 				"31B520060606,GM0606,6,11,2006,0,11,29.0641,-92.7641,29.9,33.14,404,386,1009.26,7.1", 
 				"31B520060606,GM0606,6,11,2006,0,12,29.0634,-92.766,29.89,32.97,402.9,384.9,1009.237,7.1"
 			};
-		expocode = "31B520060606";
+		String expocode = "31B520060606";
 		ArrayList<ArrayList<String>> testValues = new ArrayList<ArrayList<String>>();
 		for ( String valsString : dataValueStrings ) {
 			ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",",-1)));
@@ -95,34 +96,30 @@ public class CruiseDsgNcFileTest {
 		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
 
 		// Create the SocatMetadata for this cruise
-		SocatMetadata mdata = new SocatMetadata();
-		mdata.setExpocode(expocode);
-		mdata.setSocatVersion(3.0);
-		mdata.setCruiseName("GM0606");
-		mdata.setScienceGroup("Public, Nancy S.; Public, John Q.");
-		mdata.setVesselName("Caribbean Cruiser");
-		mdata.setOrigDataRef("doi:cdiac12345");
-		mdata.setSouthmostLatitude(20.04);
-		mdata.setNorthmostLatitude(29.07);
-		mdata.setWestmostLongitude(-92.77);
-		mdata.setEastmostLongitude(-92.74);
+		SocatMetadata metadata = new SocatMetadata();
+		metadata.setExpocode(expocode);
+		metadata.setSocatVersion(3.0);
+		metadata.setCruiseName("GM0606");
+		metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
+		metadata.setVesselName("Caribbean Cruiser");
+		metadata.setOrigDataRef("doi:cdiac12345");
+		metadata.setSouthmostLatitude(20.04);
+		metadata.setNorthmostLatitude(29.07);
+		metadata.setWestmostLongitude(-92.77);
+		metadata.setEastmostLongitude(-92.74);
 		SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
-		mdata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC"));
-		mdata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC"));
+		metadata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC"));
+		metadata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC"));
 
 		File parentDir = new File("/var/tmp/socat");
 		if ( ! parentDir.exists() )
 			parentDir.mkdir();
-		filename = parentDir.getPath() + File.separator + expocode + ".nc";
-		CruiseDsgNcFile sdgncFile = new CruiseDsgNcFile(filename);
-		sdgncFile.create(mdata, dataList);
-		assertTrue( sdgncFile.exists() );
+		String filename = parentDir.getPath() + File.separator + expocode + ".nc";
+		dsgNcFile = new CruiseDsgNcFile(filename);
+		dsgNcFile.create(metadata, dataList);
+		assertTrue( dsgNcFile.exists() );
+		assertEquals(expocode, dsgNcFile.getMetadata().getExpocode());
+		assertEquals(dataValueStrings.length, dsgNcFile.getDataList().size());
 	}
 
-	public String getFilename() {
-	    return filename;
-	}
-	public String getExpocode() {
-		return expocode;
-	}
 }
