@@ -599,16 +599,16 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * Corrects the spelling of ship and PI names intentionally misspelled 
-	 * in SOCAT metadata because they contain characters that the SOCAT 
+	 * in this SOCAT metadata because they contain characters that the SOCAT 
 	 * database cannot always handle correctly.
 	 */
-	public static void correctSpellings(SocatMetadata metadata) {
-		String newName = VESSEL_NAME_CORRECTIONS.get(metadata.getVesselName());
+	public void correctSpellings() {
+		String newName = VESSEL_NAME_CORRECTIONS.get(getVesselName());
 		if ( newName != null )
-			metadata.setVesselName(newName);
-		newName = SCIENCE_GROUP_NAME_CORRECTIONS.get(metadata.getScienceGroup());
+			setVesselName(newName);
+		newName = SCIENCE_GROUP_NAME_CORRECTIONS.get(getScienceGroup());
 		if ( newName != null )
-			metadata.setScienceGroup(newName);
+			setScienceGroup(newName);
 	}
 
 }
