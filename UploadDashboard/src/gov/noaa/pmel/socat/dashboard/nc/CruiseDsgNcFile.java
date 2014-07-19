@@ -375,7 +375,9 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Creates and assigns the internal metadata and data list
 	 * references from the contents of this netCDF DSG file.
-	 *  
+	 * 
+	 * @param onlyMetadata
+	 * 		only read the metadata?
 	 * @return
 	 * 		names of metadata and data fields not assigned from this 
 	 * 		netCDF file (will have its default/missing value)
@@ -386,7 +388,8 @@ public class CruiseDsgNcFile extends File {
 	 * 		'time' variable and all data variables must have the same
 	 * 		number of values as this variable.
 	 */
-	public ArrayList<String> read() throws IOException, IllegalArgumentException {
+	public ArrayList<String> read(boolean onlyMetadata) 
+								throws IOException, IllegalArgumentException {
 		ArrayList<String> namesNotFound = new ArrayList<String>();
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
@@ -397,12 +400,8 @@ public class CruiseDsgNcFile extends File {
 						"Unable to find variable 'time' in " + getName());
 			int numData = var.getShape(0);
 
-			// Create the metadata and complete list of data values, 
-			// all with default (missing) values
+			// Create the metadata with default (missing) values
 			metadata = new SocatMetadata();
-			dataList = new ArrayList<SocatCruiseData>(numData);
-			for (int k = 0; k < numData; k++)
-				dataList.add(new SocatCruiseData());
 
 			// Get all the metadata fields to be assigned
 			Field[] metaFields = SocatMetadata.class.getDeclaredFields();
@@ -445,6 +444,15 @@ public class CruiseDsgNcFile extends File {
 					}
 				}
 			}
+
+			if ( onlyMetadata )
+				return namesNotFound;
+
+			// Create the complete list of data values, 
+			// all with default (missing) values
+			dataList = new ArrayList<SocatCruiseData>(numData);
+			for (int k = 0; k < numData; k++)
+				dataList.add(new SocatCruiseData());
 
 			// Get all the data fields to be assigned
 			Field[] dataFields = SocatCruiseData.class.getDeclaredFields();
