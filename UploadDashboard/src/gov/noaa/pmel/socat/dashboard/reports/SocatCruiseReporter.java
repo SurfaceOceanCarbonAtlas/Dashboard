@@ -236,7 +236,8 @@ public class SocatCruiseReporter {
 		// Longitude range in [180W,180E]
 		Double westLon = metadata.getWestmostLongitude();
 		Double eastLon = metadata.getEastmostLongitude();
-		if ( westLon.isNaN() || eastLon.isNaN() ) {
+		if ( (westLon < -540.0) || (westLon > 540.0) ||
+			 (eastLon < -540.0) || (eastLon > 540.0) ) {
 			warnMsgs.add("Invalid west-most and/or east-most longitude");
 		}
 		else {
@@ -254,7 +255,8 @@ public class SocatCruiseReporter {
 		// Latitude range in [90S,90N]
 		Double southLat = metadata.getSouthmostLatitude();
 		Double northLat = metadata.getNorthmostLatitude();
-		if ( southLat.isNaN() || northLat.isNaN() ) {
+		if ( (southLat < -90.0) || (southLat > 90.0) ||
+			 (northLat < -90.0) || (northLat > 90.0) ) {
 			warnMsgs.add("Invalid south-most and/or north-most latitude");
 		}
 		else {
@@ -360,7 +362,7 @@ public class SocatCruiseReporter {
 			report.print("\t");
 
 			Double dblVal = metadata.getWestmostLongitude();
-			if ( Double.isNaN(dblVal) ) {
+			if ( (dblVal < -540.0) || (dblVal > 540.0) ) {
 				warnMsgs.add("Invalid west-most longitude for " + expocode);
 			}
 			else if ( dblVal < 0.0 ) {
@@ -372,7 +374,7 @@ public class SocatCruiseReporter {
 			report.print("\t");
 
 			dblVal = metadata.getEastmostLongitude();
-			if ( Double.isNaN(dblVal) ) {
+			if ( (dblVal < -540.0) || (dblVal > 540.0) ) {
 				warnMsgs.add("Invalid east-most longitude for " + expocode);
 			}
 			else if ( dblVal < 0.0 ) {
@@ -384,7 +386,7 @@ public class SocatCruiseReporter {
 			report.print("\t");
 
 			dblVal = metadata.getSouthmostLatitude();
-			if ( Double.isNaN(dblVal) ) {
+			if ( (dblVal < -90.0) || (dblVal > 90.0) ) {
 				warnMsgs.add("Invalid south-most latitude for " + expocode);
 			}
 			else if ( dblVal < 0.0 ) {
@@ -396,7 +398,7 @@ public class SocatCruiseReporter {
 			report.print("\t");
 
 			dblVal = metadata.getNorthmostLatitude();
-			if ( Double.isNaN(dblVal) ) {
+			if ( (dblVal < -90.0) || (dblVal > 90.0) ) {
 				warnMsgs.add("Invalid north-most latitude for " + expocode);
 			}
 			else if ( dblVal < 0.0 ) {

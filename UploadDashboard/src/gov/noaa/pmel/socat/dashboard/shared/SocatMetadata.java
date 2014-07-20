@@ -56,10 +56,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		cruiseName = "";
 		vesselName = "";
 		organization = "";
-		westmostLongitude = Double.NaN;
-		eastmostLongitude = Double.NaN;
-		southmostLatitude = Double.NaN;
-		northmostLatitude = Double.NaN;
+		westmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
+		eastmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
+		southmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
+		northmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
 		beginTime = DATE_MISSING_VALUE;
 		endTime = DATE_MISSING_VALUE;
 		scienceGroup = "";
@@ -158,7 +158,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the west-most longitude for the cruise;
-	 * 		never null could be Double.NaN if not assigned.
+	 * 		never null could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getWestmostLongitude() {
 		return westmostLongitude;
@@ -167,11 +167,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param westmostLongitude 
 	 * 		the west-most longitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned
 	 */
 	public void setWestmostLongitude(Double westmostLongitude) {
 		if ( westmostLongitude == null )
-			this.westmostLongitude = Double.NaN;
+			this.westmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
 		else 
 			this.westmostLongitude = westmostLongitude;
 	}
@@ -179,7 +179,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the east-most longitude for the cruise;
-	 * 		never null but could be Double.NaN if not assigned.
+	 * 		never null but could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getEastmostLongitude() {
 		return eastmostLongitude;
@@ -188,11 +188,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param eastmostLongitude 
 	 * 		the east-most longitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link SocatCruiseData.FP_MISSING_VALUE} is assigned
 	 */
 	public void setEastmostLongitude(Double eastmostLongitude) {
 		if ( eastmostLongitude == null )
-			this.eastmostLongitude = Double.NaN;
+			this.eastmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
 		else
 			this.eastmostLongitude = eastmostLongitude;
 	}
@@ -200,7 +200,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the south-most latitude for the cruise;
-	 * 		never null but could be Double.NaN if not assigned.
+	 * 		never null but could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getSouthmostLatitude() {
 		return southmostLatitude;
@@ -209,11 +209,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param southmostLatitude 
 	 * 		the south-most latitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned
 	 */
 	public void setSouthmostLatitude(Double southmostLatitude) {
 		if ( southmostLatitude == null )
-			this.southmostLatitude = Double.NaN;
+			this.southmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
 		else
 			this.southmostLatitude = southmostLatitude;
 	}
@@ -221,7 +221,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the south-most latitude for the cruise;
-	 * 		never null but could be Double.NaN if not assigned.
+	 * 		never null but could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getNorthmostLatitude() {
 		return northmostLatitude;
@@ -230,11 +230,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param northmostLatitude 
 	 * 		the north-most latitude to set;
-	 * 		if null, {@link Double#NaN} is assigned
+	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned
 	 */
 	public void setNorthmostLatitude(Double northmostLatitude) {
 		if ( northmostLatitude == null )
-			this.northmostLatitude = Double.NaN;
+			this.northmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
 		else
 			this.northmostLatitude = northmostLatitude;
 	}

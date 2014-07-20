@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.util.Date;
@@ -107,7 +108,7 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetWestmostLongitude() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		mdata.setWestmostLongitude(WESTMOST_LONGITUDE);
 		assertEquals(WESTMOST_LONGITUDE, mdata.getWestmostLongitude());
 		assertEquals("", mdata.getOrganization());
@@ -115,7 +116,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setWestmostLongitude(null);
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 	}
 
 	/**
@@ -125,15 +126,15 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetEastmostLongitude() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		mdata.setEastmostLongitude(EASTMOST_LONGITUDE);
 		assertEquals(EASTMOST_LONGITUDE, mdata.getEastmostLongitude());
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setEastmostLongitude(null);
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 	}
 
 	/**
@@ -143,17 +144,17 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetSouthmostLatitude() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		mdata.setSouthmostLatitude(SOUTHMOST_LATITUDE);
 		assertEquals(SOUTHMOST_LATITUDE, mdata.getSouthmostLatitude());
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setSouthmostLatitude(null);
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 	}
 
 	/**
@@ -163,18 +164,18 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetNorthmostLatitude() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 		mdata.setNorthmostLatitude(NORTHMOST_LATITUDE);
 		assertEquals(NORTHMOST_LATITUDE, mdata.getNorthmostLatitude());
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setNorthmostLatitude(null);
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 	}
 
 	/**
@@ -187,10 +188,10 @@ public class SocatMetadataTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
 		mdata.setBeginTime(BEGIN_TIME);
 		assertEquals(BEGIN_TIME, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -210,10 +211,10 @@ public class SocatMetadataTest {
 		mdata.setEndTime(END_TIME);
 		assertEquals(END_TIME, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -234,10 +235,10 @@ public class SocatMetadataTest {
 		assertEquals(SCIENCE_GROUP, mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -259,10 +260,10 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -285,10 +286,10 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -312,10 +313,10 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -340,10 +341,10 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -369,10 +370,10 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
@@ -399,10 +400,10 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getScienceGroup());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getEndTime());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, mdata.getBeginTime());
-		assertTrue( mdata.getNorthmostLatitude().isNaN() );
-		assertTrue( mdata.getSouthmostLatitude().isNaN() );
-		assertTrue( mdata.getEastmostLongitude().isNaN() );
-		assertTrue( mdata.getWestmostLongitude().isNaN() );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( SocatCruiseData.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		assertEquals("", mdata.getOrganization());
 		assertEquals("", mdata.getVesselName());
 		assertEquals("", mdata.getCruiseName());
