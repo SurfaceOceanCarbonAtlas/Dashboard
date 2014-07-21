@@ -1,5 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.sanitychecks;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.Seconds;
@@ -16,10 +17,8 @@ public class ConstantSanityCheck extends SanityCheck {
 	
 	private int itsMaxDuration = 0;
 	
-	private SocatDataRecord itsFirstRecord = null;
+	private List<SocatDataRecord> itsRecords = new ArrayList<SocatDataRecord>();
 	
-	private SocatDataRecord itsLastRecord = null;
-
 	@Override
 	public void initialise(List<String> parameters) throws SanityCheckException {
 		if (parameters.size() < 2) {
@@ -51,21 +50,18 @@ public class ConstantSanityCheck extends SanityCheck {
 	public void processRecord(SocatDataRecord record) throws SanityCheckException {
 		
 		if (recordOK(record)) {
-			if (null == itsLastRecord) {
-				itsFirstRecord = record;
-				itsLastRecord = record;
+			if (itsRecords.size() == 0) {
+				itsRecords.add(record);
 			} else {
-				
 				if (equalsConstant(record)) {
-					itsLastRecord = record;
+					itsRecords.add(record);
 				} else {
-					// Check duration
 					doDurationCheck();
 					
-					// Reset
-					itsFirstRecord = record;
-					itsLastRecord = record;
+					itsRecords.clear();
+					itsRecords.add(record);
 				}
+				
 			}
 		}
 	}
@@ -81,10 +77,12 @@ public class ConstantSanityCheck extends SanityCheck {
 		boolean result = false;
 		
 		try {
-			double constantValue = Double.parseDouble(itsFirstRecord.getColumn(itsColumnName).getValue());
-			double recordValue = Double.parseDouble(record.getColumn(itsColumnName).getValue());
+			double currentValue = getRecordValue(itsRecords.get(0));
+			double recordValue = getRecordValue(record);
 			
-			result = (constantValue == recordValue);
+			System.out.println(record.getLineNumber() + " " + currentValue + " " + recordValue + " " + (currentValue == recordValue));
+			
+			result = (currentValue == recordValue);
 		} catch (NumberFormatException e) {
 			throw new SanityCheckException("Cannot compare non-numeric values", e);
 		}
@@ -104,20 +102,27 @@ public class ConstantSanityCheck extends SanityCheck {
 	
 	private void doDurationCheck() throws SanityCheckException {
 
-		if (null != itsFirstRecord && null != itsLastRecord) {
+		if (itsRecords.size() > 1) {
 		
-			double secondsDifference = Seconds.secondsBetween(itsFirstRecord.getTime(), itsLastRecord.getTime()).getSeconds();
+			double secondsDifference = Seconds.secondsBetween(itsRecords.get(0).getTime(), itsRecords.get(itsRecords.size() - 1).getTime()).getSeconds();
 			double minutesDifference = secondsDifference / 60.0;
 			
 			
 			if (minutesDifference > itsMaxDuration) {
 				try {
-					String message = "Value for column is constant for longer than " + itsMaxDuration + " minutes";
-					itsLastRecord.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsLastRecord.getLineNumber(), message);
+					String message = "Value for column is constant for longer than " + itsMaxDuration + " (" + minutesDifference + ") minutes";
+					
+					for (SocatDataRecord record : itsRecords) {
+						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
+					}
 				} catch (SocatDataBaseException e) {
 					throw new SanityCheckException ("Error while setting flag on record", e);
 				}
 			}
 		}
+	}
+	
+	private double getRecordValue(SocatDataRecord record) {
+		return Double.parseDouble(record.getColumn(itsColumnName).getValue());
 	}
 }
