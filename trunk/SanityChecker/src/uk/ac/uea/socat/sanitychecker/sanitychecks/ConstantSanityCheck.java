@@ -80,8 +80,6 @@ public class ConstantSanityCheck extends SanityCheck {
 			double currentValue = getRecordValue(itsRecords.get(0));
 			double recordValue = getRecordValue(record);
 			
-			System.out.println(record.getLineNumber() + " " + currentValue + " " + recordValue + " " + (currentValue == recordValue));
-			
 			result = (currentValue == recordValue);
 		} catch (NumberFormatException e) {
 			throw new SanityCheckException("Cannot compare non-numeric values", e);
