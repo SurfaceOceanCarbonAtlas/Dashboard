@@ -35,9 +35,9 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 5211989173461954130L;
+	private static final long serialVersionUID = -252865287614491074L;
 
-	private static final String VERSION = "CruiseDsgNcFile 1.0";
+	private static final String VERSION = "CruiseDsgNcFile 1.1";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 
@@ -131,7 +131,7 @@ public class CruiseDsgNcFile extends File {
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
 					String name = f.getName();
-					String varName = Constants.SHORT_NAME.get(name);
+					String varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = null;
@@ -164,7 +164,7 @@ public class CruiseDsgNcFile extends File {
 					if ( units != null ) {
 						ncfile.addVariableAttribute(var, new Attribute("units", units));
 					}
-					String longName = Constants.LONG_NAME.get(name);
+					String longName = Constants.LONG_NAMES.get(name);
 					if ( longName == null )
 						throw new RuntimeException("Unexpected missing long name for " + name);
 					ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
@@ -186,7 +186,7 @@ public class CruiseDsgNcFile extends File {
 			for ( Field f : dataFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
 					String name = f.getName();
-					String varName = Constants.SHORT_NAME.get(name);
+					String varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = null;
@@ -219,7 +219,7 @@ public class CruiseDsgNcFile extends File {
 					if ( units != null ) {
 						ncfile.addVariableAttribute(var, new Attribute("units", units));
 					}
-					String longName = Constants.LONG_NAME.get(name);
+					String longName = Constants.LONG_NAMES.get(name);
 					if ( longName == null )
 						throw new RuntimeException("Unexpected missing long name for " + name);
 					ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
@@ -258,7 +258,7 @@ public class CruiseDsgNcFile extends File {
 
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String varName = Constants.SHORT_NAME.get(f.getName());
+					String varName = Constants.SHORT_NAMES.get(f.getName());
 					var = ncfile.findVariable(varName);
 					if ( var == null )
 						throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
@@ -290,7 +290,7 @@ public class CruiseDsgNcFile extends File {
 
 			for ( Field f : dataFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String varName = Constants.SHORT_NAME.get(f.getName());
+					String varName = Constants.SHORT_NAMES.get(f.getName());
 					var = ncfile.findVariable(varName);
 					if ( var == null )
 						throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
@@ -412,7 +412,7 @@ public class CruiseDsgNcFile extends File {
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
 					String name = f.getName();
-					String varName = Constants.SHORT_NAME.get(name);
+					String varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException(
 								"Unexpected missing short name for " + name);
@@ -463,7 +463,7 @@ public class CruiseDsgNcFile extends File {
 			for ( Field f : dataFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
 					String name = f.getName();
-					String varName = Constants.SHORT_NAME.get(name);
+					String varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = ncfile.findVariable(varName);
