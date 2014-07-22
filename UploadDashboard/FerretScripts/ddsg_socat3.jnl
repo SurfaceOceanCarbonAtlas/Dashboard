@@ -55,7 +55,7 @@ LET varnames_list1 = {\
 "geospatial_lat_max","time_coverage_start","time_converage_end",\
 "investigators","orig_data_ref","addl_docs","socat_data_doi",\
 "socat_data_ref","socat_version","qc_flag",\
-"year","month","day","hour","minute","second",\
+"sample_number","year","month","day","hour","minute","second",\
 "longitude","latitude","sample_depth","sal","Temperature_equi",\
 "temp","Temperature_atm","Pressure_equi","Pressure_atm",\
 "xCO2_water_equi_temp_dry_ppm","xCO2_water_sst_dry_ppm",\

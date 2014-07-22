@@ -17,7 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 46434937472989443L;
+	private static final long serialVersionUID = 4493991281281106844L;
 
 	static final double MAX_RELATIVE_ERROR = 1.0E-6;
 	static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
@@ -34,6 +34,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 *  Missing value for single character variables (regionID, all the WOCE flags)
 	 */
 	public static final Character CHAR_MISSING_VALUE = ' ';
+
+	// Sequence number (starts with one) of this data point in the data set
+	Integer rowNum;
 
 	// Time of measurement
 	Integer year;
@@ -152,6 +155,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * Generates an empty SOCAT data record
 	 */
 	public SocatCruiseData() {
+		rowNum = INT_MISSING_VALUE;
+
 		year = INT_MISSING_VALUE;
 		month = INT_MISSING_VALUE;
 		day = INT_MISSING_VALUE;
@@ -245,13 +250,16 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 * 
 	 * @param columnTypes
 	 * 		types of the data values
+	 * @param rowNum
+	 * 		sequence number (starting with one) of this data point
+	 * 		in the data set
 	 * @param dataValues
 	 * 		data values
 	 * @throws IllegalArgumentException
 	 * 		if the number of data types and data values do not match, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public SocatCruiseData(List<DataColumnType> columnTypes, 
+	public SocatCruiseData(List<DataColumnType> columnTypes, int rowNum,
 			List<String> dataValues) throws IllegalArgumentException {
 		// Initialize to an empty data record
 		this();
@@ -262,6 +270,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 					numColumns + ") does not match the number of data values (" +
 					dataValues.size() + ")");
 		// Add values to the empty record
+		this.rowNum = rowNum;
 		for (int k = 0; k < numColumns; k++) {
 			// Skip over missing values since the empty data record
 			// is initialized to the missing value for that type.
@@ -464,10 +473,33 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		// it with data from each row of the table
 		ArrayList<SocatCruiseData> socatDataList = 
 				new ArrayList<SocatCruiseData>(dataValsTable.size());
-		for ( ArrayList<String> dataVals : dataValsTable ) {
-			socatDataList.add(new SocatCruiseData(dataTypes, dataVals));
+		for (int k = 0; k < dataValsTable.size(); k++) {
+			socatDataList.add(
+					new SocatCruiseData(dataTypes, k+1, dataValsTable.get(k)));
 		}
 		return socatDataList;
+	}
+
+	/**
+	 * @return 
+	 * 		sequence number (starting with one) of this data point in the 
+	 * 		data set; never null but could be {@link #INT_MISSING_VALUE} 
+	 * 		if not assigned
+	 */
+	public Integer getRowNum() {
+		return rowNum;
+	}
+
+	/**
+	 * @param rowNum 
+	 * 		sequence number (starting with one) of this data point in the 
+	 * 		data set to assign; if null, {@link #INT_MISSING_VALUE} is assigned
+	 */
+	public void setRowNum(Integer rowNum) {
+		if ( rowNum == null )
+			this.rowNum = INT_MISSING_VALUE;
+		else
+			this.rowNum = rowNum;
 	}
 
 	/**
@@ -1914,6 +1946,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		result = result * prime + hour.hashCode();
 		result = result * prime + minute.hashCode();
 		result = result * prime + fCO2Source.hashCode();
+		result = result * prime + rowNum.hashCode();
 		return result;
 	}
 
@@ -1929,6 +1962,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		SocatCruiseData other = (SocatCruiseData) obj;
 
 		// Integer comparisons
+		if ( ! rowNum.equals(other.rowNum) )
+			return false;
 		if ( ! year.equals(other.year) )
 			return false;
 		if ( ! month.equals(other.month) )
@@ -2091,7 +2126,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	@Override
 	public String toString() {
 		return "SocatCruiseData" +
-				"[\n    year=" + year.toString() +
+				"[\n    rowNum=" + rowNum.toString() +
+				",\n    year=" + year.toString() +
 				",\n    month=" + month.toString() +
 				",\n    day=" + day.toString() +
 				",\n    hour=" + hour.toString() +

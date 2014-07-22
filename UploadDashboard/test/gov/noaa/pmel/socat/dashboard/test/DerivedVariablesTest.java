@@ -2,6 +2,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
@@ -64,6 +65,7 @@ public class DerivedVariablesTest {
 		assertEquals(numData, dsgFile.getDataList().size());
 		for (int k = 0; k < numData; k++) {
 			SocatCruiseData dataVals = dsgFile.getDataList().get(k);
+			assertEquals(Integer.valueOf(k+1), dataVals.getRowNum());
 			assertEquals(longitudes.get(k), dataVals.getLongitude(), 1.0E-6);
 			assertEquals(latitudes.get(k), dataVals.getLatitude(), 1.0E-6);
 			assertEquals(hours.get(k), dataVals.getHour());
@@ -80,6 +82,13 @@ public class DerivedVariablesTest {
 		unknownNames = decDsgFile.read(false);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
+		int lastRowNum = 0;
+		for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+			int thisRowNum = dataVals.getRowNum();
+			assertTrue( lastRowNum < thisRowNum );
+			assertTrue( thisRowNum <= numData );
+			lastRowNum = thisRowNum;
+		}
 	}
 
 }

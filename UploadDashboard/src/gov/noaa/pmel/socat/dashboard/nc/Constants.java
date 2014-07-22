@@ -30,6 +30,7 @@ public class Constants {
 	private static final String socatVersion_VARNAME = "socatVersion";
 	private static final String qcFlag_VARNAME = "qcFlag";
 
+	private static final String rowNum_VARNAME = "rowNum";
 	private static final String year_VARNAME = "year";
 	private static final String month_VARNAME = "month";
 	private static final String day_VARNAME = "day";
@@ -111,7 +112,7 @@ public class Constants {
 	/**
 	 * Variable names for netCDF files
 	 */
-	public static final Map<String, String> SHORT_NAME;
+	public static final Map<String, String> SHORT_NAMES;
 	static {
 		HashMap<String, String> shortNameMap = new HashMap<String, String>();
 
@@ -133,6 +134,7 @@ public class Constants {
 		shortNameMap.put(socatVersion_VARNAME, "socat_version");
 		shortNameMap.put(qcFlag_VARNAME, "qc_flag");
 
+		shortNameMap.put(rowNum_VARNAME, "sample_number");
 		shortNameMap.put(year_VARNAME, "year");
 		shortNameMap.put(month_VARNAME, "month");
 		shortNameMap.put(day_VARNAME, "day");
@@ -211,13 +213,13 @@ public class Constants {
 		shortNameMap.put(distToLand_VARNAME, "dist_to_land");
 		shortNameMap.put(dayOfYear_VARNAME, "day_of_year");
 
-		SHORT_NAME = Collections.unmodifiableMap(shortNameMap);
+		SHORT_NAMES = Collections.unmodifiableMap(shortNameMap);
 	}
 
 	/**
 	 *  Full length names of the variables for netCDF files
 	 */
-	public static final Map<String, String> LONG_NAME;
+	public static final Map<String, String> LONG_NAMES;
 	static {
 		HashMap<String, String> longNameMap = new HashMap<String, String>();
 
@@ -239,6 +241,7 @@ public class Constants {
 		longNameMap.put(socatVersion_VARNAME, "SOCAT version");
 		longNameMap.put(qcFlag_VARNAME, "QC flag");
 
+		longNameMap.put(rowNum_VARNAME, "sample number");
 		longNameMap.put(year_VARNAME, "year");
 		longNameMap.put(month_VARNAME, "month of year");
 		longNameMap.put(day_VARNAME, "day of month");
@@ -317,7 +320,7 @@ public class Constants {
 		longNameMap.put(distToLand_VARNAME, "distance to land");
 		longNameMap.put(dayOfYear_VARNAME, "day of the year");
 
-		LONG_NAME = Collections.unmodifiableMap(longNameMap);
+		LONG_NAMES = Collections.unmodifiableMap(longNameMap);
 	}
 
 	/**
@@ -528,6 +531,7 @@ public class Constants {
 		ioosCatMap.put(socatVersion_VARNAME, identifier_category);
 		ioosCatMap.put(qcFlag_VARNAME, quality_category);
 
+		ioosCatMap.put(rowNum_VARNAME, identifier_category);
 		ioosCatMap.put(year_VARNAME, time_category);
 		ioosCatMap.put(month_VARNAME, time_category);
 		ioosCatMap.put(day_VARNAME, time_category);
@@ -612,108 +616,8 @@ public class Constants {
 	public static final Map<String, String> VARIABLE_NAMES;
 	static {
 		HashMap<String, String> varNamesMap = new HashMap<String, String>();
-
-		varNamesMap.put("EXPOCODE", "expocode");
-		varNamesMap.put("DATASET_NAME", "dataset_name");
-		varNamesMap.put("VESSEL_NAME", "vessel_name");
-		varNamesMap.put("ORGANIZATION", "organization");
-		varNamesMap.put("GEOSPATIAL_LON_MIN", "geospatial_lon_min");
-		varNamesMap.put("GEOSPATIAL_LON_MAX", "geospatial_lon_max");
-		varNamesMap.put("GEOSPATIAL_LAT_MIN", "geospatial_lat_min");
-		varNamesMap.put("GEOSPATIAL_LAT_MAX", "geospatial_lat_max");
-		varNamesMap.put("TIME_COVERAGE_START", "time_coverage_start");
-		varNamesMap.put("TIME_CONVERAGE_END", "time_converage_end");
-		varNamesMap.put("INVESTIGATORS", "investigators");
-		varNamesMap.put("ORIG_DATA_REF", "orig_data_ref");
-		varNamesMap.put("ADDL_DOCS", "addl_docs");
-		varNamesMap.put("SOCAT_DATA_DOI", "socat_data_doi");
-		varNamesMap.put("SOCAT_DATA_REF", "socat_data_ref");
-		varNamesMap.put("SOCAT_VERSION", "socat_version");
-		varNamesMap.put("QC_FLAG", "qc_flag");
-
-		varNamesMap.put("YEAR", "year");
-		varNamesMap.put("MONTH", "month");
-		varNamesMap.put("DAY", "day");
-		varNamesMap.put("HOUR", "hour");
-		varNamesMap.put("MINUTE", "minute");
-		varNamesMap.put("SECOND", "second");
-
-		varNamesMap.put("LONGITUDE", "longitude");
-		varNamesMap.put("LATITUDE", "latitude");
-		varNamesMap.put("SAMPLE_DEPTH", "sample_depth");
-		varNamesMap.put("SAL", "sal");
-		varNamesMap.put("TEMPERATURE_EQUI", "Temperature_equi");
-		varNamesMap.put("TEMP", "temp");
-		varNamesMap.put("TEMPERATURE_ATM", "Temperature_atm");
-		varNamesMap.put("PRESSURE_EQUI", "Pressure_equi");
-		varNamesMap.put("PRESSURE_ATM", "Pressure_atm");
-		varNamesMap.put("XH2O_EQUI", "xH2O_equi");
-
-		varNamesMap.put("XCO2_WATER_EQUI_TEMP_DRY_PPM", "xCO2_water_equi_temp_dry_ppm");
-		varNamesMap.put("XCO2_WATER_SST_DRY_PPM", "xCO2_water_sst_dry_ppm");
-		varNamesMap.put("XCO2_WATER_EQUI_TEMP_WET_PPM", "xCO2_water_equi_temp_wet_ppm");
-		varNamesMap.put("XCO2_WATER_SST_WET_PPM", "xCO2_water_sst_wet_ppm");
-		varNamesMap.put("PCO2_WATER_EQUI_TEMP", "pCO2_water_equi_temp");
-		varNamesMap.put("PCO2_WATER_SST_100HUMIDITY_UATM", "pCO2_water_sst_100humidity_uatm");
-		varNamesMap.put("FCO2_WATER_EQUI_UATM", "fCO2_water_equi_uatm");
-		varNamesMap.put("FCO2_WATER_SST_100HUMIDITY_UATM", "fCO2_water_sst_100humidity_uatm");
-
-		varNamesMap.put("XCO2_ATM_DRY_ACTUAL", "xCO2_atm_dry_actual");
-		varNamesMap.put("XCO2_ATM_DRY_INTERP", "xCO2_atm_dry_interp");
-		varNamesMap.put("PCO2_ATM_WET_ACTUAL", "pCO2_atm_wet_actual");
-		varNamesMap.put("PCO2_ATM_WET_INTERP", "pCO2_atm_wet_interp");
-		varNamesMap.put("FCO2_ATM_WET_ACTUAL", "fCO2_atm_wet_actual");
-		varNamesMap.put("FCO2_ATM_WET_INTERP", "fCO2_atm_wet_interp");
-
-		varNamesMap.put("DELTA_XCO2", "delta_xCO2");
-		varNamesMap.put("DELTA_PCO2", "delta_pCO2");
-		varNamesMap.put("DELTA_FCO2", "delta_fCO2");
-
-		varNamesMap.put("XH2O_EQUI", "xH2O_equi");
-		varNamesMap.put("RELATIVE_HUMIDITY", "relative_humidity");
-		varNamesMap.put("SPECIFIC_HUMIDITY", "specific_humidity");
-		varNamesMap.put("SHIP_SPEED", "ship_speed"); 
-		varNamesMap.put("SHIP_DIR", "ship_dir");
-		varNamesMap.put("WIND_SPEED_TRUE", "wind_speed_true");
-		varNamesMap.put("WIND_SPEED_REL", "wind_speed_rel");
-		varNamesMap.put("WIND_DIR_TRUE", "wind_dir_true");
-		varNamesMap.put("WIND_DIR_REL", "wind_dir_rel");
-
-		varNamesMap.put("WOCE_CO2_WATER", "WOCE_CO2_water");
-		varNamesMap.put("WOCE_CO2_ATM", "WOCE_CO2_atm");
-
-		varNamesMap.put("WOA_SSS", "woa_sss");
-		varNamesMap.put("PRESSURE_NCEP_SLP", "pressure_ncep_slp");
-
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM", "fCO2_insitu_from_xCO2_water_sst_dry_ppm");
-		varNamesMap.put("FCO2_FROM_PCO2_WATER_WATER_EQUI_TEMP", "fCO2_from_pCO2_water_water_equi_temp");
-		varNamesMap.put("FCO2_FROM_PCO2_WATER_SST_100HUMIDITY_UATM", "fCO2_from_pCO2_water_sst_100humidity_uatm");
-		varNamesMap.put("FCO2_INSITU_FROM_FCO2_WATER_EQUI_UATM", "fCO2_insitu_from_fCO2_water_equi_uatm");
-		varNamesMap.put("FCO2_INSITU_FROM_FCO2_WATER_SST_100HUMIDTY_UATM", "fCO2_insitu_from_fCO2_water_sst_100humidty_uatm");
-		varNamesMap.put("FCO2_FROM_PCO2_WATER_WATER_EQUI_TEMP_NCEP", "fCO2_from_pCO2_water_water_equi_temp_ncep");
-		varNamesMap.put("FCO2_FROM_PCO2_WATER_SST_100HUMIDITY_UATM_NCEP", "fCO2_from_pCO2_water_sst_100humidity_uatm_ncep");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM_WOA", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM_WOA", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM_NCEP", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM_NCEP", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_EQUI_TEMP_DRY_PPM_NCEP_WOA", "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa");
-		varNamesMap.put("FCO2_INSITU_FROM_XCO2_WATER_SST_DRY_PPM_NCEP_WOA", "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa");
-
-		varNamesMap.put("FCO2_RECOMMENDED", "fCO2_recommended");
-		varNamesMap.put("FCO2_SOURCE", "fCO2_source");
-		varNamesMap.put("DELTA_TEMP", "delta_temp");
-		varNamesMap.put("REGION_ID", "region_id");
-		varNamesMap.put("CALC_SPEED", "calc_speed");
-		varNamesMap.put("ETOPO2", "etopo2");
-		varNamesMap.put("GVCO2", "gvCO2");
-		varNamesMap.put("DIST_TO_LAND", "dist_to_land");
-		varNamesMap.put("DAY_OF_YEAR", "day_of_year");
-
-		varNamesMap.put("TIME", "time");
-		varNamesMap.put("LON360", "lon360");
-		varNamesMap.put("TMONTH", "tmonth");
-
+		for ( String varName : SHORT_NAMES.values() )
+			varNamesMap.put(varName.toUpperCase(), varName);
 		VARIABLE_NAMES = Collections.unmodifiableMap(varNamesMap);
 	}
 
