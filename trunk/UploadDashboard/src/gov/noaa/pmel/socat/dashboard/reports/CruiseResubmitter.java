@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.reports;
 
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseChecker;
 import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
@@ -16,6 +15,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
+
+import uk.ac.uea.socat.sanitychecker.Output;
 
 /**
  * For resubmitting cruises automatically to update DSG files 
@@ -50,11 +51,14 @@ public class CruiseResubmitter {
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 		String qcStatus = cruise.getQcStatus();
-		// Only proceed if the cruise had been submitted at some point
 		if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ) {
+			// Only check (do not submit) if the cruise has never been submitted
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-			DashboardCruiseChecker checker = dataStore.getDashboardCruiseChecker();
-			checker.checkCruise(cruiseData);
+			Output output = dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
+			cruiseHandler.saveCruiseMessages(cruiseData.getExpocode(), output);
+			cruiseHandler.saveCruiseInfoToFile(cruiseData, 
+					"Cruise data column types, units, and missing values for " + 
+					cruiseData.getExpocode() + " updated by " + username);
 		}
 		else {
 			// Suspend the cruise but do not bother committing the change
