@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -14,7 +15,61 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -3545981144437072881L;
+	private static final long serialVersionUID = 7452039882025453331L;
+
+	// All possible QC flags other than the unassigned flag {@link SocatCruiseData#CHAR_MISSING_VALUE}
+	public static final Character QC_A_FLAG = 'A';
+	public static final Character QC_B_FLAG = 'B';
+	public static final Character QC_C_FLAG = 'C';
+	public static final Character QC_D_FLAG = 'D';
+	public static final Character QC_E_FLAG = 'E';
+	public static final Character QC_UNACCEPTABLE_FLAG = 'F';
+	public static final Character QC_NEW_FLAG = 'N';
+	public static final Character QC_PREVIEW_FLAG = 'P';
+	public static final Character QC_CONFLICT_FLAG = 'Q';
+	public static final Character QC_RENAMED_FLAG = 'R';
+	public static final Character QC_SUSPEND_FLAG = 'S';
+	public static final Character QC_UPDATED_FLAG = 'U';
+	public static final Character QC_EXCLUDE_FLAG = 'X';
+
+	// Cruise QC strings - cruises that can be modified
+	public static final String QC_STATUS_NOT_SUBMITTED = "";
+	public static final String QC_STATUS_SUSPENDED = "Suspended";
+	public static final String QC_STATUS_EXCLUDED = "Excluded";
+	public static final String QC_STATUS_UNACCEPTABLE = "Unacceptable";
+
+	// Cruise QC strings - cruises that cannot be modified
+	public static final String QC_STATUS_SUBMITTED = "Submitted";
+	public static final String QC_STATUS_PREVIEW = "Previewing";
+	public static final String QC_STATUS_ACCEPTED_A = "Flag A";
+	public static final String QC_STATUS_ACCEPTED_B = "Flag B";
+	public static final String QC_STATUS_ACCEPTED_C = "Flag C";
+	public static final String QC_STATUS_ACCEPTED_D = "Flag D";
+	public static final String QC_STATUS_ACCEPTED_E = "Flag E";
+	public static final String QC_STATUS_CONFLICT = "Conflict";
+	public static final String QC_STATUS_RENAMED = "Renamed";
+
+	/**
+	 * Map of QC flag characters to QC status strings
+	 */
+	public static final HashMap<Character,String> FLAG_STATUS_MAP = 
+			new HashMap<Character,String>();
+	static {
+		FLAG_STATUS_MAP.put(SocatCruiseData.CHAR_MISSING_VALUE, QC_STATUS_NOT_SUBMITTED);
+		FLAG_STATUS_MAP.put(QC_A_FLAG, QC_STATUS_ACCEPTED_A);
+		FLAG_STATUS_MAP.put(QC_B_FLAG, QC_STATUS_ACCEPTED_B);
+		FLAG_STATUS_MAP.put(QC_C_FLAG, QC_STATUS_ACCEPTED_C);
+		FLAG_STATUS_MAP.put(QC_D_FLAG, QC_STATUS_ACCEPTED_D);
+		FLAG_STATUS_MAP.put(QC_E_FLAG, QC_STATUS_ACCEPTED_E);
+		FLAG_STATUS_MAP.put(QC_UNACCEPTABLE_FLAG, QC_STATUS_UNACCEPTABLE);
+		FLAG_STATUS_MAP.put(QC_NEW_FLAG, QC_STATUS_SUBMITTED);
+		FLAG_STATUS_MAP.put(QC_PREVIEW_FLAG, QC_STATUS_PREVIEW);
+		FLAG_STATUS_MAP.put(QC_CONFLICT_FLAG, QC_STATUS_CONFLICT);
+		FLAG_STATUS_MAP.put(QC_RENAMED_FLAG, QC_STATUS_RENAMED);
+		FLAG_STATUS_MAP.put(QC_SUSPEND_FLAG, QC_STATUS_SUSPENDED);
+		FLAG_STATUS_MAP.put(QC_UPDATED_FLAG, QC_STATUS_SUBMITTED);
+		FLAG_STATUS_MAP.put(QC_EXCLUDE_FLAG, QC_STATUS_EXCLUDED);
+	}
 
 	Character regionID;
 

@@ -389,7 +389,7 @@ public class SocatMetadataTest {
 	@Test
 	public void testGetSetFlag() {
 		SocatMetadata mdata = new SocatMetadata();
-		assertEquals("", mdata.getQcFlag());
+		assertEquals(" ", mdata.getQcFlag());
 		mdata.setQcFlag(CRUISE_FLAG);
 		assertEquals(CRUISE_FLAG, mdata.getQcFlag());
 		assertEquals(0.0, mdata.getSocatVersion(), 1.0E-6);
@@ -409,7 +409,7 @@ public class SocatMetadataTest {
 		assertEquals("", mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
 		mdata.setQcFlag(null);
-		assertEquals("", mdata.getQcFlag());
+		assertEquals(" ", mdata.getQcFlag());
 	}
 
 	/**
