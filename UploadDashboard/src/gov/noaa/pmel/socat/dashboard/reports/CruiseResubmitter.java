@@ -8,7 +8,7 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class CruiseResubmitter {
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 		String qcStatus = cruise.getQcStatus();
-		if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ) {
+		if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ) {
 			// Only check (do not submit) if the cruise has never been submitted
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 			Output output = dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
@@ -62,7 +62,7 @@ public class CruiseResubmitter {
 		}
 		else {
 			// Suspend the cruise but do not bother committing the change
-			cruise.setQcStatus(DashboardUtils.QC_STATUS_SUSPENDED);
+			cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
 			DashboardCruiseSubmitter submitter = new DashboardCruiseSubmitter(dataStore);

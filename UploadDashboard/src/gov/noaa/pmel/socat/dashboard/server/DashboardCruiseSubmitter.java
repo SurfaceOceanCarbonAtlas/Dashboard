@@ -103,20 +103,25 @@ public class DashboardCruiseSubmitter {
 			String commitMsg = "Expocode " + expocode;
 
 			String qcStatus = cruise.getQcStatus();
-			if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ||
-				 qcStatus.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) || 
-				 qcStatus.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-				 qcStatus.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) {
+			if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ||
+				 qcStatus.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) || 
+				 qcStatus.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
+				 qcStatus.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) {
 				// QC flag to assign with this cruise
-				String flag;
-				if ( qcFlag != null ) {
-					flag = qcFlag;
+				Character flag;
+				if ( (qcFlag != null) && ! qcFlag.isEmpty() ) {
+					flag = qcFlag.charAt(0);
+					qcStatus = SocatQCEvent.FLAG_STATUS_MAP.get(flag);
+					if ( qcStatus == null )
+						throw new IllegalArgumentException("Unknown QC flag '" + qcFlag + "'");
 				}
-				else if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ) {
-					flag = "N";
+				else if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ) {
+					flag = SocatQCEvent.QC_NEW_FLAG;
+					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
 				}
 				else {
-					flag = "U";
+					flag = SocatQCEvent.QC_UPDATED_FLAG;
+					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
 				}
 				// Get the complete cruise data in standard units
 				DashboardCruiseWithData cruiseData = 
@@ -147,8 +152,8 @@ public class DashboardCruiseSubmitter {
 					addlDocsSet.addAll(Arrays.asList(addlDocs.split(" ; ")));
 				}
 				// Generate the NetCDF DSG file for this cruise
-				dsgNcHandler.saveCruise(omeMData, cruiseData, flag);
-				cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
+				dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
+				cruise.setQcStatus(qcStatus);
 				// Update cruise with the any updates from the SanityChecker
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
@@ -171,7 +176,7 @@ public class DashboardCruiseSubmitter {
 				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
 				String recFlag;
 				if ( cruiseData.getNumErrorRows() > DashboardUtils.MAX_ACCEPTABLE_ERRORS ) {
-					recFlag = "Recommend QC flag of 'F': ";
+					recFlag = "Recommend QC flag of " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + ": ";
 				}
 				else {
 					recFlag = "";

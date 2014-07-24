@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
@@ -287,6 +288,19 @@ public class DsgNcFileHandler {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Assigns the QC flag given in qcEvent in the full and decimated 
+	 * DSG files for the dataset with the expocode given in qvEvent. 
+	 * 
+	 * @param qcEvent
+	 * 		get the QC flag and dataset expocode from here
+	 * @param log
+	 * 		log messages here; can be null 
+	 */
+	public void updateQCFlag(SocatQCEvent qcEvent, Logger log) {
+		// TODO: implement
 	}
 
 	/**

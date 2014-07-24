@@ -10,6 +10,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -153,7 +154,8 @@ public class CruiseListPage extends Composite {
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
 			"</ul> These data sets can be submitted for QC, " +
-			"but a QC Flag F will be recommended when added.  " +
+			"but a QC flag " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + 
+			" (unacceptable) will be <em>recommended</em> when added.<br />" +
 			"Do you want to continue? ";
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
@@ -475,10 +477,10 @@ public class CruiseListPage extends Composite {
 			return null;
 		// false for submitted cruises
 		status = cruise.getQcStatus();
-		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-				 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-				 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) )  ) 
+		if ( ! ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
+				 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
+				 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
+				 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED) )  ) 
 			return Boolean.FALSE;
 		// true for unsubmitted cruises
 		return Boolean.TRUE;

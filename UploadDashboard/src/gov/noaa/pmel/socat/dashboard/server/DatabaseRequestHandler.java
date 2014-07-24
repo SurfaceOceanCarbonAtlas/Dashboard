@@ -325,7 +325,9 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Adds a new QC event for a dataset.
+	 * Adds a new QC event for a data set.  If the update results in
+	 * a QC flag conflict, the flag in the given SocatQCEvent is
+	 * updated to the conflict flag ('Q').
 	 * 
 	 * @param qcEvent
 	 * 		the QC event to add
@@ -358,6 +360,8 @@ public class DatabaseRequestHandler {
 			prepStmt.execute();
 			if ( prepStmt.getUpdateCount() != 1 )
 				throw new SQLException("Adding the QC event was unsuccessful");
+			// TODO: get all QC flags for this data set, check for conflicts,
+			// and assign the conflict flag in qcEvent if one if found
 		} finally {
 			catConn.close();
 		}

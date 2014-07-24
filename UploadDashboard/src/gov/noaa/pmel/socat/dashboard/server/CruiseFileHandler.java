@@ -13,6 +13,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1251,10 +1252,10 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
 		// Check if the cruise is in a submitted or accepted state
 		String status = cruise.getQcStatus();
-		if ( ! ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
-				 status.equals(DashboardUtils.QC_STATUS_UNACCEPTABLE) ||
-				 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
-				 status.equals(DashboardUtils.QC_STATUS_EXCLUDED) ) )
+		if ( ! ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
+				 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
+				 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
+				 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) )
 			throw new IllegalArgumentException("cruise status is " + status);
 		// Check if the user has permission to delete the cruise
 		try {

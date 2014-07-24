@@ -61,18 +61,6 @@ public class DashboardUtils {
 	public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
 
-	// Cruise QC strings
-	public static final String QC_STATUS_NOT_SUBMITTED = "";
-	public static final String QC_STATUS_SUBMITTED = "Submitted";
-	public static final String QC_STATUS_ACCEPTED_A = "Flag A";
-	public static final String QC_STATUS_ACCEPTED_B = "Flag B";
-	public static final String QC_STATUS_ACCEPTED_C = "Flag C";
-	public static final String QC_STATUS_ACCEPTED_D = "Flag D";
-	public static final String QC_STATUS_ACCEPTED_E = "Flag E";
-	public static final String QC_STATUS_UNACCEPTABLE = "Flag F";
-	public static final String QC_STATUS_SUSPENDED = "Suspended";
-	public static final String QC_STATUS_EXCLUDED = "Excluded";
-
 	// Archival options
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
 	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";

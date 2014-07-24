@@ -68,7 +68,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		socatDOI = "";
 		socatDOIHRef = "";
 		socatVersion = 0.0;
-		qcFlag = "";
+		qcFlag = " ";
 	}
 
 	/**
@@ -410,7 +410,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the QC flag;
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be a string with a single blank character if not assigned
 	 */
 	public String getQcFlag() {
 		return qcFlag;
@@ -419,11 +419,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param qcFlag 
 	 * 		the QC flag to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, a string with a single blank character is assigned
 	 */
 	public void setQcFlag(String qcFlag) {
 		if ( qcFlag == null )
-			this.qcFlag = "";
+			this.qcFlag = " ";
 		else
 			this.qcFlag = qcFlag;
 	}
