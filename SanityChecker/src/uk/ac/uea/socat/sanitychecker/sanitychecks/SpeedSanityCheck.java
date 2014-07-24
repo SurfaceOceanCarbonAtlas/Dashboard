@@ -6,7 +6,6 @@ import org.joda.time.DateTime;
 
 import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
-import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
@@ -63,13 +62,7 @@ public class SpeedSanityCheck extends SanityCheck {
 					double hourDiff = calcHourDiff(lastTime, thisTime);
 					
 					if (hourDiff <= 0.0) {
-						try {
-							record.setDateFlag(SocatColumnConfigItem.BAD_FLAG);
-							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
-						} catch (SocatDataBaseException e) {
-							// Being unable to set the flag indicates a configuration problem, so we can throw it
-							throw new SanityCheckException("Unable to set date flag on record", e);
-						}
+						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
 					} else if (calcSecondsDiff(lastTime, thisTime) > 1) {
 						double speed = distance / hourDiff;
 						if (speed > itsBadSpeedLimit) {
