@@ -1,14 +1,38 @@
 package uk.ac.uea.socat.sanitychecker;
 
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Miscellaneous utility methods
  */
 public class CheckerUtils {
+
+	/**
+	 * Set of default missing values as trimmed lower-case strings.
+	 */
+	public static final Set<String> DEFAULT_MISSING_VALUE_STRINGS;
+	static {
+		HashSet<String> defaultsSet = new HashSet<String>();
+		defaultsSet.add("");
+		defaultsSet.add("na");
+		defaultsSet.add("n/a");
+		defaultsSet.add("nan");
+		defaultsSet.add("-999");
+		defaultsSet.add("-999.");
+		defaultsSet.add("-999.0");
+		defaultsSet.add("-999.9");
+		defaultsSet.add("-9999");
+		defaultsSet.add("-9999.");
+		defaultsSet.add("-9999.0");
+		defaultsSet.add("-9999.9");
+		DEFAULT_MISSING_VALUE_STRINGS = Collections.unmodifiableSet(defaultsSet);
+	}
 
 	/**
 	 * Processes all items in a list of strings, trimming them and converting them
@@ -91,7 +115,8 @@ public class CheckerUtils {
 	}
 	
 	/**
-	 * Determines whether or not all of a list of string values is empty. {@code NA} or {@code NaN} qualifies as empty.
+	 * Determines whether or not all of a list of string values is empty.  
+	 * A null or default missing value is considered empty.
 	 * @param values The values to be checked.
 	 * @return {@code true} if the values are all empty; {@code false} otherwise.
 	 */
@@ -99,7 +124,8 @@ public class CheckerUtils {
 		boolean result = true;
 
 		for (String value: values) {
-			if (null != value && !value.equals("") && !value.equalsIgnoreCase("nan") && !value.equalsIgnoreCase("na")) {
+			if ( (null != value) && 
+				 ! DEFAULT_MISSING_VALUE_STRINGS.contains(value.trim().toLowerCase()) ) {
 				result = false;
 			}
 		}
@@ -108,7 +134,8 @@ public class CheckerUtils {
 	}
 	
 	/**
-	 * Determines whether or not all of a set of string values is empty. {@code NA} or {@code NaN} qualifies as empty.
+	 * Determines whether or not all of a set of string values is empty.
+	 * A null or default missing value is considered empty.
 	 * @param values The values to be checked.
 	 * @return {@code true} if the values are all empty; {@code false} otherwise.
 	 */
