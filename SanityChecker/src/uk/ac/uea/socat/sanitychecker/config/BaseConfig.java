@@ -73,7 +73,9 @@ public class BaseConfig extends Properties {
 	}
 	
 	/**
-	 * Retrieves an instance of the BaseConfig. If it doesn't exist, create it. 
+	 * Retrieves an instance of the {@link BaseConfig}. If it doesn't exist, create it.
+	 * @return The {@link BaseConfig} instance
+	 * @throws ConfigException If an error occurs while loading the configuration
 	 */
 	public static BaseConfig getInstance() throws ConfigException {
 		if (baseConfigInstance == null) {
@@ -92,7 +94,8 @@ public class BaseConfig extends Properties {
 	
 	/**
 	 * Set the location of the {@link BaseConfig} file.
-	 * @param filename The location of the {@link BaseConfig} file.
+	 * @param filenameSet the location of the {@link BaseConfig} file
+	 * @param logger A logger instance
 	 */
 	public static void init(String filename, Logger logger) {
 		itsConfigFile = filename;
@@ -175,6 +178,10 @@ public class BaseConfig extends Properties {
 		return getProperty(SOCAT_CONFIG_FILE);
 	}
 	
+	/**
+	 * Returns the name of the file containing the configuration of the Sanity Checkers
+	 * @return The name of the file containing the configuration of the Sanity Checkers
+	 */
 	public String getSanityCheckConfigFile() {
 		return getProperty(SANITY_CHECK_CONFIG_FILE);
 	}

@@ -144,6 +144,11 @@ public class SocatColumnConfig {
 		itsLogger = logger;
 	}
 
+	/**
+	 * Initialises the column configuration config.
+	 * This cannot be called until after {@link SocatColumnConfig#init(String, Logger)} has been called.
+	 * @throws ConfigException If the configuration cannot be loaded
+	 */
 	private SocatColumnConfig() throws ConfigException {
 		if (itsConfigFilename == null) {
 			throw new ConfigException(null, "SocatColumnConfig filename has not been set - must run init first");

@@ -31,6 +31,13 @@ public class ConfigValueRange {
 	 */
 	private double maxReal;
 	
+	/**
+	 * Constructs a range definition
+	 * @param dataType The type of data to be compared (either Integer or Real)
+	 * @param min The minimum value
+	 * @param max The maximum value
+	 * @throws ParseException If the range limits cannot be parsed into numbers
+	 */
 	protected ConfigValueRange(int dataType, String min, String max) throws ParseException {
 	
 		switch (dataType) {
