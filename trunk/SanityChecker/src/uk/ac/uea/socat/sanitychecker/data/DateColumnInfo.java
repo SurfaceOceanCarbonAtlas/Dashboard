@@ -112,6 +112,7 @@ public class DateColumnInfo {
 			{"processSingleElement", ColumnSpec.SINGLE_DATE_TIME_ELEMENT},
 			{"processDateTimeElements", ColumnSpec.DATE_ELEMENT, ColumnSpec.TIME_ELEMENT},
 			{"processIndividualColumnElements", ColumnSpec.YEAR_ELEMENT, ColumnSpec.MONTH_ELEMENT, ColumnSpec.DAY_ELEMENT, ColumnSpec.HOUR_ELEMENT, ColumnSpec.MINUTE_ELEMENT, ColumnSpec.SECOND_ELEMENT},
+			{"processIndividualColumnElements", ColumnSpec.YEAR_ELEMENT, ColumnSpec.MONTH_ELEMENT, ColumnSpec.DAY_ELEMENT, ColumnSpec.HOUR_ELEMENT, ColumnSpec.MINUTE_ELEMENT},
 			{"processYearDaySecondElements", ColumnSpec.YDS_YEAR_ELEMENT, ColumnSpec.YDS_DAY_ELEMENT, ColumnSpec.YDS_SECOND_ELEMENT, ColumnSpec.JAN_FIRST_INDEX_ELEMENT},
 			{"processYearJDateElements", ColumnSpec.YDJD_YEAR_ELEMENT, ColumnSpec.YDJD_DECIMAL_JDATE_ELEMENT, ColumnSpec.YDJD_JAN_FIRST_INDEX_ELEMENT},
 			{"processYearColsSingleTimeElements", ColumnSpec.YMDT_YEAR_ELEMENT, ColumnSpec.YMDT_MONTH_ELEMENT, ColumnSpec.YMDT_DAY_ELEMENT, ColumnSpec.YMDT_TIME_ELEMENT}	
@@ -416,6 +417,7 @@ public class DateColumnInfo {
 	 * Process a combined date/time column specification
 	 * @param parent The parent element
 	 */
+	@SuppressWarnings("unused")
 	private void processSingleElement(Element parent, Logger logger) {
 		itsElementType = SINGLE_ELEMENT_TYPE;
 		
@@ -430,6 +432,7 @@ public class DateColumnInfo {
 	 * Process separate date and time column specifications
 	 * @param parent The parent element
 	 */
+	@SuppressWarnings("unused")
 	private void processDateTimeElements(Element parent, Logger logger) {
 		itsElementType = DATE_TIME_ELEMENT_TYPE;
 
@@ -450,6 +453,7 @@ public class DateColumnInfo {
 		itsTimeInfo = new ColInfo(columnIndex, columnName);
 	}
 	
+	@SuppressWarnings("unused")
 	private void processYearDaySecondElements(Element parent, Logger logger) {
 		itsElementType = YEAR_DAY_SECOND_TYPE;
 		
@@ -479,6 +483,7 @@ public class DateColumnInfo {
 		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
 	}
 	
+	@SuppressWarnings("unused")
 	private void processYearJDateElements(Element parent, Logger logger) {
 		itsElementType = YEAR_DECIMAL_JDATE_TYPE;
 		
@@ -502,6 +507,7 @@ public class DateColumnInfo {
 		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
 	}
 	
+	@SuppressWarnings("unused")
 	private void processYearColsSingleTimeElements(Element parent, Logger logger) {
 		itsElementType = DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE;
 
@@ -538,6 +544,7 @@ public class DateColumnInfo {
 	 * Process individual date and time component column specifications
 	 * @param parent The parent element
 	 */
+	@SuppressWarnings("unused")
 	private void processIndividualColumnElements(Element parent, Logger logger) {
 		itsElementType = INDIVIDUAL_ELEMENTS_TYPE;
 
