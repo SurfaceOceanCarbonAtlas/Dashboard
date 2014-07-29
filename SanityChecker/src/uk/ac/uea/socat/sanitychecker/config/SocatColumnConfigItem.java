@@ -487,7 +487,13 @@ public class SocatColumnConfigItem {
 	public int getIndex() {
 		return itsIndex;
 	}
-	
+	/**
+	 * Check a value to see if it's within the range specified for the column.
+	 * The result can be good, questionable or bad, and is returned as the appropriate flag.
+	 * @param value The value to be checked
+	 * @return A flag indicating whether the value is {@link SocatColumnConfigItem#GOOD_FLAG},
+	 *         {@link SocatColumnConfigItem#QUESTIONABLE_FLAG} or {@link SocatColumnConfigItem#BAD_FLAG}
+	 */
 	public int checkRange(double value) {
 		int result = GOOD_FLAG;
 		
@@ -500,39 +506,51 @@ public class SocatColumnConfigItem {
 		return result;
 	}
 	
+	/**
+	 * Returns the number below which a value will be considered {@link SocatColumnConfigItem#BAD_FLAG}
+	 * @return The number below which a value will be considered {@link SocatColumnConfigItem#BAD_FLAG}
+	 */
 	public double getBadRangeMin() {
 		return itsBadRangeMin;
 	}
 	
+	/**
+	 * Returns the number above which a value will be considered {@link SocatColumnConfigItem#BAD_FLAG}
+	 * @return The number above which a value will be considered {@link SocatColumnConfigItem#BAD_FLAG}
+	 */
 	public double getBadRangeMax() {
 		return itsBadRangeMax;
 	}
 	
+	/**
+	 * Returns the number below which a value will be considered {@link SocatColumnConfigItem#QUESTIONABLE_FLAG}
+	 * @return The number below which a value will be considered {@link SocatColumnConfigItem#QUESTIONABLE_FLAG}
+	 */
 	public double getQuestionableRangeMin() {
 		return itsQuestionableRangeMin;
 	}
 	
+	/**
+	 * Returns the number above which a value will be considered {@link SocatColumnConfigItem#QUESTIONABLE_FLAG}
+	 * @return The number above which a value will be considered {@link SocatColumnConfigItem#QUESTIONABLE_FLAG}
+	 */
 	public double getQuestionableRangeMax() {
 		return itsQuestionableRangeMax;
 	}
 	
+	/**
+	 * Checks to see if this column has a Bad range defined
+	 * @return {@code true} if the Bad range has been defined; {@code false} otherwise.
+	 */
 	public boolean hasBadRange() {
 		return itHasBadRange;
 	}
 	
+	/**
+	 * Checks to see if this column has a Questionable range defined
+	 * @return {@code true} if the Questionable range has been defined; {@code false} otherwise.
+	 */
 	public boolean hasQuestionableRange() {
 		return itHasQuestionableRange;
-	}
-
-	public int getOutputMessageFlag(int columnFlag) {
-		int result = -1;
-		
-		if (columnFlag == QUESTIONABLE_FLAG) {
-			result = Message.WARNING;
-		} else if (columnFlag == BAD_FLAG) {
-			result = Message.ERROR;
-		}
-		
-		return result;
 	}
 }
