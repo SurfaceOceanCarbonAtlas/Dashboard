@@ -3,7 +3,6 @@ package uk.ac.uea.socat.sanitychecker.config;
 import java.lang.reflect.Method;
 
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
-import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.calculate.DataCalculator;
 
