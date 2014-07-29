@@ -220,10 +220,10 @@ public class SanityCheckerRun {
 
 	/**
 	 * Read records from the file into the required format for the Sanity Checker
-	 * @param reader
-	 * @param records
-	 * @param splitChar
-	 * @throws IOException
+	 * @param reader The input {@code Reader} object
+	 * @param records The list of records
+	 * @param splitChar The character that delimits fields on each line
+	 * @throws IOException If an error occurs reading from the file.
 	 */
 	private void extractRecords(BufferedReader reader, ArrayList<ArrayList<String>> records, String splitChar) throws IOException {
 		String line = getNextLine(reader);
