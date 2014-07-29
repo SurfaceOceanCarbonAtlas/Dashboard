@@ -21,6 +21,8 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.MissingDateTimeElementExcepti
  */
 public class DateColumnInfo {
 
+	public static final int MINIMUM_YEAR = 1900;
+	
 	/**
 	 * Indicates that a single column contains both the date and time
 	 */
@@ -398,6 +400,13 @@ public class DateColumnInfo {
 		
 		if (null == result) {
 			throw new DateTimeException("Failed to parse date for unknown reason");
+		} else if (result.getYear() < MINIMUM_YEAR) {
+			throw new DateTimeParseException("Date is before " + MINIMUM_YEAR);
+		} else {
+			DateTime now = new DateTime(DateTimeZone.UTC);
+			if (result.isAfter(now)) {
+				throw new DateTimeParseException("Date is in the future");
+			}
 		}
 		
 		return result;
