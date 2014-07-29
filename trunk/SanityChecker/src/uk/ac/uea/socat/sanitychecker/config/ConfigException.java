@@ -37,12 +37,25 @@ public class ConfigException extends Exception {
 		itsFile = file;
 	}
 	
+	/**
+	 * Creates an exception relating to a specific line
+	 * @param file The path of the file being worked on when the exception occurred.
+	 * @param lineNumber The line number of the file on which the error occurred
+	 * @param message The error message.
+	 */
 	public ConfigException(String file, int lineNumber, String message) {
 		super(message);
 		itsFile = file;
 		itsLineNumber = lineNumber;
 	}
 	
+	/**
+	 * Creates an exception relating to a specific line with a root cause
+	 * @param file The path of the file being worked on when the exception occurred.
+	 * @param lineNumber The line number of the file on which the error occurred
+	 * @param message The error message.
+	 * @param cause The underlying cause of the exception
+	 */
 	public ConfigException(String file, int lineNumber, String message, Throwable cause) {
 		super(message, cause);
 		itsFile = file;
@@ -53,6 +66,7 @@ public class ConfigException extends Exception {
 	 * Creates an exception for an error pertaining to a specific configuration item
 	 * @param file The path of the file being worked on when the exception occurred.
 	 * @param item The name of the item where the error was encountered
+	 * @param lineNumber The line number of the file on which the error occurred
 	 * @param message The error message
 	 */
 	public ConfigException(String file, String item, int lineNumber, String message) {
@@ -63,11 +77,12 @@ public class ConfigException extends Exception {
 	}
 
 	/**
-	 * Creates an exception for an error pertaining to a specific configuration item
+	 * Creates an exception relating to a specific line with a root cause
 	 * @param file The path of the file being worked on when the exception occurred.
 	 * @param item The name of the item where the error was encountered
-	 * @param message The error message
-	 * @param cause The exception that caused the error
+	 * @param lineNumber The line number of the file on which the error occurred
+	 * @param message The error message.
+	 * @param cause The underlying cause of the exception
 	 */
 	public ConfigException(String file, String item, int lineNumber, String message, Throwable cause) {
 		super(message, cause);

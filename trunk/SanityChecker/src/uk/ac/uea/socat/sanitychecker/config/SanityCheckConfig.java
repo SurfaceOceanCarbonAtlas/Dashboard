@@ -13,21 +13,48 @@ import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
 
+/**
+ * Represents the configuration of the sanity checkers to be run against
+ * input files.
+ */
 public class SanityCheckConfig {
 	
+	/**
+	 * The name of the package in which all sanity checker classes will be stored
+	 */
 	private static final String SANITY_CHECK_CLASS_ROOT = "uk.ac.uea.socat.sanitychecker.sanitychecks.";
 
+	/**
+	 * All sanity check class names must end with the same text
+	 */
 	private static final String SANITY_CHECK_CLASS_TAIL = "SanityCheck";
 
-	
+	/**
+	 * The list of sanity checker objects. All records in the input file will be passed to
+	 * each of these in turn.
+	 */
 	private List<CheckerInitData> itsSanityCheckClasses;
 	
+	/**
+	 * The name of the configuration file for the sanity checks
+	 */
 	private static String itsConfigFilename = null;
 	
+	/** 
+	 * A logger instance
+	 */
 	private static Logger itsLogger = null;
 	
+	/**
+	 * The singleton instance of this class
+	 */
 	private static SanityCheckConfig sanityCheckConfigInstance = null;
 	
+	/**
+	 * Initialises the sanity checker configuration. This cannot be run
+	 * until {@link SanityCheckConfig#init(String, Logger)} has been called.
+	 * @throws ConfigException If the configuration cannot be loaded
+	 */
 	public SanityCheckConfig() throws ConfigException {
 		if (itsConfigFilename == null) {
 			throw new ConfigException(null, "SanityCheckConfig filename has not been set - must run init first");
@@ -37,11 +64,22 @@ public class SanityCheckConfig {
 		readFile();
 	}
 	
+	/**
+	 * Initialise the variables required to bootstrap the SanityCheckerConfig
+	 * @param filename The name of the configuration file
+	 * @param logger A logger instance
+	 */
 	public static void init(String filename, Logger logger) {
 		itsConfigFilename = filename;
 		itsLogger = logger;
 	}
 	
+	/**
+	 * Retrieves the singleton instance of the SanityCheckerConfig, creating it if it
+	 * does not exist
+	 * @return An instance of the SanityCheckerConfig
+	 * @throws ConfigException If the configuration cannot be loaded
+	 */
 	public static SanityCheckConfig getInstance() throws ConfigException {
 		if (null == sanityCheckConfigInstance) {
 			sanityCheckConfigInstance = new SanityCheckConfig();
@@ -50,10 +88,17 @@ public class SanityCheckConfig {
 		return sanityCheckConfigInstance;
 	}
 	
+	/**
+	 * Destroys the singleton instance of the SanityCheckerConfig
+	 */
 	public static void destroy() {
 		sanityCheckConfigInstance = null;
 	}
 	
+	/**
+	 * Read and parse the configuration file
+	 * @throws ConfigException If the configuration cannot be loaded
+	 */
 	private void readFile() throws ConfigException {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(itsConfigFilename));
@@ -129,11 +174,29 @@ public class SanityCheckConfig {
 		return checkers;
 	}
 	
+	/**
+	 * A helper class to hold details of a given sanity checker.
+	 * A new instance of each sanity checker is created for each file,
+	 * and this class contains the details required to construct it.
+	 */
 	private class CheckerInitData {
 		
+		/**
+		 * The class of the sanity checker
+		 */
 		private Class<?> checkerClass;
+		
+		/**
+		 * The parameters for the sanity checker
+		 */
 		private List<String> params;
 		
+		/**
+		 * Builds an object containing all the details required to initialise
+		 * a given sanity checker.
+		 * @param checkerClass The class of the sanity checker
+		 * @param params The parameters for the sanity checker
+		 */
 		private CheckerInitData(Class<?> checkerClass, List<String> params) {
 			this.checkerClass = checkerClass;
 			this.params = params;
