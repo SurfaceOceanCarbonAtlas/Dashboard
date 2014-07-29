@@ -368,11 +368,11 @@ public class OmeMetadata extends DashboardMetadata {
 		for (Element invElem : rootElem.getChildren("Investigator")) {
 			
 			OMECompositeVariable invDetails = new OMECompositeVariable(investigatorPath, invIdList);
-			invDetails.addValue("Name", invElem);
-			invDetails.addValue("Organization", invElem);
-			invDetails.addValue("Address", invElem);
-			invDetails.addValue("Phone", invElem);
-			invDetails.addValue("Email", invElem);
+			invDetails.addEntry("Name", invElem);
+			invDetails.addEntry("Organization", invElem);
+			invDetails.addEntry("Address", invElem);
+			invDetails.addEntry("Phone", invElem);
+			invDetails.addEntry("Email", invElem);
 			
 			investigators.add(invDetails);
 		}
@@ -475,8 +475,8 @@ public class OmeMetadata extends DashboardMetadata {
 			for (Element variableElem : varsInfoElem.getChildren("Variable")) {
 				
 				OMECompositeVariable varDetails = new OMECompositeVariable(variablePath, "Variable_Name");
-				varDetails.addValue("Variable_Name", variableElem);
-				varDetails.addValue("Description_of_Variable", variableElem);
+				varDetails.addEntry("Variable_Name", variableElem);
+				varDetails.addEntry("Description_of_Variable", variableElem);
 				
 				variablesInfo.add(varDetails);
 			}
@@ -677,12 +677,12 @@ public class OmeMetadata extends DashboardMetadata {
 				sensorIdList.add("Manufacturer");
 				sensorIdList.add("Model");
 				OMECompositeVariable sensorDetails = new OMECompositeVariable(sensorPath, sensorIdList);
-				sensorDetails.addValue("Manufacturer", sensorElem);
-				sensorDetails.addValue("Accuracy", sensorElem);
-				sensorDetails.addValue("Model", sensorElem);
-				sensorDetails.addValue("Resolution", sensorElem);
-				sensorDetails.addValue("Calibration", sensorElem);
-				sensorDetails.addValue("Other_Comments", sensorElem);
+				sensorDetails.addEntry("Manufacturer", sensorElem);
+				sensorDetails.addEntry("Accuracy", sensorElem);
+				sensorDetails.addEntry("Model", sensorElem);
+				sensorDetails.addEntry("Resolution", sensorElem);
+				sensorDetails.addEntry("Calibration", sensorElem);
+				sensorDetails.addEntry("Other_Comments", sensorElem);
 				
 				otherSensors.add(sensorDetails);
 			}
@@ -705,9 +705,9 @@ public class OmeMetadata extends DashboardMetadata {
 		for (Element dataSetLinkElem : rootElem.getChildren("Data_Set_Link")) {
 			
 			OMECompositeVariable dataSetLinkDetails = new OMECompositeVariable(dataSetLinkPath, "URL");
-			dataSetLinkDetails.addValue("URL", dataSetLinkElem);
-			dataSetLinkDetails.addValue("Label", dataSetLinkElem);
-			dataSetLinkDetails.addValue("Link_Note", dataSetLinkElem);
+			dataSetLinkDetails.addEntry("URL", dataSetLinkElem);
+			dataSetLinkDetails.addEntry("Label", dataSetLinkElem);
+			dataSetLinkDetails.addEntry("Link_Note", dataSetLinkElem);
 			
 			dataSetLinks.add(dataSetLinkDetails);
 		}

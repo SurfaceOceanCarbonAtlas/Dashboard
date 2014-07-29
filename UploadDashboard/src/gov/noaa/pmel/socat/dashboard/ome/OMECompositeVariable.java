@@ -8,7 +8,7 @@ import org.jdom2.Element;
 class OMECompositeVariable {
 	private Path itsPath;
 	private List<String> itsIdFields;
-	private List<Value> itsValues = new ArrayList<Value>();
+	private List<Entry> itsEntries = new ArrayList<Entry>();
 	
 	protected OMECompositeVariable(Path parentPath, String idElement) {
 		itsPath = parentPath;
@@ -25,52 +25,52 @@ class OMECompositeVariable {
 		itsPath = parentPath;
 	}
 
-	protected void addValue(String name, Element element) throws IllegalArgumentException {
-		String valueText = null;
+	protected void addEntry(String name, Element element) throws IllegalArgumentException {
+		String value = null;
 		if (null != element) {
-			valueText = element.getChildTextTrim(name);
-			if (null != valueText) {
-				addValue(name, valueText);
+			value = element.getChildTextTrim(name);
+			if (null != value) {
+				addEntry(name, value);
 			}
 		}
 	}
 	
-	protected void addValue(String name, String valueText) throws IllegalArgumentException {
+	protected void addEntry(String name, String value) throws IllegalArgumentException {
 		
-		boolean foundValue = false;
-		for (Value searchValue : itsValues) {
-			if (searchValue.name.equals(name)) {
+		boolean foundEntry = false;
+		for (Entry searchEntry : itsEntries) {
+			if (searchEntry.name.equals(name)) {
 				
-				if (itsIdFields.contains(name) && searchValue.getValueCount() > 0) {
+				if (itsIdFields.contains(name) && searchEntry.getValueCount() > 0) {
 					throw new IllegalArgumentException("Cannot add multiple values to an identifier in a composite variable");
 				} else {
-					searchValue.addValue(valueText);
-					foundValue = true;
+					searchEntry.addValue(value);
+					foundEntry = true;
 					break;
 				}
 			}
 		}
 		
-		if (!foundValue) {
-			itsValues.add(new Value(name, valueText));
+		if (!foundEntry) {
+			itsEntries.add(new Entry(name, value));
 		}
 	}
 	
-	protected void addValues(List<Value> values) {
+	protected void addEntries(List<Entry> entries) {
 		
-		for (Value value : values) {
+		for (Entry entry : entries) {
 			
-			boolean valueStored = false;
-			for (Value existingValue : itsValues) {
-				if (existingValue.name.equals(value.name)) {
-					existingValue.addValues(value.values);
-					valueStored = true;
+			boolean entryStored = false;
+			for (Entry existingEntry : itsEntries) {
+				if (existingEntry.name.equals(entry.name)) {
+					existingEntry.addValues(entry.values);
+					entryStored = true;
 					break;
 				}
 			}
 			
-			if (!valueStored) {
-				itsValues.add(value);
+			if (!entryStored) {
+				itsEntries.add(entry);
 			}
 			
 			
@@ -91,7 +91,7 @@ class OMECompositeVariable {
 			} else {
 				
 				OMECompositeVariable mergedVar = (OMECompositeVariable) destVar.clone();
-				mergedVar.addValues(newValue.getAllValues());
+				mergedVar.addEntries(newValue.getAllValues());
 				merged.add(mergedVar);
 			}
 		}
@@ -107,8 +107,8 @@ class OMECompositeVariable {
 		return merged;
 	}
 	
-	private List<Value> getAllValues() {
-		return itsValues;
+	private List<Entry> getAllValues() {
+		return itsEntries;
 	}
 	
 	private static OMECompositeVariable findById(List<OMECompositeVariable> variables, OMECompositeVariable criteria) {
@@ -150,7 +150,7 @@ class OMECompositeVariable {
 		
 	private Element getElement() {
 		Element element = new Element(itsPath.getElementName());
-		for (Value subValue : itsValues) {
+		for (Entry subValue : itsEntries) {
 			Element subElement = new Element(subValue.name);
 			subElement.setText(subValue.getValue());
 			
@@ -182,7 +182,7 @@ class OMECompositeVariable {
 				variableElement.setAttribute(id, value);
 			}
 			
-			for (Value value : itsValues) {
+			for (Entry value : itsEntries) {
 				if (value.getValueCount() > 1) {
 					Element valuesElement = new Element(value.name);
 					
@@ -205,7 +205,7 @@ class OMECompositeVariable {
 	protected boolean hasConflict() {
 		boolean result = false;
 		
-		for (Value value : itsValues) {
+		for (Entry value : itsEntries) {
 			if (value.getValueCount() > 1) {
 				result = true;
 				break;
@@ -218,7 +218,7 @@ class OMECompositeVariable {
 	protected String getValue(String valueName) {
 		String result = "";
 		
-		for (Value value : itsValues) {
+		for (Entry value : itsEntries) {
 			if (value.name.equals(valueName)) {
 				result = value.getValue();
 				break;
@@ -235,24 +235,24 @@ class OMECompositeVariable {
 			clone.itsIdFields.add(id);
 		}
 		
-		for (Value value : itsValues) {
-			clone.itsValues.add((Value) value.clone());
+		for (Entry value : itsEntries) {
+			clone.itsEntries.add((Entry) value.clone());
 		}
 		
 		return clone;
 	}
 	
-	private class Value {
+	private class Entry {
 		private String name;
 		private List<String> values;
 		
-		private Value(String name, String value) {
+		private Entry(String name, String value) {
 			this.name = name;
 			values = new ArrayList<String>();
 			values.add(value);
 		}
 		
-		private Value(String name) {
+		private Entry(String name) {
 			this.name = name;
 			values = new ArrayList<String>();
 		}
@@ -313,7 +313,7 @@ class OMECompositeVariable {
 		}
 		
 		public Object clone() {
-			Value clone = new Value(name);
+			Entry clone = new Entry(name);
 			for (String value : values) {
 				clone.values.add(value);
 			}
