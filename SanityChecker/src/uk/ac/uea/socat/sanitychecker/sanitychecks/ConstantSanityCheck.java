@@ -148,7 +148,7 @@ public class ConstantSanityCheck extends SanityCheck {
 			
 			if (minutesDifference > itsMaxDuration) {
 				try {
-					String message = "Value for column is constant for longer than " + itsMaxDuration + " (" + minutesDifference + ") minutes";
+					String message = "Value for column is constant at " + getRecordValue(itsRecords.get(0)) + " for " + minutesDifference + ") minutes";
 					
 					for (SocatDataRecord record : itsRecords) {
 						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
