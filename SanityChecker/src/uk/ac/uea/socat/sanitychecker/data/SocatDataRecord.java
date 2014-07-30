@@ -280,7 +280,7 @@ public class SocatDataRecord {
 	 * @param dataFields The input data fields
 	 * @throws SocatDataException If an error occurs during processing
 	 */
-	private void setDataValues(List<String> dataFields) throws SocatDataException {
+	private void setDataValues(List<String> dataFields) throws SocatDataException, SocatDataBaseException {
 		for (String column : itsColumnConfig.getColumnList()) {
 			if (getDataSource(column) == SocatColumnConfigItem.DATA_SOURCE) {
 				StandardColumnInfo colInfo = itsColumnSpec.getColumnInfo(column);
@@ -297,14 +297,29 @@ public class SocatDataRecord {
 					
 					if (!CheckerUtils.isEmpty(value)) {
 					
-						String convertedValue = value;
-						try {
-							convertedValue = colInfo.convert(value);
-						} catch (ConversionException e) {
-							throw new SocatDataException(itsLineNumber, colInfo.getInputColumnIndex(), column, "Could not convert data value", e);
+						boolean valueOK = true;
+						
+						if (itsColumnConfig.getColumnConfig(column).isNumeric()) {
+							if (!CheckerUtils.isNumeric(value)) {
+								valueOK = false;
+								SocatDataColumn badColumn = getColumn(column);
+								itsLogger.trace("Non-parseable numeric value on line " + getLineNumber() + ", column '" + column + "'");
+								badColumn.setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, getLineNumber(), "Non-numeric value '" + value + "'");
+
+							}
 						}
 						
-						setFieldValue(column, convertedValue);
+						if (valueOK) {
+						
+							String convertedValue = value;
+							try {
+								convertedValue = colInfo.convert(value);
+							} catch (ConversionException e) {
+								throw new SocatDataException(itsLineNumber, colInfo.getInputColumnIndex(), column, "Could not convert data value", e);
+							}
+							
+							setFieldValue(column, convertedValue);
+						}
 					}
 				}
 			}
