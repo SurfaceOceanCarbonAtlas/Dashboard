@@ -129,6 +129,19 @@ public class SocatDataRecord {
 	 */
 	private Logger itsLogger;
 
+	/**
+	 * Builds a complete record object
+	 * @param dataFields The set of data values for the record, in the order specified by the column specification
+	 * @param lineNumber The line number of the record
+	 * @param colSpec The column specification
+	 * @param metadata The set of metadata for the column file. This may contain information that is required to generate some data values.
+	 * @param dateTimeHandler The utility object for handling dates and time
+	 * @param logger A logger instance
+	 * @param output The Sanity Checker's {@link Output} object, where the any generated messages will be stored.
+	 * @throws ConfigException If the output column configuration cannot be retrieved
+	 * @throws SocatDataException If an error occurs while processing the data record
+	 * @throws SocatDataBaseException If an error occurs while processing the data record
+	 */
 	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger, Output output) throws ConfigException, SocatDataException, SocatDataBaseException {
 		itsMessages = new ArrayList<Message>();
 		itsColumnSpec = colSpec;
@@ -153,6 +166,13 @@ public class SocatDataRecord {
 		setCalculatedValues(metadata, dateTimeHandler);
 	}
 
+	/**
+	 * Populate the record's date fields from the input date columns.
+	 * @param dataFields The list of data fields that constitute the record input
+	 * @param dateTimeHandler The utility object for handling dates and times
+	 * @throws SocatDataException If an error occurs while parsing the data
+	 * @throws SocatDataBaseException If an error occurs while parsing the data
+	 */
 	private void populateDateFields(List<String> dataFields, DateTimeHandler dateTimeHandler) throws SocatDataException, SocatDataBaseException {
 		DateColumnInfo colInfo = itsColumnSpec.getDateColumnInfo();
 		
@@ -189,6 +209,12 @@ public class SocatDataRecord {
 		}
 	}
 	
+	/**
+	 * Special method to set the flag for the date/time on this record. This eliminates
+	 * the need to place flags on the individual date/time columns.
+	 * @param flag The flag to set
+	 * @throws SocatDataBaseException If the flag cannot be set
+	 */
 	public void setDateFlag(int flag) throws SocatDataBaseException {
 		if (flag > itsDateFlag) {
 			itsDateFlag = flag;
@@ -198,10 +224,18 @@ public class SocatDataRecord {
 		}
 	}
 	
+	/**
+	 * Retrieve the date/time flag for this record
+	 * @return The date/time flag for this record
+	 */
 	public int getDateFlag() {
 		return itsDateFlag;
 	}
 	
+	/**
+	 * Returns the date/time of this record as a single object.
+	 * @return The date/time of this record.
+	 */
 	public DateTime getTime() {
 		DateTime result = null;
 		
@@ -223,10 +257,18 @@ public class SocatDataRecord {
 		return result;
 	}
 	
+	/**
+	 * Returns the longitude of this record
+	 * @return The longitude of this record
+	 */
 	public double getLongitude() {
 		return Double.parseDouble(getColumn(LONGITUDE_COLUMN_NAME).getValue());
 	}
 	
+	/**
+	 * Returns the latitude of this record
+	 * @return The latitude of this record
+	 */
 	public double getLatitude() {
 		return Double.parseDouble(getColumn(LATITUDE_COLUMN_NAME).getValue());
 	}
@@ -421,6 +463,11 @@ public class SocatDataRecord {
 		return itsOutputColumns.get(columnName);
 	}
 	
+	/**
+	 * Retrieves all the column values of the fields that are configured in a specified group. 
+	 * @param groupName The name of the column group
+	 * @return The list of column values in the specified column group
+	 */
 	public List<String> getRequiredGroupValues(String groupName) {
 		List<String> result = new ArrayList<String>();
 		
