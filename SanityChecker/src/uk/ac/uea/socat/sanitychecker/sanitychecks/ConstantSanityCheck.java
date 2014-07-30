@@ -11,12 +11,27 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
+/**
+ * Sanity check to ensure that a given column's value
+ * is not constant for longer than a specified period.
+ * This is often the sign of a faulty instrument.
+ *
+ */
 public class ConstantSanityCheck extends SanityCheck {
 	
+	/**
+	 * The name of the column to be changed
+	 */
 	private String itsColumnName = null;
 	
+	/**
+	 * The maximum allowed duration of a constant value
+	 */
 	private int itsMaxDuration = 0;
 	
+	/**
+	 * The list of records with a constant value
+	 */
 	private List<SocatDataRecord> itsRecords = new ArrayList<SocatDataRecord>();
 	
 	@Override
@@ -49,15 +64,21 @@ public class ConstantSanityCheck extends SanityCheck {
 	@Override
 	public void processRecord(SocatDataRecord record) throws SanityCheckException {
 		
+		// Only check a record if it is ok (see recordOK Javadoc)
 		if (recordOK(record)) {
+			// If there's no record stored, this is the first of a new constant value
 			if (itsRecords.size() == 0) {
 				itsRecords.add(record);
 			} else {
 				if (equalsConstant(record)) {
+					// If it equals the value in the first record, then it's still a constant value
 					itsRecords.add(record);
 				} else {
+					// The value is no longer constant.
+					// See how long it was constant for
 					doDurationCheck();
-					
+
+					// Clear the list of constant records and start again
 					itsRecords.clear();
 					itsRecords.add(record);
 				}
@@ -68,10 +89,18 @@ public class ConstantSanityCheck extends SanityCheck {
 	
 	@Override
 	public void performFinalCheck() throws SanityCheckException {
+		// See how long the final value(s) were constant for
 		doDurationCheck();
 	}
 	
 
+	/**
+	 * Determines whether or not the value in the passed record is identical to that
+	 * in the list of constant records
+	 * @param record The record to be checked
+	 * @return {@code true} if the value in the record equals that in the list of constant records; {@code false} otherwise.
+	 * @throws SanityCheckException If the value cannot be compared.
+	 */
 	private boolean equalsConstant(SocatDataRecord record) throws SanityCheckException {
 
 		boolean result = false;
@@ -88,6 +117,12 @@ public class ConstantSanityCheck extends SanityCheck {
 		return result;
 	}
 	
+	/**
+	 * Determines whether or not the value in a record is considered 'good'. If not, it is
+	 * not checked as part of this sanity check.
+	 * @param record The record whose column is to be checked.
+	 * @return {@code true} if the record should be considered for checking; {@code false} if it should not be checked.
+	 */
 	private boolean recordOK(SocatDataRecord record) {
 		boolean result = true;
 		
@@ -98,6 +133,11 @@ public class ConstantSanityCheck extends SanityCheck {
 		return result;
 	}
 	
+	/**
+	 * See how long the value has been constant in the set of stored records.
+	 * If the value is constant for longer than the maximum time, flag each record accordingly.
+	 * @throws SanityCheckException If the records cannot be flagged.
+	 */
 	private void doDurationCheck() throws SanityCheckException {
 
 		if (itsRecords.size() > 1) {
@@ -120,6 +160,11 @@ public class ConstantSanityCheck extends SanityCheck {
 		}
 	}
 	
+	/**
+	 * Utility method for getting a record's value
+	 * @param record The record whose value is to be retrieved
+	 * @return The value parsed as a {@code double}
+	 */
 	private double getRecordValue(SocatDataRecord record) {
 		return Double.parseDouble(record.getColumn(itsColumnName).getValue());
 	}

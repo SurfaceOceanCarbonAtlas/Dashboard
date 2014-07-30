@@ -9,13 +9,40 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
+/**
+ * Sanity check to detect outliers by spotting values
+ * outside {@code n} standard deviations from the mean.
+ * 
+ * The mean and standard deviation are calculated as the records
+ * are passed in. At the end, each record is re-checked to see if it falls
+ * outside the standard deviation limit.
+ */
 public class OutlierSanityCheck extends SanityCheck {
 	
+	/**
+	 * The name of the column to be checked
+	 */
 	private String itsColumnName;
+	
+	/**
+	 * The standard deviation limit. Values outside this number
+	 * of standard deviations will be flagged as outliers.
+	 */
 	private double itsStdevLimit;
 	
+	/**
+	 * The number of records processed
+	 */
 	private int itsValueCount = 0;
+	
+	/**
+	 * The mean of all record values
+	 */
 	private double itsMean = 0;
+	
+	/**
+	 * The standard deviation of all record values
+	 */
 	private double itsStdev = 0;
 	
 	private List<RecordValue> itsRecordValues;
@@ -91,6 +118,10 @@ public class OutlierSanityCheck extends SanityCheck {
 		
 	}
 	
+	/**
+	 * A simple object to store each record and its column value, to simplify
+	 * checking after the mean and stdev have been calculated.
+	 */
 	private class RecordValue {
 		private SocatDataRecord record;
 		private double value;

@@ -9,10 +9,30 @@ import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
+/**
+ * Sanity check to ensure that the column value in every
+ * record in a file is identical. Usually used to ensure that
+ * the EXPO Code is the same in all records; if it isn't, that
+ * means two cruises have been put in one file.
+ *
+ */
 public class FixedValueSanityCheck extends SanityCheck {
 
+	/**
+	 * The name of the column that must contain the column value
+	 */
 	private String itsColumnName = null;
+	
+	/**
+	 * Indicates whether or not empty column values should be ignored for the
+	 * purposes of the check
+	 */
 	private boolean ignoreMissing = false;
+	
+	/**
+	 * The value stored in the first record. All subsequent records
+	 * must contain this value.
+	 */
 	private String itsFixedValue = null;
 	
 	@Override
