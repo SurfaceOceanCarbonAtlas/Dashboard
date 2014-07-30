@@ -433,11 +433,9 @@ public class SanityChecker {
 					}
 				} else if (columnConfig.isNumeric()) {
 					
-					// If it's supposed to be numeric and isn't, this is always bad!
-					if (!CheckerUtils.isNumeric(column.getValue())) {
-						itsLogger.trace("Non-parseable numeric value on line " + record.getLineNumber() + ", column '" + columnName + "'");
-						column.setFlag(SocatColumnConfigItem.BAD_FLAG, messages, currentRecord, "Non-numeric value");
-					} else {
+					// Double-check that the value is actually numeric. If it's not, we don't take
+					// any action here as it will already have been handled when the values in the record were set.
+					if (CheckerUtils.isNumeric(column.getValue())) {						
 						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
 						StringBuffer messageBuilder = null;
 
