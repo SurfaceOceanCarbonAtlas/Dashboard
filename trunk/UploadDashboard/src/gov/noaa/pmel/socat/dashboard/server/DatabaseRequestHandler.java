@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -327,41 +328,113 @@ public class DatabaseRequestHandler {
 	/**
 	 * Adds a new QC event for a data set.  If the update results in
 	 * a QC flag conflict, the flag in the given SocatQCEvent is
-	 * updated to the conflict flag ('Q').
+	 * updated to the conflict flag {@link SocatQCEvent#QC_CONFLICT_FLAG}.
 	 * 
 	 * @param qcEvent
 	 * 		the QC event to add
 	 * @throws SQLException
-	 * 		if accessing or updating the database throws one, or
-	 * 		if the reviewer cannot be found in the reviewers table, or
-	 * 		if a problem occurs with adding the QC event.
+	 * 		if accessing or updating the database throws one,
+	 * 		if the reviewer cannot be found in the reviewers table,
+	 * 		if a problem occurs with adding the QC event, or
+	 * 		if a problem occurs getting all QC events for the data set.
 	 */
 	public void addQCEvent(SocatQCEvent qcEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
 			int reviewerId = getReviewerId(catConn, 
 					qcEvent.getUsername(), qcEvent.getRealname());
+
 			// Add the QC event
-			PreparedStatement prepStmt = catConn.prepareStatement(
+			PreparedStatement addPrepStmt = catConn.prepareStatement(
 					"INSERT INTO `QCEvents` (`qc_flag`, `qc_time`, `expocode`, " +
 					"`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES(?, ?, ?, ?, ?, ?, ?)");
-			prepStmt.setString(1, qcEvent.getFlag().toString());
+			addPrepStmt.setString(1, qcEvent.getFlag().toString());
 			Date flagDate = qcEvent.getFlagDate();
 			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
-				prepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
+				addPrepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
 			else
-				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
-			prepStmt.setString(3, qcEvent.getExpocode());
-			prepStmt.setDouble(4, qcEvent.getSocatVersion());
-			prepStmt.setString(5, qcEvent.getRegionID().toString());
-			prepStmt.setInt(6, reviewerId);
-			prepStmt.setString(7, qcEvent.getComment());
-			prepStmt.execute();
-			if ( prepStmt.getUpdateCount() != 1 )
+				addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
+			addPrepStmt.setString(3, qcEvent.getExpocode());
+			addPrepStmt.setDouble(4, qcEvent.getSocatVersion());
+			addPrepStmt.setString(5, qcEvent.getRegionID().toString());
+			addPrepStmt.setInt(6, reviewerId);
+			addPrepStmt.setString(7, qcEvent.getComment());
+			addPrepStmt.execute();
+			if ( addPrepStmt.getUpdateCount() != 1 )
 				throw new SQLException("Adding the QC event was unsuccessful");
-			// TODO: get all QC flags for this data set, check for conflicts,
-			// and assign the conflict flag in qcEvent if one if found
+			if ( DataLocation.GLOBAL_REGION_ID.equals(qcEvent.getRegionID()) ) {
+				// Global flag overrides any conflicts, so this is the QC flag
+				return;
+			}
+
+			// Get all the QC events for this data set, ordered so the latest are last
+			HashMap<Character,SocatQCEvent> regionFlags = new HashMap<Character,SocatQCEvent>();
+			PreparedStatement getPrepStmt = catConn.prepareStatement(
+					"SELECT `qc_flag`, `qc_time`, `region_id` FROM `QCEvents` " +
+					"WHERE `expocode` = ? ORDER BY `qc_time` ASCENDING");
+			getPrepStmt.setString(1, qcEvent.getExpocode());
+			ResultSet rslts = getPrepStmt.executeQuery();
+			try {
+				while ( rslts.next() ) {
+					String flag = rslts.getString(1);
+					if ( flag == null )
+						throw new SQLException("Unexpected null QC flag");
+					flag = flag.trim();
+					// Blank flag is valid - QC comment
+					if ( flag.length() < 1 )
+						continue;
+					if ( (flag.length() > 1) ||
+						 (SocatQCEvent.FLAG_STATUS_MAP.get(flag.charAt(0)) == null) ) 
+						throw new SQLException("Unexpected QC flag of '" + flag + "'");
+					Long time = rslts.getLong(2);
+					if ( time < 750000000L )
+						throw new SQLException("Unexpected null or invalid flag time of " + time.toString());
+					String region = rslts.getString(3);
+					if ( region == null )
+						throw new SQLException("Unexpected null region ID");
+					region = region.trim();
+					if ( (region.length() != 1) ||
+						 (DataLocation.REGION_NAMES.get(region.charAt(0)) == null) )
+						throw new SQLException("Unexpected region ID of '" + region + "'");
+					Character regionID = region.charAt(0);
+					SocatQCEvent qcFlag = new SocatQCEvent();
+					qcFlag.setFlag(flag.charAt(0));
+					qcFlag.setFlagDate(new Date(time * 1000L));
+					qcFlag.setRegionID(regionID);
+					// last are latest, so no need to check the return value
+					regionFlags.put(regionID, qcFlag);
+				}
+			} finally {
+				rslts.close();
+			}
+
+			// Check for conflicts in the latest flags
+			SocatQCEvent lastGlobalFlag = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
+			// There is always a global 'N' flag; maybe also a 'U', and maybe an override flag
+			if ( lastGlobalFlag == null )
+				throw new SQLException("Unexpected failure to find a global flag");
+			Date globalDate = lastGlobalFlag.getFlagDate();
+			Character globalFlag = lastGlobalFlag.getFlag();
+			Character lastFlag = null;
+			for ( SocatQCEvent flag : regionFlags.values() ) {
+				// Use the region flag if assigned after the global flag; otherwise use the global flag
+				Character thisFlag;
+				if ( flag.getFlagDate().after(globalDate) ) {
+					thisFlag = flag.getFlag();
+				}
+				else {
+					thisFlag = globalFlag;
+				}
+				// If any of these region flag do not match, reassign a conflict flag to qcEvent
+				if ( lastFlag == null ) {
+					lastFlag = thisFlag;
+				}
+				else if ( ! lastFlag.equals(thisFlag) ) {
+					qcEvent.setFlag(SocatQCEvent.QC_CONFLICT_FLAG);
+					break;
+				}
+			}
 		} finally {
 			catConn.close();
 		}
