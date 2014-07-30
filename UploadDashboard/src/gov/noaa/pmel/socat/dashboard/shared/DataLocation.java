@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -17,7 +18,32 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -269233606582484244L;
+	private static final long serialVersionUID = -6320586997492783178L;
+
+	public static final Character NORTH_PACIFIC_REGION_ID = 'N';
+	public static final Character TROPICAL_PACIFIC_REGION_ID = 'T';
+	public static final Character NORTH_ATLANTIC_REGION_ID = 'A';
+	public static final Character TROPICAL_ATLANTIC_REGION_ID = 'Z';
+	public static final Character INDIAN_REGION_ID = 'I';
+	public static final Character COASTAL_REGION_ID = 'C';
+	public static final Character SOUTHERN_OCEANS_REGION_ID = 'O';
+	public static final Character ARCTIC_REGION_ID = 'R';
+	public static final Character GLOBAL_REGION_ID = 'G';
+
+	public static final HashMap<Character,String> REGION_NAMES;
+	static {
+		REGION_NAMES = new HashMap<Character,String>();
+		REGION_NAMES.put(SocatCruiseData.CHAR_MISSING_VALUE, "Unknown");
+		REGION_NAMES.put(NORTH_PACIFIC_REGION_ID, "North Pacific");
+		REGION_NAMES.put(TROPICAL_PACIFIC_REGION_ID, "Tropical Pacific");
+		REGION_NAMES.put(NORTH_ATLANTIC_REGION_ID, "North Atlantic");
+		REGION_NAMES.put(TROPICAL_ATLANTIC_REGION_ID, "Tropical Atlantic");
+		REGION_NAMES.put(INDIAN_REGION_ID, "Indian");
+		REGION_NAMES.put(COASTAL_REGION_ID, "Coastal");
+		REGION_NAMES.put(SOUTHERN_OCEANS_REGION_ID, "Southern Oceans");
+		REGION_NAMES.put(ARCTIC_REGION_ID, "Artic");
+		REGION_NAMES.put(GLOBAL_REGION_ID, "Global");
+	}
 
 	Character regionID;
 	Integer rowNumber;

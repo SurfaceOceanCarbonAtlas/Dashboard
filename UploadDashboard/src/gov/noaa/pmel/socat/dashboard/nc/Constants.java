@@ -1,7 +1,5 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -619,32 +617,6 @@ public class Constants {
 		for ( String varName : SHORT_NAMES.values() )
 			varNamesMap.put(varName.toUpperCase(), varName);
 		VARIABLE_NAMES = Collections.unmodifiableMap(varNamesMap);
-	}
-
-	public static final Character NORTH_PACIFIC_REGION_ID = 'N';
-	public static final Character TROPICAL_PACIFIC_REGION_ID = 'T';
-	public static final Character NORTH_ATLANTIC_REGION_ID = 'A';
-	public static final Character TROPICAL_ATLANTIC_REGION_ID = 'Z';
-	public static final Character INDIAN_REGION_ID = 'I';
-	public static final Character COASTAL_REGION_ID = 'C';
-	public static final Character SOUTHERN_OCEANS_REGION_ID = 'O';
-	public static final Character ARCTIC_REGION_ID = 'R';
-	public static final Character GLOBAL_REGION_ID = 'G';
-
-	public static final Map<Character,String> REGION_NAMES;
-	static {
-		HashMap<Character,String> regionNamesMap = new HashMap<Character,String>();
-		regionNamesMap.put(SocatCruiseData.CHAR_MISSING_VALUE, "Unknown");
-		regionNamesMap.put(NORTH_PACIFIC_REGION_ID, "North Pacific");
-		regionNamesMap.put(TROPICAL_PACIFIC_REGION_ID, "Tropical Pacific");
-		regionNamesMap.put(NORTH_ATLANTIC_REGION_ID, "North Atlantic");
-		regionNamesMap.put(TROPICAL_ATLANTIC_REGION_ID, "Tropical Atlantic");
-		regionNamesMap.put(INDIAN_REGION_ID, "Indian");
-		regionNamesMap.put(COASTAL_REGION_ID, "Coastal");
-		regionNamesMap.put(SOUTHERN_OCEANS_REGION_ID, "Southern Oceans");
-		regionNamesMap.put(ARCTIC_REGION_ID, "Artic");
-		regionNamesMap.put(GLOBAL_REGION_ID, "Global");
-		REGION_NAMES = Collections.unmodifiableMap(regionNamesMap);
 	}
 
 }

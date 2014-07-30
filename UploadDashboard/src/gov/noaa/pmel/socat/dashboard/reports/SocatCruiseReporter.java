@@ -3,11 +3,11 @@
  */
 package gov.noaa.pmel.socat.dashboard.reports;
 
-import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
@@ -155,7 +155,7 @@ public class SocatCruiseReporter {
 		try {
 			String regionName;
 			if ( regionID != null )
-				regionName = Constants.REGION_NAMES.get(regionID);
+				regionName = DataLocation.REGION_NAMES.get(regionID);
 			else
 				regionName = null;
 			warnMsgs.addAll(printMetadataPreamble(regionName, metaList, report));
