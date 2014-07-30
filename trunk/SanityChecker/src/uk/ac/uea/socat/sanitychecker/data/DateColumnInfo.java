@@ -108,6 +108,9 @@ public class DateColumnInfo {
 	 */
 	private int itsJanFirstIndex = 0;
 	
+	/**
+	 * Defines the various sets of date XML structures that are supported, with the names of the methods that handle them.
+	 */
 	private String[][] dateElementStructures = new String[][] {
 			{"processSingleElement", ColumnSpec.SINGLE_DATE_TIME_ELEMENT},
 			{"processDateTimeElements", ColumnSpec.DATE_ELEMENT, ColumnSpec.TIME_ELEMENT},
@@ -157,6 +160,14 @@ public class DateColumnInfo {
 		}
 	}
 	
+	/**
+	 * Determines whether or not the structure of a given Date XML element (from the
+	 * per-file column configuration XML) matches a given structure as defined in
+	 * {@link DateColumnInfo#dateElementStructures}.
+	 * @param dateElement The date XML element
+	 * @param structure The structure against which the element will be tested
+	 * @return {@code true} if the XML element matches the element structure's configuration; {@code false} otherwise
+	 */
 	private boolean elementMatchesStructure(Element dateElement, String[] structure) {
 		boolean matches = true;
 		
@@ -176,6 +187,15 @@ public class DateColumnInfo {
 		return matches;
 	}
 	
+	/**
+	 * Build a {@link DateTime} object from a set of date fields.
+	 * The contents of the fields are converted into a date/time string that can be parsed
+	 * by the supplied {@link DateTimeHandler}.
+	 * @param dataFields The set of date fields
+	 * @param dateTimeHandler The utility object for handling dates and times
+	 * @return The constructed {@link DateTime} object
+	 * @throws DateTimeException If the date fields could not be parsed into a {@link DateTime} object.
+	 */
 	public DateTime makeDateTime(List<String> dataFields, DateTimeHandler dateTimeHandler) throws DateTimeException {
 
 		DateTime result = null;
@@ -416,6 +436,7 @@ public class DateColumnInfo {
 	/**
 	 * Process a combined date/time column specification
 	 * @param parent The parent element
+	 * @param logger A Logger instance
 	 */
 	@SuppressWarnings("unused")
 	private void processSingleElement(Element parent, Logger logger) {
@@ -431,6 +452,7 @@ public class DateColumnInfo {
 	/**
 	 * Process separate date and time column specifications
 	 * @param parent The parent element
+	 * @param logger A Logger instance
 	 */
 	@SuppressWarnings("unused")
 	private void processDateTimeElements(Element parent, Logger logger) {
@@ -453,6 +475,12 @@ public class DateColumnInfo {
 		itsTimeInfo = new ColInfo(columnIndex, columnName);
 	}
 	
+	
+	/**
+	 * Process a column specification of Year/Day of Year/Second
+	 * @param parent The parent element
+	 * @param logger A Logger instance
+	 */
 	@SuppressWarnings("unused")
 	private void processYearDaySecondElements(Element parent, Logger logger) {
 		itsElementType = YEAR_DAY_SECOND_TYPE;
@@ -483,6 +511,11 @@ public class DateColumnInfo {
 		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
 	}
 	
+	/**
+	 * Process a column specification of Year/Decimal JDate
+	 * @param parent The parent element
+	 * @param logger A Logger instance
+	 */
 	@SuppressWarnings("unused")
 	private void processYearJDateElements(Element parent, Logger logger) {
 		itsElementType = YEAR_DECIMAL_JDATE_TYPE;
@@ -507,6 +540,11 @@ public class DateColumnInfo {
 		itsJanFirstIndex = Integer.parseInt(child.getTextTrim());
 	}
 	
+	/**
+	 * Process a column specification of Year/Month/Day/Time elements
+	 * @param parent The parent element
+	 * @param logger A Logger instance
+	 */
 	@SuppressWarnings("unused")
 	private void processYearColsSingleTimeElements(Element parent, Logger logger) {
 		itsElementType = DATE_COLS_SINGLE_TIME_ELEMENTS_TYPE;

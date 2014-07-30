@@ -90,10 +90,18 @@ public class StandardColumnInfo {
 		return itsInputColumnName;
 	}
 	
+	/**
+	 * Determines whether or not a value that represents a missing entry (e.g. -999) has been specified for this column
+	 * @return {@code true} if a missing value has been specified; {@code false} otherwise
+	 */
 	public boolean hasMissingValue() {
 		return itsMissingValue != null;
 	}
 	
+	/**
+	 * Returns the missing value (e.g. -999) specified for this column
+	 * @return The missing value specified for the column
+	 */
 	public Double getMissingValue() {
 		return itsMissingValue;
 	}
@@ -113,7 +121,7 @@ public class StandardColumnInfo {
 		/*
 		 * Only run the conversion if:
 		 * (a) There is a converter defined
-		 * (b) There is no missing value defined, or 
+		 * (b) There is no missing value defined
 		 */
 		if (null != itsConverter && !isMissingValue(value)) {
 			result = itsConverter.convert(value, itsInputUnits);
