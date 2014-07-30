@@ -439,36 +439,39 @@ public class SanityChecker {
 						column.setFlag(SocatColumnConfigItem.BAD_FLAG, messages, currentRecord, "Non-numeric value");
 					} else {
 						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
+						StringBuffer messageBuilder = null;
 
-						if (SocatColumnConfigItem.GOOD_FLAG != rangeCheckFlag) {
-							StringBuffer rangeDetails = new StringBuffer("[");
-							if (columnConfig.hasBadRange()) {
-								rangeDetails.append(columnConfig.getBadRangeMin());
-							}
-							
-							if (columnConfig.hasQuestionableRange()) {
-								rangeDetails.append("(");
-								rangeDetails.append(columnConfig.getQuestionableRangeMin());
-								rangeDetails.append(")");
-							}
-							
-							rangeDetails.append("-");
-							
-							if (columnConfig.hasQuestionableRange()) {
-								rangeDetails.append("(");
-								rangeDetails.append(columnConfig.getQuestionableRangeMax());
-								rangeDetails.append(")");
-							}
-							
-							if (columnConfig.hasBadRange()) {
-								rangeDetails.append(columnConfig.getBadRangeMax());
-							}
-							rangeDetails.append("]");
-							
-							
-							String message = "Value " + column.getValue() + " is out of range " + rangeDetails + " on line " + record.getLineNumber() + ", column '" + columnName + "'";
-							itsLogger.trace(message);
-							column.setFlag(rangeCheckFlag, messages, currentRecord, "Value " + column.getValue() + " out of range " + rangeDetails);
+						switch (rangeCheckFlag) {
+						case SocatColumnConfigItem.GOOD_FLAG: {
+							// Do nothing
+							break;
+						}
+						case SocatColumnConfigItem.QUESTIONABLE_FLAG: {
+							messageBuilder = new StringBuffer("Value ");
+							messageBuilder.append(column.getValue());
+							messageBuilder.append(" is outside the expected range (");
+							messageBuilder.append(columnConfig.getQuestionableRangeMin());
+							messageBuilder.append(":");
+							messageBuilder.append(columnConfig.getQuestionableRangeMax());
+							messageBuilder.append(")");
+							break;
+						}
+						case SocatColumnConfigItem.BAD_FLAG:
+						{
+							messageBuilder = new StringBuffer("Value ");
+							messageBuilder.append(column.getValue());
+							messageBuilder.append(" is outside the extreme range (");
+							messageBuilder.append(columnConfig.getBadRangeMin());
+							messageBuilder.append(":");
+							messageBuilder.append(columnConfig.getBadRangeMax());
+							messageBuilder.append(")");
+							break;
+						}
+						}
+						
+						if (null != messageBuilder) {
+							itsLogger.trace(messageBuilder.toString());
+							column.setFlag(rangeCheckFlag, messages, currentRecord, messageBuilder.toString());
 						}
 					}
 				}
