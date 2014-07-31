@@ -10,102 +10,103 @@ import java.util.Map;
  */
 public class Constants {
 
-	private static final String expocode_VARNAME = "expocode";
-	private static final String cruiseName_VARNAME = "cruiseName";
-	private static final String vesselName_VARNAME = "vesselName";
-	private static final String organization_VARNAME = "organization";
-	private static final String westmostLongitude_VARNAME = "westmostLongitude";
-	private static final String eastmostLongitude_VARNAME = "eastmostLongitude";
-	private static final String southmostLatitude_VARNAME = "southmostLatitude";
-	private static final String northmostLatitude_VARNAME = "northmostLatitude";
-	private static final String beginTime_VARNAME = "beginTime";
-	private static final String endTime_VARNAME = "endTime";
-	private static final String scienceGroup_VARNAME = "scienceGroup";
-	private static final String origDataRef_VARNAME = "origDataRef";
-	private static final String addlDocs_VARNAME = "addlDocs";
-	private static final String socatDOI_VARNAME = "socatDOI";
-	private static final String socatDOIHRef_VARNAME = "socatDOIHRef";
-	private static final String socatVersion_VARNAME = "socatVersion";
-	private static final String qcFlag_VARNAME = "qcFlag";
+	public static final String expocode_VARNAME = "expocode";
+	public static final String cruiseName_VARNAME = "cruiseName";
+	public static final String vesselName_VARNAME = "vesselName";
+	public static final String organization_VARNAME = "organization";
+	public static final String westmostLongitude_VARNAME = "westmostLongitude";
+	public static final String eastmostLongitude_VARNAME = "eastmostLongitude";
+	public static final String southmostLatitude_VARNAME = "southmostLatitude";
+	public static final String northmostLatitude_VARNAME = "northmostLatitude";
+	public static final String beginTime_VARNAME = "beginTime";
+	public static final String endTime_VARNAME = "endTime";
+	public static final String scienceGroup_VARNAME = "scienceGroup";
+	public static final String origDataRef_VARNAME = "origDataRef";
+	public static final String addlDocs_VARNAME = "addlDocs";
+	public static final String socatDOI_VARNAME = "socatDOI";
+	public static final String socatDOIHRef_VARNAME = "socatDOIHRef";
+	public static final String socatVersion_VARNAME = "socatVersion";
+	public static final String qcFlag_VARNAME = "qcFlag";
 
-	private static final String rowNum_VARNAME = "rowNum";
-	private static final String year_VARNAME = "year";
-	private static final String month_VARNAME = "month";
-	private static final String day_VARNAME = "day";
-	private static final String hour_VARNAME = "hour";
-	private static final String minute_VARNAME = "minute";
-	private static final String second_VARNAME = "second";
+	public static final String rowNum_VARNAME = "rowNum";
+	public static final String year_VARNAME = "year";
+	public static final String month_VARNAME = "month";
+	public static final String day_VARNAME = "day";
+	public static final String hour_VARNAME = "hour";
+	public static final String minute_VARNAME = "minute";
+	public static final String second_VARNAME = "second";
+	public static final String time_VARNAME = "time";
 
-	private static final String longitude_VARNAME = "longitude";
-	private static final String latitude_VARNAME = "latitude";
-	private static final String sampleDepth_VARNAME = "sampleDepth";
-	private static final String salinity_VARNAME = "salinity";
-	private static final String tEqu_VARNAME = "tEqu";
-	private static final String sst_VARNAME = "sst";
-	private static final String tAtm_VARNAME = "tAtm";
-	private static final String pEqu_VARNAME = "pEqu";
-	private static final String slp_VARNAME = "slp";
+	public static final String longitude_VARNAME = "longitude";
+	public static final String latitude_VARNAME = "latitude";
+	public static final String sampleDepth_VARNAME = "sampleDepth";
+	public static final String salinity_VARNAME = "salinity";
+	public static final String tEqu_VARNAME = "tEqu";
+	public static final String sst_VARNAME = "sst";
+	public static final String tAtm_VARNAME = "tAtm";
+	public static final String pEqu_VARNAME = "pEqu";
+	public static final String slp_VARNAME = "slp";
 
-	private static final String xCO2WaterTEquDry_VARNAME = "xCO2WaterTEquDry";
-	private static final String xCO2WaterSstDry_VARNAME = "xCO2WaterSstDry";
-	private static final String xCO2WaterTEquWet_VARNAME = "xCO2WaterTEquWet";
-	private static final String xCO2WaterSstWet_VARNAME = "xCO2WaterSstWet";
-	private static final String pCO2WaterTEquWet_VARNAME = "pCO2WaterTEquWet";
-	private static final String pCO2WaterSstWet_VARNAME = "pCO2WaterSstWet";
-	private static final String fCO2WaterTEquWet_VARNAME = "fCO2WaterTEquWet";
-	private static final String fCO2WaterSstWet_VARNAME = "fCO2WaterSstWet";
+	public static final String xCO2WaterTEquDry_VARNAME = "xCO2WaterTEquDry";
+	public static final String xCO2WaterSstDry_VARNAME = "xCO2WaterSstDry";
+	public static final String xCO2WaterTEquWet_VARNAME = "xCO2WaterTEquWet";
+	public static final String xCO2WaterSstWet_VARNAME = "xCO2WaterSstWet";
+	public static final String pCO2WaterTEquWet_VARNAME = "pCO2WaterTEquWet";
+	public static final String pCO2WaterSstWet_VARNAME = "pCO2WaterSstWet";
+	public static final String fCO2WaterTEquWet_VARNAME = "fCO2WaterTEquWet";
+	public static final String fCO2WaterSstWet_VARNAME = "fCO2WaterSstWet";
 
-	private static final String xCO2AtmDryActual_VARNAME = "xCO2AtmDryActual";
-	private static final String xCO2AtmDryInterp_VARNAME = "xCO2AtmDryInterp";
-	private static final String pCO2AtmWetActual_VARNAME = "pCO2AtmWetActual";
-	private static final String pCO2AtmWetInterp_VARNAME = "pCO2AtmWetInterp";
-	private static final String fCO2AtmWetActual_VARNAME = "fCO2AtmWetActual";
-	private static final String fCO2AtmWetInterp_VARNAME = "fCO2AtmWetInterp";
+	public static final String xCO2AtmDryActual_VARNAME = "xCO2AtmDryActual";
+	public static final String xCO2AtmDryInterp_VARNAME = "xCO2AtmDryInterp";
+	public static final String pCO2AtmWetActual_VARNAME = "pCO2AtmWetActual";
+	public static final String pCO2AtmWetInterp_VARNAME = "pCO2AtmWetInterp";
+	public static final String fCO2AtmWetActual_VARNAME = "fCO2AtmWetActual";
+	public static final String fCO2AtmWetInterp_VARNAME = "fCO2AtmWetInterp";
 
-	private static final String deltaXCO2_VARNAME = "deltaXCO2";
-	private static final String deltaPCO2_VARNAME = "deltaPCO2";
-	private static final String deltaFCO2_VARNAME = "deltaFCO2";
+	public static final String deltaXCO2_VARNAME = "deltaXCO2";
+	public static final String deltaPCO2_VARNAME = "deltaPCO2";
+	public static final String deltaFCO2_VARNAME = "deltaFCO2";
 
-	private static final String xH2OEqu_VARNAME = "xH2OEqu";
-	private static final String relativeHumidity_VARNAME = "relativeHumidity";
-	private static final String specificHumidity_VARNAME = "specificHumidity";
-	private static final String shipSpeed_VARNAME = "shipSpeed"; 
-	private static final String shipDirection_VARNAME = "shipDirection";
-	private static final String windSpeedTrue_VARNAME = "windSpeedTrue";
-	private static final String windSpeedRelative_VARNAME = "windSpeedRelative";
-	private static final String windDirectionTrue_VARNAME = "windDirectionTrue";
-	private static final String windDirectionRelative_VARNAME = "windDirectionRelative";
+	public static final String xH2OEqu_VARNAME = "xH2OEqu";
+	public static final String relativeHumidity_VARNAME = "relativeHumidity";
+	public static final String specificHumidity_VARNAME = "specificHumidity";
+	public static final String shipSpeed_VARNAME = "shipSpeed"; 
+	public static final String shipDirection_VARNAME = "shipDirection";
+	public static final String windSpeedTrue_VARNAME = "windSpeedTrue";
+	public static final String windSpeedRelative_VARNAME = "windSpeedRelative";
+	public static final String windDirectionTrue_VARNAME = "windDirectionTrue";
+	public static final String windDirectionRelative_VARNAME = "windDirectionRelative";
 
-	private static final String woceCO2Water_VARNAME = "woceCO2Water";
-	private static final String woceCO2Atm_VARNAME = "woceCO2Atm";
+	public static final String woceCO2Water_VARNAME = "woceCO2Water";
+	public static final String woceCO2Atm_VARNAME = "woceCO2Atm";
 
-	private static final String woaSss_VARNAME = "woaSss";
-	private static final String ncepSlp_VARNAME = "ncepSlp";
+	public static final String woaSss_VARNAME = "woaSss";
+	public static final String ncepSlp_VARNAME = "ncepSlp";
 
-	private static final String fCO2FromXCO2TEqu_VARNAME = "fCO2FromXCO2TEqu";
-	private static final String fCO2FromXCO2Sst_VARNAME = "fCO2FromXCO2Sst";
-	private static final String fCO2FromPCO2TEqu_VARNAME = "fCO2FromPCO2TEqu";
-	private static final String fCO2FromPCO2Sst_VARNAME = "fCO2FromPCO2Sst";
-	private static final String fCO2FromFCO2TEqu_VARNAME = "fCO2FromFCO2TEqu";
-	private static final String fCO2FromFCO2Sst_VARNAME = "fCO2FromFCO2Sst";
-	private static final String fCO2FromPCO2TEquNcep_VARNAME = "fCO2FromPCO2TEquNcep";
-	private static final String fCO2FromPCO2SstNcep_VARNAME = "fCO2FromPCO2SstNcep";
-	private static final String fCO2FromXCO2TEquWoa_VARNAME = "fCO2FromXCO2TEquWoa";
-	private static final String fCO2FromXCO2SstWoa_VARNAME = "fCO2FromXCO2SstWoa";
-	private static final String fCO2FromXCO2TEquNcep_VARNAME = "fCO2FromXCO2TEquNcep";
-	private static final String fCO2FromXCO2SstNcep_VARNAME = "fCO2FromXCO2SstNcep";
-	private static final String fCO2FromXCO2TEquNcepWoa_VARNAME = "fCO2FromXCO2TEquNcepWoa";
-	private static final String fCO2FromXCO2SstNcepWoa_VARNAME = "fCO2FromXCO2SstNcepWoa";
+	public static final String fCO2FromXCO2TEqu_VARNAME = "fCO2FromXCO2TEqu";
+	public static final String fCO2FromXCO2Sst_VARNAME = "fCO2FromXCO2Sst";
+	public static final String fCO2FromPCO2TEqu_VARNAME = "fCO2FromPCO2TEqu";
+	public static final String fCO2FromPCO2Sst_VARNAME = "fCO2FromPCO2Sst";
+	public static final String fCO2FromFCO2TEqu_VARNAME = "fCO2FromFCO2TEqu";
+	public static final String fCO2FromFCO2Sst_VARNAME = "fCO2FromFCO2Sst";
+	public static final String fCO2FromPCO2TEquNcep_VARNAME = "fCO2FromPCO2TEquNcep";
+	public static final String fCO2FromPCO2SstNcep_VARNAME = "fCO2FromPCO2SstNcep";
+	public static final String fCO2FromXCO2TEquWoa_VARNAME = "fCO2FromXCO2TEquWoa";
+	public static final String fCO2FromXCO2SstWoa_VARNAME = "fCO2FromXCO2SstWoa";
+	public static final String fCO2FromXCO2TEquNcep_VARNAME = "fCO2FromXCO2TEquNcep";
+	public static final String fCO2FromXCO2SstNcep_VARNAME = "fCO2FromXCO2SstNcep";
+	public static final String fCO2FromXCO2TEquNcepWoa_VARNAME = "fCO2FromXCO2TEquNcepWoa";
+	public static final String fCO2FromXCO2SstNcepWoa_VARNAME = "fCO2FromXCO2SstNcepWoa";
 
-	private static final String fCO2Rec_VARNAME = "fCO2Rec";
-	private static final String fCO2Source_VARNAME = "fCO2Source";
-	private static final String deltaT_VARNAME = "deltaT";
-	private static final String regionID_VARNAME = "regionID";
-	private static final String calcSpeed_VARNAME = "calcSpeed";
-	private static final String etopo2Depth_VARNAME = "etopo2Depth";
-	private static final String gvCO2_VARNAME = "gvCO2";
-	private static final String distToLand_VARNAME = "distToLand";
-	private static final String dayOfYear_VARNAME = "dayOfYear";
+	public static final String fCO2Rec_VARNAME = "fCO2Rec";
+	public static final String fCO2Source_VARNAME = "fCO2Source";
+	public static final String deltaT_VARNAME = "deltaT";
+	public static final String regionID_VARNAME = "regionID";
+	public static final String calcSpeed_VARNAME = "calcSpeed";
+	public static final String etopo2Depth_VARNAME = "etopo2Depth";
+	public static final String gvCO2_VARNAME = "gvCO2";
+	public static final String distToLand_VARNAME = "distToLand";
+	public static final String dayOfYear_VARNAME = "dayOfYear";
 
 	/**
 	 * Variable names for netCDF files
@@ -139,6 +140,7 @@ public class Constants {
 		shortNameMap.put(hour_VARNAME, "hour");
 		shortNameMap.put(minute_VARNAME, "minute");
 		shortNameMap.put(second_VARNAME, "second");
+		shortNameMap.put(time_VARNAME, "time");
 
 		shortNameMap.put(longitude_VARNAME, "longitude");
 		shortNameMap.put(latitude_VARNAME, "latitude");
@@ -246,6 +248,7 @@ public class Constants {
 		longNameMap.put(hour_VARNAME, "hour of day");
 		longNameMap.put(minute_VARNAME, "minute of hour");
 		longNameMap.put(second_VARNAME, "second of minute");
+		longNameMap.put(time_VARNAME, "time");
 
 		longNameMap.put(longitude_VARNAME, "longitude");
 		longNameMap.put(latitude_VARNAME, "latitude");
@@ -351,6 +354,8 @@ public class Constants {
 		unitsMap.put(beginTime_VARNAME, seconds_time_units);
 		unitsMap.put(endTime_VARNAME, seconds_time_units);
 
+		unitsMap.put(time_VARNAME, seconds_time_units);
+
 		unitsMap.put(longitude_VARNAME, longitude_units);
 		unitsMap.put(latitude_VARNAME, latitude_units);
 		unitsMap.put(sampleDepth_VARNAME, depth_units);
@@ -432,6 +437,8 @@ public class Constants {
 		stdNamesMap.put(northmostLatitude_VARNAME, "geospatial_lat_max");
 		stdNamesMap.put(beginTime_VARNAME, "time_coverage_start");
 		stdNamesMap.put(endTime_VARNAME, "time_converage_end");
+
+		stdNamesMap.put(time_VARNAME, "time");
 
 		stdNamesMap.put(longitude_VARNAME, "longitude");
 		stdNamesMap.put(latitude_VARNAME, "latitude");
@@ -536,6 +543,7 @@ public class Constants {
 		ioosCatMap.put(hour_VARNAME, time_category);
 		ioosCatMap.put(minute_VARNAME, time_category);
 		ioosCatMap.put(second_VARNAME, time_category);
+		ioosCatMap.put(time_VARNAME, time_category);
 
 		ioosCatMap.put(longitude_VARNAME, location_category);
 		ioosCatMap.put(latitude_VARNAME, location_category);
