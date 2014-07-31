@@ -99,6 +99,8 @@ public class DsgNcFileHandler {
 	 * A regular File (instead of a CruiseDsgNcFile) is returned because the 
 	 * {@link CruiseDsgNcFile#create} and {@link CruiseDsgNcFile#updateWoceFlags} 
 	 * methods should not be used with the decimated data.
+	 * However, if needed, a CruiseDsgNcFile can be created from the returned File 
+	 * using the String (filename) constructor.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise
@@ -298,9 +300,27 @@ public class DsgNcFileHandler {
 	 * 		get the QC flag and dataset expocode from here
 	 * @param log
 	 * 		log messages here; can be null 
+	 * @throws IllegalArgumentException
+	 * 		if the DSG files are not valid
+	 * @throws IOException
+	 * 		if opening or writing to a DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the update QC flag to a DSG file throws one 
 	 */
-	public void updateQCFlag(SocatQCEvent qcEvent, Logger log) {
-		// TODO: implement
+	public void updateQCFlag(SocatQCEvent qcEvent, Logger log) 
+			throws IllegalArgumentException, IOException, InvalidRangeException {
+		// Get the location and name for the NetCDF DSG file
+		String expocode = qcEvent.getExpocode();
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.canRead() )
+			throw new IllegalArgumentException(
+					"DSG file for " + expocode + " does not exist");
+		dsgFile.updateQCFlag(qcEvent);
+		dsgFile = new CruiseDsgNcFile(getDecDsgNcFile(expocode).getPath());
+		if ( ! dsgFile.canRead() )
+			throw new IllegalArgumentException(
+					"Decimated DSG file for " + expocode + " does not exist");
+		dsgFile.updateQCFlag(qcEvent);
 	}
 
 	/**
@@ -317,7 +337,7 @@ public class DsgNcFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
-	 * 		if opening, reading from, or writing to to the DSG file throws one
+	 * 		if opening, reading from, or writing to the DSG file throws one
 	 * @throws InvalidRangeException 
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */

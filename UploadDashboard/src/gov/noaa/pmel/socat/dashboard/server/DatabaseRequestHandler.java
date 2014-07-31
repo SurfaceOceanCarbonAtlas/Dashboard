@@ -222,12 +222,12 @@ public class DatabaseRequestHandler {
 		PreparedStatement prepStmt;
 		if ( ! username.isEmpty() ) {
 			prepStmt = catConn.prepareStatement(
-				"SELECT `reviewer_id` FROM `Reviewers` WHERE `username` = ?");
+				"SELECT `reviewer_id` FROM `Reviewers` WHERE `username` = ?;");
 			prepStmt.setString(1, username);
 		}
 		else {
 			prepStmt = catConn.prepareStatement(
-					"SELECT `reviewer_id` FROM `Reviewers` WHERE `realname` = ?");
+					"SELECT `reviewer_id` FROM `Reviewers` WHERE `realname` = ?;");
 			prepStmt.setString(1, realname);
 		}
 		ResultSet results = prepStmt.executeQuery();
@@ -271,7 +271,7 @@ public class DatabaseRequestHandler {
 		Connection catConn = makeConnection(false);
 		try {
 			PreparedStatement prepStmt = catConn.prepareStatement(
-					"SELECT `realname` FROM `Reviewers` WHERE `username` = ?");
+					"SELECT `realname` FROM `Reviewers` WHERE `username` = ?;");
 			prepStmt.setString(1, username);
 			ResultSet results = prepStmt.executeQuery();
 			try {
@@ -306,7 +306,7 @@ public class DatabaseRequestHandler {
 		Connection catConn = makeConnection(false);
 		try {
 			PreparedStatement prepStmt = catConn.prepareStatement(
-					"SELECT `username` FROM `Reviewers` WHERE `realname` = ?");
+					"SELECT `username` FROM `Reviewers` WHERE `realname` = ?;");
 			prepStmt.setString(1, realname);
 			ResultSet results = prepStmt.executeQuery();
 			try {
@@ -348,7 +348,7 @@ public class DatabaseRequestHandler {
 			PreparedStatement addPrepStmt = catConn.prepareStatement(
 					"INSERT INTO `QCEvents` (`qc_flag`, `qc_time`, `expocode`, " +
 					"`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
-					"VALUES(?, ?, ?, ?, ?, ?, ?)");
+					"VALUES(?, ?, ?, ?, ?, ?, ?);");
 			addPrepStmt.setString(1, qcEvent.getFlag().toString());
 			Date flagDate = qcEvent.getFlagDate();
 			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
@@ -372,7 +372,7 @@ public class DatabaseRequestHandler {
 			HashMap<Character,SocatQCEvent> regionFlags = new HashMap<Character,SocatQCEvent>();
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
 					"SELECT `qc_flag`, `qc_time`, `region_id` FROM `QCEvents` " +
-					"WHERE `expocode` = ? ORDER BY `qc_time` ASCENDING");
+					"WHERE `expocode` = ? ORDER BY `qc_time` ASC;");
 			getPrepStmt.setString(1, qcEvent.getExpocode());
 			ResultSet rslts = getPrepStmt.executeQuery();
 			try {
@@ -499,7 +499,7 @@ public class DatabaseRequestHandler {
 		try {
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"SELECT * FROM `QCEvents` JOIN `Reviewers` " +
-							"ON QCEvents.reviewer_id = Reviewers.reviewer_id " +
+					"ON QCEvents.reviewer_id = Reviewers.reviewer_id " +
 					"WHERE QCEvents.expocode = ? ORDER BY QCEvents.qc_time DESC;");
 			prepStmt.setString(1, expocode);
 			ResultSet results = prepStmt.executeQuery();

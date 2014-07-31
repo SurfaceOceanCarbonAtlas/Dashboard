@@ -4,6 +4,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
@@ -35,7 +36,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = -252865287614491074L;
+	private static final long serialVersionUID = 3455975088151401246L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.1";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -127,11 +128,14 @@ public class CruiseDsgNcFile extends File {
 			ncfile.addVariableAttribute(var, new Attribute("sample_dimension", "obs"));
 			ncfile.addVariableAttribute(var, new Attribute("long_name", "Number of Observations"));
 
+			String name;
+			String varName;
+
 			// Make netCDF variables of all the metadata.
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String name = f.getName();
-					String varName = Constants.SHORT_NAMES.get(name);
+					name = f.getName();
+					varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = null;
@@ -185,8 +189,8 @@ public class CruiseDsgNcFile extends File {
 			// Make netCDF variables of all the data.
 			for ( Field f : dataFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String name = f.getName();
-					String varName = Constants.SHORT_NAMES.get(name);
+					name = f.getName();
+					varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = null;
@@ -237,13 +241,15 @@ public class CruiseDsgNcFile extends File {
 				}
 			}
 
-			var = ncfile.addVariable(null, "time", DataType.DOUBLE, dataDims);
+			name = Constants.time_VARNAME;
+			varName = Constants.SHORT_NAMES.get(name);
+			var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
 			ncfile.addVariableAttribute(var, new Attribute("missing_value", SocatCruiseData.FP_MISSING_VALUE));
 			ncfile.addVariableAttribute(var, new Attribute("_FillValue", SocatCruiseData.FP_MISSING_VALUE));
-			ncfile.addVariableAttribute(var, new Attribute("units", "seconds since 1970-01-01T00:00:00Z"));
-			ncfile.addVariableAttribute(var, new Attribute("long_name", "time"));
-			ncfile.addVariableAttribute(var, new Attribute("standard_name", "time"));
-			ncfile.addVariableAttribute(var, new Attribute("ioos_category", "Time"));
+			ncfile.addVariableAttribute(var, new Attribute("units", Constants.UNITS.get(name)));
+			ncfile.addVariableAttribute(var, new Attribute("long_name", Constants.LONG_NAMES.get(name)));
+			ncfile.addVariableAttribute(var, new Attribute("standard_name", Constants.STANDARD_NAMES.get(name)));
+			ncfile.addVariableAttribute(var, new Attribute("ioos_category", Constants.IOOS_CATEGORIES.get(name)));
 
 			ncfile.create();
 
@@ -258,7 +264,7 @@ public class CruiseDsgNcFile extends File {
 
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String varName = Constants.SHORT_NAMES.get(f.getName());
+					varName = Constants.SHORT_NAMES.get(f.getName());
 					var = ncfile.findVariable(varName);
 					if ( var == null )
 						throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
@@ -290,7 +296,7 @@ public class CruiseDsgNcFile extends File {
 
 			for ( Field f : dataFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String varName = Constants.SHORT_NAMES.get(f.getName());
+					varName = Constants.SHORT_NAMES.get(f.getName());
 					var = ncfile.findVariable(varName);
 					if ( var == null )
 						throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
@@ -330,9 +336,11 @@ public class CruiseDsgNcFile extends File {
 				}
 			}
 
-			var = ncfile.findVariable("time");
+			varName = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+			var = ncfile.findVariable(varName);
 			if ( var == null )
-				throw new RuntimeException("Unexpected failure to find ncfile variable time");
+				throw new RuntimeException("Unexpected failure to find " +
+						"ncfile variable '" + varName + "'");
 			ArrayDouble.D1 values = new ArrayDouble.D1(dataList.size());
 			for (int index = 0; index < dataList.size(); index++) {
 				SocatCruiseData datarow = dataList.get(index);
@@ -394,10 +402,12 @@ public class CruiseDsgNcFile extends File {
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
 			// Get the number of data points from the length of the time 1D array
-			Variable var = ncfile.findVariable("time");
+			String name = Constants.time_VARNAME;
+			String varName = Constants.SHORT_NAMES.get(name);
+			Variable var = ncfile.findVariable(varName);
 			if ( var == null )
-				throw new IllegalArgumentException(
-						"Unable to find variable 'time' in " + getName());
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
 			int numData = var.getShape(0);
 
 			// Create the metadata with default (missing) values
@@ -411,8 +421,8 @@ public class CruiseDsgNcFile extends File {
 			// Assign the metadata values from the netCDF file.
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String name = f.getName();
-					String varName = Constants.SHORT_NAMES.get(name);
+					name = f.getName();
+					varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException(
 								"Unexpected missing short name for " + name);
@@ -462,8 +472,8 @@ public class CruiseDsgNcFile extends File {
 			// Assign the data values from the netCDF file.
 			for ( Field f : dataFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					String name = f.getName();
-					String varName = Constants.SHORT_NAMES.get(name);
+					name = f.getName();
+					varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = ncfile.findVariable(varName);
@@ -524,6 +534,35 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
+	 * Updates this DSG file with the given QC flag.
+	 * 
+	 * @param qcEvent
+	 * 		get the expocode and the QC flag from here
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file is not valid
+	 * @throws IOException
+	 * 		if opening or writing to the DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the update QC flag to the DSG file throws one 
+	 */
+	public void updateQCFlag(SocatQCEvent qcEvent) 
+			throws IllegalArgumentException, IOException, InvalidRangeException {
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+			String varName = Constants.SHORT_NAMES.get(Constants.qcFlag_VARNAME);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
+			flagArray.setString(0, qcEvent.getFlag().toString());
+			ncfile.write(var, flagArray);
+		} finally {
+			ncfile.close();
+		}
+	}
+
+	/**
 	 * Updates this DSG file with the given WOCE flags.
 	 * Optionally will also update the data type, region ID, and 
 	 * row number in the WOCE flags from the data in this DSG file. 
@@ -537,7 +576,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
-	 * 		if opening, reading from, or writing to to the DSG file throws one
+	 * 		if opening, reading from, or writing to the DSG file throws one
 	 * @throws InvalidRangeException 
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
@@ -546,26 +585,34 @@ public class CruiseDsgNcFile extends File {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
 
-			Variable var = ncfile.findVariable("longitude");
+			String varName = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
+			Variable var = ncfile.findVariable(varName);
 			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find longitude variable in " + getName());
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
 			ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
 
-			var = ncfile.findVariable("latitude");
+			varName = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
+			var = ncfile.findVariable(varName);
 			if ( var == null )
-				throw new IllegalArgumentException("Unable to find latitude variable in " + getName());
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
 			ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
 
-			var = ncfile.findVariable("time");
+			varName = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+			var = ncfile.findVariable(varName);
 			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find time variable in " + getName());
+				throw new IllegalArgumentException("Unable to find variable '" +
+						varName + "' in " + getName());
 			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
 
 			ArrayChar.D2 regionIDs;
 			if ( updateWoceEvent ) {
-				var = ncfile.findVariable("region_id");
+				varName = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
+				var = ncfile.findVariable(varName);
 				if ( var == null )
-					throw new IllegalArgumentException("Unable to find region_id variable in " + getName());
+					throw new IllegalArgumentException("Unable to find variable '" +
+							varName + "' in " + getName());
 				regionIDs = (ArrayChar.D2) var.read(); 
 			}
 			else {
