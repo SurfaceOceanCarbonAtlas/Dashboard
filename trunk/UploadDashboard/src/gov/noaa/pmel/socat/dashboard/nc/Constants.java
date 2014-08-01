@@ -108,6 +108,8 @@ public class Constants {
 	public static final String distToLand_VARNAME = "distToLand";
 	public static final String dayOfYear_VARNAME = "dayOfYear";
 
+	public static final String geoposition_VARNAME = "geoposition";
+
 	/**
 	 * Variable names for netCDF files
 	 */
@@ -624,6 +626,8 @@ public class Constants {
 		HashMap<String, String> varNamesMap = new HashMap<String, String>();
 		for ( String varName : SHORT_NAMES.values() )
 			varNamesMap.put(varName.toUpperCase(), varName);
+		// GEOPOSITION is from WOCE flagging from plots of only lon/lat/time 
+		varNamesMap.put(geoposition_VARNAME.toUpperCase(), geoposition_VARNAME);
 		VARIABLE_NAMES = Collections.unmodifiableMap(varNamesMap);
 	}
 

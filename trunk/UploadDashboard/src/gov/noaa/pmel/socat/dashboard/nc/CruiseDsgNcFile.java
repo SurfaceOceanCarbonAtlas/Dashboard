@@ -563,9 +563,9 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Updates this DSG file with the given WOCE flags.
-	 * Optionally will also update the data type, region ID, and 
-	 * row number in the WOCE flags from the data in this DSG file. 
+	 * Updates this DSG file with the given WOCE flags.  Optionally will 
+	 * also update the region ID and row number in the WOCE flags from 
+	 * the data in this DSG file. 
 	 * 
 	 * @param woceEvent
 	 * 		WOCE flags to set
@@ -620,28 +620,25 @@ public class CruiseDsgNcFile extends File {
 			}
 
 			String dataname = woceEvent.getColumnName();
-			if ( updateWoceEvent ) {
-				dataname = Constants.VARIABLE_NAMES.get(dataname);
-				if ( dataname == null )
-					throw new IllegalArgumentException("Unknown variable name " + woceEvent.getColumnName());
-				woceEvent.setColumnName(dataname);
-			}
 			ArrayDouble.D1 datavalues;
-			if ( "geoposition".equals(dataname) ) {
-				// WOCE on longitude/latitude/time
+			if ( Constants.geoposition_VARNAME.equals(dataname) ) {
+				// WOCE based on longitude/latitude/time
 				datavalues = null;
 			}
 			else {
 				var = ncfile.findVariable(dataname);
 				if ( var == null )
-					throw new IllegalArgumentException("Unable to find " + dataname + " variable in " + getName());
+					throw new IllegalArgumentException("Unable to find variable '" + 
+							dataname + "' in " + getName());
 				datavalues = (ArrayDouble.D1) var.read(); 
 			}
 
-			// 
-			Variable wocevar = ncfile.findVariable("WOCE_" + dataname);
+			// WOCE flags - currently only WOCE_CO2_water
+			varName = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
+			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
-				throw new IllegalArgumentException("Unable to find WOCE_" + dataname + " variable in " + getName());
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
 			ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
 
 			char newFlag = woceEvent.getFlag();
@@ -674,7 +671,7 @@ public class CruiseDsgNcFile extends File {
 				}
 				if ( ! valueFound ) 
 					throw new IllegalArgumentException("Unable to find data location \n" +
-							dataloc.toString() + " \n in " + getName());
+							dataloc.toString() + " \n    in " + getName());
 				wocevalues.set(idx, 0, newFlag);
 				if ( updateWoceEvent ) {
 					dataloc.setRowNumber(idx + 1);
