@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1065583765156989184L;
+	private static final long serialVersionUID = 1985208023692883872L;
 
 	boolean selected;
 	Double version;
@@ -44,6 +44,14 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	ArrayList<HashSet<Integer>> woceThreeRowIndices;
 	// For each data column, a set of row indices with bad data
 	ArrayList<HashSet<Integer>> woceFourRowIndices;
+	// Row indices with questionable data not specific to a column
+	HashSet<Integer> noColumnWoceThreeRowIndices;
+	// Row indices with bad data not specific to a column
+	HashSet<Integer> noColumnWoceFourRowIndices;
+	// Row indices designated by the PI as questionable
+	HashSet<Integer> userWoceThreeRowIndices;
+	// Row indices designated by the PI as bad
+	HashSet<Integer> userWoceFourRowIndices;
 
 	public DashboardCruise() {
 		selected = false;
@@ -67,6 +75,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		missingValues = new ArrayList<String>();
 		woceThreeRowIndices = new ArrayList<HashSet<Integer>>();
 		woceFourRowIndices = new ArrayList<HashSet<Integer>>();
+		noColumnWoceThreeRowIndices = new HashSet<Integer>();
+		noColumnWoceFourRowIndices = new HashSet<Integer>();
+		userWoceThreeRowIndices = new HashSet<Integer>();
+		userWoceFourRowIndices = new HashSet<Integer>();
 	}
 
 	/**
@@ -518,6 +530,96 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			this.woceFourRowIndices.addAll(woceFourRowIndices);
 	}
 
+	/**
+	 * @return
+	 * 		The set of row indices with questionable (WOCE-3) data that
+	 * 		cannot be directly attributed to a specific data column.
+	 * 		The actual set in this object is returned.
+	 */
+	public HashSet<Integer> getNoColumnWoceThreeRowIndices() {
+		return noColumnWoceThreeRowIndices;
+	}
+
+	/**
+	 * @param noColumnWoceThreeRowIndices
+	 * 		The set to assign of row indices with questionable (WOCE-3) 
+	 * 		data that cannot be directly attributed to a specific data 
+	 * 		column.  The set in this object is cleared and all the 
+	 * 		contents of the given set, if not null, are added.
+	 */
+	public void setNoColumnWoceThreeRowIndices(
+			HashSet<Integer> noColumnWoceThreeRowIndices) {
+		this.noColumnWoceThreeRowIndices.clear();
+		if ( noColumnWoceThreeRowIndices != null )
+			this.noColumnWoceThreeRowIndices.addAll(noColumnWoceThreeRowIndices);
+	}
+
+	/**
+	 * @return
+	 * 		The set of row indices with bad (WOCE-4) data that 
+	 * 		cannot be directly attributed to a specific data column.
+	 * 		The actual set in this object is returned.
+	 */
+	public HashSet<Integer> getNoColumnWoceFourRowIndices() {
+		return noColumnWoceFourRowIndices;
+	}
+
+	/**
+	 * @param noColumnWoceFourRowIndices 
+	 * 		The set to assign of row indices with bad (WOCE-4) 
+	 * 		data that cannot be directly attributed to a specific data 
+	 * 		column.  The set in this object is cleared and all the 
+	 * 		contents of the given set, if not null, are added.
+	 */
+	public void setNoColumnWoceFourRowIndices(
+			HashSet<Integer> noColumnWoceFourRowIndices) {
+		this.noColumnWoceFourRowIndices.clear();
+		if ( noColumnWoceFourRowIndices != null )
+			this.noColumnWoceFourRowIndices.addAll(noColumnWoceFourRowIndices);
+	}
+
+	/**
+	 * @return the userWoceThreeRowIndices
+	 * 		The set of row indices designated as questionable (WOCE-3) 
+	 * 		data by the PI.  The actual set in this object is returned.
+	 */
+	public HashSet<Integer> getUserWoceThreeRowIndices() {
+		return userWoceThreeRowIndices;
+	}
+
+	/**
+	 * @param userWoceThreeRowIndices
+	 * 		The set to assign of row indices designated as questionable 
+	 * 		(WOCE-3) data by the PI.  The set in this object is cleared 
+	 * 		and all the contents of the given set, if not null, are added.
+	 */
+	public void setUserWoceThreeRowIndices(HashSet<Integer> userWoceThreeRowIndices) {
+		this.userWoceThreeRowIndices.clear();
+		if ( userWoceThreeRowIndices != null )
+			this.userWoceThreeRowIndices.addAll(userWoceThreeRowIndices);
+	}
+
+	/**
+	 * @return 
+	 * 		The set of row indices designated as bad (WOCE-4) 
+	 * 		data by the PI.  The actual set in this object is returned.
+	 */
+	public HashSet<Integer> getUserWoceFourRowIndices() {
+		return userWoceFourRowIndices;
+	}
+
+	/**
+	 * @param userWoceFourRowIndices
+	 * 		The set to assign of row indices designated as bad 
+	 * 		(WOCE-4) data by the PI.  The set in this object is cleared 
+	 * 		and all the contents of the given set, if not null, are added.
+	 */
+	public void setUserWoceFourRowIndices(HashSet<Integer> userWoceFourRowIndices) {
+		this.userWoceFourRowIndices.clear();
+		if ( userWoceFourRowIndices != null )
+			this.userWoceFourRowIndices.addAll(userWoceFourRowIndices);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -542,6 +644,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + missingValues.hashCode();
 		result = result * prime + woceThreeRowIndices.hashCode();
 		result = result * prime + woceFourRowIndices.hashCode();
+		result = result * prime + noColumnWoceThreeRowIndices.hashCode();
+		result = result * prime + noColumnWoceFourRowIndices.hashCode();
+		result = result * prime + userWoceThreeRowIndices.hashCode();
+		result = result * prime + userWoceFourRowIndices.hashCode();
 		return result;
 	}
 
@@ -598,6 +704,14 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! woceFourRowIndices.equals(other.woceFourRowIndices) ) 
 			return false;
+		if ( ! noColumnWoceThreeRowIndices.equals(other.noColumnWoceThreeRowIndices) ) 
+			return false;
+		if ( ! noColumnWoceFourRowIndices.equals(other.noColumnWoceFourRowIndices) ) 
+			return false;
+		if ( ! userWoceThreeRowIndices.equals(other.userWoceThreeRowIndices) ) 
+			return false;
+		if ( ! userWoceFourRowIndices.equals(other.userWoceFourRowIndices) ) 
+			return false;
 		return true;
 	}
 
@@ -625,6 +739,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    missingValues=" + missingValues.toString() +
 				";\n    woceThreeRowIndices = " + woceThreeRowIndices.toString() +
 				";\n    woceFourRowIndices = " + woceFourRowIndices.toString() +
+				";\n    noColumnWoceThreeRowIndices = " + noColumnWoceThreeRowIndices.toString() +
+				";\n    noColumnWoceFourRowIndices = " + noColumnWoceFourRowIndices.toString() +
+				";\n    userWoceThreeRowIndices = " + userWoceThreeRowIndices.toString() +
+				";\n    userWoceFourRowIndices = " + userWoceFourRowIndices.toString() +
 				" ]";
 	}
 
