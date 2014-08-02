@@ -28,7 +28,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 
-import uk.ac.uea.socat.sanitychecker.Message;
+import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
@@ -737,146 +737,15 @@ public class DashboardCruiseChecker {
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
 
-		// Directly modify the lists in the cruise data
-		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
-		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
-
-		// Clear all WOCE flags, then set those from the current set of messages
-		for ( HashSet<Integer> rowIdxSet : woceFourSets )
-			rowIdxSet.clear();
-		for ( HashSet<Integer> rowIdxSet : woceThreeSets )
-			rowIdxSet.clear();
-		for ( Message msg : output.getMessages().getMessages() )
-			processMessage(cruiseData, msg, colIndcs);
-
-		// Add any user-provided WOCE-3 and WOCE-4 flags
-		/* TODO: what to do with user-provided WOCE flags - not really associated with any data column
-		for (int k = 0; k < columnTypes.size(); k++) {
-			DataColumnType colType = columnTypes.get(k);
-			if ( colType.equals(DataColumnType.WOCE_CO2_WATER) ||
-				 colType.equals(DataColumnType.WOCE_CO2_ATM) ) {
-				for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
-					ArrayList<HashSet<Integer>> woceFlags;
-					try {
-						int value = Integer.parseInt(cruiseData.getDataValues().get(rowIdx).get(k));
-						if ( value == 4 )
-							woceFlags = woceFourSets;
-						else if ( value == 3 )
-							woceFlags = woceThreeSets;
-						else
-							woceFlags = null;
-					} catch (NumberFormatException ex) {
-						woceFlags = null;
-					}
-					if ( woceFlags != null ) {
-						if ( colType.equals(DataColumnType.WOCE_CO2_WATER) ) {
-							if ( colIndcs.xCO2WaterTEquDryIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2WaterTEquDryIndex).add(rowIdx);
-							if ( colIndcs.xCO2WaterSstDryIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2WaterSstDryIndex).add(rowIdx);
-							if ( colIndcs.xCO2WaterTEquWetIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2WaterTEquWetIndex).add(rowIdx);
-							if ( colIndcs.xCO2WaterSstWetIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2WaterSstWetIndex).add(rowIdx);
-							if ( colIndcs.pCO2WaterTEquWetIndex >= 0 )
-								woceFlags.get(colIndcs.pCO2WaterTEquWetIndex).add(rowIdx);
-							if ( colIndcs.pCO2WaterSstWetIndex >= 0 )
-								woceFlags.get(colIndcs.pCO2WaterSstWetIndex).add(rowIdx);
-							if ( colIndcs.fCO2WaterTEquWetIndex >= 0 )
-								woceFlags.get(colIndcs.fCO2WaterTEquWetIndex).add(rowIdx);
-							if ( colIndcs.fCO2WaterSstWetIndex >= 0 )
-								woceFlags.get(colIndcs.fCO2WaterSstWetIndex).add(rowIdx);
-						}
-						else if ( colType.equals(DataColumnType.WOCE_CO2_ATM) ) {
-							if ( colIndcs.xCO2AtmDryActualIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2AtmDryActualIndex).add(rowIdx);
-							if ( colIndcs.xCO2AtmDryInterpIndex >= 0 )
-								woceFlags.get(colIndcs.xCO2AtmDryInterpIndex).add(rowIdx);
-							if ( colIndcs.pCO2AtmWetActualIndex >= 0 )
-								woceFlags.get(colIndcs.pCO2AtmWetActualIndex).add(rowIdx);
-							if ( colIndcs.pCO2AtmWetInterpIndex >= 0 )
-								woceFlags.get(colIndcs.pCO2AtmWetInterpIndex).add(rowIdx);
-							if ( colIndcs.fCO2AtmWetActualIndex >= 0 )
-								woceFlags.get(colIndcs.fCO2AtmWetActualIndex).add(rowIdx);
-							if ( colIndcs.fCO2AtmWetInterpIndex >= 0 )
-								woceFlags.get(colIndcs.fCO2AtmWetInterpIndex).add(rowIdx);
-						}
-					}
-				}
-			}
-		}
-		*/
-
-		// Remove any WOCE-3 flags on data values that also have a WOCE-4 flag
-		for (int k = 0; k < woceThreeSets.size(); k++) {
-			woceThreeSets.get(k).removeAll(woceFourSets.get(k));
-		}
+		// Clear the WOCE flags and process the messages from the SanityChecker output
+		CheckerMessageHandler msgHandler = new CheckerMessageHandler(cruiseData, output);
+		msgHandler.assignWoceFlags();
 
 		// Count the rows of data with errors and only warnings, check if there 
 		// were lon/lat/date/time problems and assign the data check status
 		countWoceFlags(cruiseData, colIndcs, output.processedOK());
 
 		return output;
-	}
-
-	/**
-	 * Assigns the WOCE-3 or WOCE-4 flag associated with this message 
-	 * to the cruise.
-	 * 
-	 * @param cruiseData
-	 * 		cruise with data to assign
-	 * @param msg
-	 * 		SanityChecker message
-	 * @param colIndcs
-	 * 		user-provided-data column indices that could receive WOCE flags
-	 */
-	private void processMessage(DashboardCruiseWithData cruiseData, 
-								Message msg, ColumnIndices colIndcs) {
-		int rowIdx = msg.getLineNumber();
-		if ( (rowIdx <= 0) || (rowIdx > cruiseData.getNumDataRows()) )
-			throw new RuntimeException("Unexpected row number of " + 
-					Integer.toString(rowIdx) + " in the sanity checker message\n" +
-					"    " + msg.toString());
-		// Change row number to row index
-		rowIdx--;
-
-		int colIdx = msg.getInputItemIndex();
-		if ( (colIdx == 0) || (colIdx > cruiseData.getDataColTypes().size()) )
-			throw new RuntimeException("Unexpected input column number of " + 
-					Integer.toString(colIdx) + " in the sanity checker message\n" +
-					"    " + msg.toString());
-		// Change column number to column index; 
-		// negative numbers indicate an ambiguous source of error
-		if ( colIdx > 0 )
-			colIdx--;
-
-		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
-		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
-
-		if ( msg.isError() ) {
-			// Erroneous data value
-			if ( colIdx < 0 ) {
-				// TODO: What to do with an error message with no data columns
-			}
-			else {
-				woceFourSets.get(colIdx).add(rowIdx);
-			}
-		}
-		else if ( msg.isWarning() ) {
-			// Questionable data value
-			if ( colIdx < 0 ) {
-				// TODO: What to do with a warning message with no data columns
-			}
-			else {
-				woceThreeSets.get(colIdx).add(rowIdx);
-			}
-		}
-		else {
-			// Should never happen
-			throw new IllegalArgumentException(
-					"Unexpected message that is neither an error nor a warning:\n" +
-					"    " + msg.toString());
-		}
 	}
 
 	/**
@@ -1140,26 +1009,6 @@ public class DashboardCruiseChecker {
 	}
 
 	/**
-	 * Default missing values used for detecting missing lon/lat/date/time/timestamp
-	 */
-	private static final HashSet<String> DEFAULT_MISSING_VALUES = new HashSet<String>();
-	static {
-		DEFAULT_MISSING_VALUES.add("");
-		DEFAULT_MISSING_VALUES.add("NULL");
-		DEFAULT_MISSING_VALUES.add("NA");
-		DEFAULT_MISSING_VALUES.add("N/A");
-		DEFAULT_MISSING_VALUES.add("NAN");
-		DEFAULT_MISSING_VALUES.add("-999");
-		DEFAULT_MISSING_VALUES.add("-999.");
-		DEFAULT_MISSING_VALUES.add("-999.0");
-		DEFAULT_MISSING_VALUES.add("-999.9");
-		DEFAULT_MISSING_VALUES.add("-9999");
-		DEFAULT_MISSING_VALUES.add("-9999.");
-		DEFAULT_MISSING_VALUES.add("-9999.0");
-		DEFAULT_MISSING_VALUES.add("-9999.9");
-	}
-
-	/**
 	 * @param cruiseData
 	 * 		cruise to use
 	 * @param processedOK
@@ -1179,15 +1028,20 @@ public class DashboardCruiseChecker {
 		while ( k < numRows ) {
 			ArrayList<String> dataRow = dataVals.get(k);
 			if ( ( (colIndcs.timestampIndex >= 0) &&
-					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.timestampIndex).toUpperCase()) ) || 
+					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
+							dataRow.get(colIndcs.timestampIndex).toLowerCase()) ) || 
 				 ( (colIndcs.dateIndex >= 0) && 
-					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.dateIndex).toUpperCase()) ) || 
+					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
+							dataRow.get(colIndcs.dateIndex).toLowerCase()) ) || 
 				 ( (colIndcs.timeIndex >= 0) && 
-					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.timeIndex).toUpperCase()) ) || 
+					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
+							dataRow.get(colIndcs.timeIndex).toLowerCase()) ) || 
 				 ( (colIndcs.longitudeIndex >= 0) && 
-					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.longitudeIndex).toUpperCase()) ) || 
+					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
+							dataRow.get(colIndcs.longitudeIndex).toLowerCase()) ) || 
 				 ( (colIndcs.latitudeIndex >= 0) && 
-					DEFAULT_MISSING_VALUES.contains(dataRow.get(colIndcs.latitudeIndex).toUpperCase()) ) ) {
+					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
+							dataRow.get(colIndcs.latitudeIndex).toLowerCase()) ) ) {
 				// Remove this data row index from the WOCE flags, and decrement subsequent data row indices
 				for ( HashSet<Integer> woceFourRows : woceFourSets ) {
 					woceFourRows.remove(k);
@@ -1267,16 +1121,25 @@ public class DashboardCruiseChecker {
 			lastCheckHadGeopositionErrors = false;
 		}
 
-		// Assign the number of data rows with errors and with only warnings
+		// Assign the number of data rows the SanityChecker found having 
+		// errors but not marked as bad by the PI
 		HashSet<Integer> errRows = new HashSet<Integer>();
 		for ( HashSet<Integer> rowIdxSet : woceFourSets )
 			errRows.addAll(rowIdxSet);
+		errRows.addAll(cruise.getNoColumnWoceFourRowIndices());
+		errRows.removeAll(cruise.getUserWoceFourRowIndices());
 		int numErrorRows = errRows.size();
 		cruise.setNumErrorRows(numErrorRows);
+
+		// Assign the number of data rows the SanityChecker found having  
+		// only warnings but not marked as bad or questionable by the PI
 		HashSet<Integer> warnRows = new HashSet<Integer>();
 		for ( HashSet<Integer> rowIdxSet : woceThreeSets )
 			warnRows.addAll(rowIdxSet);
+		warnRows.addAll(cruise.getNoColumnWoceThreeRowIndices());
 		warnRows.removeAll(errRows);
+		warnRows.removeAll(cruise.getUserWoceFourRowIndices());
+		warnRows.removeAll(cruise.getUserWoceThreeRowIndices());
 		int numWarnRows = warnRows.size();
 		cruise.setNumWarnRows(numWarnRows);
 
