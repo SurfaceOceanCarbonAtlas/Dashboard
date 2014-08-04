@@ -18,8 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import uk.ac.uea.socat.sanitychecker.Output;
-
 /**
  * Submits Dashboard cruise for SOCAT QC
  * 
@@ -37,7 +35,7 @@ public class DashboardCruiseSubmitter {
 	/**
 	 * Create with the file handlers and data checker in the given data store.
 	 */
-	public DashboardCruiseSubmitter(DashboardDataStore dataStore) {
+	DashboardCruiseSubmitter(DashboardDataStore dataStore) {
 		cruiseHandler = dataStore.getCruiseFileHandler();
 		msgHandler = dataStore.getCheckerMsgHandler();
 		metadataHandler = dataStore.getMetadataFileHandler();
@@ -125,24 +123,22 @@ public class DashboardCruiseSubmitter {
 					flag = SocatQCEvent.QC_UPDATED_FLAG;
 					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
 				}
-				// Get the complete cruise data in standard units
+				// Get the complete original cruise data
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-				Output output = cruiseChecker.standardizeCruiseData(cruiseData);
-				// Remove data lines with missing values in any columns of type 
-				// longitude, latitude, date, time, or timestamp
-				cruiseChecker.removeMissingLonLatDateTimeData(cruiseData, output.processedOK());
-				if ( qcFlag == null ) {
-					// See if the cruise has unacceptable issues
-					if ( cruiseData.getDataCheckStatus().equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
-						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
-						continue;
-					}
-					if ( cruiseChecker.hadGeopositionErrors() ) {
-						errorMsgs.add(expocode + ": unacceptable; automated checking of data " +
-								"detected longitude, latitude, date, or time value errors");
-						continue;
-					}
+				// Convert the cruise data into standard units after removing
+				// data lines with missing values for longitude, latitude, date, 
+				// time, or timestamp, or which the PI has marked as bad.
+				// Note: this saves messages and assigns WOCE flags with row 
+				// numbers of the trimmed data.
+				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
+					errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
+					continue;
+				}
+				if ( (qcFlag == null) && cruiseChecker.hadGeopositionErrors() ) {
+					errorMsgs.add(expocode + ": unacceptable; automated checking of data " +
+							"detected longitude, latitude, date, or time value errors");
+					continue;
 				}
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
@@ -155,18 +151,11 @@ public class DashboardCruiseSubmitter {
 				}
 				// Generate the NetCDF DSG file for this cruise
 				dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
+				// Update cruise with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
-				// Update cruise with the any updates from the SanityChecker
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
-				// Save the WOCE flags for the columns in the original cruise data
-				int numDataCols = cruise.getDataColTypes().size();
-				cruise.setWoceThreeRowIndices(new ArrayList<HashSet<Integer>>(
-						cruiseData.getWoceThreeRowIndices().subList(0, numDataCols)));
-				cruise.setWoceFourRowIndices(new ArrayList<HashSet<Integer>>(
-						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
-				msgHandler.saveCruiseMessages(cruise.getExpocode(), output);
 				// Create a SocatQCEvent for the cruise with the number of data rows with errors, warnings
 				SocatQCEvent comment = new SocatQCEvent();
 				comment.setFlag(null);
