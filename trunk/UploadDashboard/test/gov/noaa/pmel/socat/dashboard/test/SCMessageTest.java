@@ -26,7 +26,7 @@ public class SCMessageTest {
 	 */
 	@Test
 	public void testGetSetType() {
-		final SCMsgType myType = SCMsgType.DATA;
+		final SCMsgType myType = SCMsgType.DATA_RANGE;
 		SCMessage msg = new SCMessage();
 		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 		msg.setType(myType);
@@ -202,7 +202,7 @@ public class SCMessageTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		final SCMsgType myType = SCMsgType.DATA;
+		final SCMsgType myType = SCMsgType.DATA_RANGE;
 		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
 		final int myRowNum = 25;
 		final String myTimestamp = "2014-02-06 11:35";
@@ -507,7 +507,7 @@ public class SCMessageTest {
 	 */
 	@Test
 	public void testCompareTo() {
-		final SCMsgType myType = SCMsgType.DATA;
+		final SCMsgType myType = SCMsgType.DATA_RANGE;
 		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
 		final int myRowNum = 25;
 		final String myTimestamp = "2014-02-06 11:35";

@@ -313,6 +313,7 @@ public class DashboardCruiseChecker {
 		// COMMENT... and OTHER should not be processed by the sanity checker
 	}
 
+	private CheckerMessageHandler msgHandler;
 	private boolean lastCheckHadGeopositionErrors;
 
 	/**
@@ -322,10 +323,13 @@ public class DashboardCruiseChecker {
 	 * @param configFile
 	 * 		properties file giving the names of the configuration files 
 	 * 		for each SanityChecker component
+	 * @param checkerMsgHandler
+	 * 		handler for SanityChecker messages
 	 * @throws IOException
 	 * 		If the SanityChecker has problems with a configuration file
 	 */
-	public DashboardCruiseChecker(File configFile) throws IOException {
+	public DashboardCruiseChecker(File configFile, 
+			CheckerMessageHandler checkerMsgHandler) throws IOException {
 		try {
 			// Clear any previous configuration
 			SanityCheckConfig.destroy();
@@ -340,6 +344,10 @@ public class DashboardCruiseChecker {
 					" values specified in " + configFile.getPath() + 
 					"\n    " + ex.getMessage());
 		}
+		if ( msgHandler == null )
+			throw new NullPointerException(
+					"CheckerMsgHandler passed to DashboardCruiseChecker is null");
+		msgHandler = checkerMsgHandler;
 		lastCheckHadGeopositionErrors = false;
 	}
 
@@ -738,8 +746,7 @@ public class DashboardCruiseChecker {
 		Output output = checker.process();
 
 		// Clear the WOCE flags and process the messages from the SanityChecker output
-		CheckerMessageHandler msgHandler = new CheckerMessageHandler(cruiseData, output);
-		msgHandler.assignWoceFlags();
+		msgHandler.assignWoceFlags(cruiseData, output);
 
 		// Count the rows of data with errors and only warnings, check if there 
 		// were lon/lat/date/time problems and assign the data check status
