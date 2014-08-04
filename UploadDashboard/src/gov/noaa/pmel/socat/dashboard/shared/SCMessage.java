@@ -27,7 +27,14 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 	public enum SCMsgType implements Serializable, IsSerializable {
 		UNKNOWN,
 		METADATA,
-		DATA,
+		DATA_RANGE,
+		DATA_TIME,
+		DATA_SPEED,
+		DATA_MISSING,
+		DATA_CONSTANT,
+		DATA_JUMP,
+		DATA_GAP,
+		DATA_ERROR,
 	}
 
 	/**

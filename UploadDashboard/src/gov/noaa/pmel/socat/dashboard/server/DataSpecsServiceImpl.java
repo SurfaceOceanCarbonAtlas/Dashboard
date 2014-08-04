@@ -120,7 +120,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 		Output output = dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
 
 		// Update the reports of any issues found
-		dataStore.getCruiseFileHandler()
+		dataStore.getCheckerMsgHandler()
 				.saveCruiseMessages(cruiseData.getExpocode(), output);
 
 		// Save and commit the updated cruise columns
@@ -160,6 +160,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 					"Invalid authentication credentials");
 
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CheckerMessageHandler msgHandler = dataStore.getCheckerMsgHandler();
 		UserFileHandler userHandler = dataStore.getUserFileHandler();
 		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
 
@@ -180,7 +181,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 				// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
 				Output output = cruiseChecker.checkCruise(cruiseData);
 				// Update the reports of any issues found
-				cruiseHandler.saveCruiseMessages(expocode, output);
+				msgHandler.saveCruiseMessages(expocode, output);
 
 				// Save and commit the updated cruise information
 				cruiseHandler.saveCruiseInfoToFile(cruiseData, 

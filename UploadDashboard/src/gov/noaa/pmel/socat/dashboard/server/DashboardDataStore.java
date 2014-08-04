@@ -110,6 +110,7 @@ public class DashboardDataStore {
 	private Double socatQCVersion;
 	private UserFileHandler userFileHandler;
 	private CruiseFileHandler cruiseFileHandler;
+	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
@@ -261,6 +262,8 @@ public class DashboardDataStore {
 			propVal = propVal.trim();
 			cruiseFileHandler = new CruiseFileHandler(propVal,
 					svnUsername, svnPassword);
+			// Put SanityChecker message files in the same directory
+			checkerMsgHandler = new CheckerMessageHandler(propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + CRUISE_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -372,7 +375,7 @@ public class DashboardDataStore {
 		}
 		// Sanity checker initialization from this same properties file 
 		try {
-			cruiseChecker = new DashboardCruiseChecker(configFile);
+			cruiseChecker = new DashboardCruiseChecker(configFile, checkerMsgHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -502,6 +505,14 @@ public class DashboardDataStore {
 	 */
 	public CruiseFileHandler getCruiseFileHandler() {
 		return cruiseFileHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the handler for SanityChecker messages
+	 */
+	public CheckerMessageHandler getCheckerMsgHandler() {
+		return checkerMsgHandler;
 	}
 
 	/**

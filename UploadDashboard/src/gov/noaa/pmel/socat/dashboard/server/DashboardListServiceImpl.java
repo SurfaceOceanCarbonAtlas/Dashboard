@@ -27,7 +27,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardListServiceImpl extends RemoteServiceServlet
 									implements DashboardListService {
 
-	private static final long serialVersionUID = -104314479885469162L;
+	private static final long serialVersionUID = -7637335749892330074L;
 
 	/**
 	 * Validates the given user.
@@ -192,7 +192,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Get the list of saved sanity checker Message objects for this cruise
 		ArrayList<SCMessage> cruiseMsgs;
 		try {
-			cruiseMsgs = dataStore.getCruiseFileHandler()
+			cruiseMsgs = dataStore.getCheckerMsgHandler()
 								  .getCruiseMessages(expocode);
 		} catch (FileNotFoundException ex) {
 			throw new IllegalArgumentException("The sanity checker " +

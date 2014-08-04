@@ -28,6 +28,7 @@ import uk.ac.uea.socat.sanitychecker.Output;
 public class DashboardCruiseSubmitter {
 
 	CruiseFileHandler cruiseHandler;
+	CheckerMessageHandler msgHandler;
 	MetadataFileHandler metadataHandler;
 	DashboardCruiseChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
@@ -38,6 +39,7 @@ public class DashboardCruiseSubmitter {
 	 */
 	public DashboardCruiseSubmitter(DashboardDataStore dataStore) {
 		cruiseHandler = dataStore.getCruiseFileHandler();
+		msgHandler = dataStore.getCheckerMsgHandler();
 		metadataHandler = dataStore.getMetadataFileHandler();
 		cruiseChecker = dataStore.getDashboardCruiseChecker();
 		dsgNcHandler = dataStore.getDsgNcFileHandler();
@@ -164,7 +166,7 @@ public class DashboardCruiseSubmitter {
 						cruiseData.getWoceThreeRowIndices().subList(0, numDataCols)));
 				cruise.setWoceFourRowIndices(new ArrayList<HashSet<Integer>>(
 						cruiseData.getWoceFourRowIndices().subList(0, numDataCols)));
-				cruiseHandler.saveCruiseMessages(cruise.getExpocode(), output);
+				msgHandler.saveCruiseMessages(cruise.getExpocode(), output);
 				// Create a SocatQCEvent for the cruise with the number of data rows with errors, warnings
 				SocatQCEvent comment = new SocatQCEvent();
 				comment.setFlag(null);
