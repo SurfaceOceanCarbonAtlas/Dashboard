@@ -116,6 +116,7 @@ public class DashboardDataStore {
 	private FerretConfig ferretConf;
 	private DashboardCruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
+	private DashboardCruiseSubmitter cruiseSubmitter;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -134,9 +135,11 @@ public class DashboardDataStore {
 		if ( baseDir == null ) 
 			baseDir = System.getProperty("user.home");
 		Logger itsLogger = Logger.getLogger(SERVER_APP_NAME);
+
 		// Configure the log4j logger
 		PropertyConfigurator.configure(baseDir + File.separator + 
 				LOGGER_CONFIG_RELATIVE_FILENAME);
+
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
 		configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
@@ -155,6 +158,7 @@ public class DashboardDataStore {
 					"\n" + ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		String propVal;
+
 		// Read the encryption key from the data store and initialize the cipher with it
 		try {
 			propVal = configProps.getProperty(ENCRYPTION_KEY_NAME_TAG);
@@ -171,6 +175,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the salt string from the data store
 		try {
 			propVal = configProps.getProperty(ENCRYPTION_SALT_NAME_TAG);
@@ -186,6 +191,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the SOCAT versions
 		try {
 			propVal = configProps.getProperty(SOCAT_UPLOAD_VERSION_NAME_TAG);
@@ -221,6 +227,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the SVN username
 		String svnUsername;
 		try {
@@ -236,6 +243,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the SVN password; can be blank or not given
 		String svnPassword = "";
 		propVal = configProps.getProperty(SVN_PASSWORD_NAME_TAG);
@@ -254,6 +262,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the cruise files directory name
 		try {
 			propVal = configProps.getProperty(CRUISE_FILES_DIR_NAME_TAG);
@@ -269,6 +278,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the metadata files directory name
 		try {
 			propVal = configProps.getProperty(METADATA_FILES_DIR_NAME_TAG);
@@ -282,8 +292,8 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the DSG files directory names and ERDDAP flag file names
-		// and create the DSG NC file handler
 		String dsgFileDirName;
 		try {
 			dsgFileDirName = configProps.getProperty(DSG_NC_FILES_DIR_NAME_TAG);
@@ -338,6 +348,7 @@ public class DashboardDataStore {
 		} catch ( Exception ex ) {
 			throw new IOException(ex);
 		}
+
 		// Read the Ferret configuration filename
 		try {
 			propVal = configProps.getProperty(FERRET_CONFIG_FILE_NAME_TAG);
@@ -360,6 +371,7 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
 		// Read the Database configuration filename
 		try {
 			propVal = configProps.getProperty(DATABASE_CONFIG_FILE_NAME_TAG);
@@ -373,12 +385,17 @@ public class DashboardDataStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-		// Sanity checker initialization from this same properties file 
+
+		// SanityChecker initialization from this same properties file 
 		try {
 			cruiseChecker = new DashboardCruiseChecker(configFile, checkerMsgHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
+		// The DashboardCruiseSubmitter uses the various handlers just created
+		cruiseSubmitter = new DashboardCruiseSubmitter(this);
+
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
 		for ( Entry<Object,Object> entry : configProps.entrySet() ) {
@@ -401,6 +418,7 @@ public class DashboardDataStore {
 			}
 			userInfoMap.put(username, userInfo);
 		}
+
 		// Read and assign the authorized user roles 
 		for ( Entry<Object,Object> entry : configProps.entrySet() ) {
 			if ( ! ((entry.getKey() instanceof String) && 
@@ -425,6 +443,7 @@ public class DashboardDataStore {
 						configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
 			}
 		}
+
 		itsLogger.info("read configuration file " + configFile.getPath());
 		// Watch for changes to the configuration file
 		watchConfigFile();
@@ -525,14 +544,6 @@ public class DashboardDataStore {
 
 	/**
 	 * @return
-	 * 		the checker for cruise data and metadata
-	 */
-	public DashboardCruiseChecker getDashboardCruiseChecker() {
-		return cruiseChecker;
-	}
-
-	/**
-	 * @return
 	 * 		the handler for NetCDF DSG files
 	 */
 	public DsgNcFileHandler getDsgNcFileHandler() {
@@ -553,6 +564,22 @@ public class DashboardDataStore {
 	 */
 	public DatabaseRequestHandler getDatabaseRequestHandler() {
 		return databaseRequestHandler;
+	}
+
+	/**
+	 * @return
+	 * 		the checker for cruise data and metadata
+	 */
+	public DashboardCruiseChecker getDashboardCruiseChecker() {
+		return cruiseChecker;
+	}
+
+	/**
+	 * @return
+	 * 		the submitter for dashboard cruises
+	 */
+	public DashboardCruiseSubmitter getDashboardCruiseSubmitter() {
+		return cruiseSubmitter;
 	}
 
 	/**

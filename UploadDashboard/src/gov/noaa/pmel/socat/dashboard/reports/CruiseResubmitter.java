@@ -3,9 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.reports;
 
-import gov.noaa.pmel.socat.dashboard.server.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -16,8 +14,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
-
-import uk.ac.uea.socat.sanitychecker.Output;
 
 /**
  * For resubmitting cruises automatically to update DSG files 
@@ -50,14 +46,12 @@ public class CruiseResubmitter {
 			DashboardDataStore dataStore) throws IllegalArgumentException {
 		// Get the information for this cruise
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		CheckerMessageHandler msgHandler = dataStore.getCheckerMsgHandler();
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 		String qcStatus = cruise.getQcStatus();
 		if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ) {
 			// Only check (do not submit) if the cruise has never been submitted
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-			Output output = dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
-			msgHandler.saveCruiseMessages(cruiseData.getExpocode(), output);
+			dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
 			cruiseHandler.saveCruiseInfoToFile(cruiseData, 
 					"Cruise data column types, units, and missing values for " + 
 					cruiseData.getExpocode() + " updated by " + username);
@@ -67,10 +61,10 @@ public class CruiseResubmitter {
 			cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
-			DashboardCruiseSubmitter submitter = new DashboardCruiseSubmitter(dataStore);
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));
 			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date());
-			submitter.submitCruises(expocodeSet, cruise.getArchiveStatus(), 
+			dataStore.getDashboardCruiseSubmitter()
+					 .submitCruises(expocodeSet, cruise.getArchiveStatus(), 
 									timestamp, false, username, null, null);
 			// Note that the cruise will now have a QC status of 'U' (updated)
 		}

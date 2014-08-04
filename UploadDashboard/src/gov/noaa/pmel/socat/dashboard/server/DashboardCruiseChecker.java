@@ -42,14 +42,14 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 
 /**
- * Class for interfacing with the SanityChecker 
+ * Class for working with the SanityChecker 
  * 
  * @author Karl Smith
  */
 public class DashboardCruiseChecker {
 
 	/**
-	 * Indices of user-provided data columns that could have WOCE flags. 
+	 * Indices of user-provided data columns. 
 	 */
 	class ColumnIndices {
 		int timestampIndex = -1;
@@ -98,6 +98,8 @@ public class DashboardCruiseChecker {
 		int windSpeedRelIndex = -1;
 		int windDirTrueIndex = -1;
 		int windDirRelIndex = -1;
+		int woceCO2WaterIndex = -1;
+		int woceCO2AtmIndex = -1;
 	}
 
 	/**
@@ -212,6 +214,11 @@ public class DashboardCruiseChecker {
 				colIndcs.windDirTrueIndex = k;
 			else if ( colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) )
 				colIndcs.windDirRelIndex = k;
+
+			else if ( colType.equals(DataColumnType.WOCE_CO2_WATER) )
+				colIndcs.woceCO2WaterIndex = k;
+			else if ( colType.equals(DataColumnType.WOCE_CO2_ATM) )
+				colIndcs.woceCO2AtmIndex = k;
 		}
 		return colIndcs;
 	}
@@ -352,19 +359,38 @@ public class DashboardCruiseChecker {
 	}
 
 	/**
-	 * Runs the SanityChecker on the given cruise.  
-	 * Assigns the data check status and the WOCE-3 and WOCE-4 
+	 * Runs the SanityChecker on the given cruise.  Saves the SanityChecker
+	 * messages, and assigns the data check status and the WOCE-3 and WOCE-4 
 	 * data flags from the SanityChecker output.
 	 * 
 	 * @param cruiseData
 	 * 		cruise to check
 	 * @return
-	 * 		output from the SanityChecker.
+	 * 		if the SanityChecker ran successfully
 	 * @throws IllegalArgumentException
 	 * 		if a data column type is unknown, or
 	 * 		if the sanity checker throws an exception
 	 */
-	public Output checkCruise(DashboardCruiseWithData cruiseData) 
+	public boolean checkCruise(DashboardCruiseWithData cruiseData) 
+											throws IllegalArgumentException {
+		Output output = checkCruiseAndReturnOutput(cruiseData);
+		return output.processedOK();
+	}
+
+	/**
+	 * Runs the SanityChecker on the given cruise.  Saves the SanityChecker
+	 * messages, and assigns the data check status and the WOCE-3 and WOCE-4 
+	 * data flags from the SanityChecker output.
+	 * 
+	 * @param cruiseData
+	 * 		cruise to check
+	 * @return
+	 * 		the returned Output from {@link SanityChecker#process()}
+	 * @throws IllegalArgumentException
+	 * 		if a data column type is unknown, or
+	 * 		if the sanity checker throws an exception
+	 */
+	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData)
 											throws IllegalArgumentException {
 		// Create the metadata properties of this cruise for the sanity checker
 		Properties metadataInput = new Properties();
@@ -745,8 +771,8 @@ public class DashboardCruiseChecker {
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
 
-		// Clear the WOCE flags and process the messages from the SanityChecker output
-		msgHandler.assignWoceFlags(cruiseData, output);
+		// Save the SanityChecker messages and assign WOCE flags
+		msgHandler.saveCruiseMessages(cruiseData, output);
 
 		// Count the rows of data with errors and only warnings, check if there 
 		// were lon/lat/date/time problems and assign the data check status
@@ -757,18 +783,25 @@ public class DashboardCruiseChecker {
 
 	/**
 	 * Sanity-checks and standardizes the units in the data values,
-	 * stored as strings, in the given cruise.  The year, month, day,
-	 * hour, minute, and second data columns are appended to each 
-	 * data measurement (row, outer array) if not already present.
+	 * stored as strings, in the given cruise after removing data
+	 * rows with known problems as defined by 
+	 * {@link DashboardCruiseChecker#removeKnownProblemRows(DashboardCruiseWithData)}.
+	 * The year, month, day, hour, minute, and second data columns 
+	 * are appended to each data measurement (row, outer array) 
+	 * if not already present.
 	 *  
 	 * @param cruiseData
 	 * 		cruise data to be standardized
 	 * @return
-	 * 		standardized cruise data
+	 * 		if the SanityChecker ran successfully;
+	 * 		if false, data will not have been standardized
 	 */
-	public Output standardizeCruiseData(DashboardCruiseWithData cruiseData) {
+	public boolean standardizeCruiseData(DashboardCruiseWithData cruiseData) {
+		removeKnownProblemRows(cruiseData);
 		// Run the SanityChecker to get the standardized data
-		Output output = checkCruise(cruiseData);
+		Output output = checkCruiseAndReturnOutput(cruiseData);
+		if ( ! output.processedOK() )
+			return false;
 		List<SocatDataRecord> stdRowVals = output.getRecords();
 
 		// Directly modify the lists in the cruise data object
@@ -980,7 +1013,10 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.WIND_SPEED_TRUE) || 
 						  colType.equals(DataColumnType.WIND_SPEED_RELATIVE) || 
 						  colType.equals(DataColumnType.WIND_DIRECTION_TRUE) || 
-						  colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ) {
+						  colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) ||
+
+						  colType.equals(DataColumnType.WOCE_CO2_WATER) || 
+						  colType.equals(DataColumnType.WOCE_CO2_ATM) ) {
 					String chkName = DashboardUtils.STD_HEADER_NAMES.get(colType);
 					SocatDataColumn stdCol = stdVals.getColumn(chkName);
 					if ( stdCol == null )
@@ -994,8 +1030,6 @@ public class DashboardCruiseChecker {
 						  colType.equals(DataColumnType.SHIP_NAME) || 
 						  colType.equals(DataColumnType.GROUP_NAME) || 
 
-						  colType.equals(DataColumnType.WOCE_CO2_WATER) || 
-						  colType.equals(DataColumnType.WOCE_CO2_ATM) || 
 						  colType.equals(DataColumnType.COMMENT_WOCE_CO2_WATER) ||
 						  colType.equals(DataColumnType.COMMENT_WOCE_CO2_ATM) ||
 						  colType.equals(DataColumnType.OTHER) ) {
@@ -1012,28 +1046,29 @@ public class DashboardCruiseChecker {
 				}
 			}
 		}
-		return output;
+		return true;
 	}
 
 	/**
+	 * Removes rows of data with known problems.  These known problems are
+	 * such that it is acceptable to ignore the data row when submitting the
+	 * cruise for QC.  Such problems including missing longitude, latitude,
+	 * timestamp, date, time, and rows the PI has specified as bad.
+	 * 
 	 * @param cruiseData
-	 * 		cruise to use
-	 * @param processedOK
-	 * 		did the SanityCheck run successfully?
+	 * 		cruise data to modify
 	 */
-	public void removeMissingLonLatDateTimeData(
-			DashboardCruiseWithData cruiseData, boolean processedOK) {
+	private void removeKnownProblemRows(DashboardCruiseWithData cruiseData) {
 		ColumnIndices colIndcs = getColumnIndices(cruiseData.getDataColTypes());
 
 		// Directly modify the data rows and data row indices for the WOCE flags
 		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
-		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
-		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
 
 		int k = 0;
 		int numRows = cruiseData.getNumDataRows();
 		while ( k < numRows ) {
 			ArrayList<String> dataRow = dataVals.get(k);
+			// Remove the row if missing timestamp, data, time, longitude, latitude
 			if ( ( (colIndcs.timestampIndex >= 0) &&
 					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
 							dataRow.get(colIndcs.timestampIndex).toLowerCase()) ) || 
@@ -1049,33 +1084,41 @@ public class DashboardCruiseChecker {
 				 ( (colIndcs.latitudeIndex >= 0) && 
 					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
 							dataRow.get(colIndcs.latitudeIndex).toLowerCase()) ) ) {
-				// Remove this data row index from the WOCE flags, and decrement subsequent data row indices
-				for ( HashSet<Integer> woceFourRows : woceFourSets ) {
-					woceFourRows.remove(k);
-					for (int j = k+1; j < numRows; j++) {
-						if ( woceFourRows.remove(j) )
-							woceFourRows.add(j-1);
-					}
-				}
-				for ( HashSet<Integer> woceThreeRows : woceThreeSets ) {
-					woceThreeRows.remove(k);
-					for (int j = k+1; j < numRows; j++) {
-						if ( woceThreeRows.remove(j) )
-							woceThreeRows.add(j-1);
-					}
-				}
 				// Remove this data row
 				dataVals.remove(k);
 				numRows--;
+				continue;
 			}
-			else {
-				k++;
-			}
-		}
 
-		// Count the rows of data with errors and only warnings, check if there 
-		// were lon/lat/date/time problems and assign the data check status
-		countWoceFlags(cruiseData, colIndcs, processedOK);
+			// Remove the row if the PI has marked it as bad
+			if ( colIndcs.woceCO2WaterIndex >= 0 ) {
+				try {
+					int woceFlag = Integer.parseInt(dataRow.get(colIndcs.woceCO2WaterIndex));
+					if ( woceFlag == 4 ) {
+						dataVals.remove(k);
+						numRows--;
+						continue;
+					}
+				} catch (Exception ex) {
+					// Assume a missing value
+				}
+			}
+			if ( colIndcs.woceCO2AtmIndex >= 0 ) {
+				try {
+					int woceFlag = Integer.parseInt(dataRow.get(colIndcs.woceCO2AtmIndex));
+					if ( woceFlag == 4 ) {
+						dataVals.remove(k);
+						numRows--;
+						continue;
+					}
+				} catch (Exception ex) {
+					// Assume a missing value
+				}
+			}
+
+			// Row looks fine, so move on to the next row
+			k++;
+		}
 	}
 
 	/**

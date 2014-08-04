@@ -11,8 +11,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import uk.ac.uea.socat.sanitychecker.Output;
-
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -117,11 +115,7 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-		Output output = dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
-
-		// Update the reports of any issues found
-		dataStore.getCheckerMsgHandler()
-				.saveCruiseMessages(cruiseData.getExpocode(), output);
+		dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
 
 		// Save and commit the updated cruise columns
 		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
@@ -160,7 +154,6 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 					"Invalid authentication credentials");
 
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		CheckerMessageHandler msgHandler = dataStore.getCheckerMsgHandler();
 		UserFileHandler userHandler = dataStore.getUserFileHandler();
 		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
 
@@ -177,11 +170,9 @@ public class DataSpecsServiceImpl extends RemoteServiceServlet
 						"Column types for " + expocode + " updated by " + username + 
 						" from post-processing a multiple-dataset upload");
 			
-				// Run the SanityCheck on the updated cruise.
-				// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-				Output output = cruiseChecker.checkCruise(cruiseData);
-				// Update the reports of any issues found
-				msgHandler.saveCruiseMessages(expocode, output);
+				// Run the SanityCheck on the updated cruise.  Saves the SanityChecker messages,
+				// and assigns the data check status and the WOCE-3 and WOCE-4 data flags.
+				cruiseChecker.checkCruise(cruiseData);
 
 				// Save and commit the updated cruise information
 				cruiseHandler.saveCruiseInfoToFile(cruiseData, 
