@@ -1,5 +1,7 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -531,6 +534,41 @@ public class CruiseDsgNcFile extends File {
 	 */
 	public ArrayList<SocatCruiseData> getDataList() {
 		return dataList;
+	}
+
+	/**
+	 * Reads and returns the set of region IDs from the DSG file.  This DSG file
+	 * must have regions IDs assigned by Ferret, such as when saved using 
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * for the set of region IDs to be meaningful.
+	 * 
+	 * @return
+	 * 		set of region IDs for this cruise
+	 * @throws IOException
+	 * 		if there are problems opening or reading from the netCDF file
+	 * @throws IllegalArgumentException
+	 * 		if the netCDF file does not have a 'region_id' variable.
+	 */
+	public TreeSet<Character> readDataRegions() 
+								throws IOException, IllegalArgumentException {
+		TreeSet<Character> dataRegions;
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
+		try {
+			// Get the number of data points from the length of the time 1D array
+			String name = Constants.regionID_VARNAME;
+			String varName = Constants.SHORT_NAMES.get(name);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
+			dataRegions = new TreeSet<Character>();
+			for (int k = 0; k < var.getShape(0); k++)
+				dataRegions.add(dvar.get(k,0));
+		} finally {
+			ncfile.close();
+		}
+		return dataRegions;
 	}
 
 	/**

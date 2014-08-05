@@ -7,12 +7,10 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -190,21 +188,15 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Validate and get the dashboard data store
 		DashboardDataStore dataStore = validateUser(username, passhash);
 		// Get the list of saved sanity checker Message objects for this cruise
-		ArrayList<SCMessage> cruiseMsgs;
+		SCMessageList scMsgList;
 		try {
-			cruiseMsgs = dataStore.getCheckerMsgHandler()
-								  .getCruiseMessages(expocode);
+			scMsgList = dataStore.getCheckerMsgHandler()
+								 .getCruiseMessages(expocode);
 		} catch (FileNotFoundException ex) {
 			throw new IllegalArgumentException("The sanity checker " +
 					"has never been run on cruise " + expocode);
 		}
-
-		// Create the SCMessageList set of data messages for passing to the client 
-		SCMessageList scMsgList = new SCMessageList();
 		scMsgList.setUsername(username);
-		scMsgList.setExpocode(expocode);
-		scMsgList.addAll(cruiseMsgs);
-
 		return scMsgList;
 	}
 

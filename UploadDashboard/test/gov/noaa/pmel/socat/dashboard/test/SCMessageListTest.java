@@ -60,7 +60,7 @@ public class SCMessageListTest {
 	public void testHashCodeEquals() {
 		final String myUsername = "SocatUser";
 		final String myExpocode = "XXXX20140204";
-		final SCMsgType myType = SCMsgType.DATA_RANGE;
+		final SCMsgType myType = SCMsgType.DATA_BAD_VALUE;
 		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
 		final int myRowNum = 25;
 		final int myColNum = 8;

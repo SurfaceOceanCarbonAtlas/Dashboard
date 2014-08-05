@@ -771,7 +771,7 @@ public class DashboardCruiseChecker {
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
 
-		// Save the SanityChecker messages and assign WOCE flags
+		// Save the SanityChecker messages and assign WOCE flags in cruiseData
 		msgHandler.saveCruiseMessages(cruiseData, output);
 
 		// Count the rows of data with errors and only warnings, check if there 
@@ -785,7 +785,7 @@ public class DashboardCruiseChecker {
 	 * Sanity-checks and standardizes the units in the data values,
 	 * stored as strings, in the given cruise after removing data
 	 * rows with known problems as defined by 
-	 * {@link DashboardCruiseChecker#removeKnownProblemRows(DashboardCruiseWithData)}.
+	 * {@link #removeKnownProblemRows(DashboardCruiseWithData)}.
 	 * The year, month, day, hour, minute, and second data columns 
 	 * are appended to each data measurement (row, outer array) 
 	 * if not already present.

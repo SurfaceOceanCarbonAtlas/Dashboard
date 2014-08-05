@@ -8,6 +8,7 @@ import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.sql.SQLException;
@@ -151,17 +152,31 @@ public class DashboardCruiseSubmitter {
 				}
 				// Generate the NetCDF DSG file for this cruise
 				dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
-				// Update cruise with status values from cruiseData
+				// Update cruise info with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
-				// Create a SocatQCEvent for the cruise with the number of data rows with errors, warnings
+				
+				// Create a SocatQCEvent for every region of the cruise 
+				TreeSet<Character> regionsSet;
+				try {
+					regionsSet = dsgNcHandler.getDsgNcFile(expocode).readDataRegions();
+				} catch (Exception ex) {
+					throw new RuntimeException("Unexpected problems reading region IDs "
+							+ "from the newly created full-data DSG file for " + 
+							expocode + ": " + ex.getMessage());
+				}
+				regionsSet.remove(DataLocation.GLOBAL_REGION_ID);
+				ArrayList<Character> regions = new ArrayList<Character>(regionsSet.size() + 1);
+				regions.addAll(regionsSet);
+				regions.add(DataLocation.GLOBAL_REGION_ID);
+
+				// Give the number of data rows with errors, warnings as the message
 				SocatQCEvent comment = new SocatQCEvent();
-				comment.setFlag(null);
+				comment.setFlag(flag);
 				comment.setExpocode(expocode);
 				comment.setSocatVersion(cruise.getVersion());
-				comment.setRegionID('G');
 				comment.setFlagDate(new Date());
 				comment.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
@@ -172,18 +187,20 @@ public class DashboardCruiseSubmitter {
 				else {
 					recFlag = "";
 				}
-				comment.setComment(recFlag + "Automated data check, " +
-						"plus any user-provided WOCE flags, gave " + 
+				comment.setComment(recFlag + "Automated data check found " + 
 						Integer.toString(cruiseData.getNumErrorRows()) + 
 						" data points with errors and " + 
 						Integer.toString(cruiseData.getNumWarnRows()) + 
 						" data points with warnings.");
+
 				try {
-					databaseHandler.addQCEvent(comment);
+					for ( Character regionID : regions ) {
+						comment.setRegionID(regionID);
+						databaseHandler.addQCEvent(comment);
+					}
 				} catch (SQLException ex) {
-					throw new IllegalArgumentException(
-							"Unable to add a QC comment with the Sanity Checker results:\n" +
-							ex.getMessage());
+					throw new IllegalArgumentException("Unable to add a QC comment "
+							+ "with the Sanity Checker results:\n" + ex.getMessage());
 				}
 
 				// Generate the decimated-data DSG file from the full-data DSG file

@@ -14,9 +14,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  *  
  * @author Karl Smith
  */
-public class SCMessage implements Serializable, IsSerializable, Comparable<SCMessage> {
+public class SCMessage implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1658534530855896157L;
+	private static final long serialVersionUID = 4600949633806244131L;
 
 	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
 
@@ -27,9 +27,11 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 	public enum SCMsgType implements Serializable, IsSerializable {
 		UNKNOWN,
 		METADATA,
-		DATA_RANGE,
+		DATA_QUESTIONABLE_VALUE,
+		DATA_BAD_VALUE,
 		DATA_TIME,
-		DATA_SPEED,
+		DATA_QUESTIONABLE_SPEED,
+		DATA_BAD_SPEED,
 		DATA_MISSING,
 		DATA_CONSTANT,
 		DATA_JUMP,
@@ -309,79 +311,6 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 	}
 
 	@Override
-	public int compareTo(SCMessage other) {
-		if ( other == null )
-			return 1;
-		// Compare so that consecutive rows with the same message
-		// on the same column are next to each other
-		int result;
-		// First split by type
-		result = type.compareTo(other.type);
-		if ( result != 0 )
-			return result;
-		// Same type - spit by severity
-		result = severity.compareTo(other.severity);
-		if ( result != 0 )
-			return result;
-		// Same type and severity - split by explanation
-		result = explanation.compareTo(other.explanation);
-		if ( result != 0 )
-			return result;
-		// Same type, severity, and explanation - split by column name/number
-		result = colName.compareTo(other.colName);
-		if ( result != 0 )
-			return result;
-		result = colNumber - other.colNumber;
-		if ( result != 0 )
-			return result;
-		// Same type, severity, explanation, and column - split by row timestamp/latitude/longitude/number
-		result = timestamp.compareTo(other.timestamp);
-		if ( result != 0 )
-			return result;
-		// Allow some slop in latitudes to match equals
-		if ( ! Double.isNaN(latitude) ) {
-			if ( Double.isNaN(other.latitude) ) {
-				return 1;
-			}
-			if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0, MAX_ABSOLUTE_ERROR) ) {
-				if ( latitude > other.latitude )
-					return 1;
-				else
-					return -1;
-			}
-		}
-		else {
-			if ( ! Double.isNaN(other.latitude) )
-				return -1;
-		}
-		// Allow some slop in longitudes, as well as modulo 360, to match equals 
-		if ( ! Double.isNaN(longitude) ) {
-			if ( Double.isNaN(other.longitude) ) {
-				return 1;
-			}
-			if ( ! DashboardUtils.closeTo(longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) ) {
-				if ( ! DashboardUtils.closeTo(longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) ) {
-					if ( ! DashboardUtils.closeTo(longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) ) {
-						if ( longitude > other.longitude )
-							return 1;
-						else
-							return -1;
-					}
-				}
-			}
-		}
-		else {
-			if ( ! Double.isNaN(other.longitude) )
-				return -1;
-		}
-		result = rowNumber - other.rowNumber;
-		if ( result != 0 )
-			return result;
-		
-		return 0;
-	}
-
-	@Override
 	public String toString() {
 		return "SCMessage[type=" + type + ", severity=" + severity + 
 				", rowNumber=" + rowNumber + ", timestamp=" + timestamp +
@@ -391,11 +320,11 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 	}
 
 	/**
-	 * Compare using the types of the messages.
-	 * Note that this is inconsistent with SCMessage.equals 
-	 * in that this is only examining one field of SCMessage.
+	 * Compare using only the severities, types, column numbers, and row numbers of 
+	 * the messages (in that order).  Note that this is inconsistent with 
+	 * SCMessage.equals in that this is only examining four fields of SCMessage.
 	 */
-	public static Comparator<SCMessage> typeComparator = 
+	public static Comparator<SCMessage> woceTypeComparator = 
 										new Comparator<SCMessage>() {
 		@Override
 		public int compare(SCMessage msg1, SCMessage msg2) {
@@ -405,7 +334,19 @@ public class SCMessage implements Serializable, IsSerializable, Comparable<SCMes
 				return -1;
 			if ( msg2 == null )
 				return 1;
-			return msg1.getType().compareTo(msg2.getType());
+			int val = msg1.getSeverity().compareTo(msg2.getSeverity());
+			if ( val != 0 )
+				return val;
+			val = msg1.getType().compareTo(msg2.getType());
+			if ( val != 0 )
+				return val;
+			val = Integer.compare(msg1.getColNumber(), msg2.getColNumber());
+			if ( val != 0 )
+				return val;
+			val = msg1.getRowNumber() - msg2.getRowNumber();
+			if ( val != 0 )
+				return val;
+			return 0;
 		}
 	};
 
