@@ -72,9 +72,9 @@ public class CheckerMessageHandler {
 		// missing value for required data value
 		msgFragsToTypes.put("Missing required value", SCMsgType.DATA_MISSING);
 		// values constant over some number of data points
-		msgFragsToTypes.put("constant for", SCMsgType.DATA_CONSTANT);
+		msgFragsToTypes.put("Value for column is constant", SCMsgType.DATA_CONSTANT);
 		// data value markedly different from values in previous and subsequent data points
-		msgFragsToTypes.put("standard deviations", SCMsgType.DATA_JUMP);
+		msgFragsToTypes.put("standard deviations from mean", SCMsgType.DATA_OUTLIER);
 		// excessive time gap between successive data points
 		msgFragsToTypes.put("days apart", SCMsgType.DATA_GAP);
 		// metadata given in a data column is not constant
@@ -545,10 +545,11 @@ public class CheckerMessageHandler {
 					woceEvent.setComment(msgComment);
 				}
 				else if ( msgType.equals(SCMsgType.DATA_CONSTANT) ) {
-					woceEvent.setComment(msgComment);
+					woceEvent.setComment("Data values are constant over a long period of time");
 				}
-				else if ( msgType.equals(SCMsgType.DATA_JUMP) ) {
-					woceEvent.setComment(msgComment);
+				else if ( msgType.equals(SCMsgType.DATA_OUTLIER) ) {
+					int k = msgComment.indexOf("is outside") + 3;
+					woceEvent.setComment("Data values are " + msgComment.substring(k));
 				}
 				else if ( msgType.equals(SCMsgType.DATA_GAP) ) {
 					woceEvent.setComment(msgComment);

@@ -181,8 +181,10 @@ public class DashboardCruiseSubmitter {
 				}
 				regionsSet.remove(DataLocation.GLOBAL_REGION_ID);
 				ArrayList<Character> regions = new ArrayList<Character>(regionsSet.size() + 1);
-				regions.addAll(regionsSet);
+				// Add the global flag first because the database request handler 
+				// expects there to always be a global flag 
 				regions.add(DataLocation.GLOBAL_REGION_ID);
+				regions.addAll(regionsSet);
 
 				// Give the number of data rows with errors, warnings as the message
 				SocatQCEvent comment = new SocatQCEvent();
@@ -212,7 +214,7 @@ public class DashboardCruiseSubmitter {
 					}
 				} catch (SQLException ex) {
 					throw new IllegalArgumentException("Unable to add a QC comment "
-							+ "with the Sanity Checker results:\n" + ex.getMessage());
+							+ "with the data checking results:\n" + ex.getMessage());
 				}
 
 				// Generate the decimated-data DSG file from the full-data DSG file

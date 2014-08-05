@@ -34,7 +34,7 @@ public class SCMessage implements Serializable, IsSerializable {
 		DATA_BAD_SPEED,
 		DATA_MISSING,
 		DATA_CONSTANT,
-		DATA_JUMP,
+		DATA_OUTLIER,
 		DATA_GAP,
 		DATA_METADATA_NOT_SAME,
 		DATA_ERROR,
