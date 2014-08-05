@@ -351,7 +351,7 @@ public class DashboardCruiseChecker {
 					" values specified in " + configFile.getPath() + 
 					"\n    " + ex.getMessage());
 		}
-		if ( msgHandler == null )
+		if ( checkerMsgHandler == null )
 			throw new NullPointerException(
 					"CheckerMsgHandler passed to DashboardCruiseChecker is null");
 		msgHandler = checkerMsgHandler;
