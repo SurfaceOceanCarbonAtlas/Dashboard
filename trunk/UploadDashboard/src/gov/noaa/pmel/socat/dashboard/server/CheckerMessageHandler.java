@@ -82,6 +82,13 @@ public class CheckerMessageHandler {
 
 	private File filesDir;
 
+	/**
+	 * Handler for SanityChecker messages, including categorizing and making WOCE flags
+	 * and events from them.
+	 * 
+	 * @param filesDirName
+	 * 		save SanityChecker messages under this directory
+	 */
 	CheckerMessageHandler(String filesDirName) {
 		filesDir = new File(filesDirName);
 		if ( ! filesDir.isDirectory() )

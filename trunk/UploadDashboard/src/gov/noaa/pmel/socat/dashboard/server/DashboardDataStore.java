@@ -699,7 +699,7 @@ public class DashboardDataStore {
 			String computedHash = dataStore.spicedHash(username, passhash);
 			System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + 
 					DashboardUtils.cleanUsername(username) + "=" + computedHash);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(1);
 		}
