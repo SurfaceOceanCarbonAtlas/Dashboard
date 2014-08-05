@@ -6,9 +6,12 @@ package gov.noaa.pmel.socat.dashboard.server;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
+import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +20,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,13 +62,11 @@ public class CheckerMessageHandler {
 	static {
 		HashMap<String,SCMsgType> msgFragsToTypes = new HashMap<String,SCMsgType>();
 		// value outside range (warning)
-		msgFragsToTypes.put("expected range", SCMsgType.DATA_RANGE);
+		msgFragsToTypes.put("expected range", SCMsgType.DATA_QUESTIONABLE_VALUE);
 		// value outside range (error)
-		msgFragsToTypes.put("extreme range", SCMsgType.DATA_RANGE);
+		msgFragsToTypes.put("extreme range", SCMsgType.DATA_BAD_VALUE);
 		// data point times out of order
 		msgFragsToTypes.put("timestamp", SCMsgType.DATA_TIME);
-		// excessive speed between data points
-		msgFragsToTypes.put("Ship speed", SCMsgType.DATA_SPEED);
 		// missing value for required data value
 		msgFragsToTypes.put("Missing required value", SCMsgType.DATA_MISSING);
 		// values constant over some number of data points
@@ -203,6 +206,12 @@ public class CheckerMessageHandler {
 					if ( msgType.equals(SCMsgType.UNKNOWN) )
 						throw new IllegalArgumentException("No message type found " +
 								"for the data check message\n    " + checkerMsg);
+					if ( checkerMsg.contains("Ship speed") ) {
+						if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) )
+							msgType = SCMsgType.DATA_QUESTIONABLE_SPEED;
+						else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) )
+							msgType = SCMsgType.DATA_BAD_SPEED;						
+					}
 					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
 							msgType.name());
 				}
@@ -323,19 +332,22 @@ public class CheckerMessageHandler {
 	 * @param expocode
 	 * 		get messages for the cruise with this expocode
 	 * @return
-	 * 		the list of sanity checker messages for the cruise;
+	 * 		the sanity checker messages for the cruise;
 	 * 		never null, but may be empty if there were no sanity
 	 * 		checker messages for the cruise.
+	 * 		The expocode, but not the username, will be assigned 
+	 * 		in the returned SCMessageList
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid, or 
 	 * 		if the messages file is invalid
 	 * @throws FileNotFoundException
 	 * 		if there is no messages file for the cruise
 	 */
-	public ArrayList<SCMessage> getCruiseMessages(String expocode) 
+	public SCMessageList getCruiseMessages(String expocode) 
 					throws IllegalArgumentException, FileNotFoundException {
 		// Create the list of messages to be returned
-		ArrayList<SCMessage> msgList = new ArrayList<SCMessage>();
+		SCMessageList msgList = new SCMessageList();
+		msgList.setExpocode(expocode);
 		// Read the cruise messages file
 		File msgsFile = cruiseMsgsFile(expocode);
 		BufferedReader msgReader;
@@ -433,6 +445,132 @@ public class CheckerMessageHandler {
 		}
 
 		return msgList;
+	}
+
+	/**
+	 * Generates a list of SocatWoceEvents to to be submitted from the saved cruise
+	 * messages as well as PI-provided WOCE flags.
+	 * 
+	 * @param cruiseData
+	 * 		get the list of SocatWoceEvents for this cruise
+	 * @return
+	 * 		the list of SocatWoceEvents for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if the expocode in cruiseData is invalid, or 
+	 * 		if the messages file is invalid
+	 * @throws FileNotFoundException
+	 * 		if there is no messages file for the cruise
+	 */
+	public ArrayList<SocatWoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData) 
+						throws IllegalArgumentException, FileNotFoundException {
+		// Get the SanityChecker messages and sort for assigning WOCE flags
+		String expocode = cruiseData.getExpocode();
+		ArrayList<SCMessage> orderedMsgs = new ArrayList<SCMessage>(getCruiseMessages(expocode));
+		Collections.sort(orderedMsgs, SCMessage.woceTypeComparator);
+
+		ArrayList<SocatWoceEvent> woceList = new ArrayList<SocatWoceEvent>();
+		SCMsgType lastType = SCMsgType.UNKNOWN;
+		SCMsgSeverity lastSeverity = SCMsgSeverity.UNKNOWN;
+		int lastColNum = 0;
+		ArrayList<DataLocation> locations = null;
+		for ( SCMessage msg : orderedMsgs ) {
+			SCMsgType msgType = msg.getType();
+			if ( msgType.equals(SCMsgType.UNKNOWN) || msgType.equals(SCMsgType.METADATA) ) 
+				continue;
+
+			SCMsgSeverity severity = msg.getSeverity();
+			if ( severity.equals(SCMsgSeverity.UNKNOWN) )
+				continue;
+
+			int rowNum = msg.getRowNumber();
+			if ( rowNum <= 0 )
+				continue;
+
+			// if no specific column associated with this message, the column number is -1
+			int colNum = msg.getColNumber();
+			if ( colNum == 0 )
+				continue;
+
+			// Check if a new WOCE event is needed
+			if ( ( ! msgType.equals(lastType) ) || 
+				 ( ! severity.equals(lastSeverity) ) ||
+				 ( colNum != lastColNum ) ) {
+				SocatWoceEvent woceEvent = new SocatWoceEvent();
+				woceEvent.setExpocode(expocode);
+				woceEvent.setSocatVersion(cruiseData.getVersion());
+				woceEvent.setFlagDate(new Date());
+				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+				if ( colNum > 0 )
+					woceEvent.setColumnName(cruiseData.getUserColNames().get(colNum-1));
+
+				if ( severity.equals(SCMsgSeverity.ERROR) )
+					woceEvent.setFlag('4');
+				else if ( severity.equals(SCMsgSeverity.WARNING) )
+					woceEvent.setFlag('3');
+				else
+					throw new RuntimeException("Unexpected message severity of " + severity.toString());
+
+				// TODO: need better code to generate a reasonable generic explanation
+				String msgComment = msg.getExplanation();
+				if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) ) {
+					int k = msgComment.indexOf("expected range");
+					woceEvent.setComment("Value is not within the " + msgComment.substring(k));
+				}
+				else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) ) {
+					int k = msgComment.indexOf("extreme range");
+					woceEvent.setComment("Value is not within the " + msgComment.substring(k));
+				}
+				else if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) ) {
+					int k = msgComment.indexOf("expected range");
+					woceEvent.setComment("Calculated ship speed is not within the " + msgComment.substring(k));
+				}
+				else if ( msgType.equals(SCMsgType.DATA_BAD_SPEED) ) {
+					int k = msgComment.indexOf("extreme range");
+					woceEvent.setComment("Calculated ship speed is not within the " + msgComment.substring(k));
+				}
+				else if ( msgType.equals(SCMsgType.DATA_TIME) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_MISSING) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_CONSTANT) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_JUMP) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_GAP) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_ERROR) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else
+					throw new RuntimeException("Unexpected message type of " + msgType.toString());
+
+				locations = new ArrayList<DataLocation>();
+				woceEvent.setLocations(locations);
+
+				woceList.add(woceEvent);
+				lastType = msgType;
+				lastSeverity = severity;
+				lastColNum = colNum;
+			}
+
+			// Add this location to the current WOCE event
+			DataLocation dataLoc = new DataLocation();
+			dataLoc.setRowNumber(rowNum);
+			// dataLoc.setDataDate(dataDate);
+			// dataLoc.setDataValue(dataValue);
+			// dataLoc.setLatitude(latitude);
+			// dataLoc.setLongitude(longitude);
+			// dataLoc.setRegionID(regionID);
+
+			locations.add(dataLoc);
+		}
+		return woceList;
 	}
 
 }
