@@ -108,6 +108,7 @@ public class DashboardCruiseSubmitter {
 				 qcStatus.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) || 
 				 qcStatus.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
 				 qcStatus.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) {
+
 				// QC flag to assign with this cruise
 				Character flag;
 				if ( (qcFlag != null) && ! qcFlag.isEmpty() ) {
@@ -124,14 +125,21 @@ public class DashboardCruiseSubmitter {
 					flag = SocatQCEvent.QC_UPDATED_FLAG;
 					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
 				}
+
 				// Get the complete original cruise data
 				DashboardCruiseWithData cruiseData = 
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-				// Convert the cruise data into standard units after removing
-				// data lines with missing values for longitude, latitude, date, 
-				// time, or timestamp, or which the PI has marked as bad.
-				// Note: this saves messages and assigns WOCE flags with row 
-				// numbers of the trimmed data.
+
+				/*
+				 *  Convert the cruise data into standard units after removing 
+				 *  data lines with missing values for longitude, latitude, date, 
+				 *  time, or timestamp, or which the PI has marked as bad.  
+				 *  Also adds and assigns year, month, day, hour, minute, second, 
+				 *  and WOCE columns if not present.  SanityChecker WOCE-4 flags
+				 *  are added to the WOCE column.
+				 *  Note: this saves messages and assigns WOCE flags with row 
+				 *  numbers of the trimmed data.
+				 */
 				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 					errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
 					continue;
@@ -141,6 +149,7 @@ public class DashboardCruiseSubmitter {
 							"detected longitude, latitude, date, or time value errors");
 					continue;
 				}
+
 				// Get the OME metadata for this cruise
 				OmeMetadata omeMData = new OmeMetadata(
 						metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
@@ -150,8 +159,11 @@ public class DashboardCruiseSubmitter {
 					TreeSet<String> addlDocsSet = cruiseData.getAddlDocs();
 					addlDocsSet.addAll(Arrays.asList(addlDocs.split(" ; ")));
 				}
-				// Generate the NetCDF DSG file for this cruise
+
+				// Generate the NetCDF DSG file, enhanced by Ferret, for this 
+				// possibly modified and WOCEd cruise data
 				dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
+
 				// Update cruise info with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
