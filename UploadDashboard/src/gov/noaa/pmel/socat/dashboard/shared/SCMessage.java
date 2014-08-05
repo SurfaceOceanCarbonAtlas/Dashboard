@@ -36,6 +36,7 @@ public class SCMessage implements Serializable, IsSerializable {
 		DATA_CONSTANT,
 		DATA_JUMP,
 		DATA_GAP,
+		DATA_METADATA_NOT_SAME,
 		DATA_ERROR,
 	}
 

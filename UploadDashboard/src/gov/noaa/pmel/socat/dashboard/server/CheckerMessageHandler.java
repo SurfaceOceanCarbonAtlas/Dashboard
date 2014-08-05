@@ -62,11 +62,13 @@ public class CheckerMessageHandler {
 	static {
 		HashMap<String,SCMsgType> msgFragsToTypes = new HashMap<String,SCMsgType>();
 		// value outside range (warning)
-		msgFragsToTypes.put("expected range", SCMsgType.DATA_QUESTIONABLE_VALUE);
+		msgFragsToTypes.put("outside the expected range", SCMsgType.DATA_QUESTIONABLE_VALUE);
 		// value outside range (error)
-		msgFragsToTypes.put("extreme range", SCMsgType.DATA_BAD_VALUE);
+		msgFragsToTypes.put("outside the extreme range", SCMsgType.DATA_BAD_VALUE);
+		// ship speed is excessive - either warning or error
+		msgFragsToTypes.put("Ship speed between measurements", SCMsgType.DATA_QUESTIONABLE_SPEED);
 		// data point times out of order
-		msgFragsToTypes.put("timestamp", SCMsgType.DATA_TIME);
+		msgFragsToTypes.put("The timestamp is either before or identical", SCMsgType.DATA_TIME);
 		// missing value for required data value
 		msgFragsToTypes.put("Missing required value", SCMsgType.DATA_MISSING);
 		// values constant over some number of data points
@@ -75,6 +77,8 @@ public class CheckerMessageHandler {
 		msgFragsToTypes.put("standard deviations", SCMsgType.DATA_JUMP);
 		// excessive time gap between successive data points
 		msgFragsToTypes.put("days apart", SCMsgType.DATA_GAP);
+		// metadata given in a data column is not constant
+		msgFragsToTypes.put("Value for column has changed", SCMsgType.DATA_METADATA_NOT_SAME);
 		// unexpected exception not handled
 		msgFragsToTypes.put("Unhandled exception", SCMsgType.DATA_ERROR);
 		MSG_FRAGMENT_TO_TYPE_SET = msgFragsToTypes.entrySet();
@@ -197,6 +201,16 @@ public class CheckerMessageHandler {
 				// Message string should never be null
 				String checkerMsg = msg.getMessage();
 
+				int severityInt = msg.getSeverity();
+				if ( severityInt == Message.ERROR ) {
+					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
+							SCMsgSeverity.ERROR.name());
+				}
+				else if ( severityInt == Message.WARNING ) {
+					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
+							SCMsgSeverity.WARNING.name());
+				}
+
 				int msgTypeInt = msg.getMessageType();
 				if ( msgTypeInt == Message.DATA_MESSAGE ) {
 					SCMsgType msgType = SCMsgType.UNKNOWN;
@@ -213,28 +227,16 @@ public class CheckerMessageHandler {
 					if ( msgType.equals(SCMsgType.UNKNOWN) )
 						throw new IllegalArgumentException("No message type found " +
 								"for the data check message\n    " + checkerMsg);
-					if ( checkerMsg.contains("Ship speed") ) {
-						if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) )
-							msgType = SCMsgType.DATA_QUESTIONABLE_SPEED;
-						else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) )
-							msgType = SCMsgType.DATA_BAD_SPEED;						
-					}
+					// Resolve whether speed speed was a warning or an error
+					if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) && 
+						 (severityInt == Message.ERROR) )
+						msgType = SCMsgType.DATA_BAD_SPEED;
 					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
 							msgType.name());
 				}
 				else if ( msgTypeInt == Message.METADATA_MESSAGE ) {
 					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
 							SCMsgType.METADATA.name());
-				}
-
-				int severityInt = msg.getSeverity();
-				if ( severityInt == Message.ERROR ) {
-					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
-							SCMsgSeverity.ERROR.name());
-				}
-				else if ( severityInt == Message.WARNING ) {
-					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
-							SCMsgSeverity.WARNING.name());
 				}
 
 				int rowNum = msg.getLineNumber();
@@ -521,20 +523,20 @@ public class CheckerMessageHandler {
 				// TODO: need better code to generate a reasonable generic explanation
 				String msgComment = msg.getExplanation();
 				if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) ) {
-					int k = msgComment.indexOf("expected range");
-					woceEvent.setComment("Value is not within the " + msgComment.substring(k));
+					int k = msgComment.indexOf("outside the expected range");
+					woceEvent.setComment("Value is " + msgComment.substring(k));
 				}
 				else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) ) {
-					int k = msgComment.indexOf("extreme range");
-					woceEvent.setComment("Value is not within the " + msgComment.substring(k));
+					int k = msgComment.indexOf("outside the extreme range");
+					woceEvent.setComment("Value is " + msgComment.substring(k));
 				}
 				else if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) ) {
-					int k = msgComment.indexOf("expected range");
-					woceEvent.setComment("Calculated ship speed is not within the " + msgComment.substring(k));
+					int k = msgComment.indexOf("should be");
+					woceEvent.setComment("Calculated ship speed is excessive; " + msgComment.substring(k));
 				}
 				else if ( msgType.equals(SCMsgType.DATA_BAD_SPEED) ) {
-					int k = msgComment.indexOf("extreme range");
-					woceEvent.setComment("Calculated ship speed is not within the " + msgComment.substring(k));
+					int k = msgComment.indexOf("should be");
+					woceEvent.setComment("Calculated ship speed is unreasonable; " + msgComment.substring(k));
 				}
 				else if ( msgType.equals(SCMsgType.DATA_TIME) ) {
 					woceEvent.setComment(msgComment);
@@ -549,6 +551,9 @@ public class CheckerMessageHandler {
 					woceEvent.setComment(msgComment);
 				}
 				else if ( msgType.equals(SCMsgType.DATA_GAP) ) {
+					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_METADATA_NOT_SAME) ) {
 					woceEvent.setComment(msgComment);
 				}
 				else if ( msgType.equals(SCMsgType.DATA_ERROR) ) {
