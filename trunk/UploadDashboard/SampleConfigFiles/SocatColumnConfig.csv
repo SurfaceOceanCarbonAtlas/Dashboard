@@ -92,9 +92,9 @@ sec_of_day,N,,D,,,Y,,,0,86400,F,G
 longitude,Y,,D,,,Y,,,-360,360,C,B
 latitude,Y,,D,,,Y,,,-90,90,C,B
 sample_depth,N,,D,,,Y,-10,10,-20,20,F,G
-salinity,N,,D,,,Y,0,42,0,45,F,G
+salinity,N,,D,,,Y,0,42,0,50,F,G
 T_equ,N,,D,,,Y,-5,40,-10,45,F,G
-SST,N,,D,,,Y,-5,40,-15,50,F,G
+SST,N,,D,,,Y,-5,40,-8,50,F,G
 Temperature_atm,N,,D,,,Y,-25,50,-35,60,F,G
 P_equ,N,,D,,,Y,900,1100,800,1200,F,G
 Pressure_atm,N,,D,,,Y,900,1100,800,1200,F,G
