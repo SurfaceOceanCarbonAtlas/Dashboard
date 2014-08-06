@@ -955,52 +955,55 @@ public class SocatCruiseReporter {
 			System.exit(1);
 		}
 
-		SocatCruiseReporter reporter = null;
+		DashboardDataStore dataStore = null;
 		try {
-			reporter = new SocatCruiseReporter(
-					DashboardDataStore.get().getDsgNcFileHandler());
+			dataStore = DashboardDataStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
-
-		if ( multicruise ) {
-			try {
-				ArrayList<String> warnMsgs = 
-						reporter.generateReport(expocodes, regionID, destFile);
-				if ( warnMsgs.size() > 0 ) {
-					System.err.println("Warnings: ");
-					for ( String msg : warnMsgs )
-						System.err.println(msg);
-				}
-			} catch (Exception ex) {
-				System.err.println("Problems generating the multi-cruise report: " + 
-						ex.getMessage());
-				ex.printStackTrace();
-				System.exit(1);
-			}
-		}
-		else {
-			for ( String expo : expocodes ) {
-				File reportFile = new File(destFile, 
-											"SOCAT_" + expo + "_report.txt");
+		try {
+			SocatCruiseReporter reporter = new SocatCruiseReporter(dataStore.getDsgNcFileHandler());
+			if ( multicruise ) {
 				try {
 					ArrayList<String> warnMsgs = 
-							reporter.generateReport(expo, reportFile);
+							reporter.generateReport(expocodes, regionID, destFile);
 					if ( warnMsgs.size() > 0 ) {
-						System.err.println("Warnings for " + expo + ": ");
+						System.err.println("Warnings: ");
 						for ( String msg : warnMsgs )
-							System.err.println(expo + ": " + msg);
+							System.err.println(msg);
 					}
 				} catch (Exception ex) {
-					System.err.println("Problems generating the single cruise " +
-							"report " + reportFile.getPath() + ": " + ex.getMessage());
+					System.err.println("Problems generating the multi-cruise report: " + 
+							ex.getMessage());
 					ex.printStackTrace();
 					System.exit(1);
 				}
 			}
+			else {
+				for ( String expo : expocodes ) {
+					File reportFile = new File(destFile, 
+							"SOCAT_" + expo + "_report.txt");
+					try {
+						ArrayList<String> warnMsgs = 
+								reporter.generateReport(expo, reportFile);
+						if ( warnMsgs.size() > 0 ) {
+							System.err.println("Warnings for " + expo + ": ");
+							for ( String msg : warnMsgs )
+								System.err.println(expo + ": " + msg);
+						}
+					} catch (Exception ex) {
+						System.err.println("Problems generating the single cruise " +
+								"report " + reportFile.getPath() + ": " + ex.getMessage());
+						ex.printStackTrace();
+						System.exit(1);
+					}
+				}
+			}
+		} finally {
+			dataStore.shutdown();
 		}
 
 		System.exit(0);

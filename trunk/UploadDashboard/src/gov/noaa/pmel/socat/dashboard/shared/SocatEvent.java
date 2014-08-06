@@ -15,12 +15,12 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -8623810089759833896L;
+	private static final long serialVersionUID = -1364838885216102670L;
 
 	Character flag;
 	Date flagDate;
 	String expocode;
-	Double socatVersion;
+	String socatVersion;
 	String username;
 	String realname;
 	String comment;
@@ -32,7 +32,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 		flag = SocatCruiseData.CHAR_MISSING_VALUE;
 		flagDate = SocatMetadata.DATE_MISSING_VALUE;
 		expocode = "";
-		socatVersion = 0.0;
+		socatVersion = "";
 		username = "";
 		realname = "";
 		comment = "";
@@ -98,19 +98,19 @@ public class SocatEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the SOCAT version; never null but may be zero
+	 * 		the SOCAT version; never null but may be empty
 	 */
-	public Double getSocatVersion() {
+	public String getSocatVersion() {
 		return socatVersion;
 	}
 
 	/**
 	 * @param socatVersion 
-	 * 		the SOCAT version to set; if null or negative, zero is assigned
+	 * 		the SOCAT version to set; if null, an empty string is assigned
 	 */
-	public void setSocatVersion(Double socatVersion) {
-		if ( (socatVersion == null) || (socatVersion < 0.0) )
-			this.socatVersion = 0.0;
+	public void setSocatVersion(String socatVersion) {
+		if ( socatVersion == null )
+			this.socatVersion = "";
 		else
 			this.socatVersion = socatVersion;
 	}
@@ -176,9 +176,9 @@ public class SocatEvent implements Serializable, IsSerializable {
 	public int hashCode() {
 		final int prime = 37;
 		int result = flag.hashCode();
-		result = result * prime + expocode.hashCode();
-		// Ignore socatVersion as it is floating point and does not have to be exact
 		result = result * prime + flagDate.hashCode();
+		result = result * prime + expocode.hashCode();
+		result = result * prime + socatVersion.hashCode();
 		result = result * prime + username.hashCode();
 		result = result * prime + realname.hashCode();
 		result = result * prime + comment.hashCode();
@@ -196,19 +196,19 @@ public class SocatEvent implements Serializable, IsSerializable {
 			return false;
 		SocatEvent other = (SocatEvent) obj;
 
-		if ( ! flagDate.equals(other.flagDate) )
-			return false;
 		if ( ! flag.equals(other.flag) )
 			return false;
+		if ( ! flagDate.equals(other.flagDate) )
+			return false;
 		if ( ! expocode.equals(other.expocode) )
+			return false;
+		if ( ! socatVersion.equals(other.socatVersion) )
 			return false;
 		if ( ! username.equals(other.username) )
 			return false;
 		if ( ! realname.equals(other.realname) )
 			return false;
 		if ( ! comment.equals(other.comment) )
-			return false;
-		if ( ! DashboardUtils.closeTo(socatVersion, other.socatVersion, 0.0, 1.0E-3) )
 			return false;
 
 		return true;
@@ -218,9 +218,9 @@ public class SocatEvent implements Serializable, IsSerializable {
 	public String toString() {
 		return "SocatEvent" +
 				"[\n    flag='" + flag.toString() + "'" +
+				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 
-				",\n    flagDate=" + flagDate.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 
 				",\n    comment=" + comment + 

@@ -356,7 +356,7 @@ public class DatabaseRequestHandler {
 			else
 				addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			addPrepStmt.setString(3, qcEvent.getExpocode());
-			addPrepStmt.setDouble(4, qcEvent.getSocatVersion());
+			addPrepStmt.setString(4, qcEvent.getSocatVersion());
 			addPrepStmt.setString(5, qcEvent.getRegionID().toString());
 			addPrepStmt.setInt(6, reviewerId);
 			addPrepStmt.setString(7, qcEvent.getComment());
@@ -466,7 +466,7 @@ public class DatabaseRequestHandler {
 		if ( results.wasNull() )
 			qcEvent.setFlagDate(null);
 		qcEvent.setExpocode(results.getString("expocode"));
-		qcEvent.setSocatVersion(results.getDouble("socat_version"));
+		qcEvent.setSocatVersion(results.getString("socat_version"));
 		if ( results.wasNull() )
 			qcEvent.setSocatVersion(null);
 		try {
@@ -544,7 +544,7 @@ public class DatabaseRequestHandler {
 			else
 				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			prepStmt.setString(3, woceEvent.getExpocode());
-			prepStmt.setDouble(4, woceEvent.getSocatVersion());
+			prepStmt.setString(4, woceEvent.getSocatVersion());
 			prepStmt.setString(5, woceEvent.getColumnName());
 			prepStmt.setInt(6, reviewerId);
 			prepStmt.setString(7, woceEvent.getComment());
@@ -632,7 +632,7 @@ public class DatabaseRequestHandler {
 		if ( results.wasNull() )
 			woceEvent.setFlagDate(null);
 		woceEvent.setExpocode(results.getString("expocode"));
-		woceEvent.setSocatVersion(results.getDouble("socat_version"));
+		woceEvent.setSocatVersion(results.getString("socat_version"));
 		if ( results.wasNull() )
 			woceEvent.setSocatVersion(null);
 		woceEvent.setColumnName(results.getString("data_name"));

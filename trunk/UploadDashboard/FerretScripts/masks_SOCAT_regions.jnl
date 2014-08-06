@@ -13,13 +13,24 @@
 !
 ! This script writes the SOCAT 2 mask on the grid of etopo5, lon in -180:180
 ! and lat in -90:90. 
-
+!
+! The masks should not include tests such as xx LE 180; these result in
+! results of 0 right at 180 or -180.
 
 ! Set up
 set memory /size=100
 
 ! variables based on etopo20
 use etopo20.cdf
+
+! Define new y axis with coordinates at -90 and 90 so that the SAMPLEXY_CLOSEST
+! function will return values even if the data is very near the poles. The function
+! doesn't return a value if the sample latitude is above the last coordinate location.
+
+define axis/y=-90:90/npoints=541/units=degrees_north yfull
+set var/name=rose_in rose
+let rose = rose_in[gy=yfull@nrst]
+set att/like=rose_in rose
 
 ! SOCAT regions, from the database requests
 ! 
@@ -82,7 +93,6 @@ let dist2landrose = dist2land[g=rose[d=1],x=`xm180`:180]
 
 LET oceanmask = if dist2landrose GT 0 then 1
 
-
 ! SOCAT regions are drawn for /X=-180:540 to ensure coverage
 ! if the Ferret region drawn changes.
 
@@ -134,9 +144,9 @@ let na_all = oceanmask*(na1+na2+na3+na4+na5)
 
 let arcx1 = if xx gt -100 and xx le 43 then oceanmask else zero
 let arcy1 = if yy gt 70 and yy le 90 then oceanmask else zero
-let arcx2 = if xx gt -180 and xx le -100 then oceanmask else zero
+let arcx2 = if xx le -100 then oceanmask else zero
 let arcy2 = if yy gt 66 and yy le 90 then oceanmask else zero
-let arcx3 = if xx gt 43 and xx le 180 then oceanmask else zero
+let arcx3 = if xx gt 43 then oceanmask else zero
 let arcy3 = if yy gt 66 and yy le 90 then oceanmask else zero
 
 let arc1 = arcx1*arcy1
@@ -179,9 +189,9 @@ let/title="Indian Ocean Mask" Indian = if ind_all then 5 else 0
 
 
 
-let npacx1 = if xx gt 106 and xx le 180 then oceanmask else zero
+let npacx1 = if xx gt 106 then oceanmask else zero
 let npacy1 = if yy gt 30 and yy le 90 then oceanmask else zero
-let npacx2 = if xx gt -180 and xx le -105 then oceanmask else zero
+let npacx2 = if xx le -105 then oceanmask else zero
 let npacy2 = if yy gt 30 and yy le 90 then oceanmask else zero
 
 let npac1 = npacx1*npacy1
@@ -202,10 +212,10 @@ let/title="North Pacific Mask" npacific = (if npac_all gt 0 and arc_all eq 0 the
 ! | T         |     -5 |    100 |     30 |    180 |           17 |
 ! | T         |    -30 |    130 |     -5 |    180 |           18 |
 
-let tpacx1 = if xx gt -180 and xx le -100 then oceanmask else zero
+let tpacx1 = if xx le -100 then oceanmask else zero
 let tpacy1 = if yy gt -5 and yy le 30 then oceanmask else zero
 
-let tpacx2 = if xx gt -180 and xx le -68 then oceanmask else zero
+let tpacx2 = if xx le -68 then oceanmask else zero
 let tpacy2 = if yy gt -30 and yy le -5 then oceanmask else zero
 
 let tpacx3 = if xx gt -100 and xx le -68 then oceanmask else zero
@@ -214,10 +224,10 @@ let tpacy3 = if yy gt -5 and yy le 5 then oceanmask else zero
 let tpacx4 = if xx gt -100 and xx le -84 then oceanmask else zero
 let tpacy4 = if yy gt  5 and yy le 18 then oceanmask else zero
 
-let tpacx5 = if xx gt 100 and xx le 180 then oceanmask else zero
+let tpacx5 = if xx gt 100 then oceanmask else zero
 let tpacy5 = if yy gt -5 and yy le 30 then oceanmask else zero
 
-let tpacx6 = if xx gt 130 and xx le 180 then oceanmask else zero
+let tpacx6 = if xx gt 130 then oceanmask else zero
 let tpacy6 = if yy gt -30 and yy le -5 then oceanmask else zero
 
 let tpac1 = tpacx1*tpacy1
@@ -279,6 +289,7 @@ let/title="Coastal mask" coast = if coast_all then 12 else 0
 
 
 ! Check
+
 shade/pal=ten_by_levels/lev=(1,11,1) npacific; go land; pause
 shade/pal=ten_by_levels/lev=(1,11,1) tpacific; go land; pause
 shade/pal=ten_by_levels/lev=(1,11,1) south; go land; pause

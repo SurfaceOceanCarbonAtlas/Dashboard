@@ -537,17 +537,18 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Reads and returns the set of region IDs from the DSG file.  This DSG file
-	 * must have regions IDs assigned by Ferret, such as when saved using 
+	 * Reads and returns the set of region IDs from this DSG file.  
+	 * This DSG file must have regions IDs assigned by Ferret, such 
+	 * as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the set of region IDs to be meaningful.
 	 * 
 	 * @return
 	 * 		set of region IDs for this cruise
 	 * @throws IOException
-	 * 		if there are problems opening or reading from the netCDF file
+	 * 		if there are problems opening or reading from this DSG file
 	 * @throws IllegalArgumentException
-	 * 		if the netCDF file does not have a 'region_id' variable.
+	 * 		if this DSG file does not have a 'region_id' variable.
 	 */
 	public TreeSet<Character> readDataRegions() 
 								throws IOException, IllegalArgumentException {
@@ -563,8 +564,13 @@ public class CruiseDsgNcFile extends File {
 						varName + "' in " + getName());
 			ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
 			dataRegions = new TreeSet<Character>();
-			for (int k = 0; k < var.getShape(0); k++)
-				dataRegions.add(dvar.get(k,0));
+			for (int k = 0; k < var.getShape(0); k++) {
+				char value = dvar.get(k,0);
+				if ( value == (char) 0 )
+					dataRegions.add(SocatCruiseData.CHAR_MISSING_VALUE);
+				else
+					dataRegions.add(value);
+			}
 		} finally {
 			ncfile.close();
 		}

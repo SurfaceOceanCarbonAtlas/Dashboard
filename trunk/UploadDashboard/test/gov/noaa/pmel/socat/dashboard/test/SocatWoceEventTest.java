@@ -27,7 +27,7 @@ public class SocatWoceEventTest {
 
 	private static final Character MY_WOCE_FLAG = '3';
 	private static final String MY_EXPOCODE = "26NA20140427";
-	private static final Double MY_SOCAT_VERSION = 3.0;
+	private static final String MY_SOCAT_VERSION = "3.0";
 	private static final String MY_COLUMN_NAME = "SLP";
 	private static final ArrayList<DataLocation> MY_LOCATIONS;
 	static {
@@ -90,13 +90,13 @@ public class SocatWoceEventTest {
 	@Test
 	public void testGetSetSocatVersion() {
 		SocatWoceEvent myflag = new SocatWoceEvent();
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		myflag.setSocatVersion(MY_SOCAT_VERSION);
-		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setSocatVersion(null);
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getColumnName());
 		myflag.setColumnName(MY_COLUMN_NAME);
 		assertEquals(MY_COLUMN_NAME, myflag.getColumnName());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setColumnName(null);
@@ -127,7 +127,7 @@ public class SocatWoceEventTest {
 		myflag.setLocations(MY_LOCATIONS);
 		assertEquals(MY_LOCATIONS, myflag.getLocations());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setLocations(null);
@@ -146,7 +146,7 @@ public class SocatWoceEventTest {
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setFlagDate(null);
@@ -166,7 +166,7 @@ public class SocatWoceEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setUsername(null);
@@ -187,7 +187,7 @@ public class SocatWoceEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setRealname(null);
@@ -209,7 +209,7 @@ public class SocatWoceEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
 		assertEquals("", myflag.getColumnName());
-		assertEquals(0.0, myflag.getSocatVersion(), 1.0E-6);
+		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
 		myflag.setComment(null);
@@ -245,8 +245,7 @@ public class SocatWoceEventTest {
 		assertTrue( myflag.equals(otherflag) );
 
 		myflag.setSocatVersion(MY_SOCAT_VERSION);
-		// socatVersion is ignored in the hash code
-		assertTrue( myflag.hashCode() == otherflag.hashCode() );
+		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
 		otherflag.setSocatVersion(MY_SOCAT_VERSION);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );

@@ -66,15 +66,15 @@ public class DashboardCruiseWithDataTest {
 	 */
 	@Test
 	public void testSetGetVersion() {
-		Double myVersion = 3.0;
+		String myVersion = "3.0";
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 		cruiseData.setVersion(myVersion);
 		assertEquals(myVersion, cruiseData.getVersion());
 		assertEquals("", cruiseData.getUploadFilename());
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setVersion(null);
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 	}
 
 	/**
@@ -88,7 +88,7 @@ public class DashboardCruiseWithDataTest {
 		assertEquals("", cruiseData.getExpocode());
 		cruiseData.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruiseData.getExpocode());
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 		assertEquals("", cruiseData.getUploadFilename());
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setExpocode(null);
@@ -112,7 +112,7 @@ public class DashboardCruiseWithDataTest {
 		cruiseData.setPreamble(myPreamble);
 		assertEquals(myPreamble, cruiseData.getPreamble());
 		assertEquals("", cruiseData.getExpocode());
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 		assertEquals("", cruiseData.getUploadFilename());
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setPreamble(null);
@@ -148,7 +148,7 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(dataValues, cruiseData.getDataValues());
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 		assertEquals("", cruiseData.getUploadFilename());
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setDataValues(null);
@@ -180,7 +180,7 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(0, cruiseData.getDataValues().size());
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 		assertEquals("", cruiseData.getUploadFilename());
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setWoceThreeRowIndices(null);
@@ -213,7 +213,7 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(0, cruiseData.getDataValues().size());
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals("", cruiseData.getExpocode());
-		assertEquals(0.0, cruiseData.getVersion(), 1.0E-6);
+		assertEquals("", cruiseData.getVersion());
 		assertEquals("", cruiseData.getUploadFilename());
 		assertEquals("", cruiseData.getOwner());
 		cruiseData.setWoceFourRowIndices(null);
@@ -228,7 +228,7 @@ public class DashboardCruiseWithDataTest {
 	public void testHashCodeEquals() {
 		String myOwner = "SocatUser";
 		String myFilename = "agsk20031205_revised.tsv";
-		Double myVersion = 3.0;
+		String myVersion = "3.0";
 		String myExpocode = "AGSK20031205";
 		ArrayList<String> myPreamble = new ArrayList<String>(Arrays.asList(
 				"Cruise Expocode: AGSK20031205",
