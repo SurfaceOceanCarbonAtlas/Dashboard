@@ -1149,6 +1149,8 @@ public class DashboardCruiseChecker {
 			// Row looks fine, so move on to the next row
 			k++;
 		}
+		// Reset the record number of data rows
+		cruiseData.setNumDataRows(numRows);
 	}
 
 	/**
