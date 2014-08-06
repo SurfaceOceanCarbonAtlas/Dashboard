@@ -16,6 +16,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -290,6 +291,33 @@ public class DsgNcFileHandler {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Reads and returns the set of region IDs from the DSG file for the given 
+	 * cruise.  This DSG file must have regions IDs assigned by Ferret, such as 
+	 * when saved using 
+	 * {@link #saveCruise(OmeMetadata, DashboardCruiseWithData, String)},
+	 * for the set of region IDs to be meaningful.
+	 * 
+	 * @param expocode
+	 * 		get the region IDs for the cruise with this expocode
+	 * @return
+	 * 		set of region IDs for the indicated cruise
+	 * @throws FileNotFoundException
+	 * 		if the full-data DSG file does not exist
+	 * @throws IOException
+	 * 		if there are problems opening or reading from the DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file does not have a 'region_id' variable.
+	 */
+	public TreeSet<Character> readDataRegions(String expocode) 
+			throws IllegalArgumentException, FileNotFoundException, IOException {
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.exists() )
+			throw new FileNotFoundException("Full data DSG file for " + 
+					expocode + " does not exist");
+		return dsgFile.readDataRegions();
 	}
 
 	/**

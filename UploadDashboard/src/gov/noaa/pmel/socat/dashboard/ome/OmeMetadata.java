@@ -32,8 +32,8 @@ import org.jdom2.input.SAXBuilder;
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 8071671406430066418L;
-	
+	private static final long serialVersionUID = -1067887166640615236L;
+
 	public static final String CONFLICT_STRING = "%%CONFLICT%%";
 
 	private static final SimpleDateFormat DATE_PARSER = 
@@ -1054,7 +1054,7 @@ public class OmeMetadata extends DashboardMetadata {
 	 * @return
 	 *		created SocatMetadata object 
 	 */
-	public SocatMetadata createSocatMetadata(Double socatVersion, 
+	public SocatMetadata createSocatMetadata(String socatVersion, 
 			Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
 		
 		// We cannot create a SocatMetadata object if there are conflicts

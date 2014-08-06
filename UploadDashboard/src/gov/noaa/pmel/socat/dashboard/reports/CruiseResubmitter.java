@@ -9,6 +9,8 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -79,20 +81,29 @@ public class CruiseResubmitter {
 	 * 		Username - name of the dashboard (admin) user requesting this update.
 	 */
 	public static void main(String[] args) {
-		if ( args.length != 1 ) {
-			System.err.println("Arguments:  Username");
+		if ( (args.length < 1) || (args.length > 2) ) {
+			System.err.println("Arguments:  Username  [ ExpocodesFile ]");
 			System.err.println();
-			System.err.println("Rechecks all cruises, and resubmits all cruises that had been submitted, ");
-			System.err.println("in the default dashboard configuration.  Resubmitted cruises will have a ");
-			System.err.println("QC status of 'U' (updated). ");
+			System.err.println("Rechecks all cruises, or those specified in ExpocodesFile if given. ");
+			System.err.println("Resubmits all cruises that had been submitted.  Resubmitted cruises ");
+			System.err.println("will have a QC status of 'U' (updated).  The default dashboard ");
+			System.err.println("configuration is used for this recheck and resubmit process. ");
 			System.err.println();
-			System.err.println("Username is the name of the dashboard (admin) user requesting this update.");
+			System.err.println("Username is the dashboard admin requesting this update.");
 			System.err.println();
 			System.exit(1);
 		}
 
 		String username = args[0];
-		// Get the expocodes of all cruises in the default dashboard
+		String expocodesFilename;
+		if ( args.length > 1 )
+			expocodesFilename = args[1];
+		else
+			expocodesFilename = null;
+
+		boolean success = true;
+
+		// Get the default dashboard configuration
 		DashboardDataStore dataStore = null;		
 		try {
 			dataStore = DashboardDataStore.get();
@@ -102,26 +113,56 @@ public class CruiseResubmitter {
 			ex.printStackTrace();
 			System.exit(1);
 		}
-		TreeSet<String> allExpocodes = null; 
 		try {
-			allExpocodes = new TreeSet<String>(
-					dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
-		} catch (Exception ex) {
-			System.err.println("Error getting all expocodes: " + ex.getMessage());
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		// Resubmit each of these cruises that had been submitted
-		boolean success = true;
-		for ( String expocode : allExpocodes ) {
-			try {
-				resubmitCruise(expocode, username, dataStore);
-			} catch (Exception ex) {
-				System.err.println("Error updating " + expocode + " : " + ex.getMessage());
-				ex.printStackTrace();
-				System.err.println("===================================================");
-				success = false;
+			// Get the expocode of the cruises to resubmit
+			TreeSet<String> allExpocodes = null; 
+			if ( expocodesFilename != null ) {
+				allExpocodes = new TreeSet<String>();
+				try {
+					BufferedReader expoReader = 
+							new BufferedReader(new FileReader(expocodesFilename));
+					try {
+						String dataline = expoReader.readLine();
+						while ( dataline != null ) {
+							dataline = dataline.trim();
+							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+								allExpocodes.add(dataline);
+							dataline = expoReader.readLine();
+						}
+					} finally {
+						expoReader.close();
+					}
+				} catch (Exception ex) {
+					System.err.println("Error getting expocodes from " + 
+							expocodesFilename + ": " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			} 
+			else {
+				try {
+					allExpocodes = new TreeSet<String>(
+							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
+				} catch (Exception ex) {
+					System.err.println("Error getting all expocodes: " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
 			}
+
+			// Recheck, and possibly resubmit, each of these cruises
+			for ( String expocode : allExpocodes ) {
+				try {
+					resubmitCruise(expocode, username, dataStore);
+				} catch (Exception ex) {
+					System.err.println("Error updating " + expocode + " : " + ex.getMessage());
+					ex.printStackTrace();
+					System.err.println("===================================================");
+					success = false;
+				}
+			}
+		} finally {
+			dataStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

@@ -665,7 +665,7 @@ public class OmeMetadataTest {
 	@Test
 	public void testCreateSocatMetadata() throws IOException, JDOMException {
 		final String uploadTimestamp = "2012-04-23 11:24 -0800";
-		final Double socatVersion = 3.0;
+		final String socatVersion = "3.0";
 		final String addlDocs = "addlDoc1.doc ; addlDoc2.pdf";
 		final LinkedHashSet<String> addlDocsSet = 
 				new LinkedHashSet<String>(Arrays.asList(addlDocs.split(" ; ")));
@@ -678,7 +678,7 @@ public class OmeMetadataTest {
 		mdata.setUploadTimestamp(uploadTimestamp);
 		mdata.assignFromOmeXmlDoc(omeDoc);
 		SocatMetadata socatMData = mdata.createSocatMetadata(socatVersion, addlDocsSet, qcFlag);
-		assertEquals(socatVersion, socatMData.getSocatVersion(), 1.0E-4);
+		assertEquals(socatVersion, socatMData.getSocatVersion());
 		assertEquals(addlDocs, socatMData.getAddlDocs());
 		assertEquals(ACTUAL_EXPOCODE, socatMData.getExpocode());
 		assertEquals(ACTUAL_CRUISE_NAME, socatMData.getCruiseName());

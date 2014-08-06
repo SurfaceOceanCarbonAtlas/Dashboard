@@ -106,8 +106,8 @@ public class DashboardDataStore {
 	private String encryptionSalt;
 	// Map of username to user info
 	private HashMap<String,DashboardUserInfo> userInfoMap;
-	private Double socatUploadVersion;
-	private Double socatQCVersion;
+	private String socatUploadVersion;
+	private String socatQCVersion;
 	private UserFileHandler userFileHandler;
 	private CruiseFileHandler cruiseFileHandler;
 	private CheckerMessageHandler checkerMsgHandler;
@@ -117,6 +117,7 @@ public class DashboardDataStore {
 	private DashboardCruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
 	private DashboardCruiseSubmitter cruiseSubmitter;
+	private Timer configWatcher;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -200,11 +201,7 @@ public class DashboardDataStore {
 			propVal = propVal.trim();
 			if ( propVal.isEmpty() )
 				throw new IllegalArgumentException("blank value");
-			try {
-				socatUploadVersion = Double.valueOf(propVal);
-			} catch (NumberFormatException ex) {
-				throw new IllegalArgumentException(ex);
-			}
+			socatUploadVersion = propVal;
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + SOCAT_UPLOAD_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -217,11 +214,7 @@ public class DashboardDataStore {
 			propVal = propVal.trim();
 			if ( propVal.isEmpty() )
 				throw new IllegalArgumentException("blank value");
-			try {
-				socatQCVersion = Double.valueOf(propVal);
-			} catch (NumberFormatException ex) {
-				throw new IllegalArgumentException(ex);
-			}
+			socatQCVersion = propVal;
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + SOCAT_QC_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -461,6 +454,21 @@ public class DashboardDataStore {
 		return singleton.get();
 	}
 
+	/**
+	 * Shuts down the handlers and timers associated with this data store and 
+	 * removes this data store as the singleton instance of this class.
+	 */
+	public void shutdown() {
+		// Shutdown all the VersionsedFileHandlers
+		userFileHandler.shutdown();
+		cruiseFileHandler.shutdown();
+		metadataFileHandler.shutdown();
+		// Stop the configuration watcher
+		configWatcher.cancel();
+		// Discard this DashboardDataStore as the singleton instance
+		singleton.set(null);
+	}
+
 	private static final long MINUTES_CHECK_INTERVAL = 5;
 	/**
 	 * Monitors the configuration file creating the current DashboardDataStore 
@@ -470,10 +478,11 @@ public class DashboardDataStore {
 	 * is needed, the configuration file will be reread and this monitor 
 	 * will be restarted.
 	 */
-	private static void watchConfigFile() {
+	private void watchConfigFile() {
 		// Just create a time to monitor the last modified timestamp 
 		// of the config file every few minutes
-		(new Timer()).schedule(new TimerTask() {
+		configWatcher = new Timer();
+		configWatcher.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				DashboardDataStore dataStore = singleton.get();
@@ -482,12 +491,9 @@ public class DashboardDataStore {
 				}
 				else if ( dataStore.configFile.lastModified() != 
 							dataStore.configFileTimestamp ) {
-					// Shutdown all the VersionsedFileHandlers
-					dataStore.userFileHandler.shutdown();
-					dataStore.cruiseFileHandler.shutdown();
-					dataStore.metadataFileHandler.shutdown();
-					// Discard this DashboardDataStore and stop this watcher
-					singleton.set(null);
+					// Shutdown all the handlers and remove the datastore
+					dataStore.shutdown();
+					// Stop this watcher
 					cancel();
 				}
 			}
@@ -498,7 +504,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		the SOCAT version for uploaded data; never null
 	 */
-	public Double getSocatUploadVersion() {
+	public String getSocatUploadVersion() {
 		return socatUploadVersion;
 	}
 
@@ -506,7 +512,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		the SOCAT version for QC flagging; never null
 	 */
-	public Double getSocatQCVersion() {
+	public String getSocatQCVersion() {
 		return socatQCVersion;
 	}
 
@@ -696,9 +702,13 @@ public class DashboardDataStore {
 		}
 		try {
 			DashboardDataStore dataStore = DashboardDataStore.get();
-			String computedHash = dataStore.spicedHash(username, passhash);
-			System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + 
-					DashboardUtils.cleanUsername(username) + "=" + computedHash);
+			try {
+				String computedHash = dataStore.spicedHash(username, passhash);
+				System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + 
+						DashboardUtils.cleanUsername(username) + "=" + computedHash);
+			} finally {
+				dataStore.shutdown();
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(1);

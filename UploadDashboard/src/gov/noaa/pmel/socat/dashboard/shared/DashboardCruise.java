@@ -19,10 +19,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1985208023692883872L;
+	private static final long serialVersionUID = -2428415075886392439L;
 
 	boolean selected;
-	Double version;
+	String version;
 	String owner;
 	String expocode;
 	String dataCheckStatus;
@@ -55,7 +55,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	public DashboardCruise() {
 		selected = false;
-		version = 0.0;
+		version = "";
 		owner = "";
 		expocode = "";
 		dataCheckStatus = "";
@@ -99,22 +99,22 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise version; never null, but could be zero if not assigned
+	 * 		the cruise version; never null, but may be empty
 	 */
-	public Double getVersion() {
+	public String getVersion() {
 		return version;
 	}
 
 	/**
 	 * @param version 
-	 * 		the cruise version to set;
-	 * 		if null or negative, assigns zero
+	 * 		the cruise version (after trimming) to set;
+	 * 		if null, an empty string is assigned
 	 */
-	public void setVersion(Double version) {
-		if ( (version == null) || (version < 0.0) )
-			this.version = 0.0;
+	public void setVersion(String version) {
+		if ( version == null )
+			this.version = "";
 		else
-			this.version = version;
+			this.version = version.trim();
 	}
 
 	/**

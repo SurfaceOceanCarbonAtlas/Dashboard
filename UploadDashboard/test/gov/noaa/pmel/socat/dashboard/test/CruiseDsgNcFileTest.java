@@ -98,7 +98,7 @@ public class CruiseDsgNcFileTest {
 		// Create the SocatMetadata for this cruise
 		SocatMetadata metadata = new SocatMetadata();
 		metadata.setExpocode(expocode);
-		metadata.setSocatVersion(3.0);
+		metadata.setSocatVersion("3.0");
 		metadata.setCruiseName("GM0606");
 		metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
 		metadata.setVesselName("Caribbean Cruiser");

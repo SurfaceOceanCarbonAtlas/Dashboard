@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7958723082421235116L;
+	private static final long serialVersionUID = 3159924753309219548L;
 
 	/**
 	 * Date used as a missing value; 
@@ -45,7 +45,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	String addlDocs;
 	String socatDOI;
 	String socatDOIHRef;
-	Double socatVersion;
+	String socatVersion;
 	String qcFlag;
 
 	/**
@@ -67,7 +67,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		addlDocs = "";
 		socatDOI = "";
 		socatDOIHRef = "";
-		socatVersion = 0.0;
+		socatVersion = "";
 		qcFlag = " ";
 	}
 
@@ -389,20 +389,20 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the SOCAT version associated with this instance;
-	 * 		never null but could be zero if not assigned
+	 * 		never null but could be empty if not assigned
 	 */
-	public Double getSocatVersion() {
+	public String getSocatVersion() {
 		return socatVersion;
 	}
 
 	/**
 	 * @param socatVersion 
 	 * 		the SOCAT version to set; 
-	 * 		if null or negative, zero is assigned
+	 * 		if null, an empty string is assigned
 	 */
-	public void setSocatVersion(Double socatVersion) {
-		if ( (socatVersion == null) || (socatVersion < 0.0) )
-			this.socatVersion = 0.0;
+	public void setSocatVersion(String socatVersion) {
+		if ( socatVersion == null )
+			this.socatVersion = "";
 		else
 			this.socatVersion = socatVersion;
 	}
@@ -448,6 +448,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			maxLength = socatDOI.length();
 		if ( maxLength < socatDOIHRef.length() ) 
 			maxLength = socatDOIHRef.length();
+		if ( maxLength < socatVersion.length() )
+			maxLength = socatVersion.length();
 		if ( maxLength < qcFlag.length() )
 			maxLength = qcFlag.length();
 		return maxLength;

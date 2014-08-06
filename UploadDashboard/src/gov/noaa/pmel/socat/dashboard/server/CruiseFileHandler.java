@@ -1037,7 +1037,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					SOCAT_VERSION_ID + " given in " + infoFile.getPath());	
 		try {
-			cruise.setVersion(Double.valueOf(value));
+			cruise.setVersion(value);
 		} catch (NumberFormatException ex) {
 			throw new IllegalArgumentException("Invalid property value for " +
 					SOCAT_VERSION_ID + " given in " + infoFile.getPath());	

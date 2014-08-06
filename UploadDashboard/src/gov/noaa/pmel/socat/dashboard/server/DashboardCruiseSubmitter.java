@@ -164,29 +164,30 @@ public class DashboardCruiseSubmitter {
 				// possibly modified and WOCEd cruise data
 				dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
 
+				// Generate the decimated-data DSG file from the full-data DSG file
+				dsgNcHandler.decimateCruise(expocode);
+
 				// Update cruise info with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
 				
-				// Create a SocatQCEvent for every region of the cruise 
+				// Create a SocatQCEvent for every region in which the cruise reports 
 				TreeSet<Character> regionsSet;
 				try {
-					regionsSet = dsgNcHandler.getDsgNcFile(expocode).readDataRegions();
+					regionsSet = dsgNcHandler.readDataRegions(expocode);
 				} catch (Exception ex) {
 					throw new RuntimeException("Unexpected problems reading region IDs "
 							+ "from the newly created full-data DSG file for " + 
 							expocode + ": " + ex.getMessage());
 				}
-				regionsSet.remove(DataLocation.GLOBAL_REGION_ID);
 				ArrayList<Character> regions = new ArrayList<Character>(regionsSet.size() + 1);
 				// Add the global flag first because the database request handler 
 				// expects there to always be a global flag 
 				regions.add(DataLocation.GLOBAL_REGION_ID);
 				regions.addAll(regionsSet);
 
-				// Give the number of data rows with errors, warnings as the message
 				SocatQCEvent comment = new SocatQCEvent();
 				comment.setFlag(flag);
 				comment.setExpocode(expocode);
@@ -194,6 +195,8 @@ public class DashboardCruiseSubmitter {
 				comment.setFlagDate(new Date());
 				comment.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+				// Give the number of data rows with errors, warnings as the message; 
+				// possibly with a recommended 'F' flag if too many errors
 				String recFlag;
 				if ( cruiseData.getNumErrorRows() > DashboardUtils.MAX_ACCEPTABLE_ERRORS ) {
 					recFlag = "Recommend QC flag of " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + ": ";
@@ -216,9 +219,6 @@ public class DashboardCruiseSubmitter {
 					throw new IllegalArgumentException("Unable to add a QC comment "
 							+ "with the data checking results:\n" + ex.getMessage());
 				}
-
-				// Generate the decimated-data DSG file from the full-data DSG file
-				dsgNcHandler.decimateCruise(expocode);
 
 				// Set up to save changes to version control
 				changed = true;
