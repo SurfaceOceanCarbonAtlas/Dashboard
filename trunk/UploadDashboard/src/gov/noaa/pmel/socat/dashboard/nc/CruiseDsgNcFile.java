@@ -666,7 +666,7 @@ public class CruiseDsgNcFile extends File {
 				regionIDs = null;
 			}
 
-			String dataname = woceEvent.getColumnName();
+			String dataname = woceEvent.getDataVarName();
 			ArrayDouble.D1 datavalues;
 			if ( Constants.geoposition_VARNAME.equals(dataname) ) {
 				// WOCE based on longitude/latitude/time

@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
@@ -513,8 +514,12 @@ public class CheckerMessageHandler {
 				woceEvent.setFlagDate(new Date());
 				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				if ( colNum > 0 )
-					woceEvent.setColumnName(cruiseData.getUserColNames().get(colNum-1));
+				if ( colNum > 0 ) {
+					DataColumnType dataType = cruiseData.getDataColTypes().get(colNum-1);
+					String dataVarName = Constants.TYPE_TO_VARNAME_MAP.get(dataType);
+					if ( dataVarName != null )
+						woceEvent.setDataVarName(dataVarName);
+				}
 
 				if ( severity.equals(SCMsgSeverity.ERROR) )
 					woceEvent.setFlag('4');

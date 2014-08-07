@@ -28,7 +28,7 @@ public class SocatWoceEventTest {
 	private static final Character MY_WOCE_FLAG = '3';
 	private static final String MY_EXPOCODE = "26NA20140427";
 	private static final String MY_SOCAT_VERSION = "3.0";
-	private static final String MY_COLUMN_NAME = "SLP";
+	private static final String MY_DATA_VAR_NAME = "Pressure_atm";
 	private static final ArrayList<DataLocation> MY_LOCATIONS;
 	static {
 		MY_LOCATIONS = new ArrayList<DataLocation>(2);
@@ -100,20 +100,20 @@ public class SocatWoceEventTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getColumnName()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setColumnName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getDataVarName()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setDataVarName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetColumnName() {
 		SocatWoceEvent myflag = new SocatWoceEvent();
-		assertEquals("", myflag.getColumnName());
-		myflag.setColumnName(MY_COLUMN_NAME);
-		assertEquals(MY_COLUMN_NAME, myflag.getColumnName());
+		assertEquals("", myflag.getDataVarName());
+		myflag.setDataVarName(MY_DATA_VAR_NAME);
+		assertEquals(MY_DATA_VAR_NAME, myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
-		myflag.setColumnName(null);
-		assertEquals("", myflag.getColumnName());
+		myflag.setDataVarName(null);
+		assertEquals("", myflag.getDataVarName());
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class SocatWoceEventTest {
 		assertEquals(0, myflag.getLocations().size());
 		myflag.setLocations(MY_LOCATIONS);
 		assertEquals(MY_LOCATIONS, myflag.getLocations());
-		assertEquals("", myflag.getColumnName());
+		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -145,7 +145,7 @@ public class SocatWoceEventTest {
 		myflag.setFlagDate(MY_FLAG_DATE);
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getColumnName());
+		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -165,7 +165,7 @@ public class SocatWoceEventTest {
 		assertEquals(MY_USERNAME, myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getColumnName());
+		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -186,7 +186,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getColumnName());
+		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -208,7 +208,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getColumnName());
+		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
@@ -251,10 +251,10 @@ public class SocatWoceEventTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
-		myflag.setColumnName(MY_COLUMN_NAME);
+		myflag.setDataVarName(MY_DATA_VAR_NAME);
 		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
-		otherflag.setColumnName(MY_COLUMN_NAME);
+		otherflag.setDataVarName(MY_DATA_VAR_NAME);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
