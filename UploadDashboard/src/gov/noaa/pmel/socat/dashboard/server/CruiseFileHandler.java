@@ -816,7 +816,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Owner of the cruise
 		cruiseProps.setProperty(DATA_OWNER_ID, cruise.getOwner());
 		// SOCAT version 
-		cruiseProps.setProperty(SOCAT_VERSION_ID, String.format("%#.1f", cruise.getVersion()));
+		cruiseProps.setProperty(SOCAT_VERSION_ID, cruise.getVersion());
 		// Upload filename
 		cruiseProps.setProperty(UPLOAD_FILENAME_ID, cruise.getUploadFilename());
 		// Upload timestamp

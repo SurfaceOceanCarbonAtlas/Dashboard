@@ -469,14 +469,13 @@ public class DashboardDataStore {
 		singleton.set(null);
 	}
 
-	private static final long MINUTES_CHECK_INTERVAL = 5;
+	private static final long MINUTES_CHECK_INTERVAL = 1;
 	/**
 	 * Monitors the configuration file creating the current DashboardDataStore 
-	 * singleton object.  If the configuration file has changed, sets the 
-	 * current DashboardDataStore singleton object to null and stops monitoring
-	 * the configuration file.  Thus, the next time the DashboardDataStore
-	 * is needed, the configuration file will be reread and this monitor 
-	 * will be restarted.
+	 * singleton object.  If the configuration file has changed, shuts down the 
+	 * current DashboardDataStore singleton object and stops monitoring the 
+	 * configuration file.  Thus, the next time the DashboardDataStore is needed, 
+	 * the configuration file will be reread and this monitor will be restarted.
 	 */
 	private void watchConfigFile() {
 		// Just create a time to monitor the last modified timestamp 

@@ -89,7 +89,7 @@ LET oceanmask = if rose[d=1,x=`xm180`:180] LT 0 then 1
 ! The land/ocean data is more detailed than in dist2land_burke. 
 ! Small islands out in the ocean should not be marked as coastal but as ocean(?)
 use  dist2land20_burke.nc
-let dist2landrose = dist2land[g=rose[d=1],x=`xm180`:180]
+let dist2landrose = dist2land[g=rose[d=1]@nrst]
 
 LET oceanmask = if dist2landrose GT 0 then 1
 
@@ -109,19 +109,19 @@ LET oceanmask = if dist2landrose GT 0 then 1
 
 
 let nax1 = if xx gt 0 and xx le 20 then oceanmask else zero
-let nay1 = if yy gt 30 and yy le 90 then oceanmask else zero
+let nay1 = if yy gt 30 then oceanmask else zero
 
 let nax2 = if xx gt -68 and xx le 0 then oceanmask else zero
-let nay2 = if yy gt 30 and yy le 90 then oceanmask else zero
+let nay2 = if yy gt 30 then oceanmask else zero
 
 let nax3 = if xx gt -84 and xx le -68 then oceanmask else zero
-let nay3 = if yy gt 7 and yy le 90 then oceanmask else zero
+let nay3 = if yy gt 7 then oceanmask else zero
 
 let nax4 = if xx gt -100 and xx le -84 then oceanmask else zero
-let nay4 = if yy gt 18 and yy le 90 then oceanmask else zero
+let nay4 = if yy gt 18 then oceanmask else zero
 
 let nax5 = if xx gt 20 and xx le 43 then oceanmask else zero
-let nay5 = if yy gt 30 and yy le 90 then oceanmask else zero
+let nay5 = if yy gt 30 then oceanmask else zero
 
 let na1 = nax1*nay1
 let na2 = nax2*nay2
@@ -143,11 +143,11 @@ let na_all = oceanmask*(na1+na2+na3+na4+na5)
 
 
 let arcx1 = if xx gt -100 and xx le 43 then oceanmask else zero
-let arcy1 = if yy gt 70 and yy le 90 then oceanmask else zero
+let arcy1 = if yy gt 70 then oceanmask else zero
 let arcx2 = if xx le -100 then oceanmask else zero
-let arcy2 = if yy gt 66 and yy le 90 then oceanmask else zero
+let arcy2 = if yy gt 66 then oceanmask else zero
 let arcx3 = if xx gt 43 then oceanmask else zero
-let arcy3 = if yy gt 66 and yy le 90 then oceanmask else zero
+let arcy3 = if yy gt 66 then oceanmask else zero
 
 let arc1 = arcx1*arcy1
 let arc2 = arcx2*arcy2
@@ -190,9 +190,9 @@ let/title="Indian Ocean Mask" Indian = if ind_all then 5 else 0
 
 
 let npacx1 = if xx gt 106 then oceanmask else zero
-let npacy1 = if yy gt 30 and yy le 90 then oceanmask else zero
+let npacy1 = if yy gt 30 then oceanmask else zero
 let npacx2 = if xx le -105 then oceanmask else zero
-let npacy2 = if yy gt 30 and yy le 90 then oceanmask else zero
+let npacy2 = if yy gt 30 then oceanmask else zero
 
 let npac1 = npacx1*npacy1
 let npac2 = npacx2*npacy2
