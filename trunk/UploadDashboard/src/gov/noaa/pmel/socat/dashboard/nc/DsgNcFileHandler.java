@@ -349,6 +349,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + expocode + " does not exist");
 		dsgFile.updateQCFlag(qcEvent);
+		flagErddap(true);
 	}
 
 	/**
@@ -378,6 +379,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
 		dsgFile.updateWoceFlags(woceEvent, true, log);
+		flagErddap(false);
 		CruiseDsgNcFile tempDsgFile = new CruiseDsgNcFile(tempDsgFilename);
 		if ( ! tempDsgFile.canRead() )
 			throw new IllegalArgumentException("Temporary DSG file " + 

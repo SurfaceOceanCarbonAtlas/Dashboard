@@ -68,7 +68,10 @@ public class CheckerMessageHandler {
 		// ship speed is excessive - either warning or error
 		msgFragsToTypes.put("Ship speed between measurements", SCMsgType.DATA_QUESTIONABLE_SPEED);
 		// data point times out of order
-		msgFragsToTypes.put("The timestamp is either before or identical", SCMsgType.DATA_TIME);
+		msgFragsToTypes.put("The timestamp is either before or identical", SCMsgType.DATA_TIME_SEQUENCE);
+		// invalid date
+		msgFragsToTypes.put("Invalid date", SCMsgType.DATA_TIME_VALUE);
+		msgFragsToTypes.put("Unable to parse date-time string", SCMsgType.DATA_TIME_VALUE);
 		// missing value for required data value
 		msgFragsToTypes.put("Missing required value", SCMsgType.DATA_MISSING);
 		// values constant over some number of data points
@@ -538,8 +541,11 @@ public class CheckerMessageHandler {
 					int k = msgComment.indexOf("should be");
 					woceEvent.setComment("Calculated ship speed is unreasonable; " + msgComment.substring(k));
 				}
-				else if ( msgType.equals(SCMsgType.DATA_TIME) ) {
+				else if ( msgType.equals(SCMsgType.DATA_TIME_SEQUENCE) ) {
 					woceEvent.setComment(msgComment);
+				}
+				else if ( msgType.equals(SCMsgType.DATA_TIME_VALUE) ) {
+					woceEvent.setComment("Invalid date/time value");
 				}
 				else if ( msgType.equals(SCMsgType.DATA_MISSING) ) {
 					woceEvent.setComment(msgComment);
