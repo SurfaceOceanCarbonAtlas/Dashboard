@@ -794,10 +794,16 @@ public class DashboardCruiseChecker {
 	 * 		cruise data to be standardized
 	 * @return
 	 * 		if the SanityChecker ran successfully;
-	 * 		if false, data will not have been standardized
+	 * 		if false, data will not have been standardized.
+	 * 		if no valid data after removing known problems,
+	 * 		false is returned and cruiseData.getNumDataRows 
+	 * 		will be zero.
 	 */
 	public boolean standardizeCruiseData(DashboardCruiseWithData cruiseData) {
 		removeKnownProblemRows(cruiseData);
+		// If all data removed, return false
+		if ( cruiseData.getNumDataRows() < 1 )
+			return false;
 		// Run the SanityChecker to get the standardized data
 		Output output = checkCruiseAndReturnOutput(cruiseData);
 		if ( ! output.processedOK() )
@@ -1168,6 +1174,8 @@ public class DashboardCruiseChecker {
 								ColumnIndices colIndcs, boolean processedOK) {
 		// Set the lastCheckHadGeopositionErrors flag indicating 
 		// if there are any date/time, lat, or lon WOCE-4 flags
+		// TODO: also need to check for error messages with type DATA_TIME_VALUE 
+		//       since these may not have been assigned to a specific column
 		ArrayList<HashSet<Integer>> woceFourSets = cruise.getWoceFourRowIndices();
 		if ( ( (colIndcs.timestampIndex >= 0) && 
 				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||

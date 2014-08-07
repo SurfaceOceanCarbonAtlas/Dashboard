@@ -141,7 +141,10 @@ public class DashboardCruiseSubmitter {
 				 *  numbers of the trimmed data.
 				 */
 				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
-					errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
+					if ( cruiseData.getNumDataRows() < 1 )
+						errorMsgs.add(expocode + ": unacceptable; all data points marked bad");
+					else
+						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
 					continue;
 				}
 				if ( (qcFlag == null) && cruiseChecker.hadGeopositionErrors() ) {
@@ -150,22 +153,27 @@ public class DashboardCruiseSubmitter {
 					continue;
 				}
 
-				// Get the OME metadata for this cruise
-				OmeMetadata omeMData = new OmeMetadata(
-						metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
-				if ( addlDocs != null ) {
-					// Add the given additional documents (metadataHRefs from the database) 
-					// to cruiseData so they will be added to the DSG file 
-					TreeSet<String> addlDocsSet = cruiseData.getAddlDocs();
-					addlDocsSet.addAll(Arrays.asList(addlDocs.split(" ; ")));
+				try {
+					// Get the OME metadata for this cruise
+					OmeMetadata omeMData = new OmeMetadata(
+							metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
+					if ( addlDocs != null ) {
+						// Add the given additional documents (metadataHRefs from the database) 
+						// to cruiseData so they will be added to the DSG file 
+						TreeSet<String> addlDocsSet = cruiseData.getAddlDocs();
+						addlDocsSet.addAll(Arrays.asList(addlDocs.split(" ; ")));
+					}
+
+					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
+					// possibly modified and WOCEd cruise data
+					dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
+
+					// Generate the decimated-data DSG file from the full-data DSG file
+					dsgNcHandler.decimateCruise(expocode);
+				} catch (Exception ex) {
+					errorMsgs.add(expocode + ": unacceptable; " + ex.getMessage());
+					continue;
 				}
-
-				// Generate the NetCDF DSG file, enhanced by Ferret, for this 
-				// possibly modified and WOCEd cruise data
-				dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
-
-				// Generate the decimated-data DSG file from the full-data DSG file
-				dsgNcHandler.decimateCruise(expocode);
 
 				// Update cruise info with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
