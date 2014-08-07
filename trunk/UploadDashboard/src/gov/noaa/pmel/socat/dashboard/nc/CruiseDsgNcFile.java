@@ -565,11 +565,14 @@ public class CruiseDsgNcFile extends File {
 			ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
 			dataRegions = new TreeSet<Character>();
 			for (int k = 0; k < var.getShape(0); k++) {
-				char value = dvar.get(k,0);
-				if ( value == (char) 0 )
-					dataRegions.add(SocatCruiseData.CHAR_MISSING_VALUE);
-				else
-					dataRegions.add(value);
+				Character value = Character.valueOf(dvar.get(k,0));
+				if ( value.equals(Character.valueOf((char) 0)) )
+					value = SocatCruiseData.CHAR_MISSING_VALUE;
+				if ( DataLocation.REGION_NAMES.get(value) == null )
+					throw new IllegalArgumentException("Unexpected region_id value of '" + 
+							value + "' = " + Integer.valueOf(value).toString() + 
+							" for sample number " + Integer.valueOf(k+1).toString() );
+				dataRegions.add(value);
 			}
 		} finally {
 			ncfile.close();
