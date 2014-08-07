@@ -394,7 +394,10 @@ public class DatabaseRequestHandler {
 					if ( region == null )
 						throw new SQLException("Unexpected null region ID");
 					region = region.trim();
-					if ( (region.length() != 1) ||
+					// Ignore missing region IDs
+					if ( region.length() < 1 )
+						continue;
+					if ( (region.length() > 1) ||
 						 (DataLocation.REGION_NAMES.get(region.charAt(0)) == null) )
 						throw new SQLException("Unexpected region ID of '" + region + "'");
 					Character regionID = region.charAt(0);
