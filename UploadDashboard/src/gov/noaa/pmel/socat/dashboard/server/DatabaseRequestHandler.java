@@ -548,7 +548,7 @@ public class DatabaseRequestHandler {
 				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			prepStmt.setString(3, woceEvent.getExpocode());
 			prepStmt.setString(4, woceEvent.getSocatVersion());
-			prepStmt.setString(5, woceEvent.getColumnName());
+			prepStmt.setString(5, woceEvent.getDataVarName());
 			prepStmt.setInt(6, reviewerId);
 			prepStmt.setString(7, woceEvent.getComment());
 			prepStmt.execute();
@@ -615,7 +615,7 @@ public class DatabaseRequestHandler {
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
 	 * 		include columns with names woce_flag, woce_time, expocode, 
-	 * 		socat_version, data_type, data_name, username, realname, 
+	 * 		socat_version, data_name, username, realname, 
 	 * 		and woce_comment.
 	 * @returns
 	 * 		the created WOCE event
@@ -638,7 +638,7 @@ public class DatabaseRequestHandler {
 		woceEvent.setSocatVersion(results.getString("socat_version"));
 		if ( results.wasNull() )
 			woceEvent.setSocatVersion(null);
-		woceEvent.setColumnName(results.getString("data_name"));
+		woceEvent.setDataVarName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
 		woceEvent.setRealname(results.getString("realname"));
 		woceEvent.setComment(results.getString("woce_comment"));

@@ -15,9 +15,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4845908374436120496L;
+	private static final long serialVersionUID = 1084266395207635831L;
 
-	String columnName;
+	String dataVarName;
 	ArrayList<DataLocation> locations;
 
 	/**
@@ -25,29 +25,29 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	 */
 	public SocatWoceEvent() {
 		super();
-		columnName = "";
+		dataVarName = "";
 		locations = new ArrayList<DataLocation>();
 	}
 
 	/**
 	 * @return 
-	 * 		the data column name;
+	 * 		the data variable name in the DSG file;
 	 * 		never null but may be empty
 	 */
-	public String getColumnName() {
-		return columnName;
+	public String getDataVarName() {
+		return dataVarName;
 	}
 
 	/**
-	 * @param columnName 
-	 * 		the data column name to set;
+	 * @param dataVarName 
+	 * 		the data variable name in the DSG file to set;
 	 * 		if null, an empty string is assigned.
 	 */
-	public void setColumnName(String columnName) {
-		if ( columnName == null )
-			this.columnName = "";
+	public void setDataVarName(String dataVarName) {
+		if ( dataVarName == null )
+			this.dataVarName = "";
 		else
-			this.columnName = columnName;
+			this.dataVarName = dataVarName;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
-		result = result * prime + columnName.hashCode();
+		result = result * prime + dataVarName.hashCode();
 		result = result * prime + locations.hashCode();
 		return result;
 	}
@@ -94,7 +94,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 
 		if ( ! super.equals(other) )
 			return false;
-		if ( ! columnName.equals(other.columnName) )
+		if ( ! dataVarName.equals(other.dataVarName) )
 			return false;
 		if ( ! locations.equals(other.locations) )
 			return false;
@@ -109,7 +109,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 
-				",\n    columnName=" + columnName.toString() + 
+				",\n    dataVarName=" + dataVarName.toString() + 
 				",\n    locations=" + locations.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 

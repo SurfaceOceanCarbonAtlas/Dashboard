@@ -1,6 +1,9 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -629,6 +632,74 @@ public class Constants {
 		// GEOPOSITION is from WOCE flagging from plots of only lon/lat/time 
 		varNamesMap.put(geoposition_VARNAME.toUpperCase(), geoposition_VARNAME);
 		VARIABLE_NAMES = Collections.unmodifiableMap(varNamesMap);
+	}
+
+	/**
+	 * Variable names for netCDF files from the type of user-provided data columns.
+	 * These are for generating WOCE events, only those types and variable names 
+	 * that a reviewer could WOCE are provided.
+	 */
+	public static final Map<DataColumnType, String> TYPE_TO_VARNAME_MAP;
+	static {
+		EnumMap<DataColumnType,String> typeToNameMap = 
+				new EnumMap<DataColumnType,String>(DataColumnType.class);
+
+		// UNKNOWN, metadata-types, WOCE flags, COMMENT, and OTHER not available to WOCE
+
+		// Map all time-related types to "time"; other variables not visible
+		typeToNameMap.put(DataColumnType.TIMESTAMP, "time");
+		typeToNameMap.put(DataColumnType.DATE, "time");
+		typeToNameMap.put(DataColumnType.TIME, "time");
+		typeToNameMap.put(DataColumnType.YEAR, "time");
+		typeToNameMap.put(DataColumnType.MONTH, "time");
+		typeToNameMap.put(DataColumnType.DAY, "time");
+		typeToNameMap.put(DataColumnType.HOUR, "time");
+		typeToNameMap.put(DataColumnType.MINUTE, "time");
+		typeToNameMap.put(DataColumnType.SECOND, "time");
+		typeToNameMap.put(DataColumnType.DAY_OF_YEAR, "time");
+		typeToNameMap.put(DataColumnType.SECOND_OF_DAY, "time");
+
+		typeToNameMap.put(DataColumnType.LONGITUDE, "longitude");
+		typeToNameMap.put(DataColumnType.LATITUDE, "latitude");
+		typeToNameMap.put(DataColumnType.SAMPLE_DEPTH, "sample_depth");
+		typeToNameMap.put(DataColumnType.SALINITY, "sal");
+		typeToNameMap.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "Temperature_equi");
+		typeToNameMap.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "temp");
+		typeToNameMap.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
+		typeToNameMap.put(DataColumnType.EQUILIBRATOR_PRESSURE, "Pressure_equi");
+		typeToNameMap.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
+
+		typeToNameMap.put(DataColumnType.XCO2_WATER_TEQU_DRY, "xCO2_water_equi_temp_dry_ppm");
+		typeToNameMap.put(DataColumnType.XCO2_WATER_SST_DRY, "xCO2_water_sst_dry_ppm");
+		typeToNameMap.put(DataColumnType.XCO2_WATER_TEQU_WET, "xCO2_water_equi_temp_wet_ppm");
+		typeToNameMap.put(DataColumnType.XCO2_WATER_SST_WET, "xCO2_water_sst_wet_ppm");
+		typeToNameMap.put(DataColumnType.PCO2_WATER_TEQU_WET, "pCO2_water_equi_temp");
+		typeToNameMap.put(DataColumnType.PCO2_WATER_SST_WET, "pCO2_water_sst_100humidity_uatm");
+		typeToNameMap.put(DataColumnType.FCO2_WATER_TEQU_WET, "fCO2_water_equi_uatm");
+		typeToNameMap.put(DataColumnType.FCO2_WATER_SST_WET, "fCO2_water_sst_100humidity_uatm");
+
+		typeToNameMap.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, "xCO2_atm_dry_actual");
+		typeToNameMap.put(DataColumnType.XCO2_ATM_DRY_INTERP, "xCO2_atm_dry_interp");
+		typeToNameMap.put(DataColumnType.PCO2_ATM_WET_ACTUAL, "pCO2_atm_wet_actual");
+		typeToNameMap.put(DataColumnType.PCO2_ATM_WET_INTERP, "pCO2_atm_wet_interp");
+		typeToNameMap.put(DataColumnType.FCO2_ATM_WET_ACTUAL, "fCO2_atm_wet_actual");
+		typeToNameMap.put(DataColumnType.FCO2_ATM_WET_INTERP, "fCO2_atm_wet_interp");
+
+		typeToNameMap.put(DataColumnType.DELTA_XCO2, "delta_xCO2");
+		typeToNameMap.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
+		typeToNameMap.put(DataColumnType.DELTA_FCO2, "delta_fCO2");
+
+		typeToNameMap.put(DataColumnType.XH2O_EQU, "xH2O_equi");
+		typeToNameMap.put(DataColumnType.RELATIVE_HUMIDITY, "relative_humidity");
+		typeToNameMap.put(DataColumnType.SPECIFIC_HUMIDITY, "specific_humidity");
+		typeToNameMap.put(DataColumnType.SHIP_SPEED, "ship_speed"); 
+		typeToNameMap.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
+		typeToNameMap.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
+		typeToNameMap.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
+		typeToNameMap.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
+		typeToNameMap.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
+
+		TYPE_TO_VARNAME_MAP = Collections.unmodifiableMap(typeToNameMap);
 	}
 
 }
