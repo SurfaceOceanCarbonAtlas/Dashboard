@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -39,7 +38,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 3455975088151401246L;
+	private static final long serialVersionUID = 8617406990008180119L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.1";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -537,47 +536,91 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Reads and returns the set of region IDs from this DSG file.  
-	 * This DSG file must have regions IDs assigned by Ferret, such 
-	 * as when saved using 
+	 * Reads and returns the array of data values for the specified variable
+	 * contained in this DSG file.  The variable must be saved in the DSG file
+	 * as characters.  Empty strings are changed to 
+	 * {@link SocatCruiseData#CHAR_MISSING_VALUE}.  For some variables, this 
+	 * DSG file must have been processes by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
-	 * for the set of region IDs to be meaningful.
+	 * for the data values to be meaningful.
 	 * 
+	 * @param varName
+	 * 		name of the variable to read
 	 * @return
-	 * 		set of region IDs for this cruise
+	 * 		array of values for the specified variable
 	 * @throws IOException
-	 * 		if there are problems opening or reading from this DSG file
+	 * 		if there is a problem opening or reading from this DSG file
 	 * @throws IllegalArgumentException
-	 * 		if this DSG file does not have a 'region_id' variable.
+	 * 		if the variable name is invalid, or
+	 * 		if the variable is not a single-character array variable
 	 */
-	public TreeSet<Character> readDataRegions() 
+	public char[] readCharVarDataValues(String varName) 
 								throws IOException, IllegalArgumentException {
-		TreeSet<Character> dataRegions;
+		char[] dataVals;
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
-			// Get the number of data points from the length of the time 1D array
-			String name = Constants.regionID_VARNAME;
-			String varName = Constants.SHORT_NAMES.get(name);
 			Variable var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
-			ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
-			dataRegions = new TreeSet<Character>();
-			for (int k = 0; k < var.getShape(0); k++) {
-				Character value = Character.valueOf(dvar.get(k,0));
-				if ( value.equals(Character.valueOf((char) 0)) )
+			ArrayChar.D2 cvar = (ArrayChar.D2) var.read();
+			if ( var.getShape(1) != 1 ) 
+				throw new IllegalArgumentException("Variable '" + varName + 
+						"' is not a single-character array variable in " + getName());
+			int numVals = var.getShape(0);
+			dataVals = new char[numVals];
+			for (int k = 0; k < numVals; k++) {
+				char value = cvar.get(k,0);
+				if ( value == (char) 0 )
 					value = SocatCruiseData.CHAR_MISSING_VALUE;
-				if ( DataLocation.REGION_NAMES.get(value) == null )
-					throw new IllegalArgumentException("Unexpected region_id value of '" + 
-							value + "' = " + Integer.valueOf(value).toString() + 
-							" for sample number " + Integer.valueOf(k+1).toString() );
-				dataRegions.add(value);
+				dataVals[k] = value;
 			}
 		} finally {
 			ncfile.close();
 		}
-		return dataRegions;
+		return dataVals;
+	}
+
+	/**
+	 * Reads and returns the array of data values for the specified variable
+	 * contained in this DSG file.  The variable must be saved in the DSG file
+	 * as doubles.  NaN and infinite values are changed to 
+	 * {@link SocatCruiseData#FP_MISSING_VALUE}.  For some variables, this 
+	 * DSG file must have been processes by Ferret, such as when saved using 
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * for the data values to be meaningful.
+	 * 
+	 * @param varName
+	 * 		name of the variable to read
+	 * @return
+	 * 		array of values for the specified variable
+	 * @throws IOException
+	 * 		if there is a problem opening or reading from this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the variable name is invalid
+	 */
+	public double[] readDoubleVarDataValues(String varName) 
+								throws IOException, IllegalArgumentException {
+		double[] dataVals;
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
+		try {
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
+			int numVals = var.getShape(0);
+			dataVals = new double[numVals];
+			for (int k = 0; k < numVals; k++) {
+				double value = dvar.get(k);
+				if ( Double.isNaN(value) || Double.isInfinite(value) )
+					value = SocatCruiseData.FP_MISSING_VALUE;
+				dataVals[k] = dvar.get(k);
+			}
+		} finally {
+			ncfile.close();
+		}
+		return dataVals;
 	}
 
 	/**
