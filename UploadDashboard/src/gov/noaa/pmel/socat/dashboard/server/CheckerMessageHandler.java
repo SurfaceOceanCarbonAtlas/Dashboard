@@ -602,6 +602,10 @@ public class CheckerMessageHandler {
 				info.flag = '3';
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
+			// TODO: Only add SanityChecker WOCE-4 flags for now 
+			// (here and at the end of DashboardCruiseChecker.standardizeCruiseData)
+			if ( ! info.flag.equals('4') )
+				continue;
 
 			if ( colNum > 0 )
 				info.columnIndex = colNum - 1;

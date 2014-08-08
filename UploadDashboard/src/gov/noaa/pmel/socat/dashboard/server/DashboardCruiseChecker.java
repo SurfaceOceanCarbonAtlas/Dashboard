@@ -1077,7 +1077,8 @@ public class DashboardCruiseChecker {
 		HashSet<Integer> warnRows = new HashSet<Integer>();
 		getErrorAndWarnRows(errRows, warnRows, cruiseData);
 
-		// Only add SanityChecker WOCE-4 flags for now
+		// TODO: Only add SanityChecker WOCE-4 flags for now 
+		// (here and in the middle of CheckerMessageHandler.generateWoceEvents)
 		for ( int rowIdx : errRows ) {
 			dataVals.get(rowIdx).set(woceCO2WaterColumnIndex, "4");
 		}
