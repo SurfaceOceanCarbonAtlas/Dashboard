@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
+import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
@@ -21,7 +22,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -44,6 +45,71 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  * @author Karl Smith
  */
 public class CheckerMessageHandler {
+
+	/**
+	 *  For combining and ordering all WOCE flags 
+	 */
+	class WoceInfo implements Comparable<WoceInfo> {
+		Character flag;
+		Integer columnIndex;
+		String comment;
+		Integer rowIndex;
+
+		public WoceInfo() {
+			flag = ' ';
+			columnIndex = Integer.MAX_VALUE;
+			comment = "";
+			rowIndex = -1;
+		}
+
+		@Override
+		public int compareTo(WoceInfo other) {
+			int result = flag.compareTo(other.flag);
+			if ( result != 0 )
+				return result;
+			result = columnIndex.compareTo(other.columnIndex);
+			if ( result != 0 )
+				return result;
+			result = comment.compareTo(other.comment);
+			if ( result != 0 )
+				return result;
+			result = rowIndex.compareTo(other.rowIndex);
+			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 37;
+			int result = flag.hashCode();
+			result = result * prime + columnIndex.hashCode();
+			result = result * prime + comment.hashCode();
+			result = prime * result + rowIndex.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj )
+				return true;
+			if ( obj == null )
+				return false;
+
+			if ( ! ( obj instanceof WoceInfo ) )
+				return false;
+			WoceInfo other = (WoceInfo) obj;
+
+			if ( ! flag.equals(other.flag) )
+				return false;
+			if ( ! columnIndex.equals(other.columnIndex) )
+				return false;
+			if ( ! comment.equals(other.comment) )
+				return false;
+			if ( ! rowIndex.equals(other.rowIndex) )
+				return false;
+
+			return true;
+		}
+	}
 
 	private static final String CRUISE_MSGS_FILENAME_EXTENSION = ".messages";
 	private static final String SCMSG_KEY_VALUE_SEP = ":";
@@ -464,29 +530,24 @@ public class CheckerMessageHandler {
 	 * Generates a list of SocatWoceEvents to to be submitted from the saved cruise
 	 * messages as well as PI-provided WOCE flags.
 	 * 
-	 * @param cruiseData
-	 * 		get the list of SocatWoceEvents for this cruise
 	 * @return
-	 * 		the list of SocatWoceEvents for the cruise
+	 * 		the list of SocatWoceEvents for the cruise; never null but may be empty
 	 * @throws IllegalArgumentException
 	 * 		if the expocode in cruiseData is invalid, or 
 	 * 		if the messages file is invalid
 	 * @throws FileNotFoundException
 	 * 		if there is no messages file for the cruise
 	 */
-	public ArrayList<SocatWoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData) 
-						throws IllegalArgumentException, FileNotFoundException {
-		// Get the SanityChecker messages and sort for assigning WOCE flags
-		String expocode = cruiseData.getExpocode();
-		ArrayList<SCMessage> orderedMsgs = new ArrayList<SCMessage>(getCruiseMessages(expocode));
-		Collections.sort(orderedMsgs, SCMessage.woceTypeComparator);
+	public ArrayList<SocatWoceEvent> generateWoceEvents(String socatVersion,
+			String expocode, ArrayList<DataColumnType> columnTypes, 
+			HashSet<Integer> userWoceThrees, HashSet<Integer> userWoceFours, 
+			ArrayList<String> userMsgs, DsgNcFileHandler dsgHandler) 
+				throws IllegalArgumentException, FileNotFoundException, IOException {
+		// Get the SanityChecker messages
+		SCMessageList msgList = getCruiseMessages(expocode);
 
-		ArrayList<SocatWoceEvent> woceList = new ArrayList<SocatWoceEvent>();
-		SCMsgType lastType = SCMsgType.UNKNOWN;
-		SCMsgSeverity lastSeverity = SCMsgSeverity.UNKNOWN;
-		int lastColNum = 0;
-		ArrayList<DataLocation> locations = null;
-		for ( SCMessage msg : orderedMsgs ) {
+		TreeSet<WoceInfo> orderedWoceInfo = new TreeSet<WoceInfo>();
+		for ( SCMessage msg : msgList ) {
 			SCMsgType msgType = msg.getType();
 			if ( msgType.equals(SCMsgType.UNKNOWN) || msgType.equals(SCMsgType.METADATA) ) 
 				continue;
@@ -504,96 +565,172 @@ public class CheckerMessageHandler {
 			if ( colNum == 0 )
 				continue;
 
+			WoceInfo info = new WoceInfo();
+
+			if ( colNum > 0 )
+				info.columnIndex = colNum - 1;
+
+			info.rowIndex = rowNum - 1;
+
+			if ( severity.equals(SCMsgSeverity.ERROR) )
+				info.flag = '4';
+			else if ( severity.equals(SCMsgSeverity.WARNING) )
+				info.flag = '3';
+			else
+				throw new RuntimeException("Unexpected message severity of " + severity.toString());
+
+			// TODO: need better code to generate a reasonable generic explanation
+			String msgComment = msg.getExplanation();
+			if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) ) {
+				int k = msgComment.indexOf("outside the expected range");
+				info.comment = "Value is " + msgComment.substring(k);
+			}
+			else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) ) {
+				int k = msgComment.indexOf("outside the extreme range");
+				info.comment = "Value is " + msgComment.substring(k);
+			}
+			else if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) ) {
+				int k = msgComment.indexOf("should be");
+				info.comment = "Calculated ship speed is excessive; " + msgComment.substring(k);
+			}
+			else if ( msgType.equals(SCMsgType.DATA_BAD_SPEED) ) {
+				int k = msgComment.indexOf("should be");
+				info.comment = "Calculated ship speed is unreasonable; " + msgComment.substring(k);
+			}
+			else if ( msgType.equals(SCMsgType.DATA_TIME_SEQUENCE) ) {
+				info.comment = msgComment;
+			}
+			else if ( msgType.equals(SCMsgType.DATA_TIME_VALUE) ) {
+				info.comment = "Invalid date/time value";
+			}
+			else if ( msgType.equals(SCMsgType.DATA_MISSING) ) {
+				info.comment = msgComment;
+			}
+			else if ( msgType.equals(SCMsgType.DATA_CONSTANT) ) {
+				info.comment = "Data values are constant over a long period of time";
+			}
+			else if ( msgType.equals(SCMsgType.DATA_OUTLIER) ) {
+				int k = msgComment.indexOf("is outside") + 3;
+				info.comment = "Data values are " + msgComment.substring(k);
+			}
+			else if ( msgType.equals(SCMsgType.DATA_GAP) ) {
+				info.comment = msgComment;
+			}
+			else if ( msgType.equals(SCMsgType.DATA_METADATA_NOT_SAME) ) {
+				info.comment = msgComment;
+			}
+			else if ( msgType.equals(SCMsgType.DATA_ERROR) ) {
+				info.comment = msgComment;
+			}
+			else
+				throw new RuntimeException("Unexpected message type of " + msgType.toString());
+			orderedWoceInfo.add(info);
+		}
+
+		// Add any PI WOCE-3 flags 
+		if ( userWoceThrees != null ) {
+			for ( Integer rowIdx : userWoceThrees ) {
+				WoceInfo info = new WoceInfo();
+				info.rowIndex = rowIdx;
+				info.flag = '3';
+				info.comment = "PI-provided WOCE-3 flag";
+				if ( userMsgs != null ) {
+					String addnMsg = userMsgs.get(rowIdx);
+					if ( ! addnMsg.isEmpty() )
+						info.comment += ": " + addnMsg;
+				}
+				orderedWoceInfo.add(info);
+			}
+		}
+
+		// Add any PI WOCE-4 flags 
+		if ( userWoceFours != null ) {
+			for ( Integer rowIdx : userWoceFours ) {
+				WoceInfo info = new WoceInfo();
+				info.rowIndex = rowIdx;
+				info.flag = '4';
+				info.comment = "PI-provided WOCE-4 flag";
+				if ( userMsgs != null ) {
+					String addnMsg = userMsgs.get(rowIdx);
+					if ( ! addnMsg.isEmpty() )
+						info.comment += ": " + addnMsg;
+				}
+				orderedWoceInfo.add(info);
+			}
+		}
+
+		ArrayList<SocatWoceEvent> woceList = new ArrayList<SocatWoceEvent>();
+		// If no WOCE flags, return now before we read data from the DSG file
+		if ( orderedWoceInfo.isEmpty() )
+			return woceList;
+
+		// Get the longitudes, latitude, times, and regions IDs 
+		// from the full-data DSG file for this cruise
+		double[] longitudes = dsgHandler.readDoubleVarDataValues(expocode, 
+				Constants.SHORT_NAMES.get(Constants.longitude_VARNAME));
+		double[] latitudes = dsgHandler.readDoubleVarDataValues(expocode, 
+				Constants.SHORT_NAMES.get(Constants.latitude_VARNAME));
+		double[] times = dsgHandler.readDoubleVarDataValues(expocode, 
+				Constants.SHORT_NAMES.get(Constants.time_VARNAME));
+		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, 
+				Constants.SHORT_NAMES.get(Constants.regionID_VARNAME));
+		Date now = new Date();
+
+		Character lastFlag = null;
+		Integer lastColumnIndex = null;
+		String lastComment = null;
+		double[] dataValues = null;
+		String lastDataVarName = null;
+		ArrayList<DataLocation> locations = null;
+		for ( WoceInfo info : orderedWoceInfo ) {
+
 			// Check if a new WOCE event is needed
-			if ( ( ! msgType.equals(lastType) ) || 
-				 ( ! severity.equals(lastSeverity) ) ||
-				 ( colNum != lastColNum ) ) {
+			if ( ( ! info.flag.equals(lastFlag) ) ||
+				 ( ! info.columnIndex.equals(lastColumnIndex) ) ||
+				 ( ! info.comment.equals(lastComment) ) ) {
+				lastFlag = info.flag;
+				lastColumnIndex = info.columnIndex;
+				lastComment = info.comment;
+
 				SocatWoceEvent woceEvent = new SocatWoceEvent();
 				woceEvent.setExpocode(expocode);
-				woceEvent.setSocatVersion(cruiseData.getVersion());
-				woceEvent.setFlagDate(new Date());
+				woceEvent.setSocatVersion(socatVersion);
+				woceEvent.setFlag(info.flag);
+				woceEvent.setFlagDate(now);
 				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				if ( colNum > 0 ) {
-					DataColumnType dataType = cruiseData.getDataColTypes().get(colNum-1);
+				woceEvent.setComment(info.comment);
+
+				// If a column can be identified, assign it at get the values if we do not already have them 
+				if ( info.columnIndex != Integer.MAX_VALUE ) {
+					DataColumnType dataType = columnTypes.get(info.columnIndex);
 					String dataVarName = Constants.TYPE_TO_VARNAME_MAP.get(dataType);
-					if ( dataVarName != null )
+					if ( dataVarName != null ) {
 						woceEvent.setDataVarName(dataVarName);
+						if ( ! dataVarName.equals(lastDataVarName) ) {
+							dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);
+							lastDataVarName = dataVarName;
+						}
+					}
 				}
-
-				if ( severity.equals(SCMsgSeverity.ERROR) )
-					woceEvent.setFlag('4');
-				else if ( severity.equals(SCMsgSeverity.WARNING) )
-					woceEvent.setFlag('3');
-				else
-					throw new RuntimeException("Unexpected message severity of " + severity.toString());
-
-				// TODO: need better code to generate a reasonable generic explanation
-				String msgComment = msg.getExplanation();
-				if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) ) {
-					int k = msgComment.indexOf("outside the expected range");
-					woceEvent.setComment("Value is " + msgComment.substring(k));
-				}
-				else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) ) {
-					int k = msgComment.indexOf("outside the extreme range");
-					woceEvent.setComment("Value is " + msgComment.substring(k));
-				}
-				else if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) ) {
-					int k = msgComment.indexOf("should be");
-					woceEvent.setComment("Calculated ship speed is excessive; " + msgComment.substring(k));
-				}
-				else if ( msgType.equals(SCMsgType.DATA_BAD_SPEED) ) {
-					int k = msgComment.indexOf("should be");
-					woceEvent.setComment("Calculated ship speed is unreasonable; " + msgComment.substring(k));
-				}
-				else if ( msgType.equals(SCMsgType.DATA_TIME_SEQUENCE) ) {
-					woceEvent.setComment(msgComment);
-				}
-				else if ( msgType.equals(SCMsgType.DATA_TIME_VALUE) ) {
-					woceEvent.setComment("Invalid date/time value");
-				}
-				else if ( msgType.equals(SCMsgType.DATA_MISSING) ) {
-					woceEvent.setComment(msgComment);
-				}
-				else if ( msgType.equals(SCMsgType.DATA_CONSTANT) ) {
-					woceEvent.setComment("Data values are constant over a long period of time");
-				}
-				else if ( msgType.equals(SCMsgType.DATA_OUTLIER) ) {
-					int k = msgComment.indexOf("is outside") + 3;
-					woceEvent.setComment("Data values are " + msgComment.substring(k));
-				}
-				else if ( msgType.equals(SCMsgType.DATA_GAP) ) {
-					woceEvent.setComment(msgComment);
-				}
-				else if ( msgType.equals(SCMsgType.DATA_METADATA_NOT_SAME) ) {
-					woceEvent.setComment(msgComment);
-				}
-				else if ( msgType.equals(SCMsgType.DATA_ERROR) ) {
-					woceEvent.setComment(msgComment);
-				}
-				else
-					throw new RuntimeException("Unexpected message type of " + msgType.toString());
 
 				locations = new ArrayList<DataLocation>();
 				woceEvent.setLocations(locations);
-
 				woceList.add(woceEvent);
-				lastType = msgType;
-				lastSeverity = severity;
-				lastColNum = colNum;
 			}
 
-			// Add this location to the current WOCE event
+			// Add a location for the current WOCE event
 			DataLocation dataLoc = new DataLocation();
-			dataLoc.setRowNumber(rowNum);
-			// dataLoc.setDataDate(dataDate);
-			// dataLoc.setDataValue(dataValue);
-			// dataLoc.setLatitude(latitude);
-			// dataLoc.setLongitude(longitude);
-			// dataLoc.setRegionID(regionID);
-
+			dataLoc.setRowNumber(info.rowIndex + 1);
+			dataLoc.setDataDate(new Date(Math.round(times[info.rowIndex] * 1000.0)));
+			dataLoc.setLatitude(latitudes[info.rowIndex]);
+			dataLoc.setLongitude(longitudes[info.rowIndex]);
+			dataLoc.setRegionID(regionIDs[info.rowIndex]);
+			if ( info.columnIndex != Integer.MAX_VALUE )
+				dataLoc.setDataValue(dataValues[info.rowIndex]);
 			locations.add(dataLoc);
 		}
+
 		return woceList;
 	}
 

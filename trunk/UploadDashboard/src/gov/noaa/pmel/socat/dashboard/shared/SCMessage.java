@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SCMessage implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4600949633806244131L;
+	private static final long serialVersionUID = -2717225935448011731L;
 
 	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
 
@@ -320,37 +320,6 @@ public class SCMessage implements Serializable, IsSerializable {
 				", colNumber=" + colNumber + ", colName=" + colName + 
 				", explanation=" + explanation + "]";
 	}
-
-	/**
-	 * Compare using only the severities, types, column numbers, and row numbers of 
-	 * the messages (in that order).  Note that this is inconsistent with 
-	 * SCMessage.equals in that this is only examining four fields of SCMessage.
-	 */
-	public static Comparator<SCMessage> woceTypeComparator = 
-										new Comparator<SCMessage>() {
-		@Override
-		public int compare(SCMessage msg1, SCMessage msg2) {
-			if ( msg1 == msg2 )
-				return 0;
-			if ( msg1 == null )
-				return -1;
-			if ( msg2 == null )
-				return 1;
-			int val = msg1.getSeverity().compareTo(msg2.getSeverity());
-			if ( val != 0 )
-				return val;
-			val = msg1.getType().compareTo(msg2.getType());
-			if ( val != 0 )
-				return val;
-			val = Integer.compare(msg1.getColNumber(), msg2.getColNumber());
-			if ( val != 0 )
-				return val;
-			val = msg1.getRowNumber() - msg2.getRowNumber();
-			if ( val != 0 )
-				return val;
-			return 0;
-		}
-	};
 
 	/**
 	 * Compare using the severity of the messages.

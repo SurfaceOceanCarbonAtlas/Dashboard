@@ -215,7 +215,6 @@ public class SCMessageTest {
 		SCMessage msg = new SCMessage();
 		assertFalse( msg.equals(null) );
 		assertFalse( msg.equals(myExplanation) );
-		assertTrue( SCMessage.woceTypeComparator.compare(msg, null) > 0 );
 		assertTrue( SCMessage.severityComparator.compare(msg, null) > 0 );
 		assertTrue( SCMessage.rowNumComparator.compare(msg, null) > 0 );
 		assertTrue( SCMessage.timestampComparator.compare(msg, null) > 0 );
@@ -224,7 +223,6 @@ public class SCMessageTest {
 		assertTrue( SCMessage.colNumComparator.compare(msg, null) > 0 );
 		assertTrue( SCMessage.colNameComparator.compare(msg, null) > 0 );
 		assertTrue( SCMessage.explanationComparator.compare(msg, null) > 0 );
-		assertTrue( SCMessage.woceTypeComparator.compare(null, msg) < 0 );
 		assertTrue( SCMessage.severityComparator.compare(null, msg) < 0 );
 		assertTrue( SCMessage.rowNumComparator.compare(null, msg) < 0 );
 		assertTrue( SCMessage.timestampComparator.compare(null, msg) < 0 );
@@ -239,7 +237,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -253,8 +250,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertTrue( SCMessage.woceTypeComparator.compare(msg, other) > 0 );
-		assertTrue( SCMessage.woceTypeComparator.compare(other, msg) < 0 );
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -267,7 +262,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -281,8 +275,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertTrue( SCMessage.woceTypeComparator.compare(msg, other) > 0 );
-		assertTrue( SCMessage.woceTypeComparator.compare(other, msg) < 0 );
 		assertTrue( SCMessage.severityComparator.compare(msg, other) > 0 );
 		assertTrue( SCMessage.severityComparator.compare(other, msg) < 0 );
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
@@ -296,7 +288,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -310,8 +301,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertTrue( SCMessage.woceTypeComparator.compare(msg, other) > 0 );
-		assertTrue( SCMessage.woceTypeComparator.compare(other, msg) < 0 );
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertTrue( SCMessage.rowNumComparator.compare(msg, other) > 0 );
 		assertTrue( SCMessage.rowNumComparator.compare(other, msg) < 0 );
@@ -325,7 +314,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -339,7 +327,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertTrue( SCMessage.timestampComparator.compare(msg, other) > 0 );
@@ -353,7 +340,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -367,7 +353,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -381,7 +366,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -395,7 +379,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -409,7 +392,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -423,8 +405,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertTrue( SCMessage.woceTypeComparator.compare(msg, other) > 0 );
-		assertTrue( SCMessage.woceTypeComparator.compare(other, msg) < 0 );
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -438,7 +418,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -452,7 +431,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -466,7 +444,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -480,7 +457,6 @@ public class SCMessageTest {
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
@@ -494,7 +470,6 @@ public class SCMessageTest {
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.woceTypeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
 		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));

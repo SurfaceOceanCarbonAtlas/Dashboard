@@ -184,7 +184,7 @@ public class DashboardCruiseSubmitter {
 				// Create a SocatQCEvent for every region in which the cruise reports 
 				TreeSet<Character> regionsSet;
 				try {
-					regionsSet = dsgNcHandler.readDataRegions(expocode);
+					regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
 				} catch (Exception ex) {
 					throw new RuntimeException("Unexpected problems reading region IDs "
 							+ "from the newly created full-data DSG file for " + 

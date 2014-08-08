@@ -53,7 +53,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	Double dataValue;
 
 	/**
-	 * Creates an empty flag.
+	 * Creates an empty location.
 	 */
 	public DataLocation() {
 		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
