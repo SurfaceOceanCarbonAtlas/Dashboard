@@ -751,8 +751,8 @@ public class CheckerMessageHandler {
 					}
 				}
 
-				locations = new ArrayList<DataLocation>();
-				woceEvent.setLocations(locations);
+				// Directly modify the locations ArrayList in this object
+				locations = woceEvent.getLocations();
 				woceList.add(woceEvent);
 			}
 

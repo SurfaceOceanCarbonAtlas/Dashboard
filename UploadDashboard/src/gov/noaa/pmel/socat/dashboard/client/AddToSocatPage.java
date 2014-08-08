@@ -480,7 +480,10 @@ public class AddToSocatPage extends Composite {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
+				// Failure, so show fail message
+				// But still go back to the cruise list page since some may have succeeded
 				SocatUploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
+				CruiseListPage.showPage(false);
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});
