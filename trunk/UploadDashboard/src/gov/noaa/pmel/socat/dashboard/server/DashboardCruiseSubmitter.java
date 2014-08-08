@@ -10,7 +10,9 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,8 +182,31 @@ public class DashboardCruiseSubmitter {
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
-				
-				// Create a SocatQCEvent for every region in which the cruise reports 
+
+				// Create the QCEvent for submitting the initial QC flags
+				SocatQCEvent initQC = new SocatQCEvent();
+				initQC.setFlag(flag);
+				initQC.setExpocode(expocode);
+				initQC.setSocatVersion(cruise.getVersion());
+				initQC.setFlagDate(new Date());
+				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+				// Give the number of data rows with errors and  warnings as the message; 
+				// include a recommended 'F' flag if too many errors
+				String recFlag;
+				if ( cruiseData.getNumErrorRows() > DashboardUtils.MAX_ACCEPTABLE_ERRORS ) {
+					recFlag = "Recommend QC flag of " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + ": ";
+				}
+				else {
+					recFlag = "";
+				}
+				initQC.setComment(recFlag + "Automated data check found " + 
+						Integer.toString(cruiseData.getNumErrorRows()) + 
+						" data points with errors and " + 
+						Integer.toString(cruiseData.getNumWarnRows()) + 
+						" data points with warnings.");
+
+				// Get the regions in which the cruise reports 
 				TreeSet<Character> regionsSet;
 				try {
 					regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
@@ -190,42 +215,38 @@ public class DashboardCruiseSubmitter {
 							+ "from the newly created full-data DSG file for " + 
 							expocode + ": " + ex.getMessage());
 				}
-				ArrayList<Character> regions = new ArrayList<Character>(regionsSet.size() + 1);
-				// Add the global flag first because the database request handler 
-				// expects there to always be a global flag 
-				regions.add(DataLocation.GLOBAL_REGION_ID);
-				regions.addAll(regionsSet);
 
-				SocatQCEvent comment = new SocatQCEvent();
-				comment.setFlag(flag);
-				comment.setExpocode(expocode);
-				comment.setSocatVersion(cruise.getVersion());
-				comment.setFlagDate(new Date());
-				comment.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
-				comment.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				// Give the number of data rows with errors, warnings as the message; 
-				// possibly with a recommended 'F' flag if too many errors
-				String recFlag;
-				if ( cruiseData.getNumErrorRows() > DashboardUtils.MAX_ACCEPTABLE_ERRORS ) {
-					recFlag = "Recommend QC flag of " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + ": ";
-				}
-				else {
-					recFlag = "";
-				}
-				comment.setComment(recFlag + "Automated data check found " + 
-						Integer.toString(cruiseData.getNumErrorRows()) + 
-						" data points with errors and " + 
-						Integer.toString(cruiseData.getNumWarnRows()) + 
-						" data points with warnings.");
-
+				// Add a QC flag for the global region, as well as every region 
+				// in which the cruise reports, to the database 
 				try {
-					for ( Character regionID : regions ) {
-						comment.setRegionID(regionID);
-						databaseHandler.addQCEvent(comment);
+					// Add the global flag first because the database request handler 
+					// expects there to always be a global flag 
+					initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
+					databaseHandler.addQCEvent(initQC);
+					for ( Character regionID : regionsSet ) {
+						initQC.setRegionID(regionID);
+						databaseHandler.addQCEvent(initQC);
 					}
 				} catch (SQLException ex) {
-					throw new IllegalArgumentException("Unable to add a QC comment "
-							+ "with the data checking results:\n" + ex.getMessage());
+					throw new IllegalArgumentException("Unable to add a QC flag "
+							+ "with the data checking results:\n    " + ex.getMessage());
+				}
+
+				// Generate and add the WOCE flags from the SanityChecker results,
+				// as well as the user-provided WOCE flags, to the database
+				ArrayList<SocatWoceEvent> initWoceList;
+				try {
+					initWoceList = msgHandler.generateWoceEvents(cruiseData, dsgNcHandler);
+				} catch (IOException ex) {
+					throw new IllegalArgumentException(ex);
+				}
+				try {
+					for ( SocatWoceEvent woceEvent : initWoceList ) {
+						databaseHandler.addWoceEvent(woceEvent);
+					}
+				} catch (SQLException ex) {
+					throw new IllegalArgumentException("Unable to add a WOCE flag "
+							+ "with the data checking results:\n    " + ex.getMessage());
 				}
 
 				// Set up to save changes to version control
@@ -278,4 +299,5 @@ public class DashboardCruiseSubmitter {
 			throw new IllegalArgumentException(sb.toString());
 		}
 	}
+
 }

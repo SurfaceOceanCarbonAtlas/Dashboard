@@ -70,7 +70,7 @@ public class CheckerMessageHandler {
 			result = columnIndex.compareTo(other.columnIndex);
 			if ( result != 0 )
 				return result;
-			result = comment.compareTo(other.comment);
+			result = comment.toUpperCase().compareTo(other.comment.toUpperCase());
 			if ( result != 0 )
 				return result;
 			result = rowIndex.compareTo(other.rowIndex);
@@ -82,7 +82,7 @@ public class CheckerMessageHandler {
 			final int prime = 37;
 			int result = flag.hashCode();
 			result = result * prime + columnIndex.hashCode();
-			result = result * prime + comment.hashCode();
+			result = result * prime + comment.toUpperCase().hashCode();
 			result = prime * result + rowIndex.hashCode();
 			return result;
 		}
@@ -102,7 +102,7 @@ public class CheckerMessageHandler {
 				return false;
 			if ( ! columnIndex.equals(other.columnIndex) )
 				return false;
-			if ( ! comment.equals(other.comment) )
+			if ( ! comment.equalsIgnoreCase(other.comment) )
 				return false;
 			if ( ! rowIndex.equals(other.rowIndex) )
 				return false;
@@ -530,19 +530,48 @@ public class CheckerMessageHandler {
 	 * Generates a list of SocatWoceEvents to to be submitted from the saved cruise
 	 * messages as well as PI-provided WOCE flags.
 	 * 
+	 * @param cruiseData
+	 * 		generate SocatWoceEvents for this cruise.  Uses the expocode, version,
+	 * 		column types, user WOCE flags, and user WOCE comments from this object.
+	 * 		SanityChecker cruise messages are read from the saved messages file for
+	 * 		this cruise, and data is read from the saved full-data DSG file for this
+	 * 		cruise. 
+	 * @param dsgHandler
+	 * 		DSG file handler to use to get the full-data DSG file for the cruise
 	 * @return
 	 * 		the list of SocatWoceEvents for the cruise; never null but may be empty
 	 * @throws IllegalArgumentException
 	 * 		if the expocode in cruiseData is invalid, or 
 	 * 		if the messages file is invalid
 	 * @throws FileNotFoundException
-	 * 		if there is no messages file for the cruise
+	 * 		if there is no messages file for the cruise, or
+	 * 		if there is no full-data DSG file for the cruise
+	 * @throws IOException
+	 * 		if there is a problem opening or reading the full-data DSG file for the cruise
 	 */
-	public ArrayList<SocatWoceEvent> generateWoceEvents(String socatVersion,
-			String expocode, ArrayList<DataColumnType> columnTypes, 
-			HashSet<Integer> userWoceThrees, HashSet<Integer> userWoceFours, 
-			ArrayList<String> userMsgs, DsgNcFileHandler dsgHandler) 
-				throws IllegalArgumentException, FileNotFoundException, IOException {
+	public ArrayList<SocatWoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData, 
+			DsgNcFileHandler dsgHandler) 
+					throws IllegalArgumentException, FileNotFoundException, IOException {
+		// Get the info needed from the DashboardCruise
+		String version = cruiseData.getVersion();
+		String expocode = cruiseData.getExpocode();
+		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
+		HashSet<Integer> userWoceThrees = cruiseData.getUserWoceThreeRowIndices();
+		HashSet<Integer> userWoceFours = cruiseData.getUserWoceFourRowIndices();
+		int userCommentsIndex = -1;
+		for (int k = 0; k < columnTypes.size(); k++) {
+			DataColumnType type = columnTypes.get(k);
+			// Want COMMENT_WOCE_CO2_WATER, but if not given accept COMMENT_WOCE_CO2_ATM
+			if ( type.equals(DataColumnType.COMMENT_WOCE_CO2_WATER) ) {
+				userCommentsIndex = k;
+				break;
+			}
+			if ( type.equals(DataColumnType.COMMENT_WOCE_CO2_ATM) ) {
+				userCommentsIndex = k;
+			}
+		}
+		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
+
 		// Get the SanityChecker messages
 		SCMessageList msgList = getCruiseMessages(expocode);
 
@@ -567,11 +596,6 @@ public class CheckerMessageHandler {
 
 			WoceInfo info = new WoceInfo();
 
-			if ( colNum > 0 )
-				info.columnIndex = colNum - 1;
-
-			info.rowIndex = rowNum - 1;
-
 			if ( severity.equals(SCMsgSeverity.ERROR) )
 				info.flag = '4';
 			else if ( severity.equals(SCMsgSeverity.WARNING) )
@@ -579,7 +603,12 @@ public class CheckerMessageHandler {
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
 
-			// TODO: need better code to generate a reasonable generic explanation
+			if ( colNum > 0 )
+				info.columnIndex = colNum - 1;
+			// if no column index, leave as Integer.MAX_VALUE to put them last for this flag
+
+			// Generate a reasonable generic explanation for the WOCE flag
+			// TODO: need better way to get a reasonable generic explanation
 			String msgComment = msg.getExplanation();
 			if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) ) {
 				int k = msgComment.indexOf("outside the expected range");
@@ -624,39 +653,42 @@ public class CheckerMessageHandler {
 			}
 			else
 				throw new RuntimeException("Unexpected message type of " + msgType.toString());
+
+			info.rowIndex = rowNum - 1;
+
 			orderedWoceInfo.add(info);
 		}
 
 		// Add any PI WOCE-3 flags 
-		if ( userWoceThrees != null ) {
-			for ( Integer rowIdx : userWoceThrees ) {
-				WoceInfo info = new WoceInfo();
-				info.rowIndex = rowIdx;
-				info.flag = '3';
-				info.comment = "PI-provided WOCE-3 flag";
-				if ( userMsgs != null ) {
-					String addnMsg = userMsgs.get(rowIdx);
-					if ( ! addnMsg.isEmpty() )
-						info.comment += ": " + addnMsg;
-				}
-				orderedWoceInfo.add(info);
+		for ( Integer rowIdx : userWoceThrees ) {
+			WoceInfo info = new WoceInfo();
+			info.flag = '3';
+			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
+			// add ZZZZ to make these the last comments for the flag/column
+			info.comment = "ZZZZ PI-provided WOCE-3 flag";
+			if ( userCommentsIndex >= 0 ) {
+				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
+				if ( ! addnMsg.isEmpty() )
+					info.comment += " with comment/subflag: " + addnMsg;
 			}
+			info.rowIndex = rowIdx;
+			orderedWoceInfo.add(info);
 		}
 
 		// Add any PI WOCE-4 flags 
-		if ( userWoceFours != null ) {
-			for ( Integer rowIdx : userWoceFours ) {
-				WoceInfo info = new WoceInfo();
-				info.rowIndex = rowIdx;
-				info.flag = '4';
-				info.comment = "PI-provided WOCE-4 flag";
-				if ( userMsgs != null ) {
-					String addnMsg = userMsgs.get(rowIdx);
-					if ( ! addnMsg.isEmpty() )
-						info.comment += ": " + addnMsg;
-				}
-				orderedWoceInfo.add(info);
+		for ( Integer rowIdx : userWoceFours ) {
+			WoceInfo info = new WoceInfo();
+			info.flag = '4';
+			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
+			// add ZZZZ to make these the last comments for the flag/column
+			info.comment = "ZZZZ PI-provided WOCE-4 flag";
+			if ( userCommentsIndex >= 0 ) {
+				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
+				if ( ! addnMsg.isEmpty() )
+					info.comment += " with comment/subflag: " + addnMsg;
 			}
+			info.rowIndex = rowIdx;
+			orderedWoceInfo.add(info);
 		}
 
 		ArrayList<SocatWoceEvent> woceList = new ArrayList<SocatWoceEvent>();
@@ -694,14 +726,19 @@ public class CheckerMessageHandler {
 
 				SocatWoceEvent woceEvent = new SocatWoceEvent();
 				woceEvent.setExpocode(expocode);
-				woceEvent.setSocatVersion(socatVersion);
+				woceEvent.setSocatVersion(version);
 				woceEvent.setFlag(info.flag);
 				woceEvent.setFlagDate(now);
 				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				woceEvent.setComment(info.comment);
+				// Remove the ZZZZ added to the PI-provided WOCE flag comment
+				if ( info.comment.startsWith("ZZZZ PI-provided WOCE") )
+					woceEvent.setComment(info.comment.substring(5));
+				else
+					woceEvent.setComment(info.comment);
 
-				// If a column can be identified, assign it at get the values if we do not already have them 
+				// If a column can be identified, assign its name and 
+				// get its values if we do not already have them 
 				if ( info.columnIndex != Integer.MAX_VALUE ) {
 					DataColumnType dataType = columnTypes.get(info.columnIndex);
 					String dataVarName = Constants.TYPE_TO_VARNAME_MAP.get(dataType);
