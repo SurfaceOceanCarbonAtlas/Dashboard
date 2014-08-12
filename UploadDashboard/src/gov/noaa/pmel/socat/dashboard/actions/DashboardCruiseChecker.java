@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.actions;
 
-import gov.noaa.pmel.socat.dashboard.server.CheckerMessageHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;

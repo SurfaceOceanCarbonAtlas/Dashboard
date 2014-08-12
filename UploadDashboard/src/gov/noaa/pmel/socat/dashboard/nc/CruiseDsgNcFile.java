@@ -1,5 +1,6 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
+import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -624,6 +625,35 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
+	 * Updates this DSG file with the given expocode.
+	 * 
+	 * @param newExpocode
+	 * 		expocode to assign in the DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file is not valid
+	 * @throws IOException
+	 * 		if opening or writing to the DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the updated expocode to the DSG file throws one 
+	 */
+	public void updateExpocode(String newExpocode) 
+			throws IllegalArgumentException, IOException, InvalidRangeException {
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+			String varName = Constants.SHORT_NAMES.get(Constants.expocode_VARNAME);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
+			flagArray.setString(0, newExpocode);
+			ncfile.write(var, flagArray);
+		} finally {
+			ncfile.close();
+		}
+	}
+
+	/**
 	 * Updates this DSG file with the given QC flag.
 	 * 
 	 * @param qcEvent
@@ -633,7 +663,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IOException
 	 * 		if opening or writing to the DSG file throws one
 	 * @throws InvalidRangeException 
-	 * 		if writing the update QC flag to the DSG file throws one 
+	 * 		if writing the updated QC flag to the DSG file throws one 
 	 */
 	public void updateQCFlag(SocatQCEvent qcEvent) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {

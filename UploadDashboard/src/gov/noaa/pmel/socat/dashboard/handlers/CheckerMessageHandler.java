@@ -1,10 +1,10 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
-import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
@@ -45,71 +45,6 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  * @author Karl Smith
  */
 public class CheckerMessageHandler {
-
-	/**
-	 *  For combining and ordering all WOCE flags 
-	 */
-	class WoceInfo implements Comparable<WoceInfo> {
-		Character flag;
-		Integer columnIndex;
-		String comment;
-		Integer rowIndex;
-
-		public WoceInfo() {
-			flag = ' ';
-			columnIndex = Integer.MAX_VALUE;
-			comment = "";
-			rowIndex = -1;
-		}
-
-		@Override
-		public int compareTo(WoceInfo other) {
-			int result = flag.compareTo(other.flag);
-			if ( result != 0 )
-				return result;
-			result = columnIndex.compareTo(other.columnIndex);
-			if ( result != 0 )
-				return result;
-			result = comment.toUpperCase().compareTo(other.comment.toUpperCase());
-			if ( result != 0 )
-				return result;
-			result = rowIndex.compareTo(other.rowIndex);
-			return result;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 37;
-			int result = flag.hashCode();
-			result = result * prime + columnIndex.hashCode();
-			result = result * prime + comment.toUpperCase().hashCode();
-			result = prime * result + rowIndex.hashCode();
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( this == obj )
-				return true;
-			if ( obj == null )
-				return false;
-
-			if ( ! ( obj instanceof WoceInfo ) )
-				return false;
-			WoceInfo other = (WoceInfo) obj;
-
-			if ( ! flag.equals(other.flag) )
-				return false;
-			if ( ! columnIndex.equals(other.columnIndex) )
-				return false;
-			if ( ! comment.equalsIgnoreCase(other.comment) )
-				return false;
-			if ( ! rowIndex.equals(other.rowIndex) )
-				return false;
-
-			return true;
-		}
-	}
 
 	private static final String CRUISE_MSGS_FILENAME_EXTENSION = ".messages";
 	private static final String SCMSG_KEY_VALUE_SEP = ":";
@@ -163,7 +98,7 @@ public class CheckerMessageHandler {
 	 * @param filesDirName
 	 * 		save SanityChecker messages under this directory
 	 */
-	CheckerMessageHandler(String filesDirName) {
+	public CheckerMessageHandler(String filesDirName) {
 		filesDir = new File(filesDirName);
 		if ( ! filesDir.isDirectory() )
 			throw new IllegalArgumentException(filesDirName + " is not a directory");
@@ -184,6 +119,38 @@ public class CheckerMessageHandler {
 		// Get the name of the cruise messages file
 		return new File(filesDir, upperExpo.substring(0,4) + 
 				File.separatorChar + upperExpo + CRUISE_MSGS_FILENAME_EXTENSION);
+	}
+
+	/**
+	 * Appropriately renames a cruise messages file, if one exists, 
+	 * for a change in cruise expocode.
+	 * 
+	 * @param oldExpocode
+	 * 		standardized old expocode of the cruise
+	 * @param newExpocode
+	 * 		standardized new expocode for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if a messages file for the new expocode already exists, or
+	 * 		if unable to rename the messages file
+	 */
+	public void renameMsgsFile(String oldExpocode, String newExpocode) 
+											throws IllegalArgumentException {
+		File oldMsgsFile = cruiseMsgsFile(oldExpocode);
+		if ( ! oldMsgsFile.exists() ) 
+			return;
+
+		File newMsgsFile = cruiseMsgsFile(newExpocode);
+		if ( newMsgsFile.exists() )
+			throw new IllegalArgumentException(
+					"Messages file already exists for " + newExpocode);
+
+		File newParent = newMsgsFile.getParentFile();
+		if ( ! newParent.exists() ) 
+			newParent.mkdirs();
+
+		if ( ! oldMsgsFile.renameTo(newMsgsFile) ) 
+			throw new IllegalArgumentException("Unable to rename messages "
+					+ "file from " + oldExpocode + " to " + newExpocode);
 	}
 
 	/**
@@ -524,6 +491,71 @@ public class CheckerMessageHandler {
 		}
 
 		return msgList;
+	}
+
+	/**
+	 *  For combining and ordering all WOCE flags 
+	 */
+	private class WoceInfo implements Comparable<WoceInfo> {
+		Character flag;
+		Integer columnIndex;
+		String comment;
+		Integer rowIndex;
+
+		public WoceInfo() {
+			flag = ' ';
+			columnIndex = Integer.MAX_VALUE;
+			comment = "";
+			rowIndex = -1;
+		}
+
+		@Override
+		public int compareTo(WoceInfo other) {
+			int result = flag.compareTo(other.flag);
+			if ( result != 0 )
+				return result;
+			result = columnIndex.compareTo(other.columnIndex);
+			if ( result != 0 )
+				return result;
+			result = comment.toUpperCase().compareTo(other.comment.toUpperCase());
+			if ( result != 0 )
+				return result;
+			result = rowIndex.compareTo(other.rowIndex);
+			return result;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 37;
+			int result = flag.hashCode();
+			result = result * prime + columnIndex.hashCode();
+			result = result * prime + comment.toUpperCase().hashCode();
+			result = prime * result + rowIndex.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj )
+				return true;
+			if ( obj == null )
+				return false;
+
+			if ( ! ( obj instanceof WoceInfo ) )
+				return false;
+			WoceInfo other = (WoceInfo) obj;
+
+			if ( ! flag.equals(other.flag) )
+				return false;
+			if ( ! columnIndex.equals(other.columnIndex) )
+				return false;
+			if ( ! comment.equalsIgnoreCase(other.comment) )
+				return false;
+			if ( ! rowIndex.equals(other.rowIndex) )
+				return false;
+
+			return true;
+		}
 	}
 
 	/**

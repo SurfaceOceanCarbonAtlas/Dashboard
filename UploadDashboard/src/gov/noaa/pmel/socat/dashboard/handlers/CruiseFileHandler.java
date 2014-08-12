@@ -1,10 +1,11 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -91,7 +92,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
-	CruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
+	public CruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
 						String svnPassword) throws IllegalArgumentException {
 		super(cruiseFilesDirName, svnUsername, svnPassword);
 	}
@@ -692,6 +693,62 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			saveCruiseInfoToFile(cruise, commitMsg);
 		}
 		return cruise;
+	}
+
+	/**
+	 * Appropriately renames the cruise data and info files for a change 
+	 * in cruise expocode.  Renames the expocode in the data file.
+	 * 
+	 * @param oldExpocode
+	 * 		standardized old expocode of the cruise
+	 * @param newExpocode
+	 * 		standardized new expocode for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if the data or info file for the old expocode does not exist, 
+	 * 		if a data or info file for the new expocode already exists, or
+	 * 		if unable to rename the data or info file
+	 * @throws IOException 
+	 * 		if unable to update the data file for the cruise
+	 */
+	public void renameCruiseFiles(String oldExpocode, String newExpocode) 
+							throws IllegalArgumentException, IOException {
+		File oldDataFile = cruiseDataFile(oldExpocode);
+		if ( ! oldDataFile.exists() ) 
+			throw new IllegalArgumentException(
+					"Data file for " + oldExpocode + " does not exist");
+		File oldInfoFile = cruiseInfoFile(oldExpocode);
+		if ( ! oldInfoFile.exists() )
+			throw new IllegalArgumentException(
+					"Info file for " + oldExpocode + " does not exist");
+
+		File newDataFile = cruiseDataFile(newExpocode);
+		if ( newDataFile.exists() )
+			throw new IllegalArgumentException(
+					"Data file for " + oldExpocode + " already exist");
+		File newInfoFile = cruiseInfoFile(newExpocode);
+		if ( newInfoFile.exists() )
+			throw new IllegalArgumentException(
+					"Info file for " + oldExpocode + " already exist");
+
+		File newParent = newInfoFile.getParentFile();
+		if ( ! newParent.exists() ) 
+			newParent.mkdirs();
+
+		if ( ! oldInfoFile.renameTo(newInfoFile) ) 
+			throw new IllegalArgumentException("Unable to rename info "
+					+ "file from " + oldExpocode + " to " + newExpocode);
+		if ( ! oldDataFile.renameTo(newDataFile) ) {
+			newInfoFile.renameTo(oldInfoFile);
+			throw new IllegalArgumentException("Unable to rename data "
+					+ "file from " + oldExpocode + " to " + newExpocode);
+		}
+		// TODO: modify the expocode in the data file, both in the preamble and in a data column
+		BufferedReader dataReader = new BufferedReader(new FileReader(newDataFile));
+		try {
+			String dataline = dataReader.readLine();
+		} finally {
+			dataReader.close();
+		}
 	}
 
 	/**

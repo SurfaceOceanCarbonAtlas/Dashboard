@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.actions;
 
-import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -27,6 +27,21 @@ import java.util.TreeSet;
  */
 public class CruiseResubmitter {
 
+	CruiseFileHandler cruiseHandler;
+	DashboardCruiseChecker cruiseChecker;
+	DashboardCruiseSubmitter cruiseSubmitter;
+
+	/**
+	 * @param dataStore
+	 * 		create using the CruiseFileHandler, DashboardCruiseChecker,
+	 * 		and DashboardCruiseSubmitter given in this DashboardDataStore
+	 */
+	public CruiseResubmitter(DashboardDataStore dataStore) {
+		cruiseHandler = dataStore.getCruiseFileHandler();
+		cruiseChecker = dataStore.getDashboardCruiseChecker();
+		cruiseSubmitter = dataStore.getDashboardCruiseSubmitter();
+	}
+
 	/**
 	 * Rechecks the data of all cruises.  If a cruise had been submitted 
 	 * at some point, it is resubmitted and the QC status is set to 'N'
@@ -36,24 +51,21 @@ public class CruiseResubmitter {
 	 * 		expocode of the cruise to check/resubmit
 	 * @param username
 	 * 		user performing this submit
-	 * @param dataStore
-	 * 		data configuration for the dashboard
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
 	 * 		if problems access the cruise information or data file,
 	 * 		if problems updating the cruise information file,
 	 * 		if problems submitting the cruise for QC
 	 */
-	public static void resubmitCruise(String expocode, String username,
-			DashboardDataStore dataStore) throws IllegalArgumentException {
+	public void resubmitCruise(String expocode, String username) 
+											throws IllegalArgumentException {
 		// Get the information for this cruise
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 		String qcStatus = cruise.getQcStatus();
 		if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ) {
 			// Only check (do not submit) if the cruise has never been submitted
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-			dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
+			cruiseChecker.checkCruise(cruiseData);
 			cruiseHandler.saveCruiseInfoToFile(cruiseData, 
 					"Cruise data column types, units, and missing values for " + 
 					cruiseData.getExpocode() + " updated by " + username);
@@ -65,9 +77,8 @@ public class CruiseResubmitter {
 			// Submit the cruise for QC
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));
 			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date());
-			dataStore.getDashboardCruiseSubmitter()
-					 .submitCruises(expocodeSet, cruise.getArchiveStatus(), 
-									timestamp, false, username, null, null);
+			cruiseSubmitter.submitCruises(expocodeSet, cruise.getArchiveStatus(), 
+										  timestamp, false, username, null, null);
 			// Note that the cruise will now have a QC status of 'N' (new)
 		}
 	}
@@ -113,6 +124,7 @@ public class CruiseResubmitter {
 			ex.printStackTrace();
 			System.exit(1);
 		}
+		CruiseResubmitter resubmitter = new CruiseResubmitter(dataStore);
 		try {
 			// Get the expocode of the cruises to resubmit
 			TreeSet<String> allExpocodes = null; 
@@ -153,7 +165,7 @@ public class CruiseResubmitter {
 			// Recheck, and possibly resubmit, each of these cruises
 			for ( String expocode : allExpocodes ) {
 				try {
-					resubmitCruise(expocode, username, dataStore);
+					resubmitter.resubmitCruise(expocode, username);
 				} catch (Exception ex) {
 					System.err.println("Error updating " + expocode + " : " + ex.getMessage());
 					ex.printStackTrace();
@@ -170,3 +182,4 @@ public class CruiseResubmitter {
 	}
 
 }
+

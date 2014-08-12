@@ -1,8 +1,9 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
@@ -55,7 +56,7 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		also, if the default column name to type properties
 	 * 		file does not exist or is invalid.
 	 */
-	UserFileHandler(String userFilesDirName, String svnUsername,
+	public UserFileHandler(String userFilesDirName, String svnUsername,
 					String svnPassword) throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
 		// Generate the default data column name to type map

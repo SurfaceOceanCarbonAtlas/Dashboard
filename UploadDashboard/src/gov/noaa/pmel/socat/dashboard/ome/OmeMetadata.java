@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.ome;
 
+import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
-import gov.noaa.pmel.socat.dashboard.server.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
