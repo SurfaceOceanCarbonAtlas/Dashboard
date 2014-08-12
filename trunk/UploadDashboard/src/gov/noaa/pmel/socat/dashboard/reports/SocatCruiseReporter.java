@@ -874,7 +874,7 @@ public class SocatCruiseReporter {
 		Character charVal = dataVals.getWoceCO2Water();
 		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("9");
-		else if ( SocatCruiseData.CHAR_MISSING_VALUE.equals(charVal) || 
+		else if ( Character.valueOf(' ').equals(charVal) || 
 				  Character.valueOf('0').equals(charVal) )
 			fmtr.format("2");
 		else

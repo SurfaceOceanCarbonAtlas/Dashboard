@@ -15,18 +15,44 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1084266395207635831L;
+	private static final long serialVersionUID = -591447227147202258L;
 
+	public static final Character WOCE_GOOD = '2';
+	public static final Character WOCE_NOT_CHECKED = '2';
+	public static final Character WOCE_QUESTIONABLE = '3';
+	public static final Character WOCE_BAD = '4';
+
+	Character flag;
 	String dataVarName;
 	ArrayList<DataLocation> locations;
 
 	/**
-	 * Creates an empty flag
+	 * Creates an empty WOCE event with flag {@link #WOCE_NOT_CHECKED}
 	 */
 	public SocatWoceEvent() {
 		super();
+		flag = WOCE_NOT_CHECKED;
 		dataVarName = "";
 		locations = new ArrayList<DataLocation>();
+	}
+
+	/**
+	 * @return 
+	 * 		the flag; never null
+	 */
+	public Character getFlag() {
+		return flag;
+	}
+
+	/**
+	 * @param flag
+	 * 		the flag to set; if null, {@link #WOCE_NOT_CHECKED} is assigned
+	 */
+	public void setFlag(Character flag) {
+		if ( flag == null )
+			this.flag = WOCE_NOT_CHECKED;
+		else
+			this.flag = flag;
 	}
 
 	/**
@@ -76,6 +102,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
+		result = result * prime + flag.hashCode();
 		result = result * prime + dataVarName.hashCode();
 		result = result * prime + locations.hashCode();
 		return result;
@@ -93,6 +120,8 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 		SocatWoceEvent other = (SocatWoceEvent) obj;
 
 		if ( ! super.equals(other) )
+			return false;
+		if ( ! flag.equals(other.flag) )
 			return false;
 		if ( ! dataVarName.equals(other.dataVarName) )
 			return false;

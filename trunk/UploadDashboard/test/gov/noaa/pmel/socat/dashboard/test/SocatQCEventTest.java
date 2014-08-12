@@ -6,8 +6,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
@@ -32,17 +31,17 @@ public class SocatQCEventTest {
 	private static final String MY_COMMENT = "from SocatQCEvent unit test";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getFlag()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#getFlag()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setQCFlag(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetQcFlag() {
 		SocatQCEvent myflag = new SocatQCEvent();
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setFlag(MY_QC_FLAG);
 		assertEquals(MY_QC_FLAG, myflag.getFlag());
 		myflag.setFlag(null);
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 	}
 
 	/**
@@ -55,7 +54,7 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getExpocode());
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setExpocode(null);
 		assertEquals("", myflag.getExpocode());
 	}
@@ -71,7 +70,7 @@ public class SocatQCEventTest {
 		myflag.setSocatVersion(MY_SOCAT_VERSION);
 		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setSocatVersion(null);
 		assertEquals("", myflag.getSocatVersion());
 	}
@@ -83,14 +82,14 @@ public class SocatQCEventTest {
 	@Test
 	public void testGetSetRegionID() {
 		SocatQCEvent myflag = new SocatQCEvent();
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		myflag.setRegionID(MY_REGION_ID);
 		assertEquals(MY_REGION_ID, myflag.getRegionID());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setRegionID(null);
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 	}
 
 	/**
@@ -103,10 +102,10 @@ public class SocatQCEventTest {
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		myflag.setFlagDate(MY_FLAG_DATE);
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setFlagDate(null);
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 	}
@@ -122,10 +121,10 @@ public class SocatQCEventTest {
 		myflag.setUsername(MY_USERNAME);
 		assertEquals(MY_USERNAME, myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setUsername(null);
 		assertEquals("", myflag.getUsername());
 	}
@@ -142,10 +141,10 @@ public class SocatQCEventTest {
 		assertEquals(MY_REALNAME, myflag.getRealname());
 		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setRealname(null);
 		assertEquals("", myflag.getRealname());
 	}
@@ -163,10 +162,10 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getRealname());
 		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setComment(null);
 		assertEquals("", myflag.getComment());
 	}

@@ -377,16 +377,16 @@ public class DatabaseRequestHandler {
 			ResultSet rslts = getPrepStmt.executeQuery();
 			try {
 				while ( rslts.next() ) {
-					String flag = rslts.getString(1);
-					if ( flag == null )
+					String flagStr = rslts.getString(1);
+					if ( flagStr == null )
 						throw new SQLException("Unexpected null QC flag");
-					flag = flag.trim();
-					// Blank flag is valid - QC comment
-					if ( flag.length() < 1 )
+					flagStr = flagStr.trim();
+					// Should not be blank, but might be from older code for a comment
+					if ( (flagStr.length() < 1) || flagStr.equals(SocatQCEvent.QC_COMMENT.toString()) )
 						continue;
-					if ( (flag.length() > 1) ||
-						 (SocatQCEvent.FLAG_STATUS_MAP.get(flag.charAt(0)) == null) ) 
-						throw new SQLException("Unexpected QC flag of '" + flag + "'");
+					if ( (flagStr.length() > 1) ||
+						 (SocatQCEvent.FLAG_STATUS_MAP.get(flagStr.charAt(0)) == null) ) 
+						throw new SQLException("Unexpected QC flag of '" + flagStr + "'");
 					Long time = rslts.getLong(2);
 					if ( time < 750000000L )
 						throw new SQLException("Unexpected null or invalid flag time of " + time.toString());
@@ -402,7 +402,7 @@ public class DatabaseRequestHandler {
 						throw new SQLException("Unexpected region ID of '" + region + "'");
 					Character regionID = region.charAt(0);
 					SocatQCEvent qcFlag = new SocatQCEvent();
-					qcFlag.setFlag(flag.charAt(0));
+					qcFlag.setFlag(flagStr.charAt(0));
 					qcFlag.setFlagDate(new Date(time * 1000L));
 					qcFlag.setRegionID(regionID);
 					// last are latest, so no need to check the return value
@@ -420,20 +420,20 @@ public class DatabaseRequestHandler {
 			Date globalDate = lastGlobalFlag.getFlagDate();
 			Character globalFlag = lastGlobalFlag.getFlag();
 			Character lastFlag = null;
-			for ( SocatQCEvent flag : regionFlags.values() ) {
+			for ( SocatQCEvent flagEvent : regionFlags.values() ) {
 				// Use the region flag if assigned after the global flag; otherwise use the global flag
-				Character thisFlag;
-				if ( flag.getFlagDate().after(globalDate) ) {
-					thisFlag = flag.getFlag();
+				Character flag;
+				if ( flagEvent.getFlagDate().after(globalDate) ) {
+					flag = flagEvent.getFlag();
 				}
 				else {
-					thisFlag = globalFlag;
+					flag = globalFlag;
 				}
 				// If any of these region flag do not match, reassign a conflict flag to qcEvent
 				if ( lastFlag == null ) {
-					lastFlag = thisFlag;
+					lastFlag = flag;
 				}
-				else if ( ! lastFlag.equals(thisFlag) ) {
+				else if ( ! lastFlag.equals(flag) ) {
 					qcEvent.setFlag(SocatQCEvent.QC_CONFLICT_FLAG);
 					break;
 				}

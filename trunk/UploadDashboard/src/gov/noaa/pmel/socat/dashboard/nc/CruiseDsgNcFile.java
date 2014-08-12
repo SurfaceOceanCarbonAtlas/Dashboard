@@ -40,7 +40,7 @@ public class CruiseDsgNcFile extends File {
 
 	private static final long serialVersionUID = 8617406990008180119L;
 
-	private static final String VERSION = "CruiseDsgNcFile 1.1";
+	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 
@@ -538,9 +538,9 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
-	 * as characters.  Empty strings are changed to 
-	 * {@link SocatCruiseData#CHAR_MISSING_VALUE}.  For some variables, this 
-	 * DSG file must have been processes by Ferret, such as when saved using 
+	 * as characters.  Empty strings are changed to a single blank character.
+	 * For some variables, this DSG file must have been processes by Ferret, 
+	 * such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
 	 * 
@@ -572,7 +572,7 @@ public class CruiseDsgNcFile extends File {
 			for (int k = 0; k < numVals; k++) {
 				char value = cvar.get(k,0);
 				if ( value == (char) 0 )
-					value = SocatCruiseData.CHAR_MISSING_VALUE;
+					value = ' ';
 				dataVals[k] = value;
 			}
 		} finally {

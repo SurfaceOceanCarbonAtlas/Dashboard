@@ -15,9 +15,8 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1364838885216102670L;
+	private static final long serialVersionUID = -7397909715673215928L;
 
-	Character flag;
 	Date flagDate;
 	String expocode;
 	String socatVersion;
@@ -29,32 +28,12 @@ public class SocatEvent implements Serializable, IsSerializable {
 	 * Creates an empty flag
 	 */
 	public SocatEvent() {
-		flag = SocatCruiseData.CHAR_MISSING_VALUE;
 		flagDate = SocatMetadata.DATE_MISSING_VALUE;
 		expocode = "";
 		socatVersion = "";
 		username = "";
 		realname = "";
 		comment = "";
-	}
-
-	/**
-	 * @return 
-	 * 		the flag; never null but may be {@link SocatCruiseData#CHAR_MISSING_VALUE}
-	 */
-	public Character getFlag() {
-		return flag;
-	}
-
-	/**
-	 * @param flag 
-	 * 		the flag to set; if null {@link SocatCruiseData#CHAR_MISSING_VALUE} is assigned
-	 */
-	public void setFlag(Character flag) {
-		if ( flag == null )
-			this.flag = SocatCruiseData.CHAR_MISSING_VALUE;
-		else
-			this.flag = flag;
 	}
 
 	/**
@@ -175,8 +154,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = flag.hashCode();
-		result = result * prime + flagDate.hashCode();
+		int result = flagDate.hashCode();
 		result = result * prime + expocode.hashCode();
 		result = result * prime + socatVersion.hashCode();
 		result = result * prime + username.hashCode();
@@ -196,8 +174,6 @@ public class SocatEvent implements Serializable, IsSerializable {
 			return false;
 		SocatEvent other = (SocatEvent) obj;
 
-		if ( ! flag.equals(other.flag) )
-			return false;
 		if ( ! flagDate.equals(other.flagDate) )
 			return false;
 		if ( ! expocode.equals(other.expocode) )
@@ -217,8 +193,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 	@Override
 	public String toString() {
 		return "SocatEvent" +
-				"[\n    flag='" + flag.toString() + "'" +
-				",\n    flagDate=" + flagDate.toString() + 
+				"[\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 
 				",\n    username=" + username + 

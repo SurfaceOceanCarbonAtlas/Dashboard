@@ -6,9 +6,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
@@ -55,17 +53,17 @@ public class SocatWoceEventTest {
 	private static final String MY_COMMENT = "from SocatWoceEvent unit test";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getFlag()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getFlag()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setFlag(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetQcFlag() {
 		SocatWoceEvent myflag = new SocatWoceEvent();
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setFlag(MY_WOCE_FLAG);
 		assertEquals(MY_WOCE_FLAG, myflag.getFlag());
 		myflag.setFlag(null);
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 	}
 
 	/**
@@ -78,7 +76,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getExpocode());
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setExpocode(null);
 		assertEquals("", myflag.getExpocode());
 	}
@@ -94,7 +92,7 @@ public class SocatWoceEventTest {
 		myflag.setSocatVersion(MY_SOCAT_VERSION);
 		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setSocatVersion(null);
 		assertEquals("", myflag.getSocatVersion());
 	}
@@ -111,7 +109,7 @@ public class SocatWoceEventTest {
 		assertEquals(MY_DATA_VAR_NAME, myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setDataVarName(null);
 		assertEquals("", myflag.getDataVarName());
 	}
@@ -129,7 +127,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setLocations(null);
 		assertEquals(0, myflag.getLocations().size());
 	}
@@ -148,7 +146,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setFlagDate(null);
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 	}
@@ -168,7 +166,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setUsername(null);
 		assertEquals("", myflag.getUsername());
 	}
@@ -189,7 +187,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setRealname(null);
 		assertEquals("", myflag.getRealname());
 	}
@@ -211,7 +209,7 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getDataVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, myflag.getFlag());
+		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setComment(null);
 		assertEquals("", myflag.getComment());
 	}
