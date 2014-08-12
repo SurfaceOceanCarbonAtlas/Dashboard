@@ -8,7 +8,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -116,7 +118,6 @@ public class SocatCruiseDataTest {
 			woceFours.add(new HashSet<Integer>());
 		}
 		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
-		Character noWoce = ' ';
 		for (int k = 0; k < dataList.size(); k++) {
 			SocatCruiseData dataRow = dataList.get(k);
 			assertEquals(EXPECTED_YEARS.get(k), dataRow.getYear());
@@ -165,9 +166,9 @@ public class SocatCruiseDataTest {
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getGvCO2());
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getDistToLand());
 			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataRow.getfCO2Source());
-			assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, dataRow.getRegionID());
-			assertEquals(noWoce, dataRow.getWoceCO2Water());
-			assertEquals(noWoce, dataRow.getWoceCO2Atm());
+			assertEquals(DataLocation.GLOBAL_REGION_ID, dataRow.getRegionID());
+			assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Water());
+			assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Atm());
 		}
 	}
 
@@ -1550,7 +1551,7 @@ public class SocatCruiseDataTest {
 	@Test
 	public void testGetSetRegionID() {
 		SocatCruiseData data = new SocatCruiseData();
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 		data.setRegionID(REGION_ID);
 		assertEquals(REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
@@ -1593,7 +1594,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getYear());
 		data.setRegionID(null);
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 	}
 
 	static final Double CALC_SPEED = 2.5;
@@ -1607,7 +1608,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
 		data.setCalcSpeed(CALC_SPEED);
 		assertEquals(CALC_SPEED, data.getCalcSpeed());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
@@ -1663,7 +1664,7 @@ public class SocatCruiseDataTest {
 		data.setEtopo2Depth(ETOPO2);
 		assertEquals(ETOPO2, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
@@ -1720,7 +1721,7 @@ public class SocatCruiseDataTest {
 		assertEquals(GVCO2, data.getGvCO2());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());
@@ -1778,7 +1779,7 @@ public class SocatCruiseDataTest {
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getGvCO2());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getEtopo2Depth());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getCalcSpeed());
-		assertEquals(SocatCruiseData.CHAR_MISSING_VALUE, data.getRegionID());
+		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getDeltaT());
 		assertEquals(SocatCruiseData.INT_MISSING_VALUE, data.getfCO2Source());
 		assertEquals(SocatCruiseData.FP_MISSING_VALUE, data.getfCO2Rec());

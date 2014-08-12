@@ -597,14 +597,14 @@ public class CheckerMessageHandler {
 			WoceInfo info = new WoceInfo();
 
 			if ( severity.equals(SCMsgSeverity.ERROR) )
-				info.flag = '4';
+				info.flag = SocatWoceEvent.WOCE_BAD;
 			else if ( severity.equals(SCMsgSeverity.WARNING) )
-				info.flag = '3';
+				info.flag = SocatWoceEvent.WOCE_QUESTIONABLE;
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
 			// TODO: Only add SanityChecker WOCE-4 flags for now 
 			// (here and at the end of DashboardCruiseChecker.standardizeCruiseData)
-			if ( ! info.flag.equals('4') )
+			if ( ! info.flag.equals(SocatWoceEvent.WOCE_BAD) )
 				continue;
 
 			if ( colNum > 0 )
@@ -666,7 +666,7 @@ public class CheckerMessageHandler {
 		// Add any PI WOCE-3 flags 
 		for ( Integer rowIdx : userWoceThrees ) {
 			WoceInfo info = new WoceInfo();
-			info.flag = '3';
+			info.flag = SocatWoceEvent.WOCE_QUESTIONABLE;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
 			info.comment = "ZZZZ PI-provided WOCE-3 flag";
@@ -682,7 +682,7 @@ public class CheckerMessageHandler {
 		// Add any PI WOCE-4 flags 
 		for ( Integer rowIdx : userWoceFours ) {
 			WoceInfo info = new WoceInfo();
-			info.flag = '4';
+			info.flag = SocatWoceEvent.WOCE_BAD;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
 			info.comment = "ZZZZ PI-provided WOCE-4 flag";

@@ -29,8 +29,8 @@ public class CruiseResubmitter {
 
 	/**
 	 * Rechecks the data of all cruises.  If a cruise had been submitted 
-	 * at some point, it is resubmitted and the QC status is set to 'U'
-	 * (updated).  Requests to "send to CDIAC immediately" are not re-sent.
+	 * at some point, it is resubmitted and the QC status is set to 'N'
+	 * (new).  Requests to "send to CDIAC immediately" are not re-sent.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise to check/resubmit
@@ -59,8 +59,8 @@ public class CruiseResubmitter {
 					cruiseData.getExpocode() + " updated by " + username);
 		}
 		else {
-			// Suspend the cruise but do not bother committing the change
-			cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
+			// Un-submit the cruise but do not bother committing the change
+			cruise.setQcStatus(SocatQCEvent.QC_STATUS_NOT_SUBMITTED);
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));
@@ -68,14 +68,14 @@ public class CruiseResubmitter {
 			dataStore.getDashboardCruiseSubmitter()
 					 .submitCruises(expocodeSet, cruise.getArchiveStatus(), 
 									timestamp, false, username, null, null);
-			// Note that the cruise will now have a QC status of 'U' (updated)
+			// Note that the cruise will now have a QC status of 'N' (new)
 		}
 	}
 
 	/**
 	 * Rechecks all cruises, and resubmits all cruises that had been submitted, 
 	 * in the default dashboard configuration.  Resubmitted cruises will have a
-	 * QC status of 'U' (updated).
+	 * QC status of 'N' (new).
 	 * 
 	 * @param args
 	 * 		Username - name of the dashboard (admin) user requesting this update.
@@ -86,7 +86,7 @@ public class CruiseResubmitter {
 			System.err.println();
 			System.err.println("Rechecks all cruises, or those specified in ExpocodesFile if given. ");
 			System.err.println("Resubmits all cruises that had been submitted.  Resubmitted cruises ");
-			System.err.println("will have a QC status of 'U' (updated).  The default dashboard ");
+			System.err.println("will have a QC status of 'N' (new).  The default dashboard ");
 			System.err.println("configuration is used for this recheck and resubmit process. ");
 			System.err.println();
 			System.err.println("Username is the dashboard admin requesting this update.");

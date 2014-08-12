@@ -20,6 +20,7 @@ public class DataLocation implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = -6320586997492783178L;
 
+	public static final Character GLOBAL_REGION_ID = 'G';
 	public static final Character NORTH_PACIFIC_REGION_ID = 'N';
 	public static final Character TROPICAL_PACIFIC_REGION_ID = 'T';
 	public static final Character NORTH_ATLANTIC_REGION_ID = 'A';
@@ -28,12 +29,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	public static final Character COASTAL_REGION_ID = 'C';
 	public static final Character SOUTHERN_OCEANS_REGION_ID = 'O';
 	public static final Character ARCTIC_REGION_ID = 'R';
-	public static final Character GLOBAL_REGION_ID = 'G';
 
 	public static final HashMap<Character,String> REGION_NAMES;
 	static {
 		REGION_NAMES = new HashMap<Character,String>();
-		REGION_NAMES.put(SocatCruiseData.CHAR_MISSING_VALUE, "Unknown");
+		REGION_NAMES.put(GLOBAL_REGION_ID, "Global");
 		REGION_NAMES.put(NORTH_PACIFIC_REGION_ID, "North Pacific");
 		REGION_NAMES.put(TROPICAL_PACIFIC_REGION_ID, "Tropical Pacific");
 		REGION_NAMES.put(NORTH_ATLANTIC_REGION_ID, "North Atlantic");
@@ -42,7 +42,6 @@ public class DataLocation implements Serializable, IsSerializable {
 		REGION_NAMES.put(COASTAL_REGION_ID, "Coastal");
 		REGION_NAMES.put(SOUTHERN_OCEANS_REGION_ID, "Southern Oceans");
 		REGION_NAMES.put(ARCTIC_REGION_ID, "Artic");
-		REGION_NAMES.put(GLOBAL_REGION_ID, "Global");
 	}
 
 	Character regionID;
@@ -53,10 +52,10 @@ public class DataLocation implements Serializable, IsSerializable {
 	Double dataValue;
 
 	/**
-	 * Creates an empty location.
+	 * Creates an empty location with a global region ID
 	 */
 	public DataLocation() {
-		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
+		regionID = GLOBAL_REGION_ID;
 		rowNumber = SocatCruiseData.INT_MISSING_VALUE;
 		dataDate = SocatMetadata.DATE_MISSING_VALUE;
 		longitude = SocatCruiseData.FP_MISSING_VALUE;
@@ -66,8 +65,7 @@ public class DataLocation implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the region ID for this WOCE flag; 
-	 * 		never null but may be {@link SocatCruiseData#CHAR_MISSING_VALUE}
+	 * 		the region ID for this WOCE flag; never null
 	 */
 	public Character getRegionID() {
 		return regionID;
@@ -76,11 +74,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param regionID 
 	 * 		the region ID to set for this WOCE flag; 
-	 * 		if null, {@link SocatCruiseData#CHAR_MISSING_VALUE} is assigned
+	 * 		if null, {@link #GLOBAL_REGION_ID} is assigned
 	 */
 	public void setRegionID(Character regionID) {
 		if ( regionID == null )
-			this.regionID = SocatCruiseData.CHAR_MISSING_VALUE;
+			this.regionID = GLOBAL_REGION_ID;
 		else
 			this.regionID = regionID;
 	}

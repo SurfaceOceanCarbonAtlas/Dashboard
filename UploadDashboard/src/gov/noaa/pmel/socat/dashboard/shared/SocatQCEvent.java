@@ -15,15 +15,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7452039882025453331L;
+	private static final long serialVersionUID = -1742421563751831057L;
 
-	// All possible QC flags other than the unassigned flag {@link SocatCruiseData#CHAR_MISSING_VALUE}
+	// All possible QC flags
 	public static final Character QC_A_FLAG = 'A';
 	public static final Character QC_B_FLAG = 'B';
 	public static final Character QC_C_FLAG = 'C';
 	public static final Character QC_D_FLAG = 'D';
 	public static final Character QC_E_FLAG = 'E';
 	public static final Character QC_UNACCEPTABLE_FLAG = 'F';
+	public static final Character QC_COMMENT = 'H';
 	public static final Character QC_NEW_FLAG = 'N';
 	public static final Character QC_PREVIEW_FLAG = 'P';
 	public static final Character QC_CONFLICT_FLAG = 'Q';
@@ -50,12 +51,11 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	public static final String QC_STATUS_RENAMED = "Renamed";
 
 	/**
-	 * Map of QC flag characters to QC status strings
+	 * Map of QC submitted status flag characters to QC status strings
 	 */
 	public static final HashMap<Character,String> FLAG_STATUS_MAP = 
 			new HashMap<Character,String>();
 	static {
-		FLAG_STATUS_MAP.put(SocatCruiseData.CHAR_MISSING_VALUE, QC_STATUS_NOT_SUBMITTED);
 		FLAG_STATUS_MAP.put(QC_A_FLAG, QC_STATUS_ACCEPTED_A);
 		FLAG_STATUS_MAP.put(QC_B_FLAG, QC_STATUS_ACCEPTED_B);
 		FLAG_STATUS_MAP.put(QC_C_FLAG, QC_STATUS_ACCEPTED_C);
@@ -71,20 +71,40 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		FLAG_STATUS_MAP.put(QC_EXCLUDE_FLAG, QC_STATUS_EXCLUDED);
 	}
 
+	Character flag;
 	Character regionID;
 
 	/**
-	 * Creates an empty flag
+	 * Creates an empty QC flag as a comment in the global region 
 	 */
 	public SocatQCEvent() {
 		super();
-		regionID = SocatCruiseData.CHAR_MISSING_VALUE;
+		flag = QC_COMMENT;
+		regionID = DataLocation.GLOBAL_REGION_ID;
 	}
 
 	/**
 	 * @return 
-	 * 		the region ID for this QC flag; 
-	 * 		never null but may be {@link SocatCruiseData#CHAR_MISSING_VALUE}
+	 * 		the flag; never null
+	 */
+	public Character getFlag() {
+		return flag;
+	}
+
+	/**
+	 * @param flag 
+	 * 		the flag to set; if null {@link #QC_COMMENT} is assigned
+	 */
+	public void setFlag(Character flag) {
+		if ( flag == null )
+			this.flag = QC_COMMENT;
+		else
+			this.flag = flag;
+	}
+
+	/**
+	 * @return 
+	 * 		the region ID for this QC flag; never null
 	 */
 	public Character getRegionID() {
 		return regionID;
@@ -93,11 +113,11 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	/**
 	 * @param regionID 
 	 * 		the region ID to set for this QC flag; 
-	 * 		if null, {@link SocatCruiseData#CHAR_MISSING_VALUE} is assigned
+	 * 		if null, {@link DataLocation#GLOBAL_REGION_ID} is assigned
 	 */
 	public void setRegionID(Character regionID) {
 		if ( regionID == null )
-			this.regionID = SocatCruiseData.CHAR_MISSING_VALUE;
+			this.regionID = DataLocation.GLOBAL_REGION_ID;
 		else
 			this.regionID = regionID;
 	}
@@ -106,6 +126,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
+		result = result * prime + flag.hashCode();
 		result = result * prime + regionID.hashCode();
 		return result;
 	}
@@ -122,6 +143,8 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		SocatQCEvent other = (SocatQCEvent) obj;
 
 		if ( ! super.equals(other) )
+			return false;
+		if ( ! flag.equals(other.flag) )
 			return false;
 		if ( ! regionID.equals(other.regionID) )
 			return false;

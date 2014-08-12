@@ -17,7 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4493991281281106844L;
+	private static final long serialVersionUID = 1918665099211273971L;
 
 	static final double MAX_RELATIVE_ERROR = 1.0E-6;
 	static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
@@ -30,10 +30,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	 *  Missing value for integer variables
 	 */
 	public static final Integer INT_MISSING_VALUE = -1;
-	/**
-	 *  Missing value for single character variables (regionID, all the WOCE flags)
-	 */
-	public static final Character CHAR_MISSING_VALUE = ' ';
 
 	// Sequence number (starts with one) of this data point in the data set
 	Integer rowNum;
@@ -204,8 +200,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		windDirectionTrue = FP_MISSING_VALUE;
 		windDirectionRelative = FP_MISSING_VALUE;
 
-		woceCO2Water = CHAR_MISSING_VALUE;
-		woceCO2Atm = CHAR_MISSING_VALUE;
+		woceCO2Water = SocatWoceEvent.WOCE_NOT_CHECKED;
+		woceCO2Atm = SocatWoceEvent.WOCE_NOT_CHECKED;
 
 		woaSss = FP_MISSING_VALUE;
 		ncepSlp = FP_MISSING_VALUE;
@@ -228,7 +224,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		fCO2Rec = FP_MISSING_VALUE;
 		fCO2Source = INT_MISSING_VALUE;
 		deltaT = FP_MISSING_VALUE;
-		regionID = CHAR_MISSING_VALUE;
+		regionID = DataLocation.GLOBAL_REGION_ID;
 		calcSpeed = FP_MISSING_VALUE;
 		etopo2Depth = FP_MISSING_VALUE;
 		gvCO2 = FP_MISSING_VALUE;
@@ -1366,7 +1362,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the woceCO2Water;
-	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 * 		never null but could be {@link SocatWoceEvent#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Water() {
 		return woceCO2Water;
@@ -1375,11 +1371,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woceCO2Water 
 	 * 		the woceCO2Water to set;
-	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 * 		if null, {@link SocatWoceEvent#WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setWoceCO2Water(Character woceCO2Water) {
 		if ( woceCO2Water == null )
-			this.woceCO2Water = CHAR_MISSING_VALUE;
+			this.woceCO2Water = SocatWoceEvent.WOCE_NOT_CHECKED;
 		else
 			this.woceCO2Water = woceCO2Water;
 	}
@@ -1387,7 +1383,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the woceCO2Atm;
-	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 * 		never null but could be {@link SocatWoceEvent#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Atm() {
 		return woceCO2Atm;
@@ -1396,11 +1392,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woceCO2Atm 
 	 * 		the woceCO2Atm to set;
-	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 * 		if null, {@link #SocatWoceEvent#WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setWoceCO2Atm(Character woceCO2Atm) {
 		if ( woceCO2Atm == null )
-			this.woceCO2Atm = CHAR_MISSING_VALUE;
+			this.woceCO2Atm = SocatWoceEvent.WOCE_NOT_CHECKED;
 		else
 			this.woceCO2Atm = woceCO2Atm;
 	}
@@ -1807,7 +1803,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the region ID;
-	 * 		never null but could be {@link #CHAR_MISSING_VALUE} if not assigned
+	 * 		never null but could be {@link DataLocation#GLOBAL_REGION_ID} if not assigned
 	 */
 	public Character getRegionID() {
 		return regionID;
@@ -1816,11 +1812,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param regionID 
 	 * 		the region ID to set;
-	 * 		if null, {@link #CHAR_MISSING_VALUE} is assigned
+	 * 		if null, {@link DataLocation#GLOBAL_REGION_ID} is assigned
 	 */
 	public void setRegionID(Character regionID) {
 		if ( regionID == null )
-			this.regionID = CHAR_MISSING_VALUE;
+			this.regionID = DataLocation.GLOBAL_REGION_ID;
 		else
 			this.regionID = regionID;
 	}
