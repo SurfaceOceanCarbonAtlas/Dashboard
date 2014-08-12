@@ -1,10 +1,15 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.nc.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.CheckerMessageHandler;
+import gov.noaa.pmel.socat.dashboard.server.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DatabaseRequestHandler;
+import gov.noaa.pmel.socat.dashboard.server.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -38,7 +43,7 @@ public class DashboardCruiseSubmitter {
 	/**
 	 * Create with the file handlers and data checker in the given data store.
 	 */
-	DashboardCruiseSubmitter(DashboardDataStore dataStore) {
+	public DashboardCruiseSubmitter(DashboardDataStore dataStore) {
 		cruiseHandler = dataStore.getCruiseFileHandler();
 		msgHandler = dataStore.getCheckerMsgHandler();
 		metadataHandler = dataStore.getMetadataFileHandler();

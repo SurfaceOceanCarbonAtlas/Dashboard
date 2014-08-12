@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
 
 import java.io.IOException;

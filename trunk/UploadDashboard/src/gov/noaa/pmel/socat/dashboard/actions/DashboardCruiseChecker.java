@@ -1,8 +1,9 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.actions;
 
+import gov.noaa.pmel.socat.dashboard.server.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -51,7 +52,7 @@ public class DashboardCruiseChecker {
 	/**
 	 * Indices of user-provided data columns. 
 	 */
-	class ColumnIndices {
+	private class ColumnIndices {
 		int timestampIndex = -1;
 		int dateIndex = -1;
 		int yearIndex = -1;
@@ -65,6 +66,7 @@ public class DashboardCruiseChecker {
 		int secondOfDayIndex = -1;
 		int longitudeIndex = -1;
 		int latitudeIndex = -1;
+		/*
 		int sampleDepthIndex = -1;
 		int salinityIndex = -1;
 		int tEquIndex = -1;
@@ -98,6 +100,7 @@ public class DashboardCruiseChecker {
 		int windSpeedRelIndex = -1;
 		int windDirTrueIndex = -1;
 		int windDirRelIndex = -1;
+		*/
 		int woceCO2WaterIndex = -1;
 		int woceCO2AtmIndex = -1;
 	}
@@ -144,6 +147,7 @@ public class DashboardCruiseChecker {
 				colIndcs.longitudeIndex = k;
 			else if ( colType.equals(DataColumnType.LATITUDE) )
 				colIndcs.latitudeIndex = k;
+			/*
 			else if ( colType.equals(DataColumnType.SAMPLE_DEPTH) )
 				colIndcs.sampleDepthIndex = k;
 			else if ( colType.equals(DataColumnType.SALINITY) )
@@ -214,6 +218,7 @@ public class DashboardCruiseChecker {
 				colIndcs.windDirTrueIndex = k;
 			else if ( colType.equals(DataColumnType.WIND_DIRECTION_RELATIVE) )
 				colIndcs.windDirRelIndex = k;
+			*/
 
 			else if ( colType.equals(DataColumnType.WOCE_CO2_WATER) )
 				colIndcs.woceCO2WaterIndex = k;
@@ -223,7 +228,7 @@ public class DashboardCruiseChecker {
 		return colIndcs;
 	}
 
-	enum DateTimeType {
+	private enum DateTimeType {
 		DATETIME_TIMESTAMP,
 		DATETIME_DATE_TIME,
 		DATETIME_YEAR_DAY_SEC,
@@ -235,7 +240,7 @@ public class DashboardCruiseChecker {
 	/**
 	 * Data units used by the sanity checker corresponding to {@link #STD_DATA_UNITS}
 	 */
-	public static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
+	private static final EnumMap<DataColumnType,ArrayList<String>> CHECKER_DATA_UNITS = 
 			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
 	static {
 		final ArrayList<String> checkerTimestampDateUnits = 
