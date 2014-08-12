@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -732,6 +732,27 @@ public class DatabaseRequestHandler {
 			catConn.close();
 		}
 		return eventsList;
+	}
+
+	/**
+	 * Generates and saves a rename QC event and 
+	 * appropriately renames the expocode for flags in the database.
+	 * 
+	 * @param oldExpocode
+	 * 		standardized old expocode 
+	 * @param newExpocode
+	 * 		standardized new expocode
+	 * @throws SQLException
+	 * 		if accessing or updating the database throws one
+	 */
+	public void renameCruiseFlags(String oldExpocode, String newExpocode) 
+														throws SQLException {
+		Connection catConn = makeConnection(true);
+		try {
+			PreparedStatement prepStmt = catConn.prepareStatement("");
+		} finally {
+			catConn.close();
+		}
 	}
 
 }

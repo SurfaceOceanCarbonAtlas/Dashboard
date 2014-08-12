@@ -1,9 +1,11 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -107,7 +109,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		File parentDir = new File(filesDir, expocode.substring(0,4));
 		if ( ! parentDir.isDirectory() )
 			return metadataList;
-		// Get all the metadata files for this expocode 
+		// Get all the metadata info files for this expocode 
 		File[] metafiles = parentDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -528,6 +530,25 @@ public class MetadataFileHandler extends VersionedFileHandler {
 					"Problems committing updated metadata information for  " + 
 					metadata.getFilename() + ":\n    " + ex.getMessage());
 		}
+	}
+
+	/**
+	 * Appropriately renames any cruise metadata documents and info files 
+	 * for a change in cruise expocode.  Renames the expocode in the OME 
+	 * metadata file if it exists.
+	 * 
+	 * @param oldExpocode
+	 * 		standardized old expocode of the cruise
+	 * @param newExpocode
+	 * 		standardized new expocode for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if a metadata or info file for the new expocode already exists, or
+	 * 		if unable to rename a metadata or info file
+	 */
+	public void renameMetadataFiles(String oldExpocode, String newExpocode) 
+											throws IllegalArgumentException {
+		ArrayList<DashboardMetadata> metaDocs = getMetadataFiles(oldExpocode);
+		// TODO: move the metadata files, modify the expocode in the OME metadata file
 	}
 
 	/**

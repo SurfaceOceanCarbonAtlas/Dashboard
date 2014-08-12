@@ -1,10 +1,12 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.nc;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
+import gov.noaa.pmel.socat.dashboard.nc.Constants;
+import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
@@ -236,6 +238,71 @@ public class DsgNcFileHandler {
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure decimating the full DSG file: " + 
 					tool.getErrorMessage());
+	}
+
+	/**
+	 * Appropriately renames any DSG and decimated DSG files, if they exist, 
+	 * for a change in cruise expocode.  Renames the expocode in the DSG files.
+	 * 
+	 * @param oldExpocode
+	 * 		standardized old expocode of the cruise
+	 * @param newExpocode
+	 * 		standardized new expocode for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if a DSG or decimated DSG file for the new expocode already exists, or
+	 * 		if unable to rename the DSG or decimated DSG file
+	 * @throws IOException
+	 * 		if unable to update the expocode contained in the DSG files
+	 */
+	public void renameDsgFiles(String oldExpocode, String newExpocode) 
+									throws IllegalArgumentException, IOException {
+		CruiseDsgNcFile newDsgFile = getDsgNcFile(newExpocode);
+		if ( newDsgFile.exists() )
+			throw new IllegalArgumentException(
+					"DSG file for " + oldExpocode + " already exist");
+		File newParent = newDsgFile.getParentFile();
+		if ( ! newParent.exists() ) 
+			newParent.mkdirs();
+
+		CruiseDsgNcFile newDecDsgFile = 
+				new CruiseDsgNcFile(getDecDsgNcFile(newExpocode).getPath());
+		if ( newDecDsgFile.exists() )
+			throw new IllegalArgumentException(
+					"Decimated DSG file for " + oldExpocode + " already exist");
+		newParent = newDecDsgFile.getParentFile();
+		if ( ! newParent.exists() ) 
+			newParent.mkdirs();
+
+		// Rename and update the DSG file
+		File oldDsgFile = getDsgNcFile(oldExpocode);
+		if ( oldDsgFile.exists() )  {
+			if ( ! oldDsgFile.renameTo(newDsgFile) ) 
+				throw new IllegalArgumentException("Unable to rename DSG "
+						+ "file from " + oldExpocode + " to " + newExpocode);
+			try {
+				newDsgFile.updateExpocode(newExpocode);
+			} catch (InvalidRangeException ex) {
+				newDsgFile.renameTo(oldDsgFile);
+				throw new IOException(ex);
+			}
+		}
+
+		// Rename and update the decimated DSG file
+		File oldDecDsgFile = getDecDsgNcFile(oldExpocode);
+		if ( oldDecDsgFile.exists() ) {
+			if ( ! oldDecDsgFile.renameTo(newDecDsgFile) ) 
+				throw new IllegalArgumentException("Unable to rename decimated "
+						+ "DSG file from " + oldExpocode + " to " + newExpocode);
+			try {
+				newDecDsgFile.updateExpocode(newExpocode);
+			} catch (InvalidRangeException ex) {
+				newDecDsgFile.renameTo(oldDecDsgFile);
+				throw new IOException(ex);
+			}
+		}
+
+		// Tell ERDDAP there are changes
+		flagErddap(true);
 	}
 
 	/**

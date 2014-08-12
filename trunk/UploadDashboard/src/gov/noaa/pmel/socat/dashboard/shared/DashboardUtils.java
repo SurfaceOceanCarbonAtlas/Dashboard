@@ -40,19 +40,22 @@ public class DashboardUtils {
 
 	/*
 	 * Only valid characters for an expocode are upper-case alphanumeric, 
-	 * underscore, and hyphen; the latter two are for the very rare case 
-	 * of valid duplicate expocodes. 
+	 * and a hyphen.  The first four or five identify the ship/platform, 
+	 * the next four is a year, the next two are a month of year number, 
+	 * and the next two are a day of month number.  For the very rare case 
+	 * of valid duplicate expocodes (up to this point), a hyphen and number
+	 * can follow.
 	 */
 	public static final String VALID_EXPOCODE_CHARACTERS = 
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-";
 	public static final int MIN_EXPOCODE_LENGTH = 12;
-	public static final int MAX_EXPOCODE_LENGTH = 14;
+	public static final int MAX_EXPOCODE_LENGTH = 15;
 
 	// Maximum number of rows shown in a page of a data grid (table)
 	public static final int MAX_ROWS_PER_GRID_PAGE = 50;
 
 	// Maximum number of error messages in an acceptable cruise
-	public static final int MAX_ACCEPTABLE_ERRORS = 49;
+	public static final int MAX_ACCEPTABLE_ERRORS = 50;
 
 	// Data check strings
 	public static final String CHECK_STATUS_NOT_CHECKED = "";

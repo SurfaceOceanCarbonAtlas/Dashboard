@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.server;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
 import java.io.File;
 import java.io.FileWriter;
