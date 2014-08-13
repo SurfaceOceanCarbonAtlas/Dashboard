@@ -496,7 +496,7 @@ public class DsgNcFileHandler {
 	 * @param woceEvent
 	 * 		WOCE event to use; the expocode is used to identify the full dataset to update
 	 * @param tempDsgFilename
-	 * 		name of the temporary DSG file to also update
+	 * 		name of the temporary DSG file to also update; can be null
 	 * @param log
 	 * 		logger to log trace messages; can be null
 	 * @throws IllegalArgumentException
@@ -516,6 +516,8 @@ public class DsgNcFileHandler {
 					"DSG file for " + expocode + " does not exist");
 		dsgFile.updateWoceFlags(woceEvent, true, log);
 		flagErddap(false);
+		if ( (tempDsgFilename == null) || tempDsgFilename.trim().isEmpty() )
+			return;
 		CruiseDsgNcFile tempDsgFile = new CruiseDsgNcFile(tempDsgFilename);
 		if ( ! tempDsgFile.canRead() )
 			throw new IllegalArgumentException("Temporary DSG file " + 
