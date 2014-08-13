@@ -30,6 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.tmatesoft.svn.core.SVNException;
+
 /**
  * Handles storage and retrieval of cruise data in files.
  * 
@@ -481,360 +483,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Creates and returns a list of strings representing the metadata
-	 * preamble and the first 25 lines of data.
-	 * 
-	 * This method is in this class instead of DashboardCruiseWithData
-	 * to reduce payload since it is only used on the server side.
-	 * 
-	 * @param cruiseData
-	 * 		cruise to use
-	 * @return
-	 * 		partial contents of the cruise file
-	 */
-	public ArrayList<String> getPartialCruiseDataContents(
-									DashboardCruiseWithData cruiseData) {
-		ArrayList<String> partialContents =
-				new ArrayList<String>(cruiseData.getPreamble().size() + 30);
-		// Add all the preamble contents, check if the last line was blank
-		boolean lastLineBlank = false;
-		for ( String dataline : cruiseData.getPreamble() ) {
-			partialContents.add(dataline);
-			if ( dataline.trim().isEmpty() )
-				lastLineBlank = true;
-			else
-				lastLineBlank = false;
-		}
-		if ( ! lastLineBlank )
-			partialContents.add("");
-	
-		// Add the data column headers line
-		String dataline = "";
-		boolean first = true;
-		for ( String name : cruiseData.getUserColNames() ) {
-			if ( ! first )
-				dataline += "\t";
-			else
-				first = false;
-			dataline += name;
-		}
-		partialContents.add(dataline);
-
-		// Add up to 25 rows of data
-		int k = 0;
-		for ( ArrayList<String> datarow : cruiseData.getDataValues() ) {
-			dataline = "";
-			first = true;
-			for ( String datum : datarow ) {
-				if ( ! first )
-					dataline += "\t";
-				else
-					first = false;
-				dataline += datum;
-			}
-			partialContents.add(dataline);
-			k++;
-			if ( k >= 25 )
-				break;
-		}
-		return partialContents;
-	}
-
-	/**
-	 * Get cruise data saved to file
-	 * 
-	 * @param expocode
-	 * 		expocode of the cruise to get data for
-	 * @param firstDataRow
-	 * 		index of the first data row to return; for all data for the
-	 * 		cruise, specify zero
-	 * @param numDataRows
-	 * 		number of data rows to return; for all data for the cruise,
-	 * 		specify -1 (or any negative integer)
-	 * @return
-	 * 		the saved cruise data, 
-	 * 		or null if there is no information or data saved for this cruise.
-	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid or if there was a error reading 
-	 * 		information or data for this cruise
-	 */
-	public DashboardCruiseWithData getCruiseDataFromFiles(String expocode,
-			int firstDataRow, int numDataRows) throws IllegalArgumentException {
-		// Create the cruise and assign the expocode
-		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		cruiseData.setExpocode(expocode);
-		try {
-			// Assign values from the cruise information file
-			assignCruiseFromInfoFile(cruiseData);
-		} catch ( FileNotFoundException ex ) {
-			return null;
-		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Problems reading cruise information for " + expocode + 
-					": " + ex.getMessage());
-		}
-		// Read the cruise data file
-		File cruiseFile = cruiseDataFile(expocode);
-		try {
-			BufferedReader cruiseReader = 
-					new BufferedReader(new FileReader(cruiseFile));
-			try {
-				// Assign values from the cruise data file
-				assignCruiseDataFromInput(cruiseData, 
-						DashboardUtils.CRUISE_FORMAT_TAB, cruiseReader, 
-						firstDataRow, numDataRows, false);
-			} finally {
-				cruiseReader.close();
-			}
-		} catch ( FileNotFoundException ex ) {
-			return null;
-		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Problems reading cruise data for " + expocode + 
-					": " + ex.getMessage());
-		}
-		return cruiseData;
-	}
-
-	/**
-	 * Returns a new DashboardCruise assigned from the cruise information
-	 * file without reading any of the data in cruise data file.
-	 * 
-	 * @param expocode
-	 * 		cruise whose information file to examine
-	 * @return
-	 * 		new DashboardCruise assigned from the information file,
-	 * 		or null if the cruise information file does not exist
-	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid or
-	 * 		if there are problems accessing the information file
-	 */
-	public DashboardCruise getCruiseFromInfoFile(String expocode) 
-									throws IllegalArgumentException {
-		// Create a cruise for this data and assign the expocode given
-		DashboardCruise cruise = new DashboardCruise();
-		cruise.setExpocode(expocode);
-		// Read the information saved cruise information file
-		try {
-			assignCruiseFromInfoFile(cruise);
-		} catch ( FileNotFoundException ex ) {
-			return null;
-		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Problems reading cruise information for " + 
-							expocode + ": " + ex.getMessage());
-		}
-		return cruise;
-	}
-
-	/**
-	 * Adds an OME metadata document or a supplemental document to a cruise.
-	 * 
-	 * @param expocode
-	 * 		add the document to the cruise with this expocode
-	 * @param addlDoc
-	 * 		document to add to the cruise; if an instance of OmeMetadata,
-	 * 		this will be added as the OME metadata document for the cruise
-	 * 		(just sets the OmeTimestamp for the cruise), otherwise adds
-	 * 		the document as an additional document to the cruise (adds the 
-	 * 		upload filename and timestamp to the additional documents list)
-	 * @return
-	 * 		the updated cruise information, or 
-	 * 		null if there is no cruise with this expocode
-	 * @throws IllegalArgumentException
-	 * 		if the cruise exists and ...
-	 * 		if the expocode is invalid,
-	 * 		if there are problems accessing the information file for the cruise,
-	 * 		if there are problems updating and committing the cruise information,
-	 * 		if the filename of the addition document is the OME filename but 
-	 * 		the additional document is not an instance of OmeMetadata
-	 */
-	public DashboardCruise addAddlDocToCruise(String expocode, 
-			DashboardMetadata addlDoc) throws IllegalArgumentException {
-		// Check if the cruise exists
-		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
-		if ( cruise == null )
-			return null;
-		String timestamp = addlDoc.getUploadTimestamp();
-		if ( addlDoc instanceof OmeMetadata ) {
-			// Assign the OME metadata timestamp for this cruise and save
-			if ( ! cruise.getOmeTimestamp().equals(timestamp) ) {
-				cruise.setOmeTimestamp(timestamp);
-				saveCruiseInfoToFile(cruise, "Assigned new OME metadata file " +
-						"timestamp '" + timestamp + "' to cruise " + expocode);
-			}
-		}
-		else {
-			String uploadFilename = addlDoc.getFilename();
-			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) )
-				throw new IllegalArgumentException("Supplemental documents cannot " +
-						"have the upload filename of " + DashboardMetadata.OME_FILENAME);
-			// Work directly on the additional documents list in the cruise object
-			TreeSet<String> addlDocTitles = cruise.getAddlDocs();
-			String titleToDelete = null;
-			for ( String title : addlDocTitles ) {
-				if ( uploadFilename.equals(
-						(DashboardMetadata.splitAddlDocsTitle(title))[0]) ) {
-					titleToDelete = title;
-					break;
-				}
-			}
-			String commitMsg; 
-			if ( titleToDelete != null ) {
-				addlDocTitles.remove(titleToDelete);
-				commitMsg = "Update additional document " + uploadFilename + 
-							" (" + timestamp + ") for cruise " + expocode;
-			}
-			else {
-				commitMsg = "Add additional document " + uploadFilename + 
-							" (" + timestamp + ") to cruise " + expocode;
-			}
-			addlDocTitles.add(addlDoc.getAddlDocsTitle());
-			saveCruiseInfoToFile(cruise, commitMsg);
-		}
-		return cruise;
-	}
-
-	/**
-	 * Appropriately renames the cruise data and info files for a change 
-	 * in cruise expocode.  Renames the expocode in the data file.
-	 * 
-	 * @param oldExpocode
-	 * 		standardized old expocode of the cruise
-	 * @param newExpocode
-	 * 		standardized new expocode for the cruise
-	 * @throws IllegalArgumentException
-	 * 		if the data or info file for the old expocode does not exist, 
-	 * 		if a data or info file for the new expocode already exists, or
-	 * 		if unable to rename the data or info file
-	 * @throws IOException 
-	 * 		if unable to update the data file for the cruise
-	 */
-	public void renameCruiseFiles(String oldExpocode, String newExpocode) 
-							throws IllegalArgumentException, IOException {
-		File oldDataFile = cruiseDataFile(oldExpocode);
-		if ( ! oldDataFile.exists() ) 
-			throw new IllegalArgumentException(
-					"Data file for " + oldExpocode + " does not exist");
-		File oldInfoFile = cruiseInfoFile(oldExpocode);
-		if ( ! oldInfoFile.exists() )
-			throw new IllegalArgumentException(
-					"Info file for " + oldExpocode + " does not exist");
-
-		File newDataFile = cruiseDataFile(newExpocode);
-		if ( newDataFile.exists() )
-			throw new IllegalArgumentException(
-					"Data file for " + oldExpocode + " already exist");
-		File newInfoFile = cruiseInfoFile(newExpocode);
-		if ( newInfoFile.exists() )
-			throw new IllegalArgumentException(
-					"Info file for " + oldExpocode + " already exist");
-
-		File newParent = newInfoFile.getParentFile();
-		if ( ! newParent.exists() ) 
-			newParent.mkdirs();
-
-		if ( ! oldInfoFile.renameTo(newInfoFile) ) 
-			throw new IllegalArgumentException("Unable to rename info "
-					+ "file from " + oldExpocode + " to " + newExpocode);
-		if ( ! oldDataFile.renameTo(newDataFile) ) {
-			newInfoFile.renameTo(oldInfoFile);
-			throw new IllegalArgumentException("Unable to rename data "
-					+ "file from " + oldExpocode + " to " + newExpocode);
-		}
-		// TODO: modify the expocode in the data file, both in the preamble and in a data column
-		BufferedReader dataReader = new BufferedReader(new FileReader(newDataFile));
-		try {
-			String dataline = dataReader.readLine();
-		} finally {
-			dataReader.close();
-		}
-	}
-
-	/**
-	 * Deletes the information and data files for a cruise 
-	 * after verifying the user is permitted to delete this cruise.
-	 * 
-	 * @param expocode
-	 * 		cruise to delete
-	 * @param username
-	 * 		user wanting to delete the cruise
-	 * @param deleteMetadata 
-	 * 		also delete metadata and additional documents?
-	 * @throws IllegalArgumentException
-	 * 		if the cruise expocode is not valid, if there were
-	 * 		problems access the cruise, if the user is not permitted 
-	 * 		to delete the cruise, or if there were problems deleting
-	 * 		a file or committing the deletion from version control
-	 * @throws FileNotFoundException
-	 * 		if the cruise information file does not exist
-	 */
-	public void deleteCruiseFiles(String expocode, String username, 
-			Boolean deleteMetadata) throws IllegalArgumentException, 
-												FileNotFoundException {
-		// Verify this cruise can be deleted
-		DashboardCruise cruise;
-		try {
-			cruise = verifyOkayToDeleteCruise(expocode, username);
-		} catch ( IllegalArgumentException ex ) {
-			throw new IllegalArgumentException(
-					"Not permitted to delete cruise " + expocode +
-					": " + ex.getMessage());
-		}
-
-		DashboardDataStore dataStore;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the dashboard configuration");
-		}
-
-		// If they exist, delete the DSG files and notify ERDDAP
-		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
-		if ( dsgHandler.deleteCruise(expocode) )
-			dsgHandler.flagErddap(true);
-
-		// If it exists, delete the messages file
-		dataStore.getCheckerMsgHandler().deleteMsgsFile(expocode);
-			
-		// Delete the cruise data file
-		try {
-			deleteVersionedFile(cruiseDataFile(expocode), 
-					"Cruise data file for " + expocode + 
-					" owned by " + cruise.getOwner() + 
-					" deleted by " + username);
-		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Problems deleting the cruise data file: " + 
-					ex.getMessage());
-		}
-		// Delete the cruise information file
-		try {
-			deleteVersionedFile(cruiseInfoFile(expocode), 
-					"Cruise information file for " + expocode + 
-					" owned by " + cruise.getOwner() + 
-					" deleted by " + username);
-		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Problems deleting the cruise information file: " + 
-					ex.getMessage());
-		}
-
-		if ( deleteMetadata ) {
-			// Delete the metadata and additional documents associated with this cruise
-			MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
-			String omeTimestamp = cruise.getOmeTimestamp();
-			if ( ! omeTimestamp.isEmpty() )
-				metadataHandler.removeMetadata(username, expocode, 
-						OmeMetadata.OME_FILENAME);
-			for ( String mdataTitle : cruise.getAddlDocs() )
-				metadataHandler.removeMetadata(username, expocode, 
-						DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
-		}
-	}
-
-	/**
 	 * Saves and commits only the cruise information to the information file.
 	 * This does not save the cruise data of a DashboardCruiseWithData.
 	 * This first checks the currently saved properties for the cruise, and 
@@ -1052,6 +700,434 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
+	 * Returns a new DashboardCruise assigned from the cruise information
+	 * file without reading any of the data in cruise data file.
+	 * 
+	 * @param expocode
+	 * 		cruise whose information file to examine
+	 * @return
+	 * 		new DashboardCruise assigned from the information file,
+	 * 		or null if the cruise information file does not exist
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid or
+	 * 		if there are problems accessing the information file
+	 */
+	public DashboardCruise getCruiseFromInfoFile(String expocode) 
+									throws IllegalArgumentException {
+		// Create a cruise for this data and assign the expocode given
+		DashboardCruise cruise = new DashboardCruise();
+		cruise.setExpocode(expocode);
+		// Read the information saved cruise information file
+		try {
+			assignCruiseFromInfoFile(cruise);
+		} catch ( FileNotFoundException ex ) {
+			return null;
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Problems reading cruise information for " + 
+							expocode + ": " + ex.getMessage());
+		}
+		return cruise;
+	}
+
+	/**
+	 * Get cruise data saved to file
+	 * 
+	 * @param expocode
+	 * 		expocode of the cruise to get data for
+	 * @param firstDataRow
+	 * 		index of the first data row to return; for all data for the
+	 * 		cruise, specify zero
+	 * @param numDataRows
+	 * 		number of data rows to return; for all data for the cruise,
+	 * 		specify -1 (or any negative integer)
+	 * @return
+	 * 		the saved cruise data, 
+	 * 		or null if there is no information or data saved for this cruise.
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid or if there was a error reading 
+	 * 		information or data for this cruise
+	 */
+	public DashboardCruiseWithData getCruiseDataFromFiles(String expocode,
+			int firstDataRow, int numDataRows) throws IllegalArgumentException {
+		// Create the cruise and assign the expocode
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
+		cruiseData.setExpocode(expocode);
+		try {
+			// Assign values from the cruise information file
+			assignCruiseFromInfoFile(cruiseData);
+		} catch ( FileNotFoundException ex ) {
+			return null;
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Problems reading cruise information for " + expocode + 
+					": " + ex.getMessage());
+		}
+		// Read the cruise data file
+		File cruiseFile = cruiseDataFile(expocode);
+		try {
+			BufferedReader cruiseReader = 
+					new BufferedReader(new FileReader(cruiseFile));
+			try {
+				// Assign values from the cruise data file
+				assignCruiseDataFromInput(cruiseData, 
+						DashboardUtils.CRUISE_FORMAT_TAB, cruiseReader, 
+						firstDataRow, numDataRows, false);
+			} finally {
+				cruiseReader.close();
+			}
+		} catch ( FileNotFoundException ex ) {
+			return null;
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Problems reading cruise data for " + expocode + 
+					": " + ex.getMessage());
+		}
+		return cruiseData;
+	}
+
+	/**
+	 * Creates and returns a list of strings representing the metadata
+	 * preamble and the first 25 lines of data.
+	 * 
+	 * This method is in this class instead of DashboardCruiseWithData
+	 * to reduce payload since it is only used on the server side.
+	 * 
+	 * @param cruiseData
+	 * 		cruise to use
+	 * @return
+	 * 		partial contents of the cruise file
+	 */
+	public ArrayList<String> getPartialCruiseDataContents(
+									DashboardCruiseWithData cruiseData) {
+		ArrayList<String> partialContents =
+				new ArrayList<String>(cruiseData.getPreamble().size() + 30);
+		// Add all the preamble contents, check if the last line was blank
+		boolean lastLineBlank = false;
+		for ( String dataline : cruiseData.getPreamble() ) {
+			partialContents.add(dataline);
+			if ( dataline.trim().isEmpty() )
+				lastLineBlank = true;
+			else
+				lastLineBlank = false;
+		}
+		if ( ! lastLineBlank )
+			partialContents.add("");
+	
+		// Add the data column headers line
+		String dataline = "";
+		boolean first = true;
+		for ( String name : cruiseData.getUserColNames() ) {
+			if ( ! first )
+				dataline += "\t";
+			else
+				first = false;
+			dataline += name;
+		}
+		partialContents.add(dataline);
+
+		// Add up to 25 rows of data
+		int k = 0;
+		for ( ArrayList<String> datarow : cruiseData.getDataValues() ) {
+			dataline = "";
+			first = true;
+			for ( String datum : datarow ) {
+				if ( ! first )
+					dataline += "\t";
+				else
+					first = false;
+				dataline += datum;
+			}
+			partialContents.add(dataline);
+			k++;
+			if ( k >= 25 )
+				break;
+		}
+		return partialContents;
+	}
+
+	/**
+	 * Adds an OME metadata document or a supplemental document to a cruise.
+	 * 
+	 * @param expocode
+	 * 		add the document to the cruise with this expocode
+	 * @param addlDoc
+	 * 		document to add to the cruise; if an instance of OmeMetadata,
+	 * 		this will be added as the OME metadata document for the cruise
+	 * 		(just sets the OmeTimestamp for the cruise), otherwise adds
+	 * 		the document as an additional document to the cruise (adds the 
+	 * 		upload filename and timestamp to the additional documents list)
+	 * @return
+	 * 		the updated cruise information, or 
+	 * 		null if there is no cruise with this expocode
+	 * @throws IllegalArgumentException
+	 * 		if the cruise exists and ...
+	 * 		if the expocode is invalid,
+	 * 		if there are problems accessing the information file for the cruise,
+	 * 		if there are problems updating and committing the cruise information,
+	 * 		if the filename of the addition document is the OME filename but 
+	 * 		the additional document is not an instance of OmeMetadata
+	 */
+	public DashboardCruise addAddlDocToCruise(String expocode, 
+			DashboardMetadata addlDoc) throws IllegalArgumentException {
+		// Check if the cruise exists
+		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
+		if ( cruise == null )
+			return null;
+		String timestamp = addlDoc.getUploadTimestamp();
+		if ( addlDoc instanceof OmeMetadata ) {
+			// Assign the OME metadata timestamp for this cruise and save
+			if ( ! cruise.getOmeTimestamp().equals(timestamp) ) {
+				cruise.setOmeTimestamp(timestamp);
+				saveCruiseInfoToFile(cruise, "Assigned new OME metadata file " +
+						"timestamp '" + timestamp + "' to cruise " + expocode);
+			}
+		}
+		else {
+			String uploadFilename = addlDoc.getFilename();
+			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) )
+				throw new IllegalArgumentException("Supplemental documents cannot " +
+						"have the upload filename of " + DashboardMetadata.OME_FILENAME);
+			// Work directly on the additional documents list in the cruise object
+			TreeSet<String> addlDocTitles = cruise.getAddlDocs();
+			String titleToDelete = null;
+			for ( String title : addlDocTitles ) {
+				if ( uploadFilename.equals(
+						(DashboardMetadata.splitAddlDocsTitle(title))[0]) ) {
+					titleToDelete = title;
+					break;
+				}
+			}
+			String commitMsg; 
+			if ( titleToDelete != null ) {
+				addlDocTitles.remove(titleToDelete);
+				commitMsg = "Update additional document " + uploadFilename + 
+							" (" + timestamp + ") for cruise " + expocode;
+			}
+			else {
+				commitMsg = "Add additional document " + uploadFilename + 
+							" (" + timestamp + ") to cruise " + expocode;
+			}
+			addlDocTitles.add(addlDoc.getAddlDocsTitle());
+			saveCruiseInfoToFile(cruise, commitMsg);
+		}
+		return cruise;
+	}
+
+	/**
+	 * Appropriately renames the cruise data and info files for a change 
+	 * in cruise expocode.  Renames the expocode in the data file.
+	 * 
+	 * @param oldExpocode
+	 * 		standardized old expocode of the cruise
+	 * @param newExpocode
+	 * 		standardized new expocode for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if the data or info file for the old expocode does not exist, 
+	 * 		if a data or info file for the new expocode already exists, or
+	 * 		if unable to rename or update the data or info file
+	 */
+	public void renameCruiseFiles(String oldExpocode, String newExpocode) 
+										throws IllegalArgumentException {
+		// Verify old file exist and new file do not exist
+		File oldDataFile = cruiseDataFile(oldExpocode);
+		if ( ! oldDataFile.exists() ) 
+			throw new IllegalArgumentException(
+					"Data file for " + oldExpocode + " does not exist");
+		File oldInfoFile = cruiseInfoFile(oldExpocode);
+		if ( ! oldInfoFile.exists() )
+			throw new IllegalArgumentException(
+					"Info file for " + oldExpocode + " does not exist");
+
+		File newDataFile = cruiseDataFile(newExpocode);
+		if ( newDataFile.exists() )
+			throw new IllegalArgumentException(
+					"Data file for " + oldExpocode + " already exist");
+		File newInfoFile = cruiseInfoFile(newExpocode);
+		if ( newInfoFile.exists() )
+			throw new IllegalArgumentException(
+					"Info file for " + oldExpocode + " already exist");
+
+		// Make sure the parent directory for the new files exists
+		File parentFile = newDataFile.getParentFile();
+		if ( ! parentFile.exists() )
+			parentFile.mkdirs();
+
+		// Easiest is to read all the data, modify the expocode in the data, 
+		// move the files, and save under the new expocode
+		DashboardCruiseWithData cruiseData = getCruiseDataFromFiles(oldExpocode, 0, -1);
+		cruiseData.setExpocode(newExpocode);
+
+		// Modify the expocode, if any, in the preamble
+		ArrayList<String> preamble = cruiseData.getPreamble();
+		for (int k = 0; k < preamble.size(); k++) {
+			String dataline = preamble.get(k);
+			// Check if this is an expocode identification line
+			for ( Pattern pat : expocodePatterns ) {
+				Matcher mat = pat.matcher(dataline);
+				if ( mat.matches() ) {
+					preamble.set(k, dataline.replace(oldExpocode, newExpocode));
+					break;
+				}
+			}
+		}
+
+		// Modify the expocode if there is a column identified as the expocode
+		int k = -1;
+		boolean hasExpoColumn = false;
+		for ( DataColumnType type : cruiseData.getDataColTypes() ) {
+			k++;
+			if ( DataColumnType.EXPOCODE.equals(type) ) {
+				hasExpoColumn = true;
+				break;
+			}
+		}
+		if ( hasExpoColumn ) {
+			for ( ArrayList<String> dataVals : cruiseData.getDataValues() ) {
+				dataVals.set(k, newExpocode);
+			}
+		}
+
+		// Move the old expocode files to the new expocode filenames
+		String commitMsg = "Rename from " + oldExpocode + " to " + newExpocode;
+		try {
+			moveVersionedFile(oldDataFile, newDataFile, commitMsg);
+			moveVersionedFile(oldInfoFile, newInfoFile, commitMsg);
+		} catch (SVNException ex) {
+			throw new IllegalArgumentException("Problems renaming the cruise files from " + 
+					oldExpocode + " to " + newExpocode + ": " + ex.getMessage());
+		}
+
+		// Save under the new expocode
+		saveCruiseInfoToFile(cruiseData, commitMsg);
+		saveCruiseDataToFile(cruiseData, commitMsg);
+	}
+
+	/**
+	 * Verify a user can overwrite or delete a cruise.  This checks
+	 * the submission state of the cruise as well as ownership of the
+	 * cruise.  If not permitted, an IllegalArgumentException is
+	 * thrown with reason for the failure.
+	 * 
+	 * @param expocode
+	 * 		cruise to check
+	 * @param username
+	 * 		user wanting to overwrite or delete the cruise
+	 * @return 
+	 * 		the cruise being overwritten or deleted; never null
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid, 
+	 * 		if there are problems accessing the cruise data file
+	 * @throws FileNotFoundException
+	 * 		if there is no cruise information file for this cruise
+	 */
+	public DashboardCruise verifyOkayToDeleteCruise(String expocode, String username) 
+				throws IllegalArgumentException, FileNotFoundException {
+		// Get the cruise information from the data file
+		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
+		// Check if the cruise is in a submitted or accepted state
+		String status = cruise.getQcStatus();
+		if ( ! ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
+				 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
+				 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
+				 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) )
+			throw new IllegalArgumentException("cruise status is " + status);
+		// Check if the user has permission to delete the cruise
+		try {
+			String owner = cruise.getOwner();
+			if ( ! DashboardDataStore.get().userManagesOver(username, owner) )
+				throw new IllegalArgumentException("cruise owner is " + owner);
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the user file handler");
+		}
+		return cruise;
+	}
+
+	/**
+	 * Deletes the information and data files for a cruise 
+	 * after verifying the user is permitted to delete this cruise.
+	 * 
+	 * @param expocode
+	 * 		cruise to delete
+	 * @param username
+	 * 		user wanting to delete the cruise
+	 * @param deleteMetadata 
+	 * 		also delete metadata and additional documents?
+	 * @throws IllegalArgumentException
+	 * 		if the cruise expocode is not valid, if there were
+	 * 		problems access the cruise, if the user is not permitted 
+	 * 		to delete the cruise, or if there were problems deleting
+	 * 		a file or committing the deletion from version control
+	 * @throws FileNotFoundException
+	 * 		if the cruise information file does not exist
+	 */
+	public void deleteCruiseFiles(String expocode, String username, 
+			Boolean deleteMetadata) throws IllegalArgumentException, 
+												FileNotFoundException {
+		// Verify this cruise can be deleted
+		DashboardCruise cruise;
+		try {
+			cruise = verifyOkayToDeleteCruise(expocode, username);
+		} catch ( IllegalArgumentException ex ) {
+			throw new IllegalArgumentException(
+					"Not permitted to delete cruise " + expocode +
+					": " + ex.getMessage());
+		}
+
+		DashboardDataStore dataStore;
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch ( IOException ex ) {
+			throw new IllegalArgumentException(
+					"Unexpected failure to get the dashboard configuration");
+		}
+
+		// If they exist, delete the DSG files and notify ERDDAP
+		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+		if ( dsgHandler.deleteCruise(expocode) )
+			dsgHandler.flagErddap(true);
+
+		// If it exists, delete the messages file
+		dataStore.getCheckerMsgHandler().deleteMsgsFile(expocode);
+			
+		// Delete the cruise data file
+		try {
+			deleteVersionedFile(cruiseDataFile(expocode), 
+					"Cruise data file for " + expocode + 
+					" owned by " + cruise.getOwner() + 
+					" deleted by " + username);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems deleting the cruise data file: " + 
+					ex.getMessage());
+		}
+		// Delete the cruise information file
+		try {
+			deleteVersionedFile(cruiseInfoFile(expocode), 
+					"Cruise information file for " + expocode + 
+					" owned by " + cruise.getOwner() + 
+					" deleted by " + username);
+		} catch ( Exception ex ) {
+			throw new IllegalArgumentException(
+					"Problems deleting the cruise information file: " + 
+					ex.getMessage());
+		}
+
+		if ( deleteMetadata ) {
+			// Delete the metadata and additional documents associated with this cruise
+			MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
+			String omeTimestamp = cruise.getOmeTimestamp();
+			if ( ! omeTimestamp.isEmpty() )
+				metadataHandler.removeMetadata(username, expocode, 
+						OmeMetadata.OME_FILENAME);
+			for ( String mdataTitle : cruise.getAddlDocs() )
+				metadataHandler.removeMetadata(username, expocode, 
+						DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
+		}
+	}
+
+	/**
 	 * Assigns a DashboardCruise from the cruise information file.  
 	 * The expocode of the cruise is obtained from the cruise object. 
 	 * 
@@ -1249,47 +1325,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException("No property value for " + 
 					WOCE_FOUR_ROWS_ID + " given in " + infoFile.getPath());
 		cruise.setWoceFourRowIndices(DashboardUtils.decodeSetsArrayList(value));
-	}
-
-	/**
-	 * Verify a user can overwrite or delete a cruise.  This checks
-	 * the submission state of the cruise as well as ownership of the
-	 * cruise.  If not permitted, an IllegalArgumentException is
-	 * thrown with reason for the failure.
-	 * 
-	 * @param expocode
-	 * 		cruise to check
-	 * @param username
-	 * 		user wanting to overwrite or delete the cruise
-	 * @return 
-	 * 		the cruise being overwritten or deleted; never null
-	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, 
-	 * 		if there are problems accessing the cruise data file
-	 * @throws FileNotFoundException
-	 * 		if there is no cruise information file for this cruise
-	 */
-	public DashboardCruise verifyOkayToDeleteCruise(String expocode, String username) 
-				throws IllegalArgumentException, FileNotFoundException {
-		// Get the cruise information from the data file
-		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
-		// Check if the cruise is in a submitted or accepted state
-		String status = cruise.getQcStatus();
-		if ( ! ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
-				 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
-				 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
-				 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) )
-			throw new IllegalArgumentException("cruise status is " + status);
-		// Check if the user has permission to delete the cruise
-		try {
-			String owner = cruise.getOwner();
-			if ( ! DashboardDataStore.get().userManagesOver(username, owner) )
-				throw new IllegalArgumentException("cruise owner is " + owner);
-		} catch ( IOException ex ) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the user file handler");
-		}
-		return cruise;
 	}
 
 }

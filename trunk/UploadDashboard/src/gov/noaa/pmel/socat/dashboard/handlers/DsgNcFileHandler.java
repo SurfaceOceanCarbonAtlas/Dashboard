@@ -100,11 +100,9 @@ public class DsgNcFileHandler {
 
 	/**
 	 * Generates the cruise-specific decimated NetCDF DSG abstract file for a cruise.
-	 * A regular File (instead of a CruiseDsgNcFile) is returned because the 
-	 * {@link CruiseDsgNcFile#create} and {@link CruiseDsgNcFile#updateWoceFlags} 
-	 * methods should not be used with the decimated data.
-	 * However, if needed, a CruiseDsgNcFile can be created from the returned File 
-	 * using the String (filename) constructor.
+	 * The {@link CruiseDsgNcFile#create} and {@link CruiseDsgNcFile#updateWoceFlags} 
+	 * methods should not be used with the decimated data file; the actual decimated 
+	 * DSG file is created using {@link #decimateCruise(String)}.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise
@@ -113,13 +111,11 @@ public class DsgNcFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 */
-	public File getDecDsgNcFile(String expocode) throws IllegalArgumentException {
+	public CruiseDsgNcFile getDecDsgNcFile(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
 		String expo = DashboardServerUtils.checkExpocode(expocode);
-		// Generate the full path filename for this cruise NetCDF DSG
-		File decDsgNcFile = new File(decDsgFilesDir, expo.substring(0,4) +
+		return new CruiseDsgNcFile(decDsgFilesDir + File.separator + expo.substring(0,4) +
 				File.separator + expo + ".nc");
-		return decDsgNcFile;
 	}
 
 	/**
@@ -215,10 +211,10 @@ public class DsgNcFileHandler {
 		}
 
 		// Get the location and name of the full DSG file
-		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		File dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )
 			throw new IllegalArgumentException(
-					"Full DSG file for " + expocode + " does not exist");
+					"Full DSG file for " + expocode + " is not readable");
 
 		// Get the location and name for the decimated DSG file
 		File decDsgFile = getDecDsgNcFile(expocode);
@@ -264,8 +260,7 @@ public class DsgNcFileHandler {
 		if ( ! newParent.exists() ) 
 			newParent.mkdirs();
 
-		CruiseDsgNcFile newDecDsgFile = 
-				new CruiseDsgNcFile(getDecDsgNcFile(newExpocode).getPath());
+		CruiseDsgNcFile newDecDsgFile = getDecDsgNcFile(newExpocode);
 		if ( newDecDsgFile.exists() )
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + oldExpocode + " already exist");
@@ -322,7 +317,7 @@ public class DsgNcFileHandler {
 	 */
 	public boolean deleteCruise(String expocode) throws IllegalArgumentException {
 		boolean fileDeleted = false;
-		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		File dsgFile = getDsgNcFile(expocode);
 		if ( dsgFile.exists() ) {
 			if ( ! dsgFile.delete() )
 				throw new IllegalArgumentException(
@@ -481,15 +476,15 @@ public class DsgNcFileHandler {
 		// Get the location and name for the NetCDF DSG file
 		String expocode = qcEvent.getExpocode();
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
-		if ( ! dsgFile.canRead() )
+		if ( ! dsgFile.exists() )
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
 		dsgFile.updateQCFlag(qcEvent);
-		dsgFile = new CruiseDsgNcFile(getDecDsgNcFile(expocode).getPath());
-		if ( ! dsgFile.canRead() )
+		CruiseDsgNcFile decDsgFile = getDecDsgNcFile(expocode);
+		if ( ! decDsgFile.exists() )
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + expocode + " does not exist");
-		dsgFile.updateQCFlag(qcEvent);
+		decDsgFile.updateQCFlag(qcEvent);
 		flagErddap(true);
 	}
 

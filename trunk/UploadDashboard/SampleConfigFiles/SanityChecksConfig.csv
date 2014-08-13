@@ -3,8 +3,8 @@ Speed,120,720
 FixedValue,expocode,Y
 FixedValue,cruise_name,Y
 TimeGap,28
-Constant,T_equ,360
-Constant,SST,360
+Constant,T_equ,1440
+Constant,SST,1440
 Constant,P_equ,360
 Constant,Pressure_atm,360
 Constant,xCO2_water_Tequ_dry,360

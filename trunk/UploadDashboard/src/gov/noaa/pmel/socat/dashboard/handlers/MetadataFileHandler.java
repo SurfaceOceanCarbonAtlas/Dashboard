@@ -542,13 +542,62 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param newExpocode
 	 * 		standardized new expocode for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if a metadata or info file for the new expocode already exists, or
+	 * 		if a metadata or info file for the new expocode already exists, 
+	 * 		if the OME metadata exists but is invalid, or
 	 * 		if unable to rename a metadata or info file
 	 */
 	public void renameMetadataFiles(String oldExpocode, String newExpocode) 
 											throws IllegalArgumentException {
-		ArrayList<DashboardMetadata> metaDocs = getMetadataFiles(oldExpocode);
-		// TODO: move the metadata files, modify the expocode in the OME metadata file
+		// Rename all the metadata documents associated with the old expocode
+		OmeMetadata omeMData = null;
+		for ( DashboardMetadata metaDoc : getMetadataFiles(oldExpocode) ) {
+			String uploadFilename = metaDoc.getFilename();
+
+			// If this is the OME metadata file, read the contents 
+			if ( OmeMetadata.OME_FILENAME.equals(uploadFilename) ) {
+				omeMData = new OmeMetadata(metaDoc);
+			}
+
+			File oldMetaFile = getMetadataFile(oldExpocode, uploadFilename);
+			if ( ! oldMetaFile.exists() )
+				throw new RuntimeException("Unexpected failure: metadata file " + 
+						oldMetaFile.getName() + " does not exist");
+
+			File oldMetaInfoFile = new File(oldMetaFile.getPath() + METADATA_INFOFILE_SUFFIX);
+			if ( ! oldMetaInfoFile.exists() )
+				throw new RuntimeException("Unexpected failure: metadata info file " + 
+						oldMetaInfoFile.getName() + " does not exist");
+
+			File newMetaFile = getMetadataFile(newExpocode, uploadFilename);
+			if ( newMetaFile.exists() )
+				throw new IllegalArgumentException("Metadata file " + 
+						uploadFilename + " already exists for " + newExpocode);
+
+			File newMetaInfoFile = new File(newMetaFile.getPath() + METADATA_INFOFILE_SUFFIX);
+			if ( newMetaInfoFile.exists() )
+			throw new IllegalArgumentException("Metadata info file for " + 
+					uploadFilename + " already exists for " + newExpocode);
+
+			// Make sure the parent directory exists for the new file
+			File parent = newMetaFile.getParentFile();
+			if ( ! parent.exists() )
+				parent.mkdirs();
+
+			String commitMsg = "Move metadata document " + uploadFilename + 
+					" from " + oldExpocode + " to " + newExpocode;
+			try {
+				moveVersionedFile(oldMetaFile, newMetaFile, commitMsg);
+				moveVersionedFile(oldMetaInfoFile, newMetaInfoFile, commitMsg);
+			} catch (SVNException ex) {
+				throw new IllegalArgumentException(ex);
+			}
+		}
+
+		if ( omeMData != null ) {
+			omeMData.changeExpocode(newExpocode);
+			saveAsOmeXmlDoc(omeMData, "Change expocode from " + 
+					oldExpocode + " to " + newExpocode);
+		}
 	}
 
 	/**
@@ -596,13 +645,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Save the pseudo-OME XML document created by {@link #createMinimalOmeXmlDoc()} 
+	 * Save the OME XML document created by {@link #createOmeXmlDoc()} 
 	 * from the given OmeDocument as the document file for this metadata.  
-	 * The parent directory for this file is expected to exist and this method will 
-	 * overwrite any existing OME metadata file.
+	 * The parent directory for this file is expected to exist and 
+	 * this method will overwrite any existing OME metadata file.
 	 * 
 	 * @param mdata
-	 * 		OME metadata to save as a pseudo-OME XML document
+	 * 		OME metadata to save as an OME XML document
 	 * @param message
 	 * 		version control commit message; if null, the commit is not
 	 * 		performed
@@ -610,21 +659,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		if the expocode or uploadFilename in this object is invalid, or
 	 * 		writing the metadata document file generates one.
 	 */
-	public void saveAsMinimalOmeXmlDoc(OmeMetadata mdata, String message) 
+	public void saveAsOmeXmlDoc(OmeMetadata mdata, String message) 
 											throws IllegalArgumentException {
-		// Get the metadata document file
-		MetadataFileHandler mdataHandler;
-		try {
-			mdataHandler = DashboardDataStore.get().getMetadataFileHandler();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the metadata handler");
-		}
-		File mdataFile = mdataHandler.getMetadataFile(mdata.getExpocode(), 
-													  mdata.getFilename());
+		File mdataFile = getMetadataFile(mdata.getExpocode(), mdata.getFilename());
 
 		// Generate the pseudo-OME XML document
-		Document omeDoc = mdata.createMinimalOmeXmlDoc();
+		Document omeDoc = mdata.createOmeXmlDoc();
 
 		// Save the XML document to the metadata document file
 		try {

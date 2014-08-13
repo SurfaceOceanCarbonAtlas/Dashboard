@@ -645,7 +645,7 @@ public class OmeMetadataTest {
 		mdata.setExpocode(ACTUAL_EXPOCODE);
 		mdata.setUploadTimestamp(uploadTimestamp);
 		mdata.assignFromOmeXmlDoc(omeDoc);
-		Document minOmeDoc = mdata.createMinimalOmeXmlDoc();
+		Document minOmeDoc = mdata.createOmeXmlDoc();
 
 		OmeMetadata other = new OmeMetadata();
 		other.setExpocode(ACTUAL_EXPOCODE);

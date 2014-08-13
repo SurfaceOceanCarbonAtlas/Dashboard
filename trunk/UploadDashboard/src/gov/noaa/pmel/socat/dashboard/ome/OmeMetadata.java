@@ -32,7 +32,7 @@ import org.jdom2.input.SAXBuilder;
  */
 public class OmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -1067887166640615236L;
+	private static final long serialVersionUID = 7764440573920800989L;
 
 	public static final String CONFLICT_STRING = "%%CONFLICT%%";
 
@@ -720,15 +720,15 @@ public class OmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Generated an pseudo-OME XML document that contains the contents
+	 * Generated an OME XML document that contains the contents
 	 * of the fields read by {@link #assignFromOmeXmlDoc(Document)}.
 	 * Fields not read by that method are not saved in the document
 	 * produced by this method.
 	 * 
 	 * @return
-	 * 		the generated pseudo-OME XML document
+	 * 		the generated OME XML document
 	 */
-	public Document createMinimalOmeXmlDoc() {
+	public Document createOmeXmlDoc() {
 		
 		Element rootElem = new Element("x_tags");
 		ConflictElement conflictElem = new ConflictElement();
@@ -1040,6 +1040,18 @@ public class OmeMetadata extends DashboardMetadata {
 			rootElem.addContent(conflictElem);
 		}
 		return new Document(rootElem);
+	}
+
+	/**
+	 * Assigns the expocode assigned for both the DashboardMetadata field
+	 * and in the OmeMetadata OME variable.
+	 * 
+	 * @param expocode
+	 * 		expocode to assign
+	 */
+	public void changeExpocode(String expocode) {
+		this.expocode = expocode;
+		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
 	}
 
 	/**
