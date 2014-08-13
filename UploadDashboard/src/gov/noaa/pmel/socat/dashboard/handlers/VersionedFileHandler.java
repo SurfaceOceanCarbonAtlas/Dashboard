@@ -220,6 +220,79 @@ public class VersionedFileHandler {
 	}
 
 	/**
+	 * Moves a working copy file.
+	 * 
+	 * @param oldWcFile
+	 * 		existing working copy file to move
+	 * @param newWcFile
+	 * 		new name and location for the file; the parent directory must exist
+	 * 		but does not need to be under version control (will be added if not)
+	 * @param message
+	 * 		commit message for this move
+	 * @throws SVNException
+	 * 		if the version control engine throws one
+	 */
+	void moveVersionedFile(File oldWcFile, File newWcFile, String message) throws SVNException {
+		// Make sure the parent directory of the new file is under version control
+		File parent = newWcFile.getParentFile();
+		boolean needsAdd = false;
+		try {
+			SVNStatus status = svnManager.getStatusClient()
+										 .doStatus(parent, false);
+			SVNStatusType contentsStatus = status.getContentsStatus();
+			if ( (contentsStatus == SVNStatusType.STATUS_UNVERSIONED) ||
+				 (contentsStatus == SVNStatusType.STATUS_DELETED) ||
+				 (contentsStatus == SVNStatusType.STATUS_NONE) )
+				needsAdd = true;
+		} catch ( SVNException ex ) {
+			// At this point, assume the parent directory is not version controlled
+			needsAdd = true;
+		}
+		if ( needsAdd ) {
+			// Add the file (force), and any unversioned directories in its path, to version control
+			svnManager.getWCClient()
+					  .doAdd(parent, true, false, false, SVNDepth.EMPTY, false, true);
+		}
+		// Move the old file to the new location
+		svnManager.getMoveClient().doMove(oldWcFile, newWcFile);
+		
+		// Get the list of directories, as well as the file, that need to be committed
+		ArrayDeque<File> commitFiles = new ArrayDeque<File>();
+		commitFiles.push(oldWcFile);
+		commitFiles.push(newWcFile);
+		// Work down the directory tree until we fall out 
+		// or find an unchanged directory
+		for (File currFile = newWcFile.getParentFile(); currFile != null; 
+										currFile = currFile.getParentFile()) {
+			SVNStatus status;
+			try {
+				status = svnManager.getStatusClient().doStatus(currFile, false);
+			} catch ( SVNException ex ) {
+				// Probably outside the working copy
+				break;
+			}
+			SVNStatusType statType = status.getContentsStatus();
+			if ( (statType == SVNStatusType.STATUS_ADDED) ||
+				 (statType == SVNStatusType.STATUS_MODIFIED) ||
+				 (statType == SVNStatusType.STATUS_REPLACED) ) {
+				commitFiles.push(currFile);
+				parent = currFile;
+			}
+			else if ( statType == SVNStatusType.STATUS_NORMAL ) {
+				// An unmodified directory under version control 
+				parent = currFile;
+				break;
+			}
+			else {
+				// A directory outside version control
+				break;
+			}
+		}
+		// schedule committing the changes
+		addFilesToCommit(commitFiles.toArray(new File[commitFiles.size()]), parent, message);
+	}
+
+	/**
 	 * Deletes the given file from both the working copy directory 
 	 * as well as from version control.
 	 * 
