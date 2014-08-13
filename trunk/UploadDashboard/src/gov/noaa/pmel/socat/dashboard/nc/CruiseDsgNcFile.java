@@ -39,7 +39,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 8617406990008180119L;
+	private static final long serialVersionUID = -4210258791851310099L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -677,6 +677,138 @@ public class CruiseDsgNcFile extends File {
 			ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
 			flagArray.setString(0, qcEvent.getFlag().toString());
 			ncfile.write(var, flagArray);
+		} finally {
+			ncfile.close();
+		}
+	}
+
+	/**
+	 * Assigns the given complete WOCE flags in this DSG file.  In particular, 
+	 * the row numbers in the WOCE flag locations are used to identify the row 
+	 * for the WOCE flag; however, the latitude, longitude, and timestamp, and 
+	 * region ID in these WOCE flag locations are checked that they match those 
+	 * in this DSG file.  The data values, if given, is also checked that they 
+	 * roughly match those in this DSG file. 
+	 * 
+	 * @param woceEvent
+	 * 		WOCE flags to set
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file or the WOCE flags are not valid, including
+	 * 		if the WOCE flag values are not close to the DSG values for
+	 * 		the indicated row in the WOCE flag
+	 * @throws IOException
+	 * 		if opening, reading from, or writing to the DSG file throws one
+	 */
+	public void assignWoceFlags(SocatWoceEvent woceEvent) 
+								throws IllegalArgumentException, IOException {
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+
+			String varName = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
+
+			varName = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
+			var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
+
+			varName = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+			var = ncfile.findVariable(varName);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" +
+						varName + "' in " + getName());
+			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
+
+			varName = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
+			var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" +
+						varName + "' in " + getName());
+			ArrayChar.D2 regionIDs = (ArrayChar.D2) var.read(); 
+
+			String dataname = woceEvent.getDataVarName();
+			ArrayDouble.D1 datavalues;
+			if ( Constants.geoposition_VARNAME.equals(dataname) ) {
+				// WOCE based on longitude/latitude/time
+				datavalues = null;
+			}
+			else {
+				var = ncfile.findVariable(dataname);
+				if ( var == null )
+					throw new IllegalArgumentException("Unable to find variable '" + 
+							dataname + "' in " + getName());
+				datavalues = (ArrayDouble.D1) var.read(); 
+			}
+
+			// WOCE flags - currently only WOCE_CO2_water
+			varName = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
+			Variable wocevar = ncfile.findVariable(varName);
+			if ( wocevar == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayChar.D2 wocevalues = (ArrayChar.D2) wocevar.read();
+
+			char newFlag = woceEvent.getFlag();
+			for ( DataLocation dataloc : woceEvent.getLocations() ) {
+				int idx = dataloc.getRowNumber() - 1;
+
+				// Check that the region ID is the same
+				Character woceRegion = dataloc.getRegionID();
+				Character dsgRegion = regionIDs.get(idx, 0);
+				if ( ! woceRegion.equals(dsgRegion) )
+					throw new IllegalArgumentException(String.format(
+							"DSG region ID (%c) different from that in " +
+							"the WOCE flag location: %s", dsgRegion, dataloc.toString()));
+					
+				// Check if longitude is within 0.001 degrees of each other
+				Double woceVal = dataloc.getLongitude();
+				Double dsgVal = longitudes.get(idx);
+				if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.0, 0.001) )
+					throw new IllegalArgumentException(String.format(
+							"DSG longitude (%#.4f) different from that in " +
+							"the WOCE flag location: %s", dsgVal, dataloc.toString()));
+
+				// Check if latitude is within 0.0001 degrees of each other
+				woceVal = dataloc.getLatitude();
+				dsgVal = latitudes.get(idx);
+				if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.0, 0.0001) )
+					throw new IllegalArgumentException(String.format(
+							"DSG latitude (%#.4f) different from that in " +
+							"the WOCE flag location: %s", dsgVal, dataloc.toString()));
+
+				// Check if times are within a second of each other
+				woceVal = dataloc.getDataDate().getTime() / 1000.0;
+				dsgVal = times.get(idx);
+				if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.0, 1.0) )
+					throw new IllegalArgumentException(String.format(
+							"DSG time (%#.0f) different from that in " +
+							"the WOCE flag location: %s", dsgVal, dataloc.toString()));
+
+				// If given, check if data values are roughly the same
+				if ( datavalues != null ) {
+					woceVal = dataloc.getDataValue();
+					dsgVal = datavalues.get(idx);
+					if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.01, 0.1) )
+						throw new IllegalArgumentException(String.format(
+								"DSG data value (%#.1f) significantly different from that in " +
+								"the WOCE flag location: %s", dsgVal, dataloc.toString()));
+				}
+
+				wocevalues.set(idx, 0, newFlag);
+			}
+
+			// Save the updated WOCE flags to the DSG file
+			try {
+				ncfile.write(wocevar, wocevalues);
+			} catch (InvalidRangeException ex) {
+				throw new IOException(ex);
+			}
 		} finally {
 			ncfile.close();
 		}
