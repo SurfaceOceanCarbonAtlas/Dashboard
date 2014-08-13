@@ -54,7 +54,7 @@ CREATE TABLE `QCEvents` (
 
 CREATE TABLE `WOCEEvents` (
   `woce_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `woce_flag` SMALLINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  `woce_flag` CHAR(1) NOT NULL DEFAULT ' ',
   `woce_time` BIGINT DEFAULT NULL,
   `expocode` VARCHAR(16) NOT NULL DEFAULT '',
   `socat_version` CHAR(4) NOT NULL DEFAULT '',
