@@ -201,7 +201,7 @@ public class DatabaseRequestHandler {
 
 	/**
 	 * Get the ID for a reviewer from the reviewers database table.
-	 * Users the username for the reviewer unless it is empty, in 
+	 * Uses the username for the reviewer unless it is empty, in 
 	 * which case it uses the realname of the reviewer.
 	 * 
 	 * @param catConn
@@ -701,7 +701,8 @@ public class DatabaseRequestHandler {
 			PreparedStatement prepStmt = catConn.prepareStatement(
 					"SELECT * FROM `WOCEEvents` JOIN `Reviewers` " +
 					"ON WOCEEvents.reviewer_id = Reviewers.reviewer_id " +
-					"WHERE WOCEEvents.expocode = ? ORDER BY WOCEEvents.woce_time DESC;");
+					"WHERE WOCEEvents.expocode = ? " +
+					"ORDER BY WOCEEvents.woce_time DESC;");
 			prepStmt.setString(1, expocode);
 			ArrayList<Long> woceIds = new ArrayList<Long>();
 			ResultSet results = prepStmt.executeQuery();
@@ -735,21 +736,97 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Generates and saves a rename QC event and 
-	 * appropriately renames the expocode for flags in the database.
+	 * Adds rename QC and WOCE events and appropriately renames 
+	 * the expocode for flags in the database.  If the cruise has
+	 * never been submitted for QC, or was already renamed, (i.e.,
+	 * has no QC events except maybe renames), returns without 
+	 * making any changes.
 	 * 
 	 * @param oldExpocode
 	 * 		standardized old expocode 
 	 * @param newExpocode
 	 * 		standardized new expocode
+	 * @param socatVersion
+	 * 		SOCAT version to associate with the rename QC and WOCE events
+	 * @param username
+	 * 		name of the user to associate with the rename QC and WOCE events 
 	 * @throws SQLException
+	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
 	 */
-	public void renameCruiseFlags(String oldExpocode, String newExpocode) 
-														throws SQLException {
+	public void renameCruiseFlags(String oldExpocode, String newExpocode, 
+			String socatVersion, String username) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
-			PreparedStatement prepStmt = catConn.prepareStatement("");
+			long nowSec = Math.round(System.currentTimeMillis() / 1000.0);
+			int reviewerId = getReviewerId(catConn, username, "");
+			String renameComment = "Rename from " + oldExpocode + " to " + newExpocode;
+
+			// Update the old expocode to the new expocode in the appropriate QC events
+			PreparedStatement modifyQcPrepStmt = catConn.prepareStatement(
+					"UPDATE `QCEvents` SET `expocode` = ? WHERE `expocode` = ? " +
+					"AND `qc_flag` <> ?;");
+			modifyQcPrepStmt.setString(1, newExpocode);
+			modifyQcPrepStmt.setString(2, oldExpocode);
+			modifyQcPrepStmt.setString(3, SocatQCEvent.QC_RENAMED_FLAG.toString());
+			modifyQcPrepStmt.execute();
+			int updateCount = modifyQcPrepStmt.getUpdateCount();
+			if ( updateCount < 0 )
+				throw new SQLException("Unexpected update count from renaming QC expocodes");
+			if ( updateCount == 0 ) {
+				// If no QC flags with the old expocode, cruise has never been submitted 
+				// or was already renamed; in either case, nothing to do. 
+				return;
+			}
+
+			// Add two rename QC events; one for the old expocode and one for the new expocode
+			PreparedStatement addQcPrepStmt = catConn.prepareStatement(
+					"INSERT INTO `QCEvents` (`qc_flag`, `qc_time`, `expocode`, " +
+					"`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
+			addQcPrepStmt.setString(1, SocatQCEvent.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(8, SocatQCEvent.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setLong(2, nowSec);
+			addQcPrepStmt.setLong(9, nowSec);
+			addQcPrepStmt.setString(3, oldExpocode);
+			addQcPrepStmt.setString(10, newExpocode);
+			addQcPrepStmt.setString(4, socatVersion);
+			addQcPrepStmt.setString(11, socatVersion);
+			addQcPrepStmt.setString(5, DataLocation.GLOBAL_REGION_ID.toString());
+			addQcPrepStmt.setString(12, DataLocation.GLOBAL_REGION_ID.toString());
+			addQcPrepStmt.setInt(6, reviewerId);
+			addQcPrepStmt.setInt(13, reviewerId);
+			addQcPrepStmt.setString(7, renameComment);
+			addQcPrepStmt.setString(14, renameComment);
+			addQcPrepStmt.execute();
+
+			// Update the old expocode to the new expocode in the appropriate WOCE events
+			PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
+					"UPDATE `WOCEEvents` SET `expocode` = ? WHERE `expocode` = ? " +
+					"AND `woce_flag` <> ?;");
+			modifyWocePrepStmt.setString(1, newExpocode);
+			modifyWocePrepStmt.setString(2, oldExpocode);
+			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_RENAME.toString());
+			modifyWocePrepStmt.execute();
+
+			// Add two rename WOCE events; one for the old expocode and one for the new expocode
+			PreparedStatement addWocePrepStmt = catConn.prepareStatement(
+					"INSERT INTO `WOCEEvents` (`woce_flag`, `woce_time`, `expocode`, " +
+					"`socat_version`, `reviewer_id`, `woce_comment`) " +
+					"VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);");
+			addWocePrepStmt.setString(1, SocatWoceEvent.WOCE_RENAME.toString());
+			addWocePrepStmt.setString(7, SocatWoceEvent.WOCE_RENAME.toString());
+			addWocePrepStmt.setLong(2, nowSec);
+			addWocePrepStmt.setLong(8, nowSec);
+			addWocePrepStmt.setString(3, oldExpocode);
+			addWocePrepStmt.setString(9, newExpocode);
+			addWocePrepStmt.setString(4, socatVersion);
+			addWocePrepStmt.setString(10, socatVersion);
+			addWocePrepStmt.setInt(5, reviewerId);
+			addWocePrepStmt.setInt(11, reviewerId);
+			addWocePrepStmt.setString(6, renameComment);
+			addWocePrepStmt.setString(12, renameComment);
+			addWocePrepStmt.execute();
 		} finally {
 			catConn.close();
 		}

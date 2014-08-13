@@ -15,12 +15,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -591447227147202258L;
+	private static final long serialVersionUID = 8280173304454973104L;
 
 	public static final Character WOCE_GOOD = '2';
 	public static final Character WOCE_NOT_CHECKED = '2';
 	public static final Character WOCE_QUESTIONABLE = '3';
 	public static final Character WOCE_BAD = '4';
+	public static final Character WOCE_RENAME = 'R';
 
 	Character flag;
 	String dataVarName;
