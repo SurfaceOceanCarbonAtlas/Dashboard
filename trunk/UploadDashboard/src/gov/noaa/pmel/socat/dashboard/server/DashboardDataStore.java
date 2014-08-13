@@ -661,6 +661,20 @@ public class DashboardDataStore {
 	}
 
 	/**
+	 * @param username
+	 * 		name of the user
+	 * @return
+	 * 		true is this user is an admin
+	 */
+	public boolean isAdmin(String username) {
+		DashboardUserInfo userInfo = userInfoMap.get(
+				DashboardUtils.cleanUsername(username));
+		if ( userInfo == null )
+			return false;
+		return userInfo.isAdmin();
+	}
+
+	/**
 	 * Generates an further encrypted password hash 
 	 * from the given username and initially encrypted password
 	 * @param username

@@ -84,12 +84,14 @@ public class CruiseResubmitter {
 	}
 
 	/**
-	 * Rechecks all cruises, and resubmits all cruises that had been submitted, 
-	 * in the default dashboard configuration.  Resubmitted cruises will have a
+	 * Rechecks cruises, and resubmits cruises that had been submitted.  Uses 
+	 * the default dashboard configuration.  Resubmitted cruises will have a
 	 * QC status of 'N' (new).
 	 * 
 	 * @param args
-	 * 		Username - name of the dashboard (admin) user requesting this update.
+	 * 		Username - name of the dashboard admin user requesting this update.
+	 * 		ExpocodesFile - file of expocodes to recheck/resubmit; if not given,
+	 * 		                all cruises are rechecked/resubmitted.
 	 */
 	public static void main(String[] args) {
 		if ( (args.length < 1) || (args.length > 2) ) {
@@ -124,8 +126,13 @@ public class CruiseResubmitter {
 			ex.printStackTrace();
 			System.exit(1);
 		}
-		CruiseResubmitter resubmitter = new CruiseResubmitter(dataStore);
 		try {
+			if ( ! dataStore.isAdmin(username) ) {
+				System.err.println(username + " is not an admin for the dashboard");
+				System.exit(1);				
+			}
+			CruiseResubmitter resubmitter = new CruiseResubmitter(dataStore);
+
 			// Get the expocode of the cruises to resubmit
 			TreeSet<String> allExpocodes = null; 
 			if ( expocodesFilename != null ) {
