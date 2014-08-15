@@ -457,6 +457,31 @@ public class DsgNcFileHandler {
 	}
 
 	/**
+	 * Read and returns the QC flag contained in the DSG file 
+	 * for the cruise with the indicated expocode.
+	 * 
+	 * @param expocode
+	 * 		get the DSG file QC flag for the cruise with this expocode
+	 * @return
+	 * 		the QC flag contained in the DSG file for the cruise
+	 * @throws FileNotFoundException
+	 * 		if the full-data DSG file does not exist
+	 * @throws IOException
+	 * 		if there is a problem opening or reading from this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is not invalid, or
+	 * 		if the DSG file for the cruise is not valid
+	 */
+	public char getQCFlag(String expocode) 
+			throws IllegalArgumentException, FileNotFoundException, IOException {
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.exists() )
+			throw new FileNotFoundException("Full data DSG file for " + 
+					expocode + " does not exist");
+		return dsgFile.getQCFlag();
+	}
+
+	/**
 	 * Assigns the QC flag given in qcEvent in the full and decimated 
 	 * DSG files for the dataset with the expocode given in qvEvent. 
 	 * 
