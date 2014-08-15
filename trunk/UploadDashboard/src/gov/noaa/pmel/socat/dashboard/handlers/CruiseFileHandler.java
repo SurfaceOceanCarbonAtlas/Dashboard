@@ -942,11 +942,11 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		File newDataFile = cruiseDataFile(newExpocode);
 		if ( newDataFile.exists() )
 			throw new IllegalArgumentException(
-					"Data file for " + oldExpocode + " already exist");
+					"Data file for " + newExpocode + " already exist");
 		File newInfoFile = cruiseInfoFile(newExpocode);
 		if ( newInfoFile.exists() )
 			throw new IllegalArgumentException(
-					"Info file for " + oldExpocode + " already exist");
+					"Info file for " + newExpocode + " already exist");
 
 		// Make sure the parent directory for the new files exists
 		File parentFile = newDataFile.getParentFile();
