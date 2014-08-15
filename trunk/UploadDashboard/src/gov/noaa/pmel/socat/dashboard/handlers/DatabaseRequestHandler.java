@@ -414,11 +414,18 @@ public class DatabaseRequestHandler {
 
 			// Check for conflicts in the latest flags
 			SocatQCEvent lastGlobalFlag = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
-			// There is always a global 'N' flag; maybe also a 'U', and maybe an override flag
-			if ( lastGlobalFlag == null )
-				throw new SQLException("Unexpected failure to find a global flag");
-			Date globalDate = lastGlobalFlag.getFlagDate();
-			Character globalFlag = lastGlobalFlag.getFlag();
+			// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
+			Character globalFlag;
+			Date globalDate;
+			if ( lastGlobalFlag == null ) {
+				// Just in case the first region flags are added before the first global flag
+				globalFlag = SocatQCEvent.QC_NEW_FLAG;
+				globalDate = new Date(0L);
+			}
+			else {
+				globalFlag = lastGlobalFlag.getFlag();
+				globalDate = lastGlobalFlag.getFlagDate();
+			}
 			Character lastFlag = null;
 			for ( SocatQCEvent flagEvent : regionFlags.values() ) {
 				// Use the region flag if assigned after the global flag; otherwise use the global flag

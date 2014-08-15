@@ -146,9 +146,9 @@ public class DataLocation implements Serializable, IsSerializable {
 		else {
 			this.longitude = longitude;
 			while ( this.longitude >= 180.0 )
-				this.longitude -= 180.0;
+				this.longitude -= 360.0;
 			while ( this.longitude < -180.0 )
-				this.longitude += 180.0;
+				this.longitude += 360.0;
 		}
 	}
 
@@ -240,7 +240,7 @@ public class DataLocation implements Serializable, IsSerializable {
 		return "DataLocation" +
 				"[ regionID='" + regionID.toString() + "'" + 
 				", rowNumber=" + rowNumber.toString() + 
-				", dataTime=" + Double.toString((dataDate.getTime()/1000.0)) + 
+				", dataTime=" + Long.toString(Math.round((dataDate.getTime()/1000.0))) + 
 				", longitude=" + longitude.toString() + 
 				", latitude=" + latitude.toString() + 
 				", dataValue=" + dataValue.toString() + 

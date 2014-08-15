@@ -39,7 +39,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = -4210258791851310099L;
+	private static final long serialVersionUID = 5792606584900612683L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -654,12 +654,37 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
+	 * @return
+	 * 		the QC flag contained in this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if this DSG file is not valid
+	 * @throws IOException
+	 * 		if opening or reading from the DSG file throws one
+	 */
+	public char getQCFlag() throws IllegalArgumentException, IOException {
+		char flag;
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+			String varName = Constants.SHORT_NAMES.get(Constants.qcFlag_VARNAME);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayChar.D2 flagArray = (ArrayChar.D2) var.read();
+			flag = flagArray.get(0, 0);
+		} finally {
+			ncfile.close();
+		}
+		return flag;
+	}
+
+	/**
 	 * Updates this DSG file with the given QC flag.
 	 * 
 	 * @param qcEvent
 	 * 		get the expocode and the QC flag from here
 	 * @throws IllegalArgumentException
-	 * 		if the DSG file is not valid
+	 * 		if this DSG file is not valid
 	 * @throws IOException
 	 * 		if opening or writing to the DSG file throws one
 	 * @throws InvalidRangeException 
@@ -758,46 +783,24 @@ public class CruiseDsgNcFile extends File {
 			for ( DataLocation dataloc : woceEvent.getLocations() ) {
 				int idx = dataloc.getRowNumber() - 1;
 
-				// Check that the region ID is the same
+				// Check the values are close (data value roughly close)
 				Character woceRegion = dataloc.getRegionID();
 				Character dsgRegion = regionIDs.get(idx, 0);
-				if ( ! woceRegion.equals(dsgRegion) )
-					throw new IllegalArgumentException(String.format(
-							"DSG region ID (%c) different from that in " +
-							"the WOCE flag location: %s", dsgRegion, dataloc.toString()));
-					
-				// Check if longitude is within 0.001 degrees of each other
-				Double woceVal = dataloc.getLongitude();
-				Double dsgVal = longitudes.get(idx);
-				if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.0, 0.001) )
-					throw new IllegalArgumentException(String.format(
-							"DSG longitude (%#.4f) different from that in " +
-							"the WOCE flag location: %s", dsgVal, dataloc.toString()));
-
-				// Check if latitude is within 0.0001 degrees of each other
-				woceVal = dataloc.getLatitude();
-				dsgVal = latitudes.get(idx);
-				if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.0, 0.0001) )
-					throw new IllegalArgumentException(String.format(
-							"DSG latitude (%#.4f) different from that in " +
-							"the WOCE flag location: %s", dsgVal, dataloc.toString()));
-
-				// Check if times are within a second of each other
-				woceVal = dataloc.getDataDate().getTime() / 1000.0;
-				dsgVal = times.get(idx);
-				if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.0, 1.0) )
-					throw new IllegalArgumentException(String.format(
-							"DSG time (%#.0f) different from that in " +
-							"the WOCE flag location: %s", dsgVal, dataloc.toString()));
-
-				// If given, check if data values are roughly the same
-				if ( datavalues != null ) {
-					woceVal = dataloc.getDataValue();
-					dsgVal = datavalues.get(idx);
-					if ( ! DashboardUtils.closeTo(woceVal, dsgVal, 0.01, 0.1) )
-						throw new IllegalArgumentException(String.format(
-								"DSG data value (%#.1f) significantly different from that in " +
-								"the WOCE flag location: %s", dsgVal, dataloc.toString()));
+				if ( ! ( woceRegion.equals(dsgRegion) &&
+						 dataMatches(dataloc, longitudes, latitudes, times, 
+								 datavalues, idx, 0.001, 0.1, null) ) ) {
+					DataLocation dsgLoc = new DataLocation();
+					dsgLoc.setRowNumber(idx + 1);
+					dsgLoc.setRegionID(regionIDs.get(idx, 0));
+					dsgLoc.setLongitude(longitudes.get(idx));
+					dsgLoc.setLatitude(latitudes.get(idx));
+					dsgLoc.setDataDate(new Date(Math.round(times.get(idx) * 1000.0)));
+					if ( datavalues != null )
+						dsgLoc.setDataValue(datavalues.get(idx));
+					throw new IllegalArgumentException(
+							"DSG values for the row different from WOCE flag location values: " +
+							"\n    " + dsgLoc.toString() +  
+							"\n    " + dataloc.toString());
 				}
 
 				wocevalues.set(idx, 0, newFlag);
@@ -904,7 +907,8 @@ public class CruiseDsgNcFile extends File {
 				boolean valueFound = false;
 				int idx;
 				for (idx = startIdx; idx < arraySize; idx++) {
-					if ( dataMatches(dataloc, longitudes, latitudes, times, datavalues, idx, log) ) {
+					if ( dataMatches(dataloc, longitudes, latitudes, times, 
+							datavalues, idx, 1.0E-5, 1.0E-5, log) ) {
 						if ( assignedRowIndices.add(idx) ) {
 							valueFound = true;
 							break;
@@ -913,7 +917,8 @@ public class CruiseDsgNcFile extends File {
 				}
 				if ( idx >= arraySize ) {
 					for (idx = 0; idx < startIdx; idx++) {
-						if ( dataMatches(dataloc, longitudes, latitudes, times, datavalues, idx, log) ) {
+						if ( dataMatches(dataloc, longitudes, latitudes, times, 
+								datavalues, idx, 1.0E-5, 1.0E-5, log) ) {
 							if ( assignedRowIndices.add(idx) ) {
 								valueFound = true;
 								break;
@@ -957,6 +962,12 @@ public class CruiseDsgNcFile extends File {
 	 * 		if not null, array of data values to use
 	 * @param idx
 	 * 		index into the arrays of the values to compare
+	 * @param dataRelTol
+	 * 		relative tolerance for (only) the data value;
+	 * 		see {@link DashboardUtils#closeTo(Double, Double, double, double)}
+	 * @param dataAbsTol
+	 * 		absolute tolerance for (only) the data value
+	 * 		see {@link DashboardUtils#closeTo(Double, Double, double, double)}
 	 * @param log
 	 * 		logger to log trace messages; can be null
 	 * @return
@@ -964,7 +975,7 @@ public class CruiseDsgNcFile extends File {
 	 */
 	private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes,
 			ArrayDouble.D1 latitudes, ArrayDouble.D1 times, ArrayDouble.D1 datavalues, 
-			int idx, Logger log) {
+			int idx, double dataRelTol, double dataAbsTol, Logger log) {
 
 		Double arrLongitude = longitudes.get(idx);
 		Double arrLatitude = latitudes.get(idx);
@@ -1019,9 +1030,9 @@ public class CruiseDsgNcFile extends File {
 			return false;
 		}
 
-		// If given, check if data values are within 1.0E-5 relative/absolute of each other
+		// If given, check if data values are close to each other
 		if ( datavalues != null ) {
-			if ( ! DashboardUtils.closeTo(datValue, arrValue, 1.0E-5, 1.0E-5) ) {
+			if ( ! DashboardUtils.closeTo(datValue, arrValue, dataRelTol, dataAbsTol) ) {
 				if ( log != null )
 					log.trace("match failed on data value");
 				return false;

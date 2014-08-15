@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -30,6 +31,7 @@ public class CruiseResubmitter {
 	CruiseFileHandler cruiseHandler;
 	DashboardCruiseChecker cruiseChecker;
 	DashboardCruiseSubmitter cruiseSubmitter;
+	DsgNcFileHandler dsgHandler;
 
 	/**
 	 * @param dataStore
@@ -40,12 +42,15 @@ public class CruiseResubmitter {
 		cruiseHandler = dataStore.getCruiseFileHandler();
 		cruiseChecker = dataStore.getDashboardCruiseChecker();
 		cruiseSubmitter = dataStore.getDashboardCruiseSubmitter();
+		dsgHandler = dataStore.getDsgNcFileHandler();
 	}
 
 	/**
 	 * Rechecks the data of all cruises.  If a cruise had been submitted 
-	 * at some point, it is resubmitted and the QC status is set to 'N'
-	 * (new).  Requests to "send to CDIAC immediately" are not re-sent.
+	 * at some point, it is resubmitted.  If a submitted cruise does not 
+	 * have a DSG file, 'N' (new) will be assigned as the QC flag; 
+	 * otherwise 'U' (updated) will be assigned.
+	 * Requests to "send to CDIAC immediately" are not re-sent.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise to check/resubmit
@@ -72,21 +77,28 @@ public class CruiseResubmitter {
 		}
 		else {
 			// Un-submit the cruise but do not bother committing the change
-			cruise.setQcStatus(SocatQCEvent.QC_STATUS_NOT_SUBMITTED);
+			if ( dsgHandler.getDsgNcFile(expocode).exists() )
+				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
+			else
+				cruise.setQcStatus(SocatQCEvent.QC_STATUS_NOT_SUBMITTED);
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));
 			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date());
 			cruiseSubmitter.submitCruises(expocodeSet, cruise.getArchiveStatus(), 
 										  timestamp, false, username, null, null);
-			// Note that the cruise will now have a QC status of 'N' (new)
+			// The cruise will now have a QC status of 'N' (new) if it was 
+			// QC_STATUS_NOT_SUBMITTED, or 'U' (updated) if it was QC_STATUS_SUSPENDED
 		}
 	}
 
 	/**
 	 * Rechecks cruises, and resubmits cruises that had been submitted.  Uses 
-	 * the default dashboard configuration.  Resubmitted cruises will have a
-	 * QC status of 'N' (new).
+	 * the default dashboard configuration.  If a submitted cruise does not 
+	 * have a DSG file, 'N' (new) will be assigned as the QC status; otherwise,
+	 * 'U' (updated) will be assigned.  Requests to "send to CDIAC immediately" 
+	 * are not re-sent.  The default dashboard configuration is used for this 
+	 * recheck and resubmit process.
 	 * 
 	 * @param args
 	 * 		Username - name of the dashboard admin user requesting this update.
@@ -98,9 +110,11 @@ public class CruiseResubmitter {
 			System.err.println("Arguments:  Username  [ ExpocodesFile ]");
 			System.err.println();
 			System.err.println("Rechecks all cruises, or those specified in ExpocodesFile if given. ");
-			System.err.println("Resubmits all cruises that had been submitted.  Resubmitted cruises ");
-			System.err.println("will have a QC status of 'N' (new).  The default dashboard ");
-			System.err.println("configuration is used for this recheck and resubmit process. ");
+			System.err.println("Resubmits all cruises that had been submitted.  If a submitted cruise ");
+			System.err.println("does not have a DSG file, 'N' (new) will be assigned as the QC status; ");
+			System.err.println("otherwise, 'U' (updated) will be assigned.  Requests to \"send to CDIAC ");
+			System.err.println("immediately\" are not re-sent.  The default dashboard configuration is ");
+			System.err.println("used for this recheck and resubmit process. ");
 			System.err.println();
 			System.err.println("Username is the dashboard admin requesting this update.");
 			System.err.println();

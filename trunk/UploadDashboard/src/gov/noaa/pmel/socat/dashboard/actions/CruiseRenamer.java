@@ -11,8 +11,13 @@ import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Renames dashboard cruise files, as well as SOCAT files and 
@@ -83,33 +88,54 @@ public class CruiseRenamer {
 	}
 
 	/**
-	 * Renames a cruise (changes the expocode).  All files will be moved to the
+	 * Renames cruises (changes the expocodes).  All files will be moved to the
 	 * new locations specified by the new expocode.  If appropriate, file contents
-	 * are updated for the new expocode.  If the cruise has been submitted for QC,
+	 * are updated for the new expocodes.  If a cruise has been submitted for QC,
 	 * QC and WOCE flags are updated and rename events are added.
 	 *  
 	 * @param args
 	 * 		Username - name of the dashboard admin user requesting this update.
-	 * 		OldExpocode - expocode of the cruise to rename
-	 * 		NewExpocode - new expocode for the cruise
+	 * 		ExpocodesFile - file of old and new expocodes (one pair per line) for the cruises
 	 */
 	public static void main(String[] args) {
-		if ( args.length != 3 ) {
-			System.err.println("Arguments:  Username  OldExpocode  NewExpocode");
+		if ( args.length != 2 ) {
+			System.err.println("Arguments:  Username  ExpocodesFile");
 			System.err.println();
-			System.err.println("Renames the cruise with OldExpocode to NewExpocode.  ");
-			System.err.println("All files will be moved, and updated if appropriate. ");
-			System.err.println("If the cruise had been submitted for QC, QC and WOCE ");
-			System.err.println("flags will be updated and rename events will be added. ");
+			System.err.println("Renames cruise (changes the expocodes).  All files will be moved, ");
+			System.err.println("and updated if appropriate.  If the cruise had been submitted for ");
+			System.err.println("QC, the QC and WOCE flags will be updated and rename events will ");
+			System.err.println("be added. ");
 			System.err.println();
 			System.err.println("Username is the dashboard admin requesting this update.");
+			System.err.println("ExpocodesFile is a file of old and new expocode pairs, one pair per line");
 			System.err.println();
 			System.exit(1);
 		}
 
 		String username = args[0];
-		String oldExpocode = args[1];
-		String newExpocode = args[2];
+		File exposFile = new File(args[1]);
+
+		TreeMap<String,String> oldNewExpoMap = new TreeMap<String,String>();
+		try {
+			BufferedReader exposReader = new BufferedReader(new FileReader(exposFile));
+			try {
+				String dataline = exposReader.readLine();
+				while ( dataline != null ) {
+					String[] expoPair = dataline.split("\\s+");
+					if ( expoPair.length != 2 )
+						throw new IllegalArgumentException("not an expocode pair: '" + dataline.trim() + "'");
+					oldNewExpoMap.put(expoPair[0], expoPair[1]);
+					dataline = exposReader.readLine();
+				}
+			} finally {
+				exposReader.close();
+			}
+			if ( oldNewExpoMap.isEmpty() )
+				throw new IOException("file is empty");
+		} catch (Exception ex) {
+			System.err.println("Problems reading the old and new expocodes from " + exposFile.getPath());
+			System.exit(1);
+		}
 
 		// Get the default dashboard configuration
 		DashboardDataStore dataStore = null;		
@@ -122,19 +148,21 @@ public class CruiseRenamer {
 			System.exit(1);
 		}
 		try {
-			try {
-				if ( ! dataStore.isAdmin(username) ) {
-					System.err.println(username + " is not an admin for the dashboard");
-					System.exit(1);
-				}
-				CruiseRenamer renamer = new CruiseRenamer(dataStore);
-				renamer.renameCruise(oldExpocode, newExpocode, 
-						dataStore.getSocatUploadVersion(), username);
-			} catch (Exception ex) {
-				System.err.println("Error renaming " + oldExpocode + " to " + 
-						newExpocode + " : " + ex.getMessage());
-				ex.printStackTrace();
+			if ( ! dataStore.isAdmin(username) ) {
+				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
+			}
+			String socatVersion = dataStore.getSocatUploadVersion();
+			CruiseRenamer renamer = new CruiseRenamer(dataStore);
+			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
+				String oldExpocode = expoEntry.getKey();
+				String newExpocode = expoEntry.getValue();
+				try {
+					renamer.renameCruise(oldExpocode, newExpocode, socatVersion, username);
+				} catch (Exception ex) {
+					System.err.println("Error renaming " + oldExpocode + " to " + newExpocode);
+					ex.printStackTrace();
+				}
 			}
 		} finally {
 			dataStore.shutdown();
