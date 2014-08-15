@@ -516,29 +516,33 @@ public class DsgNcFileHandler {
 	 * 
 	 * @param qcEvent
 	 * 		get the QC flag and dataset expocode from here
-	 * @param log
-	 * 		log messages here; can be null 
 	 * @throws IllegalArgumentException
 	 * 		if the DSG files are not valid
 	 * @throws IOException
-	 * 		if opening or writing to a DSG file throws one
-	 * @throws InvalidRangeException 
-	 * 		if writing the update QC flag to a DSG file throws one 
+	 * 		if problems opening or writing to a DSG file 
 	 */
-	public void updateQCFlag(SocatQCEvent qcEvent, Logger log) 
-			throws IllegalArgumentException, IOException, InvalidRangeException {
+	public void updateQCFlag(SocatQCEvent qcEvent) 
+			throws IllegalArgumentException, IOException {
 		// Get the location and name for the NetCDF DSG file
 		String expocode = qcEvent.getExpocode();
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.exists() )
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
-		dsgFile.updateQCFlag(qcEvent);
+		try {
+			dsgFile.updateQCFlag(qcEvent);
+		} catch (InvalidRangeException ex) {
+			throw new IOException(ex);
+		}
 		CruiseDsgNcFile decDsgFile = getDecDsgNcFile(expocode);
 		if ( ! decDsgFile.exists() )
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + expocode + " does not exist");
-		decDsgFile.updateQCFlag(qcEvent);
+		try {
+			decDsgFile.updateQCFlag(qcEvent);
+		} catch (InvalidRangeException ex) {
+			throw new IOException(ex);
+		}
 		flagErddap(true);
 	}
 
@@ -556,19 +560,21 @@ public class DsgNcFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
-	 * 		if opening, reading from, or writing to the DSG file throws one
-	 * @throws InvalidRangeException 
-	 * 		if writing the update WOCE flags to the DSG file throws one 
+	 * 		if problems opening, reading from, or writing to the DSG file
 	 */
-	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename, Logger log) 
-			throws IllegalArgumentException, IOException, InvalidRangeException {
+	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename, 
+			Logger log) throws IllegalArgumentException, IOException {
 		// Get the location and name for the NetCDF DSG file
 		String expocode = woceEvent.getExpocode();
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
-		dsgFile.updateWoceFlags(woceEvent, true, log);
+		try {
+			dsgFile.updateWoceFlags(woceEvent, true, log);
+		} catch (InvalidRangeException ex) {
+			throw new IOException(ex);
+		}
 		flagErddap(false);
 		if ( (tempDsgFilename == null) || tempDsgFilename.trim().isEmpty() )
 			return;
@@ -576,7 +582,11 @@ public class DsgNcFileHandler {
 		if ( ! tempDsgFile.canRead() )
 			throw new IllegalArgumentException("Temporary DSG file " + 
 					tempDsgFile.getName() + " does not exist");
-		tempDsgFile.updateWoceFlags(woceEvent, false, log);
+		try {
+			tempDsgFile.updateWoceFlags(woceEvent, false, log);
+		} catch (InvalidRangeException ex) {
+			throw new IOException(ex);
+		}
 	}
 
 }
