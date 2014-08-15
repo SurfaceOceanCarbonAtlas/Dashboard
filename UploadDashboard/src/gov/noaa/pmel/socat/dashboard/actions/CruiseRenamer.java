@@ -32,6 +32,7 @@ public class CruiseRenamer {
 	MetadataFileHandler metadataHandler;
 	DsgNcFileHandler dsgHandler;
 	DatabaseRequestHandler databaseHandler;
+	String socatVersion;
 	
 	/**
 	 * @param dataStore
@@ -43,6 +44,7 @@ public class CruiseRenamer {
 		metadataHandler = dataStore.getMetadataFileHandler();
 		dsgHandler = dataStore.getDsgNcFileHandler();
 		databaseHandler = dataStore.getDatabaseRequestHandler();
+		socatVersion = dataStore.getSocatUploadVersion();
 	}
 
 	/**
@@ -54,8 +56,6 @@ public class CruiseRenamer {
 	 * 		current expocode for the cruise
 	 * @param newExpocode
 	 * 		new expocode to use for the cruise
-	 * @param socatVersion
-	 * 		SOCAT version to associate with the rename QC and WOCE events
 	 * @param username
 	 * 		username to associate with the rename QC and WOCE events
 	 * @throws IllegalArgumentException
@@ -69,8 +69,7 @@ public class CruiseRenamer {
 	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
 	 */
-	public void renameCruise(String oldExpocode, String newExpocode, 
-			String socatVersion, String username) 
+	public void renameCruise(String oldExpocode, String newExpocode, String username) 
 			throws IllegalArgumentException, IOException, SQLException {
 		// check and standardized the expocodes
 		String oldExpo = DashboardServerUtils.checkExpocode(oldExpocode);
@@ -152,13 +151,12 @@ public class CruiseRenamer {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
-			String socatVersion = dataStore.getSocatUploadVersion();
 			CruiseRenamer renamer = new CruiseRenamer(dataStore);
 			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
 				String oldExpocode = expoEntry.getKey();
 				String newExpocode = expoEntry.getValue();
 				try {
-					renamer.renameCruise(oldExpocode, newExpocode, socatVersion, username);
+					renamer.renameCruise(oldExpocode, newExpocode, username);
 				} catch (Exception ex) {
 					System.err.println("Error renaming " + oldExpocode + " to " + newExpocode);
 					ex.printStackTrace();
