@@ -22,6 +22,33 @@ import org.junit.Test;
 public class DashboardUtilsTest {
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#longitudeCloseTo(Double, Double, double, double)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#closeTo(Double, Double, double, double)}
+	 */
+	@Test
+	public void testCloseToLongitudeCloseTo() {
+		double lon1 = -179.9999994;
+		double deltalon1 = lon1 - 1.2E-6;
+		double lon2 = deltalon1 + 360.0;
+
+		assertTrue( DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-5) );
+		assertFalse( DashboardUtils.closeTo(lon1, deltalon1, 0.0, 1.0E-6) );
+		assertTrue( DashboardUtils.closeTo(lon1, deltalon1, 1.0E-8, 0.0) );
+		assertFalse( DashboardUtils.closeTo(lon1, deltalon1, 1.0E-9, 0.0) );
+		assertTrue( DashboardUtils.closeTo(Double.NaN, Double.NaN, 0.0, 0.0) );
+		assertFalse( DashboardUtils.closeTo(Double.NaN, lon1, 1.0, 1.0) );
+
+		assertFalse( DashboardUtils.closeTo(lon1, lon2, 0.0, 1.0E-3) );
+		assertTrue( DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-5) );
+		assertFalse( DashboardUtils.longitudeCloseTo(lon1, lon2, 0.0, 1.0E-6) );
+		assertFalse( DashboardUtils.closeTo(lon1, lon2, 1.0E-3, 0.0) );
+		assertTrue( DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-8, 0.0) );
+		assertFalse( DashboardUtils.longitudeCloseTo(lon1, lon2, 1.0E-9, 0.0) );
+		assertTrue( DashboardUtils.longitudeCloseTo(Double.NaN, Double.NaN, 0.0, 0.0) );
+		assertFalse( DashboardUtils.longitudeCloseTo(Double.NaN, lon1, 1.0, 1.0) );
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardUtils#passhashFromPlainText()}.
 	 */
 	@Test

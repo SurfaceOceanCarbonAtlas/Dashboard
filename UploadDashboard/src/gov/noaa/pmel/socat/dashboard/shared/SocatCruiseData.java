@@ -1988,10 +1988,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 					return false;
 
 		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( ! DashboardUtils.closeTo(this.longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
-			if ( ! DashboardUtils.closeTo(this.longitude + 360.0, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
-				if ( ! DashboardUtils.closeTo(this.longitude, other.longitude + 360.0, 0.0, MAX_ABSOLUTE_ERROR) )
-					return false;
+		if ( ! DashboardUtils.longitudeCloseTo(this.longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+			return false;
 
 		// rest of the Double comparisons
 		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, MAX_ABSOLUTE_ERROR) )

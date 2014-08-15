@@ -37,6 +37,15 @@ let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask),x=-180:180], longitud
 let d2land_coast = SAMPLEXY_CLOSEST(dist2land[d=($dd2land),x=-180:180], longitude, latitude)
 let region_num_fill = if d2land_coast le 50 and region_num eq 0 then 7 else region_num
 
+! If there are any missing values, fill them with: Arctic, Coastal, or Southern.
+
+IF `region_num_fill[i=@min] EQ 0` THEN
+   LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 7 else region_num
+
+   LET region_num_fill = if region_num_fill1 then region_num_fill1 else \
+    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude)
+ENDIF
+
 ! There is no region 3 and no region 9
 let region_codes = {"N", "T", "-", "O", "I", "A", "C", "Z", "-", "R"}
 let regionid = SAMPLEI(region_codes, region_num_fill)

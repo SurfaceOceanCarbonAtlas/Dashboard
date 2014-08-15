@@ -582,6 +582,44 @@ public class DashboardUtils {
 	}
 
 	/**
+	 * Determines if two longitudes are close to the same value
+	 * modulo 360.0.  The absolute of the average value, absAver, 
+	 * and the absolute value in the difference in values, absDiff,
+	 * of first and second are determined.
+	 *  
+	 * The difference between is considered negligible if: 
+	 *     absDiff < absAver * rtol + atol 
+	 * 
+	 * This comparison is made to the values as given as well as for
+	 * each value with 360.0 added to it.  
+	 * (So not a complete modulo 360 check.)
+	 * 
+	 * @param first 
+	 * 		value to compare
+	 * @param second 
+	 * 		value to compare
+	 * @param rtol
+	 * 		relative tolerance of the difference
+	 * @param atol
+	 * 		absolute tolerance of the difference
+	 * @return 
+	 * 		true is first and second are both NaN, both Infinite
+	 * 		(regardless of whether positive or negative), or 
+	 * 		have values whose difference is "negligible".
+	 */
+	public static boolean longitudeCloseTo(Double first, Double second, 
+										double rtol, double atol) {
+		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
+		if ( DashboardUtils.closeTo(first, second, rtol, atol) )
+			return true;
+		if ( DashboardUtils.closeTo(first + 360.0, second, rtol, atol) )
+			return true;
+		if ( DashboardUtils.closeTo(first, second + 360.0, rtol, atol) )
+			return true;
+		return false;
+	}
+
+	/**
 	 * Determines if two Doubles are close to the same value.
 	 * The absolute of the average value, absAver, and the 
 	 * absolute value in the difference in values, absDiff,

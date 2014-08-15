@@ -226,11 +226,8 @@ public class DataLocation implements Serializable, IsSerializable {
 			return false;
 		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
 			return false;
-		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( ! DashboardUtils.closeTo(longitude, other.longitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-			if ( ! DashboardUtils.closeTo(longitude + 360.0, other.longitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-				if ( ! DashboardUtils.closeTo(longitude, other.longitude + 360.0, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-					return false;
+		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+			return false;
 
 		return true;
 	}

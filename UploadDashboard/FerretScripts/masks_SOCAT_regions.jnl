@@ -81,6 +81,7 @@ set att/like=rose_in rose
 !
 
 LET xm180 = `-180 + xbox[gx=rose,i=1]`
+LET xm180 = -180
 let xx =   x[gx=rose[d=1],x=`xm180`:180] + 0*y[gy=rose[d=1]]
 let yy = 0*x[gx=rose[d=1],x=`xm180`:180] + y[gy=rose[d=1]] 
 LET zero = 0+0*rose[d=1,x=`xm180`:180]
@@ -91,7 +92,8 @@ LET oceanmask = if rose[d=1,x=`xm180`:180] LT 0 then 1
 use  dist2land20_burke.nc
 let dist2landrose = dist2land[g=rose[d=1]@nrst]
 
-LET oceanmask = if dist2landrose GT 0 then 1
+LET oceanmask = if dist2landrose[x=`xm180`:180] GT 0 then 1
+
 
 ! SOCAT regions are drawn for /X=-180:540 to ensure coverage
 ! if the Ferret region drawn changes.
@@ -280,7 +282,7 @@ let/title="Southern Ocean Mask" south = if southy1 then 4 else 0
 let coast_s = if yy ge -30 then oceanmask else zero
 let coast_n = if arctic eq 0 then oceanmask else 0
 
-let coast_400 = IF  dist2landrose gt 0 and dist2landrose le 400 then oceanmask else zero
+let coast_400 = IF  dist2landrose[x=`xm180`:180] gt 0 and dist2landrose[x=`xm180`:180] le 400 then oceanmask else zero
 let coast_all = coast_n* coast_s * coast_400
 
 ! The value of the coast mask will be 7 but first its added to regions it overlaps. The
@@ -308,3 +310,82 @@ let/title="All Masks:1=NPac,2=TPac,4=South,5=Ind,6=NAtl,7=Coast,8=Tatl,10=Arctic
 shade/pal=ten_by_levels/lev=(1,11,1)/key=centerlab region_id
 
 save/clobber/file=SOCAT_region_ids.nc region_id
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+! A few locations may be near an island and so get marked as zero where they should
+! be either coastal in mid-latitudes, or Southern or Arctic. Define coastal,
+! Arctic and southern masks to not refer to land.
+
+LET ones = 1+0*dist2landrose[x=`xm180`:180] 
+
+
+! Arctic
+! overrides any of the above SOCAT regions
+! +-----------+--------+--------+--------+--------+--------------+
+! | region_ID | MinLat | MinLon | MaxLat | MaxLon | subregion_ID |
+! | R         |     70 |   -100 |     90 |     43 |           23 | 
+! | R         |     66 |   -180 |     90 |   -100 |           24 | 
+! | R         |     66 |     43 |     90 |    180 |           25 | 
+
+
+let arcx1 = if xx gt -100 and xx le 43 then ones else zero
+let arcy1 = if yy gt 70 then ones else zero
+let arcx2 = if xx le -100 then ones else zero
+let arcy2 = if yy gt 66 then ones else zero
+let arcx3 = if xx gt 43 then ones else zero
+let arcy3 = if yy gt 66 then ones else zero
+
+let arc1 = arcx1*arcy1
+let arc2 = arcx2*arcy2
+let arc3 = arcx3*arcy3
+let arc_all = ones*(arc1+arc2+arc3)
+
+let/title="Arctic Mask" arctic = if arc_all gt 0 then 10 else 0
+
+! Southern Ocean
+! overrides any of the above SOCAT regions
+! +-----------+--------+--------+--------+--------+--------------+
+! | region_ID | MinLat | MinLon | MaxLat | MaxLon | subregion_ID |
+! | O         |    -90 |   -180 |    -30 |    180 |           12 |
+
+
+let southy1 = if yy gt -90 and yy le -30 then ones else zero
+let/title="Southern Ocean Mask" south = if southy1 then 4 else 0
+
+! Arctic defined above with North Atlantic...
+
+
+! Coastal regions - within 400 km of land
+! overrides any of the above SOCAT regions
+! Coastal is not used in the Arctic or Southern regions
+
+
+let coast_s = if yy ge -30 then ones else zero
+let coast_n = if arctic eq 0 then ones else 0
+
+let coast_400 = IF  ones[x=`xm180`:180] gt 0 and ones[x=`xm180`:180] le 400 then ones else zero
+let coast_all = coast_n* coast_s * coast_400
+
+! The value of the coast mask will be 7 but first its added to regions it overlaps. The
+! final mask will be  -- if sum-of-masks gt 10 then 7
+let/title="Coastal mask" coast = if coast_all then 12 else 0
+
+
+! Check
+set win/new; 
+
+shade/pal=ten_by_levels/lev=(1,11,1) south; go land; pause
+shade/pal=ten_by_levels/lev=(1,11,1) if coast then 7; go land; pause
+shade/pal=ten_by_levels/lev=(1,11,1) arctic; go land; pause
+
+! add all the masks; each is a numeric code else 0. 
+
+let sum_mask = south+arctic+coast
+
+let/title="No ocean/land, All Masks:4=South,7=Coast,10=Arctic" southern_coast_arctic = if sum_mask gt 10 then 7 else sum_mask
+shade/pal=ten_by_levels/lev=(1,11,1)/key=centerlab southern_coast_arctic
+
+save/append/file=SOCAT_region_ids.nc southern_coast_arctic
+
+
