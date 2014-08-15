@@ -710,10 +710,10 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Assigns the given complete WOCE flags in this DSG file.  In particular, 
 	 * the row numbers in the WOCE flag locations are used to identify the row 
-	 * for the WOCE flag; however, the latitude, longitude, and timestamp, and 
-	 * region ID in these WOCE flag locations are checked that they match those 
-	 * in this DSG file.  The data values, if given, is also checked that they 
-	 * roughly match those in this DSG file. 
+	 * for the WOCE flag; however, the latitude, longitude, and timestamp in 
+	 * these WOCE flag locations are checked that they match those in this DSG 
+	 * file.  The data values, if given, is also checked that they roughly match 
+	 * those in this DSG file. 
 	 * 
 	 * @param woceEvent
 	 * 		WOCE flags to set
@@ -784,11 +784,8 @@ public class CruiseDsgNcFile extends File {
 				int idx = dataloc.getRowNumber() - 1;
 
 				// Check the values are close (data value roughly close)
-				Character woceRegion = dataloc.getRegionID();
-				Character dsgRegion = regionIDs.get(idx, 0);
-				if ( ! ( woceRegion.equals(dsgRegion) &&
-						 dataMatches(dataloc, longitudes, latitudes, times, 
-								 datavalues, idx, 0.001, 0.1, null) ) ) {
+				if ( ! dataMatches(dataloc, longitudes, latitudes, times, 
+									datavalues, idx, 0.001, 0.1, null) ) {
 					DataLocation dsgLoc = new DataLocation();
 					dsgLoc.setRowNumber(idx + 1);
 					dsgLoc.setRegionID(regionIDs.get(idx, 0));
