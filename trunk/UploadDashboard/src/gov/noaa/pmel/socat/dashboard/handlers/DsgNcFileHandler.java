@@ -397,7 +397,7 @@ public class DsgNcFileHandler {
 	 * contained in the DSG file for the specified cruise.  The variable must 
 	 * be saved in the DSG file as characters.  Empty strings are changed to 
 	 * {@link SocatCruiseData#CHAR_MISSING_VALUE}.  For some variables, the  
-	 * DSG file must have been processes by Ferret, such as when saved using 
+	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
 	 * 
@@ -427,10 +427,39 @@ public class DsgNcFileHandler {
 	/**
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the DSG file for the specified cruise.  The variable must 
+	 * be saved in the DSG file as integers.  For some variables, the DSG file 
+	 * must have been processed by Ferret, such as when saved using 
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * for the data values to be meaningful.
+	 * 
+	 * @param expocode
+	 * 		get the data values for the cruise with this expocode
+	 * @param varName
+	 * 		name of the variable to read
+	 * @return
+	 * 		array of values for the specified variable
+	 * @throws FileNotFoundException
+	 * 		if the full-data DSG file does not exist
+	 * @throws IOException
+	 * 		if there is a problem opening or reading from this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the variable name is invalid
+	 */
+	public int[] readIntVarDataValues(String expocode, String varName) 
+			throws IllegalArgumentException, FileNotFoundException, IOException {
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.exists() )
+			throw new FileNotFoundException("Full data DSG file for " + 
+					expocode + " does not exist");
+		return dsgFile.readIntVarDataValues(varName);
+	}
+
+	/**
+	 * Reads and returns the array of data values for the specified variable
 	 * contained in the DSG file for the specified cruise.  The variable must 
 	 * be saved in the DSG file as doubles.  NaN and infinite values are changed 
 	 * to {@link SocatCruiseData#FP_MISSING_VALUE}.  For some variables, the 
-	 * DSG file must have been processes by Ferret, such as when saved using 
+	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
 	 * 

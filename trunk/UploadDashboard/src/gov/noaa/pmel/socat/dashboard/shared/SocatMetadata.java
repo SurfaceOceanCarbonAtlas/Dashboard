@@ -514,9 +514,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		if ( ! qcFlag.equals(other.qcFlag) )
 			return false;
 
-		// Floating-point comparisons
+		// socatVersion was previously a double
 		if ( ! socatVersion.equals(other.socatVersion) )
 			return false;
+
+		// Floating-point comparisons
 		if ( ! DashboardUtils.closeTo(southmostLatitude, 
 				other.southmostLatitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
 			return false;
@@ -525,14 +527,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			return false;
 
 		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( ! DashboardUtils.closeTo(westmostLongitude, other.westmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-			if ( ! DashboardUtils.closeTo(westmostLongitude + 360.0, other.westmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-				if ( ! DashboardUtils.closeTo(westmostLongitude, other.westmostLongitude + 360.0, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-					return false;
-		if ( ! DashboardUtils.closeTo(eastmostLongitude, other.eastmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-			if ( ! DashboardUtils.closeTo(eastmostLongitude + 360.0, other.eastmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-				if ( ! DashboardUtils.closeTo(eastmostLongitude, other.eastmostLongitude + 360.0, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
-					return false;
+		if ( ! DashboardUtils.longitudeCloseTo(westmostLongitude, other.westmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.longitudeCloseTo(eastmostLongitude, other.eastmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+			return false;
 
 		return true;
 	}

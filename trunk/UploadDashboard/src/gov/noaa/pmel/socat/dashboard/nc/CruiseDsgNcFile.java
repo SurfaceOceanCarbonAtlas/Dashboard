@@ -39,7 +39,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 5792606584900612683L;
+	private static final long serialVersionUID = 1934270433413399830L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -540,7 +540,7 @@ public class CruiseDsgNcFile extends File {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as characters.  Empty strings are changed to a single blank character.
-	 * For some variables, this DSG file must have been processes by Ferret, 
+	 * For some variables, this DSG file must have been processed by Ferret, 
 	 * such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
@@ -585,9 +585,47 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
+	 * as integers.  For some variables, this DSG file must have been processed 
+	 * by Ferret, such as when saved using 
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * for the data values to be meaningful.
+	 * 
+	 * @param varName
+	 * 		name of the variable to read
+	 * @return
+	 * 		array of values for the specified variable
+	 * @throws IOException
+	 * 		if there is a problem opening or reading from this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the variable name is invalid
+	 */
+	public int[] readIntVarDataValues(String varName) 
+								throws IOException, IllegalArgumentException {
+		int[] dataVals;
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
+		try {
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
+			int numVals = var.getShape(0);
+			dataVals = new int[numVals];
+			for (int k = 0; k < numVals; k++) {
+				dataVals[k] = dvar.get(k);
+			}
+		} finally {
+			ncfile.close();
+		}
+		return dataVals;
+	}
+
+	/**
+	 * Reads and returns the array of data values for the specified variable
+	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as doubles.  NaN and infinite values are changed to 
 	 * {@link SocatCruiseData#FP_MISSING_VALUE}.  For some variables, this 
-	 * DSG file must have been processes by Ferret, such as when saved using 
+	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
 	 * 
@@ -616,7 +654,7 @@ public class CruiseDsgNcFile extends File {
 				double value = dvar.get(k);
 				if ( Double.isNaN(value) || Double.isInfinite(value) )
 					value = SocatCruiseData.FP_MISSING_VALUE;
-				dataVals[k] = dvar.get(k);
+				dataVals[k] = value;
 			}
 		} finally {
 			ncfile.close();
@@ -713,10 +751,13 @@ public class CruiseDsgNcFile extends File {
 	 * for the WOCE flag; however, the latitude, longitude, and timestamp in 
 	 * these WOCE flag locations are checked that they match those in this DSG 
 	 * file.  The data values, if given, is also checked that they roughly match 
-	 * those in this DSG file. 
+	 * those in this DSG file.  If there is a mismatch in any of these values, 
+	 * a message is added to the list returned.
 	 * 
 	 * @param woceEvent
 	 * 		WOCE flags to set
+	 * @return
+	 * 		list of data mismatch messages; never null but may be empty
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid, including
 	 * 		if the WOCE flag values are not close to the DSG values for
@@ -724,8 +765,9 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IOException
 	 * 		if opening, reading from, or writing to the DSG file throws one
 	 */
-	public void assignWoceFlags(SocatWoceEvent woceEvent) 
+	public ArrayList<String> assignWoceFlags(SocatWoceEvent woceEvent) 
 								throws IllegalArgumentException, IOException {
+		ArrayList<String> issues = new ArrayList<String>();
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
 
@@ -794,9 +836,8 @@ public class CruiseDsgNcFile extends File {
 					dsgLoc.setDataDate(new Date(Math.round(times.get(idx) * 1000.0)));
 					if ( datavalues != null )
 						dsgLoc.setDataValue(datavalues.get(idx));
-					throw new IllegalArgumentException(
-							"DSG values for the row different from WOCE flag location values: " +
-							"\n    " + dsgLoc.toString() +  
+					issues.add("Values for the DSG row (first) different from WOCE " +
+							"flag location (second): \n    " + dsgLoc.toString() + 
 							"\n    " + dataloc.toString());
 				}
 
@@ -812,6 +853,7 @@ public class CruiseDsgNcFile extends File {
 		} finally {
 			ncfile.close();
 		}
+		return issues;
 	}
 
 	/**
@@ -1007,7 +1049,7 @@ public class CruiseDsgNcFile extends File {
 		}
 
 		// Check if longitude is within 0.001 degrees of each other
-		if ( ! DashboardUtils.closeTo(datLongitude, arrLongitude, 0.0, 0.001) ) {
+		if ( ! DashboardUtils.longitudeCloseTo(datLongitude, arrLongitude, 0.0, 0.001) ) {
 			if ( log != null )
 				log.trace("match failed on longitude");
 			return false;
