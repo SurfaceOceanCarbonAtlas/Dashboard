@@ -15,12 +15,23 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8280173304454973104L;
+	private static final long serialVersionUID = -3576239116657788280L;
 
+	// flags for WOCE events of current cruises
 	public static final Character WOCE_GOOD = '2';
 	public static final Character WOCE_NOT_CHECKED = '2';
 	public static final Character WOCE_QUESTIONABLE = '3';
 	public static final Character WOCE_BAD = '4';
+	public static final Character WOCE_NO_DATA = '9';
+
+	// flags for WOCE events of cruises that has been updated
+	public static final Character OLD_WOCE_GOOD = 'G';
+	public static final Character OLD_WOCE_NOT_CHECKED = 'G';
+	public static final Character OLD_WOCE_QUESTIONABLE = 'Q';
+	public static final Character OLD_WOCE_BAD = 'B';
+	public static final Character OLD_WOCE_NO_DATA = 'M';
+
+	// flag for cruise rename WOCE events
 	public static final Character WOCE_RENAME = 'R';
 
 	Character flag;

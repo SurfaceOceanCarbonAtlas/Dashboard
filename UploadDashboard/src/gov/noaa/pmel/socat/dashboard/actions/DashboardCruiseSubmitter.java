@@ -247,6 +247,7 @@ public class DashboardCruiseSubmitter {
 					throw new IllegalArgumentException(ex);
 				}
 				try {
+					databaseHandler.resetWoceEvents(expocode);
 					for ( SocatWoceEvent woceEvent : initWoceList ) {
 						databaseHandler.addWoceEvent(woceEvent);
 					}
