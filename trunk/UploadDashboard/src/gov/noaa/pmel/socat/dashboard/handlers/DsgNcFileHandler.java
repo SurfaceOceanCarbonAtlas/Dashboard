@@ -18,9 +18,11 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -547,12 +549,13 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Update the WOCE flags in the full DSG file, as well as in the given temporary
-	 * DSG file.  In the process, complete some of the missing data in WOCE event
-	 * (row number, region ID, data type).
+	 * Update the WOCE flags in the full DSG file, as well as in the given 
+	 * temporary DSG file, and regenerate the decimated DSG file.  In the 
+	 * process, complete some of the missing data in WOCE event (row number, 
+	 * region ID, data type).
 	 * 
 	 * @param woceEvent
-	 * 		WOCE event to use; the expocode is used to identify the full dataset to update
+	 * 		WOCE event to use; the expocode is used to identify datasets to update
 	 * @param tempDsgFilename
 	 * 		name of the temporary DSG file to also update; can be null
 	 * @param log
@@ -575,7 +578,11 @@ public class DsgNcFileHandler {
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
-		flagErddap(false);
+		// Regenerate the decimated DSG file
+		decimateCruise(expocode);
+		// Let ERDDAP know files have changed
+		flagErddap(true);
+		// Set the flags in the temporary DSG file, if given 
 		if ( (tempDsgFilename == null) || tempDsgFilename.trim().isEmpty() )
 			return;
 		CruiseDsgNcFile tempDsgFile = new CruiseDsgNcFile(tempDsgFilename);
@@ -587,6 +594,107 @@ public class DsgNcFileHandler {
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
+	}
+
+	/**
+	 * Generates the decimated DSG file from the full-data DSG file for 
+	 * cruises specified in ExpocodesFile, or all cruises if ExpocodesFile 
+	 * is '-'. The default dashboard configuration is used for this process. 
+	 * 
+	 * @param args
+	 * 		ExpocodesFile
+	 */
+	public static void main(String[] args) {
+		if ( args.length != 1 ) {
+			System.err.println("Arguments:  [ - | ExpocodesFile ]");
+			System.err.println();
+			System.err.println("Generates the decimated DSG file from the full-data DSG file for ");
+			System.err.println("cruises specified in ExpocodesFile, or all cruises if ExpocodesFile ");
+			System.err.println("is '-'. The default dashboard configuration is used for this process. ");
+			System.err.println();
+			System.exit(1);
+		}
+
+		String expocodesFilename = args[1];
+		if ( "-".equals(expocodesFilename) )
+			expocodesFilename = null;
+
+		boolean success = true;
+
+		// Get the default dashboard configuration
+		DashboardDataStore dataStore = null;		
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (Exception ex) {
+			System.err.println("Problems reading the default dashboard " +
+					"configuration file: " + ex.getMessage());
+			ex.printStackTrace();
+			System.exit(1);
+		}
+		try {
+			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+
+			// Get the expocode of the cruises to decimate
+			TreeSet<String> allExpocodes = null; 
+			if ( expocodesFilename != null ) {
+				allExpocodes = new TreeSet<String>();
+				try {
+					BufferedReader expoReader = 
+							new BufferedReader(new FileReader(expocodesFilename));
+					try {
+						String dataline = expoReader.readLine();
+						while ( dataline != null ) {
+							dataline = dataline.trim();
+							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+								allExpocodes.add(dataline);
+							dataline = expoReader.readLine();
+						}
+					} finally {
+						expoReader.close();
+					}
+				} catch (Exception ex) {
+					System.err.println("Error getting expocodes from " + 
+							expocodesFilename + ": " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			} 
+			else {
+				try {
+					allExpocodes = new TreeSet<String>(
+							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
+				} catch (Exception ex) {
+					System.err.println("Error getting all expocodes: " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			}
+
+			// decimate each of these cruises
+			for ( String expocode : allExpocodes ) {
+				try {
+					dsgHandler.decimateCruise(expocode);
+				} catch (Exception ex) {
+					System.err.println("Error decimating " + expocode + " : " + ex.getMessage());
+					ex.printStackTrace();
+					System.err.println("===================================================");
+					success = false;
+				}
+			}
+
+			// Flag ERDDAP that (only) the decimated files have been updated
+			try {
+				FileOutputStream touchFile = new FileOutputStream(dsgHandler.erddapDecDsgFlagFile);
+				touchFile.close();
+			} catch (IOException e) {
+				// don't care
+			}
+		} finally {
+			dataStore.shutdown();
+		}
+		if ( ! success )
+			System.exit(1);
+		System.exit(0);
 	}
 
 }
