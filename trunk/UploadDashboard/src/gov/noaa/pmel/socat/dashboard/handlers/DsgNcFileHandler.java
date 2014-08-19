@@ -615,7 +615,7 @@ public class DsgNcFileHandler {
 			System.exit(1);
 		}
 
-		String expocodesFilename = args[1];
+		String expocodesFilename = args[0];
 		if ( "-".equals(expocodesFilename) )
 			expocodesFilename = null;
 
