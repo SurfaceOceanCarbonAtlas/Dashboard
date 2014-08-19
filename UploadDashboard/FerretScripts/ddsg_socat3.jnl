@@ -194,15 +194,12 @@ SAVE/QUIET/APPEND/OUTTYPE=($vtype)/FILE="($outfile)" ($vname);\
 CANCEL VAR ($vname))
 
 ! Character variables
-! WOCE flags are not used in the decimated datasets, as they may change in the full data.
-! Mark them with the unused flag "M".
 
 REPEAT/RANGE=`indx_meta+1`:`nvars`/NAME=q (DEFINE SYMBOL qq = `q`;\
 DEFINE SYMBOL vname = `varnames_list[i=($qq)]`;\
 DEFINE SYMBOL vtype = `($vname)_in,RETURN=dtype`;\
 IF `($vtype"0|CHAR>1|*>0") EQ 0` THEN EXIT/CYCLE;\
 LET ($vname)_s = SAMPLEI(($vname)_in, samplevar);\
-IF `STRINDEX("($vname)", "WOCE") GT 0` THEN LET ($vname)_s = IF SAMPLEI(($vname)_in, samplevar) THEN "M";\
 LET ($vname) = RESHAPE(($vname)_s, x[gx=obs]);\
 SET ATT/LIKE=($vname)_in ($vname);\
 SET ATT/OUTPUT=all ($vname);\
