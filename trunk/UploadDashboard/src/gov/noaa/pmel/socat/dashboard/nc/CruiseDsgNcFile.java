@@ -867,6 +867,9 @@ public class CruiseDsgNcFile extends File {
 	 * 		if true, update the WOCE flags from data in this DSG file
 	 * @param log
 	 * 		logger to log trace messages; can be null
+	 * @return
+	 * 		list of the WOCEEvent data locations not found 
+	 * 		in this DSG file; never null but may be empty
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
@@ -874,8 +877,10 @@ public class CruiseDsgNcFile extends File {
 	 * @throws InvalidRangeException 
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
-	public void updateWoceFlags(SocatWoceEvent woceEvent, boolean updateWoceEvent, Logger log) 
+	public ArrayList<DataLocation> updateWoceFlags(SocatWoceEvent woceEvent, 
+			boolean updateWoceEvent, Logger log) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
+		ArrayList<DataLocation> unidentified = new ArrayList<DataLocation>();
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
 
@@ -965,16 +970,18 @@ public class CruiseDsgNcFile extends File {
 						}
 					}
 				}
-				if ( ! valueFound ) 
-					throw new IllegalArgumentException("Unable to find data location \n" +
-							dataloc.toString() + " \n    in " + getName());
-				wocevalues.set(idx, 0, newFlag);
-				if ( updateWoceEvent ) {
-					dataloc.setRowNumber(idx + 1);
-					dataloc.setRegionID(regionIDs.get(idx, 0));
+				if ( valueFound ) {
+					wocevalues.set(idx, 0, newFlag);
+					if ( updateWoceEvent ) {
+						dataloc.setRowNumber(idx + 1);
+						dataloc.setRegionID(regionIDs.get(idx, 0));
+					}
+					// Start the next search from the next data point
+					startIdx = idx + 1;
 				}
-				// Start the next search from the next data point
-				startIdx = idx + 1;
+				else {
+					unidentified.add(dataloc);
+				}
 			}
 
 			// Save the updated WOCE flags to the DSG file
@@ -982,6 +989,7 @@ public class CruiseDsgNcFile extends File {
 		} finally {
 			ncfile.close();
 		}
+		return unidentified;
 	}
 
 	/**
