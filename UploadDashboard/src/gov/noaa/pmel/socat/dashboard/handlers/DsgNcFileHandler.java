@@ -567,30 +567,51 @@ public class DsgNcFileHandler {
 	 */
 	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename, 
 			Logger log) throws IllegalArgumentException, IOException {
-		// Get the location and name for the NetCDF DSG file
 		String expocode = woceEvent.getExpocode();
+		// Assign the WOCE flags in the full-data DSG file, and get missing data
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
 		try {
-			dsgFile.updateWoceFlags(woceEvent, true, log);
+			ArrayList<DataLocation> unidentified = 
+					dsgFile.updateWoceFlags(woceEvent, true, log);
+			if ( unidentified.size() > 0 ) {
+				String msg  = "Unable to find data location(s): \n    ";
+				for ( DataLocation dataloc : unidentified )
+					msg += dataloc.toString() + "\n    ";
+				msg += "in " + dsgFile.getName();
+				throw new IllegalArgumentException(msg);
+			}
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
-		// Regenerate the decimated DSG file
-		decimateCruise(expocode);
+
+		// Assign the WOCE flags in the decimated DSG file
+		dsgFile = getDecDsgNcFile(expocode);
+		if ( ! dsgFile.canRead() )
+			throw new IllegalArgumentException(
+					"Decimated DSG file for " + expocode + " does not exist");
+		try {
+			// Very likely to return missing data locations, but not a problem
+			dsgFile.updateWoceFlags(woceEvent, false, log);
+		} catch (InvalidRangeException ex) {
+			throw new IOException(ex);
+		}
+
 		// Let ERDDAP know files have changed
 		flagErddap(true);
+
 		// Set the flags in the temporary DSG file, if given 
 		if ( (tempDsgFilename == null) || tempDsgFilename.trim().isEmpty() )
 			return;
-		CruiseDsgNcFile tempDsgFile = new CruiseDsgNcFile(tempDsgFilename);
-		if ( ! tempDsgFile.canRead() )
+		dsgFile = new CruiseDsgNcFile(tempDsgFilename);
+		if ( ! dsgFile.canRead() )
 			throw new IllegalArgumentException("Temporary DSG file " + 
-					tempDsgFile.getName() + " does not exist");
+					dsgFile.getName() + " does not exist");
 		try {
-			tempDsgFile.updateWoceFlags(woceEvent, false, log);
+			// Probably should not be any missing data locations, but no guarantees
+			dsgFile.updateWoceFlags(woceEvent, false, log);
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
