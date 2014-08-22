@@ -39,6 +39,7 @@ public class DashboardCruiseSubmitter {
 	DashboardCruiseChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
 	DatabaseRequestHandler databaseHandler;
+	String socatVersion;
 
 	/**
 	 * @param dataStore
@@ -51,6 +52,7 @@ public class DashboardCruiseSubmitter {
 		cruiseChecker = dataStore.getDashboardCruiseChecker();
 		dsgNcHandler = dataStore.getDsgNcFileHandler();
 		databaseHandler = dataStore.getDatabaseRequestHandler();
+		socatVersion = dataStore.getSocatUploadVersion();
 	}
 
 	/**
@@ -191,49 +193,55 @@ public class DashboardCruiseSubmitter {
 
 				// Create the QCEvent for submitting the initial QC flags
 				SocatQCEvent initQC = new SocatQCEvent();
-				initQC.setFlag(flag);
 				initQC.setExpocode(expocode);
-				initQC.setSocatVersion(cruise.getVersion());
+				initQC.setSocatVersion(socatVersion);
 				initQC.setFlagDate(new Date());
 				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				// Give the number of data rows with errors and  warnings as the message; 
-				// include a recommended 'F' flag if too many errors
-				String recFlag;
-				if ( cruiseData.getNumErrorRows() > DashboardUtils.MAX_ACCEPTABLE_ERRORS ) {
-					recFlag = "Recommend QC flag of " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + ": ";
+				if ( (qcFlag == null) || qcFlag.isEmpty() ) {
+					// Add the initial QC flag in each region only for new and updated cruises
+					initQC.setFlag(flag);
+					if ( SocatQCEvent.QC_NEW_FLAG.equals(flag) )
+						initQC.setComment("Initial QC flag for new dataset");
+					else
+						initQC.setComment("Intial QC flag for updated dataset");
+
+					// Get the regions in which the cruise reports 
+					TreeSet<Character> regionsSet;
+					try {
+						regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
+					} catch (Exception ex) {
+						throw new RuntimeException("Unexpected problems reading region IDs "
+								+ "from the newly created full-data DSG file for " + 
+								expocode + ": " + ex.getMessage());
+					}
+					// Add the global and regional initial flags
+					try {
+						initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
+						for ( Character regionID : regionsSet ) {
+							initQC.setRegionID(regionID);
+							databaseHandler.addQCEvent(initQC);
+						}
+					} catch (SQLException ex) {
+						throw new IllegalArgumentException(
+								"Unable to add an initial QC flag:\n    " + ex.getMessage());
+					}
 				}
-				else {
-					recFlag = "";
-				}
-				initQC.setComment(recFlag + "Automated data check found " + 
+
+				// All cruises - remark on the number of data rows with error and warnings
+				initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				initQC.setFlag(SocatQCEvent.QC_COMMENT);
+				initQC.setComment("Automated data check found " + 
 						Integer.toString(cruiseData.getNumErrorRows()) + 
 						" data points with errors and " + 
 						Integer.toString(cruiseData.getNumWarnRows()) + 
 						" data points with warnings.");
-
-				// Get the regions in which the cruise reports 
-				TreeSet<Character> regionsSet;
 				try {
-					regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
-				} catch (Exception ex) {
-					throw new RuntimeException("Unexpected problems reading region IDs "
-							+ "from the newly created full-data DSG file for " + 
-							expocode + ": " + ex.getMessage());
-				}
-
-				// Add a QC flag for the global region, as well as every region 
-				// in which the cruise reports, to the database 
-				try {
-					initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
 					databaseHandler.addQCEvent(initQC);
-					for ( Character regionID : regionsSet ) {
-						initQC.setRegionID(regionID);
-						databaseHandler.addQCEvent(initQC);
-					}
 				} catch (SQLException ex) {
-					throw new IllegalArgumentException("Unable to add a QC flag "
-							+ "with the data checking results:\n    " + ex.getMessage());
+					throw new IllegalArgumentException("Unable to add an initial " +
+							"QC comment with the number of error and warnings:\n    " + 
+							ex.getMessage());
 				}
 
 				// Generate and add the WOCE flags from the SanityChecker results,

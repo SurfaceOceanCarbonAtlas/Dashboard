@@ -154,8 +154,9 @@ public class CruiseListPage extends Composite {
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
 			"</ul> These data sets can be submitted for QC, " +
-			"but a QC flag " + SocatQCEvent.QC_UNACCEPTABLE_FLAG + 
-			" (unacceptable) will be <em>recommended</em> when added.<br />" +
+			"but because of the number of errors, a QC flag of " + 
+			SocatQCEvent.QC_UNACCEPTABLE_FLAG + " (unacceptable) " +
+			"will <em>probably</em> be assigned by reviewers.<br />" +
 			"Do you want to continue? ";
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
