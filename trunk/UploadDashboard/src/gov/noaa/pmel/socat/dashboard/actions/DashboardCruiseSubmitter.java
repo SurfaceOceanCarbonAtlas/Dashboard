@@ -225,8 +225,6 @@ public class DashboardCruiseSubmitter {
 				// Add a QC flag for the global region, as well as every region 
 				// in which the cruise reports, to the database 
 				try {
-					// Add the global flag first because the database request handler 
-					// expects there to always be a global flag 
 					initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
 					databaseHandler.addQCEvent(initQC);
 					for ( Character regionID : regionsSet ) {
