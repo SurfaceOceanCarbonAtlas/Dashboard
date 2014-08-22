@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -325,25 +326,19 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Adds a new QC event for a data set.  If the update results in
-	 * a QC flag conflict, the flag in the given SocatQCEvent is
-	 * updated to the conflict flag {@link SocatQCEvent#QC_CONFLICT_FLAG}.
+	 * Adds a new QC event for a data set.
 	 * 
 	 * @param qcEvent
 	 * 		the QC event to add
 	 * @throws SQLException
-	 * 		if accessing or updating the database throws one,
-	 * 		if the reviewer cannot be found in the reviewers table,
-	 * 		if a problem occurs with adding the QC event, or
-	 * 		if a problem occurs getting all QC events for the data set.
+	 * 		if accessing or updating the database throws one, or
+	 * 		if the reviewer cannot be found in the reviewers table.
 	 */
 	public void addQCEvent(SocatQCEvent qcEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
 			int reviewerId = getReviewerId(catConn, 
 					qcEvent.getUsername(), qcEvent.getRealname());
-
-			// Add the QC event
 			PreparedStatement addPrepStmt = catConn.prepareStatement("INSERT INTO `" + 
 					QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
 					"`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
@@ -360,19 +355,34 @@ public class DatabaseRequestHandler {
 			addPrepStmt.setInt(6, reviewerId);
 			addPrepStmt.setString(7, qcEvent.getComment());
 			addPrepStmt.execute();
-			if ( addPrepStmt.getUpdateCount() != 1 )
-				throw new SQLException("Adding the QC event was unsuccessful");
-			if ( DataLocation.GLOBAL_REGION_ID.equals(qcEvent.getRegionID()) ) {
-				// Global flag overrides any conflicts, so this is the QC flag
-				return;
-			}
+		} finally {
+			catConn.close();
+		}
+	}
 
+	/**
+	 * Get "the" QC flag for a dataset.  If the latest QC flag for different 
+	 * regions are in conflict, and a global flag does not later resolve
+	 * this conflict, the {@link SocatQCEvent#QC_CONFLICT_FLAG} flag is 
+	 * returned.
+	 * 
+	 * @param expocode
+	 * 		get the QC flag for the dataset with this expocode.
+	 * @return
+	 * 		the QC flag for the dataset; never null
+	 * @throws SQLException
+	 * 		if a problem occurs getting all QC events for the data set, or
+	 * 		if the QC flags in the dataset are corrupt.
+	 */
+	public Character getQCFlag(String expocode) throws SQLException {
+		HashMap<Character,SocatQCEvent> regionFlags = new HashMap<Character,SocatQCEvent>();
+		Connection catConn = makeConnection(false);
+		try {
 			// Get all the QC events for this data set, ordered so the latest are last
-			HashMap<Character,SocatQCEvent> regionFlags = new HashMap<Character,SocatQCEvent>();
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
 					"SELECT `qc_flag`, `qc_time`, `region_id` FROM `" + QCEVENTS_TABLE_NAME + 
 					"` WHERE `expocode` = ? ORDER BY `qc_time` ASC;");
-			getPrepStmt.setString(1, qcEvent.getExpocode());
+			getPrepStmt.setString(1, expocode);
 			ResultSet rslts = getPrepStmt.executeQuery();
 			try {
 				while ( rslts.next() ) {
@@ -410,43 +420,46 @@ public class DatabaseRequestHandler {
 			} finally {
 				rslts.close();
 			}
-
-			// Check for conflicts in the latest flags
-			SocatQCEvent lastGlobalFlag = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
-			// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
-			Character globalFlag;
-			Date globalDate;
-			if ( lastGlobalFlag == null ) {
-				// Just in case the first region flags are added before the first global flag
-				globalFlag = SocatQCEvent.QC_NEW_FLAG;
-				globalDate = new Date(0L);
-			}
-			else {
-				globalFlag = lastGlobalFlag.getFlag();
-				globalDate = lastGlobalFlag.getFlagDate();
-			}
-			Character lastFlag = null;
-			for ( SocatQCEvent flagEvent : regionFlags.values() ) {
-				// Use the region flag if assigned after the global flag; otherwise use the global flag
-				Character flag;
-				if ( flagEvent.getFlagDate().after(globalDate) ) {
-					flag = flagEvent.getFlag();
-				}
-				else {
-					flag = globalFlag;
-				}
-				// If any of these region flag do not match, reassign a conflict flag to qcEvent
-				if ( lastFlag == null ) {
-					lastFlag = flag;
-				}
-				else if ( ! lastFlag.equals(flag) ) {
-					qcEvent.setFlag(SocatQCEvent.QC_CONFLICT_FLAG);
-					break;
-				}
-			}
 		} finally {
 			catConn.close();
 		}
+
+		// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
+		SocatQCEvent globalEvent = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
+		if ( globalEvent == null )
+			throw new SQLException("Unexpected absence of a global flag");
+		Character globalFlag = globalEvent.getFlag();
+		Date globalDate = globalEvent.getFlagDate();
+
+		// Go through the latest flags for each region, making sure:
+		// (1) global flag is last, or 
+		// (2) all region flags are after global flag and match, or
+		// (3) region flags after global flag match global flag  
+		Character latestFlag = null;
+		for ( Entry<Character,SocatQCEvent> regionEntry : regionFlags.entrySet() ) {
+			// Just compare non-global entries
+			if ( DataLocation.GLOBAL_REGION_ID.equals(regionEntry.getKey()) )
+				continue;
+			// Use the region flag if assigned after the global flag; otherwise use the global flag
+			Character flag;
+			if ( regionEntry.getValue().getFlagDate().after(globalDate) ) {
+				flag = regionEntry.getValue().getFlag();
+			}
+			else {
+				flag = globalFlag;
+			}
+			if ( latestFlag == null ) {
+				latestFlag = flag;
+			}
+			else if ( ! latestFlag.equals(flag) ) {
+				return SocatQCEvent.QC_CONFLICT_FLAG;
+			}
+		}
+		if ( latestFlag == null ) {
+			// Only a global flag; should never happen, but just return the global flag
+			latestFlag = globalFlag;
+		}
+		return latestFlag;
 	}
 
 	/**

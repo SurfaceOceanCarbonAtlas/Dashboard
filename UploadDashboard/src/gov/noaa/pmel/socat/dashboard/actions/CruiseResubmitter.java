@@ -90,8 +90,9 @@ public class CruiseResubmitter {
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Suspending cruise for pending update");
 				try {
-					dsgHandler.updateQCFlag(qcEvent);
 					databaseHandler.addQCEvent(qcEvent);
+					// This is a global 'S' flag, so this is the flag for the DSG file
+					dsgHandler.updateQCFlag(qcEvent);
 				} catch (Exception ex) {
 					throw new IllegalArgumentException("Unexpected error " +
 							"suspending the cruise " + expocode);
