@@ -218,6 +218,7 @@ public class DashboardCruiseSubmitter {
 					// Add the global and regional initial flags
 					try {
 						initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
+						databaseHandler.addQCEvent(initQC);
 						for ( Character regionID : regionsSet ) {
 							initQC.setRegionID(regionID);
 							databaseHandler.addQCEvent(initQC);
@@ -225,6 +226,19 @@ public class DashboardCruiseSubmitter {
 					} catch (SQLException ex) {
 						throw new IllegalArgumentException(
 								"Unable to add an initial QC flag:\n    " + ex.getMessage());
+					}
+				}
+				else {
+					// Transferring an old cruise
+					initQC.setSocatVersion(cruise.getVersion());
+					// Some old cruises did not get the version number updated 
+					// in the v2 metadata table so always make this 2.0 or later.
+					try {
+						Double versionNumber = Double.valueOf(cruise.getVersion());
+						if ( versionNumber < 2.0 )
+							initQC.setSocatVersion("2.0");
+					} catch (Exception ex) {
+						initQC.setSocatVersion("2.0");
 					}
 				}
 
