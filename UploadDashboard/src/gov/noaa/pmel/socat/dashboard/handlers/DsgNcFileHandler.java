@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
-
 import ucar.ma2.InvalidRangeException;
 
 /**
@@ -558,15 +556,13 @@ public class DsgNcFileHandler {
 	 * 		WOCE event to use; the expocode is used to identify datasets to update
 	 * @param tempDsgFilename
 	 * 		name of the temporary DSG file to also update; can be null
-	 * @param log
-	 * 		logger to log trace messages; can be null
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
 	 * 		if problems opening, reading from, or writing to the DSG file
 	 */
-	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename, 
-			Logger log) throws IllegalArgumentException, IOException {
+	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename) 
+								throws IllegalArgumentException, IOException {
 		String expocode = woceEvent.getExpocode();
 		// Assign the WOCE flags in the full-data DSG file, and get missing data
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
@@ -575,7 +571,7 @@ public class DsgNcFileHandler {
 					"DSG file for " + expocode + " does not exist");
 		try {
 			ArrayList<DataLocation> unidentified = 
-					dsgFile.updateWoceFlags(woceEvent, true, log);
+					dsgFile.updateWoceFlags(woceEvent, true);
 			if ( unidentified.size() > 0 ) {
 				String msg  = "Unable to find data location(s): \n    ";
 				for ( DataLocation dataloc : unidentified )
@@ -594,7 +590,7 @@ public class DsgNcFileHandler {
 					"Decimated DSG file for " + expocode + " does not exist");
 		try {
 			// Very likely to return missing data locations, but not a problem
-			dsgFile.updateWoceFlags(woceEvent, false, log);
+			dsgFile.updateWoceFlags(woceEvent, false);
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
@@ -611,7 +607,7 @@ public class DsgNcFileHandler {
 					dsgFile.getName() + " does not exist");
 		try {
 			// Probably should not be any missing data locations, but no guarantees
-			dsgFile.updateWoceFlags(woceEvent, false, log);
+			dsgFile.updateWoceFlags(woceEvent, false);
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
