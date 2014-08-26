@@ -19,9 +19,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
 import ucar.ma2.ArrayInt;
@@ -39,7 +36,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 1934270433413399830L;
+	private static final long serialVersionUID = 419168141850194424L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -827,7 +824,7 @@ public class CruiseDsgNcFile extends File {
 
 				// Check the values are close (data value roughly close)
 				if ( ! dataMatches(dataloc, longitudes, latitudes, times, 
-									datavalues, idx, 0.001, 0.1, null) ) {
+									datavalues, idx, 0.001, 0.1) ) {
 					DataLocation dsgLoc = new DataLocation();
 					dsgLoc.setRowNumber(idx + 1);
 					dsgLoc.setRegionID(regionIDs.get(idx, 0));
@@ -865,8 +862,6 @@ public class CruiseDsgNcFile extends File {
 	 * 		WOCE flags to set
 	 * @param updateWoceEvent
 	 * 		if true, update the WOCE flags from data in this DSG file
-	 * @param log
-	 * 		logger to log trace messages; can be null
 	 * @return
 	 * 		list of the WOCEEvent data locations not found 
 	 * 		in this DSG file; never null but may be empty
@@ -878,7 +873,7 @@ public class CruiseDsgNcFile extends File {
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
 	public ArrayList<DataLocation> updateWoceFlags(SocatWoceEvent woceEvent, 
-			boolean updateWoceEvent, Logger log) 
+			boolean updateWoceEvent) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		ArrayList<DataLocation> unidentified = new ArrayList<DataLocation>();
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
@@ -952,7 +947,7 @@ public class CruiseDsgNcFile extends File {
 				int idx;
 				for (idx = startIdx; idx < arraySize; idx++) {
 					if ( dataMatches(dataloc, longitudes, latitudes, times, 
-							datavalues, idx, 1.0E-5, 1.0E-5, log) ) {
+							datavalues, idx, 1.0E-5, 1.0E-5) ) {
 						if ( assignedRowIndices.add(idx) ) {
 							valueFound = true;
 							break;
@@ -962,7 +957,7 @@ public class CruiseDsgNcFile extends File {
 				if ( idx >= arraySize ) {
 					for (idx = 0; idx < startIdx; idx++) {
 						if ( dataMatches(dataloc, longitudes, latitudes, times, 
-								datavalues, idx, 1.0E-5, 1.0E-5, log) ) {
+								datavalues, idx, 1.0E-5, 1.0E-5) ) {
 							if ( assignedRowIndices.add(idx) ) {
 								valueFound = true;
 								break;
@@ -1015,14 +1010,12 @@ public class CruiseDsgNcFile extends File {
 	 * @param dataAbsTol
 	 * 		absolute tolerance for (only) the data value
 	 * 		see {@link DashboardUtils#closeTo(Double, Double, double, double)}
-	 * @param log
-	 * 		logger to log trace messages; can be null
 	 * @return
 	 * 		true if the data locations match
 	 */
 	private boolean dataMatches(DataLocation dataloc, ArrayDouble.D1 longitudes,
 			ArrayDouble.D1 latitudes, ArrayDouble.D1 times, ArrayDouble.D1 datavalues, 
-			int idx, double dataRelTol, double dataAbsTol, Logger log) {
+			int idx, double dataRelTol, double dataAbsTol) {
 
 		Double arrLongitude = longitudes.get(idx);
 		Double arrLatitude = latitudes.get(idx);
@@ -1038,56 +1031,28 @@ public class CruiseDsgNcFile extends File {
 		Double datTime = dataloc.getDataDate().getTime() / 1000.0;
 		Double datValue = dataloc.getDataValue(); 
 
-		// Try to avoid all the toString calls if not trace; but some loggers just return null
-		if ( (log != null) && 
-			 ( (log.getLevel() == null) || 
-				log.getLevel().isGreaterOrEqual(Level.TRACE) ) ) {
-			log.trace("\n    Comparing dataloc " +
-					  "[ lon=" + datLongitude.toString() + 
-					  ", lat=" + datLatitude.toString() + 
-					  ", time=" + datTime.toString() + 
-					  ", val=" + datValue.toString() + 
-					  " ] \n" +
-					  "    to arrays(" + Integer.toString(idx) + ") " +
-					  "[ lon=" + arrLongitude.toString() +
-					  ", lat=" + arrLatitude.toString() + 
-					  ", time=" + arrTime.toString() + 
-					  ", val=" + arrValue.toString() + 
-					  " ]");
-		}
-
 		// Check if longitude is within 0.001 degrees of each other
 		if ( ! DashboardUtils.longitudeCloseTo(datLongitude, arrLongitude, 0.0, 0.001) ) {
-			if ( log != null )
-				log.trace("match failed on longitude");
 			return false;
 		}
 
 		// Check if latitude is within 0.0001 degrees of each other
 		if ( ! DashboardUtils.closeTo(datLatitude, arrLatitude, 0.0, 0.0001) ) {
-			if ( log != null )
-				log.trace("match failed on latitude");
 			return false;
 		}
 
 		// Check if times are within a second of each other
 		if ( ! DashboardUtils.closeTo(datTime, arrTime, 0.0, 1.0) ) {
-			if ( log != null )
-				log.trace("match failed on time");
 			return false;
 		}
 
 		// If given, check if data values are close to each other
 		if ( datavalues != null ) {
 			if ( ! DashboardUtils.closeTo(datValue, arrValue, dataRelTol, dataAbsTol) ) {
-				if ( log != null )
-					log.trace("match failed on data value");
 				return false;
 			}
 		}
 
-		if ( log != null )
-			log.trace("match succeeded");
 		return true;
 	}
 
