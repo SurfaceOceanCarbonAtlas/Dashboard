@@ -360,6 +360,7 @@ public class DatabaseRequestHandler {
 		}
 	}
 
+	private static final long MIN_FLAG_TIME = Math.round(30.0 * 365.2425 * 24.0 * 60.0 * 60.0);
 	/**
 	 * Get "the" QC flag for a dataset.  If the latest QC flag for different 
 	 * regions are in conflict, and a global flag does not later resolve
@@ -397,7 +398,7 @@ public class DatabaseRequestHandler {
 						 (SocatQCEvent.FLAG_STATUS_MAP.get(flagStr.charAt(0)) == null) ) 
 						throw new SQLException("Unexpected QC flag of '" + flagStr + "'");
 					Long time = rslts.getLong(2);
-					if ( time < 750000000L )
+					if ( time < MIN_FLAG_TIME )
 						throw new SQLException("Unexpected null or invalid flag time of " + time.toString());
 					String region = rslts.getString(3);
 					if ( region == null )
@@ -426,10 +427,17 @@ public class DatabaseRequestHandler {
 
 		// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
 		SocatQCEvent globalEvent = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
-		if ( globalEvent == null )
-			throw new SQLException("Unexpected absence of a global flag");
-		Character globalFlag = globalEvent.getFlag();
-		Date globalDate = globalEvent.getFlagDate();
+		Character globalFlag;
+		Date globalDate;
+		if ( globalEvent == null ) {
+			// Some v1 cruises do not have global flags
+			globalFlag = SocatQCEvent.QC_NEW_FLAG;
+			globalDate = new Date(MIN_FLAG_TIME * 1000L);
+		}
+		else {
+			globalFlag = globalEvent.getFlag();
+			globalDate = globalEvent.getFlagDate();
+		}
 
 		// Go through the latest flags for each region, making sure:
 		// (1) global flag is last, or 
