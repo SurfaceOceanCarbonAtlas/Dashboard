@@ -392,7 +392,9 @@ public class DatabaseRequestHandler {
 						throw new SQLException("Unexpected null QC flag");
 					flagStr = flagStr.trim();
 					// Should not be blank, but might be from older code for a comment
-					if ( (flagStr.length() < 1) || flagStr.equals(SocatQCEvent.QC_COMMENT.toString()) )
+					if ( (flagStr.length() < 1) || 
+						 flagStr.equals(SocatQCEvent.QC_COMMENT.toString()) ||
+						 flagStr.equals(SocatQCEvent.QC_RENAMED_FLAG.toString()) )
 						continue;
 					if ( (flagStr.length() > 1) ||
 						 (SocatQCEvent.FLAG_STATUS_MAP.get(flagStr.charAt(0)) == null) ) 
