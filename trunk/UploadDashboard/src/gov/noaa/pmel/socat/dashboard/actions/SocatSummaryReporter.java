@@ -129,7 +129,7 @@ public class SocatSummaryReporter {
 			regionNames.remove(DataLocation.REGION_NAMES.get(DataLocation.GLOBAL_REGION_ID));
 			regions = "";
 			for ( String name : regionNames )
-				regions = "; " + name;
+				regions += "; " + name;
 			regions = regions.substring(2);
 			SocatMetadata socatMetadata = dsgFile.getMetadata();
 			datasetName = socatMetadata.getCruiseName();
@@ -178,6 +178,14 @@ public class SocatSummaryReporter {
 			addlDocs += "; " + name;
 		}
 		addlDocs = addlDocs.substring(2);
+
+		// Clean up the listing of PIs
+		String[] pisArray = pis.split(SocatMetadata.NAMES_SEPARATOR);
+		pis = "";
+		for ( String name : pisArray ) {
+			pis += "; " + name;
+		}
+		pis = pis.substring(2);
 
 		return expocode + "\t" + 
 			   datasetName + "\t" +
