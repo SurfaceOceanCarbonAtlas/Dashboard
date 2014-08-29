@@ -65,6 +65,7 @@ public class SocatSummaryReporter {
 		String datasetName;
 		String dsgQCFlag;
 		String databaseQCFlag;
+		String socatVersion;
 		String oldExpocode;
 		String regions;
 		String numRows;
@@ -95,6 +96,7 @@ public class SocatSummaryReporter {
 				throw new IllegalArgumentException("No OME metadata for " + expocode);
 			SocatMetadata socatMetadata = (new OmeMetadata(metadata)).createSocatMetadata(null, null, null);
 			datasetName = socatMetadata.getCruiseName();
+			socatVersion = "-";
 			pis = socatMetadata.getScienceGroup();
 			addlDocs = socatMetadata.getAddlDocs();
 			dsgQCFlag = "-";
@@ -133,6 +135,7 @@ public class SocatSummaryReporter {
 			regions = regions.substring(2);
 			SocatMetadata socatMetadata = dsgFile.getMetadata();
 			datasetName = socatMetadata.getCruiseName();
+			socatVersion = socatMetadata.getSocatVersion();
 			pis = socatMetadata.getScienceGroup();
 			addlDocs = socatMetadata.getAddlDocs();
 			dsgQCFlag = socatMetadata.getQcFlag();
@@ -191,6 +194,7 @@ public class SocatSummaryReporter {
 			   datasetName + "\t" +
 			   dsgQCFlag + "\t" + 
 			   databaseQCFlag + "\t" +
+			   socatVersion + "\t" +
 			   oldExpocode + "\t" +
 			   regions + "\t" +
 			   numRows + "\t" +
@@ -205,6 +209,7 @@ public class SocatSummaryReporter {
 			"Dataset Name\t" + 
 			"QC (DSG)\t" + 
 			"QC (Database)\t" + 
+			"Socat Version\t" +
 			"Renamed From\t" + 
 			"Regions\t" + 
 			"Num Data Pts\t" + 
