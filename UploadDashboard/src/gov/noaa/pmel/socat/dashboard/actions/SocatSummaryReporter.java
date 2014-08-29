@@ -1,0 +1,309 @@
+/**
+ * 
+ */
+package gov.noaa.pmel.socat.dashboard.actions;
+
+import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
+import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.TreeSet;
+
+/**
+ * Generates a summary of cruises in SOCAT
+ * 
+ * @author Karl Smith
+ */
+public class SocatSummaryReporter {
+
+	private CruiseFileHandler cruiseHandler;
+	private MetadataFileHandler metadataHandler;
+	private DsgNcFileHandler dsgFileHandler;
+	private DatabaseRequestHandler databaseHandler;
+
+	/**
+	 * Generate summary data using the handlers from a data store.
+	 * @param dataStore
+	 * 		use handlers in the data store
+	 */
+	public SocatSummaryReporter(DashboardDataStore dataStore) {
+		cruiseHandler = dataStore.getCruiseFileHandler();
+		metadataHandler = dataStore.getMetadataFileHandler();
+		dsgFileHandler = dataStore.getDsgNcFileHandler();
+		databaseHandler = dataStore.getDatabaseRequestHandler();
+	}
+
+	/**
+	 * Generate the summary line for a cruise.  The line contains tab-separated 
+	 * values in the order corresponding to the tab-separated titles in the 
+	 * header line returned by {@link #getCruiseSummaryHeader()}.
+	 * 
+	 * @param expocode
+	 * 		generate the summary for the cruise with this expocode
+	 * @return
+	 * 		the summary line for the cruise
+	 * @throws IllegalArgumentException
+	 * 		if there are problems generating the summary for the cruise
+	 */
+	public String getCruiseSummary(String expocode) throws IllegalArgumentException {
+		String datasetName;
+		String dsgQCFlag;
+		String databaseQCFlag;
+		String oldExpocode;
+		String regions;
+		String numRows;
+		String numErrRows;
+		String numWarnRows;
+		String pis;
+		String addlDocs;
+
+		DashboardCruise cruiseInfo = cruiseHandler.getCruiseFromInfoFile(expocode);
+		if ( cruiseInfo == null )
+			throw new IllegalArgumentException("No cruise data for " + expocode);
+		String qcStatus = cruiseInfo.getQcStatus();
+		if ( SocatQCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ||
+			 SocatQCEvent.QC_STATUS_PREVIEW.equals(qcStatus) ) {
+			// No official DSG file - get what we can from the dashboard cruise data and OME metadata
+			numRows = Integer.toString(cruiseInfo.getNumDataRows());
+			if ( cruiseInfo.getDataCheckStatus().isEmpty() ) {
+				numErrRows = "-";
+				numWarnRows = "-";
+			}
+			else {
+				numErrRows = Integer.toString(cruiseInfo.getNumErrorRows());
+				numWarnRows = Integer.toString(cruiseInfo.getNumWarnRows());
+			}
+			regions = "-";
+			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME);
+			if ( metadata == null )
+				throw new IllegalArgumentException("No OME metadata for " + expocode);
+			SocatMetadata socatMetadata = (new OmeMetadata(metadata)).createSocatMetadata(null, null, null);
+			datasetName = socatMetadata.getCruiseName();
+			pis = socatMetadata.getScienceGroup();
+			addlDocs = socatMetadata.getAddlDocs();
+			dsgQCFlag = "-";
+			databaseQCFlag = "-";
+			oldExpocode = "-";
+		}
+		else {
+			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(expocode);
+			if ( ! dsgFile.exists() )
+				throw new IllegalArgumentException("DSG file does not exist for " + expocode);
+			try {
+				dsgFile.read(false);
+			} catch (IOException ex) {
+				throw new IllegalArgumentException("Problems reading the metdata from the DSG file for " + 
+						expocode + ": " + ex.getMessage());
+			}
+			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
+			numRows = Integer.toString(dataList.size());
+			int numWoceBad = 0;
+			int numWoceWarn = 0;
+			TreeSet<String> regionNames = new TreeSet<String>();
+			for ( SocatCruiseData data : dataList ) {
+				Character woceCO2Water = data.getWoceCO2Water();
+				if ( woceCO2Water.equals(SocatWoceEvent.WOCE_BAD) )
+					numWoceBad++;
+				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) )
+					numWoceWarn++;
+				regionNames.add(DataLocation.REGION_NAMES.get(data.getRegionID()));
+			}
+			numErrRows = Integer.toString(numWoceBad);
+			numWarnRows = Integer.toString(numWoceWarn);
+			regionNames.remove(DataLocation.REGION_NAMES.get(DataLocation.GLOBAL_REGION_ID));
+			regions = "";
+			for ( String name : regionNames )
+				regions = "; " + name;
+			regions = regions.substring(2);
+			SocatMetadata socatMetadata = dsgFile.getMetadata();
+			datasetName = socatMetadata.getCruiseName();
+			pis = socatMetadata.getScienceGroup();
+			addlDocs = socatMetadata.getAddlDocs();
+			dsgQCFlag = socatMetadata.getQcFlag();
+			try {
+				databaseQCFlag = databaseHandler.getQCFlag(expocode).toString();
+			} catch (SQLException ex) {
+				throw new IllegalArgumentException("Problems generating \"the\" database QC flag for " +
+						expocode + ": " + ex.getMessage());
+			}
+			ArrayList<SocatQCEvent> qcEvents;
+			try {
+				qcEvents = databaseHandler.getQCEvents(expocode);
+			} catch (SQLException ex) {
+				throw new IllegalArgumentException("Problems reading database QC events for " +
+						expocode + ": " + ex.getMessage());
+			}
+			oldExpocode = "-";
+			for ( SocatQCEvent evt : qcEvents ) {
+				if ( ! SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) )
+					continue;
+				String msg = evt.getComment();
+				String[] msgWords = msg.split("\\s+");
+				if ( ! ( (msgWords.length >= 5) &&
+						 "Rename".equalsIgnoreCase(msgWords[0]) && 
+						 "from".equalsIgnoreCase(msgWords[1]) && 
+						 "to".equalsIgnoreCase(msgWords[3]) ) )
+					throw new IllegalArgumentException("Unexpceted comment for rename: " + msg);
+				if ( expocode.equals(msgWords[4]) )
+					oldExpocode = msgWords[2];
+			}
+		}
+		// Add any supplemental documents found in the documents directory
+		// (just to be safe) since this is what the reviewers will see
+		ArrayList<DashboardMetadata> cruiseDocs = metadataHandler.getMetadataFiles(expocode);
+		TreeSet<String> addlDocNames = new TreeSet<String>();
+		for ( DashboardMetadata mdata : cruiseDocs )
+			addlDocNames.add(mdata.getFilename());
+		for ( String name : addlDocs.split(SocatMetadata.NAMES_SEPARATOR) )
+			addlDocNames.add(name);
+		addlDocNames.remove(DashboardMetadata.OME_FILENAME);
+		addlDocs = "";
+		for ( String name : addlDocNames ) {
+			addlDocs += "; " + name;
+		}
+		addlDocs = addlDocs.substring(2);
+
+		return expocode + "\t" + 
+			   datasetName + "\t" +
+			   dsgQCFlag + "\t" + 
+			   databaseQCFlag + "\t" +
+			   oldExpocode + "\t" +
+			   regions + "\t" +
+			   numRows + "\t" +
+			   numErrRows + "\t" +
+			   numWarnRows + "\t" + 
+			   pis + "\t" +
+			   addlDocs;
+	}
+
+	private static final String CRUISE_SUMMARY_HEADER = 
+			"Expocode\t" + 
+			"Dataset Name\t" + 
+			"QC (DSG)\t" + 
+			"QC (Database)\t" + 
+			"Renamed From\t" + 
+			"Regions\t" + 
+			"Num Data Pts\t" + 
+			"Num Err Pts\t" + 
+			"Num Warn Pts\t" +
+			"PIs\t" +
+			"Addl Docs";
+
+	/**
+	 * @return
+	 * 		the header for the cruise summary lines
+	 */
+	public String getCruiseSummaryHeader() {
+		return CRUISE_SUMMARY_HEADER;
+	}
+
+	/**
+	 * Generates a summary of the cruises specified in ExpocodesFile, 
+	 * or all cruises if ExpocodesFile is '-'. The default dashboard 
+	 * configuration is used for this process.
+	 * 
+	 * @param args 
+	 * 		ExpocodesFile
+	 */
+	public static void main(String[] args) {
+		if ( args.length != 1 ) {
+			System.err.println("Arguments:  [ - | ExpocodesFile ]");
+			System.err.println();
+			System.err.println("Generates a summary of the cruises specified in ExpocodesFile, ");
+			System.err.println("or all cruises if ExpocodesFile is '-'. The default dashboard ");
+			System.err.println("configuration is used for this process. ");
+			System.err.println();
+			System.exit(1);
+		}
+
+		String expocodesFilename = args[0];
+		if ( "-".equals(expocodesFilename) )
+			expocodesFilename = null;
+
+		boolean success = true;
+
+		// Get the default dashboard configuration
+		DashboardDataStore dataStore = null;		
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (Exception ex) {
+			System.err.println("Problems reading the default dashboard " +
+					"configuration file: " + ex.getMessage());
+			ex.printStackTrace();
+			System.exit(1);
+		}
+		try {
+			SocatSummaryReporter summaryReporter = new SocatSummaryReporter(dataStore);
+
+			// Get the expocode of the cruises to report
+			TreeSet<String> allExpocodes = null; 
+			if ( expocodesFilename != null ) {
+				allExpocodes = new TreeSet<String>();
+				try {
+					BufferedReader expoReader = 
+							new BufferedReader(new FileReader(expocodesFilename));
+					try {
+						String dataline = expoReader.readLine();
+						while ( dataline != null ) {
+							dataline = dataline.trim();
+							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+								allExpocodes.add(dataline);
+							dataline = expoReader.readLine();
+						}
+					} finally {
+						expoReader.close();
+					}
+				} catch (Exception ex) {
+					System.err.println("Error getting expocodes from " + 
+							expocodesFilename + ": " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			} 
+			else {
+				try {
+					allExpocodes = new TreeSet<String>(
+							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
+				} catch (Exception ex) {
+					System.err.println("Error getting all expocodes: " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			}
+
+			// Generate the report
+			System.out.println(summaryReporter.getCruiseSummaryHeader());
+			for ( String expocode : allExpocodes ) {
+				try {
+					System.out.println(summaryReporter.getCruiseSummary(expocode));
+				} catch (Exception ex) {
+					System.err.println("Error reporting on " + expocode + " : " + ex.getMessage());
+					success = false;
+				}
+			}
+
+		} finally {
+			dataStore.shutdown();
+		}
+		if ( ! success )
+			System.exit(1);
+		System.exit(0);
+	}
+
+}
