@@ -387,7 +387,7 @@ public class SocatMetadataTest {
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatMetadata#setQcFlag(java.lang.Character)}.
 	 */
 	@Test
-	public void testGetSetFlag() {
+	public void testGetSetQCFlag() {
 		SocatMetadata mdata = new SocatMetadata();
 		assertEquals(" ", mdata.getQcFlag());
 		mdata.setQcFlag(CRUISE_FLAG);
@@ -536,8 +536,7 @@ public class SocatMetadataTest {
 		assertTrue( mdata.equals(other) );
 
 		mdata.setSocatVersion(SOCAT_VERSION);
-		// SOCAT version is ignored in hashCode (floating point value)
-		assertTrue( mdata.hashCode() == other.hashCode() );
+		assertFalse( mdata.hashCode() == other.hashCode() );
 		assertFalse( mdata.equals(other) );
 		other.setSocatVersion(SOCAT_VERSION);
 		assertEquals(mdata.hashCode(), other.hashCode());
