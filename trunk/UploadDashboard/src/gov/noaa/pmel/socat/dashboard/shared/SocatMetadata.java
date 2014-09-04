@@ -433,11 +433,15 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		the maximum length of String values given in the fields of this instance
 	 */
 	public int getMaxStringLength() {
-		int maxLength = expocode.length();
+		int maxLength = 12;
+		if ( maxLength < expocode.length() )
+			maxLength = expocode.length();
 		if ( maxLength < cruiseName.length() ) 
 			maxLength = cruiseName.length();
 		if ( maxLength < vesselName.length() ) 
 			maxLength = vesselName.length();
+		if ( maxLength < organization.length() ) 
+			maxLength = organization.length();
 		if ( maxLength < scienceGroup.length() ) 
 			maxLength = scienceGroup.length();
 		if ( maxLength < origDataRef.length() ) 
@@ -471,6 +475,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		result = result * prime + addlDocs.hashCode();
 		result = result * prime + socatDOI.hashCode();
 		result = result * prime + socatDOIHRef.hashCode();
+		result = result * prime + socatVersion.hashCode();
 		result = result * prime + qcFlag.hashCode();
 		return result;
 	}
@@ -511,11 +516,9 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			return false;
 		if ( ! socatDOIHRef.equals(other.socatDOIHRef) )
 			return false;
-		if ( ! qcFlag.equals(other.qcFlag) )
-			return false;
-
-		// socatVersion was previously a double
 		if ( ! socatVersion.equals(other.socatVersion) )
+			return false;
+		if ( ! qcFlag.equals(other.qcFlag) )
 			return false;
 
 		// Floating-point comparisons
@@ -552,7 +555,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    addlDocs=" + addlDocs + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    socatDOIHRef=" + socatDOIHRef + 
-				",\n    socatVersion=" + socatVersion.toString() + 
+				",\n    socatVersion=" + socatVersion + 
 				",\n    qcFlag=" + qcFlag + 
 				" ]";
 	}
