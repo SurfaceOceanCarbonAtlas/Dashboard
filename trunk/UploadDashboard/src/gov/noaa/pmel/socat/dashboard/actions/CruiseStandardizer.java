@@ -3,6 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.actions;
 
+import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
@@ -202,6 +204,7 @@ public class CruiseStandardizer {
 	}
 
 	DsgNcFileHandler dsgHandler;
+	FerretConfig ferretConfig;
 
 	/**
 	 * Standardize metadata for cruise DSG files obtained from
@@ -210,8 +213,9 @@ public class CruiseStandardizer {
 	 * @param dsgHandler
 	 * 		the DSG file handler to use
 	 */
-	public CruiseStandardizer(DsgNcFileHandler dsgHandler) {
+	public CruiseStandardizer(DsgNcFileHandler dsgHandler, FerretConfig ferretConfig) {
 		this.dsgHandler = dsgHandler;
+		this.ferretConfig = ferretConfig;
 	}
 
 	/**
@@ -234,47 +238,65 @@ public class CruiseStandardizer {
 						IOException, IllegalAccessException, InvalidRangeException {
 		// Get the new PI names from the saved PI names
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
-		dsgFile.read(false);
+		dsgFile.read(true);
 		SocatMetadata mdata = dsgFile.getMetadata();
-		ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
 
 		String piNames = mdata.getScienceGroup().trim();
 		String newPiNames = PI_RENAME_MAP.get(piNames);
 		if ( newPiNames == null )
 			throw new IllegalArgumentException("PI name(s) not recognized: '" + piNames + "'");
 		newPiNames = newPiNames.trim();
+
 		// If unchanged, nothing to do
-		if ( newPiNames.equals(piNames) )
+		if ( newPiNames.equals(piNames) ) {
+			System.err.println("PI names unchanged for " + expocode);
 			return;
-		mdata.setScienceGroup(newPiNames);
-		// Re-create the full-data DSG file
-		dsgFile.create(mdata, dataList);
-		// Re-decimate the full-data DSG file
-		dsgHandler.decimateCruise(expocode);
+		}
+
+		try {
+			// Try to just change the names in the existing DSG files
+			dsgFile.updatePINames(newPiNames);
+			CruiseDsgNcFile decDsgFile = dsgHandler.getDecDsgNcFile(expocode);
+			decDsgFile.updatePINames(newPiNames);
+			System.err.println("PI names changed in place for " + expocode);
+		} catch (InvalidRangeException ex) {
+			// Names longer than allotted space; regenerate the DSG files
+			dsgFile.read(false);
+			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
+			mdata = dsgFile.getMetadata();
+			mdata.setScienceGroup(newPiNames);
+			// Re-create the full-data DSG file
+			dsgFile.create(mdata, dataList);
+			// Call Ferret to add lon360 and tmonth (calculated data should be the same
+			SocatTool tool = new SocatTool(ferretConfig);
+			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
+			tool.run();
+			if ( tool.hasError() )
+				throw new IllegalArgumentException("Failure adding computed variables: " + 
+						tool.getErrorMessage());
+			// Re-create the decimated-data DSG file 
+			dsgHandler.decimateCruise(expocode);
+			System.err.println("PI names changed by regenerating the DSG files");
+		}
 	}
 
 	/**
 	 * @param args
-	 * 		[ - | ExpocodesFile ]
+	 * 		ExpocodesFile
 	 * 
-	 * 		Standardizes the PI names for cruises specified in ExpocodesFile, or 
-	 * 		for all cruises if '-' is given.  The default dashboard configuration 
-	 * 		is used for this process.  
+	 * 		Standardizes the PI names for cruises specified in ExpocodesFile. 
+	 * 		The default dashboard configuration is used for this process.  
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 1 ) {
-			System.err.println("Arguments:  [ - | ExpocodesFile ]");
+			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
-			System.err.println("Standardizes the PI names for cruises specified in ExpocodesFile, or ");
-			System.err.println("for all cruises if '-' is given.  The default dashboard configuration ");
-			System.err.println("is used for this process. ");
+			System.err.println("Standardizes the PI names for cruises specified in ExpocodesFile. ");
+			System.err.println("The default dashboard configuration is used for this process. ");
 			System.err.println();
 			System.exit(1);
 		}
 		String expocodesFilename = args[0];
-		if ( "-".equals(expocodesFilename) )
-			expocodesFilename = null;
-
 		boolean success = true;
 
 		// Get the default dashboard configuration
@@ -289,42 +311,30 @@ public class CruiseStandardizer {
 		}
 		try {
 			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
-			CruiseStandardizer standardizer = new CruiseStandardizer(dsgHandler);
+			CruiseStandardizer standardizer = new CruiseStandardizer(dsgHandler, 
+													dataStore.getFerretConfig());
 
-			// Get the expocodes of the cruises to standarize
-			TreeSet<String> allExpocodes = null; 
-			if ( expocodesFilename != null ) {
-				allExpocodes = new TreeSet<String>();
+			// Get the expocodes of the cruises to standardize
+			TreeSet<String> allExpocodes = new TreeSet<String>();
+			try {
+				BufferedReader expoReader = 
+						new BufferedReader(new FileReader(expocodesFilename));
 				try {
-					BufferedReader expoReader = 
-							new BufferedReader(new FileReader(expocodesFilename));
-					try {
-						String dataline = expoReader.readLine();
-						while ( dataline != null ) {
-							dataline = dataline.trim();
-							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
-								allExpocodes.add(dataline);
-							dataline = expoReader.readLine();
-						}
-					} finally {
-						expoReader.close();
+					String dataline = expoReader.readLine();
+					while ( dataline != null ) {
+						dataline = dataline.trim();
+						if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+							allExpocodes.add(dataline);
+						dataline = expoReader.readLine();
 					}
-				} catch (Exception ex) {
-					System.err.println("Error getting expocodes from " + 
-							expocodesFilename + ": " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
+				} finally {
+					expoReader.close();
 				}
-			} 
-			else {
-				try {
-					allExpocodes = new TreeSet<String>(
-							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
-				} catch (Exception ex) {
-					System.err.println("Error getting all expocodes: " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
-				}
+			} catch (Exception ex) {
+				System.err.println("Error getting expocodes from " + 
+						expocodesFilename + ": " + ex.getMessage());
+				ex.printStackTrace();
+				System.exit(1);
 			}
 
 			// standardize the PI names in each of these cruises

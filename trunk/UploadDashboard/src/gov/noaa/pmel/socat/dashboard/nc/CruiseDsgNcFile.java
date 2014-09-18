@@ -36,7 +36,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 419168141850194424L;
+	private static final long serialVersionUID = -5648702630381873509L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -667,7 +667,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file is not valid
 	 * @throws IOException
-	 * 		if opening or writing to the DSG file throws one
+	 * 		if opening or updating the DSG file throws one
 	 * @throws InvalidRangeException 
 	 * 		if writing the updated expocode to the DSG file throws one 
 	 */
@@ -682,8 +682,38 @@ public class CruiseDsgNcFile extends File {
 						varName + "' in " + getName());
 			ArrayChar.D2 expocodeArray = new ArrayChar.D2(1, newExpocode.length());
 			expocodeArray.setString(0, newExpocode);
-			// This will fail if the new expcode exceeds the length of the old expocode
+			// This will fail if the new expcode exceeds the available space
 			ncfile.write(var, expocodeArray);
+		} finally {
+			ncfile.close();
+		}
+	}
+
+	/**
+	 * Updates the PI names recorded in the DSG file.
+	 * 
+	 * @param piNames
+	 * 		PI names to record in the DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the DSG file is not valid
+	 * @throws IOException
+	 * 		if opening or updating the DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the updated PI names to the DSG file throws one 
+	 */
+	public void updatePINames(String piNames) 
+			throws IllegalArgumentException, IOException, InvalidRangeException {
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+			String varName = Constants.SHORT_NAMES.get(Constants.scienceGroup_VARNAME);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayChar.D2 pisArray = new ArrayChar.D2(1, piNames.length());
+			pisArray.setString(0, piNames);
+			// This will fail if the new PI names exceeds the available space
+			ncfile.write(var, pisArray);
 		} finally {
 			ncfile.close();
 		}
