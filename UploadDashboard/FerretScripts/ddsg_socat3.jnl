@@ -94,8 +94,8 @@ LET varnames_list2 = {\
 LET varnames_list = XCAT(varnames_list1, varnames_list2)
 LET nlist = `varnames_list[i=@ngd]`
 IF `nvars NE nlist` THEN
-   say List of variables in the script does not match list in the dataset 
-   say ($infile) has `nvars` variables, script list has `nlist`
+   say **ERROR List of variables in the script does not match list in the dataset 
+   say **ERROR "($infile)" has `nvars` variables, script list has `nlist`
    exit/script
 ENDIF
 
@@ -112,8 +112,8 @@ REPEAT/range=1:`nvars`/name=v (DEFINE SYMBOL  vv = `v`;\
  SET VAR/NAME=($name1)_in ($name1))
 
 IF `vdiff GT 0` THEN
-   say List of variables in the script does not match list in the dataset ($infile)
-   say Dataset has variable *** ($name1) *** which is not in variable-name list in script
+   say **ERROR List of variables in the script does not match list in the dataset "($infile)"
+   say **ERROR Dataset has variable *** ($name1) *** which is not in variable-name list in script
    exit/script
 ENDIF
 
