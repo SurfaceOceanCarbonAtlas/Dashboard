@@ -662,7 +662,7 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Updates this DSG file with the given expocode.
 	 * 
-	 * @param newExpocode
+	 * @param expocode
 	 * 		expocode to assign in the DSG file
 	 * @throws IllegalArgumentException
 	 * 		if the DSG file is not valid
@@ -671,7 +671,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws InvalidRangeException 
 	 * 		if writing the updated expocode to the DSG file throws one 
 	 */
-	public void updateExpocode(String newExpocode) 
+	public void updateExpocode(String expocode) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
@@ -680,9 +680,13 @@ public class CruiseDsgNcFile extends File {
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
-			ArrayChar.D2 expocodeArray = new ArrayChar.D2(1, newExpocode.length());
-			expocodeArray.setString(0, newExpocode);
-			// This will fail if the new expcode exceeds the available space
+			int varLen = var.getShape(1);
+			if ( expocode.length() > varLen )
+				throw new InvalidRangeException("New expocode length (" + 
+						expocode.length() + ") exceeds available space (" + 
+						varLen + ")");
+			ArrayChar.D2 expocodeArray = new ArrayChar.D2(1, varLen);
+			expocodeArray.setString(0, expocode);
 			ncfile.write(var, expocodeArray);
 		} finally {
 			ncfile.close();
@@ -710,9 +714,13 @@ public class CruiseDsgNcFile extends File {
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
-			ArrayChar.D2 pisArray = new ArrayChar.D2(1, piNames.length());
+			int varLen = var.getShape(1);
+			if ( piNames.length() > varLen )
+				throw new InvalidRangeException("New PI names length (" + 
+						piNames.length() + ") exceeds available space (" + 
+						varLen + ")");
+			ArrayChar.D2 pisArray = new ArrayChar.D2(1, varLen);
 			pisArray.setString(0, piNames);
-			// This will fail if the new PI names exceeds the available space
 			ncfile.write(var, pisArray);
 		} finally {
 			ncfile.close();
