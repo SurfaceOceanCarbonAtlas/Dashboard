@@ -249,7 +249,7 @@ public class CruiseStandardizer {
 
 		// If unchanged, nothing to do
 		if ( newPiNames.equals(piNames) ) {
-			System.err.println("PI names unchanged for " + expocode);
+			System.err.println(expocode + ": PI names unchanged");
 			return;
 		}
 
@@ -258,7 +258,7 @@ public class CruiseStandardizer {
 			dsgFile.updatePINames(newPiNames);
 			CruiseDsgNcFile decDsgFile = dsgHandler.getDecDsgNcFile(expocode);
 			decDsgFile.updatePINames(newPiNames);
-			System.err.println("PI names changed in place for " + expocode);
+			System.err.println(expocode + ": PI names changed in place");
 		} catch (InvalidRangeException ex) {
 			// Names longer than allotted space; regenerate the DSG files
 			dsgFile.read(false);
@@ -272,11 +272,11 @@ public class CruiseStandardizer {
 			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
 			tool.run();
 			if ( tool.hasError() )
-				throw new IllegalArgumentException("Failure adding computed variables: " + 
+				throw new IllegalArgumentException(expocode + ": Failure adding computed variables: " + 
 						tool.getErrorMessage());
 			// Re-create the decimated-data DSG file 
 			dsgHandler.decimateCruise(expocode);
-			System.err.println("PI names changed by regenerating the DSG files");
+			System.err.println(expocode + ": PI names changed by regenerating the DSG files");
 		}
 	}
 
