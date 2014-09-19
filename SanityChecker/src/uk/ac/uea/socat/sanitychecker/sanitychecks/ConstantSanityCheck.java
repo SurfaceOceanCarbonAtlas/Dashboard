@@ -1,5 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.sanitychecks;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class ConstantSanityCheck extends SanityCheck {
 				throw new SanityCheckException("Max duration must be larger than zero");
 			}
 		} catch(NumberFormatException e) {
-			throw new SanityCheckException("All speed parameters must be numeric");
+			throw new SanityCheckException("Duration parameter must be numeric");
 		}
 	}
 	
@@ -140,7 +141,13 @@ public class ConstantSanityCheck extends SanityCheck {
 	 */
 	private void doDurationCheck() throws SanityCheckException {
 
-		if (itsRecords.size() > 1) {
+		// For measurements taken a long time apart, the value can easily be constant.
+		// For example, measurements taken hourly can happily have the same value, but
+		// if the constant check is set for 30 minutes it will always be triggered.
+		//
+		// Therefore we make sure there's more than two consecutive measurements with the
+		// constant value.
+		if (itsRecords.size() > 2) {
 		
 			double secondsDifference = Seconds.secondsBetween(itsRecords.get(0).getTime(), itsRecords.get(itsRecords.size() - 1).getTime()).getSeconds();
 			double minutesDifference = secondsDifference / 60.0;
@@ -148,7 +155,8 @@ public class ConstantSanityCheck extends SanityCheck {
 			
 			if (minutesDifference > itsMaxDuration) {
 				try {
-					String message = "Value for column is constant at " + getRecordValue(itsRecords.get(0)) + " for " + minutesDifference + ") minutes";
+					String message = "Value for column is constant at " + getRecordValue(itsRecords.get(0)) + " for " + 
+				                     new DecimalFormat("#").format(minutesDifference) + " minutes";
 					
 					for (SocatDataRecord record : itsRecords) {
 						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
