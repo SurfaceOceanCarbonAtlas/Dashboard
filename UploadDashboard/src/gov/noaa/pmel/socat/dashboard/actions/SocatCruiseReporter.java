@@ -28,9 +28,11 @@ import java.util.TreeSet;
  */
 public class SocatCruiseReporter {
 
-	// SOCAT main DOI, DOI HRef, and publication citation (currently, for v2)
-	private static final String SOCAT_MAIN_DOI = "doi:10.1594/PANGAEA.811776";
-	private static final String SOCAT_MAIN_DOI_HREF = "http://doi.pangaea.de/10.1594/PANGAEA.811776";
+	// SOCAT main DOI, DOI HRef, and publication citation
+	private static final String SOCAT_MAIN_DOI = "(SOCAT v3 unpublished data)";
+	// private static final String SOCAT_MAIN_DOI = "doi:10.1594/PANGAEA.811776";
+	private static final String SOCAT_MAIN_DOI_HREF = "(SOCAT v3 unpublished data)";
+	// private static final String SOCAT_MAIN_DOI_HREF = "http://doi.pangaea.de/10.1594/PANGAEA.811776";
 	private static final String[] SOCAT_MAIN_CITATION = {
 		"B. Pfeil, A. Olsen, D. C. E. Bakker, et. al. \"A uniform, quality controlled",
 		"Surface Ocean CO2 Atlas (SOCAT)\" Earth Syst. Sci. Data, 5, 125-143, 2013",
@@ -105,7 +107,8 @@ public class SocatCruiseReporter {
 			printDataTableHeader(report, false);
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 				report.println(dataReportString(dataVals, metadata.getExpocode(), 
-						metadata.getSocatDOI(), metadata.getQcFlag(), false));
+						metadata.getSocatVersion(), metadata.getSocatDOI(), 
+						metadata.getQcFlag(), false));
 			}
 		} finally {
 			report.close();
@@ -182,7 +185,8 @@ public class SocatCruiseReporter {
 					if ( woceFlag.equals('3') || woceFlag.equals('4') )
 						continue;
 					report.println(dataReportString(dataVals, metadata.getExpocode(), 
-							metadata.getSocatDOI(), metadata.getQcFlag(), true));
+							metadata.getSocatVersion(), metadata.getSocatDOI(), 
+							metadata.getQcFlag(), true));
 					dataFound = true;
 				}
 				if ( ! dataFound ) 
@@ -213,6 +217,7 @@ public class SocatCruiseReporter {
 
 		report.println("SOCAT data report created: " + timestamper.format(new Date()));
 		report.println("Expocode: " + metadata.getExpocode());
+		report.println("version: " + metadata.getSocatVersion());
 		report.println("Cruise/Dataset Name: " + metadata.getCruiseName());
 		report.println("Ship/Vessel Name: " + metadata.getVesselName());
 		report.println("Principal Investigator(s): " + metadata.getScienceGroup());
@@ -323,6 +328,7 @@ public class SocatCruiseReporter {
 			report.println("SOCAT cruise data in SOCAT region \"" + 
 					regionName + "\" for the following cruises:");
 		report.println("Expocode\t" +
+					   "version\t" +
 					   "Cruise/Dataset Name\t" +
 					   "Ship/Vessel Name\t" +
 					   "PI(s)\t" +
@@ -341,6 +347,9 @@ public class SocatCruiseReporter {
 		for ( SocatMetadata metadata : metaList ) {
 			String expocode = metadata.getExpocode();
 			report.print(expocode);
+			report.print("\t");
+
+			report.print(metadata.getSocatVersion());
 			report.print("\t");
 
 			report.print(metadata.getCruiseName());
@@ -531,6 +540,7 @@ public class SocatCruiseReporter {
 	 */
 	private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the cruise from which this data was obtained",
+		"version: version of SOCAT where this enhanced cruise data first appears",
 		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
 		"QC_Flag: Cruise QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
@@ -574,6 +584,7 @@ public class SocatCruiseReporter {
 	 */
 	private static final String SINGLE_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" +
+			"version\t" +
 			"SOCAT_DOI\t" +
 			"QC_Flag\t" +
 			"yr\t" +
@@ -611,6 +622,7 @@ public class SocatCruiseReporter {
 	 */
 	private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the cruise from which this data was obtained",
+		"version: version of SOCAT where this enhanced cruise data first appears",
 		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
 		"QC_Flag: Cruise QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
@@ -648,6 +660,7 @@ public class SocatCruiseReporter {
 	 */
 	private static final String MULTI_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" + 
+			"version\t" +
 			"SOCAT_DOI\t" +
 			"QC_Flag\t" +
 			"yr\t" +
@@ -689,11 +702,12 @@ public class SocatCruiseReporter {
 	 * 		tab-separated data values for SOCAT data reporting.
 	 */
 	private static String dataReportString(SocatCruiseData dataVals, 
-			String expocode, String socatDOI, String cruiseQCFlag, 
-			boolean multicruise) throws IllegalArgumentException {
+			String expocode, String socatVersion, String socatDOI, 
+			String cruiseQCFlag, boolean multicruise) throws IllegalArgumentException {
 		// Generate the string for this data point
 		Formatter fmtr = new Formatter();
 		fmtr.format("%s\t", expocode);
+		fmtr.format("%s\t", socatVersion);
 		fmtr.format("%s\t", socatDOI);
 		fmtr.format("%s\t", cruiseQCFlag);
 
