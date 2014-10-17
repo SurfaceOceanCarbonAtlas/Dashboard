@@ -268,6 +268,8 @@ public class DsgNcFileHandler {
 		if ( ! newParent.exists() ) 
 			newParent.mkdirs();
 
+		String varName = Constants.SHORT_NAMES.get(Constants.expocode_VARNAME);
+
 		// Rename and update the DSG file
 		File oldDsgFile = getDsgNcFile(oldExpocode);
 		if ( oldDsgFile.exists() )  {
@@ -275,7 +277,7 @@ public class DsgNcFileHandler {
 				throw new IllegalArgumentException("Unable to rename DSG "
 						+ "file from " + oldExpocode + " to " + newExpocode);
 			try {
-				newDsgFile.updateExpocode(newExpocode);
+				newDsgFile.updateStringVarValue(varName, newExpocode);
 			} catch (InvalidRangeException ex) {
 				newDsgFile.renameTo(oldDsgFile);
 				throw new IOException(ex);
@@ -289,7 +291,7 @@ public class DsgNcFileHandler {
 				throw new IllegalArgumentException("Unable to rename decimated "
 						+ "DSG file from " + oldExpocode + " to " + newExpocode);
 			try {
-				newDecDsgFile.updateExpocode(newExpocode);
+				newDecDsgFile.updateStringVarValue(varName, newExpocode);
 			} catch (InvalidRangeException ex) {
 				newDecDsgFile.renameTo(oldDecDsgFile);
 				throw new IOException(ex);
