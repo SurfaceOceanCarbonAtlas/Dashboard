@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.actions;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -22,7 +23,6 @@ import ucar.ma2.InvalidRangeException;
 
 /**
  * Standardizes cruise metadata in the DSG files.  
- * Currently only the PI names are standardized from the actual current list of names.
  * 
  * @author Karl Smith
  */
@@ -203,6 +203,162 @@ public class CruiseStandardizer {
 		PI_RENAME_MAP.put("Yves Dandonneau", "Dandonneau, Y.");
 	}
 
+	private static final HashMap<String,String> SHIP_RENAME_MAP;
+	static {
+		SHIP_RENAME_MAP = new HashMap<String,String>();
+		SHIP_RENAME_MAP.put("Akademik Korolev", "Akademik Korolev");
+		SHIP_RENAME_MAP.put("Albert Rickmers", "Albert Rickmers");
+		SHIP_RENAME_MAP.put("Alligator Hope", "Alligator Hope");
+		SHIP_RENAME_MAP.put("Almirante irizar", "Almirante Irizar");
+		SHIP_RENAME_MAP.put("Antares", "Antares");
+		SHIP_RENAME_MAP.put("Argo", "Argo");
+		SHIP_RENAME_MAP.put("Atlantic  Companion", "Atlantic Companion");
+		SHIP_RENAME_MAP.put("Atlantic Companion", "Atlantic Companion");
+		SHIP_RENAME_MAP.put("Audace", "Audace");
+		SHIP_RENAME_MAP.put("Aurora Australis", "Aurora Australis");
+		SHIP_RENAME_MAP.put("A. V. Humboldt", "A.V. Humboldt");
+		SHIP_RENAME_MAP.put("A.V. Humboldt", "A.V. Humboldt");
+		SHIP_RENAME_MAP.put("Belgica", "Belgica");
+		SHIP_RENAME_MAP.put("Bell M. Shimada", "Bell M. Shimada");
+		SHIP_RENAME_MAP.put("Benguela Stream", "Benguela Stream");
+		SHIP_RENAME_MAP.put("Bold", "Bold");
+		SHIP_RENAME_MAP.put("CAPE HATTERAS", "Cape Hatteras");
+		SHIP_RENAME_MAP.put("Cape Hatteras", "Cape Hatteras");
+		SHIP_RENAME_MAP.put("Cap Victor", "Cap Victor");
+		SHIP_RENAME_MAP.put("Carioca", "Carioca");
+		SHIP_RENAME_MAP.put("CEFAS ENDEAVOUR", "Cefas Endeavour");
+		SHIP_RENAME_MAP.put("Cefas Endeavour", "Cefas Endeavour");
+		SHIP_RENAME_MAP.put("Celtic Explorer", "Celtic Explorer");
+		SHIP_RENAME_MAP.put("Charles Darwin", "Charles Darwin");
+		SHIP_RENAME_MAP.put("Colibri", "Colibri");
+		SHIP_RENAME_MAP.put("Columbus Waikato", "Columbus Waikato");
+		SHIP_RENAME_MAP.put("David Starr Jordan", "David Starr Jordan");
+		SHIP_RENAME_MAP.put("Discoverer", "Discoverer");
+		SHIP_RENAME_MAP.put("Discovery", "Discovery");
+		SHIP_RENAME_MAP.put("Drifting Buoy", "Drifting buoy");
+		SHIP_RENAME_MAP.put("Drifting Bouy", "Drifting buoy");
+		SHIP_RENAME_MAP.put("Drifting bouy", "Drifting buoy");
+		SHIP_RENAME_MAP.put("Drifting buoy", "Drifting buoy");
+		SHIP_RENAME_MAP.put("Explorer of the Seas", "Explorer of the Seas");
+		SHIP_RENAME_MAP.put("Falstaff", "Falstaff");
+		SHIP_RENAME_MAP.put("Finnmaid", "Finnmaid");
+		SHIP_RENAME_MAP.put("Franklin", "Franklin");
+		SHIP_RENAME_MAP.put("Gauss", "Gauss");
+		SHIP_RENAME_MAP.put("Genetica/Garlicos", "Genetica/Garlicos");
+		SHIP_RENAME_MAP.put("Gordon Gunter", "Gordon Gunter");
+		SHIP_RENAME_MAP.put("G. O. Sars", "G.O. Sars");
+		SHIP_RENAME_MAP.put("G.O. Sars", "G.O. Sars");
+		SHIP_RENAME_MAP.put("GULF CHALLENGER", "Gulf Challenger");
+		SHIP_RENAME_MAP.put("Gulf Challenger", "Gulf Challenger");
+		SHIP_RENAME_MAP.put("Haakon Mosby", "Haakon Mosby");
+		SHIP_RENAME_MAP.put("Hakuho Maru", "Hakuho Maru");
+		SHIP_RENAME_MAP.put("Hakurei Maru 2", "Hakurei Maru 2");
+		SHIP_RENAME_MAP.put("Healy", "Healy");
+		SHIP_RENAME_MAP.put("HENRY B. BIGELOW", "Henry B. Bigelow");
+		SHIP_RENAME_MAP.put("Henry B. Bigelow", "Henry B. Bigelow");
+		SHIP_RENAME_MAP.put("Hesperides", "Hesperides");
+		SHIP_RENAME_MAP.put("Hokuto Maru", "Hokuto Maru");
+		SHIP_RENAME_MAP.put("Horizon", "Horizon");
+		SHIP_RENAME_MAP.put("Hudson", "Hudson");
+		SHIP_RENAME_MAP.put("James Clark Ross", "James Clark Ross");
+		SHIP_RENAME_MAP.put("Johan Hjort", "Johan Hjort");
+		SHIP_RENAME_MAP.put("John P. Tully", "John P. Tully");
+		SHIP_RENAME_MAP.put("Ka imimoana", "Ka'imimoana");
+		SHIP_RENAME_MAP.put("Ka'imimoana", "Ka'imimoana");
+		SHIP_RENAME_MAP.put("Kaiyo", "Kaiyo");
+		SHIP_RENAME_MAP.put("Kaiyo Maru", "Kaiyo Maru");
+		SHIP_RENAME_MAP.put("Keifu Maru", "Keifu Maru");
+		SHIP_RENAME_MAP.put("Knorr", "Knorr");
+		SHIP_RENAME_MAP.put("Kofu Maru", "Kofu Maru");
+		SHIP_RENAME_MAP.put("Las Cuevas", "Las Cuevas");
+		SHIP_RENAME_MAP.put("L Astrolabe", "L'Astrolabe");
+		SHIP_RENAME_MAP.put("L'Astrolabe", "L'Astrolabe");
+		SHIP_RENAME_MAP.put("La Surprise", "La Surprise");
+		SHIP_RENAME_MAP.put("L Atalante", "L'Atalante");
+		SHIP_RENAME_MAP.put("L'Atalante", "L'Atalante");
+		SHIP_RENAME_MAP.put("L'Atlante", "L'Atalante");
+		SHIP_RENAME_MAP.put("Lilooet", "Lilooet");
+		SHIP_RENAME_MAP.put("L. M. Gould", "Laurence M. Gould");
+		SHIP_RENAME_MAP.put("L.M. Gould", "Laurence M. Gould");
+		SHIP_RENAME_MAP.put("Laurence M. Gould", "Laurence M. Gould");
+		SHIP_RENAME_MAP.put("Malcolm Baldrige", "Malcolm Baldrige");
+		SHIP_RENAME_MAP.put("Marcus G. Langseth", "Marcus G. Langseth");
+		SHIP_RENAME_MAP.put("Maria S. Merian", "Maria S. Merian");
+		SHIP_RENAME_MAP.put("Marion Dufresne", "Marion Dufresne");
+		SHIP_RENAME_MAP.put("Maurice Ewing", "Maurice Ewing");
+		SHIP_RENAME_MAP.put("McArthur II", "McArthur II");
+		SHIP_RENAME_MAP.put("Melville", "Melville");
+		SHIP_RENAME_MAP.put("Meteor", "Meteor");
+		SHIP_RENAME_MAP.put("Miller Freeman", "Miller Freeman");
+		SHIP_RENAME_MAP.put("Mirai", "Mirai");
+		SHIP_RENAME_MAP.put("Mooring", "Mooring");
+		SHIP_RENAME_MAP.put("Munida", "Munida");
+		SHIP_RENAME_MAP.put("Mytilus", "Mytilus");
+		SHIP_RENAME_MAP.put("Natalie Schulte", "Natalie Schulte");
+		SHIP_RENAME_MAP.put("Nathaniel B. Palmer", "Nathaniel B. Palmer");
+		SHIP_RENAME_MAP.put("Natsushima", "Natsushima");
+		SHIP_RENAME_MAP.put("Norcliff", "Norcliff");
+		SHIP_RENAME_MAP.put("Nuka Arctica", "Nuka Arctica");
+		SHIP_RENAME_MAP.put("Oceanographer", "Oceanographer");
+		SHIP_RENAME_MAP.put("Oceanus", "Oceanus");
+		SHIP_RENAME_MAP.put("Oden", "Oden");
+		SHIP_RENAME_MAP.put("Parizeau", "Parizeau");
+		SHIP_RENAME_MAP.put("Pelagia", "Pelagia");
+		SHIP_RENAME_MAP.put("PMEL/Natalie Schulte", "Natalie Schulte");
+		SHIP_RENAME_MAP.put("Polaris II", "Polaris II");
+		SHIP_RENAME_MAP.put("Polarstar", "Polarstar");
+		SHIP_RENAME_MAP.put("Polar Star", "Polar Star");
+		SHIP_RENAME_MAP.put("Polarstern", "Polarstern");
+		SHIP_RENAME_MAP.put("Poseidon", "Poseidon");
+		SHIP_RENAME_MAP.put("Pride of Bilboa", "Pride of Bilboa");
+		SHIP_RENAME_MAP.put("Prince Madog", "Prince Madog");
+		SHIP_RENAME_MAP.put("Prince of Seas", "Prince of Seas");
+		SHIP_RENAME_MAP.put("Puerto Deseado", "Puerto Deseado");
+		SHIP_RENAME_MAP.put("Pyxis", "Pyxis");
+		SHIP_RENAME_MAP.put("Quadra", "Quadra");
+		SHIP_RENAME_MAP.put("Quima", "Quima");
+		SHIP_RENAME_MAP.put("Rabelais", "Rabelais");
+		SHIP_RENAME_MAP.put("Rio Blanco", "Rio Blanco");
+		SHIP_RENAME_MAP.put("Roger Revelle", "Roger Revelle");
+		SHIP_RENAME_MAP.put("Ronald Brown", "Ronald H. Brown");
+		SHIP_RENAME_MAP.put("Ronald H. Brown", "Ronald H. Brown");
+		SHIP_RENAME_MAP.put("R/V AEGAEO", "R/V Aegaeo");
+		SHIP_RENAME_MAP.put("R/V Aegaeo", "R/V Aegaeo");
+		SHIP_RENAME_MAP.put("Ryofu Maru", "Ryofu Maru");
+		SHIP_RENAME_MAP.put("S. A. Agulhas", "S.A. Agulhas");
+		SHIP_RENAME_MAP.put("S.A. Agulhas", "S.A. Agulhas");
+		SHIP_RENAME_MAP.put("Santa Lucia", "Santa Lucia");
+		SHIP_RENAME_MAP.put("Santa Maria", "Santa Maria");
+		SHIP_RENAME_MAP.put("Skaugran", "Skaugran");
+		SHIP_RENAME_MAP.put("Skogafoss", "Skogafoss");
+		SHIP_RENAME_MAP.put("Sogen Maru", "Sogen Maru");
+		SHIP_RENAME_MAP.put("Sonne", "Sonne");
+		SHIP_RENAME_MAP.put("Southern Surveyor", "Southern Surveyor");
+		SHIP_RENAME_MAP.put("Soyo Maru", "Soyo Maru");
+		SHIP_RENAME_MAP.put("Station M", "Station M");
+		SHIP_RENAME_MAP.put("Taisei Maru", "Taisei Maru");
+		SHIP_RENAME_MAP.put("Tangaroa", "Tangaroa");
+		SHIP_RENAME_MAP.put("Tethys 2", "Tethys II");
+		SHIP_RENAME_MAP.put("Tethyss II", "Tethys II");
+		SHIP_RENAME_MAP.put("Tethys II", "Tethys II");
+		SHIP_RENAME_MAP.put("Thalassa", "Thalassa");
+		SHIP_RENAME_MAP.put("Thomas G. Thompson", "Thomas G. Thompson");
+		SHIP_RENAME_MAP.put("Tianjin", "Tianjin");
+		SHIP_RENAME_MAP.put("Times Series", "Times Series");
+		SHIP_RENAME_MAP.put("Trans Carrier", "Trans Carrier");
+		SHIP_RENAME_MAP.put("Trans Future 5", "Trans Future 5");
+		SHIP_RENAME_MAP.put("Trans Future-5", "Trans Future 5");
+		SHIP_RENAME_MAP.put("Unknown", "unknown");
+		SHIP_RENAME_MAP.put("unknown", "unknown");
+		SHIP_RENAME_MAP.put("Vancouver", "Vancouver");
+		SHIP_RENAME_MAP.put("VOS Finnpartner", "VOS Finnpartner");
+		SHIP_RENAME_MAP.put("Wakataka Maru", "Wakataka Maru");
+		SHIP_RENAME_MAP.put("Weatherbird II", "Weatherbird II");
+		SHIP_RENAME_MAP.put("Wecoma", "Wecoma");
+		SHIP_RENAME_MAP.put("Wellington Maru", "Wellington Maru");
+		SHIP_RENAME_MAP.put("Xue Long", "Xue Long");
+	}
+
 	DsgNcFileHandler dsgHandler;
 	FerretConfig ferretConfig;
 
@@ -245,7 +401,6 @@ public class CruiseStandardizer {
 		String newPiNames = PI_RENAME_MAP.get(piNames);
 		if ( newPiNames == null )
 			throw new IllegalArgumentException("PI name(s) not recognized: '" + piNames + "'");
-		newPiNames = newPiNames.trim();
 
 		// If unchanged, nothing to do
 		if ( newPiNames.equals(piNames) ) {
@@ -255,9 +410,10 @@ public class CruiseStandardizer {
 
 		try {
 			// Try to just change the names in the existing DSG files
-			dsgFile.updatePINames(newPiNames);
+			String varName = Constants.SHORT_NAMES.get(Constants.scienceGroup_VARNAME);
+			dsgFile.updateStringVarValue(varName, newPiNames);
 			CruiseDsgNcFile decDsgFile = dsgHandler.getDecDsgNcFile(expocode);
-			decDsgFile.updatePINames(newPiNames);
+			decDsgFile.updateStringVarValue(varName, newPiNames);
 			System.err.println(expocode + ": PI names changed in place");
 		} catch (InvalidRangeException ex) {
 			// Names longer than allotted space; regenerate the DSG files
@@ -267,7 +423,7 @@ public class CruiseStandardizer {
 			mdata.setScienceGroup(newPiNames);
 			// Re-create the full-data DSG file
 			dsgFile.create(mdata, dataList);
-			// Call Ferret to add lon360 and tmonth (calculated data should be the same
+			// Call Ferret to add lon360 and tmonth (calculated data should be the same)
 			SocatTool tool = new SocatTool(ferretConfig);
 			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
 			tool.run();
@@ -277,6 +433,68 @@ public class CruiseStandardizer {
 			// Re-create the decimated-data DSG file 
 			dsgHandler.decimateCruise(expocode);
 			System.err.println(expocode + ": PI names changed by regenerating the DSG files");
+		}
+	}
+
+	/**
+	 * Standardize the ship/vessel names for the given cruise.
+	 * 
+	 * @param expocode
+	 * 		expocode of the cruise to standardize
+	 * @throws IllegalArgumentException 
+	 * 		if the DSG file is invalid, 
+	 * 		if the vessel name in the DSG file is not recognized
+	 * @throws IOException 
+	 * 		if there are problems reading or recreating the DSG file
+	 * 		or decimated DSG file.
+	 * @throws InvalidRangeException 
+	 * 		if recreating the DSG file or decimated DSG file throws one
+	 * @throws IllegalAccessException 
+	 * 		if recreating the DSG file or decimated DSG file throws one
+	 */
+	public void standardizeShipNames(String expocode) throws IllegalArgumentException, 
+						IOException, IllegalAccessException, InvalidRangeException {
+		// Get the new ship name from the saved ship name
+		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
+		dsgFile.read(true);
+		SocatMetadata mdata = dsgFile.getMetadata();
+
+		String shipName = mdata.getVesselName().trim();
+		String newShipName = SHIP_RENAME_MAP.get(shipName);
+		if ( newShipName == null )
+			throw new IllegalArgumentException("Ship name not recognized: '" + shipName + "'");
+
+		// If unchanged, nothing to do
+		if ( newShipName.equals(shipName) ) {
+			System.err.println(expocode + ": Ship name unchanged");
+			return;
+		}
+
+		try {
+			// Try to just change the names in the existing DSG files
+			String varName = Constants.SHORT_NAMES.get(Constants.vesselName_VARNAME);
+			dsgFile.updateStringVarValue(varName, newShipName);
+			CruiseDsgNcFile decDsgFile = dsgHandler.getDecDsgNcFile(expocode);
+			decDsgFile.updateStringVarValue(varName, newShipName);
+			System.err.println(expocode + ": Ship name changed in place");
+		} catch (InvalidRangeException ex) {
+			// Name longer than allotted space; regenerate the DSG files
+			dsgFile.read(false);
+			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
+			mdata = dsgFile.getMetadata();
+			mdata.setVesselName(newShipName);
+			// Re-create the full-data DSG file
+			dsgFile.create(mdata, dataList);
+			// Call Ferret to add lon360 and tmonth (calculated data should be the same)
+			SocatTool tool = new SocatTool(ferretConfig);
+			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
+			tool.run();
+			if ( tool.hasError() )
+				throw new IllegalArgumentException(expocode + ": Failure adding computed variables: " + 
+						tool.getErrorMessage());
+			// Re-create the decimated-data DSG file 
+			dsgHandler.decimateCruise(expocode);
+			System.err.println(expocode + ": Ship name changed by regenerating the DSG files");
 		}
 	}
 
@@ -291,8 +509,9 @@ public class CruiseStandardizer {
 		if ( args.length != 1 ) {
 			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
-			System.err.println("Standardizes the PI names for cruises specified in ExpocodesFile. ");
-			System.err.println("The default dashboard configuration is used for this process. ");
+			System.err.println("Standardizes the PI and ship names for cruises specified ");
+			System.err.println("in ExpocodesFile.  The default dashboard configuration is ");
+			System.err.println("used for this process. ");
 			System.err.println();
 			System.exit(1);
 		}
@@ -337,10 +556,11 @@ public class CruiseStandardizer {
 				System.exit(1);
 			}
 
-			// standardize the PI names in each of these cruises
+			// standardize the PI and ship names in each of these cruises
 			for ( String expocode : allExpocodes ) {
 				try {
 					standardizer.standardizePINames(expocode);
+					standardizer.standardizeShipNames(expocode);
 				} catch (Exception ex) {
 					System.err.println("Error updating " + expocode + " : " + ex.getMessage());
 					ex.printStackTrace();

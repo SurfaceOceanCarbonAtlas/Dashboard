@@ -660,68 +660,36 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Updates this DSG file with the given expocode.
+	 * Updates the string recorded for the given variable in this DSG file.
 	 * 
-	 * @param expocode
-	 * 		expocode to assign in the DSG file
+	 * @param varName
+	 * 		name of the variable in this DSG file
+	 * @param newValue
+	 * 		new string value to record in this DSG file
 	 * @throws IllegalArgumentException
-	 * 		if the DSG file is not valid
+	 * 		if this DSG file is not valid
 	 * @throws IOException
-	 * 		if opening or updating the DSG file throws one
+	 * 		if opening or updating this DSG file throws one
 	 * @throws InvalidRangeException 
-	 * 		if writing the updated expocode to the DSG file throws one 
+	 * 		if writing the updated string to this DSG file throws one 
+	 * 		or if the updated string is too long for this DSG file
 	 */
-	public void updateExpocode(String expocode) 
-			throws IllegalArgumentException, IOException, InvalidRangeException {
+	public void updateStringVarValue(String varName, String newValue) 
+		throws IllegalArgumentException, IOException, InvalidRangeException {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
-			String varName = Constants.SHORT_NAMES.get(Constants.expocode_VARNAME);
 			Variable var = ncfile.findVariable(varName);
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			int varLen = var.getShape(1);
-			if ( expocode.length() > varLen )
-				throw new InvalidRangeException("New expocode length (" + 
-						expocode.length() + ") exceeds available space (" + 
+			if ( newValue.length() > varLen )
+				throw new InvalidRangeException("Length of new string (" + 
+						newValue.length() + ") exceeds available space (" + 
 						varLen + ")");
-			ArrayChar.D2 expocodeArray = new ArrayChar.D2(1, varLen);
-			expocodeArray.setString(0, expocode);
-			ncfile.write(var, expocodeArray);
-		} finally {
-			ncfile.close();
-		}
-	}
-
-	/**
-	 * Updates the PI names recorded in the DSG file.
-	 * 
-	 * @param piNames
-	 * 		PI names to record in the DSG file
-	 * @throws IllegalArgumentException
-	 * 		if the DSG file is not valid
-	 * @throws IOException
-	 * 		if opening or updating the DSG file throws one
-	 * @throws InvalidRangeException 
-	 * 		if writing the updated PI names to the DSG file throws one 
-	 */
-	public void updatePINames(String piNames) 
-			throws IllegalArgumentException, IOException, InvalidRangeException {
-		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
-		try {
-			String varName = Constants.SHORT_NAMES.get(Constants.scienceGroup_VARNAME);
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			int varLen = var.getShape(1);
-			if ( piNames.length() > varLen )
-				throw new InvalidRangeException("New PI names length (" + 
-						piNames.length() + ") exceeds available space (" + 
-						varLen + ")");
-			ArrayChar.D2 pisArray = new ArrayChar.D2(1, varLen);
-			pisArray.setString(0, piNames);
-			ncfile.write(var, pisArray);
+			ArrayChar.D2 valArray = new ArrayChar.D2(1, varLen);
+			valArray.setString(0, newValue);
+			ncfile.write(var, valArray);
 		} finally {
 			ncfile.close();
 		}
