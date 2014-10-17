@@ -210,6 +210,7 @@ public class CruiseStandardizer {
 		SHIP_RENAME_MAP.put("Albert Rickmers", "Albert Rickmers");
 		SHIP_RENAME_MAP.put("Alligator Hope", "Alligator Hope");
 		SHIP_RENAME_MAP.put("Almirante irizar", "Almirante Irizar");
+		SHIP_RENAME_MAP.put("Almirante Irizar", "Almirante Irizar");
 		SHIP_RENAME_MAP.put("Antares", "Antares");
 		SHIP_RENAME_MAP.put("Argo", "Argo");
 		SHIP_RENAME_MAP.put("Atlantic  Companion", "Atlantic Companion");
