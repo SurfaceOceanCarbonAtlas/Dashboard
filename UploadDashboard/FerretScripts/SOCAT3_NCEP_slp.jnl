@@ -36,6 +36,8 @@ let ttzero = t[gt=time_to_zero,L=1]
 
 LET dates_for_ncep = 24* days1900(year, month, day) + hour + minute/60 + second/(60*60) + `ttzero`
 
+LET dates_for_ncep = 24* (days1900(year, month, day)+2) + hour + minute/60 + second/(60*60) + `ttzero`
+
 ! Load just the range of time we will need in the call to SAMPLEXYT
 let data_t_lo = INT(dates_for_ncep[i=@min)] - 10) 
 let data_t_hi = INT(dates_for_ncep[i=@max)] + 10) 
