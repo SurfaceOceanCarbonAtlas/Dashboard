@@ -10,329 +10,309 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
 
 public class Task {
-    
-    private static Logger log = LogManager.getLogger(Task.class.getName());
-    
-    /** An array of strings that indicate there is an error in command output */
-    protected String[] ERROR_INDICATOR;
 
-    /** Standard output buffer */
-    protected StringBuffer output;
+	private static Logger log = LogManager.getLogger(Task.class.getName());
 
-    /** Standard error output buffer */
-    protected StringBuffer stderr;
+	/** An array of strings that indicate there is an error in command output */
+	protected String[] ERROR_INDICATOR;
 
-    /** Command string used to create this external process */
-    protected String cmdString;
+	/** Standard output buffer */
+	protected StringBuffer output;
 
-    /** An array of commmands used to create this external process */
-    protected String[] cmd;
+	/** Standard error output buffer */
+	protected StringBuffer stderr;
 
-    /**
-     * String array to describe the environment setting for this external
-     * process
-     */
-    protected String[] env;
+	/** Command string used to create this external process */
+	protected String cmdString;
 
-    /** Work directory for this external process */
-    protected File workDir;
+	/** An array of commmands used to create this external process */
+	protected String[] cmd;
 
-    /** Default time limit in sec for this external process */
-    protected long timeLimit;
+	/**
+	 * String array to describe the environment setting for this external
+	 * process
+	 */
+	protected String[] env;
 
-    /** The Error message, can be blank or null. */
-    protected String errorMessage;
+	/** Work directory for this external process */
+	protected File workDir;
 
-    /** Error indicator. */
-    protected boolean hasError;
-    
-    protected File cancel;
-    
-    /** Sets up an external process. */
-    public Task(String[] cmd, String[] env, File workDir, File cancel, long timeLimit, String[] errors) {
-        this.cmd = cmd;
-        this.env = env;
-        this.workDir = workDir;
-        this.timeLimit = timeLimit;
-        this.cmdString = buildCmdString(cmd);
-        this.output = new StringBuffer();
-        this.stderr = new StringBuffer();
-        this.cancel = cancel;
-        this.ERROR_INDICATOR = errors;
-    }
+	/** Default time limit in sec for this external process */
+	protected long timeLimit;
 
-    /**
-     * Executes the external process, returning when it is finished or when it
-     * exceeds the time limit specified in the constructor.
-     * 
-     * @throws Exception
-     *             If the process fails, or if the output parser finds an error
-     *             message in the output.
-     */
-    public void run() throws Exception {
+	/** The Error message, can be blank or null. */
+	protected String errorMessage;
 
-        try {
-            long startTime = System.currentTimeMillis();
+	/** Error indicator. */
+	protected boolean hasError;
 
-            Process process = Runtime.getRuntime().exec(cmd, env, workDir);
+	protected File cancel;
 
-            if (process == null) {
-                throw new Exception("creation of child process "
-                        + "failed for unknown reasons\n" + "command: "
-                        + cmdString);
-            }
+	/** Sets up an external process. */
+	public Task(String[] cmd, String[] env, File workDir, File cancel, long timeLimit, String[] errors) {
+		this.cmd = cmd;
+		this.env = env;
+		this.workDir = workDir;
+		this.timeLimit = timeLimit;
+		this.cmdString = buildCmdString(cmd);
+		this.output = new StringBuffer();
+		this.stderr = new StringBuffer();
+		this.cancel = cancel;
+		this.ERROR_INDICATOR = errors;
+	}
 
-            finish(process, startTime);
+	/**
+	 * Executes the external process, returning when it is finished or when it
+	 * exceeds the time limit specified in the constructor.
+	 * 
+	 * @throws Exception
+	 *             If the process fails, or if the output parser finds an error
+	 *             message in the output.
+	 */
+	public void run() throws Exception {
 
-        } catch (IOException ioe) {
-            throw new Exception("creation of child process failed\n"
-                    + "command: " + cmdString + ioe);
-        }
-    }
+		try {
+			long startTime = System.currentTimeMillis();
 
-    /**
-     * Executes the external process, returning when it is finished or when it
-     * exceeds the time limit specified.
-     * 
-     * @param timeLimit
-     *            Overrides the time limit specified in the constructor.
-     * @throws Exception
-     *             If the process fails, or if there is an error message (a line
-     *             beginning with "error: ") in the output.
-     */
-    public void run(long timeLimit) throws Exception {
+			Process process = Runtime.getRuntime().exec(cmd, env, workDir);
 
-        long defaultTimeLimit = this.timeLimit;
+			if (process == null) {
+				throw new Exception("creation of child process failed for unknown reasons\n" + 
+						"command: " + cmdString);
+			}
 
-        this.timeLimit = timeLimit;
+			finish(process, startTime);
 
-        try {
-            run();
-        } catch (Exception lase) {
-            throw new Exception(lase.toString());
-        } finally {
-            this.timeLimit = defaultTimeLimit;
-        }
-    }
+		} catch (IOException ioe) {
+			throw new Exception("creation of child process failed\n"
+					+ "command: " + cmdString + ioe);
+		}
+	}
 
-    /**
-     * Returns a printable string version of the external command.
-     */
-    public String getCmd() {
-        return cmdString;
-    }
+	/**
+	 * Executes the external process, returning when it is finished or when it
+	 * exceeds the time limit specified.
+	 * 
+	 * @param timeLimit
+	 *            Overrides the time limit specified in the constructor.
+	 * @throws Exception
+	 *             If the process fails, or if there is an error message (a line
+	 *             beginning with "error: ") in the output.
+	 */
+	public void run(long timeLimit) throws Exception {
 
-    public String getStderr() {
-        return stderr.toString();
-    }
-    
-    /** Returns a string version of the command's console output */
-    public String getOutput() {
-        return output.toString();
-    }
+		long defaultTimeLimit = this.timeLimit;
 
-    /** Returns error state. */
-    public boolean getHasError() {
-        return hasError;
-    }
+		this.timeLimit = timeLimit;
 
-    /** Returns the error message. */
-    public String getErrorMessage() {
-        return errorMessage;
-    }
+		try {
+			run();
+		} catch (Exception lase) {
+			throw new Exception(lase.toString());
+		} finally {
+			this.timeLimit = defaultTimeLimit;
+		}
+	}
 
-    /**
-     * Builds a command string using an array of commands
-     */
-    protected String buildCmdString(String[] cmd) {
-        StringBuffer buffer = new StringBuffer();
-        for (int i = 0; i < cmd.length; i++) {
-            if (i > 0) {
-                buffer.append(" ");
-            }
-            buffer.append(cmd[i]);
-        }
-        return buffer.toString();
-    }
+	/**
+	 * Returns a printable string version of the external command.
+	 */
+	public String getCmd() {
+		return cmdString;
+	}
 
-    /**
-     * Monitors the running process, puts the process's standard output to
-     * <code>output</code> and errors output to <code>stderr</code>. Also
-     * monitors the process' time limit and output limit, checks if there is any
-     * error generated.
-     * <p>
-     * 
-     * @param process
-     *            the running process
-     * @param startTime
-     *            the start time of the process
-     * @throws Exception
-     *             if anything goes wrong
-     */
-    protected void finish(Process process, long startTime) throws Exception {
+	public String getStderr() {
+		return stderr.toString();
+	}
 
-        BufferedReader outstream = new BufferedReader(new InputStreamReader(
-                process.getInputStream()));
-        BufferedReader errstream = new BufferedReader(new InputStreamReader(
-                process.getErrorStream()));
+	/** Returns a string version of the command's console output */
+	public String getOutput() {
+		return output.toString();
+	}
 
-        char[] buffer = new char[1024];
+	/** Returns error state. */
+	public boolean getHasError() {
+		return hasError;
+	}
 
-        // wait in 10ms increments for the script to complete
-        while (true) {
-            try {
-                process.exitValue();
-                break;
-            } catch (IllegalThreadStateException itse) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ie) {
-                }
-                try {
-                    if (outstream.ready()) {
-                        int charsRead = outstream.read(buffer);
-                        output.append(buffer, 0, charsRead);
-                    }
-                } catch (IOException ioe) {
-                }
-                try {
-                    if (errstream.ready()) {
-                        int charsRead = errstream.read(buffer);
-                        stderr.append(buffer, 0, charsRead);
-                    }
-                } catch (IOException ioe) {
-                }
+	/** Returns the error message. */
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 
-                long endTime = System.currentTimeMillis();
-                if (timeLimit > 0 && endTime - startTime > timeLimit * 1000) {
-                    try {
-                        outstream.close();
-                    } catch (IOException ioe) {
-                    }
-                    try {
-                    	errstream.close();
-                    } catch (IOException ioe) {
-                    }
-                    process.destroy();
-                    throw new Exception("process exceeded time limit of "
-                            + timeLimit + " sec");
-                }
-                if (cancel != null && cancel.exists()) {
-                    try {
-                        outstream.close();
-                    } catch (IOException ioe) {
-                    }
-                    try {
-                    	errstream.close();
-                    } catch (IOException ioe) {
-                    }
-                    log.debug("Backend request canceled: "+cmdString);
-                    process.destroy();
-                    cancel.delete();
-                    throw new Exception("Process canceled.");
-                }
-            }
-        }
+	/**
+	 * Builds a command string using an array of commands
+	 */
+	protected String buildCmdString(String[] cmd) {
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < cmd.length; i++) {
+			if (i > 0) {
+				buffer.append(" ");
+			}
+			buffer.append(cmd[i]);
+		}
+		return buffer.toString();
+	}
 
-        try {
-            while (outstream.ready()) {
-                int charsRead = outstream.read(buffer);
-                output.append(buffer, 0, charsRead);
-            }
-        } catch (IOException ioe) {
-        }
-        try {
-            while (errstream.ready()) {
-                int charsRead = errstream.read(buffer);
-                stderr.append(buffer, 0, charsRead);
-            }
-        } catch (IOException ioe) {
-        }
+	/**
+	 * Monitors the running process, puts the process's standard output to
+	 * <code>output</code> and errors output to <code>stderr</code>. Also
+	 * monitors the process' time limit and output limit, checks if there is any
+	 * error generated.
+	 * <p>
+	 * 
+	 * @param process
+	 *            the running process
+	 * @param startTime
+	 *            the start time of the process
+	 * @throws Exception
+	 *             if anything goes wrong
+	 */
+	protected void finish(Process process, long startTime) throws Exception {
 
-        checkErrors();
+		BufferedReader outstream = new BufferedReader(new InputStreamReader(
+				process.getInputStream()));
+		BufferedReader errstream = new BufferedReader(new InputStreamReader(
+				process.getErrorStream()));
+		try {
+			char[] buffer = new char[1024];
 
-        try {
-            outstream.close();
-        } catch (IOException ioe) {
-        }
-        try {
-            errstream.close();
-        } catch (IOException ioe) {
-        }
+			while (true) {
+				try {
+					process.exitValue();
+					break;
+				} catch (IllegalThreadStateException itse) {
+					// wait 10ms for the script to complete
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException ie) {
+					}
 
-    }
+					// pass along any stdout and stderr
+					try {
+						if (outstream.ready()) {
+							int charsRead = outstream.read(buffer);
+							output.append(buffer, 0, charsRead);
+						}
+					} catch (IOException ioe) {
+					}
+					try {
+						if (errstream.ready()) {
+							int charsRead = errstream.read(buffer);
+							stderr.append(buffer, 0, charsRead);
+						}
+					} catch (IOException ioe) {
+					}
 
-    /**
-     * Checks if there is an error after the task is completed.
-     * @throws Exception 
-     * @throws Exception 
-     * 
-     * @throws Exception
-     *             if there is any error
-     */
-    protected void checkErrors() throws Exception   {
+					// check if we have waited too long
+					long endTime = System.currentTimeMillis();
+					if (timeLimit > 0 && endTime - startTime > timeLimit * 1000) {
+						process.destroy();
+						throw new Exception("process exceeded time limit of " + timeLimit + " sec");
+					}
 
-        BufferedReader in = new BufferedReader(new StringReader(stderr
-                .toString()));
-        boolean stderrErrors = findErrorsInStream(in);
+					// check if the request was canceled
+					if (cancel != null && cancel.exists()) {
+						log.debug("Backend request canceled: "+cmdString);
+						process.destroy();
+						cancel.delete();
+						throw new Exception("Process canceled.");
+					}
+				}
+			}
 
-        in = new BufferedReader(new StringReader(output.toString()));
-        boolean stdoutErrors = findErrorsInStream(in);
-        
-        hasError = stderrErrors || stdoutErrors;
-        
-    }
+			// pass along any remaining stdout and stderr
+			try {
+				while (outstream.ready()) {
+					int charsRead = outstream.read(buffer);
+					output.append(buffer, 0, charsRead);
+				}
+			} catch (IOException ioe) {
+			}
+			try {
+				while (errstream.ready()) {
+					int charsRead = errstream.read(buffer);
+					stderr.append(buffer, 0, charsRead);
+				}
+			} catch (IOException ioe) {
+			}
 
-    /**
-     * Look for error information in an input stream. If there is an indication
-     * of error, an Exception will be thrown.
-     * @throws Exception 
-     */
-    protected boolean findErrorsInStream(BufferedReader in) throws Exception  {
-        String line;
-        int i;
-        boolean foundError = false;
-        StringBuffer msg = new StringBuffer();
-        try {
-            while ((line = in.readLine()) != null) {
-                if (!foundError) {
-                    for (i = 0; i < ERROR_INDICATOR.length; i += 1) {
-                        if (line.trim().startsWith(ERROR_INDICATOR[i])) {
-                            msg.append(line.substring(ERROR_INDICATOR[i]
-                                    .length()));
-                            foundError = true;
-                            break;
-                        }
-                    }
-                } else {
-                    for (i = 0; i < ERROR_INDICATOR.length; i += 1) {
-                        if (line.trim().startsWith(ERROR_INDICATOR[i])) {
-                            msg.append(";"
-                                    + line.substring(ERROR_INDICATOR[i]
-                                            .length()));
-                            errorMessage = msg.toString().replaceAll("\"", "&quot;");
-                        }
-                    }
-                    String solidLine = line.trim();
-                    if (solidLine.length() > 0) {
-                        char firstChar = solidLine.charAt(0);
-                        if ((firstChar <= 'A' || firstChar >= 'Z')) {
-                            msg.append(" " + solidLine);
-                        }
-                    }
-                    errorMessage = msg.toString().replaceAll("\"", "&quot;");
-                }
-            }
+			// check if any error messages were output by the process
+			checkErrors();
 
-            if (foundError) {
-               errorMessage = msg.toString().replaceAll("\"", "&quot;");
-            }
+		} finally {
+			outstream.close();
+			errstream.close();
+		}
+	}
 
-        } catch (IOException ioe) {
-            throw new Exception("Script output error scan failed: "
-                    + ioe.getMessage());
-        }
-        
-        return foundError;
-    }
+	/**
+	 * Checks if there is an error after the task is completed.
+	 * @throws Exception 
+	 * @throws Exception 
+	 * 
+	 * @throws Exception
+	 *             if there is any error
+	 */
+	protected void checkErrors() throws Exception   {
+
+		BufferedReader in = new BufferedReader(new StringReader(stderr
+				.toString()));
+		boolean stderrErrors = findErrorsInStream(in);
+
+		in = new BufferedReader(new StringReader(output.toString()));
+		boolean stdoutErrors = findErrorsInStream(in);
+
+		hasError = stderrErrors || stdoutErrors;
+
+	}
+
+	/**
+	 * Look for error information in an input stream. If there is an indication
+	 * of error, an Exception will be thrown.
+	 * @throws Exception 
+	 */
+	protected boolean findErrorsInStream(BufferedReader in) throws Exception  {
+		String line;
+		int i;
+		boolean foundError = false;
+		StringBuffer msg = new StringBuffer();
+		try {
+			while ((line = in.readLine()) != null) {
+				if (!foundError) {
+					for (i = 0; i < ERROR_INDICATOR.length; i += 1) {
+						if (line.trim().startsWith(ERROR_INDICATOR[i])) {
+							msg.append(line.substring(ERROR_INDICATOR[i].length()));
+							foundError = true;
+							break;
+						}
+					}
+				} else {
+					for (i = 0; i < ERROR_INDICATOR.length; i += 1) {
+						if (line.trim().startsWith(ERROR_INDICATOR[i])) {
+							msg.append(";" + line.substring(ERROR_INDICATOR[i].length()));
+							errorMessage = msg.toString().replaceAll("\"", "&quot;");
+						}
+					}
+					String solidLine = line.trim();
+					if (solidLine.length() > 0) {
+						char firstChar = solidLine.charAt(0);
+						if ((firstChar <= 'A' || firstChar >= 'Z')) {
+							msg.append(" " + solidLine);
+						}
+					}
+					errorMessage = msg.toString().replaceAll("\"", "&quot;");
+				}
+			}
+
+			if (foundError) {
+				errorMessage = msg.toString().replaceAll("\"", "&quot;");
+			}
+
+		} catch (IOException ioe) {
+			throw new Exception("Script output error scan failed: " + ioe.getMessage());
+		}
+
+		return foundError;
+	}
 }
