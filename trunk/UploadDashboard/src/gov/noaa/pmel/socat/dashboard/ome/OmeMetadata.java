@@ -216,7 +216,7 @@ public class OmeMetadata extends DashboardMetadata {
 	private OMEVariable measurementAndCalibrationReport = null;
 	private OMEVariable preliminaryQualityControl = null;
 	
-	private List<OMECompositeVariable> dataSetLinks = new ArrayList<OMECompositeVariable>();
+//	private List<OMECompositeVariable> dataSetLinks = new ArrayList<OMECompositeVariable>();
 	
 	private OMEVariable status = null;
 	private OMEVariable form_type = null;
@@ -701,16 +701,16 @@ public class OmeMetadata extends DashboardMetadata {
 		preliminaryQualityControl = new OMEVariable(null, rootElem, "Preliminary_Quality_control");
 		
 		// <Data_Set_Link>s
-		Path dataSetLinkPath = new Path(null, "Data_Set_Link");
-		for (Element dataSetLinkElem : rootElem.getChildren("Data_Set_Link")) {
+//		Path dataSetLinkPath = new Path(null, "Data_Set_Link");
+//		for (Element dataSetLinkElem : rootElem.getChildren("Data_Set_Link")) {
 			
-			OMECompositeVariable dataSetLinkDetails = new OMECompositeVariable(dataSetLinkPath, "URL");
-			dataSetLinkDetails.addEntry("URL", dataSetLinkElem);
-			dataSetLinkDetails.addEntry("Label", dataSetLinkElem);
-			dataSetLinkDetails.addEntry("Link_Note", dataSetLinkElem);
+//			OMECompositeVariable dataSetLinkDetails = new OMECompositeVariable(dataSetLinkPath, "URL");
+//			dataSetLinkDetails.addEntry("URL", dataSetLinkElem);
+//			dataSetLinkDetails.addEntry("Label", dataSetLinkElem);
+//			dataSetLinkDetails.addEntry("Link_Note", dataSetLinkElem);
 			
-			dataSetLinks.add(dataSetLinkDetails);
-		}
+//			dataSetLinks.add(dataSetLinkDetails);
+//		}
 		
 		// More miscellaneous root tags
 		status = new OMEVariable(null, rootElem, "status");
@@ -1025,9 +1025,9 @@ public class OmeMetadata extends DashboardMetadata {
 		preliminaryQualityControl.generateXMLContent(rootElem, conflictElem);
 		
 		// <Data_Set_Link> (multiple)
-		for (OMECompositeVariable dataSetLink : dataSetLinks) {
-			dataSetLink.generateXMLContent(rootElem, conflictElem);
-		}
+//		for (OMECompositeVariable dataSetLink : dataSetLinks) {
+//			dataSetLink.generateXMLContent(rootElem, conflictElem);
+//		}
 		// End <Data_Set_Link>
 		
 		// More misc root-level elements
@@ -1116,12 +1116,12 @@ public class OmeMetadata extends DashboardMetadata {
 			scMData.setEndTime(null);
 		}
 		
-		String firstDataSetLink = "";
-		if (dataSetLinks.size() > 0) {
-			OMECompositeVariable dataSetLink = dataSetLinks.get(0);
-			firstDataSetLink = dataSetLink.getValue("URL");
-		}
-		scMData.setOrigDataRef(firstDataSetLink);
+//		String firstDataSetLink = "";
+//		if (dataSetLinks.size() > 0) {
+//			OMECompositeVariable dataSetLink = dataSetLinks.get(0);
+//			firstDataSetLink = dataSetLink.getValue("URL");
+//		}
+//		scMData.setOrigDataRef(firstDataSetLink);
 		
 		StringBuffer scienceGroup = new StringBuffer();
 		List<String> usedOrganizations = new ArrayList<String>(investigators.size());
@@ -1388,7 +1388,7 @@ public class OmeMetadata extends DashboardMetadata {
 		dest.measurementAndCalibrationReport.addValues(newValues.measurementAndCalibrationReport.getAllValues());
 		dest.preliminaryQualityControl.addValues(newValues.preliminaryQualityControl.getAllValues());
 
-		dest.dataSetLinks = OMECompositeVariable.mergeVariables(dest.dataSetLinks, newValues.dataSetLinks);
+//		dest.dataSetLinks = OMECompositeVariable.mergeVariables(dest.dataSetLinks, newValues.dataSetLinks);
 
 		dest.status.addValues(newValues.status.getAllValues());
 		dest.form_type.addValues(newValues.form_type.getAllValues());
@@ -1544,10 +1544,10 @@ public class OmeMetadata extends DashboardMetadata {
 		clone.measurementAndCalibrationReport = (OMEVariable) measurementAndCalibrationReport.clone();
 		clone.preliminaryQualityControl = (OMEVariable) preliminaryQualityControl.clone();
 
-		clone.dataSetLinks = new ArrayList<OMECompositeVariable>(dataSetLinks.size());
-		for (OMECompositeVariable dataSetLink : dataSetLinks) {
-			clone.dataSetLinks.add((OMECompositeVariable) dataSetLink.clone());
-		}
+//		clone.dataSetLinks = new ArrayList<OMECompositeVariable>(dataSetLinks.size());
+//		for (OMECompositeVariable dataSetLink : dataSetLinks) {
+//			clone.dataSetLinks.add((OMECompositeVariable) dataSetLink.clone());
+//		}
 		
 		clone.status = (OMEVariable) status.clone();
 		clone.form_type = (OMEVariable) form_type.clone();
