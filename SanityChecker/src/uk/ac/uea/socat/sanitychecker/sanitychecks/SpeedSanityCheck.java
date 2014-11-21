@@ -4,15 +4,24 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * Sanity checker to check a ship's speed between two records
  */
 public class SpeedSanityCheck extends SanityCheck {
+
+	private static final String SPEED_ID = "SHIP_SPEED";
+	
+	private static MessageType SPEED_TYPE = null;
+	
+	private static final String BACKWARDS_TIME_ID = "BACKWARDS_TIME";
+	
+	private static MessageType BACKWARDS_TIME_TYPE = null;
 
 	/**
 	 * The radius of the earth in kilometres
@@ -56,6 +65,14 @@ public class SpeedSanityCheck extends SanityCheck {
 		if (itsQuestionableSpeedLimit > itsBadSpeedLimit) {
 			throw new SanityCheckException("Bad speed limit must be >= Questionable speed limit"); 
 		}
+		
+		if (null == BACKWARDS_TIME_TYPE) {
+			BACKWARDS_TIME_TYPE = new MessageType(BACKWARDS_TIME_ID, "The timestamp is either identical to or before the previous record", "Times out of order");
+		}
+
+		if (null == SPEED_TYPE) {
+			SPEED_TYPE = new MessageType(SPEED_ID, "Ship speed is faster than " + MessageType.VALID_VALUE_IDENTIFIER + "km/h", "Ship speed is too fast");
+		}
 	}
 	
 	@Override
@@ -79,13 +96,13 @@ public class SpeedSanityCheck extends SanityCheck {
 					double hourDiff = calcHourDiff(lastTime, thisTime);
 					
 					if (hourDiff <= 0.0) {
-						itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "The timestamp is either before or identical to the previous record"));
+						itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, BACKWARDS_TIME_TYPE, Message.ERROR, record.getLineNumber(), null, null));
 					} else if (calcSecondsDiff(lastTime, thisTime) > 1) {
 						double speed = distance / hourDiff;
 						if (speed > itsBadSpeedLimit) {
-							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.ERROR, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsBadSpeedLimit + "km/h"));
+							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, SPEED_TYPE, Message.ERROR, record.getLineNumber(), Double.toString(speed), Double.toString(itsBadSpeedLimit)));
 						} else if (speed > itsQuestionableSpeedLimit) {
-							itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Ship speed between measurements is " + String.format("%1$,.2f", speed) + "km/h: should be <= " + itsQuestionableSpeedLimit + "km/h"));
+							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, SPEED_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(speed), Double.toString(itsQuestionableSpeedLimit)));
 						}
 					}
 				}
@@ -95,7 +112,7 @@ public class SpeedSanityCheck extends SanityCheck {
 			itsLastRecord = record;
 		}
 	}
-	
+
 	/**
 	 * Determines whether or not the pertinent flags in the record are bad. If they are,
 	 * we don't process it.

@@ -8,6 +8,7 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * Sanity check to detect outliers by spotting values
@@ -19,6 +20,10 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  */
 public class OutlierSanityCheck extends SanityCheck {
 	
+	private static final String OUTLIER_ID = "OUTLIER";
+	
+	private static MessageType OUTLIER_TYPE = null;
+
 	/**
 	 * The name of the column to be checked
 	 */
@@ -69,6 +74,10 @@ public class OutlierSanityCheck extends SanityCheck {
 			throw new SanityCheckException("Standard deviation limit must be numeric");
 		}
 		
+		if (null == OUTLIER_TYPE) {
+			OUTLIER_TYPE = new MessageType(OUTLIER_ID, "Value in column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' (" + MessageType.FIELD_VALUE_IDENTIFIER + ") is outside " + MessageType.VALID_VALUE_IDENTIFIER + " standard deviations from the mean", "Outlier in column '" + MessageType.COLUMN_NAME_IDENTIFIER);
+		}
+
 		itsRecordValues = new ArrayList<RecordValue>();
 	}
 	
@@ -107,9 +116,8 @@ public class OutlierSanityCheck extends SanityCheck {
 			
 			if (diffFromMean > (itsStdev * itsStdevLimit)) {
 				try {
-					String message = "Value (" + recordValue.value + ") is outside " + itsStdevLimit + " standard deviations from mean";
 					SocatDataRecord record = recordValue.record;
-					record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
+					record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), OUTLIER_TYPE, Double.toString(recordValue.value), Double.toString(itsStdevLimit));
 				} catch (SocatDataBaseException e) {
 					throw new SanityCheckException ("Error while setting flag on record", e);
 				}

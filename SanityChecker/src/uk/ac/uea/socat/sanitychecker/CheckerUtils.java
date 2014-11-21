@@ -68,6 +68,21 @@ public class CheckerUtils {
 	}
 	
 	/**
+	 * Convert a list of strings to a single list, separated by spaces.
+	 * @param stringList The list of strings
+	 * @return The converted string
+	 */
+	public static String listToString(List<String> stringList) {
+		StringBuffer result = new StringBuffer();
+		for (String string : stringList) {
+			result.append(string);
+			result.append(' ');
+		}
+		
+		return result.toString().trim();
+	}
+	
+	/**
 	 * Determines whether or not a line is a comment, signified by it starting with {@code #} or {@code !} or {@code //}
 	 * @param line The line to be checked
 	 * @return {@code true} if the line is a comment; {@code false} otherwise.

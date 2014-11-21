@@ -19,7 +19,9 @@ public class VesselLookupMetadataItem extends MetadataItem {
 	/**
 	 * Constructs a metadata item object.
 	 * @param config The configuration for the metadata item
-	 * @param value The value of the metadata item
+	 * @param line The line number of the file on which this item occurs. If the item has come from the command line, pass {@code -1}.
+ 	 * @param messages the set of output message
+	 * @param logger The system logger
 	 * @throws ParseException If the supplied in value could not be parsed into the correct data type
 	 */
 	public VesselLookupMetadataItem(MetadataConfigItem config, int line, Logger logger) throws ParseException, DateTimeException {

@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.Properties;
 import java.util.ArrayList;
 
@@ -19,6 +18,10 @@ import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageException;
+import uk.ac.uea.socat.sanitychecker.messages.MessageSummary;
+import uk.ac.uea.socat.sanitychecker.messages.Messages;
 
 /**
  * This is an executable that can run the Sanity Checker as a standalone program.
@@ -146,14 +149,9 @@ public class SanityCheckerRun {
 				
 				Messages messages = checkerOutput.getMessages();
 				if (messages != null) {
-					//System.out.println("Metadata messages: " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.METADATA_MESSAGE, Message.WARNING) + " warnings");
-					//System.out.println("Data messages: " + messages.getMessageCount(Message.DATA_MESSAGE, Message.ERROR) + " errors, " + messages.getMessageCount(Message.DATA_MESSAGE, Message.WARNING) + " warnings");
-					System.out.println(itsDataFilename + "," + checkerOutput.getRecordCount() + "," + messages.getMessageCount(Message.METADATA_MESSAGE, Message.ERROR) + "," + messages.getMessageCount(Message.METADATA_MESSAGE, Message.WARNING) + "," + messages.getMessageCount(Message.DATA_MESSAGE, Message.ERROR) + "," + messages.getMessageCount(Message.DATA_MESSAGE, Message.WARNING));
-				
-					// Write complete messages to file
 					try {
 						writeMessages(messages);
-					} catch (IOException e) {
+					} catch (Exception e) {
 						System.out.println("ERROR WRITING OUTPUT FILES");
 						e.printStackTrace();
 					}
@@ -171,17 +169,19 @@ public class SanityCheckerRun {
 	 * @param messages The messages to be written
 	 * @throws IOException If writing to the file fails.
 	 */
-	private void writeMessages(Messages messages) throws IOException {
+	private void writeMessages(Messages messages) throws IOException, MessageException {
 		
 		PrintWriter writer = new PrintWriter(new File(itsOutputDir, getMessagesFilename()));
-		List<Message> metadataMessages = messages.getMessagesByType(Message.METADATA_MESSAGE);
-		for (Message message: metadataMessages) {
-			writer.println(message.toString());
+		for (MessageSummary summary : messages.getMessageSummaries()) {
+			writer.println(summary.getSummaryString() + " - " + summary.getWarningCount() + " warnings, " + summary.getErrorCount() + " errors");
 		}
-		List<Message> dataMessages = messages.getMessagesByType(Message.DATA_MESSAGE);
-		for (Message message: dataMessages) {
-			writer.println(message.toString());
+		
+		writer.print("\n\n\n");
+		
+		for (Message message : messages.getMessages()) {
+			writer.println(message.getMessageString());
 		}
+
 		writer.close();
 	}
 

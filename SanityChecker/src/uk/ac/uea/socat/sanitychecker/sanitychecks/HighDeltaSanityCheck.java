@@ -10,6 +10,7 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * Sanity check to detect sudden jumps between measurements,
@@ -20,6 +21,11 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  *
  */
 public class HighDeltaSanityCheck extends SanityCheck {
+	
+	private static final String HIGH_DELTA_ID = "HIGH_DELTA";
+	
+	private static MessageType HIGH_DELTA_TYPE = null;
+
 	
 	private static final double NO_VALUE = -99999.9;
 	
@@ -68,6 +74,10 @@ public class HighDeltaSanityCheck extends SanityCheck {
 		} catch(NumberFormatException e) {
 			throw new SanityCheckException("Delta parameter must be numeric");
 		}
+		
+		if (null == HIGH_DELTA_TYPE) {
+			HIGH_DELTA_TYPE = new MessageType(HIGH_DELTA_ID, "Value in column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' changes faster than " + MessageType.VALID_VALUE_IDENTIFIER + " per minute", "Value in column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' changes too fast");
+		}
 	}
 	
 	@Override
@@ -91,8 +101,7 @@ public class HighDeltaSanityCheck extends SanityCheck {
 				double deltaPerMinute = valueDelta / minutesDifference;
 				if (deltaPerMinute > itsMaxDelta) {
 					try {
-						String message = "Value changes faster than " + itsMaxDelta + " per minute";
-						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
+						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), HIGH_DELTA_TYPE, null, Double.toString(itsMaxDelta));
 					} catch (SocatDataBaseException e) {
 						throw new SanityCheckException ("Error while setting flag on record", e);
 					}

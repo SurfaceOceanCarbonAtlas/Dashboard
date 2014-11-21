@@ -1,7 +1,5 @@
 package uk.ac.uea.socat.sanitychecker;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -30,6 +28,9 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageException;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataException;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
@@ -46,6 +47,34 @@ import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
  * 
  */
 public class SanityChecker {
+	
+	private static final String INTERNAL_ERROR_ID = "INTERNAL";
+	
+	private MessageType itsInternalErrorType;
+	
+	private static final String MISSING_VALUE_ID = "MISSING_VALUE";
+	
+	private MessageType itsMissingValueType;
+	
+	private static final String MISSING_METADATA_ID = "MISSING_METADATA_VALUE";
+	
+	private MessageType itsMissingMetadataType;
+	
+	private static final String MISSING_METADATA_GROUP_ID = "MISSING_METADATA_GROUP";
+	
+	private MessageType itsMissingMetadataGroupType;
+	
+	private static final String RANGE_ID = "RANGE";
+	
+	private MessageType itsRangeType;
+	
+	private static final String UNRECOGNISED_METADATA_ID = "UNRECOGNISED_METADATA";
+	
+	private MessageType itsUnrecognisedMetadataType;
+	
+	private static final String INVALID_METADATA_DATE = "INVALID_METADATA_DATE";
+	
+	private MessageType itsInvalidMetadataDateType;
 
 	/**
 	 * The standard output output format for dates
@@ -141,7 +170,20 @@ public class SanityChecker {
 		
 		itsLogger = Logger.getLogger("Sanity Checker - " + filename);
 		itsLogger.trace("SanityChecker initialised");
-
+		
+		/*
+		 * Initialise message types
+		 */
+		itsInternalErrorType = new MessageType(INTERNAL_ERROR_ID, "Internal Error", "Internal Error");
+		itsMissingValueType = new MessageType(MISSING_VALUE_ID, "Missing value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "'", "Missing value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "'");
+		itsRangeType = new MessageType(RANGE_ID, "Value '" + MessageType.FIELD_VALUE_IDENTIFIER + "' in column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' is outside the range '" + MessageType.VALID_VALUE_IDENTIFIER + "'", "Column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' out of range");
+		itsUnrecognisedMetadataType = new MessageType(UNRECOGNISED_METADATA_ID, "Unrecognised metadata item '" + MessageType.FIELD_VALUE_IDENTIFIER + "'", "Unrecognised metadata item");
+		
+		// Note that we cheat here, and pass in the metadata item name as the value.
+		itsMissingMetadataType = new MessageType(MISSING_METADATA_ID, "Missing metadata value '" + MessageType.FIELD_VALUE_IDENTIFIER + "'", "Missing metadata value");
+		itsInvalidMetadataDateType = new MessageType(INVALID_METADATA_DATE, "Invalid date in metadata item '" + MessageType.FIELD_VALUE_IDENTIFIER + "'", "Invalid date in metadata");
+		itsMissingMetadataGroupType = new MessageType(MISSING_METADATA_GROUP_ID, "At least one of the metadata items '" + MessageType.FIELD_VALUE_IDENTIFIER + "' must be present", "Missing metadata value");
+				
 		// Make sure the the base configuration is set up. Otherwise we can't do anything!
 		if (!BaseConfig.isInitialised()) {
 			itsLogger.fatal("Base Configuration has not been initialised - call initBaseConfig first!");
@@ -191,7 +233,7 @@ public class SanityChecker {
 				for (List<String> record: itsInputData) {
 					itsRecordCount++;
 					itsLogger.trace("Processing record " + itsRecordCount);
-					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger, itsOutput);
+					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
 					itsOutput.addRecord(socatRecord);
 					itsOutput.addMessages(socatRecord.getMessages());
 				}
@@ -208,19 +250,14 @@ public class SanityChecker {
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
-			Message message = new Message(Message.DATA_MESSAGE, Message.ERROR, itsRecordCount, "Unhandled exception encountered");
-			message.addProperty("Exception", e.getClass().getCanonicalName());
-			message.addProperty("Error", e.getMessage());
-			
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			sw.toString();
-			message.addProperty("Stack Trace", sw.toString());
-			
-			itsOutput.addMessage(message);
-			itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
-			itsOutput.clear(true);
+			Message message = new Message(Message.NO_COLUMN_INDEX, itsInternalErrorType, Message.ERROR, Message.NO_LINE_NUMBER, e.getClass().getCanonicalName() + ": " + e.getMessage(), "");
+			try {
+				itsOutput.addMessage(message);
+				itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
+				itsOutput.clear(true);
+			} catch (Exception e2) {
+				itsLogger.fatal("Error while storing exception in output messages", e2);
+			}
 		}
 
 		return itsOutput;
@@ -230,8 +267,9 @@ public class SanityChecker {
 	 * Runs the individual sanity check modules over the processed data.
 	 * @throws ConfigException If the Sanity Checker modules are badly configured.
 	 * @throws SanityCheckException If errors are encountered while performing the sanity checks.
+	 * @throws MessageException If errors occur while generating and storing messages
 	 */
-	private void runSanityChecks() throws ConfigException, SanityCheckException {
+	private void runSanityChecks() throws ConfigException, SanityCheckException, MessageException {
 		
 		List<SanityCheck> checkers = SanityCheckConfig.getInstance().getCheckers();
 		
@@ -334,7 +372,7 @@ public class SanityChecker {
 	 * at a later date if automatically detecting this is better than asking users
 	 * to specify it.
 	 */
-	private void checkDataValues() throws ConfigException, SocatDataBaseException {
+	private void checkDataValues() throws ConfigException, SocatDataBaseException, MessageException {
 		/*
 		 * Loop through all the numeric columns, searching for candidates for
 		 * values that indicate missing data. For each column this is the
@@ -416,7 +454,7 @@ public class SanityChecker {
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
 							// No required group, so we just report the missing value
 							itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
+							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), itsMissingValueType, null, null);
 						} else {
 							// We're in a required group, so check the values from the other fields.
 							// Only if they're all missing do we set the missing flag
@@ -426,7 +464,7 @@ public class SanityChecker {
 								// Only report required group columns that are in the input file
 								if (null != column.getInputColumnName()) {
 									itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-									column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, "Missing required value");
+									column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), itsMissingValueType, null, null);
 								}
 							}
 						}
@@ -437,7 +475,7 @@ public class SanityChecker {
 					// any action here as it will already have been handled when the values in the record were set.
 					if (CheckerUtils.isNumeric(column.getValue())) {						
 						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
-						StringBuffer messageBuilder = null;
+						StringBuffer rangeString = null;
 
 						switch (rangeCheckFlag) {
 						case SocatColumnConfigItem.GOOD_FLAG: {
@@ -445,31 +483,24 @@ public class SanityChecker {
 							break;
 						}
 						case SocatColumnConfigItem.QUESTIONABLE_FLAG: {
-							messageBuilder = new StringBuffer("Value ");
-							messageBuilder.append(column.getValue());
-							messageBuilder.append(" is outside the expected range (");
-							messageBuilder.append(columnConfig.getQuestionableRangeMin());
-							messageBuilder.append(":");
-							messageBuilder.append(columnConfig.getQuestionableRangeMax());
-							messageBuilder.append(")");
+							rangeString = new StringBuffer();
+							rangeString.append(columnConfig.getQuestionableRangeMin());
+							rangeString.append(":");
+							rangeString.append(columnConfig.getQuestionableRangeMax());
 							break;
 						}
 						case SocatColumnConfigItem.BAD_FLAG:
 						{
-							messageBuilder = new StringBuffer("Value ");
-							messageBuilder.append(column.getValue());
-							messageBuilder.append(" is outside the extreme range (");
-							messageBuilder.append(columnConfig.getBadRangeMin());
-							messageBuilder.append(":");
-							messageBuilder.append(columnConfig.getBadRangeMax());
-							messageBuilder.append(")");
+							rangeString = new StringBuffer("Value ");
+							rangeString.append(columnConfig.getBadRangeMin());
+							rangeString.append(":");
+							rangeString.append(columnConfig.getBadRangeMax());
 							break;
 						}
 						}
 						
-						if (null != messageBuilder) {
-							itsLogger.trace(messageBuilder.toString());
-							column.setFlag(rangeCheckFlag, messages, currentRecord, messageBuilder.toString());
+						if (null != rangeString) {
+							column.setFlag(rangeCheckFlag, messages, currentRecord, column.getInputColumnIndex(), itsRangeType, column.getValue(), rangeString.toString());
 						}
 					}
 				}
@@ -492,7 +523,7 @@ public class SanityChecker {
 			if (null == config) {
 				itsLogger.trace("Unrecognised metadata item '" + name);
 				
-				Message message = new Message(Message.METADATA_MESSAGE, Message.WARNING, -1, "Unrecognised metadata item");
+				Message message = new Message(Message.NO_COLUMN_INDEX, itsUnrecognisedMetadataType, Message.WARNING, Message.NO_LINE_NUMBER, name, null);
 				itsOutput.addMessage(message);
 				itsLogger.warn("Unrecognised metadata item " + name);
 			} else {
@@ -502,7 +533,9 @@ public class SanityChecker {
 					itsOutput.addMetadataItem(createMetadataItem(name, value, -1));					
 				} catch (Exception e) {
 					if (e.getCause() instanceof DateTimeException) {
-						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, name, "Invalid date format");
+						
+						// Note that we cheat and pass the metadata item name as the value.
+						Message message = new Message(Message.NO_COLUMN_INDEX, itsInvalidMetadataDateType, Message.ERROR, Message.NO_LINE_NUMBER, name, null);
 						itsOutput.addMessage(message);
 						itsLogger.error("Invalid date format for metadata item " + name);
 					} else {
@@ -522,7 +555,7 @@ public class SanityChecker {
 	 * @param metadata The metadata to be validated
 	 * @return {@code false} if required items are missing but cannot be generated from the data; {@code true} otherwise.
 	 */
-	private boolean validateMetadata(Map<String, MetadataItem> metadata) throws ConfigException {
+	private boolean validateMetadata(Map<String, MetadataItem> metadata) throws ConfigException, MessageException {
 		boolean validatedOK = true;
 
 		// Ensure that all required values are present
@@ -558,7 +591,7 @@ public class SanityChecker {
 	 * @param metadata The metadata to be checked
 	 * @return {@code true} if all required metadata entries are present; {@code false} otherwise.
 	 */
-	private boolean checkRequiredMetadata(Map<String, MetadataItem> metadata) throws ConfigException {
+	private boolean checkRequiredMetadata(Map<String, MetadataItem> metadata) throws ConfigException, MessageException {
 		boolean ok = true;
 
 		for (String metadataName : MetadataConfig.getInstance().getConfigItemNames()) {
@@ -571,7 +604,7 @@ public class SanityChecker {
 						itsLogger.error("Required metadata item '" + metadataName + "' is missing");
 						ok = false;
 
-						Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, metadataName, "Required metadata value is missing");
+						Message message = new Message(Message.NO_COLUMN_INDEX, itsMissingMetadataType, Message.ERROR, Message.NO_LINE_NUMBER, metadataName, null);
 						itsOutput.addMessage(message);
 					}
 				}
@@ -586,7 +619,7 @@ public class SanityChecker {
 	 * @param metadata
 	 * @return
 	 */
-	private boolean checkRequiredMetadataGroups(Map<String, MetadataItem> metadata) throws ConfigException {
+	private boolean checkRequiredMetadataGroups(Map<String, MetadataItem> metadata) throws ConfigException, MessageException {
 		boolean ok = true;
 		
 		MetadataConfigRequiredGroups requiredGroups = MetadataConfig.getInstance().getRequiredGroups();
@@ -605,7 +638,7 @@ public class SanityChecker {
 				itsLogger.error("At least one of " + groupedItemNames + " must be present in the metadata");
 				ok = false;
 				
-				Message message = new Message(Message.METADATA_MESSAGE, Message.ERROR, -1, groupedItemNames.toString(), "At least one of these metadata items must be present");
+				Message message = new Message(Message.NO_COLUMN_INDEX, itsMissingMetadataGroupType, Message.ERROR, Message.NO_LINE_NUMBER, groupedItemNames.toString(), null);
 				itsOutput.addMessage(message);
 			}
 		}
