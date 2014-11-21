@@ -8,6 +8,7 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * Sanity check to ensure that the column value in every
@@ -17,6 +18,10 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  *
  */
 public class FixedValueSanityCheck extends SanityCheck {
+
+	private static final String FIXED_VALUE_ID = "FIXED_VALUE";
+	
+	private static MessageType FIXED_VALUE_TYPE = null;
 
 	/**
 	 * The name of the column that must contain the column value
@@ -54,6 +59,10 @@ public class FixedValueSanityCheck extends SanityCheck {
 		} catch (ConfigException e) {
 			throw new SanityCheckException("Unhandled error while checking FixedValueSanityCheck parameters", e);
 		}
+
+		if (null == FIXED_VALUE_TYPE) {
+			FIXED_VALUE_TYPE = new MessageType(FIXED_VALUE_ID, "Value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' has changed - it must be the same in all records", "Value for column '"+ MessageType.COLUMN_NAME_IDENTIFIER + "' not fixed");
+		}
 	}
 
 	@Override
@@ -74,8 +83,7 @@ public class FixedValueSanityCheck extends SanityCheck {
 
 		if ( value.compareTo(itsFixedValue) != 0 ) {
 			try {
-				String message = "Value for column has changed - it must be the same in all records";
-				record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
+				record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), FIXED_VALUE_TYPE, null, null);
 			}
 			catch (SocatDataBaseException e) {
 				throw new SanityCheckException ("Error while setting flag on record", e);

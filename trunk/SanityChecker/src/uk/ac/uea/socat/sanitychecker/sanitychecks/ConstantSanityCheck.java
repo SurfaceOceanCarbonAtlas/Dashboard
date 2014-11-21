@@ -11,6 +11,7 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * Sanity check to ensure that a given column's value
@@ -19,6 +20,10 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  *
  */
 public class ConstantSanityCheck extends SanityCheck {
+	
+	private static final String CONSTANT_ID = "CONSTANT";
+	
+	private static MessageType CONSTANT_TYPE = null;
 	
 	/**
 	 * The name of the column to be changed
@@ -60,6 +65,12 @@ public class ConstantSanityCheck extends SanityCheck {
 		} catch(NumberFormatException e) {
 			throw new SanityCheckException("Duration parameter must be numeric");
 		}
+		
+		if (null == CONSTANT_TYPE) {
+			CONSTANT_TYPE = new MessageType(CONSTANT_ID, "Value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' is constant at '" + MessageType.FIELD_VALUE_IDENTIFIER + "' for more than " + MessageType.VALID_VALUE_IDENTIFIER + " minutes", "Column '"+ MessageType.COLUMN_NAME_IDENTIFIER + "' constant for too long");
+		}
+
+		
 	}
 	
 	@Override
@@ -155,11 +166,8 @@ public class ConstantSanityCheck extends SanityCheck {
 			
 			if (minutesDifference > itsMaxDuration) {
 				try {
-					String message = "Value for column is constant at " + getRecordValue(itsRecords.get(0)) + " for " + 
-				                     new DecimalFormat("#").format(minutesDifference) + " minutes";
-					
 					for (SocatDataRecord record : itsRecords) {
-						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), message);
+						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsRecords.get(0).getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), CONSTANT_TYPE, new DecimalFormat("#").format(minutesDifference), Integer.toString(itsMaxDuration));
 					}
 				} catch (SocatDataBaseException e) {
 					throw new SanityCheckException ("Error while setting flag on record", e);

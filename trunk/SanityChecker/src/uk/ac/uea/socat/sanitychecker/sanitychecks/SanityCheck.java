@@ -3,8 +3,8 @@ package uk.ac.uea.socat.sanitychecker.sanitychecks;
 import java.util.ArrayList;
 import java.util.List;
 
-import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
 
 /**
  * The base class for a Sanity Check routine. These classes will be called
@@ -27,8 +27,7 @@ public abstract class SanityCheck {
 	
 	/**
 	 * Initialise the checker and check that the supplied fields are valid
-	 * @param fieldName The name of the field 
-	 * @param parameters
+	 * @param parameters The parameters for the sanity check
 	 * @throws SanityCheckException
 	 */
 	public abstract void initialise(List<String> parameters) throws SanityCheckException;
@@ -36,6 +35,7 @@ public abstract class SanityCheck {
 	/**
 	 * Processes a single record from the input data file.
 	 * These sanity checkers will be passed each record in turn.
+	 * @param messages The output messages
 	 * @param record The record
 	 */
 	public abstract void processRecord(SocatDataRecord record) throws SanityCheckException;
@@ -44,7 +44,9 @@ public abstract class SanityCheck {
 	 * Some checkers can only complete their work once all the records
 	 * have been processed. This method is called after all the records
 	 * have been passed to the checker via {@link #processRecord(SocatDataRecord)}.
-	 */
+	 *
+	 * @param messages The output messages
+	*/
 	public void performFinalCheck() throws SanityCheckException {
 		// Most checkers will not need a final check,
 		// so we implement a noop version for them.

@@ -8,6 +8,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageException;
+import uk.ac.uea.socat.sanitychecker.messages.Messages;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
 /**
@@ -205,15 +208,15 @@ public class Output {
 	 * Add a data message to the output
 	 * @param message The message
 	 */
-	public void addMessage(Message message) {
+	public void addMessage(Message message) throws MessageException {
 		itsMessages.addMessage(message);
-		itsLogger.trace("Message added to output::-> " + message.toString());
+		itsLogger.trace("Message added to output::-> " + message.getMessageString());
 		setExitFlag(message);
 	}
 	
-	public void addMessages(List<Message> messages) {
-		itsMessages.addMessages(messages);
+	public void addMessages(List<Message> messages) throws MessageException {
 		for (Message message : messages) {
+			itsMessages.addMessage(message);
 			itsLogger.trace("Message added to output::-> " + message.toString());
 			setExitFlag(message);
 		}

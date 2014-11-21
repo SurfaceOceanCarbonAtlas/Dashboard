@@ -6,17 +6,22 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * An object representing a metadata entry for a data file
  */
 public abstract class MetadataItem {
+	
+	private static final String METADATA_RANGE_ID = "METADATA_RANGE";
+	
+	private static MessageType itsMetadataRangeType;
 	
 	/**
 	 * Indicates that the metadata item is a String
@@ -81,6 +86,8 @@ public abstract class MetadataItem {
 	 * @param config The configuration for the metadata item
 	 * @param value The value of the metadata item
 	 * @param line The line number of the file on which this item occurs. If the item has come from the command line, pass {@code -1}.
+	 * @oaram messages the set of output message
+	 * @param logger The system logger
 	 * @throws ParseException If the supplied in value could not be parsed into the correct data type
 	 */
 	public MetadataItem(MetadataConfigItem config, int line, Logger logger) {
@@ -88,6 +95,10 @@ public abstract class MetadataItem {
 		itsLine = line;
 		itsValue = null;
 		itsLogger = logger;
+		
+		if (null == itsMetadataRangeType) {
+			itsMetadataRangeType = new MessageType(METADATA_RANGE_ID, "Metadata item/value '" + MessageType.FIELD_VALUE_IDENTIFIER + "' should be in the range " + MessageType.VALID_VALUE_IDENTIFIER, "Metadata value out of range");
+		}
 	}
 	
 	/**
@@ -206,9 +217,17 @@ public abstract class MetadataItem {
 					result = null;
 				} else {
 					logger.warn("Metadata value '" + itsConfigItem.getName() + "' is out of range");
-					result = new Message(Message.METADATA_MESSAGE, Message.WARNING, itsLine, itsConfigItem.getName(), "Value is out of range");
-					result.addProperty(Message.MIN_PROPERTY, "" + itsConfigItem.getRange().getIntMin());
-					result.addProperty(Message.MAX_PROPERTY, "" + itsConfigItem.getRange().getIntMax());
+
+					StringBuffer itemValueString = new StringBuffer(itsConfigItem.getName());
+					itemValueString.append(" (");
+					itemValueString.append(itsValue);
+					itemValueString.append(")");
+					
+				    StringBuffer validRangeString = new StringBuffer(itsConfigItem.getRange().getIntMin());
+				    validRangeString.append(':');
+				    validRangeString.append(itsConfigItem.getRange().getIntMax());
+
+				    result = new Message(Message.NO_COLUMN_INDEX, itsMetadataRangeType, Message.WARNING, itsLine, itemValueString.toString(), validRangeString.toString());
 				}
 			}
 			
@@ -228,9 +247,18 @@ public abstract class MetadataItem {
 					result = null;
 				} else {
 					logger.warn("Metadata value '" + itsConfigItem.getName() + "' is out of range");
-					result = new Message(Message.METADATA_MESSAGE, Message.WARNING, itsLine, itsConfigItem.getName(), "Value is out of range");
-					result.addProperty(Message.MIN_PROPERTY, "" + itsConfigItem.getRange().getRealMin());
-					result.addProperty(Message.MAX_PROPERTY, "" + itsConfigItem.getRange().getRealMax());
+
+					StringBuffer itemValueString = new StringBuffer(itsConfigItem.getName());
+					itemValueString.append(" (");
+					itemValueString.append(itsValue);
+					itemValueString.append(")");
+					
+				    StringBuffer validRangeString = new StringBuffer();
+				    validRangeString.append(itsConfigItem.getRange().getRealMin());
+				    validRangeString.append(':');
+				    validRangeString.append(itsConfigItem.getRange().getRealMax());
+
+				    result = new Message(Message.NO_COLUMN_INDEX, itsMetadataRangeType, Message.WARNING, Message.NO_LINE_NUMBER, itemValueString.toString(), validRangeString.toString());
 				}
 			}
 			

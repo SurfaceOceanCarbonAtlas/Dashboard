@@ -366,4 +366,25 @@ public class SocatColumnConfig {
 	public SocatColumnConfigItem getColumnConfig(String columnName) {
 		return itsColumnConfig.get(columnName);
 	}
+	
+	/**
+	 * Retrieves the column name for a given column index in the data file
+	 * @param columnIndex The index of the column
+	 * @return The name of the column
+	 */
+	public String getColumnName(int columnIndex) {
+		
+		String columnName = null;
+		
+		for (String searchColumn : itsColumnConfig.keySet()) {
+			
+			SocatColumnConfigItem columnConfig = itsColumnConfig.get(searchColumn);
+			if (columnConfig.getIndex() == columnIndex) {
+				columnName = searchColumn;
+				break;
+			}
+		}
+		
+		return columnName;
+	}
 }

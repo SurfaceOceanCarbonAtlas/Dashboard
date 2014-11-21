@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.joda.time.DateTime;
 
-import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 
 /**
  * Sanity check to ensure that the gap between any two records
@@ -16,6 +17,10 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
  *
  */
 public class TimeGapSanityCheck extends SanityCheck {
+	
+	private static final String TIME_GAP_ID = "TIME_GAP";
+	
+	private static MessageType TIME_GAP_TYPE = null;
 	
 	/**
 	 * The maximim time between records in days
@@ -38,6 +43,10 @@ public class TimeGapSanityCheck extends SanityCheck {
 		} catch (NumberFormatException e) {
 			throw new SanityCheckException("Time gap parameter must be numeric");
 		}
+		
+		if (null == TIME_GAP_TYPE) {
+			TIME_GAP_TYPE = new MessageType(TIME_GAP_ID, "Records are " + MessageType.FIELD_VALUE_IDENTIFIER + " days apart. Gap should not be more than " + MessageType.VALID_VALUE_IDENTIFIER + " days apart.", "Time gap between records to large");
+		}
 	}
 	
 	@Override
@@ -49,7 +58,7 @@ public class TimeGapSanityCheck extends SanityCheck {
 				double gap = calcDayDiff(itsLastTime, recordTime);
 				
 				if (gap > itsGapLimit) {
-					itsMessages.add(new Message(Message.DATA_MESSAGE, Message.WARNING, record.getLineNumber(), "Records are more than " + itsGapLimit + " days apart."));
+					itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, TIME_GAP_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(gap), Double.toString(itsGapLimit)));
 				}
 			}
 		}
