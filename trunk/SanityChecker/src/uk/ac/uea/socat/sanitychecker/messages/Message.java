@@ -68,7 +68,7 @@ public class Message {
 		return itsSeverity;
 	}
 	
-	protected MessageType getMessageType() {
+	public MessageType getMessageType() {
 		return itsType;
 	}
 	
