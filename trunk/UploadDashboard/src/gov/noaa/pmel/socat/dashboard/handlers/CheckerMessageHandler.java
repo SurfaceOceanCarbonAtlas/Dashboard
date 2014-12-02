@@ -11,7 +11,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
@@ -23,21 +22,21 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import uk.ac.uea.socat.sanitychecker.Message;
 import uk.ac.uea.socat.sanitychecker.Output;
+import uk.ac.uea.socat.sanitychecker.config.ConfigException;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageException;
 
 /**
  * Processes SanityChecker messages for a cruise.
@@ -48,7 +47,6 @@ public class CheckerMessageHandler {
 
 	private static final String CRUISE_MSGS_FILENAME_EXTENSION = ".messages";
 	private static final String SCMSG_KEY_VALUE_SEP = ":";
-	private static final String SCMSG_TYPE_KEY = "SCMsgType";
 	private static final String SCMSG_SEVERITY_KEY = "SCMsgSeverity";
 	private static final String SCMSG_ROW_NUMBER_KEY = "SCMsgRowNumber";
 	private static final String SCMSG_LONGITUDE_KEY = "SCMsgLongitude";
@@ -56,38 +54,11 @@ public class CheckerMessageHandler {
 	private static final String SCMSG_TIMESTAMP_KEY = "SCMsgTimestamp";
 	private static final String SCMSG_COLUMN_NUMBER_KEY = "SCMsgColumnNumber";
 	private static final String SCMSG_COLUMN_NAME_KEY = "SCMsgColumnName";
-	private static final String SCMSG_MESSAGE_KEY = "SCMsgMessage";
+	private static final String SCMSG_GENERAL_MSG_KEY = "SCMsgGeneralMessage";
+	private static final String SCMSG_DETAILED_MSG_KEY = "SCMsgDetailedMessage";
+	private static final String SCMSG_OLD_MESSAGE_KEY = "SCMsgMessage";
 	private static final DateTimeFormatter DATETIME_FORMATTER = 
 			DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
-
-	private static final Set<Entry<String,SCMsgType>> MSG_FRAGMENT_TO_TYPE_SET;
-	static {
-		HashMap<String,SCMsgType> msgFragsToTypes = new HashMap<String,SCMsgType>();
-		// value outside range (warning)
-		msgFragsToTypes.put("outside the expected range", SCMsgType.DATA_QUESTIONABLE_VALUE);
-		// value outside range (error)
-		msgFragsToTypes.put("outside the extreme range", SCMsgType.DATA_BAD_VALUE);
-		// ship speed is excessive - either warning or error
-		msgFragsToTypes.put("Ship speed between measurements", SCMsgType.DATA_QUESTIONABLE_SPEED);
-		// data point times out of order
-		msgFragsToTypes.put("The timestamp is either before or identical", SCMsgType.DATA_TIME_SEQUENCE);
-		// invalid date
-		msgFragsToTypes.put("Invalid date", SCMsgType.DATA_TIME_VALUE);
-		msgFragsToTypes.put("Unable to parse date-time string", SCMsgType.DATA_TIME_VALUE);
-		// missing value for required data value
-		msgFragsToTypes.put("Missing required value", SCMsgType.DATA_MISSING);
-		// values constant over some number of data points
-		msgFragsToTypes.put("Value for column is constant", SCMsgType.DATA_CONSTANT);
-		// data value markedly different from values in previous and subsequent data points
-		msgFragsToTypes.put("standard deviations from mean", SCMsgType.DATA_OUTLIER);
-		// excessive time gap between successive data points
-		msgFragsToTypes.put("days apart", SCMsgType.DATA_GAP);
-		// metadata given in a data column is not constant
-		msgFragsToTypes.put("Value for column has changed", SCMsgType.DATA_METADATA_NOT_SAME);
-		// unexpected exception not handled
-		msgFragsToTypes.put("Unhandled exception", SCMsgType.DATA_ERROR);
-		MSG_FRAGMENT_TO_TYPE_SET = msgFragsToTypes.entrySet();
-	}
 
 	private File filesDir;
 
@@ -231,117 +202,99 @@ public class CheckerMessageHandler {
 
 			List<SocatDataRecord> dataRecs = output.getRecords();
 			int numRecs = dataRecs.size();
-			for ( Message msg : output.getMessages().getMessages() ) {
-				// Generate a list of key-value strings describing this message
-				ArrayList<String> mappings = new ArrayList<String>();
+			try {
+				for ( Message msg : output.getMessages().getMessages() ) {
+					// Generate a list of key-value strings describing this message
+					ArrayList<String> mappings = new ArrayList<String>();
 
-				// Message string should never be null
-				String checkerMsg = msg.getMessage();
+					if ( msg.isError() ) {
+						mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
+								SCMsgSeverity.ERROR.name());
+					}
+					else if ( msg.isWarning() ) {
+						mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
+								SCMsgSeverity.WARNING.name());
+					}
 
-				int severityInt = msg.getSeverity();
-				if ( severityInt == Message.ERROR ) {
-					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
-							SCMsgSeverity.ERROR.name());
-				}
-				else if ( severityInt == Message.WARNING ) {
-					mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
-							SCMsgSeverity.WARNING.name());
-				}
+					int rowNum = msg.getLineNumber();
+					if ( (rowNum > 0) && (rowNum <= numRecs) ) {
+						mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
+								Integer.toString(rowNum));
 
-				int msgTypeInt = msg.getMessageType();
-				if ( msgTypeInt == Message.DATA_MESSAGE ) {
-					SCMsgType msgType = SCMsgType.UNKNOWN;
-					// Determine the error/warning type from the message itself
-					for ( Entry<String, SCMsgType> fragEntry : MSG_FRAGMENT_TO_TYPE_SET ) {
-						if ( checkerMsg.contains(fragEntry.getKey()) ) {
-							if ( msgType != SCMsgType.UNKNOWN )
-								throw new IllegalArgumentException("More than one message type (" + 
-										msgType.toString() + " and " + fragEntry.getValue().toString() + 
-										") associated with the data check message\n    " + checkerMsg);
-							msgType = fragEntry.getValue();
+						SocatDataRecord stdData = dataRecs.get(rowNum - 1);
+						try {
+							double longitude = stdData.getLongitude();
+							if ( ! Double.isNaN(longitude) )
+								mappings.add(SCMSG_LONGITUDE_KEY + SCMSG_KEY_VALUE_SEP + 
+										Double.toString(longitude));
+						} catch ( Exception ex ) {
+							// no entry
+						}
+						try {
+							double latitude = stdData.getLatitude();
+							if ( ! Double.isNaN(latitude) )
+								mappings.add(SCMSG_LATITUDE_KEY + SCMSG_KEY_VALUE_SEP + 
+										Double.toString(latitude));
+						} catch ( Exception ex ) {
+							// no entry
+						}
+						try {
+							DateTime timestamp = stdData.getTime();
+							if ( timestamp != null )
+								mappings.add(SCMSG_TIMESTAMP_KEY + SCMSG_KEY_VALUE_SEP +
+										DATETIME_FORMATTER.print(timestamp));
+						} catch ( Exception ex ) {
+							// no entry
 						}
 					}
-					if ( msgType.equals(SCMsgType.UNKNOWN) )
-						throw new IllegalArgumentException("No message type found " +
-								"for the data check message\n    " + checkerMsg);
-					// Resolve whether speed speed was a warning or an error
-					if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) && 
-						 (severityInt == Message.ERROR) )
-						msgType = SCMsgType.DATA_BAD_SPEED;
-					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
-							msgType.name());
-				}
-				else if ( msgTypeInt == Message.METADATA_MESSAGE ) {
-					mappings.add(SCMSG_TYPE_KEY + SCMSG_KEY_VALUE_SEP + 
-							SCMsgType.METADATA.name());
-				}
 
-				int rowNum = msg.getLineNumber();
-				if ( (rowNum > 0) && (rowNum <= numRecs) ) {
-					mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
-							Integer.toString(rowNum));
+					int colNum = msg.getColumnIndex();
+					if ( colNum > 0 )
+						mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
+								Integer.toString(colNum));
 
-					SocatDataRecord stdData = dataRecs.get(rowNum - 1);
+					String colName;
 					try {
-						double longitude = stdData.getLongitude();
-						if ( ! Double.isNaN(longitude) )
-							mappings.add(SCMSG_LONGITUDE_KEY + SCMSG_KEY_VALUE_SEP + 
-									Double.toString(longitude));
-					} catch ( Exception ex ) {
-						// no entry
+						colName = SocatColumnConfig.getInstance().getColumnName(colNum);
+					} catch ( ConfigException ex ) {
+						throw new RuntimeException(ex);
 					}
-					try {
-						double latitude = stdData.getLatitude();
-						if ( ! Double.isNaN(latitude) )
-							mappings.add(SCMSG_LATITUDE_KEY + SCMSG_KEY_VALUE_SEP + 
-									Double.toString(latitude));
-					} catch ( Exception ex ) {
-						// no entry
-					}
-					try {
-						DateTime timestamp = stdData.getTime();
-						if ( timestamp != null )
-							mappings.add(SCMSG_TIMESTAMP_KEY + SCMSG_KEY_VALUE_SEP +
-									DATETIME_FORMATTER.print(timestamp));
-					} catch ( Exception ex ) {
-						// no entry
-					}
-				}
+					if ( colName != null )
+						mappings.add(SCMSG_COLUMN_NAME_KEY + SCMSG_KEY_VALUE_SEP + colName);
 
-				int colNum = msg.getInputItemIndex();
-				if ( colNum > 0 )
-					mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
-							Integer.toString(colNum));
+					// Assign the general message - escape newlines
+					String checkerMsg = msg.getMessageType().getSummaryMessage(colName).replace("\n",  "\\n");
+					mappings.add(SCMSG_GENERAL_MSG_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg);
 
-				String colName = msg.getInputItemName();
-				if ( colName != null )
-					mappings.add(SCMSG_COLUMN_NAME_KEY + SCMSG_KEY_VALUE_SEP + colName);
+					// Assign the detailed message - escape newlines
+					checkerMsg = msg.getMessageString().replace("\n",  "\\n");
+					mappings.add(SCMSG_DETAILED_MSG_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg);
 
-				// Escape all newlines in the message string when saving it
-				mappings.add(SCMSG_MESSAGE_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg.replace("\n",  "\\n"));
+					// Write this array list of key-value strings to file
+					msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
 
-				// Write this array list of key-value strings to file
-				msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
-
-				// Assign the WOCE flag
-				if ( (msgTypeInt == Message.DATA_MESSAGE) && (rowNum > 0) ) {
-					if ( severityInt == Message.ERROR ) {
-						if ( colNum > 0 ) {
-							woceFourSets.get(colNum - 1).add(rowNum - 1);
+					// Assign the WOCE flag
+					if ( rowNum > 0 ) {
+						if ( msg.isError() ) {
+							if ( colNum > 0 ) {
+								woceFourSets.get(colNum - 1).add(rowNum - 1);
+							}
+							else {
+								noColumnWoceFourSet.add(rowNum - 1);
+							}
 						}
-						else {
-							noColumnWoceFourSet.add(rowNum - 1);
-						}
-					}
-					else if ( severityInt == Message.WARNING ) {
-						if ( colNum > 0 ) {
-							woceThreeSets.get(colNum - 1).add(rowNum - 1);
-						}
-						else {
-							noColumnWoceThreeSet.add(rowNum - 1);
+						else if ( msg.isWarning() ) {
+							if ( colNum > 0 ) {
+								woceThreeSets.get(colNum - 1).add(rowNum - 1);
+							}
+							else {
+								noColumnWoceThreeSet.add(rowNum - 1);
+							}
 						}
 					}
 				}
+			} catch ( MessageException ex ) {
+				throw new RuntimeException(ex);
 			}
 
 		} finally {
@@ -414,14 +367,7 @@ public class CheckerMessageHandler {
 
 						SCMessage msg = new SCMessage();
 
-						String propVal = msgProps.getProperty(SCMSG_TYPE_KEY);
-						try {
-							msg.setType(SCMsgType.valueOf(propVal));
-						} catch ( Exception ex ) {
-							// leave as the default SCMsgType.UNKNOWN
-						}
-
-						propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
+						String propVal = msgProps.getProperty(SCMSG_SEVERITY_KEY);
 						try {
 							msg.setSeverity(SCMsgSeverity.valueOf(propVal));
 						} catch ( Exception ex ) {
@@ -468,13 +414,25 @@ public class CheckerMessageHandler {
 						}
 						// default column name is an empty string 
 
-						propVal = msgProps.getProperty(SCMSG_MESSAGE_KEY);
+						propVal = msgProps.getProperty(SCMSG_GENERAL_MSG_KEY);
+						if ( propVal == null )
+							propVal = msgProps.getProperty(SCMSG_OLD_MESSAGE_KEY);
 						if ( propVal != null ) {
 							// Replace all escaped newlines in the message string
 							propVal = propVal.replace("\\n", "\n");
-							msg.setExplanation(propVal);
+							msg.setGeneralComment(propVal);
 						}
-						// default explanation is an empty string
+						// default general explanation is an empty string
+
+						propVal = msgProps.getProperty(SCMSG_DETAILED_MSG_KEY);
+						if ( propVal == null )
+							propVal = msgProps.getProperty(SCMSG_OLD_MESSAGE_KEY);
+						if ( propVal != null ) {
+							// Replace all escaped newlines in the message string
+							propVal = propVal.replace("\\n", "\n");
+							msg.setDetailedComment(propVal);
+						}
+						// default detailed explanation is an empty string
 
 						msgList.add(msg);
 
@@ -609,9 +567,6 @@ public class CheckerMessageHandler {
 
 		TreeSet<WoceInfo> orderedWoceInfo = new TreeSet<WoceInfo>();
 		for ( SCMessage msg : msgList ) {
-			SCMsgType msgType = msg.getType();
-			if ( msgType.equals(SCMsgType.UNKNOWN) || msgType.equals(SCMsgType.METADATA) ) 
-				continue;
 
 			SCMsgSeverity severity = msg.getSeverity();
 			if ( severity.equals(SCMsgSeverity.UNKNOWN) )
@@ -643,52 +598,10 @@ public class CheckerMessageHandler {
 				info.columnIndex = colNum - 1;
 			// if no column index, leave as Integer.MAX_VALUE to put them last for this flag
 
-			// Generate a reasonable generic explanation for the WOCE flag
-			// TODO: need better way to get a reasonable generic explanation
-			String msgComment = msg.getExplanation();
-			if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_VALUE) ) {
-				int k = msgComment.indexOf("outside the expected range");
-				info.comment = "Value is " + msgComment.substring(k);
-			}
-			else if ( msgType.equals(SCMsgType.DATA_BAD_VALUE) ) {
-				int k = msgComment.indexOf("outside the extreme range");
-				info.comment = "Value is " + msgComment.substring(k);
-			}
-			else if ( msgType.equals(SCMsgType.DATA_QUESTIONABLE_SPEED) ) {
-				int k = msgComment.indexOf("should be");
-				info.comment = "Calculated ship speed is excessive; " + msgComment.substring(k);
-			}
-			else if ( msgType.equals(SCMsgType.DATA_BAD_SPEED) ) {
-				int k = msgComment.indexOf("should be");
-				info.comment = "Calculated ship speed is unreasonable; " + msgComment.substring(k);
-			}
-			else if ( msgType.equals(SCMsgType.DATA_TIME_SEQUENCE) ) {
-				info.comment = msgComment;
-			}
-			else if ( msgType.equals(SCMsgType.DATA_TIME_VALUE) ) {
-				info.comment = "Invalid date/time value";
-			}
-			else if ( msgType.equals(SCMsgType.DATA_MISSING) ) {
-				info.comment = msgComment;
-			}
-			else if ( msgType.equals(SCMsgType.DATA_CONSTANT) ) {
-				info.comment = "Data values are constant over a long period of time";
-			}
-			else if ( msgType.equals(SCMsgType.DATA_OUTLIER) ) {
-				int k = msgComment.indexOf("is outside") + 3;
-				info.comment = "Data values are " + msgComment.substring(k);
-			}
-			else if ( msgType.equals(SCMsgType.DATA_GAP) ) {
-				info.comment = msgComment;
-			}
-			else if ( msgType.equals(SCMsgType.DATA_METADATA_NOT_SAME) ) {
-				info.comment = msgComment;
-			}
-			else if ( msgType.equals(SCMsgType.DATA_ERROR) ) {
-				info.comment = msgComment;
-			}
-			else
-				throw new RuntimeException("Unexpected message type of " + msgType.toString());
+			// Get the general explanation for the WOCE flag
+			info.comment = msg.getGeneralComment();
+			if ( info.comment.isEmpty() )
+				info.comment = msg.getDetailedComment();
 
 			info.rowIndex = rowNum - 1;
 

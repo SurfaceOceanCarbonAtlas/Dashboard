@@ -9,7 +9,6 @@ import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
 
 import org.junit.Test;
@@ -60,7 +59,6 @@ public class SCMessageListTest {
 	public void testHashCodeEquals() {
 		final String myUsername = "SocatUser";
 		final String myExpocode = "XXXX20140204";
-		final SCMsgType myType = SCMsgType.DATA_BAD_VALUE;
 		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
 		final int myRowNum = 25;
 		final int myColNum = 8;
@@ -68,20 +66,20 @@ public class SCMessageListTest {
 		final String myExplanation = "value exceeds the upper limit of questionable values";
 
 		SCMessage myMsg = new SCMessage();
-		myMsg.setType(myType);
 		myMsg.setSeverity(mySeverity);
 		myMsg.setRowNumber(myRowNum);
 		myMsg.setColNumber(myColNum);
 		myMsg.setColName(myColName);
-		myMsg.setExplanation(myExplanation);
+		myMsg.setGeneralComment(myExplanation);
+		myMsg.setDetailedComment(myExplanation);
 
 		SCMessage otherMsg = new SCMessage();
-		otherMsg.setType(myType);
 		otherMsg.setSeverity(mySeverity);
 		otherMsg.setRowNumber(myRowNum);
 		otherMsg.setColNumber(myColNum);
 		otherMsg.setColName(myColName);
-		otherMsg.setExplanation(myExplanation);
+		otherMsg.setGeneralComment(myExplanation);
+		otherMsg.setDetailedComment(myExplanation);
 		assertEquals(myMsg, otherMsg);
 
 		SCMessageList msgList = new SCMessageList();
