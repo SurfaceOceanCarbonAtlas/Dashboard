@@ -9,8 +9,6 @@ import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
-import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType;
-
 import org.junit.Test;
 
 /**
@@ -19,21 +17,6 @@ import org.junit.Test;
  * @author Karl Smith
  */
 public class SCMessageTest {
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#getType()} and 
-	 * {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#setType(gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgType)}.
-	 */
-	@Test
-	public void testGetSetType() {
-		final SCMsgType myType = SCMsgType.DATA_BAD_VALUE;
-		SCMessage msg = new SCMessage();
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
-		msg.setType(myType);
-		assertEquals(myType, msg.getType());
-		msg.setType(null);
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
-	}
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#getSeverity()} and 
@@ -46,7 +29,6 @@ public class SCMessageTest {
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setSeverity(mySeverity);
 		assertEquals(mySeverity, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 		msg.setSeverity(null);
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 	}
@@ -63,7 +45,6 @@ public class SCMessageTest {
 		msg.setRowNumber(myRowNum);
 		assertEquals(myRowNum, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 	}
 
 	/**
@@ -79,7 +60,6 @@ public class SCMessageTest {
 		assertEquals(myTimestamp, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 		msg.setTimestamp(null);
 		assertEquals("", msg.getTimestamp());
 	}
@@ -98,7 +78,6 @@ public class SCMessageTest {
 		assertEquals("", msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 		msg.setLongitude( Double.NEGATIVE_INFINITY );
 		assertTrue( Double.isNaN(msg.getLongitude()) );
 	}
@@ -118,7 +97,6 @@ public class SCMessageTest {
 		assertEquals("", msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 		msg.setLatitude( Double.POSITIVE_INFINITY );
 		assertTrue( Double.isNaN(msg.getLatitude()) );
 	}
@@ -139,7 +117,6 @@ public class SCMessageTest {
 		assertEquals("", msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 	}
 
 	/**
@@ -159,22 +136,21 @@ public class SCMessageTest {
 		assertEquals("", msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
 		msg.setColName(null);
 		assertEquals("", msg.getColName());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#getExplanation()} and
-	 * {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#setExplanation(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#getGeneralComment()} and
+	 * {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#setGeneralComment(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetExplanation() {
+	public void testGetSetGeneralComment() {
 		final String myExplanation = "value exceeds the upper limit of questionable values";
 		SCMessage msg = new SCMessage();
-		assertEquals("", msg.getExplanation());
-		msg.setExplanation(myExplanation);
-		assertEquals(myExplanation, msg.getExplanation());
+		assertEquals("", msg.getGeneralComment());
+		msg.setGeneralComment(myExplanation);
+		assertEquals(myExplanation, msg.getGeneralComment());
 		assertEquals("", msg.getColName());
 		assertEquals(-1, msg.getColNumber());
 		assertTrue( Double.isNaN(msg.getLatitude()) );
@@ -182,9 +158,31 @@ public class SCMessageTest {
 		assertEquals("", msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
-		assertEquals(SCMsgType.UNKNOWN, msg.getType());
-		msg.setExplanation(null);
-		assertEquals("", msg.getExplanation());
+		msg.setGeneralComment(null);
+		assertEquals("", msg.getGeneralComment());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#getDetailedComment()} and
+	 * {@link gov.noaa.pmel.socat.dashboard.shared.SCMessage#setDetailedComment(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetDetailedComment() {
+		final String myExplanation = "value exceeds the upper limit of questionable values";
+		SCMessage msg = new SCMessage();
+		assertEquals("", msg.getDetailedComment());
+		msg.setDetailedComment(myExplanation);
+		assertEquals(myExplanation, msg.getDetailedComment());
+		assertEquals("", msg.getGeneralComment());
+		assertEquals("", msg.getColName());
+		assertEquals(-1, msg.getColNumber());
+		assertTrue( Double.isNaN(msg.getLatitude()) );
+		assertTrue( Double.isNaN(msg.getLongitude()) );
+		assertEquals("", msg.getTimestamp());
+		assertEquals(-1, msg.getRowNumber());
+		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
+		msg.setDetailedComment(null);
+		assertEquals("", msg.getDetailedComment());
 	}
 
 	/**
@@ -202,7 +200,6 @@ public class SCMessageTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		final SCMsgType myType = SCMsgType.DATA_BAD_VALUE;
 		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
 		final int myRowNum = 25;
 		final String myTimestamp = "2014-02-06 11:35";
@@ -210,7 +207,8 @@ public class SCMessageTest {
 		final double myLatitude = 46.25;
 		final int myColNum = 8;
 		final String myColName = "P_atm";
-		final String myExplanation = "value exceeds the upper limit of questionable values";
+		final String myGeneralComment = "value exceeds the upper limit of questionable values";
+		final String myExplanation = "Sea-level atmospheric pressure 1205 value exceeds 1200";
 
 		SCMessage msg = new SCMessage();
 		assertFalse( msg.equals(null) );
@@ -234,31 +232,6 @@ public class SCMessageTest {
 
 
 		SCMessage other = new SCMessage();
-		assertTrue( msg.hashCode() == other.hashCode() );
-		assertTrue( msg.equals(other) );
-		assertTrue( other.equals(msg) );
-		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
-		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
-		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
-		assertEquals(0, SCMessage.longitudeComparator.compare(msg, other));
-		assertEquals(0, SCMessage.latitudeComparator.compare(msg, other));
-		assertEquals(0, SCMessage.colNumComparator.compare(msg, other));
-		assertEquals(0, SCMessage.colNameComparator.compare(msg, other));
-		assertEquals(0, SCMessage.explanationComparator.compare(msg, other));
-
-		msg.setType(myType);
-		assertFalse( msg.hashCode() == other.hashCode() );
-		assertFalse( msg.equals(other) );
-		assertFalse( other.equals(msg) );
-		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
-		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
-		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
-		assertEquals(0, SCMessage.longitudeComparator.compare(msg, other));
-		assertEquals(0, SCMessage.latitudeComparator.compare(msg, other));
-		assertEquals(0, SCMessage.colNumComparator.compare(msg, other));
-		assertEquals(0, SCMessage.colNameComparator.compare(msg, other));
-		assertEquals(0, SCMessage.explanationComparator.compare(msg, other));
-		other.setType(myType);
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );
@@ -453,7 +426,33 @@ public class SCMessageTest {
 		assertEquals(0, SCMessage.colNameComparator.compare(msg, other));
 		assertEquals(0, SCMessage.explanationComparator.compare(msg, other));
 
-		msg.setExplanation(myExplanation);
+		msg.setGeneralComment(myGeneralComment);
+		assertFalse( msg.hashCode() == other.hashCode() );
+		assertFalse( msg.equals(other) );
+		assertFalse( other.equals(msg) );
+		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
+		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
+		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
+		assertEquals(0, SCMessage.longitudeComparator.compare(msg, other));
+		assertEquals(0, SCMessage.latitudeComparator.compare(msg, other));
+		assertEquals(0, SCMessage.colNumComparator.compare(msg, other));
+		assertEquals(0, SCMessage.colNameComparator.compare(msg, other));
+		assertEquals(0, SCMessage.explanationComparator.compare(msg, other));
+		assertEquals(0,  SCMessage.explanationComparator.compare(other, msg));
+		other.setGeneralComment(myGeneralComment);
+		assertTrue( msg.hashCode() == other.hashCode() );
+		assertTrue( msg.equals(other) );
+		assertTrue( other.equals(msg) );
+		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
+		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
+		assertEquals(0, SCMessage.timestampComparator.compare(msg, other));
+		assertEquals(0, SCMessage.longitudeComparator.compare(msg, other));
+		assertEquals(0, SCMessage.latitudeComparator.compare(msg, other));
+		assertEquals(0, SCMessage.colNumComparator.compare(msg, other));
+		assertEquals(0, SCMessage.colNameComparator.compare(msg, other));
+		assertEquals(0, SCMessage.explanationComparator.compare(msg, other));
+
+		msg.setDetailedComment(myExplanation);
 		assertFalse( msg.hashCode() == other.hashCode() );
 		assertFalse( msg.equals(other) );
 		assertFalse( other.equals(msg) );
@@ -466,7 +465,7 @@ public class SCMessageTest {
 		assertEquals(0, SCMessage.colNameComparator.compare(msg, other));
 		assertTrue( SCMessage.explanationComparator.compare(msg, other) > 0 );
 		assertTrue( SCMessage.explanationComparator.compare(other, msg) < 0 );
-		other.setExplanation(myExplanation);
+		other.setDetailedComment(myExplanation);
 		assertTrue( msg.hashCode() == other.hashCode() );
 		assertTrue( msg.equals(other) );
 		assertTrue( other.equals(msg) );

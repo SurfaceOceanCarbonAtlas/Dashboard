@@ -387,7 +387,7 @@ public class DataMessagesPage extends Composite {
 			public String getValue(SCMessage msg) {
 				if ( msg == null )
 					return "";
-				return msg.getExplanation();
+				return msg.getDetailedComment();
 			}
 		};
 	}
