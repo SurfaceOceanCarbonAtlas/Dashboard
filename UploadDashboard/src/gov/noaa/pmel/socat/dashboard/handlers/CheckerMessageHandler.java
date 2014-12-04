@@ -37,6 +37,7 @@ import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
+import uk.ac.uea.socat.sanitychecker.messages.MessageSummary;
 
 /**
  * Processes SanityChecker messages for a cruise.
@@ -57,10 +58,12 @@ public class CheckerMessageHandler {
 	private static final String SCMSG_GENERAL_MSG_KEY = "SCMsgGeneralMessage";
 	private static final String SCMSG_DETAILED_MSG_KEY = "SCMsgDetailedMessage";
 	private static final String SCMSG_OLD_MESSAGE_KEY = "SCMsgMessage";
+	private static final String SCMSG_SUMMARY_MSG_KEY = "SCMsgSummaryMessage";
 	private static final DateTimeFormatter DATETIME_FORMATTER = 
 			DateTimeFormat.forPattern("YYYY-MM-dd HH:mm:ss");
 
 	private File filesDir;
+	private ArrayList<String> summaryMsgs;
 
 	/**
 	 * Handler for SanityChecker messages, including categorizing and making WOCE flags
@@ -73,6 +76,7 @@ public class CheckerMessageHandler {
 		filesDir = new File(filesDirName);
 		if ( ! filesDir.isDirectory() )
 			throw new IllegalArgumentException(filesDirName + " is not a directory");
+		summaryMsgs = new ArrayList<String>();
 	}
 
 	/**
@@ -203,6 +207,22 @@ public class CheckerMessageHandler {
 			List<SocatDataRecord> dataRecs = output.getRecords();
 			int numRecs = dataRecs.size();
 			try {
+				summaryMsgs.clear();
+				for ( MessageSummary summary : output.getMessages().getMessageSummaries() ) {
+					String msg = summary.getSummaryString();
+					int count = summary.getErrorCount();
+					if ( count > 0 ) {
+						String sumMsg = Integer.toString(count) + " errors of type: " + msg;
+						summaryMsgs.add(sumMsg);
+						msgsWriter.println(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP + sumMsg);
+					}
+					count = summary.getWarningCount();
+					if ( count > 0 ) {
+						String sumMsg = Integer.toString(count) + " warnings of type: " + msg;
+						summaryMsgs.add(sumMsg);
+						msgsWriter.println(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP + sumMsg);
+					}
+				}
 				for ( Message msg : output.getMessages().getMessages() ) {
 					// Generate a list of key-value strings describing this message
 					ArrayList<String> mappings = new ArrayList<String>();
@@ -347,6 +367,7 @@ public class CheckerMessageHandler {
 		// Create the list of messages to be returned
 		SCMessageList msgList = new SCMessageList();
 		msgList.setExpocode(expocode);
+		summaryMsgs.clear();
 		// Read the cruise messages file
 		File msgsFile = cruiseMsgsFile(expocode);
 		BufferedReader msgReader;
@@ -356,6 +377,12 @@ public class CheckerMessageHandler {
 				String msgline = msgReader.readLine();
 				while ( msgline != null ) {
 					if ( ! msgline.trim().isEmpty() ) {
+
+						if ( msgline.startsWith(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP) ) {
+							summaryMsgs.add(msgline.substring(SCMSG_SUMMARY_MSG_KEY.length() + 
+									SCMSG_KEY_VALUE_SEP.length()).trim());
+							continue;
+						}
 
 						Properties msgProps = new Properties();
 						for ( String msgPart : DashboardUtils.decodeStringArrayList(msgline) ) {
@@ -449,6 +476,20 @@ public class CheckerMessageHandler {
 		}
 
 		return msgList;
+	}
+
+	/**
+	 * Returns the list of summary messages obtained from the SanityChecker after calling
+	 * either {@link #saveCruiseMessages} or {@link #getCruiseMessages}.  The summary
+	 * messages returned are for the cruise identified in the last call of either of
+	 * these methods.  
+	 * @return
+	 * 		the list of summary messages.  The list will never be null, but may be empty 
+	 * 		if there are no SanityChecker errors or warnings, or if neither of the prerequisite 
+	 * 		methods were ever called.  The actual ArrayList in this instance is returned.
+	 */
+	public ArrayList<String> getSummaryMsgs() {
+		return summaryMsgs;
 	}
 
 	/**
