@@ -5,7 +5,8 @@ package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -1345,9 +1346,10 @@ public class DashboardCruiseChecker {
 			System.exit(1);
 		}
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		MetadataFileHandler metaHandler = dataStore.getMetadataFileHandler();
 		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
 		CheckerMessageHandler msgHandler = dataStore.getCheckerMsgHandler();
+		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
+		CruiseFlagsHandler flagsHandler = dataStore.getCruiseFlagsHandler();
 
 		for ( String expo : expocodes ) {
 			// Get all the data for this cruise
@@ -1366,8 +1368,8 @@ public class DashboardCruiseChecker {
 				continue;
 			}
 			ArrayList<String> summaryMsgs = msgHandler.getSummaryMsgs();
-			// Generate the WOCE flags report file
-			
+			// Generate the WOCE flags report file from the summary messages and current WOCE flags
+			flagsHandler.generateWoceFlagMsgsFile(expo, dbHandler, summaryMsgs);
 		}
 
 	}

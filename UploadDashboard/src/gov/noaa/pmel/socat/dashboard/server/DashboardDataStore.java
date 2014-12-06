@@ -8,6 +8,7 @@ import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
@@ -124,6 +125,7 @@ public class DashboardDataStore {
 	private DashboardCruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
 	private DashboardCruiseSubmitter cruiseSubmitter;
+	private CruiseFlagsHandler cruiseFlagsHandler;
 	private Timer configWatcher;
 
 	/**
@@ -287,6 +289,8 @@ public class DashboardDataStore {
 			propVal = propVal.trim();
 			metadataFileHandler = new MetadataFileHandler(propVal,
 					svnUsername, svnPassword);
+			// Put the flag messages file in the same directory
+			cruiseFlagsHandler = new CruiseFlagsHandler(propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -538,6 +542,9 @@ public class DashboardDataStore {
 		return cruiseFileHandler;
 	}
 
+	public CruiseFlagsHandler getCruiseFlagsHandler() {
+		return cruiseFlagsHandler;
+	}
 	/**
 	 * @return
 	 * 		the handler for SanityChecker messages
