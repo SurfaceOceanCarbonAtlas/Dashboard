@@ -724,7 +724,7 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<SocatWoceEvent> getWoceFlags(String expocode) throws SQLException {
+	public ArrayList<SocatWoceEvent> getWoceEvents(String expocode) throws SQLException {
 		ArrayList<SocatWoceEvent> eventsList = new ArrayList<SocatWoceEvent>();
 		Connection catConn = makeConnection(false);
 		try {

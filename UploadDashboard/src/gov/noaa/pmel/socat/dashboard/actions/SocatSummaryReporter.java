@@ -162,7 +162,7 @@ public class SocatSummaryReporter {
 						 "Rename".equalsIgnoreCase(msgWords[0]) && 
 						 "from".equalsIgnoreCase(msgWords[1]) && 
 						 "to".equalsIgnoreCase(msgWords[3]) ) )
-					throw new IllegalArgumentException("Unexpceted comment for rename: " + msg);
+					throw new IllegalArgumentException("Unexpected comment for rename: " + msg);
 				if ( expocode.equals(msgWords[4]) )
 					oldExpocode = msgWords[2];
 			}

@@ -4,11 +4,17 @@
 package gov.noaa.pmel.socat.dashboard.handlers;
 
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * @author Karl Smith
@@ -16,6 +22,9 @@ import java.util.ArrayList;
 public class CruiseFlagsHandler {
 
 	private static final String FLAG_MSGS_FILENAME_SUFFIX = "_WOCE_flags.tsv";
+
+	private static final SimpleDateFormat timestamper = 
+			new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
 
 	private File filesDir;
 
@@ -32,7 +41,6 @@ public class CruiseFlagsHandler {
 	}
 
 	/**
-	 * 
 	 * @param expocode
 	 * 		expocode of the cruise
 	 * @return
@@ -48,8 +56,20 @@ public class CruiseFlagsHandler {
 				File.separatorChar + upperExpo + FLAG_MSGS_FILENAME_SUFFIX);
 	}
 
-	public void generateWoceFlagMsgsFile(String expocode, DatabaseRequestHandler dbHandler, 
-			ArrayList<String> summaryMsgs) throws IllegalArgumentException {
+	/**
+	 * Create the WOCE flags messages file from the WOCE flags in the database.
+	 * 
+	 * @param expocode
+	 * 		create the WOCE flags messages file for this cruise
+	 * @param dbHandler
+	 * 		get the WOCE flags from the database using this handler
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid
+	 * @throws SQLException
+	 * 		if there are problems getting WOCE flags from the database
+	 */
+	public void generateWoceFlagMsgsFile(String expocode, DatabaseRequestHandler dbHandler) 
+											throws IllegalArgumentException, SQLException {
 		File msgsFile = cruiseFlagMsgsFile(expocode);
 		PrintWriter msgsWriter;
 		try {
@@ -60,8 +80,27 @@ public class CruiseFlagsHandler {
 					msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
 		}
 		try {
-			// TODO: Write the summary messages to file
-			// TODO: get the current WOCE flags and write to file
+			RowNumSet rowNums = new RowNumSet();
+			// Get the current WOCE flags for this cruise and print them to file
+			msgsWriter.println("Expocode: " + expocode);
+			msgsWriter.println("WOCE flags as of: " + timestamper.format(new Date()));
+			msgsWriter.println("flag\tdata name\tnum rows\trows\tmessage");
+			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode);
+			for ( SocatWoceEvent woceEvent : woceEventsList ) {
+				rowNums.clear();
+				for ( DataLocation dloc : woceEvent.getLocations() )
+					rowNums.add(dloc.getRowNumber());
+				msgsWriter.print(woceEvent.getFlag());
+				msgsWriter.print('\t');
+				msgsWriter.print(woceEvent.getDataVarName());
+				msgsWriter.print('\t');
+				msgsWriter.print(rowNums.size());
+				msgsWriter.print('\t');
+				msgsWriter.print(rowNums.toString());
+				msgsWriter.print('\t');
+				msgsWriter.print(woceEvent.getComment().replaceAll("\n", "  ").replaceAll("\t", " "));
+				msgsWriter.println();
+			}			
 		} finally {
 			msgsWriter.close();
 		}

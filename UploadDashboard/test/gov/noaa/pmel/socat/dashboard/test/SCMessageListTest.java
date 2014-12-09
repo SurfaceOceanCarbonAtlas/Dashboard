@@ -7,6 +7,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
@@ -52,6 +55,26 @@ public class SCMessageListTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessageList#getSummaries()} and 
+	 * {@link gov.noaa.pmel.socat.dashboard.shared.SCMessageList#setSummaries(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testGetSetSummaries() {
+		final ArrayList<String> mySummaries = new ArrayList<String>(Arrays.asList(
+				"3 errors of type: P_equ unreasonably large", 
+				"5 errors of type: calculated ship speed unreasonably large",
+				"20 warnings of type: P_equ unusually large"));
+		SCMessageList msgList = new SCMessageList();
+		assertEquals(0, msgList.getSummaries().size());
+		msgList.setSummaries(mySummaries);
+		assertEquals(mySummaries, msgList.getSummaries());
+		assertEquals("", msgList.getExpocode());
+		assertEquals("", msgList.getUsername());
+		msgList.setSummaries(null);
+		assertEquals(0, msgList.getSummaries().size());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SCMessageList#hashCode()} and 
 	 * {@link gov.noaa.pmel.socat.dashboard.shared.SCMessageList#equals(java.lang.Object)}.
 	 */
@@ -59,6 +82,10 @@ public class SCMessageListTest {
 	public void testHashCodeEquals() {
 		final String myUsername = "SocatUser";
 		final String myExpocode = "XXXX20140204";
+		final ArrayList<String> mySummaries = new ArrayList<String>(Arrays.asList(
+				"3 errors of type: P_equ unreasonably large", 
+				"5 errors of type: calculated ship speed unreasonably large",
+				"20 warnings of type: P_equ unusually large"));
 		final SCMsgSeverity mySeverity = SCMsgSeverity.ERROR;
 		final int myRowNum = 25;
 		final int myColNum = 8;
@@ -101,6 +128,13 @@ public class SCMessageListTest {
 		assertFalse( msgList.hashCode() == other.hashCode() );
 		assertFalse( msgList.equals(other) );
 		other.setExpocode(myExpocode);
+		assertTrue( msgList.hashCode() == other.hashCode() );
+		assertTrue( msgList.equals(other) );
+
+		msgList.setSummaries(mySummaries);
+		assertFalse( msgList.hashCode() == other.hashCode() );
+		assertFalse( msgList.equals(other) );
+		other.setSummaries(mySummaries);
 		assertTrue( msgList.hashCode() == other.hashCode() );
 		assertTrue( msgList.equals(other) );
 
