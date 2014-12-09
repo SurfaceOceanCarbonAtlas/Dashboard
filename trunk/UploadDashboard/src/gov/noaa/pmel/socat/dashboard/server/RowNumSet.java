@@ -7,8 +7,8 @@ import java.util.TreeSet;
 
 /**
  * Extension of a TreeSet of Integers whose toString() method prints the 
- * contents in a compact form; a sequence of consecutive integers are printed 
- * using the first value, a hyphen, and the last value, such as: 
+ * contents in a compact form.  A sequence of consecutive integers are 
+ * printed using the first value, a hyphen, and the last value, such as: 
  * "5-35, 67, 88-99"
  * 
  * @author Karl Smith
@@ -24,6 +24,12 @@ public class RowNumSet extends TreeSet<Integer> {
 		super();
 	}
 
+	/**
+	 * Prints the contents of this set of integers in a compact form.
+	 * A sequence of consecutive integers are printed using the first 
+	 * value, a hyphen, and the last value, such as: 
+	 * "5-35, 67, 88-99"
+	 */
 	@Override
 	public String toString() {
 		if ( this.size() < 1 )

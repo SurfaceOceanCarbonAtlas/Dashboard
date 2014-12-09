@@ -1308,8 +1308,10 @@ public class DashboardCruiseChecker {
 			System.err.println();
 			System.err.println("ExpocodesFile");
 			System.err.println("    is a file containing expocodes, one per line, to recheck with the ");
-			System.err.println("    SanityChecker and regenerate the SanityChecker messages files and ");
-			System.err.println("    the WOCE flags report file.");
+			System.err.println("    SanityChecker and regenerate the SanityChecker messages files, but ");
+			System.err.println("    does not make any changes to the WOCE flags in the database. ");
+			System.err.println("    The WOCE flags report file is also regenerated from the current ");
+			System.err.println("    WOCE flags in the database. ");
 			System.exit(1);
 		}
 		String exposFilename = args[0];
@@ -1347,7 +1349,6 @@ public class DashboardCruiseChecker {
 		}
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
-		CheckerMessageHandler msgHandler = dataStore.getCheckerMsgHandler();
 		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
 		CruiseFlagsHandler flagsHandler = dataStore.getCruiseFlagsHandler();
 
@@ -1361,15 +1362,18 @@ public class DashboardCruiseChecker {
 				continue;
 			}
 			// Check the cruise as if this was to be submitted.
-			// This will regenerate the SanityChecker messages file and 
-			// updates the summary messages saved in CheckerMessageHandler
+			// This will regenerate the SanityChecker messages file.
 			if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 				System.err.println("Error - " + expo + " - problems standardizing cruise data");
 				continue;
 			}
-			ArrayList<String> summaryMsgs = msgHandler.getSummaryMsgs();
 			// Generate the WOCE flags report file from the summary messages and current WOCE flags
-			flagsHandler.generateWoceFlagMsgsFile(expo, dbHandler, summaryMsgs);
+			try {
+				flagsHandler.generateWoceFlagMsgsFile(expo, dbHandler);
+			} catch ( Exception ex ) {
+				System.err.println("Error - " + expo + " - problems getting WOCE flags");
+				continue;
+			}
 		}
 
 	}
