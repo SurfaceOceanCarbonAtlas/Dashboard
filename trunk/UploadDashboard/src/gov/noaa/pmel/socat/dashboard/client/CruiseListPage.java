@@ -13,6 +13,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
@@ -21,6 +22,7 @@ import com.google.gwt.cell.client.Cell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -191,6 +193,14 @@ public class CruiseListPage extends Composite {
 
 	private static final String UNEXPECTED_INVALID_DATESET_LIST_MSG = 
 			" (unexpected invalid data set list returned)";
+
+	// Select options
+	private static final String MIXED_SELECTION_OPTION = " ";
+	private static final String ALL_SELECTION_OPTION = "All";
+	private static final String EDITABLE_SELECTION_OPTION = "Editable";
+	private static final String SUBMITTED_SELECTION_OPTION = "Submitted";
+	private static final String PUBLISHED_SELECTION_OPTION = "Published";
+	private static final String CLEAR_SELECTION_OPTION = "Clear";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
@@ -428,17 +438,13 @@ public class CruiseListPage extends Composite {
 		userInfoLabel.setText(WELCOME_INTRO + username);
 		if ( cruises.isManager() ) {
 			if ( ! managerButtonsShown ) {
-				// Add manager-specific buttons
-				addToListButton.setVisible(true);
-				removeFromListButton.setVisible(true);
+				// Add manager-specific buttons - currently no manager-specific buttons
 				managerButtonsShown = true;
 			}
 		}
 		else {
 			if ( managerButtonsShown ) {
-				// Remove manager-specific buttons
-				addToListButton.setVisible(false);
-				removeFromListButton.setVisible(false);
+				// Remove manager-specific buttons - currently no manager-specific buttons
 				managerButtonsShown = false;
 			}
 		}
@@ -464,12 +470,12 @@ public class CruiseListPage extends Composite {
 	 * @param cruise
 	 * 		cruise to check
 	 * @return
-	 * 		null if the cruise is from a previous SOCAT version,
+	 * 		null if the cruise is published (previous SOCAT version),
 	 * 		false if the cruise is submitted, or
 	 * 		true if the cruise is not submitted.
 	 */
-	private Boolean isUnsubmittedCruise(DashboardCruise cruise) {
-		// null for cruises from previous SOCAT versions
+	private Boolean isEditableCruise(DashboardCruise cruise) {
+		// null for published cruises
 		String status = cruise.getArchiveStatus();
 		if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
 				 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
@@ -488,25 +494,49 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * Selects or unselects cruises in the cruise list.
+	 * Selects cruises of the given type in the cruise list, supplementing the currently
+	 * selected cruises, or clears all selected cruises.
 	 * 
-	 * @param select
-	 * 		if true, all (and only) unsubmitted or failed cruises will be selected;
-	 * 		otherwise, all cruises will be unselected
+	 * @param option
+	 * 		string indicating the cruise types to select;  one of: <br />
+	 * 		MIXED_SELECTION_OPTION - does nothing; <br />
+	 * 		ALL_SELECTION_OPTION - selects all cruises; <br />
+	 * 		EDITABLE_SELECTION_OPTION - selects editable cruises; <br />
+	 * 		SUBMITTED_SELECTION_OPTION - selects submitted cruises; <br />
+	 * 		PUBLISHED_SELECTION_OPTION - selects published cruises; or <br />
+	 * 		CLEAR_SELECTION_OPTION - clears all selected cruises.
 	 */
-	private void selectAllCruises(boolean select) {
+	private void setCruiseSelection(String option) {
+		// Do nothing is MIXED_SELECTION_OPTION is given
+		if ( MIXED_SELECTION_OPTION.equals(option) )
+			return;
+		// Modify the cruise selection
 		List<DashboardCruise> cruiseList = listProvider.getList();
-		for ( DashboardCruise cruise : cruiseList ) {
-			if ( select ) {
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( Boolean.TRUE.equals(unsubmitted) )
+		if ( ALL_SELECTION_OPTION.equals(option) ) {
+			for ( DashboardCruise cruise : cruiseList )
+				cruise.setSelected(true);
+		}
+		else if ( EDITABLE_SELECTION_OPTION.equals(option) ) {
+			for ( DashboardCruise cruise : cruiseList )
+				if ( Boolean.TRUE.equals(isEditableCruise(cruise)) )
 					cruise.setSelected(true);
-				else
-					cruise.setSelected(false);
-			}
-			else {
+		}
+		else if ( SUBMITTED_SELECTION_OPTION.equals(option) ) {
+			for ( DashboardCruise cruise : cruiseList )
+				if ( Boolean.FALSE.equals(isEditableCruise(cruise)) )
+					cruise.setSelected(true);
+		}
+		else if ( PUBLISHED_SELECTION_OPTION.equals(option) ) {
+			for ( DashboardCruise cruise : cruiseList )
+				if ( null == isEditableCruise(cruise) )
+					cruise.setSelected(true);
+		}
+		else if ( CLEAR_SELECTION_OPTION.equals(option) ) {
+			for ( DashboardCruise cruise : cruiseList )
 				cruise.setSelected(false);
-			}
+		}
+		else {
+			throw new RuntimeException("Unexpected option given the setCruiseSelection: " + option);
 		}
 		datasetsGrid.setRowCount(cruiseList.size());
 		datasetsGrid.setVisibleRange(0, cruiseList.size());
@@ -516,53 +546,99 @@ public class CruiseListPage extends Composite {
 
 	/**
 	 * @return
-	 * 		true if all (and only) unsubmitted or failed cruises are selected;
-	 * 		otherwise, false.
-	 */
-	private boolean isSelectAllCruises() {
-		// result is false if there are no selected cruises
-		boolean result = false;
-		for ( DashboardCruise cruise : listProvider.getList() ) {
-			Boolean unsubmitted = isUnsubmittedCruise(cruise);
+	 * 		the ..._SELECTION_OPTION String that describes the currently selected cruises;
+	 * 		one of MIXED_SELECTION_OPTION, ALL_SELECTION_OPTION, EDITABLE_SELECTION_OPTION, 
+	 * 		SUBMITTED_SELECTION_OPTION, PUBLISHED_SELECTION_OPTION, CLEAR_SELECTION_OPTION
+	 * - unused at this time, thus commented out
+	private String getSelectedCruisesType() {
+		List<DashboardCruise> cruiseList = listProvider.getList();
+		boolean isCleared = true;
+		boolean isAll = true;
+		Boolean isAllEditable = null;
+		Boolean isAllSubmitted = null;
+		Boolean isAllPublished = null;
+		for ( DashboardCruise cruise : cruiseList ) {
+			Boolean editable = isEditableCruise(cruise);
 			if ( cruise.isSelected() ) {
-				// check that this selected cruise is part of "all"
-				if ( ! Boolean.TRUE.equals(unsubmitted) )
-					return false;
-				// there was a selected cruise, so return true if there are no problems
-				result = true;
+				isCleared = false;
+				if ( null == editable ) {
+					// Published cruise selected
+					if ( null == isAllPublished )
+						isAllPublished = true;
+					isAllEditable = false;
+					isAllSubmitted = false;
+				}
+				else if ( ! editable ) {
+					// Submitted cruise selected
+					if ( null == isAllSubmitted )
+						isAllSubmitted = true;
+					isAllEditable = false;
+					isAllPublished = false;
+				}
+				else {
+					// Editable cruise selected
+					if ( null == isAllEditable )
+						isAllEditable = true;
+					isAllSubmitted = false;
+					isAllPublished = false;
+				}
 			}
 			else {
-				// check that this unselected cruise is not part of "all"
-				if ( Boolean.TRUE.equals(unsubmitted) )
-					return false;
+				isAll = false;
+				if ( null == editable ) {
+					// Published cruise not selected
+					isAllPublished = false;
+				}
+				else if ( ! editable ) {
+					// Submitted cruise not selected
+					isAllSubmitted = false;
+				}
+				else {
+					// Editable cruise not selected
+					isAllEditable = false;
+				}
 			}
 		}
-		return result;
+		String selectType;
+		if ( isCleared )
+			selectType = CLEAR_SELECTION_OPTION;
+		else if ( isAll )
+			selectType = ALL_SELECTION_OPTION;
+		else if ( Boolean.TRUE.equals(isAllEditable) )
+			selectType = EDITABLE_SELECTION_OPTION;
+		else if ( Boolean.TRUE.equals(isAllSubmitted) )
+			selectType = SUBMITTED_SELECTION_OPTION;
+		else if ( Boolean.TRUE.equals(isAllPublished) )
+			selectType = PUBLISHED_SELECTION_OPTION;
+		else
+			selectType = MIXED_SELECTION_OPTION;
+		return selectType;
 	}
+	*/
 
 	/**
 	 * Assigns cruiseSet with the set of selected cruises, and 
 	 * expocodeSet with the expocodes of these cruises. 
 	 *  
-	 * @param onlyUnsubmitted
-	 * 		if true, fails if a submitted or previous version cruise is selected;
-	 * 		if false, fails if a previous version cruise is selected;
+	 * @param onlyEditable
+	 * 		if true, fails if a submitted or published cruise is selected;
+	 * 		if false, fails if a published cruise is selected;
 	 * 		if null, always succeeds.
 	 * @return
 	 * 		if successful
 	 */
-	private boolean getSelectedCruises(Boolean onlyUnsubmitted) {
+	private boolean getSelectedCruises(Boolean onlyEditable) {
 		cruiseSet.clear();
 		expocodeSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
-				if ( onlyUnsubmitted != null ) {
-					Boolean unsubmitted = isUnsubmittedCruise(cruise);
-					// check if from a previous SOCAT versions
-					if ( unsubmitted == null )
+				if ( onlyEditable != null ) {
+					Boolean editable = isEditableCruise(cruise);
+					// check if from a previous SOCAT version
+					if ( editable == null )
 						return false;
-					// check if unsubmitted, if requested
-					if ( onlyUnsubmitted && ! unsubmitted )
+					// check if editable, if requested
+					if ( onlyEditable && ! editable )
 						return false;
 				}
 				cruiseSet.add(cruise);
@@ -823,7 +899,7 @@ public class CruiseListPage extends Composite {
 	 * to be populated using {@link #updateCruises(DashboardCruiseList)}.
 	 */
 	private void buildCruiseListTable() {
-		Header<Boolean> selectedHeader = buildSelectedHeader();
+		Header<String> selectedHeader = buildSelectionHeader();
 
 		// Create the columns for this table
 		TextColumn<DashboardCruise> rowNumColumn = buildRowNumColumn();
@@ -866,8 +942,8 @@ public class CruiseListPage extends Composite {
 				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(selectedColumn, 
-				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
+				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(expocodeColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
@@ -985,19 +1061,26 @@ public class CruiseListPage extends Composite {
 	/**
 	 * @return the selection header for the table
 	 */
-	private Header<Boolean> buildSelectedHeader() {
-		Header<Boolean> selectedHeader = new Header<Boolean>(new CheckboxCell(true, false)) {
+	private Header<String> buildSelectionHeader() {
+		SelectionCell selectCell = new SelectionCell(Arrays.asList(
+				MIXED_SELECTION_OPTION, 
+				ALL_SELECTION_OPTION, 
+				EDITABLE_SELECTION_OPTION, 
+				SUBMITTED_SELECTION_OPTION, 
+				PUBLISHED_SELECTION_OPTION, 
+				CLEAR_SELECTION_OPTION));
+		Header<String> selectedHeader = new Header<String>(selectCell) {
 			@Override
-			public Boolean getValue() {
-				return isSelectAllCruises();
+			public String getValue() {
+				return MIXED_SELECTION_OPTION;
 			}
 		};
-		selectedHeader.setUpdater(new ValueUpdater<Boolean>() {
+		selectedHeader.setUpdater(new ValueUpdater<String>() {
 			@Override
-			public void update(Boolean selected) {
-				if ( selected == null )
+			public void update(String option) {
+				if ( option == null )
 					return;
-				selectAllCruises(selected);
+				setCruiseSelection(option);
 			}
 		});
 		return selectedHeader;
@@ -1008,7 +1091,7 @@ public class CruiseListPage extends Composite {
 	 */
 	private Column<DashboardCruise,Boolean> buildSelectedColumn() {
 		Column<DashboardCruise,Boolean> selectedColumn = 
-				new Column<DashboardCruise,Boolean>(new CheckboxCell(true, false)) {
+				new Column<DashboardCruise,Boolean>(new CheckboxCell(true, true)) {
 			@Override
 			public Boolean getValue(DashboardCruise cruise) {
 				return cruise.isSelected();
@@ -1089,11 +1172,11 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
+				Boolean editable = isEditableCruise(cruise);
 				String msg = getValue(cruise);
 				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
 					// No problems - use normal background
-					if ( Boolean.TRUE.equals(unsubmitted) ) {
+					if ( Boolean.TRUE.equals(editable) ) {
 						sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 						sb.appendEscaped(msg);
 						sb.appendHtmlConstant("</em></u></div>");
@@ -1107,7 +1190,7 @@ public class CruiseListPage extends Composite {
 				else if ( msg.contains("warnings") || (msg.contains("errors") && 
 						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
 					// Only warnings or a few errors - use warning background color
-					if ( Boolean.TRUE.equals(unsubmitted) ) {
+					if ( Boolean.TRUE.equals(editable) ) {
 						sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
 								SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
 						sb.appendEscaped(msg);
@@ -1122,7 +1205,7 @@ public class CruiseListPage extends Composite {
 				}
 				else {
 					// Many errors, unacceptable, or not checked - use error background color
-					if ( Boolean.TRUE.equals(unsubmitted) ) {
+					if ( Boolean.TRUE.equals(editable) ) {
 						sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
 								SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
 						sb.appendEscaped(msg);
@@ -1141,8 +1224,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( Boolean.TRUE.equals(unsubmitted) ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( Boolean.TRUE.equals(editable) ) {
 					// Save the currently selected cruises
 					getSelectedCruises(null);
 					// Open the data column specs page for this one cruise
@@ -1171,8 +1254,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( Boolean.TRUE.equals(unsubmitted) ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( Boolean.TRUE.equals(editable) ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(getValue(cruise));
 					sb.appendHtmlConstant("</em></u></div>");
@@ -1188,8 +1271,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( Boolean.TRUE.equals(unsubmitted) ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( Boolean.TRUE.equals(editable) ) {
 					// Save the currently selected cruises
 					getSelectedCruises(null);
 					// Show the OME metadata manager page for this one cruise
@@ -1216,8 +1299,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( unsubmitted != null ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( editable != null ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(getValue(cruise));
 					sb.appendHtmlConstant("</em></u></div>");
@@ -1233,8 +1316,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises in this version
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( unsubmitted != null ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( editable != null ) {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
@@ -1263,8 +1346,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( unsubmitted != null ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( editable != null ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(getValue(cruise));
 					sb.appendHtmlConstant("</em></u></div>");
@@ -1280,8 +1363,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises in this version
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( unsubmitted != null ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( editable != null ) {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
@@ -1340,8 +1423,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( Boolean.TRUE.equals(unsubmitted) ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( Boolean.TRUE.equals(editable) ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendHtmlConstant(getValue(cruise));
 					sb.appendHtmlConstant("</em></u></div>");
@@ -1357,8 +1440,8 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
-				Boolean unsubmitted = isUnsubmittedCruise(cruise);
-				if ( Boolean.TRUE.equals(unsubmitted) ) {
+				Boolean editable = isEditableCruise(cruise);
+				if ( Boolean.TRUE.equals(editable) ) {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
 					// Go to the additional docs page with just this one cruise
