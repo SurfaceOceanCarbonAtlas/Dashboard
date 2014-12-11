@@ -5,8 +5,6 @@ package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -1310,8 +1308,7 @@ public class DashboardCruiseChecker {
 			System.err.println("    is a file containing expocodes, one per line, to recheck with the ");
 			System.err.println("    SanityChecker and regenerate the SanityChecker messages files, but ");
 			System.err.println("    does not make any changes to the WOCE flags in the database. ");
-			System.err.println("    The WOCE flags report file is also regenerated from the current ");
-			System.err.println("    WOCE flags in the database. ");
+			System.err.println();
 			System.exit(1);
 		}
 		String exposFilename = args[0];
@@ -1349,9 +1346,8 @@ public class DashboardCruiseChecker {
 		}
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
-		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
-		CruiseFlagsHandler flagsHandler = dataStore.getCruiseFlagsHandler();
 
+		int retVal = 0;
 		for ( String expo : expocodes ) {
 			// Get all the data for this cruise
 			DashboardCruiseWithData cruiseData;
@@ -1359,23 +1355,20 @@ public class DashboardCruiseChecker {
 				cruiseData = cruiseHandler.getCruiseDataFromFiles(expo, 0, -1);
 			} catch ( Exception ex ) {
 				System.err.println("Error - " + expo + " - problems obtaining cruise data");
+				retVal = 1;
 				continue;
 			}
 			// Check the cruise as if this was to be submitted.
 			// This will regenerate the SanityChecker messages file.
 			if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 				System.err.println("Error - " + expo + " - problems standardizing cruise data");
+				retVal = 1;
 				continue;
 			}
-			// Generate the WOCE flags report file from the summary messages and current WOCE flags
-			try {
-				flagsHandler.generateWoceFlagMsgsFile(expo, dbHandler);
-			} catch ( Exception ex ) {
-				System.err.println("Error - " + expo + " - problems getting WOCE flags");
-				continue;
-			}
+			System.err.println("Success - " + expo);
 		}
-
+		// Done - return zero if no problems
+		System.exit(retVal);
 	}
 
 }
