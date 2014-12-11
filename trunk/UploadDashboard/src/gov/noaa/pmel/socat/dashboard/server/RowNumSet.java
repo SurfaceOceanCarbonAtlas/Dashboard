@@ -28,7 +28,7 @@ public class RowNumSet extends TreeSet<Integer> {
 	 * Prints the contents of this set of integers in a compact form.
 	 * A sequence of consecutive integers are printed using the first 
 	 * value, a hyphen, and the last value, such as: 
-	 * "5-35, 67, 88-99"
+	 * "5-35,67,68,88-99"
 	 */
 	@Override
 	public String toString() {
@@ -44,7 +44,7 @@ public class RowNumSet extends TreeSet<Integer> {
 				start = val;
 				end = val;
 			}
-			else if ( val == (end + 1) ) {
+			else if ( val.equals(end + 1) ) {
 				// continue the current sequence
 				end = val;
 			}
@@ -54,11 +54,17 @@ public class RowNumSet extends TreeSet<Integer> {
 					first = false;
 				}
 				else {
-					sb.append(", ");
+					sb.append(",");
 				}
-				if ( start == end ) {
+				if ( start.equals(end) ) {
 					// singleton
 					sb.append(start.toString());
+				}
+				else if ( start.equals(end - 1) ) {
+					// pair
+					sb.append(start.toString());
+					sb.append(",");
+					sb.append(end.toString());
 				}
 				else {
 					// range 
@@ -73,11 +79,17 @@ public class RowNumSet extends TreeSet<Integer> {
 		}
 		// print the final stored sequence
 		if ( ! first ) {
-			sb.append(", ");
+			sb.append(",");
 		}
-		if ( start == end ) {
+		if ( start.equals(end) ) {
 			// singleton
 			sb.append(start.toString());
+		}
+		else if ( start.equals(end - 1) ) {
+			// pair
+			sb.append(start.toString());
+			sb.append(",");
+			sb.append(end.toString());
 		}
 		else {
 			// range 

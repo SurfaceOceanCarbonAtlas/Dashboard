@@ -88,7 +88,7 @@ public class CruiseFlagsHandler {
 			// Get the current WOCE flags for this cruise and print them to file
 			msgsWriter.println("Expocode: " + expocode);
 			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + timestamper.format(new Date()));
-			msgsWriter.println("Flag\tCol. Name\tNum. Rows\tMessage\tRows");
+			msgsWriter.println("Flag\tCol.Type\tNum.Rows\tMessage\tRows");
 			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode);
 			for ( SocatWoceEvent woceEvent : woceEventsList ) {
 				// Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
@@ -121,9 +121,7 @@ public class CruiseFlagsHandler {
 	 * @param args
 	 * 		ExpocodesFile
 	 * 
-	 * where:
-	 * 
-	 * ExpocodesFile is a file containing expocodes of the cruises to report
+	 * where ExpocodesFile is a file containing expocodes of the cruises to report
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 1 ) {
