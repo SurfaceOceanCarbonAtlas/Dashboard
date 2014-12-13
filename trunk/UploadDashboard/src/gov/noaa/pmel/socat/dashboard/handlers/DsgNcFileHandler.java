@@ -549,10 +549,9 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Update the WOCE flags in the full DSG file, as well as in the given 
-	 * temporary DSG file, and regenerate the decimated DSG file.  In the 
-	 * process, complete some of the missing data in WOCE event (row number, 
-	 * region ID, data type).
+	 * Update the WOCE flags in the full and decimated DSG files, as well as 
+	 * in the temporary DSG file, if given.  In the process, complete some of 
+	 * the missing data in WOCE event (row number, region ID, data type).
 	 * 
 	 * @param woceEvent
 	 * 		WOCE event to use; the expocode is used to identify datasets to update

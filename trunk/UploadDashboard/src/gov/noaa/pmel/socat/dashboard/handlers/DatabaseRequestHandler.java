@@ -912,10 +912,14 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * One-off main to assign the WOCE-4 flags to 06AQ20090109 to data measured 
-	 * during an iron fertilization experiment.
+	 * Currently does nothing.  Originally was a one-off main to assign the WOCE-4 
+	 * flags to 06AQ20090109 to data measured during an iron fertilization experiment.
+	 * Left in as an example if needed in the future.
 	 */
 	public static void main(String[] args) {
+		// Do nothing - just return with an error value
+		System.exit(1);
+
 		SimpleDateFormat timestamper = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		timestamper.setTimeZone(TimeZone.getTimeZone("UTC"));
 		String expocode = "06AQ20090109";
@@ -942,7 +946,7 @@ public class DatabaseRequestHandler {
 		try {
 			dsgFile = dataStore.getDsgNcFileHandler().getDsgNcFile(expocode);
 		} catch (Exception ex) {
-			System.err.println("Problem the DSG file for " + expocode);
+			System.err.println("Problems getting the DSG file for " + expocode);
 			ex.printStackTrace();
 			System.exit(1);
 		}
@@ -1034,7 +1038,7 @@ public class DatabaseRequestHandler {
 			System.exit(1);
 		}
 
-		// Update the WOCE flags in the DSG and decimated DSG files
+		// Update the WOCE flags in the DSG file
 		try {
 			ArrayList<String> results = dsgFile.assignWoceFlags(woceEvent);
 			if ( ! results.isEmpty() ) {
@@ -1050,6 +1054,9 @@ public class DatabaseRequestHandler {
 			System.exit(1);
 		}
 
+		// TODO: redecimate - done by hand
+		// TODO: flag ERDDAP - done by hand
+		
 		System.exit(0);
 	}
 
