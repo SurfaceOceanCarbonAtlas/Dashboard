@@ -65,6 +65,13 @@ public class Message {
 	}
 
 	/**
+	 * @return the name of the column for which this message was raised.
+	 */
+	public String getColumnName() {
+		return itsColumnName;
+	}
+
+	/**
 	 * Returns the severity of the message
 	 * @return The severity of the message
 	 */
