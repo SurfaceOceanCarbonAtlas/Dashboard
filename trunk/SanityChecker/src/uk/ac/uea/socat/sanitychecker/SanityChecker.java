@@ -250,7 +250,7 @@ public class SanityChecker {
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
-			Message message = new Message(Message.NO_COLUMN_INDEX, itsInternalErrorType, Message.ERROR, Message.NO_LINE_NUMBER, e.getClass().getCanonicalName() + ": " + e.getMessage(), "");
+			Message message = new Message(Message.NO_COLUMN_INDEX, null, itsInternalErrorType, Message.ERROR, Message.NO_LINE_NUMBER, e.getClass().getCanonicalName() + ": " + e.getMessage(), "");
 			try {
 				itsOutput.addMessage(message);
 				itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
@@ -454,7 +454,7 @@ public class SanityChecker {
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
 							// No required group, so we just report the missing value
 							itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), itsMissingValueType, null, null);
+							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), column.getInputColumnName(), itsMissingValueType, null, null);
 						} else {
 							// We're in a required group, so check the values from the other fields.
 							// Only if they're all missing do we set the missing flag
@@ -464,7 +464,7 @@ public class SanityChecker {
 								// Only report required group columns that are in the input file
 								if (null != column.getInputColumnName()) {
 									itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-									column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), itsMissingValueType, null, null);
+									column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), column.getInputColumnName(), itsMissingValueType, null, null);
 								}
 							}
 						}
@@ -500,7 +500,7 @@ public class SanityChecker {
 						}
 						
 						if (null != rangeString) {
-							column.setFlag(rangeCheckFlag, messages, currentRecord, column.getInputColumnIndex(), itsRangeType, column.getValue(), rangeString.toString());
+							column.setFlag(rangeCheckFlag, messages, currentRecord, column.getInputColumnIndex(), column.getInputColumnName(), itsRangeType, column.getValue(), rangeString.toString());
 						}
 					}
 				}
@@ -523,7 +523,7 @@ public class SanityChecker {
 			if (null == config) {
 				itsLogger.trace("Unrecognised metadata item '" + name);
 				
-				Message message = new Message(Message.NO_COLUMN_INDEX, itsUnrecognisedMetadataType, Message.WARNING, Message.NO_LINE_NUMBER, name, null);
+				Message message = new Message(Message.NO_COLUMN_INDEX, null, itsUnrecognisedMetadataType, Message.WARNING, Message.NO_LINE_NUMBER, name, null);
 				itsOutput.addMessage(message);
 				itsLogger.warn("Unrecognised metadata item " + name);
 			} else {
@@ -535,7 +535,7 @@ public class SanityChecker {
 					if (e.getCause() instanceof DateTimeException) {
 						
 						// Note that we cheat and pass the metadata item name as the value.
-						Message message = new Message(Message.NO_COLUMN_INDEX, itsInvalidMetadataDateType, Message.ERROR, Message.NO_LINE_NUMBER, name, null);
+						Message message = new Message(Message.NO_COLUMN_INDEX, null, itsInvalidMetadataDateType, Message.ERROR, Message.NO_LINE_NUMBER, name, null);
 						itsOutput.addMessage(message);
 						itsLogger.error("Invalid date format for metadata item " + name);
 					} else {
@@ -604,7 +604,7 @@ public class SanityChecker {
 						itsLogger.error("Required metadata item '" + metadataName + "' is missing");
 						ok = false;
 
-						Message message = new Message(Message.NO_COLUMN_INDEX, itsMissingMetadataType, Message.ERROR, Message.NO_LINE_NUMBER, metadataName, null);
+						Message message = new Message(Message.NO_COLUMN_INDEX, null, itsMissingMetadataType, Message.ERROR, Message.NO_LINE_NUMBER, metadataName, null);
 						itsOutput.addMessage(message);
 					}
 				}
@@ -638,7 +638,7 @@ public class SanityChecker {
 				itsLogger.error("At least one of " + groupedItemNames + " must be present in the metadata");
 				ok = false;
 				
-				Message message = new Message(Message.NO_COLUMN_INDEX, itsMissingMetadataGroupType, Message.ERROR, Message.NO_LINE_NUMBER, groupedItemNames.toString(), null);
+				Message message = new Message(Message.NO_COLUMN_INDEX, null, itsMissingMetadataGroupType, Message.ERROR, Message.NO_LINE_NUMBER, groupedItemNames.toString(), null);
 				itsOutput.addMessage(message);
 			}
 		}

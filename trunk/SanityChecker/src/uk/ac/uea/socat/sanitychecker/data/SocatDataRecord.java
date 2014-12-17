@@ -222,13 +222,13 @@ public class SocatDataRecord {
 		} catch (MissingDateTimeElementException e) {
 			try {
 				setDateFlag(SocatColumnConfigItem.BAD_FLAG);
-				itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, MISSING_DATE_ELEMENT_TYPE, Message.ERROR, itsLineNumber, CheckerUtils.listToString(dataFields), ""));
+				itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, Message.DATE_TIME_COLUMN_NAME, MISSING_DATE_ELEMENT_TYPE, Message.ERROR, itsLineNumber, CheckerUtils.listToString(dataFields), ""));
 			} catch(SocatDataBaseException e2) {
 				throw new SocatDataException(itsLineNumber, -1, "Date", e2);
 			}
 			
 		} catch (DateTimeParseException e) {
-			itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, UNPARSABLE_DATE_TYPE, Message.ERROR, itsLineNumber, CheckerUtils.listToString(dataFields), ""));
+			itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, Message.DATE_TIME_COLUMN_NAME, UNPARSABLE_DATE_TYPE, Message.ERROR, itsLineNumber, CheckerUtils.listToString(dataFields), ""));
 			setDateFlag(SocatColumnConfigItem.BAD_FLAG);
 		} catch (DateTimeException e) {
 			setDateFlag(SocatColumnConfigItem.BAD_FLAG);
@@ -332,7 +332,7 @@ public class SocatDataRecord {
 								SocatDataColumn badColumn = getColumn(column);
 								itsLogger.trace("Non-parseable numeric value on line " + getLineNumber() + ", column '" + column + "'");
 								
-								badColumn.setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, getLineNumber(), columnIndex, UNPARSABLE_NUMBER_TYPE, value, null);
+								badColumn.setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, getLineNumber(), columnIndex, colInfo.getInputColumnName(), UNPARSABLE_NUMBER_TYPE, value, null);
 							}
 						}
 						

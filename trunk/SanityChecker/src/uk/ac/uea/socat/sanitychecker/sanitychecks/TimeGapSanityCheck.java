@@ -58,7 +58,7 @@ public class TimeGapSanityCheck extends SanityCheck {
 				double gap = calcDayDiff(itsLastTime, recordTime);
 				
 				if (gap > itsGapLimit) {
-					itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, TIME_GAP_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(gap), Double.toString(itsGapLimit)));
+					itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, Message.DATE_TIME_COLUMN_NAME, TIME_GAP_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(gap), Double.toString(itsGapLimit)));
 				}
 			}
 		}

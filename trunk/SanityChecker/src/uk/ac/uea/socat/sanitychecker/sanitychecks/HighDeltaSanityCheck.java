@@ -101,7 +101,7 @@ public class HighDeltaSanityCheck extends SanityCheck {
 				double deltaPerMinute = valueDelta / minutesDifference;
 				if (deltaPerMinute > itsMaxDelta) {
 					try {
-						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), HIGH_DELTA_TYPE, null, Double.toString(itsMaxDelta));
+						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), record.getColumn(itsColumnName).getInputColumnName(), HIGH_DELTA_TYPE, null, Double.toString(itsMaxDelta));
 					} catch (SocatDataBaseException e) {
 						throw new SanityCheckException ("Error while setting flag on record", e);
 					}

@@ -41,7 +41,7 @@ public class ExpoCode implements DataCalculator {
 				result = expocode.getValue(dateTimeHandler);
 			} else {
 				if (null == shipCode || null == startDate) {
-					Message message = new Message(Message.NO_COLUMN_INDEX, CANT_CALC_EXPOCODE_TYPE, Message.ERROR, Message.NO_LINE_NUMBER, null, null);
+					Message message = new Message(Message.NO_COLUMN_INDEX, null, CANT_CALC_EXPOCODE_TYPE, Message.ERROR, Message.NO_LINE_NUMBER, null, null);
 					record.addMessage(message);
 				} else { 
 					result = shipCode.getValue(dateTimeHandler) + startDate.getValue(dateTimeHandler);

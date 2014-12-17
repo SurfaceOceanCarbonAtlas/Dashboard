@@ -167,7 +167,7 @@ public class ConstantSanityCheck extends SanityCheck {
 			if (minutesDifference > itsMaxDuration) {
 				try {
 					for (SocatDataRecord record : itsRecords) {
-						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsRecords.get(0).getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), CONSTANT_TYPE, new DecimalFormat("#").format(minutesDifference), Integer.toString(itsMaxDuration));
+						record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, itsRecords.get(0).getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), record.getColumn(itsColumnName).getInputColumnName(), CONSTANT_TYPE, new DecimalFormat("#").format(minutesDifference), Integer.toString(itsMaxDuration));
 					}
 				} catch (SocatDataBaseException e) {
 					throw new SanityCheckException ("Error while setting flag on record", e);
