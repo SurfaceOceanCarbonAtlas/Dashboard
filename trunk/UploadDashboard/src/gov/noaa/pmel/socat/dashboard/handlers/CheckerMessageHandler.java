@@ -32,8 +32,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import uk.ac.uea.socat.sanitychecker.Output;
-import uk.ac.uea.socat.sanitychecker.config.ConfigException;
-import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
@@ -268,12 +266,7 @@ public class CheckerMessageHandler {
 						mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 								Integer.toString(colNum));
 
-					String colName;
-					try {
-						colName = SocatColumnConfig.getInstance().getColumnName(colNum);
-					} catch ( ConfigException ex ) {
-						throw new RuntimeException(ex);
-					}
+					String colName = msg.getColumnName();
 					if ( colName != null )
 						mappings.add(SCMSG_COLUMN_NAME_KEY + SCMSG_KEY_VALUE_SEP + colName);
 
