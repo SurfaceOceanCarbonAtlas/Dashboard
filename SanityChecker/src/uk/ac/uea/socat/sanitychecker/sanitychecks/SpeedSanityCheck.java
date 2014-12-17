@@ -96,13 +96,13 @@ public class SpeedSanityCheck extends SanityCheck {
 					double hourDiff = calcHourDiff(lastTime, thisTime);
 					
 					if (hourDiff <= 0.0) {
-						itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, BACKWARDS_TIME_TYPE, Message.ERROR, record.getLineNumber(), null, null));
+						itsMessages.add(new Message(Message.DATE_TIME_COLUMN_INDEX, Message.DATE_TIME_COLUMN_NAME, BACKWARDS_TIME_TYPE, Message.ERROR, record.getLineNumber(), null, null));
 					} else if (calcSecondsDiff(lastTime, thisTime) > 1) {
 						double speed = distance / hourDiff;
 						if (speed > itsBadSpeedLimit) {
-							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, SPEED_TYPE, Message.ERROR, record.getLineNumber(), Double.toString(speed), Double.toString(itsBadSpeedLimit)));
+							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, Message.SHIP_SPEED_COLUMN_NAME, SPEED_TYPE, Message.ERROR, record.getLineNumber(), Double.toString(speed), Double.toString(itsBadSpeedLimit)));
 						} else if (speed > itsQuestionableSpeedLimit) {
-							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, SPEED_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(speed), Double.toString(itsQuestionableSpeedLimit)));
+							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, Message.SHIP_SPEED_COLUMN_NAME, SPEED_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(speed), Double.toString(itsQuestionableSpeedLimit)));
 						}
 					}
 				}

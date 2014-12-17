@@ -1,8 +1,5 @@
 package uk.ac.uea.socat.sanitychecker.messages;
 
-import uk.ac.uea.socat.sanitychecker.config.ConfigException;
-import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
-
 public class Message {
 	
 	public static final int ERROR = 1;
@@ -17,13 +14,19 @@ public class Message {
 	
 	public static final int DATE_TIME_COLUMN_INDEX = -1;
 	
+	public static final String DATE_TIME_COLUMN_NAME = "Date/Time";
+	
 	public static final int SHIP_SPEED_COLUMN_INDEX = -2;
+	
+	public static final String SHIP_SPEED_COLUMN_NAME = "Ship Speed (Lon/Lat/Time)";
 	
 	public static final int NO_COLUMN_INDEX = -999;
 	
 	public static final int NO_LINE_NUMBER = -999;
 
 	private int itsColumnIndex;
+	
+	private String itsColumnName;
 	
 	private MessageType itsType;
 	
@@ -35,8 +38,9 @@ public class Message {
 	
 	private String itsValidValue;
 	
-	public Message(int columnIndex, MessageType type, int severity, int lineNumber, String fieldValue, String validValue) {
+	public Message(int columnIndex, String columnName, MessageType type, int severity, int lineNumber, String fieldValue, String validValue) {
 		itsColumnIndex = columnIndex;
+		itsColumnName = columnName;
 		itsType = type;
 		itsSeverity = severity;
 		itsLineNumber = lineNumber;
@@ -98,21 +102,14 @@ public class Message {
 		return new MessageKey(itsColumnIndex, itsType);
 	}
 	
-	public String getMessageString() throws MessageException {
+	public String getMessageString() {
 		
-			StringBuffer result = new StringBuffer();
-			result.append(getMessageSeverityString());
-			result.append(": LINE ");
-			result.append(itsLineNumber);
-			result.append(": ");
-			
-			try {
-				String columnName = SocatColumnConfig.getInstance().getColumnName(itsColumnIndex);
-				result.append(itsType.getRecordMessage(columnName, itsFieldValue, itsValidValue));
-			} catch (ConfigException e) {
-				throw new MessageException("Error while interrogating column configuration", e);
-			}
-		
+		StringBuffer result = new StringBuffer();
+		result.append(getMessageSeverityString());
+		result.append(": LINE ");
+		result.append(itsLineNumber);
+		result.append(": ");
+		result.append(itsType.getRecordMessage(itsColumnName, itsFieldValue, itsValidValue));
 		return result.toString();
 	}
 	

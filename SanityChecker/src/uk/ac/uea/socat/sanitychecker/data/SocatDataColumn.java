@@ -60,7 +60,7 @@ public class SocatDataColumn {
 	 * @param validValue The valid value(s) for the column
 	 * @throws SocatDataBaseException If the field doesn't have a flag.
 	 */
-	public void setFlag(int flag, List<Message> messages, int record, int columnIndex, MessageType messageType, String fieldValue, String validValue) throws SocatDataBaseException {
+	public void setFlag(int flag, List<Message> messages, int record, int columnIndex, String columnName, MessageType messageType, String fieldValue, String validValue) throws SocatDataBaseException {
 		if (itsConfig.hasFlag()) {
 			
 			// The flag codes are set up so worse flags are greater than weaker flags.
@@ -75,7 +75,7 @@ public class SocatDataColumn {
 						severity = Message.ERROR;
 					}
 					
-					messages.add(new Message(columnIndex, messageType, severity, record, fieldValue, validValue));
+					messages.add(new Message(columnIndex, columnName, messageType, severity, record, fieldValue, validValue));
 				}
 			}
 			

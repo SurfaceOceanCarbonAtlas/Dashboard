@@ -227,7 +227,7 @@ public abstract class MetadataItem {
 				    validRangeString.append(':');
 				    validRangeString.append(itsConfigItem.getRange().getIntMax());
 
-				    result = new Message(Message.NO_COLUMN_INDEX, itsMetadataRangeType, Message.WARNING, itsLine, itemValueString.toString(), validRangeString.toString());
+				    result = new Message(Message.NO_COLUMN_INDEX, null, itsMetadataRangeType, Message.WARNING, itsLine, itemValueString.toString(), validRangeString.toString());
 				}
 			}
 			
@@ -258,7 +258,7 @@ public abstract class MetadataItem {
 				    validRangeString.append(':');
 				    validRangeString.append(itsConfigItem.getRange().getRealMax());
 
-				    result = new Message(Message.NO_COLUMN_INDEX, itsMetadataRangeType, Message.WARNING, Message.NO_LINE_NUMBER, itemValueString.toString(), validRangeString.toString());
+				    result = new Message(Message.NO_COLUMN_INDEX, null, itsMetadataRangeType, Message.WARNING, Message.NO_LINE_NUMBER, itemValueString.toString(), validRangeString.toString());
 				}
 			}
 			

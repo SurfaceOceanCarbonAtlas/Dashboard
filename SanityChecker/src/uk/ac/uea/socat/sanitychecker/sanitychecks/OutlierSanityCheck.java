@@ -117,7 +117,7 @@ public class OutlierSanityCheck extends SanityCheck {
 			if (diffFromMean > (itsStdev * itsStdevLimit)) {
 				try {
 					SocatDataRecord record = recordValue.record;
-					record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), OUTLIER_TYPE, Double.toString(recordValue.value), Double.toString(itsStdevLimit));
+					record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), record.getColumn(itsColumnName).getInputColumnName(), OUTLIER_TYPE, Double.toString(recordValue.value), Double.toString(itsStdevLimit));
 				} catch (SocatDataBaseException e) {
 					throw new SanityCheckException ("Error while setting flag on record", e);
 				}

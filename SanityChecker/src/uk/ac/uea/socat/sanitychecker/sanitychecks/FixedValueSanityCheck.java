@@ -83,7 +83,7 @@ public class FixedValueSanityCheck extends SanityCheck {
 
 		if ( value.compareTo(itsFixedValue) != 0 ) {
 			try {
-				record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), FIXED_VALUE_TYPE, null, null);
+				record.getColumn(itsColumnName).setFlag(SocatColumnConfigItem.BAD_FLAG, itsMessages, record.getLineNumber(), record.getColumn(itsColumnName).getInputColumnIndex(), record.getColumn(itsColumnName).getInputColumnName(), FIXED_VALUE_TYPE, null, null);
 			}
 			catch (SocatDataBaseException e) {
 				throw new SanityCheckException ("Error while setting flag on record", e);
