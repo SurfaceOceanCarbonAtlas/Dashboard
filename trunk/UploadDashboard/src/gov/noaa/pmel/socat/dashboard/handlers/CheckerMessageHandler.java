@@ -370,6 +370,7 @@ public class CheckerMessageHandler {
 						if ( msgline.startsWith(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP) ) {
 							summaryMsgs.add(msgline.substring(SCMSG_SUMMARY_MSG_KEY.length() + 
 									SCMSG_KEY_VALUE_SEP.length()).trim());
+							msgline = msgReader.readLine();
 							continue;
 						}
 
