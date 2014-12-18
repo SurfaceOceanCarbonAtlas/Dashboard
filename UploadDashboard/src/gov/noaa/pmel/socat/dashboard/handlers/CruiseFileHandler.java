@@ -1327,4 +1327,143 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruise.setWoceFourRowIndices(DashboardUtils.decodeSetsArrayList(value));
 	}
 
+	/**
+	 * Updates the UploadDashboard status of the cruise based on the QC flag
+	 * provided for the cruise.
+	 * 
+	 * @param expocode
+	 * 		Update the status of the cruise with this expocode.
+	 * @param qcFlag
+	 * 		QC flag assigned to this cruise; if null or whitespace,
+	 * 		the status assigned will be unsubmitted
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid,
+	 * 		if there are problems accessing the cruise info file, or
+	 * 		if the QC flag given is invalid
+	 */
+	public void updateCruiseDashboardStatus(String expocode, Character qcFlag) 
+											throws IllegalArgumentException {
+		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
+		String oldStatus = cruise.getQcStatus();
+		String newStatus;
+		// Special check for null or blank QC flag == not submitted
+		if ( (qcFlag == null) || Character.isWhitespace(qcFlag) ) {
+			newStatus = SocatQCEvent.QC_STATUS_NOT_SUBMITTED;
+		}
+		else {
+			newStatus = SocatQCEvent.FLAG_STATUS_MAP.get(qcFlag);
+			if ( newStatus == null ) {
+				// SocatQCEvent.QC_COMMENT or unknown flag
+				throw new IllegalArgumentException("Unexpected QC flag of '" + 
+						qcFlag + "' given to updateCruiseDashboardStatus");
+			}
+		}
+		cruise.setQcStatus(newStatus);
+		saveCruiseInfoToFile(cruise, "Update cruise dashboard status from '" + 
+				oldStatus + "' to '" + newStatus + "'");
+	}
+
+	/**
+	 * Updates the cruise dashboard status from the current QC flag in the full-data 
+	 * DSG file for cruises specified in ExpocodesFile, or all cruises if ExpocodesFile 
+	 * is '-'. The default dashboard configuration is used for this process. 
+	 * 
+	 * @param args
+	 * 		ExpocodesFile
+	 */
+	public static void main(String[] args) {
+		if ( args.length != 1 ) {
+			System.err.println("Arguments:  [ - | ExpocodesFile ]");
+			System.err.println();
+			System.err.println("Updates the cruise dashboard status from the current QC flag in the full-data ");
+			System.err.println("DSG file for cruises specified in ExpocodesFile, or all cruises if ExpocodesFile "); 
+			System.err.println("is '-'. The default dashboard configuration is used for this process. "); 
+			System.err.println();
+			System.exit(1);
+		}
+
+		String expocodesFilename = args[0];
+		if ( "-".equals(expocodesFilename) )
+			expocodesFilename = null;
+
+		boolean success = true;
+
+		// Get the default dashboard configuration
+		DashboardDataStore dataStore = null;		
+		try {
+			dataStore = DashboardDataStore.get();
+		} catch (Exception ex) {
+			System.err.println("Problems reading the default dashboard " +
+					"configuration file: " + ex.getMessage());
+			ex.printStackTrace();
+			System.exit(1);
+		}
+		try {
+			// Get the expocode of the cruises to update
+			TreeSet<String> allExpocodes = null; 
+			if ( expocodesFilename != null ) {
+				allExpocodes = new TreeSet<String>();
+				try {
+					BufferedReader expoReader = 
+							new BufferedReader(new FileReader(expocodesFilename));
+					try {
+						String dataline = expoReader.readLine();
+						while ( dataline != null ) {
+							dataline = dataline.trim();
+							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+								allExpocodes.add(dataline);
+							dataline = expoReader.readLine();
+						}
+					} finally {
+						expoReader.close();
+					}
+				} catch (Exception ex) {
+					System.err.println("Error getting expocodes from " + 
+							expocodesFilename + ": " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			} 
+			else {
+				try {
+					allExpocodes = new TreeSet<String>(
+							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
+				} catch (Exception ex) {
+					System.err.println("Error getting all expocodes: " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
+				}
+			}
+
+			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+			CruiseFileHandler fileHandler = dataStore.getCruiseFileHandler();
+
+			// update each of these cruises
+			for ( String expocode : allExpocodes ) {
+				char qcFlag;
+				try {
+					qcFlag = dsgHandler.getDsgNcFile(expocode).getQCFlag();
+				} catch (Exception ex) {
+					System.err.println("Error reading the QC flag for " + expocode + 
+							" : " + ex.getMessage());
+					success = false;
+					continue;
+				}
+				try {
+					fileHandler.updateCruiseDashboardStatus(expocode, qcFlag);
+				} catch (Exception ex) {
+					System.err.println("Error updating the QC flag for " + expocode + 
+							" : " + ex.getMessage());
+					success = false;
+					continue;
+				}
+			}
+		} finally {
+			dataStore.shutdown();
+		}
+		if ( ! success )
+			System.exit(1);
+		System.exit(0);
+	}
+
 }
