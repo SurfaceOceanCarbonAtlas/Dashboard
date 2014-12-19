@@ -19,7 +19,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -43,6 +48,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String METADATA_OWNER_ID = "metadataowner";
 	private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
+	private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
 
 	/**
 	 * Handles storage and retrieval of metadata files 
@@ -298,16 +304,91 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			DashboardMetadata srcMetadata) throws IllegalArgumentException {
 		String owner = srcMetadata.getOwner();
 		String uploadName = srcMetadata.getFilename();
-		// Get the source metadata document
+		// Get and input stream for source metadata document file
 		File srcFile = getMetadataFile(srcMetadata.getExpocode(), uploadName);
-		return saveMetadataFile(destCruiseExpo, owner, uploadName, 
-				srcMetadata.getUploadTimestamp(), srcFile);
+		DashboardMetadata mdata;
+		try {
+			FileInputStream src = new FileInputStream(srcFile);
+			try {
+				// Create the metadata document from this input stream
+				// allowing overwrite if permissions permit it
+				mdata = saveMetadataInputStream(destCruiseExpo, owner, uploadName, 
+						srcMetadata.getUploadTimestamp(), src, false);
+			} finally {
+				src.close();
+			}
+		} catch (IOException ex) {
+			// file not found; negligible possibility comes from close()
+			throw new IllegalArgumentException(
+					"Problems with the metadata source file " + srcFile.getName() + 
+					":\n    " + ex.getMessage());
+		}
+		return mdata;
 	}
 
 	/**
-	 * Create or update a dashboard metadata document from the given file.
+	 * Creates or updates a metadata document from the contents of the file at the given URL.
+	 * @param expocode
+	 * 		expocode of the cruise associated with this metadata document
+	 * @param owner
+	 * 		owner of this metadata document
+	 * @param urlString
+	 * 		URL String of the document to download
+	 * @param noOverwrite
+	 * 		never overwrite an existing metadata file?  If true and the
+	 * 		metadata file exists, an IllegalArgumentException is raised
+	 * 		and no data will have been read from src.
+	 * @return
+	 * 		a DashboardMetadata describing the new or updated metadata 
+	 * 		document; never null.
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid,
+	 * 		if the URL String is invalid,
+	 * 		if problems reading the metadata from the given URL,
+	 * 		if problems writing to the new metadata document, or
+	 * 		if problems committing the new metadata document to version control
+	 */
+	public DashboardMetadata saveMetadataURL(String expocode, String owner, 
+			String urlString, boolean noOverwrite) throws IllegalArgumentException {
+		if ( urlString.endsWith("/") )
+			throw new IllegalArgumentException("Invalid link document: " + urlString + 
+					"\n    Not a file (ends in slash)");
+		URL link;
+		try {
+			link = new URL(urlString);
+		} catch (MalformedURLException ex) {
+			throw new IllegalArgumentException("Invalid document link: " + 
+					urlString + "\n    " + ex.getMessage());
+		}
+		String origName = (new File(link.getPath())).getName();
+		if ( (origName == null) || origName.trim().isEmpty() )
+			throw new IllegalArgumentException("Invalid link document: " + urlString + 
+					"\n    Not a file (empty name)");
+		if ( origName.equalsIgnoreCase("index.html") ||
+			 origName.equalsIgnoreCase("index.htm") )
+			throw new IllegalArgumentException("Invalid link document: " + urlString + 
+					"\n    index.html unlikely to be valid");
+		String timestamp = DATETIME_FORMATTER.format(new Date());
+		DashboardMetadata mdata;
+		try {
+			InputStream src = link.openStream();
+			try {
+				mdata = saveMetadataInputStream(expocode, owner, origName, 
+												timestamp, src, noOverwrite);
+			} finally {
+				src.close();
+			}
+		} catch (IOException ex) {
+			throw new IllegalArgumentException("Unable to read from the URL: " + 
+					urlString + "\n    " + ex.getMessage());
+		}
+		return mdata;
+	}
+
+	/**
+	 * Create or update a dashboard metadata document from the given input stream
 	 * 
-	 * @param cruiseExpocode
+	 * @param expocode
 	 * 		expocode of the cruise associated with this metadata document.
 	 * @param owner
 	 * 		owner of this metadata document.
@@ -315,37 +396,42 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		"original" or "upload" filename to use for this metadata document
 	 * @param timestamp
 	 * 		"upload" timestamp to assign for this metadata document
-	 * @param srcFile
-	 * 		metadata file to copy
+	 * @param src
+	 * 		source to read for the contents of this metadata file
+	 * @param noOverwrite
+	 * 		never overwrite an existing metadata file?  If true and the
+	 * 		metadata file exists, an IllegalArgumentException is raised
+	 * 		and no data will have been read from src.
 	 * @return
 	 * 		a DashboardMetadata describing the new or updated metadata 
-	 * 		document; never null 
+	 * 		document; never null.
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
-	 * 		if problems reading the given metadata file,
+	 * 		if problems reading the given metadata file data,
 	 * 		if problems writing to the new metadata document, or
 	 * 		if problems committing the new metadata document to version control
 	 */
-	public DashboardMetadata saveMetadataFile(String cruiseExpocode, 
-			String owner, String origName, String timestamp, File srcFile) 
-											throws IllegalArgumentException {
-		if ( ! srcFile.exists() )
-			throw new IllegalArgumentException("Source metadata file " + 
-					srcFile.getPath() + " does not exist");
+	public DashboardMetadata saveMetadataInputStream(String expocode, 
+			String owner, String origName, String timestamp, InputStream src, 
+			boolean noOverwrite) throws IllegalArgumentException {
+
 		// Get the destination metadata document 
-		File destFile = getMetadataFile(cruiseExpocode, origName);
+		File destFile = getMetadataFile(expocode, origName);
 		File parentDir = destFile.getParentFile();
 		if ( ! parentDir.exists() ) {
 			if ( ! parentDir.mkdirs() )
 				throw new IllegalArgumentException(
 						"Problems creating the parent directory for " + 
-						destFile.getPath());
+						destFile.getName());
 		}
 
 		// Check if this will overwrite existing metadata
 		boolean isUpdate;
 		if ( destFile.exists() ) {
-			verifyOkayToDelete(owner, cruiseExpocode, origName);
+			if ( noOverwrite )
+				throw new IllegalArgumentException(
+						"Destination metdata file " + destFile.getName() + "already exists");
+			verifyOkayToDelete(owner, expocode, origName);
 			isUpdate = true;
 		}
 		else {
@@ -354,11 +440,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 		// Copy the metadata document
 		try {
-			FileInputStream src = null;
-			FileOutputStream dest = null;
+			FileOutputStream dest = new FileOutputStream(destFile);
 			try {
-				src = new FileInputStream(srcFile);
-				dest = new FileOutputStream(destFile);
 				byte[] buff = new byte[4096];
 				int numRead = src.read(buff);
 				while ( numRead > 0 ) {
@@ -368,25 +451,25 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			} finally {
 				if ( dest != null )
 					dest.close();
-				if ( src != null )
-					src.close();
 			}
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
-					"Problems copying the metadata document " + 
-					srcFile.getPath() + " to " + destFile.getPath() + 
-					":\n    " + ex.getMessage());
+					"Problems copying the metadata document " + origName + 
+					" to " + destFile.getName() + ":\n    " + ex.getMessage());
 		}
 
 		// Create the appropriate check-in message
 		String message;
 		if ( isUpdate ) {
 			message = "Updated metadata document " + origName + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+					  " for cruise " + expocode;
 		}
 		else {
 			message = "Added metadata document " + origName + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+					  " for cruise " + expocode;
+		}
+		if ( (owner != null) && ! owner.trim().isEmpty() ) {
+			message += " with owner " + owner;
 		}
 
 		// Commit the new/updated metadata document to version control
@@ -394,13 +477,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			commitVersion(destFile, message);
 		} catch ( SVNException ex ) {
 			throw new IllegalArgumentException("Problems committing " + 
-					destFile.getPath() + " to version control:\n    " + 
+					destFile.getName() + " to version control:\n    " + 
 					ex.getMessage());
 		}
 		
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
-		metadata.setExpocode(cruiseExpocode);
+		metadata.setExpocode(expocode);
 		metadata.setFilename(origName);
 		metadata.setUploadTimestamp(timestamp);
 		metadata.setOwner(owner);
@@ -408,11 +491,14 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		if ( isUpdate ) {
 			message = "Updated properties of metadata document " + origName + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+					  " for cruise " + expocode;
 		}
 		else {
 			message = "Added properties of metadata document " + origName + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+					  " for cruise " + expocode;
+		}
+		if ( (owner != null) && ! owner.trim().isEmpty() ) {
+			message += " with owner " + owner;
 		}
 
 		// Save the metadata properties
@@ -757,26 +843,27 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			while ( dataline != null ) {
 				String[] expoLinks = dataline.split("\t");
 				if ( expoLinks.length != 2 ) {
-					System.err.println("No tab found in expo-link line: '" + dataline + "'");
-					System.exit(1);
+					System.err.println("expo-link line: '" + dataline + "' ignored");
 				}
-				for ( String link : expoLinks[1].split(" ; ") ) {
-					link = link.trim();
-					if ( link.isEmpty() || link.equalsIgnoreCase("NULL") )
-						continue;
-					TreeSet<String> expos = linkExposMap.get(link);
-					if ( expos == null )
-						expos = new TreeSet<String>();
-					String expocode = null;
-					try {
-						expocode = DashboardServerUtils.checkExpocode(expoLinks[0]);
-					} catch (Exception ex) {
-						System.err.println("Invalid expocode given in links line: '" + dataline + "'");
-						ex.printStackTrace();
-						System.exit(1);
+				else {
+					for ( String link : expoLinks[1].split(" ; ") ) {
+						link = link.trim();
+						if ( link.isEmpty() || link.equalsIgnoreCase("NULL") )
+							continue;
+						TreeSet<String> expos = linkExposMap.get(link);
+						if ( expos == null )
+							expos = new TreeSet<String>();
+						String expocode = null;
+						try {
+							expocode = DashboardServerUtils.checkExpocode(expoLinks[0]);
+						} catch (Exception ex) {
+							System.err.println("Invalid expocode given in links line: '" + dataline + "'");
+							ex.printStackTrace();
+							System.exit(1);
+						}
+						expos.add(expocode);
+						linkExposMap.put(link, expos);
 					}
-					expos.add(expocode);
-					linkExposMap.put(link, expos);
 				}
 				dataline = buffReader.readLine();
 			}
@@ -861,6 +948,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 					linkNewExposMap.put(link, newExpoSet);
 				}
 			}
+			linkExposMap = linkNewExposMap;
 		} finally {
 			cruiseHandler.shutdown();
 		}
@@ -876,7 +964,26 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			System.exit(1);
 		}
 		try {
-			// TODO:
+			for ( String link : linkExposMap.keySet() ) {
+				try {
+					DashboardMetadata mdata = null;
+					for ( String expocode : linkExposMap.get(link) ) {
+						if ( mdata == null ) {
+							// First expocode - read the link contents and save to file
+							mdata = metaHandler.saveMetadataURL(expocode, "", link, true);
+							System.err.println(expocode + " - read " + link);
+						}
+						else {
+							// Copy the already-downloaded metadata file
+							metaHandler.copyMetadataFile(expocode, mdata);
+							System.err.println(expocode + " - copied previous " + link);
+						}
+					}
+				} catch (Exception ex) {
+					System.err.println("failed link: " + link + " :: " + ex.getMessage());
+					success = false;
+				}
+			}
 		} finally {
 			metaHandler.shutdown();
 		}
