@@ -169,13 +169,18 @@ public class UploadFormController extends BaseController implements
 			}
 		} catch (Exception e) {
 		}
+		String doc_base = "";
+		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+			doc_base = (String) hmProps.get("win_base");
+		} else {
+			doc_base = (String) hmProps.get("lin_base");
+		}
 
-		// System.out.println("Here openform");
 		try {
 
 			// s1 = editor.getHomePath();
 			// s2 = editor.getMdFile();
-			testMe = esd.readFGDC(editor.getHomePath() +name+ fs+editor.getMdFile());
+			testMe = esd.readFGDC(doc_base+editor.getProfile()+fs+editor.getMdFile());
 			testMe.setField_filename(editor.getMdFile());
 			editor.setMed(testMe);		
 			model.addAttribute("fgdcMap", testMe);
@@ -220,7 +225,7 @@ public class UploadFormController extends BaseController implements
 			doc_base = (String) hmProps.get("lin_base");
 
 		}
-		System.out.println("doc_base"+doc_base);
+		
 		try {
 			if (isLoggedIn()) {
 				user = (User) SecurityContextHolder.getContext()
@@ -260,6 +265,7 @@ public class UploadFormController extends BaseController implements
 
 			
 			FileNameMap fileNameMap = URLConnection.getFileNameMap();
+			System.out.println(form.getFile().getOriginalFilename());
 			String mimeType = fileNameMap.getContentTypeFor(form.getFile()
 					.getOriginalFilename());
 			if (mimeType != null && mimeType.length() > 0) {
@@ -282,7 +288,7 @@ public class UploadFormController extends BaseController implements
 			FileOutputStream outputStream = null;
 			String filePath = System.getProperty("java.io.tmpdir") + "/"
 					+ form.getFile().getOriginalFilename();
-			System.out.println(filePath);
+			
 			try {
 				outputStream = new FileOutputStream(new File(filePath));
 				outputStream.write(form.getFile().getFileItem().get());
@@ -333,7 +339,7 @@ public class UploadFormController extends BaseController implements
 			throws Exception {
 		File d = null;
 		boolean b = false;
-		String doc_base = "";
+		
 		UploadForm form = new UploadForm();
 		model.addAttribute("FORM", form);
 		
@@ -347,6 +353,7 @@ public class UploadFormController extends BaseController implements
 				"applicationContext.xml");
 		Configuration cv = (Configuration) factory.getBean("propertiesBean");
 		HashMap hmProps = cv.getProperties();
+		String doc_base = "";
 		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
 			doc_base = (String) hmProps.get("win_base");
 		} else {
@@ -354,6 +361,7 @@ public class UploadFormController extends BaseController implements
 		}
 		// String doc_base = (String) param_map.get("doc_base");
 		String dir = doc_base + editor.getProfile() + fs;
+		editor.setHomePath(dir);
 
 		try {
 			d = new File(dir);
@@ -369,7 +377,7 @@ public class UploadFormController extends BaseController implements
 				// System.out.println("ROLE_USER=" + c);
 
 				String users[] = { "guest","admin" };
-				editor.setHomePath(dir);
+				
 
 				
 				model.addAttribute("files", entries);
@@ -388,6 +396,7 @@ public class UploadFormController extends BaseController implements
 					editor.setadminUser(adminUser);
 				} else {
 					editor.setFiles(entries);
+					
 				
 				}
 				model.addAttribute("editor", editor);
@@ -403,6 +412,7 @@ public class UploadFormController extends BaseController implements
 
 
 	}
+	
 
 	@RequestMapping(value = "/editor", params = "statistics", method = RequestMethod.POST)
 	public ModelAndView processStats(@ModelAttribute("editor") Editor editor,

@@ -5,7 +5,9 @@
 <link rel="stylesheet" type="text/css" href="css/customer_form.css"></link>
 <link rel="stylesheet" type="text/css"
 	href="bootstrap/css/bootstrap.css"></link>
-<script type="text/javascript" src="js/main.js"></script>
+<script>function back() {
+	window.location.href = "/SocatOME/editor.htm";
+}</script>	
 </head>
 <body>
 	<div id="wrapper">

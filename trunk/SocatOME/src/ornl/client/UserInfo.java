@@ -9,8 +9,6 @@ import java.util.List;
 
 import ornl.database.UserRoles;
 import ornl.database.UserRolesDAO;
-import ornl.database.Users;
-import ornl.database.UsersDAO;
 
 public class UserInfo{
 	public String[] getUsers() {

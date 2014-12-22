@@ -1,7 +1,7 @@
 /**
-* Author: Mercury Software Consortium, Oak Ridge National Laboratory, Oak Ridge, TN
-* Contact: zzr@ornl.gov 
-*/
+ * Author: Mercury Software Consortium, Oak Ridge National Laboratory, Oak Ridge, TN
+ * Contact: zzr@ornl.gov 
+ */
 package ornl.service;
 
 import java.io.BufferedReader;
@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,18 +22,11 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-import org.hibernate.mapping.Array;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -47,9 +39,8 @@ import ornl.beans.Configuration;
 import ornl.beans.DynamicMapBean;
 import ornl.beans.FormElements;
 import ornl.beans.MapBean;
-import ornl.beans.MultiMapBean;
 import ornl.beans.Metadata_Editor;
-import ornl.beans.Variable_Info;
+import ornl.beans.MultiMapBean;
 import ornl.client.AddNewAuthors;
 import ornl.client.AddNewSurvey;
 import ornl.client.AddNewVariables;
@@ -498,13 +489,14 @@ public class EditorService {
 		Document doc = null;
 		Metadata_Editor med = null;
 		SAXBuilder builder = new SAXBuilder();
-		builder.setFeature("http://xml.org/sax/features/validation", false);
-		builder.setFeature(
-				"http://apache.org/xml/features/nonvalidating/load-dtd-grammar",
-				false);
-		builder.setFeature(
-				"http://apache.org/xml/features/nonvalidating/load-external-dtd",
-				false);
+		/*
+		 * builder.setFeature("http://xml.org/sax/features/validation", false);
+		 * builder.setFeature(
+		 * "http://apache.org/xml/features/nonvalidating/load-dtd-grammar",
+		 * false); builder.setFeature(
+		 * "http://apache.org/xml/features/nonvalidating/load-external-dtd",
+		 * false);
+		 */
 		File in = new File(inFile);
 		try {
 			doc = builder.build(in);
@@ -522,28 +514,27 @@ public class EditorService {
 
 	public Metadata_Editor read(Document doc) {
 		Metadata_Editor med = new Metadata_Editor();
+
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"mergeConfig.xml");
-		
 		HashMap fromXML = new HashMap();
 		String value = "";
 
 		String xexprBean = "";
 		XPath beans = null;
 		Set<String> set1 = xpath_map.keySet();
-		
+
 		MapBean xmlBean = (MapBean) ctx.getBean("fgdc_merge_map");
 		LinkedHashMap<String, String> xpath_map = xmlBean.getFgdc();
-		
+
 		MultiMapBean multiPBean = (MultiMapBean) ctx.getBean("multiTags");
 		LinkedHashMap<String, String> multiMap = multiPBean.getMultiBean();
 		Set<String> set2 = multiMap.keySet();
-		
-	
-		DynamicMapBean DMB = (DynamicMapBean) ctx.getBean("dynamicTags");	
+
+		DynamicMapBean DMB = (DynamicMapBean) ctx.getBean("dynamicTags");
 		LinkedHashMap<String, String> dynamicMap = DMB.getDynamicBean();
 		Set<String> set3 = dynamicMap.keySet();
-	
+
 		ArrayList<String> conflicts = new ArrayList<String>();
 		for (String s1 : set1) {
 			xexprBean = s1;
@@ -553,17 +544,23 @@ public class EditorService {
 
 				if ((null != value) && (value.trim().length() > 0)) {
 
-					if (value.contains("@@CONFLICT@@")) {
+					if (value.contains("%%CONFLICT%%")) {
 						String conflictXpath = getConflictTag(beans.getXPath());
 						beans = XPath.newInstance(conflictXpath);
-						// System.out.println(conflictXpath);
-						List<Element> elements = beans.selectNodes(doc,
+						System.out.println(conflictXpath);
+						Element parent = (Element) beans.selectSingleNode(doc,
 								conflictXpath);
-						for (Element e : elements) {
-							value = value + "#";
-							value = value + e.getValue().trim();
+						List<Element> elements = parent.getChildren("VALUE");
 
-						}
+						value = "";
+						int count = 0;
+						do {
+							value = value
+									+ elements.get(count).getValue().trim();
+							count = count + 1;
+							if (count < elements.size())
+								value = value + '#';
+						} while (count < elements.size());
 						// System.out.println(value);
 						conflicts.add(s1);
 						fromXML.put(s1, value);
@@ -583,26 +580,65 @@ public class EditorService {
 			try {
 				beans = XPath.newInstance(multiMap.get(xexprBean));
 				value = beans.valueOf(doc);
-				// only keep entries which are not empty
-				if ((null != value) && (value.trim().length() > 0)) {
-					if (value.contains("@@CONFLICT@@")) {
-						String conflictXpath = getConflictTag(beans.getXPath());
-						beans = XPath.newInstance(conflictXpath);
-						// System.out.println(conflictXpath);
-						List<Element> elements = beans.selectNodes(doc,
-								conflictXpath);
-						for (Element e : elements) {
-							value = value + "#";
-							value = value + e.getValue().trim();
+				beans = XPath.newInstance(beans.getXPath());
+				// System.out.println(conflictXpath);
+				List<Element> elements = beans.selectNodes(doc,
+						beans.getXPath());
+				for (Element e : elements) {
+					value = e.getValue();
+					
 
+					if ((null != value) && (value.trim().length() > 0)) {
+						if (value.contains("%%CONFLICT%%")) {
+
+							String conflictXpath = getConflictTag(beans
+									.getXPath());
+							String key = "";
+							String keyVal = "";
+							String xpath = multiMap.get(xexprBean);
+							
+							if (xpath.contains("Investigator")) {
+								key = "Email";
+								keyVal = e.getParentElement().getChild("Email")
+										.getValue();
+							} else if (xpath.contains("Variable")) {
+								key = "Variable_Name";
+								keyVal = e.getParentElement()
+										.getChild("Variable_Name").getValue();
+							} else if (xpath.contains("Sensor")) {
+								key = "Model";
+								keyVal = e.getParentElement().getChild("Model")
+										.getValue();
+							}
+							//System.out.println("key: "+key);
+							//System.out.println("keyVal: "+keyVal);
+							
+							List<Element> parents = beans.selectNodes(doc,
+									conflictXpath);
+							for (Element element : parents) {
+								//System.out.println(element.getParentElement().getAttributeValue(key));
+								if (keyVal.contains(element.getParentElement().getAttributeValue(key).trim())) {
+									List<Element> elms = element.getChildren("VALUE");
+									value = "";
+									int count = 0;
+									do {
+										value = value
+												+ elms.get(count).getValue()
+														.trim();
+										count = count + 1;
+										if (count < elms.size())
+											value = value + '#';
+									} while (count < elms.size());
+								}
+
+							}
+							conflicts.add(s2);
+							fromXML.put(s2, value);
+						} else {
+							value = beans.valueOf(doc);
+							fromXML.put(s2, value);
 						}
 
-						conflicts.add(s2);
-						fromXML.put(s2, value);
-
-					} else {
-						value = beans.valueOf(doc);
-						fromXML.put(s2, value);
 					}
 				}
 
@@ -631,10 +667,16 @@ public class EditorService {
 				e.printStackTrace();
 			}
 		}
-		
+
 		fromXML.put("field_conflicts", conflicts);
 		med.setLhm(fromXML);
 		return med;
+	}
+
+	private String getConflictTagForRepeatSection(String xPath, String key,
+			String keyVal) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public ArrayList<String> getKeys() {
@@ -800,7 +842,7 @@ public class EditorService {
 
 	private String getConflictTag(String tag) {
 		String conflictTag = tag.replace("x_tags",
-				"x_tags/ CONFLICTS/ Conflict") + " /VALUE";
+				"x_tags/ CONFLICTS/ Conflict");
 		conflictTag = conflictTag.replaceAll("\\[[0-9]\\]", "");
 		return conflictTag;
 	}

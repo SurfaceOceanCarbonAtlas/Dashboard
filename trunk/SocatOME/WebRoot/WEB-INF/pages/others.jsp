@@ -37,10 +37,5 @@
 		<form:textarea path="field_citation" name="Citation" cols="60"
 			rows="5" />
 	</div>
-	<div class="Section2 section">
-		<h4 class="alert alert-info">Append Measurement or Calibration
-			reports here:</h4>
-		<form:textarea path="field_additional_measurements"
-			id="field_additional_measurements" cols="60" rows="5" />
-	</div>
+	
 </div>

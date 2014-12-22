@@ -38,20 +38,20 @@
 						<option value="Others">Others</option>
 					</select>
 				
-				   <form:input class="short" id="platform_type" style="display:none" placeHolder="Describe Others Here" path="field_platform_type"/>
+				   <form:input class="short" id="field_platform_type" style="display:none" placeHolder="Describe Others Here" path="field_platform_type"/>
 					
 				</li>
 
 
 				<li class="Section2">CO<sub>2</sub> Instrument Type <span
-					class="form-required" title="This field is required.">*</span>:</br> <select type="text"
-						class="select2"	id="field_co2_instr_type" onchange="filterReq()">
+					class="form-required" title="This field is required.">*</span>:</br> <select type="text" id="select_co2_instr_type"
+						class="select2"	onchange="filterReq()">
 						<option value="Equilibrator-IR or CRDS or GC">Equilibrator-IR or CRDS or GC</option>
 						<option value="Membrane-IR">Membrane-IR</option>
 						<option value="Spectrophotometry">Spectrophotometry</option>
 						<option value="Others">Others</option>
 					</select>
-					<form:input class="short" id="co2_instr_type" style="display:none" placeHolder="Describe Others Here" path="field_co2_instr_type"/>
+					<form:input class="short" id="field_co2_instr_type" style="display:none" placeHolder="Describe Others Here" path="field_co2_instr_type"/>
 				</li>
 				<li class="Section2">Survey type (e.g. VOS Lines, Research
 					Cruise, Moored Buoy, Drifting Buoy):</br> <form:input
@@ -90,10 +90,7 @@
 
 		</li>
 		<li class="Section1">Geographical Coverage:
-			<ul>
-				<li class="Section2">Geographical Region:<br> <form:textarea
-						path="field_geographical_area" name="Geographical_Region"
-						cols="56" rows="3" /></li>
+			<ul>				
 				<li class="Section1">Bounds:
 					<ul>
 						<li class="Section2">Westernmost Longitude:<br> Enter

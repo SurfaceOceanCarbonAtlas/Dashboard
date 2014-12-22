@@ -4,13 +4,6 @@
 */
 package ornl.beans;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
-
-import ornl.beans.Metadata_Editor;
 
 public class Editor {
 

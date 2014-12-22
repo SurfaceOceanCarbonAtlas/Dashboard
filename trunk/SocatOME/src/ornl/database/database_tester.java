@@ -4,12 +4,10 @@
 */
 package ornl.database;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.Transaction;
-import org.jdom.Element;
 
 public class database_tester {
 

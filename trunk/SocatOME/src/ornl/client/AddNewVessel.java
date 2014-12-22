@@ -9,8 +9,6 @@ import java.util.List;
 
 import org.hibernate.Transaction;
 
-import ornl.database.Author;
-import ornl.database.AuthorDAO;
 import ornl.database.Vessel;
 import ornl.database.VesselDAO;
 

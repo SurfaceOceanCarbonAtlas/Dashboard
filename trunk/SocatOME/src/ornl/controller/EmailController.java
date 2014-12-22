@@ -12,18 +12,18 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.lang.StringEscapeUtils;
-import ornl.database.UserRoles;
-import ornl.database.UserRolesDAO;
-import ornl.database.Users;
-import ornl.database.UsersDAO;
 
 import javax.mail.MessagingException;
-import ornl.emailservice.EmailGenerator;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ornl.beans.Configuration;
+import ornl.database.UserRoles;
+import ornl.database.UserRolesDAO;
+import ornl.database.Users;
+import ornl.database.UsersDAO;
+import ornl.emailservice.EmailGenerator;
 
 public class EmailController {
 	static ApplicationContext emailsfactory = new ClassPathXmlApplicationContext("applicationContext.xml");
