@@ -1,9 +1,4 @@
-/**
-* Author: Mercury Software Consortium, Oak Ridge National Laboratory, Oak Ridge, TN
-* Contact: zzr@ornl.gov 
-*/
 package ornl.beans;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,7 +8,7 @@ import java.util.HashMap;
  *         populated as they are set. Used by the xml generator code along with
  *         the XPATH to fill in the template.
  */
-public class Metadata_Editor {
+public class USGS_Core_Science_Metadata_Editor {
 	
 	
 	private HashMap<String, String> lhm = new HashMap<String, String>();
@@ -189,72 +184,50 @@ public class Metadata_Editor {
 	// varaible info
 	private String field_variable0;
 	private String field_variable_description0;
-	private String field_variable_unit0;
 	private String field_variable_sensor_model0;
 	private String field_variable1;
 	private String field_variable_description1;
-	private String field_variable_unit1;
 	private String field_variable2;
 	private String field_variable_description2;
-	private String field_variable_unit2;
 	private String field_variable3;
 	private String field_variable_description3;
-	private String field_variable_unit3;
 	private String field_variable4;
 	private String field_variable_description4;
-	private String field_variable_unit4;
 	private String field_variable5;
 	private String field_variable_description5;
-	private String field_variable_unit5;
 	private String field_variable6;
 	private String field_variable_description6;
-	private String field_variable_unit6;
 	private String field_variable7;
 	private String field_variable_description7;
-	private String field_variable_unit7;
 	private String field_variable8;
 	private String field_variable_description8;
-	private String field_variable_unit8;
 	private String field_variable9;
 	private String field_variable_description9;
-	private String field_variable_unit9;
 	private String field_variable10;
 	private String field_variable_description10;
-	private String field_variable_unit10;
 	private String field_variable11;
 	private String field_variable_description11;
-	private String field_variable_unit11;
 	private String field_variable12;
 	private String field_variable_description12;
-	private String field_variable_unit12;
 	private String field_variable13;
 	private String field_variable_description13;
-	private String field_variable_unit13;
 	private String field_variable14;
 	private String field_variable_description14;
-	private String field_variable_unit14;
 	
 	private String field_variable15;
 	private String field_variable_description15;
-	private String field_variable_unit15;
 	private String field_variable16;
 	private String field_variable_description16;
-	private String field_variable_unit16;
 	private String field_variable17;
 	private String field_variable_description17;
-	private String field_variable_unit17;
 	private String field_variable18;
 	private String field_variable_description18;
-	private String field_variable_unit18;
 	private String field_variable19;
 	private String field_variable_description19;
-	private String field_variable_unit19;
 	private String field_variable20;
 	private String field_variable_description20;
-	private String field_variable_unit20;
 	private String field_variable21;
 	private String field_variable_description21;
-	private String field_variable_unit21;
 	public String getField_variable15() {
 		return field_variable15;
 	}
@@ -367,9 +340,6 @@ public class Metadata_Editor {
 		this.field_variable_description21 = field_variable_description21;
 	}
 	
-	
-	
-	
 /*
 	public String getField_mooring_id() {
 		return field_mooring_id;
@@ -381,182 +351,6 @@ public class Metadata_Editor {
 	
 
 	
-	public String getField_variable_unit0() {
-		return field_variable_unit0;
-	}
-
-	public void setField_variable_unit0(String field_variable_unit0) {
-		this.field_variable_unit0 = field_variable_unit0;
-	}
-
-	public String getField_variable_unit1() {
-		return field_variable_unit1;
-	}
-
-	public void setField_variable_unit1(String field_variable_unit1) {
-		this.field_variable_unit1 = field_variable_unit1;
-	}
-
-	public String getField_variable_unit2() {
-		return field_variable_unit2;
-	}
-
-	public void setField_variable_unit2(String field_variable_unit2) {
-		this.field_variable_unit2 = field_variable_unit2;
-	}
-
-	public String getField_variable_unit3() {
-		return field_variable_unit3;
-	}
-
-	public void setField_variable_unit3(String field_variable_unit3) {
-		this.field_variable_unit3 = field_variable_unit3;
-	}
-
-	public String getField_variable_unit4() {
-		return field_variable_unit4;
-	}
-
-	public void setField_variable_unit4(String field_variable_unit4) {
-		this.field_variable_unit4 = field_variable_unit4;
-	}
-
-	public String getField_variable_unit5() {
-		return field_variable_unit5;
-	}
-
-	public void setField_variable_unit5(String field_variable_unit5) {
-		this.field_variable_unit5 = field_variable_unit5;
-	}
-
-	public String getField_variable_unit6() {
-		return field_variable_unit6;
-	}
-
-	public void setField_variable_unit6(String field_variable_unit6) {
-		this.field_variable_unit6 = field_variable_unit6;
-	}
-
-	public String getField_variable_unit7() {
-		return field_variable_unit7;
-	}
-
-	public void setField_variable_unit7(String field_variable_unit7) {
-		this.field_variable_unit7 = field_variable_unit7;
-	}
-
-	public String getField_variable_unit8() {
-		return field_variable_unit8;
-	}
-
-	public void setField_variable_unit8(String field_variable_unit8) {
-		this.field_variable_unit8 = field_variable_unit8;
-	}
-
-	public String getField_variable_unit9() {
-		return field_variable_unit9;
-	}
-
-	public void setField_variable_unit9(String field_variable_unit9) {
-		this.field_variable_unit9 = field_variable_unit9;
-	}
-
-	public String getField_variable_unit10() {
-		return field_variable_unit10;
-	}
-
-	public void setField_variable_unit10(String field_variable_unit10) {
-		this.field_variable_unit10 = field_variable_unit10;
-	}
-
-	public String getField_variable_unit11() {
-		return field_variable_unit11;
-	}
-
-	public void setField_variable_unit11(String field_variable_unit11) {
-		this.field_variable_unit11 = field_variable_unit11;
-	}
-
-	public String getField_variable_unit12() {
-		return field_variable_unit12;
-	}
-
-	public void setField_variable_unit12(String field_variable_unit12) {
-		this.field_variable_unit12 = field_variable_unit12;
-	}
-
-	public String getField_variable_unit13() {
-		return field_variable_unit13;
-	}
-
-	public void setField_variable_unit13(String field_variable_unit13) {
-		this.field_variable_unit13 = field_variable_unit13;
-	}
-
-	public String getField_variable_unit14() {
-		return field_variable_unit14;
-	}
-
-	public void setField_variable_unit14(String field_variable_unit14) {
-		this.field_variable_unit14 = field_variable_unit14;
-	}
-
-	public String getField_variable_unit15() {
-		return field_variable_unit15;
-	}
-
-	public void setField_variable_unit15(String field_variable_unit15) {
-		this.field_variable_unit15 = field_variable_unit15;
-	}
-
-	public String getField_variable_unit16() {
-		return field_variable_unit16;
-	}
-
-	public void setField_variable_unit16(String field_variable_unit16) {
-		this.field_variable_unit16 = field_variable_unit16;
-	}
-
-	public String getField_variable_unit17() {
-		return field_variable_unit17;
-	}
-
-	public void setField_variable_unit17(String field_variable_unit17) {
-		this.field_variable_unit17 = field_variable_unit17;
-	}
-
-	public String getField_variable_unit18() {
-		return field_variable_unit18;
-	}
-
-	public void setField_variable_unit18(String field_variable_unit18) {
-		this.field_variable_unit18 = field_variable_unit18;
-	}
-
-	public String getField_variable_unit19() {
-		return field_variable_unit19;
-	}
-
-	public void setField_variable_unit19(String field_variable_unit19) {
-		this.field_variable_unit19 = field_variable_unit19;
-	}
-
-	public String getField_variable_unit20() {
-		return field_variable_unit20;
-	}
-
-	public void setField_variable_unit20(String field_variable_unit20) {
-		this.field_variable_unit20 = field_variable_unit20;
-	}
-
-	public String getField_variable_unit21() {
-		return field_variable_unit21;
-	}
-
-	public void setField_variable_unit21(String field_variable_unit21) {
-		this.field_variable_unit21 = field_variable_unit21;
-	}
-
 	public String getField_co2_instr_type() {
 		return field_co2_instr_type;
 	}
@@ -576,32 +370,23 @@ public class Metadata_Editor {
 
 	private String field_variable22;
 	private String field_variable_description22;
-	private String field_variable_unit22;
 	private String field_variable23;
 	private String field_variable_description23;
-	private String field_variable_unit23;
 	private String field_variable24;
 	private String field_variable_description24;
-	private String field_variable_unit24;
 	
 	private String field_variable25;
 	private String field_variable_description25;
-	private String field_variable_unit25;
 	private String field_variable26;
 	private String field_variable_description26;
-	private String field_variable_unit26;
 	private String field_variable27;
 	private String field_variable_description27;
-	private String field_variable_unit27;
 	private String field_variable28;
 	private String field_variable_description28;
-	private String field_variable_unit28;
 	private String field_variable29;
 	private String field_variable_description29;
-	private String field_variable_unit29;
 	private String field_variable30;
 	private String field_variable_description30;
-	private String field_variable_unit30;
 	
 	
 	public String getField_variable22() {
@@ -747,78 +532,6 @@ public class Metadata_Editor {
 	public void setField_variable_description30(String field_variable_description30) {
 		this.field_variable_description30 = field_variable_description30;
 	}
-	
-	public String getField_variable_unit22() {
-		return field_variable_unit22;
-	}
-
-	public void setField_variable_unit22(String field_variable_unit22) {
-		this.field_variable_unit22 = field_variable_unit22;
-	}
-
-	public String getField_variable_unit23() {
-		return field_variable_unit23;
-	}
-
-	public void setField_variable_unit23(String field_variable_unit23) {
-		this.field_variable_unit23 = field_variable_unit23;
-	}
-
-	public String getField_variable_unit24() {
-		return field_variable_unit24;
-	}
-
-	public void setField_variable_unit24(String field_variable_unit24) {
-		this.field_variable_unit24 = field_variable_unit24;
-	}
-
-	public String getField_variable_unit25() {
-		return field_variable_unit25;
-	}
-
-	public void setField_variable_unit25(String field_variable_unit25) {
-		this.field_variable_unit25 = field_variable_unit25;
-	}
-
-	public String getField_variable_unit26() {
-		return field_variable_unit26;
-	}
-
-	public void setField_variable_unit26(String field_variable_unit26) {
-		this.field_variable_unit26 = field_variable_unit26;
-	}
-
-	public String getField_variable_unit27() {
-		return field_variable_unit27;
-	}
-
-	public void setField_variable_unit27(String field_variable_unit27) {
-		this.field_variable_unit27 = field_variable_unit27;
-	}
-
-	public String getField_variable_unit28() {
-		return field_variable_unit28;
-	}
-
-	public void setField_variable_unit28(String field_variable_unit28) {
-		this.field_variable_unit28 = field_variable_unit28;
-	}
-
-	public String getField_variable_unit29() {
-		return field_variable_unit29;
-	}
-
-	public void setField_variable_unit29(String field_variable_unit29) {
-		this.field_variable_unit29 = field_variable_unit29;
-	}
-
-	public String getField_variable_unit30() {
-		return field_variable_unit30;
-	}
-
-	public void setField_variable_unit30(String field_variable_unit30) {
-		this.field_variable_unit30 = field_variable_unit30;
-	}
 
 	private String field_co2_data_type0;
 	private String field_co2_data_unit0;
@@ -868,26 +581,7 @@ public class Metadata_Editor {
 	private String field_uncertainity_air;
 	private String field_resolution;
 	private String field_calibration;
-	private String field_no_of_non_zero_gas_stds;
 	private String field_uncertainity;
-	private String field_system_manufacturer;	
-
-	public String getField_no_of_non_zero_gas_stds() {
-		return field_no_of_non_zero_gas_stds;
-	}
-
-	public void setField_no_of_non_zero_gas_stds(
-			String field_no_of_non_zero_gas_stds) {
-		this.field_no_of_non_zero_gas_stds = field_no_of_non_zero_gas_stds;
-	}
-
-	public String getField_system_manufacturer() {
-		return field_system_manufacturer;
-	}
-
-	public void setField_system_manufacturer(String field_system_manufacturer) {
-		this.field_system_manufacturer = field_system_manufacturer;
-	}
 
 	// method description II
 	private String field_TCO2_analyis_method;
@@ -988,7 +682,6 @@ public class Metadata_Editor {
 
 	// others
 	private String field_manufaturer_other;
-	private String field_sensor_desciption;
 	private String field_accuracy_other;
 	private String field_model_other;
 	private String field_resolution_other;
@@ -997,7 +690,6 @@ public class Metadata_Editor {
 	private String field_method_references;
 
 	private String field_manufaturer_other1;
-	private String field_sensor_desciption1;
 	private String field_accuracy_other1;
 	private String field_model_other1;
 	private String field_resolution_other1;
@@ -1006,7 +698,6 @@ public class Metadata_Editor {
 	private String field_method_references1;
 
 	private String field_manufaturer_other2;
-	private String field_sensor_desciption2;
 	private String field_accuracy_other2;
 	private String field_model_other2;
 	private String field_resolution_other2;
@@ -1015,7 +706,6 @@ public class Metadata_Editor {
 	private String field_method_references2;
 	
 	private String field_manufaturer_other3;
-	private String field_sensor_desciption3;
 	private String field_accuracy_other3;
 	private String field_model_other3;
 	private String field_resolution_other3;
@@ -1024,7 +714,6 @@ public class Metadata_Editor {
 	private String field_method_references3;
 	
 	private String field_manufaturer_other4;
-	private String field_sensor_desciption4;
 	private String field_accuracy_other4;
 	private String field_model_other4;
 	private String field_resolution_other4;
@@ -1033,7 +722,6 @@ public class Metadata_Editor {
 	private String field_method_references4;
 	
 	private String field_manufaturer_other5;
-	private String field_sensor_desciption5;
 	private String field_accuracy_other5;
 	private String field_model_other5;
 	private String field_resolution_other5;
@@ -1042,7 +730,6 @@ public class Metadata_Editor {
 	private String field_method_references5;
 	
 	private String field_manufaturer_other6;
-	private String field_sensor_desciption6;
 	private String field_accuracy_other6;
 	private String field_model_other6;
 	private String field_resolution_other6;
@@ -1051,7 +738,6 @@ public class Metadata_Editor {
 	private String field_method_references6;
 	
 	private String field_manufaturer_other7;
-	private String field_sensor_desciption7;
 	private String field_accuracy_other7;
 	private String field_model_other7;
 	private String field_resolution_other7;
@@ -1060,7 +746,6 @@ public class Metadata_Editor {
 	private String field_method_references7;
 	
 	private String field_manufaturer_other8;
-	private String field_sensor_desciption8;
 	private String field_accuracy_other8;
 	private String field_model_other8;
 	private String field_resolution_other8;
@@ -1069,7 +754,6 @@ public class Metadata_Editor {
 	private String field_method_references8;
 	
 	private String field_manufaturer_other9;
-	private String field_sensor_desciption9;
 	private String field_accuracy_other9;
 	private String field_model_other9;
 	private String field_resolution_other9;
@@ -1163,15 +847,6 @@ public class Metadata_Editor {
 	public void setField_preliminary_quality_control(
 			String field_preliminary_quality_control) {
 		this.field_preliminary_quality_control = field_preliminary_quality_control;
-	}
-	private ArrayList<String> field_conflicts;	
-
-	public ArrayList<String> getField_conflicts() {
-		return field_conflicts;
-	}
-
-	public void setField_conflicts(ArrayList<String> field_conflicts) {
-		this.field_conflicts = field_conflicts;
 	}
 
 	public void setLhm(HashMap lhm) {
@@ -1635,51 +1310,6 @@ public class Metadata_Editor {
 		this.field_preliminary_quality_control = (String) lhm.get("field_preliminary_quality_control");
 		this.field_platform_type = (String) lhm.get("field_platform_type");
 		this.field_Patm_normalized = (String) lhm.get("private String field_Patm_normalized");
-		this.field_conflicts = (ArrayList<String>) lhm.get("field_conflicts");
-		this.field_system_manufacturer = (String) lhm.get("field_system_manufacturer");
-		this.field_no_of_non_zero_gas_stds = (String) lhm.get("field_no_of_non_zero_gas_stds");
-		this.field_variable_unit0 = (String) lhm.get("field_variable_unit0");
-		this.field_variable_unit1 = (String) lhm.get("field_variable_unit1");
-		this.field_variable_unit2 = (String) lhm.get("field_variable_unit2");
-		this.field_variable_unit3 = (String) lhm.get("field_variable_unit3");
-		this.field_variable_unit4 = (String) lhm.get("field_variable_unit4");
-		this.field_variable_unit5 = (String) lhm.get("field_variable_unit5");
-		this.field_variable_unit6 = (String) lhm.get("field_variable_unit6");
-		this.field_variable_unit7 = (String) lhm.get("field_variable_unit7");
-		this.field_variable_unit8 = (String) lhm.get("field_variable_unit8");
-		this.field_variable_unit9 = (String) lhm.get("field_variable_unit9");
-		this.field_variable_unit10 = (String) lhm.get("field_variable_unit10");
-		this.field_variable_unit11 = (String) lhm.get("field_variable_unit11");
-		this.field_variable_unit12 = (String) lhm.get("field_variable_unit12");
-		this.field_variable_unit13 = (String) lhm.get("field_variable_unit13");
-		this.field_variable_unit14 = (String) lhm.get("field_variable_unit14");
-		this.field_variable_unit15 = (String) lhm.get("field_variable_unit15");
-		this.field_variable_unit16 = (String) lhm.get("field_variable_unit16");
-		this.field_variable_unit17 = (String) lhm.get("field_variable_unit17");
-		this.field_variable_unit18 = (String) lhm.get("field_variable_unit18");
-		this.field_variable_unit19 = (String) lhm.get("field_variable_unit19");
-		this.field_variable_unit20 = (String) lhm.get("field_variable_unit20");
-		this.field_variable_unit21 = (String) lhm.get("field_variable_unit21");
-		this.field_variable_unit22 = (String) lhm.get("field_variable_unit22");
-		this.field_variable_unit23 = (String) lhm.get("field_variable_unit23");
-		this.field_variable_unit24 = (String) lhm.get("field_variable_unit24");
-		this.field_variable_unit25 = (String) lhm.get("field_variable_unit25");
-		this.field_variable_unit26 = (String) lhm.get("field_variable_unit26");
-		this.field_variable_unit27 = (String) lhm.get("field_variable_unit27");
-		this.field_variable_unit28 = (String) lhm.get("field_variable_unit28");
-		this.field_variable_unit29 = (String) lhm.get("field_variable_unit29");
-		this.field_variable_unit30 = (String) lhm.get("field_variable_unit30");
-		
-		this.field_sensor_desciption = (String) lhm.get("field_sensor_desciption");
-		this.field_sensor_desciption1 = (String) lhm.get("field_sensor_desciption1");
-		this.field_sensor_desciption2 = (String) lhm.get("field_sensor_desciption2");
-		this.field_sensor_desciption3 = (String) lhm.get("field_sensor_desciption3");
-		this.field_sensor_desciption4 = (String) lhm.get("field_sensor_desciption4");
-		this.field_sensor_desciption5 = (String) lhm.get("field_sensor_desciption5");
-		this.field_sensor_desciption6 = (String) lhm.get("field_sensor_desciption6");
-		this.field_sensor_desciption7 = (String) lhm.get("field_sensor_desciption7");
-		this.field_sensor_desciption8 = (String) lhm.get("field_sensor_desciption8");
-		this.field_sensor_desciption9 = (String) lhm.get("field_sensor_desciption9");
 	}
 
 	public String getField_filestatus() {
@@ -4152,87 +3782,5 @@ public class Metadata_Editor {
 	public void setField_end_date_dup(String field_end_date_dup) {
 		this.field_end_date_dup = field_end_date_dup;
 	}
-
-	public String getField_sensor_desciption() {
-		return field_sensor_desciption;
-	}
-
-	public void setField_sensor_desciption(String field_sensor_desciption) {
-		this.field_sensor_desciption = field_sensor_desciption;
-	}
-
-	public String getField_sensor_desciption1() {
-		return field_sensor_desciption1;
-	}
-
-	public void setField_sensor_desciption1(String field_sensor_desciption1) {
-		this.field_sensor_desciption1 = field_sensor_desciption1;
-	}
-
-	public String getField_sensor_desciption2() {
-		return field_sensor_desciption2;
-	}
-
-	public void setField_sensor_desciption2(String field_sensor_desciption2) {
-		this.field_sensor_desciption2 = field_sensor_desciption2;
-	}
-
-	public String getField_sensor_desciption3() {
-		return field_sensor_desciption3;
-	}
-
-	public void setField_sensor_desciption3(String field_sensor_desciption3) {
-		this.field_sensor_desciption3 = field_sensor_desciption3;
-	}
-
-	public String getField_sensor_desciption4() {
-		return field_sensor_desciption4;
-	}
-
-	public void setField_sensor_desciption4(String field_sensor_desciption4) {
-		this.field_sensor_desciption4 = field_sensor_desciption4;
-	}
-
-	public String getField_sensor_desciption5() {
-		return field_sensor_desciption5;
-	}
-
-	public void setField_sensor_desciption5(String field_sensor_desciption5) {
-		this.field_sensor_desciption5 = field_sensor_desciption5;
-	}
-
-	public String getField_sensor_desciption6() {
-		return field_sensor_desciption6;
-	}
-
-	public void setField_sensor_desciption6(String field_sensor_desciption6) {
-		this.field_sensor_desciption6 = field_sensor_desciption6;
-	}
-
-	public String getField_sensor_desciption7() {
-		return field_sensor_desciption7;
-	}
-
-	public void setField_sensor_desciption7(String field_sensor_desciption7) {
-		this.field_sensor_desciption7 = field_sensor_desciption7;
-	}
-
-	public String getField_sensor_desciption8() {
-		return field_sensor_desciption8;
-	}
-
-	public void setField_sensor_desciption8(String field_sensor_desciption8) {
-		this.field_sensor_desciption8 = field_sensor_desciption8;
-	}
-
-	public String getField_sensor_desciption9() {
-		return field_sensor_desciption9;
-	}
-
-	public void setField_sensor_desciption9(String field_sensor_desciption9) {
-		this.field_sensor_desciption9 = field_sensor_desciption9;
-	}
-	
-	
 	
 }

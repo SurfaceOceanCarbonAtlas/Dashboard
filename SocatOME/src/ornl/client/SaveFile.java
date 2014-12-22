@@ -5,7 +5,6 @@
 package ornl.client;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import ornl.beans.Configuration;
-import ornl.database.Author;
 import ornl.database.Files;
 import ornl.database.FilesDAO;
 

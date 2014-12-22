@@ -71,5 +71,5 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/standard.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/taglibs-xsl.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/taglibs-xtags.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
 </classpath>

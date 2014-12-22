@@ -20,11 +20,6 @@
 				<entry key="field_user_email" value="//x_tags/ User/ Email" />
 
 				<!-- Investigator -->
-				<entry key="field_ownername" value="//x_tags/ Investigator[1]/ Name" />
-				<entry key="field_organizationame" value="//x_tags/ Investigator[1]/ Organization" />
-				<entry key="field_owneraddress" value="//x_tags/ Investigator[1]/ Address" />
-				<entry key="field_telephonenumber" value="//x_tags/ Investigator[1]/ Phone" />
-				<entry key="field_email" value="//x_tags/ Investigator[1]/ Email" />
 
 				<!-- Dataset Info -->
 				<entry key="field_title" value="//x_tags/ Dataset_Info/ Dataset_ID" />
@@ -37,12 +32,14 @@
 				<!-- Cruise Info -->
 				<entry key="field_experiment_name"
 					value="//x_tags/ Cruise_Info/ Experiment/ Experiment_Name" />
+				<entry key="field_platform_type" value="//x_tags/ Cruise_Info/ Experiment/ Platform_Type" />
 				<entry key="field_survey_type"
 					value="//x_tags/ Cruise_Info/ Experiment/ Experiment_Type" />
-					
-				<entry key="field_mooring_id"
-					value="//x_tags/ Cruise_Info/ Experiment/ Mooring_ID" />
-					
+
+				<entry key="field_co2_instr_type"
+					value="//x_tags/ Cruise_Info/ Experiment/ Co2_Instrument_type" />
+
+
 				<entry key="field_cruise_id"
 					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Cruise_ID" />
 				<entry key="field_cruise_info"
@@ -67,12 +64,12 @@
 					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Start_Date" />
 				<entry key="field_end_date_dup"
 					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ End_Date" />
-					
-					
+
+
 				<entry key="field_vessel_name" value="//x_tags/ Cruise_Info/ Vessel/ Vessel_Name" />
 				<entry key="field_vessel_id" value="//x_tags/ Cruise_Info/ Vessel/ Vessel_ID" />
 				<entry key="field_vessel_country" value="//x_tags/ Cruise_Info/ Vessel/ Country" />
-				<entry key="field_vessel_owner" value="//x_tags/ Cruise_Info/ Vessel/ Vessel_Owner"/>
+				<entry key="field_vessel_owner" value="//x_tags/ Cruise_Info/ Vessel/ Vessel_Owner" />
 
 				<!--Surface Water CO2 Method Description -->
 				<entry key="field_depth_seawater_intake"
@@ -131,6 +128,15 @@
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ Environmental_Control" />
 				<entry key="field_method_references"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Method_References" />
+				<!-- added -->
+				<entry key="field_detail_sensing"
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Details_Co2_Sensing" />
+				<entry key="field_sensor_calibration"
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Sensor_Calibration"></entry>
+				<entry key="field_comparision_co2_analysis"
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Analysis_of_Co2_Comparision" />
+				<entry key="field_measured_co2_params"
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Measured_Co2_Params" />
 
 				<!--Sea Surface Temperature (SST) -->
 				<entry key="field_SST_location"
@@ -182,6 +188,8 @@
 					value="//x_tags/ Method_Description/ Equilibrator_Pressure/ Calibration" />
 				<entry key="field_Pequ_comments"
 					value="//x_tags/ Method_Description/ Equilibrator_Pressure/ Other_Comments" />
+				<entry key="field_Patm_normalized"
+					value="//x_tags/ Method_Description/ Equilibrator_Pressure/ Normalized" />
 
 				<!-- Atmospheric Pressure (sea level) (Patm) -->
 				<entry key="field_Patm_sensor"
@@ -303,7 +311,7 @@
 					value="//x_tags/ Method_Description/ pH_Data/ Accuracy_Info" />
 				<entry key="field_ph_method_references"
 					value="//x_tags/ Method_Description/ pH_Data/ Method_References" />
-					
+
 				<!-- Additional Information -->
 				<entry key="field_additional_info" value="//x_tags/ Additional_Information" />
 
@@ -320,12 +328,21 @@
 				<entry key="field_additional_measurements" value="//x_tags/ Measurement_and_Calibration_Report" />
 
 				<entry key="field_userfile0" value="//x_tags/ Data_Link[1]/ URL" />
+				<entry key="field_preliminary_quality_control" value="//x_tags/ Preliminary_Quality_control" />
+				<entry key="field_conflicts" value="//x_tags/ CONFLICTS" />
 			</map>
 		</property>
 	</bean>
-	<bean id="multiTags" class="ornl.beans.DynamicMapBean">
-		<property name="dynamicTagsfdgc">
+
+	<bean id="multiTags" class="ornl.beans.MultiMapBean">
+		<property name="multiBean">
 			<map>
+				<entry key="field_ownername" value="//x_tags/ Investigator[1]/ Name" />
+				<entry key="field_organizationame" value="//x_tags/ Investigator[1]/ Organization" />
+				<entry key="field_owneraddress" value="//x_tags/ Investigator[1]/ Address" />
+				<entry key="field_telephonenumber" value="//x_tags/ Investigator[1]/ Phone" />
+				<entry key="field_email" value="//x_tags/ Investigator[1]/ Email" />
+
 				<!-- Investigator 2 -->
 				<entry key="field_ownername2" value="//x_tags/ Investigator[2]/ Name" />
 				<entry key="field_organizationame2" value="//x_tags/ Investigator[2]/ Organization" />
@@ -346,15 +363,14 @@
 				<entry key="field_owneraddress4" value="//x_tags/ Investigator[4]/ Address" />
 				<entry key="field_telephonenumber4" value="//x_tags/ Investigator[4]/ Phone" />
 				<entry key="field_email4" value="//x_tags/ Investigator[4]/ Email" />
-				
+
 				<!-- Investigator 5 -->
 				<entry key="field_ownername5" value="//x_tags/ Investigator[5]/ Name" />
 				<entry key="field_organizationame5" value="//x_tags/ Investigator[5]/ Organization" />
 				<entry key="field_owneraddress5" value="//x_tags/ Investigator[5]/ Address" />
 				<entry key="field_telephonenumber5" value="//x_tags/ Investigator[5]/ Phone" />
 				<entry key="field_email5" value="//x_tags/ Investigator[5]/ Email" />
-				
-				<!-- Variable Info -->
+
 				<entry key="field_variable0"
 					value="//x_tags/ Variables_Info/ Variable[1]/ Variable_Name" />
 				<entry key="field_variable_description0"
@@ -415,7 +431,7 @@
 					value="//x_tags/ Variables_Info/ Variable[15]/ Variable_Name" />
 				<entry key="field_variable_description14"
 					value="//x_tags/ Variables_Info/ Variable[15]/ Description_of_Variable" />
-					
+
 				<entry key="field_variable15"
 					value="//x_tags/ Variables_Info/ Variable[16]/ Variable_Name" />
 				<entry key="field_variable_description15"
@@ -436,8 +452,8 @@
 					value="//x_tags/ Variables_Info/ Variable[20]/ Variable_Name" />
 				<entry key="field_variable_description19"
 					value="//x_tags/ Variables_Info/ Variable[20]/ Description_of_Variable" />
-					
-					
+
+
 				<entry key="field_variable20"
 					value="//x_tags/ Variables_Info/ Variable[21]/ Variable_Name" />
 				<entry key="field_variable_description20"
@@ -457,7 +473,7 @@
 				<entry key="field_variable24"
 					value="//x_tags/ Variables_Info/ Variable[25]/ Variable_Name" />
 				<entry key="field_variable_description24"
-					value="//x_tags/ Variables_Info/ Variable[25]/ Description_of_Variable" />					
+					value="//x_tags/ Variables_Info/ Variable[25]/ Description_of_Variable" />
 				<entry key="field_variable25"
 					value="//x_tags/ Variables_Info/ Variable[26]/ Variable_Name" />
 				<entry key="field_variable_description25"
@@ -474,12 +490,11 @@
 					value="//x_tags/ Variables_Info/ Variable[29]/ Variable_Name" />
 				<entry key="field_variable_description28"
 					value="//x_tags/ Variables_Info/ Variable[29]/ Description_of_Variable" />
-				<entry key="field_variable29" value="//x_tags/ Variables_Info/ Variable[30]/ Variable_Name" />
+				<entry key="field_variable29"
+					value="//x_tags/ Variables_Info/ Variable[30]/ Variable_Name" />
 				<entry key="field_variable_description29"
 					value="//x_tags/ Variables_Info/ Variable[30]/ Description_of_Variable" />
 
-				<!-- Varaibles Info Co2 -->
-		
 
 				<!-- Other sensors -->
 				<entry key="field_manufaturer_other"
@@ -612,16 +627,14 @@
 				<entry key="field_comment_other9"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Other_Comments" />
 
-
-
 				<entry key="field_userfile1" value="//x_tags/ Data_Link[2]/ URL" />
 				<entry key="field_userfile2" value="//x_tags/ Data_Link[3]/ URL" />
 				<entry key="field_userfile3" value="//x_tags/ Data_Link[4]/ URL" />
 			</map>
 		</property>
 	</bean>
-	<bean id="multibeanMap" class="ornl.beans.MultiMapBean">
-		<property name="multibean">
+	<bean id="dynamicTags" class="ornl.beans.DynamicMapBean">
+		<property name="dynamicBean">
 			<map>
 				<entry key="field_port_of_call"
 					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Ports_of_Call" />

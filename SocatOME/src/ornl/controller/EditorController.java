@@ -8,7 +8,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.FileNameMap;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Date;
@@ -23,9 +22,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.tanesha.recaptcha.ReCaptchaImpl;
-import net.tanesha.recaptcha.ReCaptchaResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -52,8 +48,8 @@ import ornl.beans.Configuration;
 import ornl.beans.Editor;
 import ornl.beans.EmailLinks;
 import ornl.beans.FormElements;
-import ornl.beans.TransactionDetail;
 import ornl.beans.Metadata_Editor;
+import ornl.beans.TransactionDetail;
 import ornl.client.UserInfo;
 import ornl.service.EditorService;
 import ornl.service.SimpleFTPClient;

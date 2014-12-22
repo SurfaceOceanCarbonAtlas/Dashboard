@@ -4,22 +4,12 @@
 */
 package ornl.service;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.mapping.Value;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import ornl.beans.Configuration;
 
 public class Utility {
 

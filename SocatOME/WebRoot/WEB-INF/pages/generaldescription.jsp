@@ -1,27 +1,7 @@
 
 <div id="generaldescription" class="Section1 section">
 	<h4 class="alert alert-info">General Description:</h4>
-	<ul>
-
-
-		<li class="Section1"><label style="width: 350">Depth of
-				Seawater Intake (m):<span class="form-required"
-				title="This field is required.">*</span>
-		</label> <form:input path="field_depth_seawater_intake"
-				id="field_depth_seawater_intake" /></li>
-		<li class="Section2"><label style="width: 350">Location
-				of Seawater Intake:<span class="form-required"
-				title="This field is required.">*</span>
-		</label> <form:input path="field_location_seawater_intake"
-				id="field_location_seawater_intake" /></li>
-		<li class="Section2"><label for="Water_Flow_Rate"
-			style="width: 350">Water_Flow_Rate (L/min):<span
-				class="form-required" title="This field is required.">*</span></label> <form:input
-				path="field_water_flow_rate" name="Water_Flow_Rate" />
-		<li class="Section2"><label style="width: 450">Additional
-				comments on equilibration:</label><br /> <form:textarea
-				path="field_equilibrium_comments" name="field_equilibrium_comments"
-				cols="66" rows="3" /></li>
+	<ul>	
 
 
 		<li class="Section1">Sea Surface Temperature (SST):
@@ -29,7 +9,7 @@
 				<li class="Section2"><label style="width: 300px">Location
 						and depth of SST sensor:<span class="form-required"
 						title="This field is required.">*</span>
-				</label> <form:input path="field_SST_location" id="" /></li>
+				</label> <form:input id="field_SST_location" path="field_SST_location"/></li>
 				<li class="Section2"><label style="width: 300px">Manufacturer
 						SST sensor:<span class="form-required"
 						title="This field is required.">*</span>
@@ -40,11 +20,11 @@
 						title="This field is required.">*</span>
 				</label> <form:input path="field_SST_model" /></li>
 				<li class="Section2"><label style="width: 300px">Accuracy
-						SST:<span class="form-required" title="This field is required.">*</span>
-				</label> <form:input path="field_SST_accuracy" /></li>
+						SST in Degree Celsius :<span class="form-required" title="This field is required.">*</span>
+				</label> <form:input path="field_SST_accuracy" type="number" step="any"/></li>
 				<li class="Section2"><label style="width: 300px">Precision
-						SST:<span class="form-required" title="This field is required.">*</span>
-				</label> <form:input path="field_SST_precision" /></li>
+						SST in Degree Celcius:<span class="form-required" title="This field is required.">*</span>
+				</label> <form:input path="field_SST_precision" type="number" step="any"/></li>
 				<li class="Section2">Calibration of SST (document traceability
 					to an internationally recognized scale, including dates and
 					location of calibrations):<span class="form-required"
@@ -83,7 +63,7 @@
 				</li>
 			</ul>
 		</li>
-		<li class="Section1">Atmospheric Pressure (sea level) (P<sub>atm</sub>):
+		<li class="Section1">Atmospheric Pressure (not equilibrator pressure)(P<sub>atm</sub>):
 			<ul>
 				<li class="Section2"><label >Location
 						and height of P<sub>atm</sub> sensor:<span

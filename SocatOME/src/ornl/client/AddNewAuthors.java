@@ -5,10 +5,7 @@
 package ornl.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -16,6 +13,7 @@ import java.util.Properties;
 import org.hibernate.Transaction;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import ornl.beans.Configuration;
 import ornl.database.Author;
 import ornl.database.AuthorDAO;

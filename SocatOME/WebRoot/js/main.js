@@ -1,332 +1,516 @@
-var jq = jQuery.noConflict();
-jq(document)
+jQuery(document)
 		.ready(
 				function() {
+					var $ = jQuery;
 
 					open();
-				
-					/*
-					 * jq("a.fancy").fancybox({ 'width' : '75%', 'height' :
-					 * '75%', 'autoScale' : false, 'transitionIn' : 'none',
-					 * 'transitionOut' : 'none', 'type' : 'iframe' });
-					 */
-					jq("#mainform").validate({
+
+					$("#mainform").validate({
+
+						errorPlacement : function(error, element) {
+							error.insertBefore(element);
+
+						},
 						rules : {
+
 							'field_title' : {
 								required : true
-							},
-							'field_username' : {
-								required : true
-							},
-							'field_user_organizationname' : {
-								required : true
-							},
-							'field_user_address' : {
-								required : true
-							},
-							'field_user_telephonenumber' : {
-								required : true
-							},
-							'field_user_email' : {
-								required : true
-							},
-							'field_ownername' : {
-								required : true
-							},
-							'field_organizationname' : {
-								required : true
-							},
-							'field_owneraddress' : {
-								required : true
-							},
-							'field_telephonenumber' : {
-								required : true
-							},
-							'field_email' : {
-								required : true
-							},
-							'field_vessel_id' : {
-								required : true
-							},
-							'field_start_date' : {
-								required : true
-							},
-							'field_platform_type' : {
-								required : true
-							},
-							'field_co2_instr_type' : {
-								required : true
-							},
-							'field_survey_type' : {
-								required : true
-							},
-							'field_experiment_name' : {
-								required : true
-							},
-							'field_depth_seawater_intake' : {
-								required : true
-							},
-							'field_location_seawater_intake' : {
-								required : true
-							},
-							'field_water_flow_rate' : {
-								required : true
-							},
-							'field_SST_location' : {
-								required : true
-							},
-							'field_SST_manufacturer' : {
-								required : true
-							},
-							'field_SST_model' : {
-								required : true
-							},
-							'field_SST_accuracy' : {
-								required : true
-							},
-							'field_SST_precision' : {
-								required : true
-							},
-							'field_SST_calibration' : {
-								required : true
-							},
-							'field_equilibrator_type' : {
-								required : true
-							},
-							'field_drying_method' : {
-								required : true
-							},
-							'field_measurement_method' : {
-								required : true
-							},
-							'field_manufacturer' : {
-								required : true
-							},
-							'field_model' : {
-								required : true
-							},
-							'field_measured_co2_params' : {
-								required : true
-							},
-							'field_frequency' : {
-								required : true
-							},
-							'field_uncertainity' : {
-								required : true
-							},
-							'field_manufacturer' : {
-								required : true
-							},
-							'field_resolution' : {
-								required : true
-							},
-							'field_uncertainity_air' : {
-								required : true
-							},
-							'field_resolution_air' : {
-								required : true
-							},
-							'field_sensor_calibration' : {
-								required : true
-							},
-							'field_calibration' : {
-								required : true
-							},
-							'field_manufacturer_calibration' : {
-								required : true
-							},
-							'field_Tequ_location' : {
-								required : true
-							},
-							'field_Tequ_manufacturer' : {
-								required : true
-							},
-							'field_Tequ_model' : {
-								required : true
-							},
-							'field_Tequ_accuracy' : {
-								required : true
-							},
-							'field_Tequ_precision' : {
-								required : true
-							},
-							'field_Tequ_calibration' : {
-								required : true
-							},
-							'field_Pequ_location' : {
-								required : true
-							},
-							'field_Pequ_manufacturer' : {
-								required : true
-							},
-							'field_Pequ_model' : {
-								required : true
-							},
-							'field_Pequ_accuracy' : {
-								required : true
-							},
-							'field_Pequ_precision' : {
-								required : true
-							},
-							'field_Pequ_calibration' : {
-								required : true
-							},
+							}
+
 						}
-
 					});
-					jq("a.fancy").fancybox({
-						'width' : 970,
-						'height' : 920,
-						'transitionIn' : 'elastic',
-						'speedIn' : 600,
-						'speedOut' : 200,
-						'showCloseButton' : true,
-						'type' : 'iframe'
-
+					$.validator.addClassRules("conflicts", {
+						required : true
 					});
 
-					jq(".addfilter1").click(
-							function() {
-								jq("#field_equilibration_volume").rules("add",
-										"required");
-								jq("#field_gas_flow_rate").rules("add",
-										"required");
-								jq("#field_vented").rules("add", "required");
-								jq("#field_Patm_sensor").rules("add",
-										"required");
-								jq("#field_Patm_normalized").rules("add",
-										"required");
-								jq("#field_Patm_manufacturer").rules("add",
-										"required");
-								jq("#field_Patm_model")
-										.rules("add", "required");
-								jq("#field_Patm_accutacy").rules("add",
-										"required");
-								jq("#field_Patm_precision").rules("add",
-										"required");
-								jq("#field_Patm_calibration").rules("add",
-										"required");
-								
+					$(".addfilter2").click(
 
-								jq("#field_detail_sensing").rules("remove",
-										"required");
-								jq("#field_method_references").rules("remove",
-										"required");
-							});
-					jq(".addfilter2")
-							.click(
-									function() {
-										jq("#field_detail_sensing").rules(
-												"add", "required");
-										jq("#field_method_references").rules(
-												"add", "required");
+					function() {
+						// common//
+						$("#field_ownername").rules("add", {
+							"required" : true
+						});
+						$("#field_username").rules("add", {
+							"required" : true
+						});
+						$("#field_user_organizationame").rules("add", {
+							"required" : true
+						});
+						$("#field_user_adress").rules("add", {
+							"required" : true
+						});
+						$("#field_user_telephonenumber").rules("add", {
+							"required" : true
+						});
+						$("#field_user_email").rules("add", {
+							"required" : true
+						});
+						$("#field_ownername").rules("add", {
+							"required" : true
+						});
+						$("#field_organizationame").rules("add", {
+							"required" : true
+						});
+						$("#field_owneraddress").rules("add", {
+							"required" : true
+						});
+						$("#field_telephonenumber").rules("add", {
+							"required" : true
+						});
+						$("#field_email").rules("add", {
+							"required" : true
+						});
+						$("#field_vessel_id").rules("add", {
+							"required" : true
+						});
+						$("#field_start_date").rules("add", {
+							"required" : true
+						});
+						$("#field_platform_type").rules("add", {
+							"required" : true
+						});
+						$("#field_co2_instr_type").rules("add", {
+							"required" : true
+						});
+						$("#field_survey_type").rules("add", {
+							"required" : true
+						});
+						$("#field_experiment_name").rules("add", {
+							"required" : true
+						});
+						$("#field_depth_seawater_intake").rules("add", {
+							"required" : true
+						});
+						$("#field_location_seawater_intake").rules("add", {
+							"required" : true
+						});
+						$("#field_water_flow_rate").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_location").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_model").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_accuracy").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_precision").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_equilibrator_type").rules("add", {
+							"required" : true
+						});
+						$("#field_drying_method").rules("add", {
+							"required" : true
+						});
+						$("#field_measurement_method").rules("add", {
+							"required" : true
+						});
+						$("#field_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_model").rules("add", {
+							"required" : true
+						});
+						$("#field_measured_co2_params").rules("add", {
+							"required" : true
+						});
+						$("#field_frequency").rules("add", {
+							"required" : true
+						});
+						$("#field_uncertainity").rules("add", {
+							"required" : true
+						});
+						$("#field_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_resolution").rules("add", {
+							"required" : true
+						});
+						$("#field_uncertainity_air").rules("add", {
+							"required" : true
+						});
+						$("#field_resolution_air").rules("add", {
+							"required" : true
+						});
+						$("#field_sensor_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_manufacturer_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_model").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_accuracy").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_precision").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_model").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_accuracy").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_precision").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_calibration").rules("add", {
+							"required" : true
+						});
+						// end of common//
 
-										
-										
-										
-										jq("#field_equilibration_volume")
-												.rules("remove", "required");
-										jq("#field_gas_flow_rate").rules(
-												"remove", "required");
-										jq("#field_vented").rules("remove",
-												"required");
-										jq("#field_Patm_sensor").rules(
-												"remove", "required");
-										jq("#field_Patm_normalized").rules(
-												"remove", "required");
-										jq("#field_Patm_manufacturer").rules(
-												"remove", "required");
-										jq("#field_Patm_model").rules("remove",
-												"required");
-										jq("#field_Patm_accutacy").rules(
-												"remove", "required");
-										jq("#field_Patm_precision").rules(
-												"remove", "required");
-										jq("#field_Patm_calibration").rules(
-												"remove", "required");
-									});
+						// for filter 2//
+						$("#field_equilibration_volume").rules("remove", {
+							"required" : true
+						});
+						$("#field_gas_flow_rate").rules("remove", {
+							"required" : true
+						});
+						$("#field_vented").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_sensor").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_normalized").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_manufacturer").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_model").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_accutacy").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_precision").rules("remove", {
+							"required" : true
+						});
+						$("#field_Patm_calibration").rules("remove", {
+							"required" : true
+						});
 
-					// jq(".select2").select2();
-					jq(".select2").change(function() {
+						// for filter 1//
+						$("#field_detail_sensing").rules("add", {
+							"required" : true
+						});
+						$("#field_method_references").rules("add", {
+							"required" : true
+						});
 
-						var val = jq(this).val();
+					});
+
+					$(".addfilter1").click(function() {
+						// common//
+						$("#field_ownername").rules("add", {
+							"required" : true
+						});
+						$("#field_username").rules("add", {
+							"required" : true
+						});
+						$("#field_organizationame").rules("add", {
+							"required" : true
+						});
+						$("#field_user_adress").rules("add", {
+							"required" : true
+						});
+						$("#field_user_telephonenumber").rules("add", {
+							"required" : true
+						});
+						$("#field_user_email").rules("add", {
+							"required" : true
+						});
+						$("#field_ownername").rules("add", {
+							"required" : true
+						});
+						$("#field_organizationname").rules("add", {
+							"required" : true
+						});
+						$("#field_owneraddress").rules("add", {
+							"required" : true
+						});
+						$("#field_telephonenumber").rules("add", {
+							"required" : true
+						});
+						$("#field_email").rules("add", {
+							"required" : true
+						});
+						$("#field_vessel_id").rules("add", {
+							"required" : true
+						});
+						$("#field_start_date").rules("add", {
+							"required" : true
+						});
+						$("#field_platform_type").rules("add", {
+							"required" : true
+						});
+						$("#field_co2_instr_type").rules("add", {
+							"required" : true
+						});
+						$("#field_survey_type").rules("add", {
+							"required" : true
+						});
+						$("#field_experiment_name").rules("add", {
+							"required" : true
+						});
+						$("#field_depth_seawater_intake").rules("add", {
+							"required" : true
+						});
+						$("#field_location_seawater_intake").rules("add", {
+							"required" : true
+						});
+						$("#field_water_flow_rate").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_location").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_model").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_accuracy").rules("add", {
+							"required" : true
+						});
+						$("#field_SST_precision").rules("add", {"required":true});
+						$("#field_SST_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_equilibrator_type").rules("add", {
+							"required" : true
+						});
+						$("#field_drying_method").rules("add", {
+							"required" : true
+						});
+						$("#field_measurement_method").rules("add", {
+							"required" : true
+						});
+						$("#field_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_model").rules("add", {
+							"required" : true
+						});
+						$("#field_measured_co2_params").rules("add", {
+							"required" : true
+						});
+						$("#field_frequency").rules("add", {
+							"required" : true
+						});
+						$("#field_uncertainity").rules("add", {
+							"required" : true
+						});
+						$("#field_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_resolution").rules("add", {
+							"required" : true
+						});
+						$("#field_uncertainity_air").rules("add", {
+							"required" : true
+						});
+						$("#field_resolution_air").rules("add", {
+							"required" : true
+						});
+						$("#field_sensor_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_manufacturer_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_location").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_model").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_accuracy").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_precision").rules("add", {
+							"required" : true
+						});
+						$("#field_Tequ_calibration").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_model").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_accuracy").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_precision").rules("add", {
+							"required" : true
+						});
+						$("#field_Pequ_calibration").rules("add", {
+							"required" : true
+						});
+
+						// end of common//
+
+						// for filter 1
+						$("#field_equilibration_volume").rules("add", {
+							"required" : true
+						});
+						$("#field_gas_flow_rate").rules("add", {
+							"required" : true
+						});
+						$("#field_vented").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_sensor").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_normalized").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_manufacturer").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_model").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_accutacy").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_precision").rules("add", {
+							"required" : true
+						});
+						$("#field_Patm_calibration").rules("add", {
+							"required" : true
+						});
+
+						// for filter 2
+						$("#field_detail_sensing").rules("remove", {
+							"required" : true
+						});
+						$("#field_method_references").rules("remove", {
+							"required" : true
+						});
+
+					});
+
+					$(".select2").change(function() {
+
+						var val = $(this).val();
 
 						if (val.trim() == 'Others') {
-							jq(this).next("input").css("display", "block");
-							jq(this).next("input").val("");
+							$(this).next("input").css("display", "block");
+							$(this).next("input").val("");
 						} else {
-							jq(this).next("input").val(val);
-							jq(this).next("input").css("display", "none");
+							$(this).next("input").val(val);
+							$(this).next("input").css("display", "none");
 
 						}
 					});
 
-					var elems = jq(".select2");
+					var elems = $(".select2");
 					var options = new Array();
 					var optionsVal = new Array();
-					jq.each(elems, function(i, elm) {
-						var nextElem = jq(elm).next("input");
-						options = jq(elm).children();
-						jq.each(options, function(i, option) {
-							optionsVal.push(jq(option).text().trim());
+					$.each(elems, function(i, elm) {
+						var nextElem = $(elm).next("input");
+						options = $(elm).children();
+						$.each(options, function(i, option) {
+							optionsVal.push($(option).text().trim());
 
 						});
-						var val1 = jq(nextElem).val();
+						var val1 = $(nextElem).val();
 
 						if (optionsVal.indexOf(val1) != -1) {
-							jq(elm).val(val1);
+							$(elm).val(val1);
 						} else {
 
-							jq(elm).val("Others");
-							jq(elm).next("input").css("display", "block");
+							$(elm).val("Others");
+							$(elm).next("input").css("display", "block");
 						}
 
 					});
-					jq(".select2").select2();
-					if (jq("#field_conflicts").val() != null
-							&& jq("#field_conflicts").val() != '') {
-						var conflictedFields = jq("#field_conflicts").val()
+					$(".select2").select2();
+					if ($("#field_conflicts").val() != null
+							&& $("#field_conflicts").val() != '') {
+						var conflictedFields = $("#field_conflicts").val()
 								.split(",");
 						var html, i;
 						for (i = 0; i < conflictedFields.length; i++) {
-							html = "<div class='alert error'><p>There is a conflict. Please select one of the following: </p>";
-							var options = jq("#" + conflictedFields[i]).val()
+							html = "<div class='alert alert-error'><p>There is a conflict. Please select one of the following: </p>";
+							var options = $("#" + conflictedFields[i]).val()
 									.split("#");
 
 							var i;
 							for (j = 0; j < options.length; j++) {
 								var option = options[j];
-								if (option.indexOf("@@CONFLICT@@")!=-1)
-									html = html
-											+ "<input type='radio' name='conflict"
-											+ i
-											+ "'  onclick='selectRadio(\""
-											+ conflictedFields[i]
-											+ "\",\""
-											+ options
-											+ "\")' class='conflicts' value='"
-											+ options
-											+ "' checked> preserve conflict</input><br>";
-								else
-									html = html
-											+ "<input type='radio' name='conflict"
-											+ i + "' onclick='selectRadio(\""
-											+ conflictedFields[i] + "\",\""
-											+ option
-											+ "\")' class='conflicts' value='"
-											+ option + "'> " + option
-											+ "</input><br>";
+								/*
+								 * if (option.indexOf("@@CONFLICT@@")!=-1) html =
+								 * html + "<input type='radio' name='conflict" +
+								 * i + "' onclick='selectRadio(\"" +
+								 * conflictedFields[i] + "\",\"" + options +
+								 * "\")' class='conflicts' value='" + options + "'
+								 * checked> preserve conflict</input><br>";
+								 * else
+								 */
+								html = html
+										+ "<input type='radio' name='conflict"
+										+ i + "' onclick='selectRadio(\""
+										+ conflictedFields[i] + "\",\""
+										+ option
+										+ "\")' class='conflicts' value='"
+										+ option + "'> " + option
+										+ "</input><br>";
 							}
 
 							html = html + "</div>";
-
-							jq("#" + conflictedFields[i]).before(html);
+							$("#" + conflictedFields[i]).css('display', 'none');
+							$("#" + conflictedFields[i]).before(html);
 						}
-						// jq("#" + conflictedFields[i]).val('');
+						// $("#" + conflictedFields[i]).val('');
 					}
 					filterReq();
 
+					/*
+					 * $("a.fancy").fancybox({ 'width' : 970, 'height' : 920,
+					 * 'transitionIn' : 'elastic', 'speedIn' : 600, 'speedOut' :
+					 * 200, 'showCloseButton' : true, 'type' : 'iframe'
+					 * 
+					 * });
+					 */
+
 				});
+
 function selectRadio(inputName, opt) {
 	// alert(inputName+":"+ opt);
 	document.getElementById(inputName).value = opt;
@@ -567,7 +751,7 @@ function open() {
 function showDiv(divName) {
 	if (document.getElementById(divName).style.display == 'block') {
 		document.getElementById(divName).style.display = 'none';
-		jq("#" + divName).find('input').removeAttr('checked');
+		jQuery("#" + divName).find('input').removeAttr('checked');
 	} else
 		document.getElementById(divName).style.display = 'block';
 }
@@ -584,7 +768,7 @@ function Sensor() {
 		document.getElementById("sensor3").style.display = 'block';
 }
 function validateCaptcha() {
-	$.ajax({
+	jQuery.ajax({
 		type : 'POST',
 		url : 'recaptcha.jsp',
 		success : function(result) {
@@ -651,8 +835,8 @@ function displayFile(divID1, divID2) {
 	document.getElementById(divID2).value = val;
 }
 function filterReq() {
-	var value = document.getElementById("field_co2_instr_type").selectedIndex;
 	
+	var value = document.getElementById("select_co2_instr_type").selectedIndex;
 	switch (value) {
 	case 0: {
 		var elements = document.querySelectorAll(".req-filter1");
@@ -698,7 +882,16 @@ function filterReq() {
 		}
 		break;
 	}
-	default:
+	default: {
+		var elements = document.querySelectorAll(".req-filter2");
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].style.display = "inline-block";
+		}
+		var elements = document.querySelectorAll(".req-filter1");
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].style.display = "none";
+		}
 		break;
+	}
 	}
 }

@@ -4,11 +4,9 @@
 */
 package ornl.database;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 
 public class db_tester {
