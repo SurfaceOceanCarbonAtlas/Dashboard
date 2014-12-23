@@ -17,11 +17,8 @@ import org.jdom2.Element;
  * database.  
  * 
  * @author Steve Jones
- * @author Karl Smith
  */
 public class OmeMetadata {
-
-	private static final long serialVersionUID = 7764440573920810989L;
 
 	public static final String CONFLICT_STRING = "%%CONFLICT%%";
 
@@ -218,8 +215,8 @@ public class OmeMetadata {
 	private OMEVariable recordID = null;
 
 	/**
-	 * Creates an empty OME metadata document; 
-	 * only the standard OME filename is assigned.
+	 * Creates an empty OME metadata document with the given expocode.
+	 * @param expoCode expocode to use
 	 */
 	public OmeMetadata(String expoCode) {
 		itsExpoCode = expoCode;
@@ -231,6 +228,100 @@ public class OmeMetadata {
 	 */
 	public boolean isDraft() {
 		return itIsDraft;
+	}
+
+	/**
+	 * @return the experiment name
+	 */
+	public String getExperimentName() {
+		if ( null == experimentName )
+			return null;
+		return experimentName.getValue();
+	}
+
+	/**
+	 * @return the west-most longitude
+	 */
+	public String getWestmostLongitude() {
+		if ( null == westmostLongitude )
+			return null;
+		return westmostLongitude.getValue();
+	}
+
+	/**
+	 * @return the east-most longitude
+	 */
+	public String getEastmostLongitude() {
+		if ( null == eastmostLongitude )
+			return null;
+		return eastmostLongitude.getValue();
+	}
+
+	/**
+	 * @return the south-most latitude
+	 */
+	public String getSouthmostLatitude() {
+		if ( null == southmostLatitude )
+			return null;
+		return southmostLatitude.getValue();
+	}
+
+	/**
+	 * @return the north-most latitude
+	 */
+	public String getNorthmostLatitude() {
+		if ( null == northmostLatitude )
+			return null;
+		return northmostLatitude.getValue();
+	}
+
+	/**
+	 * @return the start date
+	 */
+	public String getTemporalCoverageStartDate() {
+		if ( null == temporalCoverageStartDate )
+			return null;
+		return temporalCoverageStartDate.getValue();
+	}
+
+	/**
+	 * @return the end date
+	 */
+	public String getTemporalCoverageEndDate() {
+		if ( null == temporalCoverageEndDate )
+			return null;
+		return temporalCoverageEndDate.getValue();
+	}
+
+	/**
+	 * @return the vessel name
+	 */
+	public String getVesselName() {
+		if ( null == vesselName )
+			return null;
+		return vesselName.getValue();
+	}
+
+	/**
+	 * @return the list of investigator names
+	 */
+	public ArrayList<String> getInvestigators() {
+		ArrayList<String> investigatorsList = new ArrayList<String>(investigators.size());
+		for ( OMECompositeVariable invst : investigators ) {
+			investigatorsList.add(invst.getValue("Name"));
+		}
+		return investigatorsList;
+	}
+
+	/**
+	 * @return the list of investigator organizations
+	 */
+	public ArrayList<String> getOrganizations() {
+		ArrayList<String> organizationsList = new ArrayList<String>(investigators.size());
+		for ( OMECompositeVariable invst : investigators ) {
+			organizationsList.add(invst.getValue("Organization"));
+		}
+		return organizationsList;
 	}
 
 	/**
@@ -989,8 +1080,7 @@ public class OmeMetadata {
 	}
 
 	/**
-	 * Assigns the expocode assigned for both the DashboardMetadata field
-	 * and in the OmeMetadata OME variable.
+	 * Assigns the expocode for this OME metadata.
 	 * 
 	 * @param expocode
 	 * 		expocode to assign
