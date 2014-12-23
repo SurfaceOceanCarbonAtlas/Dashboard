@@ -8,10 +8,11 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
@@ -165,8 +166,8 @@ public class DashboardCruiseSubmitter {
 
 				try {
 					// Get the OME metadata for this cruise
-					OmeMetadata omeMData = new OmeMetadata(
-							metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME));
+					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
+							metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME));
 					if ( addlDocs != null ) {
 						// Add the given additional documents (metadataHRefs from the database) 
 						// to cruiseData so they will be added to the DSG file 

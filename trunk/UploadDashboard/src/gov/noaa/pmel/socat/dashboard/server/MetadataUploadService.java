@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -134,14 +133,14 @@ public class MetadataUploadService extends HttpServlet {
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		String uploadFilename;
 		if ( omeIndicator.equals("true") ) {
-			uploadFilename = OmeMetadata.OME_FILENAME;
+			uploadFilename = DashboardMetadata.OME_FILENAME;
 		}
 		else {
 			uploadFilename = DashboardUtils.baseName(metadataItem.getName());
-			if ( uploadFilename.equals(OmeMetadata.OME_FILENAME) ) {
+			if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ) {
 				metadataItem.delete();
 				sendErrMsg(response, "Name of the uploaded file cannot be " + 
-						OmeMetadata.OME_FILENAME + "\nPlease rename the file and try again.");
+						DashboardMetadata.OME_FILENAME + "\nPlease rename the file and try again.");
 			}
 		}
 
@@ -159,9 +158,9 @@ public class MetadataUploadService extends HttpServlet {
 				// Update the metadata documents associated with this cruise
 				if ( omeIndicator.equals("true") ) {
 					// Make sure the contents are valid OME XML
-					OmeMetadata omedata;
+					DashboardOmeMetadata omedata;
 					try {
-						omedata = new OmeMetadata(metadata);
+						omedata = new DashboardOmeMetadata(metadata);
 					} catch ( IllegalArgumentException ex ) {
 						// Problems with the file - delete it
 						metadataHandler.removeMetadata(username, expo, 

@@ -1,7 +1,6 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;

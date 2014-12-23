@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -641,13 +641,13 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	public void renameMetadataFiles(String oldExpocode, String newExpocode) 
 											throws IllegalArgumentException {
 		// Rename all the metadata documents associated with the old expocode
-		OmeMetadata omeMData = null;
+		DashboardOmeMetadata omeMData = null;
 		for ( DashboardMetadata metaDoc : getMetadataFiles(oldExpocode) ) {
 			String uploadFilename = metaDoc.getFilename();
 
 			// If this is the OME metadata file, read the contents 
-			if ( OmeMetadata.OME_FILENAME.equals(uploadFilename) ) {
-				omeMData = new OmeMetadata(metaDoc);
+			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) ) {
+				omeMData = new DashboardOmeMetadata(metaDoc);
 			}
 
 			File oldMetaFile = getMetadataFile(oldExpocode, uploadFilename);
@@ -751,7 +751,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		if the expocode or uploadFilename in this object is invalid, or
 	 * 		writing the metadata document file generates one.
 	 */
-	public void saveAsOmeXmlDoc(OmeMetadata mdata, String message) 
+	public void saveAsOmeXmlDoc(DashboardOmeMetadata mdata, String message) 
 											throws IllegalArgumentException {
 		File mdataFile = getMetadataFile(mdata.getExpocode(), mdata.getFilename());
 

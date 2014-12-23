@@ -7,8 +7,8 @@ import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -135,7 +135,7 @@ public class DsgNcFileHandler {
 	 * 		if there are problems with the metadata or data given, or
 	 * 		if there are problems creating or writing the full-data DSG file
 	 */
-	public void saveCruise(OmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
+	public void saveCruise(DashboardOmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
 									String qcFlag) throws IllegalArgumentException {
 		DashboardDataStore dataStore;
 		try {
