@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -875,7 +875,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( cruise == null )
 			return null;
 		String timestamp = addlDoc.getUploadTimestamp();
-		if ( addlDoc instanceof OmeMetadata ) {
+		if ( addlDoc instanceof DashboardOmeMetadata ) {
 			// Assign the OME metadata timestamp for this cruise and save
 			if ( ! cruise.getOmeTimestamp().equals(timestamp) ) {
 				cruise.setOmeTimestamp(timestamp);
@@ -1120,7 +1120,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			String omeTimestamp = cruise.getOmeTimestamp();
 			if ( ! omeTimestamp.isEmpty() )
 				metadataHandler.removeMetadata(username, expocode, 
-						OmeMetadata.OME_FILENAME);
+						DashboardMetadata.OME_FILENAME);
 			for ( String mdataTitle : cruise.getAddlDocs() )
 				metadataHandler.removeMetadata(username, expocode, 
 						DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);

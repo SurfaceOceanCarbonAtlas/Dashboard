@@ -30,9 +30,9 @@ import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
  */
 public class SanityCheckerTest {
 	private static final String CONFIG_FILENAME = 
-			"/home/users/ksmith/content/SocatUploadDashboard/SocatUploadDashboard.properties";
+			"/home/flat/ksmith/content/SocatUploadDashboard/SocatUploadDashboard.properties";
 	private static final String LOG4J_PROPERTIES_FILENAME = 
-			"/home/users/ksmith/content/SocatUploadDashboard/log4j.properties";
+			"/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
 
 	@Test
 	public void testSanityChecker() throws Exception {

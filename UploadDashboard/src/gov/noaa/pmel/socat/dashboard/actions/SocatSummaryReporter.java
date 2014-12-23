@@ -8,8 +8,8 @@ import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
@@ -91,10 +91,10 @@ public class SocatSummaryReporter {
 				numWarnRows = Integer.toString(cruiseInfo.getNumWarnRows());
 			}
 			regions = "-";
-			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, OmeMetadata.OME_FILENAME);
+			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
 			if ( metadata == null )
 				throw new IllegalArgumentException("No OME metadata for " + expocode);
-			SocatMetadata socatMetadata = (new OmeMetadata(metadata)).createSocatMetadata(null, null, null);
+			SocatMetadata socatMetadata = (new DashboardOmeMetadata(metadata)).createSocatMetadata(null, null, null);
 			datasetName = socatMetadata.getCruiseName();
 			socatVersion = "-";
 			pis = socatMetadata.getScienceGroup();

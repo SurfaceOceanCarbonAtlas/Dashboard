@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.ome.OmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -259,7 +258,7 @@ public class CruiseUploadService extends HttpServlet {
 					dataStore.getMetadataFileHandler().getMetadataFiles(expocode);
 			TreeSet<String> addlDocs = new TreeSet<String>();
 			for ( DashboardMetadata mdata : mdataList ) {
-				if ( OmeMetadata.OME_FILENAME.equals(mdata.getFilename())) {
+				if ( DashboardMetadata.OME_FILENAME.equals(mdata.getFilename())) {
 					cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());					
 				}
 				else {

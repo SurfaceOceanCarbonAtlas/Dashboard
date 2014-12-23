@@ -22,7 +22,7 @@ import org.junit.Test;
 public class DerivedVariablesTest {
 
 	public static final String CONFIG_FILENAME = 
-			"/home/users/ksmith/content/SocatUploadDashboard/FerretConfig.xml";
+			"/home/flat/ksmith/content/SocatUploadDashboard/FerretConfig.xml";
 
 	@Test
 	public void derivedVariablesTest() throws Exception {
