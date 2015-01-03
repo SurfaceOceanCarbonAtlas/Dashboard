@@ -23,7 +23,7 @@ public class TimeGapSanityCheck extends SanityCheck {
 	private static MessageType TIME_GAP_TYPE = null;
 	
 	/**
-	 * The maximim time between records in days
+	 * The maximum time between records in days
 	 */
 	private double itsGapLimit;
 	
