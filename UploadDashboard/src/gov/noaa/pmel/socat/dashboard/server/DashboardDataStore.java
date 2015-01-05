@@ -68,7 +68,7 @@ public class DashboardDataStore {
 	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
-	private static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
+	public static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -691,7 +691,7 @@ public class DashboardDataStore {
 	 * @return
 	 * 		further encrypted password, or an empty string on failure
 	 */
-	private String spicedHash(String username, String passhash) {
+	public String spicedHash(String username, String passhash) {
 		String passSpicedHash;
 		try {
 			passSpicedHash = cipher.encrypt(passhash + encryptionSalt);
@@ -700,47 +700,6 @@ public class DashboardDataStore {
 			return "";
 		}
 		return DashboardUtils.passhashFromPlainText(username, passSpicedHash);
-	}
-
-	/**
-	 * Prints out the username and password hash for the configuration file.
-	 * 
-	 * @param args
-	 * 		(username)  (password)
-	 */
-	public static void main(String[] args) {
-		if ( (args.length != 2) || 
-			 args[0].trim().isEmpty() || 
-			 args[1].trim().isEmpty() ) {
-			System.err.println();
-			System.err.println("arguments:  username  password");
-			System.err.println();
-			System.err.println("Prints out the username and password hash " +
-					"for the dashboard configuration file");
-			System.err.println();
-			System.exit(1);
-		}
-		String username = args[0];
-		String password = args[1];
-		String passhash = DashboardUtils.passhashFromPlainText(username, password);
-		if ( (passhash == null) || passhash.isEmpty() ) {
-			System.err.println("Unacceptable username or password");
-			System.exit(1);
-		}
-		try {
-			DashboardDataStore dataStore = DashboardDataStore.get();
-			try {
-				String computedHash = dataStore.spicedHash(username, passhash);
-				System.out.println(AUTHENTICATION_NAME_TAG_PREFIX + 
-						DashboardUtils.cleanUsername(username) + "=" + computedHash);
-			} finally {
-				dataStore.shutdown();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		System.exit(0);
 	}
 
 }
