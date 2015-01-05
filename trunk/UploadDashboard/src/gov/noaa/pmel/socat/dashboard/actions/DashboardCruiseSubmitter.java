@@ -310,7 +310,7 @@ public class DashboardCruiseSubmitter {
 
 		// notify ERDDAP of new/updated cruises
 		if ( ! ingestExpos.isEmpty() )
-			dsgNcHandler.flagErddap(true);
+			dsgNcHandler.flagErddap(true, true);
 
 		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 

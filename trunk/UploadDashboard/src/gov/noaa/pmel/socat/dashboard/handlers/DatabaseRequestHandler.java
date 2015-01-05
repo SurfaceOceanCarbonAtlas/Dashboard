@@ -3,9 +3,6 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.nc.Constants;
-import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -20,14 +17,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.TimeZone;
 
 /**
  * Handles database requests for dealing with SOCAT flag events
@@ -909,155 +903,6 @@ public class DatabaseRequestHandler {
 		} finally {
 			catConn.close();
 		}
-	}
-
-	/**
-	 * Currently does nothing.  Originally was a one-off main to assign the WOCE-4 
-	 * flags to 06AQ20090109 to data measured during an iron fertilization experiment.
-	 * Left in as an example if needed in the future.
-	 */
-	public static void main(String[] args) {
-		// Do nothing - just return with an error value
-		System.exit(1);
-
-		SimpleDateFormat timestamper = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		timestamper.setTimeZone(TimeZone.getTimeZone("UTC"));
-		String expocode = "06AQ20090109";
-		double startTime = Double.NaN;
-		double endTime = Double.NaN;
-		try {
-			startTime = timestamper.parse("2009-01-27 00:00:00").getTime() / 1000.0;
-			endTime = timestamper.parse("2009-03-06 23:59:59").getTime() / 1000.0;
-		} catch (ParseException ex) {
-			System.err.println("Unexpected problems parsing hard-coded timestamp");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-
-		DashboardDataStore dataStore = null;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			System.err.println("Problem getting the default DashboardDataStore");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		CruiseDsgNcFile dsgFile = null;
-		try {
-			dsgFile = dataStore.getDsgNcFileHandler().getDsgNcFile(expocode);
-		} catch (Exception ex) {
-			System.err.println("Problems getting the DSG file for " + expocode);
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		char[] regionIDs = null;
-		try {
-			regionIDs = dsgFile.readCharVarDataValues(Constants.SHORT_NAMES.get(Constants.regionID_VARNAME));
-		} catch (Exception ex) {
-			System.err.println("Problem reading the region IDs from the DSG file");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		double[] longitudes = null;
-		try {
-			longitudes = dsgFile.readDoubleVarDataValues(Constants.SHORT_NAMES.get(Constants.longitude_VARNAME));
-		} catch (Exception ex) {
-			System.err.println("Problem reading longitudes from the DSG file");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		double[] latitudes = null;
-		try {
-			latitudes = dsgFile.readDoubleVarDataValues(Constants.SHORT_NAMES.get(Constants.latitude_VARNAME));
-		} catch (Exception ex) {
-			System.err.println("Problem reading latitudes from the DSG file");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		double[] times = null;
-		try {
-			times = dsgFile.readDoubleVarDataValues(Constants.SHORT_NAMES.get(Constants.time_VARNAME));
-		} catch (Exception ex) {
-			System.err.println("Problem reading times from the DSG file");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		String dataVarName = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
-		double[] fco2Rec = null;
-		try {
-			fco2Rec = dsgFile.readDoubleVarDataValues(dataVarName);
-		} catch (Exception ex) {
-			System.err.println("Problem reading fco2_recommended values from the DSG file");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		char[] woceFlags = null;
-		try {
-			woceFlags = dsgFile.readCharVarDataValues(Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME));
-		} catch (Exception ex) {
-			System.err.println("Problem reading the WOCE flags from the DSG file");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		int numRows = woceFlags.length;
-
-		// Create the WOCE event
-		SocatWoceEvent woceEvent = new SocatWoceEvent();
-		woceEvent.setComment("samples collected during an iron fertilization experiment");
-		woceEvent.setDataVarName(dataVarName);
-		woceEvent.setExpocode(expocode);
-		woceEvent.setFlag(SocatWoceEvent.WOCE_BAD);
-		woceEvent.setFlagDate(new Date());
-		woceEvent.setRealname("Judith Hauck");
-		woceEvent.setSocatVersion(dataStore.getSocatQCVersion());
-		woceEvent.setUsername("judith.hauck");
-
-		// Directly modify the data locations list in this event
-		ArrayList<DataLocation> locList = woceEvent.getLocations();
-		for (int rowIdx = 0; rowIdx < numRows; rowIdx++) {
-			if ( times[rowIdx] < startTime )
-				continue;
-			if ( times[rowIdx] > endTime )
-				break;
-			DataLocation dataLoc = new DataLocation();
-			dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
-			dataLoc.setDataValue(fco2Rec[rowIdx]);
-			dataLoc.setLatitude(latitudes[rowIdx]);
-			dataLoc.setLongitude(longitudes[rowIdx]);
-			dataLoc.setRegionID(regionIDs[rowIdx]);
-			dataLoc.setRowNumber(rowIdx+1);
-			locList.add(dataLoc);
-		}
-
-		// Submit this WOCE Event to the database
-		try {
-			dataStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);
-		} catch (SQLException ex) {
-			System.err.println("Problem adding the WOCE event to the database");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-
-		// Update the WOCE flags in the DSG file
-		try {
-			ArrayList<String> results = dsgFile.assignWoceFlags(woceEvent);
-			if ( ! results.isEmpty() ) {
-				System.err.println("Errors returned when assigning the WOCE flags in the DSG file");
-				for ( String msg : results ) {
-					System.err.println(msg);
-				}
-				System.exit(1);
-			}
-		} catch (Exception ex) {
-			System.err.println("Problem assigning the WOCE flags in the DSG files");
-			ex.printStackTrace();
-			System.exit(1);
-		}
-
-		// TODO: redecimate - done by hand
-		// TODO: flag ERDDAP - done by hand
-		
-		System.exit(0);
 	}
 
 }

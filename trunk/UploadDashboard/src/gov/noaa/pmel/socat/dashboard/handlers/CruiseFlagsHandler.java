@@ -3,22 +3,18 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TreeSet;
 
 /**
  * @author Karl Smith
@@ -115,75 +111,6 @@ public class CruiseFlagsHandler {
 		} finally {
 			msgsWriter.close();
 		}
-	}
-
-	/**
-	 * @param args
-	 * 		ExpocodesFile
-	 * 
-	 * where ExpocodesFile is a file containing expocodes of the cruises to report
-	 */
-	public static void main(String[] args) {
-		if ( args.length != 1 ) {
-			System.err.println("Arguments:  ExpocodesFile");
-			System.err.println();
-			System.err.println("ExpocodesFile");
-			System.err.println("    is a file containing expocodes, one per line, of cruises for which ");
-			System.err.println("    to generate WOCE flags report filea from the current WOCE flags in ");
-			System.err.println("    the database. ");
-			System.err.println();
-			System.exit(1);
-		}
-		String exposFilename = args[0];
-
-		TreeSet<String> expocodes = new TreeSet<String>();
-		try {
-			BufferedReader reader = 
-					new BufferedReader(new FileReader(exposFilename));
-			try {
-				String dataline = reader.readLine();
-				while ( dataline != null ) {
-					dataline = dataline.trim().toUpperCase();
-					if ( ! dataline.isEmpty() )
-						expocodes.add(dataline);
-					dataline = reader.readLine();
-				}
-			} finally {
-				reader.close();
-			}
-		} catch (Exception ex) {
-			System.err.println("Problems reading the file of expocodes '" + 
-					exposFilename + "': " + ex.getMessage());
-			ex.printStackTrace();
-			System.exit(1);
-		}
-
-		DashboardDataStore dataStore = null;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (Exception ex) {
-			System.err.println("Problems obtaining the default dashboard " +
-							   "configuration: " + ex.getMessage());
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
-		CruiseFlagsHandler flagsHandler = dataStore.getCruiseFlagsHandler();
-
-		int retVal = 0;
-		for ( String expo : expocodes ) {
-			// Generate the WOCE flags report file from the summary messages and current WOCE flags
-			try {
-				flagsHandler.generateWoceFlagMsgsFile(expo, dbHandler);
-			} catch ( Exception ex ) {
-				System.err.println("Error - " + expo + " - problems getting WOCE flags");
-				retVal = 1;
-				continue;
-			}
-			System.err.println("Success - " + expo);
-		}
-		// Done - return zero if no problems
-		System.exit(retVal);
 	}
 
 }

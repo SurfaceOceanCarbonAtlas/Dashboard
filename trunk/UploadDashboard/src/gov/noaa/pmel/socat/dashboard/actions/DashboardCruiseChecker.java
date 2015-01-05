@@ -4,17 +4,13 @@
 package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Properties;
-import java.util.TreeSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -1290,85 +1285,6 @@ public class DashboardCruiseChecker {
 	 */
 	public boolean hadGeopositionErrors() {
 		return lastCheckHadGeopositionErrors;
-	}
-
-	/**
-	 * @param args
-	 * 		ExpocodesFile
-	 * 
-	 * where:
-	 * 
-	 * ExpocodesFile is a file containing expocodes of the cruises to report
-	 */
-	public static void main(String[] args) {
-		if ( args.length != 1 ) {
-			System.err.println("Arguments:  ExpocodesFile");
-			System.err.println();
-			System.err.println("ExpocodesFile");
-			System.err.println("    is a file containing expocodes, one per line, to recheck with the ");
-			System.err.println("    SanityChecker and regenerate the SanityChecker messages files, but ");
-			System.err.println("    does not make any changes to the WOCE flags in the database. ");
-			System.err.println();
-			System.exit(1);
-		}
-		String exposFilename = args[0];
-
-		TreeSet<String> expocodes = new TreeSet<String>();
-		try {
-			BufferedReader reader = 
-					new BufferedReader(new FileReader(exposFilename));
-			try {
-				String dataline = reader.readLine();
-				while ( dataline != null ) {
-					dataline = dataline.trim().toUpperCase();
-					if ( ! dataline.isEmpty() )
-						expocodes.add(dataline);
-					dataline = reader.readLine();
-				}
-			} finally {
-				reader.close();
-			}
-		} catch (Exception ex) {
-			System.err.println("Problems reading the file of expocodes '" + 
-					exposFilename + "': " + ex.getMessage());
-			ex.printStackTrace();
-			System.exit(1);
-		}
-
-		DashboardDataStore dataStore = null;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (Exception ex) {
-			System.err.println("Problems obtaining the default dashboard " +
-							   "configuration: " + ex.getMessage());
-			ex.printStackTrace();
-			System.exit(1);
-		}
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
-
-		int retVal = 0;
-		for ( String expo : expocodes ) {
-			// Get all the data for this cruise
-			DashboardCruiseWithData cruiseData;
-			try {
-				cruiseData = cruiseHandler.getCruiseDataFromFiles(expo, 0, -1);
-			} catch ( Exception ex ) {
-				System.err.println("Error - " + expo + " - problems obtaining cruise data");
-				retVal = 1;
-				continue;
-			}
-			// Check the cruise as if this was to be submitted.
-			// This will regenerate the SanityChecker messages file.
-			if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
-				System.err.println("Error - " + expo + " - problems standardizing cruise data");
-				retVal = 1;
-				continue;
-			}
-			System.err.println("Success - " + expo);
-		}
-		// Done - return zero if no problems
-		System.exit(retVal);
 	}
 
 }
