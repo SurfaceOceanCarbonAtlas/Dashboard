@@ -35,7 +35,7 @@ import ucar.nc2.time.CalendarDate;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = -5648702630381873509L;
+	private static final long serialVersionUID = 329855623536562779L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -576,6 +576,50 @@ public class CruiseDsgNcFile extends File {
 			ncfile.close();
 		}
 		return dataVals;
+	}
+
+	/**
+	 * Writes the given array of characters as the values 
+	 * for the given character data variable.
+	 * 
+	 * @param varName
+	 * 		character data variable name
+	 * @param values
+	 * 		character values to assign
+	 * @throws IOException
+	 * 		if reading from or writing to the file throws one
+	 * @throws IllegalArgumentException
+	 * 		if the variable name or number of provided values
+	 * 		is invalid
+	 */
+	public void writeCharVarDataValues(String varName, char[] values) 
+								throws IOException, IllegalArgumentException {
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			if ( var.getShape(1) != 1 ) 
+				throw new IllegalArgumentException("Variable '" + varName + 
+						"' is not a single-character array variable in " + getName());
+			int numVals = var.getShape(0);
+			if ( numVals != values.length )
+				throw new IllegalArgumentException("Inconstistent number of variables for '" + 
+						varName + "' (" + Integer.toString(numVals) + 
+						") and provided data (" + Integer.toString(values.length) + ")");
+			ArrayChar.D2 dvar = new ArrayChar.D2(numVals, 1);
+			for (int k = 0; k < numVals; k++) {
+				dvar.set(k, 0, values[k]);
+			}
+			try {
+				ncfile.write(var, dvar);
+			} catch (InvalidRangeException ex) {
+				throw new IllegalArgumentException(ex);
+			}
+		} finally {
+			ncfile.close();
+		}
 	}
 
 	/**

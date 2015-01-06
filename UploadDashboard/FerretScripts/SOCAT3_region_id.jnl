@@ -35,15 +35,26 @@ set data "($cruise_filename)"
 
 let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask),x=-180:180], longitude, latitude)
 let d2land_coast = SAMPLEXY_CLOSEST(dist2land[d=($dd2land),x=-180:180], longitude, latitude)
-let region_num_fill = if d2land_coast le 50 and region_num eq 0 then 7 else region_num
+
 
 ! If there are any missing values, fill them with: Arctic, Coastal, or Southern.
+! Because datasets are at different resolutions, region_num may not have been assigned
+! for locations very near land. Mark these temporarily with code 88
+
+let region_num_fill = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
 
 IF `region_num_fill[i=@min] EQ 0` THEN
-   LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 7 else region_num
+   LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
 
-   LET region_num_fill = if region_num_fill1 then region_num_fill1 else \
-    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude)
+   LET region_num_fill = if region_num_fill1 EQ 88 then \
+    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE region_num_fill1
+ENDIF
+
+IF `region_num_fill[i=@max] EQ 88` THEN
+   LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
+
+   LET region_num_fill = if region_num_fill1 EQ 88 then \
+    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE region_num_fill1
 ENDIF
 
 ! There is no region 3 and no region 9
