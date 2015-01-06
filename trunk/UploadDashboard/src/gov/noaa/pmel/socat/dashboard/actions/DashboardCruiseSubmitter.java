@@ -205,7 +205,7 @@ public class DashboardCruiseSubmitter {
 					if ( SocatQCEvent.QC_NEW_FLAG.equals(flag) )
 						initQC.setComment("Initial QC flag for new dataset");
 					else
-						initQC.setComment("Intial QC flag for updated dataset");
+						initQC.setComment("Initial QC flag for updated dataset");
 
 					// Get the regions in which the cruise reports 
 					TreeSet<Character> regionsSet;

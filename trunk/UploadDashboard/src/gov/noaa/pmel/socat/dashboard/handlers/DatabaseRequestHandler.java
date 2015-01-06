@@ -360,6 +360,37 @@ public class DatabaseRequestHandler {
 		}
 	}
 
+	/**
+	 * Removed any QC events that:
+	 * (1) are for the given expocode,
+	 * (2) are for the coastal region,
+	 * (3) have new (N) or update (U) flags,
+	 * (4) have a comment starting with "Initial".
+	 * 
+	 * This is for removing initial QC regional flags for cruises that were
+	 * mistakenly assigned coastal region in the Southern or Arctic Oceans
+	 * (which do not have coastal regions).
+	 * 
+	 * @param expocode
+	 * 		remove initial coastal QC flags for the cruise with this expocode
+	 * @throws SQLException
+	 * 		if removing the QC flags throws one
+	 */
+	public void removeInitialCoastalQCEvent(String expocode) throws SQLException {
+		Connection catConn = makeConnection(true);
+		try {
+			PreparedStatement removeCoastalPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
+					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('" + 
+					SocatQCEvent.QC_NEW_FLAG + "','" + SocatQCEvent.QC_UPDATED_FLAG + 
+					"') AND `region_id` = '" + DataLocation.COASTAL_REGION_ID + 
+					"' AND `qc_comment` LIKE 'Initial%'");
+			removeCoastalPrepStmt.setString(1, expocode);
+			removeCoastalPrepStmt.execute();
+		} finally {
+			catConn.close();
+		}
+	}
+
 	private static final long MIN_FLAG_TIME = Math.round(30.0 * 365.2425 * 24.0 * 60.0 * 60.0);
 	/**
 	 * Get "the" QC flag for a dataset.  If the latest QC flag for different 
