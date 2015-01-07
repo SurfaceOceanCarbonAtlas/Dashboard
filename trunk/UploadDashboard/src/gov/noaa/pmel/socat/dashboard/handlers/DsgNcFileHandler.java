@@ -535,7 +535,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException(
 					"DSG file for " + expocode + " does not exist");
 		try {
-			dsgFile.updateQCFlag(qcEvent);
+			dsgFile.updateQCFlag(qcEvent.getFlag());
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}
@@ -544,7 +544,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + expocode + " does not exist");
 		try {
-			decDsgFile.updateQCFlag(qcEvent);
+			decDsgFile.updateQCFlag(qcEvent.getFlag());
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
 		}

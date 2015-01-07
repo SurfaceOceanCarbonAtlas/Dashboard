@@ -373,10 +373,13 @@ public class DatabaseRequestHandler {
 	 * 
 	 * @param expocode
 	 * 		remove initial coastal QC flags for the cruise with this expocode
+	 * @returns 
+	 * 		the row count returned from the DELETE SQL statement
 	 * @throws SQLException
 	 * 		if removing the QC flags throws one
 	 */
-	public void removeInitialCoastalQCEvent(String expocode) throws SQLException {
+	public int removeInitialCoastalQCEvent(String expocode) throws SQLException {
+		int numDeleted = 0;
 		Connection catConn = makeConnection(true);
 		try {
 			PreparedStatement removeCoastalPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
@@ -385,10 +388,11 @@ public class DatabaseRequestHandler {
 					"') AND `region_id` = '" + DataLocation.COASTAL_REGION_ID + 
 					"' AND `qc_comment` LIKE 'Initial%'");
 			removeCoastalPrepStmt.setString(1, expocode);
-			removeCoastalPrepStmt.execute();
+			numDeleted = removeCoastalPrepStmt.executeUpdate();
 		} finally {
 			catConn.close();
 		}
+		return numDeleted;
 	}
 
 	private static final long MIN_FLAG_TIME = Math.round(30.0 * 365.2425 * 24.0 * 60.0 * 60.0);
