@@ -6,7 +6,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
@@ -31,11 +30,12 @@ import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 329855623536562779L;
+	private static final long serialVersionUID = 4891504229996681548L;
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -766,8 +766,8 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Updates this DSG file with the given QC flag.
 	 * 
-	 * @param qcEvent
-	 * 		get the expocode and the QC flag from here
+	 * @param qcFlag
+	 * 		the QC flag to assign
 	 * @throws IllegalArgumentException
 	 * 		if this DSG file is not valid
 	 * @throws IOException
@@ -775,7 +775,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws InvalidRangeException 
 	 * 		if writing the updated QC flag to the DSG file throws one 
 	 */
-	public void updateQCFlag(SocatQCEvent qcEvent) 
+	public void updateQCFlag(Character qcFlag)
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
@@ -785,7 +785,7 @@ public class CruiseDsgNcFile extends File {
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
-			flagArray.setString(0, qcEvent.getFlag().toString());
+			flagArray.setString(0, qcFlag.toString());
 			ncfile.write(var, flagArray);
 		} finally {
 			ncfile.close();
