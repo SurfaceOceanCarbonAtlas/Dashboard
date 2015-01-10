@@ -28,7 +28,7 @@ public class GenerateWoceReports {
 			System.err.println();
 			System.err.println("ExpocodesFile");
 			System.err.println("    is a file containing expocodes, one per line, of cruises for which ");
-			System.err.println("    to generate WOCE flags report filea from the current WOCE flags in ");
+			System.err.println("    to generate WOCE flags report files from the current WOCE flags in ");
 			System.err.println("    the database. ");
 			System.err.println();
 			System.exit(1);
