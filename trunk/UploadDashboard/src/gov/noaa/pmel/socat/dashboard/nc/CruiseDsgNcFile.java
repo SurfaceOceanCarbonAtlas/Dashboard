@@ -748,7 +748,7 @@ public class CruiseDsgNcFile extends File {
 	 */
 	public char getQCFlag() throws IllegalArgumentException, IOException {
 		char flag;
-		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
 			String varName = Constants.SHORT_NAMES.get(Constants.qcFlag_VARNAME);
 			Variable var = ncfile.findVariable(varName);

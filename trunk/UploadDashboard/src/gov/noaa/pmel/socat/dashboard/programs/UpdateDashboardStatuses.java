@@ -26,18 +26,16 @@ public class UpdateDashboardStatuses {
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 1 ) {
-			System.err.println("Arguments:  [ - | ExpocodesFile ]");
+			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
-			System.err.println("Updates the cruise dashboard status from the current QC flag in the full-data ");
-			System.err.println("DSG file for cruises specified in ExpocodesFile, or all cruises if ExpocodesFile "); 
-			System.err.println("is '-'. The default dashboard configuration is used for this process. "); 
+			System.err.println("Updates the cruise dashboard status from the current QC flag ");
+			System.err.println("in the full-data DSG file for cruises specified in ExpocodesFile. "); 
+			System.err.println("The default dashboard configuration is used for this process. "); 
 			System.err.println();
 			System.exit(1);
 		}
 
 		String expocodesFilename = args[0];
-		if ( "-".equals(expocodesFilename) )
-			expocodesFilename = null;
 
 		boolean success = true;
 
@@ -53,39 +51,26 @@ public class UpdateDashboardStatuses {
 		}
 		try {
 			// Get the expocode of the cruises to update
-			TreeSet<String> allExpocodes = null; 
-			if ( expocodesFilename != null ) {
-				allExpocodes = new TreeSet<String>();
+			TreeSet<String> allExpocodes = new TreeSet<String>();
+			try {
+				BufferedReader expoReader = 
+						new BufferedReader(new FileReader(expocodesFilename));
 				try {
-					BufferedReader expoReader = 
-							new BufferedReader(new FileReader(expocodesFilename));
-					try {
-						String dataline = expoReader.readLine();
-						while ( dataline != null ) {
-							dataline = dataline.trim();
-							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
-								allExpocodes.add(dataline);
-							dataline = expoReader.readLine();
-						}
-					} finally {
-						expoReader.close();
+					String dataline = expoReader.readLine();
+					while ( dataline != null ) {
+						dataline = dataline.trim();
+						if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+							allExpocodes.add(dataline);
+						dataline = expoReader.readLine();
 					}
-				} catch (Exception ex) {
-					System.err.println("Error getting expocodes from " + 
-							expocodesFilename + ": " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
+				} finally {
+					expoReader.close();
 				}
-			} 
-			else {
-				try {
-					allExpocodes = new TreeSet<String>(
-							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
-				} catch (Exception ex) {
-					System.err.println("Error getting all expocodes: " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
-				}
+			} catch (Exception ex) {
+				System.err.println("Error getting expocodes from " + 
+						expocodesFilename + ": " + ex.getMessage());
+				ex.printStackTrace();
+				System.exit(1);
 			}
 
 			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
@@ -97,19 +82,21 @@ public class UpdateDashboardStatuses {
 				try {
 					qcFlag = dsgHandler.getDsgNcFile(expocode).getQCFlag();
 				} catch (Exception ex) {
-					System.err.println("Error reading the QC flag for " + expocode + 
-							" : " + ex.getMessage());
+					System.err.println("Error reading the QC flag for " + 
+							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
 				try {
 					fileHandler.updateCruiseDashboardStatus(expocode, qcFlag);
 				} catch (Exception ex) {
-					System.err.println("Error updating the QC flag for " + expocode + 
-							" : " + ex.getMessage());
+					System.err.println("Error updating the dashboard status for " + 
+							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
+				System.err.println("Updated dashboard status for " + 
+						expocode + " to '" + qcFlag + "'");
 			}
 		} finally {
 			dataStore.shutdown();

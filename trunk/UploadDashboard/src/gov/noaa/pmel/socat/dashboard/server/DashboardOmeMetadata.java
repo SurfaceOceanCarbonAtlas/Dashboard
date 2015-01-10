@@ -8,7 +8,6 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -16,7 +15,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.jdom2.Document;
-import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
@@ -32,7 +30,7 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -1408194745405236524L;
+	private static final long serialVersionUID = 1935026048888928520L;
 
 	private static final SimpleDateFormat DATE_PARSER = 
 			new SimpleDateFormat("yyyyMMdd HH:mm:ss");
@@ -47,15 +45,16 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * DashboardMetadata given. 
 	 * 
 	 * @param mdata
-	 * 		OME XML file to read.  The expocode, filename, upload timestamp 
-	 * 		and owner are copied from this object, and the file specified is 
-	 * 		read to populate the fields of this object.
+	 * 		OME XML file to read.  The expocode, upload timestamp, and owner 
+	 * 		are copied from this object, and the file specified is read to 
+	 * 		populate the OmeMetadata member of this object.
 	 * @throws IllegalArgumentException
 	 * 		if mdata is null, or
 	 * 		if the information in the DashboardMetadata is invalid, or
 	 * 		if the contents of the metadata document are not valid
 	 */
-	public DashboardOmeMetadata(DashboardMetadata mdata) {
+	public DashboardOmeMetadata(DashboardMetadata mdata) 
+											throws IllegalArgumentException {
 		// Initialize to an empty OME metadata document with the standard OME filename
 		super();
 		filename = OME_FILENAME;
@@ -73,7 +72,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		MetadataFileHandler mdataHandler;
 		try {
 			mdataHandler = DashboardDataStore.get().getMetadataFileHandler();
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the metadata handler");
 		}
@@ -81,7 +80,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		Document omeDoc;
 		try {
 			omeDoc = (new SAXBuilder()).build(mdataFile);
-		} catch (JDOMException | IOException ex ) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problems interpreting " +
 					"the OME XML contents in " + mdataFile.getName() + 
 					"\n    " + ex.getMessage());
@@ -92,8 +91,42 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		try {
 			omeMData = new OmeMetadata(expocode);
 			omeMData.assignFromOmeXmlDoc(omeDoc);
-		} catch ( Exception ex ) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problem with " + mdataFile.getName() +
+					"\n    " + ex.getMessage(), ex);
+		}
+		// If conflicted or otherwise draft, set the conflicted flags in SocatMetadata
+		setConflicted(omeMData.isDraft());
+	}
+
+	/**
+	 * Creates with the given expocode and timestamp, and from the contents 
+	 * of the given OME XML document.  The owner is left empty.
+	 * 
+	 * @param expocode
+	 * 		expocode for this metadata
+	 * @param timestamp
+	 * 		upload timestamp for this metadata
+	 * @param omeDoc
+	 * 		document containing the metadata contents
+	 * @throws IllegalArgumentException
+	 * 		if expocode is invalid, or
+	 * 		if the contents of the metadata document are not valid
+	 */
+	public DashboardOmeMetadata(String expocode, String timestamp, Document omeDoc) 
+											throws IllegalArgumentException {
+		super();
+		this.filename = OME_FILENAME;
+		this.expocode = DashboardServerUtils.checkExpocode(expocode);
+		// Use the setter in case of null
+		setUploadTimestamp(timestamp);
+
+		// Read the document to create the OmeMetadata member of this object
+		try {
+			omeMData = new OmeMetadata(this.expocode);
+			omeMData.assignFromOmeXmlDoc(omeDoc);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Problems with the provided XML document:" +
 					"\n    " + ex.getMessage(), ex);
 		}
 		// If conflicted or otherwise draft, set the conflicted flags in SocatMetadata
