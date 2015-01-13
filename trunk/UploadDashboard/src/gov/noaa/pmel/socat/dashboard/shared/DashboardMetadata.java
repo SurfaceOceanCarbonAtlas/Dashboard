@@ -47,8 +47,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * Returns the additional documents title for this metadata.
-	 * Normally this title is the filename, followed by a semicolon, 
-	 * a space, and the upload timestamp.  If the filename is empty,
+	 * Normally this title is the filename, followed by a space, a semicolon, 
+	 * another space, and the upload timestamp.  If the filename is empty,
 	 * this title is empty.  If the upload timestamp is empty, the 
 	 * title is just the filename.
 	 */
