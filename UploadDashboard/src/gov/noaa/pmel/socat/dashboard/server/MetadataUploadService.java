@@ -153,7 +153,7 @@ public class MetadataUploadService extends HttpServlet {
 							username, uploadTimestamp, uploadFilename, metadataItem);
 				}
 				else {
-					metadata = metadataHandler.copyMetadataFile(expo, metadata);
+					metadata = metadataHandler.copyMetadataFile(expo, metadata, true);
 				}
 				// Update the metadata documents associated with this cruise
 				if ( omeIndicator.equals("true") ) {

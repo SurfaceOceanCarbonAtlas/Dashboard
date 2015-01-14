@@ -285,6 +285,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		copy of the metadata file
 	 * @param srcMetadata
 	 * 		metadata document to be copied
+	 * @param allowOverwrite
+	 * 		allow overwrite an existing metadata file?  If false and the
+	 * 		metadata file exists, an IllegalArgumentException is raised
 	 * @return
 	 * 		a DashboardMetadata describing the new or updated metadata 
 	 * 		document copied from the another cruise; never null
@@ -295,7 +298,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		if there were problems writing to the destination metadata document.
 	 */
 	public DashboardMetadata copyMetadataFile(String destCruiseExpo,
-			DashboardMetadata srcMetadata) throws IllegalArgumentException {
+			DashboardMetadata srcMetadata, boolean allowOverwrite) throws IllegalArgumentException {
 		String owner = srcMetadata.getOwner();
 		String uploadName = srcMetadata.getFilename();
 		// Get and input stream for source metadata document file
@@ -307,7 +310,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 				// Create the metadata document from this input stream
 				// allowing overwrite if permissions permit it
 				mdata = saveMetadataInputStream(destCruiseExpo, owner, uploadName, 
-						srcMetadata.getUploadTimestamp(), src, false);
+						srcMetadata.getUploadTimestamp(), src, allowOverwrite);
 			} finally {
 				src.close();
 			}
@@ -328,8 +331,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		owner of this metadata document
 	 * @param urlString
 	 * 		URL String of the document to download
-	 * @param noOverwrite
-	 * 		never overwrite an existing metadata file?  If true and the
+	 * @param allowOverwrite
+	 * 		allow overwrite an existing metadata file?  If false and the
 	 * 		metadata file exists, an IllegalArgumentException is raised
 	 * 		and no data will have been read from src.
 	 * @return
@@ -338,12 +341,14 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
 	 * 		if the URL String is invalid,
-	 * 		if problems reading the metadata from the given URL,
+	 * 		if problems reading the metadata from the given URL
 	 * 		if problems writing to the new metadata document, or
 	 * 		if problems committing the new metadata document to version control
+	 * @throws IOException 
+	 * 		if problems opening the given URL for reading
 	 */
 	public DashboardMetadata saveMetadataURL(String expocode, String owner, 
-			String urlString, boolean noOverwrite) throws IllegalArgumentException {
+			String urlString, boolean allowOverwrite) throws IllegalArgumentException, IOException {
 		if ( urlString.endsWith("/") )
 			throw new IllegalArgumentException("Invalid link document: " + urlString + 
 					"\n    Not a file (ends in slash)");
@@ -364,11 +369,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
 					"\n    index.html unlikely to be valid");
 		String timestamp = DATETIME_FORMATTER.format(new Date());
 		DashboardMetadata mdata;
+		InputStream src = link.openStream();
 		try {
-			InputStream src = link.openStream();
 			try {
 				mdata = saveMetadataInputStream(expocode, owner, origName, 
-												timestamp, src, noOverwrite);
+												timestamp, src, allowOverwrite);
 			} finally {
 				src.close();
 			}
@@ -392,8 +397,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		"upload" timestamp to assign for this metadata document
 	 * @param src
 	 * 		source to read for the contents of this metadata file
-	 * @param noOverwrite
-	 * 		never overwrite an existing metadata file?  If true and the
+	 * @param allowOverwrite
+	 * 		allow overwrite an existing metadata file?  If false and the
 	 * 		metadata file exists, an IllegalArgumentException is raised
 	 * 		and no data will have been read from src.
 	 * @return
@@ -407,7 +412,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardMetadata saveMetadataInputStream(String expocode, 
 			String owner, String origName, String timestamp, InputStream src, 
-			boolean noOverwrite) throws IllegalArgumentException {
+			boolean allowOverwrite) throws IllegalArgumentException {
 
 		// Get the destination metadata document 
 		File destFile = getMetadataFile(expocode, origName);
@@ -422,7 +427,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Check if this will overwrite existing metadata
 		boolean isUpdate;
 		if ( destFile.exists() ) {
-			if ( noOverwrite )
+			if ( ! allowOverwrite )
 				throw new IllegalArgumentException(
 						"Destination metdata file " + destFile.getName() + "already exists");
 			verifyOkayToDelete(owner, expocode, origName);
