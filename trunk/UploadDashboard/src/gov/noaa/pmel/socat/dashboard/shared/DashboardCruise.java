@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2428415075886392439L;
+	private static final long serialVersionUID = -7667588095811121038L;
 
 	boolean selected;
 	String version;
@@ -79,6 +79,34 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		noColumnWoceFourRowIndices = new HashSet<Integer>();
 		userWoceThreeRowIndices = new HashSet<Integer>();
 		userWoceFourRowIndices = new HashSet<Integer>();
+	}
+
+	/**
+	 * @param cruise
+	 * 		cruise to check
+	 * @return
+	 * 		Boolean.TRUE if the cruise is unacceptable, suspended, excluded, in preview, or not submitted, 
+	 * 		Boolean.FALSE if the cruise is submitted or acceptable but unpublished cruise,
+	 * 		null if the cruise is (acceptable and) published (previous SOCAT version)
+	 */
+	public Boolean isEditable() {
+		// true for cruises that are unacceptable, suspended, excluded, in preview, or not submitted
+		String status = getQcStatus();
+		if ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
+			 status.equals(SocatQCEvent.QC_STATUS_PREVIEW) ||
+			 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
+			 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
+			 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED)  ) 
+			return Boolean.TRUE;
+		// false for submitted or acceptable unpublished cruises
+		status = getArchiveStatus();
+		if ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) 
+			return Boolean.FALSE;
+		// null for acceptable published cruises
+		return null;
 	}
 
 	/**

@@ -58,8 +58,8 @@ public class DashboardCruiseSubmitter {
 
 	/**
 	 * Submit a dataset for SOCAT QC.  This sanity checks and generates
-	 * DSG and decimated DSG files for datasets which have a QC status 
-	 * of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED}, 
+	 * DSG and decimated DSG files for datasets which are editable 
+	 * (have a QC status of {@link DashboardUtils#QC_STATUS_NOT_SUBMITTED}, 
 	 * {@link DashboardUtils#QC_STATUS_UNACCEPTABLE},
 	 * {@link DashboardUtils#QC_STATUS_SUSPENDED}, or
 	 * {@link DashboardUtils#QC_STATUS_EXCLUDED}.
@@ -114,14 +114,10 @@ public class DashboardCruiseSubmitter {
 			boolean changed = false;
 			String commitMsg = "Expocode " + expocode;
 
-			String qcStatus = cruise.getQcStatus();
-			if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ||
-				 qcStatus.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) || 
-				 qcStatus.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
-				 qcStatus.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) {
-
+			if ( Boolean.TRUE.equals(cruise.isEditable()) ) {
 				// QC flag to assign with this cruise
 				Character flag;
+				String qcStatus = cruise.getQcStatus();
 				if ( (qcFlag != null) && ! qcFlag.isEmpty() ) {
 					flag = qcFlag.charAt(0);
 					qcStatus = SocatQCEvent.FLAG_STATUS_MAP.get(flag);

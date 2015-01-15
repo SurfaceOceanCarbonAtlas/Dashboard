@@ -861,7 +861,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		the updated cruise information, or 
 	 * 		null if there is no cruise with this expocode
 	 * @throws IllegalArgumentException
-	 * 		if the cruise exists and ...
+	 * 		if the cruise exists and one of:
 	 * 		if the expocode is invalid,
 	 * 		if there are problems accessing the information file for the cruise,
 	 * 		if there are problems updating and committing the cruise information,
@@ -1025,13 +1025,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				throws IllegalArgumentException, FileNotFoundException {
 		// Get the cruise information from the data file
 		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
-		// Check if the cruise is in a submitted or accepted state
-		String status = cruise.getQcStatus();
-		if ( ! ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
-				 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
-				 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
-				 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED) ) )
-			throw new IllegalArgumentException("cruise status is " + status);
+		// Check if the cruise is in a submitted or published state
+		if ( ! Boolean.TRUE.equals(cruise.isEditable()) )
+			throw new IllegalArgumentException("cruise status is " + cruise.getQcStatus());
 		// Check if the user has permission to delete the cruise
 		try {
 			String owner = cruise.getOwner();

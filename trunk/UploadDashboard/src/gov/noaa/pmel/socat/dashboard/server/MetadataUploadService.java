@@ -4,13 +4,18 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServlet;
@@ -129,10 +134,13 @@ public class MetadataUploadService extends HttpServlet {
 			return;
 		}
 
+		boolean isOme = omeIndicator.equals("true");
+
 		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
 		String uploadFilename;
-		if ( omeIndicator.equals("true") ) {
+		if ( isOme ) {
 			uploadFilename = DashboardMetadata.OME_FILENAME;
 		}
 		else {
@@ -156,7 +164,8 @@ public class MetadataUploadService extends HttpServlet {
 					metadata = metadataHandler.copyMetadataFile(expo, metadata, true);
 				}
 				// Update the metadata documents associated with this cruise
-				if ( omeIndicator.equals("true") ) {
+				DashboardCruise cruise;
+				if ( isOme ) {
 					// Make sure the contents are valid OME XML
 					DashboardOmeMetadata omedata;
 					try {
@@ -168,10 +177,33 @@ public class MetadataUploadService extends HttpServlet {
 						throw new IllegalArgumentException(
 								"Invalid OME metadata file:\n   " + ex.getMessage());
 					}
-					cruiseHandler.addAddlDocToCruise(expo, omedata);
+					cruise = cruiseHandler.addAddlDocToCruise(expo, omedata);
 				}
 				else {
-					cruiseHandler.addAddlDocToCruise(expo, metadata);
+					cruise = cruiseHandler.addAddlDocToCruise(expo, metadata);
+				}
+				if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
+					SocatQCEvent qcEvent = new SocatQCEvent();
+					qcEvent.setExpocode(expo);
+					qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
+					qcEvent.setFlagDate(new Date());
+					qcEvent.setRegionID(DataLocation.COASTAL_REGION_ID);
+					qcEvent.setSocatVersion(dataStore.getSocatUploadVersion());
+					qcEvent.setUsername(username);
+					String comment;
+					if ( isOme )
+						comment = "Update of OME metadata.  ";
+					else
+						comment = "Update of metadata file " + uploadFilename + ".  ";
+					comment += "Data and WOCE flags were not changed.";
+					qcEvent.setComment(comment);
+					try {
+						dbHandler.addQCEvent(qcEvent);
+					} catch (Exception ex) {
+						// Should not fail.  
+						// If does, do not delete the file since it is okay, and ignore the failure.
+						;
+					}
 				}
 			} catch ( Exception ex ) {
 				metadataItem.delete();
