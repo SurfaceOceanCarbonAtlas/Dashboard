@@ -9,10 +9,13 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -148,6 +151,8 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
 
 		if ( DashboardMetadata.OME_FILENAME.equals(deleteFilename) ) {
+			if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) 
+				throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted cruise");
 			// No more OME metadata for this cruise
 			cruise.setOmeTimestamp(null);
 		}
@@ -174,6 +179,24 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		cruiseHandler.saveCruiseInfoToFile(cruise, "Removed metadata document " + 
 									deleteFilename + " from cruise " + expocode);
+		// If submitted cruise, add QC update ('U') global flag about removal of metadata
+		if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
+			SocatQCEvent qcEvent = new SocatQCEvent();
+			qcEvent.setExpocode(expocode);
+			qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
+			qcEvent.setFlagDate(new Date());
+			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+			qcEvent.setSocatVersion(dataStore.getSocatUploadVersion());
+			qcEvent.setUsername(username);
+			qcEvent.setComment("Deleted metadata file \"" + deleteFilename + 
+					"\".  Data and WOCE flags were not changed.");
+			try {
+				dataStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
+			} catch (Exception ex) {
+				// Should not fail.  If does, ignore the failure.
+				;
+			}
+		}
 
 		// Create the set of updated cruise information to return
 		HashSet<DashboardCruise> cruiseSet = 
