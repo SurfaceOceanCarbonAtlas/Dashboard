@@ -187,14 +187,14 @@ public class MetadataUploadService extends HttpServlet {
 					qcEvent.setExpocode(expo);
 					qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
 					qcEvent.setFlagDate(new Date());
-					qcEvent.setRegionID(DataLocation.COASTAL_REGION_ID);
+					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 					qcEvent.setSocatVersion(dataStore.getSocatUploadVersion());
 					qcEvent.setUsername(username);
 					String comment;
 					if ( isOme )
 						comment = "Update of OME metadata.  ";
 					else
-						comment = "Update of metadata file " + uploadFilename + ".  ";
+						comment = "Update of metadata file \"" + uploadFilename + "\".  ";
 					comment += "Data and WOCE flags were not changed.";
 					qcEvent.setComment(comment);
 					try {
