@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -13,8 +14,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import org.junit.Test;
 
@@ -714,6 +717,75 @@ public class DashboardCruiseTest {
 		secondCruise.setUserWoceFourRowIndices(userWoceFours);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#isSelected()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setSelected(boolean)}.
+	 */
+	@Test
+	public void testSetIsEditable() {
+		DashboardCruise cruise = new DashboardCruise();
+		assertTrue( cruise.isEditable() );
+
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_NOT_SUBMITTED);
+		assertNotNull( cruise.isEditable() );
+		assertTrue( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_EXCLUDED);
+		assertNotNull( cruise.isEditable() );
+		assertTrue( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
+		assertNotNull( cruise.isEditable() );
+		assertTrue( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_UNACCEPTABLE);
+		assertNotNull( cruise.isEditable() );
+		assertTrue( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_PREVIEW);
+		assertNotNull( cruise.isEditable() );
+		assertTrue( cruise.isEditable() );
+
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_ACCEPTED_A);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_ACCEPTED_B);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_ACCEPTED_C);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_ACCEPTED_D);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_ACCEPTED_E);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_CONFLICT);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_RENAMED);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
+		assertNull( cruise.isEditable() );
 	}
 
 }

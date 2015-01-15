@@ -467,33 +467,6 @@ public class CruiseListPage extends Composite {
 	}
 
 	/**
-	 * @param cruise
-	 * 		cruise to check
-	 * @return
-	 * 		true if the cruise is unacceptable, suspended, excluded, or not submitted, 
-	 * 		null if the cruise is an acceptable published (previous SOCAT version),
-	 * 		false if the cruise is submitted or acceptable unpublished cruise
-	 */
-	private Boolean isEditableCruise(DashboardCruise cruise) {
-		// true for cruises that are unacceptable, suspended, excluded, or not submitted
-		String status = cruise.getQcStatus();
-		if ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
-			 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
-			 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
-			 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED)  ) 
-			return Boolean.TRUE;
-		// null for acceptable acceptable cruises
-		status = cruise.getArchiveStatus();
-		if ( ! ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
-				 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
-				 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
-				 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) ) 
-			return null;
-		// false for submitted or acceptable unpublished cruises
-		return Boolean.FALSE;
-	}
-
-	/**
 	 * Selects cruises of the given type in the cruise list, supplementing the currently
 	 * selected cruises, or clears all selected cruises.
 	 * 
@@ -518,7 +491,7 @@ public class CruiseListPage extends Composite {
 		}
 		else if ( EDITABLE_SELECTION_OPTION.equals(option) ) {
 			for ( DashboardCruise cruise : cruiseList ) {
-				if ( Boolean.TRUE.equals(isEditableCruise(cruise)) )
+				if ( Boolean.TRUE.equals(cruise.isEditable()) )
 					cruise.setSelected(true);
 				else
 					cruise.setSelected(false);
@@ -526,7 +499,7 @@ public class CruiseListPage extends Composite {
 		}
 		else if ( SUBMITTED_SELECTION_OPTION.equals(option) ) {
 			for ( DashboardCruise cruise : cruiseList ) {
-				if ( Boolean.FALSE.equals(isEditableCruise(cruise)) )
+				if ( Boolean.FALSE.equals(cruise.isEditable()) )
 					cruise.setSelected(true);
 				else
 					cruise.setSelected(false);					
@@ -534,7 +507,7 @@ public class CruiseListPage extends Composite {
 		}
 		else if ( PUBLISHED_SELECTION_OPTION.equals(option) ) {
 			for ( DashboardCruise cruise : cruiseList )
-				if ( null == isEditableCruise(cruise) )
+				if ( null == cruise.isEditable() )
 					cruise.setSelected(true);
 				else
 					cruise.setSelected(false);					
@@ -641,7 +614,7 @@ public class CruiseListPage extends Composite {
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
 				if ( onlyEditable != null ) {
-					Boolean editable = isEditableCruise(cruise);
+					Boolean editable = cruise.isEditable();
 					// check if from a previous SOCAT version
 					if ( editable == null )
 						return false;
@@ -686,9 +659,9 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("omeMetadataButton")
 	void omeOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(true) ) {
+		if ( ! getSelectedCruises(false) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
+					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() < 1 ) {
@@ -706,9 +679,9 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("addlDocsButton")
 	void addlDocsOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(true) ) {
+		if ( ! getSelectedCruises(false) ) {
 			SocatUploadDashboard.showMessage(
-					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
+					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() < 1 ) {
@@ -1180,7 +1153,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				String msg = getValue(cruise);
 				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
 					// No problems - use normal background
@@ -1232,7 +1205,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( Boolean.TRUE.equals(editable) ) {
 					// Save the currently selected cruises
 					getSelectedCruises(null);
@@ -1262,7 +1235,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( Boolean.TRUE.equals(editable) ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(getValue(cruise));
@@ -1279,7 +1252,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( Boolean.TRUE.equals(editable) ) {
 					// Save the currently selected cruises
 					getSelectedCruises(null);
@@ -1307,7 +1280,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(getValue(cruise));
@@ -1324,7 +1297,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises in this version
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
@@ -1354,7 +1327,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendEscaped(getValue(cruise));
@@ -1371,7 +1344,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises in this version
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( editable != null ) {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
@@ -1431,7 +1404,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( Boolean.TRUE.equals(editable) ) {
 					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
 					sb.appendHtmlConstant(getValue(cruise));
@@ -1448,7 +1421,7 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
 				// Respond only for cruises that have not been submitted
-				Boolean editable = isEditableCruise(cruise);
+				Boolean editable = cruise.isEditable();
 				if ( Boolean.TRUE.equals(editable) ) {
 					// Save the currently selected cruises (in expocodeSet)
 					getSelectedCruises(null);
