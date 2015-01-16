@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 /**
  * Class for working with data values of interest, both PI-provided
  * values and computed values, from a SOCAT cruise data measurement.
+ * Note that WOCE flags are ignored in the hashCode and equals methods.
  * 
  * @author Karl Smith
  */
@@ -1929,12 +1930,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	@Override 
 	public int hashCode() {
+		// Ignore WOCE flag differences.
 		// Do not use floating-point fields since they do not 
 		// have to be exactly the same for equals to return true.
 		final int prime = 37;
 		int result = 0;
-		result = result * prime + woceCO2Water.hashCode();
-		result = result * prime + woceCO2Atm.hashCode();
 		result = result * prime + regionID.hashCode();
 		result = result * prime + year.hashCode();
 		result = result * prime + month.hashCode();
@@ -1971,14 +1971,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		if ( ! minute.equals(other.minute) )
 			return false;
 
-		// Character comparisons
+		// Character comparisons - ignore WOCE flag differences
 		if ( ! fCO2Source.equals(other.fCO2Source) ) 
 			return false;
 		if ( ! regionID.equals(other.regionID) )
-			return false;
-		if ( ! woceCO2Water.equals(other.woceCO2Water) ) 
-			return false;
-		if ( ! woceCO2Atm.equals(other.woceCO2Atm) ) 
 			return false;
 
 		// Match seconds not given (FP_MISSING_VALUE) with zero seconds

@@ -10,6 +10,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Represents a WOCE event occurring on a number of values in a data column. 
+ * Note that the inherited id field is ignored in the hashCode and equals methods.
  * 
  * @author Karl Smith
  */
@@ -146,7 +147,8 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	@Override
 	public String toString() {
 		return "SocatWoceEvent" +
-				"[\n    flag='" + flag.toString() + "'" +
+				"[\n    id=" + id.toString() +
+				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 

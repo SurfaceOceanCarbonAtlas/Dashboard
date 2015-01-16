@@ -354,7 +354,7 @@ public class DatabaseRequestHandler {
 			addPrepStmt.setString(5, qcEvent.getRegionID().toString());
 			addPrepStmt.setInt(6, reviewerId);
 			addPrepStmt.setString(7, qcEvent.getComment());
-			addPrepStmt.execute();
+			addPrepStmt.executeUpdate();
 		} finally {
 			catConn.close();
 		}
@@ -522,6 +522,10 @@ public class DatabaseRequestHandler {
 	 */
 	private SocatQCEvent createQCEvent(ResultSet results) throws SQLException {
 		SocatQCEvent qcEvent = new SocatQCEvent();
+		Long id = results.getLong("qc_id");
+		if ( id < 1L )
+			throw new SQLException("Unexpected invalid qc_id");
+		qcEvent.setId(id);
 		try {
 			qcEvent.setFlag(results.getString("qc_flag").charAt(0));
 		} catch (NullPointerException ex) {
@@ -617,8 +621,7 @@ public class DatabaseRequestHandler {
 			prepStmt.setString(5, woceEvent.getDataVarName());
 			prepStmt.setInt(6, reviewerId);
 			prepStmt.setString(7, woceEvent.getComment());
-			prepStmt.execute();
-			if ( prepStmt.getUpdateCount() != 1 )
+			if ( prepStmt.executeUpdate() != 1 )
 				throw new SQLException("Adding the WOCE event was unsuccessful");
 			// Get the woce_id for the added WOCE event
 			long woceId;
@@ -664,7 +667,7 @@ public class DatabaseRequestHandler {
 					prepStmt.setNull(7, java.sql.Types.DOUBLE);
 				else
 					prepStmt.setDouble(7, dblVal);
-				prepStmt.execute();
+				prepStmt.executeUpdate();
 				if ( prepStmt.getUpdateCount() != 1 ) 
 					throw new SQLException("Adding the WOCE location was unsuccessful");
 			}
@@ -689,6 +692,10 @@ public class DatabaseRequestHandler {
 	 */
 	private SocatWoceEvent createWoceEvent(ResultSet results) throws SQLException {
 		SocatWoceEvent woceEvent = new SocatWoceEvent();
+		Long id = results.getLong("woce_id");
+		if ( id < 1 )
+			throw new SQLException("Unexpected invalid woce_id");
+		woceEvent.setId(id);
 		try {
 			woceEvent.setFlag(results.getString("woce_flag").charAt(0));
 		} catch (NullPointerException ex) {
@@ -770,22 +777,20 @@ public class DatabaseRequestHandler {
 					WOCEEVENTS_TABLE_NAME + ".expocode = ? ORDER BY " + 
 					WOCEEVENTS_TABLE_NAME + ".woce_time DESC;");
 			prepStmt.setString(1, expocode);
-			ArrayList<Long> woceIds = new ArrayList<Long>();
 			ResultSet results = prepStmt.executeQuery();
 			try {
 				while ( results.next() ) {
 					eventsList.add(createWoceEvent(results));
-					woceIds.add(results.getLong("woce_id"));
 				}
 			} finally {
 				results.close();
 			}
 			prepStmt = catConn.prepareStatement("SELECT * FROM `" + WOCELOCATIONS_TABLE_NAME + 
 					"` WHERE `woce_id` = ? ORDER BY `row_num`;");
-			for (int k = 0; k < woceIds.size(); k++) {
+			for (SocatWoceEvent event : eventsList) {
 				// Directly modify the list of locations in the WOCE event
-				ArrayList<DataLocation> locations = eventsList.get(k).getLocations();
-				prepStmt.setLong(1, woceIds.get(k));
+				ArrayList<DataLocation> locations = event.getLocations();
+				prepStmt.setLong(1, event.getId());
 				results = prepStmt.executeQuery();
 				try {
 					while ( results.next() ) {
@@ -809,7 +814,7 @@ public class DatabaseRequestHandler {
 	 * @param expocode
 	 * 		reset the WOCE events for the cruise with this expocode
 	 * @throws SQLException
-	 * 		if modify the WOCE events in the database throws one
+	 * 		if modifying the WOCE events in the database throws one
 	 */
 	public void resetWoceEvents(String expocode) throws SQLException {
 		Connection catConn = makeConnection(true);
@@ -821,26 +826,88 @@ public class DatabaseRequestHandler {
 
 			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_GOOD.toString());
 			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_GOOD.toString());
-			modifyWocePrepStmt.execute();
+			modifyWocePrepStmt.executeUpdate();
 
 			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_NOT_CHECKED.toString());
 			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_NOT_CHECKED.toString());
-			modifyWocePrepStmt.execute();
+			modifyWocePrepStmt.executeUpdate();
 
 			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_QUESTIONABLE.toString());
 			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_QUESTIONABLE.toString());
-			modifyWocePrepStmt.execute();
+			modifyWocePrepStmt.executeUpdate();
 
 			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_BAD.toString());
 			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_BAD.toString());
-			modifyWocePrepStmt.execute();
+			modifyWocePrepStmt.executeUpdate();
 
 			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_NO_DATA.toString());
 			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_NO_DATA.toString());
-			modifyWocePrepStmt.execute();
+			modifyWocePrepStmt.executeUpdate();
 		} finally {
 			catConn.close();
 		}
+	}
+
+	/**
+	 * Restores the WOCE flags in the database associated with the given WOCE event.
+	 * This is done by changing the "old" WOCE flag value back to the corresponding 
+	 * "regular" WOCE flag value.  If the event does not have an "old" WOCE flag
+	 * value, this call does nothing.  If the database is successfully updated, the
+	 * flag in the given WOCE event will also be updated.
+	 *  
+	 * @param woceEvent
+	 * 		WOCE event to restore and update with the new flag
+	 * @throws IllegalArgumentException
+	 * 		if WOCE event does not match an existing WOCE flag
+	 * 		(woce_id, expocode, old woce_flag)
+	 * @throws SQLException
+	 * 		if modifying the WOCE event in the database throws one
+	 */
+	public void restoreWoceEvent(SocatWoceEvent woceEvent) 
+								throws IllegalArgumentException, SQLException {
+		if ( woceEvent.getId() < 1 )
+			throw new IllegalArgumentException("Invalid ID for WOCE event");
+
+		Character newFlag;
+		Character oldFlag = woceEvent.getFlag();
+		if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_GOOD) ) {
+			newFlag = SocatWoceEvent.WOCE_GOOD;
+		}
+		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_NOT_CHECKED) ) {
+			newFlag = SocatWoceEvent.WOCE_NOT_CHECKED;
+		}
+		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_QUESTIONABLE) ) {
+			newFlag = SocatWoceEvent.WOCE_QUESTIONABLE;
+		}
+		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_BAD) ) {
+			newFlag = SocatWoceEvent.WOCE_BAD;
+		}
+		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_NO_DATA) ) {
+			newFlag = SocatWoceEvent.WOCE_NO_DATA;
+		}
+		else {
+			return;
+		}
+
+		Connection catConn = makeConnection(true);
+		try {
+			PreparedStatement prepStmt = catConn.prepareStatement("UPDATE `" + 
+					WOCEEVENTS_TABLE_NAME + "` SET `woce_flag` = ? WHERE " +
+					"`woce_id` = ? AND `expocode` = ? AND `woce_flag` = ?;");
+			prepStmt.setString(1, newFlag.toString());
+			prepStmt.setLong(2, woceEvent.getId());
+			prepStmt.setString(3, woceEvent.getExpocode());
+			prepStmt.setString(4, oldFlag.toString());
+			if ( prepStmt.executeUpdate() != 1 ) {
+				// woce_id is a unique key, so could not be more than one
+				throw new IllegalArgumentException("Unable to match the given WOCE event");
+			}
+		} finally {
+			catConn.close();
+		}
+
+		// Success; update the flag in the given event
+		woceEvent.setFlag(newFlag);
 	}
 
 	/**
@@ -877,7 +944,7 @@ public class DatabaseRequestHandler {
 			modifyQcPrepStmt.setString(1, newExpocode);
 			modifyQcPrepStmt.setString(2, oldExpocode);
 			modifyQcPrepStmt.setString(3, SocatQCEvent.QC_RENAMED_FLAG.toString());
-			modifyQcPrepStmt.execute();
+			modifyQcPrepStmt.executeUpdate();
 			int updateCount = modifyQcPrepStmt.getUpdateCount();
 			if ( updateCount < 0 )
 				throw new SQLException("Unexpected update count from renaming QC expocodes");
@@ -906,7 +973,7 @@ public class DatabaseRequestHandler {
 			addQcPrepStmt.setInt(13, reviewerId);
 			addQcPrepStmt.setString(7, renameComment);
 			addQcPrepStmt.setString(14, renameComment);
-			addQcPrepStmt.execute();
+			addQcPrepStmt.executeUpdate();
 
 			// Update the old expocode to the new expocode in the appropriate WOCE events
 			PreparedStatement modifyWocePrepStmt = catConn.prepareStatement(
@@ -915,7 +982,7 @@ public class DatabaseRequestHandler {
 			modifyWocePrepStmt.setString(1, newExpocode);
 			modifyWocePrepStmt.setString(2, oldExpocode);
 			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_RENAME.toString());
-			modifyWocePrepStmt.execute();
+			modifyWocePrepStmt.executeUpdate();
 
 			// Add two rename WOCE events; one for the old expocode and one for the new expocode
 			PreparedStatement addWocePrepStmt = catConn.prepareStatement("INSERT INTO `" + 
@@ -934,7 +1001,7 @@ public class DatabaseRequestHandler {
 			addWocePrepStmt.setInt(11, reviewerId);
 			addWocePrepStmt.setString(6, renameComment);
 			addWocePrepStmt.setString(12, renameComment);
-			addWocePrepStmt.execute();
+			addWocePrepStmt.executeUpdate();
 		} finally {
 			catConn.close();
 		}
