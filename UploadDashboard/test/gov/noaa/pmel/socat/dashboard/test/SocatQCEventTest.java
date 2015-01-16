@@ -21,6 +21,8 @@ import org.junit.Test;
  */
 public class SocatQCEventTest {
 
+	private static final Long DEFAULT_QC_ID = 0L;
+	private static final Long MY_QC_ID = 123L;
 	private static final Character MY_QC_FLAG = 'B';
 	private static final String MY_EXPOCODE = "26NA20140427";
 	private static final String MY_SOCAT_VERSION = "3.0";
@@ -31,15 +33,30 @@ public class SocatQCEventTest {
 	private static final String MY_COMMENT = "from SocatQCEvent unit test";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#getFlag()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setQCFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getID()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setId(java.lang.Long)}.
 	 */
 	@Test
-	public void testGetSetQcFlag() {
+	public void testGetSetId() {
+		SocatQCEvent myflag = new SocatQCEvent();
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
+		myflag.setId(MY_QC_ID);
+		assertEquals(MY_QC_ID, myflag.getId());
+		myflag.setId(null);
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#getFlag()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent#setFlag(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetFlag() {
 		SocatQCEvent myflag = new SocatQCEvent();
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 		myflag.setFlag(MY_QC_FLAG);
 		assertEquals(MY_QC_FLAG, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlag(null);
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
 	}
@@ -55,6 +72,7 @@ public class SocatQCEventTest {
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setExpocode(null);
 		assertEquals("", myflag.getExpocode());
 	}
@@ -71,6 +89,7 @@ public class SocatQCEventTest {
 		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setSocatVersion(null);
 		assertEquals("", myflag.getSocatVersion());
 	}
@@ -88,6 +107,7 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setRegionID(null);
 		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 	}
@@ -106,6 +126,7 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlagDate(null);
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 	}
@@ -125,6 +146,7 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setUsername(null);
 		assertEquals("", myflag.getUsername());
 	}
@@ -145,6 +167,7 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setRealname(null);
 		assertEquals("", myflag.getRealname());
 	}
@@ -166,6 +189,7 @@ public class SocatQCEventTest {
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
 		assertEquals(SocatQCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setComment(null);
 		assertEquals("", myflag.getComment());
 	}
@@ -181,6 +205,12 @@ public class SocatQCEventTest {
 		assertFalse( myflag.equals(new SocatEvent()) );
 
 		SocatQCEvent otherflag = new SocatQCEvent();
+		assertTrue( myflag.hashCode() == otherflag.hashCode() );
+		assertTrue( myflag.equals(otherflag) );
+
+		// ID ignored for hashCode and equals
+		myflag.setId(MY_QC_ID);
+		assertFalse( myflag.getId().equals(otherflag.getId()) );
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

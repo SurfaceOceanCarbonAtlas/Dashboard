@@ -10,6 +10,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Represents a QC event giving a flag (or just a comment) on a region of a cruise. 
+ * Note that the inherited id field is ignored in the hashCode and equals methods.
  * 
  * @author Karl Smith
  */
@@ -155,7 +156,8 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	@Override
 	public String toString() {
 		return "SocatQCEvent" +
-				"[\n    flag='" + flag.toString() + "'" +
+				"[\n    id=" + id.toString() +
+				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 

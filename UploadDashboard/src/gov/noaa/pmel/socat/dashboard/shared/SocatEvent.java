@@ -9,14 +9,16 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Base class for SocatQCEvent and SocatWoceEvent. 
+ * Base class for SocatQCEvent and SocatWoceEvent.  
+ * Note that the id field is ignored in the hashCode and equals methods.
  * 
  * @author Karl Smith
  */
 public class SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7397909715673215928L;
+	private static final long serialVersionUID = 6486161161849835442L;
 
+	Long id;
 	Date flagDate;
 	String expocode;
 	String socatVersion;
@@ -28,12 +30,32 @@ public class SocatEvent implements Serializable, IsSerializable {
 	 * Creates an empty flag
 	 */
 	public SocatEvent() {
+		id = 0L;
 		flagDate = SocatMetadata.DATE_MISSING_VALUE;
 		expocode = "";
 		socatVersion = "";
 		username = "";
 		realname = "";
 		comment = "";
+	}
+
+	/**
+	 * @return 
+	 * 		the id; never null, but may be zero if missing
+	 */
+	public Long getId() {
+		return id;
+	}
+
+	/**
+	 * @param id 
+	 * 		the id to set; if null, zero is assigned
+	 */
+	public void setId(Long id) {
+		if ( id == null )
+			this.id = 0L;
+		else
+			this.id = id;
 	}
 
 	/**
@@ -193,7 +215,8 @@ public class SocatEvent implements Serializable, IsSerializable {
 	@Override
 	public String toString() {
 		return "SocatEvent" +
-				"[\n    flagDate=" + flagDate.toString() + 
+				"[\n    id=" + id.toString() +
+				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
 				",\n    socatVersion=" + socatVersion.toString() + 
 				",\n    username=" + username + 
