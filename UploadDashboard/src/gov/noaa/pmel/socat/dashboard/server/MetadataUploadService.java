@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -139,6 +140,7 @@ public class MetadataUploadService extends HttpServlet {
 		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
+		DsgNcFileHandler dsgFileHandler = dataStore.getDsgNcFileHandler();
 		String uploadFilename;
 		if ( isOme ) {
 			uploadFilename = DashboardMetadata.OME_FILENAME;
@@ -198,7 +200,9 @@ public class MetadataUploadService extends HttpServlet {
 					comment += "Data and WOCE flags were not changed.";
 					qcEvent.setComment(comment);
 					try {
+						// Add the 'U' QC flag
 						dbHandler.addQCEvent(qcEvent);
+						dsgFileHandler.updateQCFlag(qcEvent);
 						// Update the dashboard status for the 'U' QC flag
 						cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
 						cruiseHandler.saveCruiseInfoToFile(cruise, comment);
