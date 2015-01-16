@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 
@@ -12,11 +12,12 @@ import java.io.FileReader;
 import java.util.TreeSet;
 
 /**
- * Updates the cruise dashboard status from the current QC flag in the full-data DSG file.
-s * 
+ * Updates the QC flags in the full-data and decimated-data DSG files for cruises
+ * to the flag obtained from the database.
+ * 
  * @author Karl Smith
  */
-public class UpdateDashboardStatuses {
+public class UpdateQCFlags {
 
 	/**
 	 * @param args
@@ -26,9 +27,10 @@ public class UpdateDashboardStatuses {
 		if ( args.length != 1 ) {
 			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
-			System.err.println("Updates the cruise dashboard status from the current QC flag ");
-			System.err.println("in the full-data DSG file for cruises specified in ExpocodesFile. "); 
-			System.err.println("The default dashboard configuration is used for this process. "); 
+			System.err.println("Updates the QC flags in the full-data and decimated-data DSG ");
+			System.err.println("files for cruises specified in ExpocodesFile to the flag obtained ");
+			System.err.println("from the database.  The default dashboard configuration is ");
+			System.err.println("used for this process. "); 
 			System.err.println();
 			System.exit(1);
 		}
@@ -36,6 +38,7 @@ public class UpdateDashboardStatuses {
 		String expocodesFilename = args[0];
 
 		boolean success = true;
+		boolean updated = false;
 
 		// Get the default dashboard configuration
 		DashboardDataStore dataStore = null;		
@@ -71,30 +74,46 @@ public class UpdateDashboardStatuses {
 				System.exit(1);
 			}
 
+			DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
 			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
-			CruiseFileHandler fileHandler = dataStore.getCruiseFileHandler();
 
 			// update each of these cruises
 			for ( String expocode : allExpocodes ) {
-				char qcFlag;
+				Character qcFlag;
 				try {
-					qcFlag = dsgHandler.getDsgNcFile(expocode).getQCFlag();
+					qcFlag = dbHandler.getQCFlag(expocode);
 				} catch (Exception ex) {
-					System.err.println("Error reading the QC flag for " + 
+					System.err.println("Error getting the database QC flag for " + 
+							expocode + " : " + ex.getMessage());
+					success = false;
+					continue;
+				}
+				char oldFlag;
+				try {
+					oldFlag = dsgHandler.getQCFlag(expocode);
+				} catch (Exception ex) {
+					System.err.println("Error reading the current DSG QC flag for " + 
 							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
 				try {
-					fileHandler.updateCruiseDashboardStatus(expocode, qcFlag);
+					if ( ! qcFlag.equals(oldFlag) ) {
+						dsgHandler.getDsgNcFile(expocode).updateQCFlag(qcFlag);
+						dsgHandler.getDecDsgNcFile(expocode).updateQCFlag(qcFlag);
+						updated = true;
+					}
 				} catch (Exception ex) {
-					System.err.println("Error updating the dashboard status for " + 
+					System.err.println("Error updating the QC flag in the DSG files for " + 
 							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
 				System.err.println("Updated dashboard status for " + 
 						expocode + " to '" + qcFlag + "'");
+			}
+			if ( updated && success ) {
+				dsgHandler.flagErddap(true, true);
 			}
 		} finally {
 			dataStore.shutdown();

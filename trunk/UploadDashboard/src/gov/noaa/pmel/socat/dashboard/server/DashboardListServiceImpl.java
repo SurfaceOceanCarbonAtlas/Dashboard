@@ -192,7 +192,9 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 					"\".  Data and WOCE flags were not changed.";
 			qcEvent.setComment(comment);
 			try {
+				// Add the 'U' QC flag
 				dataStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
+				dataStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
 				// Update the dashboard status for the 'U' QC flag
 				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
 				dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruise, comment);
