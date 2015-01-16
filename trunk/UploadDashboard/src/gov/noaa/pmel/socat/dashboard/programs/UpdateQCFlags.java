@@ -101,6 +101,8 @@ public class UpdateQCFlags {
 					if ( ! qcFlag.equals(oldFlag) ) {
 						dsgHandler.getDsgNcFile(expocode).updateQCFlag(qcFlag);
 						dsgHandler.getDecDsgNcFile(expocode).updateQCFlag(qcFlag);
+						System.err.println("Updated QC flag for " + 
+								expocode + " from '" + oldFlag + "' to '" + qcFlag + "'");
 						updated = true;
 					}
 				} catch (Exception ex) {
@@ -109,10 +111,8 @@ public class UpdateQCFlags {
 					success = false;
 					continue;
 				}
-				System.err.println("Updated dashboard status for " + 
-						expocode + " to '" + qcFlag + "'");
 			}
-			if ( updated && success ) {
+			if ( updated ) {
 				dsgHandler.flagErddap(true, true);
 			}
 		} finally {
