@@ -85,7 +85,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 * @param cruise
 	 * 		cruise to check
 	 * @return
-	 * 		Boolean.TRUE if the cruise is unacceptable, suspended, excluded, in preview, or not submitted, 
+	 * 		Boolean.TRUE if the cruise is suspended, excluded, in preview, or not submitted, 
 	 * 		Boolean.FALSE if the cruise is submitted or acceptable but unpublished cruise,
 	 * 		null if the cruise is (acceptable and) published (previous SOCAT version)
 	 */
@@ -94,7 +94,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		String status = getQcStatus();
 		if ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
 			 status.equals(SocatQCEvent.QC_STATUS_PREVIEW) ||
-			 status.equals(SocatQCEvent.QC_STATUS_UNACCEPTABLE) ||
 			 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
 			 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED)  ) 
 			return Boolean.TRUE;

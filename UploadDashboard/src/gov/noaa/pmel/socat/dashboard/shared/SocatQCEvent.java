@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1742421563751831057L;
+	private static final long serialVersionUID = 3508441631061666439L;
 
 	// All possible QC flags
 	public static final Character QC_A_FLAG = 'A';
@@ -24,7 +24,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	public static final Character QC_C_FLAG = 'C';
 	public static final Character QC_D_FLAG = 'D';
 	public static final Character QC_E_FLAG = 'E';
-	public static final Character QC_UNACCEPTABLE_FLAG = 'F';
+	public static final Character QC_F_FLAG = 'F';
 	public static final Character QC_COMMENT = 'H';
 	public static final Character QC_NEW_FLAG = 'N';
 	public static final Character QC_PREVIEW_FLAG = 'P';
@@ -36,18 +36,18 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 
 	// Cruise QC strings - cruises that can be modified
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
+	public static final String QC_STATUS_PREVIEW = "Previewing";
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
-	public static final String QC_STATUS_UNACCEPTABLE = "Unacceptable";
 
 	// Cruise QC strings - cruises that cannot be modified
 	public static final String QC_STATUS_SUBMITTED = "Submitted";
-	public static final String QC_STATUS_PREVIEW = "Previewing";
 	public static final String QC_STATUS_ACCEPTED_A = "Flag A";
 	public static final String QC_STATUS_ACCEPTED_B = "Flag B";
 	public static final String QC_STATUS_ACCEPTED_C = "Flag C";
 	public static final String QC_STATUS_ACCEPTED_D = "Flag D";
 	public static final String QC_STATUS_ACCEPTED_E = "Flag E";
+	public static final String QC_STATUS_UNACCEPTABLE = "Unacceptable";
 	public static final String QC_STATUS_CONFLICT = "Conflict";
 	public static final String QC_STATUS_RENAMED = "Renamed";
 
@@ -62,7 +62,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		FLAG_STATUS_MAP.put(QC_C_FLAG, QC_STATUS_ACCEPTED_C);
 		FLAG_STATUS_MAP.put(QC_D_FLAG, QC_STATUS_ACCEPTED_D);
 		FLAG_STATUS_MAP.put(QC_E_FLAG, QC_STATUS_ACCEPTED_E);
-		FLAG_STATUS_MAP.put(QC_UNACCEPTABLE_FLAG, QC_STATUS_UNACCEPTABLE);
+		FLAG_STATUS_MAP.put(QC_F_FLAG, QC_STATUS_UNACCEPTABLE);
 		FLAG_STATUS_MAP.put(QC_NEW_FLAG, QC_STATUS_SUBMITTED);
 		FLAG_STATUS_MAP.put(QC_PREVIEW_FLAG, QC_STATUS_PREVIEW);
 		FLAG_STATUS_MAP.put(QC_CONFLICT_FLAG, QC_STATUS_CONFLICT);
