@@ -199,6 +199,9 @@ public class MetadataUploadService extends HttpServlet {
 					qcEvent.setComment(comment);
 					try {
 						dbHandler.addQCEvent(qcEvent);
+						// Update the dashboard status for the 'U' QC flag
+						cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+						cruiseHandler.saveCruiseInfoToFile(cruise, comment);
 					} catch (Exception ex) {
 						// Should not fail.  
 						// If does, do not delete the file since it is okay, and ignore the failure.

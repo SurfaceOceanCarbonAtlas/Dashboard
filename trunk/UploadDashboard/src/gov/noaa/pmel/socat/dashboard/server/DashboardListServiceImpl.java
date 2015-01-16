@@ -188,10 +188,14 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 			qcEvent.setSocatVersion(dataStore.getSocatUploadVersion());
 			qcEvent.setUsername(username);
-			qcEvent.setComment("Deleted metadata file \"" + deleteFilename + 
-					"\".  Data and WOCE flags were not changed.");
+			String comment = "Deleted metadata file \"" + deleteFilename + 
+					"\".  Data and WOCE flags were not changed.";
+			qcEvent.setComment(comment);
 			try {
 				dataStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
+				// Update the dashboard status for the 'U' QC flag
+				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+				dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruise, comment);
 			} catch (Exception ex) {
 				// Should not fail.  If does, ignore the failure.
 				;
