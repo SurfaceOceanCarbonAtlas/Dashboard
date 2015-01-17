@@ -1332,12 +1332,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * @param qcFlag
 	 * 		QC flag assigned to this cruise; if null or whitespace,
 	 * 		the status assigned will be unsubmitted
+	 * @return
+	 * 		true if the status was updated (needed to be updated); 
+	 * 		otherwise false
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
 	 * 		if there are problems accessing the cruise info file, or
 	 * 		if the QC flag given is invalid
 	 */
-	public void updateCruiseDashboardStatus(String expocode, Character qcFlag) 
+	public boolean updateCruiseDashboardStatus(String expocode, Character qcFlag) 
 											throws IllegalArgumentException {
 		DashboardCruise cruise = getCruiseFromInfoFile(expocode);
 		String oldStatus = cruise.getQcStatus();
@@ -1354,9 +1357,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						qcFlag + "' given to updateCruiseDashboardStatus");
 			}
 		}
+		if ( oldStatus.equals(newStatus) )
+			return false;
 		cruise.setQcStatus(newStatus);
 		saveCruiseInfoToFile(cruise, "Update cruise dashboard status from '" + 
 				oldStatus + "' to '" + newStatus + "'");
+		return true;
 	}
 
 }
