@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
@@ -46,9 +45,8 @@ public class UpdateQCFlags {
 		String expocodesFilename = args[0];
 
 		final String username = "karl.smith";
-		final String versionName = Constants.SHORT_NAMES.get(Constants.socatVersion_VARNAME);
 
-		SimpleDateFormat dateParser = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss");
+		SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		dateParser.setTimeZone(TimeZone.getTimeZone("UTC"));
 		Date oldQCTime = null;
 		try {
@@ -122,7 +120,8 @@ public class UpdateQCFlags {
 				try {
 					if ( ! qcFlag.equals(oldFlag) ) {
 						CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
-						String version = String.valueOf(dsgFile.readCharVarDataValues(versionName));
+						dsgFile.read(true);
+						String version = dsgFile.getMetadata().getSocatVersion();
 						if ( "1.3".equals(version)  || "1.4".equals(version)  || "2.0".equals(version) || 
 							 "1.30".equals(version) || "1.40".equals(version) || "2.00".equals(version) ) {
 							// Add an old global QC flag with the flag in the DSG file
@@ -131,7 +130,7 @@ public class UpdateQCFlags {
 							qcEvent.setFlag(oldFlag);
 							qcEvent.setFlagDate(oldQCTime);
 							qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-							qcEvent.setSocatVersion(version);
+							qcEvent.setSocatVersion("2.0");
 							qcEvent.setUsername(username);
 							qcEvent.setComment("Adding global QC flag to that assigned in v2 to fix unresolved conflicts");
 							try {
