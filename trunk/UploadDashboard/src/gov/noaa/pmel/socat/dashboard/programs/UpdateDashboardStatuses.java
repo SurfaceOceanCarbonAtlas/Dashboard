@@ -86,15 +86,16 @@ public class UpdateDashboardStatuses {
 					continue;
 				}
 				try {
-					fileHandler.updateCruiseDashboardStatus(expocode, qcFlag);
+					if ( fileHandler.updateCruiseDashboardStatus(expocode, qcFlag) ) {
+						System.err.println("Updated dashboard status for " + 
+								expocode + " to that for QC flag '" + qcFlag + "'");
+					}
 				} catch (Exception ex) {
 					System.err.println("Error updating the dashboard status for " + 
 							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
-				System.err.println("Updated dashboard status for " + 
-						expocode + " to '" + qcFlag + "'");
 			}
 		} finally {
 			dataStore.shutdown();
