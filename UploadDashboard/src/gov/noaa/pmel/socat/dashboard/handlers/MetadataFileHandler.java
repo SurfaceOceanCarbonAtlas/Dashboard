@@ -42,6 +42,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String METADATA_OWNER_ID = "metadataowner";
 	private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
+	private static final String METADATA_VERSION_ID = "metadataversion";
 	private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
 
 	/**
@@ -189,6 +190,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param uploadFilename
 	 * 		upload filename to use for this metadata document; 
 	 * 		may or may not match the basename of uploadFileItem.getName()
+	 * @param version
+	 * 		SOCAT version for this metadata item
 	 * @param uploadFileItem
 	 * 		upload file item providing the metadata contents
 	 * @return
@@ -202,7 +205,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardMetadata saveMetadataFileItem(String cruiseExpocode, 
 			String owner, String uploadTimestamp, String uploadFilename,
-			FileItem uploadFileItem) throws IllegalArgumentException {
+			String version, FileItem uploadFileItem) throws IllegalArgumentException {
 		// Create the metadata filename
 		File metadataFile = getMetadataFile(cruiseExpocode, uploadFilename);
 
@@ -260,6 +263,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		metadata.setFilename(uploadFilename);
 		metadata.setUploadTimestamp(uploadTimestamp);
 		metadata.setOwner(owner);
+		metadata.setVersion(version);
 
 		// Save the metadata properties
 		if ( isUpdate ) {
@@ -277,8 +281,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Copy a metadata document to another cruise.  The document,
-	 * as well as the owner and upload timestamp properties, is 
-	 * copied under appropriate names for the new cruise.
+	 * as well as the owner, upload timestamp, and version properties, 
+	 * are copied under appropriate names for the new cruise.
 	 * 
 	 * @param destCruiseExpo
 	 * 		expocode of the cruise to be associated with the 
@@ -310,7 +314,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 				// Create the metadata document from this input stream
 				// allowing overwrite if permissions permit it
 				mdata = saveMetadataInputStream(destCruiseExpo, owner, uploadName, 
-						srcMetadata.getUploadTimestamp(), src, allowOverwrite);
+						srcMetadata.getUploadTimestamp(), srcMetadata.getVersion(), 
+						src, allowOverwrite);
 			} finally {
 				src.close();
 			}
@@ -329,6 +334,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		expocode of the cruise associated with this metadata document
 	 * @param owner
 	 * 		owner of this metadata document
+	 * @param version 
+	 * 		SOCAT version for this metadata document
 	 * @param urlString
 	 * 		URL String of the document to download
 	 * @param allowOverwrite
@@ -347,7 +354,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @throws IOException 
 	 * 		if problems opening the given URL for reading
 	 */
-	public DashboardMetadata saveMetadataURL(String expocode, String owner, 
+	public DashboardMetadata saveMetadataURL(String expocode, String owner, String version,
 			String urlString, boolean allowOverwrite) throws IllegalArgumentException, IOException {
 		if ( urlString.endsWith("/") )
 			throw new IllegalArgumentException("Invalid link document: " + urlString + 
@@ -373,7 +380,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		try {
 			try {
 				mdata = saveMetadataInputStream(expocode, owner, origName, 
-												timestamp, src, allowOverwrite);
+						timestamp, version, src, allowOverwrite);
 			} finally {
 				src.close();
 			}
@@ -395,6 +402,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		"original" or "upload" filename to use for this metadata document
 	 * @param timestamp
 	 * 		"upload" timestamp to assign for this metadata document
+	 * @param version
+	 * 		SOCAT version for this metadata document
 	 * @param src
 	 * 		source to read for the contents of this metadata file
 	 * @param allowOverwrite
@@ -411,8 +420,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * 		if problems committing the new metadata document to version control
 	 */
 	public DashboardMetadata saveMetadataInputStream(String expocode, 
-			String owner, String origName, String timestamp, InputStream src, 
-			boolean allowOverwrite) throws IllegalArgumentException {
+			String owner, String origName, String timestamp, String version,
+			InputStream src, boolean allowOverwrite) throws IllegalArgumentException {
 
 		// Get the destination metadata document 
 		File destFile = getMetadataFile(expocode, origName);
@@ -486,6 +495,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		metadata.setFilename(origName);
 		metadata.setUploadTimestamp(timestamp);
 		metadata.setOwner(owner);
+		metadata.setVersion(version);
 
 		// Create the appropriate check-in message
 		if ( isUpdate ) {
@@ -558,6 +568,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Conflicted flag
 		value = metaProps.getProperty(METADATA_CONFLICTED_ID);
 		metadata.setConflicted(Boolean.valueOf(value));
+		// Version
+		value = metaProps.getProperty(METADATA_VERSION_ID);
+		metadata.setVersion(value);
 
 		return metadata;
 	}
@@ -595,6 +608,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		metaProps.setProperty(METADATA_OWNER_ID, metadata.getOwner());
 		// Conflicted flag
 		metaProps.setProperty(METADATA_CONFLICTED_ID, Boolean.toString(metadata.isConflicted()));
+		// Version 
+		metaProps.setProperty(METADATA_VERSION_ID, metadata.getVersion());
 		// Save the properties to the metadata properties file
 		try {
 			FileWriter propsWriter = new FileWriter(propsFile);
@@ -666,8 +681,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 			File newMetaInfoFile = new File(newMetaFile.getPath() + METADATA_INFOFILE_SUFFIX);
 			if ( newMetaInfoFile.exists() )
-			throw new IllegalArgumentException("Metadata info file for " + 
-					uploadFilename + " already exists for " + newExpocode);
+				throw new IllegalArgumentException("Metadata info file for " + 
+						uploadFilename + " already exists for " + newExpocode);
 
 			// Make sure the parent directory exists for the new file
 			File parent = newMetaFile.getParentFile();

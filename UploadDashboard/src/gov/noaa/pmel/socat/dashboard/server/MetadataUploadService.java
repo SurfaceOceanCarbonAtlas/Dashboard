@@ -136,6 +136,7 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		boolean isOme = omeIndicator.equals("true");
+		String socatVersion = dataStore.getSocatUploadVersion();
 
 		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
@@ -160,7 +161,7 @@ public class MetadataUploadService extends HttpServlet {
 				// Save the metadata document for this cruise
 				if ( metadata == null ) {
 					metadata = metadataHandler.saveMetadataFileItem(expo, 
-							username, uploadTimestamp, uploadFilename, metadataItem);
+							username, uploadTimestamp, uploadFilename, socatVersion, metadataItem);
 				}
 				else {
 					metadata = metadataHandler.copyMetadataFile(expo, metadata, true);
@@ -190,7 +191,7 @@ public class MetadataUploadService extends HttpServlet {
 					qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
 					qcEvent.setFlagDate(new Date());
 					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-					qcEvent.setSocatVersion(dataStore.getSocatUploadVersion());
+					qcEvent.setSocatVersion(socatVersion);
 					qcEvent.setUsername(username);
 					String comment;
 					if ( isOme )

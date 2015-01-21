@@ -62,11 +62,12 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		if ( mdata == null )
 			throw new IllegalArgumentException("No metadata file given");
 
-		// Copy the expocode, uploadTimestamp, and owner 
+		// Copy the expocode, uploadTimestamp, owner, and version
 		// from the given DashboardMetadata object
 		expocode = mdata.getExpocode();
 		uploadTimestamp = mdata.getUploadTimestamp();
 		owner = mdata.getOwner();
+		version = mdata.getVersion();
 
 		// Read this metadata document as an XML file
 		MetadataFileHandler mdataHandler;
@@ -101,7 +102,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 	/**
 	 * Creates with the given expocode and timestamp, and from the contents 
-	 * of the given OME XML document.  The owner is left empty.
+	 * of the given OME XML document.  The owner and version is left empty.
 	 * 
 	 * @param expocode
 	 * 		expocode for this metadata

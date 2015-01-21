@@ -14,7 +14,7 @@ import java.util.TreeSet;
 
 /**
  * Rechecks cruises with the SanityChecker and regenerates the SanityChecker messages files.
- * Does not make nay changes to the WOCE flags in the database.
+ * Does not make any changes to the WOCE flags in the database.
  * 
  * @author Karl Smith
  */
