@@ -166,7 +166,7 @@ public class DownloadMetadataDocs {
 					if ( mdata == null ) {
 						// First expocode - read the link contents and save to file
 						try {
-							mdata = metaHandler.saveMetadataURL(expocode, "", link, allowOverwrite);
+							mdata = metaHandler.saveMetadataURL(expocode, "", "", link, allowOverwrite);
 						} catch (IllegalArgumentException ex) {
 							System.err.println(expocode + " - failed to save the link: " + link + " :: " + ex.getMessage());
 							success = false;

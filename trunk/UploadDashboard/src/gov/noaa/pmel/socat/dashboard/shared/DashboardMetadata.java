@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8390215646094878787L;
+	private static final long serialVersionUID = 2996234104405680120L;
 
 	/**
 	 * The "upload filename" for all OME metadata files.  (The name of the 
@@ -32,6 +32,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	protected String uploadTimestamp;
 	protected String owner;
 	protected boolean conflicted;
+	protected String version;
 
 	/**
 	 * Creates an empty metadata document record
@@ -43,6 +44,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		uploadTimestamp = "";
 		owner = "";
 		conflicted = false;
+		version = "";
 	}
 
 	/**
@@ -189,6 +191,24 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		this.conflicted = conflicted;
 	}
 
+	/**
+	 * @return the SOCAT version; never null, but may be empty if not assigned
+	 */
+	public String getVersion() {
+		return version;
+	}
+
+	/**
+	 * @param version 
+	 * 		the SOCAT version to set; if null, an empty string is assigned
+	 */
+	public void setVersion(String version) {
+		if ( version != null )
+			this.version = version;
+		else
+			this.version = "";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -198,6 +218,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + owner.hashCode();
 		result = result * prime + Boolean.valueOf(conflicted).hashCode();
+		result = result * prime + version.hashCode();
 		return result;
 	}
 
@@ -224,6 +245,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			return false;
 		if ( conflicted != other.conflicted )
 			return false;
+		if ( ! version.equals(other.version) )
+			return false;
 		return true;
 	}
 
@@ -236,6 +259,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 				",\n  uploadTimestamp=" + uploadTimestamp +
 				",\n  owner=" + owner + 
 				",\n  conflicted=" + conflicted + 
+				",\n  version=" + version + 
 				" ]";
 	}
 
