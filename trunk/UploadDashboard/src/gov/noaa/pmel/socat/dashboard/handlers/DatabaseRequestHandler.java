@@ -760,22 +760,30 @@ public class DatabaseRequestHandler {
 	 * 
 	 * @param expocode
 	 * 		get the WOCE events for the dataset with this expocode 
+	 * @param latestFirst
+	 * 		order with the latest first?
 	 * @return
-	 * 		list of WOCE events for the dataset, ordered by the date
-	 * 		of the event (latest event first)
+	 * 		list of WOCE events for the dataset, ordered by the dates
+	 * 		of the events (either latest first or latest last)
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<SocatWoceEvent> getWoceEvents(String expocode) throws SQLException {
+	public ArrayList<SocatWoceEvent> getWoceEvents(String expocode, 
+									boolean latestFirst) throws SQLException {
 		ArrayList<SocatWoceEvent> eventsList = new ArrayList<SocatWoceEvent>();
 		Connection catConn = makeConnection(false);
 		try {
+			String order;
+			if ( latestFirst )
+				order = "DESC;";
+			else
+				order = "ASC;";
 			PreparedStatement prepStmt = catConn.prepareStatement("SELECT * FROM `" + 
 					WOCEEVENTS_TABLE_NAME + "` JOIN `" + REVIEWERS_TABLE_NAME + 
 					"` ON " + WOCEEVENTS_TABLE_NAME + ".reviewer_id = " + 
 					REVIEWERS_TABLE_NAME + ".reviewer_id WHERE " + 
 					WOCEEVENTS_TABLE_NAME + ".expocode = ? ORDER BY " + 
-					WOCEEVENTS_TABLE_NAME + ".woce_time DESC;");
+					WOCEEVENTS_TABLE_NAME + ".woce_time " + order);
 			prepStmt.setString(1, expocode);
 			ResultSet results = prepStmt.executeQuery();
 			try {
@@ -851,19 +859,20 @@ public class DatabaseRequestHandler {
 	/**
 	 * Restores the WOCE flags in the database associated with the given WOCE event.
 	 * This is done by changing the "old" WOCE flag value back to the corresponding 
-	 * "regular" WOCE flag value.  If the event does not have an "old" WOCE flag
-	 * value, this call does nothing.  If the database is successfully updated, the
-	 * flag in the given WOCE event will also be updated.
+	 * "regular" WOCE flag value.
 	 *  
 	 * @param woceEvent
-	 * 		WOCE event to restore and update with the new flag
+	 * 		WOCE event to restore
+	 * @return
+	 * 		the "regular" WOCE flag for reassigned to this event 
 	 * @throws IllegalArgumentException
+	 * 		if the WOCE flag in the event is not a "old" WOCE flag, or
 	 * 		if WOCE event does not match an existing WOCE flag
 	 * 		(woce_id, expocode, old woce_flag)
 	 * @throws SQLException
 	 * 		if modifying the WOCE event in the database throws one
 	 */
-	public void restoreWoceEvent(SocatWoceEvent woceEvent) 
+	public Character restoreWoceEvent(SocatWoceEvent woceEvent) 
 								throws IllegalArgumentException, SQLException {
 		if ( woceEvent.getId() < 1 )
 			throw new IllegalArgumentException("Invalid ID for WOCE event");
@@ -886,7 +895,7 @@ public class DatabaseRequestHandler {
 			newFlag = SocatWoceEvent.WOCE_NO_DATA;
 		}
 		else {
-			return;
+			throw new IllegalArgumentException("Invalid \"old\" WOCE flag of '" + oldFlag + "'");
 		}
 
 		Connection catConn = makeConnection(true);
@@ -906,8 +915,8 @@ public class DatabaseRequestHandler {
 			catConn.close();
 		}
 
-		// Success; update the flag in the given event
-		woceEvent.setFlag(newFlag);
+		// Success; return the WOCE flag that was reassigned 
+		return newFlag;
 	}
 
 	/**
