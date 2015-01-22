@@ -85,7 +85,7 @@ public class CruiseFlagsHandler {
 			msgsWriter.println("Expocode: " + expocode);
 			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + TIMESTAMPER.format(new Date()));
 			msgsWriter.println("Flag\tCol.Type\tNum.Rows\tMessage\tRows");
-			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode);
+			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
 			for ( SocatWoceEvent woceEvent : woceEventsList ) {
 				// Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
 				Character woceFlag = woceEvent.getFlag();
