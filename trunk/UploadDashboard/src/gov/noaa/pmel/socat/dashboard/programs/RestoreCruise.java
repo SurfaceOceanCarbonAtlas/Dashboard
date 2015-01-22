@@ -3,11 +3,13 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
+import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -16,7 +18,10 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Restores the cruise DSG files to the data currently given in the text data file.  
@@ -148,11 +153,14 @@ public class RestoreCruise {
 			System.err.println("Arguments:  Expocode  Username  MetadataUpdated?");
 			System.err.println();
 			System.err.println("Restores the cruise DSG files to the data currently given in ");
-			System.err.println("the text data file.  Removes WOCE flags and QC flags for the ");
-			System.err.println("current SOCAT upload version and restores any old WOCE flags ");
-			System.err.println("applicable to the current data.  Adds a QC comment that the ");
-			System.err.println("cruise data and WOCE flags were restored.  Optionally, adds a ");
-			System.err.println("QC update ('U') flag indicating the metadata was updated.");
+			System.err.println("the text data and properties file.  Removes WOCE flags and QC ");
+			System.err.println("flags for the current SOCAT upload version and restores any ");
+			System.err.println("old WOCE flags applicable to the current data.  If the QC flag ");
+			System.err.println("from the revised QC flags does not match that in the properties ");
+			System.err.println("file, a global v2 QC flag is added to resolve the issue.  Adds ");
+			System.err.println("a QC comment that the cruise data and WOCE flags were restored.  ");
+			System.err.println("Optionally, adds a QC update ('U') flag indicating the metadata ");
+			System.err.println("was updated.");
 			System.err.println();
 			System.err.println("Expocode");
 			System.err.println("    expocodes of the cruise to be restored. ");
@@ -181,6 +189,7 @@ public class RestoreCruise {
 			System.exit(1);
 		}
 
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		String removeSocatVersion = dataStore.getSocatUploadVersion();
 		ResubmitCruises resubmitter = new ResubmitCruises(dataStore);
 		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
@@ -188,6 +197,22 @@ public class RestoreCruise {
 		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
 
 		try {
+			// Get the QC flag to restore from the cruise info file
+			DashboardCruise cruise = null;
+			try {
+				cruise = cruiseHandler.getCruiseFromInfoFile(expo);
+			} catch (Exception ex) {
+				System.err.println(expo + ": problems reaading the cruise properties file - " + ex.getMessage());
+				ex.printStackTrace();
+				System.err.println("========================================");
+				System.exit(1);
+			}
+			Character oldQCFlag = SocatQCEvent.STATUS_FLAG_MAP.get(cruise.getQcStatus());
+			if ( oldQCFlag == null ) {
+				System.err.println(expo + ": problems interpreting the cruise qc status - " + cruise.getQcStatus());
+				System.err.println("========================================");
+				System.exit(1);
+			}
 			// Resubmit the cruise using the reverted text data
 			try {
 				resubmitter.resubmitCruise(expo, username);
@@ -236,18 +261,6 @@ public class RestoreCruise {
 				System.err.println("========================================");
 				System.exit(1);
 			}
-			if ( metadataUpdated ) {
-				qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
-				qcEvent.setComment("Metadata updated.  Data and WOCE flags where not changed.");
-				try {
-					dbHandler.addQCEvent(qcEvent);
-				} catch (Exception ex) {
-					System.err.println(expo + ": problems adding a QC update flag - " + ex.getMessage());
-					ex.printStackTrace();
-					System.err.println("========================================");
-					System.exit(1);
-				}
-			}
 			// Get the revised QC flag
 			Character qcFlag = null;
 			try {
@@ -257,6 +270,52 @@ public class RestoreCruise {
 				ex.printStackTrace();
 				System.err.println("========================================");
 				System.exit(1);
+			}
+			if ( ! qcFlag.equals(oldQCFlag) ) {
+				SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				dateParser.setTimeZone(TimeZone.getTimeZone("UTC"));
+				Date oldQCTime = null;
+				try {
+					oldQCTime = dateParser.parse("2013-12-31 12:00:00");
+				} catch (ParseException ex) {
+					System.err.println("Unexpected error parsing 2013-12-31 12:00:00");
+					ex.printStackTrace();
+					System.exit(1);
+				}
+				qcFlag = oldQCFlag;
+				qcEvent.setExpocode(expo);
+				qcEvent.setFlag(qcFlag);
+				qcEvent.setFlagDate(oldQCTime);
+				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				qcEvent.setSocatVersion("2.0");
+				qcEvent.setUsername(username);
+				qcEvent.setComment("Adding global QC flag to that assigned in v2 to fix unresolved conflicts");
+				try {
+					dbHandler.addQCEvent(qcEvent);
+				} catch (Exception ex) {
+					System.err.println(expo + ": problems adding a QC conflict resolution flag - " + ex.getMessage());
+					ex.printStackTrace();
+					System.err.println("========================================");
+					System.exit(1);
+				}
+			}
+			if ( metadataUpdated ) {
+				qcFlag = SocatQCEvent.QC_UPDATED_FLAG;
+				qcEvent.setExpocode(expo);
+				qcEvent.setFlag(qcFlag);
+				qcEvent.setFlagDate(new Date());
+				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				qcEvent.setSocatVersion(removeSocatVersion);
+				qcEvent.setUsername(username);
+				qcEvent.setComment("Metadata had been updated.  Restored data and WOCE flags were not changed.");
+				try {
+					dbHandler.addQCEvent(qcEvent);
+				} catch (Exception ex) {
+					System.err.println(expo + ": problems adding a QC update flag - " + ex.getMessage());
+					ex.printStackTrace();
+					System.err.println("========================================");
+					System.exit(1);
+				}
 			}
 			// Assign the revised flag to the DSG files
 			try {

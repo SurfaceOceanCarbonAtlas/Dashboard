@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 3508441631061666439L;
+	private static final long serialVersionUID = -2998774807126254182L;
 
 	// All possible QC flags
 	public static final Character QC_A_FLAG = 'A';
@@ -52,7 +52,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	public static final String QC_STATUS_RENAMED = "Renamed";
 
 	/**
-	 * Map of QC submitted status flag characters to QC status strings
+	 * Map of QC status flag characters to QC status strings
 	 */
 	public static final HashMap<Character,String> FLAG_STATUS_MAP = 
 			new HashMap<Character,String>();
@@ -72,6 +72,26 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		FLAG_STATUS_MAP.put(QC_EXCLUDE_FLAG, QC_STATUS_EXCLUDED);
 	}
 
+	/**
+	 * Map of QC status strings to QC status flag characters 
+	 * QC_STATUS_SUBMITTED is mapped to QC_UPDATED_FLAG
+	 */
+	public static final HashMap<String,Character> STATUS_FLAG_MAP = 
+			new HashMap<String,Character>();
+	static {
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_A, QC_A_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_B, QC_B_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_C, QC_C_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_D, QC_D_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_E, QC_E_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_UNACCEPTABLE, QC_F_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_PREVIEW, QC_PREVIEW_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_CONFLICT, QC_CONFLICT_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_RENAMED, QC_RENAMED_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_SUSPENDED, QC_SUSPEND_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_SUBMITTED, QC_UPDATED_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_EXCLUDED, QC_EXCLUDE_FLAG);
+	}
 	Character flag;
 	Character regionID;
 
