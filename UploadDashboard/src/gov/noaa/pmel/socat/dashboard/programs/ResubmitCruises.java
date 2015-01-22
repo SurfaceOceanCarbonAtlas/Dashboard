@@ -56,11 +56,10 @@ public class ResubmitCruises {
 	}
 
 	/**
-	 * Rechecks the data of all cruises.  If a cruise had been submitted 
-	 * at some point, it is resubmitted.  If a submitted cruise does not 
-	 * have a DSG file, 'N' (new) will be assigned as the QC flag; 
-	 * otherwise 'U' (updated) will be assigned.
-	 * Requests to "send to CDIAC immediately" are not re-sent.
+	 * Rechecks the data of the given cruise.  If the cruise had been submitted 
+	 * at some point, it is resubmitted.  If a submitted cruise does not have a 
+	 * DSG file, 'N' (new) will be assigned as the QC flag; otherwise 'U' (updated) 
+	 * will be assigned.  Requests to "send to CDIAC immediately" are not re-sent.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise to check/resubmit
@@ -135,27 +134,23 @@ public class ResubmitCruises {
 	 * 		                all cruises are rechecked/resubmitted.
 	 */
 	public static void main(String[] args) {
-		if ( (args.length < 1) || (args.length > 2) ) {
-			System.err.println("Arguments:  Username  [ ExpocodesFile ]");
+		if ( args.length != 2 ) {
+			System.err.println("Arguments:  ExpocodesFile  Username");
 			System.err.println();
-			System.err.println("Rechecks all cruises, or those specified in ExpocodesFile if given. ");
-			System.err.println("Resubmits all cruises that had been submitted.  If a submitted cruise ");
-			System.err.println("does not have a DSG file, 'N' (new) will be assigned as the QC status; ");
-			System.err.println("otherwise, 'U' (updated) will be assigned.  Requests to \"send to CDIAC ");
-			System.err.println("immediately\" are not re-sent.  The default dashboard configuration is ");
-			System.err.println("used for this recheck and resubmit process. ");
+			System.err.println("Rechecks cruises specified in ExpocodesFile.  Resubmits all cruises ");
+			System.err.println("that had been submitted.  If a submitted cruise does not have a DSG ");
+			System.err.println("file, 'N' (new) will be assigned as the QC status; otherwise, 'U' ");
+			System.err.println("(updated) will be assigned.  Requests to \"send to CDIAC immediately\" ");
+			System.err.println("are not re-sent.  The default dashboard configuration is used for this ");
+			System.err.println("recheck and resubmit process. ");
 			System.err.println();
 			System.err.println("Username is the dashboard admin requesting this update.");
 			System.err.println();
 			System.exit(1);
 		}
 
-		String username = args[0];
-		String expocodesFilename;
-		if ( args.length > 1 )
-			expocodesFilename = args[1];
-		else
-			expocodesFilename = null;
+		String expocodesFilename = args[0];
+		String username = args[1];
 
 		boolean success = true;
 
@@ -178,38 +173,26 @@ public class ResubmitCruises {
 
 			// Get the expocode of the cruises to resubmit
 			TreeSet<String> allExpocodes = null; 
-			if ( expocodesFilename != null ) {
-				allExpocodes = new TreeSet<String>();
+			allExpocodes = new TreeSet<String>();
+			try {
+				BufferedReader expoReader = 
+						new BufferedReader(new FileReader(expocodesFilename));
 				try {
-					BufferedReader expoReader = 
-							new BufferedReader(new FileReader(expocodesFilename));
-					try {
-						String dataline = expoReader.readLine();
-						while ( dataline != null ) {
-							dataline = dataline.trim();
-							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
-								allExpocodes.add(dataline);
-							dataline = expoReader.readLine();
-						}
-					} finally {
-						expoReader.close();
+					String dataline = expoReader.readLine();
+					while ( dataline != null ) {
+						dataline = dataline.trim();
+						if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+							allExpocodes.add(dataline);
+						dataline = expoReader.readLine();
 					}
-				} catch (Exception ex) {
-					System.err.println("Error getting expocodes from " + 
-							expocodesFilename + ": " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
+				} finally {
+					expoReader.close();
 				}
-			} 
-			else {
-				try {
-					allExpocodes = new TreeSet<String>(
-							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
-				} catch (Exception ex) {
-					System.err.println("Error getting all expocodes: " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
-				}
+			} catch (Exception ex) {
+				System.err.println("Error getting expocodes from " + 
+						expocodesFilename + ": " + ex.getMessage());
+				ex.printStackTrace();
+				System.exit(1);
 			}
 
 			// Recheck, and possibly resubmit, each of these cruises
