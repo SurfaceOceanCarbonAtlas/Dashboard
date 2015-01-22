@@ -190,6 +190,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param uploadFilename
 	 * 		upload filename to use for this metadata document; 
 	 * 		may or may not match the basename of uploadFileItem.getName()
+	 * 		If the name starts with the expocode and an underscore, this
+	 * 		prefix is removed from the upload filename recorded in this 
+	 * 		metadata record.
 	 * @param version
 	 * 		SOCAT version for this metadata item
 	 * @param uploadFileItem
@@ -206,8 +209,16 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	public DashboardMetadata saveMetadataFileItem(String cruiseExpocode, 
 			String owner, String uploadTimestamp, String uploadFilename,
 			String version, FileItem uploadFileItem) throws IllegalArgumentException {
+		String filename;
+		if ( uploadFilename.toUpperCase().startsWith(cruiseExpocode.toUpperCase() + "_") && 
+			(uploadFilename.length() > cruiseExpocode.length() + 3) ) {
+			filename = uploadFilename.substring(cruiseExpocode.length()+1);
+		}
+		else
+			filename = uploadFilename;
+
 		// Create the metadata filename
-		File metadataFile = getMetadataFile(cruiseExpocode, uploadFilename);
+		File metadataFile = getMetadataFile(cruiseExpocode, filename);
 
 		// Make sure the parent directory exists 
 		File parentDir = metadataFile.getParentFile();
@@ -221,7 +232,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Check if this will overwrite existing metadata
 		boolean isUpdate;
 		if ( metadataFile.exists() ) {
-			verifyOkayToDelete(owner, cruiseExpocode, uploadFilename);
+			verifyOkayToDelete(owner, cruiseExpocode, filename);
 			isUpdate = true;
 		}
 		else {
@@ -240,11 +251,11 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		String message;
 		if ( isUpdate ) {
-			message = "Updated metadata document " + uploadFilename + 
+			message = "Updated metadata document " + filename + 
 					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
-			message = "Added metadata document " + uploadFilename + 
+			message = "Added metadata document " + filename + 
 					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 
@@ -260,18 +271,18 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
 		metadata.setExpocode(cruiseExpocode);
-		metadata.setFilename(uploadFilename);
+		metadata.setFilename(filename);
 		metadata.setUploadTimestamp(uploadTimestamp);
 		metadata.setOwner(owner);
 		metadata.setVersion(version);
 
 		// Save the metadata properties
 		if ( isUpdate ) {
-			message = "Updated properties of metadata document " + uploadFilename + 
+			message = "Updated properties of metadata document " + filename + 
 					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
-			message = "Added properties of metadata document " + uploadFilename + 
+			message = "Added properties of metadata document " + filename + 
 					  " for cruise " + cruiseExpocode + " and owner " + owner;
 		}
 		saveMetadataInfo(metadata, message);
