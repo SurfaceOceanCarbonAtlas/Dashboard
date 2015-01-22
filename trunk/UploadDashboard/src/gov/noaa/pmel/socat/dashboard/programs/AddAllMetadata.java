@@ -32,7 +32,7 @@ public class AddAllMetadata {
 			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
 			System.err.println("Updates the metadata and additional documents for the cruises ");
-			System.err.println("specified in ExpocodesFile from te current set of available "); 
+			System.err.println("specified in ExpocodesFile from the current set of available "); 
 			System.err.println("documents for each cruise.  The default dashboard configuration "); 
 			System.err.println("is used for this process. ");
 			System.err.println();
