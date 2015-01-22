@@ -1016,4 +1016,37 @@ public class DatabaseRequestHandler {
 		}
 	}
 
+	/**
+	 * Removes all QC and WOCE flags that have the given expocode and socat version.
+	 * 
+	 * @param expocode
+	 * 		expocode to use
+	 * @param socatVersion
+	 * 		socat version to use
+	 * @throws SQLException
+	 * 		if generating the prepared statements or deleting the flags throws one
+	 */
+	public void removeFlagsForCruiseVersion(String expocode, String socatVersion) throws SQLException {
+		Connection catConn = makeConnection(true);
+		try {
+			// Remove any QC events for this cruise version
+			PreparedStatement deleteQcPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
+					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `socat_version` = ?;");
+			deleteQcPrepStmt.setString(1, expocode);
+			deleteQcPrepStmt.setString(2, socatVersion);
+			deleteQcPrepStmt.executeUpdate();
+
+			// Remove any WOCE events and associated locations for this cruise version
+			PreparedStatement deleteWoceLocPrepStmt = catConn.prepareStatement("DELETE FROM " +
+					"Evt, Loc USING `" + WOCEEVENTS_TABLE_NAME + " AS Evt ` JOIN `" +
+					WOCELOCATIONS_TABLE_NAME + " AS Loc ` ON Evt.woce_id = Loc.woce_id WHERE " +
+					"Evt.expocode = ? AND Evt.socat_version = ?;");
+			deleteWoceLocPrepStmt.setString(1, expocode);
+			deleteWoceLocPrepStmt.setString(2, socatVersion);
+			deleteWoceLocPrepStmt.executeUpdate();
+		} finally {
+			catConn.close();
+		}		
+	}
+
 }
