@@ -1037,10 +1037,12 @@ public class DatabaseRequestHandler {
 			deleteQcPrepStmt.executeUpdate();
 
 			// Remove any WOCE events and associated locations for this cruise version
-			PreparedStatement deleteWoceLocPrepStmt = catConn.prepareStatement("DELETE FROM " +
-					"Evt, Loc USING `" + WOCEEVENTS_TABLE_NAME + " AS Evt ` JOIN `" +
-					WOCELOCATIONS_TABLE_NAME + " AS Loc ` ON Evt.woce_id = Loc.woce_id WHERE " +
-					"Evt.expocode = ? AND Evt.socat_version = ?;");
+			PreparedStatement deleteWoceLocPrepStmt = catConn.prepareStatement("DELETE FROM `" +
+					WOCEEVENTS_TABLE_NAME + "`, `" + WOCELOCATIONS_TABLE_NAME + "` USING `" +
+					WOCEEVENTS_TABLE_NAME + "` JOIN `" + WOCELOCATIONS_TABLE_NAME + "` ON " + 
+					WOCEEVENTS_TABLE_NAME + ".woce_id = " + WOCELOCATIONS_TABLE_NAME + ".woce_id WHERE " + 
+					WOCEEVENTS_TABLE_NAME + ".expocode = ? AND " + 
+					WOCEEVENTS_TABLE_NAME + ".socat_version = ?;");
 			deleteWoceLocPrepStmt.setString(1, expocode);
 			deleteWoceLocPrepStmt.setString(2, socatVersion);
 			deleteWoceLocPrepStmt.executeUpdate();
