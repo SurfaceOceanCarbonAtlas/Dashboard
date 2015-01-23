@@ -126,7 +126,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 				return false;
 			}
 		});
-		// Add the metadata info for all the metadata files (may be an empty array)
+		// Record the metadata file for each metadata info files (may be an empty array)
 		for ( File mfile : metafiles ) {
 			String basename = mfile.getName().substring(expocode.length() + 1, 
 					mfile.getName().length() - METADATA_INFOFILE_SUFFIX.length());
