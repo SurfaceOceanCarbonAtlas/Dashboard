@@ -106,7 +106,7 @@ public class ResubmitCruises {
 					"Cruise data column types, units, and missing values for " + 
 					cruiseData.getExpocode() + " updated by " + username);
 		}
-		else if ( qcStatus.equals(SocatQCEvent.QC_STATUS_SUBMITTED) ) {
+		else {
 			// Un-submit the cruise but do not bother committing the change at this time
 			if ( dsgHandler.getDsgNcFile(expocode).exists() )
 				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
@@ -120,10 +120,6 @@ public class ResubmitCruises {
 										  timestamp, false, username, null, null);
 			// The cruise will now have a QC status of 'N' (new) if it was 
 			// QC_STATUS_NOT_SUBMITTED, or 'U' (updated) if it was QC_STATUS_SUSPENDED
-		}
-		else {
-			throw new IllegalArgumentException(
-					"Unexpected QC status of '" + qcStatus + "' for " + expocode);
 		}
 	}
 
