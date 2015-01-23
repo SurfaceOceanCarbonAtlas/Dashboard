@@ -207,6 +207,12 @@ public class RestoreCruise {
 				System.err.println("========================================");
 				System.exit(1);
 			}
+			String textSocatVersion = cruise.getVersion();
+			if ( textSocatVersion.equals(removeSocatVersion) ) {
+				System.err.println(expo + ": SOCAT version in the properties file is the current SOCAT version " + removeSocatVersion);
+				System.err.println("========================================");
+				System.exit(1);
+			}
 			Character oldQCFlag = SocatQCEvent.STATUS_FLAG_MAP.get(cruise.getQcStatus());
 			if ( oldQCFlag == null ) {
 				System.err.println(expo + ": problems interpreting the cruise qc status - " + cruise.getQcStatus());
@@ -239,6 +245,12 @@ public class RestoreCruise {
 			} catch (Exception ex) {
 				System.err.println(expo + ": problems restoring the WOCE flags - " + ex.getMessage());
 				ex.printStackTrace();
+				System.err.println("========================================");
+				System.exit(1);
+			}
+			if ( ! restoredVersion.equals(textSocatVersion) ) {
+				System.err.println(expo + ": unexpected mismatch of restored SOCAT versions: DSG file " + 
+						restoredVersion + "; properties file " + textSocatVersion);
 				System.err.println("========================================");
 				System.exit(1);
 			}
