@@ -332,7 +332,7 @@ public class CruiseStandardizer {
 		SHIP_RENAME_MAP.put("Sonne", "Sonne");
 		SHIP_RENAME_MAP.put("Southern Surveyor", "Southern Surveyor");
 		SHIP_RENAME_MAP.put("Soyo Maru", "Soyo Maru");
-		SHIP_RENAME_MAP.put("Station M", "Station M");
+		SHIP_RENAME_MAP.put("Station M", "Mooring");
 		SHIP_RENAME_MAP.put("Taisei Maru", "Taisei Maru");
 		SHIP_RENAME_MAP.put("Tangaroa", "Tangaroa");
 		SHIP_RENAME_MAP.put("Tethys 2", "Tethys II");
