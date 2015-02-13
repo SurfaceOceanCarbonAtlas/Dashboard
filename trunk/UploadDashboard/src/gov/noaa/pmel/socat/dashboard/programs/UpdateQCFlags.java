@@ -7,15 +7,9 @@ import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
-import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.TreeSet;
 
 /**
@@ -43,19 +37,6 @@ public class UpdateQCFlags {
 		}
 
 		String expocodesFilename = args[0];
-
-		final String username = "karl.smith";
-
-		SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		dateParser.setTimeZone(TimeZone.getTimeZone("UTC"));
-		Date oldQCTime = null;
-		try {
-			oldQCTime = dateParser.parse("2013-12-31 12:00:00");
-		} catch (ParseException ex) {
-			System.err.println("Unexpected error parsing 2013-12-31 12:00:00");
-			ex.printStackTrace();
-			System.exit(1);
-		}
 
 		boolean success = true;
 		boolean updated = false;
@@ -121,41 +102,12 @@ public class UpdateQCFlags {
 					if ( ! qcFlag.equals(oldFlag) ) {
 						CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
 						dsgFile.read(true);
-						String version = dsgFile.getMetadata().getSocatVersion();
-						if ( "1.3".equals(version)  || "1.4".equals(version)  || "2.0".equals(version) || 
-							 "1.30".equals(version) || "1.40".equals(version) || "2.00".equals(version) ) {
-							// Add an old global QC flag with the flag in the DSG file
-							SocatQCEvent qcEvent = new SocatQCEvent();
-							qcEvent.setExpocode(expocode);
-							qcEvent.setFlag(oldFlag);
-							qcEvent.setFlagDate(oldQCTime);
-							qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-							qcEvent.setSocatVersion("2.0");
-							qcEvent.setUsername(username);
-							qcEvent.setComment("Adding global QC flag to that assigned in v2 to fix unresolved conflicts");
-							try {
-								dbHandler.addQCEvent(qcEvent);
-								System.err.println("Add old global QC flag of '" + oldFlag + 
-										"' to fix unresolved conflicts in " + expocode);
-							} catch (Exception ex) {
-								System.err.println("Failed to add old global QC flag of '" + oldFlag + 
-										"' to fix unresolved conflicts for " + expocode);
-								success = false;
-							}
-						}
-						else if ( "3.0".equals(version) || "3.00".equals(version) ) {
-							// Update the QC flag in the DSG files
-							dsgHandler.getDsgNcFile(expocode).updateQCFlag(qcFlag);
-							dsgHandler.getDecDsgNcFile(expocode).updateQCFlag(qcFlag);
-							System.err.println("Updated QC flag for " + 
-									expocode + " from '" + oldFlag + "' to '" + qcFlag + "'");
-							updated = true;
-						}
-						else {
-							System.err.println("Unknown SOCAT version number \"" + 
-									String.valueOf(version) + "\" for " + expocode);
-							success = false;
-						}
+						// Update the QC flag in the DSG files
+						dsgHandler.getDsgNcFile(expocode).updateQCFlag(qcFlag);
+						dsgHandler.getDecDsgNcFile(expocode).updateQCFlag(qcFlag);
+						System.out.println("Updated QC flag for " + 
+								expocode + " from '" + oldFlag + "' to '" + qcFlag + "'");
+						updated = true;
 					}
 				} catch (Exception ex) {
 					System.err.println("Error updating the QC flag in the DSG files for " + 
