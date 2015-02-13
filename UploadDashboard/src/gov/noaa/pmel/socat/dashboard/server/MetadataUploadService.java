@@ -206,6 +206,9 @@ public class MetadataUploadService extends HttpServlet {
 						dsgFileHandler.updateQCFlag(qcEvent);
 						// Update the dashboard status for the 'U' QC flag
 						cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+						// If archived, reset the archived status so the updated metadata will be archived
+						if ( cruise.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
+							cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 						cruiseHandler.saveCruiseInfoToFile(cruise, comment);
 					} catch (Exception ex) {
 						// Should not fail.  

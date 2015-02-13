@@ -659,11 +659,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("omeMetadataButton")
 	void omeOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(false) ) {
-			SocatUploadDashboard.showMessage(
-					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
-			return;
-		}
+		getSelectedCruises(null);
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_OME_ERR_END);
@@ -679,11 +675,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("addlDocsButton")
 	void addlDocsOnClick(ClickEvent event) {
-		if ( ! getSelectedCruises(false) ) {
-			SocatUploadDashboard.showMessage(
-					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
-			return;
-		}
+		getSelectedCruises(null);
 		if ( cruiseSet.size() < 1 ) {
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
@@ -1235,30 +1227,18 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = cruise.isEditable();
-				if ( Boolean.TRUE.equals(editable) ) {
-					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-					sb.appendEscaped(getValue(cruise));
-					sb.appendHtmlConstant("</em></u></div>");
-				}
-				else {
-					sb.appendHtmlConstant("<div>");
-					sb.appendEscaped(getValue(cruise));
-					sb.appendHtmlConstant("</div>");
-				}
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendEscaped(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
 			}
 		};
 		omeMetadataColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
-				// Respond only for cruises that have not been submitted
-				Boolean editable = cruise.isEditable();
-				if ( Boolean.TRUE.equals(editable) ) {
-					// Save the currently selected cruises
-					getSelectedCruises(null);
-					// Show the OME metadata manager page for this one cruise
-					OmeManagerPage.showPage(cruise);
-				}
+				// Save the currently selected cruises
+				getSelectedCruises(null);
+				// Show the OME metadata manager page for this one cruise
+				OmeManagerPage.showPage(cruise);
 			}
 		});
 		return omeMetadataColumn;
@@ -1404,33 +1384,21 @@ public class CruiseListPage extends Composite {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = cruise.isEditable();
-				if ( Boolean.TRUE.equals(editable) ) {
-					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-					sb.appendHtmlConstant(getValue(cruise));
-					sb.appendHtmlConstant("</em></u></div>");
-				}
-				else {
-					sb.appendHtmlConstant("<div>");
-					sb.appendHtmlConstant(getValue(cruise));
-					sb.appendHtmlConstant("</div>");
-				}
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendHtmlConstant(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
 			}
 		};
 		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
-				// Respond only for cruises that have not been submitted
-				Boolean editable = cruise.isEditable();
-				if ( Boolean.TRUE.equals(editable) ) {
-					// Save the currently selected cruises (in expocodeSet)
-					getSelectedCruises(null);
-					// Go to the additional docs page with just this one cruise
-					// Go to the QC page after performing the client-side checks on this one cruise
-					checkSet.clear();
-					checkSet.add(cruise);
-					AddlDocsManagerPage.showPage(checkSet);
-				}
+				// Save the currently selected cruises (in expocodeSet)
+				getSelectedCruises(null);
+				// Go to the additional docs page with just this one cruise
+				// Go to the QC page after performing the client-side checks on this one cruise
+				checkSet.clear();
+				checkSet.add(cruise);
+				AddlDocsManagerPage.showPage(checkSet);
 			}
 		});
 		return addnDocsColumn;
