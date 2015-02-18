@@ -117,7 +117,7 @@ public class ResubmitCruises {
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));
 			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date());
 			cruiseSubmitter.submitCruises(expocodeSet, cruise.getArchiveStatus(), 
-										  timestamp, false, username, null, null);
+										  timestamp, false, username);
 			// The cruise will now have a QC status of 'N' (new) if it was 
 			// QC_STATUS_NOT_SUBMITTED, or 'U' (updated) if it was QC_STATUS_SUSPENDED
 		}

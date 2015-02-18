@@ -40,7 +40,7 @@ public class AddToSocatServiceImpl extends RemoteServiceServlet
 		// Submit the cruises for QC and possibly send to CDIAC
 		DashboardCruiseSubmitter submitter = new DashboardCruiseSubmitter(dataStore);
 		submitter.submitCruises(cruiseExpocodes, archiveStatus, 
-				localTimestamp, repeatSend, username, null, null);
+								localTimestamp, repeatSend, username);
 	}
 
 }

@@ -21,7 +21,6 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,14 +79,6 @@ public class DashboardCruiseSubmitter {
 	 * 		which already had a request sent?
 	 * @param submitter
 	 * 		user performing this submit 
-	 * @param qcFlag
-	 * 		if not null, flag to associate with this submit.
-	 * 		This is only for transferring v2 cruises and 
-	 * 		should be null for standard use.
-	 * @param addlDocs
-	 * 		if not null, additional documents (metadata HRefs)
-	 * 		to include.  This is only for transferring v2 cruises 
-	 * 		and should be null for standard use. 
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid, or
 	 * 		if the data or metadata is missing, or
@@ -98,8 +89,7 @@ public class DashboardCruiseSubmitter {
 	 */
 	public void submitCruises(Set<String> cruiseExpocodes, 
 			String archiveStatus, String localTimestamp, 
-			boolean repeatSend, String submitter, String qcFlag, 
-			String addlDocs) throws IllegalArgumentException {
+			boolean repeatSend, String submitter) throws IllegalArgumentException {
 
 		HashSet<String> ingestExpos = new HashSet<String>();
 		HashSet<String> archiveExpos = new HashSet<String>();
@@ -118,13 +108,7 @@ public class DashboardCruiseSubmitter {
 				// QC flag to assign with this cruise
 				Character flag;
 				String qcStatus = cruise.getQcStatus();
-				if ( (qcFlag != null) && ! qcFlag.isEmpty() ) {
-					flag = qcFlag.charAt(0);
-					qcStatus = SocatQCEvent.FLAG_STATUS_MAP.get(flag);
-					if ( qcStatus == null )
-						throw new IllegalArgumentException("Unknown QC flag '" + qcFlag + "'");
-				}
-				else if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ) {
+				if ( SocatQCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ) {
 					flag = SocatQCEvent.QC_NEW_FLAG;
 					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
 				}
@@ -154,7 +138,7 @@ public class DashboardCruiseSubmitter {
 						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
 					continue;
 				}
-				if ( (qcFlag == null) && cruiseChecker.hadGeopositionErrors() ) {
+				if ( cruiseChecker.hadGeopositionErrors() ) {
 					errorMsgs.add(expocode + ": unacceptable; automated checking of data " +
 							"detected longitude, latitude, date, or time value errors");
 					continue;
@@ -164,12 +148,6 @@ public class DashboardCruiseSubmitter {
 					// Get the OME metadata for this cruise
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
 							metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME));
-					if ( addlDocs != null ) {
-						// Add the given additional documents (metadataHRefs from the database) 
-						// to cruiseData so they will be added to the DSG file 
-						TreeSet<String> addlDocsSet = cruiseData.getAddlDocs();
-						addlDocsSet.addAll(Arrays.asList(addlDocs.split(" ; ")));
-					}
 
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data
@@ -195,48 +173,33 @@ public class DashboardCruiseSubmitter {
 				initQC.setFlagDate(new Date());
 				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				if ( (qcFlag == null) || qcFlag.isEmpty() ) {
-					// Add the initial QC flag in each region only for new and updated cruises
-					initQC.setFlag(flag);
-					if ( SocatQCEvent.QC_NEW_FLAG.equals(flag) )
-						initQC.setComment("Initial QC flag for new dataset");
-					else
-						initQC.setComment("Initial QC flag for updated dataset");
+				// Add the initial QC flag in each region only for new and updated cruises
+				initQC.setFlag(flag);
+				if ( SocatQCEvent.QC_NEW_FLAG.equals(flag) )
+					initQC.setComment("Initial QC flag for new dataset");
+				else
+					initQC.setComment("Initial QC flag for updated dataset");
 
-					// Get the regions in which the cruise reports 
-					TreeSet<Character> regionsSet;
-					try {
-						regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
-					} catch (Exception ex) {
-						throw new RuntimeException("Unexpected problems reading region IDs "
-								+ "from the newly created full-data DSG file for " + 
-								expocode + ": " + ex.getMessage());
-					}
-					// Add the global and regional initial flags
-					try {
-						initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
-						databaseHandler.addQCEvent(initQC);
-						for ( Character regionID : regionsSet ) {
-							initQC.setRegionID(regionID);
-							databaseHandler.addQCEvent(initQC);
-						}
-					} catch (SQLException ex) {
-						throw new IllegalArgumentException(
-								"Unable to add an initial QC flag:\n    " + ex.getMessage());
-					}
+				// Get the regions in which the cruise reports 
+				TreeSet<Character> regionsSet;
+				try {
+					regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
+				} catch (Exception ex) {
+					throw new RuntimeException("Unexpected problems reading region IDs " +
+							"from the newly created full-data DSG file for " + 
+							expocode + ": " + ex.getMessage());
 				}
-				else {
-					// Transferring an old cruise
-					initQC.setSocatVersion(cruise.getVersion());
-					// Some old cruises did not get the version number updated 
-					// in the v2 metadata table so always make this 2.0 or later.
-					try {
-						Double versionNumber = Double.valueOf(cruise.getVersion());
-						if ( versionNumber < 2.0 )
-							initQC.setSocatVersion("2.0");
-					} catch (Exception ex) {
-						initQC.setSocatVersion("2.0");
+				// Add the global and regional initial flags
+				try {
+					initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
+					databaseHandler.addQCEvent(initQC);
+					for ( Character regionID : regionsSet ) {
+						initQC.setRegionID(regionID);
+						databaseHandler.addQCEvent(initQC);
 					}
+				} catch (SQLException ex) {
+					throw new IllegalArgumentException(
+							"Unable to add an initial QC flag:\n    " + ex.getMessage());
 				}
 
 				// All cruises - remark on the number of data rows with error and warnings
