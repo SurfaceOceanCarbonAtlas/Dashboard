@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -34,7 +35,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -51,7 +51,7 @@ import com.google.gwt.view.client.ListDataProvider;
  *  
  * @author Karl Smith
  */
-public class AddlDocsManagerPage extends Composite {
+public class AddlDocsManagerPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Supplemental Documents";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -134,17 +134,14 @@ public class AddlDocsManagerPage extends Composite {
 	@UiField DataGrid<DashboardMetadata> addlDocsGrid;
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload docUpload;
-	@UiField Hidden usernameToken;
-	@UiField Hidden passhashToken;
 	@UiField Hidden timestampToken;
 	@UiField Hidden expocodesToken;
 	@UiField Hidden omeToken;
 	@UiField Button uploadButton;
 	@UiField Button dismissButton;
 
-	private String username;
 	private ListDataProvider<DashboardMetadata> listProvider;
-	private HashSet<DashboardCruise> cruises;
+	private HashSet<DashboardCruise> cruiseSet;
 	private TreeSet<String> expocodes;
 	private DashboardAskPopup askOverwritePopup;
 
@@ -163,8 +160,8 @@ public class AddlDocsManagerPage extends Composite {
 
 		buildMetadataListTable();
 
-		username = "";
-		cruises = new HashSet<DashboardCruise>();
+		setUsername(null);
+		cruiseSet = new HashSet<DashboardCruise>();
 		expocodes = new TreeSet<String>();
 		askOverwritePopup = null;
 
@@ -189,35 +186,28 @@ public class AddlDocsManagerPage extends Composite {
 	 * are added to all the cruises by replicating the documents.  
 	 * Adds this page to the page history list.
 	 * 
-	 * @param cruiseSet
-	 * 		set of cruises to use 
+	 * @param cruiseList
+	 * 		cruises to use 
 	 */
-	static void showPage(HashSet<DashboardCruise> cruiseSet) {
+	static void showPage(DashboardCruiseList cruiseList) {
 		if ( singleton == null )
 			singleton = new AddlDocsManagerPage();
 		SocatUploadDashboard.updateCurrentPage(singleton);
-		singleton.updateAddlDocs(cruiseSet);
+		singleton.updateAddlDocs(cruiseList);
 		History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 	}
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory 
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never show before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
+			CruiseListPage.showPage();
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )
-				History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 		}
 	}
 
@@ -228,17 +218,16 @@ public class AddlDocsManagerPage extends Composite {
 	 * @param cruiseSet
 	 * 		set of cruises to use 
 	 */
-	private void updateAddlDocs(HashSet<DashboardCruise> cruiseSet) {
+	private void updateAddlDocs(DashboardCruiseList cruises) {
 		// Update the username
-		username = DashboardLoginPage.getUsername();
-		userInfoLabel.setText(WELCOME_INTRO + username);
+		setUsername(cruises.getUsername());
+		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		// Update the cruises associated with this page
-		cruises.clear();
-		cruises.addAll(cruiseSet);
+		cruiseSet.clear();
+		cruiseSet.addAll(cruises.values());
 		expocodes.clear();
-		for ( DashboardCruise cruz : cruiseSet )
-			expocodes.add(cruz.getExpocode());
+		expocodes.addAll(cruises.keySet());
 
 		// Update the HTML intro naming the cruises
 		StringBuilder sb = new StringBuilder();
@@ -275,8 +264,6 @@ public class AddlDocsManagerPage extends Composite {
 	 * Clears all the Hidden tokens on the page.
 	 */
 	private void clearTokens() {
-		usernameToken.setValue("");
-		passhashToken.setValue("");
 		timestampToken.setValue("");
 		expocodesToken.setValue("");
 		omeToken.setValue("");
@@ -286,27 +273,21 @@ public class AddlDocsManagerPage extends Composite {
 	 * Assigns all the Hidden tokens on the page.
 	 */
 	private void assignTokens() {
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
+		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm").format(new Date());
 		timestampToken.setValue(localTimestamp);
-		expocodesToken.setValue(
-				DashboardUtils.encodeStringArrayList(
-						new ArrayList<String>(expocodes)));
+		expocodesToken.setValue(DashboardUtils.encodeStringArrayList(new ArrayList<String>(expocodes)));
 		omeToken.setValue("false");
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
+		DashboardLogoutPage.showPage(getUsername());
 	}
 
 	@UiHandler("dismissButton")
 	void cancelOnClick(ClickEvent event) {
 		// Change to the latest cruise listing page.
-		CruiseListPage.showPage(false);
+		CruiseListPage.showPage();
 	}
 
 	@UiHandler("uploadButton") 
@@ -327,7 +308,7 @@ public class AddlDocsManagerPage extends Composite {
 		// Check for any overwrites that will happen
 		String message = OVERWRITE_WARNING_MSG_PROLOGUE;
 		boolean willOverwrite = false;
-		for ( DashboardCruise cruz : cruises ) {
+		for ( DashboardCruise cruz : cruiseSet ) {
 			for ( String addlDocTitle : cruz.getAddlDocs() ) {
 				String[] nameTime = DashboardMetadata.splitAddlDocsTitle(addlDocTitle);
 				if ( uploadFilename.equals(nameTime[0]) ) {
@@ -381,11 +362,10 @@ public class AddlDocsManagerPage extends Composite {
 		processResultMsg(event.getResults());
 		// Contact the server to obtain the latest set 
 		// of supplemental documents for the current cruises
-		service.getUpdatedCruises(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), expocodes, 
-				new AsyncCallback<HashSet<DashboardCruise>>() {
+		service.getUpdatedCruises(getUsername(), expocodes, 
+				new AsyncCallback<DashboardCruiseList>() {
 			@Override
-			public void onSuccess(HashSet<DashboardCruise> cruiseList) {
+			public void onSuccess(DashboardCruiseList cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
 				SocatUploadDashboard.showAutoCursor();
@@ -587,12 +567,10 @@ public class AddlDocsManagerPage extends Composite {
 	private void continueDelete(String deleteFilename, String deleteExpocode) {
 		// Send the request to the server
 		SocatUploadDashboard.showWaitCursor();
-		service.deleteAddlDoc(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(),
-				deleteFilename, deleteExpocode, expocodes, 
-				new AsyncCallback<HashSet<DashboardCruise>>() {
+		service.deleteAddlDoc(getUsername(), deleteFilename, deleteExpocode, 
+				expocodes, new AsyncCallback<DashboardCruiseList>() {
 			@Override
-			public void onSuccess(HashSet<DashboardCruise> cruiseList) {
+			public void onSuccess(DashboardCruiseList cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
 				SocatUploadDashboard.showAutoCursor();

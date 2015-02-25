@@ -9,15 +9,16 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.TreeSet;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
@@ -30,121 +31,152 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardListServiceImpl extends RemoteServiceServlet
 									implements DashboardListService {
 
-	private static final long serialVersionUID = -7637335749892330074L;
+	private static final long serialVersionUID = 1580873646687637682L;
+
+	private String username = null;
+	private DashboardDataStore dataStore = null;
 
 	/**
-	 * Validates the given user.
+	 * Validates the given request by retrieving the current username from the request.
+	 * Assigns the username and dataStore fields in this instance.
 	 * 
-	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
 	 * @return
-	 * 		the dashboard data store
+	 * 		true if the request obtained a valid username; otherwise false
 	 * @throws IllegalArgumentException
-	 * 		if authentication fails
+	 * 		if unable to obtain the dashboard data store
 	 */
-	private DashboardDataStore validateUser(String username,
-			String passhash) throws IllegalArgumentException {
-		DashboardDataStore dataStore;
+	private boolean validateRequest() throws IllegalArgumentException {
+		username = null;
+		dataStore = null;
 		try {
 			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected configuration error: " + ex.getMessage());
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Unexpected configuration error: " + ex.getMessage());
 		}
-		if ( ! dataStore.validateUser(username, passhash) )
-			throw new IllegalArgumentException(
-					"Invalid authentication credentials");
-		return dataStore;
+		HttpServletRequest request = getThreadLocalRequest();
+		try {
+			username = request.getUserPrincipal().getName().trim();
+		} catch (Exception ex) {
+			// Probably null pointer exception - leave username null
+			return false;
+		}
+		return dataStore.validateUser(username);
 	}
 
 	@Override
-	public boolean logoutUser(String username, String passhash) {
-		// Validate and get the dashboard data store
-		validateUser(username, passhash);
+	public DashboardCruiseList getCruiseList() throws IllegalArgumentException {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		DashboardCruiseList cruiseList = dataStore.getUserFileHandler().getCruiseListing(username);
+		Logger.getLogger("CruiseListService").info("cruise list returned for " + username);
+		return cruiseList;
+	}
+
+	@Override
+	public boolean logoutUser(String pageUsername) {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			return false;
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			return false;
 		getServletContext().removeAttribute("JSESSIONID");
 		Logger.getLogger("CruiseListService").info("logged out " + username);
 		return true;
 	}
 
 	@Override
-	public DashboardCruiseList getCruiseList(String username, String passhash)
-			throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
-		Logger.getLogger("CruiseListService").info("cruise list returned for " + username);
-		// Return the current list of cruises for this user
-		return dataStore.getUserFileHandler().getCruiseListing(username);
-	}
-
-	@Override
-	public DashboardCruiseList deleteCruises(String username, String passhash,
+	public DashboardCruiseList deleteCruises(String pageUsername, 
 			TreeSet<String> expocodeSet, Boolean deleteMetadata) 
-											throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
+					throws IllegalArgumentException {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			throw new IllegalArgumentException("Invalid user request");
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		// Delete each of the cruises in the given set
 		for ( String expocode : expocodeSet ) {
 			try {
-				dataStore.getCruiseFileHandler()
-						 .deleteCruiseFiles(expocode, username, deleteMetadata);
-
+				cruiseHandler.deleteCruiseFiles(expocode, username, deleteMetadata);
 			} catch (FileNotFoundException ex) {
 				// Cruise already deleted? - ignore
 				;
 			}
 			// IllegalArgumentException for other problems escape as-is
+			Logger.getLogger("CruiseListService").info("cruise " + expocode + " deleted by " + username);
 		}
 
 		// Return the current list of cruises, which should 
 		// detect the missing cruises and update itself
-		return dataStore.getUserFileHandler().getCruiseListing(username);
+		DashboardCruiseList cruiseList = dataStore.getUserFileHandler().getCruiseListing(username);
+		Logger.getLogger("CruiseListService").info("cruise list returned for " + username);
+		return cruiseList;
 	}
 
 	@Override
-	public DashboardCruiseList addCruisesToList(String username,
-			String passhash, String wildExpocode) throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
+	public DashboardCruiseList addCruisesToList(String pageUsername, 
+			String wildExpocode) throws IllegalArgumentException {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			throw new IllegalArgumentException("Invalid user request");
 		// Add the cruises to the user's list and return the updated list
-		return dataStore.getUserFileHandler()
-						.addCruisesToListing(wildExpocode, username);
+		DashboardCruiseList cruiseList = dataStore.getUserFileHandler()
+				.addCruisesToListing(wildExpocode, username);
+		Logger.getLogger("CruiseListService").info("added cruises " + wildExpocode + " for " + username);
+		return cruiseList;
 	}
 
 	@Override
-	public DashboardCruiseList removeCruisesFromList(String username,
-			String passhash, TreeSet<String> expocodeSet)
-			throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
+	public DashboardCruiseList removeCruisesFromList(String pageUsername,
+			TreeSet<String> expocodeSet) throws IllegalArgumentException {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			throw new IllegalArgumentException("Invalid user request");
 		// Remove the cruises from the user's list and return the updated list
-		return dataStore.getUserFileHandler()
-						.removeCruisesFromListing(expocodeSet, username);
+		DashboardCruiseList cruiseList = dataStore.getUserFileHandler()
+				.removeCruisesFromListing(expocodeSet, username);
+		Logger.getLogger("CruiseListService").info("removed cruises " + expocodeSet.toString() + " for " + username);
+		return cruiseList;
 	}
 
 	@Override
-	public HashSet<DashboardCruise> getUpdatedCruises(String username,
-			String passhash, TreeSet<String> expocodeSet)
+	public DashboardCruiseList getUpdatedCruises(String pageUsername, TreeSet<String> expocodeSet)
 			throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			throw new IllegalArgumentException("Invalid user request");
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		// Create the set of updated cruise information to return
-		HashSet<DashboardCruise> cruiseSet = 
-				new HashSet<DashboardCruise>(expocodeSet.size());
+		DashboardCruiseList cruiseList = new DashboardCruiseList();
+		cruiseList.setUsername(username);
 		for ( String cruiseExpocode : expocodeSet ) {
-			cruiseSet.add(cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
+			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
-		return cruiseSet;
+		Logger.getLogger("CruiseListService").info("returned updated cruise information for " + username);
+		return cruiseList;
 	}
 
 	@Override
-	public HashSet<DashboardCruise> deleteAddlDoc(String username,
-			String passhash, String deleteFilename, String expocode,
-			TreeSet<String> allExpocodes) throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
+	public DashboardCruiseList deleteAddlDoc(String pageUsername, String deleteFilename, 
+			String expocode, TreeSet<String> allExpocodes) throws IllegalArgumentException {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			throw new IllegalArgumentException("Invalid user request");
 		// Get the current metadata documents for the cruise
 		DashboardCruise cruise = dataStore.getCruiseFileHandler()
 										  .getCruiseFromInfoFile(expocode);
@@ -175,6 +207,9 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Delete this OME metadata or additional documents file on the server
 		mdataHandler.removeMetadata(username, expocode, deleteFilename);
 
+		Logger.getLogger("CruiseListService").info("deleted metadata " + deleteFilename + 
+				" from " + expocode + " for " + username);
+
 		// Save the updated cruise
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		cruiseHandler.saveCruiseInfoToFile(cruise, "Removed metadata document " + 
@@ -197,37 +232,46 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 				dataStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
 				// Update the dashboard status for the 'U' QC flag
 				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+				if ( cruise.isEditable() == null ) {
+					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+				}
 				dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruise, comment);
+				Logger.getLogger("CruiseListService").info("updated QC status for " + expocode);
 			} catch (Exception ex) {
-				// Should not fail.  If does, ignore the failure.
-				;
+				// Should not fail.  If does, record but otherwise ignore the failure.
+				Logger.getLogger("CruiseListService").error("failed to update QC status for " + 
+						expocode + " after deleting metadata " + deleteFilename + 
+						" from " + expocode + " for " + username + ": " + ex.getMessage());
 			}
 		}
 
 		// Create the set of updated cruise information to return
-		HashSet<DashboardCruise> cruiseSet = 
-				new HashSet<DashboardCruise>(allExpocodes.size());
+		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		for ( String cruiseExpocode : allExpocodes ) {
-			cruiseSet.add(cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
+			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
-		return cruiseSet;
+		Logger.getLogger("CruiseListService").info("returned updated cruise information for " + username);
+		return cruiseList;
 	}
 
 	@Override
-	public SCMessageList getDataMessages(String username, String passhash,
-			String expocode) throws IllegalArgumentException {
-		// Validate and get the dashboard data store
-		DashboardDataStore dataStore = validateUser(username, passhash);
+	public SCMessageList getDataMessages(String pageUsername, String expocode) 
+			throws IllegalArgumentException {
+		// Get the dashboard data store and current username
+		if ( ! validateRequest() ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Check that the username matches that which was displayed on the page
+		if ( ! username.equals(pageUsername) )
+			throw new IllegalArgumentException("Invalid user request");
 		// Get the list of saved sanity checker Message objects for this cruise
 		SCMessageList scMsgList;
 		try {
-			scMsgList = dataStore.getCheckerMsgHandler()
-								 .getCruiseMessages(expocode);
+			scMsgList = dataStore.getCheckerMsgHandler().getCruiseMessages(expocode);
 		} catch (FileNotFoundException ex) {
-			throw new IllegalArgumentException("The sanity checker " +
-					"has never been run on cruise " + expocode);
+			throw new IllegalArgumentException("The sanity checker has never been run on cruise " + expocode);
 		}
 		scMsgList.setUsername(username);
+		Logger.getLogger("CruiseListService").info("returned sanity checker messages for " + expocode + " for " + username);
 		return scMsgList;
 	}
 

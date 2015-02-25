@@ -20,7 +20,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -38,7 +37,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class CruiseUploadPage extends Composite {
+public class CruiseUploadPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Upload Data Files";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -146,8 +145,6 @@ public class CruiseUploadPage extends Composite {
 	@UiField Button logoutButton;
 	@UiField FormPanel uploadForm;
 	@UiField HTML cruiseUpload;
-	@UiField Hidden usernameToken;
-	@UiField Hidden passhashToken;
 	@UiField Hidden timestampToken;
 	@UiField Hidden actionToken;
 	@UiField Hidden encodingToken;
@@ -166,7 +163,6 @@ public class CruiseUploadPage extends Composite {
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
-	private String username;
 	private Element uploadElement;
 
 	// Singleton instance of this page
@@ -181,7 +177,7 @@ public class CruiseUploadPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		username = "";
+		setUsername(null);
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -237,12 +233,11 @@ public class CruiseUploadPage extends Composite {
 	 * The upload filename cannot be cleared. 
 	 * Adds this page to the page history.
 	 */
-	static void showPage() {
+	static void showPage(String username) {
 		if ( singleton == null )
 			singleton = new CruiseUploadPage();
-		singleton.username = DashboardLoginPage.getUsername();
-		singleton.userInfoLabel.setText(WELCOME_INTRO + 
-				singleton.username);
+		singleton.setUsername(username);
+		singleton.userInfoLabel.setText(WELCOME_INTRO + singleton.getUsername());
 		singleton.clearTokens();
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
 		singleton.encodingListBox.setSelectedIndex(2);
@@ -253,22 +248,15 @@ public class CruiseUploadPage extends Composite {
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory 
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never show before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
+			CruiseListPage.showPage();
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )
-				History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
 		}
 	}
 
@@ -288,8 +276,6 @@ public class CruiseUploadPage extends Composite {
 		else
 			format = DashboardUtils.CRUISE_FORMAT_TAB;
 		
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		timestampToken.setValue(localTimestamp);
 		actionToken.setValue(cruiseAction);
 		encodingToken.setValue(encoding);
@@ -300,8 +286,6 @@ public class CruiseUploadPage extends Composite {
 	 * Clears the values of the Hidden tokens on the page.
 	 */
 	private void clearTokens() {
-		usernameToken.setValue("");
-		passhashToken.setValue("");
 		timestampToken.setValue("");
 		actionToken.setValue("");
 		encodingToken.setValue("");
@@ -310,7 +294,7 @@ public class CruiseUploadPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
+		DashboardLogoutPage.showPage(getUsername());
 		// Make sure the normal cursor is shown
 		SocatUploadDashboard.showAutoCursor();
 	}
@@ -368,7 +352,7 @@ public class CruiseUploadPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the cruise list page after updating the cruise list
-		CruiseListPage.showPage(false);
+		CruiseListPage.showPage();
 		// Make sure the normal cursor is shown
 		SocatUploadDashboard.showAutoCursor();
 	}
@@ -475,7 +459,7 @@ public class CruiseUploadPage extends Composite {
 				errMsgs.add(failMsg + FILE_DOES_NOT_EXIST_FAIL_MSG);
 			}
 			else if ( header.startsWith(JAVASCRIPT_START) ) {
-				// ignore the added javascript from the socat firewall
+				// ignore the added javascript from the firewall
 				do {
 					k++;
 					if ( k >= splitMsgs.length )
@@ -506,7 +490,7 @@ public class CruiseUploadPage extends Composite {
 			for ( String expo : expocodes )
 				CruiseListPage.addSelectedCruise(expo);
 			CruiseListPage.resortTable();
-			DataColumnSpecsPage.showPage(expocodes);
+			DataColumnSpecsPage.showPage(getUsername(), expocodes);
 		}
 	}
 

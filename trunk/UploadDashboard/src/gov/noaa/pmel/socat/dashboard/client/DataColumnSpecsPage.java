@@ -30,7 +30,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -44,7 +43,7 @@ import com.google.gwt.view.client.Range;
  * 
  * @author Karl Smith
  */
-public class DataColumnSpecsPage extends Composite {
+public class DataColumnSpecsPage extends CompositeWithUsername {
 
 	private static final int DATA_COLUMN_WIDTH = 16;
 
@@ -161,8 +160,6 @@ public class DataColumnSpecsPage extends Composite {
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
-	// Username associated with this page
-	private String username;
 	// Popup to confirm continue with default zero seconds
 	private DashboardAskPopup defaultSecondsPopup;
 	// Cruise associated with and updated by this page
@@ -192,7 +189,7 @@ public class DataColumnSpecsPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		username = "";
+		setUsername(null);
 		defaultSecondsPopup = null;
 		notCheckedPopup = null;
 		cruiseNeverChecked = false;
@@ -219,9 +216,8 @@ public class DataColumnSpecsPage extends Composite {
 				SocatUploadDashboard.showWaitCursor();
 				// Get the data for the cruise from the server
 				final Range range = display.getVisibleRange();
-				service.getCruiseData(DashboardLoginPage.getUsername(), 
-						DashboardLoginPage.getPasshash(), 
-						cruise.getExpocode(), range.getStart(), range.getLength(), 
+				service.getCruiseData(getUsername(), cruise.getExpocode(), 
+						range.getStart(), range.getLength(), 
 						new AsyncCallback<ArrayList<ArrayList<String>>>() {
 					@Override
 					public void onSuccess(ArrayList<ArrayList<String>> newData) {
@@ -246,17 +242,19 @@ public class DataColumnSpecsPage extends Composite {
 	 * with the latest cruise data column specifications from the server.
 	 * Adds this page to the page history.
 	 * 
+	 * @param username
+	 * 		username for this page
 	 * @param expocode
 	 * 		show the specifications for this cruise
 	 */
-	static void showPage(ArrayList<String> expocodes) {
+	static void showPage(String username, ArrayList<String> expocodes) {
 		if ( singleton == null )
 			singleton = new DataColumnSpecsPage();
+		singleton.setUsername(username);
 		singleton.expocodes.clear();
 		singleton.expocodes.addAll(expocodes);
 		SocatUploadDashboard.showWaitCursor();
-		service.getCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
-								DashboardLoginPage.getPasshash(), expocodes.get(0), 
+		service.getCruiseDataColumnSpecs(singleton.getUsername(), expocodes.get(0), 
 								new AsyncCallback<DashboardCruiseWithData>() {
 			@Override
 			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
@@ -283,22 +281,15 @@ public class DataColumnSpecsPage extends Composite {
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory 
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never show before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
+			CruiseListPage.showPage();
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )
-				History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 		}
 	}
 
@@ -311,8 +302,7 @@ public class DataColumnSpecsPage extends Composite {
 	 * 		initial cruise data for display
 	 */
 	private void updateCruiseColumnSpecs(DashboardCruiseWithData cruiseSpecs) {
-		username = DashboardLoginPage.getUsername();
-		userInfoLabel.setText(WELCOME_INTRO + username);
+		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		String status = cruiseSpecs.getDataCheckStatus();
 		if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
@@ -416,7 +406,7 @@ public class DataColumnSpecsPage extends Composite {
 		}
 		else {
 			// No changes; just log out
-			DashboardLogoutPage.showPage();
+			DashboardLogoutPage.showPage(getUsername());
 		}
 	}
 
@@ -448,25 +438,24 @@ public class DataColumnSpecsPage extends Composite {
 			// No changes since last update
 			// If only one cruise, done
 			if ( expocodes.size() < 2 ) {
-				CruiseListPage.showPage(false);
+				CruiseListPage.showPage();
 				return;
 			}
 			// Put up the wait cursor and send the rest of the cruises through the sanity checker
 			SocatUploadDashboard.showWaitCursor();
 			expocodes.remove(0);
-			service.updateCruiseDataColumns(DashboardLoginPage.getUsername(), 
-					DashboardLoginPage.getPasshash(), expocodes, new AsyncCallback<Void>() {
+			service.updateCruiseDataColumns(getUsername(), expocodes, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					// Go to the list of cruises without comment; return to the normal cursor
-					CruiseListPage.showPage(false);
+					CruiseListPage.showPage();
 					SocatUploadDashboard.showAutoCursor();
 					return;
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					// Go to the list of cruises without comment; return to the normal cursor
-					CruiseListPage.showPage(false);
+					CruiseListPage.showPage();
 					SocatUploadDashboard.showAutoCursor();
 					return;
 				}
@@ -485,12 +474,12 @@ public class DataColumnSpecsPage extends Composite {
 				if ( result ) {
 					if ( wasLoggingOut ) {
 						wasLoggingOut = false;
-						DashboardLogoutPage.showPage();
+						DashboardLogoutPage.showPage(getUsername());
 					}
 					else {
 						// Return to the latest cruise listing page, which may  
 						// have been updated from previous actions on this page.
-						CruiseListPage.showPage(false);
+						CruiseListPage.showPage();
 					}
 				}
 				else {
@@ -508,7 +497,7 @@ public class DataColumnSpecsPage extends Composite {
 
 	@UiHandler("messagesButton") 
 	void showMessagesOnClick(ClickEvent event) {
-		DataMessagesPage.showPage(cruise.getExpocode());
+		DataMessagesPage.showPage(getUsername(), cruise.getExpocode());
 	}
 
 	@UiHandler("submitButton")
@@ -725,9 +714,8 @@ public class DataColumnSpecsPage extends Composite {
 		// Submit the updated data column types to the server.
 		// This update invokes the SanityChecker on the data and
 		// the results are then reported back to this page.
-		service.updateCruiseDataColumnSpecs(DashboardLoginPage.getUsername(), 
-								DashboardLoginPage.getPasshash(), cruise, 
-								new AsyncCallback<DashboardCruiseWithData>() {
+		service.updateCruiseDataColumnSpecs(getUsername(), cruise, 
+				new AsyncCallback<DashboardCruiseWithData>() {
 			@Override
 			public void onSuccess(DashboardCruiseWithData specs) {
 				if ( specs == null ) {

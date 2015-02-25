@@ -738,9 +738,6 @@ public class DashboardCruiseTest {
 		cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
-		cruise.setQcStatus(SocatQCEvent.QC_STATUS_UNACCEPTABLE);
-		assertNotNull( cruise.isEditable() );
-		assertTrue( cruise.isEditable() );
 		cruise.setQcStatus(SocatQCEvent.QC_STATUS_PREVIEW);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
@@ -761,6 +758,9 @@ public class DashboardCruiseTest {
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 		cruise.setQcStatus(SocatQCEvent.QC_STATUS_ACCEPTED_E);
+		assertNotNull( cruise.isEditable() );
+		assertFalse( cruise.isEditable() );
+		cruise.setQcStatus(SocatQCEvent.QC_STATUS_UNACCEPTABLE);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 		cruise.setQcStatus(SocatQCEvent.QC_STATUS_CONFLICT);

@@ -17,7 +17,6 @@ public class DashboardUserInfo {
 	private static final String ADMIN_NAME_TAG = "Admin";
 
 	private String username;
-	private String authHash;
 	// List of group numbers this user belongs to
 	private HashSet<Integer> memberNums;
 	// List of group numbers this user manages
@@ -31,30 +30,17 @@ public class DashboardUserInfo {
 	 * 
 	 * @param username
 	 * 		username to use
-	 * @param authHash
-	 * 		authorization hash for this user
 	 * @throws IllegalArgumentException
-	 * 		if username or authHash is invalid (null or too short)
+	 * 		if username is invalid (null or too short)
 	 */
-	public DashboardUserInfo(String username, String authHash) 
-											throws IllegalArgumentException {
+	public DashboardUserInfo(String username) 
+			throws IllegalArgumentException {
 		if ( (username == null) || (username.trim().length() < 4) )
 			throw new IllegalArgumentException("User name too short");
-		if ( (authHash == null) || (authHash.trim().length() < 32) )
-			throw new IllegalArgumentException("Authentication hash too short");
 		this.username = username;
-		this.authHash = authHash;
 		memberNums = new HashSet<Integer>();
 		managerNums = new HashSet<Integer>();
 		admin = false;
-	}
-
-	/**
-	 * @return
-	 * 		the authorization hash for this user
-	 */
-	public String getAuthorizationHash() {
-		return authHash;
 	}
 
 	/**
@@ -156,7 +142,6 @@ public class DashboardUserInfo {
 		final int prime = 37;
 		int result = Boolean.valueOf(admin).hashCode();
 		result = result * prime + username.hashCode();
-		result = result * prime + authHash.hashCode();
 		result = result * prime + memberNums.hashCode();
 		result = result * prime + managerNums.hashCode();
 		return result;
@@ -176,8 +161,6 @@ public class DashboardUserInfo {
 		if ( admin != other.admin )
 			return false;
 		if ( ! username.equals(other.username) )
-			return false;
-		if ( ! authHash.equals(other.authHash) )
 			return false;
 		if ( ! managerNums.equals(other.managerNums) )
 			return false;

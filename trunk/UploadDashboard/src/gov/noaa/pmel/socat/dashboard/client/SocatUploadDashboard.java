@@ -7,7 +7,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.UIObject;
@@ -21,8 +20,6 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	 * Enumerated type to specify pages for browser history.
 	 */
 	public enum PagesEnum {
-		/** History tag for DashboardLoginPage */
-		LOGIN,
 		/** History tag for CruiseListPage */
 		SHOW_DATASETS,
 		/** History tag for CruiseUploadPage */
@@ -58,7 +55,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	private static SocatUploadDashboard singleton = null;
 
 	// Keep a record of the currently displayed page
-	private Composite currentPage;
+	private CompositeWithUsername currentPage;
 	// PopupPanel for displaying messages 
 	private DashboardInfoPopup msgPopup;
 
@@ -141,7 +138,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	 * @param newPage
 	 * 		new page to be shown; if null, not page is shown
 	 */
-	public static void updateCurrentPage(Composite newPage) {
+	public static void updateCurrentPage(CompositeWithUsername newPage) {
 		if ( singleton == null )
 			singleton = new SocatUploadDashboard();
 		if ( singleton.currentPage != null )
@@ -178,45 +175,41 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		String token = event.getValue();
 		if ( token != null )
 			token = token.trim();
-		if ( (token == null) || token.isEmpty() ) {
-			// Initial history setup; show the login page
-			DashboardLoginPage.showPage(true);
-		}
-		else if ( token.equals(PagesEnum.LOGIN.name()) ) {
-			// Login page from history
-			DashboardLoginPage.showPage(false);
+		if ( (token == null) || token.isEmpty() || (currentPage == null) ) {
+			// Initial history setup; show the cruise list page
+			CruiseListPage.showPage();
 		}
 		else if ( token.equals(PagesEnum.SHOW_DATASETS.name()) ) {
 			// Cruise list page from history
-			CruiseListPage.redisplayPage(false);
+			CruiseListPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.UPLOAD_DATASETS.name()) ) {
 			// Cruise upload page from history
-			CruiseUploadPage.redisplayPage(false);
+			CruiseUploadPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.IDENTIFY_COLUMNS.name()) ) {
 			// Data column specs page from history
-			DataColumnSpecsPage.redisplayPage(false);
+			DataColumnSpecsPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.EDIT_METADATA.name()) ) {
 			// OME metadata manager page from history
-			OmeManagerPage.redisplayPage(false);
+			OmeManagerPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.MANAGE_DOCUMENTS.name()) ) {
-			// Additionl data manager page from history
-			AddlDocsManagerPage.redisplayPage(false);
+			// Additional data manager page from history
+			AddlDocsManagerPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.SUBMIT_FOR_QC.name()) ) {
 			// Add to SOCAT page from history
-			AddToSocatPage.redisplayPage(false);
+			AddToSocatPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
 			// Logout page from history
-			DashboardLogoutPage.redisplayPage(false);
+			DashboardLogoutPage.redisplayPage(currentPage.getUsername());
 		}
 		else {
-			// Unknown page from the history; instead show the login page 
-			DashboardLoginPage.showPage(true);
+			// Unknown page from the history; instead show the  cruise list page 
+			CruiseListPage.showPage();
 		}
 	}
 

@@ -17,7 +17,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -26,7 +25,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class DashboardLogoutPage extends Composite {
+public class DashboardLogoutPage extends CompositeWithUsername {
 
 	private static final String GOODBYE_TITLE = 
 			"Thank you for contributing data to SOCAT.";
@@ -68,24 +67,21 @@ public class DashboardLogoutPage extends Composite {
 	}
 
 	/**
-	 * Shows the logout page in the RootLayoutPanel 
-	 * and logs out the user.  
+	 * Shows the logout page in the RootLayoutPanel and logs out the user.  
 	 * Adds this page to the page history.
 	 */
-	static void showPage() {
+	static void showPage(String username) {
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
+		singleton.setUsername(username);
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.LOGOUT.name(), false);
 		SocatUploadDashboard.showWaitCursor();
-		service.logoutUser(DashboardLoginPage.getUsername(),
-						   DashboardLoginPage.getPasshash(),
-						   new AsyncCallback<Boolean>() {
+		service.logoutUser(username, new AsyncCallback<Boolean>() {
 			@Override
-			public void onSuccess(Boolean okay) {
-				if ( okay ) {
+			public void onSuccess(Boolean success) {
+				if ( success ) {
 					Cookies.removeCookie("JSESSIONID");
-					DashboardLoginPage.clearAuthentication();
 				}
 				else {
 					SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG);
@@ -103,22 +99,18 @@ public class DashboardLogoutPage extends Composite {
 	/**
 	 * Shows the logout page in the RootLayoutPanel.
 	 * Does not attempt to logout the user.
-	 * 
-	 * @param addToHistory 
-	 * 		if true, adds this page to the page history 
 	 */
-	static void redisplayPage(boolean addToHistory) {
+	static void redisplayPage(String username) {
 		// Allow this succeed even if never called before
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
+		singleton.setUsername(username);
 		SocatUploadDashboard.updateCurrentPage(singleton);
-		if ( addToHistory )
-			History.newItem(PagesEnum.LOGOUT.name(), false);
 	}
 
 	@UiHandler("reloginButton")
 	void loginOnClick(ClickEvent event) {
-		DashboardLoginPage.showPage(true);
+		CruiseListPage.showPage();
 	}
 
 }

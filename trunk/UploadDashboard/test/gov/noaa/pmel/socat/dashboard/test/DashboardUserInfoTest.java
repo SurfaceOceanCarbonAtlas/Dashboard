@@ -14,29 +14,19 @@ import org.junit.Test;
 public class DashboardUserInfoTest {
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.DashboardUserInfo#DashboardUserInfo(java.lang.String, java.lang.String)}
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.DashboardUserInfo#getAuthorizationHash()}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.DashboardUserInfo#DashboardUserInfo(java.lang.String)}
 	 */
 	@Test
 	public void testDashboardUserInfoGetAuthorizationHash() {
-		String username = "socatuser";
-		String authHash = "0123456789ABCDEF0123456789ABCDEF";
+		String goodUsername = "socatuser";
+		String badUsername = "me";
 
-		DashboardUserInfo userInfo = new DashboardUserInfo(username, authHash);
-		assertEquals(authHash, userInfo.getAuthorizationHash());
+		DashboardUserInfo userInfo = new DashboardUserInfo(goodUsername);
+		assertNotNull(userInfo);
 
 		boolean errMissed = false;
 		try {
-			userInfo = new DashboardUserInfo("me", authHash);
-			errMissed = true;
-		} catch ( IllegalArgumentException ex ) {
-			// Expected result
-			;
-		}
-		assertFalse(errMissed);
-
-		try {
-			userInfo = new DashboardUserInfo(username, "0123456789ABCDEF");
+			userInfo = new DashboardUserInfo(badUsername);
 			errMissed = true;
 		} catch ( IllegalArgumentException ex ) {
 			// Expected result
@@ -53,31 +43,30 @@ public class DashboardUserInfoTest {
 	public void testAddUserRolesManagesOver() {
 		String firstuser = "firstuser";
 		String seconduser = "seconduser";
-		String authHash = "0123456789ABCDEF0123456789ABCDEF";
 
-		DashboardUserInfo firstInfo = new DashboardUserInfo(firstuser, authHash);
+		DashboardUserInfo firstInfo = new DashboardUserInfo(firstuser);
 		assertTrue(firstInfo.managesOver(firstInfo));
 		firstInfo.addUserRoles("MemberOf1,MemberOf2");
-		DashboardUserInfo secondInfo = new DashboardUserInfo(seconduser, authHash);
+		DashboardUserInfo secondInfo = new DashboardUserInfo(seconduser);
 		assertFalse(secondInfo.managesOver(firstInfo));
 		secondInfo.addUserRoles("MemberOf1 ,,\t;; MemberOf2");
 		assertFalse(secondInfo.managesOver(firstInfo));
 		secondInfo.addUserRoles("ManagerOf1");
 		assertTrue(secondInfo.managesOver(firstInfo));
 
-		secondInfo = new DashboardUserInfo(seconduser, authHash);
+		secondInfo = new DashboardUserInfo(seconduser);
 		assertFalse(secondInfo.managesOver(firstInfo));
 		secondInfo.addUserRoles("ManagerOf1");
 		assertTrue(secondInfo.managesOver(firstInfo));
 
-		firstInfo = new DashboardUserInfo(firstuser, authHash);
+		firstInfo = new DashboardUserInfo(firstuser);
 		assertFalse(firstInfo.managesOver(secondInfo));
 		assertFalse(secondInfo.managesOver(firstInfo));
 		firstInfo.addUserRoles("ManagerOf1");
 		assertTrue(firstInfo.managesOver(secondInfo));
 		assertTrue(secondInfo.managesOver(firstInfo));
 
-		secondInfo = new DashboardUserInfo(seconduser, authHash);
+		secondInfo = new DashboardUserInfo(seconduser);
 		assertFalse(secondInfo.managesOver(firstInfo));
 		secondInfo.addUserRoles("Admin");
 		assertTrue(secondInfo.managesOver(firstInfo));
@@ -118,15 +107,14 @@ public class DashboardUserInfoTest {
 	@Test
 	public void testHashCodeEqualsObject() {
 		String username = "socatuser";
-		String authHash = "0123456789ABCDEF0123456789ABCDEF";
 		String userRole = "MemberOf1";
 		String managerRole = "ManagerOf1";
 		String adminRole = "Admin";
 
-		DashboardUserInfo userInfo = new DashboardUserInfo(username, authHash);
+		DashboardUserInfo userInfo = new DashboardUserInfo(username);
 		assertFalse( userInfo.equals(null) );
 		assertFalse( userInfo.equals(username) );
-		DashboardUserInfo otherInfo = new DashboardUserInfo(username, authHash);
+		DashboardUserInfo otherInfo = new DashboardUserInfo(username);
 		assertEquals(userInfo.hashCode(), otherInfo.hashCode());
 		assertEquals(userInfo, otherInfo);
 
@@ -155,10 +143,10 @@ public class DashboardUserInfoTest {
 		assertEquals(userInfo.hashCode(), otherInfo.hashCode());
 		assertEquals(userInfo, otherInfo);
 
-		userInfo = new DashboardUserInfo(username, authHash);
+		userInfo = new DashboardUserInfo(username);
 		userInfo.addUserRoles(userRole);
 		userInfo.addUserRoles(managerRole);
-		otherInfo = new DashboardUserInfo(username, authHash);
+		otherInfo = new DashboardUserInfo(username);
 		otherInfo.addUserRoles(managerRole);
 		assertEquals(userInfo.hashCode(), otherInfo.hashCode());
 		assertEquals(userInfo, otherInfo);

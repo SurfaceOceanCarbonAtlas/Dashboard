@@ -68,7 +68,12 @@ public class MetadataUploadService extends HttpServlet {
 
 		// Get the contents from the post request
 		String username = null;
-		String passhash = null;
+		try {
+			username = request.getUserPrincipal().getName().trim();
+		} catch (Exception ex) {
+			; // leave username null for error message later
+		}
+
 		String expocodes = null;
 		String uploadTimestamp = null;
 		String omeIndicator = null;
@@ -77,15 +82,7 @@ public class MetadataUploadService extends HttpServlet {
 			// Go through each item in the request
 			for ( FileItem item : metadataUpload.parseRequest(request) ) {
 				String itemName = item.getFieldName();
-				if ( "username".equals(itemName) ) {
-					username = item.getString();
-					item.delete();
-				}
-				else if ( "passhash".equals(itemName) ) {
-					passhash = item.getString();
-					item.delete();
-				}
-				else if ( "expocodes".equals(itemName) ) {
+				if ( "expocodes".equals(itemName) ) {
 					expocodes = item.getString();
 					item.delete();
 				}
@@ -113,11 +110,10 @@ public class MetadataUploadService extends HttpServlet {
 
 		// Verify page contents seem okay
 		DashboardDataStore dataStore = DashboardDataStore.get();
-		if ( (username == null) || (passhash == null) || 
-			 (expocodes == null) || (uploadTimestamp == null) ||
+		if ( (username == null) || (expocodes == null) || (uploadTimestamp == null) ||
 			 (omeIndicator == null) || (metadataItem == null) || 
 			 ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) || 
-			 ! dataStore.validateUser(username, passhash) ) {
+			 ! dataStore.validateUser(username) ) {
 			metadataItem.delete();
 			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
@@ -125,8 +121,7 @@ public class MetadataUploadService extends HttpServlet {
 		// Extract the cruise expocodes from the expocodes string
 		TreeSet<String> cruiseExpocodes = new TreeSet<String>(); 
 		try {
-			cruiseExpocodes.addAll(
-					DashboardUtils.decodeStringArrayList(expocodes));
+			cruiseExpocodes.addAll(DashboardUtils.decodeStringArrayList(expocodes));
 			if ( cruiseExpocodes.size() < 1 )
 				throw new IllegalArgumentException();
 		} catch ( IllegalArgumentException ex ) {
@@ -175,10 +170,8 @@ public class MetadataUploadService extends HttpServlet {
 						omedata = new DashboardOmeMetadata(metadata);
 					} catch ( IllegalArgumentException ex ) {
 						// Problems with the file - delete it
-						metadataHandler.removeMetadata(username, expo, 
-														metadata.getFilename());
-						throw new IllegalArgumentException(
-								"Invalid OME metadata file:\n   " + ex.getMessage());
+						metadataHandler.removeMetadata(username, expo, metadata.getFilename());
+						throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
 					}
 					cruise = cruiseHandler.addAddlDocToCruise(expo, omedata);
 				}

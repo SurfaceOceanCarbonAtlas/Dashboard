@@ -64,9 +64,14 @@ public class CruiseUploadService extends HttpServlet {
 			return;
 		}
 
-		// Get the contents from the post request
 		String username = null;
-		String passhash = null;
+		try {
+			username = request.getUserPrincipal().getName().trim();
+		} catch (Exception ex) {
+			; // leave username null for error message later
+		}
+
+		// Get the contents from the post request
 		String timestamp = null;
 		String dataFormat = null;
 		String encoding = null;
@@ -76,15 +81,7 @@ public class CruiseUploadService extends HttpServlet {
 			// Go through each item in the request
 			for ( FileItem item : cruiseUpload.parseRequest(request) ) {
 				String itemName = item.getFieldName();
-				if ( "username".equals(itemName) ) {
-					username = item.getString();
-					item.delete();
-				}
-				else if ( "passhash".equals(itemName) ) {
-					passhash = item.getString();
-					item.delete();
-				}
-				else if ( "timestamp".equals(itemName) ) {
+				if ( "timestamp".equals(itemName) ) {
 					timestamp = item.getString();
 					item.delete();
 				}
@@ -120,9 +117,9 @@ public class CruiseUploadService extends HttpServlet {
 			return;
 		}
 		DashboardDataStore dataStore = DashboardDataStore.get();
-		if ( (username == null) || (passhash == null) || (dataFormat == null) || 
-			 (encoding == null) || (action == null) || (timestamp == null) || 
-			 ( ! dataStore.validateUser(username, passhash) ) ||
+		if ( (username == null) || (dataFormat == null) || (encoding == null) || 
+			 (action == null)   || (timestamp == null)  || 
+			 ( ! dataStore.validateUser(username) ) ||
 			 ! ( action.equals(DashboardUtils.REQUEST_PREVIEW_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_NEW_CRUISE_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG) ) ) {
@@ -295,8 +292,7 @@ public class CruiseUploadService extends HttpServlet {
 		try {
 			dataStore.getUserFileHandler().addCruisesToListing(successes, username);
 		} catch (IllegalArgumentException ex) {
-			sendErrMsg(response, "Unexpected error updating list of cruises \n" + 
-									ex.getMessage());
+			sendErrMsg(response, "Unexpected error updating list of cruises \n" + ex.getMessage());
 			return;
 		}
 

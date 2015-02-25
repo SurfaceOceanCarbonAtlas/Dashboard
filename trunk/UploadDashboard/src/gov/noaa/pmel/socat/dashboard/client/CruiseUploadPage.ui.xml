@@ -14,8 +14,6 @@
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
 					<g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload" />
-					<g:Hidden name="username" ui:field="usernameToken" />
-					<g:Hidden name="passhash" ui:field="passhashToken" />
 					<g:Hidden name="timestamp" ui:field="timestampToken" /> 
 					<g:Hidden name="cruiseaction" ui:field="actionToken" />
 					<g:Hidden name="cruiseencoding" ui:field="encodingToken" />

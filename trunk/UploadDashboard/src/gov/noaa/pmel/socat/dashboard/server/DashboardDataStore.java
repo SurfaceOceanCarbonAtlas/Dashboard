@@ -68,7 +68,6 @@ public class DashboardDataStore {
 	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
-	public static final String AUTHENTICATION_NAME_TAG_PREFIX = "HashFor_";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -95,11 +94,8 @@ public class DashboardDataStore {
 			BaseConfig.SANITY_CHECK_CONFIG_FILE + "/Path/To/SanityConfig/CSVFile \n" + 
 			BaseConfig.COLUMN_SPEC_SCHEMA_FILE + "=/Path/To/ColumnSpecSchema/XMLFile \n" + 
 			BaseConfig.COLUMN_CONVERSION_FILE + "=/Path/To/ColumnConversion/PropsFile \n" + 
-			AUTHENTICATION_NAME_TAG_PREFIX + "SomeUserName=AVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
-			AUTHENTICATION_NAME_TAG_PREFIX + "SomeManagerName=AnotherVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
-			AUTHENTICATION_NAME_TAG_PREFIX + "SomeAdminName=YetAnotherVeryLongKeyOfHexidecimalValues \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
 			"# ------------------------------ \n" +
 			"The EncryptionKey should be 24 random integer values in [-128,127] \n" +
@@ -407,38 +403,19 @@ public class DashboardDataStore {
 					(entry.getValue() instanceof String)) )
 				continue;
 			String username = (String) entry.getKey();
-			if ( ! username.startsWith(AUTHENTICATION_NAME_TAG_PREFIX) )
+			if ( ! username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
 				continue;
-			username = username.substring(AUTHENTICATION_NAME_TAG_PREFIX.length());
+			username = username.substring(USER_ROLE_NAME_TAG_PREFIX.length());
 			username = DashboardUtils.cleanUsername(username);
-			String hash = (String) entry.getValue();
 			DashboardUserInfo userInfo;
 			try {
-				userInfo = new DashboardUserInfo(username, hash);
+				userInfo = new DashboardUserInfo(username);
 			} catch ( IllegalArgumentException ex ) {
 				throw new IOException(ex.getMessage() + "\n" +
 						"for " + username + " specified in " + 
 						configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
 			}
-			userInfoMap.put(username, userInfo);
-		}
-
-		// Read and assign the authorized user roles 
-		for ( Entry<Object,Object> entry : configProps.entrySet() ) {
-			if ( ! ((entry.getKey() instanceof String) && 
-					(entry.getValue() instanceof String)) )
-				continue;
-			String username = (String) entry.getKey();
-			if ( ! username.startsWith(USER_ROLE_NAME_TAG_PREFIX) )
-				continue;
-			username = username.substring(USER_ROLE_NAME_TAG_PREFIX.length());
-			username = DashboardUtils.cleanUsername(username);
 			String rolesString = (String) entry.getValue();
-			DashboardUserInfo userInfo = userInfoMap.get(username);
-			if ( userInfo == null )
-				throw new IOException("Unknown user " + username + 
-						" assigned roles in " + configFile.getPath() +
-						"\n" + CONFIG_FILE_INFO_MSG);
 			try {
 				userInfo.addUserRoles(rolesString);
 			} catch ( IllegalArgumentException ex ) {
@@ -446,6 +423,7 @@ public class DashboardDataStore {
 						"for " + username + " specified in " + 
 						configFile.getPath() + "\n" + CONFIG_FILE_INFO_MSG);
 			}
+			userInfoMap.put(username, userInfo);
 		}
 
 		itsLogger.info("read configuration file " + configFile.getPath());
@@ -602,28 +580,21 @@ public class DashboardDataStore {
 	}
 
 	/**
-	 * Authenticates a user from the given username and password hashes.
+	 * Validate a username from the user info map
 	 *  
 	 * @param username
 	 * 		username
-	 * @param passhash
-	 * 		password hash
 	 * @return
 	 * 		true if successful
 	 */
-	public boolean validateUser(String username, String passhash) {
+	public boolean validateUser(String username) {
 		if ( (username == null) || username.isEmpty() )
-			return false;
-		if ( (passhash == null) || passhash.isEmpty() )
 			return false;
 		String name = DashboardUtils.cleanUsername(username);
 		DashboardUserInfo userInfo = userInfoMap.get(name);
 		if ( userInfo == null )
 			return false;
-		String computedHash = spicedHash(name, passhash);
-		if ( (computedHash == null) || computedHash.isEmpty() )
-			return false;
-		return computedHash.equals(userInfo.getAuthorizationHash());
+		return true;
 	}
 
 

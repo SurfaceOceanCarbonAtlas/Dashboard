@@ -29,7 +29,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -39,7 +38,7 @@ import com.google.gwt.view.client.ListDataProvider;
 /**
  * @author Karl Smith
  */
-public class DataMessagesPage extends Composite {
+public class DataMessagesPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Data Errors and Warnings";
 
@@ -80,7 +79,6 @@ public class DataMessagesPage extends Composite {
 	@UiField Button dismissButton;
 	@UiField SimplePager messagesPager;
 	
-	private String username;
 	private ListDataProvider<SCMessage> listProvider;
 
 	// The singleton instance of this page
@@ -96,7 +94,7 @@ public class DataMessagesPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		username = "";
+		singleton.setUsername(null);
 		titleLabel.setText(TITLE_TEXT);
 		buildMessageListTable();
 		dismissButton.setText(DISMISS_BUTTON_TEXT);
@@ -110,16 +108,12 @@ public class DataMessagesPage extends Composite {
 	 * messages for cruise with the provided expocode.
 	 * Adds this page to the page history.
 	 */
-	static void showPage(String cruiseExpocode) {
+	static void showPage(String username, String cruiseExpocode) {
 		SocatUploadDashboard.showWaitCursor();
-		service.getDataMessages(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), cruiseExpocode, 
-				new AsyncCallback<SCMessageList>() {
+		service.getDataMessages(username, cruiseExpocode, new AsyncCallback<SCMessageList>() {
 			@Override
 			public void onSuccess(SCMessageList msgList) {
-				if ( (msgList == null) || 
-					 msgList.getUsername().isEmpty() || 
-					 ! msgList.getUsername().equals(DashboardLoginPage.getUsername()) ) {
+				if ( msgList == null ) {
 					SocatUploadDashboard.showMessage("Unexpected list of data problems returned");
 					SocatUploadDashboard.showAutoCursor();
 					return;
@@ -143,28 +137,21 @@ public class DataMessagesPage extends Composite {
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never shown before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
+			CruiseListPage.showPage();
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )	
-				History.newItem(PagesEnum.SHOW_DATA_MESSAGES.name(), false);
 		}
 	}
 
 	@UiHandler("dismissButton")
 	void dismissOnClick(ClickEvent event) {
-		DataColumnSpecsPage.redisplayPage(true);
+		DataColumnSpecsPage.redisplayPage(getUsername());
 	}
 
 	/**
@@ -176,7 +163,7 @@ public class DataMessagesPage extends Composite {
 	 */
 	private void updateMessages(SCMessageList msgs) {
 		// Assign the username and introduction message
-		username = DashboardLoginPage.getUsername();
+		setUsername(msgs.getUsername());
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + 
 				SafeHtmlUtils.htmlEscape(msgs.getExpocode()) + 
 				INTRO_HTML_EPILOGUE);

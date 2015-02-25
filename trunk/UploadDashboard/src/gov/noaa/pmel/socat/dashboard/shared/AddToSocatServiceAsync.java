@@ -21,8 +21,6 @@ public interface AddToSocatServiceAsync {
 	 * 
 	 * @param username
 	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
 	 * @param cruiseExpocodes
 	 * 		expocodes of cruises to add to SOCAT
 	 * @param archiveStatus
@@ -39,9 +37,8 @@ public interface AddToSocatServiceAsync {
 	 * 		expocodes, or if the addition of a cruise or change in
 	 * 		archive status failed.
 	 */
-	void addCruisesToSocat(String username, String passhash,
-			HashSet<String> cruiseExpocodes, String archiveStatus,
-			String localTimestamp, boolean repeatSend,
+	void addCruisesToSocat(String username, HashSet<String> cruiseExpocodes, 
+			String archiveStatus, String localTimestamp, boolean repeatSend,
 			AsyncCallback<Void> callback);
 
 }
