@@ -140,11 +140,11 @@ public class DashboardDataStore {
 		// The following is just for debugging under Eclipse
 		if ( baseDir == null ) 
 			baseDir = System.getProperty("user.home");
-		Logger itsLogger = Logger.getLogger(SERVER_APP_NAME);
 
 		// Configure the log4j logger
 		PropertyConfigurator.configure(baseDir + File.separator + 
 				LOGGER_CONFIG_RELATIVE_FILENAME);
+		Logger itsLogger = Logger.getLogger(SERVER_APP_NAME);
 
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
