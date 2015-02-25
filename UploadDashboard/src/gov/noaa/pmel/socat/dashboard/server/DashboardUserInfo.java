@@ -83,7 +83,7 @@ public class DashboardUserInfo {
 			else if ( (roles[k]).equals(ADMIN_NAME_TAG) ) {
 				admin = true;
 			}
-			else {
+			else if ( ! (roles[k]).isEmpty() ) {
 				throw new IllegalArgumentException("Unknown role " + roles[k]);
 			}
 		}
