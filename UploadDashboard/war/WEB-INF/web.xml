@@ -50,6 +50,25 @@
 		<url-pattern>/SocatUploadDashboard/AddToSocatService</url-pattern>
 	</servlet-mapping>
 
+	<filter>
+		<filter-name>AuthenticateFilter</filter-name>
+		<filter-class>gov.noaa.pmel.socat.dashboard.server.AuthenticateFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthenticateFilter</filter-name>
+		<url-pattern>/SocatUploadDashboard/*</url-pattern>
+		<url-pattern>/SocatUploadDashboard.html</url-pattern>
+	</filter-mapping>
+
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<realm-name>socatdashboarduser</realm-name>
+		<form-login-config>
+			<form-login-page>/socatlogin.html</form-login-page>
+			<form-error-page>/socatloginerror.html</form-error-page>
+		</form-login-config>
+	</login-config>
+
 	<!-- Default page to serve -->
 	<welcome-file-list>
 		<welcome-file>SocatUploadDashboard.html</welcome-file>

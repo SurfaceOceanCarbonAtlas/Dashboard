@@ -3,7 +3,6 @@
  */
 package gov.noaa.pmel.socat.dashboard.shared;
 
-import java.util.HashSet;
 import java.util.TreeSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,104 +16,66 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface DashboardListServiceAsync {
 
 	/**
-	 * Client side request to log out a user.
+	 * Client side request to get the current user's list of cruises.
 	 * 
-	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
-	 * @return
-	 * 		true if successful
 	 * @param callback
-	 * 		the callback to make with result;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed.
+	 * 		the callback to make with the cruise list.
 	 */
-	void logoutUser(String username, String passhash,
-			AsyncCallback<Boolean> callback);
+	void getCruiseList(AsyncCallback<DashboardCruiseList> callback);
 
 	/**
-	 * Client side request to get a user's list of cruises.
+	 * Client side request to log out the current user.
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
-	 * @return
-	 * 		the list of cruises for the user
+	 * 		name of the current user - for validation
 	 * @param callback
-	 * 		the callback to make with the cruise list;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed.
+	 * 		the callback to make with the success status.
 	 */
-	void getCruiseList(String username, String passhash,
-			AsyncCallback<DashboardCruiseList> callback);
+	void logoutUser(String username, AsyncCallback<Boolean> callback);
 
 	/**
 	 * Client side request to deletes all files for the indicated cruises.
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
+	 * 		name of the current user - for validation
 	 * @param expocodeSet
 	 * 		cruises to be deleted
 	 * @param deleteMetadata
 	 * 		also delete metadata and additional documents?
 	 * @return
-	 * 		the updated list of cruises for the user
+	 * 		the updated list of cruises for the current user
 	 * @param callback
-	 * 		the callback to make with the cruise list;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed, or 
-	 * 		if problems deleting a cruise
+	 * 		the callback to make with the updated cruise list for the current user
 	 */
-	void deleteCruises(String username, String passhash, 
-			TreeSet<String> expocodeSet, Boolean deleteMetadata,
-			AsyncCallback<DashboardCruiseList> callback);
+	void deleteCruises(String username, TreeSet<String> expocodeSet, 
+			Boolean deleteMetadata, AsyncCallback<DashboardCruiseList> callback);
 
 	/**
-	 * Client side request to add the indicated cruises to the user's 
-	 * list of cruises.
+	 * Client side request to add the indicated cruises 
+	 * to the current user's list of cruises.
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
+	 * 		name of the current user - for validation
 	 * @param wildExpocode
 	 * 		expocode, possibly with wildcards * and ?, to use
-	 * @return
-	 * 		the updated list of cruises for the user
 	 * @param callback
-	 * 		the callback to make with the cruise list;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed, or 
-	 * 		if the cruise to be added does not exist
+	 * 		the callback to make with the current user's updated cruise list
 	 */
-	void addCruisesToList(String username, String passhash, 
-			String wildExpocode,
+	void addCruisesToList(String username, String wildExpocode,
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
-	 * Client side request to remove the indicated cruises from the user's 
-	 * list of cruises (but does not delete any files for these cruises).
+	 * Client side request to remove the indicated cruises from the current 
+	 * user's list of cruises (but does not delete any files for these cruises).
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
+	 * 		name of the current user - for validation
 	 * @param expocodeSet
 	 * 		cruises to be removed
-	 * @return
-	 * 		the updated list of cruises for the user
 	 * @param callback
-	 * 		the callback to make with the cruise list;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed, or 
-	 * 		if problems removing a cruise
+	 * 		the callback to make with the current user's updated cruise list
 	 */	
-	void removeCruisesFromList(String username, String passhash,
-			TreeSet<String> expocodeSet, 
+	void removeCruisesFromList(String username, TreeSet<String> expocodeSet, 
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
@@ -122,30 +83,22 @@ public interface DashboardListServiceAsync {
 	 * for the indicated cruises.
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
+	 * 		name of the current user - for validation
 	 * @param expocodeSet
 	 * 		set of all cruises to include in the returned
 	 * 		updated cruise information
-	 * @return
-	 * 		updated cruise information for the indicated cruises
-	 * @throws IllegalArgumentException
-	 * 		if authentication failed or 
-	 * 		if a cruise does not exist
+	 * @param callback
+	 * 		the callback to make with the updated cruise information
 	 */
-	void getUpdatedCruises(String username, String passhash,
-			TreeSet<String> expocodeSet,
-			AsyncCallback<HashSet<DashboardCruise>> callback);
+	void getUpdatedCruises(String username, TreeSet<String> expocodeSet,
+			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
 	 * Client side request to remove (delete) an ancillary document 
 	 * for a cruise.
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
+	 * 		name of the current user - for validation
 	 * @param deleteFilename
 	 * 		remove the ancillary document with this name
 	 * @param expocode
@@ -153,27 +106,19 @@ public interface DashboardListServiceAsync {
 	 * @param allExpocodes
 	 * 		set of all cruises to include in the returned 
 	 * 		updated cruise information
-	 * @return
-	 * 		updated cruise information for the indicated cruises 
 	 * @param callback
-	 * 		the callback to make with the cruise list;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication failed or if the ancillary document
-	 * 		does not exist 
+	 * 		the callback to make with the updated cruise information
 	 */
-	void deleteAddlDoc(String username, String passhash,
-			String deleteFilename, String expocode,
-			TreeSet<String> allExpocodes,
-			AsyncCallback<HashSet<DashboardCruise>> callback);
+	void deleteAddlDoc(String username, String deleteFilename, 
+			String expocode, TreeSet<String> allExpocodes,
+			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
 	 * Client side request to send the set of sanity checker 
 	 * data messages for a given cruise.
 	 * 
 	 * @param username
-	 * 		name of the user making the request
-	 * @param passhash
-	 * 		password hash of the user making the request
+	 * 		name of the current user - for validation
 	 * @param expocode
 	 * 		get data messages for this cruise
 	 * @return
@@ -181,13 +126,9 @@ public interface DashboardListServiceAsync {
 	 * 		never null, but may be empty if the SanityChecker 
 	 * 		did not generate any data messages. 
 	 * @param callback
-	 * 		the callback to make with the cruise list;
-	 * 		the onFailure method of the callback will be called
-	 * 		if authentication fails, 
-	 * 		if the cruise expocode is invalid, or
-	 * 		if the SanityChecker has never been run on this cruise.
+	 * 		the callback to make with list of sanity checker data messages
 	 */
-	void getDataMessages(String username, String passhash, String expocode,
+	void getDataMessages(String username, String expocode,
 			AsyncCallback<SCMessageList> callback);
 
 }

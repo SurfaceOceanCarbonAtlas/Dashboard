@@ -21,9 +21,7 @@ public interface DataSpecsService extends RemoteService {
 	 * to assist in identifying cruise data columns.
 	 *  
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param expocode
 	 * 		generate report for this cruise
 	 * @return
@@ -35,7 +33,7 @@ public interface DataSpecsService extends RemoteService {
 	 * 		problems obtaining the data for the cruise
 	 */
 	DashboardCruiseWithData getCruiseDataColumnSpecs(String username, 
-			String passhash, String expocode) throws IllegalArgumentException;
+			String expocode) throws IllegalArgumentException;
 
 	/**
 	 * Reads the saved cruise file and returns the specified
@@ -46,9 +44,7 @@ public interface DataSpecsService extends RemoteService {
 	 * of a given type measured for all samples.)
 	 * 
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param expocode
 	 * 		get data for this cruise
 	 * @param firstRow
@@ -63,8 +59,8 @@ public interface DataSpecsService extends RemoteService {
 	 * 		problems obtaining the specified data for the cruise
 	 */
 	ArrayList<ArrayList<String>> getCruiseData(String username,
-			String passhash, String expocode, int firstRow, int numRows)
-											throws IllegalArgumentException;
+			String expocode, int firstRow, int numRows)
+					throws IllegalArgumentException;
 
 	/**
 	 * Updates the data column specifications for a cruise 
@@ -72,9 +68,7 @@ public interface DataSpecsService extends RemoteService {
 	 * to run using the new data column specifications.
 	 * 
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param newSpecs
 	 * 		cruise data column types to assign.  The expocode
 	 * 		in this object specifies the cruise to update.
@@ -89,8 +83,7 @@ public interface DataSpecsService extends RemoteService {
 	 * 		the cruise
 	 */
 	DashboardCruiseWithData updateCruiseDataColumnSpecs(String username, 
-			String passhash, DashboardCruise newSpecs) 
-					throws IllegalArgumentException;
+			DashboardCruise newSpecs) throws IllegalArgumentException;
 
 	/**
 	 * Updates the data column specifications for the cruises with the 
@@ -101,15 +94,13 @@ public interface DataSpecsService extends RemoteService {
 	 * but otherwise is silently ignored.
 	 * 
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param cruiseExpocodes
 	 * 		process cruises with these expocodes
 	 * @throws IllegalArgumentException
 	 * 		if authentication fails
 	 */
-	void updateCruiseDataColumns(String username, String passhash,
-			ArrayList<String> cruiseExpocodes) throws IllegalArgumentException;
+	void updateCruiseDataColumns(String username, ArrayList<String> cruiseExpocodes) 
+			throws IllegalArgumentException;
 
 }

@@ -18,13 +18,10 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface AddToSocatService extends RemoteService {
 
 	/**
-	 * After authenticating the user using the given credentials,
-	 * adds cruises named in the given listing to the SOCAT database.
+	 * Adds cruises named in the given listing to the SOCAT database.
 	 * 
 	 * @param username
-	 * 		name of user making this request
-	 * @param passhash
-	 * 		encrypted password to use
+	 * 		name of user making this request - for validation
 	 * @param cruiseExpocodes
 	 * 		expocodes of cruises to add to SOCAT
 	 * @param archiveStatus
@@ -34,16 +31,13 @@ public interface AddToSocatService extends RemoteService {
 	 * @param repeatSend
 	 * 		if the request is to send to CDIAC ASAP,
 	 * 		should cruises already sent be resent?
-	 * @return
-	 * 		updated dashboard listing of all cruises for the user
 	 * @throws IllegalArgumentException
 	 * 		if authentication failed, if the dashboard cruise does 
 	 * 		not exist for any of the given expocodes, or if adding 
 	 * 		the cruise data failed
 	 */
-	void addCruisesToSocat(String username, String passhash, 
-			HashSet<String> cruiseExpocodes, String archiveStatus, 
-			String localTimestamp, boolean repeatSend)
-									throws IllegalArgumentException;
+	void addCruisesToSocat(String username, HashSet<String> cruiseExpocodes, 
+			String archiveStatus, String localTimestamp, boolean repeatSend)
+					throws IllegalArgumentException;
 
 }

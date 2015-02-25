@@ -19,9 +19,7 @@ public interface DataSpecsServiceAsync {
 	 * to assist in identifying cruise data columns.
 	 *  
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param expocode
 	 * 		generate report for this cruise
 	 * @param callback
@@ -31,8 +29,8 @@ public interface DataSpecsServiceAsync {
 	 * 		if expocode is invalid, if the cruise does not exist, 
 	 * 		or if there are problems obtaining the data for the cruise
 	 */
-	void getCruiseDataColumnSpecs(String username, String passhash,
-			String expocode, AsyncCallback<DashboardCruiseWithData> callback);
+	void getCruiseDataColumnSpecs(String username, String expocode, 
+			AsyncCallback<DashboardCruiseWithData> callback);
 
 	/**
 	 * Reads the saved cruise file and returns the specified
@@ -43,9 +41,7 @@ public interface DataSpecsServiceAsync {
 	 * of a given type measured for all samples.)
 	 * 
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param expocode
 	 * 		get data for this cruise
 	 * @param firstRow
@@ -59,8 +55,7 @@ public interface DataSpecsServiceAsync {
 	 * 		or if there are problems obtaining the specified data 
 	 * 		for the cruise
 	 */
-	void getCruiseData(String username, String passhash, String expocode,
-			int firstRow, int numRows,
+	void getCruiseData(String username, String expocode, int firstRow, int numRows, 
 			AsyncCallback<ArrayList<ArrayList<String>>> callback);
 
 	/**
@@ -69,9 +64,7 @@ public interface DataSpecsServiceAsync {
 	 * new data column specifications.
 	 * 
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param newSpecs
 	 * 		cruise data column types to assign.  The expocode in this 
 	 * 		object specifies the cruise to update.  Any cruise data in 
@@ -84,8 +77,7 @@ public interface DataSpecsServiceAsync {
 	 * 		if the cruise does not exist, or if there are problems 
 	 * 		obtaining or evaluating the data for the cruise
 	 */
-	void updateCruiseDataColumnSpecs(String username, String passhash,
-			DashboardCruise newSpecs, 
+	void updateCruiseDataColumnSpecs(String username, DashboardCruise newSpecs, 
 			AsyncCallback<DashboardCruiseWithData> callback);
 
 	/**
@@ -97,16 +89,14 @@ public interface DataSpecsServiceAsync {
 	 * but otherwise is silently ignored.
 	 * 
 	 * @param username
-	 * 		authenticate using this username
-	 * @param passhash
-	 * 		authenticate using this password hash
+	 * 		username for validation
 	 * @param cruiseExpocodes
 	 * 		process cruises with these expocodes
 	 * @param callback
 	 * 		callback to make after processing is complete.
 	 * 		The fail method is invoked if authentication fails.
 	 */
-	void updateCruiseDataColumns(String username, String passhash,
+	void updateCruiseDataColumns(String username, 
 			ArrayList<String> cruiseExpocodes, AsyncCallback<Void> callback);
 
 }

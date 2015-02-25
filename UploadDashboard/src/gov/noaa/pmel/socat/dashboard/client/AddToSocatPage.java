@@ -7,6 +7,7 @@ import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
 import gov.noaa.pmel.socat.dashboard.shared.AddToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
@@ -26,7 +27,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class AddToSocatPage extends Composite {
+public class AddToSocatPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Submit Datasets for QC / Manage Archival";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -153,7 +153,6 @@ public class AddToSocatPage extends Composite {
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
-	private String username;
 	private HashSet<String> expocodes;
 	private boolean hasSentCruise;
 	private DashboardInfoPopup socatArchivePopup;
@@ -173,7 +172,7 @@ public class AddToSocatPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		username = "";
+		setUsername(null);
 		expocodes = new HashSet<String>();
 		hasSentCruise = false;
 
@@ -207,7 +206,7 @@ public class AddToSocatPage extends Composite {
 	 * Display this page in the RootLayoutPanel showing the
 	 * given cruises.  Adds this page to the page history.
 	 */
-	static void showPage(HashSet<DashboardCruise> cruises) {
+	static void showPage(DashboardCruiseList cruises) {
 		if ( singleton == null )
 			singleton = new AddToSocatPage();
 		SocatUploadDashboard.updateCurrentPage(singleton);
@@ -217,22 +216,15 @@ public class AddToSocatPage extends Composite {
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never show before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
+			CruiseListPage.showPage();
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )	
-				History.newItem(PagesEnum.SUBMIT_FOR_QC.name(), false);
 		}
 	}
 
@@ -244,10 +236,10 @@ public class AddToSocatPage extends Composite {
 	 * @param cruises
 	 * 		cruises to display
 	 */
-	private void updateCruises(HashSet<DashboardCruise> cruisesSet) {
+	private void updateCruises(DashboardCruiseList cruises) {
 		// Update the username
-		username = DashboardLoginPage.getUsername();
-		userInfoLabel.setText(WELCOME_INTRO + username);
+		setUsername(cruises.getUsername());
+		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		expocodes.clear();
 		hasSentCruise = false;
@@ -255,7 +247,7 @@ public class AddToSocatPage extends Composite {
 		int numOwner = 0;
 		int numCdiac = 0;
 		TreeSet<String> cruiseIntros = new TreeSet<String>();
-		for ( DashboardCruise cruise : cruisesSet ) {
+		for ( DashboardCruise cruise : cruises.values() ) {
 			String expo = cruise.getExpocode();
 			// Add the status of this cruise to the counts 
 			String archiveStatus = cruise.getArchiveStatus();
@@ -342,7 +334,7 @@ public class AddToSocatPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
+		DashboardLogoutPage.showPage(getUsername());
 	}
 
 	@UiHandler({"socatRadio","ownerRadio"})
@@ -400,7 +392,7 @@ public class AddToSocatPage extends Composite {
 	@UiHandler("cancelButton")
 	void cancelOnClick(ClickEvent event) {
 		// Return to the list of cruises which could have been modified by this page
-		CruiseListPage.showPage(false);
+		CruiseListPage.showPage();
 	}
 
 	@UiHandler("submitButton")
@@ -468,14 +460,12 @@ public class AddToSocatPage extends Composite {
 		boolean repeatSend = true;
 		// Add the cruises to SOCAT
 		SocatUploadDashboard.showWaitCursor();
-		service.addCruisesToSocat(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), expocodes, 
-				archiveStatus, localTimestamp, repeatSend,
-				new AsyncCallback<Void>() {
+		service.addCruisesToSocat(getUsername(), expocodes, archiveStatus, 
+				localTimestamp, repeatSend, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Success - go back to the cruise list page
-				CruiseListPage.showPage(false);
+				CruiseListPage.showPage();
 				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
@@ -483,7 +473,7 @@ public class AddToSocatPage extends Composite {
 				// Failure, so show fail message
 				// But still go back to the cruise list page since some may have succeeded
 				SocatUploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
-				CruiseListPage.showPage(false);
+				CruiseListPage.showPage();
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});

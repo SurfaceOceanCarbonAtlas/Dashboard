@@ -14,7 +14,6 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -44,7 +43,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -59,7 +57,7 @@ import com.google.gwt.view.client.ListDataProvider;
  * 
  * @author Karl Smith
  */
-public class CruiseListPage extends Composite {
+public class CruiseListPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT_PROLOGUE = "My SOCAT Version ";
 	private static final String TITLE_TEXT_EPILOGUE = " Datasets";
@@ -109,16 +107,14 @@ public class CruiseListPage extends Composite {
 			"remove the selected data sets from this list of data sets; " +
 			"this will NOT delete the data set from the system";
 
-	// Error messages when the request for the latest cruise list fails
-	private static final String LOGIN_ERROR_MSG = 
-			"Sorry, your login failed";
+	// Error message when the request for the latest cruise list fails
 	private static final String GET_DATASET_LIST_ERROR_MSG = 
 			"Problems obtaining the latest data set listing";
 
 	// Starts of error messages for improper cruise selections
 	private static final String SUBMITTED_DATASETS_SELECTED_ERR_START = 
 			"Only data sets which have not been submitted for QC, " +
-			"or which have been suspended or failed, may be selected ";
+			"or which have been suspended or excluded, may be selected ";
 	private static final String ARCHIVED_DATASETS_SELECTED_ERR_START =
 			"Only data sets which have not been archived may be selected ";
 	private static final String NO_DATASET_SELECTED_ERR_START = 
@@ -249,12 +245,11 @@ public class CruiseListPage extends Composite {
 	@UiField Button removeFromListButton;
 	@UiField DataGrid<DashboardCruise> datasetsGrid;
 
-	private String username;
 	private ListDataProvider<DashboardCruise> listProvider;
 	private DashboardAskPopup askDeletePopup;
 	private DashboardAskPopup askRemovePopup;
-	private HashSet<DashboardCruise> cruiseSet;
-	private HashSet<DashboardCruise> checkSet;
+	private DashboardCruiseList cruiseSet;
+	private DashboardCruiseList checkSet;
 	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	private boolean managerButtonsShown;
@@ -276,10 +271,10 @@ public class CruiseListPage extends Composite {
 
 		buildCruiseListTable();
 
-		username = "";
+		setUsername(null);
 
-		cruiseSet = new HashSet<DashboardCruise>();
-		checkSet = new HashSet<DashboardCruise>();
+		cruiseSet = new DashboardCruiseList();
+		checkSet = new DashboardCruiseList();
 		expocodeSet = new TreeSet<String>();
 
 		titleImage.setResource(SocatUploadDashboard.resources.getSocatCatPng());
@@ -323,52 +318,23 @@ public class CruiseListPage extends Composite {
 	 * Display the cruise list page in the RootLayoutPanel 
 	 * with the latest information from the server.
 	 * Adds this page to the page history.
-	 * 
-	 * @param loggingIn
-	 * 		is this request coming from a login request?  
-	 * 		This is only used to select the error message 
-	 * 		to show in a Window.alert when the request for
-	 * 		the latest cruise information fails.
 	 */
-	static void showPage(boolean loggingIn) {
-		final String errMsg;
-		final boolean clearExpocodes;
-		if ( loggingIn ) {
-			errMsg = LOGIN_ERROR_MSG;
-			clearExpocodes = true;
-		}
-		else {
-			errMsg = GET_DATASET_LIST_ERROR_MSG;
-			clearExpocodes = false;
-		}
+	static void showPage() {
 		SocatUploadDashboard.showWaitCursor();
 		// Request the latest cruise list
-		service.getCruiseList(DashboardLoginPage.getUsername(), 
-								 DashboardLoginPage.getPasshash(),
-								 new AsyncCallback<DashboardCruiseList>() {
+		service.getCruiseList(new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardLoginPage.getUsername()
-										.equals(cruises.getUsername()) ) {
-					if ( singleton == null ) {
-						singleton = new CruiseListPage();
-					}
-					else if ( clearExpocodes ) {
-						singleton.expocodeSet.clear();
-					}
-					SocatUploadDashboard.updateCurrentPage(singleton);
-					singleton.updateCruises(cruises);
-					History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
-				}
-				else {
-					SocatUploadDashboard.showMessage(errMsg + 
-							UNEXPECTED_INVALID_DATESET_LIST_MSG);
-				}
+				if ( singleton == null )
+					singleton = new CruiseListPage();
+				SocatUploadDashboard.updateCurrentPage(singleton);
+				singleton.updateCruises(cruises);
+				History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
 				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(errMsg, ex);
+				SocatUploadDashboard.showFailureMessage(GET_DATASET_LIST_ERROR_MSG, ex);
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});
@@ -376,28 +342,19 @@ public class CruiseListPage extends Composite {
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory 
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never shown before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
-		}
-		else {
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) )
+			CruiseListPage.showPage();
+		else
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )
-				History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
-		}
 	}
 
 	/**
 	 * Add a cruise to the selected list when the page is displayed.
-	 * This should be called just prior to calling showPage(false).  
+	 * This should be called just prior to calling showPage().  
 	 * If no cruise with the given expocode exists in the updated 
 	 * list of cruises, this expocode will be ignored. 
 	 * 
@@ -434,8 +391,8 @@ public class CruiseListPage extends Composite {
 		// Update the title and username
 		titleLabel.setText(TITLE_TEXT_PROLOGUE + 
 				cruises.getSocatVersion() + TITLE_TEXT_EPILOGUE);
-		username = DashboardLoginPage.getUsername();
-		userInfoLabel.setText(WELCOME_INTRO + username);
+		setUsername(cruises.getUsername());
+		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 		if ( cruises.isManager() ) {
 			if ( ! managerButtonsShown ) {
 				// Add manager-specific buttons - currently no manager-specific buttons
@@ -598,7 +555,7 @@ public class CruiseListPage extends Composite {
 	*/
 
 	/**
-	 * Assigns cruiseSet with the set of selected cruises, and 
+	 * Assigns cruiseSet with the selected cruises, and 
 	 * expocodeSet with the expocodes of these cruises. 
 	 *  
 	 * @param onlyEditable
@@ -610,6 +567,7 @@ public class CruiseListPage extends Composite {
 	 */
 	private boolean getSelectedCruises(Boolean onlyEditable) {
 		cruiseSet.clear();
+		cruiseSet.setUsername(getUsername());
 		expocodeSet.clear();
 		for ( DashboardCruise cruise : listProvider.getList() ) {
 			if ( cruise.isSelected() ) {
@@ -622,8 +580,9 @@ public class CruiseListPage extends Composite {
 					if ( onlyEditable && ! editable )
 						return false;
 				}
-				cruiseSet.add(cruise);
-				expocodeSet.add(cruise.getExpocode());
+				String expocode = cruise.getExpocode();
+				cruiseSet.put(expocode, cruise);
+				expocodeSet.add(expocode);
 			}
 		}
 		return true;
@@ -631,7 +590,7 @@ public class CruiseListPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
+		DashboardLogoutPage.showPage(getUsername());
 	}
 
 	@UiHandler("uploadButton")
@@ -639,7 +598,7 @@ public class CruiseListPage extends Composite {
 		// Save the expocodes of the currently selected cruises
 		getSelectedCruises(null);
 		// Go to the cruise upload page
-		CruiseUploadPage.showPage();
+		CruiseUploadPage.showPage(getUsername());
 	}
 
 	@UiHandler("viewDataButton")
@@ -654,7 +613,7 @@ public class CruiseListPage extends Composite {
 					NO_DATASET_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
-		DataColumnSpecsPage.showPage(new ArrayList<String>(expocodeSet));
+		DataColumnSpecsPage.showPage(getUsername(), new ArrayList<String>(expocodeSet));
 	}
 
 	@UiHandler("omeMetadataButton")
@@ -670,7 +629,7 @@ public class CruiseListPage extends Composite {
 					MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
-		OmeManagerPage.showPage(cruiseSet.iterator().next());
+		OmeManagerPage.showPage(cruiseSet);
 	}
 
 	@UiHandler("addlDocsButton")
@@ -704,7 +663,7 @@ public class CruiseListPage extends Composite {
 			return;
 		}
 		checkSet.clear();
-		checkSet.addAll(cruiseSet);
+		checkSet.putAll(cruiseSet);
 		checkCruisesForSocat();
 	}
 
@@ -752,13 +711,11 @@ public class CruiseListPage extends Composite {
 	 */
 	private void continueDeleteCruises(Boolean deleteMetadata) {
 		SocatUploadDashboard.showWaitCursor();
-		service.deleteCruises(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), expocodeSet,
-				deleteMetadata, new AsyncCallback<DashboardCruiseList>() {
+		service.deleteCruises(getUsername(), expocodeSet, deleteMetadata, 
+				new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardLoginPage.getUsername()
-						.equals(cruises.getUsername()) ) {
+				if ( getUsername().equals(cruises.getUsername()) ) {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
@@ -782,13 +739,11 @@ public class CruiseListPage extends Composite {
 			SocatUploadDashboard.showWaitCursor();
 			// Save the currently selected cruises
 			getSelectedCruises(null);
-			service.addCruisesToList(DashboardLoginPage.getUsername(), 
-					DashboardLoginPage.getPasshash(), wildExpocode, 
+			service.addCruisesToList(getUsername(), wildExpocode, 
 					new AsyncCallback<DashboardCruiseList>() {
 				@Override
 				public void onSuccess(DashboardCruiseList cruises) {
-					if ( DashboardLoginPage.getUsername()
-							.equals(cruises.getUsername()) ) {
+					if ( getUsername().equals(cruises.getUsername()) ) {
 						CruiseListPage.this.updateCruises(cruises);
 					}
 					else {
@@ -844,13 +799,11 @@ public class CruiseListPage extends Composite {
 	 */
 	private void continueRemoveCruisesFromList() {
 		SocatUploadDashboard.showWaitCursor();
-		service.removeCruisesFromList(DashboardLoginPage.getUsername(), 
-				DashboardLoginPage.getPasshash(), expocodeSet, 
+		service.removeCruisesFromList(getUsername(), expocodeSet, 
 				new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
-				if ( DashboardLoginPage.getUsername()
-						.equals(cruises.getUsername()) ) {
+				if ( getUsername().equals(cruises.getUsername()) ) {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
@@ -1204,7 +1157,7 @@ public class CruiseListPage extends Composite {
 					// Open the data column specs page for this one cruise
 					ArrayList<String> expocodes = new ArrayList<String>(1);
 					expocodes.add(cruise.getExpocode());
-					DataColumnSpecsPage.showPage(expocodes);
+					DataColumnSpecsPage.showPage(getUsername(), expocodes);
 				}
 			}
 		});
@@ -1238,7 +1191,10 @@ public class CruiseListPage extends Composite {
 				// Save the currently selected cruises
 				getSelectedCruises(null);
 				// Show the OME metadata manager page for this one cruise
-				OmeManagerPage.showPage(cruise);
+				checkSet.clear();
+				checkSet.setUsername(getUsername());
+				checkSet.put(cruise.getExpocode(), cruise);
+				OmeManagerPage.showPage(checkSet);
 			}
 		});
 		return omeMetadataColumn;
@@ -1283,7 +1239,8 @@ public class CruiseListPage extends Composite {
 					getSelectedCruises(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
 					checkSet.clear();
-					checkSet.add(cruise);
+					checkSet.setUsername(getUsername());
+					checkSet.put(cruise.getExpocode(), cruise);
 					checkCruisesForSocat();
 				}
 			}
@@ -1330,7 +1287,8 @@ public class CruiseListPage extends Composite {
 					getSelectedCruises(null);
 					// Go to the QC page after performing the client-side checks on this one cruise
 					checkSet.clear();
-					checkSet.add(cruise);
+					checkSet.setUsername(getUsername());
+					checkSet.put(cruise.getExpocode(), cruise);
 					checkCruisesForSocat();
 				}
 			}
@@ -1397,7 +1355,8 @@ public class CruiseListPage extends Composite {
 				// Go to the additional docs page with just this one cruise
 				// Go to the QC page after performing the client-side checks on this one cruise
 				checkSet.clear();
-				checkSet.add(cruise);
+				checkSet.setUsername(getUsername());
+				checkSet.put(cruise.getExpocode(), cruise);
 				AddlDocsManagerPage.showPage(checkSet);
 			}
 		});
@@ -1438,7 +1397,7 @@ public class CruiseListPage extends Composite {
 		// Check if the cruises have metadata documents
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;
-		for ( DashboardCruise cruise : checkSet ) {
+		for ( DashboardCruise cruise : checkSet.values() ) {
 			// At this time, just check that a metadata file exists
 			// and do not worry about the contents
 			if ( cruise.getOmeTimestamp().isEmpty() ) {
@@ -1459,7 +1418,7 @@ public class CruiseListPage extends Composite {
 		errMsg = CANNOT_SUBMIT_HTML_PROLOGUE;
 		String warnMsg = DATA_AUTOFAIL_HTML_PROLOGUE;
 		boolean willAutofail = false;
-		for ( DashboardCruise cruise : checkSet ) {
+		for ( DashboardCruise cruise : checkSet.values() ) {
 			String status = cruise.getDataCheckStatus();
 			if ( DashboardUtils.CHECK_STATUS_NOT_CHECKED.equals(status) ||
 				 DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(status) ) {

@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
@@ -19,7 +20,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * @author Karl Smith
  */
-public class OmeManagerPage extends Composite {
+public class OmeManagerPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Edit Metadata";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -89,15 +89,12 @@ public class OmeManagerPage extends Composite {
 	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
 	@UiField FileUpload omeUpload;
-	@UiField Hidden usernameToken;
-	@UiField Hidden passhashToken;
 	@UiField Hidden timestampToken;
 	@UiField Hidden expocodesToken;
 	@UiField Hidden omeToken;
 	@UiField Button uploadButton;
 	@UiField Button cancelButton;
 
-	private String username;
 	private DashboardCruise cruise;
 	private DashboardAskPopup askOverwritePopup;
 
@@ -108,7 +105,7 @@ public class OmeManagerPage extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
-		username = "";
+		setUsername(null);
 		cruise = null;
 		askOverwritePopup = null;
 
@@ -130,51 +127,43 @@ public class OmeManagerPage extends Composite {
 	 * for the given cruise.  Adds this page to the page history.
 	 * 
 	 * @param cruises
-	 * 		add/replace the OME metadata for this cruise 
+	 * 		add/replace the OME metadata for the cruise in this list 
 	 */
-	static void showPage(DashboardCruise cruise) {
+	static void showPage(DashboardCruiseList cruises) {
 		if ( singleton == null )
 			singleton = new OmeManagerPage();
-		singleton.updateCruise(cruise);
+		singleton.updateCruise(cruises);
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.EDIT_METADATA.name(), false);
 	}
 
 	/**
 	 * Redisplays the last version of this page if the username
-	 * associated with this page matches the current login username.
-	 * 
-	 * @param addToHistory 
-	 * 		if true, adds this page to the page history 
+	 * associated with this page matches the given username.
 	 */
-	static void redisplayPage(boolean addToHistory) {
-		// If never show before, or if the username does not match the 
-		// current login username, show the login page instead
-		if ( (singleton == null) || 
-			 ! singleton.username.equals(DashboardLoginPage.getUsername()) ) {
-			DashboardLoginPage.showPage(true);
+	static void redisplayPage(String username) {
+		if ( (username == null) || username.isEmpty() || 
+			 (singleton == null) || ! singleton.getUsername().equals(username) ) {
+			CruiseListPage.showPage();
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			if ( addToHistory )
-				History.newItem(PagesEnum.EDIT_METADATA.name(), false);
 		}
 	}
 
 	/**
-	 * Updates this page with the latest username from DashboardLoginPage
-	 * and the given set of cruise.
+	 * Updates this page with the username and the cruise in the given set of cruise.
 	 * 
-	 * @param cruise
-	 * 		associate the uploaded OME metadata to this cruise
+	 * @param cruises
+	 * 		associate the uploaded OME metadata to the cruise in this set of cruises
 	 */
-	private void updateCruise(DashboardCruise cruise) {
+	private void updateCruise(DashboardCruiseList cruises) {
 		// Update the current username
-		username = DashboardLoginPage.getUsername();
-		userInfoLabel.setText(WELCOME_INTRO + username);
+		setUsername(cruises.getUsername());
+		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
 		// Update the cruise associated with this page
-		this.cruise = cruise;
+		cruise = cruises.values().iterator().next();
 
 		// Update the HTML intro naming the cruise
 		introHtml.setHTML(CRUISE_HTML_INTRO_PROLOGUE + 
@@ -189,8 +178,6 @@ public class OmeManagerPage extends Composite {
 	 * Clears all the Hidden tokens on the page. 
 	 */
 	private void clearTokens() {
-		usernameToken.setValue("");
-		passhashToken.setValue("");
 		timestampToken.setValue("");
 		expocodesToken.setValue("");
 		omeToken.setValue("");
@@ -200,8 +187,6 @@ public class OmeManagerPage extends Composite {
 	 * Assigns all the Hidden tokens on the page. 
 	 */
 	private void assignTokens() {
-		usernameToken.setValue(DashboardLoginPage.getUsername());
-		passhashToken.setValue(DashboardLoginPage.getPasshash());
 		String localTimestamp = 
 				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
 							  .format(new Date());
@@ -212,13 +197,13 @@ public class OmeManagerPage extends Composite {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage();
+		DashboardLogoutPage.showPage(getUsername());
 	}
 
 	@UiHandler("cancelButton")
 	void cancelButtonOnClick(ClickEvent event) {
 		// Return to the cruise list page which might have been updated
-		CruiseListPage.showPage(false);
+		CruiseListPage.showPage();
 	}
 
 	@UiHandler("uploadButton") 
@@ -287,7 +272,7 @@ public class OmeManagerPage extends Composite {
 		if ( resultMsg.startsWith(DashboardUtils.FILE_CREATED_HEADER_TAG) ) {
 			// cruise file created or updated; return to the cruise list, 
 			// having it request the updated cruises for the user from the server
-			CruiseListPage.showPage(false);
+			CruiseListPage.showPage();
 		}
 		else {
 			// Unknown response, just display the entire message
