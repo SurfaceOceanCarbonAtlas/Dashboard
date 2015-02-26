@@ -166,7 +166,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	public void onModuleLoad() {
 		// setup history management
 		History.addValueChangeHandler(this);
-		// show the appropriate page - if new, then the login page
+		// show the appropriate page - if new, then the cruise list page
 		History.fireCurrentHistoryState();
 	}
 
@@ -209,7 +209,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		}
 		else {
 			// Unknown page from the history; instead show the  cruise list page 
-			CruiseListPage.showPage();
+			CruiseListPage.redisplayPage(currentPage.getUsername());
 		}
 	}
 

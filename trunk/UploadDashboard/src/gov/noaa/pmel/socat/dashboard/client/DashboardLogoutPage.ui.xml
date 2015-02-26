@@ -6,9 +6,8 @@
 
 	<g:VerticalPanel addStyleNames="{style.fixedwidthcontainer}" horizontalAlignment="ALIGN_CENTER">
 		<g:HTML addStyleNames="{style.introtitle}" ui:field="goodbyeTitle" />
-		<g:Button addStyleNames="{style.loginbutton}" ui:field="reloginButton" />
-		<g:HorizontalPanel addStyleNames="{style.socatinfopanel}">
-			<g:Anchor addStyleNames="{style.socatinfoanchor}" ui:field="socatInfoAnchor" />
+		<g:HorizontalPanel addStyleNames="{style.reloginpanel}">
+			<g:Anchor addStyleNames="{style.reloginanchor}" ui:field="reloginAnchor" />
 		</g:HorizontalPanel>
 	</g:VerticalPanel>
 

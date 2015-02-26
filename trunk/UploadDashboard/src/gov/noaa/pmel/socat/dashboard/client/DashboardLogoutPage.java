@@ -8,15 +8,12 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -30,8 +27,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 	private static final String GOODBYE_TITLE = 
 			"Thank you for contributing data to SOCAT.";
 	private static final String RELOGIN_TEXT = "Log in again";
-	private static final String SOCAT_INFO_TEXT = "Return to socat.info";
-	private static final String SOCAT_INFO_LINK = "http://www.socat.info";
+	private static final String RELOGIN_HREF = "SocatUploadDashboard.html";
 	private static final String REQUEST_FAILED_MSG = 
 			"Sorry, an error occurred with your logout request";
 
@@ -45,8 +41,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 			GWT.create(DashboardListService.class);
 
 	@UiField HTML goodbyeTitle;
-	@UiField Button reloginButton;
-	@UiField Anchor socatInfoAnchor;
+	@UiField Anchor reloginAnchor;
 
 	// The singleton instance of this page
 	private static DashboardLogoutPage singleton = null;
@@ -61,9 +56,8 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 		singleton = this;
 
 		goodbyeTitle.setHTML(GOODBYE_TITLE);
-		reloginButton.setText(RELOGIN_TEXT);
-		socatInfoAnchor.setText(SOCAT_INFO_TEXT);
-		socatInfoAnchor.setHref(SOCAT_INFO_LINK);
+		reloginAnchor.setText(RELOGIN_TEXT);
+		reloginAnchor.setHref(RELOGIN_HREF);
 	}
 
 	/**
@@ -106,11 +100,6 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 			singleton = new DashboardLogoutPage();
 		singleton.setUsername(username);
 		SocatUploadDashboard.updateCurrentPage(singleton);
-	}
-
-	@UiHandler("reloginButton")
-	void loginOnClick(ClickEvent event) {
-		CruiseListPage.showPage();
 	}
 
 }
