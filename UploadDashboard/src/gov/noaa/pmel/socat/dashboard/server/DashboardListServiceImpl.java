@@ -81,7 +81,7 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Check that the username matches that which was displayed on the page
 		if ( ! username.equals(pageUsername) )
 			return false;
-		getServletContext().removeAttribute("JSESSIONID");
+		getThreadLocalRequest().getSession(false).invalidate();
 		Logger.getLogger("CruiseListService").info("logged out " + username);
 		return true;
 	}

@@ -77,11 +77,11 @@ body {
 	margin-bottom: 2em;
 }
 
-.socatinfoanchor {
-	font-weight: bold;
-	font-size: large;
+.reloginpanel {
+	margin: 2em;
 }
 
-.socatinfopanel {
-	margin: 2em;
+.reloginanchor {
+	font-weight: bold;
+	font-size: large;
 }
