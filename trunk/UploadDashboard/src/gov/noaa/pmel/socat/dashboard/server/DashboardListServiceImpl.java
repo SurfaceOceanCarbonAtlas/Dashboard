@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
@@ -81,8 +82,21 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		// Check that the username matches that which was displayed on the page
 		if ( ! username.equals(pageUsername) )
 			return false;
-		getThreadLocalRequest().getSession(false).invalidate();
+		HttpServletRequest request = getThreadLocalRequest();
+		HttpSession session = request.getSession(false);
+		try {
+			session.invalidate();
+		} catch ( Exception ex ) {
+			// Log but otherwise ignore this error
+			Logger.getLogger("CruiseListService").error("session.invalidate failed: " + ex.getMessage());
+		}
+		try {
+			request.logout();
+		} catch ( Exception ex ) {
+			Logger.getLogger("CruiseListService").error("request.logout failed: " + ex.getMessage());
+		}
 		Logger.getLogger("CruiseListService").info("logged out " + username);
+		username = null;
 		return true;
 	}
 

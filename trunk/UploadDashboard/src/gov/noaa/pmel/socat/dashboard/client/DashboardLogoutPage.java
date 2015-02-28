@@ -76,6 +76,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 			public void onSuccess(Boolean success) {
 				if ( success ) {
 					Cookies.removeCookie("JSESSIONID");
+					SocatUploadDashboard.stopHistoryHandling();
 				}
 				else {
 					SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG);
