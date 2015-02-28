@@ -5,6 +5,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.ui.PopupPanel;
@@ -53,6 +54,9 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 
 	// Singleton instance of this object
 	private static SocatUploadDashboard singleton = null;
+
+	// History change handler registration
+	private HandlerRegistration historyHandlerReg = null;
 
 	// Keep a record of the currently displayed page
 	private CompositeWithUsername currentPage;
@@ -164,8 +168,10 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 
 	@Override
 	public void onModuleLoad() {
+		if ( historyHandlerReg != null )
+			historyHandlerReg.removeHandler();
 		// setup history management
-		History.addValueChangeHandler(this);
+		historyHandlerReg = History.addValueChangeHandler(this);
 		// show the appropriate page - if new, then the cruise list page
 		History.fireCurrentHistoryState();
 	}
@@ -211,6 +217,16 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 			// Unknown page from the history; instead show the  cruise list page 
 			CruiseListPage.redisplayPage(currentPage.getUsername());
 		}
+	}
+
+	/**
+	 * Removes the history change handler, if there is one
+	 */
+	public static void stopHistoryHandling() {
+		if ( (singleton == null) || (singleton.historyHandlerReg == null) )
+			return;
+		singleton.historyHandlerReg.removeHandler();
+		singleton.historyHandlerReg = null;
 	}
 
 }

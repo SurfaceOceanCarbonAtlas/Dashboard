@@ -10,6 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 
 /**
@@ -31,7 +32,8 @@ public class AuthenticateFilter implements Filter {
 
 		// Check that there is a session and a username from authenticating
 		String username = "";
-		if ( request.getSession(false) != null ) {
+		HttpSession session = request.getSession(false);
+		if ( (session != null) && ! session.isNew() ) {
 			try {
 				username = request.getUserPrincipal().getName().trim();
 			} catch ( Exception ex ) {
