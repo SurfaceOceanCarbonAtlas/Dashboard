@@ -29,13 +29,8 @@ public interface DashboardListService extends RemoteService {
 
 	/**
 	 * Logs out the current user.
-	 * 
-	 * @param username
-	 * 		name of the current user - for validation
-	 * @return
-	 * 		true if successful
 	 */
-	boolean logoutUser(String username);
+	void logoutUser();
 	
 	/**
 	 * Deletes all files for the indicated cruises.

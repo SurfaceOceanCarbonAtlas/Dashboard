@@ -334,7 +334,7 @@ public class AddToSocatPage extends CompositeWithUsername {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage(getUsername());
+		DashboardLogoutPage.showPage();
 	}
 
 	@UiHandler({"socatRadio","ownerRadio"})

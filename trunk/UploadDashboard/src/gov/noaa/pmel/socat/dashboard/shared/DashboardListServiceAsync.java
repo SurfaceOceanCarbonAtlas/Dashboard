@@ -26,12 +26,10 @@ public interface DashboardListServiceAsync {
 	/**
 	 * Client side request to log out the current user.
 	 * 
-	 * @param username
-	 * 		name of the current user - for validation
 	 * @param callback
-	 * 		the callback to make with the success status.
+	 * 		the callback to make after logout.
 	 */
-	void logoutUser(String username, AsyncCallback<Boolean> callback);
+	void logoutUser(AsyncCallback<Void> callback);
 
 	/**
 	 * Client side request to deletes all files for the indicated cruises.

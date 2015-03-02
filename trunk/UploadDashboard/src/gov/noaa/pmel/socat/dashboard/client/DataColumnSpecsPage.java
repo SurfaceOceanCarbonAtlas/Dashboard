@@ -406,7 +406,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		}
 		else {
 			// No changes; just log out
-			DashboardLogoutPage.showPage(getUsername());
+			DashboardLogoutPage.showPage();
 		}
 	}
 
@@ -474,7 +474,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				if ( result ) {
 					if ( wasLoggingOut ) {
 						wasLoggingOut = false;
-						DashboardLogoutPage.showPage(getUsername());
+						DashboardLogoutPage.showPage();
 					}
 					else {
 						// Return to the latest cruise listing page, which may  

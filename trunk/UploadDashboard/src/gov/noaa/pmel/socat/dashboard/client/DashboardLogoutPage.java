@@ -28,8 +28,6 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 			"Thank you for contributing data to SOCAT.";
 	private static final String RELOGIN_TEXT = "Log in again";
 	private static final String RELOGIN_HREF = "SocatUploadDashboard.html";
-	private static final String REQUEST_FAILED_MSG = 
-			"Sorry, an error occurred with your logout request";
 
 	interface DashboardLogoutPageUiBinder extends UiBinder<Widget, DashboardLogoutPage> {
 	}
@@ -64,28 +62,23 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 	 * Shows the logout page in the RootLayoutPanel and logs out the user.  
 	 * Adds this page to the page history.
 	 */
-	static void showPage(String username) {
+	static void showPage() {
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		singleton.setUsername(username);
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.LOGOUT.name(), false);
 		SocatUploadDashboard.showWaitCursor();
-		service.logoutUser(username, new AsyncCallback<Boolean>() {
+		service.logoutUser(new AsyncCallback<Void>() {
 			@Override
-			public void onSuccess(Boolean success) {
-				if ( success ) {
-					Cookies.removeCookie("JSESSIONID");
-					SocatUploadDashboard.stopHistoryHandling();
-				}
-				else {
-					SocatUploadDashboard.showMessage(REQUEST_FAILED_MSG);
-				}
+			public void onSuccess(Void nada) {
+				Cookies.removeCookie("JSESSIONID");
+				SocatUploadDashboard.stopHistoryHandling();
 				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(REQUEST_FAILED_MSG, ex);
+				Cookies.removeCookie("JSESSIONID");
+				SocatUploadDashboard.stopHistoryHandling();
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});
@@ -95,11 +88,10 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 	 * Shows the logout page in the RootLayoutPanel.
 	 * Does not attempt to logout the user.
 	 */
-	static void redisplayPage(String username) {
+	static void redisplayPage() {
 		// Allow this succeed even if never called before
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		singleton.setUsername(username);
 		SocatUploadDashboard.updateCurrentPage(singleton);
 	}
 
