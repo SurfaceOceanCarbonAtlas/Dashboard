@@ -14,8 +14,7 @@ import javax.servlet.http.HttpSession;
 
 
 /**
- * Assigns the "user_name" attribute to a session, which comes from the name
- * in the user Principal of an authenticated user.
+ * Authenticates a user for a session
  */
 public class AuthenticateFilter implements Filter {
 
@@ -30,21 +29,32 @@ public class AuthenticateFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-		// Check that there is a session and a username from authenticating
-		String username = "";
 		HttpSession session = request.getSession(false);
-		if ( (session != null) && ! session.isNew() ) {
-			try {
-				username = request.getUserPrincipal().getName().trim();
-			} catch ( Exception ex ) {
-				// Probably null pointer exception - leave username empty
-			}
+		if ( session == null ) {
+			// Session has expired
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "session timed out - refresh page to login again");
+			return;
 		}
-		if ( username.isEmpty() ) {
+
+		if ( session.isNew() ) {
+			// New session - go login
 			response.sendRedirect("socatlogin.html");
 			return;
 		}
 
+		// Check the user name used by the servers
+		String username = "";
+		try {
+			username = request.getUserPrincipal().getName().trim();
+		} catch ( Exception ex ) {
+			// No user principal or name - leave username empty
+		}
+		if ( username.isEmpty() ) {
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "not logged in - refresh page to login");
+			return;
+		}
+
+		// All is well - continue on
 		chain.doFilter(request, response);
 	}
 

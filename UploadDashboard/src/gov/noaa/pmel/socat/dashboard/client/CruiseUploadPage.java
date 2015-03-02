@@ -294,7 +294,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
-		DashboardLogoutPage.showPage(getUsername());
+		DashboardLogoutPage.showPage();
 		// Make sure the normal cursor is shown
 		SocatUploadDashboard.showAutoCursor();
 	}

@@ -211,7 +211,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
 			// Logout page from history
-			DashboardLogoutPage.redisplayPage(currentPage.getUsername());
+			DashboardLogoutPage.redisplayPage();
 		}
 		else {
 			// Unknown page from the history; instead show the  cruise list page 

@@ -32,7 +32,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardListServiceImpl extends RemoteServiceServlet
 									implements DashboardListService {
 
-	private static final long serialVersionUID = 1580873646687637682L;
+	private static final long serialVersionUID = 5135385626064223202L;
 
 	private String username = null;
 	private DashboardDataStore dataStore = null;
@@ -75,14 +75,14 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 	}
 
 	@Override
-	public boolean logoutUser(String pageUsername) {
-		// Get the dashboard data store and current username
-		if ( ! validateRequest() ) 
-			return false;
-		// Check that the username matches that which was displayed on the page
-		if ( ! username.equals(pageUsername) )
-			return false;
+	public void logoutUser() {
 		HttpServletRequest request = getThreadLocalRequest();
+		username = null;
+		try {
+			username = request.getUserPrincipal().getName().trim();
+		} catch (Exception ex) {
+			// Probably null pointer exception - leave username null
+		}
 		HttpSession session = request.getSession(false);
 		try {
 			session.invalidate();
@@ -97,7 +97,6 @@ public class DashboardListServiceImpl extends RemoteServiceServlet
 		}
 		Logger.getLogger("CruiseListService").info("logged out " + username);
 		username = null;
-		return true;
 	}
 
 	@Override
