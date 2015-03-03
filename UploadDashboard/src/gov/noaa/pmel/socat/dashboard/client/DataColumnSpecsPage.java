@@ -6,10 +6,10 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socat.dashboard.shared.DataSpecsService;
-import gov.noaa.pmel.socat.dashboard.shared.DataSpecsServiceAsync;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -145,8 +145,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	private static DataColumnSpecsPageUiBinder uiBinder = 
 			GWT.create(DataColumnSpecsPageUiBinder.class);
 
-	private static DataSpecsServiceAsync service = 
-			GWT.create(DataSpecsService.class);
+	private static DashboardServicesInterfaceAsync service = 
+			GWT.create(DashboardServicesInterface.class);
 
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;

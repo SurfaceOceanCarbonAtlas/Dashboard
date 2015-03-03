@@ -4,8 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
@@ -70,8 +70,8 @@ public class DataMessagesPage extends CompositeWithUsername {
 	private static DataMessagesPageUiBinder uiBinder = 
 			GWT.create(DataMessagesPageUiBinder.class);
 
-	private static DashboardListServiceAsync service = 
-			GWT.create(DashboardListService.class);
+	private static DashboardServicesInterfaceAsync service = 
+			GWT.create(DashboardServicesInterface.class);
 
 	@UiField InlineLabel titleLabel;
 	@UiField HTML introHtml;

@@ -11,12 +11,12 @@
 
 	<!-- Servlets -->
 	<servlet>
-		<servlet-name>DashboardListServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardListServiceImpl</servlet-class>
+		<servlet-name>DashboardServlet</servlet-name>
+		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardServices</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>DashboardListServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/DashboardListService</url-pattern>
+		<servlet-name>DashboardServlet</servlet-name>
+		<url-pattern>/SocatUploadDashboard/DashboardServices</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -29,30 +29,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>DashboardDataSpecsServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DataSpecsServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DashboardDataSpecsServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/DataSpecsService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
 		<servlet-class>gov.noaa.pmel.socat.dashboard.server.MetadataUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
 		<url-pattern>/SocatUploadDashboard/MetadataUploadService</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>DashboardAddToSocatServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.AddToSocatServiceImpl</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>DashboardAddToSocatServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/AddToSocatService</url-pattern>
 	</servlet-mapping>
 
 	<filter>

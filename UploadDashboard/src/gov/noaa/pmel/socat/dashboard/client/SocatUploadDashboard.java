@@ -33,7 +33,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		EDIT_METADATA,
 		/** History tag for AddlDocsManagerPage */
 		MANAGE_DOCUMENTS,
-		/** History tag for AddToSocatPage */
+		/** History tag for SubmitForQCPage */
 		SUBMIT_FOR_QC,
 		/** History tag for DashboardLogoutPage */
 		LOGOUT
@@ -207,7 +207,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		}
 		else if ( token.equals(PagesEnum.SUBMIT_FOR_QC.name()) ) {
 			// Add to SOCAT page from history
-			AddToSocatPage.redisplayPage(currentPage.getUsername());
+			SubmitForQCPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
 			// Logout page from history
