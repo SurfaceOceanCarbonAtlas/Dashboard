@@ -4,10 +4,10 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.AddToSocatService;
-import gov.noaa.pmel.socat.dashboard.shared.AddToSocatServiceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Karl Smith
  */
-public class AddToSocatPage extends CompositeWithUsername {
+public class SubmitForQCPage extends CompositeWithUsername {
 
 	private static final String TITLE_TEXT = "Submit Datasets for QC / Manage Archival";
 	private static final String WELCOME_INTRO = "Logged in as ";
@@ -127,14 +127,14 @@ public class AddToSocatPage extends CompositeWithUsername {
 	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Cancel";
 
-	interface AddCruiseToSocatPageUiBinder extends UiBinder<Widget, AddToSocatPage> {
+	interface AddCruiseToSocatPageUiBinder extends UiBinder<Widget, SubmitForQCPage> {
 	}
 
 	private static AddCruiseToSocatPageUiBinder uiBinder = 
 			GWT.create(AddCruiseToSocatPageUiBinder.class);
 
-	private static AddToSocatServiceAsync service = 
-			GWT.create(AddToSocatService.class);
+	private static DashboardServicesInterfaceAsync service = 
+			GWT.create(DashboardServicesInterface.class);
 
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
@@ -162,13 +162,13 @@ public class AddToSocatPage extends CompositeWithUsername {
 	private DashboardAskPopup resubmitAskPopup;
 
 	// The singleton instance of this page
-	private static AddToSocatPage singleton;
+	private static SubmitForQCPage singleton;
 
 	/**
 	 * Creates an empty AddToSocat page.  Do not use this constructor;
 	 * instead use the static showPage or redisplayPage method.
 	 */
-	AddToSocatPage() {
+	SubmitForQCPage() {
 		initWidget(uiBinder.createAndBindUi(this));
 		singleton = this;
 
@@ -208,7 +208,7 @@ public class AddToSocatPage extends CompositeWithUsername {
 	 */
 	static void showPage(DashboardCruiseList cruises) {
 		if ( singleton == null )
-			singleton = new AddToSocatPage();
+			singleton = new SubmitForQCPage();
 		SocatUploadDashboard.updateCurrentPage(singleton);
 		singleton.updateCruises(cruises);
 		History.newItem(PagesEnum.SUBMIT_FOR_QC.name(), false);
@@ -265,10 +265,6 @@ public class AddToSocatPage extends CompositeWithUsername {
 					DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
 				// Owner will archive
 				numOwner++;
-			}
-			else if ( ! archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ) {
-				Window.alert("Unexpected archive status of '" + archiveStatus + "'");
-				continue;
 			}
 			expocodes.add(expo);
 
@@ -460,7 +456,7 @@ public class AddToSocatPage extends CompositeWithUsername {
 		boolean repeatSend = true;
 		// Add the cruises to SOCAT
 		SocatUploadDashboard.showWaitCursor();
-		service.addCruisesToSocat(getUsername(), expocodes, archiveStatus, 
+		service.submitCruiseForQC(getUsername(), expocodes, archiveStatus, 
 				localTimestamp, repeatSend, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {

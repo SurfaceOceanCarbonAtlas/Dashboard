@@ -31,26 +31,29 @@ public class AuthenticateFilter implements Filter {
 
 		HttpSession session = request.getSession(false);
 		if ( session == null ) {
-			// Session has expired
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "session timed out - refresh page to login again");
+			// Session has been invalidated -
+			// unlikely to be seen here since a new session will have been created
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, 
+					"invalid session - refresh page to login again");
 			return;
 		}
-
 		if ( session.isNew() ) {
-			// New session - go login
+			// New session - temporary redirect to the login page
 			response.sendRedirect("socatlogin.html");
 			return;
 		}
 
-		// Check the user name used by the servers
-		String username = "";
+		// Check for the username used by the dashboard service methods
+		String username;
 		try {
 			username = request.getUserPrincipal().getName().trim();
 		} catch ( Exception ex ) {
-			// No user principal or name - leave username empty
+			// No user principal or name in old session - unexpected
+			username = "";
 		}
 		if ( username.isEmpty() ) {
-			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "not logged in - refresh page to login");
+			response.sendError(HttpServletResponse.SC_UNAUTHORIZED, 
+					"unexpected missing user name - refresh page to login again");
 			return;
 		}
 
@@ -63,4 +66,3 @@ public class AuthenticateFilter implements Filter {
 	}
 
 }
-

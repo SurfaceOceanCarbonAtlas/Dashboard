@@ -6,8 +6,8 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -124,8 +124,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	private static AddlDocsManagerPageUiBinder uiBinder = 
 			GWT.create(AddlDocsManagerPageUiBinder.class);
 
-	private static DashboardListServiceAsync service = 
-			GWT.create(DashboardListService.class);
+	private static DashboardServicesInterfaceAsync service = 
+			GWT.create(DashboardServicesInterface.class);
 
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;

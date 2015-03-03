@@ -4,8 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.client;
 
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,8 +35,8 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 	private static DashboardLogoutPageUiBinder uiBinder = 
 			GWT.create(DashboardLogoutPageUiBinder.class);
 
-	private static DashboardListServiceAsync service = 
-			GWT.create(DashboardListService.class);
+	private static DashboardServicesInterfaceAsync service = 
+			GWT.create(DashboardServicesInterface.class);
 
 	@UiField HTML goodbyeTitle;
 	@UiField Anchor reloginAnchor;

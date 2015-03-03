@@ -6,8 +6,8 @@ package gov.noaa.pmel.socat.dashboard.client;
 import gov.noaa.pmel.socat.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListService;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardListServiceAsync;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
@@ -227,8 +227,8 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static CruiseListPageUiBinder uiBinder = 
 			GWT.create(CruiseListPageUiBinder.class);
 
-	private static DashboardListServiceAsync service = 
-			GWT.create(DashboardListService.class);
+	private static DashboardServicesInterfaceAsync service = 
+			GWT.create(DashboardServicesInterface.class);
 
 	@UiField Label titleLabel;
 	@UiField Image titleImage;
@@ -664,6 +664,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		}
 		checkSet.clear();
 		checkSet.putAll(cruiseSet);
+		checkSet.setUsername(getUsername());
 		checkCruisesForSocat();
 	}
 
@@ -1391,7 +1392,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * If the data has serious issues to cause an automatic F flag, asks the 
 	 * user if the submit should be continued.  If the answer is yes, or if 
 	 * there were no serious data issues, continues the submission to SOCAT 
-	 * by calling {@link AddToSocatPage#showPage(java.util.HashSet)}.
+	 * by calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
 	 */
 	private void checkCruisesForSocat() {
 		// Check if the cruises have metadata documents
@@ -1456,7 +1457,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					public void onSuccess(Boolean okay) {
 						// Only proceed if yes; ignore if no or null
 						if ( okay )
-							AddToSocatPage.showPage(checkSet);
+							SubmitForQCPage.showPage(checkSet);
 					}
 					@Override
 					public void onFailure(Throwable ex) {
@@ -1469,7 +1470,7 @@ public class CruiseListPage extends CompositeWithUsername {
 			return;
 		}
 		// No problems; continue on
-		AddToSocatPage.showPage(checkSet);
+		SubmitForQCPage.showPage(checkSet);
 	}
 
 }
