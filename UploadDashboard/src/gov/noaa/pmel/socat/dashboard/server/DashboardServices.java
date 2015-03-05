@@ -180,6 +180,8 @@ public class DashboardServices extends RemoteServiceServlet
 		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
+		cruiseList.setSocatVersion(dataStore.getSocatUploadVersion());
+		cruiseList.setManager(dataStore.isManager(username));
 		for ( String cruiseExpocode : expocodeSet ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
@@ -264,6 +266,9 @@ public class DashboardServices extends RemoteServiceServlet
 
 		// Create the set of updated cruise information to return
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
+		cruiseList.setUsername(username);
+		cruiseList.setSocatVersion(dataStore.getSocatUploadVersion());
+		cruiseList.setManager(dataStore.isManager(username));
 		for ( String cruiseExpocode : allExpocodes ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
