@@ -122,9 +122,8 @@ public class DashboardCruiseSubmitter {
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 
 				/*
-				 *  Convert the cruise data into standard units after removing 
-				 *  data lines with missing values for longitude, latitude, date, 
-				 *  time, or timestamp, or which the PI has marked as bad.  
+				 *  Convert the cruise data into standard units and setting to null
+				 *  those data lines which the PI has marked as bad.  
 				 *  Also adds and assigns year, month, day, hour, minute, second, 
 				 *  and WOCE columns if not present.  SanityChecker WOCE-4 flags
 				 *  are added to the WOCE column.
@@ -134,13 +133,13 @@ public class DashboardCruiseSubmitter {
 				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 					if ( cruiseData.getNumDataRows() < 1 )
 						errorMsgs.add(expocode + ": unacceptable; all data points marked bad");
-					else
+					else if (  ! cruiseChecker.checkProcessedOkay() )
 						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
-					continue;
-				}
-				if ( cruiseChecker.hadGeopositionErrors() ) {
-					errorMsgs.add(expocode + ": unacceptable; automated checking of data " +
-							"detected longitude, latitude, date, or time value errors");
+					else if ( cruiseChecker.hadGeopositionErrors() )
+						errorMsgs.add(expocode + ": unacceptable; automated checking of data " +
+								"detected longitude, latitude, date, or time value errors");
+					else
+						errorMsgs.add(expocode + ": unacceptable for unknown reason - unexpected");
 					continue;
 				}
 

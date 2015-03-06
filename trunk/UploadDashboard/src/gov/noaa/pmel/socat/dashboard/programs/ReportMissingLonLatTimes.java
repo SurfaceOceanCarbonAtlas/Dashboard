@@ -13,6 +13,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.TreeSet;
 
 /**
@@ -27,8 +28,63 @@ public class ReportMissingLonLatTimes {
 	private static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
 	private static final String LATITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
 	private static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
-	private static final double REL_TOLER = 1.0E-9;
-	private static final double ABS_TOLER = 1.0E-5;
+	private static final double REL_TOLER = 1.0E-12;
+	private static final double ABS_TOLER = 1.0E-6;
+
+	/**
+	 * Reports to System.out any missing longitudes, latitudes, and times in the given DSG file.
+	 * 
+	 * @param dsgFile
+	 * 		DSG file to examine
+	 * @param expocode
+	 * 		dataset expocode of this DSG file
+	 * @param typeName
+	 * 		type of this DSG file "full" or "dec." - for the messages 
+	 * @throws IOException
+	 * 		if there is a problem opening, or reading data from, the DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the longitude, latitude, or time variables are not found in the DSG file
+	 */
+	private static void checkMissingLonLatTimes(CruiseDsgNcFile dsgFile, String expocode, 
+			String typeName) throws IOException, IllegalArgumentException {
+		double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_NCVAR_NAME);
+		double[] latitudes = dsgFile.readDoubleVarDataValues(LATITUDE_NCVAR_NAME);
+		double[] times = dsgFile.readDoubleVarDataValues(TIME_NCVAR_NAME);
+		int numObs = longitudes.length;
+		if ( latitudes.length != numObs )
+			throw new IllegalArgumentException("number of latitudes (" + 
+					Integer.toString(latitudes.length) + 
+					") does not match the number of longitudes (" + 
+					Integer.toString(numObs) + ")");
+		if ( times.length != numObs )
+			throw new IllegalArgumentException("number of times (" + 
+					Integer.toString(times.length) + 
+					") does not match the number of longitudes (" + 
+					Integer.toString(numObs) + ")");
+
+		RowNumSet missingLons = new RowNumSet();
+		for (int k = 0; k < numObs; k++)
+			if ( DashboardUtils.closeTo(longitudes[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
+				missingLons.add(k+1);
+		RowNumSet missingLats = new RowNumSet();
+		for (int k = 0; k < numObs; k++)
+			if ( DashboardUtils.closeTo(latitudes[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
+				missingLats.add(k+1);
+		RowNumSet missingTimes = new RowNumSet();
+		for (int k = 0; k < numObs; k++)
+			if ( DashboardUtils.closeTo(times[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
+				missingTimes.add(k+1);
+
+		if ( ! missingLons.isEmpty() )
+			System.out.println(expocode + " " + typeName + " DSG: missing longitudes for rows " + 
+					missingLons.toString());
+		if ( ! missingLats.isEmpty() )
+			System.out.println(expocode + " " + typeName + " DSG: missing latitudes for rows " + 
+					missingLats.toString());
+		if ( ! missingTimes.isEmpty() )
+			System.out.println(expocode + " " + typeName + " DSG: missing times for rows " + 
+					missingTimes.toString());
+	}
 
 	/**
 	 * @param args
@@ -40,10 +96,10 @@ public class ReportMissingLonLatTimes {
 			System.err.println();
 			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
-			System.err.println("Reports any missing longitude, latitude, or time values in DSG files ");
-			System.err.println("(which should not have any missing longitude, latitude, or time values) "); 
-			System.err.println("for the indicated cruises.  The default dashboard configuration is used "); 
-			System.err.println("for this process. ");
+			System.err.println("Reports any missing longitude, latitude, or time values in DSG and ");
+			System.err.println("decimated DSG files (which should not have any missing longitude, "); 
+			System.err.println("latitude, or time values) for the indicated cruises.  The default "); 
+			System.err.println("dashboard configuration is used for this process. ");
 			System.err.println();
 			System.exit(1);
 		}
@@ -85,48 +141,22 @@ public class ReportMissingLonLatTimes {
 			}
 
 			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
-			RowNumSet missingLons = new RowNumSet();
-			RowNumSet missingLats = new RowNumSet();
-			RowNumSet missingTimes = new RowNumSet();
 			for ( String expocode : allExpocodes ) {
 				try {
 					CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
-					double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_NCVAR_NAME);
-					double[] latitudes = dsgFile.readDoubleVarDataValues(LATITUDE_NCVAR_NAME);
-					double[] times = dsgFile.readDoubleVarDataValues(TIME_NCVAR_NAME);
-					int numObs = longitudes.length;
-					if ( latitudes.length != numObs )
-						throw new IllegalArgumentException("number of latitudes (" + 
-								Integer.toString(latitudes.length) + 
-								") does not match the number of longitudes (" + 
-								Integer.toString(numObs) + ")");
-					if ( times.length != numObs )
-						throw new IllegalArgumentException("number of times (" + 
-								Integer.toString(times.length) + 
-								") does not match the number of longitudes (" + 
-								Integer.toString(numObs) + ")");
-					missingLons.clear();
-					missingLats.clear();
-					missingTimes.clear();
-					for (int k = 0; k < numObs; k++) {
-						if ( DashboardUtils.closeTo(longitudes[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
-							missingLons.add(k+1);
-						if ( DashboardUtils.closeTo(latitudes[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
-							missingLats.add(k+1);
-						if ( DashboardUtils.closeTo(times[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
-							missingTimes.add(k+1);
-					}
-					if ( ! missingLons.isEmpty() )
-						System.out.println(expocode + " missing longitudes for rows " + missingLons.toString());
-					if ( ! missingLats.isEmpty() )
-						System.out.println(expocode + " missing latitudes for rows " + missingLats.toString());
-					if ( ! missingTimes.isEmpty() )
-						System.out.println(expocode + " missing times for rows " + missingTimes.toString());
+					checkMissingLonLatTimes(dsgFile, expocode, "full");
 				} catch (Exception ex) {
-					System.err.println("Problems working with " + expocode);
+					System.err.println("Problems working with full DSG for " + expocode);
 					ex.printStackTrace();
 					success = false;
-					continue;
+				}				
+				try {
+					CruiseDsgNcFile dsgFile = dsgHandler.getDecDsgNcFile(expocode);
+					checkMissingLonLatTimes(dsgFile, expocode, "dec.");
+				} catch (Exception ex) {
+					System.err.println("Problems working with decimated DSG for " + expocode);
+					ex.printStackTrace();
+					success = false;
 				}				
 			}
 		} finally {

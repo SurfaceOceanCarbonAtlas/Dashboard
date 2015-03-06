@@ -29,7 +29,6 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 
-import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
@@ -41,6 +40,8 @@ import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
+import uk.ac.uea.socat.sanitychecker.messages.Message;
+import uk.ac.uea.socat.sanitychecker.messages.MessageException;
 
 /**
  * Class for working with the SanityChecker 
@@ -326,6 +327,7 @@ public class DashboardCruiseChecker {
 	}
 
 	private CheckerMessageHandler msgHandler;
+	private boolean lastCheckProcessedOkay;
 	private boolean lastCheckHadGeopositionErrors;
 
 	/**
@@ -360,6 +362,7 @@ public class DashboardCruiseChecker {
 			throw new NullPointerException(
 					"CheckerMsgHandler passed to DashboardCruiseChecker is null");
 		msgHandler = checkerMsgHandler;
+		lastCheckProcessedOkay = false;
 		lastCheckHadGeopositionErrors = false;
 	}
 
@@ -781,37 +784,35 @@ public class DashboardCruiseChecker {
 
 		// Count the rows of data with errors and only warnings, check if there 
 		// were lon/lat/date/time problems and assign the data check status
-		countWoceFlags(cruiseData, colIndcs, output.processedOK());
+		countWoceFlagsAndAssignStatus(cruiseData, colIndcs, output);
 
 		return output;
 	}
 
 	/**
 	 * Sanity-checks and standardizes the units in the data values,
-	 * stored as strings, in the given cruise after removing data
-	 * rows with known problems as defined by 
-	 * {@link #removeKnownProblemRows(DashboardCruiseWithData)}.
-	 * The year, month, day, hour, minute, and second data columns 
-	 * are appended to each data measurement (row, outer array) 
+	 * stored as strings, in the given cruise after removing any data
+	 * rows known problems (ones which the PI has marked with a WOCE-4 
+	 * flag).  The year, month, day, hour, minute, and second data 
+	 * columns are appended to each data measurement (row, outer array) 
 	 * if not already present.
 	 *  
 	 * @param cruiseData
 	 * 		cruise data to be standardized
 	 * @return
-	 * 		if the SanityChecker ran successfully;
-	 * 		if false, data will not have been standardized.
-	 * 		if no valid data after removing known problems,
-	 * 		false is returned and cruiseData.getNumDataRows 
-	 * 		will be zero.
+	 * 		true if the SanityChecker ran successfully and data had no geoposition errors.
+	 * 		If no valid data after removing rows with known problems (PI WOCE-4), 
+	 * 		false is returned and cruiseData.getNumDataRows will be zero.
 	 */
 	public boolean standardizeCruiseData(DashboardCruiseWithData cruiseData) {
 		removeKnownProblemRows(cruiseData);
 		// If all data removed, return false
 		if ( cruiseData.getNumDataRows() < 1 )
 			return false;
+
 		// Run the SanityChecker to get the standardized data
 		Output output = checkCruiseAndReturnOutput(cruiseData);
-		if ( ! output.processedOK() )
+		if ( lastCheckHadGeopositionErrors || ! lastCheckProcessedOkay )
 			return false;
 		List<SocatDataRecord> stdRowVals = output.getRecords();
 
@@ -854,127 +855,129 @@ public class DashboardCruiseChecker {
 			}
 		}
 
-		if ( (woceCO2WaterColumnIndex < 0) ||
-			 ! ( hasYearColumn && hasMonthColumn && hasDayColumn &&
-				 hasHourColumn && hasMinuteColumn && hasSecondColumn ) ) {
-			// Add missing time columns; 
-			// directly modify the lists in the cruise data object
-			ArrayList<String> userColNames = cruiseData.getUserColNames();
-			ArrayList<String> dataColUnits = cruiseData.getDataColUnits();
-			ArrayList<String> missingValues = cruiseData.getMissingValues();
-			ArrayList<HashSet<Integer>> woceThreeRowIndices = cruiseData.getWoceThreeRowIndices();
-			ArrayList<HashSet<Integer>> woceFourRowIndices = cruiseData.getWoceFourRowIndices();
-			if ( ! hasYearColumn ) {
-				dataColTypes.add(DataColumnType.YEAR);
-				userColNames.add("Year");
-				dataColUnits.add("");
-				missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			if ( ! hasMonthColumn ) {
-				dataColTypes.add(DataColumnType.MONTH);
-				userColNames.add("Month");
-				dataColUnits.add("");
-				missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			if ( ! hasDayColumn ) {
-				dataColTypes.add(DataColumnType.DAY);
-				userColNames.add("Day");
-				dataColUnits.add("");
-				missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			if ( ! hasHourColumn ) {
-				dataColTypes.add(DataColumnType.HOUR);
-				userColNames.add("Hour");
-				dataColUnits.add("");
-				missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			if ( ! hasMinuteColumn ) {
-				dataColTypes.add(DataColumnType.MINUTE);
-				userColNames.add("Minute");
-				dataColUnits.add("");
-				missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			if ( ! hasSecondColumn ) {
-				dataColTypes.add(DataColumnType.SECOND);
-				userColNames.add("Second");
-				dataColUnits.add("");
-				missingValues.add(Double.toString(SocatCruiseData.FP_MISSING_VALUE));
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			if ( woceCO2WaterColumnIndex < 0 ) {
-				dataColTypes.add(DataColumnType.WOCE_CO2_WATER);
-				userColNames.add("WOCE FLag");
-				dataColUnits.add("");
-				missingValues.add("");
-				woceThreeRowIndices.add(new HashSet<Integer>());
-				woceFourRowIndices.add(new HashSet<Integer>());
-			}
-			Iterator<SocatDataRecord> stdRowIter = stdRowVals.iterator();
-			for ( ArrayList<String> rowData : dataVals ) {
-				SocatDataRecord stdVals;
-				try {
-					stdVals = stdRowIter.next();
-				} catch ( NoSuchElementException ex ) {
-					throw new IllegalArgumentException(
-							"Unexpected mismatch in the number of rows of " +
-							"original data and standardized data");
-				}
-				Integer year;
-				Integer month;
-				Integer day;
-				Integer hour;
-				Integer minute;
-				Double second;
-				try {
-					DateTime timestamp = stdVals.getTime();
-					year = timestamp.getYear();
-					month = timestamp.getMonthOfYear();
-					day = timestamp.getDayOfMonth();
-					hour = timestamp.getHourOfDay();
-					minute = timestamp.getMinuteOfHour();
-					int isecond = timestamp.getSecondOfMinute();
-					int msecs = timestamp.getMillisOfSecond();
-					second = isecond + (double) msecs / 1000.0;
-				} catch ( Exception ex ) {
-					year = SocatCruiseData.INT_MISSING_VALUE;
-					month = SocatCruiseData.INT_MISSING_VALUE;
-					day = SocatCruiseData.INT_MISSING_VALUE;
-					hour = SocatCruiseData.INT_MISSING_VALUE;
-					minute = SocatCruiseData.INT_MISSING_VALUE;
-					second = SocatCruiseData.FP_MISSING_VALUE;
-				}
-				if ( ! hasYearColumn )
-					rowData.add(year.toString());
-				if ( ! hasMonthColumn )
-					rowData.add(month.toString());
-				if ( ! hasDayColumn )
-					rowData.add(day.toString());
-				if ( ! hasHourColumn )
-					rowData.add(hour.toString());
-				if ( ! hasMinuteColumn )
-					rowData.add(minute.toString());
-				if ( ! hasSecondColumn )
-					rowData.add(second.toString());
-				if ( woceCO2WaterColumnIndex < 0 )
-					rowData.add("");
-			}
-			if ( woceCO2WaterColumnIndex < 0 )
-				woceCO2WaterColumnIndex = dataColTypes.size() - 1;
+		// Add any missing time columns; 
+		// directly modify the lists in the cruise data object
+		ArrayList<String> userColNames = cruiseData.getUserColNames();
+		ArrayList<String> dataColUnits = cruiseData.getDataColUnits();
+		ArrayList<String> missingValues = cruiseData.getMissingValues();
+		ArrayList<HashSet<Integer>> woceThreeRowIndices = cruiseData.getWoceThreeRowIndices();
+		ArrayList<HashSet<Integer>> woceFourRowIndices = cruiseData.getWoceFourRowIndices();
+		if ( ! hasYearColumn ) {
+			dataColTypes.add(DataColumnType.YEAR);
+			userColNames.add("Year");
+			dataColUnits.add("");
+			missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
 		}
+		if ( ! hasMonthColumn ) {
+			dataColTypes.add(DataColumnType.MONTH);
+			userColNames.add("Month");
+			dataColUnits.add("");
+			missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
+		}
+		if ( ! hasDayColumn ) {
+			dataColTypes.add(DataColumnType.DAY);
+			userColNames.add("Day");
+			dataColUnits.add("");
+			missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
+		}
+		if ( ! hasHourColumn ) {
+			dataColTypes.add(DataColumnType.HOUR);
+			userColNames.add("Hour");
+			dataColUnits.add("");
+			missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
+		}
+		if ( ! hasMinuteColumn ) {
+			dataColTypes.add(DataColumnType.MINUTE);
+			userColNames.add("Minute");
+			dataColUnits.add("");
+			missingValues.add(Integer.toString(SocatCruiseData.INT_MISSING_VALUE));
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
+		}
+		if ( ! hasSecondColumn ) {
+			dataColTypes.add(DataColumnType.SECOND);
+			userColNames.add("Second");
+			dataColUnits.add("");
+			missingValues.add(Double.toString(SocatCruiseData.FP_MISSING_VALUE));
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
+		}
+		if ( woceCO2WaterColumnIndex < 0 ) {
+			dataColTypes.add(DataColumnType.WOCE_CO2_WATER);
+			userColNames.add("WOCE FLag");
+			dataColUnits.add("");
+			missingValues.add("");
+			woceThreeRowIndices.add(new HashSet<Integer>());
+			woceFourRowIndices.add(new HashSet<Integer>());
+		}
+		Iterator<SocatDataRecord> stdRowIter = stdRowVals.iterator();
+		for ( ArrayList<String> rowData : dataVals ) {
+			SocatDataRecord stdVals;
+			try {
+				stdVals = stdRowIter.next();
+			} catch ( NoSuchElementException ex ) {
+				throw new IllegalArgumentException(
+						"Unexpected mismatch in the number of rows of " +
+						"original data and standardized data");
+			}
+			Double longitude;
+			Double latitude;
+			Integer year;
+			Integer month;
+			Integer day;
+			Integer hour;
+			Integer minute;
+			Double second;
+			try {
+				// Verify the longitude, latitude, and time are given
+				longitude = stdVals.getLongitude();
+				latitude = stdVals.getLatitude();
+				if ( longitude.isNaN() || latitude.isNaN() )
+					throw new IllegalArgumentException();
+				DateTime timestamp = stdVals.getTime();
+				year = timestamp.getYear();
+				month = timestamp.getMonthOfYear();
+				day = timestamp.getDayOfMonth();
+				hour = timestamp.getHourOfDay();
+				minute = timestamp.getMinuteOfHour();
+				int isecond = timestamp.getSecondOfMinute();
+				int msecs = timestamp.getMillisOfSecond();
+				second = isecond + (double) msecs / 1000.0;
+			} catch ( Exception ex ) {
+				// Problem with the lon/lat/date/time of this record
+				// Should have been caught earlier, but just in case....
+				lastCheckHadGeopositionErrors = true;
+				return false;
+			}
+			// Fill in any supplemental date/time columns
+			if ( ! hasYearColumn )
+				rowData.add(year.toString());
+			if ( ! hasMonthColumn )
+				rowData.add(month.toString());
+			if ( ! hasDayColumn )
+				rowData.add(day.toString());
+			if ( ! hasHourColumn )
+				rowData.add(hour.toString());
+			if ( ! hasMinuteColumn )
+				rowData.add(minute.toString());
+			if ( ! hasSecondColumn )
+				rowData.add(second.toString());
+			if ( woceCO2WaterColumnIndex < 0 )
+				rowData.add("");
+		}
+		if ( woceCO2WaterColumnIndex < 0 )
+			woceCO2WaterColumnIndex = dataColTypes.size() - 1;
 
 		// Go through each row, converting data as needed
-		Iterator<SocatDataRecord> stdRowIter = stdRowVals.iterator();
+		stdRowIter = stdRowVals.iterator();
 		for ( ArrayList<String> rowData : dataVals ) {
 			SocatDataRecord stdVals;
 			try {
@@ -987,7 +990,12 @@ public class DashboardCruiseChecker {
 			k = -1;
 			for ( DataColumnType colType : dataColTypes ) {
 				k++;
-				if ( colType.equals(DataColumnType.TIMESTAMP) || 
+				if ( colType.equals(DataColumnType.EXPOCODE) || 
+					 colType.equals(DataColumnType.CRUISE_NAME) || 
+					 colType.equals(DataColumnType.SHIP_NAME) || 
+					 colType.equals(DataColumnType.GROUP_NAME) || 
+
+					 colType.equals(DataColumnType.TIMESTAMP) || 
 					 colType.equals(DataColumnType.DATE) || 
 					 colType.equals(DataColumnType.YEAR) || 
 					 colType.equals(DataColumnType.MONTH) || 
@@ -995,8 +1003,12 @@ public class DashboardCruiseChecker {
 					 colType.equals(DataColumnType.TIME) ||  
 					 colType.equals(DataColumnType.HOUR) || 
 					 colType.equals(DataColumnType.MINUTE) || 
-					 colType.equals(DataColumnType.SECOND) ) {
-					// Already handled
+					 colType.equals(DataColumnType.SECOND) ||
+
+					 colType.equals(DataColumnType.COMMENT_WOCE_CO2_WATER) ||
+					 colType.equals(DataColumnType.COMMENT_WOCE_CO2_ATM) ||
+					 colType.equals(DataColumnType.OTHER) ) {
+					// Do not change
 					;
 				}
 				else if ( colType.equals(DataColumnType.LONGITUDE) ) {
@@ -1055,18 +1067,6 @@ public class DashboardCruiseChecker {
 					String value = stdCol.getValue();
 					rowData.set(k, value);
 				}
-				else if ( colType.equals(DataColumnType.EXPOCODE) || 
-						  colType.equals(DataColumnType.CRUISE_NAME) || 
-						  colType.equals(DataColumnType.SHIP_NAME) || 
-						  colType.equals(DataColumnType.GROUP_NAME) || 
-
-						  colType.equals(DataColumnType.COMMENT_WOCE_CO2_WATER) ||
-						  colType.equals(DataColumnType.COMMENT_WOCE_CO2_ATM) ||
-						  colType.equals(DataColumnType.OTHER) ) {
-					// Column types that are never modified by the sanity checker
-					// They may or may not have been checked.
-					;
-				}
 				else {
 					// Should never happen
 					throw new IllegalArgumentException(
@@ -1082,8 +1082,9 @@ public class DashboardCruiseChecker {
 		HashSet<Integer> warnRows = new HashSet<Integer>();
 		getErrorAndWarnRows(errRows, warnRows, cruiseData);
 
-		// TODO: Only add SanityChecker WOCE-4 flags for now 
+		// Only add SanityChecker WOCE-4 flags for now 
 		// (here and in the middle of CheckerMessageHandler.generateWoceEvents)
+		// TODO: also do WOCE-3 flags?
 		for ( int rowIdx : errRows ) {
 			dataVals.get(rowIdx).set(woceCO2WaterColumnIndex, "4");
 		}
@@ -1092,46 +1093,20 @@ public class DashboardCruiseChecker {
 	}
 
 	/**
-	 * Removes rows of data with known problems.  These known problems are
-	 * such that it is acceptable to ignore the data row when submitting the
-	 * cruise for QC.  Such problems including missing longitude, latitude,
-	 * timestamp, date, time, and rows the PI has specified as bad.
+	 * Removes rows of data which have known problems 
+	 * (those with a WOCE-4 flag assigned by the PI).
 	 * 
 	 * @param cruiseData
 	 * 		cruise data to modify
 	 */
 	private void removeKnownProblemRows(DashboardCruiseWithData cruiseData) {
 		ColumnIndices colIndcs = getColumnIndices(cruiseData.getDataColTypes());
-
 		// Directly modify the data rows and data row indices for the WOCE flags
 		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
-
 		int k = 0;
 		int numRows = cruiseData.getNumDataRows();
 		while ( k < numRows ) {
 			ArrayList<String> dataRow = dataVals.get(k);
-			// Remove the row if missing timestamp, data, time, longitude, latitude
-			if ( ( (colIndcs.timestampIndex >= 0) &&
-					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
-							dataRow.get(colIndcs.timestampIndex).toLowerCase()) ) || 
-				 ( (colIndcs.dateIndex >= 0) && 
-					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
-							dataRow.get(colIndcs.dateIndex).toLowerCase()) ) || 
-				 ( (colIndcs.timeIndex >= 0) && 
-					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
-							dataRow.get(colIndcs.timeIndex).toLowerCase()) ) || 
-				 ( (colIndcs.longitudeIndex >= 0) && 
-					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
-							dataRow.get(colIndcs.longitudeIndex).toLowerCase()) ) || 
-				 ( (colIndcs.latitudeIndex >= 0) && 
-					CheckerUtils.DEFAULT_MISSING_VALUE_STRINGS.contains(
-							dataRow.get(colIndcs.latitudeIndex).toLowerCase()) ) ) {
-				// Remove this data row
-				dataVals.remove(k);
-				numRows--;
-				continue;
-			}
-
 			// Remove the row if the PI has marked it as bad
 			if ( colIndcs.woceCO2WaterIndex >= 0 ) {
 				try {
@@ -1166,8 +1141,9 @@ public class DashboardCruiseChecker {
 	}
 
 	/**
-	 * Counts and assigns the number of data rows with errors and with only warnings.
-	 * Also assigns the lastChecHadGeopositionErrors flag.  Assigns the data check status.
+	 * Counts and assigns the number of data rows with errors and with only 
+	 * warnings.  Sets lastCheckProcessedOkay and lastCheckHadGeopostionErrors.
+	 * Assigns the data check status.
 	 * 
 	 * @param cruise
 	 * 		cruise to use
@@ -1176,14 +1152,16 @@ public class DashboardCruiseChecker {
 	 * @param processedOK
 	 * 		did the SanityCheck run successfully?
 	 */
-	private void countWoceFlags(DashboardCruise cruise, 
-								ColumnIndices colIndcs, boolean processedOK) {
-		// Set the lastCheckHadGeopositionErrors flag indicating 
-		// if there are any date/time, lat, or lon WOCE-4 flags
-		// TODO: also need to check for error messages with type DATA_TIME_VALUE 
-		//       since these may not have been assigned to a specific column
+	private void countWoceFlagsAndAssignStatus(DashboardCruise cruise, 
+								ColumnIndices colIndcs, Output output) {
+		lastCheckProcessedOkay = output.processedOK();
+		lastCheckHadGeopositionErrors = false;
 		ArrayList<HashSet<Integer>> woceFourSets = cruise.getWoceFourRowIndices();
-		if ( ( (colIndcs.timestampIndex >= 0) && 
+		if ( (colIndcs.longitudeIndex < 0) ||
+			 (colIndcs.latitudeIndex < 0) ||
+			 ( ! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
+			 ( ! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ||
+			 ( (colIndcs.timestampIndex >= 0) && 
 				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||
 			 ( (colIndcs.dateIndex >= 0) && 
 				! woceFourSets.get(colIndcs.dateIndex).isEmpty() ) ||
@@ -1204,15 +1182,23 @@ public class DashboardCruiseChecker {
 			 ( (colIndcs.dayOfYearIndex >= 0) &&
 				! woceFourSets.get(colIndcs.dayOfYearIndex).isEmpty() ) ||
 			 ( (colIndcs.secondOfDayIndex >= 0) &&
-				! woceFourSets.get(colIndcs.secondOfDayIndex).isEmpty() ) ||
-			 ( (colIndcs.longitudeIndex < 0) ||
-				! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
-			 ( (colIndcs.latitudeIndex < 0) ||
-				! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ) {
+				! woceFourSets.get(colIndcs.secondOfDayIndex).isEmpty() ) ) {
 			lastCheckHadGeopositionErrors = true;
 		}
-		else {
-			lastCheckHadGeopositionErrors = false;
+		if ( ! lastCheckHadGeopositionErrors ) {
+			// Date/time errors may not be associated with any column
+			// so check the sanity checker messages
+			try {
+				for ( Message msg : output.getMessages().getMessages() ) {
+					String colName = msg.getColumnName();
+					String summary = msg.getMessageType().getSummaryMessage(colName);
+					if ( "Date/time could not be parsed".equals(summary) ) {
+						lastCheckHadGeopositionErrors = true;
+					}
+				}
+			} catch ( MessageException ex ) {
+				throw new RuntimeException(ex);
+			}
 		}
 
 		// Assign the number of data rows the SanityChecker found having 
@@ -1228,7 +1214,7 @@ public class DashboardCruiseChecker {
 		cruise.setNumWarnRows(numWarnRows);
 
 		// Assign the data-check status message using the results of the sanity check
-		if ( ! processedOK ) {
+		if ( lastCheckHadGeopositionErrors || ! lastCheckProcessedOkay ) {
 			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
 		}
 		else if ( numErrorRows > 0 ) {
@@ -1277,6 +1263,14 @@ public class DashboardCruiseChecker {
 		warnRows.removeAll(errRows);
 		warnRows.removeAll(cruise.getUserWoceFourRowIndices());
 		warnRows.removeAll(cruise.getUserWoceThreeRowIndices());
+	}
+
+	/**
+	 * @return
+	 * 		true if the last cruise check ran successfully
+	 */
+	public boolean checkProcessedOkay() {
+		return lastCheckProcessedOkay;
 	}
 
 	/**

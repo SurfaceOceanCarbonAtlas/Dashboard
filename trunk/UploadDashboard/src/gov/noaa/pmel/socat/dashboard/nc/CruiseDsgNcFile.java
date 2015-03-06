@@ -65,8 +65,9 @@ public class CruiseDsgNcFile extends File {
 	 * @param data
 	 * 		list of data for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if either argument is null, or 
-	 * 		if the list of SocatCruiseData objects is empty
+	 * 		if either argument is null,
+	 * 		if the list of SocatCruiseData objects is empty, or
+	 * 		if a date/time in the data is missing or invalid
 	 * @throws IOException
 	 * 		if creating the NetCDF file throws one
 	 * @throws InvalidRangeException
@@ -344,10 +345,20 @@ public class CruiseDsgNcFile extends File {
 			for (int index = 0; index < dataList.size(); index++) {
 				SocatCruiseData datarow = dataList.get(index);
 				Integer year = datarow.getYear();
+				if ( year == SocatCruiseData.INT_MISSING_VALUE )
+					throw new IllegalArgumentException("No year is given");
 				Integer month = datarow.getMonth();
+				if ( month == SocatCruiseData.INT_MISSING_VALUE )
+					throw new IllegalArgumentException("No month is given");
 				Integer day = datarow.getDay();
+				if ( day == SocatCruiseData.INT_MISSING_VALUE )
+					throw new IllegalArgumentException("No day is given");
 				Integer hour = datarow.getHour();
+				if ( hour == SocatCruiseData.INT_MISSING_VALUE )
+					throw new IllegalArgumentException("No hour is given");
 				Integer minute = datarow.getMinute();
+				if ( minute == SocatCruiseData.INT_MISSING_VALUE )
+					throw new IllegalArgumentException("No month is given");
 				Double second = datarow.getSecond();
 				Integer sec;
 				if ( second.isNaN() || (second == SocatCruiseData.FP_MISSING_VALUE) ) {
@@ -356,21 +367,14 @@ public class CruiseDsgNcFile extends File {
 				else {
 					sec = (int) Math.round(second);
 				}
-				if ( (year != SocatCruiseData.INT_MISSING_VALUE) && 
-						(month != SocatCruiseData.INT_MISSING_VALUE) && 
-						(day != SocatCruiseData.INT_MISSING_VALUE) && 
-						(hour != SocatCruiseData.INT_MISSING_VALUE) && 
-						(minute != SocatCruiseData.INT_MISSING_VALUE) ) {
-					try {
-						CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, minute, sec);
-						double value = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
-						values.set(index, value);
-					} catch (Exception ex) {
-						values.set(index, SocatCruiseData.FP_MISSING_VALUE);
-					}
-				}
-				else {
-					values.set(index, SocatCruiseData.FP_MISSING_VALUE);
+				try {
+					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, minute, sec);
+					double value = date.getDifferenceInMsecs(BASE_DATE) / 1000.0;
+					values.set(index, value);
+				} catch (Exception ex) {
+					throw new IllegalArgumentException("Invalid timestamp " + 
+							year + "-" + month + "-" + day + " " + 
+							hour + ":" + minute + ":" + sec);
 				}
 				ncfile.write(var, values);
 			}
