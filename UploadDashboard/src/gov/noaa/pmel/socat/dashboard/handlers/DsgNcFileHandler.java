@@ -171,6 +171,7 @@ public class DsgNcFileHandler {
 		try {
 			dsgFile.create(socatMData, socatDatalist);
 		} catch (Exception ex) {
+			dsgFile.delete();
 			throw new IllegalArgumentException(
 					"Problems creating the SOCAT DSG file " + dsgFile.getName() +
 					"\n    " + ex.getMessage(), ex);

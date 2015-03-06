@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
@@ -27,7 +28,8 @@ public class CruiseDsgNcFileTest {
     CruiseDsgNcFile dsgNcFile = null;
  
     /**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create(java.lang.String)}.
+	 * Test method for successfully creating a DSG file using 
+	 * {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create}.
 	 */
 	@Test
 	public void testCreate() throws Exception {
@@ -116,10 +118,99 @@ public class CruiseDsgNcFileTest {
 			parentDir.mkdir();
 		String filename = parentDir.getPath() + File.separator + expocode + ".nc";
 		dsgNcFile = new CruiseDsgNcFile(filename);
-		dsgNcFile.create(metadata, dataList);
+		try {
+			dsgNcFile.create(metadata, dataList);
+		} catch ( Exception ex ) {
+			dsgNcFile.delete();
+		}
 		assertTrue( dsgNcFile.exists() );
 		assertEquals(expocode, dsgNcFile.getMetadata().getExpocode());
 		assertEquals(dataValueStrings.length, dsgNcFile.getDataList().size());
 	}
 
+    /**
+	 * Test method for checking expected failures to a DSG file using 
+	 * {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create}.
+	 */
+	@Test
+	public void testBadMissingValuesFail() throws Exception {
+		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
+				DataColumnType.EXPOCODE,
+				DataColumnType.CRUISE_NAME,
+				DataColumnType.MONTH, 
+				DataColumnType.DAY, 
+				DataColumnType.YEAR, 
+				DataColumnType.HOUR, 
+				DataColumnType.MINUTE, 
+				DataColumnType.LATITUDE, 
+				DataColumnType.LONGITUDE, 
+				DataColumnType.SEA_SURFACE_TEMPERATURE,
+				DataColumnType.SALINITY,
+				DataColumnType.XCO2_WATER_SST_DRY,
+				DataColumnType.PCO2_WATER_TEQU_WET,
+				DataColumnType.SEA_LEVEL_PRESSURE,
+				DataColumnType.SHIP_SPEED));
+		String[][] badTimeDataValueStringsSets = {
+				{
+					"11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
+					"11B520060606,GM0606,2,29,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3", 
+					"11B520060606,GM0606,3,1,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2"
+				},
+				{
+					"11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
+					"11B520060606,GM0606,2,NaN,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3", 
+					"11B520060606,GM0606,3,1,2006,23,50,29.0518,-92.7591,28.94,33.48,402.1,385.1,1009.314,2"
+				}
+			};
+		String expocode = "11B520060606";
+		for ( String[] dataValueStrings : badTimeDataValueStringsSets ) {
+			ArrayList<ArrayList<String>> testValues = new ArrayList<ArrayList<String>>();
+			for ( String valsString : dataValueStrings ) {
+				ArrayList<String> dataVals = new ArrayList<String>(Arrays.asList(valsString.split(",",-1)));
+				testValues.add(dataVals);
+			}
+
+			// Create the DashboardCruiseWithData from the above data
+			DashboardCruiseWithData cruise = new DashboardCruiseWithData();
+			cruise.setDataColTypes(testTypes);
+			cruise.setDataValues(testValues);
+			ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
+			ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
+			for (int k = 0; k < testTypes.size(); k++) {
+				woceThrees.add(new HashSet<Integer>());
+				woceFours.add(new HashSet<Integer>());
+			}
+
+			// Create the list of SocatCruiseData from the DashboardCruiseWithData
+			ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
+
+			// Create the SocatMetadata for this cruise
+			SocatMetadata metadata = new SocatMetadata();
+			metadata.setExpocode(expocode);
+			metadata.setSocatVersion("3.0");
+			metadata.setCruiseName("GM0606");
+			metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
+			metadata.setVesselName("Caribbean Cruiser");
+			metadata.setOrigDataRef("doi:cdiac12345");
+			metadata.setSouthmostLatitude(20.04);
+			metadata.setNorthmostLatitude(29.07);
+			metadata.setWestmostLongitude(-92.77);
+			metadata.setEastmostLongitude(-92.74);
+			SimpleDateFormat dateFmt = new SimpleDateFormat("yyyy-MM-dd HH:mm z");
+			metadata.setBeginTime(dateFmt.parse("2006-02-28 23:48 UTC"));
+			metadata.setEndTime(dateFmt.parse("2006-03-01 23:50 UTC"));
+
+			File parentDir = new File("/var/tmp/socat");
+			if ( ! parentDir.exists() )
+				parentDir.mkdir();
+			String filename = parentDir.getPath() + File.separator + expocode + ".nc";
+			dsgNcFile = new CruiseDsgNcFile(filename);
+			try {
+				dsgNcFile.create(metadata, dataList);
+			} catch ( IllegalArgumentException ex ) {
+				dsgNcFile.delete();
+			}
+			assertFalse( dsgNcFile.exists() );
+		}
+	}
 }
