@@ -412,14 +412,19 @@ public class CruiseStandardizer {
 			CruiseDsgNcFile decDsgFile = dsgHandler.getDecDsgNcFile(expocode);
 			decDsgFile.updateStringVarValue(varName, newPiNames);
 			System.err.println(expocode + ": PI names changed in place");
-		} catch (InvalidRangeException ex) {
+		} catch (InvalidRangeException irex) {
 			// Names longer than allotted space; regenerate the DSG files
 			dsgFile.read(false);
 			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
 			mdata = dsgFile.getMetadata();
 			mdata.setScienceGroup(newPiNames);
 			// Re-create the full-data DSG file
-			dsgFile.create(mdata, dataList);
+			try {
+				dsgFile.create(mdata, dataList);
+			} catch ( Exception ex ) {
+				dsgFile.delete();
+				throw ex;
+			}
 			// Call Ferret to add lon360 and tmonth (calculated data should be the same)
 			SocatTool tool = new SocatTool(ferretConfig);
 			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
@@ -474,14 +479,19 @@ public class CruiseStandardizer {
 			CruiseDsgNcFile decDsgFile = dsgHandler.getDecDsgNcFile(expocode);
 			decDsgFile.updateStringVarValue(varName, newShipName);
 			System.err.println(expocode + ": Ship name changed in place");
-		} catch (InvalidRangeException ex) {
+		} catch (InvalidRangeException irex) {
 			// Name longer than allotted space; regenerate the DSG files
 			dsgFile.read(false);
 			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
 			mdata = dsgFile.getMetadata();
 			mdata.setVesselName(newShipName);
 			// Re-create the full-data DSG file
-			dsgFile.create(mdata, dataList);
+			try {
+				dsgFile.create(mdata, dataList);
+			} catch ( Exception ex ) {
+				dsgFile.delete();
+				throw ex;
+			}
 			// Call Ferret to add lon360 and tmonth (calculated data should be the same)
 			SocatTool tool = new SocatTool(ferretConfig);
 			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
