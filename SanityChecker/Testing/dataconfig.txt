@@ -1,2 +1,0 @@
-InputDir=/local/uuk07qzu/work/projects/SOCAT/Automation/DUP_Testing/input
-OutputDir=/local/uuk07qzu/work/projects/SOCAT/Automation/DUP_Testing/output
