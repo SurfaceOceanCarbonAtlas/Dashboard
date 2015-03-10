@@ -29,11 +29,11 @@ class OMEVariable {
 	 * @param parentElement The XML element containing the variable value
 	 * @param name The name of the variable.
 	 */
-	protected OMEVariable(Path parentPath, Element parentElement, String name) {
-		itsPath = new Path(parentPath, name);
+	protected OMEVariable(Path path, Element parentElement) {
+		itsPath = path;
 		itsValues = new ArrayList<String>();
 		if (null != parentElement) {
-			String value = parentElement.getChildTextTrim(name);
+			String value = parentElement.getChildTextTrim(path.getElementName());
 			if (null != value) {
 				itsValues.add(value);
 			}

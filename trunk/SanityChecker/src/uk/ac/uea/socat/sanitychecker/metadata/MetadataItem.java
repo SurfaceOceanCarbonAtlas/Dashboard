@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -319,7 +318,7 @@ public abstract class MetadataItem {
 	 * @param metadataSet The currently extracted metadata
 	 * @param record The data record
 	 */
-	public abstract void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException;
+	public abstract void processRecordForValue(SocatDataRecord record) throws MetadataException;
 	
 	/**
 	 * Internal class for holding a metadata value. This handles the fact that
@@ -505,6 +504,10 @@ public abstract class MetadataItem {
 	 */
 	public String getName() {
 		return itsConfigItem.getName();
+	}
+	
+	public int getLine() {
+		return itsLine;
 	}
 }
 

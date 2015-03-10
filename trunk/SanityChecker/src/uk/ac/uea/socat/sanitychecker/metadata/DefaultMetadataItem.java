@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -44,7 +43,7 @@ public class DefaultMetadataItem extends MetadataItem {
 	 * cannot generate values, so an exception is always thrown. 
 	 */
 	@Override
-	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 		throw new MetadataException("This metadata value cannot be automatically generated");
 	}
 }

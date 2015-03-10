@@ -8,7 +8,7 @@ import org.jdom2.Element;
 class OMECompositeVariable {
 	private Path itsPath;
 	private List<String> itsIdFields;
-	private List<Entry> itsEntries = new ArrayList<Entry>();
+	private List<OMECompositeVariableEntry> itsEntries = new ArrayList<OMECompositeVariableEntry>();
 	
 	protected OMECompositeVariable(Path parentPath, String idElement) {
 		itsPath = parentPath;
@@ -38,8 +38,8 @@ class OMECompositeVariable {
 	protected void addEntry(String name, String value) throws IllegalArgumentException {
 		
 		boolean foundEntry = false;
-		for (Entry searchEntry : itsEntries) {
-			if (searchEntry.name.equals(name)) {
+		for (OMECompositeVariableEntry searchEntry : itsEntries) {
+			if (searchEntry.getName().equals(name)) {
 				
 				if (itsIdFields.contains(name) && searchEntry.getValueCount() > 0) {
 					throw new IllegalArgumentException("Cannot add multiple values to an identifier in a composite variable");
@@ -52,18 +52,18 @@ class OMECompositeVariable {
 		}
 		
 		if (!foundEntry) {
-			itsEntries.add(new Entry(name, value));
+			itsEntries.add(new OMECompositeVariableEntry(name, value));
 		}
 	}
 	
-	protected void addEntries(List<Entry> entries) {
+	protected void addEntries(List<OMECompositeVariableEntry> entries) {
 		
-		for (Entry entry : entries) {
+		for (OMECompositeVariableEntry entry : entries) {
 			
 			boolean entryStored = false;
-			for (Entry existingEntry : itsEntries) {
-				if (existingEntry.name.equals(entry.name)) {
-					existingEntry.addValues(entry.values);
+			for (OMECompositeVariableEntry existingEntry : itsEntries) {
+				if (existingEntry.getName().equals(entry.getName())) {
+					existingEntry.addValues(entry.getAllValues());
 					entryStored = true;
 					break;
 				}
@@ -91,7 +91,7 @@ class OMECompositeVariable {
 			} else {
 				
 				OMECompositeVariable mergedVar = (OMECompositeVariable) destVar.clone();
-				mergedVar.addEntries(newValue.getAllValues());
+				mergedVar.addEntries(newValue.getAllEntries());
 				merged.add(mergedVar);
 			}
 		}
@@ -107,7 +107,7 @@ class OMECompositeVariable {
 		return merged;
 	}
 	
-	private List<Entry> getAllValues() {
+	protected List<OMECompositeVariableEntry> getAllEntries() {
 		return itsEntries;
 	}
 	
@@ -150,8 +150,8 @@ class OMECompositeVariable {
 		
 	private Element getElement() {
 		Element element = new Element(itsPath.getElementName());
-		for (Entry subValue : itsEntries) {
-			Element subElement = new Element(subValue.name);
+		for (OMECompositeVariableEntry subValue : itsEntries) {
+			Element subElement = new Element(subValue.getName());
 			subElement.setText(subValue.getValue());
 			
 			element.addContent(subElement);
@@ -182,9 +182,9 @@ class OMECompositeVariable {
 				variableElement.setAttribute(id, value);
 			}
 			
-			for (Entry value : itsEntries) {
+			for (OMECompositeVariableEntry value : itsEntries) {
 				if (value.getValueCount() > 1) {
-					Element valuesElement = new Element(value.name);
+					Element valuesElement = new Element(value.getName());
 					
 					for (String valueString : value.getAllValues()) {
 						Element valueElement = new Element("VALUE");
@@ -205,7 +205,7 @@ class OMECompositeVariable {
 	protected boolean hasConflict() {
 		boolean result = false;
 		
-		for (Entry value : itsEntries) {
+		for (OMECompositeVariableEntry value : itsEntries) {
 			if (value.getValueCount() > 1) {
 				result = true;
 				break;
@@ -218,8 +218,8 @@ class OMECompositeVariable {
 	protected String getValue(String valueName) {
 		String result = "";
 		
-		for (Entry value : itsEntries) {
-			if (value.name.equals(valueName)) {
+		for (OMECompositeVariableEntry value : itsEntries) {
+			if (value.getName().equals(valueName)) {
 				result = value.getValue();
 				break;
 			}
@@ -235,90 +235,10 @@ class OMECompositeVariable {
 			clone.itsIdFields.add(id);
 		}
 		
-		for (Entry value : itsEntries) {
-			clone.itsEntries.add((Entry) value.clone());
+		for (OMECompositeVariableEntry value : itsEntries) {
+			clone.itsEntries.add((OMECompositeVariableEntry) value.clone());
 		}
 		
 		return clone;
-	}
-	
-	private class Entry {
-		private String name;
-		private List<String> values;
-		
-		private Entry(String name, String value) {
-			this.name = name;
-			values = new ArrayList<String>();
-			values.add(value);
-		}
-		
-		private Entry(String name) {
-			this.name = name;
-			values = new ArrayList<String>();
-		}
-		
-		private void addValue(String value) {
-			if (!values.contains(value)) {
-				values.add(value);
-			}
-		}
-		
-		private void addValues(List<String> values) {
-			for (String value: values) {
-				addValue(value);
-			}
-		}
-		
-		private int getValueCount() {
-			return values.size();
-		}
-
-		
-		
-		/**
-		 * Gets the value of this variable for placing in an XML document.
-		 * If the variable has no values, an empty string is returned.
-		 * If the variable has exactly one value, that value is returned.
-		 * If the variable has more than one value, this represents a conflict
-		 * and {@link OmeMetadata#CONFLICT_STRING} is returned.
-		 * 
-		 * @return The value of the variable
-		 */
-		private String getValue() {
-			
-			String result;
-			
-			switch (values.size()) {
-			case 0:
-			{
-				result = "";
-				break;
-			}
-			case 1:
-			{
-				result = values.get(0);
-				break;
-			}
-			default:
-			{
-				result = OmeMetadata.CONFLICT_STRING;
-			}
-			}
-			
-			return result;
-		}
-		
-		private List<String> getAllValues() {
-			return values;
-		}
-		
-		public Object clone() {
-			Entry clone = new Entry(name);
-			for (String value : values) {
-				clone.values.add(value);
-			}
-			
-			return clone;
-		}
 	}
 }

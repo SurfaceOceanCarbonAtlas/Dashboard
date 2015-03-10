@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
@@ -62,9 +65,10 @@ public class Output {
 	private int itsResultCode;
 	
 	/**
-	 *	The metadata processed from the passed in metadata entries 
+	 * String representation of the metadata from the top
+	 * of the file. This can be expanded with new values.
 	 */
-	Map<String, MetadataItem> itsMetadata;
+	private OmeMetadata itsMetadata;
 	
 	/**
 	 * The list of data records
@@ -88,15 +92,19 @@ public class Output {
 	 * Constructor for the output object
 	 * @param filename The filename of the original data file
 	 */
-	protected Output(String filename, int metadataLength, int dataLength, Logger logger) {
+	protected Output(String filename, OmeMetadata metadata, int dataLength, Logger logger) {
 		// Initialize result code to zero since flags can only be mixed in
 		itsResultCode = 0;
 		itsFilename = filename;
-		itsMetadata = new HashMap<String, MetadataItem>(metadataLength);
+		itsMetadata = metadata;
 		itsDataRecords = new ArrayList<SocatDataRecord>(dataLength);
 		itsMessages = new Messages();
 		
 		itsLogger = logger;
+		
+		// Always set the metadata to draft - this will remain in place until
+		// the MetadataChecker is complete.
+		itsMetadata.setDraft(true);
 	}
 	
 	/**
@@ -250,34 +258,20 @@ public class Output {
 		}
 	}
 	
-	/**
-	 * Add an item to the output metadata
-	 * @param item The metadata item
-	 */
-	public void addMetadataItem(MetadataItem item) {
-		itsMetadata.put(item.getName(), item);
+	public void addMetadataValue(String name, String value, int line) throws OmeMetadataException {
+		itsMetadata.storeValue(name, value, line);
+	}
+	
+	public void addCompositeMetadataValue(String name, Properties values, int line) throws OmeMetadataException {
+		itsMetadata.storeCompositeValue(name, values, line);
 	}
 	
 	/**
 	 * Returns the processed metadata
 	 * @return The processed metadata
 	 */
-	public Map<String, MetadataItem> getMetadata() {
+	public OmeMetadata getMetadata() {
 		return itsMetadata;
-	}
-	
-	/**
-	 * Returns the number of metadata items in the output
-	 * @return The number of metadata items
-	 */
-	public int getMetadataCount() {
-		int result = 0;
-		
-		if (null != itsMetadata) {
-			result = itsMetadata.size();
-		}
-		
-		return result;
 	}
 	
 	/**
