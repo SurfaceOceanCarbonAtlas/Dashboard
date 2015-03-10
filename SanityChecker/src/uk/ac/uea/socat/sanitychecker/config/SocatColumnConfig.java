@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
@@ -244,7 +245,7 @@ public class SocatColumnConfig {
 								}
 
 								calculatorObject = (DataCalculator) calcClass.newInstance();
-								calculatorMethod = calculatorObject.getClass().getDeclaredMethod(CALCULATOR_METHOD_NAME, Map.class, SocatDataRecord.class, int.class, String.class, DateTimeHandler.class);
+								calculatorMethod = calculatorObject.getClass().getDeclaredMethod(CALCULATOR_METHOD_NAME, OmeMetadata.class, SocatDataRecord.class, int.class, String.class, DateTimeHandler.class);
 							}
 							catch (ClassNotFoundException e) {
 								throw new ConfigException(itsConfigFilename, columnName, lineCount, "The specified calculator class does not exist");
