@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
@@ -23,7 +24,7 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	/**
 	 * The value that represents a missing longitude
 	 */
-	private static final double MISSING_VALUE = -999.0;
+	private static final String MISSING_VALUE = "-999";
 	
 	/**
 	 * Indicates whether or not a value has been set
@@ -62,7 +63,7 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException, SanityCheckerException {
 		// If we haven't had any data, set a dummy value
 		if (!hasValue) {
 			setValue(MISSING_VALUE);
@@ -75,9 +76,9 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 			// The lowest value is the western limit, and the highest is the eastern limit
 			if (!crossesZero) {
 				if (parameter.equalsIgnoreCase("W")) {
-					setValue(allLons.get(0));
+					setValue(String.valueOf(allLons.get(0)));
 				} else if (parameter.equalsIgnoreCase("E")) {
-					setValue(allLons.get(allLons.size() - 1));
+					setValue(String.valueOf(allLons.get(allLons.size() - 1)));
 				}
 			} else {
 				
@@ -106,9 +107,9 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 				}
 				
 				if (parameter.equalsIgnoreCase("W")) {
-					setValue(allLons.get(gapUpper));
+					setValue(String.valueOf(allLons.get(gapUpper)));
 				} else if (parameter.equalsIgnoreCase("E")) {
-					setValue(allLons.get(gapLower));
+					setValue(String.valueOf(allLons.get(gapLower)));
 				}
 			}
 		}

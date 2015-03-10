@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
@@ -36,8 +37,8 @@ public class ColumnExistsMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
-		setValue(columnExists);
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException, SanityCheckerException {
+		setValue(String.valueOf(columnExists));
 	}
 
 	@Override

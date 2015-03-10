@@ -252,7 +252,7 @@ public class SanityChecker {
 	 * Any conflicting metadata items already present will be overwritten
 	 * @param metadataSet The metadata that has been extracted thus far. New metadata will be added to this.
 	 */
-	private void generateMetadataFromData() throws ConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, DateTimeException, OmeMetadataException {
+	private void generateMetadataFromData() throws SanityCheckerException, ConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, DateTimeException, OmeMetadataException {
 		
 		List<MetadataItem> allRecordItems = new ArrayList<MetadataItem>();
 		
@@ -291,7 +291,7 @@ public class SanityChecker {
 		// and add it to the metadata set.
 		for (MetadataItem item: allRecordItems) {
 			item.generateValue(itsDateTimeHandler);
-			itsOutput.addMetadataValue(item.getName(), item.getValue(itsDateTimeHandler), item.getLine());
+			itsOutput.addMetadataValue(item.getName(), item.getValue(), item.getLine());
 		}
 	}
 	
