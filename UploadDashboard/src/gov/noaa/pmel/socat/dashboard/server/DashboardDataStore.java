@@ -388,7 +388,7 @@ public class DashboardDataStore {
 
 		// SanityChecker initialization from this same properties file 
 		try {
-			cruiseChecker = new DashboardCruiseChecker(configFile, checkerMsgHandler);
+			cruiseChecker = new DashboardCruiseChecker(configFile, checkerMsgHandler, metadataFileHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}

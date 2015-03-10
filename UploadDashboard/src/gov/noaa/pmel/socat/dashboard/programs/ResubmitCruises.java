@@ -115,7 +115,7 @@ public class ResubmitCruises {
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));
-			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm")).format(new Date());
+			String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 			cruiseSubmitter.submitCruises(expocodeSet, cruise.getArchiveStatus(), 
 										  timestamp, false, username);
 			// The cruise will now have a QC status of 'N' (new) if it was 

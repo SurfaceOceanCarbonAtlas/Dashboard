@@ -273,7 +273,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	 * Assigns all the Hidden tokens on the page.
 	 */
 	private void assignTokens() {
-		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm").format(new Date());
+		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		timestampToken.setValue(localTimestamp);
 		expocodesToken.setValue(DashboardUtils.encodeStringArrayList(new ArrayList<String>(expocodes)));
 		omeToken.setValue("false");

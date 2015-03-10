@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 /**
@@ -48,8 +49,10 @@ public class SocatCruiseReporter {
 					"316N19971005",
 			}));
 
-	private static final SimpleDateFormat timestamper = 
-			new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
+	private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
+	static {
+		TIMESTAMPER.setTimeZone(TimeZone.getTimeZone("UTC"));
+	}
 
 	private DsgNcFileHandler dsgFileHandler;
 
@@ -212,7 +215,7 @@ public class SocatCruiseReporter {
 	private static ArrayList<String> printMetadataPreamble(SocatMetadata metadata, PrintWriter report) {
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
-		report.println("SOCAT data report created: " + timestamper.format(new Date()));
+		report.println("SOCAT data report created: " + TIMESTAMPER.format(new Date()));
 		report.println("Expocode: " + metadata.getExpocode());
 		report.println("version: " + metadata.getSocatVersion());
 		report.println("Cruise/Dataset Name: " + metadata.getCruiseName());
@@ -281,8 +284,8 @@ public class SocatCruiseReporter {
 			warnMsgs.add("Invalid start time and/or end time");
 		}
 		else {
-			report.println("Time range: " + timestamper.format(startTime) + 
-					" to " + timestamper.format(endTime));
+			report.println("Time range: " + TIMESTAMPER.format(startTime) + 
+					" to " + TIMESTAMPER.format(endTime));
 		}
 		// Check if this is a day-resolution cruise whose hour, minutes, and seconds 
 		// were approximated and reset in the database
@@ -316,7 +319,7 @@ public class SocatCruiseReporter {
 			ArrayList<SocatMetadata> metaList, PrintWriter report) {
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
-		report.println("SOCAT data report created: " + timestamper.format(new Date()));
+		report.println("SOCAT data report created: " + TIMESTAMPER.format(new Date()));
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
 		report.println("    or see: " + SOCAT_MAIN_DOI_HREF);
 		if ( regionName == null )
@@ -419,7 +422,7 @@ public class SocatCruiseReporter {
 				warnMsgs.add("Invalid beginning time for " + expocode);
 			}
 			else {
-				report.print(timestamper.format(metadata.getBeginTime()));
+				report.print(TIMESTAMPER.format(metadata.getBeginTime()));
 			}
 			report.print("\t");
 
@@ -427,7 +430,7 @@ public class SocatCruiseReporter {
 				warnMsgs.add("Invalid ending time for " + expocode);
 			}
 			else {
-				report.print(timestamper.format(metadata.getEndTime()));
+				report.print(TIMESTAMPER.format(metadata.getEndTime()));
 			}
 			report.print("\t");
 

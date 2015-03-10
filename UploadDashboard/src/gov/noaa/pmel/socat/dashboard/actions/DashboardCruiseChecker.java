@@ -4,8 +4,11 @@
 package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -19,16 +22,18 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Properties;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
@@ -327,6 +332,7 @@ public class DashboardCruiseChecker {
 	}
 
 	private CheckerMessageHandler msgHandler;
+	private MetadataFileHandler metadataHandler;
 	private boolean lastCheckProcessedOkay;
 	private boolean lastCheckHadGeopositionErrors;
 
@@ -342,8 +348,8 @@ public class DashboardCruiseChecker {
 	 * @throws IOException
 	 * 		If the SanityChecker has problems with a configuration file
 	 */
-	public DashboardCruiseChecker(File configFile, 
-			CheckerMessageHandler checkerMsgHandler) throws IOException {
+	public DashboardCruiseChecker(File configFile, CheckerMessageHandler checkerMsgHandler, 
+			MetadataFileHandler metaFileHandler) throws IOException {
 		try {
 			// Clear any previous configuration
 			SanityCheckConfig.destroy();
@@ -362,6 +368,10 @@ public class DashboardCruiseChecker {
 			throw new NullPointerException(
 					"CheckerMsgHandler passed to DashboardCruiseChecker is null");
 		msgHandler = checkerMsgHandler;
+		if ( metaFileHandler == null )
+			throw new NullPointerException(
+					"MetadataFileHandler passed to DashboardCruiseChecker is null");
+		metadataHandler = metaFileHandler;
 		lastCheckProcessedOkay = false;
 		lastCheckHadGeopositionErrors = false;
 	}
@@ -400,9 +410,23 @@ public class DashboardCruiseChecker {
 	 */
 	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData)
 											throws IllegalArgumentException {
-		// Create the metadata properties of this cruise for the sanity checker
-		Properties metadataInput = new Properties();
-		metadataInput.setProperty("EXPOCode", cruiseData.getExpocode());
+		String expocode = cruiseData.getExpocode();
+		// Get or create the OME metadata for this cruise
+		OmeMetadata omeMData = new OmeMetadata(expocode);
+		File omeFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.OME_FILENAME);
+		Document omeDoc; 
+		if ( omeFile.exists() ) {
+			try {
+				omeDoc = (new SAXBuilder()).build(omeFile);
+			} catch (Exception ex) {
+				throw new IllegalArgumentException("Problems interpreting the OME XML contents in " + 
+						omeFile.getName() + "\n    " + ex.getMessage());
+			}
+			omeMData.assignFromOmeXmlDoc(omeDoc);
+		}
+		else {
+			omeDoc = null;
+		}
 
 		// Get the data column units conversion object
 		ColumnConversionConfig convConfig;
@@ -751,7 +775,6 @@ public class DashboardCruiseChecker {
 		Document cruiseDoc = new Document(rootElement);
 
 		// Create the column specifications object for the sanity checker
-		String expocode = cruiseData.getExpocode();
 		Logger logger = Logger.getLogger("Sanity Checker - " + expocode);
 		if ( Level.DEBUG.isGreaterOrEqual(logger.getEffectiveLevel()) ) {
 			logger.debug("cruise columns specifications document:\n" + 
@@ -769,7 +792,7 @@ public class DashboardCruiseChecker {
 		// Create the SanityChecker for this cruise
 		SanityChecker checker;
 		try {
-			checker = new SanityChecker(expocode, metadataInput, colSpec, 
+			checker = new SanityChecker(expocode, omeMData, colSpec, 
 									cruiseData.getDataValues(), dateFormat);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException(
@@ -778,6 +801,26 @@ public class DashboardCruiseChecker {
 
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
+
+		// Check if the OME metadata has been modified
+		boolean omeUnchanged;
+		try {
+			Document updatedOmeDoc = output.getMetadata().createOmeXmlDoc();
+			omeUnchanged = omeDoc.equals(updatedOmeDoc);
+		} catch (Exception ex) {
+			omeUnchanged = false; 
+		}
+
+		// Save the updated OME metadata
+		if ( ! omeUnchanged ) {
+			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm Z")
+											 .print(new DateTime());
+			DashboardOmeMetadata dashOmeMData = new DashboardOmeMetadata(output.getMetadata(), 
+					timestamp, cruiseData.getOwner(), cruiseData.getVersion());
+			String message = "Update of OME metadata from cruise checker";
+			metadataHandler.saveMetadataInfo(dashOmeMData, message);
+			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
+		}
 
 		// Save the SanityChecker messages and assign WOCE flags in cruiseData
 		msgHandler.saveCruiseMessages(cruiseData, output);

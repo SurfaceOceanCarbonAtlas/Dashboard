@@ -431,9 +431,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	 * Submits cruises and updated archival selection to SOCAT.
 	 */
 	void continueSubmit() {
-		String localTimestamp = 
-				DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-							  .format(new Date());
+		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		String archiveStatus;
 		if ( socatRadio.getValue() ) {
 			// Archive with the next release of SOCAT
