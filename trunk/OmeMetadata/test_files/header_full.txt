@@ -1,0 +1,156 @@
+user_name=Catherine Cosca
+user_organization=NOAA/PMEL
+user_address=7600 Sand Point Way NE; Seattle, WA; 98115
+user_phone=1-(206)-526-6183
+user_email=cathy.cosca@noaa.gov
+investigator[
+name=Cosca, Catherine E.
+organization=NOAA/PMEL
+address=7600 Sand Point Way NE
+Seattle, WA  98115
+phone=(206) 526-6183
+email=cathy.cosca@noaa.gov
+]
+investigator[
+name=Feely, Richard A.
+organization=NOAA/PMEL
+address=7600 Sand Point Way NE
+Seattle, WA 98115
+phone=(206) 526-6214
+email=Richard.A.Feely@noaa.gov
+]
+investigator[
+name=Alin, Simone R.
+organization=NOAA/PMEL
+address=7600 Sand Point Way NE
+Seattle, WA 98115
+]
+investigator[
+name=Lebon, Geoffrey T.
+organization=NOAA/PMEL/JISAO
+address=7600 Sand Point Way NE
+Seattle, WA 98115
+]
+funding_info=NOAA Oceanic and Atmospheric Research
+experiment_name=SH1201
+experiment_type=VOS Lines
+cruise_id=332220120220
+cruise_start_date=
+cruise_end_date=
+temporal_coverage_start_date=
+temporal_coverage_end_date=
+geographical_region=North American West Coast
+vessel_name=Bell M. Shimada
+vessel_id=3322
+vessel_owner=NOAA
+variable[
+variable_name=xCO2W_PPM
+description_of_variable=PPM
+]
+variable[
+variable_name=xCO2A_PPM
+description_of_variable=PPM
+]
+variable[
+variable_name=xCO2A_INTERPOLATED_PPM
+description_of_variable=PPM
+]
+variable[
+variable_name=PRES_EQUIL_hPa
+description_of_variable=HectoPascals
+]
+variable[
+variable_name=PRES_SEALEVEL_hPa
+description_of_variable=HectoPascals
+]
+variable[
+variable_name=EqTEMP_C
+description_of_variable=Degrees C
+]
+variable[
+variable_name=SST(TSG)_C
+description_of_variable=Degrees C
+]
+variable[
+variable_name=SAL(TSG)_PERMIL
+description_of_variable=Permil
+]
+variable[
+variable_name=fCO2W@SST_uATM
+description_of_variable=microatmospheres
+]
+variable[
+variable_name=fCO2A_uATM
+description_of_variable=microatmospheres
+]
+variable[
+variable_name=dfCO2_uATM
+description_of_variable=microatmospheres
+]
+variable[
+variable_name=QC_FLAG
+description_of_variable=WOCE QC Flag
+]
+variable[
+variable_name=QC_SUBFLAG
+description_of_variable=QC SUBFLAG
+]
+depth_of_seawater_intake=3
+location_of_seawater_intake=Bow
+equilibrator_type=Showerhead
+equilibrator_volume=0.5
+water_flow_rate=3.5
+headspace_gas_flow_rate=60
+vented=Yes
+drying_method_for_co2_in_water=Thermoelectric condensor; Perma Pure (Naphion); magnesium perchlorate.  80% dry
+co2_in_marine_air_measurement=yes, 6 measurements every 3 hours
+co2_in_marine_air_location_and_height=Bow, 10m above water line
+co2_measurement_method=Infrared absorption of dry gas
+co2_manufacturer=Licor
+co2_model=Licor 7000, Serial # IRG4-0233
+co2_frequency=Every 180 seconds
+co2_resolution_water=1 uatm
+co2_uncertainty_water=2 uatm
+co2_resolution_air=.1 ppm
+co2_manufacturer_of_calibration_gas=LL55884 - 301.13 ppm,
+LL83547 - 450.34 ppm,
+LL83516 - 552.68 ppm,
+LL154359 - 579.58 ppm,
+CO2 system was calibrated every 8.5 hours.
+co2_sensor_calibration=Standards are from ESRL in Boulder CO; directly traceable to WMO scale; every 6 hours
+co2_environmental_control=CO2 system, built by General Oceanics, was installed in the computer lab of the NOAA Ship Bell Shimada.  The system was maintained by the CO2 group at PMEL, and operated by the ship's survey technician.  The Licor infrared sensor was zeroed with a 99.9% nitrogen gas and spanned with the high standard gas.
+co2_method_references=Pierrot, D., C. Neil, K. Sullivan, R. Castle, R. Wanninkhof, H. Lueger, T. Johannson, A. Olsen, R. A. Feely, and C. E. Cosca (2009), Recommendations for autonomous underway pCO2 measuring systems and data reduction routines, Deep-Sea Res II, 56, 512-522.
+sst_location=Bow intake, ~3m below water line
+sst_manufacturer=Seabird
+sst_model=SBE45, maintained by the ship
+sst_accuracy=.01 °C
+sst_precision=.001 °C
+sst_calibration=Calibrated annually at Seabird
+equ_temperature_location=In the equilibrator of the CO2 system located in the ship's computer lab.
+equ_temperature_manufacturer=Hart Scientific
+equ_temperature_model=1521; serial number A8B280
+equ_temperature_accuracy=0.0025 °C
+equ_temperature_precision=0.002 °C
+equ_temperature_calibration=Calibrated at Hart Scientific
+equ_temperature_warming=0.33 °C
+equ_temperature_other_comments=Equilibrator temperature was measured with a Hart Scientific model 1521 digital thermometer, serial number A8B280, with an NIST traceable model 5610 thermistor probe, serial number A8C0309 located inside the equilibrator.
+equ_pressure_location=In the equilibrator of the CO2 system located in the ship's computer lab.
+equ_pressure_manufacturer=Setra
+equ_pressure_model=239
+equ_pressure_accuracy=+/- .15% full scale
+equ_pressure_precision=+/- .005% full scale
+equ_pressure_calibration=Factory calibration
+equ_pressure_other_comments=The equilibrator was passively vented to a secondary equilibrator, and the Licor sample output was vented to the laboratory when CO2 measurements were made.  Pressure in the laboratory was measured with a GE Druck barometer with an accuracy of  ± 0.01 %fs.
+atm_pressure_location=On flying bridge of the ship; approximated 10 m above sea level
+atm_pressure_manufacturer=GE
+atm_pressure_model=Druck
+atm_pressure_accuracy=± 0.01 %fs
+atm_pressure_precision=± 0.005 %fs
+sss_location=Bow intake, ~3m below water line
+sss_manufacturer=Seabird
+sss_model=SBE45; maintained by the ship
+sss_accuracy=0.005 PSU
+sss_precision=0.0002 PSU
+sss_calibration=Calibrated annually at Seabird
+citation=Cosca, C., R. Feely, S. Alin, and G. Lebon. 2013. Sea Surface and Atmospheric fCO2 measurements from the NOAA Ship Bell M. Shimada 2012 VOS project line, cruise SH1201.
+
