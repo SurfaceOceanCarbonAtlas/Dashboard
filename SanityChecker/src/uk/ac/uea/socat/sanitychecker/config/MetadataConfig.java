@@ -24,45 +24,24 @@ public class MetadataConfig {
 	private static final int NAME_COL = 0;
 	
 	/**
-	 * The index of the column that contains the metadata data type
-	 */
-	private static final int TYPE_COL = 1;
-	
-	/**
 	 * The index of the column that states whether the item is required
 	 */
-	private static final int REQUIRED_COL = 2;
-	
-	/**
-	 * The index of the column that defines the mutual group of required values that
-	 * pertains to the item
-	 */
-	private static final int REQUIRED_GROUP_COL = 3;
+	private static final int REQUIRED_COL = 1;
 	
 	/**
 	 * The index of the column that states whether the Sanity Checker should generate the metadata value
 	 */
-	private static final int GENERATE_COL = 4;
-	
-	/**
-	 * The index of the column that contains the metadata item's minimum value
-	 */
-	private static final int MIN_COL = 5;
-	
-	/**
-	 * The index of the column that contains the metadata item's maximum value
-	 */
-	private static final int MAX_COL = 6;
+	private static final int GENERATE_COL = 2;
 	
 	/**
 	 * The index of the column that contains name of the class to use for the metadata item 
 	 */
-	private static final int ITEM_CLASS_COL = 7;
+	private static final int ITEM_CLASS_COL = 3;
 	
 	/**
 	 * The index of the column that contains the parameter to be passed to the generator function
 	 */
-	private static final int GENERATOR_PARAM_COL = 8;
+	private static final int GENERATOR_PARAM_COL = 4;
 	
 	/**
 	 * The root of all metadata item class names
