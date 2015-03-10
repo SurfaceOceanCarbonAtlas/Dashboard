@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -42,7 +41,7 @@ public class ColumnExistsMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 		Set<String> columnNames = record.getColumnNames();
 		columnExists = columnNames.contains(itsConfigItem.getGeneratorParameter());
 	}

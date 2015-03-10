@@ -6,19 +6,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
-import uk.ac.uea.socat.sanitychecker.config.MetadataConfigRequiredGroups;
 import uk.ac.uea.socat.sanitychecker.config.SanityCheckConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
@@ -56,26 +55,10 @@ public class SanityChecker {
 	
 	private MessageType itsMissingValueType;
 	
-	private static final String MISSING_METADATA_ID = "MISSING_METADATA_VALUE";
-	
-	private MessageType itsMissingMetadataType;
-	
-	private static final String MISSING_METADATA_GROUP_ID = "MISSING_METADATA_GROUP";
-	
-	private MessageType itsMissingMetadataGroupType;
-	
 	private static final String RANGE_ID = "RANGE";
 	
 	private MessageType itsRangeType;
 	
-	private static final String UNRECOGNISED_METADATA_ID = "UNRECOGNISED_METADATA";
-	
-	private MessageType itsUnrecognisedMetadataType;
-	
-	private static final String INVALID_METADATA_DATE = "INVALID_METADATA_DATE";
-	
-	private MessageType itsInvalidMetadataDateType;
-
 	/**
 	 * The standard output output format for dates
 	 */
@@ -85,11 +68,6 @@ public class SanityChecker {
 	 * The logger for this instance of the Sanity Checker
 	 */
 	private Logger itsLogger;
-	
-	/**
-	 * The passed in metadata name/value pairs
-	 */
-	private Properties itsInputMetadata;
 	
 	/**
 	 * The passed in data fields
@@ -165,7 +143,7 @@ public class SanityChecker {
 	 * @param dateTimeFormat The date format to be used for parsing date strings. Do not include the time specification!
 	 * @throws ConfigException If the base configuration has not been initialised
 	 */
-	public SanityChecker(String filename, Properties metadataInput, ColumnSpec colSpec, 
+	public SanityChecker(String filename, OmeMetadata metadata, ColumnSpec colSpec, 
 			ArrayList<ArrayList<String>> dataInput, String dateFormat) throws SanityCheckerException {
 		
 		itsLogger = Logger.getLogger("Sanity Checker - " + filename);
@@ -177,13 +155,7 @@ public class SanityChecker {
 		itsInternalErrorType = new MessageType(INTERNAL_ERROR_ID, "Internal Error", "Internal Error");
 		itsMissingValueType = new MessageType(MISSING_VALUE_ID, "Missing value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "'", "Missing value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "'");
 		itsRangeType = new MessageType(RANGE_ID, "Value '" + MessageType.FIELD_VALUE_IDENTIFIER + "' in column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' is outside the range '" + MessageType.VALID_VALUE_IDENTIFIER + "'", "Column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' out of range");
-		itsUnrecognisedMetadataType = new MessageType(UNRECOGNISED_METADATA_ID, "Unrecognised metadata item '" + MessageType.FIELD_VALUE_IDENTIFIER + "'", "Unrecognised metadata item");
 		
-		// Note that we cheat here, and pass in the metadata item name as the value.
-		itsMissingMetadataType = new MessageType(MISSING_METADATA_ID, "Missing metadata value '" + MessageType.FIELD_VALUE_IDENTIFIER + "'", "Missing metadata value");
-		itsInvalidMetadataDateType = new MessageType(INVALID_METADATA_DATE, "Invalid date in metadata item '" + MessageType.FIELD_VALUE_IDENTIFIER + "'", "Invalid date in metadata");
-		itsMissingMetadataGroupType = new MessageType(MISSING_METADATA_GROUP_ID, "At least one of the metadata items '" + MessageType.FIELD_VALUE_IDENTIFIER + "' must be present", "Missing metadata value");
-				
 		// Make sure the the base configuration is set up. Otherwise we can't do anything!
 		if (!BaseConfig.isInitialised()) {
 			itsLogger.fatal("Base Configuration has not been initialised - call initBaseConfig first!");
@@ -192,11 +164,10 @@ public class SanityChecker {
 		
 		try {
 			// Initialise the output object
-			itsInputMetadata = metadataInput;
 			itsInputData = dataInput;
 			itsColumnSpec = colSpec;
 			itsDateTimeHandler = new DateTimeHandler(dateFormat);
-			itsOutput = new Output(filename, metadataInput.size(), dataInput.size(), itsLogger);
+			itsOutput = new Output(filename, metadata, dataInput.size(), itsLogger);
 			
 		} catch (Exception e) {
 			itsLogger.fatal("Error initialising Sanity Checker instance", e);
@@ -211,42 +182,24 @@ public class SanityChecker {
 	public Output process() {
 
 		try {
-			boolean ok = true;
+			itsLogger.debug("Processing data records");
 			
-			// Extract the metadata. If this comes back as null, then we can't continue
-			itsLogger.debug("Processing metadata");
-			processInputMetadata();
-			
-			// Validate the metadata items from the header.
-			// If required fields are missing, we will fail.
-			// Other validation failures are allowed through with errors.
-			itsLogger.debug("Validating metadata");
-			boolean metadataPassed = validateMetadata(itsOutput.getMetadata());
-			if (!metadataPassed) {
-				itsOutput.clear(true);
-				ok = false;
+			for (List<String> record: itsInputData) {
+				itsRecordCount++;
+				itsLogger.trace("Processing record " + itsRecordCount);
+				SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
+				itsOutput.addRecord(socatRecord);
+				itsOutput.addMessages(socatRecord.getMessages());
 			}
 			
-			if (ok) {
-				itsLogger.debug("Processing data records");
-				
-				for (List<String> record: itsInputData) {
-					itsRecordCount++;
-					itsLogger.trace("Processing record " + itsRecordCount);
-					SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
-					itsOutput.addRecord(socatRecord);
-					itsOutput.addMessages(socatRecord.getMessages());
-				}
-				
-				// Check for missing/out-of-range values
-				checkDataValues();
-				
-				// Generate metadata from data
-				generateMetadataFromData();
-				
-				// Run data sanity checks
-				runSanityChecks();
-			}
+			// Check for missing/out-of-range values
+			checkDataValues();
+			
+			// Generate metadata from data
+			generateMetadataFromData();
+			
+			// Run data sanity checks
+			runSanityChecks();
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
@@ -294,36 +247,14 @@ public class SanityChecker {
 		}
 	}
 	
-
-	/**
-	 * Generates a MetadataItem object for a given piece of metadata
-	 * @param metadataItemName The name of the metadata item
-	 * @param metadataValue The value of the metadata
-	 * @return An item representing the metadata and its associated options and methods
-	 * @throws NoSuchMethodException If an error occurs setting up the MetadataItem object
-	 * @throws InstantiationException If an error occurs setting up the MetadataItem object
-	 * @throws IllegalAccessException If an error occurs setting up the MetadataItem object
-	 * @throws InvocationTargetException If an error occurs setting up the MetadataItem object
-	 */
-	private MetadataItem createMetadataItem(String metadataItemName, String metadataValue, int line) throws ConfigException, SanityCheckerException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-		MetadataConfigItem metadataItemConfig = MetadataConfig.getInstance().get(metadataItemName);
-		Class<?> c = metadataItemConfig.getItemClass();
-		Class<? extends MetadataItem> itemClass = c.asSubclass(MetadataItem.class);
-		Constructor<? extends MetadataItem> itemConstructor = itemClass.getConstructor(MetadataConfigItem.class, Integer.TYPE, Logger.class);
-		MetadataItem item = itemConstructor.newInstance(metadataItemConfig, line, itsLogger);
-		item.setValue(metadataValue, itsDateTimeHandler);
-		return item;
-	}
-	
 	/**
 	 * Generates metadata values from the file data.
 	 * Any conflicting metadata items already present will be overwritten
 	 * @param metadataSet The metadata that has been extracted thus far. New metadata will be added to this.
 	 */
-	private void generateMetadataFromData() throws ConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	private void generateMetadataFromData() throws ConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, DateTimeException, OmeMetadataException {
 		
 		List<MetadataItem> allRecordItems = new ArrayList<MetadataItem>();
-		Map<String, MetadataItem> metadataSet = itsOutput.getMetadata();
 		
 		// Loop through every item in the metadata config
 		for (String metadataName : MetadataConfig.getInstance().getConfigItemNames()) {
@@ -341,7 +272,7 @@ public class SanityChecker {
 				if (!item.canGenerateFromOneRecord()) {
 					allRecordItems.add(item);
 				} else {
-					item.processRecordForValue(metadataSet, itsOutput.getRecords().get(0));
+					item.processRecordForValue(itsOutput.getRecords().get(0));
 					item.generateValue(itsDateTimeHandler);
 				}
 			}
@@ -352,7 +283,7 @@ public class SanityChecker {
 		// Loop through all the records from the file, and pass each record to each metadata entry in turn.
 		for (SocatDataRecord record: itsOutput.getRecords()) {
 			for (MetadataItem item : allRecordItems) {
-				item.processRecordForValue(metadataSet, record);
+				item.processRecordForValue(record);
 			}
 		}
 		
@@ -360,7 +291,7 @@ public class SanityChecker {
 		// and add it to the metadata set.
 		for (MetadataItem item: allRecordItems) {
 			item.generateValue(itsDateTimeHandler);
-			metadataSet.put(item.getName(), item);
+			itsOutput.addMetadataValue(item.getName(), item.getValue(itsDateTimeHandler), item.getLine());
 		}
 	}
 	
@@ -508,140 +439,5 @@ public class SanityChecker {
 		}
 		
 		itsOutput.addMessages(messages);
-	}
-
-	/**
-	 * Processes the passed in metadata and adds the results to the output.
-	 * @throws ConfigException If an error occurs while retrieving the configuration (this shouldn't happen!)
-	 * @throws Exception If any exceptions occur while creating metadata item objects (most likely to be Refelction issues)
-	 */
-	private void processInputMetadata() throws ConfigException, Exception {
-		for (String name : itsInputMetadata.stringPropertyNames()) {
-			String value = itsInputMetadata.getProperty(name);
-			
-			MetadataConfigItem config = MetadataConfig.getInstance().get(name);
-			if (null == config) {
-				itsLogger.trace("Unrecognised metadata item '" + name);
-				
-				Message message = new Message(Message.NO_COLUMN_INDEX, null, itsUnrecognisedMetadataType, Message.WARNING, Message.NO_LINE_NUMBER, name, null);
-				itsOutput.addMessage(message);
-				itsLogger.warn("Unrecognised metadata item " + name);
-			} else {
-				itsLogger.trace("Metadata item: " + name + " = " + value);
-				
-				try {
-					itsOutput.addMetadataItem(createMetadataItem(name, value, -1));					
-				} catch (Exception e) {
-					if (e.getCause() instanceof DateTimeException) {
-						
-						// Note that we cheat and pass the metadata item name as the value.
-						Message message = new Message(Message.NO_COLUMN_INDEX, null, itsInvalidMetadataDateType, Message.ERROR, Message.NO_LINE_NUMBER, name, null);
-						itsOutput.addMessage(message);
-						itsLogger.error("Invalid date format for metadata item " + name);
-					} else {
-						// Other exceptions are internal Java issues from Reflection. There's not much
-						// we can do about them
-						throw e;
-					}
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Validates all metadata items in a given set of metadata. Warnings and errors are logged as required.
-	 * If any metadata items are required, but are not configured to be generated from the data, the method
-	 * returns {@code false}. In all other cases it returns {@code true}.
-	 * @param metadata The metadata to be validated
-	 * @return {@code false} if required items are missing but cannot be generated from the data; {@code true} otherwise.
-	 */
-	private boolean validateMetadata(Map<String, MetadataItem> metadata) throws ConfigException, MessageException {
-		boolean validatedOK = true;
-
-		// Ensure that all required values are present
-		validatedOK = checkRequiredMetadata(metadata);
-		
-		// Ensure that all grouped value requirements are met
-		boolean requiredGroupsOK = checkRequiredMetadataGroups(metadata);
-		if (!requiredGroupsOK)
-			validatedOK = false;
-		
-		
-		// Finally, validate each value individually.
-		// The severity of any validation failure is determined by the validation method.
-		for (String metadataName : metadata.keySet()) {
-			MetadataItem value = metadata.get(metadataName);
-			Message validateResult = value.validate(itsLogger);
-
-			if (validateResult != null) {
-				if (validateResult.getSeverity() == Message.ERROR) {
-					validatedOK = false;
-				}
-				
-				itsOutput.addMessage(validateResult);
-			}
-		}
-		return validatedOK;
-	}
-
-	/**
-	 * Check that all required metadata items are present.
-	 * Note that if the metadata item in question is generated automatically
-	 * then we don't expect it to be there.
-	 * @param metadata The metadata to be checked
-	 * @return {@code true} if all required metadata entries are present; {@code false} otherwise.
-	 */
-	private boolean checkRequiredMetadata(Map<String, MetadataItem> metadata) throws ConfigException, MessageException {
-		boolean ok = true;
-
-		for (String metadataName : MetadataConfig.getInstance().getConfigItemNames()) {
-			MetadataConfigItem configuredItem = MetadataConfig.getInstance().get(metadataName);
-			
-			// Things in required groups are processed separately
-			if (!configuredItem.isInRequiredGroup()) {
-				if (configuredItem.isRequired() && !configuredItem.autoGenerated()) {
-					if (!metadata.containsKey(metadataName)) {
-						itsLogger.error("Required metadata item '" + metadataName + "' is missing");
-						ok = false;
-
-						Message message = new Message(Message.NO_COLUMN_INDEX, null, itsMissingMetadataType, Message.ERROR, Message.NO_LINE_NUMBER, metadataName, null);
-						itsOutput.addMessage(message);
-					}
-				}
-			}
-		}
-		return ok;
-	}
-
-	/**
-	 * Check that at least one representative item is present for each metadata group.
-	 * If one of the entries is auto-generated, then the check will pass.
-	 * @param metadata
-	 * @return
-	 */
-	private boolean checkRequiredMetadataGroups(Map<String, MetadataItem> metadata) throws ConfigException, MessageException {
-		boolean ok = true;
-		
-		MetadataConfigRequiredGroups requiredGroups = MetadataConfig.getInstance().getRequiredGroups();
-		for (String groupName : requiredGroups.getGroupNames()) {
-			boolean groupOK = false;
-			
-			List<String> groupedItemNames = requiredGroups.getGroupedItemNames(groupName);
-			for (String groupedItemName : groupedItemNames) {
-				MetadataConfigItem configItem = MetadataConfig.getInstance().get(groupedItemName);
-				if (metadata.get(groupedItemName) != null || configItem.autoGenerated()) {
-					groupOK = true;
-				}
-			}
-			
-			if (!groupOK) {
-				itsLogger.error("At least one of " + groupedItemNames + " must be present in the metadata");
-				ok = false;
-				
-				Message message = new Message(Message.NO_COLUMN_INDEX, null, itsMissingMetadataGroupType, Message.ERROR, Message.NO_LINE_NUMBER, groupedItemNames.toString(), null);
-				itsOutput.addMessage(message);
-			}
-		}
-		return ok;
 	}
 }

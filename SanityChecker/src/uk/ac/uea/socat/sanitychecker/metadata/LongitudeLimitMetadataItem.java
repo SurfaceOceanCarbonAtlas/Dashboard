@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -116,7 +115,7 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 
 		SocatDataColumn longitudeColumn = record.getColumn(SocatDataRecord.LONGITUDE_COLUMN_NAME);
 		if (longitudeColumn.getFlag() != SocatColumnConfigItem.BAD_FLAG) {

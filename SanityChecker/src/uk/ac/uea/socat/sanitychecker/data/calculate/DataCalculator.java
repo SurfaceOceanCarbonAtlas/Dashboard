@@ -1,11 +1,10 @@
 package uk.ac.uea.socat.sanitychecker.data.calculate;
 
-import java.util.Map;
-
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
-import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
 /**
  * Interface providing prototypes for methods to dynamically calculate data values
@@ -21,5 +20,5 @@ public interface DataCalculator {
 	 * @return The calculated value
 	 * @throws SocatDataException If the value cannot be calculated
 	 */
-	public String calculateDataValue(Map<String, MetadataItem> metadata, SocatDataRecord record, int colIndex, String colName, DateTimeHandler dateTimeHander) throws SocatDataException;
+	public String calculateDataValue(OmeMetadata metadata, SocatDataRecord record, int colIndex, String colName, DateTimeHandler dateTimeHander) throws SocatDataException, OmeMetadataException;
 }

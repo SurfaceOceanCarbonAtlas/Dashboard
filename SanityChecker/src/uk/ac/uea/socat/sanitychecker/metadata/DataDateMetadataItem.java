@@ -1,7 +1,6 @@
 package uk.ac.uea.socat.sanitychecker.metadata;
 
 import java.text.ParseException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
@@ -40,7 +39,7 @@ public class DataDateMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void processRecordForValue(Map<String, MetadataItem> metadataSet, SocatDataRecord record) throws MetadataException {
+	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 		
 		// Get the record's date
 		if (!record.getColumn(SocatDataRecord.YEAR_COLUMN_NAME).getValue().equalsIgnoreCase("NaN")) {

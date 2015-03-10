@@ -15,6 +15,12 @@ class Path {
 		itsParent = parent;
 	}
 	
+	protected Path(Path parent, String elementName, String subElement) {
+		Path parentPath = new Path(parent, elementName);
+		itsElementName = subElement;
+		itsParent = parentPath;
+	}
+	
 	protected String getElementName() {
 		return itsElementName;
 	}

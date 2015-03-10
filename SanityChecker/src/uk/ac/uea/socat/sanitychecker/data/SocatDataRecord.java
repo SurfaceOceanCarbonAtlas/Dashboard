@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.CheckerUtils;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
@@ -25,7 +27,6 @@ import uk.ac.uea.socat.sanitychecker.data.datetime.MissingDateTimeElementExcepti
 import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
 import uk.ac.uea.socat.sanitychecker.messages.MessageType;
-import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
 /**
  * A class representing a single measurement record.
@@ -157,7 +158,7 @@ public class SocatDataRecord {
 	 * @throws SocatDataException If an error occurs while processing the data record
 	 * @throws SocatDataBaseException If an error occurs while processing the data record
 	 */
-	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler, Logger logger) throws ConfigException, SocatDataException, SocatDataBaseException, MessageException {
+	public SocatDataRecord(List<String> dataFields, int lineNumber, ColumnSpec colSpec, OmeMetadata metadata, DateTimeHandler dateTimeHandler, Logger logger) throws ConfigException, SocatDataException, SocatDataBaseException, MessageException, OmeMetadataException {
 		itsMessages = new ArrayList<Message>();
 		itsColumnSpec = colSpec;
 		itsLineNumber = lineNumber;
@@ -357,20 +358,12 @@ public class SocatDataRecord {
 	 * Populate all fields whose values are extracted from the file's metadata.
 	 * @param metadata The set of metadata to use as a data source.
 	 */
-	private void setMetadataValues(Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler) throws SocatDataException {
+	private void setMetadataValues(OmeMetadata metadata, DateTimeHandler dateTimeHandler) throws SocatDataException, OmeMetadataException {
 		for (String column : itsColumnConfig.getColumnList()) {
 			if (getDataSource(column) == SocatColumnConfigItem.METADATA_SOURCE) {
 				String metadataName = getMetadataSourceName(column);
 				itsLogger.trace("Retrieving value for column '" + column + "' from metadata item '" + metadataName + "'");
-
-				MetadataItem metadataItem = metadata.get(metadataName);
-				if (null != metadataItem) {
-					try {
-						setFieldValue(column, metadataItem.getValue(dateTimeHandler));
-					} catch (DateTimeException e) {
-						throw new SocatDataException(itsLineNumber, itsColumnSpec.getColumnInfo(column).getInputColumnIndex(), column, "Could not retrieve metadata value", e);
-					}
-				}
+				setFieldValue(column, metadata.getValue(metadataName));
 			}
 		}
 	}
@@ -379,7 +372,7 @@ public class SocatDataRecord {
 	 * Populate all fields whose values are calculated by the Sanity Checker
 	 * @param metadata
 	 */
-	private void setCalculatedValues(Map<String, MetadataItem> metadata, DateTimeHandler dateTimeHandler) throws SocatDataException {
+	private void setCalculatedValues(OmeMetadata metadata, DateTimeHandler dateTimeHandler) throws SocatDataException {
 		
 		int columnIndex = 0;
 		for (String column : itsColumnConfig.getColumnList()) {
