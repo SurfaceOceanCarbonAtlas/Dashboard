@@ -1,8 +1,0 @@
-#Name,Type,Required?,Required Group,Generate?,Min,Max,Item Class,Generator Parameter
-EXPOCode,String,Y,,N,NA,NA,Default,
-StartDate,Date,Y,,Y,NA,NA,DataDate,Start
-EndDate,Date,Y,,Y,NA,NA,DataDate,End
-WesternLimit,Real,Y,,Y,-180,180,LongitudeLimit,W
-EasternLimit,Real,Y,,Y,-180,180,LongitudeLimit,E
-NorthernLimit,Real,Y,,Y,-90,90,LatitudeLimit,N
-SouthernLimit,Real,Y,,Y,-90,90,LatitudeLimit,S

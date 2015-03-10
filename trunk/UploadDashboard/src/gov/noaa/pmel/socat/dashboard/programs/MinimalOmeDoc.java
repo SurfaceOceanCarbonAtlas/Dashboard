@@ -30,11 +30,6 @@ import org.jdom2.Element;
  */
 public class MinimalOmeDoc {
 
-	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyyMMdd");
-	static {
-		DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
-
 	String expocode;
 	String cruiseName;
 	String vesselName;
@@ -177,18 +172,21 @@ public class MinimalOmeDoc {
 			cruiseElem.addContent(geoElem);
 		}
 
+		SimpleDateFormat dateFmtr = new SimpleDateFormat("yyyyMMdd");
+		dateFmtr.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 		// Start and end date go in <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
 		Element timeElem = new Element("Temporal_Coverage");
 		somethingAdded = false;
 		if ( ! startDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
 			Element startElem = new Element("Start_Date");
-			startElem.addContent(DATE_FORMATTER.format(startDate));
+			startElem.addContent(dateFmtr.format(startDate));
 			timeElem.addContent(startElem);
 			somethingAdded = true;
 		}
 		if ( ! endDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
 			Element endElem = new Element("End_Date");
-			endElem.addContent(DATE_FORMATTER.format(endDate));
+			endElem.addContent(dateFmtr.format(endDate));
 			timeElem.addContent(endElem);
 			somethingAdded = true;
 		}
@@ -696,7 +694,7 @@ public class MinimalOmeDoc {
 			MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
 			// Open the file containing the spreadsheet TSV table 
 			File tsvFile = new File(args[0]);
-			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm"))
+			String timestamp = (new SimpleDateFormat("yyyy-MM-dd HH:mm Z"))
 					.format(new Date(tsvFile.lastModified()));
 			String dataline = "";
 			BufferedReader tsvIn = null;

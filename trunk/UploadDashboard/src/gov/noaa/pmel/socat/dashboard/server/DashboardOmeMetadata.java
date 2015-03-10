@@ -18,6 +18,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
@@ -30,13 +31,7 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 1935026048888928520L;
-
-	private static final SimpleDateFormat DATE_PARSER = 
-			new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-	static {
-		DATE_PARSER.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
+	private static final long serialVersionUID = 4372813844320404620L;
 
 	private OmeMetadata omeMData;
 
@@ -48,13 +43,15 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 		OME XML file to read.  The expocode, upload timestamp, and owner 
 	 * 		are copied from this object, and the file specified is read to 
 	 * 		populate the OmeMetadata member of this object.
+	 * @param mdataHandler
+	 * 		MetadataFileHandler to use get the given OME XML file
 	 * @throws IllegalArgumentException
 	 * 		if mdata is null, or
 	 * 		if the information in the DashboardMetadata is invalid, or
 	 * 		if the contents of the metadata document are not valid
 	 */
-	public DashboardOmeMetadata(DashboardMetadata mdata) 
-											throws IllegalArgumentException {
+	public DashboardOmeMetadata(DashboardMetadata mdata, 
+			MetadataFileHandler mdataHandler) throws IllegalArgumentException {
 		// Initialize to an empty OME metadata document with the standard OME filename
 		super();
 		filename = OME_FILENAME;
@@ -69,14 +66,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		owner = mdata.getOwner();
 		version = mdata.getVersion();
 
-		// Read this metadata document as an XML file
-		MetadataFileHandler mdataHandler;
-		try {
-			mdataHandler = DashboardDataStore.get().getMetadataFileHandler();
-		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get the metadata handler");
-		}
 		File mdataFile = mdataHandler.getMetadataFile(expocode, mdata.getFilename());
 		Document omeDoc;
 		try {
@@ -135,6 +124,36 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	}
 
 	/**
+	 * Creates using the given OmeMetadata.  The expocode is obtained from the OmeMetadata.
+	 * 
+	 * @param omeMeta
+	 * 		the OmeMetadata contents of this metadata
+	 * @param timestamp
+	 * 		the upload timestamp for this metadata
+	 * @param owner
+	 * 		the owner of this metadata
+	 * @param version
+	 * 		the SOCAT version of this metadata
+	 */
+	public DashboardOmeMetadata(OmeMetadata omeMeta, String timestamp, String owner, String version) {
+		super();
+		this.filename = OME_FILENAME;
+		String expo;
+		try {
+			expo = omeMeta.getValue(OmeMetadata.EXPO_CODE_STRING);
+		} catch (OmeMetadataException ex) {
+			throw new RuntimeException(ex);
+		}
+		this.expocode = DashboardServerUtils.checkExpocode(expo);
+		setUploadTimestamp(timestamp);
+		setOwner(owner);
+		setVersion(version);
+		this.omeMData = omeMeta;
+		// If conflicted or otherwise draft, set the conflicted flags in SocatMetadata
+		setConflicted(this.omeMData.isDraft());
+	}
+
+	/**
 	 * Create a SocatMetadata object from the data in this object.
 	 * 
 	 * @param socatVersion
@@ -148,9 +167,9 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 */
 	public SocatMetadata createSocatMetadata(String socatVersion, 
 			Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
-		
+
 		// We cannot create a SocatMetadata object if there are conflicts
-		if (isConflicted()) {
+		if ( isConflicted() ) {
 			throw new IllegalArgumentException("The Metadata contains conflicts");
 		}
 		
@@ -162,37 +181,38 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(omeMData.getWestmostLongitude()));
-		} catch (NumberFormatException | NullPointerException e) {
+		} catch (NumberFormatException | NullPointerException ex) {
 			scMData.setWestmostLongitude(null);				
 		}
 
 		try {
 			scMData.setEastmostLongitude(Double.parseDouble(omeMData.getEastmostLongitude()));
-		} catch (NumberFormatException | NullPointerException e) {
+		} catch (NumberFormatException | NullPointerException ex) {
 			scMData.setEastmostLongitude(null);
 		}
 
 		try {
 			scMData.setSouthmostLatitude(Double.parseDouble(omeMData.getSouthmostLatitude()));
-		} catch (NumberFormatException | NullPointerException e) {
+		} catch (NumberFormatException | NullPointerException ex) {
 			scMData.setSouthmostLatitude(null);
 		}
 
 		try {
 			scMData.setNorthmostLatitude(Double.parseDouble(omeMData.getNorthmostLatitude()));
-		} catch (NumberFormatException | NullPointerException e) {
+		} catch (NumberFormatException | NullPointerException ex) {
 			scMData.setNorthmostLatitude(null);
 		}
 		
+		SimpleDateFormat dateParser = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+		dateParser.setTimeZone(TimeZone.getTimeZone("UTC"));
 		try {
-			scMData.setBeginTime(DATE_PARSER.parse(omeMData.getTemporalCoverageStartDate() + " 00:00:00"));
-		} catch (ParseException e) {
+			scMData.setBeginTime(dateParser.parse(omeMData.getTemporalCoverageStartDate() + " 00:00:00"));
+		} catch (ParseException ex) {
 			scMData.setBeginTime(null);
 		}
-
 		try {
-			scMData.setEndTime(DATE_PARSER.parse(omeMData.getTemporalCoverageEndDate() + " 23:59:59"));
-		} catch (ParseException e) {
+			scMData.setEndTime(dateParser.parse(omeMData.getTemporalCoverageEndDate() + " 23:59:59"));
+		} catch (ParseException ex) {
 			scMData.setEndTime(null);
 		}
 		
@@ -250,7 +270,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 		new expocode to use
 	 */
 	public void changeExpocode(String newExpocode) {
-		omeMData.changeExpocode(newExpocode);
+		omeMData.setExpocode(newExpocode);
 		setExpocode(newExpocode);
 	}
 	

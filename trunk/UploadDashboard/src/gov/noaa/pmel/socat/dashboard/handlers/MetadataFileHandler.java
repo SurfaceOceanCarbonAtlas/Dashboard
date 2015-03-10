@@ -672,7 +672,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 
 			// If this is the OME metadata file, read the contents 
 			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) ) {
-				omeMData = new DashboardOmeMetadata(metaDoc);
+				omeMData = new DashboardOmeMetadata(metaDoc, this);
 			}
 
 			File oldMetaFile = getMetadataFile(oldExpocode, uploadFilename);

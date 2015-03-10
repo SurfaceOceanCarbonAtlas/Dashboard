@@ -1,0 +1,8 @@
+#Name,Required?,Generate?,Item Class,Generator Parameter
+EXPOCode,Y,N,Default,
+StartDate,Y,Y,DataDate,Start
+EndDate,Y,Y,DataDate,End
+WesternLimit,Y,Y,LongitudeLimit,W
+EasternLimit,Y,Y,LongitudeLimit,E
+NorthernLimit,Y,Y,LatitudeLimit,N
+SouthernLimit,Y,Y,LatitudeLimit,S

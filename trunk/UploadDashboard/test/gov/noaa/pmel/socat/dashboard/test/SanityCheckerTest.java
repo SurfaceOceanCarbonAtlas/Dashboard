@@ -10,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -18,6 +17,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
@@ -184,8 +184,7 @@ public class SanityCheckerTest {
 		for ( String dataString : badCruiseDataStrings )
 			badCruiseData.add(new ArrayList<String>(Arrays.asList(dataString.split("\t", -1))));
 
-		Properties metadataInput = new Properties();
-		metadataInput.setProperty("EXPOCode", expocode);
+		OmeMetadata metadataInput = new OmeMetadata(expocode);
 
 		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILENAME);
 		SanityChecker.initConfig(CONFIG_FILENAME);

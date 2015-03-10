@@ -145,8 +145,8 @@ public class DashboardCruiseSubmitter {
 
 				try {
 					// Get the OME metadata for this cruise
-					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
-							metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME));
+					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
+					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data

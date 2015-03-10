@@ -92,7 +92,8 @@ public class SocatSummaryReporter {
 			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
 			if ( metadata == null )
 				throw new IllegalArgumentException("No OME metadata for " + expocode);
-			SocatMetadata socatMetadata = (new DashboardOmeMetadata(metadata)).createSocatMetadata(null, null, null);
+			DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
+			SocatMetadata socatMetadata = omeMeta.createSocatMetadata(null, null, null);
 			datasetName = socatMetadata.getCruiseName();
 			socatVersion = "-";
 			pis = socatMetadata.getScienceGroup();

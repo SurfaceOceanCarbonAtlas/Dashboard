@@ -267,8 +267,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	 * 		value to assign to the actionToken
 	 */
 	private void assignTokens(String cruiseAction) {
-		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm")
-											  .format(new Date());
+		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		String encoding = KNOWN_ENCODINGS[encodingListBox.getSelectedIndex()];
 		String format;
 		if ( commaRadio.getValue() )

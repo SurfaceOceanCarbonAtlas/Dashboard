@@ -22,10 +22,6 @@ import java.util.Date;
 public class CruiseFlagsHandler {
 
 	private static final String FLAG_MSGS_FILENAME_SUFFIX = "_WOCE_flags.tsv";
-
-	private static final SimpleDateFormat TIMESTAMPER = 
-			new SimpleDateFormat("yyyy-MM-dd HH:mm Z");
-
 	private File filesDir;
 
 	/**
@@ -83,7 +79,8 @@ public class CruiseFlagsHandler {
 			RowNumSet rowNums = new RowNumSet();
 			// Get the current WOCE flags for this cruise and print them to file
 			msgsWriter.println("Expocode: " + expocode);
-			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + TIMESTAMPER.format(new Date()));
+			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + 
+					(new SimpleDateFormat("yyyy-MM-dd HH:mm Z")).format(new Date()));
 			msgsWriter.println("Flag\tCol.Type\tNum.Rows\tMessage\tRows");
 			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
 			for ( SocatWoceEvent woceEvent : woceEventsList ) {
