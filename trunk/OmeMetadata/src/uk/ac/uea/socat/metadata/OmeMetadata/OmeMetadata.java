@@ -188,128 +188,132 @@ public class OmeMetadata {
 	/**
 	 * Names of fields in the data file headers
 	 */
-	private static final String USER_NAME_STRING = "user_name";
-	private static final String USER_ORGANIZATION_STRING = "user_organization";
-	private static final String USER_ADDRESS_STRING = "user_address";
-	private static final String USER_PHONE_STRING = "user_phone";
-	private static final String USER_EMAIL_STRING = "user_email";
+	public static final String USER_NAME_STRING = "user_name";
+	public static final String USER_ORGANIZATION_STRING = "user_organization";
+	public static final String USER_ADDRESS_STRING = "user_address";
+	public static final String USER_PHONE_STRING = "user_phone";
+	public static final String USER_EMAIL_STRING = "user_email";
 	
-	private static final String DATASET_ID_STRING = "dataset_id";
-	private static final String FUNDING_INFO_STRING = "funding_info";
+	public static final String DATASET_ID_STRING = "dataset_id";
+	public static final String FUNDING_INFO_STRING = "funding_info";
 	
-	private static final String EXPERIMENT_NAME_STRING = "experiment_name";
-	private static final String EXPERIMENT_TYPE_STRING = "experiment_type";
-	private static final String PLATFORM_TYPE_STRING = "platform_type";
-	private static final String CO2_INSTRUMENT_TYPE_STRING = "co2_instrument_type";
-	private static final String MOORING_ID_STRING = "mooring_id";
+	public static final String EXPERIMENT_NAME_STRING = "experiment_name";
+	public static final String EXPERIMENT_TYPE_STRING = "experiment_type";
+	public static final String PLATFORM_TYPE_STRING = "platform_type";
+	public static final String CO2_INSTRUMENT_TYPE_STRING = "co2_instrument_type";
+	public static final String MOORING_ID_STRING = "mooring_id";
 	
-	private static final String EXPO_CODE_STRING = "expocode";
-	private static final String CRUISE_ID_STRING = "cruise_id";
-	private static final String SUB_CRUISE_INFO_STRING = "cruise_info";
-	private static final String SECTION_STRING = "section";
+	public static final String EXPO_CODE_STRING = "expocode";
+	public static final String CRUISE_ID_STRING = "cruise_id";
+	public static final String SUB_CRUISE_INFO_STRING = "cruise_info";
+	public static final String SECTION_STRING = "section";
 	
-	private static final String GEO_REGION_STRING = "geographical_region";
+	public static final String GEO_REGION_STRING = "geographical_region";
+	public static final String WEST_BOUND_STRING = "westernmost_longitude";
+	public static final String EAST_BOUND_STRING = "easternmost_longitude";
+	public static final String NORTH_BOUND_STRING = "northernmost_latitude";
+	public static final String SOUTH_BOUND_STRING = "southernmost_latitude";
 	
-	private static final String TEMP_START_DATE_STRING = "temporal_coverage_start_date";
-	private static final String TEMP_END_DATE_STRING = "temporal_coverage_end_date";
-	private static final String START_DATE_STRING = "cruiseStartDate";
-	private static final String END_DATE_STRING = "cruise_end_date";
+	public static final String TEMP_START_DATE_STRING = "temporal_coverage_start_date";
+	public static final String TEMP_END_DATE_STRING = "temporal_coverage_end_date";
+	public static final String START_DATE_STRING = "cruise_start_date";
+	public static final String END_DATE_STRING = "cruise_end_date";
 	
-	private static final String VESSEL_NAME_STRING = "vessel_name";
-	private static final String VESSEL_ID_STRING = "vessel_id";
-	private static final String COUNTRY_STRING = "country";
-	private static final String OWNER_STRING = "vessel_owner";
+	public static final String VESSEL_NAME_STRING = "vessel_name";
+	public static final String VESSEL_ID_STRING = "vessel_id";
+	public static final String COUNTRY_STRING = "country";
+	public static final String OWNER_STRING = "vessel_owner";
 	
-	private static final String XCO2_WATER_EQU_DRY_STRING = "xco2_water_equ_dry_unit";
-	private static final String XCO2_WATER_SST_DRY_STRING = "xco2_water_sst_dry_unit";
-	private static final String PCO2_WATER_EQU_WET_STRING = "pco2_water_equ_wet_unit";
-	private static final String PCO2_WATER_SST_WET_STRING = "pco2_water_sst_wet_unit";
-	private static final String FCO2_WATER_EQU_WET_STRING = "fco2_water_equ_wet_unit";
-	private static final String FCO2_WATER_SST_WET_STRING = "fco2_water_sst_wet_unit";
-	private static final String XCO2_AIR_DRY_STRING = "xco2_air_dry_unit";
-	private static final String PCO2_AIR_WET_STRING = "pco2_air_wet_unit";
-	private static final String FCO2_AIR_WET_STRING = "fco2_air_wet_unit";
-	private static final String XCO2_AIR_DRY_INTERP_STRING = "xco2_air_dry_interpolated_unit";
-	private static final String PCO2_AIR_WET_INTERP_STRING = "pco2_air_wet_interpolated_unit";
-	private static final String FCO2_AIR_WET_INTERP_STRING = "fco2_air_wet_interpolated_unit";
+	public static final String XCO2_WATER_EQU_DRY_STRING = "xco2_water_equ_dry_unit";
+	public static final String XCO2_WATER_SST_DRY_STRING = "xco2_water_sst_dry_unit";
+	public static final String PCO2_WATER_EQU_WET_STRING = "pco2_water_equ_wet_unit";
+	public static final String PCO2_WATER_SST_WET_STRING = "pco2_water_sst_wet_unit";
+	public static final String FCO2_WATER_EQU_WET_STRING = "fco2_water_equ_wet_unit";
+	public static final String FCO2_WATER_SST_WET_STRING = "fco2_water_sst_wet_unit";
+	public static final String XCO2_AIR_DRY_STRING = "xco2_air_dry_unit";
+	public static final String PCO2_AIR_WET_STRING = "pco2_air_wet_unit";
+	public static final String FCO2_AIR_WET_STRING = "fco2_air_wet_unit";
+	public static final String XCO2_AIR_DRY_INTERP_STRING = "xco2_air_dry_interpolated_unit";
+	public static final String PCO2_AIR_WET_INTERP_STRING = "pco2_air_wet_interpolated_unit";
+	public static final String FCO2_AIR_WET_INTERP_STRING = "fco2_air_wet_interpolated_unit";
 	
-	private static final String INTAKE_DEPTH_STRING = "depth_of_seawater_intake";
-	private static final String INTAKE_LOCATION_STRING = "location_of_seawater_intake";
-	private static final String EQUI_TYPE_STRING = "equilibrator_type";
-	private static final String EQUI_VOLUME_STRING = "equilibrator_volume";
-	private static final String WATER_FLOW_RATE_STRING = "water_flow_rate";
-	private static final String GAS_FLOW_RATE_STRING = "headspace_gas_flow_rate";
-	private static final String VENTED_STRING = "vented";
-	private static final String DRYING_METHOD_STRING = "drying_method_for_co2_in_water";
-	private static final String EQUI_ADDITIONAL_INFO_STRING = "equilibrator_additional_information";
+	public static final String INTAKE_DEPTH_STRING = "depth_of_seawater_intake";
+	public static final String INTAKE_LOCATION_STRING = "location_of_seawater_intake";
+	public static final String EQUI_TYPE_STRING = "equilibrator_type";
+	public static final String EQUI_VOLUME_STRING = "equilibrator_volume";
+	public static final String WATER_FLOW_RATE_STRING = "water_flow_rate";
+	public static final String GAS_FLOW_RATE_STRING = "headspace_gas_flow_rate";
+	public static final String VENTED_STRING = "vented";
+	public static final String DRYING_METHOD_STRING = "drying_method_for_co2_in_water";
+	public static final String EQUI_ADDITIONAL_INFO_STRING = "equilibrator_additional_information";
 	
-	private static final String MARINE_AIR_MEASUREMENT_STRING = "co2_in_marine_air_measurement";
-	private static final String MARINE_AIR_LOCATION_STRING = "co2_in_marine_air_location_and_height";
-	private static final String MARINE_AIR_DRYING_STRING = "co2_in_marine_air_drying_method";
+	public static final String MARINE_AIR_MEASUREMENT_STRING = "co2_in_marine_air_measurement";
+	public static final String MARINE_AIR_LOCATION_STRING = "co2_in_marine_air_location_and_height";
+	public static final String MARINE_AIR_DRYING_STRING = "co2_in_marine_air_drying_method";
 	
-	private static final String CO2_MEASUREMENT_METHOD_STRING = "co2_measurement_method";
-	private static final String CO2_MANUFACTURER_STRING = "co2_manufacturer";
-	private static final String CO2_MODEL_STRING = "co2_model";
-	private static final String CO2_FREQUENCY_STRING = "co2_frequency";
-	private static final String CO2_WATER_RES_STRING = "co2_resolution_water";
-	private static final String CO2_WATER_UNC_STRING = "co2_uncertainty_water";
-	private static final String CO2_AIR_RES_STRING = "co2_resolution_air";
-	private static final String CO2_AIR_UNC_STRING = "co2_uncertainty_air";
-	private static final String CO2_CALIBRATION_MANUFACTURER_STRING = "co2_manufacturer_of_calibration_gas";
-	private static final String CO2_SENSOR_CALIBRATION_STRING = "co2_sensor_calibration";
-	private static final String ENVIRONMENTAL_CONTROL_STRING = "co2_environmental_control";
-	private static final String METHOD_REFS_STRING = "co2_method_references";
-	private static final String DETAILS_OF_CO2_SENSING_STRING = "details_of_co2_sensing";
-	private static final String ANALYSIS_OF_COMPARISON_STRING = "analysis_of_co2_comparison";
-	private static final String MEASURED_CO2_PARAMS_STRING = "measured_co2_params";
+	public static final String CO2_MEASUREMENT_METHOD_STRING = "co2_measurement_method";
+	public static final String CO2_MANUFACTURER_STRING = "co2_manufacturer";
+	public static final String CO2_MODEL_STRING = "co2_model";
+	public static final String CO2_FREQUENCY_STRING = "co2_frequency";
+	public static final String CO2_WATER_RES_STRING = "co2_resolution_water";
+	public static final String CO2_WATER_UNC_STRING = "co2_uncertainty_water";
+	public static final String CO2_AIR_RES_STRING = "co2_resolution_air";
+	public static final String CO2_AIR_UNC_STRING = "co2_uncertainty_air";
+	public static final String CO2_CALIBRATION_MANUFACTURER_STRING = "co2_manufacturer_of_calibration_gas";
+	public static final String CO2_SENSOR_CALIBRATION_STRING = "co2_sensor_calibration";
+	public static final String ENVIRONMENTAL_CONTROL_STRING = "co2_environmental_control";
+	public static final String METHOD_REFS_STRING = "co2_method_references";
+	public static final String DETAILS_OF_CO2_SENSING_STRING = "details_of_co2_sensing";
+	public static final String ANALYSIS_OF_COMPARISON_STRING = "analyswesternmost_longitudeis_of_co2_comparison";
+	public static final String MEASURED_CO2_PARAMS_STRING = "measured_co2_params";
 	
-	private static final String SST_LOCATION_STRING = "sst_location";
-	private static final String SST_MANUFACTURER_STRING = "sst_manufacturer";
-	private static final String SST_MODEL_STRING = "sst_model";
-	private static final String SST_ACCURACY_STRING = "sst_accuracy";
-	private static final String SST_PRECISION_STRING = "sst_precision";
-	private static final String SST_CALIBRATION_STRING = "sst_calibration";
-	private static final String SST_COMMENTS_STRING = "sst_other_comments";
+	public static final String SST_LOCATION_STRING = "sst_location";
+	public static final String SST_MANUFACTURER_STRING = "sst_manufacturer";
+	public static final String SST_MODEL_STRING = "sst_model";
+	public static final String SST_ACCURACY_STRING = "sst_accuracy";
+	public static final String SST_PRECISION_STRING = "sst_precision";
+	public static final String SST_CALIBRATION_STRING = "sst_calibration";
+	public static final String SST_COMMENTS_STRING = "sst_other_comments";
 	
-	private static final String EQT_LOCATION_STRING = "equ_temperature_location";
-	private static final String EQT_MANUFACTURER_STRING = "equ_temperature_manufacturer";
-	private static final String EQT_MODEL_STRING = "equ_temperature_model";
-	private static final String EQT_ACCURACY_STRING = "equ_temperature_accuracy";
-	private static final String EQT_PRECISION_STRING = "equ_temperature_precision";
-	private static final String EQT_CALIBRATION_STRING = "equ_temperature_calibration";
-	private static final String EQT_WARMING_STRING = "equ_temperature_warming";
-	private static final String EQT_COMMENTS_STRING = "equ_temperature_other_comments";	
+	public static final String EQT_LOCATION_STRING = "equ_temperature_location";
+	public static final String EQT_MANUFACTURER_STRING = "equ_temperature_manufacturer";
+	public static final String EQT_MODEL_STRING = "equ_temperature_model";
+	public static final String EQT_ACCURACY_STRING = "equ_temperature_accuracy";
+	public static final String EQT_PRECISION_STRING = "equ_temperature_precision";
+	public static final String EQT_CALIBRATION_STRING = "equ_temperature_calibration";
+	public static final String EQT_WARMING_STRING = "equ_temperature_warming";
+	public static final String EQT_COMMENTS_STRING = "equ_temperature_other_comments";	
 	
-	private static final String EQP_LOCATION_STRING = "equ_pressure_location";
-	private static final String EQP_MANUFACTURER_STRING = "equ_pressure_manufacturer";
-	private static final String EQP_MODEL_STRING = "equ_pressure_model";
-	private static final String EQP_ACCURACY_STRING = "equ_pressure_accuracy";
-	private static final String EQP_PRECISION_STRING = "equ_pressure_precision";
-	private static final String EQP_CALIBRATION_STRING = "equ_pressure_calibration";
-	private static final String EQP_COMMENTS_STRING = "equ_pressure_other_comments";
-	private static final String EQP_NORMALIZED_STRING = "equ_pressure_normalized";
+	public static final String EQP_LOCATION_STRING = "equ_pressure_location";
+	public static final String EQP_MANUFACTURER_STRING = "equ_pressure_manufacturer";
+	public static final String EQP_MODEL_STRING = "equ_pressure_model";
+	public static final String EQP_ACCURACY_STRING = "equ_pressure_accuracy";
+	public static final String EQP_PRECISION_STRING = "equ_pressure_precision";
+	public static final String EQP_CALIBRATION_STRING = "equ_pressure_calibration";
+	public static final String EQP_COMMENTS_STRING = "equ_pressure_other_comments";
+	public static final String EQP_NORMALIZED_STRING = "equ_pressure_normalized";
 		
-	private static final String ATM_LOCATION_STRING = "atm_pressure_location";
-	private static final String ATM_MANUFACTURER_STRING = "atm_pressure_manufacturer";
-	private static final String ATM_MODEL_STRING = "atm_pressure_model";
-	private static final String ATM_ACCURACY_STRING = "atm_pressure_accuracy";
-	private static final String ATM_PRECISION_STRING = "atm_pressure_precision";
-	private static final String ATM_CALIBRATION_STRING = "atm_pressure_calibration";
-	private static final String ATM_COMMENTS_STRING = "atm_pressure_other_comments";
+	public static final String ATM_LOCATION_STRING = "atm_pressure_location";
+	public static final String ATM_MANUFACTURER_STRING = "atm_pressure_manufacturer";
+	public static final String ATM_MODEL_STRING = "atm_pressure_model";
+	public static final String ATM_ACCURACY_STRING = "atm_pressure_accuracy";
+	public static final String ATM_PRECISION_STRING = "atm_pressure_precision";
+	public static final String ATM_CALIBRATION_STRING = "atm_pressure_calibration";
+	public static final String ATM_COMMENTS_STRING = "atm_pressure_other_comments";
 	
-	private static final String SSS_LOCATION_STRING = "sss_location";
-	private static final String SSS_MANUFACTURER_STRING = "sss_manufacturer";
-	private static final String SSS_MODEL_STRING = "sss_model";
-	private static final String SSS_ACCURACY_STRING = "sss_accuracy";
-	private static final String SSS_PRECISION_STRING = "sss_precision";
-	private static final String SSS_CALIBRATION_STRING = "sss_calibration";
-	private static final String SSS_COMMENTS_STRING = "sss_other_comments";
+	public static final String SSS_LOCATION_STRING = "sss_location";
+	public static final String SSS_MANUFACTURER_STRING = "sss_manufacturer";
+	public static final String SSS_MODEL_STRING = "sss_model";
+	public static final String SSS_ACCURACY_STRING = "sss_accuracy";
+	public static final String SSS_PRECISION_STRING = "sss_precision";
+	public static final String SSS_CALIBRATION_STRING = "sss_calibration";
+	public static final String SSS_COMMENTS_STRING = "sss_other_comments";
 
-	private static final String DATA_SET_REFS_STRING = "data_set_references";
-	private static final String ADD_INFO_STRING = "additional_information";
-	private static final String CITATION_STRING = "citation";
-	private static final String MEAS_CALIB_REPORT_STRING = "measurement_and_calibration_report";
-	private static final String PRELIM_QC_STRING = "preliminary_quality_control";
+	public static final String DATA_SET_REFS_STRING = "data_set_references";
+	public static final String ADD_INFO_STRING = "additional_information";
+	public static final String CITATION_STRING = "citation";
+	public static final String MEAS_CALIB_REPORT_STRING = "measurement_and_calibration_report";
+	public static final String PRELIM_QC_STRING = "preliminary_quality_control";
 	
 		
 	/**
@@ -887,6 +891,26 @@ public class OmeMetadata {
 			case SECTION_STRING:
 			{
 				section = setValue(section, SECTION_PATH, name, value, lineCount);
+				break;
+			}
+			case WEST_BOUND_STRING:
+			{
+				westmostLongitude = setValue(westmostLongitude, WEST_BOUND_PATH, name, value, lineCount);
+				break;
+			}
+			case EAST_BOUND_STRING:
+			{
+				eastmostLongitude = setValue(eastmostLongitude, EAST_BOUND_PATH, name, value, lineCount);
+				break;
+			}
+			case NORTH_BOUND_STRING:
+			{
+				northmostLatitude = setValue(northmostLatitude, NORTH_BOUND_PATH, name, value, lineCount);
+				break;
+			}
+			case SOUTH_BOUND_STRING:
+			{
+				southmostLatitude = setValue(southmostLatitude, NORTH_BOUND_PATH, name, value, lineCount);
 				break;
 			}
 			case START_DATE_STRING:
