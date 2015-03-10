@@ -29,22 +29,6 @@ public class MetadataConfigItem {
 	private boolean itIsRequired;
 	
 	/**
-	 * Indicates the group of items that constitute a required metadata entry.
-	 * At least one of such a group is required.
-	 */
-	private String itsRequiredGroup;
-	
-	/**
-	 * Indicates the type of data held in this metadata item.
-	 */
-	private int itsDataType;
-	
-	/**
-	 * The range limit of this metadata item
-	 */
-	private ConfigValueRange itsRange;
-	
-	/**
 	 * The class to be used when constructing a Metadata item of this type
 	 */
 	private Class<? extends MetadataItem> itsItemClass;
@@ -57,18 +41,15 @@ public class MetadataConfigItem {
 	/**
 	 * Constructor for the metadata configuration object
 	 */
-	public MetadataConfigItem(String name, int dataType, boolean required, boolean generate,
-			String requiredGroup, ConfigValueRange range, Class<? extends MetadataItem> itemClass,
+	public MetadataConfigItem(String name, boolean required, boolean generate,
+			Class<? extends MetadataItem> itemClass,
 			String generatorParameter, Logger logger) throws ConfigException {
 		
 		logger.trace("Creating Metadata Config Item " + name);
 		
 		itsName = name;
-		itsDataType = dataType;
 		itIsRequired = required;
 		itMustGenerate = generate;
-		itsRequiredGroup = requiredGroup;
-		itsRange = range;
 		itsItemClass = itemClass;
 		itsGeneratorParameter = generatorParameter;
 	}
@@ -82,53 +63,11 @@ public class MetadataConfigItem {
 	}
 	
 	/**
-	 * Returns the data type of this metadata item.
-	 * @return The data type of this metadata item
-	 */
-	public int getType() {
-		return itsDataType;
-	}
-	
-	/**
-	 * Indicates whether or not this metadata item has an associated data range.
-	 * @return {@code true} if a data range has been specified; {@code false} otherwise.
-	 */
-	public boolean hasRange() {
-		return (itsRange != null);
-	}
-	
-	/**
-	 * Returns the data range object for this metadata item
-	 * @return The data range specification
-	 */
-	public ConfigValueRange getRange() {
-		return itsRange;
-	}
-	
-	/**
 	 * Indicates whether or not this metadata item is required
 	 * @return {@code true} if the metadata item is required; {@code false} otherwise
 	 */
 	public boolean isRequired() {
 		return itIsRequired;
-	}
-	
-	/**
-	 * Indicates whether or not this item is part of a group of items where at least
-	 * one of them is required
-	 * @return {@code true} if this item is part of a requirement group; {@code false} otherwise.
-	 */
-	public boolean isInRequiredGroup() {
-		return (itsRequiredGroup != null && !itsRequiredGroup.equalsIgnoreCase(""));
-	}
-	
-	/**
-	 * Returns the name of the group of values that constitute a requirement (at least
-	 * one of the values in the group is required).
-	 * @return The name of the requirement group
-	 */
-	public String getRequiredGroup() {
-		return itsRequiredGroup;
 	}
 	
 	/**

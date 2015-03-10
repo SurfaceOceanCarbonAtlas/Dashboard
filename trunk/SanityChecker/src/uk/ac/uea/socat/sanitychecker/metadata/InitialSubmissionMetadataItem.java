@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
 
 
@@ -33,15 +33,12 @@ public class InitialSubmissionMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException, SanityCheckerException {
 		// If there's already an initial submission date, we do nothing.
 		// Otherwise we set today's date.
-		try {
-			if (null == getValue(dateTimeHandler)) {
-				setValue(new DateTime(DateTimeZone.UTC).withTimeAtStartOfDay());
-			}
-		} catch (DateTimeException e) {
-			throw new MetadataException(getName(), "A value already exists for the initial submission date, but it couldn't be retrieved");
+		if (null == getValue()) {
+			DateTime date = new DateTime(DateTimeZone.UTC).withTimeAtStartOfDay();
+			setValue(dateTimeHandler.formatDate(date));
 		}
 	}
 

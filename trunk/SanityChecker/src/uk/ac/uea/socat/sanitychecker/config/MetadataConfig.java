@@ -189,19 +189,8 @@ public class MetadataConfig {
 
 							// Extract all values from the config line
 							// All the simple ones are at the top!
-							int dataType = MetadataItem.getTypeFlag(fields.get(TYPE_COL));
 							boolean itemRequired = CheckerUtils.parseBoolean(fields.get(REQUIRED_COL));
-							String requiredGroup = fields.get(REQUIRED_GROUP_COL);
 							boolean mustGenerate = CheckerUtils.parseBoolean(fields.get(GENERATE_COL));
-
-							// Process the data range information
-							String minColValue = fields.get(MIN_COL);
-							String maxColValue = fields.get(MAX_COL);
-							ConfigValueRange range = null;
-							if (!minColValue.equalsIgnoreCase("NA") || !maxColValue.equalsIgnoreCase("NA")) {
-								range = new ConfigValueRange(dataType, minColValue, maxColValue);
-							}
-
 
 							// Get the class of the final metadata item
 							Class<? extends MetadataItem> itemClass = null;
@@ -234,17 +223,12 @@ public class MetadataConfig {
 							}
 
 							// Now we have all the values, construct an object for them
-							MetadataConfigItem configItem = new MetadataConfigItem(name, dataType,
-									itemRequired, mustGenerate, requiredGroup, range, itemClass, generatorParameter, itsLogger);
+							MetadataConfigItem configItem = new MetadataConfigItem(name, 
+									itemRequired, mustGenerate, itemClass, generatorParameter, itsLogger);
 
 							// And add it to the configuration list
 							itsConfigItems.put(name, configItem);
 
-							// If the config item is part of a Required Group, add it to the
-							// relevant group
-							if (null != requiredGroup && requiredGroup.length() > 0) {
-								itsRequiredGroups.addGroupEntry(requiredGroup, name);
-							}
 						} catch (Exception e) {
 							itsLogger.error("Error processing Metadata config", e);
 							throw new ConfigException(itsConfigFilename, name, lineCount, e.getMessage());

@@ -4,6 +4,7 @@ import java.text.ParseException;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
@@ -20,7 +21,7 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 	/**
 	 * The value that represents a missing latitude
 	 */
-	private static final double MISSING_VALUE = -999.0;
+	private static final String MISSING_VALUE = "-999";
 	
 	/**
 	 * Indicates whether or not a value has been set
@@ -52,7 +53,7 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException, SanityCheckerException {
 		// If we haven't had any data, set a dummy value
 		if (!hasValue) {
 			setValue(MISSING_VALUE);
@@ -61,10 +62,10 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 			String parameter = itsConfigItem.getGeneratorParameter();
 			if (parameter.equalsIgnoreCase("N")) {
 				// The northern limit is the maximum value stored.
-				setValue(max);
+				setValue(String.valueOf(max));
 			} else if (parameter.equalsIgnoreCase("S")) {
 				// The southern limit is the minimum value stored.
-				setValue(min);
+				setValue(String.valueOf(min));
 			}
 		}
 	}

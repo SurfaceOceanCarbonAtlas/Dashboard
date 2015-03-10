@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
@@ -32,10 +33,10 @@ public class RevisedSubmissionMetadataItem extends MetadataItem {
 	}
 
 	@Override
-	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException {
+	public void generateValue(DateTimeHandler dateTimeHandler) throws MetadataException, SanityCheckerException {
 		// Set to today's date
-		setValue(new DateTime(DateTimeZone.UTC).withTimeAtStartOfDay());
-
+		DateTime date = new DateTime(DateTimeZone.UTC).withTimeAtStartOfDay();
+		setValue(dateTimeHandler.formatDate(date));
 	}
 
 	@Override
