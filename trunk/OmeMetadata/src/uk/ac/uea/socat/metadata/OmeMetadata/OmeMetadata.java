@@ -815,7 +815,7 @@ public class OmeMetadata {
 			throw new OmeMetadataException(lineCount, "This name is reserved for composite values");
 		} else {
 		
-			switch (name) {
+			switch (name.toLowerCase()) {
 			case USER_NAME_STRING:
 			{
 				userName = setValue(userName, USER_NAME_PATH, name, value, lineCount);
@@ -1380,7 +1380,7 @@ public class OmeMetadata {
 			throw new OmeMetadataException("Cannot retrieve data from composite values");
 		} else {
 		
-			switch (name) {
+			switch (name.toLowerCase()) {
 			case USER_NAME_STRING:
 			{
 				if (null != userName) {
