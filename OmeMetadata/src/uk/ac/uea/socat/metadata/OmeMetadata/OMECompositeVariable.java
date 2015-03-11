@@ -7,17 +7,20 @@ import org.jdom2.Element;
 
 class OMECompositeVariable {
 	private Path itsPath;
+	private List<String> itsAllowedEntries;
 	private List<String> itsIdFields;
 	private List<OMECompositeVariableEntry> itsEntries = new ArrayList<OMECompositeVariableEntry>();
 	
-	protected OMECompositeVariable(Path parentPath, String idElement) {
+	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, String idElement) {
 		itsPath = parentPath;
+		itsAllowedEntries = allowedEntries;
 		itsIdFields = new ArrayList<String>();
 		itsIdFields.add(idElement);
 	}
 	
-	protected OMECompositeVariable(Path parentPath, List<String> idElements) {
+	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, List<String> idElements) {
 		itsPath = parentPath;
+		itsAllowedEntries = allowedEntries;
 		itsIdFields = idElements;
 	}
 	
@@ -36,6 +39,10 @@ class OMECompositeVariable {
 	}
 	
 	protected void addEntry(String name, String value) throws IllegalArgumentException {
+		
+		if (!itsAllowedEntries.contains(name.toLowerCase())) {
+			throw new IllegalArgumentException("Cannot add an entry '" + name + "' to composite value '" + itsPath.getElementName() + "'");
+		}
 		
 		boolean foundEntry = false;
 		for (OMECompositeVariableEntry searchEntry : itsEntries) {
@@ -56,13 +63,18 @@ class OMECompositeVariable {
 		}
 	}
 	
-	protected void addEntries(List<OMECompositeVariableEntry> entries) {
+	protected void addEntries(List<OMECompositeVariableEntry> entries) throws IllegalArgumentException {
 		
 		for (OMECompositeVariableEntry entry : entries) {
 			
+			if (!itsAllowedEntries.contains(entry.getName().toLowerCase())) {
+				throw new IllegalArgumentException("Cannot add an entry '" + entry.getName() + "' to composite value '" + itsPath.getElementName() + "'");
+			}
+
+			
 			boolean entryStored = false;
 			for (OMECompositeVariableEntry existingEntry : itsEntries) {
-				if (existingEntry.getName().equals(entry.getName())) {
+				if (existingEntry.getName().equalsIgnoreCase(entry.getName())) {
 					existingEntry.addValues(entry.getAllValues());
 					entryStored = true;
 					break;

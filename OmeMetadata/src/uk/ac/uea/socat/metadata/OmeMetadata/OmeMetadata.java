@@ -315,20 +315,38 @@ public class OmeMetadata {
 	public static final String MEAS_CALIB_REPORT_STRING = "measurement_and_calibration_report";
 	public static final String PRELIM_QC_STRING = "preliminary_quality_control";
 	
-		
+	public static final String INVESTIGATOR_NAME = "name";
+	public static final String INVESTIGATOR_ORGANIZATION = "organization";
+	public static final String INVESTIGATOR_ADDRESS = "address";
+	public static final String INVESTIGATOR_PHONE = "phone";
+	public static final String INVESTIGATOR_EMAIL = "email";
+	
+	public static final String VARIABLES_NAME = "variable_name";
+	public static final String VARIABLES_DESCRIPTION = "description_of_variable";
+	
+	public static final String OTHER_SENSORS_MANUFACTURER = "manufacturer";
+	public static final String OTHER_SENSORS_MODEL = "model";
+	public static final String OTHER_SENSORS_ACCURACY = "accuracy";
+	public static final String OTHER_SENSORS_RESOLUTION = "resolution";
+	public static final String OTHER_SENSORS_CALIBRATION = "calibration";
+	public static final String OTHER_SENSORS_COMMENTS = "other_comments";
+	
 	/**
 	 * Variables holding info about composite values
 	 */
 	private static final String INVESTIGATOR_COMP_NAME = "investigator";
 	private static Path INVESTIGATORS_PATH = null;
+	private static List<String> INVESTIGATOR_ENTRIES = null;
 	private static List<String> INVESTIGATOR_ID_LIST = null;
 	
 	private static final String VARIABLE_COMP_NAME = "variable";
 	private static Path VARIABLES_INFO_PATH = null;
+	private static List<String> VARIABLES_INFO_ENTRIES = null;
 	private static List<String> VARIABLES_INFO_ID_LIST = null;
 	
 	private static final String OTHER_SENSOR_COMP_NAME = "other_sensor";
 	private static Path OTHER_SENSORS_PATH = null;
+	private static List<String> OTHER_SENSORS_ENTRIES = null;
 	private static List<String> OTHER_SENSORS_ID_LIST = null;
 	
 	/**
@@ -527,21 +545,44 @@ public class OmeMetadata {
 		if (null == INVESTIGATORS_PATH) {
 			
 			INVESTIGATORS_PATH = new Path(null, "Investigator");
+			
+			INVESTIGATOR_ENTRIES = new ArrayList<String>(5);
+			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_NAME);
+			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_ORGANIZATION);
+			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_ADDRESS);
+			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_PHONE);
+			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_EMAIL);
+			
 			INVESTIGATOR_ID_LIST = new ArrayList<String>(2);
-			INVESTIGATOR_ID_LIST.add("Name");
-			INVESTIGATOR_ID_LIST.add("Email");
+			INVESTIGATOR_ID_LIST.add("name");
+			INVESTIGATOR_ID_LIST.add("email");
 
 			Path tempPath = new Path(null, "Variables_Info");
 			VARIABLES_INFO_PATH = new Path(tempPath, "Variable");
-			VARIABLES_INFO_ID_LIST = new ArrayList<String>();
-			VARIABLES_INFO_ID_LIST.add("Variable_Name");
+
+			VARIABLES_INFO_ENTRIES = new ArrayList<String>(2);
+			VARIABLES_INFO_ENTRIES.add(VARIABLES_NAME);
+			VARIABLES_INFO_ENTRIES.add(VARIABLES_DESCRIPTION);
+			
+			VARIABLES_INFO_ID_LIST = new ArrayList<String>(1);
+			VARIABLES_INFO_ID_LIST.add("variable_name");
 			
 			tempPath = new Path(null, "Method_Description");
 			tempPath = new Path(tempPath, "Other_Sensors");
 			OTHER_SENSORS_PATH = new Path(tempPath, "Sensor");
+			
+			OTHER_SENSORS_ENTRIES = new ArrayList<String>(6);
+			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_MANUFACTURER);
+			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_MODEL);
+			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_ACCURACY);
+			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_RESOLUTION);
+			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_CALIBRATION);
+			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_COMMENTS);
+			
+			
 			OTHER_SENSORS_ID_LIST = new ArrayList<String>();
-			OTHER_SENSORS_ID_LIST.add("Manufacturer");
-			OTHER_SENSORS_ID_LIST.add("Model");
+			OTHER_SENSORS_ID_LIST.add("manufacturer");
+			OTHER_SENSORS_ID_LIST.add("model");
 		}
 	}
 	
@@ -740,11 +781,11 @@ public class OmeMetadata {
 						compositeName = line.getBefore("[");
 						
 						if (compositeName.equalsIgnoreCase(INVESTIGATOR_COMP_NAME)) {
-							compositeVar = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ID_LIST);
+							compositeVar = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST);
 						} else if (compositeName.equalsIgnoreCase(VARIABLE_COMP_NAME)) {
-							compositeVar = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ID_LIST);
+							compositeVar = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST);
 						} else if (compositeName.equalsIgnoreCase(OTHER_SENSOR_COMP_NAME)) {
-							compositeVar = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ID_LIST);
+							compositeVar = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ENTRIES, OTHER_SENSORS_ID_LIST);
 						}
 					}
 				} else if (line.contains("=")) {
@@ -782,11 +823,11 @@ public class OmeMetadata {
 		OMECompositeVariable compositeVar = null;
 		
 		if (name.equalsIgnoreCase(INVESTIGATOR_COMP_NAME)) {
-			compositeVar = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ID_LIST);
+			compositeVar = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST);
 		} else if (name.equalsIgnoreCase(VARIABLE_COMP_NAME)) {
-			compositeVar = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ID_LIST);
+			compositeVar = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST);
 		} else if (name.equalsIgnoreCase(OTHER_SENSOR_COMP_NAME)) {
-			compositeVar = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ID_LIST);
+			compositeVar = new OMECompositeVariable(OTHER_SENSORS_PATH, VARIABLES_INFO_ENTRIES, OTHER_SENSORS_ID_LIST);
 		}
 
 		for (String propName : values.stringPropertyNames()) {
@@ -2223,12 +2264,12 @@ public class OmeMetadata {
 
 		// <Investigator> (repeating element)
 		for (Element invElem : rootElem.getChildren("Investigator")) {
-			OMECompositeVariable invDetails = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ID_LIST);
-			invDetails.addEntry("Name", invElem);
-			invDetails.addEntry("Organization", invElem);
-			invDetails.addEntry("Address", invElem);
-			invDetails.addEntry("Phone", invElem);
-			invDetails.addEntry("Email", invElem);
+			OMECompositeVariable invDetails = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST);
+			invDetails.addEntry(INVESTIGATOR_NAME, invElem);
+			invDetails.addEntry(INVESTIGATOR_ORGANIZATION, invElem);
+			invDetails.addEntry(INVESTIGATOR_ADDRESS, invElem);
+			invDetails.addEntry(INVESTIGATOR_PHONE, invElem);
+			invDetails.addEntry(INVESTIGATOR_EMAIL, invElem);
 			
 			investigators.add(invDetails);
 		}
@@ -2320,9 +2361,9 @@ public class OmeMetadata {
 		if (null != varsInfoElem) {
 			for (Element variableElem : varsInfoElem.getChildren("Variable")) {
 				
-				OMECompositeVariable varDetails = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ID_LIST);
-				varDetails.addEntry("Variable_Name", variableElem);
-				varDetails.addEntry("Description_of_Variable", variableElem);
+				OMECompositeVariable varDetails = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST);
+				varDetails.addEntry(VARIABLES_NAME, variableElem);
+				varDetails.addEntry(VARIABLES_DESCRIPTION, variableElem);
 				
 				variablesInfo.add(varDetails);
 			}
@@ -2504,13 +2545,13 @@ public class OmeMetadata {
 		
 		if (null != otherSensorsElem) {
 			for (Element sensorElem : otherSensorsElem.getChildren("Sensor")) {
-				OMECompositeVariable sensorDetails = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ID_LIST);
-				sensorDetails.addEntry("Manufacturer", sensorElem);
-				sensorDetails.addEntry("Accuracy", sensorElem);
-				sensorDetails.addEntry("Model", sensorElem);
-				sensorDetails.addEntry("Resolution", sensorElem);
-				sensorDetails.addEntry("Calibration", sensorElem);
-				sensorDetails.addEntry("Other_Comments", sensorElem);
+				OMECompositeVariable sensorDetails = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ENTRIES, OTHER_SENSORS_ID_LIST);
+				sensorDetails.addEntry(OTHER_SENSORS_MANUFACTURER, sensorElem);
+				sensorDetails.addEntry(OTHER_SENSORS_MODEL, sensorElem);
+				sensorDetails.addEntry(OTHER_SENSORS_ACCURACY, sensorElem);
+				sensorDetails.addEntry(OTHER_SENSORS_RESOLUTION, sensorElem);
+				sensorDetails.addEntry(OTHER_SENSORS_CALIBRATION, sensorElem);
+				sensorDetails.addEntry(OTHER_SENSORS_COMMENTS, sensorElem);
 				
 				otherSensors.add(sensorDetails);
 			}
@@ -2947,9 +2988,8 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(userPhone, USER_PHONE_STRING));
 		output.append(getSingleHeaderString(userEmail, USER_EMAIL_STRING));
 		
-		String[] investogatorEntries = new String[]{"name", "organization", "address", "phone", "email"};
 		for (OMECompositeVariable investigator : investigators) {
-			output.append(getCompositeHeaderString(investigator, "investigator", investogatorEntries));
+			output.append(getCompositeHeaderString(investigator, "investigator", INVESTIGATOR_ENTRIES));
 		}
 		
 		output.append(getSingleHeaderString(datasetID, DATASET_ID_STRING));
@@ -2978,9 +3018,8 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(country, COUNTRY_STRING));
 		output.append(getSingleHeaderString(vesselOwner, OWNER_STRING));
 		
-		String[] variableEntries = new String[]{"variable_name", "description_of_variable"};
 		for (OMECompositeVariable variable : variablesInfo) {
-			output.append(getCompositeHeaderString(variable, "variable", variableEntries));
+			output.append(getCompositeHeaderString(variable, "variable", VARIABLES_INFO_ENTRIES));
 		}
 		
 		output.append(getSingleHeaderString(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_STRING));
@@ -3067,9 +3106,8 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(sssCalibration, SSS_CALIBRATION_STRING));
 		output.append(getSingleHeaderString(sssOtherComments, SSS_COMMENTS_STRING));
 		
-		String[] otherSensorEntries = new String[]{"manufacturer", "model", "accuracy", "resolution", "calibration", "other_comments"};
 		for (OMECompositeVariable otherSensor : otherSensors) {
-			output.append(getCompositeHeaderString(otherSensor, "other_sensor", otherSensorEntries));
+			output.append(getCompositeHeaderString(otherSensor, "other_sensor", OTHER_SENSORS_ENTRIES));
 		}
 
 		output.append(getSingleHeaderString(dataSetReferences, DATA_SET_REFS_STRING));
@@ -3085,7 +3123,7 @@ public class OmeMetadata {
 		return name + "=\n";
 	}
 	
-	private String getCompositeHeaderString(OMECompositeVariable variable, String name, String[] entryNames) throws OmeMetadataException {
+	private String getCompositeHeaderString(OMECompositeVariable variable, String name, List<String> entryNames) throws OmeMetadataException {
 		StringBuffer out = new StringBuffer();
 		
 		if (null != variable) {
