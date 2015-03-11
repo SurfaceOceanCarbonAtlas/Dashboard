@@ -1,9 +1,7 @@
 package uk.ac.uea.socat.sanitychecker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -14,7 +12,6 @@ import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
 import uk.ac.uea.socat.sanitychecker.messages.Messages;
-import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
 
 /**
  * Class to hold the complete output of the Sanity Checker from processing
