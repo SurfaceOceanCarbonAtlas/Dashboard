@@ -2941,142 +2941,142 @@ public class OmeMetadata {
 	public String getHeaderText() throws OmeMetadataException {
 		StringBuffer output = new StringBuffer();
 
-		output.append(getSingleHeaderString(userName, "user_name"));
-		output.append(getSingleHeaderString(userOrganization, "user_organization"));
-		output.append(getSingleHeaderString(userAddress, "user_address"));
-		output.append(getSingleHeaderString(userPhone, "user_phone"));
-		output.append(getSingleHeaderString(userEmail, "user_email"));
+		output.append(getSingleHeaderString(userName, USER_NAME_STRING));
+		output.append(getSingleHeaderString(userOrganization, USER_ORGANIZATION_STRING));
+		output.append(getSingleHeaderString(userAddress, USER_ADDRESS_STRING));
+		output.append(getSingleHeaderString(userPhone, USER_PHONE_STRING));
+		output.append(getSingleHeaderString(userEmail, USER_EMAIL_STRING));
 		
 		String[] investogatorEntries = new String[]{"name", "organization", "address", "phone", "email"};
 		for (OMECompositeVariable investigator : investigators) {
 			output.append(getCompositeHeaderString(investigator, "investigator", investogatorEntries));
 		}
 		
-		output.append(getSingleHeaderString(datasetID, "dataset_id"));
-		output.append(getSingleHeaderString(fundingInfo, "funding_info"));
+		output.append(getSingleHeaderString(datasetID, DATASET_ID_STRING));
+		output.append(getSingleHeaderString(fundingInfo, FUNDING_INFO_STRING));
 		
 		// initialSubmission and revisedSubmission not included
 		
-		output.append(getSingleHeaderString(experimentName, "experiment_name"));
-		output.append(getSingleHeaderString(experimentType, "experiment_type"));
-		output.append(getSingleHeaderString(platformType, "platform_type"));
-		output.append(getSingleHeaderString(co2InstrumentType, "co2_instrument_type"));
-		output.append(getSingleHeaderString(mooringId, "mooring_id"));
-		output.append(getSingleHeaderString(cruiseID, "cruise_id"));
-		output.append(getSingleHeaderString(cruiseInfo, "cruise_info"));
-		output.append(getSingleHeaderString(section, "section"));
-		output.append(getEmptyHeaderString("cruise_start_date"));
-		output.append(getEmptyHeaderString("cruise_end_date"));
-		output.append(getEmptyHeaderString("temporal_coverage_start_date"));
-		output.append(getEmptyHeaderString("temporal_coverage_end_date"));
-		output.append(getSingleHeaderString(geographicalRegion, "geographical_region"));
+		output.append(getSingleHeaderString(experimentName, EXPERIMENT_NAME_STRING));
+		output.append(getSingleHeaderString(experimentType, EXPERIMENT_TYPE_STRING));
+		output.append(getSingleHeaderString(platformType, PLATFORM_TYPE_STRING));
+		output.append(getSingleHeaderString(co2InstrumentType, CO2_INSTRUMENT_TYPE_STRING));
+		output.append(getSingleHeaderString(mooringId, MOORING_ID_STRING));
+		output.append(getEmptyHeaderString(CRUISE_ID_STRING));
+		output.append(getSingleHeaderString(cruiseInfo, SUB_CRUISE_INFO_STRING));
+		output.append(getSingleHeaderString(section, SECTION_STRING));
+		output.append(getEmptyHeaderString(START_DATE_STRING));
+		output.append(getEmptyHeaderString(END_DATE_STRING));
+		output.append(getEmptyHeaderString(TEMP_START_DATE_STRING));
+		output.append(getEmptyHeaderString(TEMP_END_DATE_STRING));
+		output.append(getSingleHeaderString(geographicalRegion, GEO_REGION_STRING));
 		
 		// Geographical bounds not included
 		
-		output.append(getSingleHeaderString(vesselName, "vessel_name"));
-		output.append(getSingleHeaderString(vesselID, "vessel_id"));
-		output.append(getSingleHeaderString(country, "country"));
-		output.append(getSingleHeaderString(vesselOwner, "vessel_owner"));
+		output.append(getSingleHeaderString(vesselName, VESSEL_NAME_STRING));
+		output.append(getSingleHeaderString(vesselID, VESSEL_ID_STRING));
+		output.append(getSingleHeaderString(country, COUNTRY_STRING));
+		output.append(getSingleHeaderString(vesselOwner, OWNER_STRING));
 		
 		String[] variableEntries = new String[]{"variable_name", "description_of_variable"};
 		for (OMECompositeVariable variable : variablesInfo) {
 			output.append(getCompositeHeaderString(variable, "variable", variableEntries));
 		}
 		
-		output.append(getSingleHeaderString(xCO2WaterEquDryUnit, "xco2_water_equ_dry_unit"));
-		output.append(getSingleHeaderString(xCO2WaterSSTDryUnit, "xco2_water_sst_dry_unit"));
-		output.append(getSingleHeaderString(pCO2WaterEquWetUnit, "pco2_water_equ_wet_unit"));
-		output.append(getSingleHeaderString(pCO2WaterSSTWetUnit, "pco2_water_sst_wet_unit"));
-		output.append(getSingleHeaderString(fCO2WaterEquWetUnit, "fco2_water_equ_wet_unit"));
-		output.append(getSingleHeaderString(fCO2WaterSSTWetUnit, "fco2_water_sst_wet_unit"));
-		output.append(getSingleHeaderString(xCO2AirDryUnit, "xco2_air_dry_unit"));
-		output.append(getSingleHeaderString(pCO2AirWetUnit, "pco2_air_wet_unit"));
-		output.append(getSingleHeaderString(fCO2AirWetUnit, "fco2_air_wet_unit"));
-		output.append(getSingleHeaderString(xCO2AirDryInterpolatedUnit, "xco2_air_dry_interpolated_unit"));
-		output.append(getSingleHeaderString(pCO2AirWetInterpolatedUnit, "pco2_air_wet_interpolated_unit"));
-		output.append(getSingleHeaderString(fCO2AirWetInterpolatedUnit, "fco2_air_wet_interpolated_unit"));
+		output.append(getSingleHeaderString(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_STRING));
+		output.append(getSingleHeaderString(xCO2WaterSSTDryUnit, XCO2_WATER_SST_DRY_STRING));
+		output.append(getSingleHeaderString(pCO2WaterEquWetUnit, PCO2_WATER_EQU_WET_STRING));
+		output.append(getSingleHeaderString(pCO2WaterSSTWetUnit, PCO2_WATER_SST_WET_STRING));
+		output.append(getSingleHeaderString(fCO2WaterEquWetUnit, FCO2_WATER_EQU_WET_STRING));
+		output.append(getSingleHeaderString(fCO2WaterSSTWetUnit, FCO2_WATER_SST_WET_STRING));
+		output.append(getSingleHeaderString(xCO2AirDryUnit, XCO2_AIR_DRY_STRING));
+		output.append(getSingleHeaderString(pCO2AirWetUnit, PCO2_AIR_WET_STRING));
+		output.append(getSingleHeaderString(fCO2AirWetUnit, FCO2_AIR_WET_STRING));
+		output.append(getSingleHeaderString(xCO2AirDryInterpolatedUnit, XCO2_AIR_DRY_INTERP_STRING));
+		output.append(getSingleHeaderString(pCO2AirWetInterpolatedUnit, PCO2_AIR_WET_INTERP_STRING));
+		output.append(getSingleHeaderString(fCO2AirWetInterpolatedUnit, FCO2_AIR_WET_INTERP_STRING));
 
-		output.append(getSingleHeaderString(depthOfSeaWaterIntake, "depth_of_seawater_intake"));
-		output.append(getSingleHeaderString(locationOfSeaWaterIntake, "location_of_seawater_intake"));
-		output.append(getSingleHeaderString(equilibratorType, "equilibrator_type"));
-		output.append(getSingleHeaderString(equilibratorVolume, "equilibrator_volume"));
-		output.append(getSingleHeaderString(waterFlowRate, "water_flow_rate"));
-		output.append(getSingleHeaderString(headspaceGasFlowRate, "headspace_gas_flow_rate"));
-		output.append(getSingleHeaderString(vented, "vented"));
-		output.append(getSingleHeaderString(dryingMethodForCO2InWater, "drying_method_for_co2_in_water"));
-		output.append(getSingleHeaderString(equAdditionalInformation, "equilibrator_additional_information"));
+		output.append(getSingleHeaderString(depthOfSeaWaterIntake, INTAKE_DEPTH_STRING));
+		output.append(getSingleHeaderString(locationOfSeaWaterIntake, INTAKE_LOCATION_STRING));
+		output.append(getSingleHeaderString(equilibratorType, EQUI_TYPE_STRING));
+		output.append(getSingleHeaderString(equilibratorVolume, EQUI_VOLUME_STRING));
+		output.append(getSingleHeaderString(waterFlowRate, WATER_FLOW_RATE_STRING));
+		output.append(getSingleHeaderString(headspaceGasFlowRate, GAS_FLOW_RATE_STRING));
+		output.append(getSingleHeaderString(vented, VENTED_STRING));
+		output.append(getSingleHeaderString(dryingMethodForCO2InWater, DRYING_METHOD_STRING));
+		output.append(getSingleHeaderString(equAdditionalInformation, EQUI_ADDITIONAL_INFO_STRING));
 		
-		output.append(getSingleHeaderString(co2InMarineAirMeasurement, "co2_in_marine_air_measurement"));
-		output.append(getSingleHeaderString(co2InMarineAirLocationAndHeight, "co2_in_marine_air_location_and_height"));
-		output.append(getSingleHeaderString(co2InMarineAirDryingMethod, "co2_in_marine_air_drying_method"));
-		output.append(getSingleHeaderString(co2MeasurementMethod, "co2_measurement_method"));
-		output.append(getSingleHeaderString(co2Manufacturer, "co2_manufacturer"));
-		output.append(getSingleHeaderString(co2Model, "co2_model"));
-		output.append(getSingleHeaderString(co2Frequency, "co2_frequency"));
-		output.append(getSingleHeaderString(co2ResolutionWater, "co2_resolution_water"));
-		output.append(getSingleHeaderString(co2UncertaintyWater, "co2_uncertainty_water"));
-		output.append(getSingleHeaderString(co2ResolutionAir, "co2_resolution_air"));
-		output.append(getSingleHeaderString(co2UncertaintyAir, "co2_uncertainty_air"));
-		output.append(getSingleHeaderString(co2ManufacturerOfCalibrationGas, "co2_manufacturer_of_calibration_gas"));
-		output.append(getSingleHeaderString(co2SensorCalibration, "co2_sensor_calibration"));
-		output.append(getSingleHeaderString(co2EnvironmentalControl, "co2_environmental_control"));
-		output.append(getSingleHeaderString(co2MethodReferences, "co2_method_references"));
-		output.append(getSingleHeaderString(detailsOfCO2Sensing, "details_of_co2_sensing"));
-		output.append(getSingleHeaderString(analysisOfCO2Comparison, "analysis_of_co2_comparison"));
-		output.append(getSingleHeaderString(measuredCO2Params, "measured_co2_params"));
+		output.append(getSingleHeaderString(co2InMarineAirMeasurement, MARINE_AIR_MEASUREMENT_STRING));
+		output.append(getSingleHeaderString(co2InMarineAirLocationAndHeight, MARINE_AIR_LOCATION_STRING));
+		output.append(getSingleHeaderString(co2InMarineAirDryingMethod, MARINE_AIR_DRYING_STRING));
+		output.append(getSingleHeaderString(co2MeasurementMethod, CO2_MEASUREMENT_METHOD_STRING));
+		output.append(getSingleHeaderString(co2Manufacturer, CO2_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(co2Model, CO2_MODEL_STRING));
+		output.append(getSingleHeaderString(co2Frequency, CO2_FREQUENCY_STRING));
+		output.append(getSingleHeaderString(co2ResolutionWater, CO2_WATER_RES_STRING));
+		output.append(getSingleHeaderString(co2UncertaintyWater, CO2_WATER_UNC_STRING));
+		output.append(getSingleHeaderString(co2ResolutionAir, CO2_AIR_RES_STRING));
+		output.append(getSingleHeaderString(co2UncertaintyAir, CO2_AIR_UNC_STRING));
+		output.append(getSingleHeaderString(co2ManufacturerOfCalibrationGas, CO2_CALIBRATION_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(co2SensorCalibration, CO2_SENSOR_CALIBRATION_STRING));
+		output.append(getSingleHeaderString(co2EnvironmentalControl, ENVIRONMENTAL_CONTROL_STRING));
+		output.append(getSingleHeaderString(co2MethodReferences, METHOD_REFS_STRING));
+		output.append(getSingleHeaderString(detailsOfCO2Sensing, DETAILS_OF_CO2_SENSING_STRING));
+		output.append(getSingleHeaderString(analysisOfCO2Comparison, ANALYSIS_OF_COMPARISON_STRING));
+		output.append(getSingleHeaderString(measuredCO2Params, MEASURED_CO2_PARAMS_STRING));
 
-		output.append(getSingleHeaderString(sstLocation, "sst_location"));
-		output.append(getSingleHeaderString(sstManufacturer, "sst_manufacturer"));
-		output.append(getSingleHeaderString(sstModel, "sst_model"));
-		output.append(getSingleHeaderString(sstAccuracy, "sst_accuracy"));
-		output.append(getSingleHeaderString(sstPrecision, "sst_precision"));
-		output.append(getSingleHeaderString(sstCalibration, "sst_calibration"));
-		output.append(getSingleHeaderString(sstOtherComments, "sst_other_commnents"));
+		output.append(getSingleHeaderString(sstLocation, SST_LOCATION_STRING));
+		output.append(getSingleHeaderString(sstManufacturer, SST_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(sstModel, SST_MODEL_STRING));
+		output.append(getSingleHeaderString(sstAccuracy, SST_ACCURACY_STRING));
+		output.append(getSingleHeaderString(sstPrecision, SST_PRECISION_STRING));
+		output.append(getSingleHeaderString(sstCalibration, SST_CALIBRATION_STRING));
+		output.append(getSingleHeaderString(sstOtherComments, SST_COMMENTS_STRING));
 
-		output.append(getSingleHeaderString(eqtLocation, "equ_temperature_location"));
-		output.append(getSingleHeaderString(eqtManufacturer, "equ_temperature_manufacturer"));
-		output.append(getSingleHeaderString(eqtModel, "equ_temperature_model"));
-		output.append(getSingleHeaderString(eqtAccuracy, "equ_temperature_accuracy"));
-		output.append(getSingleHeaderString(eqtPrecision, "equ_temperature_precision"));
-		output.append(getSingleHeaderString(eqtCalibration, "equ_temperature_calibration"));
-		output.append(getSingleHeaderString(eqtWarming, "equ_temperature_warming"));
-		output.append(getSingleHeaderString(eqtOtherComments, "equ_temperature_other_comments"));
+		output.append(getSingleHeaderString(eqtLocation, EQT_LOCATION_STRING));
+		output.append(getSingleHeaderString(eqtManufacturer, EQT_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(eqtModel, EQT_MODEL_STRING));
+		output.append(getSingleHeaderString(eqtAccuracy, EQT_ACCURACY_STRING));
+		output.append(getSingleHeaderString(eqtPrecision, EQT_PRECISION_STRING));
+		output.append(getSingleHeaderString(eqtCalibration, EQT_CALIBRATION_STRING));
+		output.append(getSingleHeaderString(eqtWarming, EQT_WARMING_STRING));
+		output.append(getSingleHeaderString(eqtOtherComments, EQT_COMMENTS_STRING));
 
-		output.append(getSingleHeaderString(eqpLocation, "equ_pressure_location"));
-		output.append(getSingleHeaderString(eqpManufacturer, "equ_pressure_manufacturer"));
-		output.append(getSingleHeaderString(eqpModel, "equ_pressure_model"));
-		output.append(getSingleHeaderString(eqpAccuracy, "equ_pressure_accuracy"));
-		output.append(getSingleHeaderString(eqpPrecision, "equ_pressure_precision"));
-		output.append(getSingleHeaderString(eqpCalibration, "equ_pressure_calibration"));
-		output.append(getSingleHeaderString(eqpOtherComments, "equ_pressure_other_comments"));
-		output.append(getSingleHeaderString(eqpNormalized, "equ_pressure_normalized"));
+		output.append(getSingleHeaderString(eqpLocation, EQP_LOCATION_STRING));
+		output.append(getSingleHeaderString(eqpManufacturer, EQP_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(eqpModel, EQP_MODEL_STRING));
+		output.append(getSingleHeaderString(eqpAccuracy, EQP_ACCURACY_STRING));
+		output.append(getSingleHeaderString(eqpPrecision, EQP_PRECISION_STRING));
+		output.append(getSingleHeaderString(eqpCalibration, EQP_CALIBRATION_STRING));
+		output.append(getSingleHeaderString(eqpOtherComments, EQP_COMMENTS_STRING));
+		output.append(getSingleHeaderString(eqpNormalized, EQP_NORMALIZED_STRING));
 		
-		output.append(getSingleHeaderString(atpLocation, "atm_pressure_location"));
-		output.append(getSingleHeaderString(atpManufacturer, "atm_pressure_manufacturer"));
-		output.append(getSingleHeaderString(atpModel, "atm_pressure_model"));
-		output.append(getSingleHeaderString(atpAccuracy, "atm_pressure_accuracy"));
-		output.append(getSingleHeaderString(atpPrecision, "atm_pressure_precision"));
-		output.append(getSingleHeaderString(atpCalibration, "atm_pressure_calibration"));
-		output.append(getSingleHeaderString(atpOtherComments, "atm_pressure_other_comments"));
+		output.append(getSingleHeaderString(atpLocation, ATM_LOCATION_STRING));
+		output.append(getSingleHeaderString(atpManufacturer, ATM_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(atpModel, ATM_MODEL_STRING));
+		output.append(getSingleHeaderString(atpAccuracy, ATM_ACCURACY_STRING));
+		output.append(getSingleHeaderString(atpPrecision, ATM_PRECISION_STRING));
+		output.append(getSingleHeaderString(atpCalibration, ATM_CALIBRATION_STRING));
+		output.append(getSingleHeaderString(atpOtherComments, ATM_COMMENTS_STRING));
 		
-		output.append(getSingleHeaderString(sssLocation, "sss_location"));
-		output.append(getSingleHeaderString(sssManufacturer, "sss_manufacturer"));
-		output.append(getSingleHeaderString(sssModel, "sss_model"));
-		output.append(getSingleHeaderString(sssAccuracy, "sss_accuracy"));
-		output.append(getSingleHeaderString(sssPrecision, "sss_precision"));
-		output.append(getSingleHeaderString(sssCalibration, "sss_calibration"));
-		output.append(getSingleHeaderString(sssOtherComments, "sss_other_comments"));
+		output.append(getSingleHeaderString(sssLocation, SSS_LOCATION_STRING));
+		output.append(getSingleHeaderString(sssManufacturer, SSS_MANUFACTURER_STRING));
+		output.append(getSingleHeaderString(sssModel, SSS_MODEL_STRING));
+		output.append(getSingleHeaderString(sssAccuracy, SSS_ACCURACY_STRING));
+		output.append(getSingleHeaderString(sssPrecision, SSS_PRECISION_STRING));
+		output.append(getSingleHeaderString(sssCalibration, SSS_CALIBRATION_STRING));
+		output.append(getSingleHeaderString(sssOtherComments, SSS_COMMENTS_STRING));
 		
 		String[] otherSensorEntries = new String[]{"manufacturer", "model", "accuracy", "resolution", "calibration", "other_comments"};
 		for (OMECompositeVariable otherSensor : otherSensors) {
 			output.append(getCompositeHeaderString(otherSensor, "other_sensor", otherSensorEntries));
 		}
 
-		output.append(getSingleHeaderString(dataSetReferences, "data_set_references"));
-		output.append(getSingleHeaderString(additionalInformation, "additional_information"));
-		output.append(getSingleHeaderString(citation, "citation"));
-		output.append(getSingleHeaderString(measurementAndCalibrationReport, "measurement_and_calibration_report"));
-		output.append(getSingleHeaderString(preliminaryQualityControl, "preliminary_quality_control"));
+		output.append(getSingleHeaderString(dataSetReferences, DATA_SET_REFS_STRING));
+		output.append(getSingleHeaderString(additionalInformation, ADD_INFO_STRING));
+		output.append(getSingleHeaderString(citation, CITATION_STRING));
+		output.append(getSingleHeaderString(measurementAndCalibrationReport, MEAS_CALIB_REPORT_STRING));
+		output.append(getSingleHeaderString(preliminaryQualityControl, PRELIM_QC_STRING));
 		
 		return output.toString();
 	}
@@ -3128,11 +3128,6 @@ public class OmeMetadata {
 			}
 			
 			String value = escapeValue(variable.getValue());
-			if (name.equalsIgnoreCase(EXPO_CODE_STRING) || name.equalsIgnoreCase(CRUISE_ID_STRING)) {
-				// We put the entry in as a space so users can see it
-				value = " ";
-			}
-		
 			if (value.length() > 0) {
 				out.append(name);
 				out.append('=');
