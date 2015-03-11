@@ -28,7 +28,7 @@ class OMECompositeVariable {
 		itsPath = parentPath;
 	}
 
-	protected void addEntry(String name, Element element) throws IllegalArgumentException {
+	protected void addEntry(String name, Element element) throws BadEntryNameException {
 		String value = null;
 		if (null != element) {
 			value = element.getChildTextTrim(name);
@@ -38,10 +38,10 @@ class OMECompositeVariable {
 		}
 	}
 	
-	protected void addEntry(String name, String value) throws IllegalArgumentException {
+	protected void addEntry(String name, String value) throws BadEntryNameException {
 		
 		if (!itsAllowedEntries.contains(name.toLowerCase())) {
-			throw new IllegalArgumentException("Cannot add an entry '" + name + "' to composite value '" + itsPath.getElementName() + "'");
+			throw new BadEntryNameException("Cannot add an entry '" + name + "' to composite value '" + itsPath.getElementName() + "'");
 		}
 		
 		boolean foundEntry = false;
@@ -49,7 +49,7 @@ class OMECompositeVariable {
 			if (searchEntry.getName().equals(name)) {
 				
 				if (itsIdFields.contains(name) && searchEntry.getValueCount() > 0) {
-					throw new IllegalArgumentException("Cannot add multiple values to an identifier in a composite variable");
+					throw new BadEntryNameException("Cannot add multiple values to an identifier in a composite variable");
 				} else {
 					searchEntry.addValue(value);
 					foundEntry = true;
@@ -63,12 +63,12 @@ class OMECompositeVariable {
 		}
 	}
 	
-	protected void addEntries(List<OMECompositeVariableEntry> entries) throws IllegalArgumentException {
+	protected void addEntries(List<OMECompositeVariableEntry> entries) throws BadEntryNameException {
 		
 		for (OMECompositeVariableEntry entry : entries) {
 			
 			if (!itsAllowedEntries.contains(entry.getName().toLowerCase())) {
-				throw new IllegalArgumentException("Cannot add an entry '" + entry.getName() + "' to composite value '" + itsPath.getElementName() + "'");
+				throw new BadEntryNameException("Cannot add an entry '" + entry.getName() + "' to composite value '" + itsPath.getElementName() + "'");
 			}
 
 			
@@ -89,7 +89,7 @@ class OMECompositeVariable {
 		}
 	}
 	
-	protected static List<OMECompositeVariable> mergeVariables(List<OMECompositeVariable> dest, List<OMECompositeVariable> newValues) {
+	protected static List<OMECompositeVariable> mergeVariables(List<OMECompositeVariable> dest, List<OMECompositeVariable> newValues) throws BadEntryNameException {
 		
 		// Copy the dest list to the output.
 		List<OMECompositeVariable> merged = new ArrayList<OMECompositeVariable>();
