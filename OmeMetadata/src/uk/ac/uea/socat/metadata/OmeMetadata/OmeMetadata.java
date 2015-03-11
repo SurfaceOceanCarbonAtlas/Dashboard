@@ -3128,6 +3128,11 @@ public class OmeMetadata {
 			}
 			
 			String value = escapeValue(variable.getValue());
+			if (name.equalsIgnoreCase(EXPO_CODE_STRING) || name.equalsIgnoreCase(CRUISE_ID_STRING)) {
+				// We put the entry in as a space so users can see it
+				value = " ";
+			}
+		
 			if (value.length() > 0) {
 				out.append(name);
 				out.append('=');
