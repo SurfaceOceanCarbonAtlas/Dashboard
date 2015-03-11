@@ -697,7 +697,7 @@ public class OmeMetadata {
 	}
 
 	
-	public void assignFromHeaderText(String header) throws OmeMetadataException {
+	public void assignFromHeaderText(String header) throws OmeMetadataException, BadEntryNameException {
 		String[] lines = header.split("\n");
 		
 		String compositeName = null;
@@ -818,7 +818,7 @@ public class OmeMetadata {
 		}
 	}
 	
-	public void storeCompositeValue(String name, Properties values, int line) throws OmeMetadataException {
+	public void storeCompositeValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException {
 		
 		OMECompositeVariable compositeVar = null;
 		
@@ -2190,7 +2190,7 @@ public class OmeMetadata {
 	 * @param omeDoc
 	 * 		OME XML Document to use
 	 */
-	public void assignFromOmeXmlDoc(Document omeDoc) {
+	public void assignFromOmeXmlDoc(Document omeDoc) throws BadEntryNameException {
 		
 		Element rootElem = omeDoc.getRootElement();
 
@@ -2203,30 +2203,30 @@ public class OmeMetadata {
 		 */
 		Element cruiseInfoElem = rootElem.getChild("Cruise_Info");
 		if ( cruiseInfoElem == null )
-			throw new IllegalArgumentException(
+			throw new BadEntryNameException(
 					"No Cruise_Info element in the OME XML contents");
 
 		Element experimentElem = cruiseInfoElem.getChild("Experiment");
 		if ( experimentElem == null )
-			throw new IllegalArgumentException(
+			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment element in the OME XML contents");
 		
 		Element cruiseElem = experimentElem.getChild("Cruise");
 		if ( cruiseElem == null )
-			throw new IllegalArgumentException(
+			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment->Cruise " +
 					"element in the OME XML contents");
 		
 		String cruiseIDText = cruiseElem.getChildTextTrim("Cruise_ID");
 		if ( cruiseIDText == null )
-			throw new IllegalArgumentException(
+			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment->Cruise->Cruise_ID " +
 					"element in the OME XML contents");
 		
 		if ( itsExpoCode.length() == 0) {
 			itsExpoCode = cruiseIDText.toUpperCase();
 		} else if ( ! itsExpoCode.equals(cruiseIDText.toUpperCase()) )
-			throw new IllegalArgumentException("Expocode of cruise (" + 
+			throw new BadEntryNameException("Expocode of cruise (" + 
 					itsExpoCode + ") does not match that the Cruise ID in " +
 					"the OME document (" + cruiseID + ")");
 		
@@ -3195,7 +3195,7 @@ public class OmeMetadata {
 		return output;
 	}
 	
-	public static OmeMetadata merge(OmeMetadata... metadatas) throws IllegalArgumentException {
+	public static OmeMetadata merge(OmeMetadata... metadatas) throws BadEntryNameException {
 		OmeMetadata merged = null;
 		
 		if (metadatas.length == 1) {
@@ -3213,14 +3213,14 @@ public class OmeMetadata {
 		return merged;
 	}
 	
-	private static void copyValuesIn(OmeMetadata dest, OmeMetadata newValues) throws IllegalArgumentException {
+	private static void copyValuesIn(OmeMetadata dest, OmeMetadata newValues) throws BadEntryNameException {
 		
 		// The first thing to copy is the cruise ID (aka EXPO Code).
 		// If these are different, it implies that we have metadata from
 		// different cruises so they should not be merged.
 		dest.cruiseID.addValues(newValues.cruiseID.getAllValues());
 		if (dest.cruiseID.hasConflict()) {
-			throw new IllegalArgumentException("Cruise IDs do not match - cannot merge");
+			throw new BadEntryNameException("Cruise IDs do not match - cannot merge");
 		}
 		
 		dest.userName.addValues(newValues.userName.getAllValues());
