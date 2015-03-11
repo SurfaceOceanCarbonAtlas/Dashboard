@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.Properties;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -70,11 +69,6 @@ public class SanityCheckerRun {
 	 * Logger object
 	 */
 	private Logger itsLogger = null;
-	
-	/**
-	 * Tracker for the file line number
-	 */
-	private int itsCurrentLine = 0;
 	
 	/**
 	 * Sanity checks the file whose details were passed in on
@@ -399,7 +393,6 @@ public class SanityCheckerRun {
 		
 		while (!foundLine) {
 			nextLine = reader.readLine();
-			itsCurrentLine++;
 			if (null == nextLine) {
 				// We've reached the end of the file. The calling function must deal with that.
 				foundLine = true;
