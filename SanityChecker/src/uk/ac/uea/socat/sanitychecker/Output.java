@@ -225,7 +225,7 @@ public class Output {
 	public void addMessages(List<Message> messages) throws MessageException {
 		for (Message message : messages) {
 			itsMessages.addMessage(message);
-			itsLogger.trace("Message added to output::-> " + message.toString());
+			itsLogger.trace("Message added to output::-> " + message.getMessageString());
 			setExitFlag(message);
 		}
 	}
