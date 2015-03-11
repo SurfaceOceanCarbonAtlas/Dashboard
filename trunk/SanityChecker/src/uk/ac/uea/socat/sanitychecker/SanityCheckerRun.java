@@ -84,7 +84,7 @@ public class SanityCheckerRun {
 	private SanityCheckerRun(String[] args) {
 		// Extract what we need from the data file
 		ColumnSpec colSpec = null;
-		Properties metadata = new Properties();
+		StringBuffer metadataHeader = new StringBuffer();
 		ArrayList<ArrayList<String>> records = new ArrayList<ArrayList<String>>();
 		
 		// Read in the command line arguments
@@ -125,7 +125,7 @@ public class SanityCheckerRun {
 		if (ok) {
 			
 			try {
-				readInputFile(metadata, records);
+				readInputFile(metadataHeader, records);
 			} catch (IOException e) {
 				System.out.println("Error reading from file: " + e.getMessage());
 				ok = false;
@@ -137,7 +137,9 @@ public class SanityCheckerRun {
 			
 			try {
 				// Create the Sanity Checker and process the file
-				SanityChecker checker = new SanityChecker(itsDataFilename, new OmeMetadata(""), colSpec, records, itsDateFormat);
+				OmeMetadata metadata = new OmeMetadata("");
+				metadata.assignFromHeaderText(metadataHeader.toString());
+				SanityChecker checker = new SanityChecker(itsDataFilename, metadata, colSpec, records, itsDateFormat);
 				Output checkerOutput = checker.process();
 				
 				// Print summary
@@ -158,7 +160,7 @@ public class SanityCheckerRun {
 					}
 				}
 				
-			} catch (SanityCheckerException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				ok = false;
 			}
@@ -200,7 +202,7 @@ public class SanityCheckerRun {
 	 * @throws FileNotFoundException If the input file (specified on the command line) doesn't exist
 	 * @throws IOException If reading the input file fails.
 	 */
-	private void readInputFile(Properties metadata, ArrayList<ArrayList<String>> records) throws FileNotFoundException, IOException {
+	private void readInputFile(StringBuffer metadata, ArrayList<ArrayList<String>> records) throws FileNotFoundException, IOException {
 		
 		File inputFile = new File(itsInputDir, itsDataFilename);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream(inputFile))));
@@ -248,7 +250,7 @@ public class SanityCheckerRun {
 	 * @param metadata The properties object that will contain the metadata values
 	 * @throws IOException If an error occurs while reading from the file
 	 */
-	private void extractMetadata(BufferedReader reader, Properties metadata) throws IOException {
+	private void extractMetadata(BufferedReader reader, StringBuffer metadata) throws IOException {
 
 		// Read lines from the file until we find a slash-star on its own.
 		String line = getNextLine(reader);
@@ -271,20 +273,8 @@ public class SanityCheckerRun {
 					// We've found the end of the metadata header. We can stop now!
 					metadataEnded = true;
 				} else {
-					// Find the = sign, and split the line into name=value
-					int equalsPos = line.indexOf("=");
-					
-					// Make sure the equals sign is in a sensible place. We allow the equals at the end of the line
-					// to signify an empty value, which may be possible. The metadata checker routines will decide about that later.
-					if (equalsPos == -1 || equalsPos == 0) {
-						itsLogger.trace("Malformed metadata line (" + itsCurrentLine + ")");
-					} else {
-					
-						String name = line.substring(0, equalsPos).trim();
-						String value = line.substring(equalsPos + 1).trim();
-						
-						metadata.put(name, value);
-					}
+					metadata.append(line);
+					metadata.append("\n");
 				}
 			}
 		}
