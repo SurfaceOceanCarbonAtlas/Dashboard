@@ -97,4 +97,8 @@ public class HeaderLine {
 	protected String substring(int start, int end) {
 		return itsString.substring(start, end);
 	}
+	
+	public String toString() {
+		return itsString;
+	}
 }
