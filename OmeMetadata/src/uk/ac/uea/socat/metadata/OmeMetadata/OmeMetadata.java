@@ -680,7 +680,7 @@ public class OmeMetadata {
 					throw new OmeMetadataException("Orphaned line " + lineCount + ": \"" + line + "\"");
 				} else {
 					// Add it to the existing value
-					value = value + "\n" + line;
+					value = value + "\n" + line.toString();
 				}
 			} else {
 				
