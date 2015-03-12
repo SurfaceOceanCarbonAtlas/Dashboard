@@ -601,7 +601,25 @@ public class OmeMetadata {
 	public void setDraft(boolean draft) {
 		itIsDraft = draft;
 	}
-	
+
+	/**
+	 * @return the expocode for this OME metadata
+	 */
+	public String getExpocode() {
+		return itsExpoCode;
+	}
+
+	/**
+	 * Assigns the expocode for this OME metadata.
+	 * 
+	 * @param expocode
+	 * 		expocode to assign
+	 */
+	public void setExpocode(String expocode) {
+		this.itsExpoCode = expocode;
+		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
+	}
+
 	/**
 	 * @return the experiment name
 	 */
@@ -680,7 +698,7 @@ public class OmeMetadata {
 	public ArrayList<String> getInvestigators() {
 		ArrayList<String> investigatorsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			investigatorsList.add(invst.getValue("Name"));
+			investigatorsList.add(invst.getValue(INVESTIGATOR_NAME));
 		}
 		return investigatorsList;
 	}
@@ -691,7 +709,7 @@ public class OmeMetadata {
 	public ArrayList<String> getOrganizations() {
 		ArrayList<String> organizationsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			organizationsList.add(invst.getValue("Organization"));
+			organizationsList.add(invst.getValue(INVESTIGATOR_ORGANIZATION));
 		}
 		return organizationsList;
 	}
@@ -2898,18 +2916,6 @@ public class OmeMetadata {
 		return new Document(rootElem);
 	}
 
-	/**
-	 * Assigns the expocode for this OME metadata.
-	 * 
-	 * @param expocode
-	 * 		expocode to assign
-	 */
-	public void setExpocode(String expocode) {
-		this.itsExpoCode = expocode;
-		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
-	}
-
-	
 	/**
 	 * Some elements of the OME XML have a single child. This is a shortcut method to
 	 * extract the element and its child in one step. For example, there are a set of
