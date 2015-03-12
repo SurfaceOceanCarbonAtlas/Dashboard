@@ -80,9 +80,8 @@ public class DashboardCruiseSubmitter {
 	 * @param submitter
 	 * 		user performing this submit 
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid, or
-	 * 		if the data or metadata is missing, or
-	 * 		if the sanity checker fails or gives a geoposition error, or
+	 * 		if the expocode is invalid,
+	 * 		if the data or metadata is missing,
 	 * 		if the DSG files cannot be created, or
 	 * 		if there was a problem saving the updated dataset information
 	 * 		(including archive status)
