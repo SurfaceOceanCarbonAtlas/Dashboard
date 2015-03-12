@@ -33,6 +33,7 @@ import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
@@ -386,7 +387,8 @@ public class DashboardCruiseChecker {
 	 * @return
 	 * 		if the SanityChecker ran successfully
 	 * @throws IllegalArgumentException
-	 * 		if a data column type is unknown, or
+	 * 		if a data column type is unknown, 
+	 * 		if an existing OME XML file is corrupt, or
 	 * 		if the sanity checker throws an exception
 	 */
 	public boolean checkCruise(DashboardCruiseWithData cruiseData) 
@@ -405,7 +407,8 @@ public class DashboardCruiseChecker {
 	 * @return
 	 * 		the returned Output from {@link SanityChecker#process()}
 	 * @throws IllegalArgumentException
-	 * 		if a data column type is unknown, or
+	 * 		if a data column type is unknown, 
+	 * 		if an existing OME XML file is corrupt, or
 	 * 		if the sanity checker throws an exception
 	 */
 	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData)
@@ -422,7 +425,11 @@ public class DashboardCruiseChecker {
 				throw new IllegalArgumentException("Problems interpreting the OME XML contents in " + 
 						omeFile.getName() + "\n    " + ex.getMessage());
 			}
-			omeMData.assignFromOmeXmlDoc(omeDoc);
+			try {
+				omeMData.assignFromOmeXmlDoc(omeDoc);
+			} catch (BadEntryNameException ex) {
+				throw new IllegalArgumentException("Unknown entry in the OME XML: " + ex.getMessage());
+			}
 		}
 		else {
 			omeDoc = null;
@@ -854,7 +861,13 @@ public class DashboardCruiseChecker {
 			return false;
 
 		// Run the SanityChecker to get the standardized data
-		Output output = checkCruiseAndReturnOutput(cruiseData);
+		Output output;
+		try {
+			output = checkCruiseAndReturnOutput(cruiseData);
+		} catch (IllegalArgumentException ex) {
+			lastCheckProcessedOkay = false;
+			return false;
+		}
 		if ( lastCheckHadGeopositionErrors || ! lastCheckProcessedOkay )
 			return false;
 		List<SocatDataRecord> stdRowVals = output.getRecords();
