@@ -414,26 +414,6 @@ public class DashboardCruiseChecker {
 	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData)
 											throws IllegalArgumentException {
 		String expocode = cruiseData.getExpocode();
-		// Get or create the OME metadata for this cruise
-		OmeMetadata omeMData = new OmeMetadata(expocode);
-		File omeFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.OME_FILENAME);
-		Document omeDoc; 
-		if ( omeFile.exists() ) {
-			try {
-				omeDoc = (new SAXBuilder()).build(omeFile);
-			} catch (Exception ex) {
-				throw new IllegalArgumentException("Problems interpreting the OME XML contents in " + 
-						omeFile.getName() + "\n    " + ex.getMessage());
-			}
-			try {
-				omeMData.assignFromOmeXmlDoc(omeDoc);
-			} catch (BadEntryNameException ex) {
-				throw new IllegalArgumentException("Unknown entry in the OME XML: " + ex.getMessage());
-			}
-		}
-		else {
-			omeDoc = null;
-		}
 
 		// Get the data column units conversion object
 		ColumnConversionConfig convConfig;
@@ -799,8 +779,8 @@ public class DashboardCruiseChecker {
 		// Create the SanityChecker for this cruise
 		SanityChecker checker;
 		try {
-			checker = new SanityChecker(expocode, omeMData, colSpec, 
-									cruiseData.getDataValues(), dateFormat);
+			checker = new SanityChecker(expocode, new OmeMetadata(expocode), 
+										colSpec, cruiseData.getDataValues(), dateFormat);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Sanity Checker Exception: " + ex.getMessage());
@@ -809,20 +789,43 @@ public class DashboardCruiseChecker {
 		// Run the SanityChecker on this data and get the results
 		Output output = checker.process();
 
-		// Check if the OME metadata has been modified
-		boolean omeUnchanged;
-		try {
-			Document updatedOmeDoc = output.getMetadata().createOmeXmlDoc();
-			omeUnchanged = omeDoc.equals(updatedOmeDoc);
-		} catch (Exception ex) {
-			omeUnchanged = false; 
+		// Update the metadata from the data values if there are any changes
+		OmeMetadata omeMData;
+		boolean saveOmeMData;
+		File omeFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.OME_FILENAME);
+		if ( omeFile.exists() ) {
+			Document oldOmeDoc; 
+			try {
+				oldOmeDoc = (new SAXBuilder()).build(omeFile);
+			} catch (Exception ex) {
+				throw new IllegalArgumentException("Problems interpreting the OME XML contents in " + 
+						omeFile.getName() + "\n    " + ex.getMessage());
+			}
+			OmeMetadata oldOmeMData = new OmeMetadata(expocode);
+			try {
+				oldOmeMData.assignFromOmeXmlDoc(oldOmeDoc);
+			} catch (BadEntryNameException ex) {
+				throw new IllegalArgumentException("Unknown entry in the OME XML: " + ex.getMessage());
+			}
+			try {
+				omeMData = OmeMetadata.merge(output.getMetadata(), oldOmeMData);
+			} catch (BadEntryNameException ex) {
+				throw new IllegalArgumentException("Unknown entry in the OME XML: " + ex.getMessage());
+			}
+			Document updatedOmeDoc = omeMData.createOmeXmlDoc();
+			if ( oldOmeDoc.equals(updatedOmeDoc) )
+				saveOmeMData = false;
+			else
+				saveOmeMData = true;
 		}
-
-		// Save the updated OME metadata
-		if ( ! omeUnchanged ) {
-			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm Z")
-											 .print(new DateTime());
-			DashboardOmeMetadata dashOmeMData = new DashboardOmeMetadata(output.getMetadata(), 
+		else {
+			omeMData = output.getMetadata();
+			saveOmeMData = true;
+		}
+		if ( saveOmeMData ) {
+			// Save the updated OME metadata
+			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm Z").print(new DateTime());
+			DashboardOmeMetadata dashOmeMData = new DashboardOmeMetadata(omeMData, 
 					timestamp, cruiseData.getOwner(), cruiseData.getVersion());
 			String message = "Update of OME metadata from cruise checker";
 			metadataHandler.saveMetadataInfo(dashOmeMData, message);
