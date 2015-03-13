@@ -666,7 +666,25 @@ public class OmeMetadata {
 	}
 
 	/**
-	 * @return the start date
+	 * @return the cruise start date
+	 */
+	public String getCruiseStartDate() {
+		if ( null == cruiseStartDate )
+			return null;
+		return cruiseStartDate.getValue();
+	}
+
+	/**
+	 * @return the cruise end date
+	 */
+	public String getCruiseEndDate() {
+		if ( null == cruiseEndDate )
+			return null;
+		return cruiseEndDate.getValue();
+	}
+
+	/**
+	 * @return the temporal coverage start date
 	 */
 	public String getTemporalCoverageStartDate() {
 		if ( null == temporalCoverageStartDate )
@@ -675,7 +693,7 @@ public class OmeMetadata {
 	}
 
 	/**
-	 * @return the end date
+	 * @return the temporal coverage end date
 	 */
 	public String getTemporalCoverageEndDate() {
 		if ( null == temporalCoverageEndDate )
