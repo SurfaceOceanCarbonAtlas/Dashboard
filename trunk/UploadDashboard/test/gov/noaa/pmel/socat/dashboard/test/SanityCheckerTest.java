@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -201,12 +201,30 @@ public class SanityCheckerTest {
 		assertTrue( output.processedOK() );
 		assertFalse( output.hasWarnings() );
 		assertFalse( output.hasErrors() );
-		assertNotNull( metadataInput.getWestmostLongitude() );
-		assertNotNull( metadataInput.getEastmostLongitude() );
-		assertNotNull( metadataInput.getSouthmostLatitude() );
-		assertNotNull( metadataInput.getNorthmostLatitude() );
-		// assertNotNull( metadataInput.getTemporalCoverageStartDate() );
-		// assertNotNull( metadataInput.getTemporalCoverageEndDate() );
+		assertEquals( 342.039, Double.parseDouble(metadataInput.getWestmostLongitude()), 0.0001 );
+		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
+		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
+		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
+		assertEquals( "20030715", metadataInput.getCruiseStartDate() );
+		assertEquals( "20030715", metadataInput.getCruiseEndDate() );
+		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
+
+		// Repeat the check with the already assigned metadata
+		checker = new SanityChecker(expocode, metadataInput, 
+				colSpec, goodCruiseData, "YYYY-MM-DD");
+		output = checker.process();
+		assertTrue( output.processedOK() );
+		assertFalse( output.hasWarnings() );
+		assertFalse( output.hasErrors() );
+		assertEquals( 342.039, Double.parseDouble(metadataInput.getWestmostLongitude()), 0.0001 );
+		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
+		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
+		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
+		assertEquals( "20030715", metadataInput.getCruiseStartDate() );
+		assertEquals( "20030715", metadataInput.getCruiseEndDate() );
+		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
 
 		metadataInput = new OmeMetadata(expocode);
 		checker = new SanityChecker(expocode, metadataInput, 
@@ -215,12 +233,14 @@ public class SanityCheckerTest {
 		assertTrue( output.processedOK() );
 		assertTrue( output.hasWarnings() );
 		assertFalse( output.hasErrors() );
-		assertNotNull( metadataInput.getWestmostLongitude() );
-		assertNotNull( metadataInput.getEastmostLongitude() );
-		assertNotNull( metadataInput.getSouthmostLatitude() );
-		assertNotNull( metadataInput.getNorthmostLatitude() );
-		// assertNotNull( metadataInput.getTemporalCoverageStartDate() );
-		// assertNotNull( metadataInput.getTemporalCoverageEndDate() );
+		assertEquals( 342.039, Double.parseDouble(metadataInput.getWestmostLongitude()), 0.0001 );
+		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
+		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
+		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
+		assertEquals( "20030715", metadataInput.getCruiseStartDate() );
+		assertEquals( "20030715", metadataInput.getCruiseEndDate() );
+		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
 
 		metadataInput = new OmeMetadata(expocode);
 		checker = new SanityChecker(expocode, metadataInput, 
@@ -229,13 +249,14 @@ public class SanityCheckerTest {
 		assertTrue( output.processedOK() );
 		assertFalse( output.hasWarnings() );
 		assertTrue( output.hasErrors() );
-		assertNotNull( metadataInput.getWestmostLongitude() );
-		assertNotNull( metadataInput.getEastmostLongitude() );
-		assertNotNull( metadataInput.getSouthmostLatitude() );
-		assertNotNull( metadataInput.getNorthmostLatitude() );
-		// assertNotNull( metadataInput.getTemporalCoverageStartDate() );
-		// assertNotNull( metadataInput.getTemporalCoverageEndDate() );
-
+		assertEquals( 342.103, Double.parseDouble(metadataInput.getWestmostLongitude()), 0.0001 );
+		assertEquals( 2.039, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
+		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
+		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
+		assertEquals( "20030715", metadataInput.getCruiseStartDate() );
+		assertEquals( "20030715", metadataInput.getCruiseEndDate() );
+		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
 	}
 	
 }
