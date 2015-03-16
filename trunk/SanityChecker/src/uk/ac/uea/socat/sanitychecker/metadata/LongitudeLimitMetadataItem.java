@@ -137,11 +137,11 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 			// See if the cruise has crossed the zero line, if it hasn't already.
 			if (!crossesZero) {
 				if (lastPosition != -9999.0) {
-					lastPosition = position;
 					if (Math.abs(position - lastPosition) > 180) {
 						crossesZero = true;
 					}
 				}
+				lastPosition = position;
 			}
 		}
 	}
