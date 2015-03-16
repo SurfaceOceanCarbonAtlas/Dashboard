@@ -9,4 +9,4 @@
 		<g:Button addStyleNames="{style.infobutton}" ui:field="dismissButton" />
 	</g:VerticalPanel>
 
-</ui:UiBinder> 
+</ui:UiBinder>
