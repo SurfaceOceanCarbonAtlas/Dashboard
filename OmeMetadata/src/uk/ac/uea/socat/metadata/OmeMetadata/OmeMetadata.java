@@ -601,25 +601,7 @@ public class OmeMetadata {
 	public void setDraft(boolean draft) {
 		itIsDraft = draft;
 	}
-
-	/**
-	 * @return the expocode for this OME metadata
-	 */
-	public String getExpocode() {
-		return itsExpoCode;
-	}
-
-	/**
-	 * Assigns the expocode for this OME metadata.
-	 * 
-	 * @param expocode
-	 * 		expocode to assign
-	 */
-	public void setExpocode(String expocode) {
-		this.itsExpoCode = expocode;
-		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
-	}
-
+	
 	/**
 	 * @return the experiment name
 	 */
@@ -666,25 +648,7 @@ public class OmeMetadata {
 	}
 
 	/**
-	 * @return the cruise start date
-	 */
-	public String getCruiseStartDate() {
-		if ( null == cruiseStartDate )
-			return null;
-		return cruiseStartDate.getValue();
-	}
-
-	/**
-	 * @return the cruise end date
-	 */
-	public String getCruiseEndDate() {
-		if ( null == cruiseEndDate )
-			return null;
-		return cruiseEndDate.getValue();
-	}
-
-	/**
-	 * @return the temporal coverage start date
+	 * @return the start date
 	 */
 	public String getTemporalCoverageStartDate() {
 		if ( null == temporalCoverageStartDate )
@@ -693,7 +657,7 @@ public class OmeMetadata {
 	}
 
 	/**
-	 * @return the temporal coverage end date
+	 * @return the end date
 	 */
 	public String getTemporalCoverageEndDate() {
 		if ( null == temporalCoverageEndDate )
@@ -716,7 +680,7 @@ public class OmeMetadata {
 	public ArrayList<String> getInvestigators() {
 		ArrayList<String> investigatorsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			investigatorsList.add(invst.getValue(INVESTIGATOR_NAME));
+			investigatorsList.add(invst.getValue("Name"));
 		}
 		return investigatorsList;
 	}
@@ -727,7 +691,7 @@ public class OmeMetadata {
 	public ArrayList<String> getOrganizations() {
 		ArrayList<String> organizationsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			organizationsList.add(invst.getValue(INVESTIGATOR_ORGANIZATION));
+			organizationsList.add(invst.getValue("Organization"));
 		}
 		return organizationsList;
 	}
@@ -2935,6 +2899,18 @@ public class OmeMetadata {
 	}
 
 	/**
+	 * Assigns the expocode for this OME metadata.
+	 * 
+	 * @param expocode
+	 * 		expocode to assign
+	 */
+	public void setExpocode(String expocode) {
+		this.itsExpoCode = expocode;
+		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
+	}
+
+	
+	/**
 	 * Some elements of the OME XML have a single child. This is a shortcut method to
 	 * extract the element and its child in one step. For example, there are a set of
 	 * elements like this:
@@ -3389,155 +3365,386 @@ public class OmeMetadata {
 		OmeMetadata clone = new OmeMetadata(itsExpoCode);
 		clone.setDraft(isDraft());
 		
-		clone.userName = (OMEVariable) userName.clone();
-		clone.userOrganization = (OMEVariable) userOrganization.clone();
-		clone.userAddress = (OMEVariable) userAddress.clone();
-		clone.userPhone = (OMEVariable) userPhone.clone();
-		clone.userEmail = (OMEVariable) userEmail.clone();
-		
-		clone.investigators = new ArrayList<OMECompositeVariable>(investigators.size());
-		for (OMECompositeVariable investigator : investigators) {
-			clone.investigators.add((OMECompositeVariable) investigator.clone());
+		if (null != userName) {
+			clone.userName = (OMEVariable) userName.clone();
 		}
 		
-		clone.datasetID = (OMEVariable) datasetID.clone();
-		clone.fundingInfo = (OMEVariable) fundingInfo.clone();
-		
-		clone.initialSubmission = (OMEVariable) initialSubmission.clone();
-		clone.revisedSubmission = (OMEVariable) revisedSubmission.clone();
-		
-		clone.experimentName = (OMEVariable) experimentName.clone();
-		clone.experimentType = (OMEVariable) experimentType.clone();
-		clone.platformType = (OMEVariable) platformType.clone();
-		clone.co2InstrumentType = (OMEVariable) co2InstrumentType.clone();
-		clone.mooringId = (OMEVariable) mooringId.clone();
-		
-		clone.cruiseID = (OMEVariable) cruiseID.clone();
-		clone.cruiseInfo = (OMEVariable) cruiseInfo.clone();
-		clone.section = (OMEVariable) section.clone();
-
-		clone.geographicalRegion = (OMEVariable) geographicalRegion.clone();
-		
-		clone.westmostLongitude = (OMEVariable) westmostLongitude.clone();
-		clone.eastmostLongitude = (OMEVariable) eastmostLongitude.clone();
-		clone.northmostLatitude = (OMEVariable) northmostLatitude.clone();
-		clone.southmostLatitude = (OMEVariable) southmostLatitude.clone();
-		
-		clone.temporalCoverageStartDate = (OMEVariable) temporalCoverageStartDate.clone();
-		clone.temporalCoverageEndDate = (OMEVariable) temporalCoverageEndDate.clone();
-
-		clone.cruiseStartDate = (OMEVariable) cruiseStartDate.clone();
-		clone.cruiseEndDate = (OMEVariable) cruiseEndDate.clone();
-
-		clone.vesselName = (OMEVariable) vesselName.clone();
-		clone.vesselID = (OMEVariable) vesselID.clone();
-		clone.country = (OMEVariable) country.clone();
-		clone.vesselOwner = (OMEVariable) vesselOwner.clone();
-		
-		clone.variablesInfo = new ArrayList<OMECompositeVariable>(variablesInfo.size());
-		for (OMECompositeVariable varInfo : variablesInfo) {
-			clone.variablesInfo.add((OMECompositeVariable) varInfo.clone());
-		}
-
-		clone.xCO2WaterEquDryUnit = (OMEVariable) xCO2WaterEquDryUnit.clone();
-		clone.xCO2WaterSSTDryUnit = (OMEVariable) xCO2WaterSSTDryUnit.clone();
-		clone.pCO2WaterEquWetUnit = (OMEVariable) pCO2WaterEquWetUnit.clone();
-		clone.pCO2WaterSSTWetUnit = (OMEVariable) pCO2WaterSSTWetUnit.clone();
-		clone.fCO2WaterEquWetUnit = (OMEVariable) fCO2WaterEquWetUnit.clone();
-		clone.fCO2WaterSSTWetUnit = (OMEVariable) fCO2WaterSSTWetUnit.clone();
-		clone.xCO2AirDryUnit = (OMEVariable) xCO2AirDryUnit.clone();
-		clone.pCO2AirWetUnit = (OMEVariable) pCO2AirWetUnit.clone();
-		clone.fCO2AirWetUnit = (OMEVariable) fCO2AirWetUnit.clone();
-		clone.xCO2AirDryInterpolatedUnit = (OMEVariable) xCO2AirDryInterpolatedUnit.clone();
-		clone.pCO2AirWetInterpolatedUnit = (OMEVariable) pCO2AirWetInterpolatedUnit.clone();
-		clone.fCO2AirWetInterpolatedUnit = (OMEVariable) fCO2AirWetInterpolatedUnit.clone();
-
-		clone.depthOfSeaWaterIntake = (OMEVariable) depthOfSeaWaterIntake.clone();
-		clone.locationOfSeaWaterIntake = (OMEVariable) locationOfSeaWaterIntake.clone();
-		clone.equilibratorType = (OMEVariable) equilibratorType.clone();
-		clone.equilibratorVolume = (OMEVariable) equilibratorVolume.clone();
-		clone.waterFlowRate = (OMEVariable) waterFlowRate.clone();
-		clone.headspaceGasFlowRate = (OMEVariable) headspaceGasFlowRate.clone();
-		clone.vented = (OMEVariable) vented.clone();
-		clone.dryingMethodForCO2InWater = (OMEVariable) dryingMethodForCO2InWater.clone();
-		clone.equAdditionalInformation = (OMEVariable) equAdditionalInformation.clone();
-
-		clone.co2InMarineAirMeasurement = (OMEVariable) co2InMarineAirMeasurement.clone();
-		clone.co2InMarineAirLocationAndHeight = (OMEVariable) co2InMarineAirLocationAndHeight.clone();
-		clone.co2InMarineAirDryingMethod = (OMEVariable) co2InMarineAirDryingMethod.clone();
-		
-		clone.co2MeasurementMethod = (OMEVariable) co2MeasurementMethod.clone();
-		clone.co2Manufacturer = (OMEVariable) co2Manufacturer.clone();
-		clone.co2Model = (OMEVariable) co2Model.clone();
-		clone.co2Frequency = (OMEVariable) co2Frequency.clone();
-		clone.co2ResolutionWater = (OMEVariable) co2ResolutionWater.clone();
-		clone.co2UncertaintyWater = (OMEVariable) co2UncertaintyWater.clone();
-		clone.co2ResolutionAir = (OMEVariable) co2ResolutionAir.clone();
-		clone.co2UncertaintyAir = (OMEVariable) co2UncertaintyAir.clone();
-		clone.co2ManufacturerOfCalibrationGas = (OMEVariable) co2ManufacturerOfCalibrationGas.clone();
-		clone.co2SensorCalibration = (OMEVariable) co2SensorCalibration.clone();
-		clone.co2EnvironmentalControl = (OMEVariable) co2EnvironmentalControl.clone();
-		clone.co2MethodReferences = (OMEVariable) co2MethodReferences.clone();
-		clone.detailsOfCO2Sensing = (OMEVariable) detailsOfCO2Sensing.clone();
-		clone.analysisOfCO2Comparison = (OMEVariable) analysisOfCO2Comparison.clone();
-		clone.measuredCO2Params = (OMEVariable) measuredCO2Params.clone();
-
-		clone.sstLocation = (OMEVariable) sstLocation.clone();
-		clone.sstManufacturer = (OMEVariable) sstManufacturer.clone();
-		clone.sstModel = (OMEVariable) sstModel.clone();
-		clone.sstAccuracy = (OMEVariable) sstAccuracy.clone();
-		clone.sstPrecision = (OMEVariable) sstPrecision.clone();
-		clone.sstCalibration = (OMEVariable) sstCalibration.clone();
-		clone.sstOtherComments = (OMEVariable) sstOtherComments.clone();
-
-		clone.eqtLocation = (OMEVariable) eqtLocation.clone();
-		clone.eqtManufacturer = (OMEVariable) eqtManufacturer.clone();
-		clone.eqtModel = (OMEVariable) eqtModel.clone();
-		clone.eqtAccuracy = (OMEVariable) eqtAccuracy.clone();
-		clone.eqtPrecision = (OMEVariable) eqtPrecision.clone();
-		clone.eqtCalibration = (OMEVariable) eqtCalibration.clone();
-		clone.eqtWarming = (OMEVariable) eqtWarming.clone();
-		clone.eqtOtherComments = (OMEVariable) eqtOtherComments.clone();
-
-		clone.eqpLocation = (OMEVariable) eqpLocation.clone();
-		clone.eqpManufacturer = (OMEVariable) eqpManufacturer.clone();
-		clone.eqpModel = (OMEVariable) eqpModel.clone();
-		clone.eqpAccuracy = (OMEVariable) eqpAccuracy.clone();
-		clone.eqpPrecision = (OMEVariable) eqpPrecision.clone();
-		clone.eqpCalibration = (OMEVariable) eqpCalibration.clone();
-		clone.eqpOtherComments = (OMEVariable) eqpOtherComments.clone();
-		clone.eqpNormalized = (OMEVariable) eqpNormalized.clone();
-
-		clone.atpLocation = (OMEVariable) atpLocation.clone();
-		clone.atpManufacturer = (OMEVariable) atpManufacturer.clone();
-		clone.atpModel = (OMEVariable) atpModel.clone();
-		clone.atpAccuracy = (OMEVariable) atpAccuracy.clone();
-		clone.atpPrecision = (OMEVariable) atpPrecision.clone();
-		clone.atpCalibration = (OMEVariable) atpCalibration.clone();
-		clone.atpOtherComments = (OMEVariable) atpOtherComments.clone();
-
-		clone.sssLocation = (OMEVariable) sssLocation.clone();
-		clone.sssManufacturer = (OMEVariable) sssManufacturer.clone();
-		clone.sssModel = (OMEVariable) sssModel.clone();
-		clone.sssAccuracy = (OMEVariable) sssAccuracy.clone();
-		clone.sssPrecision = (OMEVariable) sssPrecision.clone();
-		clone.sssCalibration = (OMEVariable) sssCalibration.clone();
-		clone.sssOtherComments = (OMEVariable) sssOtherComments.clone();
-
-		clone.otherSensors = new ArrayList<OMECompositeVariable>(otherSensors.size());
-		for (OMECompositeVariable otherSensor : otherSensors) {
-			clone.otherSensors.add((OMECompositeVariable) otherSensor.clone());
+		if (null != userOrganization) {
+			clone.userOrganization = (OMEVariable) userOrganization.clone();
 		}
 		
-		clone.dataSetReferences = (OMEVariable) dataSetReferences.clone();
-		clone.additionalInformation = (OMEVariable) additionalInformation.clone();
-		clone.citation = (OMEVariable) citation.clone();
-		clone.measurementAndCalibrationReport = (OMEVariable) measurementAndCalibrationReport.clone();
-		clone.preliminaryQualityControl = (OMEVariable) preliminaryQualityControl.clone();
+		if (null != userAddress) {
+			clone.userAddress = (OMEVariable) userAddress.clone();
+		}
 		
-		clone.form_type = (OMEVariable) form_type.clone();
-		clone.recordID = (OMEVariable) recordID.clone();
+		if (null != userEmail) {
+			clone.userEmail = (OMEVariable) userEmail.clone();
+		}
+		
+		
+		if (null != investigators) {
+			clone.investigators = new ArrayList<OMECompositeVariable>(
+					investigators.size());
+			for (OMECompositeVariable investigator : investigators) {
+				clone.investigators.add((OMECompositeVariable) investigator
+						.clone());
+			}
+		}
+		
+		if (null != datasetID) {
+			clone.datasetID = (OMEVariable) datasetID.clone();
+		}
+		
+		if (null != fundingInfo) {
+			clone.fundingInfo = (OMEVariable) fundingInfo.clone();
+		}
+
+		if (null != initialSubmission) {
+			clone.initialSubmission = (OMEVariable) initialSubmission.clone();
+		}
+		
+		if (null != revisedSubmission) {
+			clone.revisedSubmission = (OMEVariable) revisedSubmission.clone();
+		}
+		
+		if (null != experimentName) {
+			clone.experimentName = (OMEVariable) experimentName.clone();
+		}
+		
+		if (null != experimentType) {
+			clone.experimentType = (OMEVariable) experimentType.clone();
+		}
+
+		if (null != platformType) {
+			clone.platformType = (OMEVariable) platformType.clone();
+		}
+
+		if (null != co2InstrumentType) {
+			clone.co2InstrumentType = (OMEVariable) co2InstrumentType.clone();
+		}
+
+		if (null != mooringId) {
+			clone.mooringId = (OMEVariable) mooringId.clone();
+		}
+
+		if (null != cruiseID) {
+			clone.cruiseID = (OMEVariable) cruiseID.clone();
+		}
+
+		if (null != cruiseInfo) {
+			clone.cruiseInfo = (OMEVariable) cruiseInfo.clone();
+		}
+		if (null != section) {
+			clone.section = (OMEVariable) section.clone();
+		}
+		if (null != geographicalRegion) {
+			clone.geographicalRegion = (OMEVariable) geographicalRegion.clone();
+		}
+		if (null != westmostLongitude) {
+			clone.westmostLongitude = (OMEVariable) westmostLongitude.clone();
+		}
+		if (null != eastmostLongitude) {
+			clone.eastmostLongitude = (OMEVariable) eastmostLongitude.clone();
+		}
+		if (null != northmostLatitude) {
+			clone.northmostLatitude = (OMEVariable) northmostLatitude.clone();
+		}
+		if (null != southmostLatitude) {
+			clone.southmostLatitude = (OMEVariable) southmostLatitude.clone();
+		}
+		if (null != temporalCoverageStartDate) {
+			clone.temporalCoverageStartDate = (OMEVariable) temporalCoverageStartDate
+					.clone();
+		}
+		if (null != temporalCoverageEndDate) {
+			clone.temporalCoverageEndDate = (OMEVariable) temporalCoverageEndDate
+					.clone();
+		}
+		if (null != cruiseStartDate) {
+			clone.cruiseStartDate = (OMEVariable) cruiseStartDate.clone();
+		}
+		if (null != cruiseEndDate) {
+			clone.cruiseEndDate = (OMEVariable) cruiseEndDate.clone();
+		}
+		if (null != vesselID) {
+			clone.vesselName = (OMEVariable) vesselName.clone();
+		}
+		if (null != vesselID) {
+			clone.vesselID = (OMEVariable) vesselID.clone();
+		}
+		if (null != country) {
+			clone.country = (OMEVariable) country.clone();
+		}
+		if (null != vesselOwner) {
+			clone.vesselOwner = (OMEVariable) vesselOwner.clone();
+		}
+		
+		if (null != variablesInfo) {
+			clone.variablesInfo = new ArrayList<OMECompositeVariable>(
+					variablesInfo.size());
+			for (OMECompositeVariable varInfo : variablesInfo) {
+				clone.variablesInfo.add((OMECompositeVariable) varInfo.clone());
+			}
+		}
+		
+		if (null != xCO2WaterEquDryUnit) {
+			clone.xCO2WaterEquDryUnit = (OMEVariable) xCO2WaterEquDryUnit.clone();
+		}
+		if (null != xCO2WaterSSTDryUnit) {
+			clone.xCO2WaterSSTDryUnit = (OMEVariable) xCO2WaterSSTDryUnit.clone();
+		}
+		if (null != pCO2WaterEquWetUnit) {
+			clone.pCO2WaterEquWetUnit = (OMEVariable) pCO2WaterEquWetUnit.clone();
+		}
+		if (null != pCO2WaterSSTWetUnit) {
+			clone.pCO2WaterSSTWetUnit = (OMEVariable) pCO2WaterSSTWetUnit.clone();
+		}
+		if (null != fCO2WaterEquWetUnit) {
+			clone.fCO2WaterEquWetUnit = (OMEVariable) fCO2WaterEquWetUnit.clone();
+		}
+		if (null != fCO2WaterSSTWetUnit) {
+			clone.fCO2WaterSSTWetUnit = (OMEVariable) fCO2WaterSSTWetUnit.clone();
+		}
+		if (null != xCO2AirDryUnit) {
+			clone.xCO2AirDryUnit = (OMEVariable) xCO2AirDryUnit.clone();
+		}
+		if (null != pCO2AirWetUnit) {
+			clone.pCO2AirWetUnit = (OMEVariable) pCO2AirWetUnit.clone();
+		}
+		if (null != fCO2AirWetUnit) {
+			clone.fCO2AirWetUnit = (OMEVariable) fCO2AirWetUnit.clone();
+		}
+		if (null != xCO2AirDryInterpolatedUnit) {
+			clone.xCO2AirDryInterpolatedUnit = (OMEVariable) xCO2AirDryInterpolatedUnit.clone();
+		}
+		if (null != pCO2AirWetInterpolatedUnit) {
+			clone.pCO2AirWetInterpolatedUnit = (OMEVariable) pCO2AirWetInterpolatedUnit.clone();
+		}
+		if (null != fCO2AirWetInterpolatedUnit) {
+			clone.fCO2AirWetInterpolatedUnit = (OMEVariable) fCO2AirWetInterpolatedUnit.clone();
+		}
+		if (null != depthOfSeaWaterIntake) {
+			clone.depthOfSeaWaterIntake = (OMEVariable) depthOfSeaWaterIntake.clone();
+		}
+		if (null != locationOfSeaWaterIntake) {
+			clone.locationOfSeaWaterIntake = (OMEVariable) locationOfSeaWaterIntake.clone();
+		}
+		if (null != equilibratorType) {
+			clone.equilibratorType = (OMEVariable) equilibratorType.clone();
+		}
+		if (null != equilibratorVolume) {
+			clone.equilibratorVolume = (OMEVariable) equilibratorVolume.clone();
+		}
+		if (null != waterFlowRate) {
+			clone.waterFlowRate = (OMEVariable) waterFlowRate.clone();
+		}
+		if (null != headspaceGasFlowRate) {
+			clone.headspaceGasFlowRate = (OMEVariable) headspaceGasFlowRate.clone();
+		}
+		if (null != vented) {
+			clone.vented = (OMEVariable) vented.clone();
+		}
+		if (null != dryingMethodForCO2InWater) {
+			clone.dryingMethodForCO2InWater = (OMEVariable) dryingMethodForCO2InWater.clone();
+		}
+		if (null != equAdditionalInformation) {
+			clone.equAdditionalInformation = (OMEVariable) equAdditionalInformation.clone();
+		}
+		if (null != co2InMarineAirMeasurement) {
+			clone.co2InMarineAirMeasurement = (OMEVariable) co2InMarineAirMeasurement.clone();
+		}
+		if (null != co2InMarineAirLocationAndHeight) {
+			clone.co2InMarineAirLocationAndHeight = (OMEVariable) co2InMarineAirLocationAndHeight.clone();
+		}
+		if (null != co2InMarineAirDryingMethod) {
+			clone.co2InMarineAirDryingMethod = (OMEVariable) co2InMarineAirDryingMethod.clone();
+		}
+		if (null != co2MeasurementMethod) {
+			clone.co2MeasurementMethod = (OMEVariable) co2MeasurementMethod.clone();
+		}
+		if (null != co2Manufacturer) {
+			clone.co2Manufacturer = (OMEVariable) co2Manufacturer.clone();
+		}
+		if (null != co2Model) {
+			clone.co2Model = (OMEVariable) co2Model.clone();
+		}
+		if (null != co2Frequency) {
+			clone.co2Frequency = (OMEVariable) co2Frequency.clone();
+		}
+		if (null != co2ResolutionWater) {
+			clone.co2ResolutionWater = (OMEVariable) co2ResolutionWater.clone();
+		}
+		if (null != co2UncertaintyWater) {
+			clone.co2UncertaintyWater = (OMEVariable) co2UncertaintyWater.clone();
+		}
+		if (null != co2ResolutionAir) {
+			clone.co2ResolutionAir = (OMEVariable) co2ResolutionAir.clone();
+		}
+		if (null != co2UncertaintyAir) {
+			clone.co2UncertaintyAir = (OMEVariable) co2UncertaintyAir.clone();
+		}
+		if (null != co2ManufacturerOfCalibrationGas) {
+			clone.co2ManufacturerOfCalibrationGas = (OMEVariable) co2ManufacturerOfCalibrationGas.clone();
+		}
+		if (null != co2SensorCalibration) {
+			clone.co2SensorCalibration = (OMEVariable) co2SensorCalibration.clone();
+		}
+		if (null != co2EnvironmentalControl) {
+			clone.co2EnvironmentalControl = (OMEVariable) co2EnvironmentalControl.clone();
+		}
+		if (null != co2MethodReferences) {
+			clone.co2MethodReferences = (OMEVariable) co2MethodReferences.clone();
+		}
+		if (null != detailsOfCO2Sensing) {
+			clone.detailsOfCO2Sensing = (OMEVariable) detailsOfCO2Sensing.clone();
+		}
+		if (null != analysisOfCO2Comparison) {
+			clone.analysisOfCO2Comparison = (OMEVariable) analysisOfCO2Comparison.clone();
+		}
+		if (null != measuredCO2Params) {
+			clone.measuredCO2Params = (OMEVariable) measuredCO2Params.clone();
+		}
+		if (null != sstLocation) {
+			clone.sstLocation = (OMEVariable) sstLocation.clone();
+		}
+		if (null != sstManufacturer) {
+			clone.sstManufacturer = (OMEVariable) sstManufacturer.clone();
+		}
+		if (null != sstModel) {
+			clone.sstModel = (OMEVariable) sstModel.clone();
+		}
+		if (null != sstAccuracy) {
+			clone.sstAccuracy = (OMEVariable) sstAccuracy.clone();
+		}
+		if (null != sstPrecision) {
+			clone.sstPrecision = (OMEVariable) sstPrecision.clone();
+		}
+		if (null != sstCalibration) {
+			clone.sstCalibration = (OMEVariable) sstCalibration.clone();
+		}
+		if (null != sstOtherComments) {
+			clone.sstOtherComments = (OMEVariable) sstOtherComments.clone();
+		}
+		if (null != eqtLocation) {
+			clone.eqtLocation = (OMEVariable) eqtLocation.clone();
+		}
+		if (null != eqtManufacturer) {
+			clone.eqtManufacturer = (OMEVariable) eqtManufacturer.clone();
+		}
+		if (null != eqtModel) {
+			clone.eqtModel = (OMEVariable) eqtModel.clone();
+		}
+		if (null != eqtAccuracy) {
+			clone.eqtAccuracy = (OMEVariable) eqtAccuracy.clone();
+		}
+		if (null != eqtPrecision) {
+			clone.eqtPrecision = (OMEVariable) eqtPrecision.clone();
+		}
+		if (null != eqtCalibration) {
+			clone.eqtCalibration = (OMEVariable) eqtCalibration.clone();
+		}
+		if (null != eqtWarming) {
+			clone.eqtWarming = (OMEVariable) eqtWarming.clone();
+		}
+		if (null != eqtOtherComments) {
+			clone.eqtOtherComments = (OMEVariable) eqtOtherComments.clone();
+		}
+		if (null != eqpLocation) {
+			clone.eqpLocation = (OMEVariable) eqpLocation.clone();
+		}
+		if (null != eqpManufacturer) {
+			clone.eqpManufacturer = (OMEVariable) eqpManufacturer.clone();
+		}
+		if (null != eqpModel) {
+			clone.eqpModel = (OMEVariable) eqpModel.clone();
+		}
+		if (null != eqpAccuracy) {
+			clone.eqpAccuracy = (OMEVariable) eqpAccuracy.clone();
+		}
+		if (null != eqpPrecision) {
+			clone.eqpPrecision = (OMEVariable) eqpPrecision.clone();
+		}
+		if (null != eqpCalibration) {
+			clone.eqpCalibration = (OMEVariable) eqpCalibration.clone();
+		}
+		if (null != eqpOtherComments) {
+			clone.eqpOtherComments = (OMEVariable) eqpOtherComments.clone();
+		}
+		if (null != eqpOtherComments) {
+			clone.eqpNormalized = (OMEVariable) eqpNormalized.clone();
+		}
+		if (null != atpLocation) {
+			clone.atpLocation = (OMEVariable) atpLocation.clone();
+		}
+		if (null != atpManufacturer) {
+			clone.atpManufacturer = (OMEVariable) atpManufacturer.clone();
+		}
+		if (null != atpModel) {
+			clone.atpModel = (OMEVariable) atpModel.clone();
+		}
+		if (null != atpAccuracy) {
+			clone.atpAccuracy = (OMEVariable) atpAccuracy.clone();
+		}
+		if (null != atpPrecision) {
+			clone.atpPrecision = (OMEVariable) atpPrecision.clone();
+		}
+		if (null != atpCalibration) {
+			clone.atpCalibration = (OMEVariable) atpCalibration.clone();
+		}
+		if (null != atpOtherComments) {
+			clone.atpOtherComments = (OMEVariable) atpOtherComments.clone();
+		}
+		if (null != sssLocation) {
+			clone.sssLocation = (OMEVariable) sssLocation.clone();
+		}
+		if (null != sssManufacturer) {
+			clone.sssManufacturer = (OMEVariable) sssManufacturer.clone();
+		}
+		if (null != sssModel) {
+			clone.sssModel = (OMEVariable) sssModel.clone();
+		}
+		if (null != sssAccuracy) {
+			clone.sssAccuracy = (OMEVariable) sssAccuracy.clone();
+		}
+		if (null != sssPrecision) {
+			clone.sssPrecision = (OMEVariable) sssPrecision.clone();
+		}
+		if (null != sssCalibration) {
+			clone.sssCalibration = (OMEVariable) sssCalibration.clone();
+		}
+		if (null != sssOtherComments) {
+			clone.sssOtherComments = (OMEVariable) sssOtherComments.clone();
+		}
+		
+		if (null != otherSensors) {
+			clone.otherSensors = new ArrayList<OMECompositeVariable>(otherSensors.size());
+			for (OMECompositeVariable otherSensor : otherSensors) {
+				clone.otherSensors.add((OMECompositeVariable) otherSensor.clone());
+			}
+		}
+		if (null != dataSetReferences) {
+			clone.dataSetReferences = (OMEVariable) dataSetReferences.clone();
+		}
+		if (null != additionalInformation) {
+			clone.additionalInformation = (OMEVariable) additionalInformation.clone();
+		}
+		if (null != citation) {
+			clone.citation = (OMEVariable) citation.clone();
+		}
+		if (null != measurementAndCalibrationReport) {
+			clone.measurementAndCalibrationReport = (OMEVariable) measurementAndCalibrationReport.clone();
+		}
+		if (null != preliminaryQualityControl) {
+			clone.preliminaryQualityControl = (OMEVariable) preliminaryQualityControl.clone();
+		}
+		if (null != form_type) {
+			clone.form_type = (OMEVariable) form_type.clone();
+		}
+		if (null != recordID) {
+			clone.recordID = (OMEVariable) recordID.clone();
+		}
 		
 		return clone;
 	}
 }
+
