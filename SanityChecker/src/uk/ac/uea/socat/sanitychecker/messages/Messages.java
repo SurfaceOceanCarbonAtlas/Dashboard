@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
+import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 
 /**
  * Handles messages generated during sanity checking.
@@ -28,12 +29,15 @@ public class Messages {
 	 */
 	private Map<MessageKey, Map<Integer, Message>> itsMessages;
 	
+	private ColumnSpec itsColumnSpec;
+	
 	/**
 	 * Constructor - simply initialises the fields
 	 */
-	public Messages() {
+	public Messages(ColumnSpec columnSpec) {
 		itsMessageTypes = new HashMap<String, MessageType>();
 		itsMessages = new TreeMap<MessageKey, Map<Integer, Message>>();
+		itsColumnSpec = columnSpec;
 	}
 	
 	/**
@@ -86,36 +90,31 @@ public class Messages {
 		
 		for (MessageKey key : itsMessages.keySet()) {
 
-			try {
-				int columnIndex = key.getColumnIndex();
-				String columnName = SocatColumnConfig.getInstance().getColumnName(columnIndex);
-				MessageSummary summary = new MessageSummary(key.getMessageType(), columnName);
-				
-				for (Integer lineNumber : itsMessages.get(key).keySet()) {
-					Message message = itsMessages.get(key).get(lineNumber);
-					switch (message.getSeverity()) {
-					case Message.WARNING:
-					{
-						summary.addWarning();
-						break;
-					}
-					case Message.ERROR:
-					{
-						summary.addError();
-						break;
-					}
-					default:
-					{
-						throw new MessageException("Unrecognised message status " + message.getSeverity());
-					}
-					}
+			int columnIndex = key.getColumnIndex();
+			String columnName = itsColumnSpec.getInputColumnName(columnIndex);
+			MessageSummary summary = new MessageSummary(key.getMessageType(), columnName);
+			
+			for (Integer lineNumber : itsMessages.get(key).keySet()) {
+				Message message = itsMessages.get(key).get(lineNumber);
+				switch (message.getSeverity()) {
+				case Message.WARNING:
+				{
+					summary.addWarning();
+					break;
 				}
-				
-				result.add(summary);
-			} catch (ConfigException e) {
-				throw new MessageException("Error while interrogating column configuration", e);
+				case Message.ERROR:
+				{
+					summary.addError();
+					break;
+				}
+				default:
+				{
+					throw new MessageException("Unrecognised message status " + message.getSeverity());
+				}
+				}
 			}
-					
+			
+			result.add(summary);
 		}
 		
 		return result;
