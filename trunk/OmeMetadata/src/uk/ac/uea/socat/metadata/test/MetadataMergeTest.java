@@ -60,6 +60,8 @@ public class MetadataMergeTest {
 	        
 	        OmeMetadata inputMD = new OmeMetadata("");
 	        inputMD.assignFromHeaderText(fileData.toString());
+	        
+	        System.out.println(inputMD.getHeaderText());
 
 		} catch (Exception e) {
 			System.out.println("Test failed because of exception: " + e.getMessage());
