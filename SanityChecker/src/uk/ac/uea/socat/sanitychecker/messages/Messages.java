@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import uk.ac.uea.socat.sanitychecker.config.ConfigException;
-import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 
 /**
