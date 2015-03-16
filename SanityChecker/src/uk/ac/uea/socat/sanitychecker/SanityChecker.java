@@ -167,7 +167,7 @@ public class SanityChecker {
 			itsInputData = dataInput;
 			itsColumnSpec = colSpec;
 			itsDateTimeHandler = new DateTimeHandler(dateFormat);
-			itsOutput = new Output(filename, metadata, dataInput.size(), itsLogger);
+			itsOutput = new Output(filename, metadata, dataInput.size(), itsColumnSpec, itsLogger);
 			
 		} catch (Exception e) {
 			itsLogger.fatal("Error initialising Sanity Checker instance", e);

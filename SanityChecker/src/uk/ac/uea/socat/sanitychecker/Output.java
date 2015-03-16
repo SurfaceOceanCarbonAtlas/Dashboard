@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
+import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
 import uk.ac.uea.socat.sanitychecker.messages.MessageException;
@@ -90,13 +91,13 @@ public class Output {
 	 * Constructor for the output object
 	 * @param filename The filename of the original data file
 	 */
-	protected Output(String filename, OmeMetadata metadata, int dataLength, Logger logger) {
+	protected Output(String filename, OmeMetadata metadata, int dataLength, ColumnSpec columnSpec, Logger logger) {
 		// Initialize result code to zero since flags can only be mixed in
 		itsResultCode = 0;
 		itsFilename = filename;
 		itsMetadata = metadata;
 		itsDataRecords = new ArrayList<SocatDataRecord>(dataLength);
-		itsMessages = new Messages();
+		itsMessages = new Messages(columnSpec);
 		
 		itsLogger = logger;
 		
