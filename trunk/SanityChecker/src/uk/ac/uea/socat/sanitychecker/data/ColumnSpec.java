@@ -312,6 +312,20 @@ public class ColumnSpec {
 		return itsStandardColumnInfo.keySet();
 	}
 	
+	public String getInputColumnName(int columnIndex) {
+		String result = null;
+		
+		for (String columnName : getColumnNames()) {
+			StandardColumnInfo colInfo = itsStandardColumnInfo.get(columnName);
+			if (colInfo.getInputColumnIndex() == columnIndex) {
+				result = columnName;
+				break;
+			}
+		}
+		
+		return result;
+	}
+	
 	/**
 	 * Determines whether or not the specified input column name is required or not
 	 * @param columnName The input column name
