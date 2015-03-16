@@ -318,7 +318,7 @@ public class ColumnSpec {
 		for (String columnName : getColumnNames()) {
 			StandardColumnInfo colInfo = itsStandardColumnInfo.get(columnName);
 			if (colInfo.getInputColumnIndex() == columnIndex) {
-				result = columnName;
+				result = colInfo.getInputColumnName();
 				break;
 			}
 		}
