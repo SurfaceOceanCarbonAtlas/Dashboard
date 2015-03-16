@@ -33,6 +33,8 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		EDIT_METADATA,
 		/** History tag for AddlDocsManagerPage */
 		MANAGE_DOCUMENTS,
+		/** History tag for CruisePreviewPage */
+		PREVIEW_CRUISE,
 		/** History tag for SubmitForQCPage */
 		SUBMIT_FOR_QC,
 		/** History tag for DashboardLogoutPage */
@@ -205,8 +207,12 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 			// Additional data manager page from history
 			AddlDocsManagerPage.redisplayPage(currentPage.getUsername());
 		}
+		else if ( token.equals(PagesEnum.PREVIEW_CRUISE.name()) ) {
+			// Preview cruise page from history
+			CruisePreviewPage.redisplayPage(currentPage.getUsername());
+		}
 		else if ( token.equals(PagesEnum.SUBMIT_FOR_QC.name()) ) {
-			// Add to SOCAT page from history
+			// Submit for QC page from history
 			SubmitForQCPage.redisplayPage(currentPage.getUsername());
 		}
 		else if ( token.equals(PagesEnum.LOGOUT.name()) ) {
