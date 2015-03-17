@@ -2175,6 +2175,7 @@ public class OmeMetadata {
 		
 		if (null != target) {
 			target.addValue(value);
+			result = target;
 		} else {
 			result = new OMEVariable(path, value);
 		}
