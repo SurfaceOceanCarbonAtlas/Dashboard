@@ -48,9 +48,7 @@ class OMEVariable {
 	protected OMEVariable(Path path, String value) {
 		itsPath = path;
 		itsValues = new ArrayList<String>();
-		if (null != value) {
-			itsValues.add(value);
-		}
+		addValue(value);
 	}
 	
 	private OMEVariable(Path path) {
@@ -59,8 +57,12 @@ class OMEVariable {
 	}
 	
 	protected void addValue(String value) {
-		if (!itsValues.contains(value)) {
-			itsValues.add(value);
+		String trimmedValue = value.trim();
+		
+		if (trimmedValue.length() > 0) {
+			if (!itsValues.contains(trimmedValue)) {
+				itsValues.add(trimmedValue);
+			}
 		}
 	}
 	
