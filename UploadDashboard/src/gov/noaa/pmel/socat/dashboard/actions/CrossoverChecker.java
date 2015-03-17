@@ -24,7 +24,13 @@ public class CrossoverChecker {
 
 	DsgNcFileHandler dsgHandler;
 
-	CrossoverChecker(DsgNcFileHandler dsgHandler) {
+	/**
+	 * Creates a checker for high-quality crossovers.
+	 * 
+	 * @param dsgHandler
+	 * 		handler to obtain full-data DSG files for cruises
+	 */
+	public CrossoverChecker(DsgNcFileHandler dsgHandler) {
 		this.dsgHandler = dsgHandler;
 	}
 
@@ -194,10 +200,11 @@ public class CrossoverChecker {
 
 	/**
 	 * Returns the location-time "distance" to another location-time point.
-	 * Uses {@link SocatCrossover#EARTH_AUTHALIC_RADIUS} for the radius of
-	 * a spherical Earth, and {@link SocatCrossover#SEAWATER_SPEED} for 
-	 * converting differences in time into distance.  The haversine formula 
-	 * to compute the great circle distance from the longitudes and latitudes.
+	 * Uses {@link SocatCrossover#SEAWATER_SPEED} for converting differences 
+	 * in time into distance.  Uses the haversine formula, and 
+	 * {@link SocatCrossover#EARTH_AUTHALIC_RADIUS} for the radius of a 
+	 * spherical Earth, to compute the great circle distance from the 
+	 * longitudes and latitudes.
 	 * 
 	 * @param lon
 	 * 		longitude, in degrees, of the first data location
