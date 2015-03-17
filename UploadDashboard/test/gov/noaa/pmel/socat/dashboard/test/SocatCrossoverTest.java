@@ -3,10 +3,12 @@
  */
 package gov.noaa.pmel.socat.dashboard.test;
 
-import static org.junit.Assert.*;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.Date;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
 
 import org.junit.Test;
 
@@ -22,16 +24,16 @@ public class SocatCrossoverTest {
 	private static final Integer firstRowNum = 47;
 	private static final Double firstLon = 125.250;
 	private static final Double firstLat = 45.320;
-	private static final Date firstTime = new Date();
-	private static final Date firstMinTime = new Date(firstTime.getTime() - (20L * 24L * 60L * 60L * 1000L));
-	private static final Date firstMaxTime =  new Date(firstTime.getTime() + (5L * 24L * 60L * 60L * 1000L));
+	private static final Long firstTime = Math.round(System.currentTimeMillis() / 1000.0);
+	private static final Long firstMinTime = firstTime - (20L * 24L * 60L * 60L);
+	private static final Long firstMaxTime =  firstTime + (5L * 24L * 60L * 60L);
 	private static final String secondExpo = "BBBB19951207";
 	private static final Integer secondRowNum = 123;
 	private static final Double secondLon = 125.255;
 	private static final Double secondLat = 45.315;
-	private static final Date secondTime = new Date(firstTime.getTime() - (4L * 60L * 60L * 1000L));
-	private static final Date secondMinTime = new Date(secondTime.getTime() - (10L * 24L * 60L * 60L * 1000L));
-	private static final Date secondMaxTime =  new Date(secondTime.getTime() + (15L * 24L * 60L * 60L * 1000L));
+	private static final Long secondTime = firstTime - (4L * 60L * 60L);
+	private static final Long secondMinTime = secondTime - (10L * 24L * 60L * 60L);
+	private static final Long secondMaxTime =  secondTime + (15L * 24L * 60L * 60L);
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getExpocodes()}
@@ -186,17 +188,17 @@ public class SocatCrossoverTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getTimesAtMin()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setTimesAtMin(java.util.Date[])}.
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setTimesAtMin(java.util.Long[])}.
 	 */
 	@Test
 	public void testGetSetTimesAtMin() {
 		SocatCrossover cross = new SocatCrossover();
-		Date[] times = cross.getTimesAtMin();
+		Long[] times = cross.getTimesAtMin();
 		assertEquals(2, times.length);
 		assertNull(times[0]);
 		assertNull(times[1]);
 
-		cross.setTimesAtMin(new Date[] {firstTime, secondTime});
+		cross.setTimesAtMin(new Long[] {firstTime, secondTime});
 		times = cross.getTimesAtMin();
 		assertEquals(2, times.length);
 		assertEquals(firstTime, times[0]);
@@ -229,23 +231,23 @@ public class SocatCrossoverTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getCruiseMinTimes()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setCruiseMinTimes(java.util.Date[])}.
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setCruiseMinTimes(java.util.Long[])}.
 	 */
 	@Test
 	public void testGetCruiseMinTimes() {
 		SocatCrossover cross = new SocatCrossover();
-		Date[] minTimes = cross.getCruiseMinTimes();
+		Long[] minTimes = cross.getCruiseMinTimes();
 		assertEquals(2, minTimes.length);
 		assertNull(minTimes[0]);
 		assertNull(minTimes[1]);
 
-		cross.setCruiseMinTimes(new Date[] {firstMinTime, secondMinTime});
+		cross.setCruiseMinTimes(new Long[] {firstMinTime, secondMinTime});
 		minTimes = cross.getCruiseMinTimes();
 		assertEquals(2, minTimes.length);
 		assertEquals(firstMinTime, minTimes[0]);
 		assertEquals(secondMinTime, minTimes[1]);
 
-		Date[] times = cross.getTimesAtMin();
+		Long[] times = cross.getTimesAtMin();
 		assertEquals(2, times.length);
 		assertNull(times[0]);
 		assertNull(times[1]);
@@ -276,27 +278,27 @@ public class SocatCrossoverTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getCruiseMaxTimes()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setCruiseMaxTimes(java.util.Date[])}.
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setCruiseMaxTimes(java.util.Long[])}.
 	 */
 	@Test
 	public void testGetCruiseMaxTimes() {
 		SocatCrossover cross = new SocatCrossover();
-		Date[] maxTimes = cross.getCruiseMaxTimes();
+		Long[] maxTimes = cross.getCruiseMaxTimes();
 		assertEquals(2, maxTimes.length);
 		assertNull(maxTimes[0]);
 		assertNull(maxTimes[1]);
 
-		cross.setCruiseMaxTimes(new Date[] {firstMaxTime, secondMaxTime});
+		cross.setCruiseMaxTimes(new Long[] {firstMaxTime, secondMaxTime});
 		maxTimes = cross.getCruiseMaxTimes();
 		assertEquals(2, maxTimes.length);
 		assertEquals(firstMaxTime, maxTimes[0]);
 		assertEquals(secondMaxTime, maxTimes[1]);
 
-		Date[] minTimes = cross.getCruiseMinTimes();
+		Long[] minTimes = cross.getCruiseMinTimes();
 		assertEquals(2, minTimes.length);
 		assertNull(minTimes[0]);
 		assertNull(minTimes[1]);
-		Date[] times = cross.getTimesAtMin();
+		Long[] times = cross.getTimesAtMin();
 		assertEquals(2, times.length);
 		assertNull(times[0]);
 		assertNull(times[1]);
@@ -377,24 +379,24 @@ public class SocatCrossoverTest {
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 
-		first.setTimesAtMin(new Date[] {firstTime, secondTime});
+		first.setTimesAtMin(new Long[] {firstTime, secondTime});
 		assertFalse( first.hashCode() == second.hashCode());
 		assertFalse( first.equals(second) );
-		second.setTimesAtMin(new Date[] {firstTime, secondTime});
+		second.setTimesAtMin(new Long[] {firstTime, secondTime});
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 
-		first.setCruiseMinTimes(new Date[] {firstMinTime, secondMinTime});
+		first.setCruiseMinTimes(new Long[] {firstMinTime, secondMinTime});
 		assertFalse( first.hashCode() == second.hashCode());
 		assertFalse( first.equals(second) );
-		second.setCruiseMinTimes(new Date[] {firstMinTime, secondMinTime});
+		second.setCruiseMinTimes(new Long[] {firstMinTime, secondMinTime});
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 
-		first.setCruiseMaxTimes(new Date[] {firstMaxTime, secondMaxTime});
+		first.setCruiseMaxTimes(new Long[] {firstMaxTime, secondMaxTime});
 		assertFalse( first.hashCode() == second.hashCode());
 		assertFalse( first.equals(second) );
-		second.setCruiseMaxTimes(new Date[] {firstMaxTime, secondMaxTime});
+		second.setCruiseMaxTimes(new Long[] {firstMaxTime, secondMaxTime});
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 	}

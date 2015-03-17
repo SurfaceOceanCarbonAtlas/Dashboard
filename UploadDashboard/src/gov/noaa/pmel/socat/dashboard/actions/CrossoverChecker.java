@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.actions;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -82,8 +81,8 @@ public class CrossoverChecker {
 		double minDistance = SocatCrossover.MAX_CROSSOVER_DIST + 1.0;
 		SocatCrossover crossover = null;
 
-		Date[] dataMinTimes = null;
-		Date[] dataMaxTimes = null;
+		Long[] dataMinTimes = null;
+		Long[] dataMaxTimes = null;
 
 		for (int j = 0; j < numRows[0]; j++) {
 			// Skip this point if any missing values
@@ -151,31 +150,15 @@ public class CrossoverChecker {
 
 					// Get the min and max data times for the cruises if not done earlier
 					if ( (dataMaxTimes == null) || (dataMinTimes == null) ) {
-						dataMaxTimes = new Date[] {null, null};
-						dataMinTimes = new Date[] {null, null};
+						dataMinTimes = new Long[] {null, null};
+						dataMaxTimes = new Long[] {null, null};
 						for (int q = 0; q < 2; q++) {
-							double maxTime = SocatCruiseData.FP_MISSING_VALUE;
-							double minTime = SocatCruiseData.FP_MISSING_VALUE;
-							for (int r = 0; r < numRows[q]; r++) {
-								if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, times[q][r], MISSVAL_RTOLER, MISSVAL_ATOLER) )
-									continue;
-								if ( (maxTime == SocatCruiseData.FP_MISSING_VALUE) ||
-									 (minTime == SocatCruiseData.FP_MISSING_VALUE) ) {
-									maxTime = times[q][r];
-									minTime = maxTime;
-								}
-								else if ( maxTime < times[q][r] ) {
-									maxTime = times[q][r];
-								}
-								else if ( minTime > times[q][r] ) {
-									minTime = times[q][r];
-								}
-							}
-							if ( (maxTime == SocatCruiseData.FP_MISSING_VALUE) ||
-								 (minTime == SocatCruiseData.FP_MISSING_VALUE) )
+							double[] minMaxVals = getMinMaxValid(times[q]);
+							if ( (minMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
+								 (minMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) )
 								throw new IOException("No valid times for " + expocodes[q]);
-							dataMaxTimes[q] = new Date(Math.round(maxTime * 1000.0));
-							dataMinTimes[q] = new Date(Math.round(minTime * 1000.0));
+							dataMinTimes[q] = Math.round(minMaxVals[0]);
+							dataMaxTimes[q] = Math.round(minMaxVals[1]);
 						}
 					}
 
@@ -187,8 +170,7 @@ public class CrossoverChecker {
 					crossover.setRowNumsAtMin(new Integer[] {j+1, k+1});
 					crossover.setLonsAtMin(new Double[] {lons[0][j], lons[1][k]});
 					crossover.setLatsAtMin(new Double[] {lats[0][j], lats[1][k]});
-					crossover.setTimesAtMin(new Date[] {new Date(Math.round(times[0][j] * 1000.0)), 
-														new Date(Math.round(times[1][k] * 1000.0))});
+					crossover.setTimesAtMin(new Long[] {Math.round(times[0][j]), Math.round(times[1][k])});
 					crossover.setCruiseMinTimes(dataMinTimes);
 					crossover.setCruiseMaxTimes(dataMaxTimes);
 				}
@@ -196,6 +178,39 @@ public class CrossoverChecker {
 		}
 
 		return crossover;
+	}
+
+	/**
+	 * Returns the minimum and maximum valid values from the given data array.
+	 * Missing values (those very close to {@link SocatCruiseData#FP_MISSING_VALUE})
+	 * are ignored.
+	 * 
+	 * @param data
+	 * 		find the minimum and maximum valid values of this data
+	 * @return
+	 * 		(minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
+	 * 		({@link SocatCruiseData#FP_MISSING_VALUE}, {@link SocatCruiseData#FP_MISSING_VALUE})
+	 * 		if all data is missing.
+	 */
+	private double[] getMinMaxValid(double[] data) {
+		double maxVal = SocatCruiseData.FP_MISSING_VALUE;
+		double minVal = SocatCruiseData.FP_MISSING_VALUE;
+		for ( double val : data ) {
+			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, val, MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				continue;
+			if ( (maxVal == SocatCruiseData.FP_MISSING_VALUE) ||
+				 (minVal == SocatCruiseData.FP_MISSING_VALUE) ) {
+				maxVal = val;
+				minVal = val;
+			}
+			else if ( maxVal < val ) {
+				maxVal = val;
+			}
+			else if ( minVal > val ) {
+				minVal = val;
+			}
+		}
+		return new double[] {minVal, maxVal};
 	}
 
 	/**
@@ -211,18 +226,18 @@ public class CrossoverChecker {
 	 * @param lat
 	 * 		latitude, in degrees, of the first data location
 	 * @param time
-	 * 		time, in seconds since Jan 1, 1970 00:00:00 of the first data location
+	 * 		time, in seconds since Jan 1, 1970 00:00:00, of the first data location
 	 * @param otherlon
 	 * 		longitude, in degrees, of the other data location
 	 * @param otherlat
 	 * 		latitude, in degrees, of the other data location
 	 * @param othertime
-	 * 		time, in seconds since Jan 1, 1970 00:00:00 of the other data location
+	 * 		time, in seconds since Jan 1, 1970 00:00:00, of the other data location
 	 * @return
 	 *      the location-time distance between this location-time point
 	 *      and other in kilometers
 	 */
-	public double distanceTo(double lon, double lat, double time, 
+	private double distanceTo(double lon, double lat, double time, 
 							 double otherLon, double otherLat, double otherTime) {
 		// Convert longitude and latitude degrees to radians
 		double lat1 = lat * Math.PI / 180.0;
@@ -242,7 +257,7 @@ public class CrossoverChecker {
 		distance *= SocatCrossover.EARTH_AUTHALIC_RADIUS;
 
 		// Get the time difference in days (24 hours)
-		double deltime = (otherTime - time) / (24.0 * 60.0 * 60.0 * 1000.0);
+		double deltime = (otherTime - time) / (24.0 * 60.0 * 60.0);
 		// Convert to the time difference to kilometers
 		deltime *= SocatCrossover.SEAWATER_SPEED;
 		// Combine the time distance with the surface distance
