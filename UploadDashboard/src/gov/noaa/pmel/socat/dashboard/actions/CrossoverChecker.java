@@ -55,6 +55,10 @@ public class CrossoverChecker {
 			 (expocodes[0]).equals(expocodes[1]) )
 			throw new IllegalArgumentException("Invalid expocodes given to checkForCrossover");
 
+		// Check that the NODC codes are different - crossovers must be between different instruments
+		if ( (expocodes[0]).substring(0,4).equals((expocodes[1]).substring(0,4)) )
+			return null;
+
 		int[] numRows = new int[2];
 		double[][] lons = new double[2][];
 		double[][] lats = new double[2][];
@@ -80,10 +84,8 @@ public class CrossoverChecker {
 
 		double minDistance = SocatCrossover.MAX_CROSSOVER_DIST + 1.0;
 		SocatCrossover crossover = null;
-
 		Long[] dataMinTimes = null;
 		Long[] dataMaxTimes = null;
-
 		for (int j = 0; j < numRows[0]; j++) {
 			// Skip this point if any missing values
 			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, lons[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )

@@ -123,17 +123,17 @@ public class GetCruiseCrossovers {
 						 reportFlagsSet.contains( cruiseFlagsMap.get(secondExpo) ) ) )
 					continue;
 				timeDiff = (System.currentTimeMillis() - startTime) / (1000.0 * 60.0);
-				System.err.format("%.1dm - examining %s and %s: ", timeDiff, firstExpo, secondExpo);
+				System.err.format("%.1fm - examining %s and %s: ", timeDiff, firstExpo, secondExpo);
 				System.err.flush();
 				try {
 					SocatCrossover cross = crossChecker.checkForCrossover(new String[] {firstExpo, secondExpo});
 					timeDiff = 60.0 * ( (System.currentTimeMillis() - startTime) / (1000.0 * 60.0) - timeDiff );
 					if ( cross != null ) {
-						System.err.format("%.1ds - crossover found: %s\n", timeDiff * 60.0, cross.toString());
+						System.err.format("%.1fs - crossover found: %s\n", timeDiff * 60.0, cross.toString());
 						crossoversMap.put(firstExpo + " and " + secondExpo, cross);
 					}
 					else {
-						System.err.format("%.1ds - no crossover\n", timeDiff);
+						System.err.format("%.1fs - no crossover\n", timeDiff);
 					}
 				} catch (Exception ex) {
 					System.err.println("problems: " + ex.getMessage());
