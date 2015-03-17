@@ -2174,7 +2174,7 @@ public class OmeMetadata {
 		OMEVariable result = null;
 		
 		if (null != target) {
-			throw new OmeMetadataException(lineCount, "Value '" + name + "' has already been set");
+			target.addValue(value);
 		} else {
 			result = new OMEVariable(path, value);
 		}
