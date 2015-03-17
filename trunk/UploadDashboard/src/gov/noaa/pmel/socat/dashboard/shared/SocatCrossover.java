@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Date;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -16,7 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCrossover implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4623571482454231931L;
+	private static final long serialVersionUID = -1480644418805338101L;
 
 	/** Max "distance", in kilometers, still considered a crossover */
 	public static final double MAX_CROSSOVER_DIST = 80.0;
@@ -39,9 +38,9 @@ public class SocatCrossover implements Serializable, IsSerializable {
 	Integer[] rowNumsAtMin;
 	Double[] lonsAtMin;
 	Double[] latsAtMin;
-	Date[] timesAtMin;
-	Date[] cruiseMinTimes;
-	Date[] cruiseMaxTimes;
+	Long[] timesAtMin;
+	Long[] cruiseMinTimes;
+	Long[] cruiseMaxTimes;
 
 	/**
 	 * Creates an crossover with no information (all null).
@@ -88,7 +87,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the "distance" of the crossover; may be null.
+	 * 		the "distance" of the crossover in kilometers; may be null.
 	 */
 	public Double getMinDistance() {
 		return minDistance;
@@ -96,7 +95,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @param minDistance
-	 * 		the "distance" of the crossover to set.
+	 * 		the "distance" of the crossover in kilometers to set.
 	 */
 	public void setMinDistance(Double minDistance) {
 		this.minDistance = minDistance;
@@ -104,7 +103,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the data row numbers of the two cruises at the crossover;
+	 * 		the data row numbers (starts with one) of the two cruises at the crossover;
 	 * 		always an array of two Integers, but each Integer may be null.
 	 * 		The actual array in this instance is returned.
 	 */
@@ -114,7 +113,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @param rowNumsAtMin
-	 * 		the data row numbers of the two cruises at the crossover to set.
+	 * 		the data row numbers (starts with one) of the two cruises at the crossover to set.
 	 * 		If null, an array of two nulls is assigned; 
 	 * 		otherwise an array of two Integers must be given.
 	 * 		The values in the array, but not the array itself, are used.
@@ -191,24 +190,26 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the dates of the two cruises at the crossover;
+	 * 		the times, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		of the two cruises at the crossover;
 	 * 		always an array of two Dates, but each Date may be null.
 	 * 		The actual array in this instance is returned.
 	 */
-	public Date[] getTimesAtMin() {
+	public Long[] getTimesAtMin() {
 		return timesAtMin;
 	}
 
 	/**
 	 * @param timesAtMin
-	 * 		the dates of the two cruises at the crossover to set.
+	 * 		the times, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		of the two cruises at the crossover to set.
 	 * 		If null, an array of two nulls is assigned; 
 	 * 		otherwise an array of two Dates must be given.
 	 * 		The values in the array, but not the array itself, are used.
 	 */
-	public void setTimesAtMin(Date[] timesAtMin) {
+	public void setTimesAtMin(Long[] timesAtMin) {
 		if ( timesAtMin == null ) {
-			this.timesAtMin = new Date[] { null, null };
+			this.timesAtMin = new Long[] { null, null };
 		}
 		else {
 			if ( timesAtMin.length != 2 )
@@ -220,24 +221,26 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the minimum time of all data for each cruise;
+	 * 		the minimum time, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		of all data for each cruise;
 	 * 		always an array of two Dates, but each Date may be null.
 	 * 		The actual array in this instance is returned.
 	 */
-	public Date[] getCruiseMinTimes() {
+	public Long[] getCruiseMinTimes() {
 		return cruiseMinTimes;
 	}
 
 	/**
 	 * @param cruiseMinTimes 
-	 * 		the minimum time of all data for each cruise to set.
+	 * 		the minimum time, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		of all data for each cruise to set.
 	 * 		If null, an array of two nulls is assigned; 
 	 * 		otherwise an array of two Dates must be given.
 	 * 		The values in the array, but not the array itself, are used.
 	 */
-	public void setCruiseMinTimes(Date[] cruiseMinTimes) {
+	public void setCruiseMinTimes(Long[] cruiseMinTimes) {
 		if ( cruiseMinTimes == null ) {
-			this.cruiseMinTimes = new Date[] { null, null };
+			this.cruiseMinTimes = new Long[] { null, null };
 		}
 		else {
 			if ( cruiseMinTimes.length != 2 )
@@ -249,24 +252,26 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		maximum time of all data for each cruise;
+	 * 		maximum time, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		of all data for each cruise;
 	 * 		always an array of two Dates, but each Date may be null.
 	 * 		The actual array in this instance is returned.
 	 */
-	public Date[] getCruiseMaxTimes() {
+	public Long[] getCruiseMaxTimes() {
 		return cruiseMaxTimes;
 	}
 
 	/**
 	 * @param cruiseMaxTimes
-	 * 		the maximum time of all data for each cruise to set.
+	 * 		the maximum time, in seconds with Jan 1, 1970 00:00:00, 
+	 * 		of all data for each cruise to set.
 	 * 		If null, an array of two nulls is assigned; 
 	 * 		otherwise an array of two Dates must be given.
 	 * 		The values in the array, but not the array itself, are used.
 	 */
-	public void setCruiseMaxTimes(Date[] cruiseMaxTimes) {
+	public void setCruiseMaxTimes(Long[] cruiseMaxTimes) {
 		if ( cruiseMaxTimes == null ) {
-			this.cruiseMaxTimes = new Date[] { null, null };
+			this.cruiseMaxTimes = new Long[] { null, null };
 		}
 		else {
 			if ( cruiseMaxTimes.length != 2 )

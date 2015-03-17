@@ -112,6 +112,8 @@ public class GetCruiseCrossovers {
 		}
 
 		CrossoverChecker crossChecker = new CrossoverChecker(dataStore.getDsgNcFileHandler());
+		long startTime = System.currentTimeMillis();
+		Double timeDiff;
 		TreeMap<String,SocatCrossover> crossoversMap = new TreeMap<String,SocatCrossover>();
 		for ( String firstExpo : cruiseFlagsMap.keySet() ) {
 			for ( String secondExpo : cruiseFlagsMap.keySet() ) {
@@ -120,16 +122,18 @@ public class GetCruiseCrossovers {
 				if ( ! ( reportFlagsSet.contains( cruiseFlagsMap.get(firstExpo) ) ||
 						 reportFlagsSet.contains( cruiseFlagsMap.get(secondExpo) ) ) )
 					continue;
-				System.err.print("Examining " + firstExpo + " and " + secondExpo + ": ");
+				timeDiff = (System.currentTimeMillis() - startTime) / (1000.0 * 60.0);
+				System.err.format("%.1dm - examining %s and %s: ", timeDiff, firstExpo, secondExpo);
 				System.err.flush();
 				try {
 					SocatCrossover cross = crossChecker.checkForCrossover(new String[] {firstExpo, secondExpo});
+					timeDiff = 60.0 * ( (System.currentTimeMillis() - startTime) / (1000.0 * 60.0) - timeDiff );
 					if ( cross != null ) {
-						System.err.println(" crossover found");
+						System.err.format("%.1ds - crossover found: %s\n", timeDiff * 60.0, cross.toString());
 						crossoversMap.put(firstExpo + " and " + secondExpo, cross);
 					}
 					else {
-						System.err.println(" no crossover");
+						System.err.format("%.1ds - no crossover\n", timeDiff);
 					}
 				} catch (Exception ex) {
 					System.err.println("problems: " + ex.getMessage());
