@@ -10,7 +10,7 @@ public class OMECompositeVariableEntry {
 	protected OMECompositeVariableEntry(String name, String value) {
 		this.itsName = name;
 		itsValues = new ArrayList<String>();
-		itsValues.add(value);
+		addValue(value);
 	}
 	
 	protected OMECompositeVariableEntry(String name) {
@@ -19,8 +19,12 @@ public class OMECompositeVariableEntry {
 	}
 	
 	protected void addValue(String value) {
-		if (!itsValues.contains(value)) {
-			itsValues.add(value);
+		String trimmedValue = value.trim();
+		
+		if (trimmedValue.length() > 0) {
+			if (!itsValues.contains(trimmedValue)) {
+				itsValues.add(trimmedValue);
+			}
 		}
 	}
 	
