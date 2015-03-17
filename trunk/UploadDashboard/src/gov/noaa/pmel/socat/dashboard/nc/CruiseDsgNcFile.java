@@ -35,7 +35,14 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 4891504229996681548L;
+	private static final long serialVersionUID = -6999092037915835809L;
+
+	// Names of the variables in the DSG files
+	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
+	public static final String LATITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
+	public static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
+	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -704,6 +711,113 @@ public class CruiseDsgNcFile extends File {
 			ncfile.close();
 		}
 		return dataVals;
+	}
+
+	/**
+	 * Reads and returns the longitudes, latitudes, times, SST values, and 
+	 * fCO2_recommended values contained in this DSG file.  NaN and infinite 
+	 * values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.  This 
+	 * DSG file must have been processed by Ferret, such as when saved using 
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * for the fCO2_recommended values to be meaningful.
+	 * 
+	 * @return
+	 * 		the array { lons, lats, times, ssts, fco2s } for this cruise, where
+	 * 		lons are the array of longitudes, lats are the array of latitudes, 
+	 * 		times are the array of times, ssts are the array of SST values, and 
+	 * 		fco2s are the array of fCO2_recommended values.
+	 * @throws IOException
+	 * 		if problems opening or reading from this DSG file, or 
+	 * 		if any of the data arrays are not given in this DSG file
+	 */
+	public double[][] readLonLatTimeSstFco2DataValues() throws IOException {
+		double[] lons;
+		double[] lats;
+		double[] times;
+		double[] ssts;
+		double[] fco2s;
+
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
+		try {
+			Variable lonVar = ncfile.findVariable(LONGITUDE_NCVAR_NAME);
+			if ( lonVar == null )
+				throw new IOException("Unable to find longitudes in " + getName());
+			int numVals = lonVar.getShape(0);
+
+			Variable latVar = ncfile.findVariable(LATITUDE_NCVAR_NAME);
+			if ( latVar == null )
+				throw new IOException("Unable to find latitudes in " + getName());
+			if ( latVar.getShape(0) != numVals ) 
+				throw new IOException("Unexpected number of latitudes in " + getName());
+
+			Variable timeVar = ncfile.findVariable(TIME_NCVAR_NAME);
+			if ( timeVar == null )
+				throw new IOException("Unable to find times in " + getName());
+			if ( timeVar.getShape(0) != numVals ) 
+				throw new IOException("Unexpected number of time values in " + getName());
+
+			Variable sstVar = ncfile.findVariable(SST_NCVAR_NAME);
+			if ( sstVar == null )
+				throw new IOException("Unable to find SST in " + getName());
+			if ( sstVar.getShape(0) != numVals ) 
+				throw new IOException("Unexpected number of SST values in " + getName());
+
+			Variable fco2Var = ncfile.findVariable(SST_NCVAR_NAME);
+			if ( fco2Var == null )
+				throw new IOException("Unable to find fCO2_recommended in " + getName());
+			if ( fco2Var.getShape(0) != numVals ) 
+				throw new IOException("Unexpected number of fCO2_recommeded values in " + getName());
+
+			lons = new double[numVals];
+			lats = new double[numVals];
+			times = new double[numVals];
+			ssts = new double[numVals];
+			fco2s = new double[numVals];
+
+			ArrayDouble.D1 dvar = (ArrayDouble.D1) lonVar.read();
+			for (int k = 0; k < numVals; k++) {
+				double value = dvar.get(k);
+				if ( Double.isNaN(value) || Double.isInfinite(value) )
+					value = SocatCruiseData.FP_MISSING_VALUE;
+				lons[k] = value;
+			}
+
+			dvar = (ArrayDouble.D1) latVar.read();
+			for (int k = 0; k < numVals; k++) {
+				double value = dvar.get(k);
+				if ( Double.isNaN(value) || Double.isInfinite(value) )
+					value = SocatCruiseData.FP_MISSING_VALUE;
+				lats[k] = value;
+			}
+
+			dvar = (ArrayDouble.D1) timeVar.read();
+			for (int k = 0; k < numVals; k++) {
+				double value = dvar.get(k);
+				if ( Double.isNaN(value) || Double.isInfinite(value) )
+					value = SocatCruiseData.FP_MISSING_VALUE;
+				times[k] = value;
+			}
+
+			dvar = (ArrayDouble.D1) sstVar.read();
+			for (int k = 0; k < numVals; k++) {
+				double value = dvar.get(k);
+				if ( Double.isNaN(value) || Double.isInfinite(value) )
+					value = SocatCruiseData.FP_MISSING_VALUE;
+				ssts[k] = value;
+			}
+
+			dvar = (ArrayDouble.D1) fco2Var.read();
+			for (int k = 0; k < numVals; k++) {
+				double value = dvar.get(k);
+				if ( Double.isNaN(value) || Double.isInfinite(value) )
+					value = SocatCruiseData.FP_MISSING_VALUE;
+				fco2s[k] = value;
+			}
+		} finally {
+			ncfile.close();
+		}
+
+		return new double[][] { lons, lats, times, ssts, fco2s }; 
 	}
 
 	/**
