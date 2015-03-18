@@ -848,8 +848,16 @@ public class OmeMetadata {
 		}
 
 	}
+
+	public void replaceValue(String name, String value, int lineCount) throws OmeMetadataException {
+		storeValue(name, value, lineCount, true);
+	}
 	
 	public void storeValue(String name, String value, int lineCount) throws OmeMetadataException {
+		storeValue(name, value, lineCount, false);
+	}
+	
+	private void storeValue(String name, String value, int lineCount, boolean replace) throws OmeMetadataException {
 		
 		// Reject composites
 		if (name.equalsIgnoreCase("investigator") || name.equalsIgnoreCase("variable") || name.equalsIgnoreCase("other_sensor")) {
@@ -859,549 +867,549 @@ public class OmeMetadata {
 			switch (name.toLowerCase()) {
 			case USER_NAME_STRING:
 			{
-				userName = setValue(userName, USER_NAME_PATH, name, value, lineCount);
+				userName = setValue(userName, USER_NAME_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case USER_ORGANIZATION_STRING:
 			{
-				userOrganization = setValue(userOrganization, USER_ORGANIZATION_PATH, name, value, lineCount);
+				userOrganization = setValue(userOrganization, USER_ORGANIZATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case USER_ADDRESS_STRING:
 			{
-				userAddress = setValue(userAddress, USER_ADDRESS_PATH, name, value, lineCount);
+				userAddress = setValue(userAddress, USER_ADDRESS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case USER_PHONE_STRING:
 			{
-				userPhone = setValue(userPhone, USER_PHONE_PATH, name, value, lineCount);
+				userPhone = setValue(userPhone, USER_PHONE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case USER_EMAIL_STRING:
 			{
-				userEmail = setValue(userEmail, USER_EMAIL_PATH, name, value, lineCount);
+				userEmail = setValue(userEmail, USER_EMAIL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case DATASET_ID_STRING:
 			{
-				datasetID = setValue(datasetID, DATASET_ID_PATH, name, value, lineCount);
+				datasetID = setValue(datasetID, DATASET_ID_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case FUNDING_INFO_STRING:
 			{
-				fundingInfo = setValue(fundingInfo, FUNDING_INFO_PATH, name, value, lineCount);
+				fundingInfo = setValue(fundingInfo, FUNDING_INFO_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EXPERIMENT_NAME_STRING:
 			{
-				experimentName = setValue(experimentName, EXPERIMENT_NAME_PATH, name, value, lineCount);
+				experimentName = setValue(experimentName, EXPERIMENT_NAME_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EXPERIMENT_TYPE_STRING:
 			{
-				experimentType = setValue(experimentType, EXPERIMENT_TYPE_PATH, name, value, lineCount);
+				experimentType = setValue(experimentType, EXPERIMENT_TYPE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case PLATFORM_TYPE_STRING:
 			{
-				platformType = setValue(platformType, PLATFORM_TYPE_PATH, name, value, lineCount);
+				platformType = setValue(platformType, PLATFORM_TYPE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_INSTRUMENT_TYPE_STRING:
 			{
-				co2InstrumentType = setValue(co2InstrumentType, CO2_INSTRUMENT_TYPE_PATH, name, value, lineCount);
+				co2InstrumentType = setValue(co2InstrumentType, CO2_INSTRUMENT_TYPE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case MOORING_ID_STRING:
 			{
-				mooringId = setValue(mooringId, MOORING_ID_PATH, name, value, lineCount);
+				mooringId = setValue(mooringId, MOORING_ID_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EXPO_CODE_STRING:
 			case CRUISE_ID_STRING:
 			{
 				itsExpoCode = value;
-				cruiseID = setValue(cruiseID, CRUISE_ID_PATH, name, value, lineCount);
+				cruiseID = setValue(cruiseID, CRUISE_ID_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SUB_CRUISE_INFO_STRING:
 			{
-				cruiseInfo = setValue(cruiseInfo, SUB_CRUISE_INFO_PATH, name, value, lineCount);
+				cruiseInfo = setValue(cruiseInfo, SUB_CRUISE_INFO_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SECTION_STRING:
 			{
-				section = setValue(section, SECTION_PATH, name, value, lineCount);
+				section = setValue(section, SECTION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case WEST_BOUND_STRING:
 			{
-				westmostLongitude = setValue(westmostLongitude, WEST_BOUND_PATH, name, value, lineCount);
+				westmostLongitude = setValue(westmostLongitude, WEST_BOUND_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EAST_BOUND_STRING:
 			{
-				eastmostLongitude = setValue(eastmostLongitude, EAST_BOUND_PATH, name, value, lineCount);
+				eastmostLongitude = setValue(eastmostLongitude, EAST_BOUND_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case NORTH_BOUND_STRING:
 			{
-				northmostLatitude = setValue(northmostLatitude, NORTH_BOUND_PATH, name, value, lineCount);
+				northmostLatitude = setValue(northmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SOUTH_BOUND_STRING:
 			{
-				southmostLatitude = setValue(southmostLatitude, NORTH_BOUND_PATH, name, value, lineCount);
+				southmostLatitude = setValue(southmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case START_DATE_STRING:
 			{
-				cruiseStartDate = setValue(cruiseStartDate, START_DATE_PATH, name, value, lineCount);
+				cruiseStartDate = setValue(cruiseStartDate, START_DATE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case END_DATE_STRING:
 			{
-				cruiseEndDate = setValue(cruiseEndDate, END_DATE_PATH, name, value, lineCount);
+				cruiseEndDate = setValue(cruiseEndDate, END_DATE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case TEMP_START_DATE_STRING:
 			{
-				temporalCoverageStartDate = setValue(temporalCoverageStartDate, TEMP_START_DATE_PATH, name, value, lineCount);
+				temporalCoverageStartDate = setValue(temporalCoverageStartDate, TEMP_START_DATE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case TEMP_END_DATE_STRING:
 			{
-				temporalCoverageEndDate = setValue(temporalCoverageEndDate, TEMP_END_DATE_PATH, name, value, lineCount);
+				temporalCoverageEndDate = setValue(temporalCoverageEndDate, TEMP_END_DATE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case GEO_REGION_STRING:
 			{
-				geographicalRegion = setValue(geographicalRegion, GEO_REGION_PATH, name, value, lineCount);
+				geographicalRegion = setValue(geographicalRegion, GEO_REGION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case VESSEL_NAME_STRING:
 			{
-				vesselName = setValue(vesselName, VESSEL_NAME_PATH, name, value, lineCount);
+				vesselName = setValue(vesselName, VESSEL_NAME_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case VESSEL_ID_STRING:
 			{
-				vesselID = setValue(vesselID, VESSEL_ID_PATH, name, value, lineCount);
+				vesselID = setValue(vesselID, VESSEL_ID_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case COUNTRY_STRING:
 			{
-				country = setValue(country, COUNTRY_PATH, name, value, lineCount);
+				country = setValue(country, COUNTRY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case OWNER_STRING:
 			{
-				vesselOwner = setValue(vesselOwner, OWNER_PATH, name, value, lineCount);
+				vesselOwner = setValue(vesselOwner, OWNER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case XCO2_WATER_EQU_DRY_STRING:
 			{
-				xCO2WaterEquDryUnit = setValue(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_PATH, name, value, lineCount);
+				xCO2WaterEquDryUnit = setValue(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case XCO2_WATER_SST_DRY_STRING:
 			{
-				xCO2WaterSSTDryUnit = setValue(xCO2WaterSSTDryUnit, XCO2_WATER_SST_DRY_PATH, name, value, lineCount);
+				xCO2WaterSSTDryUnit = setValue(xCO2WaterSSTDryUnit, XCO2_WATER_SST_DRY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case PCO2_WATER_EQU_WET_STRING:
 			{
-				pCO2WaterEquWetUnit = setValue(pCO2WaterEquWetUnit, PCO2_WATER_EQU_WET_PATH, name, value, lineCount);
+				pCO2WaterEquWetUnit = setValue(pCO2WaterEquWetUnit, PCO2_WATER_EQU_WET_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case PCO2_WATER_SST_WET_STRING:
 			{
-				pCO2WaterSSTWetUnit = setValue(pCO2WaterSSTWetUnit, PCO2_WATER_SST_WET_PATH, name, value, lineCount);
+				pCO2WaterSSTWetUnit = setValue(pCO2WaterSSTWetUnit, PCO2_WATER_SST_WET_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case FCO2_WATER_EQU_WET_STRING:
 			{
-				fCO2WaterEquWetUnit = setValue(fCO2WaterEquWetUnit, FCO2_WATER_EQU_WET_PATH, name, value, lineCount);
+				fCO2WaterEquWetUnit = setValue(fCO2WaterEquWetUnit, FCO2_WATER_EQU_WET_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case FCO2_WATER_SST_WET_STRING:
 			{
-				fCO2WaterSSTWetUnit = setValue(fCO2WaterSSTWetUnit, FCO2_WATER_SST_WET_PATH, name, value, lineCount);
+				fCO2WaterSSTWetUnit = setValue(fCO2WaterSSTWetUnit, FCO2_WATER_SST_WET_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case XCO2_AIR_DRY_STRING:
 			{
-				xCO2AirDryUnit = setValue(xCO2AirDryUnit, XCO2_AIR_DRY_PATH, name, value, lineCount);
+				xCO2AirDryUnit = setValue(xCO2AirDryUnit, XCO2_AIR_DRY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case PCO2_AIR_WET_STRING:
 			{
-				pCO2AirWetUnit = setValue(pCO2AirWetUnit, PCO2_AIR_WET_PATH, name, value, lineCount);
+				pCO2AirWetUnit = setValue(pCO2AirWetUnit, PCO2_AIR_WET_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case FCO2_AIR_WET_STRING:
 			{
-				fCO2AirWetUnit = setValue(fCO2AirWetUnit, FCO2_AIR_WET_PATH, name, value, lineCount);
+				fCO2AirWetUnit = setValue(fCO2AirWetUnit, FCO2_AIR_WET_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case XCO2_AIR_DRY_INTERP_STRING:
 			{
-				xCO2AirDryInterpolatedUnit = setValue(xCO2AirDryInterpolatedUnit, XCO2_AIR_DRY_INTERP_PATH, name, value, lineCount);
+				xCO2AirDryInterpolatedUnit = setValue(xCO2AirDryInterpolatedUnit, XCO2_AIR_DRY_INTERP_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case PCO2_AIR_WET_INTERP_STRING:
 			{
-				pCO2AirWetInterpolatedUnit = setValue(pCO2AirWetInterpolatedUnit, PCO2_AIR_WET_INTERP_PATH, name, value, lineCount);
+				pCO2AirWetInterpolatedUnit = setValue(pCO2AirWetInterpolatedUnit, PCO2_AIR_WET_INTERP_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case FCO2_AIR_WET_INTERP_STRING:
 			{
-				fCO2AirWetInterpolatedUnit = setValue(fCO2AirWetInterpolatedUnit, FCO2_AIR_WET_INTERP_PATH, name, value, lineCount);
+				fCO2AirWetInterpolatedUnit = setValue(fCO2AirWetInterpolatedUnit, FCO2_AIR_WET_INTERP_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case INTAKE_DEPTH_STRING:
 			{
-				depthOfSeaWaterIntake = setValue(depthOfSeaWaterIntake, INTAKE_DEPTH_PATH, name, value, lineCount);
+				depthOfSeaWaterIntake = setValue(depthOfSeaWaterIntake, INTAKE_DEPTH_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case INTAKE_LOCATION_STRING:
 			{
-				locationOfSeaWaterIntake = setValue(locationOfSeaWaterIntake, INTAKE_LOCATION_PATH, name, value, lineCount);
+				locationOfSeaWaterIntake = setValue(locationOfSeaWaterIntake, INTAKE_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQUI_TYPE_STRING:
 			{
-				equilibratorType = setValue(equilibratorType, EQUI_TYPE_PATH, name, value, lineCount);
+				equilibratorType = setValue(equilibratorType, EQUI_TYPE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQUI_VOLUME_STRING:
 			{
-				equilibratorVolume = setValue(equilibratorVolume, EQUI_VOLUME_PATH, name, value, lineCount);
+				equilibratorVolume = setValue(equilibratorVolume, EQUI_VOLUME_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case WATER_FLOW_RATE_STRING:
 			{
-				waterFlowRate = setValue(waterFlowRate, WATER_FLOW_RATE_PATH, name, value, lineCount);
+				waterFlowRate = setValue(waterFlowRate, WATER_FLOW_RATE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case GAS_FLOW_RATE_STRING:
 			{
-				headspaceGasFlowRate = setValue(headspaceGasFlowRate, GAS_FLOW_RATE_PATH, name, value, lineCount);
+				headspaceGasFlowRate = setValue(headspaceGasFlowRate, GAS_FLOW_RATE_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case VENTED_STRING:
 			{
-				vented = setValue(vented, VENTED_PATH, name, value, lineCount);
+				vented = setValue(vented, VENTED_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case DRYING_METHOD_STRING:
 			{
-				dryingMethodForCO2InWater = setValue(dryingMethodForCO2InWater, DRYING_METHOD_PATH, name, value, lineCount);
+				dryingMethodForCO2InWater = setValue(dryingMethodForCO2InWater, DRYING_METHOD_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQUI_ADDITIONAL_INFO_STRING:
 			{
-				equAdditionalInformation = setValue(equAdditionalInformation, EQUI_ADDITIONAL_INFO_PATH, name, value, lineCount);
+				equAdditionalInformation = setValue(equAdditionalInformation, EQUI_ADDITIONAL_INFO_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case MARINE_AIR_MEASUREMENT_STRING:
 			{
-				co2InMarineAirMeasurement = setValue(co2InMarineAirMeasurement, MARINE_AIR_MEASUREMENT_PATH, name, value, lineCount);
+				co2InMarineAirMeasurement = setValue(co2InMarineAirMeasurement, MARINE_AIR_MEASUREMENT_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case MARINE_AIR_LOCATION_STRING:
 			{
-				co2InMarineAirLocationAndHeight = setValue(co2InMarineAirLocationAndHeight, MARINE_AIR_LOCATION_PATH, name, value, lineCount);
+				co2InMarineAirLocationAndHeight = setValue(co2InMarineAirLocationAndHeight, MARINE_AIR_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case MARINE_AIR_DRYING_STRING:
 			{
-				co2InMarineAirDryingMethod = setValue(co2InMarineAirDryingMethod, MARINE_AIR_DRYING_PATH, name, value, lineCount);
+				co2InMarineAirDryingMethod = setValue(co2InMarineAirDryingMethod, MARINE_AIR_DRYING_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_MEASUREMENT_METHOD_STRING:
 			{
-				co2MeasurementMethod = setValue(co2MeasurementMethod, CO2_MEASUREMENT_METHOD_PATH, name, value, lineCount);
+				co2MeasurementMethod = setValue(co2MeasurementMethod, CO2_MEASUREMENT_METHOD_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_MANUFACTURER_STRING:
 			{
-				co2Manufacturer = setValue(co2Manufacturer, CO2_MANUFACTURER_PATH, name, value, lineCount);
+				co2Manufacturer = setValue(co2Manufacturer, CO2_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_MODEL_STRING:
 			{
-				co2Model = setValue(co2Model, CO2_MODEL_PATH, name, value, lineCount);
+				co2Model = setValue(co2Model, CO2_MODEL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_FREQUENCY_STRING:
 			{
-				co2Frequency = setValue(co2Frequency, CO2_FREQUENCY_PATH, name, value, lineCount);
+				co2Frequency = setValue(co2Frequency, CO2_FREQUENCY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_WATER_RES_STRING:
 			{
-				co2ResolutionWater = setValue(co2ResolutionWater, CO2_WATER_RES_PATH, name, value, lineCount);
+				co2ResolutionWater = setValue(co2ResolutionWater, CO2_WATER_RES_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_WATER_UNC_STRING:
 			{
-				co2UncertaintyWater = setValue(co2UncertaintyWater, CO2_WATER_UNC_PATH, name, value, lineCount);
+				co2UncertaintyWater = setValue(co2UncertaintyWater, CO2_WATER_UNC_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_AIR_RES_STRING:
 			{
-				co2ResolutionAir = setValue(co2ResolutionAir, CO2_AIR_RES_PATH, name, value, lineCount);
+				co2ResolutionAir = setValue(co2ResolutionAir, CO2_AIR_RES_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_AIR_UNC_STRING:
 			{
-				co2UncertaintyAir = setValue(co2UncertaintyAir, CO2_AIR_UNC_PATH, name, value, lineCount);
+				co2UncertaintyAir = setValue(co2UncertaintyAir, CO2_AIR_UNC_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_CALIBRATION_MANUFACTURER_STRING:
 			{
-				co2ManufacturerOfCalibrationGas = setValue(co2ManufacturerOfCalibrationGas, CO2_CALIBRATION_MANUFACTURER_PATH, name, value, lineCount);
+				co2ManufacturerOfCalibrationGas = setValue(co2ManufacturerOfCalibrationGas, CO2_CALIBRATION_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CO2_SENSOR_CALIBRATION_STRING:
 			{
-				co2SensorCalibration = setValue(co2SensorCalibration, CO2_SENSOR_CALIBRATION_PATH, name, value, lineCount);
+				co2SensorCalibration = setValue(co2SensorCalibration, CO2_SENSOR_CALIBRATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ENVIRONMENTAL_CONTROL_STRING:
 			{
-				co2EnvironmentalControl = setValue(co2EnvironmentalControl, ENVIRONMENTAL_CONTROL_PATH, name, value, lineCount);
+				co2EnvironmentalControl = setValue(co2EnvironmentalControl, ENVIRONMENTAL_CONTROL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case METHOD_REFS_STRING:
 			{
-				co2MethodReferences = setValue(co2MethodReferences, METHOD_REFS_PATH, name, value, lineCount);
+				co2MethodReferences = setValue(co2MethodReferences, METHOD_REFS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case DETAILS_OF_CO2_SENSING_STRING:
 			{
-				detailsOfCO2Sensing = setValue(detailsOfCO2Sensing, DETAILS_OF_CO2_SENSING_PATH, name, value, lineCount);
+				detailsOfCO2Sensing = setValue(detailsOfCO2Sensing, DETAILS_OF_CO2_SENSING_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ANALYSIS_OF_COMPARISON_STRING:
 			{
-				analysisOfCO2Comparison = setValue(analysisOfCO2Comparison, ANALYSIS_OF_COMPARISON_PATH, name, value, lineCount);
+				analysisOfCO2Comparison = setValue(analysisOfCO2Comparison, ANALYSIS_OF_COMPARISON_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case MEASURED_CO2_PARAMS_STRING:
 			{
-				measuredCO2Params = setValue(measuredCO2Params, MEASURED_CO2_PARAMS_PATH, name, value, lineCount);
+				measuredCO2Params = setValue(measuredCO2Params, MEASURED_CO2_PARAMS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_LOCATION_STRING:
 			{
-				sstLocation = setValue(sstLocation, SST_LOCATION_PATH, name, value, lineCount);
+				sstLocation = setValue(sstLocation, SST_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_MANUFACTURER_STRING:
 			{
-				sstManufacturer = setValue(sstManufacturer, SST_MANUFACTURER_PATH, name, value, lineCount);
+				sstManufacturer = setValue(sstManufacturer, SST_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_MODEL_STRING:
 			{
-				sstModel = setValue(sstModel, SST_MODEL_PATH, name, value, lineCount);
+				sstModel = setValue(sstModel, SST_MODEL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_ACCURACY_STRING:
 			{
-				sstAccuracy = setValue(sstAccuracy, SST_ACCURACY_PATH, name, value, lineCount);
+				sstAccuracy = setValue(sstAccuracy, SST_ACCURACY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_PRECISION_STRING:
 			{
-				sstPrecision = setValue(sstPrecision, SST_PRECISION_PATH, name, value, lineCount);
+				sstPrecision = setValue(sstPrecision, SST_PRECISION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_CALIBRATION_STRING:
 			{
-				sstCalibration = setValue(sstCalibration, SST_CALIBRATION_PATH, name, value, lineCount);
+				sstCalibration = setValue(sstCalibration, SST_CALIBRATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SST_COMMENTS_STRING:
 			{
-				sstOtherComments = setValue(sstOtherComments, SST_COMMENTS_PATH, name, value, lineCount);
+				sstOtherComments = setValue(sstOtherComments, SST_COMMENTS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_LOCATION_STRING:
 			{
-				eqtLocation = setValue(eqtLocation, EQT_LOCATION_PATH, name, value, lineCount);
+				eqtLocation = setValue(eqtLocation, EQT_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_MANUFACTURER_STRING:
 			{
-				eqtManufacturer = setValue(eqtManufacturer, EQT_MANUFACTURER_PATH, name, value, lineCount);
+				eqtManufacturer = setValue(eqtManufacturer, EQT_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_MODEL_STRING:
 			{
-				eqtModel = setValue(eqtModel, EQT_MODEL_PATH, name, value, lineCount);
+				eqtModel = setValue(eqtModel, EQT_MODEL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_ACCURACY_STRING:
 			{
-				eqtAccuracy = setValue(eqtAccuracy, EQT_ACCURACY_PATH, name, value, lineCount);
+				eqtAccuracy = setValue(eqtAccuracy, EQT_ACCURACY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_PRECISION_STRING:
 			{
-				eqtPrecision = setValue(eqtPrecision, EQT_PRECISION_PATH, name, value, lineCount);
+				eqtPrecision = setValue(eqtPrecision, EQT_PRECISION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_CALIBRATION_STRING:
 			{
-				eqtCalibration = setValue(eqtCalibration, EQT_CALIBRATION_PATH, name, value, lineCount);
+				eqtCalibration = setValue(eqtCalibration, EQT_CALIBRATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_WARMING_STRING:
 			{
-				eqtWarming = setValue(eqtWarming, EQT_WARMING_PATH, name, value, lineCount);
+				eqtWarming = setValue(eqtWarming, EQT_WARMING_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQT_COMMENTS_STRING:
 			{
-				eqtOtherComments = setValue(eqtOtherComments, EQT_COMMENTS_PATH, name, value, lineCount);
+				eqtOtherComments = setValue(eqtOtherComments, EQT_COMMENTS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_LOCATION_STRING:
 			{
-				eqpLocation = setValue(eqpLocation, EQP_LOCATION_PATH, name, value, lineCount);
+				eqpLocation = setValue(eqpLocation, EQP_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_MANUFACTURER_STRING:
 			{
-				eqpManufacturer = setValue(eqpManufacturer, EQP_MANUFACTURER_PATH, name, value, lineCount);
+				eqpManufacturer = setValue(eqpManufacturer, EQP_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_MODEL_STRING:
 			{
-				eqpModel = setValue(eqpModel, EQP_MODEL_PATH, name, value, lineCount);
+				eqpModel = setValue(eqpModel, EQP_MODEL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_ACCURACY_STRING:
 			{
-				eqpAccuracy = setValue(eqpAccuracy, EQP_ACCURACY_PATH, name, value, lineCount);
+				eqpAccuracy = setValue(eqpAccuracy, EQP_ACCURACY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_PRECISION_STRING:
 			{
-				eqpPrecision = setValue(eqpPrecision, EQP_PRECISION_PATH, name, value, lineCount);
+				eqpPrecision = setValue(eqpPrecision, EQP_PRECISION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_CALIBRATION_STRING:
 			{
-				eqpCalibration = setValue(eqpCalibration, EQP_CALIBRATION_PATH, name, value, lineCount);
+				eqpCalibration = setValue(eqpCalibration, EQP_CALIBRATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_COMMENTS_STRING:
 			{
-				eqpOtherComments = setValue(eqpOtherComments, EQP_COMMENTS_PATH, name, value, lineCount);
+				eqpOtherComments = setValue(eqpOtherComments, EQP_COMMENTS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case EQP_NORMALIZED_STRING:
 			{
-				eqpNormalized = setValue(eqpNormalized, EQP_NORMALIZED_PATH, name, value, lineCount);
+				eqpNormalized = setValue(eqpNormalized, EQP_NORMALIZED_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_LOCATION_STRING:
 			{
-				atpLocation = setValue(atpLocation, ATM_LOCATION_PATH, name, value, lineCount);
+				atpLocation = setValue(atpLocation, ATM_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_MANUFACTURER_STRING:
 			{
-				atpManufacturer = setValue(atpManufacturer, ATM_MANUFACTURER_PATH, name, value, lineCount);
+				atpManufacturer = setValue(atpManufacturer, ATM_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_MODEL_STRING:
 			{
-				atpModel = setValue(atpModel, ATM_MODEL_PATH, name, value, lineCount);
+				atpModel = setValue(atpModel, ATM_MODEL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_ACCURACY_STRING:
 			{
-				atpAccuracy = setValue(atpAccuracy, ATM_ACCURACY_PATH, name, value, lineCount);
+				atpAccuracy = setValue(atpAccuracy, ATM_ACCURACY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_PRECISION_STRING:
 			{
-				atpPrecision = setValue(atpPrecision, ATM_PRECISION_PATH, name, value, lineCount);
+				atpPrecision = setValue(atpPrecision, ATM_PRECISION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_CALIBRATION_STRING:
 			{
-				atpCalibration = setValue(atpCalibration, ATM_CALIBRATION_PATH, name, value, lineCount);
+				atpCalibration = setValue(atpCalibration, ATM_CALIBRATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ATM_COMMENTS_STRING:
 			{
-				atpOtherComments = setValue(atpOtherComments, ATM_COMMENTS_PATH, name, value, lineCount);
+				atpOtherComments = setValue(atpOtherComments, ATM_COMMENTS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_LOCATION_STRING:
 			{
-				sssLocation = setValue(sssLocation, SSS_LOCATION_PATH, name, value, lineCount);
+				sssLocation = setValue(sssLocation, SSS_LOCATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_MANUFACTURER_STRING:
 			{
-				sssManufacturer = setValue(sssManufacturer, SSS_MANUFACTURER_PATH, name, value, lineCount);
+				sssManufacturer = setValue(sssManufacturer, SSS_MANUFACTURER_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_MODEL_STRING:
 			{
-				sssModel = setValue(sssModel, SSS_MODEL_PATH, name, value, lineCount);
+				sssModel = setValue(sssModel, SSS_MODEL_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_ACCURACY_STRING:
 			{
-				sssAccuracy = setValue(sssAccuracy, SSS_ACCURACY_PATH, name, value, lineCount);
+				sssAccuracy = setValue(sssAccuracy, SSS_ACCURACY_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_PRECISION_STRING:
 			{
-				sssPrecision = setValue(sssPrecision, SSS_PRECISION_PATH, name, value, lineCount);
+				sssPrecision = setValue(sssPrecision, SSS_PRECISION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_CALIBRATION_STRING:
 			{
-				sssCalibration = setValue(sssCalibration, SSS_CALIBRATION_PATH, name, value, lineCount);
+				sssCalibration = setValue(sssCalibration, SSS_CALIBRATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case SSS_COMMENTS_STRING:
 			{
-				sssOtherComments = setValue(sssOtherComments, SSS_COMMENTS_PATH, name, value, lineCount);
+				sssOtherComments = setValue(sssOtherComments, SSS_COMMENTS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case DATA_SET_REFS_STRING:
 			{
-				dataSetReferences = setValue(dataSetReferences, DATA_SET_REFS_PATH, name, value, lineCount);
+				dataSetReferences = setValue(dataSetReferences, DATA_SET_REFS_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case ADD_INFO_STRING:
 			{
-				additionalInformation = setValue(additionalInformation, ADD_INFO_PATH, name, value, lineCount);
+				additionalInformation = setValue(additionalInformation, ADD_INFO_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case CITATION_STRING:
 			{
-				citation = setValue(citation, CITATION_PATH, name, value, lineCount);
+				citation = setValue(citation, CITATION_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case MEAS_CALIB_REPORT_STRING:
 			{
-				measurementAndCalibrationReport = setValue(measurementAndCalibrationReport, MEAS_CALIB_REPORT_PATH, name, value, lineCount);
+				measurementAndCalibrationReport = setValue(measurementAndCalibrationReport, MEAS_CALIB_REPORT_PATH, name, value, lineCount, replace);
 				break;
 			}
 			case PRELIM_QC_STRING:
 			{
-				preliminaryQualityControl = setValue(preliminaryQualityControl, PRELIM_QC_PATH, name, value, lineCount);
+				preliminaryQualityControl = setValue(preliminaryQualityControl, PRELIM_QC_PATH, name, value, lineCount, replace);
 				break;
 			}
 			default:
@@ -2169,15 +2177,15 @@ public class OmeMetadata {
 	}
 
 	
-	private OMEVariable setValue(OMEVariable target, Path path, String name, String value, int lineCount) throws OmeMetadataException {
+	private OMEVariable setValue(OMEVariable target, Path path, String name, String value, int lineCount, boolean replace) throws OmeMetadataException {
 		
 		OMEVariable result = null;
 		
-		if (null != target) {
+		if (replace || null == target) {
+			result = new OMEVariable(path, value);
+		} else {
 			target.addValue(value);
 			result = target;
-		} else {
-			result = new OMEVariable(path, value);
 		}
 		
 		return result;
