@@ -3016,8 +3016,6 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(section, SECTION_STRING));
 		output.append(getEmptyHeaderString(START_DATE_STRING));
 		output.append(getEmptyHeaderString(END_DATE_STRING));
-		output.append(getEmptyHeaderString(TEMP_START_DATE_STRING));
-		output.append(getEmptyHeaderString(TEMP_END_DATE_STRING));
 		output.append(getSingleHeaderString(geographicalRegion, GEO_REGION_STRING));
 		
 		// Geographical bounds not included
