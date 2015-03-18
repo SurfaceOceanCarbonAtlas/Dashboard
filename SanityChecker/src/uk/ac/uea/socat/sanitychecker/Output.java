@@ -258,7 +258,7 @@ public class Output {
 	}
 	
 	public void addMetadataValue(String name, String value, int line) throws OmeMetadataException {
-		itsMetadata.storeValue(name, value, line);
+		itsMetadata.replaceValue(name, value, line);
 	}
 	
 	public void addCompositeMetadataValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException {
