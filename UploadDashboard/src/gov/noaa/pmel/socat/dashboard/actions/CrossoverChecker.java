@@ -151,7 +151,7 @@ public class CrossoverChecker {
 	 * 		with the primary cruise
 	 * @param progressPrinter
 	 * 		if not null, progress messages with timings are printed using this
-	 * @param startTime
+	 * @param progStartMilliTime
 	 * 		System.getCurrentTimeMillis() start time of the program for reporting 
 	 * 		times to progressWriter; only used if progressWriter is not null
 	 * @return
@@ -166,7 +166,7 @@ public class CrossoverChecker {
 	 * 		if problems reading from any full-data DSG file
 	 */
 	public ArrayList<SocatCrossover> getCrossovers(String expocode, 
-			Iterable<String> checkExpos, PrintStream progressPrinter, long startTime) 
+			Iterable<String> checkExpos, PrintStream progressPrinter, long progStartMilliTime) 
 					throws IllegalArgumentException, FileNotFoundException, IOException {
 		ArrayList<SocatCrossover> crossList = new ArrayList<SocatCrossover>();
 
@@ -177,14 +177,13 @@ public class CrossoverChecker {
 		double[][] ssts = new double[2][];
 		double[][] fco2s = new double[2][];
 
-		if ( progressPrinter != null ) {
-			double timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
-			progressPrinter.format("%.2fm - reading data for %s\n", timeDiff, upperExpos[0]);
-			progressPrinter.flush();
-		}
-
 		// Get the data for the primary cruise
 		upperExpos[0] = DashboardServerUtils.checkExpocode(expocode);
+		if ( progressPrinter != null ) {
+			double deltaMinutes = (System.currentTimeMillis() - progStartMilliTime) / (60.0 * 1000.0);
+			progressPrinter.format("%.2fm - reading data for %s\n", deltaMinutes, upperExpos[0]);
+			progressPrinter.flush();
+		}
 		double[][] dataVals = dsgHandler.readLonLatTimeSstFco2DataValues(upperExpos[0]);
 		lons[0] = dataVals[0];
 		lats[0] = dataVals[1];
@@ -199,8 +198,8 @@ public class CrossoverChecker {
 				continue;
 
 			if ( progressPrinter != null ) {
-				double timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
-				progressPrinter.format("%.2fm - reading data for %s\n", timeDiff, upperExpos[1]);
+				double deltaMinutes = (System.currentTimeMillis() - progStartMilliTime) / (60.0 * 1000.0);
+				progressPrinter.format("%.2fm - reading data for %s\n", deltaMinutes, upperExpos[1]);
 				progressPrinter.flush();
 			}
 
@@ -211,10 +210,10 @@ public class CrossoverChecker {
 			ssts[1] = dataVals[3];
 			fco2s[1] = dataVals[4];
 
-			long checkStart = System.currentTimeMillis();
+			long checkStartMilliTime = System.currentTimeMillis();
 			if ( progressPrinter != null ) {
-				double timeDiff = (checkStart - startTime) / (60.0 * 1000.0);
-				progressPrinter.format("%.2fm - examining %s and %s: ", timeDiff, upperExpos[0], upperExpos[1]);
+				double deltaMinutes = (checkStartMilliTime - progStartMilliTime) / (60.0 * 1000.0);
+				progressPrinter.format("%.2fm - examining %s and %s: ", deltaMinutes, upperExpos[0], upperExpos[1]);
 				progressPrinter.flush();
 			}
 
@@ -225,14 +224,14 @@ public class CrossoverChecker {
 				crossover.setExpocodes(upperExpos);
 				crossList.add(crossover);
 				if ( progressPrinter != null ) {
-					double timeDiff = (System.currentTimeMillis() - checkStart) / (60.0 * 60.0 * 1000.0);
-					progressPrinter.format("%.1fs - crossover found: %s\n", timeDiff * 60.0, crossover.toString());
+					double checkDeltaSecs = (System.currentTimeMillis() - checkStartMilliTime) / 1000.0;
+					progressPrinter.format("%.2fs - crossover found: %s\n", checkDeltaSecs, crossover.toString());
 					progressPrinter.flush();
 				}
 			}
 			else if ( progressPrinter != null ) {
-				double timeDiff = (System.currentTimeMillis() - checkStart) / (60.0 * 60.0 * 1000.0);
-				System.err.format("%.1fs - no crossover\n", timeDiff);
+				double checkDeltaSecs = (System.currentTimeMillis() - checkStartMilliTime) / 1000.0;
+				System.err.format("%.2fs - no crossover\n", checkDeltaSecs);
 				progressPrinter.flush();
 			}
 		}
