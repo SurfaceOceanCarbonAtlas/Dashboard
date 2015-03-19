@@ -1,7 +1,7 @@
 #Name,Required?,Generate?,Item Class,Generator Parameter
 expocode,Y,N,Default,
-cruise_start_date,N,Y,DataDate,Start
-cruise_end_date,N,Y,DataDate,End
+temporal_coverage_start_date,N,Y,DataDate,Start
+temporal_coverage_end_date,N,Y,DataDate,End
 westernmost_longitude,N,Y,LongitudeLimit,W
 easternmost_longitude,N,Y,LongitudeLimit,E
 northernmost_latitude,N,Y,LatitudeLimit,N

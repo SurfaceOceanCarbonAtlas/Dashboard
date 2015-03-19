@@ -367,6 +367,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 		return "SocatCrossover" + 
 				"[ expocodes=" + Arrays.toString(expocodes) + 
 				", minDistance=" + minDistance + 
+				", rowNumsAtMin=" + Arrays.toString(rowNumsAtMin) + 
 				", lonsAtMin=" + Arrays.toString(lonsAtMin) + 
 				", latsAtMin=" + Arrays.toString(latsAtMin) + 
 				", timesAtMin=" +Arrays.toString(timesAtMin) + 

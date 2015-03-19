@@ -205,8 +205,8 @@ public class SanityCheckerTest {
 		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
 		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
 		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
-		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
-		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageEndDate() );
 
 		// Repeat the check with the already assigned metadata
 		checker = new SanityChecker(expocode, metadataInput, 
@@ -219,8 +219,8 @@ public class SanityCheckerTest {
 		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
 		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
 		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
-		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
-		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageEndDate() );
 
 		metadataInput = new OmeMetadata(expocode);
 		checker = new SanityChecker(expocode, metadataInput, 
@@ -233,8 +233,8 @@ public class SanityCheckerTest {
 		assertEquals( 342.763, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
 		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
 		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
-		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
-		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageEndDate() );
 
 		metadataInput = new OmeMetadata(expocode);
 		checker = new SanityChecker(expocode, metadataInput, 
@@ -247,8 +247,8 @@ public class SanityCheckerTest {
 		assertEquals( 2.039, Double.parseDouble(metadataInput.getEastmostLongitude()), 0.0001 );
 		assertEquals( 32.195, Double.parseDouble(metadataInput.getSouthmostLatitude()), 0.0001 );
 		assertEquals( 32.482, Double.parseDouble(metadataInput.getNorthmostLatitude()), 0.0001 );
-		assertEquals( "2003-07-15 16:15:00", metadataInput.getTemporalCoverageStartDate() );
-		assertEquals( "2003-07-15 19:15:00", metadataInput.getTemporalCoverageEndDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageStartDate() );
+		assertEquals( "20030715", metadataInput.getTemporalCoverageEndDate() );
 	}
 	
 }
