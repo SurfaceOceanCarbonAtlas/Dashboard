@@ -224,6 +224,26 @@ public interface DashboardServicesInterface extends RemoteService {
 			throws IllegalArgumentException;
 
 	/**
+	 * Requests that the preview images for a cruise be generated.
+	 * 
+	 * @param username
+	 * 		name of the current user - for validation
+	 * @param expocode
+	 * 		get data messages for this cruise
+	 * @param firstCall
+	 * 		is this the first request for the preview images?
+	 * 		If true, the process to generate the images are started.
+	 * 		If false, just checks if all the images have been created.
+	 * @return
+	 * 		true if all the images have been created
+	 * @throws IllegalArgumentException
+	 * 		if the cruise expocode is invalid, or
+	 * 		if the images cannot be created (probably because of bad data)
+	 */
+	boolean buildPreviewImages(String username, String expocode, boolean firstCall)
+			throws IllegalArgumentException;
+
+	/**
 	 * Submits cruises named in the given listing for QC.
 	 * 
 	 * @param username

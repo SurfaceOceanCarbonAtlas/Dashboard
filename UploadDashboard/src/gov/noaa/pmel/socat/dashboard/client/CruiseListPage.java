@@ -129,6 +129,8 @@ public class CruiseListPage extends CompositeWithUsername {
 			"for managing metadata.";
 	private static final String FOR_ADDL_DOCS_ERR_END = 
 			"for managing supplemental documents.";
+	private static final String FOR_PREVIEW_ERR_END = 
+			"for previewing data plots.";
 	private static final String FOR_QC_SUBMIT_ERR_END =
 			"for submitting for QC and archival.";
 	private static final String FOR_DELETE_ERR_END = 
@@ -645,8 +647,18 @@ public class CruiseListPage extends CompositeWithUsername {
 
 	@UiHandler("reviewButton")
 	void reviewOnClick(ClickEvent event) {
-		// TODO: implement
-		SocatUploadDashboard.showMessage("Not yet implemented");
+		getSelectedCruises(null);
+		if ( cruiseSet.size() < 1 ) {
+			SocatUploadDashboard.showMessage(
+					NO_DATASET_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
+			return;
+		}
+		if ( cruiseSet.size() > 1 ) {
+			SocatUploadDashboard.showMessage(
+					MANY_DATASETS_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
+			return;
+		}
+		CruisePreviewPage.showPage(cruiseSet);
 		return;
 	}
 

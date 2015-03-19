@@ -17,15 +17,31 @@
 			<g:TabLayoutPanel barUnit='EM' barHeight='3'>
 				<g:tab>
 					<g:header size='10'><b>Location</b></g:header>
-					<g:FlowPanel></g:FlowPanel>
+					<g:FlowPanel>
+						<g:Image addStyleNames="{style.previewimage}" ui:field="latVsLonImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="latLonVsNumImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="dayYearVsNumImage" />
+					</g:FlowPanel>
 				</g:tab>
 				<g:tab>
 					<g:header size='10'><b>Data</b></g:header>
-					<g:FlowPanel></g:FlowPanel>
+					<g:FlowPanel>
+						<g:Image addStyleNames="{style.previewimage}" ui:field="timeSeriesImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="pressuresVsNumImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="temperaturesVsNumImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="xco2sVsNumImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="salinitiesVsNumImage" />
+					</g:FlowPanel>
 				</g:tab>
 				<g:tab>
 					<g:header size='10'><b>fCO2_rec</b></g:header>
-					<g:FlowPanel></g:FlowPanel>
+					<g:FlowPanel>
+						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsNumImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsSstImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsSalImage" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsFco2Image" />
+						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recSrcHistogramImage" />
+					</g:FlowPanel>
 				</g:tab>
 			</g:TabLayoutPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">

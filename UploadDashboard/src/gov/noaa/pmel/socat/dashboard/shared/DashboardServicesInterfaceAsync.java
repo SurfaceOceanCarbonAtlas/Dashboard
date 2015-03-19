@@ -206,15 +206,29 @@ public interface DashboardServicesInterfaceAsync {
 	 * 		name of the current user - for validation
 	 * @param expocode
 	 * 		get data messages for this cruise
-	 * @return
-	 * 		list of data messages for the cruise; 
-	 * 		never null, but may be empty if the SanityChecker 
-	 * 		did not generate any data messages. 
 	 * @param callback
 	 * 		the callback to make with list of sanity checker data messages
 	 */
 	void getDataMessages(String username, String expocode,
 			AsyncCallback<SCMessageList> callback);
+
+	/**
+	 * Client side request to generate the preview images for a cruise.
+	 * 
+	 * @param username
+	 * 		name of the current user - for validation
+	 * @param expocode
+	 * 		get data messages for this cruise
+	 * @param firstCall
+	 * 		is this the first request for the preview images?
+	 * 		If true, the process to generate the images are started.
+	 * 		If false, just checks if all the images have been created.
+	 * @param callback
+	 * 		callback to make indicating the image-generating status
+	 * 		(true if done generating plots)
+	 */
+	void buildPreviewImages(String username, String expocode,
+			boolean firstCall, AsyncCallback<Boolean> callback);
 
 	/**
 	 * Client-side interface for submitting cruises for QC.
