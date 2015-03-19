@@ -117,15 +117,13 @@ public class GetCruiseCrossovers {
 			}
 		}
 
-		timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
-		System.err.format("%.2fm - getting data limies for the cruises\n", timeDiff);
 		// Get the time and latitude limits for all the cruises in the list
 		// in order to narrow down the cruises to examine for crossovers
 		TreeMap<String,double[]> cruiseTimeMinMaxMap = new TreeMap<String,double[]>();
 		TreeMap<String,double[]> cruiseLatMinMaxMap = new TreeMap<String,double[]>();
 		for ( String expo : cruiseFlagsMap.keySet() ) {
 			timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
-			System.err.format("%.2fm - getting data limies for %s\n", timeDiff, expo);
+			System.err.format("%.2fm - getting data limits for %s\n", timeDiff, expo);
 			double[][] dataVals = null;
 			try {
 				dataVals = dsgHandler.readLonLatTimeDataValues(expo);
