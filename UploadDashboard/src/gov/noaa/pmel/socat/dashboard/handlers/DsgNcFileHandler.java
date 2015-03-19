@@ -492,6 +492,34 @@ public class DsgNcFileHandler {
 	}
 
 	/**
+	 * Reads and returns the longitudes, latitudes, and times contained in the 
+	 * full-data DSG file for the specified cruise.  NaN and infinite values 
+	 * are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.
+	 * 
+	 * @param expocode
+	 * 		get the data values for the cruise with this expocode
+	 * @return
+	 * 		the array { lons, lats, times } from the full-data DSG file, 
+	 * 		where lons are the array of longitudes, lats are the array of latitudes, 
+	 * 		times are the array of times.
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid
+	 * @throws FileNotFoundException
+	 * 		if the full-data DSG file does not exist
+	 * @throws IOException
+	 * 		if problems opening or reading from the DSG file, or 
+	 * 		if any of the data arrays are not given in the DSG file
+	 */
+	public double[][] readLonLatTimeDataValues(String expocode) 
+			throws IllegalArgumentException, FileNotFoundException, IOException {
+		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
+		if ( ! dsgFile.exists() )
+			throw new FileNotFoundException("Full data DSG file for " + 
+					expocode + " does not exist");
+		return dsgFile.readLonLatTimeDataValues();
+	}
+
+	/**
 	 * Reads and returns the longitudes, latitudes, times, SST values, and 
 	 * fCO2_recommended values contained in the full-data DSG file for the
 	 * specified cruise.  NaN and infinite values are changed to 
