@@ -62,6 +62,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 
 	// Keep a record of the currently displayed page
 	private CompositeWithUsername currentPage;
+
 	// PopupPanel for displaying messages 
 	private DashboardInfoPopup msgPopup;
 
@@ -152,6 +153,21 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		singleton.currentPage = newPage;
 		if ( singleton.currentPage != null )
 			RootLayoutPanel.get().add(singleton.currentPage);
+	}
+
+	/**
+	 * Returns whether the given page is still the current page instance 
+	 * in the dashboard.
+	 * 
+	 * @param page
+	 * 		page to check; if null, checks if there is no current page
+	 * @return
+	 * 		true if the given page is the current page in the dashboard
+	 */
+	public static boolean isCurrentPage(CompositeWithUsername page) {
+		if ( singleton == null )
+			singleton = new SocatUploadDashboard();
+		return (page == singleton.currentPage);
 	}
 
 	/**

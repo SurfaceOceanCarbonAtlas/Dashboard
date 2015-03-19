@@ -39,7 +39,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardServices extends RemoteServiceServlet
 								implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = 1832877865268819150L;
+	private static final long serialVersionUID = 6016997467864247161L;
 
 	private String username = null;
 	private DashboardDataStore dataStore = null;
@@ -422,6 +422,17 @@ public class DashboardServices extends RemoteServiceServlet
 		scMsgList.setUsername(username);
 		Logger.getLogger("CruiseListService").info("returned sanity checker messages for " + expocode + " for " + username);
 		return scMsgList;
+	}
+
+	@Override
+	public boolean buildPreviewImages(String pageUsername, String expocode, 
+			boolean firstCall) throws IllegalArgumentException {
+		// Get the dashboard data store and current username, and validate that username
+		if ( ! validateRequest(pageUsername) ) 
+			throw new IllegalArgumentException("Invalid user request");
+
+		// TODO Auto-generated method stub
+		return true;
 	}
 
 	@Override
