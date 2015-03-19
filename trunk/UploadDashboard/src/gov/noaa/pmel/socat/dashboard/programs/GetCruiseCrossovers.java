@@ -7,10 +7,12 @@ import gov.noaa.pmel.socat.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -95,7 +97,11 @@ public class GetCruiseCrossovers {
 		}
 		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
 
+		long startTime = System.currentTimeMillis();
+
 		// Get the QC flags for the cruises from the DSG files
+		double timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
+		System.err.format("%.2fm - getting QC flags for the cruises\n", timeDiff);
 		TreeMap<String,Character> cruiseFlagsMap = new TreeMap<String,Character>();
 		for ( String expo : givenExpocodes ) {
 			try {
@@ -111,32 +117,89 @@ public class GetCruiseCrossovers {
 			}
 		}
 
+		timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
+		System.err.format("%.2fm - getting data limies for the cruises\n", timeDiff);
+		// Get the time and latitude limits for all the cruises in the list
+		// in order to narrow down the cruises to examine for crossovers
+		TreeMap<String,double[]> cruiseTimeMinMaxMap = new TreeMap<String,double[]>();
+		TreeMap<String,double[]> cruiseLatMinMaxMap = new TreeMap<String,double[]>();
+		for ( String expo : cruiseFlagsMap.keySet() ) {
+			timeDiff = (System.currentTimeMillis() - startTime) / (60.0 * 1000.0);
+			System.err.format("%.2fm - getting data limies for %s\n", timeDiff, expo);
+			double[][] dataVals = null;
+			try {
+				dataVals = dsgHandler.readLonLatTimeDataValues(expo);
+			} catch ( Exception ex ) {
+				System.err.println("Unexpected error rereading " + expo + ": " + ex.getMessage());
+				System.exit(1);
+			}
+			double[] timeMinMaxVals = CrossoverChecker.getMinMaxValidData(dataVals[2]);
+			if ( (timeMinMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
+				 (timeMinMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) ) {
+				System.err.println("No valid times for " + expo);
+				System.exit(1);
+			}
+			cruiseTimeMinMaxMap.put(expo, timeMinMaxVals);
+			double[] latMinMaxVals = CrossoverChecker.getMinMaxValidData(dataVals[1]);
+			if ( (latMinMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
+				 (latMinMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) ) {
+				System.err.println("No valid latitudes for " + expo);
+				System.exit(1);
+			}
+			cruiseLatMinMaxMap.put(expo, latMinMaxVals);
+		}
+
 		CrossoverChecker crossChecker = new CrossoverChecker(dataStore.getDsgNcFileHandler());
-		long startTime = System.currentTimeMillis();
-		Double timeDiff;
 		TreeMap<String,SocatCrossover> crossoversMap = new TreeMap<String,SocatCrossover>();
 		for ( String firstExpo : cruiseFlagsMap.keySet() ) {
+			double[] firstTimeMinMax = cruiseTimeMinMaxMap.get(firstExpo);
+			double[] firstLatMinMax = cruiseLatMinMaxMap.get(firstExpo);
+			// Get the list of possibly-crossing cruises to check
+			TreeSet<String> checkExpos = new TreeSet<String>();
 			for ( String secondExpo : cruiseFlagsMap.keySet() ) {
+				// Only those cruise preceding this one so not doing two checks on a pair
 				if ( secondExpo.equals(firstExpo) )
 					break;
+				// Must be different instrument - different NODC code
+				if ( firstExpo.substring(0,4).equals(secondExpo.substring(0,4)) )
+					continue;
+				// One of the cruises must be from the report set
 				if ( ! ( reportFlagsSet.contains( cruiseFlagsMap.get(firstExpo) ) ||
 						 reportFlagsSet.contains( cruiseFlagsMap.get(secondExpo) ) ) )
 					continue;
-				timeDiff = (System.currentTimeMillis() - startTime) / (1000.0 * 60.0);
-				System.err.format("%.1fm - examining %s and %s: ", timeDiff, firstExpo, secondExpo);
-				System.err.flush();
+				// Check that there is some overlap in time
+				double[] secondTimeMinMax = cruiseTimeMinMaxMap.get(secondExpo);
+				if ( (firstTimeMinMax[1] + SocatCrossover.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
+					 (secondTimeMinMax[1] + SocatCrossover.MAX_TIME_DIFF < firstTimeMinMax[0]) )
+					continue;
+				// Check that there is some overlap in latitude
+				double[] secondLatMinMax = cruiseLatMinMaxMap.get(secondExpo);
+				if ( (firstLatMinMax[1] + SocatCrossover.MAX_TIME_DIFF < secondLatMinMax[0]) ||
+					 (secondLatMinMax[1] + SocatCrossover.MAX_TIME_DIFF < firstLatMinMax[0]) )
+						continue;
+				checkExpos.add(secondExpo);
+			}
+			// Find any crossovers with this cruise with the selected set of cruises
+			if ( checkExpos.size() > 0 ) {
 				try {
-					SocatCrossover cross = crossChecker.checkForCrossover(new String[] {firstExpo, secondExpo});
-					timeDiff = 60.0 * ( (System.currentTimeMillis() - startTime) / (1000.0 * 60.0) - timeDiff );
-					if ( cross != null ) {
-						System.err.format("%.1fs - crossover found: %s\n", timeDiff * 60.0, cross.toString());
-						crossoversMap.put(firstExpo + " and " + secondExpo, cross);
-					}
-					else {
-						System.err.format("%.1fs - no crossover\n", timeDiff);
+					ArrayList<SocatCrossover> crossList = 
+							crossChecker.getCrossovers(firstExpo, checkExpos, System.err, startTime);
+					for ( SocatCrossover cross : crossList ) {
+						String[] expos = cross.getExpocodes();
+						Long[] cruiseMinTimes = new Long[2];
+						Long[] cruiseMaxTimes = new Long[2];
+						for (int q = 0; q < 2; q++) {
+							double[] timeMinMax = cruiseTimeMinMaxMap.get(expos[q]);
+							cruiseMinTimes[q] = Math.round(timeMinMax[0]);
+							cruiseMaxTimes[q] = Math.round(timeMinMax[1]);
+						}
+						cross.setCruiseMinTimes(cruiseMinTimes);
+						cross.setCruiseMaxTimes(cruiseMaxTimes);
+						crossoversMap.put(expos[0] + " and " + expos[1], cross);
 					}
 				} catch (Exception ex) {
-					System.err.println("problems: " + ex.getMessage());
+					ex.printStackTrace();
+					System.exit(1);
 				}
 			}
 		}
