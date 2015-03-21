@@ -4,15 +4,14 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
@@ -196,11 +195,11 @@ public class DashboardServices extends RemoteServiceServlet
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		// Get the current metadata documents for the cruise
-		DashboardCruise cruise = dataStore.getCruiseFileHandler()
-										  .getCruiseFromInfoFile(expocode);
-		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
+		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 
+		// Get the current metadata documents for the cruise
+		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
 		if ( DashboardMetadata.OME_FILENAME.equals(deleteFilename) ) {
 			if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) 
 				throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted cruise");
@@ -230,7 +229,6 @@ public class DashboardServices extends RemoteServiceServlet
 				" from " + expocode + " for " + username);
 
 		// Save the updated cruise
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		cruiseHandler.saveCruiseInfoToFile(cruise, "Removed metadata document " + 
 									deleteFilename + " from cruise " + expocode);
 		// If submitted cruise, add QC update ('U') global flag about removal of metadata
@@ -254,7 +252,7 @@ public class DashboardServices extends RemoteServiceServlet
 				if ( cruise.isEditable() == null ) {
 					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 				}
-				dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruise, comment);
+				cruiseHandler.saveCruiseInfoToFile(cruise, comment);
 				Logger.getLogger("DashboardServices").info("updated QC status for " + expocode);
 			} catch (Exception ex) {
 				// Should not fail.  If does, record but otherwise ignore the failure.
@@ -431,7 +429,12 @@ public class DashboardServices extends RemoteServiceServlet
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		// TODO Auto-generated method stub
+		// Generate the preview plots for this cruise
+		// TODO: refactor so starts this in a separate thread when firstCall is true and 
+		//       returns false, then when gets called again with firstCall is false for
+		//       a status update, returns false if still working and true if all plots are done
+		if ( firstCall )
+			dataStore.getPreviewPlotsHandler().createPreviewPlots(expocode, timetag);
 		return true;
 	}
 
@@ -444,9 +447,8 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Submit the cruises for QC and possibly send to CDIAC
-		DashboardCruiseSubmitter submitter = new DashboardCruiseSubmitter(dataStore);
-		submitter.submitCruises(cruiseExpocodes, archiveStatus, 
-								localTimestamp, repeatSend, username);
+		dataStore.getDashboardCruiseSubmitter().submitCruises(cruiseExpocodes, 
+				archiveStatus, localTimestamp, repeatSend, username);
 		Logger.getLogger("DashboardServices").info("cruises " + cruiseExpocodes.toString() + 
 				" submitted by " + username);
 	}

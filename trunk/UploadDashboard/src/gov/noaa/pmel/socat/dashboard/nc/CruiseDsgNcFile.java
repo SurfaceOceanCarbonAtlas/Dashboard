@@ -35,7 +35,7 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = -3901930192627099116L;
+	private static final long serialVersionUID = -8033968233628871901L;
 
 	// Names of the variables in the DSG files
 	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
@@ -57,6 +57,16 @@ public class CruiseDsgNcFile extends File {
 	 */
 	public CruiseDsgNcFile(String filename) {
 		super(filename);
+		metadata = null;
+		dataList = null;
+	}
+
+	/**
+	 * See {@link java.io.File#File(java.io.File,java.lang.String)}
+	 * The internal metadata and data list references are set null.
+	 */
+	public CruiseDsgNcFile(File parent, String child) {
+		super(parent, child);
 		metadata = null;
 		dataList = null;
 	}

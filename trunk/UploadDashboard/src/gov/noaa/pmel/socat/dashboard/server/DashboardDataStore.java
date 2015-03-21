@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.PreviewPlotsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -53,6 +54,8 @@ public class DashboardDataStore {
 	private static final String CONFIG_RELATIVE_FILENAME = "content" + 
 			File.separator + SERVER_APP_NAME + File.separator + 
 			"SocatUploadDashboard.properties";
+	private static final String WEBINF_RELATIVE_FILENAME = "webapps" +
+			File.separator + SERVER_APP_NAME + "WEB-INF";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
 	private static final String SOCAT_UPLOAD_VERSION_NAME_TAG = "SocatUploadVersion";
@@ -120,6 +123,7 @@ public class DashboardDataStore {
 	private FerretConfig ferretConf;
 	private DashboardCruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
+	private PreviewPlotsHandler plotsHandler;
 	private DashboardCruiseSubmitter cruiseSubmitter;
 	private CruiseFlagsHandler cruiseFlagsHandler;
 	private Timer configWatcher;
@@ -247,6 +251,7 @@ public class DashboardDataStore {
 		propVal = configProps.getProperty(SVN_PASSWORD_NAME_TAG);
 		if ( propVal != null )
 			svnPassword = propVal.trim();
+
 		// Read the user files directory name
 		try {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
@@ -289,6 +294,29 @@ public class DashboardDataStore {
 			cruiseFlagsHandler = new CruiseFlagsHandler(propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
+		// Read the Ferret configuration filename
+		try {
+			propVal = configProps.getProperty(FERRET_CONFIG_FILE_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			// Read the Ferret configuration given in this file
+		    InputStream stream = new FileInputStream(new File(propVal));
+		    try {
+			    SAXBuilder sb = new SAXBuilder();
+		    	Document jdom = sb.build(stream);
+		    	ferretConf = new FerretConfig();
+		    	ferretConf.setRootElement((Element)jdom.getRootElement().clone());
+		    } finally {
+		    	stream.close();
+		    }
+		    itsLogger.info("read Ferret configuration file " + propVal);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -344,32 +372,9 @@ public class DashboardDataStore {
 		}
 		try {
 			dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
-					erddapDsgFlagFileName, erddapDecDsgFlagFileName);
+					erddapDsgFlagFileName, erddapDecDsgFlagFileName, ferretConf);
 		} catch ( Exception ex ) {
 			throw new IOException(ex);
-		}
-
-		// Read the Ferret configuration filename
-		try {
-			propVal = configProps.getProperty(FERRET_CONFIG_FILE_NAME_TAG);
-			if ( propVal == null )
-				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
-			// Read the Ferret configuration given in this file
-		    InputStream stream = new FileInputStream(new File(propVal));
-		    try {
-			    SAXBuilder sb = new SAXBuilder();
-		    	Document jdom = sb.build(stream);
-		    	ferretConf = new FerretConfig();
-		    	ferretConf.setRootElement((Element)jdom.getRootElement().clone());
-		    } finally {
-		    	stream.close();
-		    }
-		    itsLogger.info("read Ferret configuration file " + propVal);
-		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + FERRET_CONFIG_FILE_NAME_TAG + 
-					" value specified in " + configFile.getPath() + "\n" + 
-					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
 		// Read the Database configuration filename
@@ -392,6 +397,12 @@ public class DashboardDataStore {
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
+
+		// The PreviewPlotsHandler uses the various handlers just created
+		String previewDirname = baseDir + File.separator + WEBINF_RELATIVE_FILENAME + 
+				File.separator + "preview" + File.separator;
+		plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles", 
+				previewDirname + "plots", this);
 
 		// The DashboardCruiseSubmitter uses the various handlers just created
 		cruiseSubmitter = new DashboardCruiseSubmitter(this);
@@ -569,6 +580,14 @@ public class DashboardDataStore {
 	 */
 	public DashboardCruiseChecker getDashboardCruiseChecker() {
 		return cruiseChecker;
+	}
+
+	/**
+	 * @return
+	 * 		the preview plots handler
+	 */
+	public PreviewPlotsHandler getPreviewPlotsHandler() {
+		return plotsHandler;
 	}
 
 	/**

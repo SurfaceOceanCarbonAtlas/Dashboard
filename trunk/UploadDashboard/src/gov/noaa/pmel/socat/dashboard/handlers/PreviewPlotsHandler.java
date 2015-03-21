@@ -1,9 +1,8 @@
-package gov.noaa.pmel.socat.dashboard.actions;
+package gov.noaa.pmel.socat.dashboard.handlers;
 
+import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
@@ -15,14 +14,17 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-public class CruisePreviewer {
+public class PreviewPlotsHandler {
 
 	File dsgFilesDir;
 	File plotsDir;
+	CruiseFileHandler cruiseHandler;
+	DashboardCruiseChecker cruiseChecker;
+	MetadataFileHandler metadataHandler;
+	FerretConfig ferretConfig;
 
 	/**
 	 * Create with the given directories for the preview DSG files and plots.
@@ -31,31 +33,51 @@ public class CruisePreviewer {
 	 * 		directory to contain the preview DSG files
 	 * @param plotsDirName
 	 * 		directory to contain the preview plots
+	 * @param dataStore
+	 * 		get the CruiseFileHandler, DashboardCruiseChecker, 
+	 * 		MetadataFileHandler, and FerretConfig from here
 	 */
-	public CruisePreviewer(String dsgFilesDirName, String plotsDirName) {
+	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, DashboardDataStore dataStore) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
 		plotsDir = new File(plotsDirName);
 		if ( ! plotsDir.isDirectory() )
 			throw new IllegalArgumentException(plotsDirName + " is not a directory");
+		cruiseHandler = dataStore.getCruiseFileHandler();
+		cruiseChecker = dataStore.getDashboardCruiseChecker();
+		metadataHandler = dataStore.getMetadataFileHandler();
+		ferretConfig = dataStore.getFerretConfig();
 	}
 
 	/**
-	 * Generates the preview NetCDF DSG abstract file for a cruise.
+	 * Generates the preview DSG files for a cruise.
+	 * Creates this directory if it does not exist.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise 
 	 * @return
-	 * 		preview NetCDF DSG abstract file for the cruise
+	 * 		DSG files directory for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the expocode is invalid, 
+	 * 		if problems creating the directory
 	 */
-	public CruiseDsgNcFile getPreviewDsgFile(String expocode) throws IllegalArgumentException {
+	private File getCruisePreviewDsgDir(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
 		String expo = DashboardServerUtils.checkExpocode(expocode);
-		return new CruiseDsgNcFile(dsgFilesDir + File.separator + expo.substring(0,4) +
-				File.separator + expo + ".nc");
+		// Make sure the DSG subdirectory exists
+		File cruiseDsgDir = new File(dsgFilesDir, expo.substring(0,4));
+		if ( cruiseDsgDir.exists() ) {
+			if ( ! cruiseDsgDir.isDirectory() ) {
+				throw new IllegalArgumentException("Cruise DSG file subdirectory exists "
+						+ "but is not a directory: " + cruiseDsgDir.getPath()); 
+			}
+		}
+		else if ( ! cruiseDsgDir.mkdirs() ) {
+			throw new IllegalArgumentException("Cannot create the cruise DSG file "
+					+ "subdirectory " + cruiseDsgDir.getPath());
+		}
+		return cruiseDsgDir;
 	}
 
 	/**
@@ -68,19 +90,22 @@ public class CruisePreviewer {
 	 * 		preview plots directory for the cruise
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid, or
-	 * 		if unable to create the 
+	 * 		if problems creating the directory
 	 */
-	public File getCruisePreviewPlotsDir(String expocode) throws IllegalArgumentException {
+	private File getCruisePreviewPlotsDir(String expocode) throws IllegalArgumentException {
+		// Check and standardize the expocode
 		String expo = DashboardServerUtils.checkExpocode(expocode);
-		File cruisePlotsDir = new File(plotsDir + File.separator + expo.substring(0,4));
+		// Make sure the plots subdirectory exists
+		File cruisePlotsDir = new File(plotsDir, expo.substring(0,4));
 		if ( cruisePlotsDir.exists() ) {
-			if ( ! cruisePlotsDir.isDirectory() )
+			if ( ! cruisePlotsDir.isDirectory() ) {
 				throw new IllegalArgumentException("Plots directory exists "
-						+ "but is not a directory: " + cruisePlotsDir.getPath()); 
+						+ "but is not a directory: " + cruisePlotsDir.getPath());
+			}
 		}
 		else if ( ! cruisePlotsDir.mkdirs() ) {
-				throw new IllegalArgumentException("Unexpected problems "
-						+ "creating the new subdirectory " + cruisePlotsDir.getPath());
+			throw new IllegalArgumentException("Unexpected problems "
+					+ "creating the new subdirectory " + cruisePlotsDir.getPath());
 		}
 		return cruisePlotsDir;
 	}
@@ -108,16 +133,7 @@ public class CruisePreviewer {
 			throws IllegalArgumentException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 
-		DashboardDataStore dataStore;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to obtain the dashboard data store");
-		}
-
 		// Get the complete original cruise data
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
 		DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(upperExpo, 0, -1);
 
 		/*
@@ -129,7 +145,6 @@ public class CruisePreviewer {
 		 *  Note: this saves messages and assigns WOCE flags with row 
 		 *  numbers of the trimmed data.
 		 */
-		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
 		if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 			if ( cruiseData.getNumDataRows() < 1 )
 				throw new IllegalArgumentException(upperExpo + ": unacceptable; all data points marked bad");
@@ -143,12 +158,12 @@ public class CruisePreviewer {
 		}
 
 		// Get the OME metadata for this cruise
-		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
 		DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME);
 		DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 
 		// Get the location and name for the NetCDF DSG file
-		CruiseDsgNcFile dsgFile = getPreviewDsgFile(upperExpo);
+		CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(getCruisePreviewDsgDir(upperExpo), 
+				upperExpo + "_" + timetag + ".nc");
 
 		// Make sure the parent directory exists
 		File parentDir = dsgFile.getParentFile();
@@ -168,9 +183,7 @@ public class CruisePreviewer {
 		SocatMetadata socatMData = omeMData.createSocatMetadata(
 				cruiseData.getVersion(), addlDocs, SocatQCEvent.QC_PREVIEW_FLAG.toString());
 		// Convert the cruise data strings into the appropriate type
-		ArrayList<SocatCruiseData> socatDatalist = 
-				SocatCruiseData.dataListFromDashboardCruise(cruiseData);
-
+		ArrayList<SocatCruiseData> socatDatalist = SocatCruiseData.dataListFromDashboardCruise(cruiseData);
 		// Create the preview NetCDF DSG file
 		try {
 			dsgFile.create(socatMData, socatDatalist);
@@ -181,7 +194,7 @@ public class CruisePreviewer {
 		}
 
 		// Call Ferret to add the computed variables to the preview DSG file
-		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
+		SocatTool tool = new SocatTool(ferretConfig);
 		ArrayList<String> scriptArgs = new ArrayList<String>(1);
 		scriptArgs.add(dsgFile.getPath());
 		tool.init(scriptArgs, upperExpo, FerretConfig.Action.COMPUTE);
@@ -190,11 +203,10 @@ public class CruisePreviewer {
 			throw new IllegalArgumentException("Failure adding computed variables: " + 
 					tool.getErrorMessage());
 
-		File plotsDir = getCruisePreviewPlotsDir(upperExpo);
 
 		// Call Ferret to generate the plots from the preview DSG file
-		tool = new SocatTool(dataStore.getFerretConfig());
-		scriptArgs.add(plotsDir.getPath());
+		tool = new SocatTool(ferretConfig);
+		scriptArgs.add(getCruisePreviewPlotsDir(upperExpo).getPath());
 		scriptArgs.add(timetag);
 		tool.init(scriptArgs, upperExpo, FerretConfig.Action.PLOTS);
 		tool.run();

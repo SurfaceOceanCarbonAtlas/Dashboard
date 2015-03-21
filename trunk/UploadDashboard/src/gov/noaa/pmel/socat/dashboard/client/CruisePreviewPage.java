@@ -251,7 +251,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + SafeHtmlUtils.htmlEscape(this.expocode));
 		if ( this.expocode.length() > 11 ) {
 			// Tell the server to generate the preview plots
-			DateTimeFormat formatter = DateTimeFormat.getFormat("yyMMddHHmmss");
+			DateTimeFormat formatter = DateTimeFormat.getFormat("MMddHHmmss");
 			this.timetag = formatter.format(new Date(), TimeZone.createTimeZone(0));
 			service.buildPreviewImages(getUsername(), this.expocode, 
 					this.timetag, true, checkStatusCallback);
