@@ -37,6 +37,10 @@ public class FerretConfig extends Document {
 		 * Decimate data in a completed DSG file.
 		 */
 		DECIMATE,
+		/**
+		 * Create the preview plots
+		 */
+		PLOTS,
 	}
 
 	/**
@@ -247,6 +251,8 @@ public class FerretConfig extends Document {
         		driver = invoker.getAttributeValue("compute_driver");
         	else if ( actionEnum.equals(Action.DECIMATE) )
         		driver = invoker.getAttributeValue("decimate_driver");
+        	else if ( actionEnum.equals(Action.PLOTS) )
+        		driver = invoker.getAttributeValue("plots_driver");
         	else
         		driver = null;
             if ( driver != null ) {

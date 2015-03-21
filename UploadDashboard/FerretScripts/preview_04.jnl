@@ -1,0 +1,30 @@
+! Pressure variables
+
+go preview_setup ($infile_dsg) 4
+
+! First draw a top axis labeled with # obs
+go preview_top_axis
+
+set view full
+! Plot pressure variables each with its own vertical axis
+
+let/title="@P2@ASP_NCEP" P_NCEP =  reshape(pressure_ncep_slp, tt)
+let/title="@P3@ASP_atm" patm = reshape(Pressure_atm, tt)
+let/title="@P4@ASP_equi" pequi =  reshape(Pressure_equi, tt)
+
+
+
+ppl axlint,,2
+plot($linestyle)/line/color/axes=0,1,1,1/key=title/set P_NCEP, patm, pequi 
+  ($taxis_setting)
+  ppl ylab Pressure (`Pressure_atm,return=units`)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+def sym lab_top = Expocode `EXPOCODE`
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

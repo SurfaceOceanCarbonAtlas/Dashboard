@@ -219,6 +219,10 @@ public interface DashboardServicesInterfaceAsync {
 	 * 		name of the current user - for validation
 	 * @param expocode
 	 * 		get data messages for this cruise
+	 * @param timetag
+	 * 		tag to be added to the end of the plot file names
+	 * 		(before the filename extension) to make them specific
+	 * 		to the time the request was made
 	 * @param firstCall
 	 * 		is this the first request for the preview images?
 	 * 		If true, the process to generate the images are started.
@@ -227,7 +231,7 @@ public interface DashboardServicesInterfaceAsync {
 	 * 		callback to make indicating the image-generating status
 	 * 		(true if done generating plots)
 	 */
-	void buildPreviewImages(String username, String expocode,
+	void buildPreviewImages(String username, String expocode, String timetag,
 			boolean firstCall, AsyncCallback<Boolean> callback);
 
 	/**

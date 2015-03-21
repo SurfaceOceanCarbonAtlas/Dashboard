@@ -150,18 +150,27 @@ body {
 	margin-bottom: 1em;
 }
 
+.plotspanel {
+	display: block;
+	width: 800px;
+	height: 800px;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+.plotslabel {
+	font-size: small;
+}
+.plotsimage {
+	display: inline;
+	margin: 1em;
+}
+
 .previewbutton {
 	display: block;
 	font-size: small;
 	width: 10em;
 	margin: 2em;
 }
-
-.previewimage {
-	display: inline;
-	margin: 1em;
-}
-
 .previewcaptionpanel {
 	display: block;
 	margin: 1em;

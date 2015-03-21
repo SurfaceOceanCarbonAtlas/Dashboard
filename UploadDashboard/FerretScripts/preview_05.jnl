@@ -1,0 +1,53 @@
+! Temperatures
+
+go preview_setup ($infile_dsg) 5
+
+! Plot together to get scale for LHS axis
+plot reshape(temperature_equi, tt), reshape(temp, tt)
+let vmin = ($yaxis_min)
+let vmax = ($yaxis_max)
+
+! First draw a top axis labeled with # obs
+go preview_top_axis
+
+! Plot temperature variables each with its own vertical axis
+
+
+let/title="temp intake" tempr = reshape(temp, tt)
+let/title="Temp diff" dtemp = reshape(delta_temp, tt)
+let/title="Temp equ" itemp = reshape(temperature_equi, tt)
+
+let/title="Temp diff" ntemp = `2*vmax` + 0*reshape(delta_temp, tt)
+
+set view full
+
+plot($linestyle)/line/color/axes=0,1,1,0/vlim=`vmin`:`vmax`/key=title/set tempr, ntemp, itemp
+  ppl ylab Temp (`temperature_equi,return=units`)
+  ($taxis_setting)
+  ppl title " "
+  ppl xlab " "
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  let labdat = ($labnum_dset)
+  let labttl = ($labnum_datitl)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+def sym lab_top = Expocode `EXPOCODE`
+
+set view full2
+plot/axes=0,1,0,1/color=green/line($linestyle)/nolab/set dtemp
+  ($taxis_setting)
+  ppl ylab Temp Diff (`temperature_equi,return=units`)
+  ppl title " "
+  ppl xlab " "
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  go unlabel `labdat`
+  go unlabel `labttl`
+ppl plot
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+
+

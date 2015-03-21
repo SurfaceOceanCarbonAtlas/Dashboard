@@ -230,6 +230,10 @@ public interface DashboardServicesInterface extends RemoteService {
 	 * 		name of the current user - for validation
 	 * @param expocode
 	 * 		get data messages for this cruise
+	 * @param timetag
+	 * 		tag to be added to the end of the plot file names
+	 * 		(before the filename extension) to make them specific
+	 * 		to the time the request was made
 	 * @param firstCall
 	 * 		is this the first request for the preview images?
 	 * 		If true, the process to generate the images are started.
@@ -240,8 +244,8 @@ public interface DashboardServicesInterface extends RemoteService {
 	 * 		if the cruise expocode is invalid, or
 	 * 		if the images cannot be created (probably because of bad data)
 	 */
-	boolean buildPreviewImages(String username, String expocode, boolean firstCall)
-			throws IllegalArgumentException;
+	boolean buildPreviewImages(String username, String expocode, String timetag,
+			boolean firstCall) throws IllegalArgumentException;
 
 	/**
 	 * Submits cruises named in the given listing for QC.

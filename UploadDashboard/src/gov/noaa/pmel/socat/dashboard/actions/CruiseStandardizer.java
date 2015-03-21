@@ -427,7 +427,9 @@ public class CruiseStandardizer {
 			}
 			// Call Ferret to add lon360 and tmonth (calculated data should be the same)
 			SocatTool tool = new SocatTool(ferretConfig);
-			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
+			ArrayList<String> scriptArgs = new ArrayList<String>(1);
+			scriptArgs.add(dsgFile.getPath());
+			tool.init(scriptArgs, expocode, FerretConfig.Action.COMPUTE);
 			tool.run();
 			if ( tool.hasError() )
 				throw new IllegalArgumentException(expocode + ": Failure adding computed variables: " + 
@@ -494,7 +496,9 @@ public class CruiseStandardizer {
 			}
 			// Call Ferret to add lon360 and tmonth (calculated data should be the same)
 			SocatTool tool = new SocatTool(ferretConfig);
-			tool.init(dsgFile.getPath(), null, expocode, FerretConfig.Action.COMPUTE);
+			ArrayList<String> scriptArgs = new ArrayList<String>(1);
+			scriptArgs.add(dsgFile.getPath());
+			tool.init(scriptArgs, expocode, FerretConfig.Action.COMPUTE);
 			tool.run();
 			if ( tool.hasError() )
 				throw new IllegalArgumentException(expocode + ": Failure adding computed variables: " + 
