@@ -7,7 +7,6 @@ import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -39,6 +38,7 @@ public class DsgNcFileHandler {
 	private File decDsgFilesDir;
 	private File erddapDsgFlagFile;
 	private File erddapDecDsgFlagFile;
+	private FerretConfig ferretConfig;
 
 	/**
 	 * Handles storage and retrieval of full and decimated NetCDF DSG files 
@@ -54,20 +54,21 @@ public class DsgNcFileHandler {
 	 * @param erddapDecDsgFlagFileName
 	 * 		name of the flag file to create to notify ERDDAP 
 	 * 		of updates to the decimated NetCDF DSG files
+	 * @param ferretConf
+	 * 		configuration document for running Ferret
 	 * @throws IllegalArgumentException
 	 * 		if the specified DSG directories, or the parent directories
 	 * 		of the ERDDAP flag files, do not exist or are not directories
 	 */
 	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName,
-			String erddapDsgFlagFileName, String erddapDecDsgFlagFileName) {
+			String erddapDsgFlagFileName, String erddapDecDsgFlagFileName, 
+			FerretConfig ferretConf) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
-			throw new IllegalArgumentException(
-					dsgFilesDirName + " is not a directory");
+			throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
 		decDsgFilesDir = new File(decDsgFilesDirName);
 		if ( ! decDsgFilesDir.isDirectory() )
-			throw new IllegalArgumentException(
-					decDsgFilesDirName + " is not a directory");
+			throw new IllegalArgumentException(decDsgFilesDirName + " is not a directory");
 		erddapDsgFlagFile = new File(erddapDsgFlagFileName);
 		File parentDir = erddapDsgFlagFile.getParentFile();
 		if ( (parentDir == null) || ! parentDir.isDirectory() )
@@ -78,27 +79,42 @@ public class DsgNcFileHandler {
 		if ( (parentDir == null) || ! parentDir.isDirectory() )
 			throw new IllegalArgumentException("parent directory of " + 
 					erddapDecDsgFlagFile.getPath() + " is not valid");
+		ferretConfig = ferretConf;
 	}
 
 	/**
 	 * Generates the cruise-specific full NetCDF DSG abstract file for a cruise.
+	 * Creates the parent subdirectory if it does not exist.
 	 * 
 	 * @param expocode
 	 * 		expocode of the cruise 
 	 * @return
 	 * 		full NetCDF DSG abstract file for the cruise
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
+	 * 		if the expocode is invalid, or
+	 * 		if problems creating the parent subdirectory
 	 */
 	public CruiseDsgNcFile getDsgNcFile(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
-		String expo = DashboardServerUtils.checkExpocode(expocode);
-		return new CruiseDsgNcFile(dsgFilesDir + File.separator + expo.substring(0,4) +
-				File.separator + expo + ".nc");
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Make sure the parent directory exists
+		File parentDir = new File(dsgFilesDir, upperExpo.substring(0,4));
+		if ( parentDir.exists() ) {
+			if ( ! parentDir.isDirectory() ) {
+				throw new IllegalArgumentException("Parent subdirectory exists but is not a directory: " +
+						parentDir.getPath());
+			}
+		}
+		else if ( ! parentDir.mkdirs() ) {
+			throw new IllegalArgumentException("Unable to create the new subdirectory " + 
+					parentDir.getPath());
+		}
+		return new CruiseDsgNcFile(parentDir, upperExpo + ".nc");
 	}
 
 	/**
 	 * Generates the cruise-specific decimated NetCDF DSG abstract file for a cruise.
+	 * Creates the parent subdirectory if it does not exist.
 	 * The {@link CruiseDsgNcFile#create} and {@link CruiseDsgNcFile#updateWoceFlags} 
 	 * methods should not be used with the decimated data file; the actual decimated 
 	 * DSG file is created using {@link #decimateCruise(String)}.
@@ -112,9 +128,20 @@ public class DsgNcFileHandler {
 	 */
 	public CruiseDsgNcFile getDecDsgNcFile(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
-		String expo = DashboardServerUtils.checkExpocode(expocode);
-		return new CruiseDsgNcFile(decDsgFilesDir + File.separator + expo.substring(0,4) +
-				File.separator + expo + ".nc");
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Make sure the parent directory exists
+		File parentDir = new File(decDsgFilesDir, upperExpo.substring(0,4));
+		if ( parentDir.exists() ) {
+			if ( ! parentDir.isDirectory() ) {
+				throw new IllegalArgumentException("Parent subdirectory exists but is not a directory: " +
+						parentDir.getPath());
+			}
+		}
+		else if ( ! parentDir.mkdirs() ) {
+			throw new IllegalArgumentException("Unable to create the new subdirectory " + 
+					parentDir.getPath());
+		}
+		return new CruiseDsgNcFile(parentDir, upperExpo + ".nc");
 	}
 
 	/**
@@ -136,25 +163,8 @@ public class DsgNcFileHandler {
 	 */
 	public void saveCruise(DashboardOmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
 									String qcFlag) throws IllegalArgumentException {
-		DashboardDataStore dataStore;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to obtain the dashboard data store");
-		}
-
 		// Get the location and name for the NetCDF DSG file
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
-
-		// Make sure the parent directory exists
-		File parentDir = dsgFile.getParentFile();
-		if ( ! parentDir.exists() ) {
-			if ( ! parentDir.mkdirs() )
-				throw new IllegalArgumentException(
-						"Unexpected problems creating the new subdirectory " + 
-						parentDir.getPath());
-		}
 
 		// Get just the filenames from the set of addition document
 		TreeSet<String> addlDocs = new TreeSet<String>();
@@ -178,7 +188,7 @@ public class DsgNcFileHandler {
 		}
 
 		// Call Ferret to add the computed variables to the NetCDF DSG file
-		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
+		SocatTool tool = new SocatTool(ferretConfig);
 		ArrayList<String> scriptArgs = new ArrayList<String>(1);
 		scriptArgs.add(dsgFile.getPath());
 		tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
@@ -204,14 +214,6 @@ public class DsgNcFileHandler {
 	 * 		if there are problems creating or writing the decimated-data DSG file
 	 */
 	public void decimateCruise(String expocode) throws IllegalArgumentException {
-		DashboardDataStore dataStore;
-		try {
-			dataStore = DashboardDataStore.get();
-		} catch (IOException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to obtain the dashboard data store");
-		}
-
 		// Get the location and name of the full DSG file
 		File dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )
@@ -220,17 +222,9 @@ public class DsgNcFileHandler {
 
 		// Get the location and name for the decimated DSG file
 		File decDsgFile = getDecDsgNcFile(expocode);
-		// Make sure the parent directory exists
-		File parentDir = decDsgFile.getParentFile();
-		if ( ! parentDir.exists() ) {
-			if ( ! parentDir.mkdirs() )
-				throw new IllegalArgumentException(
-						"Unexpected problems creating the new subdirectory " + 
-						parentDir.getPath());
-		}
 
 		// Call Ferret to create the decimated DSG file from the full DSG file
-		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
+		SocatTool tool = new SocatTool(ferretConfig);
 		ArrayList<String> scriptArgs = new ArrayList<String>(2);
 		scriptArgs.add(dsgFile.getPath());
 		scriptArgs.add(decDsgFile.getPath());
@@ -261,17 +255,11 @@ public class DsgNcFileHandler {
 		if ( newDsgFile.exists() )
 			throw new IllegalArgumentException(
 					"DSG file for " + oldExpocode + " already exist");
-		File newParent = newDsgFile.getParentFile();
-		if ( ! newParent.exists() ) 
-			newParent.mkdirs();
 
 		CruiseDsgNcFile newDecDsgFile = getDecDsgNcFile(newExpocode);
 		if ( newDecDsgFile.exists() )
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + oldExpocode + " already exist");
-		newParent = newDecDsgFile.getParentFile();
-		if ( ! newParent.exists() ) 
-			newParent.mkdirs();
 
 		String varName = Constants.SHORT_NAMES.get(Constants.expocode_VARNAME);
 

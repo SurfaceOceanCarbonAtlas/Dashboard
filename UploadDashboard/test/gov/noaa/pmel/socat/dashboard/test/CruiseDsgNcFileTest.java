@@ -116,8 +116,7 @@ public class CruiseDsgNcFileTest {
 		File parentDir = new File("/var/tmp/socat");
 		if ( ! parentDir.exists() )
 			parentDir.mkdir();
-		String filename = parentDir.getPath() + File.separator + expocode + ".nc";
-		dsgNcFile = new CruiseDsgNcFile(filename);
+		dsgNcFile = new CruiseDsgNcFile(parentDir, expocode + ".nc");
 		try {
 			dsgNcFile.create(metadata, dataList);
 		} catch ( Exception ex ) {
@@ -203,8 +202,7 @@ public class CruiseDsgNcFileTest {
 			File parentDir = new File("/var/tmp/socat");
 			if ( ! parentDir.exists() )
 				parentDir.mkdir();
-			String filename = parentDir.getPath() + File.separator + expocode + ".nc";
-			dsgNcFile = new CruiseDsgNcFile(filename);
+			dsgNcFile = new CruiseDsgNcFile(parentDir, expocode + ".nc");
 			try {
 				dsgNcFile.create(metadata, dataList);
 			} catch ( IllegalArgumentException ex ) {
