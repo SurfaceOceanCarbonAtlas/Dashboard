@@ -55,7 +55,9 @@ public class DerivedVariablesTest {
 		}
 		SocatTool tool = new SocatTool(ferret);
 		String fullDataFilename = dsgFile.getPath();
-		tool.init(fullDataFilename, null, expocode, FerretConfig.Action.COMPUTE);
+		ArrayList<String> scriptArgs = new ArrayList<String>(1);
+		scriptArgs.add(fullDataFilename);
+		tool.init(scriptArgs, expocode, FerretConfig.Action.COMPUTE);
 		tool.run();
 		assertFalse(tool.hasError());
 
@@ -74,7 +76,8 @@ public class DerivedVariablesTest {
 
 		String decDataFilename = fullDataFilename.replace(expocode + ".nc", expocode + "_decimated.nc");
 		tool = new SocatTool(ferret);
-		tool.init(fullDataFilename, decDataFilename, expocode, FerretConfig.Action.DECIMATE);
+		scriptArgs.add(decDataFilename);
+		tool.init(scriptArgs, expocode, FerretConfig.Action.DECIMATE);
 		tool.run();
 		assertFalse(tool.hasError());
 

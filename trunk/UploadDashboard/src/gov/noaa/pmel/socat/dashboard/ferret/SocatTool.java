@@ -2,6 +2,7 @@ package gov.noaa.pmel.socat.dashboard.ferret;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom2.Element;
@@ -11,8 +12,7 @@ import org.jdom2.Element;
 public class SocatTool extends Thread {
 
 	FerretConfig ferret = new FerretConfig();
-	String firstFilename;
-	String secondFilename;
+	ArrayList<String> scriptArgs;
 	String expocode;
 	FerretConfig.Action action;
 	String message;
@@ -23,17 +23,16 @@ public class SocatTool extends Thread {
 	public SocatTool(FerretConfig ferretConf) {
 	    ferret = new FerretConfig();
 	    ferret.setRootElement((Element)ferretConf.getRootElement().clone());
-	    firstFilename = null;
-	    secondFilename = null;
+	    scriptArgs = new ArrayList<String>(3);
 	    expocode = null;
 	    message = null;
 	    error = false;
 	    done = false;
 	}
 
-	public void init(String firstFilename, String secondFilename, String expocode, FerretConfig.Action action) {
-		this.firstFilename = firstFilename;
-		this.secondFilename = secondFilename;
+	public void init(List<String> scriptArgs, String expocode, FerretConfig.Action action) {
+		this.scriptArgs.clear();
+		this.scriptArgs.addAll(scriptArgs);
 		this.expocode = expocode;
 		this.action = action;
 	}
@@ -62,17 +61,17 @@ public class SocatTool extends Thread {
 			else if ( action.equals(FerretConfig.Action.DECIMATE) ) {
 				script = new File(temp_dir, "ferret_decimate_" + expocode + ".jnl");
 			}
+			else if ( action.equals(FerretConfig.Action.PLOTS) ) {
+				script = new File(temp_dir, "ferret_plots_" + expocode + ".jnl");
+			}
 			else
 				throw new RuntimeException("Unknown action " + action.toString());
 			
 			script_writer = new PrintStream(script);
-
-			if ( secondFilename == null ) {
-				script_writer.println("go " + driver + " \"" + firstFilename + "\"");
-			}
-			else {
-				script_writer.println("go " + driver + " \"" + firstFilename + "\" \"" + secondFilename + "\"");
-			}
+			script_writer.print("go " + driver);
+			for (String scarg : scriptArgs)
+				script_writer.print(" \"" + scarg + "\"");
+			script_writer.println();
 
 			List<String> args = ferret.getArgs();
 		    String interpreter = ferret.getInterpreter();

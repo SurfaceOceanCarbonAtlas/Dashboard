@@ -1,0 +1,59 @@
+
+! Latitude, Longitude vs time and sample number
+
+go preview_setup ($infile_dsg) 2
+
+! First draw a top axis labeled with # obs
+go preview_top_axis
+
+let/title=Latitude lat = reshape(latitude, tt)
+let/title=Longitude lon = reshape(longitude, tt)
+
+! Plot Longitude and Latitude, each with its own vertical axis
+
+set view full
+plot($linestyle)/line/color=blue/axes=0,1,1,0/title=" "/set lat
+  ppl ylab Deg N
+  ppl xlab " "
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+set view full2
+plot($linestyle)/line/color=green/axes=0,1,0,1/title=" "/set lon
+  ppl ylab Deg E
+  ppl xlab " "
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+
+! Make the color key - draw a plot withlines off the page, but 
+! with the Ferret key made by Ferret PLOT/KEY=TITLE
+! Redefine color 2 to blue (and afterwards back to red)
+
+
+set view full3
+ppl color,2,0,0,100
+plot/key=title/color/noax/set/vlim=1000:2000/L=1:5/set lat, lon
+  ppl ylab " "
+  ppl xlab " "
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+PPL PLOT
+
+!def sym lab_top = ($lab($labnum_datitl)) Expocode `EXPOCODE`
+def sym lab_top = Expocode `EXPOCODE`
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+
+! Restore color 2 definition
+ppl color,2,100,0,0

@@ -1,0 +1,84 @@
+! Time Series plots
+
+go preview_setup ($infile_dsg) 11
+
+define view/axes/x=0.1:0.9/y=0.07:0.19 y1
+define view/axes/x=0.1:0.9/y=0.25:0.37 y2
+define view/axes/x=0.1:0.9/y=0.43:0.55 y3
+define view/axes/x=0.1:0.9/y=0.61:0.73 y4
+define view/axes/x=0.1:0.9/y=0.79:0.91 y5
+
+
+let/title=Latitude lat = reshape(latitude, tt)
+let/title=Longitude lon = reshape(longitude, tt)
+let/title=Salinity salin = reshape(sal, tt)
+let/title=Temperature temper = reshape(temp, tt)
+let/title=fCO2_recommended fco2 = reshape(fco2_recommended, tt)
+
+
+set view y1
+plot/noy/color=blue/title=" "($linestyle)/set lat
+  ppl ylab lat
+  ppl xlab " "
+  ppl axatic,,3
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+set view y2
+plot/noy/color=blue/title=" "($linestyle)/set lon
+  ppl ylab long
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+set view y3
+plot/noy/color=blue/title=" "($linestyle)/set salin
+  ppl ylab sal
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+set view y4
+plot/noy/color=blue/title=" "($linestyle)/set temper
+  ppl ylab temp
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+set view y5
+plot/noy/color=blue/title=" "($linestyle)/set fco2
+  ppl ylab fCO2 rec
+  ppl xlab " "
+  ppl axatic,,3
+  ppl txlabp,0
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+
+def sym lab_top = Temporal variations for  Expocode `EXPOCODE`
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.4*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+
+! reset
+ppl txlabp,0
+ppl axatic,5,5
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

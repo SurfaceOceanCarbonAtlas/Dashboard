@@ -16,7 +16,8 @@
         time_limit="10000"
         temp_dir="/var/tmp/socat/"
         compute_driver="calcSOCAT3"
-        decimate_driver="ddsg_socat3">
+        decimate_driver="ddsg_socat3"
+        plots_driver="run_preview">
         <!--
             For PyFerret use:
                 executable="/usr/bin/python2.7"

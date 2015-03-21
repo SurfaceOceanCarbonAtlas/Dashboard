@@ -1,0 +1,56 @@
+! Setup for preview plots
+! Open the dataset, define the output file name
+! Make definitions used by all the scripts
+
+can view
+
+! Open the input dataset
+use "$1"
+
+! Define the plot file name
+DEFINE SYMBOL expocode_str = `expocode`
+DEFINE SYMBOL nplt = $2
+IF `($nplt) LT 10` then DEFINE SYMBOL nplt = 0($nplt)
+
+DEFINE SYMBOL result_plot_image_filename = ($result_directory)/($expocode_str)_($nplt).png
+
+! Redefine the GIF-image file name, which prevents name clashes when there
+! are multiple sessions.
+
+DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)_($session_pid)
+SET GIFFILE "($gifplot_name)"
+
+! Further setup, done once for all the outputs
+
+IF ($preview_setup_done"0|*>1") THEN exit/script
+
+can mode logo
+
+ppl txlsze,0.08
+ppl axlsze,0.08,0.08
+
+! reset the green pen to a darker green...
+ppl color,3,0,70,0      ! dark green
+
+! Define time axis
+DEFINE AXIS/T/T0=1-jan-1969/UNITS=seconds tax = time
+let tt = t[gt=tax]; 
+let tt1 = `tt[l=@min]`
+let ttn = `tt[l=@max]`
+LET monthsecs = 30*24*60*60
+IF `ttn-tt1 GT monthsecs` THEN DEFINE SYMBOL taxis_setting = PPL txtype,MON,DMY
+
+define view/x=0:1/y=0:1 full0
+define view/x=0:1/y=0:1 full1
+define view/x=0:1/y=0:1 full2
+define view/x=0:1/y=0:1 full3
+
+cancel mode nodata_label
+
+! line plots (except for Prop-Prop plots)
+CANCEL SYMBOL linestyle
+
+! or LINE/SYMBOL=
+DEFINE SYMBOL linestyle = /SYMBOL=17
+
+DEFINE SYMBOL preview_setup_done = 1

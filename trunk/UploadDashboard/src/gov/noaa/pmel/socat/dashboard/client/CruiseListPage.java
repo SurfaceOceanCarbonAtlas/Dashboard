@@ -130,7 +130,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String FOR_ADDL_DOCS_ERR_END = 
 			"for managing supplemental documents.";
 	private static final String FOR_PREVIEW_ERR_END = 
-			"for previewing data plots.";
+			"for dataset preview.";
 	private static final String FOR_QC_SUBMIT_ERR_END =
 			"for submitting for QC and archival.";
 	private static final String FOR_DELETE_ERR_END = 

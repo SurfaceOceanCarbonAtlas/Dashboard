@@ -1,0 +1,18 @@
+! Map with trajectory track
+
+GO preview_setup ($infile_dsg) 1
+
+DEFINE SYMBOL lonlatcolor = blue
+
+SET VIEW full
+GO margins 1,0.7,0.7,0.7
+
+GO preview_map
+
+! Label at the top with the Expocode and count
+LET nobs = `lat[i=@ngd]`
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`<NL>Count: `nobs` locations
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

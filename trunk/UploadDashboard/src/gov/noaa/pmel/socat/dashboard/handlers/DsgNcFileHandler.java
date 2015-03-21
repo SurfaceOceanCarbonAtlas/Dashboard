@@ -179,7 +179,9 @@ public class DsgNcFileHandler {
 
 		// Call Ferret to add the computed variables to the NetCDF DSG file
 		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
-		tool.init(dsgFile.getPath(), null, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
+		ArrayList<String> scriptArgs = new ArrayList<String>(1);
+		scriptArgs.add(dsgFile.getPath());
+		tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
 		tool.run();
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure adding computed variables: " + 
@@ -229,7 +231,10 @@ public class DsgNcFileHandler {
 
 		// Call Ferret to create the decimated DSG file from the full DSG file
 		SocatTool tool = new SocatTool(dataStore.getFerretConfig());
-		tool.init(dsgFile.getPath(), decDsgFile.getPath(), expocode, FerretConfig.Action.DECIMATE);
+		ArrayList<String> scriptArgs = new ArrayList<String>(2);
+		scriptArgs.add(dsgFile.getPath());
+		scriptArgs.add(decDsgFile.getPath());
+		tool.init(scriptArgs, expocode, FerretConfig.Action.DECIMATE);
 		tool.run();
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure decimating the full DSG file: " + 

@@ -14,36 +14,88 @@
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
-			<g:TabLayoutPanel barUnit='EM' barHeight='3'>
-				<g:tab>
-					<g:header size='10'><b>Location</b></g:header>
-					<g:FlowPanel>
-						<g:Image addStyleNames="{style.previewimage}" ui:field="latVsLonImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="latLonVsNumImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="dayYearVsNumImage" />
-					</g:FlowPanel>
-				</g:tab>
-				<g:tab>
-					<g:header size='10'><b>Data</b></g:header>
-					<g:FlowPanel>
-						<g:Image addStyleNames="{style.previewimage}" ui:field="timeSeriesImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="pressuresVsNumImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="temperaturesVsNumImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="xco2sVsNumImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="salinitiesVsNumImage" />
-					</g:FlowPanel>
-				</g:tab>
-				<g:tab>
-					<g:header size='10'><b>fCO2_rec</b></g:header>
-					<g:FlowPanel>
-						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsNumImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsSstImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsSalImage" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recVsFco2Image" />
-						<g:Image addStyleNames="{style.previewimage}" ui:field="fco2recSrcHistogramImage" />
-					</g:FlowPanel>
-				</g:tab>
-			</g:TabLayoutPanel>
+			<g:ResizeLayoutPanel addStyleNames="{style.plotspanel}" >
+				<g:TabLayoutPanel barUnit='EM' barHeight='2'>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="latVsLonHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="latVsLonImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="latLonHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="latLonImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="dayYearHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="dayYearImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="timeSeriesHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="timeSeriesImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="pressuresHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="pressuresImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="temperaturesHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="temperaturesImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="salinitiesHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="salinitiesImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="xco2sHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="xco2sImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsTimeHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsTimeImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsSstHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsSstImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsSalHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsSalImage" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsFco2Html" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsFco2Image" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2MethodHtml" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2MethodImage" />
+					</g:tab>
+				</g:TabLayoutPanel>
+			</g:ResizeLayoutPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton" />
 			</g:FlowPanel>

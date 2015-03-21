@@ -1,0 +1,91 @@
+! Difference between reported and recalculated fCO_2
+
+
+GO preview_setup.jnl ($infile_dsg) 13
+
+
+LET var_sources = {\
+"xCO2_water_equi_temp_dry_ppm", \
+"xCO2_water_sst_dry_ppm", \
+"pCO2_water_equi_temp", \
+"pCO2_water_sst_100humidity_uatm", \
+"fCO2_water_equi_uatm", \
+"fCO2_water_sst_100humidity_uatm", \
+"pCO2_water_equi_temp", \
+"pCO2_water_sst_100humidity_uatm", \
+"xCO2_water_equi_temp_dry_ppm", \
+"xCO2_water_sst_dry_ppm", \
+"xCO2_water_equi_temp_dry_ppm", \
+"xCO2_water_sst_dry_ppm", \
+"xCO2_water_equi_temp_dry_ppm", \
+"xCO2_water_sst_dry_ppm"}
+
+! We compute the fco2_source in calcSOCAT3.jnl
+!  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even
+!  if the values of xCO2_water_equi_temp_dry_ppm are valid, because the computed
+!  fCO2_insitu variable also depends on temperature and temperature_equi.)
+!
+
+LET vsrc1 = IF fco2_source EQ 1 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc2 = IF fco2_source EQ 2 THEN xCO2_water_sst_dry_ppm ELSE 0
+LET vsrc3 = IF fco2_source EQ 3 THEN pCO2_water_equi_temp ELSE 0
+LET vsrc4 = IF fco2_source EQ 4 THEN pCO2_water_sst_100humidity_uatm ELSE 0
+LET vsrc5 = IF fco2_source EQ 5 THEN fCO2_water_equi_uatm ELSE 0
+LET vsrc6 = IF fco2_source EQ 6 THEN fCO2_water_sst_100humidity_uatm ELSE 0
+LET vsrc7 = IF fco2_source EQ 7 THEN pCO2_water_equi_temp ELSE 0
+LET vsrc8 = IF fco2_source EQ 8 THEN pCO2_water_sst_100humidity_uatm ELSE 0
+LET vsrc9 = IF fco2_source EQ 9 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc10 = IF fco2_source EQ 10 THEN xCO2_water_sst_dry_ppm ELSE 0
+LET vsrc11 = IF fco2_source EQ 11 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc12 = IF fco2_source EQ 12 THEN xCO2_water_sst_dry_ppm ELSE 0
+LET vsrc13 = IF fco2_source EQ 13 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
+LET vsrc14 = IF fco2_source EQ 14 THEN xCO2_water_sst_dry_ppm ELSE 0
+
+LET sources = vsrc1 + vsrc2 + vsrc3 + vsrc4 + vsrc5 + vsrc6 + vsrc7 + vsrc8 + vsrc9 + vsrc10 + vsrc11 + vsrc12 + vsrc13 + vsrc14
+
+LET mask = IF fco2_source THEN 1
+
+LET masksource = sources* mask
+
+LET diff = fco2_recommended - masksource
+LET diff_t = reshape( diff, tt)
+LET fco2_t = reshape(fco2_recommended, tt)
+LET source_t = reshape (masksource, tt)
+LET alg_id_t = reshape (fco2_source, tt)
+
+SET VIEW FULL
+
+LET use_color = `fco2_source[i=@min] NE fco2_source[i=@max]`
+
+IF `use_color` THEN
+
+   PLOT($linestyle)/SIZ=0.12/RIBBON/PAL=fifteen_by_levels/LEV=(1,15,1)/KEY=cent/AXES=0,1,1,1/\
+   TITLE="@SRDifference between reported and recalculated fCO_2<nl>Colored by source id "/SET diff_t, alg_id_t
+     PPL YLAB " "
+     PPL XLAB " "
+     ($taxis_setting)
+     IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
+     IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+     IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+   PPL RIBBON
+
+ELSE 
+   PLOT($linestyle)/COLOR=BLUE/AXES=0,1,1,1/SET diff_t
+     PPL ylab " "
+     PPL xlab " "
+     PPL title "Difference between reported and recalculated fCO_2<NL>Source is `fco2_source[i=@min]`"
+     ($taxis_setting)
+     IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
+     IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+     IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+   PPL plot
+ENDIF
+
+GO preview_top_axis
+
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.8*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+
