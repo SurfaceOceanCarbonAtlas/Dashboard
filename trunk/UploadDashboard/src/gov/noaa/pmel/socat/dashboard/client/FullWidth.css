@@ -152,8 +152,8 @@ body {
 
 .plotspanel {
 	display: block;
-	width: 800px;
-	height: 800px;
+	width: 85em;
+	height: 700px;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }

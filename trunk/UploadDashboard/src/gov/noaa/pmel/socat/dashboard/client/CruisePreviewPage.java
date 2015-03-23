@@ -48,8 +48,8 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String PLOT_GENERATION_FAILURE_HTML = "<b>Problems generating the plot previews</b>";
 
 	private static final String LAT_VS_LON_TAB_TEXT = "lat vs lon";
-	private static final String LAT_LON_TAB_TEXT = "lat,lon";
-	private static final String DAY_YEAR_TAB_TEXT = "day,year";
+	private static final String LAT_LON_TAB_TEXT = "lat, lon";
+	private static final String DAY_YEAR_TAB_TEXT = "day, year";
 	private static final String TIME_SERIES_TAB_TEXT = "time series";
 	private static final String PRESSURES_TAB_TEXT = "pressures";
 	private static final String TEMPERATURES_TAB_TEXT = "temperatures";
@@ -64,16 +64,16 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
 	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
 	private static final String DAY_YEAR_ALT_TEXT = "day of year, year versus time";
-	private static final String TIME_SERIES_ALT_TEXT = "fCO2_rec, SST, sal, lon, lat versus time";
+	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
 	private static final String PRESSURES_ALT_TEXT = "pressures versus time";
 	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
 	private static final String SALINITIES_ALT_TEXT = "salinities versus time";
 	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time";
 	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time";
-	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus SST";
+	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
 	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
 	private static final String REC_FCO2_VS_FCO2_ALT_TEXT = "recommended fCO2 versus given fCO2";
-	private static final String REC_FCO2_METHOD_ALT_TEXT = "histogram of recommended fCO2 computation method";
+	private static final String REC_FCO2_METHOD_ALT_TEXT = "histogram of computation methods for recommended fCO2";
 
 	private static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
 	private static final String LAT_LON_IMAGE_NAME = "lat_lon";
