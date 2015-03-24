@@ -90,9 +90,9 @@
 					</g:tab>
 					<g:tab>
 						<g:customHeader>
-							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2MethodHtml" />
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2SourcesHtml" />
 						</g:customHeader>
-						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2MethodImage" />
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2SourcesImage" />
 					</g:tab>
 				</g:TabLayoutPanel>
 			</g:ResizeLayoutPanel>
