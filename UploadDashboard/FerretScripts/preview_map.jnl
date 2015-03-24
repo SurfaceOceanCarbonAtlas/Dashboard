@@ -71,4 +71,4 @@ DEFINE SYMBOL land_palette = gray_light
 
 GO preview_fland ($land_palette)
 
-PLOT/VS/OVER/NOLAB/NOKEY/SYM=17/SIZE=0.12/COLOR=($lonlatcolor"red") lon, lat
+PLOT/VS/OVER/NOLAB/NOKEY($linestyle)/SIZE=0.12/COLOR=($lonlatcolor"blue") lon, lat

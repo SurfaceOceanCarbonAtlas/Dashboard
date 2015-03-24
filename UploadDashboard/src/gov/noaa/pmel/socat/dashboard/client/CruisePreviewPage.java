@@ -43,6 +43,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String INTRO_HTML_PROLOGUE = 
 			"Plots of the dataset: ";
 
+	private static final String REFRESH_TEXT = "Refresh plots";
 	private static final String DISMISS_TEXT = "Done";
 
 	private static final String PLOT_GENERATION_FAILURE_HTML = "<b>Problems generating the plot previews</b>";
@@ -101,7 +102,8 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
-	@UiField HTML introHtml; 
+	@UiField HTML introHtml;
+	@UiField Button refreshButton;
 	@UiField Button dismissButton;
 
 	@UiField HTML latVsLonHtml;
@@ -175,6 +177,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
+		refreshButton.setText(REFRESH_TEXT);
 		dismissButton.setText(DISMISS_TEXT);
 
 		// Set the HTML for the tabs
@@ -324,6 +327,12 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsSalImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SAL_IMAGE_NAME + imageSuffix));
 		recFco2DeltaImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_DELTA_IMAGE_NAME + imageSuffix));
 		recFco2SourcesImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_SOURCES_IMAGE_NAME + imageSuffix));
+	}
+
+	@UiHandler("refreshButton")
+	void refreshOnClick(ClickEvent event) {
+		// Reload the images by setting the URLs again
+		resetImageUrls();
 	}
 
 	@UiHandler("logoutButton")

@@ -97,6 +97,7 @@
 				</g:TabLayoutPanel>
 			</g:ResizeLayoutPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="refreshButton" />
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="dismissButton" />
 			</g:FlowPanel>
 		</g:FlowPanel>
