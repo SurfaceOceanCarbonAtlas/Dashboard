@@ -271,7 +271,6 @@ LET srck = IF srcj THEN srcj ELSE src12
 LET srcl = IF srck THEN srck ELSE src13
 LET/bad=999 fco2_src = IF srcl THEN srcl ELSE src14
 
-
 ! More variables to add: etopoDepth, d2l, region_id, gvCO2
 
 GO SOCAT3_ETOPO2_depth

@@ -58,7 +58,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REC_FCO2_VS_TIME_TAB_TEXT = "rec fCO<sub>2</sub> vs time";
 	private static final String REC_FCO2_VS_SST_TAB_TEXT = "rec fCO<sub>2</sub> vs SST";
 	private static final String REC_FCO2_VS_SAL_TAB_TEXT = "rec fCO<sub>2</sub> vs sal";
-	private static final String REC_FCO2_VS_FCO2_TAB_TEXT = "rec fCO<sub>2</sub> vs fCO<sub>2</sub>";
+	private static final String REC_FCO2_DELTA_TAB_TEXT = "rec fCO<sub>2</sub> delta";
 	private static final String REC_FCO2_METHOD_TAB_TEXT = "rec fCO<sub>2</sub> method";
 
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
@@ -72,22 +72,22 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time";
 	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
 	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
-	private static final String REC_FCO2_VS_FCO2_ALT_TEXT = "recommended fCO2 versus given fCO2";
+	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus given fCO2";
 	private static final String REC_FCO2_METHOD_ALT_TEXT = "histogram of computation methods for recommended fCO2";
 
-	private static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
-	private static final String LAT_LON_IMAGE_NAME = "lat_lon";
-	private static final String DAY_YEAR_IMAGE_NAME = "day_year";
-	private static final String TIME_SERIES_IMAGE_NAME = "time_series";
-	private static final String PRESSURES_IMAGE_NAME = "pressures";
-	private static final String TEMPERATURES_IMAGE_NAME = "temperatures";
-	private static final String SALINITIES_IMAGE_NAME = "salinities";
-	private static final String XCO2S_IMAGE_NAME = "xco2s";
-	private static final String REC_FCO2_VS_TIME_IMAGE_NAME = "rec_fco2_vs_time";
-	private static final String REC_FCO2_VS_SST_IMAGE_NAME = "rec_fco2_vs_sst";
-	private static final String REC_FCO2_VS_SAL_IMAGE_NAME = "rec_fco2_vs_sal";
-	private static final String REC_FCO2_VS_FCO2_IMAGE_NAME = "rec_fco2_vs_fco2";
-	private static final String REC_FCO2_METHOD_IMAGE_NAME = "rec_fco2_method";
+	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
+	public static final String LAT_LON_IMAGE_NAME = "lat_lon";
+	public static final String DAY_YEAR_IMAGE_NAME = "day_year";
+	public static final String TIME_SERIES_IMAGE_NAME = "time_series";
+	public static final String PRESSURES_IMAGE_NAME = "pressures";
+	public static final String TEMPERATURES_IMAGE_NAME = "temperatures";
+	public static final String SALINITIES_IMAGE_NAME = "salinities";
+	public static final String XCO2S_IMAGE_NAME = "xco2s";
+	public static final String REC_FCO2_VS_TIME_IMAGE_NAME = "rec_fco2_vs_time";
+	public static final String REC_FCO2_VS_SST_IMAGE_NAME = "rec_fco2_vs_sst";
+	public static final String REC_FCO2_VS_SAL_IMAGE_NAME = "rec_fco2_vs_sal";
+	public static final String REC_FCO2_DELTA_IMAGE_NAME = "rec_fco2_delta";
+	public static final String REC_FCO2_METHOD_IMAGE_NAME = "rec_fco2_method";
 
 	interface CruisePreviewPageUiBinder extends UiBinder<Widget, CruisePreviewPage> {
 	}
@@ -115,7 +115,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField HTML recFco2VsTimeHtml;
 	@UiField HTML recFco2VsSstHtml;
 	@UiField HTML recFco2VsSalHtml;
-	@UiField HTML recFco2VsFco2Html;
+	@UiField HTML recFco2DeltaHtml;
 	@UiField HTML recFco2MethodHtml;
 
 	@UiField Image latVsLonImage;
@@ -129,7 +129,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField Image recFco2VsTimeImage;
 	@UiField Image recFco2VsSstImage;
 	@UiField Image recFco2VsSalImage;
-	@UiField Image recFco2VsFco2Image;
+	@UiField Image recFco2DeltaImage;
 	@UiField Image recFco2MethodImage;
 
 	String expocode;
@@ -150,6 +150,9 @@ public class CruisePreviewPage extends CompositeWithUsername {
 			@Override
 			public void onSuccess(Boolean isDone) {
 				if ( SocatUploadDashboard.isCurrentPage(singleton) ) {
+					if ( isDone ) {
+						SocatUploadDashboard.showAutoCursor();
+					}
 					// Refresh this page to get the new image(s)
 					singleton.resetImageUrls();
 					if ( ! isDone ) {
@@ -162,6 +165,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 			@Override
 			public void onFailure(Throwable ex) {
 				if ( SocatUploadDashboard.isCurrentPage(singleton) ) {
+					SocatUploadDashboard.showAutoCursor();
 					singleton.resetImageUrls();
 					SocatUploadDashboard.showFailureMessage(PLOT_GENERATION_FAILURE_HTML, ex);
 				}
@@ -173,6 +177,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 
 		dismissButton.setText(DISMISS_TEXT);
 
+		// Set the HTML for the tabs
 		latVsLonHtml.setHTML(LAT_VS_LON_TAB_TEXT);
 		latLonHtml.setHTML(LAT_LON_TAB_TEXT);
 		dayYearHtml.setHTML(DAY_YEAR_TAB_TEXT);
@@ -184,8 +189,23 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsTimeHtml.setHTML(REC_FCO2_VS_TIME_TAB_TEXT);
 		recFco2VsSstHtml.setHTML(REC_FCO2_VS_SST_TAB_TEXT);
 		recFco2VsSalHtml.setHTML(REC_FCO2_VS_SAL_TAB_TEXT);
-		recFco2VsFco2Html.setHTML(REC_FCO2_VS_FCO2_TAB_TEXT);
+		recFco2DeltaHtml.setHTML(REC_FCO2_DELTA_TAB_TEXT);
 		recFco2MethodHtml.setHTML(REC_FCO2_METHOD_TAB_TEXT);
+
+		// Set hover helps for the tabs
+		latVsLonHtml.setTitle(LAT_VS_LON_ALT_TEXT);
+		latLonHtml.setTitle(LAT_LON_ALT_TEXT);
+		dayYearHtml.setTitle(DAY_YEAR_ALT_TEXT);
+		timeSeriesHtml.setTitle(TIME_SERIES_ALT_TEXT);
+		pressuresHtml.setTitle(PRESSURES_ALT_TEXT);
+		temperaturesHtml.setTitle(TEMPERATURES_ALT_TEXT);
+		salinitiesHtml.setTitle(SALINITIES_ALT_TEXT);
+		xco2sHtml.setTitle(XCO2S_ALT_TEXT);
+		recFco2VsTimeHtml.setTitle(REC_FCO2_VS_TIME_ALT_TEXT);
+		recFco2VsSstHtml.setTitle(REC_CO2_VS_SST_ALT_TEXT);
+		recFco2VsSalHtml.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
+		recFco2DeltaHtml.setTitle(REC_FCO2_DELTA_ALT_TEXT);
+		recFco2MethodHtml.setTitle(REC_FCO2_METHOD_ALT_TEXT);
 
 		// Set text alternative for the images
 		latVsLonImage.setAltText(LAT_VS_LON_ALT_TEXT);
@@ -199,8 +219,23 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsTimeImage.setAltText(REC_FCO2_VS_TIME_ALT_TEXT);
 		recFco2VsSstImage.setAltText(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalImage.setAltText(REC_FCO2_VS_SAL_ALT_TEXT);
-		recFco2VsFco2Image.setAltText(REC_FCO2_VS_FCO2_ALT_TEXT);
+		recFco2DeltaImage.setAltText(REC_FCO2_DELTA_ALT_TEXT);
 		recFco2MethodImage.setAltText(REC_FCO2_METHOD_ALT_TEXT);
+
+		// Set hover helps for the images
+		latVsLonImage.setTitle(LAT_VS_LON_ALT_TEXT);
+		latLonImage.setTitle(LAT_LON_ALT_TEXT);
+		dayYearImage.setTitle(DAY_YEAR_ALT_TEXT);
+		timeSeriesImage.setTitle(TIME_SERIES_ALT_TEXT);
+		pressuresImage.setTitle(PRESSURES_ALT_TEXT);
+		temperaturesImage.setTitle(TEMPERATURES_ALT_TEXT);
+		salinitiesImage.setTitle(SALINITIES_ALT_TEXT);
+		xco2sImage.setTitle(XCO2S_ALT_TEXT);
+		recFco2VsTimeImage.setTitle(REC_FCO2_VS_TIME_ALT_TEXT);
+		recFco2VsSstImage.setTitle(REC_CO2_VS_SST_ALT_TEXT);
+		recFco2VsSalImage.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
+		recFco2DeltaImage.setTitle(REC_FCO2_DELTA_ALT_TEXT);
+		recFco2MethodImage.setTitle(REC_FCO2_METHOD_ALT_TEXT);
 	}
 
 	/**
@@ -251,6 +286,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + SafeHtmlUtils.htmlEscape(this.expocode));
 		if ( this.expocode.length() > 11 ) {
 			// Tell the server to generate the preview plots
+			SocatUploadDashboard.showWaitCursor();
 			DateTimeFormat formatter = DateTimeFormat.getFormat("MMddHHmmss");
 			this.timetag = formatter.format(new Date(), TimeZone.createTimeZone(0));
 			service.buildPreviewImages(getUsername(), this.expocode, 
@@ -286,7 +322,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsTimeImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_TIME_IMAGE_NAME + imageSuffix));
 		recFco2VsSstImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SST_IMAGE_NAME + imageSuffix));
 		recFco2VsSalImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SAL_IMAGE_NAME + imageSuffix));
-		recFco2VsFco2Image.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_FCO2_IMAGE_NAME + imageSuffix));
+		recFco2DeltaImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_DELTA_IMAGE_NAME + imageSuffix));
 		recFco2MethodImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_METHOD_IMAGE_NAME + imageSuffix));
 	}
 

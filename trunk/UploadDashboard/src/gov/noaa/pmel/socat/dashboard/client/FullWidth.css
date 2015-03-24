@@ -152,8 +152,8 @@ body {
 
 .plotspanel {
 	display: block;
-	width: 85em;
-	height: 700px;
+	width: 80em;
+	height: 710px;
 	margin-top: 1em;
 	margin-bottom: 1em;
 }
@@ -162,7 +162,7 @@ body {
 }
 .plotsimage {
 	display: inline;
-	margin: 1em;
+	margin: 0em;
 }
 
 .previewbutton {

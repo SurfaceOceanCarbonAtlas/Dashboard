@@ -13,7 +13,7 @@ go preview_top_axis
 ! Plot temperature variables each with its own vertical axis
 
 
-let/title="temp intake" tempr = reshape(temp, tt)
+let/title="Temp intake" tempr = reshape(temp, tt)
 let/title="Temp diff" dtemp = reshape(delta_temp, tt)
 let/title="Temp equ" itemp = reshape(temperature_equi, tt)
 

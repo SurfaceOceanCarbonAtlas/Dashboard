@@ -48,12 +48,12 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
 public class DashboardDataStore {
 
 	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
-	private static final String LOGGER_CONFIG_RELATIVE_FILENAME = "content" +
-			File.separator + SERVER_APP_NAME + File.separator + "log4j.properties";
+	private static final String LOGGER_CONFIG_RELATIVE_FILENAME = "content" + File.separator + 
+			SERVER_APP_NAME + File.separator + "log4j.properties";
 	private static final String CONFIG_RELATIVE_FILENAME = "content" + File.separator + 
 			SERVER_APP_NAME + File.separator + "SocatUploadDashboard.properties";
-	private static final String WEBINF_RELATIVE_FILENAME = "webapps" +
-			File.separator + SERVER_APP_NAME + File.separator + "WEB-INF";
+	private static final String PREVIEW_RELATIVE_DIRNAME = "webapps" + File.separator + 
+			SERVER_APP_NAME + File.separator + "preview" + File.separator;
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
 	private static final String SOCAT_UPLOAD_VERSION_NAME_TAG = "SocatUploadVersion";
@@ -397,8 +397,7 @@ public class DashboardDataStore {
 		}
 
 		// The PreviewPlotsHandler uses the various handlers just created
-		String previewDirname = baseDir + File.separator + WEBINF_RELATIVE_FILENAME + 
-				File.separator + "preview" + File.separator;
+		String previewDirname = baseDir + File.separator + PREVIEW_RELATIVE_DIRNAME;
 		plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles", 
 				previewDirname + "plots", this);
 

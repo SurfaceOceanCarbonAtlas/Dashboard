@@ -47,7 +47,7 @@ DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_re
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
 GO preview_13
-DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_rec_fco2_vs_fco2_($result_time_tag).gif
+DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_rec_fco2_delta_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
 GO preview_12
