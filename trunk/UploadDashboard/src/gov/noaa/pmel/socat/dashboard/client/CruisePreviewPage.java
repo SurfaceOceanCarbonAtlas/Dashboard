@@ -59,7 +59,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REC_FCO2_VS_SST_TAB_TEXT = "rec fCO<sub>2</sub> vs SST";
 	private static final String REC_FCO2_VS_SAL_TAB_TEXT = "rec fCO<sub>2</sub> vs sal";
 	private static final String REC_FCO2_DELTA_TAB_TEXT = "rec fCO<sub>2</sub> delta";
-	private static final String REC_FCO2_METHOD_TAB_TEXT = "rec fCO<sub>2</sub> method";
+	private static final String REC_FCO2_SOURCES_TAB_TEXT = "rec fCO<sub>2</sub> sources";
 
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
 	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
@@ -73,7 +73,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
 	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
 	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus given fCO2";
-	private static final String REC_FCO2_METHOD_ALT_TEXT = "histogram of computation methods for recommended fCO2";
+	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2";
 
 	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
 	public static final String LAT_LON_IMAGE_NAME = "lat_lon";
@@ -87,7 +87,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	public static final String REC_FCO2_VS_SST_IMAGE_NAME = "rec_fco2_vs_sst";
 	public static final String REC_FCO2_VS_SAL_IMAGE_NAME = "rec_fco2_vs_sal";
 	public static final String REC_FCO2_DELTA_IMAGE_NAME = "rec_fco2_delta";
-	public static final String REC_FCO2_METHOD_IMAGE_NAME = "rec_fco2_method";
+	public static final String REC_FCO2_SOURCES_IMAGE_NAME = "rec_fco2_sources";
 
 	interface CruisePreviewPageUiBinder extends UiBinder<Widget, CruisePreviewPage> {
 	}
@@ -116,7 +116,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField HTML recFco2VsSstHtml;
 	@UiField HTML recFco2VsSalHtml;
 	@UiField HTML recFco2DeltaHtml;
-	@UiField HTML recFco2MethodHtml;
+	@UiField HTML recFco2SourcesHtml;
 
 	@UiField Image latVsLonImage;
 	@UiField Image latLonImage;
@@ -130,7 +130,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField Image recFco2VsSstImage;
 	@UiField Image recFco2VsSalImage;
 	@UiField Image recFco2DeltaImage;
-	@UiField Image recFco2MethodImage;
+	@UiField Image recFco2SourcesImage;
 
 	String expocode;
 	String timetag;
@@ -190,7 +190,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsSstHtml.setHTML(REC_FCO2_VS_SST_TAB_TEXT);
 		recFco2VsSalHtml.setHTML(REC_FCO2_VS_SAL_TAB_TEXT);
 		recFco2DeltaHtml.setHTML(REC_FCO2_DELTA_TAB_TEXT);
-		recFco2MethodHtml.setHTML(REC_FCO2_METHOD_TAB_TEXT);
+		recFco2SourcesHtml.setHTML(REC_FCO2_SOURCES_TAB_TEXT);
 
 		// Set hover helps for the tabs
 		latVsLonHtml.setTitle(LAT_VS_LON_ALT_TEXT);
@@ -205,7 +205,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsSstHtml.setTitle(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalHtml.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
 		recFco2DeltaHtml.setTitle(REC_FCO2_DELTA_ALT_TEXT);
-		recFco2MethodHtml.setTitle(REC_FCO2_METHOD_ALT_TEXT);
+		recFco2SourcesHtml.setTitle(REC_FCO2_SOURCES_ALT_TEXT);
 
 		// Set text alternative for the images
 		latVsLonImage.setAltText(LAT_VS_LON_ALT_TEXT);
@@ -220,7 +220,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsSstImage.setAltText(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalImage.setAltText(REC_FCO2_VS_SAL_ALT_TEXT);
 		recFco2DeltaImage.setAltText(REC_FCO2_DELTA_ALT_TEXT);
-		recFco2MethodImage.setAltText(REC_FCO2_METHOD_ALT_TEXT);
+		recFco2SourcesImage.setAltText(REC_FCO2_SOURCES_ALT_TEXT);
 
 		// Set hover helps for the images
 		latVsLonImage.setTitle(LAT_VS_LON_ALT_TEXT);
@@ -235,7 +235,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsSstImage.setTitle(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalImage.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
 		recFco2DeltaImage.setTitle(REC_FCO2_DELTA_ALT_TEXT);
-		recFco2MethodImage.setTitle(REC_FCO2_METHOD_ALT_TEXT);
+		recFco2SourcesImage.setTitle(REC_FCO2_SOURCES_ALT_TEXT);
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2VsSstImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SST_IMAGE_NAME + imageSuffix));
 		recFco2VsSalImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SAL_IMAGE_NAME + imageSuffix));
 		recFco2DeltaImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_DELTA_IMAGE_NAME + imageSuffix));
-		recFco2MethodImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_METHOD_IMAGE_NAME + imageSuffix));
+		recFco2SourcesImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_SOURCES_IMAGE_NAME + imageSuffix));
 	}
 
 	@UiHandler("logoutButton")

@@ -50,9 +50,9 @@ public class PreviewPlotsHandlerTest {
 				CruisePreviewPage.REC_FCO2_VS_SST_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_VS_SAL_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_DELTA_IMAGE_NAME,
-				CruisePreviewPage.REC_FCO2_METHOD_IMAGE_NAME } ) {
+				CruisePreviewPage.REC_FCO2_SOURCES_IMAGE_NAME } ) {
 			plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + ".gif");
-			assertTrue( plotFile.exists() );
+			assertTrue( "Plot for " + imgName + " does not exist", plotFile.exists() );
 			plotFile.delete();
 		}
 	}
