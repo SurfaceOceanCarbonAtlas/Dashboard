@@ -8,15 +8,21 @@ go preview_top_axis
 ! Plot  Year and day-of-year, each with its own vertical axis
 
 
-let/title=Year yr = tax_year (tt,tt)
+let/title=Year yr = TAX_YEAR (tt,tt)
 let/title="Day of Year" day = reshape(day_of_year, tt)
 
 
 ! Year
 
 set view full
-let ax1 = `yr[L=@min]-1`
-let ax2 = `yr[L=@max]+1`
+let tt1 = tt[L=1]
+let ttn = tt[L=@max]
+let ax1 = `tax_year(tt1,tt1)-1`
+let ax2 = `tax_year(ttn,ttn)+1`
+
+! If there's just one year, no need to evaluate function TAX_YEAR for the whole series
+IF `tax_year(tt1,tt1) EQ tax_year(ttn,ttn)` THEN let/title=Year yr = `tax_year(tt1,tt1)` + 0*tt
+
 let dy = 1
 let yint = 1
 if `ax2-ax1 GT 6` then 

@@ -8,9 +8,9 @@ go preview_top_axis
 set view full
 ! Plot pressure variables each with its own vertical axis
 
-let/title="@P2@ASP_NCEP" P_NCEP =  reshape(pressure_ncep_slp, tt)
-let/title="@P3@ASP_atm" patm = reshape(Pressure_atm, tt)
-let/title="@P4@ASP_equi" pequi =  reshape(Pressure_equi, tt)
+let/title="@ASP_NCEP" P_NCEP =  reshape(pressure_ncep_slp, tt)
+let/title="@ASP_atm" patm = reshape(Pressure_atm, tt)
+let/title="@ASP_equi" pequi =  reshape(Pressure_equi, tt)
 
 
 

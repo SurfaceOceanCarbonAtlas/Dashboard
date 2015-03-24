@@ -1,4 +1,5 @@
 ! Time Series plots
+set mem/siz=60
 
 go preview_setup ($infile_dsg) 11
 
@@ -15,9 +16,8 @@ let/title=Salinity salin = reshape(sal, tt)
 let/title=Temperature temper = reshape(temp, tt)
 let/title=fCO2_recommended fco2 = reshape(fco2_recommended, tt)
 
-
 set view y1
-plot/noy/color=blue/title=" "($linestyle)/set lat
+plot/noy/color=blue/title=" "($linestyle)/line/set lat
   ppl ylab lat
   ppl xlab " "
   ppl axatic,,3
@@ -28,7 +28,7 @@ plot/noy/color=blue/title=" "($linestyle)/set lat
 ppl plot
 
 set view y2
-plot/noy/color=blue/title=" "($linestyle)/set lon
+plot/noy/color=blue/title=" "($linestyle)/line/set lon
   ppl ylab long
   ppl xlab " "
   ppl axatic,,3
@@ -39,7 +39,7 @@ plot/noy/color=blue/title=" "($linestyle)/set lon
 ppl plot
 
 set view y3
-plot/noy/color=blue/title=" "($linestyle)/set salin
+plot/noy/color=blue/title=" "($linestyle)/line/set salin
   ppl ylab sal
   ppl xlab " "
   ppl axatic,,3
@@ -50,7 +50,7 @@ plot/noy/color=blue/title=" "($linestyle)/set salin
 ppl plot
 
 set view y4
-plot/noy/color=blue/title=" "($linestyle)/set temper
+plot/noy/color=blue/title=" "($linestyle)/line/set temper
   ppl ylab temp
   ppl xlab " "
   ppl axatic,,3
@@ -61,7 +61,7 @@ plot/noy/color=blue/title=" "($linestyle)/set temper
 ppl plot
 
 set view y5
-plot/noy/color=blue/title=" "($linestyle)/set fco2
+plot/noy/color=blue/title=" "($linestyle)/line/set fco2
   ppl ylab fCO2 rec
   ppl xlab " "
   ppl axatic,,3
