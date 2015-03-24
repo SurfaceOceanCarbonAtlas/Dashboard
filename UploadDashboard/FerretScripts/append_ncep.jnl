@@ -1,0 +1,31 @@
+! append_ncep.jnl
+! Data downloaded from http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
+! Add an offset and fix the missing-value flag so that the data can be saved as SHORT
+
+set mem/siz=300
+def sym offst = 119765
+def sym newbad = `32766+($offst)`
+
+use "/home/data/socat/ncep_slp_new/slp.1968.nc"
+
+! Replace the bad-flag
+set var/name=slp_in slp
+let/bad=($newbad)/units="`slp_in,return=units`"/title="`slp_in,return=title`"  slp = missing(slp_in, ($newbad))
+
+! set up scale and offset
+def att/output slp.scale_factor = 1
+def att/output slp.add_offset = ($offst)
+
+! keep the input attributes; title, units, etc
+set att/output=all slp
+save/clobber/file="/home/data/socat/ncep_slp_new/ncep_slp.nc"/outtype=short slp
+
+repeat/range=1969:2014/name=yr (\
+can dat/all; can var/all;\
+use "/home/data/socat/ncep_slp_new/slp.`yr`.nc";\
+set var/name=slp_in slp;\
+let/bad=($newbad) slp = missing(slp_in, ($newbad));\
+def att/output slp.scale_factor = 1;\
+def att/output slp.add_offset = ($offst);\
+set att/output=all slp;\
+save/append/file= "/home/data/socat/ncep_slp_new/ncep_slp.nc"/outtype=short slp)

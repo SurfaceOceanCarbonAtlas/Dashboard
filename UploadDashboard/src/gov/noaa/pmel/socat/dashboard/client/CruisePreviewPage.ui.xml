@@ -84,9 +84,9 @@
 					</g:tab>
 					<g:tab>
 						<g:customHeader>
-							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsFco2Html" />
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2DeltaHtml" />
 						</g:customHeader>
-						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsFco2Image" />
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2DeltaImage" />
 					</g:tab>
 					<g:tab>
 						<g:customHeader>

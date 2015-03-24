@@ -5,17 +5,16 @@ import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
-import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 public class PreviewPlotsHandler {
 
@@ -62,7 +61,7 @@ public class PreviewPlotsHandler {
 	 * 		if the expocode is invalid, 
 	 * 		if problems creating the directory
 	 */
-	private File getCruisePreviewDsgDir(String expocode) throws IllegalArgumentException {
+	public File getCruisePreviewDsgDir(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
 		String expo = DashboardServerUtils.checkExpocode(expocode);
 		// Make sure the DSG subdirectory exists
@@ -92,7 +91,7 @@ public class PreviewPlotsHandler {
 	 * 		if the expocode is invalid, or
 	 * 		if problems creating the directory
 	 */
-	private File getCruisePreviewPlotsDir(String expocode) throws IllegalArgumentException {
+	public File getCruisePreviewPlotsDir(String expocode) throws IllegalArgumentException {
 		// Check and standardize the expocode
 		String expo = DashboardServerUtils.checkExpocode(expocode);
 		// Make sure the plots subdirectory exists
@@ -132,18 +131,22 @@ public class PreviewPlotsHandler {
 	public void createPreviewPlots(String expocode, String timetag) 
 			throws IllegalArgumentException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		Logger log = Logger.getLogger("PreviewPlotsHandler");
+		log.debug("reading data for " + upperExpo);
 
 		// Get the complete original cruise data
 		DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(upperExpo, 0, -1);
 
+		log.debug("standardizing data for " + upperExpo);
+
 		/*
-		 *  Convert the cruise data into standard units and setting to null
+		 *  Convert the cruise data into standard units and removes
 		 *  those data lines which the PI has marked as bad.  
 		 *  Also adds and assigns year, month, day, hour, minute, second, 
 		 *  and WOCE columns if not present.  SanityChecker WOCE-4 flags
-		 *  are added to the WOCE column.
-		 *  Note: this saves messages and assigns WOCE flags with row 
-		 *  numbers of the trimmed data.
+		 *  are added to the WOCE column.  This updates the OME metadata
+		 *  from the SanityChecker, and saves SanityChecker messages with 
+		 *  row numbers of the trimmed data.
 		 */
 		if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 			if ( cruiseData.getNumDataRows() < 1 )
@@ -157,33 +160,22 @@ public class PreviewPlotsHandler {
 				throw new IllegalArgumentException(upperExpo + ": unacceptable for unknown reason - unexpected");
 		}
 
-		// Get the OME metadata for this cruise
-		DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME);
-		DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
+		// Get the preview DSG filename, creating the parent directory if it does not exist
+		CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(
+				getCruisePreviewDsgDir(upperExpo), upperExpo + "_" + timetag + ".nc");
 
-		// Get the location and name for the NetCDF DSG file
-		CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(getCruisePreviewDsgDir(upperExpo), 
-				upperExpo + "_" + timetag + ".nc");
+		log.debug("generating preview DSG file " + dsgFile.getPath());
 
-		// Make sure the parent directory exists
-		File parentDir = dsgFile.getParentFile();
-		if ( ! parentDir.exists() ) {
-			if ( ! parentDir.mkdirs() ) {
-				throw new IllegalArgumentException(
-						"Unexpected problems creating the new subdirectory " + parentDir.getPath());
-			}
-		}
+		// Do not use the metadata in the DSG file, and to avoid issues with the existing
+		// OME metadata, just use what we already know to create a SocatMetadata
+		SocatMetadata socatMData = new SocatMetadata();
+		socatMData.setExpocode(upperExpo);
+		socatMData.setSocatVersion(cruiseData.getVersion());
+		socatMData.setQcFlag(SocatQCEvent.QC_PREVIEW_FLAG.toString());
 
-		// Get just the filenames from the set of addition document
-		TreeSet<String> addlDocs = new TreeSet<String>();
-		for ( String docInfo : cruiseData.getAddlDocs() ) {
-			addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
-		}
-		// Get the metadata needed for creating the DSG file
-		SocatMetadata socatMData = omeMData.createSocatMetadata(
-				cruiseData.getVersion(), addlDocs, SocatQCEvent.QC_PREVIEW_FLAG.toString());
-		// Convert the cruise data strings into the appropriate type
+		// Convert the cruise data strings into the appropriate list of data objects
 		ArrayList<SocatCruiseData> socatDatalist = SocatCruiseData.dataListFromDashboardCruise(cruiseData);
+
 		// Create the preview NetCDF DSG file
 		try {
 			dsgFile.create(socatMData, socatDatalist);
@@ -192,6 +184,8 @@ public class PreviewPlotsHandler {
 			throw new IllegalArgumentException("Problems creating the SOCAT DSG file " + dsgFile.getName() +
 					"\n    " + ex.getMessage(), ex);
 		}
+
+		log.debug("adding computed variables to preview DSG file " + dsgFile.getPath());
 
 		// Call Ferret to add the computed variables to the preview DSG file
 		SocatTool tool = new SocatTool(ferretConfig);
@@ -203,16 +197,23 @@ public class PreviewPlotsHandler {
 			throw new IllegalArgumentException("Failure adding computed variables: " + 
 					tool.getErrorMessage());
 
+		log.debug("generating preview plots for " + dsgFile.getPath());
 
-		// Call Ferret to generate the plots from the preview DSG file
+		// Get the location for the preview plots, creating the driectory if it does not exist
+		String cruisePlotsDirname = getCruisePreviewPlotsDir(upperExpo).getPath();
+
+		// Call Ferret to generate the plots from the preview DSG file; 
+		// the plots parent directory is created if it does not exist
 		tool = new SocatTool(ferretConfig);
-		scriptArgs.add(getCruisePreviewPlotsDir(upperExpo).getPath());
+		scriptArgs.add(cruisePlotsDirname);
 		scriptArgs.add(timetag);
 		tool.init(scriptArgs, upperExpo, FerretConfig.Action.PLOTS);
 		tool.run();
 		if ( tool.hasError() )
 			throw new IllegalArgumentException("Failure generating data preview plots: " + 
 					tool.getErrorMessage());
+
+		log.debug("preview plots generated in " + cruisePlotsDirname);
 	}
 
 }
