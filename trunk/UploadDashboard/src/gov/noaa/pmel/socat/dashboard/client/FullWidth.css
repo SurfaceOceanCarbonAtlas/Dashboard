@@ -31,11 +31,44 @@ body {
 	margin-left: 3em;
 }
 
-.cruisespanel {
+.cruiselistdockpanel {
+	width: 100%;
+	height: 40em;
+}
+.cruiselistgrid {
+	margin-top: 1em;
+	margin-right: 0.5em;
+}
+.cruisebuttonspanel {
+	background-color: #AACCEE;
+	padding-top: 0em;
+	padding-bottom: 0.5em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	margin-top: 0em;
+	margin-bottom: 0em;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+}
+.cruisepanelmainbutton {
 	display: block;
-	margin-top: 2em;
-	margin-left: 1em;
-	margin-right: 1em;
+	width: 7.25em;
+	margin-top: 0.5em;
+	margin-bottom: 0.75em;
+}
+.cruisebuttonpanelseparator {
+	display: block;
+	height: 0px;
+	border-style: solid;
+	border-width: 1px;
+	margin-top: 0.75em;
+	margin-bottom: 0.75em;
+}
+.cruisepanelbutton {
+	display: block;
+	width: 7.25em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 .datagrid {
@@ -66,11 +99,6 @@ body {
 }
 .datamsgreset {
 	clear: both;
-}
-
-.datasetsgrid {
-	margin-top: 1em;
-	margin-right: 0.5em;
 }
 
 .fullpagecontainer {
@@ -203,43 +231,6 @@ body {
 	margin-bottom: 1em;
 	margin-left: 2em;
 	margin-right: 1em;
-}
-
-
-.submitdockpanel {
-	width: 100%;
-	height: 32em;
-}
-.submitpanel {
-	background-color: #AACCEE;
-	padding-top: 0em;
-	padding-bottom: 0.5em;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
-	margin-top: 0em;
-	margin-bottom: 0em;
-	margin-left: 0.5em;
-	margin-right: 0.5em;
-}
-.submitpanelmainbutton {
-	display: block;
-	width: 7.25em;
-	margin-top: 0.5em;
-	margin-bottom: 0.75em;
-}
-.submitpanelbutton {
-	display: block;
-	width: 7.25em;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-}
-.submitpanelseparator {
-	display: block;
-	height: 0px;
-	border-style: solid;
-	border-width: 1px;
-	margin-top: 0.75em;
-	margin-bottom: 0.75em;
 }
 
 .titlepanel {
