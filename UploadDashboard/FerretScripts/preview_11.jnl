@@ -3,11 +3,11 @@ set mem/siz=60
 
 go preview_setup ($infile_dsg) 11
 
-define view/axes/x=0.1:0.9/y=0.07:0.19 y1
-define view/axes/x=0.1:0.9/y=0.25:0.37 y2
-define view/axes/x=0.1:0.9/y=0.43:0.55 y3
-define view/axes/x=0.1:0.9/y=0.61:0.73 y4
-define view/axes/x=0.1:0.9/y=0.79:0.91 y5
+define view/axes/x=0.1:0.9/y=0.07:0.20 y1
+define view/axes/x=0.1:0.9/y=0.25:0.38 y2
+define view/axes/x=0.1:0.9/y=0.43:0.56 y3
+define view/axes/x=0.1:0.9/y=0.61:0.74 y4
+define view/axes/x=0.1:0.9/y=0.79:0.92 y5
 
 
 let/title=Latitude lat = reshape(latitude, tt)
@@ -72,8 +72,11 @@ plot/noy/color=blue/title=" "($linestyle)/line/set fco2
 ppl plot
 
 
-def sym lab_top = Temporal variations for  Expocode `EXPOCODE`
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.4*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.5*($ppl$yorg)`, 0,0,0.14,  ($lab_top)
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.12, Count: `nobs` locations
 
 
 ! reset

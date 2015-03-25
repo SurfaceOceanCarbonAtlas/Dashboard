@@ -71,4 +71,7 @@ DEFINE SYMBOL land_palette = gray_light
 
 GO preview_fland ($land_palette)
 
-PLOT/VS/OVER/NOLAB/NOKEY($linestyle)/SIZE=0.12/COLOR=($lonlatcolor"blue") lon, lat
+! Underlay to connect the points with a gray dashed line
+ppl color,6,70,70,70 ! gray
+PLOT/VS/OVER/LINE/DASH=(0.1,0.04,0.1,0.04)/line=6/NOLAB lon, lat
+PLOT/VS/OVER/NOLAB/NOKEY($ppstyle"($linestyle)")/COLOR=($lonlatcolor"blue") lon, lat

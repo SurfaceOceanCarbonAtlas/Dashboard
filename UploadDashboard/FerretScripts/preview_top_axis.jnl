@@ -1,7 +1,0 @@
-! Draw a top axis labeled with # obs
-
-set view full0
-plot/vlim=1000:2000/axes=1,0,0,0/nolab latitude
-
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Sample No
-

@@ -7,8 +7,6 @@ plot reshape(temperature_equi, tt), reshape(temp, tt)
 let vmin = ($yaxis_min)
 let vmax = ($yaxis_max)
 
-! First draw a top axis labeled with # obs
-go preview_top_axis
 
 ! Plot temperature variables each with its own vertical axis
 
@@ -21,7 +19,7 @@ let/title="Temp diff" ntemp = `2*vmax` + 0*reshape(delta_temp, tt)
 
 set view full
 
-plot($linestyle)/line/color/axes=0,1,1,0/vlim=`vmin`:`vmax`/key=title/set tempr, ntemp, itemp
+plot($linestyle)/line/color/axes=1,1,1,0/vlim=`vmin`:`vmax`/key=title/set tempr, ntemp, itemp
   ppl ylab Temp (`temperature_equi,return=units`)
   ($taxis_setting)
   ppl title " "
@@ -35,7 +33,7 @@ ppl plot
 def sym lab_top = Expocode `EXPOCODE`
 
 set view full2
-plot/axes=0,1,0,1/color=green/line($linestyle)/nolab/set dtemp
+plot/axes=1,1,0,1/color=green/line($linestyle)/nolab/set dtemp
   ($taxis_setting)
   ppl ylab Temp Diff (`temperature_equi,return=units`)
   ppl title " "
@@ -45,8 +43,12 @@ plot/axes=0,1,0,1/color=green/line($linestyle)/nolab/set dtemp
   go unlabel `labttl`
 ppl plot
 
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 

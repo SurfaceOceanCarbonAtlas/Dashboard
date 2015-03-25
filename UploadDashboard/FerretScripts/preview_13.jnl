@@ -58,7 +58,7 @@ SET VIEW FULL
 LET use_color = `fco2_source[i=@min] NE fco2_source[i=@max]`
 
 IF `use_color` THEN
-   PLOT($linestyle)/SIZ=0.12/RIBBON/PAL=fifteen_by_levels/LEV=(1,15,1)/KEY=cent/AXES=0,1,1,1/\
+   PLOT($linestyle)/SIZ=0.12/RIBBON/PAL=fifteen_by_levels/LEV=(1,15,1)/KEY=cent/\
    TITLE="@SRDifference: recalculated minus reported fCO_2<NL>Colored by source id "/SET diff_t, alg_id_t
      PPL YLAB " "
      PPL XLAB " "
@@ -68,7 +68,7 @@ IF `use_color` THEN
      IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
    PPL RIBBON
 ELSE 
-   PLOT($linestyle)/COLOR=BLUE/AXES=0,1,1,1/SET diff_t
+   PLOT($linestyle)/COLOR=blue/SET diff_t
      PPL ylab " "
      PPL xlab " "
      PPL title "Difference: recalculated minus reported fCO_2<NL>Source is `fco2_source[i=@min]`"
@@ -79,11 +79,11 @@ ELSE
    PPL PLOT
 ENDIF
 
-GO preview_top_axis
 
+! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
-LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.8*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
-
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nfnoc` Valid fCO_2 recomputed
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 

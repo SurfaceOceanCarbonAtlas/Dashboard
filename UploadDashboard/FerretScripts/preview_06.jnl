@@ -18,13 +18,11 @@ if `teqdry[l=@ngd] eq 0` THEN let/title="Teq dry" teqdry = 1000*tt
 let ymin = ($yaxis_min)
 let ymax = ($yaxis_max)
 
-! First draw a top axis labeled with # obs
-go preview_top_axis
 
 ! Plot xCO2 variables 
 set view full
 
-plot/line($linestyle)/axes=0,1,1,1/vlim=`ymin`:`ymax`/key=title/set  sstwet, sstdry, teqwet, teqdry 
+plot/line($linestyle)/vlim=`ymin`:`ymax`/key=title/set  sstwet, sstdry, teqwet, teqdry 
   ($taxis_setting)
   ppl ylab xCO_2 (`xCO2_water_sst_wet_ppm,return=units`)
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
@@ -32,8 +30,11 @@ plot/line($linestyle)/axes=0,1,1,1/vlim=`ymin`:`ymax`/key=title/set  sstwet, sst
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl plot
 
-def sym lab_top = Expocode `EXPOCODE`
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
