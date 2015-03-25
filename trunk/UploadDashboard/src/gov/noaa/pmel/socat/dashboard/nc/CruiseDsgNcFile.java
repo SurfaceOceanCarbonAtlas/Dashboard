@@ -47,6 +47,7 @@ public class CruiseDsgNcFile extends File {
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
+	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
 
 	private SocatMetadata metadata;
 	private ArrayList<SocatCruiseData> dataList;
@@ -267,6 +268,8 @@ public class CruiseDsgNcFile extends File {
 			ncfile.addVariableAttribute(var, new Attribute("long_name", Constants.LONG_NAMES.get(name)));
 			ncfile.addVariableAttribute(var, new Attribute("standard_name", Constants.STANDARD_NAMES.get(name)));
 			ncfile.addVariableAttribute(var, new Attribute("ioos_category", Constants.IOOS_CATEGORIES.get(name)));
+			// Additional attribute giving the time origin (although also mentioned in the units)
+			ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
 
 			ncfile.create();
 

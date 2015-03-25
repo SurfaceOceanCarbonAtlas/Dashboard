@@ -3,15 +3,17 @@
 go preview_setup ($infile_dsg) 10
 
 set view full
-plot/vs($linestyle)/color=blue/set sal, fCO2_recommended
+plot/vs($ppstyle"($linestyle)")/color=blue/set sal, fCO2_recommended
   ppl title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
   IF ($labnum_x"0|*>1") THEN go unlabel ($lab($labnum_x))
 ppl plot
 
-let nobs = `fCO2_recommended[i=@ngd]`
-def sym lab_top = Expocode `EXPOCODE`<NL>Count: `nobs` fCO2 observations
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nfnoc` Valid fCO_2 recomputed
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

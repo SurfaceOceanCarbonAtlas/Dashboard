@@ -29,11 +29,16 @@ can mode logo
 ppl txlsze,0.08
 ppl axlsze,0.08,0.08
 
+
+LET nobs = `latitude[i=@ngd]`
+LET nfnoc = `fCO2_recommended[i=@ngd]`
+
+ 
 ! reset the green pen to a darker green...
 ppl color,3,0,70,0      ! dark green
 
 ! Define time axis
-DEFINE AXIS/T/T0=1-jan-1969/UNITS=seconds tax = time
+DEFINE AXIS/T/T0="1-Jan-1970"/UNITS=seconds tax = time
 let tt = t[gt=tax]; 
 let tt1 = `tt[l=@min]`
 let ttn = `tt[l=@max]`
@@ -47,10 +52,15 @@ define view/x=0:1/y=0:1 full3
 
 cancel mode nodata_label
 
-! line plots (except for Prop-Prop plots)
-CANCEL SYMBOL linestyle
 
-! or LINE/SYMBOL=
-DEFINE SYMBOL linestyle = /SYMBOL=17
+
+! line plot stuyle (except for map and Prop-Prop plots)
+! Line style: SYMBOLS connected with lines
+! or just lines. 
+
+DEFINE SYMBOL linestyle = /SYMBOL=17/siz=0.06
+!CANCEL SYMBOL linestyle
+
+DEFINE SYMBOL ppstyle = /SYMBOL=17/siz=0.06
 
 DEFINE SYMBOL preview_setup_done = 1
