@@ -32,6 +32,11 @@ class OMECompositeVariable {
 		String value = null;
 		if (null != element) {
 			value = element.getChildTextTrim(name);
+			if ( null == value ) {
+				// If no entry, try again with the first letter capitalized
+				String capName = name.substring(0, 1).toUpperCase() + name.substring(1);
+				value = element.getChildTextTrim(capName);
+			}
 			if (null != value) {
 				addEntry(name, value);
 			}
