@@ -59,8 +59,7 @@ import com.google.gwt.view.client.ListDataProvider;
  */
 public class CruiseListPage extends CompositeWithUsername {
 
-	private static final String TITLE_TEXT_PROLOGUE = "My SOCAT Version ";
-	private static final String TITLE_TEXT_EPILOGUE = " Datasets";
+	private static final String TITLE_TEXT = "My SOCAT Datasets";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
@@ -93,19 +92,18 @@ public class CruiseListPage extends CompositeWithUsername {
 
 	private static final String DELETE_TEXT = "Delete Datasets";
 	private static final String DELETE_HOVER_HELP =
-			"delete the selected data sets, " +
-			"including its metadata and supplemental documents";
+			"delete the selected data sets from the system";
 
 	private static final String ADD_TO_LIST_TEXT = 
-			"Add to List";
+			"Add to My List";
 	private static final String ADD_TO_LIST_HOVER_HELP = 
-			"add existing data sets to this list of data sets";
+			"add existing data sets to this displayed list of data sets";
 
 	private static final String REMOVE_FROM_LIST_TEXT = 
-			"Remove from List";
+			"Remove from My List";
 	private static final String REMOVE_FROM_LIST_HOVER_HELP =
-			"remove the selected data sets from this list of data sets; " +
-			"this will NOT delete the data set from the system";
+			"remove the selected data sets from this displayed list of data sets; " +
+			"this will NOT delete the data sets from the system";
 
 	// Error message when the request for the latest cruise list fails
 	private static final String GET_DATASET_LIST_ERROR_MSG = 
@@ -279,6 +277,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		checkSet = new DashboardCruiseList();
 		expocodeSet = new TreeSet<String>();
 
+		titleLabel.setText(TITLE_TEXT);
 		titleImage.setResource(SocatUploadDashboard.resources.getSocatCatPng());
 		logoutButton.setText(LOGOUT_TEXT);
 
@@ -390,9 +389,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * 		cruises to display
 	 */
 	private void updateCruises(DashboardCruiseList cruises) {
-		// Update the title and username
-		titleLabel.setText(TITLE_TEXT_PROLOGUE + 
-				cruises.getSocatVersion() + TITLE_TEXT_EPILOGUE);
+		// Update the username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 		if ( cruises.isManager() ) {
