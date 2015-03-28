@@ -680,7 +680,7 @@ public class OmeMetadata {
 	public ArrayList<String> getInvestigators() {
 		ArrayList<String> investigatorsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			investigatorsList.add(invst.getValue("Name"));
+			investigatorsList.add(invst.getValue(INVESTIGATOR_NAME));
 		}
 		return investigatorsList;
 	}
@@ -691,7 +691,7 @@ public class OmeMetadata {
 	public ArrayList<String> getOrganizations() {
 		ArrayList<String> organizationsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			organizationsList.add(invst.getValue("Organization"));
+			organizationsList.add(invst.getValue(INVESTIGATOR_ORGANIZATION));
 		}
 		return organizationsList;
 	}
