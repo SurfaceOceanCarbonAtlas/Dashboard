@@ -54,12 +54,12 @@ cancel mode nodata_label
 
 
 
-! line plot stuyle (except for map and Prop-Prop plots)
+! line plot style (except for map and Prop-Prop plots)
 ! Line style: SYMBOLS connected with lines
-! or just lines. 
+! or cancel the symbol to draw with just lines. 
 
 DEFINE SYMBOL linestyle = /SYMBOL=17/siz=0.06
-!CANCEL SYMBOL linestyle
+CANCEL SYMBOL linestyle
 
 DEFINE SYMBOL ppstyle = /SYMBOL=17/siz=0.06
 

@@ -26,7 +26,7 @@ public class CruiseStandardizer {
 
 	private static final String yAcute = "\u00FD";
 
-	private static final HashMap<String,String> PI_RENAME_MAP;
+	public static final HashMap<String,String> PI_RENAME_MAP;
 	static {
 		PI_RENAME_MAP = new HashMap<String,String>();
 		PI_RENAME_MAP.put("", "unknown");
@@ -199,7 +199,7 @@ public class CruiseStandardizer {
 		PI_RENAME_MAP.put("Yves Dandonneau", "Dandonneau, Y.");
 	}
 
-	private static final HashMap<String,String> SHIP_RENAME_MAP;
+	public static final HashMap<String,String> SHIP_RENAME_MAP;
 	static {
 		SHIP_RENAME_MAP = new HashMap<String,String>();
 		SHIP_RENAME_MAP.put("Akademik Korolev", "Akademik Korolev");
