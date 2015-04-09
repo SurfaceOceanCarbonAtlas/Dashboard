@@ -13,6 +13,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -819,19 +820,42 @@ public class DashboardCruiseChecker {
 		boolean saveOmeMData;
 		if ( oldOmeDoc != null ) {
 			Document updatedOmeDoc = updatedOmeMData.createOmeXmlDoc();
-			if ( oldOmeDoc.equals(updatedOmeDoc) )
-				saveOmeMData = false;
-			else
-				saveOmeMData = true;
+			// Document.equals is just "==", so useless; instead compare XML strings from the Documents
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			XMLOutputter xmlWriter = new XMLOutputter(Format.getCompactFormat());
+			try {
+				try {
+					xmlWriter.output(oldOmeDoc, out);
+					String oldXmlString = out.toString();
+					out.reset();
+					xmlWriter.output(updatedOmeDoc, out);
+					String updatedXmlString = out.toString();
+					if ( oldXmlString.equals(updatedXmlString) ) {
+						saveOmeMData = false;
+					}
+					else {
+						saveOmeMData = true;
+					}
+				} finally {
+					out.close();
+				}
+			} catch (IOException e) {
+				throw new RuntimeException("Unexpected IOException writing to a ByteArrayOutputStream");
+			}
 		}
 		else {
 			saveOmeMData = true;
 		}
+
 		if ( saveOmeMData ) {
 			// Save the updated OME metadata
 			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm Z").print(new DateTime());
 			DashboardOmeMetadata dashOmeMData = new DashboardOmeMetadata(updatedOmeMData, 
 					timestamp, cruiseData.getOwner(), cruiseData.getVersion());
+
+			// TODO: remove the following override of the dashboard metadata conflict flag when the OME is being used.
+			dashOmeMData.setConflicted(false);
+
 			String message = "Update of OME metadata from cruise checker";
 			metadataHandler.saveMetadataInfo(dashOmeMData, message);
 			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
