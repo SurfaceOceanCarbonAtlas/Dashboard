@@ -24,6 +24,10 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	 */
 	public static final String OME_FILENAME = "OME.xml";
 
+	/**
+	 * Separator between the filename and the upload timestamp 
+	 * in additional document titles.
+	 */
 	private static final String TITLE_SEPARATOR = " ; ";
 
 	protected boolean selected;

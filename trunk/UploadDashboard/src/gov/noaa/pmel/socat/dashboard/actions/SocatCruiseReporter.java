@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -102,7 +101,7 @@ public class SocatCruiseReporter {
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
 			SocatMetadata metadata = dsgFile.getMetadata();
-			metadata.correctSpellings();
+			correctSpellings(metadata);
 			warnMsgs.addAll(printMetadataPreamble(metadata, report));
 			printDataTableHeader(report, false);
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
@@ -150,7 +149,7 @@ public class SocatCruiseReporter {
 			dsgFile.read(true);
 			// Wait until later to report all unknown variables
 			SocatMetadata metadata = dsgFile.getMetadata();
-			metadata.correctSpellings();
+			correctSpellings(metadata);
 			metaList.add(metadata);
 		}
 
@@ -174,7 +173,7 @@ public class SocatCruiseReporter {
 					warnMsgs.add(msg);
 				}
 				SocatMetadata metadata = dsgFile.getMetadata();
-				metadata.correctSpellings();
+				correctSpellings(metadata);
 				boolean dataFound = false;
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					if ( (regionID != null) && ! regionID.equals(dataVals.getRegionID()) )
@@ -197,6 +196,34 @@ public class SocatCruiseReporter {
 		}
 
 		return warnMsgs;
+	}
+
+	/**
+	 * Corrections intentional misspellings in the PI and ship names, and corrects 
+	 * the punctuation separating multiple PI names.
+	 * 
+	 * @param metadata
+	 * 		correct the names in this SocatMetadata 
+	 */
+	private static void correctSpellings(SocatMetadata metadata) {
+		// Correct any intentional misspellings in each of the PI names 
+		String[] piArray = metadata.getScienceGroup().split(SocatMetadata.NAMES_SEPARATOR);
+		for (int k = 0; k < piArray.length; k++) {
+			String piName = SocatMetadata.PI_NAME_CORRECTIONS.get(piArray[k]);
+			if ( piName != null )
+				piArray[k] = piName;
+		}
+		// Create the new science group string with proper punctuation
+		String scienceGroup = piArray[0];
+		for (int k = 1; k < piArray.length; k++) {
+			scienceGroup += "; " + piArray[k];
+		}
+		metadata.setScienceGroup(scienceGroup);
+		// Correct any intentional misspellings in the vessel name
+		String shipName = metadata.getVesselName();
+		String vesselName = SocatMetadata.VESSEL_NAME_CORRECTIONS.get(shipName);
+		if ( vesselName != null )
+			metadata.setVesselName(vesselName);
 	}
 
 	/**
@@ -231,10 +258,8 @@ public class SocatCruiseReporter {
 		// Additional references
 		report.println("Supplemental documentation reference(s):");
 		for (String ref : metadata.getAddlDocs().split(SocatMetadata.NAMES_SEPARATOR)) {
-			String name = DashboardMetadata.splitAddlDocsTitle(ref)[0];
 			// TODO: this needs to be changed to an http or doi reference 
-			warnMsgs.add("Supplemental documentation is not a reference: " + name);
-			report.println("    " + name);
+			report.println("    " + ref);
 		}
 		report.println();
 
@@ -440,14 +465,12 @@ public class SocatCruiseReporter {
 			String suppRefs = "";
 			boolean first = true;
 			for (String ref : metadata.getAddlDocs().split(SocatMetadata.NAMES_SEPARATOR) ) {
-				String name = DashboardMetadata.splitAddlDocsTitle(ref)[0];
 				// TODO: this needs to be changed to an http or doi reference 
-				warnMsgs.add(expocode + " supplemental documentation is not a reference: " + name);
 				if ( ! first )
-					suppRefs += " ; ";
+					suppRefs += "; ";
 				else
 					first = false;
-				suppRefs += name;
+				suppRefs += ref;
 			}
 			report.print(suppRefs);
 

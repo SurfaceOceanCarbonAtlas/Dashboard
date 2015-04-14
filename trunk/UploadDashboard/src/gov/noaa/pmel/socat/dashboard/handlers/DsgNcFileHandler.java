@@ -166,7 +166,7 @@ public class DsgNcFileHandler {
 		// Get the location and name for the NetCDF DSG file
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
-		// Get just the filenames from the set of addition document
+		// Get just the filenames from the set of additional documents
 		TreeSet<String> addlDocs = new TreeSet<String>();
 		for ( String docInfo : cruiseData.getAddlDocs() ) {
 			addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
