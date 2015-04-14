@@ -85,8 +85,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException("Problem with " + mdataFile.getName() +
 					"\n    " + ex.getMessage(), ex);
 		}
-		// If conflicted or otherwise draft, set the conflicted flags in SocatMetadata
-		setConflicted(omeMData.isDraft());
+		// If conflicted or incomplete, set the conflicted flags in SocatMetadata
+		setConflicted( ! omeMData.isAcceptable() );
 	}
 
 	/**

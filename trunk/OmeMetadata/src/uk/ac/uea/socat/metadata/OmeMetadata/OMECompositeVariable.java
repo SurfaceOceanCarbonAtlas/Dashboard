@@ -94,10 +94,10 @@ class OMECompositeVariable {
 		}
 	}
 	
-	protected static List<OMECompositeVariable> mergeVariables(List<OMECompositeVariable> dest, List<OMECompositeVariable> newValues) throws BadEntryNameException {
+	protected static ArrayList<OMECompositeVariable> mergeVariables(List<OMECompositeVariable> dest, List<OMECompositeVariable> newValues) throws BadEntryNameException {
 		
 		// Copy the dest list to the output.
-		List<OMECompositeVariable> merged = new ArrayList<OMECompositeVariable>();
+		ArrayList<OMECompositeVariable> merged = new ArrayList<OMECompositeVariable>();
 		
 		// Now copy in the new values
 		for (OMECompositeVariable newValue : newValues) {

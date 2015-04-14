@@ -69,6 +69,7 @@ public class MetadataMergeTest {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void makeHeaderTest() {
 		try {
 			File inputFile = new File("Test1.xml");
@@ -87,6 +88,7 @@ public class MetadataMergeTest {
 	 * to merge one file. It should return the exact same
 	 * file.
 	 */
+	@SuppressWarnings("unused")
 	private void mergeTest() {
 		try {
 			// Load the input metadata

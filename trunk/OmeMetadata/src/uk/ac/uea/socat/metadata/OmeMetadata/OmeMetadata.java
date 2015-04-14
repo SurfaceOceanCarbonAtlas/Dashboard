@@ -5,6 +5,7 @@ package uk.ac.uea.socat.metadata.OmeMetadata;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -28,75 +29,105 @@ public class OmeMetadata {
 	static {
 		DATE_PARSER.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
-	
+
+	private static final String ROOT_ELEMENT_NAME = "x_tags";
+	private static final String STATUS_ELEMENT_NAME = "status";
+	private static final String DRAFT_ELEMENT_NAME = "draft";
+
 	/**
 	 * Paths for simple variables
 	 */
-	private static final Path USER_PATH = new Path(null, "User");
+	private static final String USER_ELEMENT_NAME = "User";
+	private static final Path USER_PATH = new Path(null, USER_ELEMENT_NAME);
 	private static final Path USER_NAME_PATH = new Path(USER_PATH, "Name");
 	private static final Path USER_ORGANIZATION_PATH = new Path(USER_PATH, "Organization");
 	private static final Path USER_ADDRESS_PATH = new Path(USER_PATH, "Address");
 	private static final Path USER_PHONE_PATH = new Path(USER_PATH, "Phone");
 	private static final Path USER_EMAIL_PATH = new Path(USER_PATH, "Email");
-	
-	private static final Path DATASET_INFO_PATH = new Path(null, "Dataset_Info");
+
+	private static final String DATASET_INFO_ELEMENT_NAME = "Dataset_Info";
+	private static final Path DATASET_INFO_PATH = new Path(null, DATASET_INFO_ELEMENT_NAME);
 	private static final Path DATASET_ID_PATH = new Path(DATASET_INFO_PATH, "Dataset_ID");
 	private static final Path FUNDING_INFO_PATH = new Path(DATASET_INFO_PATH, "Funding_Info");
-	
-	private static final Path SUBMISSION_DATES_PATH = new Path(DATASET_INFO_PATH, "Submission_Dates");
+
+	private static final String SUBMISSION_DATES_ELEMENT_NAME = "Submission_Dates";
+	private static final Path SUBMISSION_DATES_PATH = new Path(DATASET_INFO_PATH, SUBMISSION_DATES_ELEMENT_NAME);
 	private static final Path INITIAL_SUBMISSION_PATH = new Path(SUBMISSION_DATES_PATH, "Initial_Submission");
 	private static final Path REVISED_SUBMISSION_PATH = new Path(SUBMISSION_DATES_PATH, "Revised_Submission");
 	
-	private static final Path CRUISE_INFO_PATH = new Path(null, "Cruise_Info");
-	private static final Path EXPERIMENT_PATH = new Path(CRUISE_INFO_PATH, "Experiment");
+	private static final String CRUISE_INFO_ELEMENT_NAME = "Cruise_Info";
+	private static final Path CRUISE_INFO_PATH = new Path(null, CRUISE_INFO_ELEMENT_NAME);
+	private static final String EXPERIMENT_ELEMENT_NAME = "Experiment";
+	private static final Path EXPERIMENT_PATH = new Path(CRUISE_INFO_PATH, EXPERIMENT_ELEMENT_NAME);
 	private static final Path EXPERIMENT_NAME_PATH = new Path(EXPERIMENT_PATH, "Experiment_Name");
 	private static final Path EXPERIMENT_TYPE_PATH = new Path(EXPERIMENT_PATH, "Experiment_Type");
 	private static final Path PLATFORM_TYPE_PATH = new Path(EXPERIMENT_PATH, "Platform_Type");
 	private static final Path CO2_INSTRUMENT_TYPE_PATH = new Path(EXPERIMENT_PATH, "Co2_Instrument_type");
 	private static final Path MOORING_ID_PATH = new Path(EXPERIMENT_PATH, "Mooring_ID");
 	
-	
-	private static final Path CRUISE_PATH = new Path(EXPERIMENT_PATH, "Cruise");
-	private static final Path CRUISE_ID_PATH = new Path(CRUISE_PATH, "Cruise_ID");
+	private static final String CRUISE_ELEMENT_NAME = "Cruise";
+	private static final Path CRUISE_PATH = new Path(EXPERIMENT_PATH, CRUISE_ELEMENT_NAME);
+	private static final String CRUISE_ID_ELEMENT_NAME = "Cruise_ID";
+	private static final Path CRUISE_ID_PATH = new Path(CRUISE_PATH, CRUISE_ID_ELEMENT_NAME);
 	private static final Path SUB_CRUISE_INFO_PATH = new Path(CRUISE_PATH, "Cruise_Info");
 	private static final Path SECTION_PATH = new Path(CRUISE_PATH, "Section");
-	
-	private static final Path GEO_COVERAGE_PATH = new Path(CRUISE_PATH, "Geographical_Coverage");
+
+	private static final String GEO_COVERAGE_ELEMENT_NAME = "Geographical_Coverage";
+	private static final Path GEO_COVERAGE_PATH = new Path(CRUISE_PATH, GEO_COVERAGE_ELEMENT_NAME);
 	private static final Path GEO_REGION_PATH = new Path(GEO_COVERAGE_PATH, "Geographical_Region");
-	private static final Path BOUNDS_PATH = new Path(GEO_COVERAGE_PATH, "Bounds");
+	private static final String BOUNDS_ELEMENT_NAME = "Bounds";
+	private static final Path BOUNDS_PATH = new Path(GEO_COVERAGE_PATH, BOUNDS_ELEMENT_NAME);
 	private static final Path WEST_BOUND_PATH = new Path(BOUNDS_PATH, "Westernmost_Longitude");
 	private static final Path EAST_BOUND_PATH = new Path(BOUNDS_PATH, "Easternmost_Longitude");
 	private static final Path NORTH_BOUND_PATH = new Path(BOUNDS_PATH, "Northernmost_Latitude");
 	private static final Path SOUTH_BOUND_PATH = new Path(BOUNDS_PATH, "Southernmost_Latitude");
-	
-	private static final Path TEMP_COVERAGE_PATH = new Path(CRUISE_PATH, "Temporal_Coverage");
+
+	private static final String TEMP_COVERAGE_ELEMENT_NAME = "Temporal_Coverage";
+	private static final Path TEMP_COVERAGE_PATH = new Path(CRUISE_PATH, TEMP_COVERAGE_ELEMENT_NAME);
 	private static final Path TEMP_START_DATE_PATH = new Path(TEMP_COVERAGE_PATH, "Start_Date");
 	private static final Path TEMP_END_DATE_PATH = new Path(TEMP_COVERAGE_PATH, "End_Date");
 	private static final Path START_DATE_PATH = new Path(CRUISE_PATH, "Start_Date");
 	private static final Path END_DATE_PATH = new Path(CRUISE_PATH, "End_Date");
-	
-	private static final Path VESSEL_PATH = new Path(CRUISE_INFO_PATH, "Vessel");
+
+	private static final String VESSEL_ELEMENT_NAME = "Vessel";
+	private static final Path VESSEL_PATH = new Path(CRUISE_INFO_PATH, VESSEL_ELEMENT_NAME);
 	private static final Path VESSEL_NAME_PATH = new Path(VESSEL_PATH, "Vessel_Name");
 	private static final Path VESSEL_ID_PATH = new Path(VESSEL_PATH, "Vessel_ID");
 	private static final Path COUNTRY_PATH = new Path(VESSEL_PATH, "Country");
 	private static final Path OWNER_PATH = new Path(VESSEL_PATH, "Vessel_Owner");
-	
-	private static final Path CO2_DATA_INFO_PATH = new Path(null, "CO2_Data_Info");
-	private static final Path XCO2_WATER_EQU_DRY_PATH = new Path(CO2_DATA_INFO_PATH, "xCO2water_equ_dry", "Unit");
-	private static final Path XCO2_WATER_SST_DRY_PATH = new Path(CO2_DATA_INFO_PATH, "xCO2water_SST_dry", "Unit");
-	private static final Path PCO2_WATER_EQU_WET_PATH = new Path(CO2_DATA_INFO_PATH, "pCO2water_equ_wet", "Unit");
-	private static final Path PCO2_WATER_SST_WET_PATH = new Path(CO2_DATA_INFO_PATH, "pCO2water_SST_wet", "Unit");
-	private static final Path FCO2_WATER_EQU_WET_PATH = new Path(CO2_DATA_INFO_PATH, "fCO2water_equ_wet", "Unit");
-	private static final Path FCO2_WATER_SST_WET_PATH = new Path(CO2_DATA_INFO_PATH, "fCO2water_SST_wet", "Unit");
-	private static final Path XCO2_AIR_DRY_PATH = new Path(CO2_DATA_INFO_PATH, "xCO2air_dry", "Unit");
-	private static final Path PCO2_AIR_WET_PATH = new Path(CO2_DATA_INFO_PATH, "pCO2air_wet", "Unit");
-	private static final Path FCO2_AIR_WET_PATH = new Path(CO2_DATA_INFO_PATH, "fCO2air_wet", "Unit");
-	private static final Path XCO2_AIR_DRY_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, "xCO2air_dry_interpolated", "Unit");
-	private static final Path PCO2_AIR_WET_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, "pCO2air_wet_interpolated", "Unit");
-	private static final Path FCO2_AIR_WET_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, "fCO2air_wet_interpolated", "Unit");
-	
-	private static final Path METHOD_DESCRIPTION_PATH = new Path(null, "Method_Description");
-	private static final Path EQUILIBRATOR_DESIGN_PATH = new Path(METHOD_DESCRIPTION_PATH, "Equilibrator_Design");
+
+	private static final String CO2_DATA_INFO_ELEMENT_NAME = "CO2_Data_Info";
+	private static final Path CO2_DATA_INFO_PATH = new Path(null, CO2_DATA_INFO_ELEMENT_NAME);
+	private static final String UNIT_ELEMENT_NAME = "Unit";
+	private static final String XCO2_WATER_EQU_DRY_ELEMENT_NAME = "xCO2water_equ_dry";
+	private static final Path XCO2_WATER_EQU_DRY_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_WATER_EQU_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String XCO2_WATER_SST_DRY_ELEMENT_NAME = "xCO2water_SST_dry";
+	private static final Path XCO2_WATER_SST_DRY_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_WATER_SST_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String PCO2_WATER_EQU_WET_ELEMENT_NAME = "pCO2water_equ_wet";
+	private static final Path PCO2_WATER_EQU_WET_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String PCO2_WATER_SST_WET_ELEMENT_NAME = "pCO2water_SST_wet";
+	private static final Path PCO2_WATER_SST_WET_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String FCO2_WATER_EQU_WET_ELEMENT_NAME = "fCO2water_equ_wet";
+	private static final Path FCO2_WATER_EQU_WET_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String FCO2_WATER_SST_WET_ELEMENT_NAME = "fCO2water_SST_wet";
+	private static final Path FCO2_WATER_SST_WET_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String XCO2_AIR_DRY_ELEMENT_NAME = "xCO2air_dry";
+	private static final Path XCO2_AIR_DRY_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_AIR_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String PCO2_AIR_WET_ELEMENT_NAME = "pCO2air_wet";
+	private static final Path PCO2_AIR_WET_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String FCO2_AIR_WET_ELEMENT_NAME = "fCO2air_wet";
+	private static final Path FCO2_AIR_WET_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String XCO2_AIR_DRY_INTERP_ELEMENT_NAME = "xCO2air_dry_interpolated";
+	private static final Path XCO2_AIR_DRY_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_AIR_DRY_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String PCO2_AIR_WET_INTERP_ELEMENT_NAME = "pCO2air_wet_interpolated";
+	private static final Path PCO2_AIR_WET_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final String FCO2_AIR_WET_INTERP_ELEMENT_NAME = "fCO2air_wet_interpolated";
+	private static final Path FCO2_AIR_WET_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+
+	private static final String METHOD_DESCRIPTION_ELEMENT_NAME = "Method_Description";
+	private static final Path METHOD_DESCRIPTION_PATH = new Path(null, METHOD_DESCRIPTION_ELEMENT_NAME);
+	private static final String EQUILIBRATOR_DESIGN_ELEMENT_NAME = "Equilibrator_Design";
+	private static final Path EQUILIBRATOR_DESIGN_PATH = new Path(METHOD_DESCRIPTION_PATH, EQUILIBRATOR_DESIGN_ELEMENT_NAME);
 	private static final Path INTAKE_DEPTH_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Depth_of_Sea_Water_Intake");
 	private static final Path INTAKE_LOCATION_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Location_of_Sea_Water_Intake");
 	private static final Path EQUI_TYPE_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Equilibrator_Type");
@@ -106,13 +137,15 @@ public class OmeMetadata {
 	private static final Path VENTED_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Vented");
 	private static final Path DRYING_METHOD_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Drying_Method_for_CO2_in_water");
 	private static final Path EQUI_ADDITIONAL_INFO_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Additional_Information");
-	
-	private static final Path CO2_MARINE_AIR_PATH = new Path(METHOD_DESCRIPTION_PATH, "CO2_in_Marine_Air");
+
+	private static final String CO2_MARINE_AIR_ELEMENT_NAME = "CO2_in_Marine_Air";
+	private static final Path CO2_MARINE_AIR_PATH = new Path(METHOD_DESCRIPTION_PATH, CO2_MARINE_AIR_ELEMENT_NAME);
 	private static final Path MARINE_AIR_MEASUREMENT_PATH = new Path(CO2_MARINE_AIR_PATH, "Measurement");
 	private static final Path MARINE_AIR_LOCATION_PATH = new Path(CO2_MARINE_AIR_PATH, "Location_and_Height");
 	private static final Path MARINE_AIR_DRYING_PATH = new Path(CO2_MARINE_AIR_PATH, "Drying_Method");
-	
-	private static final Path CO2_SENSORS_PATH = new Path(METHOD_DESCRIPTION_PATH, "CO2_Sensors");
+
+	private static final String CO2_SENSORS_ELEMENT_NAME = "CO2_Sensors";
+	private static final Path CO2_SENSORS_PATH = new Path(METHOD_DESCRIPTION_PATH, CO2_SENSORS_ELEMENT_NAME);
 	private static final Path CO2_SENSOR_PATH = new Path(CO2_SENSORS_PATH, "CO2_Sensor");
 	private static final Path CO2_MEASUREMENT_METHOD_PATH = new Path(CO2_SENSOR_PATH, "Measurement_Method");
 	private static final Path CO2_MANUFACTURER_PATH = new Path(CO2_SENSOR_PATH, "Manufacturer");
@@ -129,8 +162,9 @@ public class OmeMetadata {
 	private static final Path DETAILS_OF_CO2_SENSING_PATH = new Path(CO2_SENSOR_PATH, "Details_Co2_Sensing");
 	private static final Path ANALYSIS_OF_COMPARISON_PATH = new Path(CO2_SENSOR_PATH, "Analysis_of_Co2_Comparision");
 	private static final Path MEASURED_CO2_PARAMS_PATH = new Path(CO2_SENSOR_PATH, "Measured_Co2_Params");
-	
-	private static final Path SST_PATH = new Path(METHOD_DESCRIPTION_PATH, "Sea_Surface_Temperature");
+
+	private static final String SST_ELEMENT_NAME = "Sea_Surface_Temperature";
+	private static final Path SST_PATH = new Path(METHOD_DESCRIPTION_PATH, SST_ELEMENT_NAME);
 	private static final Path SST_LOCATION_PATH = new Path(SST_PATH, "Location");
 	private static final Path SST_MANUFACTURER_PATH = new Path(SST_PATH, "Manufacturer");
 	private static final Path SST_MODEL_PATH = new Path(SST_PATH, "Model");
@@ -138,8 +172,9 @@ public class OmeMetadata {
 	private static final Path SST_PRECISION_PATH = new Path(SST_PATH, "Precision");
 	private static final Path SST_CALIBRATION_PATH = new Path(SST_PATH, "Calibration");
 	private static final Path SST_COMMENTS_PATH = new Path(SST_PATH, "Other_Comments");
-	
-	private static final Path EQU_TEMP_PATH = new Path(METHOD_DESCRIPTION_PATH, "Equilibrator_Temperature");
+
+	private static final String EQU_TEMP_ELEMENT_NAME = "Equilibrator_Temperature";
+	private static final Path EQU_TEMP_PATH = new Path(METHOD_DESCRIPTION_PATH, EQU_TEMP_ELEMENT_NAME);
 	private static final Path EQT_LOCATION_PATH = new Path(EQU_TEMP_PATH, "Location");
 	private static final Path EQT_MANUFACTURER_PATH = new Path(EQU_TEMP_PATH, "Manufacturer");
 	private static final Path EQT_MODEL_PATH = new Path(EQU_TEMP_PATH, "Model");
@@ -148,8 +183,9 @@ public class OmeMetadata {
 	private static final Path EQT_CALIBRATION_PATH = new Path(EQU_TEMP_PATH, "Calibration");
 	private static final Path EQT_WARMING_PATH = new Path(EQU_TEMP_PATH, "Warming");
 	private static final Path EQT_COMMENTS_PATH = new Path(EQU_TEMP_PATH, "Other_Comments");	
-	
-	private static final Path EQU_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, "Equilibrator_Pressure");
+
+	private static final String EQU_PRESSURE_ELEMENT_NAME = "Equilibrator_Pressure";
+	private static final Path EQU_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, EQU_PRESSURE_ELEMENT_NAME);
 	private static final Path EQP_LOCATION_PATH = new Path(EQU_PRESSURE_PATH, "Location");
 	private static final Path EQP_MANUFACTURER_PATH = new Path(EQU_PRESSURE_PATH, "Manufacturer");
 	private static final Path EQP_MODEL_PATH = new Path(EQU_PRESSURE_PATH, "Model");
@@ -158,8 +194,9 @@ public class OmeMetadata {
 	private static final Path EQP_CALIBRATION_PATH = new Path(EQU_PRESSURE_PATH, "Calibration");
 	private static final Path EQP_COMMENTS_PATH = new Path(EQU_PRESSURE_PATH, "Other_Comments");
 	private static final Path EQP_NORMALIZED_PATH = new Path(EQU_PRESSURE_PATH, "Normalized");
-		
-	private static final Path ATM_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, "Atmospheric_Pressure");
+
+	private static final String ATM_PRESSURE_ELEMENT_NAME = "Atmospheric_Pressure";
+	private static final Path ATM_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, ATM_PRESSURE_ELEMENT_NAME);
 	private static final Path ATM_LOCATION_PATH = new Path(ATM_PRESSURE_PATH, "Location");
 	private static final Path ATM_MANUFACTURER_PATH = new Path(ATM_PRESSURE_PATH, "Manufacturer");
 	private static final Path ATM_MODEL_PATH = new Path(ATM_PRESSURE_PATH, "Model");
@@ -167,8 +204,9 @@ public class OmeMetadata {
 	private static final Path ATM_PRECISION_PATH = new Path(ATM_PRESSURE_PATH, "Precision");
 	private static final Path ATM_CALIBRATION_PATH = new Path(ATM_PRESSURE_PATH, "Calibration");
 	private static final Path ATM_COMMENTS_PATH = new Path(ATM_PRESSURE_PATH, "Other_Comments");
-	
-	private static final Path SSS_PATH = new Path(METHOD_DESCRIPTION_PATH, "Sea_Surface_Salinity");
+
+	private static final String SSS_ELEMENT_NAME = "Sea_Surface_Salinity";
+	private static final Path SSS_PATH = new Path(METHOD_DESCRIPTION_PATH, SSS_ELEMENT_NAME);
 	private static final Path SSS_LOCATION_PATH = new Path(SSS_PATH, "Location");
 	private static final Path SSS_MANUFACTURER_PATH = new Path(SSS_PATH, "Manufacturer");
 	private static final Path SSS_MODEL_PATH = new Path(SSS_PATH, "Model");
@@ -335,24 +373,48 @@ public class OmeMetadata {
 	 * Variables holding info about composite values
 	 */
 	private static final String INVESTIGATOR_COMP_NAME = "investigator";
-	private static Path INVESTIGATORS_PATH = null;
-	private static List<String> INVESTIGATOR_ENTRIES = null;
-	private static List<String> INVESTIGATOR_ID_LIST = null;
+	private static final String INVESTIGATOR_ELEMENT_NAME = "Investigator";
+	private static final Path INVESTIGATORS_PATH = new Path(null, INVESTIGATOR_ELEMENT_NAME);
+	private static final ArrayList<String> INVESTIGATOR_ENTRIES = 
+			new ArrayList<String>(Arrays.asList(INVESTIGATOR_NAME, 
+												INVESTIGATOR_ORGANIZATION, 
+												INVESTIGATOR_ADDRESS, 
+												INVESTIGATOR_PHONE, 
+												INVESTIGATOR_EMAIL));
+	private static final ArrayList<String> INVESTIGATOR_ID_LIST = 
+			new ArrayList<String>(Arrays.asList(INVESTIGATOR_NAME, 
+												INVESTIGATOR_EMAIL));
 	
 	private static final String VARIABLE_COMP_NAME = "variable";
-	private static Path VARIABLES_INFO_PATH = null;
-	private static List<String> VARIABLES_INFO_ENTRIES = null;
-	private static List<String> VARIABLES_INFO_ID_LIST = null;
+	private static final String VARIABLES_INFO_ELEMENT_NAME = "Variables_Info";
+	private static final String VARIABLE_ELEMENT_NAME = "Variable";
+	private static final Path VARIABLES_INFO_PATH = new Path(null, VARIABLES_INFO_ELEMENT_NAME, VARIABLE_ELEMENT_NAME);
+	private static final ArrayList<String> VARIABLES_INFO_ENTRIES =
+			new ArrayList<String>(Arrays.asList(VARIABLES_NAME, 
+												VARIABLES_DESCRIPTION));
+	private static final ArrayList<String> VARIABLES_INFO_ID_LIST =
+			new ArrayList<String>(Arrays.asList(VARIABLES_NAME));
 	
 	private static final String OTHER_SENSOR_COMP_NAME = "other_sensor";
-	private static Path OTHER_SENSORS_PATH = null;
-	private static List<String> OTHER_SENSORS_ENTRIES = null;
-	private static List<String> OTHER_SENSORS_ID_LIST = null;
+	private static final String OTHER_SENSORS_ELEMENT_NAME = "Other_Sensors";
+	private static final String SENSOR_ELEMENT_NAME = "Sensor";
+	private static final Path OTHER_SENSORS_PATH = 
+			new Path(new Path(null, METHOD_DESCRIPTION_ELEMENT_NAME, OTHER_SENSORS_ELEMENT_NAME), SENSOR_ELEMENT_NAME);
+	private static final ArrayList<String> OTHER_SENSORS_ENTRIES = 
+			new ArrayList<String>(Arrays.asList(OTHER_SENSORS_MANUFACTURER,
+												OTHER_SENSORS_MODEL,
+												OTHER_SENSORS_ACCURACY,
+												OTHER_SENSORS_RESOLUTION,
+												OTHER_SENSORS_CALIBRATION,
+												OTHER_SENSORS_COMMENTS));
+	private static final ArrayList<String> OTHER_SENSORS_ID_LIST = 
+			new ArrayList<String>(Arrays.asList(OTHER_SENSORS_MANUFACTURER,
+												OTHER_SENSORS_MODEL));
 	
 	/**
 	 * The EXPO Code that this OmeMetadata object is related to.
 	 */
-	private String itsExpoCode = null;
+	private String itsExpoCode;
 
 	// data values from the OME metadata 
 	
@@ -368,221 +430,192 @@ public class OmeMetadata {
 	 */
 	
 	// <Draft>
-	private boolean itIsDraft = false;
+	private boolean itIsDraft;
 	
 	// <User>
-	private OMEVariable userName = null;
-	private OMEVariable userOrganization = null;
-	private OMEVariable userAddress = null;
-	private OMEVariable userPhone = null;
-	private OMEVariable userEmail = null;
+	private OMEVariable userName;
+	private OMEVariable userOrganization;
+	private OMEVariable userAddress;
+	private OMEVariable userPhone;
+	private OMEVariable userEmail;
 	
 	// <Investigator>
-	private List<OMECompositeVariable> investigators = new ArrayList<OMECompositeVariable>();
+	private List<OMECompositeVariable> investigators;
 	
 	// <Dataset Info>
-	private OMEVariable datasetID = null;
-	private OMEVariable fundingInfo = null;
+	private OMEVariable datasetID;
+	private OMEVariable fundingInfo;
 	
 	// <DatasetInfo><Submission_Dates>
-	private OMEVariable initialSubmission = null;
-	private OMEVariable revisedSubmission = null;
+	private OMEVariable initialSubmission;
+	private OMEVariable revisedSubmission;
 	
 	// <Cruise_Info><Experiment>
-	private OMEVariable experimentName = null;
-	private OMEVariable experimentType = null;
-	private OMEVariable platformType = null;
-	private OMEVariable co2InstrumentType = null;
-	private OMEVariable mooringId = null;
+	private OMEVariable experimentName;
+	private OMEVariable experimentType;
+	private OMEVariable platformType;
+	private OMEVariable co2InstrumentType;
+	private OMEVariable mooringId;
 	
 	// <Cruise_Info><Experiment><Cruise>
-	private OMEVariable cruiseID = null;
-	private OMEVariable cruiseInfo = null;
-	private OMEVariable section = null;
+	private OMEVariable cruiseID;
+	private OMEVariable cruiseInfo;
+	private OMEVariable section;
 
 	// These two come after Temporal_Coverage in the XML
-	private OMEVariable cruiseStartDate = null;
-	private OMEVariable cruiseEndDate = null;
+	private OMEVariable cruiseStartDate;
+	private OMEVariable cruiseEndDate;
 	
 	// Cruise_Info><Experiment><Cruise><Geographical_Coverage>
-	private OMEVariable geographicalRegion = null;
+	private OMEVariable geographicalRegion;
 	
 	// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
-	private OMEVariable westmostLongitude = null;
-	private OMEVariable eastmostLongitude = null;
-	private OMEVariable northmostLatitude = null;
-	private OMEVariable southmostLatitude = null;
+	private OMEVariable westmostLongitude;
+	private OMEVariable eastmostLongitude;
+	private OMEVariable northmostLatitude;
+	private OMEVariable southmostLatitude;
 	
 	// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
-	private OMEVariable temporalCoverageStartDate = null;
-	private OMEVariable temporalCoverageEndDate = null;
+	private OMEVariable temporalCoverageStartDate;
+	private OMEVariable temporalCoverageEndDate;
 	
 	
 	// <Cruise_Info><Vessel>
-	private OMEVariable vesselName = null;
-	private OMEVariable vesselID = null;
-	private OMEVariable country = null;
-	private OMEVariable vesselOwner = null;
+	private OMEVariable vesselName;
+	private OMEVariable vesselID;
+	private OMEVariable country;
+	private OMEVariable vesselOwner;
 	
 	// <Variables_Info>
-	List<OMECompositeVariable> variablesInfo = new ArrayList<OMECompositeVariable>();
+	private ArrayList<OMECompositeVariable> variablesInfo;
 	
 	// Units stuff: <CO2_Data_Info><xxx><Unit>
-	private OMEVariable xCO2WaterEquDryUnit = null;
-	private OMEVariable xCO2WaterSSTDryUnit = null;
-	private OMEVariable pCO2WaterEquWetUnit = null;
-	private OMEVariable pCO2WaterSSTWetUnit = null;
-	private OMEVariable fCO2WaterEquWetUnit = null;
-	private OMEVariable fCO2WaterSSTWetUnit = null;
-	private OMEVariable xCO2AirDryUnit = null;
-	private OMEVariable pCO2AirWetUnit = null;
-	private OMEVariable fCO2AirWetUnit = null;
-	private OMEVariable xCO2AirDryInterpolatedUnit = null;
-	private OMEVariable pCO2AirWetInterpolatedUnit = null;
-	private OMEVariable fCO2AirWetInterpolatedUnit = null;
+	private OMEVariable xCO2WaterEquDryUnit;
+	private OMEVariable xCO2WaterSSTDryUnit;
+	private OMEVariable pCO2WaterEquWetUnit;
+	private OMEVariable pCO2WaterSSTWetUnit;
+	private OMEVariable fCO2WaterEquWetUnit;
+	private OMEVariable fCO2WaterSSTWetUnit;
+	private OMEVariable xCO2AirDryUnit;
+	private OMEVariable pCO2AirWetUnit;
+	private OMEVariable fCO2AirWetUnit;
+	private OMEVariable xCO2AirDryInterpolatedUnit;
+	private OMEVariable pCO2AirWetInterpolatedUnit;
+	private OMEVariable fCO2AirWetInterpolatedUnit;
 	
 	// <Method_Description><Equilibrator_Design>
-	private OMEVariable depthOfSeaWaterIntake = null;
-	private OMEVariable locationOfSeaWaterIntake = null;
-	private OMEVariable equilibratorType = null;
-	private OMEVariable equilibratorVolume = null;
-	private OMEVariable waterFlowRate = null;
-	private OMEVariable headspaceGasFlowRate = null;
-	private OMEVariable vented = null;
-	private OMEVariable dryingMethodForCO2InWater = null;
-	private OMEVariable equAdditionalInformation = null;
+	private OMEVariable depthOfSeaWaterIntake;
+	private OMEVariable locationOfSeaWaterIntake;
+	private OMEVariable equilibratorType;
+	private OMEVariable equilibratorVolume;
+	private OMEVariable waterFlowRate;
+	private OMEVariable headspaceGasFlowRate;
+	private OMEVariable vented;
+	private OMEVariable dryingMethodForCO2InWater;
+	private OMEVariable equAdditionalInformation;
 	
 	// <Method_Description><CO2_in_Marine_Air>
-	private OMEVariable co2InMarineAirMeasurement = null;
-	private OMEVariable co2InMarineAirLocationAndHeight = null;
-	private OMEVariable co2InMarineAirDryingMethod = null;
+	private OMEVariable co2InMarineAirMeasurement;
+	private OMEVariable co2InMarineAirLocationAndHeight;
+	private OMEVariable co2InMarineAirDryingMethod;
 	
 	// <Method_Description><CO2_Sensors><CO2_Sensor>
-	private OMEVariable co2MeasurementMethod = null;
-	private OMEVariable co2Manufacturer = null;
-	private OMEVariable co2Model = null;
-	private OMEVariable co2Frequency = null;
-	private OMEVariable co2ResolutionWater = null;
-	private OMEVariable co2UncertaintyWater = null;
-	private OMEVariable co2ResolutionAir = null;
-	private OMEVariable co2UncertaintyAir = null;
-	private OMEVariable co2ManufacturerOfCalibrationGas = null;
-	private OMEVariable co2SensorCalibration = null;
-	private OMEVariable co2EnvironmentalControl = null;
-	private OMEVariable co2MethodReferences = null;
-	private OMEVariable detailsOfCO2Sensing = null;
-	private OMEVariable analysisOfCO2Comparison = null;
-	private OMEVariable measuredCO2Params = null;
+	private OMEVariable co2MeasurementMethod;
+	private OMEVariable co2Manufacturer;
+	private OMEVariable co2Model;
+	private OMEVariable co2Frequency;
+	private OMEVariable co2ResolutionWater;
+	private OMEVariable co2UncertaintyWater;
+	private OMEVariable co2ResolutionAir;
+	private OMEVariable co2UncertaintyAir;
+	private OMEVariable co2ManufacturerOfCalibrationGas;
+	private OMEVariable co2SensorCalibration;
+	private OMEVariable co2EnvironmentalControl;
+	private OMEVariable co2MethodReferences;
+	private OMEVariable detailsOfCO2Sensing;
+	private OMEVariable analysisOfCO2Comparison;
+	private OMEVariable measuredCO2Params;
 	
 	// <Method_Description><Sea_Surface_Temperature>
-	private OMEVariable sstLocation = null;
-	private OMEVariable sstManufacturer = null;
-	private OMEVariable sstModel = null;
-	private OMEVariable sstAccuracy = null;
-	private OMEVariable sstPrecision = null;
-	private OMEVariable sstCalibration = null;
-	private OMEVariable sstOtherComments = null;
+	private OMEVariable sstLocation;
+	private OMEVariable sstManufacturer;
+	private OMEVariable sstModel;
+	private OMEVariable sstAccuracy;
+	private OMEVariable sstPrecision;
+	private OMEVariable sstCalibration;
+	private OMEVariable sstOtherComments;
 	
 	// <Method_Description><Equilibrator_Temperature>
-	private OMEVariable eqtLocation = null;
-	private OMEVariable eqtManufacturer = null;
-	private OMEVariable eqtModel = null;
-	private OMEVariable eqtAccuracy = null;
-	private OMEVariable eqtPrecision = null;
-	private OMEVariable eqtCalibration = null;
-	private OMEVariable eqtWarming = null;
-	private OMEVariable eqtOtherComments = null;
+	private OMEVariable eqtLocation;
+	private OMEVariable eqtManufacturer;
+	private OMEVariable eqtModel;
+	private OMEVariable eqtAccuracy;
+	private OMEVariable eqtPrecision;
+	private OMEVariable eqtCalibration;
+	private OMEVariable eqtWarming;
+	private OMEVariable eqtOtherComments;
 
 	// <Method_Description><Equilibrator_Pressure>
-	private OMEVariable eqpLocation = null;
-	private OMEVariable eqpManufacturer = null;
-	private OMEVariable eqpModel = null;
-	private OMEVariable eqpAccuracy = null;
-	private OMEVariable eqpPrecision = null;
-	private OMEVariable eqpCalibration = null;
-	private OMEVariable eqpOtherComments = null;
-	private OMEVariable eqpNormalized = null;
+	private OMEVariable eqpLocation;
+	private OMEVariable eqpManufacturer;
+	private OMEVariable eqpModel;
+	private OMEVariable eqpAccuracy;
+	private OMEVariable eqpPrecision;
+	private OMEVariable eqpCalibration;
+	private OMEVariable eqpOtherComments;
+	private OMEVariable eqpNormalized;
 	
 	// <Method_Description><Atmospheric_Pressure>
-	private OMEVariable atpLocation = null;
-	private OMEVariable atpManufacturer = null;
-	private OMEVariable atpModel = null;
-	private OMEVariable atpAccuracy = null;
-	private OMEVariable atpPrecision = null;
-	private OMEVariable atpCalibration = null;
-	private OMEVariable atpOtherComments = null;
+	private OMEVariable atpLocation;
+	private OMEVariable atpManufacturer;
+	private OMEVariable atpModel;
+	private OMEVariable atpAccuracy;
+	private OMEVariable atpPrecision;
+	private OMEVariable atpCalibration;
+	private OMEVariable atpOtherComments;
 	
 	// <Method_Description><Sea_Surface_Salinity>
-	private OMEVariable sssLocation = null;
-	private OMEVariable sssManufacturer = null;
-	private OMEVariable sssModel = null;
-	private OMEVariable sssAccuracy = null;
-	private OMEVariable sssPrecision = null;
-	private OMEVariable sssCalibration = null;
-	private OMEVariable sssOtherComments = null;
+	private OMEVariable sssLocation;
+	private OMEVariable sssManufacturer;
+	private OMEVariable sssModel;
+	private OMEVariable sssAccuracy;
+	private OMEVariable sssPrecision;
+	private OMEVariable sssCalibration;
+	private OMEVariable sssOtherComments;
 	
 	// <Method_Description><Other_Sensors>
-	private List<OMECompositeVariable> otherSensors = new ArrayList<OMECompositeVariable>();
+	private ArrayList<OMECompositeVariable> otherSensors;
 	
 	// Root element
-	private OMEVariable dataSetReferences = null;
-	private OMEVariable additionalInformation = null;
-	private OMEVariable citation = null;
-	private OMEVariable measurementAndCalibrationReport = null;
-	private OMEVariable preliminaryQualityControl = null;
+	private OMEVariable dataSetReferences;
+	private OMEVariable additionalInformation;
+	private OMEVariable citation;
+	private OMEVariable measurementAndCalibrationReport;
+	private OMEVariable preliminaryQualityControl;
 	
-	private OMEVariable form_type = null;
-	private OMEVariable recordID = null;
+	private OMEVariable form_type;
+	private OMEVariable recordID;
 
 	/**
 	 * Creates an empty OME metadata document with the given expocode.
 	 * @param expoCode expocode to use
 	 */
 	public OmeMetadata(String expoCode) {
-		itsExpoCode = expoCode;
-		
-		// Initialise composite value details if required
-		if (null == INVESTIGATORS_PATH) {
-			
-			INVESTIGATORS_PATH = new Path(null, "Investigator");
-			
-			INVESTIGATOR_ENTRIES = new ArrayList<String>(5);
-			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_NAME);
-			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_ORGANIZATION);
-			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_ADDRESS);
-			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_PHONE);
-			INVESTIGATOR_ENTRIES.add(INVESTIGATOR_EMAIL);
-			
-			INVESTIGATOR_ID_LIST = new ArrayList<String>(2);
-			INVESTIGATOR_ID_LIST.add("name");
-			INVESTIGATOR_ID_LIST.add("email");
+		itsExpoCode = expoCode.toUpperCase();
 
-			Path tempPath = new Path(null, "Variables_Info");
-			VARIABLES_INFO_PATH = new Path(tempPath, "Variable");
-
-			VARIABLES_INFO_ENTRIES = new ArrayList<String>(2);
-			VARIABLES_INFO_ENTRIES.add(VARIABLES_NAME);
-			VARIABLES_INFO_ENTRIES.add(VARIABLES_DESCRIPTION);
-			
-			VARIABLES_INFO_ID_LIST = new ArrayList<String>(1);
-			VARIABLES_INFO_ID_LIST.add("variable_name");
-			
-			tempPath = new Path(null, "Method_Description");
-			tempPath = new Path(tempPath, "Other_Sensors");
-			OTHER_SENSORS_PATH = new Path(tempPath, "Sensor");
-			
-			OTHER_SENSORS_ENTRIES = new ArrayList<String>(6);
-			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_MANUFACTURER);
-			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_MODEL);
-			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_ACCURACY);
-			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_RESOLUTION);
-			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_CALIBRATION);
-			OTHER_SENSORS_ENTRIES.add(OTHER_SENSORS_COMMENTS);
-			
-			
-			OTHER_SENSORS_ID_LIST = new ArrayList<String>();
-			OTHER_SENSORS_ID_LIST.add("manufacturer");
-			OTHER_SENSORS_ID_LIST.add("model");
+		// Use assignFromOmeXmlDoc to initialize all the OMEVariables with empty values
+		// This avoids having to do an insane amount of null-checking everywhere
+		Element cruiseIdElem = new Element(CRUISE_ID_ELEMENT_NAME).setText(itsExpoCode);
+		Element cruiseElem = new Element(CRUISE_ELEMENT_NAME).addContent(cruiseIdElem);
+		Element experimentElem = new Element(EXPERIMENT_ELEMENT_NAME).addContent(cruiseElem);
+		Element cruiseInfoElem = new Element(CRUISE_INFO_ELEMENT_NAME).addContent(experimentElem);
+		Element rootElem = new Element(ROOT_ELEMENT_NAME).addContent(cruiseInfoElem);
+		Document emptyDoc = new Document(rootElem);
+		try {
+			assignFromOmeXmlDoc(emptyDoc);
+		} catch (BadEntryNameException ex) {
+			// Should never happen, so throw a RunTime exception if it does
+			throw new RuntimeException(ex);
 		}
 	}
 	
@@ -860,1319 +893,898 @@ public class OmeMetadata {
 	private void storeValue(String name, String value, int lineCount, boolean replace) throws OmeMetadataException {
 		
 		// Reject composites
-		if (name.equalsIgnoreCase("investigator") || name.equalsIgnoreCase("variable") || name.equalsIgnoreCase("other_sensor")) {
+		if ( name.equalsIgnoreCase(INVESTIGATOR_COMP_NAME) || 
+			 name.equalsIgnoreCase(VARIABLE_COMP_NAME) || 
+			 name.equalsIgnoreCase(OTHER_SENSOR_COMP_NAME)) {
 			throw new OmeMetadataException(lineCount, "This name is reserved for composite values");
-		} else {
-		
-			switch (name.toLowerCase()) {
-			case USER_NAME_STRING:
-			{
-				userName = setValue(userName, USER_NAME_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case USER_ORGANIZATION_STRING:
-			{
-				userOrganization = setValue(userOrganization, USER_ORGANIZATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case USER_ADDRESS_STRING:
-			{
-				userAddress = setValue(userAddress, USER_ADDRESS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case USER_PHONE_STRING:
-			{
-				userPhone = setValue(userPhone, USER_PHONE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case USER_EMAIL_STRING:
-			{
-				userEmail = setValue(userEmail, USER_EMAIL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case DATASET_ID_STRING:
-			{
-				datasetID = setValue(datasetID, DATASET_ID_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case FUNDING_INFO_STRING:
-			{
-				fundingInfo = setValue(fundingInfo, FUNDING_INFO_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EXPERIMENT_NAME_STRING:
-			{
-				experimentName = setValue(experimentName, EXPERIMENT_NAME_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EXPERIMENT_TYPE_STRING:
-			{
-				experimentType = setValue(experimentType, EXPERIMENT_TYPE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case PLATFORM_TYPE_STRING:
-			{
-				platformType = setValue(platformType, PLATFORM_TYPE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_INSTRUMENT_TYPE_STRING:
-			{
-				co2InstrumentType = setValue(co2InstrumentType, CO2_INSTRUMENT_TYPE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case MOORING_ID_STRING:
-			{
-				mooringId = setValue(mooringId, MOORING_ID_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EXPO_CODE_STRING:
-			case CRUISE_ID_STRING:
-			{
-				itsExpoCode = value;
-				cruiseID = setValue(cruiseID, CRUISE_ID_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SUB_CRUISE_INFO_STRING:
-			{
-				cruiseInfo = setValue(cruiseInfo, SUB_CRUISE_INFO_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SECTION_STRING:
-			{
-				section = setValue(section, SECTION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case WEST_BOUND_STRING:
-			{
-				westmostLongitude = setValue(westmostLongitude, WEST_BOUND_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EAST_BOUND_STRING:
-			{
-				eastmostLongitude = setValue(eastmostLongitude, EAST_BOUND_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case NORTH_BOUND_STRING:
-			{
-				northmostLatitude = setValue(northmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SOUTH_BOUND_STRING:
-			{
-				southmostLatitude = setValue(southmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case START_DATE_STRING:
-			{
-				cruiseStartDate = setValue(cruiseStartDate, START_DATE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case END_DATE_STRING:
-			{
-				cruiseEndDate = setValue(cruiseEndDate, END_DATE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case TEMP_START_DATE_STRING:
-			{
-				temporalCoverageStartDate = setValue(temporalCoverageStartDate, TEMP_START_DATE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case TEMP_END_DATE_STRING:
-			{
-				temporalCoverageEndDate = setValue(temporalCoverageEndDate, TEMP_END_DATE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case GEO_REGION_STRING:
-			{
-				geographicalRegion = setValue(geographicalRegion, GEO_REGION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case VESSEL_NAME_STRING:
-			{
-				vesselName = setValue(vesselName, VESSEL_NAME_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case VESSEL_ID_STRING:
-			{
-				vesselID = setValue(vesselID, VESSEL_ID_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case COUNTRY_STRING:
-			{
-				country = setValue(country, COUNTRY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case OWNER_STRING:
-			{
-				vesselOwner = setValue(vesselOwner, OWNER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case XCO2_WATER_EQU_DRY_STRING:
-			{
-				xCO2WaterEquDryUnit = setValue(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case XCO2_WATER_SST_DRY_STRING:
-			{
-				xCO2WaterSSTDryUnit = setValue(xCO2WaterSSTDryUnit, XCO2_WATER_SST_DRY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case PCO2_WATER_EQU_WET_STRING:
-			{
-				pCO2WaterEquWetUnit = setValue(pCO2WaterEquWetUnit, PCO2_WATER_EQU_WET_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case PCO2_WATER_SST_WET_STRING:
-			{
-				pCO2WaterSSTWetUnit = setValue(pCO2WaterSSTWetUnit, PCO2_WATER_SST_WET_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case FCO2_WATER_EQU_WET_STRING:
-			{
-				fCO2WaterEquWetUnit = setValue(fCO2WaterEquWetUnit, FCO2_WATER_EQU_WET_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case FCO2_WATER_SST_WET_STRING:
-			{
-				fCO2WaterSSTWetUnit = setValue(fCO2WaterSSTWetUnit, FCO2_WATER_SST_WET_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case XCO2_AIR_DRY_STRING:
-			{
-				xCO2AirDryUnit = setValue(xCO2AirDryUnit, XCO2_AIR_DRY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case PCO2_AIR_WET_STRING:
-			{
-				pCO2AirWetUnit = setValue(pCO2AirWetUnit, PCO2_AIR_WET_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case FCO2_AIR_WET_STRING:
-			{
-				fCO2AirWetUnit = setValue(fCO2AirWetUnit, FCO2_AIR_WET_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case XCO2_AIR_DRY_INTERP_STRING:
-			{
-				xCO2AirDryInterpolatedUnit = setValue(xCO2AirDryInterpolatedUnit, XCO2_AIR_DRY_INTERP_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case PCO2_AIR_WET_INTERP_STRING:
-			{
-				pCO2AirWetInterpolatedUnit = setValue(pCO2AirWetInterpolatedUnit, PCO2_AIR_WET_INTERP_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case FCO2_AIR_WET_INTERP_STRING:
-			{
-				fCO2AirWetInterpolatedUnit = setValue(fCO2AirWetInterpolatedUnit, FCO2_AIR_WET_INTERP_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case INTAKE_DEPTH_STRING:
-			{
-				depthOfSeaWaterIntake = setValue(depthOfSeaWaterIntake, INTAKE_DEPTH_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case INTAKE_LOCATION_STRING:
-			{
-				locationOfSeaWaterIntake = setValue(locationOfSeaWaterIntake, INTAKE_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQUI_TYPE_STRING:
-			{
-				equilibratorType = setValue(equilibratorType, EQUI_TYPE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQUI_VOLUME_STRING:
-			{
-				equilibratorVolume = setValue(equilibratorVolume, EQUI_VOLUME_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case WATER_FLOW_RATE_STRING:
-			{
-				waterFlowRate = setValue(waterFlowRate, WATER_FLOW_RATE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case GAS_FLOW_RATE_STRING:
-			{
-				headspaceGasFlowRate = setValue(headspaceGasFlowRate, GAS_FLOW_RATE_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case VENTED_STRING:
-			{
-				vented = setValue(vented, VENTED_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case DRYING_METHOD_STRING:
-			{
-				dryingMethodForCO2InWater = setValue(dryingMethodForCO2InWater, DRYING_METHOD_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQUI_ADDITIONAL_INFO_STRING:
-			{
-				equAdditionalInformation = setValue(equAdditionalInformation, EQUI_ADDITIONAL_INFO_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case MARINE_AIR_MEASUREMENT_STRING:
-			{
-				co2InMarineAirMeasurement = setValue(co2InMarineAirMeasurement, MARINE_AIR_MEASUREMENT_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case MARINE_AIR_LOCATION_STRING:
-			{
-				co2InMarineAirLocationAndHeight = setValue(co2InMarineAirLocationAndHeight, MARINE_AIR_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case MARINE_AIR_DRYING_STRING:
-			{
-				co2InMarineAirDryingMethod = setValue(co2InMarineAirDryingMethod, MARINE_AIR_DRYING_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_MEASUREMENT_METHOD_STRING:
-			{
-				co2MeasurementMethod = setValue(co2MeasurementMethod, CO2_MEASUREMENT_METHOD_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_MANUFACTURER_STRING:
-			{
-				co2Manufacturer = setValue(co2Manufacturer, CO2_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_MODEL_STRING:
-			{
-				co2Model = setValue(co2Model, CO2_MODEL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_FREQUENCY_STRING:
-			{
-				co2Frequency = setValue(co2Frequency, CO2_FREQUENCY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_WATER_RES_STRING:
-			{
-				co2ResolutionWater = setValue(co2ResolutionWater, CO2_WATER_RES_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_WATER_UNC_STRING:
-			{
-				co2UncertaintyWater = setValue(co2UncertaintyWater, CO2_WATER_UNC_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_AIR_RES_STRING:
-			{
-				co2ResolutionAir = setValue(co2ResolutionAir, CO2_AIR_RES_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_AIR_UNC_STRING:
-			{
-				co2UncertaintyAir = setValue(co2UncertaintyAir, CO2_AIR_UNC_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_CALIBRATION_MANUFACTURER_STRING:
-			{
-				co2ManufacturerOfCalibrationGas = setValue(co2ManufacturerOfCalibrationGas, CO2_CALIBRATION_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CO2_SENSOR_CALIBRATION_STRING:
-			{
-				co2SensorCalibration = setValue(co2SensorCalibration, CO2_SENSOR_CALIBRATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ENVIRONMENTAL_CONTROL_STRING:
-			{
-				co2EnvironmentalControl = setValue(co2EnvironmentalControl, ENVIRONMENTAL_CONTROL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case METHOD_REFS_STRING:
-			{
-				co2MethodReferences = setValue(co2MethodReferences, METHOD_REFS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case DETAILS_OF_CO2_SENSING_STRING:
-			{
-				detailsOfCO2Sensing = setValue(detailsOfCO2Sensing, DETAILS_OF_CO2_SENSING_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ANALYSIS_OF_COMPARISON_STRING:
-			{
-				analysisOfCO2Comparison = setValue(analysisOfCO2Comparison, ANALYSIS_OF_COMPARISON_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case MEASURED_CO2_PARAMS_STRING:
-			{
-				measuredCO2Params = setValue(measuredCO2Params, MEASURED_CO2_PARAMS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_LOCATION_STRING:
-			{
-				sstLocation = setValue(sstLocation, SST_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_MANUFACTURER_STRING:
-			{
-				sstManufacturer = setValue(sstManufacturer, SST_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_MODEL_STRING:
-			{
-				sstModel = setValue(sstModel, SST_MODEL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_ACCURACY_STRING:
-			{
-				sstAccuracy = setValue(sstAccuracy, SST_ACCURACY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_PRECISION_STRING:
-			{
-				sstPrecision = setValue(sstPrecision, SST_PRECISION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_CALIBRATION_STRING:
-			{
-				sstCalibration = setValue(sstCalibration, SST_CALIBRATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SST_COMMENTS_STRING:
-			{
-				sstOtherComments = setValue(sstOtherComments, SST_COMMENTS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_LOCATION_STRING:
-			{
-				eqtLocation = setValue(eqtLocation, EQT_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_MANUFACTURER_STRING:
-			{
-				eqtManufacturer = setValue(eqtManufacturer, EQT_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_MODEL_STRING:
-			{
-				eqtModel = setValue(eqtModel, EQT_MODEL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_ACCURACY_STRING:
-			{
-				eqtAccuracy = setValue(eqtAccuracy, EQT_ACCURACY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_PRECISION_STRING:
-			{
-				eqtPrecision = setValue(eqtPrecision, EQT_PRECISION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_CALIBRATION_STRING:
-			{
-				eqtCalibration = setValue(eqtCalibration, EQT_CALIBRATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_WARMING_STRING:
-			{
-				eqtWarming = setValue(eqtWarming, EQT_WARMING_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQT_COMMENTS_STRING:
-			{
-				eqtOtherComments = setValue(eqtOtherComments, EQT_COMMENTS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_LOCATION_STRING:
-			{
-				eqpLocation = setValue(eqpLocation, EQP_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_MANUFACTURER_STRING:
-			{
-				eqpManufacturer = setValue(eqpManufacturer, EQP_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_MODEL_STRING:
-			{
-				eqpModel = setValue(eqpModel, EQP_MODEL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_ACCURACY_STRING:
-			{
-				eqpAccuracy = setValue(eqpAccuracy, EQP_ACCURACY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_PRECISION_STRING:
-			{
-				eqpPrecision = setValue(eqpPrecision, EQP_PRECISION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_CALIBRATION_STRING:
-			{
-				eqpCalibration = setValue(eqpCalibration, EQP_CALIBRATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_COMMENTS_STRING:
-			{
-				eqpOtherComments = setValue(eqpOtherComments, EQP_COMMENTS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case EQP_NORMALIZED_STRING:
-			{
-				eqpNormalized = setValue(eqpNormalized, EQP_NORMALIZED_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_LOCATION_STRING:
-			{
-				atpLocation = setValue(atpLocation, ATM_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_MANUFACTURER_STRING:
-			{
-				atpManufacturer = setValue(atpManufacturer, ATM_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_MODEL_STRING:
-			{
-				atpModel = setValue(atpModel, ATM_MODEL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_ACCURACY_STRING:
-			{
-				atpAccuracy = setValue(atpAccuracy, ATM_ACCURACY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_PRECISION_STRING:
-			{
-				atpPrecision = setValue(atpPrecision, ATM_PRECISION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_CALIBRATION_STRING:
-			{
-				atpCalibration = setValue(atpCalibration, ATM_CALIBRATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ATM_COMMENTS_STRING:
-			{
-				atpOtherComments = setValue(atpOtherComments, ATM_COMMENTS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_LOCATION_STRING:
-			{
-				sssLocation = setValue(sssLocation, SSS_LOCATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_MANUFACTURER_STRING:
-			{
-				sssManufacturer = setValue(sssManufacturer, SSS_MANUFACTURER_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_MODEL_STRING:
-			{
-				sssModel = setValue(sssModel, SSS_MODEL_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_ACCURACY_STRING:
-			{
-				sssAccuracy = setValue(sssAccuracy, SSS_ACCURACY_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_PRECISION_STRING:
-			{
-				sssPrecision = setValue(sssPrecision, SSS_PRECISION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_CALIBRATION_STRING:
-			{
-				sssCalibration = setValue(sssCalibration, SSS_CALIBRATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case SSS_COMMENTS_STRING:
-			{
-				sssOtherComments = setValue(sssOtherComments, SSS_COMMENTS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case DATA_SET_REFS_STRING:
-			{
-				dataSetReferences = setValue(dataSetReferences, DATA_SET_REFS_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case ADD_INFO_STRING:
-			{
-				additionalInformation = setValue(additionalInformation, ADD_INFO_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case CITATION_STRING:
-			{
-				citation = setValue(citation, CITATION_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case MEAS_CALIB_REPORT_STRING:
-			{
-				measurementAndCalibrationReport = setValue(measurementAndCalibrationReport, MEAS_CALIB_REPORT_PATH, name, value, lineCount, replace);
-				break;
-			}
-			case PRELIM_QC_STRING:
-			{
-				preliminaryQualityControl = setValue(preliminaryQualityControl, PRELIM_QC_PATH, name, value, lineCount, replace);
-				break;
-			}
-			default:
-			{
-				throw new OmeMetadataException(lineCount, "Unrecognised variable name '" + name + "'");
-			}
-			}
+		}
+
+		switch (name.toLowerCase()) {
+		case USER_NAME_STRING:
+		{
+			userName = setValue(userName, USER_NAME_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case USER_ORGANIZATION_STRING:
+		{
+			userOrganization = setValue(userOrganization, USER_ORGANIZATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case USER_ADDRESS_STRING:
+		{
+			userAddress = setValue(userAddress, USER_ADDRESS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case USER_PHONE_STRING:
+		{
+			userPhone = setValue(userPhone, USER_PHONE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case USER_EMAIL_STRING:
+		{
+			userEmail = setValue(userEmail, USER_EMAIL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case DATASET_ID_STRING:
+		{
+			datasetID = setValue(datasetID, DATASET_ID_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case FUNDING_INFO_STRING:
+		{
+			fundingInfo = setValue(fundingInfo, FUNDING_INFO_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EXPERIMENT_NAME_STRING:
+		{
+			experimentName = setValue(experimentName, EXPERIMENT_NAME_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EXPERIMENT_TYPE_STRING:
+		{
+			experimentType = setValue(experimentType, EXPERIMENT_TYPE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case PLATFORM_TYPE_STRING:
+		{
+			platformType = setValue(platformType, PLATFORM_TYPE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_INSTRUMENT_TYPE_STRING:
+		{
+			co2InstrumentType = setValue(co2InstrumentType, CO2_INSTRUMENT_TYPE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case MOORING_ID_STRING:
+		{
+			mooringId = setValue(mooringId, MOORING_ID_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EXPO_CODE_STRING:
+		case CRUISE_ID_STRING:
+		{
+			itsExpoCode = value;
+			cruiseID = setValue(cruiseID, CRUISE_ID_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SUB_CRUISE_INFO_STRING:
+		{
+			cruiseInfo = setValue(cruiseInfo, SUB_CRUISE_INFO_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SECTION_STRING:
+		{
+			section = setValue(section, SECTION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case WEST_BOUND_STRING:
+		{
+			westmostLongitude = setValue(westmostLongitude, WEST_BOUND_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EAST_BOUND_STRING:
+		{
+			eastmostLongitude = setValue(eastmostLongitude, EAST_BOUND_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case NORTH_BOUND_STRING:
+		{
+			northmostLatitude = setValue(northmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SOUTH_BOUND_STRING:
+		{
+			southmostLatitude = setValue(southmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case START_DATE_STRING:
+		{
+			cruiseStartDate = setValue(cruiseStartDate, START_DATE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case END_DATE_STRING:
+		{
+			cruiseEndDate = setValue(cruiseEndDate, END_DATE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case TEMP_START_DATE_STRING:
+		{
+			temporalCoverageStartDate = setValue(temporalCoverageStartDate, TEMP_START_DATE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case TEMP_END_DATE_STRING:
+		{
+			temporalCoverageEndDate = setValue(temporalCoverageEndDate, TEMP_END_DATE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case GEO_REGION_STRING:
+		{
+			geographicalRegion = setValue(geographicalRegion, GEO_REGION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case VESSEL_NAME_STRING:
+		{
+			vesselName = setValue(vesselName, VESSEL_NAME_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case VESSEL_ID_STRING:
+		{
+			vesselID = setValue(vesselID, VESSEL_ID_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case COUNTRY_STRING:
+		{
+			country = setValue(country, COUNTRY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case OWNER_STRING:
+		{
+			vesselOwner = setValue(vesselOwner, OWNER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case XCO2_WATER_EQU_DRY_STRING:
+		{
+			xCO2WaterEquDryUnit = setValue(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case XCO2_WATER_SST_DRY_STRING:
+		{
+			xCO2WaterSSTDryUnit = setValue(xCO2WaterSSTDryUnit, XCO2_WATER_SST_DRY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case PCO2_WATER_EQU_WET_STRING:
+		{
+			pCO2WaterEquWetUnit = setValue(pCO2WaterEquWetUnit, PCO2_WATER_EQU_WET_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case PCO2_WATER_SST_WET_STRING:
+		{
+			pCO2WaterSSTWetUnit = setValue(pCO2WaterSSTWetUnit, PCO2_WATER_SST_WET_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case FCO2_WATER_EQU_WET_STRING:
+		{
+			fCO2WaterEquWetUnit = setValue(fCO2WaterEquWetUnit, FCO2_WATER_EQU_WET_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case FCO2_WATER_SST_WET_STRING:
+		{
+			fCO2WaterSSTWetUnit = setValue(fCO2WaterSSTWetUnit, FCO2_WATER_SST_WET_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case XCO2_AIR_DRY_STRING:
+		{
+			xCO2AirDryUnit = setValue(xCO2AirDryUnit, XCO2_AIR_DRY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case PCO2_AIR_WET_STRING:
+		{
+			pCO2AirWetUnit = setValue(pCO2AirWetUnit, PCO2_AIR_WET_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case FCO2_AIR_WET_STRING:
+		{
+			fCO2AirWetUnit = setValue(fCO2AirWetUnit, FCO2_AIR_WET_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case XCO2_AIR_DRY_INTERP_STRING:
+		{
+			xCO2AirDryInterpolatedUnit = setValue(xCO2AirDryInterpolatedUnit, XCO2_AIR_DRY_INTERP_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case PCO2_AIR_WET_INTERP_STRING:
+		{
+			pCO2AirWetInterpolatedUnit = setValue(pCO2AirWetInterpolatedUnit, PCO2_AIR_WET_INTERP_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case FCO2_AIR_WET_INTERP_STRING:
+		{
+			fCO2AirWetInterpolatedUnit = setValue(fCO2AirWetInterpolatedUnit, FCO2_AIR_WET_INTERP_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case INTAKE_DEPTH_STRING:
+		{
+			depthOfSeaWaterIntake = setValue(depthOfSeaWaterIntake, INTAKE_DEPTH_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case INTAKE_LOCATION_STRING:
+		{
+			locationOfSeaWaterIntake = setValue(locationOfSeaWaterIntake, INTAKE_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQUI_TYPE_STRING:
+		{
+			equilibratorType = setValue(equilibratorType, EQUI_TYPE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQUI_VOLUME_STRING:
+		{
+			equilibratorVolume = setValue(equilibratorVolume, EQUI_VOLUME_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case WATER_FLOW_RATE_STRING:
+		{
+			waterFlowRate = setValue(waterFlowRate, WATER_FLOW_RATE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case GAS_FLOW_RATE_STRING:
+		{
+			headspaceGasFlowRate = setValue(headspaceGasFlowRate, GAS_FLOW_RATE_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case VENTED_STRING:
+		{
+			vented = setValue(vented, VENTED_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case DRYING_METHOD_STRING:
+		{
+			dryingMethodForCO2InWater = setValue(dryingMethodForCO2InWater, DRYING_METHOD_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQUI_ADDITIONAL_INFO_STRING:
+		{
+			equAdditionalInformation = setValue(equAdditionalInformation, EQUI_ADDITIONAL_INFO_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case MARINE_AIR_MEASUREMENT_STRING:
+		{
+			co2InMarineAirMeasurement = setValue(co2InMarineAirMeasurement, MARINE_AIR_MEASUREMENT_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case MARINE_AIR_LOCATION_STRING:
+		{
+			co2InMarineAirLocationAndHeight = setValue(co2InMarineAirLocationAndHeight, MARINE_AIR_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case MARINE_AIR_DRYING_STRING:
+		{
+			co2InMarineAirDryingMethod = setValue(co2InMarineAirDryingMethod, MARINE_AIR_DRYING_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_MEASUREMENT_METHOD_STRING:
+		{
+			co2MeasurementMethod = setValue(co2MeasurementMethod, CO2_MEASUREMENT_METHOD_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_MANUFACTURER_STRING:
+		{
+			co2Manufacturer = setValue(co2Manufacturer, CO2_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_MODEL_STRING:
+		{
+			co2Model = setValue(co2Model, CO2_MODEL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_FREQUENCY_STRING:
+		{
+			co2Frequency = setValue(co2Frequency, CO2_FREQUENCY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_WATER_RES_STRING:
+		{
+			co2ResolutionWater = setValue(co2ResolutionWater, CO2_WATER_RES_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_WATER_UNC_STRING:
+		{
+			co2UncertaintyWater = setValue(co2UncertaintyWater, CO2_WATER_UNC_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_AIR_RES_STRING:
+		{
+			co2ResolutionAir = setValue(co2ResolutionAir, CO2_AIR_RES_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_AIR_UNC_STRING:
+		{
+			co2UncertaintyAir = setValue(co2UncertaintyAir, CO2_AIR_UNC_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_CALIBRATION_MANUFACTURER_STRING:
+		{
+			co2ManufacturerOfCalibrationGas = setValue(co2ManufacturerOfCalibrationGas, CO2_CALIBRATION_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CO2_SENSOR_CALIBRATION_STRING:
+		{
+			co2SensorCalibration = setValue(co2SensorCalibration, CO2_SENSOR_CALIBRATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ENVIRONMENTAL_CONTROL_STRING:
+		{
+			co2EnvironmentalControl = setValue(co2EnvironmentalControl, ENVIRONMENTAL_CONTROL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case METHOD_REFS_STRING:
+		{
+			co2MethodReferences = setValue(co2MethodReferences, METHOD_REFS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case DETAILS_OF_CO2_SENSING_STRING:
+		{
+			detailsOfCO2Sensing = setValue(detailsOfCO2Sensing, DETAILS_OF_CO2_SENSING_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ANALYSIS_OF_COMPARISON_STRING:
+		{
+			analysisOfCO2Comparison = setValue(analysisOfCO2Comparison, ANALYSIS_OF_COMPARISON_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case MEASURED_CO2_PARAMS_STRING:
+		{
+			measuredCO2Params = setValue(measuredCO2Params, MEASURED_CO2_PARAMS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_LOCATION_STRING:
+		{
+			sstLocation = setValue(sstLocation, SST_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_MANUFACTURER_STRING:
+		{
+			sstManufacturer = setValue(sstManufacturer, SST_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_MODEL_STRING:
+		{
+			sstModel = setValue(sstModel, SST_MODEL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_ACCURACY_STRING:
+		{
+			sstAccuracy = setValue(sstAccuracy, SST_ACCURACY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_PRECISION_STRING:
+		{
+			sstPrecision = setValue(sstPrecision, SST_PRECISION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_CALIBRATION_STRING:
+		{
+			sstCalibration = setValue(sstCalibration, SST_CALIBRATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SST_COMMENTS_STRING:
+		{
+			sstOtherComments = setValue(sstOtherComments, SST_COMMENTS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_LOCATION_STRING:
+		{
+			eqtLocation = setValue(eqtLocation, EQT_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_MANUFACTURER_STRING:
+		{
+			eqtManufacturer = setValue(eqtManufacturer, EQT_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_MODEL_STRING:
+		{
+			eqtModel = setValue(eqtModel, EQT_MODEL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_ACCURACY_STRING:
+		{
+			eqtAccuracy = setValue(eqtAccuracy, EQT_ACCURACY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_PRECISION_STRING:
+		{
+			eqtPrecision = setValue(eqtPrecision, EQT_PRECISION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_CALIBRATION_STRING:
+		{
+			eqtCalibration = setValue(eqtCalibration, EQT_CALIBRATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_WARMING_STRING:
+		{
+			eqtWarming = setValue(eqtWarming, EQT_WARMING_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQT_COMMENTS_STRING:
+		{
+			eqtOtherComments = setValue(eqtOtherComments, EQT_COMMENTS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_LOCATION_STRING:
+		{
+			eqpLocation = setValue(eqpLocation, EQP_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_MANUFACTURER_STRING:
+		{
+			eqpManufacturer = setValue(eqpManufacturer, EQP_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_MODEL_STRING:
+		{
+			eqpModel = setValue(eqpModel, EQP_MODEL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_ACCURACY_STRING:
+		{
+			eqpAccuracy = setValue(eqpAccuracy, EQP_ACCURACY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_PRECISION_STRING:
+		{
+			eqpPrecision = setValue(eqpPrecision, EQP_PRECISION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_CALIBRATION_STRING:
+		{
+			eqpCalibration = setValue(eqpCalibration, EQP_CALIBRATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_COMMENTS_STRING:
+		{
+			eqpOtherComments = setValue(eqpOtherComments, EQP_COMMENTS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case EQP_NORMALIZED_STRING:
+		{
+			eqpNormalized = setValue(eqpNormalized, EQP_NORMALIZED_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_LOCATION_STRING:
+		{
+			atpLocation = setValue(atpLocation, ATM_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_MANUFACTURER_STRING:
+		{
+			atpManufacturer = setValue(atpManufacturer, ATM_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_MODEL_STRING:
+		{
+			atpModel = setValue(atpModel, ATM_MODEL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_ACCURACY_STRING:
+		{
+			atpAccuracy = setValue(atpAccuracy, ATM_ACCURACY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_PRECISION_STRING:
+		{
+			atpPrecision = setValue(atpPrecision, ATM_PRECISION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_CALIBRATION_STRING:
+		{
+			atpCalibration = setValue(atpCalibration, ATM_CALIBRATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ATM_COMMENTS_STRING:
+		{
+			atpOtherComments = setValue(atpOtherComments, ATM_COMMENTS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_LOCATION_STRING:
+		{
+			sssLocation = setValue(sssLocation, SSS_LOCATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_MANUFACTURER_STRING:
+		{
+			sssManufacturer = setValue(sssManufacturer, SSS_MANUFACTURER_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_MODEL_STRING:
+		{
+			sssModel = setValue(sssModel, SSS_MODEL_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_ACCURACY_STRING:
+		{
+			sssAccuracy = setValue(sssAccuracy, SSS_ACCURACY_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_PRECISION_STRING:
+		{
+			sssPrecision = setValue(sssPrecision, SSS_PRECISION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_CALIBRATION_STRING:
+		{
+			sssCalibration = setValue(sssCalibration, SSS_CALIBRATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case SSS_COMMENTS_STRING:
+		{
+			sssOtherComments = setValue(sssOtherComments, SSS_COMMENTS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case DATA_SET_REFS_STRING:
+		{
+			dataSetReferences = setValue(dataSetReferences, DATA_SET_REFS_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case ADD_INFO_STRING:
+		{
+			additionalInformation = setValue(additionalInformation, ADD_INFO_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case CITATION_STRING:
+		{
+			citation = setValue(citation, CITATION_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case MEAS_CALIB_REPORT_STRING:
+		{
+			measurementAndCalibrationReport = setValue(measurementAndCalibrationReport, MEAS_CALIB_REPORT_PATH, name, value, lineCount, replace);
+			break;
+		}
+		case PRELIM_QC_STRING:
+		{
+			preliminaryQualityControl = setValue(preliminaryQualityControl, PRELIM_QC_PATH, name, value, lineCount, replace);
+			break;
+		}
+		default:
+		{
+			throw new OmeMetadataException(lineCount, "Unrecognised variable name '" + name + "'");
+		}
 		}
 	}
 	
 	public String getValue(String name) throws OmeMetadataException {
-		
-		String result = null;
-		
+
 		// Reject composites
-		if (name.equalsIgnoreCase("investigator") || name.equalsIgnoreCase("variable") || name.equalsIgnoreCase("other_sensor")) {
+		if ( name.equalsIgnoreCase(INVESTIGATOR_COMP_NAME) || 
+			 name.equalsIgnoreCase(VARIABLE_COMP_NAME) || 
+			 name.equalsIgnoreCase(OTHER_SENSOR_COMP_NAME)) {
 			throw new OmeMetadataException("Cannot retrieve data from composite values");
-		} else {
-		
-			switch (name.toLowerCase()) {
-			case USER_NAME_STRING:
-			{
-				if (null != userName) {
-					result = userName.getValue();
-				}
-				break;
-			}
-			case USER_ORGANIZATION_STRING:
-			{
-				if (null != userOrganization) {
-					result = userOrganization.getValue();
-				}
-				break;
-			}
-			case USER_ADDRESS_STRING:
-			{
-				if (null != userAddress) {
-					result = userAddress.getValue();
-				}
-				break;
-			}
-			case USER_PHONE_STRING:
-			{
-				if (null != userPhone) {
-					result = userPhone.getValue();
-				}
-				break;
-			}
-			case USER_EMAIL_STRING:
-			{
-				if (null != userEmail) {
-					result = userEmail.getValue();
-				}
-				break;
-			}
-			case DATASET_ID_STRING:
-			{
-				if (null != datasetID) {
-					result = datasetID.getValue();
-				}
-				break;
-			}
-			case FUNDING_INFO_STRING:
-			{
-				if (null != fundingInfo) {
-					result = fundingInfo.getValue();
-				}
-				break;
-			}
-			case EXPERIMENT_NAME_STRING:
-			{
-				if (null != experimentName) {
-					result = experimentName.getValue();
-				}
-				break;
-			}
-			case EXPERIMENT_TYPE_STRING:
-			{
-				if (null != experimentType) {
-					result = experimentType.getValue();
-				}
-				break;
-			}
-			case PLATFORM_TYPE_STRING:
-			{
-				if (null != platformType) {
-					result = platformType.getValue();
-				}
-				break;
-			}
-			case CO2_INSTRUMENT_TYPE_STRING:
-			{
-				if (null != co2InstrumentType) {
-					result = co2InstrumentType.getValue();
-				}
-				break;
-			}
-			case MOORING_ID_STRING:
-			{
-				if (null != mooringId) {
-					result = mooringId.getValue();
-				}
-				break;
-			}
-			case EXPO_CODE_STRING:
-			case CRUISE_ID_STRING:
-			{
-				if (null != itsExpoCode) {
-					result = itsExpoCode;
-				}
-				break;
-			}
-			case SUB_CRUISE_INFO_STRING:
-			{
-				if (null != cruiseInfo) {
-					result = cruiseInfo.getValue();
-				}
-				break;
-			}
-			case SECTION_STRING:
-			{
-				if (null != section) {
-					result = section.getValue();
-				}
-				break;
-			}
-			case START_DATE_STRING:
-			{
-				if (null != cruiseStartDate) {
-					result = cruiseStartDate.getValue();
-				}
-				break;
-			}
-			case END_DATE_STRING:
-			{
-				if (null != cruiseEndDate) {
-					result = cruiseEndDate.getValue();
-				}
-				break;
-			}
-			case TEMP_START_DATE_STRING:
-			{
-				if (null != temporalCoverageStartDate) {
-					result = temporalCoverageStartDate.getValue();
-				}
-				break;
-			}
-			case TEMP_END_DATE_STRING:
-			{
-				if (null != temporalCoverageEndDate) {
-					result = temporalCoverageEndDate.getValue();
-				}
-				break;
-			}
-			case GEO_REGION_STRING:
-			{
-				if (null != geographicalRegion) {
-					result = geographicalRegion.getValue();
-				}
-				break;
-			}
-			case VESSEL_NAME_STRING:
-			{
-				if (null != vesselName) {
-					result = vesselName.getValue();
-				}
-				break;
-			}
-			case VESSEL_ID_STRING:
-			{
-				if (null != vesselID) {
-					result = vesselID.getValue();
-				}
-				break;
-			}
-			case COUNTRY_STRING:
-			{
-				if (null != country) {
-					result = country.getValue();
-				}
-				break;
-			}
-			case OWNER_STRING:
-			{
-				if (null != vesselOwner) {
-					result = vesselOwner.getValue();
-				}
-				break;
-			}
-			case XCO2_WATER_EQU_DRY_STRING:
-			{
-				if (null != xCO2WaterEquDryUnit) {
-					result = xCO2WaterEquDryUnit.getValue();
-				}
-				break;
-			}
-			case XCO2_WATER_SST_DRY_STRING:
-			{
-				if (null != xCO2WaterSSTDryUnit) {
-					result = xCO2WaterSSTDryUnit.getValue();
-				}
-				break;
-			}
-			case PCO2_WATER_EQU_WET_STRING:
-			{
-				if (null != pCO2WaterEquWetUnit) {
-					result = pCO2WaterEquWetUnit.getValue();
-				}
-				break;
-			}
-			case PCO2_WATER_SST_WET_STRING:
-			{
-				if (null != pCO2WaterSSTWetUnit) {
-					result = pCO2WaterSSTWetUnit.getValue();
-				}
-				break;
-			}
-			case FCO2_WATER_EQU_WET_STRING:
-			{
-				if (null != fCO2WaterEquWetUnit) {
-					result = fCO2WaterEquWetUnit.getValue();
-				}
-				break;
-			}
-			case FCO2_WATER_SST_WET_STRING:
-			{
-				if (null != fCO2WaterSSTWetUnit) {
-					result = fCO2WaterSSTWetUnit.getValue();
-				}
-				break;
-			}
-			case XCO2_AIR_DRY_STRING:
-			{
-				if (null != xCO2AirDryUnit) {
-					result = xCO2AirDryUnit.getValue();
-				}
-				break;
-			}
-			case PCO2_AIR_WET_STRING:
-			{
-				if (null != pCO2AirWetUnit) {
-					result = pCO2AirWetUnit.getValue();
-				}
-				break;
-			}
-			case FCO2_AIR_WET_STRING:
-			{
-				if (null != fCO2AirWetUnit) {
-					result = fCO2AirWetUnit.getValue();
-				}
-				break;
-			}
-			case XCO2_AIR_DRY_INTERP_STRING:
-			{
-				if (null != xCO2AirDryInterpolatedUnit) {
-					result = xCO2AirDryInterpolatedUnit.getValue();
-				}
-				break;
-			}
-			case PCO2_AIR_WET_INTERP_STRING:
-			{
-				if (null != pCO2AirWetInterpolatedUnit) {
-					result = pCO2AirWetInterpolatedUnit.getValue();
-				}
-				break;
-			}
-			case FCO2_AIR_WET_INTERP_STRING:
-			{
-				if (null != pCO2AirWetInterpolatedUnit) {
-					result = pCO2AirWetInterpolatedUnit.getValue();
-				}
-				break;
-			}
-			case INTAKE_DEPTH_STRING:
-			{
-				if (null != depthOfSeaWaterIntake) {
-					result = depthOfSeaWaterIntake.getValue();
-				}
-				break;
-			}
-			case INTAKE_LOCATION_STRING:
-			{
-				if (null != locationOfSeaWaterIntake) {
-					result = locationOfSeaWaterIntake.getValue();
-				}
-				break;
-			}
-			case EQUI_TYPE_STRING:
-			{
-				if (null != equilibratorType) {
-					result = equilibratorType.getValue();
-				}
-				break;
-			}
-			case EQUI_VOLUME_STRING:
-			{
-				if (null != equilibratorVolume) {
-					result = equilibratorVolume.getValue();
-				}
-				break;
-			}
-			case WATER_FLOW_RATE_STRING:
-			{
-				if (null != waterFlowRate) {
-					result = waterFlowRate.getValue();
-				}
-				break;
-			}
-			case GAS_FLOW_RATE_STRING:
-			{
-				if (null != headspaceGasFlowRate) {
-					result = headspaceGasFlowRate.getValue();
-				}
-				break;
-			}
-			case VENTED_STRING:
-			{
-				if (null != vented) {
-					result = vented.getValue();
-				}
-				break;
-			}
-			case DRYING_METHOD_STRING:
-			{
-				if (null != dryingMethodForCO2InWater) {
-					result = dryingMethodForCO2InWater.getValue();
-				}
-				break;
-			}
-			case EQUI_ADDITIONAL_INFO_STRING:
-			{
-				if (null != equAdditionalInformation) {
-					result = equAdditionalInformation.getValue();
-				}
-				break;
-			}
-			case MARINE_AIR_MEASUREMENT_STRING:
-			{
-				if (null != co2InMarineAirMeasurement) {
-					result = co2InMarineAirMeasurement.getValue();
-				}
-				break;
-			}
-			case MARINE_AIR_LOCATION_STRING:
-			{
-				if (null != co2InMarineAirLocationAndHeight) {
-					result = co2InMarineAirLocationAndHeight.getValue();
-				}
-				break;
-			}
-			case MARINE_AIR_DRYING_STRING:
-			{
-				if (null != co2InMarineAirDryingMethod) {
-					result = co2InMarineAirDryingMethod.getValue();
-				}
-				break;
-			}
-			case CO2_MEASUREMENT_METHOD_STRING:
-			{
-				if (null != co2MeasurementMethod) {
-					result = co2MeasurementMethod.getValue();
-				}
-				break;
-			}
-			case CO2_MANUFACTURER_STRING:
-			{
-				if (null != co2Manufacturer) {
-					result = co2Manufacturer.getValue();
-				}
-				break;
-			}
-			case CO2_MODEL_STRING:
-			{
-				if (null != co2Model) {
-					result = co2Model.getValue();
-				}
-				break;
-			}
-			case CO2_FREQUENCY_STRING:
-			{
-				if (null != co2Frequency) {
-					result = co2Frequency.getValue();
-				}
-				break;
-			}
-			case CO2_WATER_RES_STRING:
-			{
-				if (null != co2ResolutionWater) {
-					result = co2ResolutionWater.getValue();
-				}
-				break;
-			}
-			case CO2_WATER_UNC_STRING:
-			{
-				if (null != co2UncertaintyWater) {
-					result = co2UncertaintyWater.getValue();
-				}
-				break;
-			}
-			case CO2_AIR_RES_STRING:
-			{
-				if (null != co2ResolutionAir) {
-					result = co2ResolutionAir.getValue();
-				}
-				break;
-			}
-			case CO2_AIR_UNC_STRING:
-			{
-				if (null != co2UncertaintyAir) {
-					result = co2UncertaintyAir.getValue();
-				}
-				break;
-			}
-			case CO2_CALIBRATION_MANUFACTURER_STRING:
-			{
-				if (null != co2ManufacturerOfCalibrationGas) {
-					result = co2ManufacturerOfCalibrationGas.getValue();
-				}
-				break;
-			}
-			case CO2_SENSOR_CALIBRATION_STRING:
-			{
-				if (null != co2SensorCalibration) {
-					result = co2SensorCalibration.getValue();
-				}
-				break;
-			}
-			case ENVIRONMENTAL_CONTROL_STRING:
-			{
-				if (null != co2EnvironmentalControl) {
-					result = co2EnvironmentalControl.getValue();
-				}
-				break;
-			}
-			case METHOD_REFS_STRING:
-			{
-				if (null != co2MethodReferences) {
-					result = co2MethodReferences.getValue();
-				}
-				break;
-			}
-			case DETAILS_OF_CO2_SENSING_STRING:
-			{
-				if (null != detailsOfCO2Sensing) {
-					result = detailsOfCO2Sensing.getValue();
-				}
-				break;
-			}
-			case ANALYSIS_OF_COMPARISON_STRING:
-			{
-				if (null != analysisOfCO2Comparison) {
-					result = analysisOfCO2Comparison.getValue();
-				}
-				break;
-			}
-			case MEASURED_CO2_PARAMS_STRING:
-			{
-				if (null != measuredCO2Params) {
-					result = measuredCO2Params.getValue();
-				}
-				break;
-			}
-			case SST_LOCATION_STRING:
-			{
-				if (null != sstLocation) {
-					result = sstLocation.getValue();
-				}
-				break;
-			}
-			case SST_MANUFACTURER_STRING:
-			{
-				if (null != sstManufacturer) {
-					result = sstManufacturer.getValue();
-				}
-				break;
-			}
-			case SST_MODEL_STRING:
-			{
-				if (null != sstModel) {
-					result = sstModel.getValue();
-				}
-				break;
-			}
-			case SST_ACCURACY_STRING:
-			{
-				if (null != sstAccuracy) {
-					result = sstAccuracy.getValue();
-				}
-				break;
-			}
-			case SST_PRECISION_STRING:
-			{
-				if (null != sstPrecision) {
-					result = sstPrecision.getValue();
-				}
-				break;
-			}
-			case SST_CALIBRATION_STRING:
-			{
-				if (null != sstCalibration) {
-					result = sstCalibration.getValue();
-				}
-				break;
-			}
-			case SST_COMMENTS_STRING:
-			{
-				if (null != sstOtherComments) {
-					result = sstOtherComments.getValue();
-				}
-				break;
-			}
-			case EQT_LOCATION_STRING:
-			{
-				if (null != eqtLocation) {
-					result = eqtLocation.getValue();
-				}
-				break;
-			}
-			case EQT_MANUFACTURER_STRING:
-			{
-				if (null != eqtManufacturer) {
-					result = eqtManufacturer.getValue();
-				}
-				break;
-			}
-			case EQT_MODEL_STRING:
-			{
-				if (null != eqtModel) {
-					result = eqtModel.getValue();
-				}
-				break;
-			}
-			case EQT_ACCURACY_STRING:
-			{
-				if (null != eqtAccuracy) {
-					result = eqtAccuracy.getValue();
-				}
-				break;
-			}
-			case EQT_PRECISION_STRING:
-			{
-				if (null != eqtPrecision) {
-					result = eqtPrecision.getValue();
-				}
-				break;
-			}
-			case EQT_CALIBRATION_STRING:
-			{
-				if (null != eqtCalibration) {
-					result = eqtCalibration.getValue();
-				}
-				break;
-			}
-			case EQT_WARMING_STRING:
-			{
-				if (null != eqtWarming) {
-					result = eqtWarming.getValue();
-				}
-				break;
-			}
-			case EQT_COMMENTS_STRING:
-			{
-				if (null != eqtOtherComments) {
-					result = eqtOtherComments.getValue();
-				}
-				break;
-			}
-			case EQP_LOCATION_STRING:
-			{
-				if (null != eqpLocation) {
-					result = eqpLocation.getValue();
-				}
-				break;
-			}
-			case EQP_MANUFACTURER_STRING:
-			{
-				if (null != eqpManufacturer) {
-					result = eqpManufacturer.getValue();
-				}
-				break;
-			}
-			case EQP_MODEL_STRING:
-			{
-				if (null != eqpModel) {
-					result = eqpModel.getValue();
-				}
-				break;
-			}
-			case EQP_ACCURACY_STRING:
-			{
-				if (null != eqpAccuracy) {
-					result = eqpAccuracy.getValue();
-				}
-				break;
-			}
-			case EQP_PRECISION_STRING:
-			{
-				if (null != eqpPrecision) {
-					result = eqpPrecision.getValue();
-				}
-				break;
-			}
-			case EQP_CALIBRATION_STRING:
-			{
-				if (null != eqpCalibration) {
-					result = eqpCalibration.getValue();
-				}
-				break;
-			}
-			case EQP_COMMENTS_STRING:
-			{
-				if (null != eqpOtherComments) {
-					result = eqpOtherComments.getValue();
-				}
-				break;
-			}
-			case EQP_NORMALIZED_STRING:
-			{
-				if (null != eqpNormalized) {
-					result = eqpNormalized.getValue();
-				}
-				break;
-			}
-			case ATM_LOCATION_STRING:
-			{
-				if (null != atpLocation) {
-					result = atpLocation.getValue();
-				}
-				break;
-			}
-			case ATM_MANUFACTURER_STRING:
-			{
-				if (null != atpManufacturer) {
-					result = atpManufacturer.getValue();
-				}
-				break;
-			}
-			case ATM_MODEL_STRING:
-			{
-				if (null != atpModel) {
-					result = atpModel.getValue();
-				}
-				break;
-			}
-			case ATM_ACCURACY_STRING:
-			{
-				if (null != atpAccuracy) {
-					result = atpAccuracy.getValue();
-				}
-				break;
-			}
-			case ATM_PRECISION_STRING:
-			{
-				if (null != atpPrecision) {
-					result = atpPrecision.getValue();
-				}
-				break;
-			}
-			case ATM_CALIBRATION_STRING:
-			{
-				if (null != atpCalibration) {
-					result = atpCalibration.getValue();
-				}
-				break;
-			}
-			case ATM_COMMENTS_STRING:
-			{
-				if (null != atpOtherComments) {
-					result = atpOtherComments.getValue();
-				}
-				break;
-			}
-			case SSS_LOCATION_STRING:
-			{
-				if (null != sssLocation) {
-					result = sssLocation.getValue();
-				}
-				break;
-			}
-			case SSS_MANUFACTURER_STRING:
-			{
-				if (null != sssManufacturer) {
-					result = sssManufacturer.getValue();
-				}
-				break;
-			}
-			case SSS_MODEL_STRING:
-			{
-				if (null != sssModel) {
-					result = sssModel.getValue();
-				}
-				break;
-			}
-			case SSS_ACCURACY_STRING:
-			{
-				if (null != sssAccuracy) {
-					result = sssAccuracy.getValue();
-				}
-				break;
-			}
-			case SSS_PRECISION_STRING:
-			{
-				if (null != sssPrecision) {
-					result = sssPrecision.getValue();
-				}
-				break;
-			}
-			case SSS_CALIBRATION_STRING:
-			{
-				if (null != sssCalibration) {
-					result = sssCalibration.getValue();
-				}
-				break;
-			}
-			case SSS_COMMENTS_STRING:
-			{
-				if (null != sssOtherComments) {
-					result = sssOtherComments.getValue();
-				}
-				break;
-			}
-			case DATA_SET_REFS_STRING:
-			{
-				if (null != dataSetReferences) {
-					result = dataSetReferences.getValue();
-				}
-				break;
-			}
-			case ADD_INFO_STRING:
-			{
-				if (null != additionalInformation) {
-					result = additionalInformation.getValue();
-				}
-				break;
-			}
-			case CITATION_STRING:
-			{
-				if (null != citation) {
-					result = citation.getValue();
-				}
-				break;
-			}
-			case MEAS_CALIB_REPORT_STRING:
-			{
-				if (null != measurementAndCalibrationReport) {
-					result = measurementAndCalibrationReport.getValue();
-				}
-				break;
-			}
-			case PRELIM_QC_STRING:
-			{
-				if (null != preliminaryQualityControl) {
-					result = preliminaryQualityControl.getValue();
-				}
-				break;
-			}
-			default:
-			{
-				throw new OmeMetadataException("Unrecognised variable name '" + name + "'");
-			}
-			}
+		} 
+
+		String result;
+		switch (name.toLowerCase()) {
+		case USER_NAME_STRING:
+			result = userName.getValue();
+			break;
+		case USER_ORGANIZATION_STRING:
+			result = userOrganization.getValue();
+			break;
+		case USER_ADDRESS_STRING:
+			result = userAddress.getValue();
+			break;
+		case USER_PHONE_STRING:
+			result = userPhone.getValue();
+			break;
+		case USER_EMAIL_STRING:
+			result = userEmail.getValue();
+			break;
+		case DATASET_ID_STRING:
+			result = datasetID.getValue();
+			break;
+		case FUNDING_INFO_STRING:
+			result = fundingInfo.getValue();
+			break;
+		case EXPERIMENT_NAME_STRING:
+			result = experimentName.getValue();
+			break;
+		case EXPERIMENT_TYPE_STRING:
+			result = experimentType.getValue();
+			break;
+		case PLATFORM_TYPE_STRING:
+			result = platformType.getValue();
+			break;
+		case CO2_INSTRUMENT_TYPE_STRING:
+			result = co2InstrumentType.getValue();
+			break;
+		case MOORING_ID_STRING:
+			result = mooringId.getValue();
+			break;
+		case EXPO_CODE_STRING:
+		case CRUISE_ID_STRING:
+			result = itsExpoCode;
+			break;
+		case SUB_CRUISE_INFO_STRING:
+			result = cruiseInfo.getValue();
+			break;
+		case SECTION_STRING:
+			result = section.getValue();
+			break;
+		case START_DATE_STRING:
+			result = cruiseStartDate.getValue();
+			break;
+		case END_DATE_STRING:
+			result = cruiseEndDate.getValue();
+			break;
+		case TEMP_START_DATE_STRING:
+			result = temporalCoverageStartDate.getValue();
+			break;
+		case TEMP_END_DATE_STRING:
+			result = temporalCoverageEndDate.getValue();
+			break;
+		case GEO_REGION_STRING:
+			result = geographicalRegion.getValue();
+			break;
+		case VESSEL_NAME_STRING:
+			result = vesselName.getValue();
+			break;
+		case VESSEL_ID_STRING:
+			result = vesselID.getValue();
+			break;
+		case COUNTRY_STRING:
+			result = country.getValue();
+			break;
+		case OWNER_STRING:
+			result = vesselOwner.getValue();
+			break;
+		case XCO2_WATER_EQU_DRY_STRING:
+			result = xCO2WaterEquDryUnit.getValue();
+			break;
+		case XCO2_WATER_SST_DRY_STRING:
+			result = xCO2WaterSSTDryUnit.getValue();
+			break;
+		case PCO2_WATER_EQU_WET_STRING:
+			result = pCO2WaterEquWetUnit.getValue();
+			break;
+		case PCO2_WATER_SST_WET_STRING:
+			result = pCO2WaterSSTWetUnit.getValue();
+			break;
+		case FCO2_WATER_EQU_WET_STRING:
+			result = fCO2WaterEquWetUnit.getValue();
+			break;
+		case FCO2_WATER_SST_WET_STRING:
+			result = fCO2WaterSSTWetUnit.getValue();
+			break;
+		case XCO2_AIR_DRY_STRING:
+			result = xCO2AirDryUnit.getValue();
+			break;
+		case PCO2_AIR_WET_STRING:
+			result = pCO2AirWetUnit.getValue();
+			break;
+		case FCO2_AIR_WET_STRING:
+			result = fCO2AirWetUnit.getValue();
+			break;
+		case XCO2_AIR_DRY_INTERP_STRING:
+			result = xCO2AirDryInterpolatedUnit.getValue();
+			break;
+		case PCO2_AIR_WET_INTERP_STRING:
+			result = pCO2AirWetInterpolatedUnit.getValue();
+			break;
+		case FCO2_AIR_WET_INTERP_STRING:
+			result = pCO2AirWetInterpolatedUnit.getValue();
+			break;
+		case INTAKE_DEPTH_STRING:
+			result = depthOfSeaWaterIntake.getValue();
+			break;
+		case INTAKE_LOCATION_STRING:
+			result = locationOfSeaWaterIntake.getValue();
+			break;
+		case EQUI_TYPE_STRING:
+			result = equilibratorType.getValue();
+			break;
+		case EQUI_VOLUME_STRING:
+			result = equilibratorVolume.getValue();
+			break;
+		case WATER_FLOW_RATE_STRING:
+			result = waterFlowRate.getValue();
+			break;
+		case GAS_FLOW_RATE_STRING:
+			result = headspaceGasFlowRate.getValue();
+			break;
+		case VENTED_STRING:
+			result = vented.getValue();
+			break;
+		case DRYING_METHOD_STRING:
+			result = dryingMethodForCO2InWater.getValue();
+			break;
+		case EQUI_ADDITIONAL_INFO_STRING:
+			result = equAdditionalInformation.getValue();
+			break;
+		case MARINE_AIR_MEASUREMENT_STRING:
+			result = co2InMarineAirMeasurement.getValue();
+			break;
+		case MARINE_AIR_LOCATION_STRING:
+			result = co2InMarineAirLocationAndHeight.getValue();
+			break;
+		case MARINE_AIR_DRYING_STRING:
+			result = co2InMarineAirDryingMethod.getValue();
+			break;
+		case CO2_MEASUREMENT_METHOD_STRING:
+			result = co2MeasurementMethod.getValue();
+			break;
+		case CO2_MANUFACTURER_STRING:
+			result = co2Manufacturer.getValue();
+			break;
+		case CO2_MODEL_STRING:
+			result = co2Model.getValue();
+			break;
+		case CO2_FREQUENCY_STRING:
+			result = co2Frequency.getValue();
+			break;
+		case CO2_WATER_RES_STRING:
+			result = co2ResolutionWater.getValue();
+			break;
+		case CO2_WATER_UNC_STRING:
+			result = co2UncertaintyWater.getValue();
+			break;
+		case CO2_AIR_RES_STRING:
+			result = co2ResolutionAir.getValue();
+			break;
+		case CO2_AIR_UNC_STRING:
+			result = co2UncertaintyAir.getValue();
+			break;
+		case CO2_CALIBRATION_MANUFACTURER_STRING:
+			result = co2ManufacturerOfCalibrationGas.getValue();
+			break;
+		case CO2_SENSOR_CALIBRATION_STRING:
+			result = co2SensorCalibration.getValue();
+			break;
+		case ENVIRONMENTAL_CONTROL_STRING:
+			result = co2EnvironmentalControl.getValue();
+			break;
+		case METHOD_REFS_STRING:
+			result = co2MethodReferences.getValue();
+			break;
+		case DETAILS_OF_CO2_SENSING_STRING:
+			result = detailsOfCO2Sensing.getValue();
+			break;
+		case ANALYSIS_OF_COMPARISON_STRING:
+			result = analysisOfCO2Comparison.getValue();
+			break;
+		case MEASURED_CO2_PARAMS_STRING:
+			result = measuredCO2Params.getValue();
+			break;
+		case SST_LOCATION_STRING:
+			result = sstLocation.getValue();
+			break;
+		case SST_MANUFACTURER_STRING:
+			result = sstManufacturer.getValue();
+			break;
+		case SST_MODEL_STRING:
+			result = sstModel.getValue();
+			break;
+		case SST_ACCURACY_STRING:
+			result = sstAccuracy.getValue();
+			break;
+		case SST_PRECISION_STRING:
+			result = sstPrecision.getValue();
+			break;
+		case SST_CALIBRATION_STRING:
+			result = sstCalibration.getValue();
+			break;
+		case SST_COMMENTS_STRING:
+			result = sstOtherComments.getValue();
+			break;
+		case EQT_LOCATION_STRING:
+			result = eqtLocation.getValue();
+			break;
+		case EQT_MANUFACTURER_STRING:
+			result = eqtManufacturer.getValue();
+			break;
+		case EQT_MODEL_STRING:
+			result = eqtModel.getValue();
+			break;
+		case EQT_ACCURACY_STRING:
+			result = eqtAccuracy.getValue();
+			break;
+		case EQT_PRECISION_STRING:
+			result = eqtPrecision.getValue();
+			break;
+		case EQT_CALIBRATION_STRING:
+			result = eqtCalibration.getValue();
+			break;
+		case EQT_WARMING_STRING:
+			result = eqtWarming.getValue();
+			break;
+		case EQT_COMMENTS_STRING:
+			result = eqtOtherComments.getValue();
+			break;
+		case EQP_LOCATION_STRING:
+			result = eqpLocation.getValue();
+			break;
+		case EQP_MANUFACTURER_STRING:
+			result = eqpManufacturer.getValue();
+			break;
+		case EQP_MODEL_STRING:
+			result = eqpModel.getValue();
+			break;
+		case EQP_ACCURACY_STRING:
+			result = eqpAccuracy.getValue();
+			break;
+		case EQP_PRECISION_STRING:
+			result = eqpPrecision.getValue();
+			break;
+		case EQP_CALIBRATION_STRING:
+			result = eqpCalibration.getValue();
+			break;
+		case EQP_COMMENTS_STRING:
+			result = eqpOtherComments.getValue();
+			break;
+		case EQP_NORMALIZED_STRING:
+			result = eqpNormalized.getValue();
+			break;
+		case ATM_LOCATION_STRING:
+			result = atpLocation.getValue();
+			break;
+		case ATM_MANUFACTURER_STRING:
+			result = atpManufacturer.getValue();
+			break;
+		case ATM_MODEL_STRING:
+			result = atpModel.getValue();
+			break;
+		case ATM_ACCURACY_STRING:
+			result = atpAccuracy.getValue();
+			break;
+		case ATM_PRECISION_STRING:
+			result = atpPrecision.getValue();
+			break;
+		case ATM_CALIBRATION_STRING:
+			result = atpCalibration.getValue();
+			break;
+		case ATM_COMMENTS_STRING:
+			result = atpOtherComments.getValue();
+			break;
+		case SSS_LOCATION_STRING:
+			result = sssLocation.getValue();
+			break;
+		case SSS_MANUFACTURER_STRING:
+			result = sssManufacturer.getValue();
+			break;
+		case SSS_MODEL_STRING:
+			result = sssModel.getValue();
+			break;
+		case SSS_ACCURACY_STRING:
+			result = sssAccuracy.getValue();
+			break;
+		case SSS_PRECISION_STRING:
+			result = sssPrecision.getValue();
+			break;
+		case SSS_CALIBRATION_STRING:
+			result = sssCalibration.getValue();
+			break;
+		case SSS_COMMENTS_STRING:
+			result = sssOtherComments.getValue();
+			break;
+		case DATA_SET_REFS_STRING:
+			result = dataSetReferences.getValue();
+			break;
+		case ADD_INFO_STRING:
+			result = additionalInformation.getValue();
+			break;
+		case CITATION_STRING:
+			result = citation.getValue();
+			break;
+		case MEAS_CALIB_REPORT_STRING:
+			result = measurementAndCalibrationReport.getValue();
+			break;
+		case PRELIM_QC_STRING:
+			result = preliminaryQualityControl.getValue();
+			break;
+		default:
+			throw new OmeMetadataException("Unrecognised variable name '" + name + "'");
 		}
-		
+
 		return result;
 	}
 
@@ -2210,23 +1822,23 @@ public class OmeMetadata {
 		 * This is the only element that's accessed out of order.
 		 * All the others are done in the order they appear in the XML.
 		 */
-		Element cruiseInfoElem = rootElem.getChild("Cruise_Info");
+		Element cruiseInfoElem = rootElem.getChild(CRUISE_INFO_ELEMENT_NAME);
 		if ( cruiseInfoElem == null )
 			throw new BadEntryNameException(
 					"No Cruise_Info element in the OME XML contents");
 
-		Element experimentElem = cruiseInfoElem.getChild("Experiment");
+		Element experimentElem = cruiseInfoElem.getChild(EXPERIMENT_ELEMENT_NAME);
 		if ( experimentElem == null )
 			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment element in the OME XML contents");
 		
-		Element cruiseElem = experimentElem.getChild("Cruise");
+		Element cruiseElem = experimentElem.getChild(CRUISE_ELEMENT_NAME);
 		if ( cruiseElem == null )
 			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment->Cruise " +
 					"element in the OME XML contents");
 		
-		String cruiseIDText = cruiseElem.getChildTextTrim("Cruise_ID");
+		String cruiseIDText = cruiseElem.getChildTextTrim(CRUISE_ID_ELEMENT_NAME);
 		if ( cruiseIDText == null )
 			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment->Cruise->Cruise_ID " +
@@ -2252,16 +1864,16 @@ public class OmeMetadata {
 		
 		// <Status>
 		itIsDraft = false;
-		Element statusElem = rootElem.getChild("status");
+		Element statusElem = rootElem.getChild(STATUS_ELEMENT_NAME);
 		if (null != statusElem) {
 			String statusString = statusElem.getTextTrim();
-			if (statusString.equalsIgnoreCase("draft")) {
+			if (statusString.equalsIgnoreCase(DRAFT_ELEMENT_NAME)) {
 				itIsDraft = true;
 			}
 		}
 		
 		// <User>
-		Element userElem = rootElem.getChild("User");
+		Element userElem = rootElem.getChild(USER_ELEMENT_NAME);
 			
 		userName = new OMEVariable(USER_NAME_PATH, userElem);
 		userOrganization = new OMEVariable(USER_ORGANIZATION_PATH, userElem);
@@ -2272,7 +1884,8 @@ public class OmeMetadata {
 		// End <User>
 
 		// <Investigator> (repeating element)
-		for (Element invElem : rootElem.getChildren("Investigator")) {
+		investigators = new ArrayList<OMECompositeVariable>();
+		for (Element invElem : rootElem.getChildren(INVESTIGATOR_ELEMENT_NAME)) {
 			OMECompositeVariable invDetails = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST);
 			invDetails.addEntry(INVESTIGATOR_NAME, invElem);
 			invDetails.addEntry(INVESTIGATOR_ORGANIZATION, invElem);
@@ -2285,7 +1898,7 @@ public class OmeMetadata {
 		// End <Investigator>
 		
 		// <DataSet_Info>
-		Element dataSetInfoElem = rootElem.getChild("Dataset_Info");
+		Element dataSetInfoElem = rootElem.getChild(DATASET_INFO_ELEMENT_NAME);
 		
 		datasetID = new OMEVariable(DATASET_ID_PATH, dataSetInfoElem);
 		fundingInfo = new OMEVariable(FUNDING_INFO_PATH, dataSetInfoElem);
@@ -2293,7 +1906,7 @@ public class OmeMetadata {
 		// <DataSet_Info><Submission_Dates>
 		Element submissionDatesElem = null;
 		if (null != dataSetInfoElem) {
-			submissionDatesElem = dataSetInfoElem.getChild("Submission_Dates");
+			submissionDatesElem = dataSetInfoElem.getChild(SUBMISSION_DATES_ELEMENT_NAME);
 		}
 		
 		initialSubmission = new OMEVariable(INITIAL_SUBMISSION_PATH, submissionDatesElem);
@@ -2322,26 +1935,26 @@ public class OmeMetadata {
 		section = new OMEVariable(SECTION_PATH, cruiseElem);
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
-		Element geogCoverageElem = cruiseElem.getChild("Geographical_Coverage");
+		Element geogCoverageElem = cruiseElem.getChild(GEO_COVERAGE_ELEMENT_NAME);
 		
 		geographicalRegion = new OMEVariable(GEO_REGION_PATH, geogCoverageElem);
 			
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
+		Element boundsElem = null;
 		if (null != geogCoverageElem) {
-			Element boundsElem = geogCoverageElem.getChild("Bounds");
-			
-			westmostLongitude = new OMEVariable(WEST_BOUND_PATH, boundsElem);
-			eastmostLongitude = new OMEVariable(EAST_BOUND_PATH, boundsElem);
-			northmostLatitude = new OMEVariable(NORTH_BOUND_PATH, boundsElem);
-			southmostLatitude = new OMEVariable(SOUTH_BOUND_PATH, boundsElem);
+			boundsElem = geogCoverageElem.getChild(BOUNDS_ELEMENT_NAME);
 		}
+		westmostLongitude = new OMEVariable(WEST_BOUND_PATH, boundsElem);
+		eastmostLongitude = new OMEVariable(EAST_BOUND_PATH, boundsElem);
+		northmostLatitude = new OMEVariable(NORTH_BOUND_PATH, boundsElem);
+		southmostLatitude = new OMEVariable(SOUTH_BOUND_PATH, boundsElem);
 	
 		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
 		
 		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
 		
 		// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
-		Element tempCoverageElem = cruiseElem.getChild("Temporal_Coverage");
+		Element tempCoverageElem = cruiseElem.getChild(TEMP_COVERAGE_ELEMENT_NAME);
 		
 		temporalCoverageStartDate = new OMEVariable(TEMP_START_DATE_PATH, tempCoverageElem);
 		temporalCoverageEndDate = new OMEVariable(TEMP_END_DATE_PATH, tempCoverageElem);
@@ -2356,7 +1969,7 @@ public class OmeMetadata {
 		
 		// <Cruise_Info><Vessel>
 		
-		Element vesselElem = cruiseInfoElem.getChild("Vessel");
+		Element vesselElem = cruiseInfoElem.getChild(VESSEL_ELEMENT_NAME);
 		
 		vesselName = new OMEVariable(VESSEL_NAME_PATH, vesselElem);
 		vesselID = new OMEVariable(VESSEL_ID_PATH, vesselElem);
@@ -2366,9 +1979,10 @@ public class OmeMetadata {
 		// <Variables_Info>
 		
 		// The contents of this are a repeating sub-element, so live in a list of OMECompositeVariables.
-		Element varsInfoElem = rootElem.getChild("Variables_Info");
+		variablesInfo = new ArrayList<OMECompositeVariable>();
+		Element varsInfoElem = rootElem.getChild(VARIABLES_INFO_ELEMENT_NAME);
 		if (null != varsInfoElem) {
-			for (Element variableElem : varsInfoElem.getChildren("Variable")) {
+			for (Element variableElem : varsInfoElem.getChildren(VARIABLE_ELEMENT_NAME)) {
 				
 				OMECompositeVariable varDetails = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST);
 				varDetails.addEntry(VARIABLES_NAME, variableElem);
@@ -2381,31 +1995,31 @@ public class OmeMetadata {
 		// End <Variables_Info>
 		
 		// <CO2_Data_Info>
-		Element co2DataInfoElem = rootElem.getChild("CO2_Data_Info");
+		Element co2DataInfoElem = rootElem.getChild(CO2_DATA_INFO_ELEMENT_NAME);
 		
 		// If the co2DataInfoElem is null, this is handled by extractSubElement
-		xCO2WaterEquDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "xCO2water_equ_dry", "Unit");
-		xCO2WaterSSTDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "xCO2water_SST_dry", "Unit");
-		pCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "pCO2water_equ_wet", "Unit");
-		pCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "pCO2water_SST_wet", "Unit");
-		fCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "fCO2water_equ_wet", "Unit");
-		fCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "fCO2water_SST_wet", "Unit");
-		xCO2AirDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "xCO2air_dry", "Unit");
-		pCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "pCO2air_wet", "Unit");
-		fCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "fCO2air_wet", "Unit");
-		xCO2AirDryInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "xCO2air_dry_interpolated", "Unit");
-		pCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "pCO2air_wet_interpolated", "Unit");
-		fCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, "fCO2air_wet_interpolated", "Unit");
+		xCO2WaterEquDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_WATER_EQU_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		xCO2WaterSSTDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_WATER_SST_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		pCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		pCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		fCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		fCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		xCO2AirDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_AIR_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		pCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		fCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		xCO2AirDryInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_AIR_DRY_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		pCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		fCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 		
 		// End <CO2_Data_Info>
 		
 		// <Method_Description>
-		Element methodDescriptionElem = rootElem.getChild("Method_Description");
+		Element methodDescriptionElem = rootElem.getChild(METHOD_DESCRIPTION_ELEMENT_NAME);
 
 		// <Method_Description><Equilibrator_Design>
 		Element equDesignElement = null;
 		if (null != methodDescriptionElem) {
-			equDesignElement = methodDescriptionElem.getChild("Equilibrator_Design");
+			equDesignElement = methodDescriptionElem.getChild(EQUILIBRATOR_DESIGN_ELEMENT_NAME);
 		}
 
 		depthOfSeaWaterIntake = new OMEVariable(INTAKE_DEPTH_PATH, equDesignElement);
@@ -2423,7 +2037,7 @@ public class OmeMetadata {
 		// <Method_Description><CO2_in_Marine_Air>
 		Element co2MarineAirElem = null;
 		if (null != methodDescriptionElem) {
-			co2MarineAirElem = methodDescriptionElem.getChild("CO2_in_Marine_Air");
+			co2MarineAirElem = methodDescriptionElem.getChild(CO2_MARINE_AIR_ELEMENT_NAME);
 		}
 
 		co2InMarineAirMeasurement = new OMEVariable(MARINE_AIR_MEASUREMENT_PATH, co2MarineAirElem);
@@ -2436,7 +2050,7 @@ public class OmeMetadata {
 		Element co2SensorsElem = null;
 
 		if (null != methodDescriptionElem) {
-			co2SensorsElem = methodDescriptionElem.getChild("CO2_Sensors");
+			co2SensorsElem = methodDescriptionElem.getChild(CO2_SENSORS_ELEMENT_NAME);
 		}
 		
 		// <Method_Description><CO2_Sensors><CO2_Sensor>
@@ -2467,7 +2081,7 @@ public class OmeMetadata {
 		// <Method_Description><Sea_Surface_Temperature>
 		Element sstElem = null;
 		if (null != methodDescriptionElem) {
-			sstElem = methodDescriptionElem.getChild("Sea_Surface_Temperature");
+			sstElem = methodDescriptionElem.getChild(SST_ELEMENT_NAME);
 		}
 		
 		sstLocation = new OMEVariable(SST_LOCATION_PATH, sstElem);
@@ -2483,7 +2097,7 @@ public class OmeMetadata {
 		// <Method_Description><Equilibrator_Temperature>
 		Element eqtElem = null;
 		if (null != methodDescriptionElem) {
-			eqtElem = methodDescriptionElem.getChild("Equilibrator_Temperature");
+			eqtElem = methodDescriptionElem.getChild(EQU_TEMP_ELEMENT_NAME);
 		}
 				
 		eqtLocation = new OMEVariable(EQT_LOCATION_PATH, eqtElem);
@@ -2500,7 +2114,7 @@ public class OmeMetadata {
 		// <Method_Description><Equilibrator_Pressure>
 		Element eqpElem = null;
 		if (null != methodDescriptionElem) {
-			eqpElem = methodDescriptionElem.getChild("Equilibrator_Pressure");
+			eqpElem = methodDescriptionElem.getChild(EQU_PRESSURE_ELEMENT_NAME);
 		}
 				
 		eqpLocation = new OMEVariable(EQP_LOCATION_PATH, eqpElem);
@@ -2517,7 +2131,7 @@ public class OmeMetadata {
 		// <Method_Description><Atmospheric_Pressure>
 		Element atpElem = null;
 		if (null != methodDescriptionElem) {
-			atpElem = methodDescriptionElem.getChild("Atmospheric_Pressure");
+			atpElem = methodDescriptionElem.getChild(ATM_PRESSURE_ELEMENT_NAME);
 		}
 				
 		atpLocation = new OMEVariable(ATM_LOCATION_PATH, atpElem);
@@ -2533,7 +2147,7 @@ public class OmeMetadata {
 		// <Method_Description><Sea_Surface_Salinity>
 		Element sssElem = null;
 		if (null != methodDescriptionElem) {
-			sssElem = methodDescriptionElem.getChild("Sea_Surface_Salinity");
+			sssElem = methodDescriptionElem.getChild(SSS_ELEMENT_NAME);
 		}
 				
 		sssLocation = new OMEVariable(SSS_LOCATION_PATH, sssElem);
@@ -2547,13 +2161,13 @@ public class OmeMetadata {
 		// End <Method_Description><Sea_Surface_Salinity>
 		
 		// <Method_Description><Other_Sensors>
+		otherSensors = new ArrayList<OMECompositeVariable>();
 		Element otherSensorsElem = null;
 		if (null != methodDescriptionElem) {
-			otherSensorsElem = methodDescriptionElem.getChild("Other_Sensors");
+			otherSensorsElem = methodDescriptionElem.getChild(OTHER_SENSORS_ELEMENT_NAME);
 		}
-		
 		if (null != otherSensorsElem) {
-			for (Element sensorElem : otherSensorsElem.getChildren("Sensor")) {
+			for (Element sensorElem : otherSensorsElem.getChildren(SENSOR_ELEMENT_NAME)) {
 				OMECompositeVariable sensorDetails = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ENTRIES, OTHER_SENSORS_ID_LIST);
 				sensorDetails.addEntry(OTHER_SENSORS_MANUFACTURER, sensorElem);
 				sensorDetails.addEntry(OTHER_SENSORS_MODEL, sensorElem);
@@ -2595,18 +2209,18 @@ public class OmeMetadata {
 	 */
 	public Document createOmeXmlDoc() {
 		
-		Element rootElem = new Element("x_tags");
+		Element rootElem = new Element(ROOT_ELEMENT_NAME);
 		ConflictElement conflictElem = new ConflictElement();
 		
 		// <Status>
 		if (itIsDraft) {
-			Element statusElem = new Element("status");
-			statusElem.setText("draft");
+			Element statusElem = new Element(STATUS_ELEMENT_NAME);
+			statusElem.setText(DRAFT_ELEMENT_NAME);
 			rootElem.addContent(statusElem);
 		}
 		
 		// <User>
-		Element userElem = new Element("User");
+		Element userElem = new Element(USER_ELEMENT_NAME);
 
 		userName.generateXMLContent(userElem, conflictElem);
 		userOrganization.generateXMLContent(userElem, conflictElem);
@@ -2624,12 +2238,12 @@ public class OmeMetadata {
 		// End <Investigator>
 		
 		// <Dataset_Info>
-		Element datasetInfoElem = new Element("Dataset_Info");
+		Element datasetInfoElem = new Element(DATASET_INFO_ELEMENT_NAME);
 		datasetID.generateXMLContent(datasetInfoElem,  conflictElem);
 		fundingInfo.generateXMLContent(datasetInfoElem,  conflictElem);
 		
 		// <Dataset_Info><Submission_Dates>
-		Element submissionElem = new Element("Submission_Dates");
+		Element submissionElem = new Element(SUBMISSION_DATES_ELEMENT_NAME);
 		initialSubmission.generateXMLContent(submissionElem, conflictElem);
 		revisedSubmission.generateXMLContent(submissionElem, conflictElem);
 		datasetInfoElem.addContent(submissionElem);
@@ -2640,10 +2254,10 @@ public class OmeMetadata {
 		// End <Dataset_Info>
 		
 		// <Cruise_Info>
-		Element cruiseInfoElem = new Element("Cruise_Info");
+		Element cruiseInfoElem = new Element(CRUISE_INFO_ELEMENT_NAME);
 		
 		// <Cruise_Info><Experiment>
-		Element experimentElem = new Element("Experiment");
+		Element experimentElem = new Element(EXPERIMENT_ELEMENT_NAME);
 		
 		experimentName.generateXMLContent(experimentElem, conflictElem);
 		experimentType.generateXMLContent(experimentElem, conflictElem);
@@ -2652,19 +2266,19 @@ public class OmeMetadata {
 		mooringId.generateXMLContent(experimentElem, conflictElem);
 		
 		// <Cruise_Info><Experiment><Cruise>
-		Element cruiseElem = new Element("Cruise");
+		Element cruiseElem = new Element(CRUISE_ELEMENT_NAME);
 		
 		cruiseID.generateXMLContent(cruiseElem, conflictElem);
 		cruiseInfo.generateXMLContent(cruiseElem, conflictElem);
 		section.generateXMLContent(cruiseElem, conflictElem);
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
-		Element geoCoverageElem = new Element("Geographical_Coverage");
+		Element geoCoverageElem = new Element(GEO_COVERAGE_ELEMENT_NAME);
 		
 		geographicalRegion.generateXMLContent(geoCoverageElem, conflictElem);
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
-		Element boundsElem = new Element("Bounds");
+		Element boundsElem = new Element(BOUNDS_ELEMENT_NAME);
 		
 		if ( null != westmostLongitude )
 			westmostLongitude.generateXMLContent(boundsElem, conflictElem);
@@ -2683,7 +2297,7 @@ public class OmeMetadata {
 		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
 		
 		// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
-		Element tempCoverageElem = new Element("Temporal_Coverage");
+		Element tempCoverageElem = new Element(TEMP_COVERAGE_ELEMENT_NAME);
 		
 		temporalCoverageStartDate.generateXMLContent(tempCoverageElem, conflictElem);
 		temporalCoverageEndDate.generateXMLContent(tempCoverageElem, conflictElem);
@@ -2702,7 +2316,7 @@ public class OmeMetadata {
 		
 
 		// <Cruise_Info><Vessel>
-		Element vesselElem = new Element("Vessel");
+		Element vesselElem = new Element(VESSEL_ELEMENT_NAME);
 		
 		vesselName.generateXMLContent(vesselElem, conflictElem);
 		vesselID.generateXMLContent(vesselElem, conflictElem);
@@ -2716,7 +2330,7 @@ public class OmeMetadata {
 		// End <Cruise_Info>
 
 		// <Variables_Info>
-		Element varsInfoElem = new Element("Variables_Info");
+		Element varsInfoElem = new Element(VARIABLES_INFO_ELEMENT_NAME);
 		for (OMECompositeVariable varInfo : variablesInfo) {
 			varInfo.generateXMLContent(varsInfoElem, conflictElem);
 		}
@@ -2726,7 +2340,7 @@ public class OmeMetadata {
 		
 		
 		// <CO2_Data_Info>
-		Element co2DataInfoElem = new Element("CO2_Data_Info");
+		Element co2DataInfoElem = new Element(CO2_DATA_INFO_ELEMENT_NAME);
 		
 		co2DataInfoElem.addContent(buildSubElement(xCO2WaterEquDryUnit, conflictElem));
 		co2DataInfoElem.addContent(buildSubElement(xCO2WaterSSTDryUnit, conflictElem));
@@ -2745,10 +2359,10 @@ public class OmeMetadata {
 		// End <CO2_Data_Info>
 		
 		// <Method_Description>
-		Element methodDescElem = new Element("Method_Description");
+		Element methodDescElem = new Element(METHOD_DESCRIPTION_ELEMENT_NAME);
 		
 		// <Method_Description><Equilibrator_Design>
-		Element eqDesignElem = new Element("Equilibrator_Design");
+		Element eqDesignElem = new Element(EQUILIBRATOR_DESIGN_ELEMENT_NAME);
 		
 		depthOfSeaWaterIntake.generateXMLContent(eqDesignElem, conflictElem);
 		locationOfSeaWaterIntake.generateXMLContent(eqDesignElem, conflictElem);
@@ -2765,7 +2379,7 @@ public class OmeMetadata {
 		// End <Method_Description><Equilibrator_Design>
 		
 		// <Method_Description><CO2_in_Marine_Air>
-		Element co2MarineAirElem = new Element("CO2_in_Marine_Air");
+		Element co2MarineAirElem = new Element(CO2_MARINE_AIR_ELEMENT_NAME);
 
 		co2InMarineAirMeasurement.generateXMLContent(co2MarineAirElem, conflictElem);
 		co2InMarineAirLocationAndHeight.generateXMLContent(co2MarineAirElem, conflictElem);
@@ -2775,7 +2389,7 @@ public class OmeMetadata {
 		// End <Method_Description><CO2_in_Marine_Air>
 		
 		// <Method_Description><CO2_Sensors>
-		Element co2SensorsElem = new Element("CO2_Sensors");
+		Element co2SensorsElem = new Element(CO2_SENSORS_ELEMENT_NAME);
 		
 		// <Method_Description><CO2_Sensors><CO2_Sensor>
 		Element co2SensorElem = new Element("CO2_Sensor");
@@ -2804,7 +2418,7 @@ public class OmeMetadata {
 		
 		
 		// <Method_Description><Sea_Surface_Temperature>
-		Element sstElem = new Element("Sea_Surface_Temperature");
+		Element sstElem = new Element(SST_ELEMENT_NAME);
 		
 		sstLocation.generateXMLContent(sstElem, conflictElem);
 		sstManufacturer.generateXMLContent(sstElem, conflictElem);
@@ -2818,7 +2432,7 @@ public class OmeMetadata {
 		// End <Method_Description><Sea_Surface_Temperature>
 		
 		// <Method_Description><Equilibrator_Temperature>
-		Element eqtElem = new Element("Equilibrator_Temperature");
+		Element eqtElem = new Element(EQU_TEMP_ELEMENT_NAME);
 		
 		eqtLocation.generateXMLContent(eqtElem, conflictElem);
 		eqtManufacturer.generateXMLContent(eqtElem, conflictElem);
@@ -2833,7 +2447,7 @@ public class OmeMetadata {
 		// End <Method_Description><Equilibrator_Temperature>
 	
 		// <Method_Description><Equilibrator_Pressure>
-		Element eqpElem = new Element("Equilibrator_Pressure");
+		Element eqpElem = new Element(EQU_PRESSURE_ELEMENT_NAME);
 		
 		eqpLocation.generateXMLContent(eqpElem, conflictElem);
 		eqpManufacturer.generateXMLContent(eqpElem, conflictElem);
@@ -2848,7 +2462,7 @@ public class OmeMetadata {
 		// End <Method_Description><Equilibrator_Pressure>
 
 		// <Method_Description><Atmospheric_Pressure>
-		Element atpElem = new Element("Atmospheric_Pressure");
+		Element atpElem = new Element(ATM_PRESSURE_ELEMENT_NAME);
 		
 		atpLocation.generateXMLContent(atpElem, conflictElem);
 		atpManufacturer.generateXMLContent(atpElem, conflictElem);
@@ -2862,7 +2476,7 @@ public class OmeMetadata {
 		// End <Method_Description><Atmospheric_Pressure>
 		
 		// <Method_Description><Sea_Surface_Salinity>
-		Element sssElem = new Element("Sea_Surface_Salinity");
+		Element sssElem = new Element(SSS_ELEMENT_NAME);
 		
 		sssLocation.generateXMLContent(sssElem, conflictElem);
 		sssManufacturer.generateXMLContent(sssElem, conflictElem);
@@ -2876,7 +2490,7 @@ public class OmeMetadata {
 		// End <Method_Description><Sea_Surface_Salinity>
 		
 		// <Method_Description><Other_Sensors>
-		Element otherSensorsElem = new Element("Other_Sensors");
+		Element otherSensorsElem = new Element(OTHER_SENSORS_ELEMENT_NAME);
 		for (OMECompositeVariable sensorInfo : otherSensors) {
 			sensorInfo.generateXMLContent(otherSensorsElem, conflictElem);
 		}
@@ -2918,6 +2532,226 @@ public class OmeMetadata {
 		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
 	}
 
+	/**
+	 * Checks the current contents to see if there is any conflicts in 
+	 * any elements or if there is any missing content that is absolutely 
+	 * required.  This ignores the draft flag and is intended to be a way 
+	 * of updating the draft flag after merging.
+	 * 
+	 * @return
+	 * 		true if there are no conflicts and all absolutely-required 
+	 * 		content is present
+	 */
+	public boolean isAcceptable() {
+
+		if ( cruiseID.hasConflict() ) {
+			return false;
+		}
+
+		if ( userName.hasConflict() ||
+			 userOrganization.hasConflict() ||
+			 userAddress.hasConflict() ||
+			 userPhone.hasConflict() ||
+			 userEmail.hasConflict() ) {
+			return false;
+		}
+
+		for (OMECompositeVariable compVar : investigators) {
+			 if ( compVar.hasConflict() ) {
+				 return false;
+			 }
+		}
+
+		if ( datasetID.hasConflict() ||
+			 fundingInfo.hasConflict() ) {
+			return false;
+		}
+
+		if ( initialSubmission.hasConflict() ||
+			 revisedSubmission.hasConflict() ) {
+			return false;
+		}
+
+		if ( experimentName.hasConflict() ||
+			 experimentType.hasConflict() ||
+			 platformType.hasConflict() ||
+			 co2InstrumentType.hasConflict() ||
+			 mooringId.hasConflict() ) {
+			return false;
+		}
+
+		if ( cruiseInfo.hasConflict() ||
+			 section.hasConflict() ) {
+			return false;
+		}
+
+		if ( geographicalRegion.hasConflict() ) {
+			return false;
+		}
+
+		if ( westmostLongitude.hasConflict() ||
+			 eastmostLongitude.hasConflict() ||
+			 northmostLatitude.hasConflict() ||
+			 southmostLatitude.hasConflict() ) {
+			return false;
+		}
+
+		if ( temporalCoverageStartDate.hasConflict() ||
+			 temporalCoverageEndDate.hasConflict() ) {
+			return false;
+		}
+
+		if ( cruiseStartDate.hasConflict() ||
+			 cruiseEndDate.hasConflict() ) {
+			return false;
+		}
+
+		if ( vesselName.hasConflict() ||
+			 vesselID.hasConflict() ||
+			 country.hasConflict() ||
+			 vesselOwner.hasConflict() ) {
+			return false;
+		}
+
+		for (OMECompositeVariable compVar : variablesInfo) {
+			 if ( compVar.hasConflict() ) {
+				 return false;
+			 }
+		}
+
+		if ( xCO2WaterEquDryUnit.hasConflict() ||
+			 xCO2WaterSSTDryUnit.hasConflict() ||
+			 pCO2WaterEquWetUnit.hasConflict() ||
+			 pCO2WaterSSTWetUnit.hasConflict() ||
+			 fCO2WaterEquWetUnit.hasConflict() ||
+			 fCO2WaterSSTWetUnit.hasConflict() ||
+			 xCO2AirDryUnit.hasConflict() ||
+			 pCO2AirWetUnit.hasConflict() ||
+			 fCO2AirWetUnit.hasConflict() ||
+			 xCO2AirDryInterpolatedUnit.hasConflict() ||
+			 pCO2AirWetInterpolatedUnit.hasConflict() ||
+			 fCO2AirWetInterpolatedUnit.hasConflict() ) {
+			return false;
+		}
+
+		if ( depthOfSeaWaterIntake.hasConflict() ||
+			 locationOfSeaWaterIntake.hasConflict() ||
+			 equilibratorType.hasConflict() ||
+			 equilibratorVolume.hasConflict() ||
+			 waterFlowRate.hasConflict() ||
+			 headspaceGasFlowRate.hasConflict() ||
+			 vented.hasConflict() ||
+			 dryingMethodForCO2InWater.hasConflict() ||
+			 equAdditionalInformation.hasConflict() ) {
+			return false;
+		}
+
+		if ( co2InMarineAirMeasurement.hasConflict() ||
+			 co2InMarineAirLocationAndHeight.hasConflict() ||
+			 co2InMarineAirDryingMethod.hasConflict() ) {
+			return false;
+		}
+
+		if ( co2MeasurementMethod.hasConflict() ||
+			 co2Manufacturer.hasConflict() ||
+			 co2Model.hasConflict() ||
+			 co2Frequency.hasConflict() ||
+			 co2ResolutionWater.hasConflict() ||
+			 co2UncertaintyWater.hasConflict() ||
+			 co2ResolutionAir.hasConflict() ||
+			 co2UncertaintyAir.hasConflict() ||
+			 co2ManufacturerOfCalibrationGas.hasConflict() ||
+			 co2SensorCalibration.hasConflict() ||
+			 co2EnvironmentalControl.hasConflict() ||
+			 co2MethodReferences.hasConflict() ||
+			 detailsOfCO2Sensing.hasConflict() ||
+			 analysisOfCO2Comparison.hasConflict() ||
+			 measuredCO2Params.hasConflict() ) {
+			return false;
+		}
+
+		if ( sstLocation.hasConflict() ||
+			 sstManufacturer.hasConflict() ||
+			 sstModel.hasConflict() ||
+			 sstAccuracy.hasConflict() ||
+			 sstPrecision.hasConflict() ||
+			 sstCalibration.hasConflict() ||
+			 sstOtherComments.hasConflict() ) {
+			return false;
+		}
+
+		if ( eqtLocation.hasConflict() ||
+			 eqtManufacturer.hasConflict() ||
+			 eqtModel.hasConflict() ||
+			 eqtAccuracy.hasConflict() ||
+			 eqtPrecision.hasConflict() ||
+			 eqtCalibration.hasConflict() ||
+			 eqtWarming.hasConflict() ||
+			 eqtOtherComments.hasConflict() ) {
+			return false;
+		}
+
+		if ( eqpLocation.hasConflict() ||
+			 eqpManufacturer.hasConflict() ||
+			 eqpModel.hasConflict() ||
+			 eqpAccuracy.hasConflict() ||
+			 eqpPrecision.hasConflict() ||
+			 eqpCalibration.hasConflict() ||
+			 eqpOtherComments.hasConflict() ||
+			 eqpNormalized.hasConflict() ) {
+			return false;
+		}
+
+		if ( atpLocation.hasConflict() ||
+			 atpManufacturer.hasConflict() ||
+			 atpModel.hasConflict() ||
+			 atpAccuracy.hasConflict() ||
+			 atpPrecision.hasConflict() ||
+			 atpCalibration.hasConflict() ||
+			 atpOtherComments.hasConflict() ) {
+			return false;
+		}
+
+		if ( sssLocation.hasConflict() ||
+			 sssManufacturer.hasConflict() ||
+			 sssModel.hasConflict() ||
+			 sssAccuracy.hasConflict() ||
+			 sssPrecision.hasConflict() ||
+			 sssCalibration.hasConflict() ||
+			 sssOtherComments.hasConflict() ) {
+			return false;
+		}
+
+		for (OMECompositeVariable compVar : otherSensors) {
+			 if ( compVar.hasConflict() ) {
+				 return false;
+			 }
+		}
+
+		if ( dataSetReferences.hasConflict() ||
+			 additionalInformation.hasConflict() ||
+			 citation.hasConflict() ||
+			 measurementAndCalibrationReport.hasConflict() ||
+			 preliminaryQualityControl.hasConflict() ) {
+			return false;
+		}
+
+		if ( form_type.hasConflict() ||
+			 recordID.hasConflict() ) {
+			return false;
+		}
+
+		// Check for absolutely required content; at this time only
+		// what is required for the UploadDashboard submission 
+		// (expocode, at least one investigator name, vessel name)
+		if ( cruiseID.getAllValues().isEmpty() ||
+			 investigators.isEmpty() ||
+			 vesselName.getAllValues().isEmpty() ) {
+			return false;
+		}
+
+		return true;
+	}
 	
 	/**
 	 * Some elements of the OME XML have a single child. This is a shortcut method to
@@ -2998,7 +2832,7 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(userEmail, USER_EMAIL_STRING));
 		
 		for (OMECompositeVariable investigator : investigators) {
-			output.append(getCompositeHeaderString(investigator, "investigator", INVESTIGATOR_ENTRIES));
+			output.append(getCompositeHeaderString(investigator, INVESTIGATOR_COMP_NAME, INVESTIGATOR_ENTRIES));
 		}
 		
 		output.append(getSingleHeaderString(datasetID, DATASET_ID_STRING));
@@ -3026,7 +2860,7 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(vesselOwner, OWNER_STRING));
 		
 		for (OMECompositeVariable variable : variablesInfo) {
-			output.append(getCompositeHeaderString(variable, "variable", VARIABLES_INFO_ENTRIES));
+			output.append(getCompositeHeaderString(variable, VARIABLE_COMP_NAME, VARIABLES_INFO_ENTRIES));
 		}
 		
 		output.append(getSingleHeaderString(xCO2WaterEquDryUnit, XCO2_WATER_EQU_DRY_STRING));
@@ -3114,7 +2948,7 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(sssOtherComments, SSS_COMMENTS_STRING));
 		
 		for (OMECompositeVariable otherSensor : otherSensors) {
-			output.append(getCompositeHeaderString(otherSensor, "other_sensor", OTHER_SENSORS_ENTRIES));
+			output.append(getCompositeHeaderString(otherSensor, OTHER_SENSOR_COMP_NAME, OTHER_SENSORS_ENTRIES));
 		}
 
 		output.append(getSingleHeaderString(dataSetReferences, DATA_SET_REFS_STRING));
@@ -3203,23 +3037,15 @@ public class OmeMetadata {
 	}
 	
 	public static OmeMetadata merge(OmeMetadata... metadatas) throws BadEntryNameException {
-		OmeMetadata merged = null;
-		
-		if (metadatas.length == 1) {
-			merged = metadatas[0];
-		} else {
-			
-			merged = (OmeMetadata) metadatas[0].clone();
-			
-			for (int i = 1; i < metadatas.length; i++) {
-				copyValuesIn(merged, metadatas[i]);
-			}
-			
+		OmeMetadata merged = (OmeMetadata) metadatas[0].clone();
+		for (int i = 1; i < metadatas.length; i++) {
+			copyValuesIn(merged, metadatas[i]);
 		}
-		
+		merged.setDraft( ! merged.isAcceptable() );
+
 		return merged;
 	}
-	
+
 	private static void copyValuesIn(OmeMetadata dest, OmeMetadata newValues) throws BadEntryNameException {
 		
 		// The first thing to copy is the cruise ID (aka EXPO Code).
@@ -3229,7 +3055,9 @@ public class OmeMetadata {
 		if (dest.cruiseID.hasConflict()) {
 			throw new BadEntryNameException("Cruise IDs do not match - cannot merge");
 		}
-		
+
+		// draft value is dealt with after merging
+
 		dest.userName.addValues(newValues.userName.getAllValues());
 		dest.userOrganization.addValues(newValues.userOrganization.getAllValues());
 		dest.userAddress.addValues(newValues.userAddress.getAllValues());
@@ -3260,6 +3088,9 @@ public class OmeMetadata {
 		dest.eastmostLongitude.addValues(newValues.eastmostLongitude.getAllValues());
 		dest.northmostLatitude.addValues(newValues.northmostLatitude.getAllValues());
 		dest.southmostLatitude.addValues(newValues.southmostLatitude.getAllValues());
+
+		dest.temporalCoverageStartDate.addValues(newValues.temporalCoverageStartDate.getAllValues());
+		dest.temporalCoverageEndDate.addValues(newValues.temporalCoverageEndDate.getAllValues());
 
 		dest.cruiseStartDate.addValues(newValues.cruiseStartDate.getAllValues());
 		dest.cruiseEndDate.addValues(newValues.cruiseEndDate.getAllValues());
@@ -3367,390 +3198,157 @@ public class OmeMetadata {
 		dest.form_type.addValues(newValues.form_type.getAllValues());
 		dest.recordID.addValues(newValues.recordID.getAllValues());
 	}
-	
+
+	@Override
 	public Object clone() {
 		OmeMetadata clone = new OmeMetadata(itsExpoCode);
 		clone.setDraft(isDraft());
-		
-		if (null != userName) {
-			clone.userName = (OMEVariable) userName.clone();
-		}
-		
-		if (null != userOrganization) {
-			clone.userOrganization = (OMEVariable) userOrganization.clone();
-		}
-		
-		if (null != userAddress) {
-			clone.userAddress = (OMEVariable) userAddress.clone();
-		}
-		
-		if (null != userEmail) {
-			clone.userEmail = (OMEVariable) userEmail.clone();
-		}
-		
-		
-		if (null != investigators) {
-			clone.investigators = new ArrayList<OMECompositeVariable>(
-					investigators.size());
-			for (OMECompositeVariable investigator : investigators) {
-				clone.investigators.add((OMECompositeVariable) investigator
-						.clone());
-			}
-		}
-		
-		if (null != datasetID) {
-			clone.datasetID = (OMEVariable) datasetID.clone();
-		}
-		
-		if (null != fundingInfo) {
-			clone.fundingInfo = (OMEVariable) fundingInfo.clone();
+
+		clone.userName = (OMEVariable) userName.clone();
+		clone.userOrganization = (OMEVariable) userOrganization.clone();
+		clone.userAddress = (OMEVariable) userAddress.clone();
+		clone.userEmail = (OMEVariable) userEmail.clone();
+
+		for (OMECompositeVariable investigator : investigators) {
+			clone.investigators.add((OMECompositeVariable) investigator.clone());
 		}
 
-		if (null != initialSubmission) {
-			clone.initialSubmission = (OMEVariable) initialSubmission.clone();
-		}
+		clone.datasetID = (OMEVariable) datasetID.clone();
+		clone.fundingInfo = (OMEVariable) fundingInfo.clone();
+
+		clone.initialSubmission = (OMEVariable) initialSubmission.clone();
+		clone.revisedSubmission = (OMEVariable) revisedSubmission.clone();
+
+		clone.experimentName = (OMEVariable) experimentName.clone();
+		clone.experimentType = (OMEVariable) experimentType.clone();
+		clone.platformType = (OMEVariable) platformType.clone();
+		clone.co2InstrumentType = (OMEVariable) co2InstrumentType.clone();
+		clone.mooringId = (OMEVariable) mooringId.clone();
+
+		clone.cruiseID = (OMEVariable) cruiseID.clone();
+		clone.cruiseInfo = (OMEVariable) cruiseInfo.clone();
+		clone.section = (OMEVariable) section.clone();
+
+		clone.geographicalRegion = (OMEVariable) geographicalRegion.clone();
+
+		clone.westmostLongitude = (OMEVariable) westmostLongitude.clone();
+		clone.eastmostLongitude = (OMEVariable) eastmostLongitude.clone();
+		clone.northmostLatitude = (OMEVariable) northmostLatitude.clone();
+		clone.southmostLatitude = (OMEVariable) southmostLatitude.clone();
+
+		clone.temporalCoverageStartDate = (OMEVariable) temporalCoverageStartDate.clone();
+		clone.temporalCoverageEndDate = (OMEVariable) temporalCoverageEndDate.clone();
+
+		clone.cruiseStartDate = (OMEVariable) cruiseStartDate.clone();
+		clone.cruiseEndDate = (OMEVariable) cruiseEndDate.clone();
+
+		clone.vesselName = (OMEVariable) vesselName.clone();
+		clone.vesselID = (OMEVariable) vesselID.clone();
+		clone.country = (OMEVariable) country.clone();
+		clone.vesselOwner = (OMEVariable) vesselOwner.clone();
 		
-		if (null != revisedSubmission) {
-			clone.revisedSubmission = (OMEVariable) revisedSubmission.clone();
-		}
-		
-		if (null != experimentName) {
-			clone.experimentName = (OMEVariable) experimentName.clone();
-		}
-		
-		if (null != experimentType) {
-			clone.experimentType = (OMEVariable) experimentType.clone();
+		for (OMECompositeVariable varInfo : variablesInfo) {
+			clone.variablesInfo.add((OMECompositeVariable) varInfo.clone());
 		}
 
-		if (null != platformType) {
-			clone.platformType = (OMEVariable) platformType.clone();
+		clone.xCO2WaterEquDryUnit = (OMEVariable) xCO2WaterEquDryUnit.clone();
+		clone.xCO2WaterSSTDryUnit = (OMEVariable) xCO2WaterSSTDryUnit.clone();
+		clone.pCO2WaterEquWetUnit = (OMEVariable) pCO2WaterEquWetUnit.clone();
+		clone.pCO2WaterSSTWetUnit = (OMEVariable) pCO2WaterSSTWetUnit.clone();
+		clone.fCO2WaterEquWetUnit = (OMEVariable) fCO2WaterEquWetUnit.clone();
+		clone.fCO2WaterSSTWetUnit = (OMEVariable) fCO2WaterSSTWetUnit.clone();
+		clone.xCO2AirDryUnit = (OMEVariable) xCO2AirDryUnit.clone();
+		clone.pCO2AirWetUnit = (OMEVariable) pCO2AirWetUnit.clone();
+		clone.fCO2AirWetUnit = (OMEVariable) fCO2AirWetUnit.clone();
+		clone.xCO2AirDryInterpolatedUnit = (OMEVariable) xCO2AirDryInterpolatedUnit.clone();
+		clone.pCO2AirWetInterpolatedUnit = (OMEVariable) pCO2AirWetInterpolatedUnit.clone();
+		clone.fCO2AirWetInterpolatedUnit = (OMEVariable) fCO2AirWetInterpolatedUnit.clone();
+
+		clone.depthOfSeaWaterIntake = (OMEVariable) depthOfSeaWaterIntake.clone();
+		clone.locationOfSeaWaterIntake = (OMEVariable) locationOfSeaWaterIntake.clone();
+		clone.equilibratorType = (OMEVariable) equilibratorType.clone();
+		clone.equilibratorVolume = (OMEVariable) equilibratorVolume.clone();
+		clone.waterFlowRate = (OMEVariable) waterFlowRate.clone();
+		clone.headspaceGasFlowRate = (OMEVariable) headspaceGasFlowRate.clone();
+		clone.vented = (OMEVariable) vented.clone();
+		clone.dryingMethodForCO2InWater = (OMEVariable) dryingMethodForCO2InWater.clone();
+		clone.equAdditionalInformation = (OMEVariable) equAdditionalInformation.clone();
+
+		clone.co2InMarineAirMeasurement = (OMEVariable) co2InMarineAirMeasurement.clone();
+		clone.co2InMarineAirLocationAndHeight = (OMEVariable) co2InMarineAirLocationAndHeight.clone();
+		clone.co2InMarineAirDryingMethod = (OMEVariable) co2InMarineAirDryingMethod.clone();
+
+		clone.co2MeasurementMethod = (OMEVariable) co2MeasurementMethod.clone();
+		clone.co2Manufacturer = (OMEVariable) co2Manufacturer.clone();
+		clone.co2Model = (OMEVariable) co2Model.clone();
+		clone.co2Frequency = (OMEVariable) co2Frequency.clone();
+		clone.co2ResolutionWater = (OMEVariable) co2ResolutionWater.clone();
+		clone.co2UncertaintyWater = (OMEVariable) co2UncertaintyWater.clone();
+		clone.co2ResolutionAir = (OMEVariable) co2ResolutionAir.clone();
+		clone.co2UncertaintyAir = (OMEVariable) co2UncertaintyAir.clone();
+		clone.co2ManufacturerOfCalibrationGas = (OMEVariable) co2ManufacturerOfCalibrationGas.clone();
+		clone.co2SensorCalibration = (OMEVariable) co2SensorCalibration.clone();
+		clone.co2EnvironmentalControl = (OMEVariable) co2EnvironmentalControl.clone();
+		clone.co2MethodReferences = (OMEVariable) co2MethodReferences.clone();
+		clone.detailsOfCO2Sensing = (OMEVariable) detailsOfCO2Sensing.clone();
+		clone.analysisOfCO2Comparison = (OMEVariable) analysisOfCO2Comparison.clone();
+		clone.measuredCO2Params = (OMEVariable) measuredCO2Params.clone();
+
+		clone.sstLocation = (OMEVariable) sstLocation.clone();
+		clone.sstManufacturer = (OMEVariable) sstManufacturer.clone();
+		clone.sstModel = (OMEVariable) sstModel.clone();
+		clone.sstAccuracy = (OMEVariable) sstAccuracy.clone();
+		clone.sstPrecision = (OMEVariable) sstPrecision.clone();
+		clone.sstCalibration = (OMEVariable) sstCalibration.clone();
+		clone.sstOtherComments = (OMEVariable) sstOtherComments.clone();
+
+		clone.eqtLocation = (OMEVariable) eqtLocation.clone();
+		clone.eqtManufacturer = (OMEVariable) eqtManufacturer.clone();
+		clone.eqtModel = (OMEVariable) eqtModel.clone();
+		clone.eqtAccuracy = (OMEVariable) eqtAccuracy.clone();
+		clone.eqtPrecision = (OMEVariable) eqtPrecision.clone();
+		clone.eqtCalibration = (OMEVariable) eqtCalibration.clone();
+		clone.eqtWarming = (OMEVariable) eqtWarming.clone();
+		clone.eqtOtherComments = (OMEVariable) eqtOtherComments.clone();
+
+		clone.eqpLocation = (OMEVariable) eqpLocation.clone();
+		clone.eqpManufacturer = (OMEVariable) eqpManufacturer.clone();
+		clone.eqpModel = (OMEVariable) eqpModel.clone();
+		clone.eqpAccuracy = (OMEVariable) eqpAccuracy.clone();
+		clone.eqpPrecision = (OMEVariable) eqpPrecision.clone();
+		clone.eqpCalibration = (OMEVariable) eqpCalibration.clone();
+		clone.eqpOtherComments = (OMEVariable) eqpOtherComments.clone();
+		clone.eqpNormalized = (OMEVariable) eqpNormalized.clone();
+
+		clone.atpLocation = (OMEVariable) atpLocation.clone();
+		clone.atpManufacturer = (OMEVariable) atpManufacturer.clone();
+		clone.atpModel = (OMEVariable) atpModel.clone();
+		clone.atpAccuracy = (OMEVariable) atpAccuracy.clone();
+		clone.atpPrecision = (OMEVariable) atpPrecision.clone();
+		clone.atpCalibration = (OMEVariable) atpCalibration.clone();
+		clone.atpOtherComments = (OMEVariable) atpOtherComments.clone();
+
+		clone.sssLocation = (OMEVariable) sssLocation.clone();
+		clone.sssManufacturer = (OMEVariable) sssManufacturer.clone();
+		clone.sssModel = (OMEVariable) sssModel.clone();
+		clone.sssAccuracy = (OMEVariable) sssAccuracy.clone();
+		clone.sssPrecision = (OMEVariable) sssPrecision.clone();
+		clone.sssCalibration = (OMEVariable) sssCalibration.clone();
+		clone.sssOtherComments = (OMEVariable) sssOtherComments.clone();
+
+		for (OMECompositeVariable varInfo : otherSensors) {
+			clone.otherSensors.add((OMECompositeVariable) varInfo.clone());
 		}
 
-		if (null != co2InstrumentType) {
-			clone.co2InstrumentType = (OMEVariable) co2InstrumentType.clone();
-		}
+		clone.dataSetReferences = (OMEVariable) dataSetReferences.clone();
+		clone.additionalInformation = (OMEVariable) additionalInformation.clone();
+		clone.citation = (OMEVariable) citation.clone();
+		clone.measurementAndCalibrationReport = (OMEVariable) measurementAndCalibrationReport.clone();
+		clone.preliminaryQualityControl = (OMEVariable) preliminaryQualityControl.clone();
 
-		if (null != mooringId) {
-			clone.mooringId = (OMEVariable) mooringId.clone();
-		}
+		clone.form_type = (OMEVariable) form_type.clone();
+		clone.recordID = (OMEVariable) recordID.clone();
 
-		if (null != cruiseID) {
-			clone.cruiseID = (OMEVariable) cruiseID.clone();
-		}
-
-		if (null != cruiseInfo) {
-			clone.cruiseInfo = (OMEVariable) cruiseInfo.clone();
-		}
-		if (null != section) {
-			clone.section = (OMEVariable) section.clone();
-		}
-		if (null != geographicalRegion) {
-			clone.geographicalRegion = (OMEVariable) geographicalRegion.clone();
-		}
-		if (null != westmostLongitude) {
-			clone.westmostLongitude = (OMEVariable) westmostLongitude.clone();
-		}
-		if (null != eastmostLongitude) {
-			clone.eastmostLongitude = (OMEVariable) eastmostLongitude.clone();
-		}
-		if (null != northmostLatitude) {
-			clone.northmostLatitude = (OMEVariable) northmostLatitude.clone();
-		}
-		if (null != southmostLatitude) {
-			clone.southmostLatitude = (OMEVariable) southmostLatitude.clone();
-		}
-		if (null != temporalCoverageStartDate) {
-			clone.temporalCoverageStartDate = (OMEVariable) temporalCoverageStartDate
-					.clone();
-		}
-		if (null != temporalCoverageEndDate) {
-			clone.temporalCoverageEndDate = (OMEVariable) temporalCoverageEndDate
-					.clone();
-		}
-		if (null != cruiseStartDate) {
-			clone.cruiseStartDate = (OMEVariable) cruiseStartDate.clone();
-		}
-		if (null != cruiseEndDate) {
-			clone.cruiseEndDate = (OMEVariable) cruiseEndDate.clone();
-		}
-		if (null != vesselID) {
-			clone.vesselName = (OMEVariable) vesselName.clone();
-		}
-		if (null != vesselID) {
-			clone.vesselID = (OMEVariable) vesselID.clone();
-		}
-		if (null != country) {
-			clone.country = (OMEVariable) country.clone();
-		}
-		if (null != vesselOwner) {
-			clone.vesselOwner = (OMEVariable) vesselOwner.clone();
-		}
-		
-		if (null != variablesInfo) {
-			clone.variablesInfo = new ArrayList<OMECompositeVariable>(
-					variablesInfo.size());
-			for (OMECompositeVariable varInfo : variablesInfo) {
-				clone.variablesInfo.add((OMECompositeVariable) varInfo.clone());
-			}
-		}
-		
-		if (null != xCO2WaterEquDryUnit) {
-			clone.xCO2WaterEquDryUnit = (OMEVariable) xCO2WaterEquDryUnit.clone();
-		}
-		if (null != xCO2WaterSSTDryUnit) {
-			clone.xCO2WaterSSTDryUnit = (OMEVariable) xCO2WaterSSTDryUnit.clone();
-		}
-		if (null != pCO2WaterEquWetUnit) {
-			clone.pCO2WaterEquWetUnit = (OMEVariable) pCO2WaterEquWetUnit.clone();
-		}
-		if (null != pCO2WaterSSTWetUnit) {
-			clone.pCO2WaterSSTWetUnit = (OMEVariable) pCO2WaterSSTWetUnit.clone();
-		}
-		if (null != fCO2WaterEquWetUnit) {
-			clone.fCO2WaterEquWetUnit = (OMEVariable) fCO2WaterEquWetUnit.clone();
-		}
-		if (null != fCO2WaterSSTWetUnit) {
-			clone.fCO2WaterSSTWetUnit = (OMEVariable) fCO2WaterSSTWetUnit.clone();
-		}
-		if (null != xCO2AirDryUnit) {
-			clone.xCO2AirDryUnit = (OMEVariable) xCO2AirDryUnit.clone();
-		}
-		if (null != pCO2AirWetUnit) {
-			clone.pCO2AirWetUnit = (OMEVariable) pCO2AirWetUnit.clone();
-		}
-		if (null != fCO2AirWetUnit) {
-			clone.fCO2AirWetUnit = (OMEVariable) fCO2AirWetUnit.clone();
-		}
-		if (null != xCO2AirDryInterpolatedUnit) {
-			clone.xCO2AirDryInterpolatedUnit = (OMEVariable) xCO2AirDryInterpolatedUnit.clone();
-		}
-		if (null != pCO2AirWetInterpolatedUnit) {
-			clone.pCO2AirWetInterpolatedUnit = (OMEVariable) pCO2AirWetInterpolatedUnit.clone();
-		}
-		if (null != fCO2AirWetInterpolatedUnit) {
-			clone.fCO2AirWetInterpolatedUnit = (OMEVariable) fCO2AirWetInterpolatedUnit.clone();
-		}
-		if (null != depthOfSeaWaterIntake) {
-			clone.depthOfSeaWaterIntake = (OMEVariable) depthOfSeaWaterIntake.clone();
-		}
-		if (null != locationOfSeaWaterIntake) {
-			clone.locationOfSeaWaterIntake = (OMEVariable) locationOfSeaWaterIntake.clone();
-		}
-		if (null != equilibratorType) {
-			clone.equilibratorType = (OMEVariable) equilibratorType.clone();
-		}
-		if (null != equilibratorVolume) {
-			clone.equilibratorVolume = (OMEVariable) equilibratorVolume.clone();
-		}
-		if (null != waterFlowRate) {
-			clone.waterFlowRate = (OMEVariable) waterFlowRate.clone();
-		}
-		if (null != headspaceGasFlowRate) {
-			clone.headspaceGasFlowRate = (OMEVariable) headspaceGasFlowRate.clone();
-		}
-		if (null != vented) {
-			clone.vented = (OMEVariable) vented.clone();
-		}
-		if (null != dryingMethodForCO2InWater) {
-			clone.dryingMethodForCO2InWater = (OMEVariable) dryingMethodForCO2InWater.clone();
-		}
-		if (null != equAdditionalInformation) {
-			clone.equAdditionalInformation = (OMEVariable) equAdditionalInformation.clone();
-		}
-		if (null != co2InMarineAirMeasurement) {
-			clone.co2InMarineAirMeasurement = (OMEVariable) co2InMarineAirMeasurement.clone();
-		}
-		if (null != co2InMarineAirLocationAndHeight) {
-			clone.co2InMarineAirLocationAndHeight = (OMEVariable) co2InMarineAirLocationAndHeight.clone();
-		}
-		if (null != co2InMarineAirDryingMethod) {
-			clone.co2InMarineAirDryingMethod = (OMEVariable) co2InMarineAirDryingMethod.clone();
-		}
-		if (null != co2MeasurementMethod) {
-			clone.co2MeasurementMethod = (OMEVariable) co2MeasurementMethod.clone();
-		}
-		if (null != co2Manufacturer) {
-			clone.co2Manufacturer = (OMEVariable) co2Manufacturer.clone();
-		}
-		if (null != co2Model) {
-			clone.co2Model = (OMEVariable) co2Model.clone();
-		}
-		if (null != co2Frequency) {
-			clone.co2Frequency = (OMEVariable) co2Frequency.clone();
-		}
-		if (null != co2ResolutionWater) {
-			clone.co2ResolutionWater = (OMEVariable) co2ResolutionWater.clone();
-		}
-		if (null != co2UncertaintyWater) {
-			clone.co2UncertaintyWater = (OMEVariable) co2UncertaintyWater.clone();
-		}
-		if (null != co2ResolutionAir) {
-			clone.co2ResolutionAir = (OMEVariable) co2ResolutionAir.clone();
-		}
-		if (null != co2UncertaintyAir) {
-			clone.co2UncertaintyAir = (OMEVariable) co2UncertaintyAir.clone();
-		}
-		if (null != co2ManufacturerOfCalibrationGas) {
-			clone.co2ManufacturerOfCalibrationGas = (OMEVariable) co2ManufacturerOfCalibrationGas.clone();
-		}
-		if (null != co2SensorCalibration) {
-			clone.co2SensorCalibration = (OMEVariable) co2SensorCalibration.clone();
-		}
-		if (null != co2EnvironmentalControl) {
-			clone.co2EnvironmentalControl = (OMEVariable) co2EnvironmentalControl.clone();
-		}
-		if (null != co2MethodReferences) {
-			clone.co2MethodReferences = (OMEVariable) co2MethodReferences.clone();
-		}
-		if (null != detailsOfCO2Sensing) {
-			clone.detailsOfCO2Sensing = (OMEVariable) detailsOfCO2Sensing.clone();
-		}
-		if (null != analysisOfCO2Comparison) {
-			clone.analysisOfCO2Comparison = (OMEVariable) analysisOfCO2Comparison.clone();
-		}
-		if (null != measuredCO2Params) {
-			clone.measuredCO2Params = (OMEVariable) measuredCO2Params.clone();
-		}
-		if (null != sstLocation) {
-			clone.sstLocation = (OMEVariable) sstLocation.clone();
-		}
-		if (null != sstManufacturer) {
-			clone.sstManufacturer = (OMEVariable) sstManufacturer.clone();
-		}
-		if (null != sstModel) {
-			clone.sstModel = (OMEVariable) sstModel.clone();
-		}
-		if (null != sstAccuracy) {
-			clone.sstAccuracy = (OMEVariable) sstAccuracy.clone();
-		}
-		if (null != sstPrecision) {
-			clone.sstPrecision = (OMEVariable) sstPrecision.clone();
-		}
-		if (null != sstCalibration) {
-			clone.sstCalibration = (OMEVariable) sstCalibration.clone();
-		}
-		if (null != sstOtherComments) {
-			clone.sstOtherComments = (OMEVariable) sstOtherComments.clone();
-		}
-		if (null != eqtLocation) {
-			clone.eqtLocation = (OMEVariable) eqtLocation.clone();
-		}
-		if (null != eqtManufacturer) {
-			clone.eqtManufacturer = (OMEVariable) eqtManufacturer.clone();
-		}
-		if (null != eqtModel) {
-			clone.eqtModel = (OMEVariable) eqtModel.clone();
-		}
-		if (null != eqtAccuracy) {
-			clone.eqtAccuracy = (OMEVariable) eqtAccuracy.clone();
-		}
-		if (null != eqtPrecision) {
-			clone.eqtPrecision = (OMEVariable) eqtPrecision.clone();
-		}
-		if (null != eqtCalibration) {
-			clone.eqtCalibration = (OMEVariable) eqtCalibration.clone();
-		}
-		if (null != eqtWarming) {
-			clone.eqtWarming = (OMEVariable) eqtWarming.clone();
-		}
-		if (null != eqtOtherComments) {
-			clone.eqtOtherComments = (OMEVariable) eqtOtherComments.clone();
-		}
-		if (null != eqpLocation) {
-			clone.eqpLocation = (OMEVariable) eqpLocation.clone();
-		}
-		if (null != eqpManufacturer) {
-			clone.eqpManufacturer = (OMEVariable) eqpManufacturer.clone();
-		}
-		if (null != eqpModel) {
-			clone.eqpModel = (OMEVariable) eqpModel.clone();
-		}
-		if (null != eqpAccuracy) {
-			clone.eqpAccuracy = (OMEVariable) eqpAccuracy.clone();
-		}
-		if (null != eqpPrecision) {
-			clone.eqpPrecision = (OMEVariable) eqpPrecision.clone();
-		}
-		if (null != eqpCalibration) {
-			clone.eqpCalibration = (OMEVariable) eqpCalibration.clone();
-		}
-		if (null != eqpOtherComments) {
-			clone.eqpOtherComments = (OMEVariable) eqpOtherComments.clone();
-		}
-		if (null != eqpOtherComments) {
-			clone.eqpNormalized = (OMEVariable) eqpNormalized.clone();
-		}
-		if (null != atpLocation) {
-			clone.atpLocation = (OMEVariable) atpLocation.clone();
-		}
-		if (null != atpManufacturer) {
-			clone.atpManufacturer = (OMEVariable) atpManufacturer.clone();
-		}
-		if (null != atpModel) {
-			clone.atpModel = (OMEVariable) atpModel.clone();
-		}
-		if (null != atpAccuracy) {
-			clone.atpAccuracy = (OMEVariable) atpAccuracy.clone();
-		}
-		if (null != atpPrecision) {
-			clone.atpPrecision = (OMEVariable) atpPrecision.clone();
-		}
-		if (null != atpCalibration) {
-			clone.atpCalibration = (OMEVariable) atpCalibration.clone();
-		}
-		if (null != atpOtherComments) {
-			clone.atpOtherComments = (OMEVariable) atpOtherComments.clone();
-		}
-		if (null != sssLocation) {
-			clone.sssLocation = (OMEVariable) sssLocation.clone();
-		}
-		if (null != sssManufacturer) {
-			clone.sssManufacturer = (OMEVariable) sssManufacturer.clone();
-		}
-		if (null != sssModel) {
-			clone.sssModel = (OMEVariable) sssModel.clone();
-		}
-		if (null != sssAccuracy) {
-			clone.sssAccuracy = (OMEVariable) sssAccuracy.clone();
-		}
-		if (null != sssPrecision) {
-			clone.sssPrecision = (OMEVariable) sssPrecision.clone();
-		}
-		if (null != sssCalibration) {
-			clone.sssCalibration = (OMEVariable) sssCalibration.clone();
-		}
-		if (null != sssOtherComments) {
-			clone.sssOtherComments = (OMEVariable) sssOtherComments.clone();
-		}
-		
-		if (null != otherSensors) {
-			clone.otherSensors = new ArrayList<OMECompositeVariable>(otherSensors.size());
-			for (OMECompositeVariable otherSensor : otherSensors) {
-				clone.otherSensors.add((OMECompositeVariable) otherSensor.clone());
-			}
-		}
-		if (null != dataSetReferences) {
-			clone.dataSetReferences = (OMEVariable) dataSetReferences.clone();
-		}
-		if (null != additionalInformation) {
-			clone.additionalInformation = (OMEVariable) additionalInformation.clone();
-		}
-		if (null != citation) {
-			clone.citation = (OMEVariable) citation.clone();
-		}
-		if (null != measurementAndCalibrationReport) {
-			clone.measurementAndCalibrationReport = (OMEVariable) measurementAndCalibrationReport.clone();
-		}
-		if (null != preliminaryQualityControl) {
-			clone.preliminaryQualityControl = (OMEVariable) preliminaryQualityControl.clone();
-		}
-		if (null != form_type) {
-			clone.form_type = (OMEVariable) form_type.clone();
-		}
-		if (null != recordID) {
-			clone.recordID = (OMEVariable) recordID.clone();
-		}
-		
 		return clone;
 	}
 }
