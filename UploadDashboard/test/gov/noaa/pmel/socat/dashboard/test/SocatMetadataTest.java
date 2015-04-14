@@ -31,9 +31,9 @@ public class SocatMetadataTest {
 	static final Double NORTHMOST_LATITUDE = 50.0;
 	static final Date BEGIN_TIME = new Date();
 	static final Date END_TIME = new Date(BEGIN_TIME.getTime() + 1000000L);
-	static final String SCIENCE_GROUP = "My Science Group ; Another Science Group";
+	static final String SCIENCE_GROUP = "My Science Group : Another Science Group";
 	static final String ORIGINAL_DATA_REF = "doi:cdiac12345";
-	static final String ADDL_DOCS = "MySupplementalDoc1.doc ; MySupplementalDoc2.pdf";
+	static final String ADDL_DOCS = "MySupplementalDoc1.doc : MySupplementalDoc2.pdf";
 	static final String SOCAT_DOI = "doi:pangaea12345";
 	static final String SOCAT_DOI_HREF = "http://www.socat.info/doi/xxxx20140113.html";
 	static final String SOCAT_VERSION = "3.0";

@@ -155,6 +155,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 	/**
 	 * Create a SocatMetadata object from the data in this object.
+	 * Any known non-standard PI or vessel names will be changed to
+	 * the standard format (which might be intentionally misspelled).
 	 * 
 	 * @param socatVersion
 	 * 		SOCAT version to assign
@@ -172,12 +174,18 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		if ( isConflicted() ) {
 			throw new IllegalArgumentException("The Metadata contains conflicts");
 		}
-		
+
 		SocatMetadata scMData = new SocatMetadata();
 		
 		scMData.setExpocode(expocode);
 		scMData.setCruiseName(omeMData.getExperimentName());
-		scMData.setVesselName(omeMData.getVesselName());
+
+		// Check if the vessel name needs standardizing before assigning it
+		String vesselName = omeMData.getVesselName();
+		String stdVesselName = SocatMetadata.VESSEL_RENAME_MAP.get(vesselName);
+		if ( stdVesselName == null )
+			stdVesselName = vesselName;
+		scMData.setVesselName(stdVesselName);
 
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(omeMData.getWestmostLongitude()));
@@ -215,18 +223,22 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		} catch (ParseException ex) {
 			scMData.setEndTime(null);
 		}
-		
+
 		StringBuffer scienceGroup = new StringBuffer();
 		for ( String investigator : omeMData.getInvestigators() ) {
+			// Check if any investigator names need to be standardized
+			String piName = SocatMetadata.PI_RENAME_MAP.get(investigator);
+			if ( piName == null )
+				piName = investigator;
 			if (scienceGroup.length() == 0) {
-				scienceGroup.append(investigator);
+				scienceGroup.append(piName);
 			} else {
 				scienceGroup.append(SocatMetadata.NAMES_SEPARATOR);
-				scienceGroup.append(investigator);
+				scienceGroup.append(piName);
 			}
 		}
 		scMData.setScienceGroup(scienceGroup.toString());
-		
+
 		HashSet<String> usedOrganizations = new HashSet<String>();
 		StringBuffer orgGroup = new StringBuffer();
 		for ( String org : omeMData.getOrganizations() ) {
@@ -237,7 +249,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 					orgGroup.append(SocatMetadata.NAMES_SEPARATOR);
 					orgGroup.append(org);
 				}
-				
 			}
 		}
 		scMData.setOrganization(orgGroup.toString());

@@ -3,7 +3,6 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.CruiseStandardizer;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
@@ -49,6 +48,7 @@ public class UpdateDsgMetadata {
 		String expocodesFilename = args[0];
 
 		boolean success = true;
+		boolean changed = false;
 
 		// Get the default dashboard configuration
 		DashboardDataStore dataStore = null;		
@@ -90,30 +90,27 @@ public class UpdateDsgMetadata {
 			// update each of these cruises
 			for ( String expocode : allExpocodes ) {
 				try {
-					DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+
 					// Get just the filenames from the set of addition document
+					DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 					TreeSet<String> addlDocs = new TreeSet<String>();
 					for ( String docInfo : cruise.getAddlDocs() ) {
 						addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
 					}
+
 					// Read the current metadata in the full-data DSG file
 					CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
 					ArrayList<String> missing = fullDataDsg.read(true);
 					if ( ! missing.isEmpty() )
 						throw new RuntimeException("Unexpected values missing from the DSG file: " + missing);
 					SocatMetadata fullDataMeta = fullDataDsg.getMetadata();
+
 					// Get the metadata in the OME XML file
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
 							metaHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME), metaHandler);
 					SocatMetadata updatedMeta = omeMData.createSocatMetadata(
 							fullDataMeta.getSocatVersion(), addlDocs, fullDataMeta.getQcFlag());
-					// Make sure the PI and ship names in the OME metadata are the standard names
-					String newPiNames = CruiseStandardizer.PI_RENAME_MAP.get(updatedMeta.getScienceGroup());
-					if ( newPiNames != null )
-						updatedMeta.setScienceGroup(newPiNames);
-					String newShipName = CruiseStandardizer.SHIP_RENAME_MAP.get(updatedMeta.getVesselName());
-					if ( newShipName != null )
-						updatedMeta.setVesselName(newShipName);
+
 					// Check if there are any changes in the metadata
 					if ( ! fullDataMeta.equals(updatedMeta) ) {
 						// Just re-create the DSG file with the updated metadata
@@ -135,6 +132,7 @@ public class UpdateDsgMetadata {
 							// Re-create the decimated-data DSG file 
 							dsgHandler.decimateCruise(expocode);
 							System.out.println("Updated metadata in the DSG files for " + expocode);
+							changed = true;
 						} catch ( Exception ex ) {
 							fullDataDsg.delete();
 							System.err.println("Problems re-creating the DSG files for " + 
@@ -143,12 +141,16 @@ public class UpdateDsgMetadata {
 							continue;
 						}
 					}
+
 				} catch ( Exception ex ) {
 					System.err.println("Problems working with the full-data DSG file for " + 
 							expocode + ": " + ex.getMessage());
 					success = false;
 					continue;
 				}
+			}
+			if ( changed ) {
+				dsgHandler.flagErddap(true, true);
 			}
 		} finally {
 			dataStore.shutdown();
