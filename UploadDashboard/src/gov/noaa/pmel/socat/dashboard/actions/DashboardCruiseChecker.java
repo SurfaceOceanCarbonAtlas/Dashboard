@@ -816,6 +816,8 @@ public class DashboardCruiseChecker {
 
 		// Get the OME metadata that was updated from the data
 		OmeMetadata updatedOmeMData = output.getMetadata();
+		updatedOmeMData.setDraft( ! updatedOmeMData.isAcceptable() );
+
 		// Check if this OME metadata has any changes
 		boolean saveOmeMData;
 		if ( oldOmeDoc != null ) {
@@ -852,9 +854,6 @@ public class DashboardCruiseChecker {
 			String timestamp = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm Z").print(new DateTime());
 			DashboardOmeMetadata dashOmeMData = new DashboardOmeMetadata(updatedOmeMData, 
 					timestamp, cruiseData.getOwner(), cruiseData.getVersion());
-
-			// TODO: remove the following override of the dashboard metadata conflict flag when the OME is being used.
-			dashOmeMData.setConflicted(false);
 
 			String message = "Update of OME metadata from cruise checker";
 			metadataHandler.saveMetadataInfo(dashOmeMData, message);
