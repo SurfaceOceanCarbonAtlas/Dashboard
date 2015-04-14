@@ -639,8 +639,6 @@ public class OmeMetadata {
 	 * @return the experiment name
 	 */
 	public String getExperimentName() {
-		if ( null == experimentName )
-			return null;
 		return experimentName.getValue();
 	}
 
@@ -648,8 +646,6 @@ public class OmeMetadata {
 	 * @return the west-most longitude
 	 */
 	public String getWestmostLongitude() {
-		if ( null == westmostLongitude )
-			return null;
 		return westmostLongitude.getValue();
 	}
 
@@ -657,8 +653,6 @@ public class OmeMetadata {
 	 * @return the east-most longitude
 	 */
 	public String getEastmostLongitude() {
-		if ( null == eastmostLongitude )
-			return null;
 		return eastmostLongitude.getValue();
 	}
 
@@ -666,8 +660,6 @@ public class OmeMetadata {
 	 * @return the south-most latitude
 	 */
 	public String getSouthmostLatitude() {
-		if ( null == southmostLatitude )
-			return null;
 		return southmostLatitude.getValue();
 	}
 
@@ -675,8 +667,6 @@ public class OmeMetadata {
 	 * @return the north-most latitude
 	 */
 	public String getNorthmostLatitude() {
-		if ( null == northmostLatitude )
-			return null;
 		return northmostLatitude.getValue();
 	}
 
@@ -684,8 +674,6 @@ public class OmeMetadata {
 	 * @return the start date
 	 */
 	public String getTemporalCoverageStartDate() {
-		if ( null == temporalCoverageStartDate )
-			return null;
 		return temporalCoverageStartDate.getValue();
 	}
 
@@ -693,8 +681,6 @@ public class OmeMetadata {
 	 * @return the end date
 	 */
 	public String getTemporalCoverageEndDate() {
-		if ( null == temporalCoverageEndDate )
-			return null;
 		return temporalCoverageEndDate.getValue();
 	}
 
@@ -702,8 +688,6 @@ public class OmeMetadata {
 	 * @return the vessel name
 	 */
 	public String getVesselName() {
-		if ( null == vesselName )
-			return null;
 		return vesselName.getValue();
 	}
 
@@ -994,7 +978,7 @@ public class OmeMetadata {
 		}
 		case SOUTH_BOUND_STRING:
 		{
-			southmostLatitude = setValue(southmostLatitude, NORTH_BOUND_PATH, name, value, lineCount, replace);
+			southmostLatitude = setValue(southmostLatitude, SOUTH_BOUND_PATH, name, value, lineCount, replace);
 			break;
 		}
 		case START_DATE_STRING:
@@ -2279,15 +2263,10 @@ public class OmeMetadata {
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
 		Element boundsElem = new Element(BOUNDS_ELEMENT_NAME);
-		
-		if ( null != westmostLongitude )
-			westmostLongitude.generateXMLContent(boundsElem, conflictElem);
-		if ( null != eastmostLongitude )
-			eastmostLongitude.generateXMLContent(boundsElem, conflictElem);
-		if ( null != northmostLatitude )
-			northmostLatitude.generateXMLContent(boundsElem, conflictElem);
-		if ( null != southmostLatitude )
-			southmostLatitude.generateXMLContent(boundsElem, conflictElem);
+		westmostLongitude.generateXMLContent(boundsElem, conflictElem);
+		eastmostLongitude.generateXMLContent(boundsElem, conflictElem);
+		northmostLatitude.generateXMLContent(boundsElem, conflictElem);
+		southmostLatitude.generateXMLContent(boundsElem, conflictElem);
 		
 		
 		geoCoverageElem.addContent(boundsElem);
