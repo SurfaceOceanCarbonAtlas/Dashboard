@@ -65,60 +65,59 @@ public class CruiseListPage extends CompositeWithUsername {
 
 	private static final String UPLOAD_TEXT = "Upload Datasets";
 	private static final String UPLOAD_HOVER_HELP = 
-			"upload data to create a new data set " +
-			"or replace an existing data set";
+			"upload data to create a new dataset " +
+			"or replace an existing dataset";
 
 	private static final String VIEW_DATA_TEXT = "Identify Columns";
 	private static final String VIEW_DATA_HOVER_HELP =
 			"review and modify data column type assignments for the " +
-			"selected data set; identify issues in the data";
+			"selected dataset; identify issues in the data";
 
 	static final String OME_METADATA_TEXT = "Edit Metadata";
 	private static final String OME_METADATA_HOVER_HELP =
-			"edit the metadata for the selected data set";
+			"edit the metadata for the selected dataset";
 
 	private static final String ADDL_DOCS_TEXT = "Supplemental Documents";
 	private static final String ADDL_DOCS_HOVER_HELP =
-			"manage supplemental documents for the selected data sets";
+			"manage supplemental documents for the selected datasets";
 
 	private static final String QC_SUBMIT_TEXT = "Submit for QC";
 	private static final String QC_SUBMIT_HOVER_HELP =
-			"submit the selected data sets for quality control assessment";
+			"submit the selected datasets for quality control assessment";
 
 	private static final String REVIEW_TEXT = "Preview Dataset";
 	private static final String REVIEW_HOVER_HELP =
-			"examine the selected data set in the data set viewer " +
-			"aside other SOCAT data sets";
+			"examine various plots of data given in the selected dataset";
+
+	private static final String SHOW_DATASETS_TEXT = 
+			"Show Datasets";
+	private static final String SHOW_DATASETS_HOVER_HELP = 
+			"show existing datasets in your list of displayed datasets";
+
+	private static final String HIDE_DATASETS_TEXT = 
+			"Hide Datasets";
+	private static final String HIDE_DATASETS_HOVER_HELP =
+			"hides the selected datasets from your list of displayed datasets; " +
+			"this will NOT delete the datasets from the system";
 
 	private static final String DELETE_TEXT = "Delete Datasets";
 	private static final String DELETE_HOVER_HELP =
-			"delete the selected data sets from the system";
-
-	private static final String ADD_TO_LIST_TEXT = 
-			"Add to My List";
-	private static final String ADD_TO_LIST_HOVER_HELP = 
-			"add existing data sets to this displayed list of data sets";
-
-	private static final String REMOVE_FROM_LIST_TEXT = 
-			"Remove from My List";
-	private static final String REMOVE_FROM_LIST_HOVER_HELP =
-			"remove the selected data sets from this displayed list of data sets; " +
-			"this will NOT delete the data sets from the system";
+			"delete the selected datasets from the system";
 
 	// Error message when the request for the latest cruise list fails
 	private static final String GET_DATASET_LIST_ERROR_MSG = 
-			"Problems obtaining the latest data set listing";
+			"Problems obtaining the latest dataset listing";
 
 	// Starts of error messages for improper cruise selections
 	private static final String SUBMITTED_DATASETS_SELECTED_ERR_START = 
-			"Only data sets which have not been submitted for QC, " +
+			"Only datasets which have not been submitted for QC, " +
 			"or which have been suspended or excluded, may be selected ";
 	private static final String ARCHIVED_DATASETS_SELECTED_ERR_START =
-			"Only data sets which have not been archived may be selected ";
+			"Only datasets which have not been archived may be selected ";
 	private static final String NO_DATASET_SELECTED_ERR_START = 
-			"No data set is selected ";
+			"No dataset is selected ";
 	private static final String MANY_DATASETS_SELECTED_ERR_START = 
-			"Only one data set may be selected ";
+			"Only one dataset may be selected ";
 
 	// Ends of error messages for improper cruise selections
 	private static final String FOR_REVIEWING_ERR_END = 
@@ -133,25 +132,25 @@ public class CruiseListPage extends CompositeWithUsername {
 			"for submitting for QC and archival.";
 	private static final String FOR_DELETE_ERR_END = 
 			"for deletion from the system.";
-	private static final String FOR_REMOVE_ERR_END = 
-			"for removal from your personal list of datasets.";
+	private static final String FOR_HIDE_ERR_END = 
+			"for hiding from your list of displayed datasets.";
 
 	private static final String NO_METADATA_HTML_PROLOGUE = 
-			"The following data sets do not have appropriate metadata " +
+			"The following datasets do not have appropriate metadata " +
 			"and cannot be submitted for QC: <ul>";
 	private static final String NO_METADATA_HTML_EPILOGUE = 
 			"</ul>";
 	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
-			"The following data sets have not been checked, or have very " +
+			"The following datasets have not been checked, or have very " +
 			"serious errors detected by the automated data checker: <ul>";
 	private static final String CANNOT_SUBMIT_HTML_EPILOGUE =
-			"</ul> These data sets cannot be submitted for QC " +
+			"</ul> These datasets cannot be submitted for QC " +
 			"until these problems have been resolved.";
 	private static final String DATA_AUTOFAIL_HTML_PROLOGUE = 
-			"The following data sets have errors detected " +
+			"The following datasets have errors detected " +
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
-			"</ul> These data sets can be submitted for QC, " +
+			"</ul> These datasets can be submitted for QC, " +
 			"but because of the number of errors, a QC flag of " + 
 			SocatQCEvent.QC_F_FLAG + " (unacceptable) " +
 			"will <em>probably</em> be assigned by reviewers.<br />" +
@@ -159,36 +158,36 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String AUTOFAIL_YES_TEXT = "Yes";
 	private static final String AUTOFAIL_NO_TEXT = "No";
 
+	private static final String EXPOCODE_TO_SHOW_MSG = 
+			"Enter the expocode, possibly with wildcards * and ?, of the datasets " +
+			"you want to show in your list of displayed datasets";
+	private static final String SHOW_DATASET_FAIL_MSG = 
+			"Unable to show the specified datasets " +
+			"in your personal list of displayed datasets";
+
+	private static final String HIDE_DATASET_HTML_PROLOGUE = 
+			"The following datasets will be hidden from your " +
+			"list of displayed datasets; the data, metadata, and " +
+			"supplemental documents will <b>not</b> be removed: <ul>";
+	private static final String HIDE_DATASET_HTML_EPILOGUE = 
+			"</ul> Do you want to proceed?";
+	private static final String HIDE_YES_TEXT = "Yes";
+	private static final String HIDE_NO_TEXT = "No";
+	private static final String HIDE_DATASET_FAIL_MSG = 
+			"Unable to hide the selected datasets from " +
+			"your list of displayed datasets";
+
 	private static final String DELETE_DATASET_HTML_PROLOGUE = 
-			"All data will be deleted for the following data sets: <ul>";
+			"All data will be deleted for the following datasets: <ul>";
 	private static final String DELETE_DATASET_HTML_EPILOGUE =
 			"</ul> Do you want to proceed?";
 	private static final String DELETE_YES_TEXT = "Yes";
 	private static final String DELETE_NO_TEXT = "No";
 	private static final String DELETE_DATASET_FAIL_MSG = 
-			"Unable to delete the data sets";
-
-	private static final String EXPOCODE_TO_ADD_MSG = 
-			"Enter the expocode, possibly with wildcards * and ?, of the " +
-			"data set(s) you want to add to your personal list of data sets";
-	private static final String ADD_DATASET_FAIL_MSG = 
-			"Unable to add the specified data set(s) " +
-			"to your personal list of data sets";
-
-	private static final String REMOVE_DATASET_HTML_PROLOGUE = 
-			"The following data sets will be removed from your personal " +
-			"list of data sets; the data, metadata, and supplemental " +
-			"documents will <b>not</b> be removed: <ul>";
-	private static final String REMOVE_DATASET_HTML_EPILOGUE = 
-			"</ul> Do you want to proceed?";
-	private static final String REMOVE_YES_TEXT = "Yes";
-	private static final String REMOVE_NO_TEXT = "No";
-	private static final String REMOVE_DATASET_FAIL_MSG = 
-			"Unable to remove the selected data sets " +
-			"from your personal list of data sets";
+			"Unable to delete the datasets";
 
 	private static final String UNEXPECTED_INVALID_DATESET_LIST_MSG = 
-			" (unexpected invalid data set list returned)";
+			" (unexpected invalid datasets list returned)";
 
 	// Select options
 	private static final String MIXED_SELECTION_OPTION = " ";
@@ -241,8 +240,8 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
 	@UiField Button deleteButton;
-	@UiField Button addToListButton;
-	@UiField Button removeFromListButton;
+	@UiField Button showDatasetButton;
+	@UiField Button hideDatasetButton;
 	@UiField DataGrid<DashboardCruise> datasetsGrid;
 
 	private ListDataProvider<DashboardCruise> listProvider;
@@ -299,14 +298,14 @@ public class CruiseListPage extends CompositeWithUsername {
 		qcSubmitButton.setText(QC_SUBMIT_TEXT);
 		qcSubmitButton.setTitle(QC_SUBMIT_HOVER_HELP);
 
+		showDatasetButton.setText(SHOW_DATASETS_TEXT);
+		showDatasetButton.setTitle(SHOW_DATASETS_HOVER_HELP);
+
+		hideDatasetButton.setText(HIDE_DATASETS_TEXT);
+		hideDatasetButton.setTitle(HIDE_DATASETS_HOVER_HELP);
+
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
-
-		addToListButton.setText(ADD_TO_LIST_TEXT);
-		addToListButton.setTitle(ADD_TO_LIST_HOVER_HELP);
-
-		removeFromListButton.setText(REMOVE_FROM_LIST_TEXT);
-		removeFromListButton.setTitle(REMOVE_FROM_LIST_HOVER_HELP);
 
 		managerButtonsShown = true;
 		askDeletePopup = null;
@@ -742,9 +741,9 @@ public class CruiseListPage extends CompositeWithUsername {
 		});
 	}
 
-	@UiHandler("addToListButton")
+	@UiHandler("showDatasetButton")
 	void addToListOnClick(ClickEvent event) {
-		String wildExpocode = Window.prompt(EXPOCODE_TO_ADD_MSG, "");
+		String wildExpocode = Window.prompt(EXPOCODE_TO_SHOW_MSG, "");
 		if ( (wildExpocode != null) && ! wildExpocode.trim().isEmpty() ) {
 			SocatUploadDashboard.showWaitCursor();
 			// Save the currently selected cruises
@@ -757,36 +756,36 @@ public class CruiseListPage extends CompositeWithUsername {
 						CruiseListPage.this.updateCruises(cruises);
 					}
 					else {
-						SocatUploadDashboard.showMessage(ADD_DATASET_FAIL_MSG + 
+						SocatUploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG + 
 								UNEXPECTED_INVALID_DATESET_LIST_MSG);
 					}
 					SocatUploadDashboard.showAutoCursor();
 				}
 				@Override
 				public void onFailure(Throwable ex) {
-					SocatUploadDashboard.showFailureMessage(ADD_DATASET_FAIL_MSG, ex);
+					SocatUploadDashboard.showFailureMessage(SHOW_DATASET_FAIL_MSG, ex);
 					SocatUploadDashboard.showAutoCursor();
 				}
 			});
 		}
 	}
 
-	@UiHandler("removeFromListButton")
+	@UiHandler("hideDatasetButton")
 	void removeFromListOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( expocodeSet.size() == 0 ) {
 			SocatUploadDashboard.showMessage(
-					NO_DATASET_SELECTED_ERR_START + FOR_REMOVE_ERR_END);
+					NO_DATASET_SELECTED_ERR_START + FOR_HIDE_ERR_END);
 			return;
 		}
 		// Confirm cruises to be removed
-		String message = REMOVE_DATASET_HTML_PROLOGUE;
+		String message = HIDE_DATASET_HTML_PROLOGUE;
 		for ( String expocode : expocodeSet )
 			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
-		message += REMOVE_DATASET_HTML_EPILOGUE;
+		message += HIDE_DATASET_HTML_EPILOGUE;
 		if ( askRemovePopup == null ) {
-			askRemovePopup = new DashboardAskPopup(REMOVE_YES_TEXT, 
-					REMOVE_NO_TEXT, new AsyncCallback<Boolean>() {
+			askRemovePopup = new DashboardAskPopup(HIDE_YES_TEXT, 
+					HIDE_NO_TEXT, new AsyncCallback<Boolean>() {
 				@Override
 				public void onSuccess(Boolean result) {
 					// Only proceed if yes; ignore if no or null
@@ -817,14 +816,14 @@ public class CruiseListPage extends CompositeWithUsername {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
-					SocatUploadDashboard.showMessage(REMOVE_DATASET_FAIL_MSG + 
+					SocatUploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG + 
 							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
 				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(REMOVE_DATASET_FAIL_MSG, ex);
+				SocatUploadDashboard.showFailureMessage(HIDE_DATASET_FAIL_MSG, ex);
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});
@@ -1108,67 +1107,39 @@ public class CruiseListPage extends CompositeWithUsername {
 			@Override
 			public void render(Cell.Context ctx, DashboardCruise cruise, 
 													SafeHtmlBuilder sb) {
-				Boolean editable = cruise.isEditable();
 				String msg = getValue(cruise);
 				if ( msg.equals(DashboardUtils.CHECK_STATUS_ACCEPTABLE) ) {
 					// No problems - use normal background
-					if ( Boolean.TRUE.equals(editable) ) {
-						sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-						sb.appendEscaped(msg);
-						sb.appendHtmlConstant("</em></u></div>");
-					}
-					else {
-						sb.appendHtmlConstant("<div>");
-						sb.appendEscaped(msg);
-						sb.appendHtmlConstant("</div>");
-					}
+					sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+					sb.appendEscaped(msg);
+					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else if ( msg.contains("warnings") || (msg.contains("errors") && 
 						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
 					// Only warnings or a few errors - use warning background color
-					if ( Boolean.TRUE.equals(editable) ) {
-						sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-								SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
-						sb.appendEscaped(msg);
-						sb.appendHtmlConstant("</em></u></div>");
-					}
-					else {
-						sb.appendHtmlConstant("<div style=\"background-color:" +
-								SocatUploadDashboard.WARNING_COLOR + ";\">");
-						sb.appendEscaped(msg);
-						sb.appendHtmlConstant("</div>");
-					}
+					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
+							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
+					sb.appendEscaped(msg);
+					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else {
 					// Many errors, unacceptable, or not checked - use error background color
-					if ( Boolean.TRUE.equals(editable) ) {
-						sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-								SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
-						sb.appendEscaped(msg);
-						sb.appendHtmlConstant("</em></u></div>");
-					}
-					else {
-						sb.appendHtmlConstant("<div style=\"background-color:" +
-								SocatUploadDashboard.ERROR_COLOR + ";\">");
-						sb.appendEscaped(msg);
-						sb.appendHtmlConstant("</div>");
-					}
+					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
+							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
+					sb.appendEscaped(msg);
+					sb.appendHtmlConstant("</em></u></div>");
 				}
 			}
 		};
 		dataCheckColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
 			@Override
 			public void update(int index, DashboardCruise cruise, String value) {
-				// Respond only for cruises that have not been submitted
-				Boolean editable = cruise.isEditable();
-				if ( Boolean.TRUE.equals(editable) ) {
-					// Save the currently selected cruises
-					getSelectedCruises(null);
-					// Open the data column specs page for this one cruise
-					ArrayList<String> expocodes = new ArrayList<String>(1);
-					expocodes.add(cruise.getExpocode());
-					DataColumnSpecsPage.showPage(getUsername(), expocodes);
-				}
+				// Save the currently selected cruises
+				getSelectedCruises(null);
+				// Open the data column specs page for this one cruise
+				ArrayList<String> expocodes = new ArrayList<String>(1);
+				expocodes.add(cruise.getExpocode());
+				DataColumnSpecsPage.showPage(getUsername(), expocodes);
 			}
 		});
 		return dataCheckColumn;
@@ -1430,8 +1401,9 @@ public class CruiseListPage extends CompositeWithUsername {
 		boolean willAutofail = false;
 		for ( DashboardCruise cruise : checkSet.values() ) {
 			String status = cruise.getDataCheckStatus();
-			if ( DashboardUtils.CHECK_STATUS_NOT_CHECKED.equals(status) ||
-				 DashboardUtils.CHECK_STATUS_UNACCEPTABLE.equals(status) ) {
+			if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
+				 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ||
+				 status.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) {
 				errMsg += "<li>" + 
 						 SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				cannotSubmit = true;

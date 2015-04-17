@@ -24,9 +24,11 @@
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="addlDocsButton" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="reviewButton" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="qcSubmitButton" />
+						<g:Label addStyleNames="{style.cruisebuttonpanelseparator}" />
+						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="showDatasetButton" />
+						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="hideDatasetButton" />
+						<g:Label addStyleNames="{style.cruisebuttonpanelseparator}" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="deleteButton" />
-						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="addToListButton" />
-						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="removeFromListButton" />
 					</g:FlowPanel>
 				</g:west>
 				<g:center>

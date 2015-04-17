@@ -762,10 +762,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Save the OME XML document created by {@link #createOmeXmlDoc()} 
-	 * from the given OmeDocument as the document file for this metadata.  
-	 * The parent directory for this file is expected to exist and 
-	 * this method will overwrite any existing OME metadata file.
+	 * Save the OME XML document created by {@link DashboardOmeMetadata#createOmeXmlDoc()} 
+	 * as the document file for this metadata.  The parent directory for this file is 
+	 * expected to exist and this method will overwrite any existing OME metadata file.
 	 * 
 	 * @param mdata
 	 * 		OME metadata to save as an OME XML document

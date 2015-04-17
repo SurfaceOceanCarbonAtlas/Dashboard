@@ -1301,8 +1301,12 @@ public class DashboardCruiseChecker {
 		cruise.setNumWarnRows(numWarnRows);
 
 		// Assign the data-check status message using the results of the sanity check
-		if ( lastCheckHadGeopositionErrors || ! lastCheckProcessedOkay ) {
+		if ( ! lastCheckProcessedOkay ) {
 			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_UNACCEPTABLE);
+		}
+		else if ( lastCheckHadGeopositionErrors ) {
+			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
+					Integer.toString(numErrorRows) + " errors " + DashboardUtils.GEOPOSITION_ERRORS_MSG);
 		}
 		else if ( numErrorRows > 0 ) {
 			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX +
