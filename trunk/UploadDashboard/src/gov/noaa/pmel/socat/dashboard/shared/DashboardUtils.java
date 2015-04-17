@@ -63,6 +63,7 @@ public class DashboardUtils {
 	public static final String CHECK_STATUS_WARNINGS_PREFIX = "Warnings:";
 	public static final String CHECK_STATUS_ERRORS_PREFIX = "Errors:";
 	public static final String CHECK_STATUS_UNACCEPTABLE = "Unacceptable";
+	public static final String GEOPOSITION_ERRORS_MSG = "(lat/lon/time errors!)";
 
 	// Archival options
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
