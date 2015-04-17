@@ -137,6 +137,10 @@ public class FixOmeMetadata {
 					if ( changed ) {
 						omeMData = new DashboardOmeMetadata(expocode, omeMData.getUploadTimestamp(), omeXmlDoc);
 						metaHandler.saveAsOmeXmlDoc(omeMData, "Correction of PI names and/or vessel name");
+						System.out.println("PI and/or vessel name updated in the OME for " + expocode);
+					}
+					else {
+						System.out.println("No PI or vessel name changes in the OME for " + expocode);
 					}
 
 				} catch ( Exception ex ) {
