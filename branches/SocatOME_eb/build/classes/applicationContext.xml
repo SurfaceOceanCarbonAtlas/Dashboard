@@ -8,16 +8,15 @@
 		<property name="properties">
 			<map>
 				<entry key="xmlStyle" value="fgdc" />
-				<entry key="XMLStyleMap"
-					value="/home/users/ksmith/workspace/SocatOME/WebRoot/fgdc_template.xml" />
+				<entry key="XMLStyleMap" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/WebRoot/fgdc_template.xml" />
 				<entry key="XMLStyleMapDis"
-					value="/home/users/ksmith/workspace/SocatOME/WebRoot/fgdc_template_dis.xml" />
-				<entry key="XMLOutPath" value="/home/users/ksmith/workspace/SocatOME/WebRoot/" />
+					value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/WebRoot/fgdc_template_dis.xml" />
+				<entry key="XMLOutPath" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/WebRoot/" />
 				<entry key="delimiter" value="\|\|" />
-				<entry key="linkbasepath" value="http://localhost:8580/SocatOME/" />
+				<entry key="linkbasepath" value="http://localhost:8080/SocatOME/" />
 				<entry key="sender" value="mercury-support@ornl.gov" />
 				<entry key="win_base" value="" />
-				<entry key="lin_base" value="/home/users/ksmith/workspace/SocatOME/WebRoot/" />
+				<entry key="lin_base" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/WebRoot/" />
 				<entry key="foldername" value="OceanMetadata" />
 				<entry key="datafolder" value="cdiac.ornl.gov/incoming/ocean.co2/forms/" />
 				<entry key="datafilesize" value="2097152"/>
@@ -26,7 +25,7 @@
 				<entry key="discrete" value="discrete" />
 				<entry key="redirect" value="true"/>
 				<entry key="stylesheet"
-					value="/home/users/ksmith/workspace/SocatOME/WebRoot/removeEmpty.xsl" />				
+					value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/WebRoot/removeEmpty.xsl" />				
 			</map>
 
 		</property>

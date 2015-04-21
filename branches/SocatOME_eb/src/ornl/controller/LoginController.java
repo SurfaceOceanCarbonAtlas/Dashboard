@@ -44,8 +44,6 @@ public class LoginController extends BaseController{
 				.getAuthentication().getPrincipal();
 		String name = user.getUsername();
 
-
-
 		
 		model.addAttribute("username", name);
 		model.addAttribute("message",
@@ -93,8 +91,8 @@ public class LoginController extends BaseController{
 
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String login(ModelMap model) {
-		// System.out.println("Here is the user from login controller /login => "+
-		// model.get("username"));
+		System.out.println("************************************* Here is the user from login controller /login => "+
+		model.get("username"));
 		return "login";
 
 	}

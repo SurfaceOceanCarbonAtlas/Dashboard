@@ -108,8 +108,7 @@ public class EditorController extends BaseController {
 		String profile = "";
 
 		model.addAttribute("username", name);
-		model.addAttribute("message",
-				"Spring Security login + database example");
+		model.addAttribute("message", "Spring Security login + database example");
 
 		String[] regusers = {"admin","guest"};
 		Editor editor = new Editor();
@@ -194,6 +193,7 @@ public class EditorController extends BaseController {
 	public String newForm(@ModelAttribute("editor") Editor editor,
 			BindingResult result, SessionStatus status, ModelMap model) {
 
+		System.out.println("*********************************************************************  Inside NewForm");
 		UserInfo userInfo = new UserInfo();
 		try {
 			if (isLoggedIn()) {
@@ -210,11 +210,11 @@ public class EditorController extends BaseController {
 		}
 		try {
 			if (userInfo.isAdmin(name)) {
-				// System.out.println("Inside isadmin");
+				System.out.println("*********************************************************************  Inside isadmin");
 				editor.setadminUser("true");
 			} else {
 				editor.setadminUser("false");
-				// System.out.println("ouside isadmin");
+				System.out.println("*********************************************************************  ouside isadmin");
 			}
 		} catch (Exception e) {
 		}

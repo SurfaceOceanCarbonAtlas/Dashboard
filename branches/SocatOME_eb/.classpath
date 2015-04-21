@@ -67,9 +67,9 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/slf4j-simple-1.6.4.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-security-config-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-security-core-3.0.7.RELEASE.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-security-web-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/standard.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/taglibs-xsl.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/taglibs-xtags.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/spring-security-web-3.0.7.RELEASE.jar"/>
 	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
 </classpath>

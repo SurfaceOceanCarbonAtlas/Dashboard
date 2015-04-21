@@ -7,16 +7,16 @@
 <hibernate-configuration>
 
 	 <session-factory>
-                <property name="connection.username">mercuryui</property>
+                <property name="connection.username">socatDev</property>
                 <property name="connection.url">
-                        jdbc:mysql://mercury3-rh.ornl.gov:3306/metadata_editor</property>
+                        jdbc:mysql://dunkel.pmel.noaa.gov:3306/SocatOME</property>
                 <property name="dialect">
                         org.hibernate.dialect.MySQLDialect
                 </property>
-                <property name="myeclipse.connection.profile">
-                        mercury3logs_dev
-                </property>
-                <property name="connection.password">mercury3ui</property>
+<!--                 <property name="myeclipse.connection.profile"> -->
+<!--                         mercury3logs_dev -->
+<!--                 </property> -->
+                <property name="connection.password">soc@tDB</property>
                 <property name="connection.driver_class">
                         com.mysql.jdbc.Driver
                 </property>
@@ -29,7 +29,7 @@
                 <property name="connection.provider_class">
                         org.hibernate.connection.C3P0ConnectionProvider
                 </property>
-                <mapping resource="ornl/database/Site.hbm.xml" />
+<!--                 <mapping resource="ornl/database/Site.hbm.xml" /> -->
                 <mapping resource="ornl/database/Author.hbm.xml" />
                 <mapping resource="ornl/database/UserRoles.hbm.xml" />
                 <mapping resource="ornl/database/Users.hbm.xml" />

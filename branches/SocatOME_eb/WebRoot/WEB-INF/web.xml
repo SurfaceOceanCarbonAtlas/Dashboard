@@ -89,7 +89,8 @@
   <session-timeout>10080</session-timeout>
  </session-config>
  <welcome-file-list>
-  <welcome-file>/WEB-INF/pages/index.jsp</welcome-file>
+ 	<welcome-file>/WEB-INF/pages/index.jsp</welcome-file>
+	<welcome-file>/WEB-INF/pages/EditorForm.jsp</welcome-file>
  </welcome-file-list>
  <jsp-config> 	
   <taglib>

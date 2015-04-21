@@ -7,21 +7,19 @@
     <property name="properties">
         <map>
             <entry key="xmlStyle" value="fgdc" />
-            <entry key="XMLStyleMap"
-            value="/usr/share/apache-tomcat-7.0.14-new/webapps/OME/fgdc_template.xml" />
-            <entry key="XMLOutPath" value="/usr/share/apache-tomcat-7.0.14-new/webapps/OME/" />
+            <entry key="XMLStyleMap" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/fgdc_template.xml" />
+            <entry key="XMLOutPath" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/" />
             <entry key="delimiter" value="\|\|" />
-            <entry key="linkbasepath" value="http://mercury-ops2.ornl.gov/OME/" />
+            <entry key="linkbasepath" value="http://localhost/SocatOME/" />
             <entry key="sender" value="metadata_editor@usgs.gov" />
             <entry key="contact" value="mercury-service@ornl.gov" />
             <entry key="smtp" value="mail.smtp.host" />
             <entry key="mail_host" value="smtp.ornl.gov" />
-            <entry key="logo" value="http://mercury-ops2:8080/OME/images/USGS_logo.jpg" />
+<!--             <entry key="logo" value="http://mercury-ops2:8080/OME/images/USGS_logo.jpg" /> -->
             <entry key="win_base" value="" />
-            <entry key="lin_base" value="/usr/share/apache-tomcat-7.0.14-new/webapps/OME/" />
+            <entry key="lin_base" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/" />
             <entry key="redirect" value="true"/>
-            <entry key="stylesheet"
-            value="/usr/share/apache-tomcat-7.0.14-new/webapps/OME/removeEmpty.xsl" />
+            <entry key="stylesheet" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/removeEmpty.xsl" />
         </map>
     </property>
 </bean>

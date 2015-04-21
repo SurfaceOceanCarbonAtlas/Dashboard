@@ -36,8 +36,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class XMLWriter {
 
 	private org.jdom.Element titleNode;
-	ApplicationContext factory = new ClassPathXmlApplicationContext(
-			"applicationContext.xml");
+	ApplicationContext factory = new ClassPathXmlApplicationContext("applicationContext.xml");
 	// ApplicationContext factory2 = new
 	// ClassPathXmlApplicationContext("fgdc_template.xml");
 

@@ -35,9 +35,9 @@
 				</center>
 			</div>
 
-			<div class="request-signin">
-				<a href="<c:url value="/login.htm"/>">Admin Login</a>
-			</div>
+<!-- 			<div class="request-signin"> -->
+<%-- 				<a href="<c:url value="/login.htm"/>">Admin Login</a> --%>
+<!-- 			</div> -->
 
 
 		</div>
