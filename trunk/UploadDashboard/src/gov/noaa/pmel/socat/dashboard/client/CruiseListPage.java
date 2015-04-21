@@ -1114,9 +1114,11 @@ public class CruiseListPage extends CompositeWithUsername {
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
-				else if ( msg.contains("warnings") || (msg.contains("errors") && 
-						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS)) ) {
-					// Only warnings or a few errors - use warning background color
+				else if ( msg.contains("warnings") || 
+						  ( msg.contains("errors") && 
+						    ( ! msg.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) && 
+						    ( cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS ) ) ) {
+					// Only warnings or a few minor errors - use warning background color
 					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
 							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);

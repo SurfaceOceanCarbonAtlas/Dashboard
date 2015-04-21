@@ -46,6 +46,7 @@ public class CruiseDsgNcFile extends File {
 
 	private static final String VERSION = "CruiseDsgNcFile 1.2";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
+	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
 
@@ -385,7 +386,9 @@ public class CruiseDsgNcFile extends File {
 					sec = 0;
 				}
 				else {
-					sec = (int) Math.round(second);
+					// Truncate - don't deal with roll-overs such as from Feb 28 23:59:59.75;
+					// furthermore, Ferret will overwrite with the fractional seconds. 
+					sec = (int) Math.round(Math.floor(second));
 				}
 				try {
 					CalendarDate date = CalendarDate.of(BASE_CALENDAR, year, month, day, hour, minute, sec);
