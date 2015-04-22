@@ -399,8 +399,8 @@ public class CruiseDsgNcFile extends File {
 							year + "-" + month + "-" + day + " " + 
 							hour + ":" + minute + ":" + sec);
 				}
-				ncfile.write(var, values);
 			}
+			ncfile.write(var, values);
 		} finally {
 			ncfile.close();
 		}
