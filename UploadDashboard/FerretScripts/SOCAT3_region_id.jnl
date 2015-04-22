@@ -41,21 +41,27 @@ let d2land_coast = SAMPLEXY_CLOSEST(dist2land[d=($dd2land),x=-180:180], longitud
 ! Because datasets are at different resolutions, region_num may not have been assigned
 ! for locations very near land. Mark these temporarily with code 88
 
+! Also mark all locations that may be on land as coastal - or Arctic/Southern in those regions. 
+! dont have the missing-ids over land.
+
 let region_num_fill = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
+let region_num_fill2 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
 
 IF `region_num_fill[i=@min] EQ 0` THEN
    LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
 
-   LET region_num_fill = if region_num_fill1 EQ 88 then \
+   LET region_num_fill2 = if region_num_fill1 EQ 88 then \
     SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE region_num_fill1
 ENDIF
 
 IF `region_num_fill[i=@max] EQ 88` THEN
    LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
 
-   LET region_num_fill = if region_num_fill1 EQ 88 then \
-    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE region_num_fill1
+   LET region_num_fill2 = if region_num_fill1 EQ 88 then \
+    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE 7
 ENDIF
+
+LET region_num_fill = IF region_num_fill2 EQ 0 THEN 7 ELSE region_num_fill2
 
 ! There is no region 3 and no region 9
 let region_codes = {"N", "T", "-", "O", "I", "A", "C", "Z", "-", "R"}
