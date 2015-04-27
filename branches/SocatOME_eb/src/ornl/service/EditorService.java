@@ -51,7 +51,6 @@ import ornl.controller.EmailController;
 public class EditorService {
 
 	private ApplicationContext ctx = null;
-
 	private MapBean xmlBean = new MapBean();
 	private MultiMapBean multiMapBean = new MultiMapBean();
 	public LinkedHashMap<String, String> xpath_map = null;
