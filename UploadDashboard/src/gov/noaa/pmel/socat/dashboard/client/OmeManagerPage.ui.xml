@@ -13,18 +13,17 @@
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
-			<g:FormPanel ui:field="uploadForm">
-				<g:FlowPanel>
-					<g:FileUpload name="metadataupload" addStyleNames="{style.uploadfile}"
-							ui:field="omeUpload" />
-					<g:Hidden name="timestamp" ui:field="timestampToken" /> 
-					<g:Hidden name="expocodes" ui:field="expocodesToken" />
-					<g:Hidden name="ometoken" ui:field="omeToken" />
-				</g:FlowPanel>
-			</g:FormPanel>
+			<g:FlowPanel addStyleNames="{style.omeoptionpanel}">
+				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
+						name="OmeRadioGroup" ui:field="editNewRadio" />
+				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
+						name="OmeRadioGroup" ui:field="editPreviousRadio" />
+				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
+						name="OmeRadioGroup" ui:field="editUploadRadio" />
+			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
-				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="uploadButton" />
-				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="editButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="doneButton" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:ScrollPanel>

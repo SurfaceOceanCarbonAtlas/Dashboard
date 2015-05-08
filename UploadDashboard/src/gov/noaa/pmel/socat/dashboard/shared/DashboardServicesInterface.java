@@ -224,6 +224,22 @@ public interface DashboardServicesInterface extends RemoteService {
 			throws IllegalArgumentException;
 
 	/**
+	 * Opens the OME for a cruise
+	 * 
+	 * @param activeExpocode
+	 * 		open the OME for this cruise
+	 * @param previousExpocode
+	 * 		if not empty, initialize with metadata from this cruise
+	 * @param editUpload
+	 * 		if true, start by uploading a user's OME XML file
+	 * @param callback
+	 * 		the callback to make when complete; the onFailure method
+	 * 		of the callback will be called if authentication failed,
+	 * 		or if the OME was not able to be started
+	 */
+	boolean openOME(String activeExpocode, String previousExpocode, boolean editUpload);
+
+	/**
 	 * Requests that the preview images for a cruise be generated.
 	 * 
 	 * @param username

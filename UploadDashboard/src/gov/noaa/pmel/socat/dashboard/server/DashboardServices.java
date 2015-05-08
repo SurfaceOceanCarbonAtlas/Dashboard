@@ -38,7 +38,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardServices extends RemoteServiceServlet
 								implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = -6393205906275553899L;
+	private static final long serialVersionUID = -3989874185735330638L;
 
 	private String username = null;
 	private DashboardDataStore dataStore = null;
@@ -420,6 +420,12 @@ public class DashboardServices extends RemoteServiceServlet
 		scMsgList.setUsername(username);
 		Logger.getLogger("DashboardServices").info("returned sanity checker messages for " + expocode + " for " + username);
 		return scMsgList;
+	}
+
+	@Override
+	public boolean openOME(String activeExpocode, String previousExpocode, boolean editUpload) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
