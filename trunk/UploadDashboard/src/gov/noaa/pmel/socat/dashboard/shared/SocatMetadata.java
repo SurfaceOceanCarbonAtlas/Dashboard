@@ -594,6 +594,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		PI_RENAME_MAP.put("Andrew Watson", "Watson, A.");
 		PI_RENAME_MAP.put("Are Olsen", "Olsen, A.");
 		PI_RENAME_MAP.put("Arne Koertzinger", "Koertzinger, A.");
+		PI_RENAME_MAP.put("Arne K" + oUmlaut + "tzinger", "Koertzinger, A.");
 		PI_RENAME_MAP.put("B" + eAcute + "govic, M.", "Begovic, M.");
 		PI_RENAME_MAP.put("B" + yAcute + "govic, M.", "Begovic, M.");
 		PI_RENAME_MAP.put("Bernd Schneider", "Schneider, B.");
@@ -624,6 +625,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		PI_RENAME_MAP.put("Jeremy Matthis", "Mathis, J.");
 		PI_RENAME_MAP.put("Joe Salisbury", "Salisbury, J.");
 		PI_RENAME_MAP.put("Kim Currie", "Currie, K.I.");
+		PI_RENAME_MAP.put("K" + oUmlaut + "tzinger, A.", "Koertzinger, A.");
 		PI_RENAME_MAP.put("Liliane Merlivat", "Merlivat, L.");
 		PI_RENAME_MAP.put("Ludger Mintrop", "Mintrop, L.");
 		PI_RENAME_MAP.put("Mario Hoppema", "Hoppema, M.");
