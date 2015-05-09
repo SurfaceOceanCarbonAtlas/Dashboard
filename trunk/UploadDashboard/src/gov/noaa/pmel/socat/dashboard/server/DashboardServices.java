@@ -38,7 +38,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardServices extends RemoteServiceServlet
 								implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = -3989874185735330638L;
+	private static final long serialVersionUID = -6032642942696536607L;
 
 	private String username = null;
 	private DashboardDataStore dataStore = null;
@@ -423,9 +423,10 @@ public class DashboardServices extends RemoteServiceServlet
 	}
 
 	@Override
-	public boolean openOME(String activeExpocode, String previousExpocode, boolean editUpload) {
-		// TODO Auto-generated method stub
-		return false;
+	public String openOME(String activeExpocode, String previousExpocode, boolean editUpload) {
+		return "activeExpcode=" + activeExpocode + 
+			   ";previousExpocode=" + previousExpocode + 
+			   ";editUpload=" + Boolean.toString(editUpload);
 	}
 
 	@Override

@@ -18,6 +18,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
@@ -34,22 +35,24 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String EDIT_TEXT = "Open OME";
+	private static final String EDIT_TOOLTIP_HELP = "Opens the OME in another window " +
+			"with the indicated content and advances this page to the next dataset";
 	private static final String DONE_TEXT = "Done";
+	private static final String DONE_TOOLTIP_HELP = "Returns to your personal list of datasets";
 
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
 			"<p>" +
-			"This form is used to open the online metadata editor (OME) " +
-			"for the following datasets.  " +
-			"</p><p>" +
-			"Datasets: <ul>";
+			"Sequentially open the online metadata editor (OME) " +
+			"for each of the following datasets: " +
+			"<ul>";
 	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</ul>";
-	private static final String CRUISE_HTML_ACTIVE_PROLOGUE = "<p>Open OME for <b>";
-	private static final String CRUISE_HTML_ACTIVE_EPILOGUE = "</b> using:</p>";
+	private static final String CRUISE_HTML_ACTIVE_PROLOGUE = "<p>Open the OME for <b>";
+	private static final String CRUISE_HTML_ACTIVE_EPILOGUE = "</b>:</p>";
 	private static final String CRUISE_HTML_DONE_MSG = "<p>Select Done when finished editing</p>";
 
-	private static final String EDIT_NEW_RADIO_TEXT = "existing metadata for this dataset (if any)";
-	private static final String EDIT_PREVIOUS_RADIO_TEXT = "applicable metadata from the previous dataset";
-	private static final String EDIT_UPLOAD_RADIO_TEXT = "contents of your locally-saved OME XML file";
+	private static final String EDIT_NEW_RADIO_TEXT = "with existing metadata for this dataset (if any)";
+	private static final String EDIT_PREVIOUS_RADIO_TEXT = "copying applicable metadata from ";
+	private static final String EDIT_UPLOAD_RADIO_TEXT = "using contents of your locally-saved OME XML file";
 
 	private static final String OPEN_OME_FAIL_MSG = "Opening the metadata editor failed";
 
@@ -78,11 +81,17 @@ public class OmeManagerPage extends CompositeWithUsername {
 	// Ordered set of expocodes to work with
 	private TreeSet<String> expocodes;
 
+	// Iterator over the above set of expocodes
+	private Iterator<String> exposIter;
+
 	// First expocode in the ordered set
 	private String firstExpocode;
 
 	// Open the OME with metadata for this expocode
 	private String activeExpocode;
+
+	// Expocode of the datasets immediately prior to the active expocode
+	private String previousExpocode;
 
 	/**
 	 * Creates an empty OME manager page.  Do not call this 
@@ -98,6 +107,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 		expocodes = new TreeSet<String>();
 		firstExpocode = "";
 		activeExpocode = "";
+		previousExpocode = "";
+		exposIter = expocodes.iterator();
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
@@ -106,7 +117,9 @@ public class OmeManagerPage extends CompositeWithUsername {
 		editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
 		editUploadRadio.setText(EDIT_UPLOAD_RADIO_TEXT);
 		editButton.setText(EDIT_TEXT);
+		editButton.setTitle(EDIT_TOOLTIP_HELP);
 		doneButton.setText(DONE_TEXT);
+		doneButton.setTitle(DONE_TOOLTIP_HELP);
 	}
 
 	/**
@@ -138,7 +151,9 @@ public class OmeManagerPage extends CompositeWithUsername {
 			// If was complete, reset to the start
 			if ( singleton.activeExpocode.isEmpty() ) {
 				try {
-					singleton.activeExpocode = singleton.expocodes.first();
+					singleton.exposIter = singleton.expocodes.iterator();
+					singleton.activeExpocode = singleton.exposIter.next();
+					singleton.previousExpocode = "";
 					singleton.updateIntro();
 				} catch ( Exception ex ) {
 					// Should never happen - leave empty
@@ -161,13 +176,15 @@ public class OmeManagerPage extends CompositeWithUsername {
 		for (String expo : cruises.keySet() ) {
 			expocodes.add(expo);
 		}
+		exposIter = expocodes.iterator();
 		try {
-			firstExpocode = expocodes.first();
+			firstExpocode = exposIter.next();
 		} catch ( Exception ex ) {
 			// Should not happen as the list should not be empty
 			firstExpocode = "";
 		}
 		activeExpocode = firstExpocode;
+		previousExpocode = "";
 
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 
@@ -201,25 +218,32 @@ public class OmeManagerPage extends CompositeWithUsername {
 		}
 		introHtml.setHTML(introMsg);
 
-		// Enable/Disable the radio buttons and set the default selection
 		if ( activeExpocode.isEmpty() ) {
+			// Gone through the list - only done button
+			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
+			editNewRadio.setValue(true);
 			editNewRadio.setEnabled(false);
 			editPreviousRadio.setEnabled(false);
 			editUploadRadio.setEnabled(false);
 			editButton.setEnabled(false);
 		}
-		else if ( activeExpocode.equals(firstExpocode) ) {
+		else if ( previousExpocode.isEmpty() ) {
+			// First expocode in the list - no previous option
+			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
+			editNewRadio.setValue(true);
 			editNewRadio.setEnabled(true);
 			editPreviousRadio.setEnabled(false);
 			editUploadRadio.setEnabled(true);
-			editNewRadio.setValue(true);
 			editButton.setEnabled(true);
 		}
 		else {
+			// Middle of the list - all options available
+			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT + 
+					SafeHtmlUtils.htmlEscape(previousExpocode));
+			editPreviousRadio.setValue(true);
 			editNewRadio.setEnabled(true);
 			editPreviousRadio.setEnabled(true);
 			editUploadRadio.setEnabled(true);
-			editPreviousRadio.setValue(true);
 			editButton.setEnabled(true);
 		}
 	}
@@ -238,14 +262,10 @@ public class OmeManagerPage extends CompositeWithUsername {
 	@UiHandler("editButton") 
 	void editButtonOnClick(ClickEvent event) {
 		// Get the selected option for opening the OME
-		String previousExpocode = "";
+		String prevExpo = "";
 		boolean editUpload = false;
 		if ( editPreviousRadio.getValue() ) {
-			try {
-				previousExpocode = expocodes.headSet(activeExpocode).last();
-			} catch ( Exception ex ) {
-				// Should never happen as this should not be checked if the first - leave empty
-			}
+			prevExpo = previousExpocode;
 		}
 		else if ( editUploadRadio.getValue() ) {
 			editUpload = true;
@@ -255,30 +275,35 @@ public class OmeManagerPage extends CompositeWithUsername {
 		SocatUploadDashboard.showWaitCursor();
 
 		// Open the OME for the active expocode
-		service.openOME(activeExpocode, previousExpocode, editUpload, new AsyncCallback<Boolean>() {
+		service.openOME(activeExpocode, prevExpo, editUpload, new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(Boolean success) {
-				if ( success ) {
-					try {
-						Iterator<String> iter = expocodes.tailSet(activeExpocode).iterator();
-						iter.next();
-						activeExpocode = iter.next();
-						// Another expocode found - make it active and update the page message
-						updateIntro();
-					} catch ( Exception ex ) {
-						// No more expocodes
-						activeExpocode = "";
-						updateIntro();
-					}
+			public void onSuccess(String omeUrl) {
+				// Open a new window with the given URL
+				Window.open(omeUrl, "OME for " + activeExpocode, "resizeable,scrollbars,status");
+				// Go on to the next dataset
+				previousExpocode = activeExpocode;
+				try {
+					activeExpocode = exposIter.next();
+				} catch ( Exception ex ) {
+					// No more expocodes
+					activeExpocode = "";
 				}
-				else {
-					SocatUploadDashboard.showMessage(OPEN_OME_FAIL_MSG);
-				}
+				updateIntro();
 				// Show the normal cursor
 				SocatUploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
+				// Go on to the next dataset
+				previousExpocode = activeExpocode;
+				try {
+					activeExpocode = exposIter.next();
+				} catch ( Exception ex1 ) {
+					// No more expocodes
+					activeExpocode = "";
+				}
+				updateIntro();
+				// Show the failure message along with the exception message
 				SocatUploadDashboard.showFailureMessage(OPEN_OME_FAIL_MSG, ex);
 				// Show the normal cursor
 				SocatUploadDashboard.showAutoCursor();
