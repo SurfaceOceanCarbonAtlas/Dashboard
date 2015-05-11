@@ -424,7 +424,14 @@ public class DashboardServices extends RemoteServiceServlet
 
 	@Override
 	public String openOME(String activeExpocode, String previousExpocode, boolean editUpload) {
-		return "activeExpcode=" + activeExpocode + 
+		// TODO: If editUpload is true, return the OME URL for the file upload page
+
+		// TODO: If previousExpocode is not blank, merge any current OME.xml for activeExpocode 
+		// with the OME.xml for previousExpocode and save it for activeExpocode
+
+		// TODO: Return the OME URL for the edit page with the current OME.xml for activeExpcode
+
+		return "https://www.google.com?activeExpcode=" + activeExpocode + 
 			   ";previousExpocode=" + previousExpocode + 
 			   ";editUpload=" + Boolean.toString(editUpload);
 	}

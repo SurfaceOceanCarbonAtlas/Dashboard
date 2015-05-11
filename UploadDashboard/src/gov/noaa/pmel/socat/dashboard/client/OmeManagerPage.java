@@ -34,23 +34,22 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private static final String TITLE_TEXT = "Edit Metadata";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
-	private static final String EDIT_TEXT = "Open OME";
+	private static final String EDIT_TEXT = "Open OME ...";
 	private static final String EDIT_TOOLTIP_HELP = "Opens the OME in another window " +
 			"with the indicated content and advances this page to the next dataset";
 	private static final String DONE_TEXT = "Done";
-	private static final String DONE_TOOLTIP_HELP = "Returns to your personal list of datasets";
+	private static final String DONE_TOOLTIP_HELP = "Returns to your list of displayed datasets";
 
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
-			"<p>" +
 			"Sequentially open the online metadata editor (OME) " +
-			"for each of the following datasets: " +
-			"<ul>";
+			"for each of the following datasets: <ul>";
 	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</ul>";
-	private static final String CRUISE_HTML_ACTIVE_PROLOGUE = "<p>Open the OME for <b>";
-	private static final String CRUISE_HTML_ACTIVE_EPILOGUE = "</b>:</p>";
-	private static final String CRUISE_HTML_DONE_MSG = "<p>Select Done when finished editing</p>";
 
-	private static final String EDIT_NEW_RADIO_TEXT = "with existing metadata for this dataset (if any)";
+	private static final String CRUISE_HTML_ACTIVE_PROLOGUE = "Open the OME for <b>";
+	private static final String CRUISE_HTML_ACTIVE_EPILOGUE = "</b>:";
+	private static final String CRUISE_HTML_DONE_MSG = "Select Done when finished editing in the OME";
+
+	private static final String EDIT_NEW_RADIO_TEXT = "with any existing metadata for ";
 	private static final String EDIT_PREVIOUS_RADIO_TEXT = "copying applicable metadata from ";
 	private static final String EDIT_UPLOAD_RADIO_TEXT = "using contents of your locally-saved OME XML file";
 
@@ -69,6 +68,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
+	@UiField HTML cruiseNameHtml;
 	@UiField RadioButton editNewRadio;
 	@UiField RadioButton editPreviousRadio;
 	@UiField RadioButton editUploadRadio;
@@ -208,18 +208,22 @@ public class OmeManagerPage extends CompositeWithUsername {
 			}
 		}
 		introMsg += CRUISE_HTML_INTRO_EPILOGUE;
+		introHtml.setHTML(introMsg);
+
+		String cruiseNameMsg;
 		if ( activeExpocode.isEmpty() ) {
-			introMsg += CRUISE_HTML_DONE_MSG;
+			cruiseNameMsg = CRUISE_HTML_DONE_MSG;
 		}
 		else {
-			introMsg += CRUISE_HTML_ACTIVE_PROLOGUE;
-			introMsg += SafeHtmlUtils.htmlEscape(activeExpocode);
-			introMsg += CRUISE_HTML_ACTIVE_EPILOGUE;
+			cruiseNameMsg  = CRUISE_HTML_ACTIVE_PROLOGUE;
+			cruiseNameMsg += SafeHtmlUtils.htmlEscape(activeExpocode);
+			cruiseNameMsg += CRUISE_HTML_ACTIVE_EPILOGUE;
 		}
-		introHtml.setHTML(introMsg);
+		cruiseNameHtml.setHTML(cruiseNameMsg);
 
 		if ( activeExpocode.isEmpty() ) {
 			// Gone through the list - only done button
+			editNewRadio.setText(EDIT_NEW_RADIO_TEXT);
 			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
 			editNewRadio.setValue(true);
 			editNewRadio.setEnabled(false);
@@ -229,6 +233,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 		}
 		else if ( previousExpocode.isEmpty() ) {
 			// First expocode in the list - no previous option
+			editNewRadio.setText(EDIT_NEW_RADIO_TEXT +
+					SafeHtmlUtils.htmlEscape(activeExpocode));
 			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
 			editNewRadio.setValue(true);
 			editNewRadio.setEnabled(true);
@@ -238,6 +244,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 		}
 		else {
 			// Middle of the list - all options available
+			editNewRadio.setText(EDIT_NEW_RADIO_TEXT +
+					SafeHtmlUtils.htmlEscape(activeExpocode));
 			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT + 
 					SafeHtmlUtils.htmlEscape(previousExpocode));
 			editPreviousRadio.setValue(true);
@@ -278,8 +286,6 @@ public class OmeManagerPage extends CompositeWithUsername {
 		service.openOME(activeExpocode, prevExpo, editUpload, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String omeUrl) {
-				// Open a new window with the given URL
-				Window.open(omeUrl, "OME for " + activeExpocode, "resizeable,scrollbars,status");
 				// Go on to the next dataset
 				previousExpocode = activeExpocode;
 				try {
@@ -289,6 +295,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 					activeExpocode = "";
 				}
 				updateIntro();
+				// Open a new window with the given URL
+				Window.open(omeUrl, "OME for " + activeExpocode, "resizeable,scrollbars,status");
 				// Show the normal cursor
 				SocatUploadDashboard.showAutoCursor();
 			}

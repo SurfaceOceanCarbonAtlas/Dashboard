@@ -75,7 +75,7 @@ public class CruiseListPage extends CompositeWithUsername {
 
 	static final String OME_METADATA_TEXT = "Edit Metadata";
 	private static final String OME_METADATA_HOVER_HELP =
-			"edit the metadata for the selected dataset";
+			"edit the metadata for the selected datasets";
 
 	private static final String ADDL_DOCS_TEXT = "Supplemental Documents";
 	private static final String ADDL_DOCS_HOVER_HELP =
