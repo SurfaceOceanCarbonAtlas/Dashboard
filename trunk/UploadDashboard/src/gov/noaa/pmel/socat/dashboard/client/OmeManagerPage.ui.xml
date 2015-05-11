@@ -14,6 +14,7 @@
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			<g:FlowPanel addStyleNames="{style.omeoptionpanel}">
+				<g:HTML addStyleNames="{style.omecruiselabel}" ui:field="cruiseNameHtml" />
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
 						name="OmeRadioGroup" ui:field="editNewRadio" />
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
