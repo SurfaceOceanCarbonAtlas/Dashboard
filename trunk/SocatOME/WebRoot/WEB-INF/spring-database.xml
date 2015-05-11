@@ -7,9 +7,9 @@
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/SocatOME" />
-		<property name="username" value="root" />
-		<property name="password" value="b2uorb4u" />
+		<property name="url" value="jdbc:mysql://dunkel.pmel.noaa.gov:3306/SocatOME" />
+		<property name="username" value="socatDev" />
+		<property name="password" value="soc@tDB" />
 	</bean>
 
 </beans>

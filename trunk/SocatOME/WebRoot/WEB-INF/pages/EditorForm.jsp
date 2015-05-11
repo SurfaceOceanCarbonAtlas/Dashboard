@@ -26,21 +26,21 @@
 		<div class="container">
 			<div class="row">
 
-				<span class="span3"> <input type="submit" name="expand-all"
-					id="back" value="Back" class="btn" onclick="backI()" /></span> <span
-					class="span9"> <form:form method="POST" commandName="editor">
+<!-- 				<span class="span3"> <input type="submit" name="expand-all" -->
+<!-- 					id="back" value="Back" class="btn" onclick="backI()" /></span> <span -->
+<%-- 					class="span9"> <form:form method="POST" commandName="editor"> --%>
 
-						<form:errors path="*" cssClass="errorblock" element="div" />
+<%-- 						<form:errors path="*" cssClass="errorblock" element="div" /> --%>
 
-					</form:form>
-				</span>
+<%-- 					</form:form> --%>
+<!-- 				</span> -->
 			</div>
 			
 			<div class="section">
 				<div class="row">
-					<div class="span5">
-						<h5 class="alert alert-info">Create new record using editor</h5>
-					</div>
+<!-- 					<div class="span5"> -->
+<!-- 						<h5 class="alert alert-info">Create new record using editor</h5> -->
+<!-- 					</div> -->
 					<div class="span6">
 						<h5 class="alert alert-info">Upload metadata file from your
 							computer </h5>
@@ -49,11 +49,11 @@
 				</div>
 				<div class="row">
 
-					<span class="offset1 span4"> <form:form method="POST"
-							action="newForm.htm" commandName="editor">
-							<input class="btn btn-success" value="Create New" type="submit" />
-						</form:form>
-					</span> 
+<%-- 					<span class="offset1 span4"> <form:form method="POST" --%>
+<%-- 							action="newForm.htm" commandName="editor"> --%>
+<!-- 							<input class="btn btn-success" value="Create New" type="submit" /> -->
+<%-- 						</form:form> --%>
+<!-- 					</span>  -->
 					
 					<span class="offset1 span5"> 
 					

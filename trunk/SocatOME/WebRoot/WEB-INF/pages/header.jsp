@@ -1,7 +1,7 @@
 <div id="header" class="row-fluid">
 	<div class="offset1 span9">
 			
-				<h3 class='vcenter'>Online Metadata Editor<img id="doe" src="images/mercury_logo.png"></img></h3>
+				<h3 class='vcenter'>Online Metadata Editor</h3>
 			
 			
 
