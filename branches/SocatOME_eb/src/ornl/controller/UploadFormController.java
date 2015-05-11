@@ -148,27 +148,27 @@ public class UploadFormController extends BaseController implements
 		EditorService esd = new EditorService();
 		Metadata_Editor testMe = new Metadata_Editor();
 		UserInfo userInfo = new UserInfo();
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-				editor.setaUser(name);
-				// System.out.println("initForm:loginName : " +name );
-			} else {
-				return ("index");
-			}
-		} catch (Exception exc) {
-
-		}
-		try {
-			if (userInfo.isAdmin(name)) {
-				editor.setadminUser("true");
-			} else {
-				editor.setadminUser("false");
-			}
-		} catch (Exception e) {
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//				editor.setaUser(name);
+//				// System.out.println("initForm:loginName : " +name );
+//			} else {
+//				return ("index");
+//			}
+//		} catch (Exception exc) {
+//
+//		}
+//		try {
+//			if (userInfo.isAdmin(name)) {
+//				editor.setadminUser("true");
+//			} else {
+//				editor.setadminUser("false");
+//			}
+//		} catch (Exception e) {
+//		}
 		String doc_base = "";
 		if (System.getProperty("os.name").toLowerCase().contains("windows")) {
 			doc_base = (String) hmProps.get("win_base");
@@ -226,19 +226,19 @@ public class UploadFormController extends BaseController implements
 
 		}
 		
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-				editor.setaUser(name);
-				// System.out.println("initForm:Name : " +name );
-			} else {
-				return new ModelAndView("index");
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//				editor.setaUser(name);
+//				// System.out.println("initForm:Name : " +name );
+//			} else {
+//				return new ModelAndView("index");
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		String users[] = { "guest","admin" };
 		String dir = doc_base+name+fs;
 		editor.setHomePath(dir);
