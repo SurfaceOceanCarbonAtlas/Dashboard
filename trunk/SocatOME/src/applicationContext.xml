@@ -8,7 +8,7 @@
         <map>
             <entry key="xmlStyle" value="fgdc" />
             <entry key="XMLStyleMap" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/fgdc_template.xml" />
-            <entry key="XMLOutPath" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/" />
+            <entry key="XMLOutPath" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/output" />
             <entry key="delimiter" value="\|\|" />
             <entry key="linkbasepath" value="http://localhost/SocatOME/" />
             <entry key="sender" value="metadata_editor@usgs.gov" />
