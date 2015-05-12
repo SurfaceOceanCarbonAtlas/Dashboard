@@ -88,7 +88,7 @@ public class EmailController {
 		 sender = (String) email.get("sender");
 		}
 		else{
-			sender = "mercury-support@ornl.gov";
+			sender = "karl.smith@noaa.gov";
 		}
 
 		
