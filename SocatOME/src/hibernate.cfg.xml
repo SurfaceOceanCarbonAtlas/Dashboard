@@ -7,7 +7,7 @@
 <hibernate-configuration>
 
 	 <session-factory>
-                <property name="connection.username"></property>
+                <property name="connection.username">socatDev</property>
                 <property name="connection.url">
                         jdbc:mysql://dunkel.pmel.noaa.gov:3306/SocatOME</property>
                 <property name="dialect">
@@ -16,7 +16,7 @@
 <!--                 <property name="myeclipse.connection.profile"> -->
 <!--                         mercury3logs_dev -->
 <!--                 </property> -->
-                <property name="connection.password"></property>
+                <property name="connection.password">soca@tDB</property>
                 <property name="connection.driver_class">
                         com.mysql.jdbc.Driver
                 </property>

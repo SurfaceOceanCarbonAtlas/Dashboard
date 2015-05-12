@@ -86,20 +86,20 @@ public class EditorController extends BaseController {
 		String discrete = (String) hmProps.get("discrete");
 		String underway = (String) hmProps.get("underway");
 
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-
-				// System.out.println("initForm:loginName : " +name );
-			} else {
-				name = "guest";
-
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//
+//				// System.out.println("initForm:loginName : " +name );
+//			} else {
+//				name = "guest";
+//
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		// this is a decision point for returning to login with a model in tow
 		// restructure here to detect and handle multiple new fields ( file ids
 		// and alternate logins and ? )
@@ -282,19 +282,19 @@ public class EditorController extends BaseController {
 			BindingResult result, SessionStatus status, ModelMap model) {
 
 		UserInfo userInfo = new UserInfo();
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-				editor.setaUser(name);
-				// System.out.println("initForm:loginName : " +name );
-			} else {
-				return "index";
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//				editor.setaUser(name);
+//				// System.out.println("initForm:loginName : " +name );
+//			} else {
+//				return "index";
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		try {
 			if (userInfo.isAdmin(name)) {
 				// System.out.println("Inside isadmin");
@@ -324,19 +324,19 @@ public class EditorController extends BaseController {
 			HttpServletResponse response, ModelMap modelMap) throws Exception {
 
 		UserInfo userInfo = new UserInfo();
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-				editor.setaUser(name);
-				// System.out.println("initForm:loginName : " +name );
-			} else {
-				return "index";
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//				editor.setaUser(name);
+//				// System.out.println("initForm:loginName : " +name );
+//			} else {
+//				return "index";
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		FormElements fe = new FormElements();
 		EmailLinks emailLinks = new EmailLinks();
 		fe = this.get_params(request, response);
