@@ -55,6 +55,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 
 	private static final String OPEN_OME_FAIL_MSG = "Opening the metadata editor failed";
 
+	private static final String WINDOW_FEATURES = "resizeable,scrollbars,status";
+
 	interface OmeManagerPageUiBinder extends UiBinder<Widget, OmeManagerPage> {
 	}
 
@@ -270,22 +272,30 @@ public class OmeManagerPage extends CompositeWithUsername {
 	@UiHandler("editButton") 
 	void editButtonOnClick(ClickEvent event) {
 		// Get the selected option for opening the OME
-		String prevExpo = "";
-		boolean editUpload = false;
+		String prevExpo;
 		if ( editPreviousRadio.getValue() ) {
 			prevExpo = previousExpocode;
 		}
-		else if ( editUploadRadio.getValue() ) {
+		else {
+			prevExpo = "";
+		}
+
+		final boolean editUpload;
+		if ( editUploadRadio.getValue() ) {
 			editUpload = true;
+		}
+		else {
+			editUpload = false;
 		}
 
 		// Show the wait cursor
 		SocatUploadDashboard.showWaitCursor();
 
 		// Open the OME for the active expocode
-		service.openOME(activeExpocode, prevExpo, editUpload, new AsyncCallback<String>() {
+		service.getOmeXmlPath(getUsername(), activeExpocode, prevExpo, 
+				new AsyncCallback<String>() {
 			@Override
-			public void onSuccess(String omeUrl) {
+			public void onSuccess(String fileAbsPath) {
 				// Go on to the next dataset
 				previousExpocode = activeExpocode;
 				try {
@@ -295,8 +305,16 @@ public class OmeManagerPage extends CompositeWithUsername {
 					activeExpocode = "";
 				}
 				updateIntro();
-				// Open a new window with the given URL
-				Window.open(omeUrl, "OME for " + activeExpocode, "resizeable,scrollbars,status");
+				if ( editUpload ) {
+					// Open a new window with the OME upload page
+					Window.open("/SocatOME/editor.htm?fileURI=file://" + fileAbsPath, 
+							"OME for " + activeExpocode, WINDOW_FEATURES);
+				}
+				else {
+					// Open a new window with the OME initialized from indicated file
+					Window.open("/SocatOME/show.htm?fileURI=file://" + fileAbsPath, 
+							"OME for " + activeExpocode, WINDOW_FEATURES);
+				}
 				// Show the normal cursor
 				SocatUploadDashboard.showAutoCursor();
 			}

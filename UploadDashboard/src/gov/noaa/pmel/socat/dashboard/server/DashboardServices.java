@@ -17,6 +17,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -418,22 +419,26 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("The sanity checker has never been run on cruise " + expocode);
 		}
 		scMsgList.setUsername(username);
-		Logger.getLogger("DashboardServices").info("returned sanity checker messages for " + expocode + " for " + username);
+		Logger.getLogger("DashboardServices")
+			  .info("returned sanity checker messages for " + expocode + " for " + username);
 		return scMsgList;
 	}
 
 	@Override
-	public String openOME(String activeExpocode, String previousExpocode, boolean editUpload) {
-		// TODO: If editUpload is true, return the OME URL for the file upload page
+	public String getOmeXmlPath(String pageUsername, String activeExpocode, String previousExpocode) {
+		// Get the dashboard data store and current username, and validate that username
+		if ( ! validateRequest(pageUsername) ) 
+			throw new IllegalArgumentException("Invalid user request");
 
-		// TODO: If previousExpocode is not blank, merge any current OME.xml for activeExpocode 
-		// with the OME.xml for previousExpocode and save it for activeExpocode
+		if ( ! previousExpocode.isEmpty() ) {
+			// TODO: merge any current OME.xml for activeExpocode with the 
+			// OME.xml for previousExpocode and save it for activeExpocode
+		}
 
-		// TODO: Return the OME URL for the edit page with the current OME.xml for activeExpcode
-
-		return "https://www.google.com?activeExpcode=" + activeExpocode + 
-			   ";previousExpocode=" + previousExpocode + 
-			   ";editUpload=" + Boolean.toString(editUpload);
+		// return the absolute path to the OME.xml for activeExpcode
+		File omeFile = dataStore.getMetadataFileHandler()
+								.getMetadataFile(activeExpocode, DashboardMetadata.OME_FILENAME);
+		return omeFile.getAbsolutePath();
 	}
 
 	@Override
