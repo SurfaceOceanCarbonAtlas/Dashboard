@@ -213,21 +213,23 @@ public interface DashboardServicesInterfaceAsync {
 			AsyncCallback<SCMessageList> callback);
 
 	/**
-	 * Client-side interface for getting the URL of the OME to open for a cruise
+	 * Client-side interface for getting the absolute path 
+	 * to the OME.xml file for a cruise
 	 * 
+	 * @param username
+	 * 		name of the current user - for validation
 	 * @param activeExpocode
-	 * 		open the OME for this cruise
+	 * 		get the OME for this cruise
 	 * @param previousExpocode
 	 * 		if not empty, initialize with metadata from this cruise
-	 * @param editUpload
-	 * 		if true, start by uploading a user's OME XML file
 	 * @param callback
-	 * 		the callback to make with the URL; the onFailure method
-	 * 		of the callback will be called if authentication failed,
-	 * 		or if the appropriate content for the OME could not be found
+	 * 		the callback to make with the absolute path to the OME.xml file 
+	 * 		for activeExpocode; the onFailure method of the callback will be 
+	 * 		called if authentication failed, or if the appropriate content 
+	 * 		for the OME could not be found
 	 */
-	void openOME(String activeExpocode, String previousExpocode,
-			boolean editUpload, AsyncCallback<String> callback);
+	void getOmeXmlPath(String pageUsername, String activeExpocode, 
+			String previousExpocode, AsyncCallback<String> callback);
 
 	/**
 	 * Client side request to generate the preview images for a cruise.
