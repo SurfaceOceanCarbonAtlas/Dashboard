@@ -11,10 +11,10 @@
             <entry key="XMLOutPath" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/" />
             <entry key="delimiter" value="\|\|" />
             <entry key="linkbasepath" value="http://localhost/SocatOME/" />
-            <entry key="sender" value="karl.smith@noaa.gov" />
-            <entry key="contact" value="karl.smith@noaa.gov" />
+            <entry key="sender" value="metadata_editor@usgs.gov" />
+            <entry key="contact" value="mercury-service@ornl.gov" />
             <entry key="smtp" value="mail.smtp.host" />
-            <entry key="mail_host" value="smtp.pmel.noaa.gov" />
+            <entry key="mail_host" value="smtp.ornl.gov" />
 <!--             <entry key="logo" value="http://mercury-ops2:8080/OME/images/USGS_logo.jpg" /> -->
             <entry key="win_base" value="" />
             <entry key="lin_base" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/" />

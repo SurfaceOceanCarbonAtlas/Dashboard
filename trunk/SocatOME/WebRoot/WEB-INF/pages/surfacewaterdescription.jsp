@@ -68,11 +68,16 @@
 						Method CO<sub>2</sub>:<span class="form-required"
 						title="This field is required.">*</span>
 				</label> <select type="text" class="select2">
-						<option value="Self-propelled surface platform">IR</option>
-						<option value="Ship">Spectrophotometric</option>
-						<option value="Mooring">CRDS</option>
-						<option value="Surface Drifter">GC</option>
+				<option value="IR">IR</option>
+						<option value="Spectrophotometric">Spectrophotometric</option>
+						<option value="CRDS">CRDS</option>
+						<option value="GC">GC</option>
 						<option value="Others">Others</option>
+<!-- 						<option value="Self-propelled surface platform">IR</option> -->
+<!-- 						<option value="Ship">Spectrophotometric</option> -->
+<!-- 						<option value="Mooring">CRDS</option> -->
+<!-- 						<option value="Surface Drifter">GC</option> -->
+<!-- 						<option value="Others">Others</option> -->
 				</select> <form:input class="short" id="field_measurement_method"
 						style="display:none" placeHolder="Describe Others Here"
 						path="field_measurement_method" />

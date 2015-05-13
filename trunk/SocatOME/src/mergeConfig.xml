@@ -294,7 +294,8 @@
 				<entry key="field_PCO2_method_references"
 					value="//x_tags/ Method_Description/ pCO2_Data/ Method_References" />
 
-				<entry key="field_ph_scale" value="//x_tags/ Method_Description/ pH_Data/ pH_Scale" />
+				<entry key="field_ph_scale" 
+				    value="//x_tags/ Method_Description/ pH_Data/ pH_Scale" />
 				<entry key="field_ph_analysis_method"
 					value="//x_tags/ Method_Description/ pH_Data/ pH_Analysis_Method" />
 				<entry key="field_calibration_description"

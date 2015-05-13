@@ -62,20 +62,20 @@
 
 		<li class="Section2"><label for="Vessel_Name">Vessel
 				Name:<span class="form-required" title="This field is required.">*</span>
-		</label> </br> <form:input path="field_vessel_name" name="Vessel_Name" /></li>
+		</label><form:input path="field_vessel_name" name="Vessel_Name" /></li>
+		
 		<li class="Section2"><label for="Vessel_Owner" style="width: 150">Vessel
-				Owner: </label> <form:input path="field_vessel_owner" name="Vessel_Owner" /></li>
+				Owner: </label><form:input path="field_vessel_owner" name="Vessel_Owner" /></li>
 
 		<li class="Section2"><label for="Cruise_Info">Campaign
 				Info/Cruise Info (e.g. SAVE, TTO-NAS, SOIREE, AMT08, Antares,
-				EisenEx):</label></br> <form:input path="field_cruise_info" name="Cruise_Info"
+				EisenEx):</label><form:input path="field_cruise_info" name="Cruise_Info"
 				type="text" /></li>
 
 		<li class="Section2"><label for="Section">Campaign
 				name/Cruise name(including Leg) (E.g. ANTV-2, Biscay_979815C, D198)<span
-				class="form-required" title="This field is required.">*</span><span
 				class="form-required" title="This field is required.">*</span>:
-		</label></br> <form:input path="field_experiment_name" name="field_experiment_name"
+		</label><form:input path="field_experiment_name" name="field_experiment_name"
 				type="text" /></li>
 
 		<li class="Section2"><label for="End_Date">End Date:</label> <form:input
