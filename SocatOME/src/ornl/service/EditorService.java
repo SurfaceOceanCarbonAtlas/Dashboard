@@ -324,25 +324,25 @@ public class EditorService {
 			sb.append(linkbasepath + filepath);
 
 			// sending emails
-//			try {
-//				// send emails
-//				if (filestatus != "" && filestatus != null) {
-//					filestatus = (String) fe.getElements().get(
-//							"field_filestatus");
-//				}
-//				if (emailAddress != "" && emailAddress != null) {
-//
-//					try {
-//						EmailController.sendEmail(filestatus, fileName, sb,
-//								emailAddress);
-//					} catch (Exception E) {
-//						E.printStackTrace();
-//					}
-//
-//				}
-//
-//			} catch (Exception e) {
-//			}
+			try {
+				// send emails
+				if (filestatus != "" && filestatus != null) {
+					filestatus = (String) fe.getElements().get(
+							"field_filestatus");
+				}
+				if (emailAddress != "" && emailAddress != null) {
+
+					try {
+						EmailController.sendEmail(filestatus, fileName, sb,
+								emailAddress);
+					} catch (Exception E) {
+						E.printStackTrace();
+					}
+
+				}
+
+			} catch (Exception e) {
+			}
 
 			// saving fiel in the database
 			try {
