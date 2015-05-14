@@ -9,7 +9,7 @@
 	 <session-factory>
                 <property name="connection.username"></property>
                 <property name="connection.url">
-                        jdbc:mysql://dunkel.pmel.noaa.gov:3306/SocatOME</property>
+                        jdbc:mysql://flat.pmel.noaa.gov:3306/SocatOME</property>
                 <property name="dialect">
                         org.hibernate.dialect.MySQLDialect
                 </property>

@@ -21,8 +21,7 @@
 						type="hidden" /></li>
 				<li class="Section2"><span style="width: 300px">Cruise
 						Information for the expocode:</span> <form:input path="field_cruise_id"
-						style="background:#D3D3D3;" id="field_cruise_id"  class="short"
-						onfocus="blur()" type="text" /></li>
+						style="background:#D3D3D3;" id="field_cruise_id"  class="short" type="text" onfocus="blur()" /></li>
 
 			</ul>
 		</li>

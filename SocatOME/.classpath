@@ -37,7 +37,7 @@
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/hibernate3.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/javax.servlet-3.0.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jaxen.jar"/>
-	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jdom.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jdom.jar" sourcepath="WebRoot/WEB-INF/lib/jdom.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jstl.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jta.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/mail.jar"/>
