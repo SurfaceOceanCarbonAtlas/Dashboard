@@ -40,7 +40,7 @@ public class PreviewPlotsHandlerTest {
 		for ( String imgName : new String[] {
 				CruisePreviewPage.LAT_VS_LON_IMAGE_NAME,
 				CruisePreviewPage.LAT_LON_IMAGE_NAME,
-				CruisePreviewPage.DAY_YEAR_IMAGE_NAME,
+				CruisePreviewPage.SAMPLE_VS_TIME_IMAGE_NAME,
 				CruisePreviewPage.TIME_SERIES_IMAGE_NAME,
 				CruisePreviewPage.PRESSURES_IMAGE_NAME,
 				CruisePreviewPage.TEMPERATURES_IMAGE_NAME,

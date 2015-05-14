@@ -71,7 +71,7 @@ ELSE
    PLOT($ppstyle)/COLOR=blue/SET diff_t
      PPL ylab " "
      PPL xlab " "
-     PPL title "Difference: recalculated minus reported fCO_2<NL>Source is `fco2_source[i=@min]`"
+     PPL title "Difference: recalculated minus reported fCO_2<NL>Single source is `fco2_source[i=@min]`"
      ($taxis_setting)
      IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
      IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)

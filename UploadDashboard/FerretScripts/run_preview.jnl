@@ -10,11 +10,11 @@ GO preview_02
 DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_lat_lon_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
-GO preview_03
-DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_day_year_($result_time_tag).gif
+GO preview_14
+DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_sample_vs_time_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
-GO preview_11
+GO preview_11_color
 DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_time_series_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 

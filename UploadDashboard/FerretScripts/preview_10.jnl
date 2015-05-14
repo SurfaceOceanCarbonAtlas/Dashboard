@@ -3,17 +3,20 @@
 go preview_setup ($infile_dsg) 10
 
 set view full
-plot/vs($ppstyle"($linestyle)")/color=blue/set sal, fCO2_recommended
+ribbon/vs($ppstyle"($linestyle)")/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/set sal, fCO2_recommended, WOCE_CO2_water
   ppl title
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
   IF ($labnum_x"0|*>1") THEN go unlabel ($lab($labnum_x))
-ppl plot
+ppl ribbon
 
 
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nfnoc` Valid fCO_2 recomputed
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, \
+"Count: `nfnoc` Valid fCO_2 recomputed"
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.15*($ppl$yorg)`, 0,0,0.10, \
+"Colored by `WOCE_CO2_water_in,return=title`"
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

@@ -91,7 +91,7 @@ public class FixOmeMetadata {
 					if ( ! cruiseChecker.checkCruise(cruiseData) )
 						throw new IllegalArgumentException("Sanity check failed");
 
-					// Fix and vessel and PI names
+					// Fix the vessel and PI names
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
 							metaHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME), metaHandler);
 					// Kludgey - working with the XML instead of OmeMetadata methods

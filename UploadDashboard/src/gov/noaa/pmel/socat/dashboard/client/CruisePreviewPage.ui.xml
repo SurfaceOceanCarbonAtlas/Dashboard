@@ -30,9 +30,9 @@
 					</g:tab>
 					<g:tab>
 						<g:customHeader>
-							<g:HTML addStyleNames="{style.plotslabel}" ui:field="dayYearHtml" />
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="sampleVsTimeHtml" />
 						</g:customHeader>
-						<g:Image addStyleNames="{style.plotsimage}" ui:field="dayYearImage" />
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="sampleVsTimeImage" />
 					</g:tab>
 					<g:tab>
 						<g:customHeader>
