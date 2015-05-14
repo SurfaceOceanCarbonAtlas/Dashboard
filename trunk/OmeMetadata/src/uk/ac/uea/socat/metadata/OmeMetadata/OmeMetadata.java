@@ -601,10 +601,9 @@ public class OmeMetadata {
 	 * @param expoCode expocode to use
 	 */
 	public OmeMetadata(String expoCode) {
-		itsExpoCode = expoCode.toUpperCase();
-
 		// Use assignFromOmeXmlDoc to initialize all the OMEVariables with empty values
 		// This avoids having to do an insane amount of null-checking everywhere
+		itsExpoCode = expoCode.toUpperCase();
 		Element cruiseIdElem = new Element(CRUISE_ID_ELEMENT_NAME).setText(itsExpoCode);
 		Element cruiseElem = new Element(CRUISE_ELEMENT_NAME).addContent(cruiseIdElem);
 		Element experimentElem = new Element(EXPERIMENT_ELEMENT_NAME).addContent(cruiseElem);
@@ -617,6 +616,9 @@ public class OmeMetadata {
 			// Should never happen, so throw a RunTime exception if it does
 			throw new RuntimeException(ex);
 		}
+
+		// Use setExpocode to also assign any fields associated with the expocode
+		setExpocode(itsExpoCode);
 	}
 	
 	/**
@@ -2507,8 +2509,17 @@ public class OmeMetadata {
 	 * 		expocode to assign
 	 */
 	public void setExpocode(String expocode) {
-		this.itsExpoCode = expocode;
-		this.cruiseID = new OMEVariable(this.cruiseID.getPath(), expocode);
+		itsExpoCode = expocode.toUpperCase();
+		String nodcCode;
+		if ( Character.isLetter(itsExpoCode.charAt(4)) ) {
+			nodcCode = itsExpoCode.substring(0, 5);
+		}
+		else {
+			nodcCode = itsExpoCode.substring(0, 4);
+		}
+		vesselID = new OMEVariable(vesselID.getPath(), nodcCode);
+		cruiseID = new OMEVariable(cruiseID.getPath(), itsExpoCode);
+		datasetID = new OMEVariable(datasetID.getPath(), itsExpoCode);
 	}
 
 	/**
