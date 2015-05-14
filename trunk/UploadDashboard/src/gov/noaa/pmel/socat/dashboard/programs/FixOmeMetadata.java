@@ -88,7 +88,7 @@ public class FixOmeMetadata {
 					// Read the original data for this cruise and sanity check 
 					// to correct the XML and update with the lon/lat/time bounds
 					DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-					if ( ! cruiseChecker.checkCruise(cruiseData, true) )
+					if ( ! cruiseChecker.checkCruise(cruiseData) )
 						throw new IllegalArgumentException("Sanity check failed");
 
 					// Fix the vessel and PI names

@@ -385,8 +385,6 @@ public class DashboardCruiseChecker {
 	 * 
 	 * @param cruiseData
 	 * 		cruise to check
-	 * @param forceOmeUpdate
-	 * 		update of the OME XML file even if no apparent changes?
 	 * @return
 	 * 		if the SanityChecker ran successfully
 	 * @throws IllegalArgumentException
@@ -394,9 +392,9 @@ public class DashboardCruiseChecker {
 	 * 		if an existing OME XML file is corrupt, or
 	 * 		if the sanity checker throws an exception
 	 */
-	public boolean checkCruise(DashboardCruiseWithData cruiseData, 
-						boolean forceOmeUpdate) throws IllegalArgumentException {
-		Output output = checkCruiseAndReturnOutput(cruiseData, forceOmeUpdate);
+	public boolean checkCruise(DashboardCruiseWithData cruiseData) 
+												throws IllegalArgumentException {
+		Output output = checkCruiseAndReturnOutput(cruiseData);
 		return output.processedOK();
 	}
 
@@ -407,8 +405,6 @@ public class DashboardCruiseChecker {
 	 * 
 	 * @param cruiseData
 	 * 		cruise to check
-	 * @param forceOmeUpdate
-	 * 		update of the OME XML file even if no apparent changes?
 	 * @return
 	 * 		the returned Output from {@link SanityChecker#process()}
 	 * @throws IllegalArgumentException
@@ -416,8 +412,8 @@ public class DashboardCruiseChecker {
 	 * 		if an existing OME XML file is corrupt, or
 	 * 		if the sanity checker throws an exception
 	 */
-	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData, 
-						boolean forceOmeUpdate) throws IllegalArgumentException {
+	private Output checkCruiseAndReturnOutput(DashboardCruiseWithData cruiseData) 
+												throws IllegalArgumentException {
 		String expocode = cruiseData.getExpocode();
 
 		// Get the data column units conversion object
@@ -820,11 +816,13 @@ public class DashboardCruiseChecker {
 
 		// Get the OME metadata that was updated from the data
 		OmeMetadata updatedOmeMData = output.getMetadata();
+		// Set the expocode to force the assignment of other fields associated with the expocode
+		updatedOmeMData.setExpocode(expocode);
 		updatedOmeMData.setDraft( ! updatedOmeMData.isAcceptable() );
 
 		// Check if this OME metadata has any changes
 		boolean saveOmeMData;
-		if ( (oldOmeDoc != null) && ! forceOmeUpdate ) {
+		if ( oldOmeDoc != null ) {
 			Document updatedOmeDoc = updatedOmeMData.createOmeXmlDoc();
 			// Document.equals is just "==", so useless; instead compare XML strings from the Documents
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -898,7 +896,7 @@ public class DashboardCruiseChecker {
 		// Run the SanityChecker to get the standardized data
 		Output output;
 		try {
-			output = checkCruiseAndReturnOutput(cruiseData, false);
+			output = checkCruiseAndReturnOutput(cruiseData);
 		} catch (IllegalArgumentException ex) {
 			lastCheckProcessedOkay = false;
 			return false;
