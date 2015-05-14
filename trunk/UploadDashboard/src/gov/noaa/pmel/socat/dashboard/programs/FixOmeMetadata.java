@@ -34,7 +34,7 @@ public class FixOmeMetadata {
 		if ( args.length != 1 ) {
 			System.err.println("Arguments:  ExpocodesFile");
 			System.err.println();
-			System.err.println("Corrects the XML, as well as nay PI and vessel names, "); 
+			System.err.println("Corrects the XML, as well as any PI and vessel names, "); 
 			System.err.println("in the OME XML files for cruises specified in ExpocodesFile.  ");
 			System.err.println("The default dashboard configuration is used for this process. "); 
 			System.err.println();
@@ -88,7 +88,7 @@ public class FixOmeMetadata {
 					// Read the original data for this cruise and sanity check 
 					// to correct the XML and update with the lon/lat/time bounds
 					DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
-					if ( ! cruiseChecker.checkCruise(cruiseData) )
+					if ( ! cruiseChecker.checkCruise(cruiseData, true) )
 						throw new IllegalArgumentException("Sanity check failed");
 
 					// Fix the vessel and PI names

@@ -101,7 +101,7 @@ public class ResubmitCruises {
 							"suspending the cruise " + expocode);
 				}
 			}
-			cruiseChecker.checkCruise(cruiseData);
+			cruiseChecker.checkCruise(cruiseData, false);
 			cruiseHandler.saveCruiseInfoToFile(cruiseData, 
 					"Cruise data column types, units, and missing values for " + 
 					cruiseData.getExpocode() + " updated by " + username);

@@ -341,7 +341,7 @@ public class DashboardServices extends RemoteServiceServlet
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-		dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
+		dataStore.getDashboardCruiseChecker().checkCruise(cruiseData, false);
 
 		// Save and commit the updated cruise columns
 		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
@@ -390,7 +390,7 @@ public class DashboardServices extends RemoteServiceServlet
 			
 				// Run the SanityCheck on the updated cruise.  Saves the SanityChecker messages,
 				// and assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-				cruiseChecker.checkCruise(cruiseData);
+				cruiseChecker.checkCruise(cruiseData, false);
 
 				// Save and commit the updated cruise information
 				cruiseHandler.saveCruiseInfoToFile(cruiseData, "Data status and WOCE flags for " + expocode + 
