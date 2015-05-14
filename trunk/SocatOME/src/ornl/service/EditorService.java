@@ -423,8 +423,7 @@ public class EditorService {
 		try {
 			URL lURL = new URL(uri);
 			URLConnection lURLconn = lURL.openConnection();
-			in = new BufferedReader(new InputStreamReader(
-					lURLconn.getInputStream(), "UTF-8"));
+			in = new BufferedReader(new InputStreamReader(lURLconn.getInputStream(), "UTF-8"));
 		} catch (Exception exc) {
 			String message = "There is a problem with the requested URL.";
 			model.addAttribute("message", message);
