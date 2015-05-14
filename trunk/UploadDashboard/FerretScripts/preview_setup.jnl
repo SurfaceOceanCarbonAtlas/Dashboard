@@ -45,6 +45,12 @@ let ttn = `tt[l=@max]`
 LET monthsecs = 30*24*60*60
 !IF `ttn-tt1 GT monthsecs` THEN DEFINE SYMBOL taxis_setting = PPL txtype,MON,DMY
 
+! Define numeric variable on the time axis with the WOCE flags
+SET VAR/NAME=WOCE_CO2_water_in WOCE_CO2_water
+LET WOCE_CO2_water_x = STRFLOAT(WOCE_CO2_water_in)
+LET WOCE_CO2_water = RESHAPE(WOCE_CO2_water_x, tt)
+
+
 define view/x=0:1/y=0:1 full0
 define view/x=0:1/y=0:1 full1
 define view/x=0:1/y=0:1 full2
@@ -54,7 +60,7 @@ cancel mode nodata_label
 
 
 
-! line plot style (except for map and Prop-Prop plots)
+! line plot stuyle (except for map and Prop-Prop plots)
 ! Line style: SYMBOLS connected with lines
 ! or cancel the symbol to draw with just lines. 
 

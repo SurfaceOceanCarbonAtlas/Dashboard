@@ -4,17 +4,17 @@ go preview_setup ($infile_dsg) 6
 
 ! lines blk, red, green, blue
 
-let/title="SST wet" sstwet = reshape(xCO2_water_sst_wet_ppm, tt)
-let/title="SST dry" sstdry = reshape(xCO2_water_sst_dry_ppm, tt)
-let/title="Teq wet" teqwet = reshape(xCO2_water_equi_temp_wet_ppm, tt)
-let/title="Teq dry" teqdry = reshape(xCO2_water_equi_temp_dry_ppm, tt)
+let/title="@AS@ SST wet" sstwet = reshape(xCO2_water_sst_wet_ppm, tt)
+let/title="@AS@ SST dry" sstdry = reshape(xCO2_water_sst_dry_ppm, tt)
+let/title="@AS@ Teq wet" teqwet = reshape(xCO2_water_equi_temp_wet_ppm, tt)
+let/title="@AS@ Teq dry" teqdry = reshape(xCO2_water_equi_temp_dry_ppm, tt)
 
 ! Plot variables together to set common vertical scale
 plot  sstwet, sstdry, teqwet, teqdry 
-if `sstwet[l=@ngd] eq 0` THEN let/title="SST wet" sstwet = 1000*tt
-if `sstdry[l=@ngd] eq 0` THEN let/title="SST dry" sstdry = 1000*tt
-if `teqwet[l=@ngd] eq 0` THEN let/title="Teq wet" teqwet= 1000*tt
-if `teqdry[l=@ngd] eq 0` THEN let/title="Teq dry" teqdry = 1000*tt
+if `sstwet[l=@ngd] eq 0` THEN let/title="@AS@ SST wet" sstwet = 1000*tt
+if `sstdry[l=@ngd] eq 0` THEN let/title="@AS@ SST dry" sstdry = 1000*tt
+if `teqwet[l=@ngd] eq 0` THEN let/title="@AS@ Teq wet" teqwet= 1000*tt
+if `teqdry[l=@ngd] eq 0` THEN let/title="@AS@ Teq dry" teqdry = 1000*tt
 let ymin = ($yaxis_min)
 let ymax = ($yaxis_max)
 

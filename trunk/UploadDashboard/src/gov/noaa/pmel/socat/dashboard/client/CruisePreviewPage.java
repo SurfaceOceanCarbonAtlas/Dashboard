@@ -50,7 +50,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 
 	private static final String LAT_VS_LON_TAB_TEXT = "lat vs lon";
 	private static final String LAT_LON_TAB_TEXT = "lat, lon";
-	private static final String DAY_YEAR_TAB_TEXT = "day, year";
+	private static final String SAMPLE_VS_TIME_TAB_TEXT = "sample num vs time";
 	private static final String TIME_SERIES_TAB_TEXT = "time series";
 	private static final String PRESSURES_TAB_TEXT = "pressures";
 	private static final String TEMPERATURES_TAB_TEXT = "temperatures";
@@ -64,7 +64,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
 	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
-	private static final String DAY_YEAR_ALT_TEXT = "day of year, year versus time";
+	private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time";
 	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
 	private static final String PRESSURES_ALT_TEXT = "pressures versus time";
 	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
@@ -78,7 +78,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 
 	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
 	public static final String LAT_LON_IMAGE_NAME = "lat_lon";
-	public static final String DAY_YEAR_IMAGE_NAME = "day_year";
+	public static final String SAMPLE_VS_TIME_IMAGE_NAME = "sample_vs_time";
 	public static final String TIME_SERIES_IMAGE_NAME = "time_series";
 	public static final String PRESSURES_IMAGE_NAME = "pressures";
 	public static final String TEMPERATURES_IMAGE_NAME = "temperatures";
@@ -108,7 +108,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 
 	@UiField HTML latVsLonHtml;
 	@UiField HTML latLonHtml;
-	@UiField HTML dayYearHtml;
+	@UiField HTML sampleVsTimeHtml;
 	@UiField HTML timeSeriesHtml;
 	@UiField HTML pressuresHtml;
 	@UiField HTML temperaturesHtml;
@@ -122,7 +122,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 
 	@UiField Image latVsLonImage;
 	@UiField Image latLonImage;
-	@UiField Image dayYearImage;
+	@UiField Image sampleVsTimeImage;
 	@UiField Image timeSeriesImage;
 	@UiField Image pressuresImage;
 	@UiField Image temperaturesImage;
@@ -183,7 +183,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		// Set the HTML for the tabs
 		latVsLonHtml.setHTML(LAT_VS_LON_TAB_TEXT);
 		latLonHtml.setHTML(LAT_LON_TAB_TEXT);
-		dayYearHtml.setHTML(DAY_YEAR_TAB_TEXT);
+		sampleVsTimeHtml.setHTML(SAMPLE_VS_TIME_TAB_TEXT);
 		timeSeriesHtml.setHTML(TIME_SERIES_TAB_TEXT);
 		pressuresHtml.setHTML(PRESSURES_TAB_TEXT);
 		temperaturesHtml.setHTML(TEMPERATURES_TAB_TEXT);
@@ -198,7 +198,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		// Set hover helps for the tabs
 		latVsLonHtml.setTitle(LAT_VS_LON_ALT_TEXT);
 		latLonHtml.setTitle(LAT_LON_ALT_TEXT);
-		dayYearHtml.setTitle(DAY_YEAR_ALT_TEXT);
+		sampleVsTimeHtml.setTitle(SAMPLE_VS_TIME_ALT_TEXT);
 		timeSeriesHtml.setTitle(TIME_SERIES_ALT_TEXT);
 		pressuresHtml.setTitle(PRESSURES_ALT_TEXT);
 		temperaturesHtml.setTitle(TEMPERATURES_ALT_TEXT);
@@ -213,7 +213,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		// Set text alternative for the images
 		latVsLonImage.setAltText(LAT_VS_LON_ALT_TEXT);
 		latLonImage.setAltText(LAT_LON_ALT_TEXT);
-		dayYearImage.setAltText(DAY_YEAR_ALT_TEXT);
+		sampleVsTimeImage.setAltText(SAMPLE_VS_TIME_ALT_TEXT);
 		timeSeriesImage.setAltText(TIME_SERIES_ALT_TEXT);
 		pressuresImage.setAltText(PRESSURES_ALT_TEXT);
 		temperaturesImage.setAltText(TEMPERATURES_ALT_TEXT);
@@ -228,7 +228,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		// Set hover helps for the images
 		latVsLonImage.setTitle(LAT_VS_LON_ALT_TEXT);
 		latLonImage.setTitle(LAT_LON_ALT_TEXT);
-		dayYearImage.setTitle(DAY_YEAR_ALT_TEXT);
+		sampleVsTimeImage.setTitle(SAMPLE_VS_TIME_ALT_TEXT);
 		timeSeriesImage.setTitle(TIME_SERIES_ALT_TEXT);
 		pressuresImage.setTitle(PRESSURES_ALT_TEXT);
 		temperaturesImage.setTitle(TEMPERATURES_ALT_TEXT);
@@ -316,7 +316,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		}
 		latVsLonImage.setUrl(UriUtils.fromString(imagePrefix + LAT_VS_LON_IMAGE_NAME + imageSuffix));
 		latLonImage.setUrl(UriUtils.fromString(imagePrefix + LAT_LON_IMAGE_NAME + imageSuffix));
-		dayYearImage.setUrl(UriUtils.fromString(imagePrefix + DAY_YEAR_IMAGE_NAME + imageSuffix));
+		sampleVsTimeImage.setUrl(UriUtils.fromString(imagePrefix + SAMPLE_VS_TIME_IMAGE_NAME + imageSuffix));
 		timeSeriesImage.setUrl(UriUtils.fromString(imagePrefix + TIME_SERIES_IMAGE_NAME + imageSuffix));
 		pressuresImage.setUrl(UriUtils.fromString(imagePrefix + PRESSURES_IMAGE_NAME + imageSuffix));
 		temperaturesImage.setUrl(UriUtils.fromString(imagePrefix + TEMPERATURES_IMAGE_NAME + imageSuffix));
