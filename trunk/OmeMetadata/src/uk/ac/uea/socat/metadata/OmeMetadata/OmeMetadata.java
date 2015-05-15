@@ -2511,11 +2511,15 @@ public class OmeMetadata {
 	public void setExpocode(String expocode) {
 		itsExpoCode = expocode.toUpperCase();
 		String nodcCode;
-		if ( Character.isLetter(itsExpoCode.charAt(4)) ) {
-			nodcCode = itsExpoCode.substring(0, 5);
-		}
-		else {
-			nodcCode = itsExpoCode.substring(0, 4);
+		try {
+			if ( Character.isLetter(itsExpoCode.charAt(4)) ) {
+				nodcCode = itsExpoCode.substring(0, 5);
+			}
+			else {
+				nodcCode = itsExpoCode.substring(0, 4);
+			}
+		} catch ( IndexOutOfBoundsException ex ) {
+			nodcCode = "";
 		}
 		vesselID = new OMEVariable(vesselID.getPath(), nodcCode);
 		cruiseID = new OMEVariable(cruiseID.getPath(), itsExpoCode);
