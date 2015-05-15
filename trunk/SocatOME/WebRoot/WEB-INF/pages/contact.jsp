@@ -25,10 +25,8 @@
 		<form:input path="field_user_adress" id="field_user_adress" value="" />
 	</div>
 	<div class="Section2">
-		<label style="width: 88px"> Telephone:<span
-			class="form-required" title="This field is required.">*</span></label>
-		<form:input path="field_user_telephonenumber"
-			id="field_user_telephonenumber" value="" />
+		<label style="width: 88px"> Telephone:</label>
+		<form:input path="field_user_telephonenumber" id="field_user_telephonenumber" value="" />
 	</div>
 	<div class="Section2">
 		<label for="userEmail" style="width: 88px">Email:<span
