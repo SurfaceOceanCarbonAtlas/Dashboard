@@ -109,11 +109,11 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		// Verify page contents seem okay
-		DashboardDataStore dataStore = DashboardDataStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get();
 		if ( (username == null) || (expocodes == null) || (uploadTimestamp == null) ||
 			 (omeIndicator == null) || (metadataItem == null) || 
 			 ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) || 
-			 ! dataStore.validateUser(username) ) {
+			 ! configStore.validateUser(username) ) {
 			metadataItem.delete();
 			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
@@ -131,12 +131,12 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		boolean isOme = omeIndicator.equals("true");
-		String socatVersion = dataStore.getSocatUploadVersion();
+		String socatVersion = configStore.getSocatUploadVersion();
 
-		MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
-		DsgNcFileHandler dsgFileHandler = dataStore.getDsgNcFileHandler();
+		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+		DsgNcFileHandler dsgFileHandler = configStore.getDsgNcFileHandler();
 		String uploadFilename;
 		if ( isOme ) {
 			uploadFilename = DashboardMetadata.OME_FILENAME;

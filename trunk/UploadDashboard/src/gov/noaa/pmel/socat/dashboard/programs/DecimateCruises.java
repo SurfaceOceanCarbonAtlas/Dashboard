@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -40,9 +40,9 @@ public class DecimateCruises {
 		boolean success = true;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());
@@ -50,7 +50,7 @@ public class DecimateCruises {
 			System.exit(1);
 		}
 		try {
-			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+			DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 			// Get the expocode of the cruises to decimate
 			TreeSet<String> allExpocodes = null; 
@@ -80,7 +80,7 @@ public class DecimateCruises {
 			else {
 				try {
 					allExpocodes = new TreeSet<String>(
-							dataStore.getCruiseFileHandler().getMatchingExpocodes("*"));
+							configStore.getCruiseFileHandler().getMatchingExpocodes("*"));
 				} catch (Exception ex) {
 					System.err.println("Error getting all expocodes: " + ex.getMessage());
 					ex.printStackTrace();
@@ -103,7 +103,7 @@ public class DecimateCruises {
 			// Flag ERDDAP that (only) the decimated files have been updated
 			dsgHandler.flagErddap(false, true);
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

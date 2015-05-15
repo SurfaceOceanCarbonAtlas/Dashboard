@@ -57,6 +57,11 @@ public class OmeManagerPage extends CompositeWithUsername {
 
 	private static final String WINDOW_FEATURES = "resizeable,scrollbars,status";
 
+	// URL for OME file-upload page; fileURI is actually ignored at this time, but keep it in there
+	private static final String OME_UPLOAD_FILE_URL = "/SocatOME/editor.htm?fileURI=file://";
+	// URL for OME to show the current XML file on the server
+	private static final String OME_SHOW_FILE_URL = "/SocatOME/show.htm?fileURI=file://";
+
 	interface OmeManagerPageUiBinder extends UiBinder<Widget, OmeManagerPage> {
 	}
 
@@ -307,12 +312,12 @@ public class OmeManagerPage extends CompositeWithUsername {
 				updateIntro();
 				if ( editUpload ) {
 					// Open a new window with the OME upload page
-					Window.open("/SocatOME/editor.htm?fileURI=file://" + fileAbsPath, 
+					Window.open(OME_UPLOAD_FILE_URL + fileAbsPath, 
 							"OME for " + activeExpocode, WINDOW_FEATURES);
 				}
 				else {
 					// Open a new window with the OME initialized from indicated file
-					Window.open("/SocatOME/show.htm?fileURI=file://" + fileAbsPath, 
+					Window.open(OME_SHOW_FILE_URL + fileAbsPath, 
 							"OME for " + activeExpocode, WINDOW_FEATURES);
 				}
 				// Show the normal cursor

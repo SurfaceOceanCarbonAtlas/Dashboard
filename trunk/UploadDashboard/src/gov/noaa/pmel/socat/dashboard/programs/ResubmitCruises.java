@@ -8,7 +8,7 @@ import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
@@ -42,17 +42,17 @@ public class ResubmitCruises {
 	String socatVersion;
 
 	/**
-	 * @param dataStore
+	 * @param configStore
 	 * 		create using the CruiseFileHandler, DashboardCruiseChecker,
-	 * 		and DashboardCruiseSubmitter given in this DashboardDataStore
+	 * 		and DashboardCruiseSubmitter given in this DashboardConfigStore
 	 */
-	public ResubmitCruises(DashboardDataStore dataStore) {
-		cruiseHandler = dataStore.getCruiseFileHandler();
-		cruiseChecker = dataStore.getDashboardCruiseChecker();
-		cruiseSubmitter = dataStore.getDashboardCruiseSubmitter();
-		dsgHandler = dataStore.getDsgNcFileHandler();
-		databaseHandler = dataStore.getDatabaseRequestHandler();
-		socatVersion = dataStore.getSocatUploadVersion();
+	public ResubmitCruises(DashboardConfigStore configStore) {
+		cruiseHandler = configStore.getCruiseFileHandler();
+		cruiseChecker = configStore.getDashboardCruiseChecker();
+		cruiseSubmitter = configStore.getDashboardCruiseSubmitter();
+		dsgHandler = configStore.getDsgNcFileHandler();
+		databaseHandler = configStore.getDatabaseRequestHandler();
+		socatVersion = configStore.getSocatUploadVersion();
 	}
 
 	/**
@@ -151,9 +151,9 @@ public class ResubmitCruises {
 		boolean success = true;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());
@@ -161,11 +161,11 @@ public class ResubmitCruises {
 			System.exit(1);
 		}
 		try {
-			if ( ! dataStore.isAdmin(username) ) {
+			if ( ! configStore.isAdmin(username) ) {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);				
 			}
-			ResubmitCruises resubmitter = new ResubmitCruises(dataStore);
+			ResubmitCruises resubmitter = new ResubmitCruises(configStore);
 
 			// Get the expocode of the cruises to resubmit
 			TreeSet<String> allExpocodes = null; 
@@ -203,7 +203,7 @@ public class ResubmitCruises {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

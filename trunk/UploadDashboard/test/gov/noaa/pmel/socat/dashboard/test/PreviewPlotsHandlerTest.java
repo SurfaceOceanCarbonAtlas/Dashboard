@@ -3,7 +3,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.client.CruisePreviewPage;
 import gov.noaa.pmel.socat.dashboard.handlers.PreviewPlotsHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,8 +25,8 @@ public class PreviewPlotsHandlerTest {
 	@Test
 	public void testCreatePreviewPlots() throws IOException {
 		final String timetag = "testing";
-		DashboardDataStore dataStore = DashboardDataStore.get();
-		PreviewPlotsHandler plotsHandler = dataStore.getPreviewPlotsHandler();
+		DashboardConfigStore configStore = DashboardConfigStore.get();
+		PreviewPlotsHandler plotsHandler = configStore.getPreviewPlotsHandler();
 		File dsgFilesDir = plotsHandler.getCruisePreviewDsgDir(EXPOCODE);
 		File plotsDir = plotsHandler.getCruisePreviewPlotsDir(EXPOCODE);
 

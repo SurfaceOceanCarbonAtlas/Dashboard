@@ -9,7 +9,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -51,9 +51,9 @@ public class UpdateDsgMetadata {
 		boolean changed = false;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
 			ex.printStackTrace();
@@ -82,10 +82,10 @@ public class UpdateDsgMetadata {
 				System.exit(1);
 			}
 
-			CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
-			MetadataFileHandler metaHandler = dataStore.getMetadataFileHandler();
-			FerretConfig ferretConfig = dataStore.getFerretConfig();
+			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+			DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
+			FerretConfig ferretConfig = configStore.getFerretConfig();
 
 			// update each of these cruises
 			for ( String expocode : allExpocodes ) {
@@ -153,7 +153,7 @@ public class UpdateDsgMetadata {
 				dsgHandler.flagErddap(true, true);
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

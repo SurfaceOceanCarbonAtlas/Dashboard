@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
@@ -181,18 +181,18 @@ public class UserFileHandler extends VersionedFileHandler {
 					userDataFile.getPath() + ": " + ex.getMessage());
 		}
 		// Get the cruise file handler
-		DashboardDataStore dataStore;
+		DashboardConfigStore configStore;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get settings");
 		}
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		// Create the cruise list (map) for these cruises
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
-		cruiseList.setSocatVersion(dataStore.getSocatUploadVersion());
+		cruiseList.setSocatVersion(configStore.getSocatUploadVersion());
 		for ( String expocode : expocodeSet ) {
 			// Create the DashboardCruise from the info file
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
@@ -208,7 +208,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		if ( needsCommit )
 			saveCruiseListing(cruiseList, commitMessage);
 		// Determine whether or not this user is a manager/admin 
-		cruiseList.setManager(dataStore.isManager(username));
+		cruiseList.setManager(configStore.isManager(username));
 		// Return the listing of cruises
 		return cruiseList;
 	}
@@ -320,7 +320,7 @@ public class UserFileHandler extends VersionedFileHandler {
 						String username) throws IllegalArgumentException {
 		CruiseFileHandler cruiseHandler;
 		try {
-			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
+			cruiseHandler = DashboardConfigStore.get().getCruiseFileHandler();
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the cruise file handler");
@@ -374,7 +374,7 @@ public class UserFileHandler extends VersionedFileHandler {
 							String username) throws IllegalArgumentException {
 		CruiseFileHandler cruiseHandler;
 		try {
-			cruiseHandler = DashboardDataStore.get().getCruiseFileHandler();
+			cruiseHandler = DashboardConfigStore.get().getCruiseFileHandler();
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the cruise file handler");

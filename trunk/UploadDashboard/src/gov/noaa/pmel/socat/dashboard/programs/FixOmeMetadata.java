@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -46,9 +46,9 @@ public class FixOmeMetadata {
 		boolean success = true;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
 			ex.printStackTrace();
@@ -77,9 +77,9 @@ public class FixOmeMetadata {
 				System.exit(1);
 			}
 
-			CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-			DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
-			MetadataFileHandler metaHandler = dataStore.getMetadataFileHandler();
+			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+			DashboardCruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
+			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
 
 			// update each of these cruises
 			for ( String expocode : allExpocodes ) {
@@ -150,7 +150,7 @@ public class FixOmeMetadata {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

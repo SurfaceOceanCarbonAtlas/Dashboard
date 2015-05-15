@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -38,9 +38,9 @@ public class UpdateDashboardStatuses {
 		boolean success = true;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());
@@ -71,8 +71,8 @@ public class UpdateDashboardStatuses {
 				System.exit(1);
 			}
 
-			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
-			CruiseFileHandler fileHandler = dataStore.getCruiseFileHandler();
+			DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
+			CruiseFileHandler fileHandler = configStore.getCruiseFileHandler();
 
 			// update each of these cruises
 			for ( String expocode : allExpocodes ) {
@@ -98,7 +98,7 @@ public class UpdateDashboardStatuses {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

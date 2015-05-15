@@ -8,7 +8,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -42,17 +42,17 @@ public class DashboardCruiseSubmitter {
 	String socatVersion;
 
 	/**
-	 * @param dataStore
+	 * @param configStore
 	 * 		create with the file handlers and data checker in this data store.
 	 */
-	public DashboardCruiseSubmitter(DashboardDataStore dataStore) {
-		cruiseHandler = dataStore.getCruiseFileHandler();
-		msgHandler = dataStore.getCheckerMsgHandler();
-		metadataHandler = dataStore.getMetadataFileHandler();
-		cruiseChecker = dataStore.getDashboardCruiseChecker();
-		dsgNcHandler = dataStore.getDsgNcFileHandler();
-		databaseHandler = dataStore.getDatabaseRequestHandler();
-		socatVersion = dataStore.getSocatUploadVersion();
+	public DashboardCruiseSubmitter(DashboardConfigStore configStore) {
+		cruiseHandler = configStore.getCruiseFileHandler();
+		msgHandler = configStore.getCheckerMsgHandler();
+		metadataHandler = configStore.getMetadataFileHandler();
+		cruiseChecker = configStore.getDashboardCruiseChecker();
+		dsgNcHandler = configStore.getDsgNcFileHandler();
+		databaseHandler = configStore.getDatabaseRequestHandler();
+		socatVersion = configStore.getSocatUploadVersion();
 	}
 
 	/**
