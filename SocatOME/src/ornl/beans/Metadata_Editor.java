@@ -4232,7 +4232,4 @@ public class Metadata_Editor {
 	public void setField_sensor_desciption9(String field_sensor_desciption9) {
 		this.field_sensor_desciption9 = field_sensor_desciption9;
 	}
-	
-	
-	
 }

@@ -78,9 +78,9 @@
 
 				</span> <span class="offset3 span1"> <span
 					class="label label-important"> * = required </span>
-				</span> <span class="offset3 span1"> <a
-					href="<c:url value="j_spring_security_logout" />"> Logout</a>
-				</span>
+<!-- 				</span> <span class="offset3 span1"> <a -->
+<%-- 					href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
+<!-- 				</span> -->
 
 			</div>
 			<div class="row-fluid">
@@ -104,8 +104,7 @@
 			<div class="row-fluid">
 				<div class="span2 bs-docs-sidebar">
 					<ul class="nav nav-list bs-docs-sidenav affix-top">
-						<li><a href="#contact"><i class="icon-chevron-right"></i>
-								Metadata Creator</a></li>
+						<li><a href="#contact"><i class="icon-chevron-right"></i>Metadata Creator</a></li>
 
 						<li><a href="#investigators"><i
 								class="icon-chevron-right"></i> Investigators</a></li>

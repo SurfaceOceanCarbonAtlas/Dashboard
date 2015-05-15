@@ -427,6 +427,8 @@ public class EditorService {
 		} catch (Exception exc) {
 			String message = "There is a problem with the requested URL.";
 			model.addAttribute("message", message);
+			exc.printStackTrace();
+			return med;
 		}
 
 		Document doc = null;

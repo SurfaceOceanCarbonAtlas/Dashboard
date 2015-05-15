@@ -40,7 +40,7 @@ jQuery(document)
 							"required" : true
 						});
 						$("#field_user_telephonenumber").rules("add", {
-							"required" : true
+							"required" : false
 						});
 						$("#field_user_email").rules("add", {
 							"required" : true
@@ -239,7 +239,7 @@ jQuery(document)
 							"required" : true
 						});
 						$("#field_user_telephonenumber").rules("add", {
-							"required" : true
+							"required" : false
 						});
 						$("#field_user_email").rules("add", {
 							"required" : true
