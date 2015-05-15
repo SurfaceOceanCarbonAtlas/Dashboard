@@ -6,21 +6,19 @@
 		<li class="section1">Cruise Information for the Expocode:
 			<ul>
 				<li class="Section2"><span style="width: 300px">NODC
-						Platform (Ship) Code List:<span class="form-required"
-						title="This field is required.">*</span>
+						Platform (Ship) Code List:
 				</span> <form:input path="field_vessel_id" name="Vessel_ID" size="2"
-						MAXLENGTH="4" class="short" onkeyup="displayExpo()" /> <span><a class="fancy"
+						MAXLENGTH="4" class="short" onkeyup="displayExpo()" style="background:#D3D3D3;" onfocus="blur()"/> <span><a class="fancy"
 					href="http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt">4
 						character NODC</a></li></span>
 				<li class="Section2"><span style="width: 350px">Start
 						Date (cruise or data set, for Expocode)<span class="form-required"
 						title="This field is required.">*</span>:
 				</span> <form:input path="field_start_date" id="field_start_date"
-						name="Start_Date" size="9" class="short" onchange="displayExpo()" /><span class="description">(yyyymmdd)</span>
+						name="Start_Date" size="9" class="short" onchange="displayExpo()" style="background:#D3D3D3;" onfocus="blur()"/><span class="description">(yyyymmdd)</span>
 					<form:input path="field_start_date_dup" id="field_start_date_dup"
 						type="hidden" /></li>
-				<li class="Section2"><span style="width: 300px">Cruise
-						Information for the expocode:</span> <form:input path="field_cruise_id"
+				<li class="Section2"><span style="width: 300px">Expocode:</span> <form:input path="field_cruise_id"
 						style="background:#D3D3D3;" id="field_cruise_id"  class="short" type="text" onfocus="blur()" /></li>
 
 			</ul>

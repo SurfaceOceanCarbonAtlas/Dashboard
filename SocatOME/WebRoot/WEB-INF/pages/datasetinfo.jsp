@@ -3,10 +3,15 @@
 	<h4 class="alert alert-info">Dataset Info:</h4>
 	<ul>
 
-		<li class="Section2"><label for="Dataset_ID" style="width: 100px">Dataset
-				ID:<span class="form-required" title="This field is required.">*</span>
+		<li class="Section2">
+		
+		<label for="Dataset_ID" style="width: 100px">Expocode:
 		</label> <form:input name="Dataset_ID" path="field_title" id="field_title"
-				type="text" /></li>
+				type="text" style="background:#D3D3D3;" onfocus="blur()"/></li>
+				
+<!-- 		<label for="Dataset_ID" style="width: 100px">Expocode:</label> -->
+<!-- 		<form:input name="Dataset_ID" path="field_cruise_id" id="field_cruise_id"  type="text" style="background:#D3D3D3;" onfocus="blur()"/> -->
+<!-- 		</li> -->
 
 		<li class="Section2"><label>Funding Information (funder,
 				project name, grant number, e.g. MEXT Grant-in-Aid for Scientific

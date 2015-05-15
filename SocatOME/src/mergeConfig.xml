@@ -22,7 +22,8 @@
 				<!-- Investigator -->
 
 				<!-- Dataset Info -->
-				<entry key="field_title" value="//x_tags/ Dataset_Info/ Dataset_ID" />
+				<entry key="field_title" 	value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Cruise_ID" />
+<!-- 				value="//x_tags/ Dataset_Info/ Dataset_IDs" /> -->
 				<entry key="field_funding_info" value="//x_tags/ Dataset_Info/ Funding_Info" />
 				<entry key="field_initial_submission"
 					value="//x_tags/ Dataset_Info/ Submission_Dates/ Initial_Submission" />
