@@ -88,7 +88,7 @@ public class EmailController {
 		 sender = (String) email.get("sender");
 		}
 		else{
-			sender = "mercury-support@ornl.gov";
+			sender = "karl.smith@noaa.gov";
 		}
 
 		
@@ -100,7 +100,7 @@ public class EmailController {
 		
 		
 		body.append("<html><body>"+"\n");
-		body.append("<a href=\"http://mercury.ornl.gov/OceanOME\"><img src=\"http://mercury.ornl.gov/OceanOME/images/index.gif\"></a>"+"<br>");
+// 		body.append("<a href=\"http://mercury.ornl.gov/OceanOME\"><img src=\"http://mercury.ornl.gov/OceanOME/images/index.gif\"></a>"+"<br>");
 		body.append("<b>*** Automated E-Mail - Please do not reply ***</b>");
 		body.append("<br>");
 		
