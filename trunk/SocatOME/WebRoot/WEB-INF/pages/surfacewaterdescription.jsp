@@ -73,11 +73,6 @@
 						<option value="CRDS">CRDS</option>
 						<option value="GC">GC</option>
 						<option value="Others">Others</option>
-<!-- 						<option value="Self-propelled surface platform">IR</option> -->
-<!-- 						<option value="Ship">Spectrophotometric</option> -->
-<!-- 						<option value="Mooring">CRDS</option> -->
-<!-- 						<option value="Surface Drifter">GC</option> -->
-<!-- 						<option value="Others">Others</option> -->
 				</select> <form:input class="short" id="field_measurement_method"
 						style="display:none" placeHolder="Describe Others Here"
 						path="field_measurement_method" />
