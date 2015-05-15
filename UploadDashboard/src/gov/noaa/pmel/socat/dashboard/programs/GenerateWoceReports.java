@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -57,9 +57,9 @@ public class GenerateWoceReports {
 			System.exit(1);
 		}
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
@@ -68,8 +68,8 @@ public class GenerateWoceReports {
 		}
 		int retVal = 0;
 		try {
-			DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
-			CruiseFlagsHandler flagsHandler = dataStore.getCruiseFlagsHandler();
+			DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+			CruiseFlagsHandler flagsHandler = configStore.getCruiseFlagsHandler();
 
 			for ( String expo : expocodes ) {
 				// Generate the WOCE flags report file from the summary messages and current WOCE flags
@@ -83,7 +83,7 @@ public class GenerateWoceReports {
 				System.err.println("Success - " + expo);
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 
 		// Done - return zero if no problems

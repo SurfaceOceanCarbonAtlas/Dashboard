@@ -7,7 +7,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -39,13 +39,13 @@ public class CruiseRestorer {
 	/**
 	 * Restores cruises using the handlers provided by the given DashboardDataStore
 	 * 
-	 * @param dataStore
+	 * @param configStore
 	 * 		DashboardDataStore to use
 	 * 		
 	 */
-	public CruiseRestorer(DashboardDataStore dataStore) {
-		databaseHandler = dataStore.getDatabaseRequestHandler();
-		dsgHandler = dataStore.getDsgNcFileHandler();
+	public CruiseRestorer(DashboardConfigStore configStore) {
+		databaseHandler = configStore.getDatabaseRequestHandler();
+		dsgHandler = configStore.getDsgNcFileHandler();
 		socatVersion = null;
 	}
 

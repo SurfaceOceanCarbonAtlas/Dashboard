@@ -116,10 +116,10 @@ public class CruiseUploadService extends HttpServlet {
 			sendErrMsg(response, "No upload files specified");
 			return;
 		}
-		DashboardDataStore dataStore = DashboardDataStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get();
 		if ( (username == null) || (dataFormat == null) || (encoding == null) || 
 			 (action == null)   || (timestamp == null)  || 
-			 ( ! dataStore.validateUser(username) ) ||
+			 ( ! configStore.validateUser(username) ) ||
 			 ! ( action.equals(DashboardUtils.REQUEST_PREVIEW_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_NEW_CRUISE_TAG) ||
 				 action.equals(DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG) ) ) {
@@ -176,7 +176,7 @@ public class CruiseUploadService extends HttpServlet {
 			return;
 		}
 
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 
 		ArrayList<String> successes = new ArrayList<String>(cruiseItems.size());
 		ArrayList<String> messages = new ArrayList<String>(cruiseItems.size());
@@ -252,7 +252,7 @@ public class CruiseUploadService extends HttpServlet {
 
 			// Check if an OME metadata file or supplemental documents already exist for this cruise
 			ArrayList<DashboardMetadata> mdataList = 
-					dataStore.getMetadataFileHandler().getMetadataFiles(expocode);
+					configStore.getMetadataFileHandler().getMetadataFiles(expocode);
 			TreeSet<String> addlDocs = new TreeSet<String>();
 			for ( DashboardMetadata mdata : mdataList ) {
 				if ( DashboardMetadata.OME_FILENAME.equals(mdata.getFilename())) {
@@ -290,7 +290,7 @@ public class CruiseUploadService extends HttpServlet {
 
 		// Update the list of cruises for the user
 		try {
-			dataStore.getUserFileHandler().addCruisesToListing(successes, username);
+			configStore.getUserFileHandler().addCruisesToListing(successes, username);
 		} catch (IllegalArgumentException ex) {
 			sendErrMsg(response, "Unexpected error updating list of cruises \n" + ex.getMessage());
 			return;

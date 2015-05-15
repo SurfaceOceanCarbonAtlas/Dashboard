@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
@@ -86,16 +86,16 @@ public class GetCruiseCrossovers {
 			System.exit(1);
 		}
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
-		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 		long startTime = System.currentTimeMillis();
 
@@ -147,7 +147,7 @@ public class GetCruiseCrossovers {
 			cruiseLatMinMaxMap.put(expo, latMinMaxVals);
 		}
 
-		CrossoverChecker crossChecker = new CrossoverChecker(dataStore.getDsgNcFileHandler());
+		CrossoverChecker crossChecker = new CrossoverChecker(configStore.getDsgNcFileHandler());
 		TreeMap<String,SocatCrossover> crossoversMap = new TreeMap<String,SocatCrossover>();
 		for ( String firstExpo : cruiseFlagsMap.keySet() ) {
 			double[] firstTimeMinMax = cruiseTimeMinMaxMap.get(firstExpo);

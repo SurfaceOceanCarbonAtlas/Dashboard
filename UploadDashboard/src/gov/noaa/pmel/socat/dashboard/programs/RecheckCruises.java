@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 
 import java.io.BufferedReader;
@@ -59,9 +59,9 @@ public class RecheckCruises {
 			System.exit(1);
 		}
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
@@ -70,8 +70,8 @@ public class RecheckCruises {
 		}
 		int retVal = 0;
 		try {
-			CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-			DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
+			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+			DashboardCruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 
 			for ( String expo : expocodes ) {
 				// Get all the data for this cruise
@@ -93,7 +93,7 @@ public class RecheckCruises {
 				System.err.println("Success - " + expo);
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 
 		// Done - return zero if no problems

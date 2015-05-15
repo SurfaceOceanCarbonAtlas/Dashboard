@@ -4,7 +4,7 @@ import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -32,21 +32,21 @@ public class PreviewPlotsHandler {
 	 * 		directory to contain the preview DSG files
 	 * @param plotsDirName
 	 * 		directory to contain the preview plots
-	 * @param dataStore
+	 * @param configStore
 	 * 		get the CruiseFileHandler, DashboardCruiseChecker, 
 	 * 		MetadataFileHandler, and FerretConfig from here
 	 */
-	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, DashboardDataStore dataStore) {
+	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, DashboardConfigStore configStore) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
 		plotsDir = new File(plotsDirName);
 		if ( ! plotsDir.isDirectory() )
 			throw new IllegalArgumentException(plotsDirName + " is not a directory");
-		cruiseHandler = dataStore.getCruiseFileHandler();
-		cruiseChecker = dataStore.getDashboardCruiseChecker();
-		metadataHandler = dataStore.getMetadataFileHandler();
-		ferretConfig = dataStore.getFerretConfig();
+		cruiseHandler = configStore.getCruiseFileHandler();
+		cruiseChecker = configStore.getDashboardCruiseChecker();
+		metadataHandler = configStore.getMetadataFileHandler();
+		ferretConfig = configStore.getFerretConfig();
 	}
 
 	/**

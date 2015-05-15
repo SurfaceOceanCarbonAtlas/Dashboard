@@ -8,7 +8,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -37,14 +37,14 @@ public class SocatSummaryReporter {
 
 	/**
 	 * Generate summary data using the handlers from a data store.
-	 * @param dataStore
+	 * @param configStore
 	 * 		use handlers in the data store
 	 */
-	public SocatSummaryReporter(DashboardDataStore dataStore) {
-		cruiseHandler = dataStore.getCruiseFileHandler();
-		metadataHandler = dataStore.getMetadataFileHandler();
-		dsgFileHandler = dataStore.getDsgNcFileHandler();
-		databaseHandler = dataStore.getDatabaseRequestHandler();
+	public SocatSummaryReporter(DashboardConfigStore configStore) {
+		cruiseHandler = configStore.getCruiseFileHandler();
+		metadataHandler = configStore.getMetadataFileHandler();
+		dsgFileHandler = configStore.getDsgNcFileHandler();
+		databaseHandler = configStore.getDatabaseRequestHandler();
 	}
 
 	/**

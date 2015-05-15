@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
@@ -44,9 +44,9 @@ public class AddAllMetadata {
 		boolean success = true;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard "
 					+ "configuration file: " + ex.getMessage());
@@ -77,8 +77,8 @@ public class AddAllMetadata {
 				System.exit(1);
 			}
 
-			CruiseFileHandler fileHandler = dataStore.getCruiseFileHandler();
-			MetadataFileHandler metaHandler = dataStore.getMetadataFileHandler();
+			CruiseFileHandler fileHandler = configStore.getCruiseFileHandler();
+			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
 			for ( String expocode : allExpocodes ) {
 				try {
 					DashboardCruise cruise = fileHandler.getCruiseFromInfoFile(expocode);
@@ -112,7 +112,7 @@ public class AddAllMetadata {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

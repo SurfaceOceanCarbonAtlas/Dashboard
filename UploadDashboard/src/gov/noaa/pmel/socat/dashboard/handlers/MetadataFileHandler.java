@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -161,15 +161,15 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		DashboardMetadata oldMetadata = getMetadataInfo(expocode, metaname);
 		if ( oldMetadata == null )
 			return;
-		DashboardDataStore dataStore;
+		DashboardConfigStore configStore;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (IOException ex) {
 			throw new IllegalArgumentException(
 					"Unexpected error obtaining the dashboard configuration");
 		}
 		String oldOwner = oldMetadata.getOwner();
-		if ( ! dataStore.userManagesOver(username, oldOwner) )
+		if ( ! configStore.userManagesOver(username, oldOwner) )
 			throw new IllegalArgumentException(
 					"Not permitted to update metadata document " + 
 					oldMetadata.getFilename() + " for cruise " + 

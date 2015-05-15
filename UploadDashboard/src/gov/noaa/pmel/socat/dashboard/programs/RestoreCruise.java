@@ -7,7 +7,7 @@ import gov.noaa.pmel.socat.dashboard.actions.CruiseRestorer;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
@@ -70,9 +70,9 @@ public class RestoreCruise {
 		else
 			metadataUpdated = false;
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
@@ -80,12 +80,12 @@ public class RestoreCruise {
 			System.exit(1);
 		}
 
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		String removeSocatVersion = dataStore.getSocatUploadVersion();
-		ResubmitCruises resubmitter = new ResubmitCruises(dataStore);
-		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
-		CruiseRestorer restorer = new CruiseRestorer(dataStore);
-		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+		String removeSocatVersion = configStore.getSocatUploadVersion();
+		ResubmitCruises resubmitter = new ResubmitCruises(configStore);
+		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+		CruiseRestorer restorer = new CruiseRestorer(configStore);
+		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 		try {
 			// Get the QC flag to restore from the cruise info file
@@ -239,7 +239,7 @@ public class RestoreCruise {
 				System.exit(1);
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 
 		System.exit(0);

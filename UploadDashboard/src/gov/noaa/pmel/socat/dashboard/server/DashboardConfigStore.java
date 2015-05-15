@@ -41,11 +41,11 @@ import com.googlecode.gwt.crypto.bouncycastle.InvalidCipherTextException;
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
 
 /**
- * Reads and holds the data in the Dashboard configuration file
+ * Reads and holds the Dashboard configuration details
  * 
  * @author Karl Smith
  */
-public class DashboardDataStore {
+public class DashboardConfigStore {
 
 	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
 	private static final String LOGGER_CONFIG_RELATIVE_FILENAME = "content" + File.separator + 
@@ -102,8 +102,8 @@ public class DashboardDataStore {
 			"The EncryptionKey should be 24 random integer values in [-128,127] \n" +
 			"The hexidecimal keys for users can be generated using the mkpasshash.sh script. \n";
 
-	private static final AtomicReference<DashboardDataStore> singleton = 
-			new AtomicReference<DashboardDataStore>();
+	private static final AtomicReference<DashboardConfigStore> singleton = 
+			new AtomicReference<DashboardConfigStore>();
 
 	private File configFile;
 	private long configFileTimestamp;
@@ -137,7 +137,7 @@ public class DashboardDataStore {
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
-	private DashboardDataStore() throws IOException {
+	private DashboardConfigStore() throws IOException {
 		String baseDir = System.getProperty("catalina.base");
 		// The following is just for debugging under Eclipse
 		if ( baseDir == null ) 
@@ -441,13 +441,13 @@ public class DashboardDataStore {
 
 	/**
 	 * @return
-	 * 		the singleton instance of the DashboardDataStore
+	 * 		the singleton instance of the DashboardConfigStore
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
-	public static DashboardDataStore get() throws IOException {
+	public static DashboardConfigStore get() throws IOException {
 		if ( singleton.get() == null )
-			singleton.compareAndSet(null, new DashboardDataStore());
+			singleton.compareAndSet(null, new DashboardConfigStore());
 		return singleton.get();
 	}
 
@@ -462,16 +462,16 @@ public class DashboardDataStore {
 		metadataFileHandler.shutdown();
 		// Stop the configuration watcher
 		configWatcher.cancel();
-		// Discard this DashboardDataStore as the singleton instance
+		// Discard this DashboardConfigStore as the singleton instance
 		singleton.set(null);
 	}
 
 	private static final long MINUTES_CHECK_INTERVAL = 1;
 	/**
-	 * Monitors the configuration file creating the current DashboardDataStore 
+	 * Monitors the configuration file creating the current DashboardConfigStore 
 	 * singleton object.  If the configuration file has changed, shuts down the 
-	 * current DashboardDataStore singleton object and stops monitoring the 
-	 * configuration file.  Thus, the next time the DashboardDataStore is needed, 
+	 * current DashboardConfigStore singleton object and stops monitoring the 
+	 * configuration file.  Thus, the next time the DashboardConfigStore is needed, 
 	 * the configuration file will be reread and this monitor will be restarted.
 	 */
 	private void watchConfigFile() {
@@ -481,16 +481,15 @@ public class DashboardDataStore {
 		configWatcher.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				DashboardDataStore dataStore = singleton.get();
-				if ( dataStore == null ) {
+				DashboardConfigStore configStore = singleton.get();
+				if ( configStore == null ) {
+					// datastore already removed so cancel this timer
 					cancel(); 
 				}
-				else if ( dataStore.configFile.lastModified() != 
-							dataStore.configFileTimestamp ) {
-					// Shutdown all the handlers and remove the datastore
-					dataStore.shutdown();
-					// Stop this watcher
-					cancel();
+				else if ( configStore.configFile.lastModified() != 
+							configStore.configFileTimestamp ) {
+					// Shutdown all the handlers, cancel this timer, and remove the datastore
+					configStore.shutdown();
 				}
 			}
 		}, MINUTES_CHECK_INTERVAL * 60 * 1000, MINUTES_CHECK_INTERVAL * 60 * 1000);

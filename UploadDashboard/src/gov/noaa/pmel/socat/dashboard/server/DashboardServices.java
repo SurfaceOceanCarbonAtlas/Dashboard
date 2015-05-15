@@ -39,10 +39,10 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardServices extends RemoteServiceServlet
 								implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = -6032642942696536607L;
+	private static final long serialVersionUID = 6522763403680226864L;
 
 	private String username = null;
-	private DashboardDataStore dataStore = null;
+	private DashboardConfigStore configStore = null;
 
 	@Override
 	public void logoutUser() {
@@ -73,7 +73,7 @@ public class DashboardServices extends RemoteServiceServlet
 	 * Validates the given request by retrieving the current username from the request
 	 * and verifying that username with the Dashboard data store.  If pageUsername is
 	 * given, also checks these usernames are the same.
-	 * Assigns the username and dataStore fields in this instance.
+	 * Assigns the username and configStore fields in this instance.
 	 * 
 	 * @param pageUsername
 	 * 		if not null, check that this matches the current page username
@@ -94,13 +94,13 @@ public class DashboardServices extends RemoteServiceServlet
 		if ( (pageUsername != null) && ! pageUsername.equals(username) )
 			return false;
 
-		dataStore = null;
+		configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Unexpected configuration error: " + ex.getMessage());
 		}
-		return dataStore.validateUser(username);
+		return configStore.validateUser(username);
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class DashboardServices extends RemoteServiceServlet
 		// Get the dashboard data store and current username
 		if ( ! validateRequest(null) ) 
 			throw new IllegalArgumentException("Invalid user request");
-		DashboardCruiseList cruiseList = dataStore.getUserFileHandler().getCruiseListing(username);
+		DashboardCruiseList cruiseList = configStore.getUserFileHandler().getCruiseListing(username);
 		Logger.getLogger("DashboardServices").info("cruise list returned for " + username);
 		return cruiseList;
 	}
@@ -121,7 +121,7 @@ public class DashboardServices extends RemoteServiceServlet
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		// Delete each of the cruises in the given set
 		for ( String expocode : expocodeSet ) {
 			try {
@@ -136,7 +136,7 @@ public class DashboardServices extends RemoteServiceServlet
 
 		// Return the current list of cruises, which should 
 		// detect the missing cruises and update itself
-		DashboardCruiseList cruiseList = dataStore.getUserFileHandler().getCruiseListing(username);
+		DashboardCruiseList cruiseList = configStore.getUserFileHandler().getCruiseListing(username);
 		Logger.getLogger("DashboardServices").info("cruise list returned for " + username);
 		return cruiseList;
 	}
@@ -149,7 +149,7 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Add the cruises to the user's list and return the updated list
-		DashboardCruiseList cruiseList = dataStore.getUserFileHandler()
+		DashboardCruiseList cruiseList = configStore.getUserFileHandler()
 				.addCruisesToListing(wildExpocode, username);
 		Logger.getLogger("DashboardServices").info("added cruises " + wildExpocode + " for " + username);
 		return cruiseList;
@@ -163,7 +163,7 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Remove the cruises from the user's list and return the updated list
-		DashboardCruiseList cruiseList = dataStore.getUserFileHandler()
+		DashboardCruiseList cruiseList = configStore.getUserFileHandler()
 				.removeCruisesFromListing(expocodeSet, username);
 		Logger.getLogger("DashboardServices").info("removed cruises " + expocodeSet.toString() + " for " + username);
 		return cruiseList;
@@ -177,11 +177,11 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Create the set of updated cruise information to return
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
-		cruiseList.setSocatVersion(dataStore.getSocatUploadVersion());
-		cruiseList.setManager(dataStore.isManager(username));
+		cruiseList.setSocatVersion(configStore.getSocatUploadVersion());
+		cruiseList.setManager(configStore.isManager(username));
 		for ( String cruiseExpocode : expocodeSet ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
@@ -196,11 +196,11 @@ public class DashboardServices extends RemoteServiceServlet
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 
 		// Get the current metadata documents for the cruise
-		MetadataFileHandler mdataHandler = dataStore.getMetadataFileHandler();
+		MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 		if ( DashboardMetadata.OME_FILENAME.equals(deleteFilename) ) {
 			if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) 
 				throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted cruise");
@@ -239,15 +239,15 @@ public class DashboardServices extends RemoteServiceServlet
 			qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
 			qcEvent.setFlagDate(new Date());
 			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-			qcEvent.setSocatVersion(dataStore.getSocatUploadVersion());
+			qcEvent.setSocatVersion(configStore.getSocatUploadVersion());
 			qcEvent.setUsername(username);
 			String comment = "Deleted metadata file \"" + deleteFilename + 
 					"\".  Data and WOCE flags were not changed.";
 			qcEvent.setComment(comment);
 			try {
 				// Add the 'U' QC flag
-				dataStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
-				dataStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
+				configStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
+				configStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
 				// Update the dashboard status for the 'U' QC flag
 				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
 				if ( cruise.isEditable() == null ) {
@@ -266,8 +266,8 @@ public class DashboardServices extends RemoteServiceServlet
 		// Create the set of updated cruise information to return
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
-		cruiseList.setSocatVersion(dataStore.getSocatUploadVersion());
-		cruiseList.setManager(dataStore.isManager(username));
+		cruiseList.setSocatVersion(configStore.getSocatUploadVersion());
+		cruiseList.setManager(configStore.isManager(username));
 		for ( String cruiseExpocode : allExpocodes ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
@@ -283,7 +283,7 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Get the cruise with the first maximum-needed number of rows
-		DashboardCruiseWithData cruiseData = dataStore.getCruiseFileHandler()
+		DashboardCruiseWithData cruiseData = configStore.getCruiseFileHandler()
 				.getCruiseDataFromFiles(expocode, 0, 
 						DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 		if ( cruiseData == null )
@@ -306,7 +306,7 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Get the cruise data with exactly the data rows desired
-		DashboardCruiseWithData cruiseWithData = dataStore.getCruiseFileHandler()
+		DashboardCruiseWithData cruiseWithData = configStore.getCruiseFileHandler()
 									.getCruiseDataFromFiles(expocode, firstRow, numRows);
 		if ( cruiseWithData == null )
 			throw new IllegalArgumentException("cruise " + expocode + " does not exist");
@@ -328,7 +328,7 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Retrieve all the current cruise data
-		DashboardCruiseWithData cruiseData = dataStore.getCruiseFileHandler()
+		DashboardCruiseWithData cruiseData = configStore.getCruiseFileHandler()
 						.getCruiseDataFromFiles(newSpecs.getExpocode(), 0, -1);
 		// Revise the cruise data column types and units 
 		if ( newSpecs.getDataColTypes().size() != cruiseData.getDataColTypes().size() )
@@ -341,14 +341,14 @@ public class DashboardServices extends RemoteServiceServlet
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.
-		dataStore.getDashboardCruiseChecker().checkCruise(cruiseData);
+		configStore.getDashboardCruiseChecker().checkCruise(cruiseData);
 
 		// Save and commit the updated cruise columns
-		dataStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
+		configStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
 				"Cruise data column types, units, and missing values for " + 
 				cruiseData.getExpocode() + " updated by " + username);
 		// Update the user-specific data column names to types, units, and missing values 
-		dataStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, username);
+		configStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, username);
 		
 		// Remove all but the first maximum-needed number of rows of cruise data 
 		// to minimize the payload of the returned cruise data
@@ -372,9 +372,9 @@ public class DashboardServices extends RemoteServiceServlet
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		CruiseFileHandler cruiseHandler = dataStore.getCruiseFileHandler();
-		UserFileHandler userHandler = dataStore.getUserFileHandler();
-		DashboardCruiseChecker cruiseChecker = dataStore.getDashboardCruiseChecker();
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+		UserFileHandler userHandler = configStore.getUserFileHandler();
+		DashboardCruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 		Logger dataSpecsLogger = Logger.getLogger("DashboardServices");
 
 		for ( String expocode : cruiseExpocodes ) {
@@ -414,7 +414,7 @@ public class DashboardServices extends RemoteServiceServlet
 		// Get the list of saved sanity checker Message objects for this cruise
 		SCMessageList scMsgList;
 		try {
-			scMsgList = dataStore.getCheckerMsgHandler().getCruiseMessages(expocode);
+			scMsgList = configStore.getCheckerMsgHandler().getCruiseMessages(expocode);
 		} catch (FileNotFoundException ex) {
 			throw new IllegalArgumentException("The sanity checker has never been run on cruise " + expocode);
 		}
@@ -436,7 +436,7 @@ public class DashboardServices extends RemoteServiceServlet
 		}
 
 		// return the absolute path to the OME.xml for activeExpcode
-		File omeFile = dataStore.getMetadataFileHandler()
+		File omeFile = configStore.getMetadataFileHandler()
 								.getMetadataFile(activeExpocode, DashboardMetadata.OME_FILENAME);
 		return omeFile.getAbsolutePath();
 	}
@@ -453,7 +453,7 @@ public class DashboardServices extends RemoteServiceServlet
 		//       returns false, then when gets called again with firstCall is false for
 		//       a status update, returns false if still working and true if all plots are done
 		if ( firstCall )
-			dataStore.getPreviewPlotsHandler().createPreviewPlots(expocode, timetag);
+			configStore.getPreviewPlotsHandler().createPreviewPlots(expocode, timetag);
 		return true;
 	}
 
@@ -466,7 +466,7 @@ public class DashboardServices extends RemoteServiceServlet
 			throw new IllegalArgumentException("Invalid user request");
 
 		// Submit the cruises for QC and possibly send to CDIAC
-		dataStore.getDashboardCruiseSubmitter().submitCruises(cruiseExpocodes, 
+		configStore.getDashboardCruiseSubmitter().submitCruises(cruiseExpocodes, 
 				archiveStatus, localTimestamp, repeatSend, username);
 		Logger.getLogger("DashboardServices").info("cruises " + cruiseExpocodes.toString() + 
 				" submitted by " + username);

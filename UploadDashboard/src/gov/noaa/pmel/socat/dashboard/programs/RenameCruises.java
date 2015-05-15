@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.actions.CruiseRenamer;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -69,9 +69,9 @@ public class RenameCruises {
 		}
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());
@@ -79,11 +79,11 @@ public class RenameCruises {
 			System.exit(1);
 		}
 		try {
-			if ( ! dataStore.isAdmin(username) ) {
+			if ( ! configStore.isAdmin(username) ) {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
-			CruiseRenamer renamer = new CruiseRenamer(dataStore);
+			CruiseRenamer renamer = new CruiseRenamer(configStore);
 			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
 				String oldExpocode = expoEntry.getKey();
 				String newExpocode = expoEntry.getValue();
@@ -95,7 +95,7 @@ public class RenameCruises {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		System.exit(0);
 	}

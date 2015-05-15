@@ -8,7 +8,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 
 import java.io.IOException;
@@ -30,16 +30,16 @@ public class CruiseRenamer {
 	String socatVersion;
 	
 	/**
-	 * @param dataStore
+	 * @param configStore
 	 * 		create with the handlers given in the dashboard data store.
 	 */
-	public CruiseRenamer(DashboardDataStore dataStore) {
-		cruiseHandler = dataStore.getCruiseFileHandler();
-		msgHandler = dataStore.getCheckerMsgHandler();
-		metadataHandler = dataStore.getMetadataFileHandler();
-		dsgHandler = dataStore.getDsgNcFileHandler();
-		databaseHandler = dataStore.getDatabaseRequestHandler();
-		socatVersion = dataStore.getSocatUploadVersion();
+	public CruiseRenamer(DashboardConfigStore configStore) {
+		cruiseHandler = configStore.getCruiseFileHandler();
+		msgHandler = configStore.getCheckerMsgHandler();
+		metadataHandler = configStore.getMetadataFileHandler();
+		dsgHandler = configStore.getDsgNcFileHandler();
+		databaseHandler = configStore.getDatabaseRequestHandler();
+		socatVersion = configStore.getSocatUploadVersion();
 	}
 
 	/**

@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.actions.SocatCruiseReporter;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -89,9 +89,9 @@ public class GenerateFullCruiseReports {
 			System.exit(1);
 		}
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
@@ -99,7 +99,7 @@ public class GenerateFullCruiseReports {
 			System.exit(1);
 		}
 		try {
-			SocatCruiseReporter reporter = new SocatCruiseReporter(dataStore.getDsgNcFileHandler());
+			SocatCruiseReporter reporter = new SocatCruiseReporter(configStore.getDsgNcFileHandler());
 			if ( multicruise ) {
 				try {
 					ArrayList<String> warnMsgs = 
@@ -137,7 +137,7 @@ public class GenerateFullCruiseReports {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 
 		System.exit(0);

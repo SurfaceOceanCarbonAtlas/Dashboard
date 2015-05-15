@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -124,9 +124,9 @@ public class ReportMissing {
 		boolean success = true;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard configuration file: " + ex.getMessage());
 			ex.printStackTrace();
@@ -155,7 +155,7 @@ public class ReportMissing {
 				System.exit(1);
 			}
 
-			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+			DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 			for ( String expocode : allExpocodes ) {
 				try {
 					CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
@@ -175,7 +175,7 @@ public class ReportMissing {
 				}				
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

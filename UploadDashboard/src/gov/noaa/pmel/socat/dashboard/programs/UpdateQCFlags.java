@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -42,9 +42,9 @@ public class UpdateQCFlags {
 		boolean updated = false;
 
 		// Get the default dashboard configuration
-		DashboardDataStore dataStore = null;		
+		DashboardConfigStore configStore = null;		
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());
@@ -75,8 +75,8 @@ public class UpdateQCFlags {
 				System.exit(1);
 			}
 
-			DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
-			DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+			DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
+			DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 			// update each of these cruises
 			for ( String expocode : allExpocodes ) {
@@ -119,7 +119,7 @@ public class UpdateQCFlags {
 				dsgHandler.flagErddap(true, true);
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

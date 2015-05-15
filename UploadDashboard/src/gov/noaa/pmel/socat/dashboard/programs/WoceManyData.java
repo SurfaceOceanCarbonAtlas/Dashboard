@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
@@ -74,18 +74,18 @@ public class WoceManyData {
 			System.exit(1);
 		}
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (IOException ex) {
-			System.err.println("Problem getting the default DashboardDataStore");
+			System.err.println("Problem getting the default DashboardConfigStore");
 			ex.printStackTrace();
 			System.exit(1);
 		}
 		try {
 			CruiseDsgNcFile dsgFile = null;
 			try {
-				dsgFile = dataStore.getDsgNcFileHandler().getDsgNcFile(expocode);
+				dsgFile = configStore.getDsgNcFileHandler().getDsgNcFile(expocode);
 			} catch (Exception ex) {
 				System.err.println("Problems getting the DSG file for " + expocode);
 				ex.printStackTrace();
@@ -149,7 +149,7 @@ public class WoceManyData {
 			woceEvent.setExpocode(expocode);
 			woceEvent.setFlag(woceFlag);
 			woceEvent.setFlagDate(new Date());
-			woceEvent.setSocatVersion(dataStore.getSocatQCVersion());
+			woceEvent.setSocatVersion(configStore.getSocatQCVersion());
 			woceEvent.setUsername(username);
 
 			// Directly modify the data locations list in this event
@@ -171,7 +171,7 @@ public class WoceManyData {
 
 			// Submit this WOCE Event to the database
 			try {
-				dataStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);
+				configStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);
 			} catch (SQLException ex) {
 				System.err.println("Problem adding the WOCE event to the database");
 				ex.printStackTrace();
@@ -197,7 +197,7 @@ public class WoceManyData {
 			// TODO: redecimate - done by hand
 			// TODO: flag ERDDAP - done by hand
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 
 		System.exit(0);

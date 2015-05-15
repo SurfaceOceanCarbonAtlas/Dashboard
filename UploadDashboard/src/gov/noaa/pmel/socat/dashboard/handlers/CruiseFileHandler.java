@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
@@ -404,15 +404,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( assignCruiseInfo ) {
 			// Assign the data column types, units, and missing values 
 			// from the data column names
-			DashboardDataStore dataStore;
+			DashboardConfigStore configStore;
 			try {
-				dataStore = DashboardDataStore.get();
+				configStore = DashboardConfigStore.get();
 			} catch ( IOException ex ) {
 				throw new IOException(
 						"Unexpected failure to get the dashboard configuration");
 			}
-			dataStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
-			cruiseData.setVersion(dataStore.getSocatUploadVersion());
+			configStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
+			cruiseData.setVersion(configStore.getSocatUploadVersion());
 			// Set all WOCE-3 row index sets to empty
 			ArrayList<HashSet<Integer>> woceFlags = 
 									cruiseData.getWoceThreeRowIndices();
@@ -627,14 +627,14 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 		else {
 			// Delete the messages file (for old data) if it exists
-			DashboardDataStore dataStore;
+			DashboardConfigStore configStore;
 			try {
-				dataStore = DashboardDataStore.get();
+				configStore = DashboardConfigStore.get();
 			} catch ( IOException ex ) {
 				throw new IllegalArgumentException(
 						"Unexpected failure to get the dashboard configuration");
 			}
-			dataStore.getCheckerMsgHandler().deleteMsgsFile(expocode);
+			configStore.getCheckerMsgHandler().deleteMsgsFile(expocode);
 		}
 
 		// Print the cruise data to the data file
@@ -1031,7 +1031,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Check if the user has permission to delete the cruise
 		try {
 			String owner = cruise.getOwner();
-			if ( ! DashboardDataStore.get().userManagesOver(username, owner) )
+			if ( ! DashboardConfigStore.get().userManagesOver(username, owner) )
 				throw new IllegalArgumentException("cruise owner is " + owner);
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
@@ -1071,21 +1071,21 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					": " + ex.getMessage());
 		}
 
-		DashboardDataStore dataStore;
+		DashboardConfigStore configStore;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the dashboard configuration");
 		}
 
 		// If they exist, delete the DSG files and notify ERDDAP
-		DsgNcFileHandler dsgHandler = dataStore.getDsgNcFileHandler();
+		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		if ( dsgHandler.deleteCruise(expocode) )
 			dsgHandler.flagErddap(true, true);
 
 		// If it exists, delete the messages file
-		dataStore.getCheckerMsgHandler().deleteMsgsFile(expocode);
+		configStore.getCheckerMsgHandler().deleteMsgsFile(expocode);
 			
 		// Delete the cruise data file
 		try {
@@ -1112,7 +1112,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		if ( deleteMetadata ) {
 			// Delete the metadata and additional documents associated with this cruise
-			MetadataFileHandler metadataHandler = dataStore.getMetadataFileHandler();
+			MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 			String omeTimestamp = cruise.getOmeTimestamp();
 			if ( ! omeTimestamp.isEmpty() )
 				metadataHandler.removeMetadata(username, expocode, 

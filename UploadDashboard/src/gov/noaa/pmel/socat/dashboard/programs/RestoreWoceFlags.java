@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.actions.CruiseRestorer;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
-import gov.noaa.pmel.socat.dashboard.server.DashboardDataStore;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 
@@ -51,9 +51,9 @@ public class RestoreWoceFlags {
 		String expocode = args[0];
 		String username = args[1];
 
-		DashboardDataStore dataStore = null;
+		DashboardConfigStore configStore = null;
 		try {
-			dataStore = DashboardDataStore.get();
+			configStore = DashboardConfigStore.get();
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
@@ -61,8 +61,8 @@ public class RestoreWoceFlags {
 			System.exit(1);
 		}
 
-		CruiseRestorer restorer = new CruiseRestorer(dataStore);
-		DatabaseRequestHandler dbHandler = dataStore.getDatabaseRequestHandler();
+		CruiseRestorer restorer = new CruiseRestorer(configStore);
+		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 
 		try {
 			boolean changed = false;
@@ -98,7 +98,7 @@ public class RestoreWoceFlags {
 				}
 			}
 		} finally {
-			dataStore.shutdown();
+			configStore.shutdown();
 		}
 
 		System.exit(0);
