@@ -330,21 +330,21 @@ public class EditorService {
 					filestatus = (String) fe.getElements().get(
 							"field_filestatus");
 				}
-				if (emailAddress != "" && emailAddress != null) {
-
-					try {
-						EmailController.sendEmail(filestatus, fileName, sb,
-								emailAddress);
-					} catch (Exception E) {
-						E.printStackTrace();
-					}
-
-				}
+//				if (emailAddress != "" && emailAddress != null) {
+//
+//					try {
+//						EmailController.sendEmail(filestatus, fileName, sb,
+//								emailAddress);
+//					} catch (Exception E) {
+//						E.printStackTrace();
+//					}
+//
+//				}
 
 			} catch (Exception e) {
 			}
 
-			// saving fiel in the database
+			// saving file in the database
 			try {
 				String creator = (String) fe.getElements().get(
 						"field_user_email");

@@ -7,9 +7,9 @@
 <hibernate-configuration>
 
 	 <session-factory>
-                <property name="connection.username"></property>
+                <property name="connection.username">scientist</property>
                 <property name="connection.url">
-                        jdbc:mysql://dunkel.pmel.noaa.gov:3306/SocatOME</property>
+                        jdbc:mysql://flat.pmel.noaa.gov:3306/SocatOME</property>
                 <property name="dialect">
                         org.hibernate.dialect.MySQLDialect
                 </property>
@@ -33,6 +33,9 @@
                 <mapping resource="ornl/database/Author.hbm.xml" />
                 <mapping resource="ornl/database/UserRoles.hbm.xml" />
                 <mapping resource="ornl/database/Users.hbm.xml" />
+               	<mapping resource="ornl/database/Files.hbm.xml" />
+                <mapping resource="ornl/database/Survey.hbm.xml" />
+                <mapping resource="ornl/database/VariableVesselUsers.hbm.xml" />
 
         </session-factory>
 
