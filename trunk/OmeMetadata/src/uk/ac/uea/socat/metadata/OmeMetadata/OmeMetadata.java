@@ -2503,6 +2503,14 @@ public class OmeMetadata {
 	}
 
 	/**
+	 * @return
+	 * 		the expocode for this OME metadata
+	 */
+	public String getExpocode() {
+		return itsExpoCode;
+	}
+
+	/**
 	 * Assigns the expocode for this OME metadata.
 	 * 
 	 * @param expocode
