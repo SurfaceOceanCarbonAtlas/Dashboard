@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.OmeFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.PreviewPlotsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -63,6 +64,7 @@ public class DashboardConfigStore {
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
+	private static final String OME_SERVER_OUTPUT_DIR_NAME_TAG = "OmeServerOutputDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
 	private static final String ERDDAP_DSG_FLAG_FILE_NAME_TAG = "ErddapDsgFlagFile";
@@ -84,6 +86,7 @@ public class DashboardConfigStore {
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
+			OME_SERVER_OUTPUT_DIR_NAME_TAG + "=/Path/To/SocatOME/guest/output/dir \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
@@ -117,6 +120,7 @@ public class DashboardConfigStore {
 	private CruiseFileHandler cruiseFileHandler;
 	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
+	private OmeFileHandler omeFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
 	private DashboardCruiseChecker cruiseChecker;
@@ -296,6 +300,19 @@ public class DashboardConfigStore {
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
+		// Read the OME server guest output directory name
+		try {
+			propVal = configProps.getProperty(OME_SERVER_OUTPUT_DIR_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			omeFileHandler = new OmeFileHandler(propVal, metadataFileHandler, socatUploadVersion);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + OME_SERVER_OUTPUT_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
 		// Read the Ferret configuration filename
 		try {
 			propVal = configProps.getProperty(FERRET_CONFIG_FILE_NAME_TAG);
@@ -437,6 +454,8 @@ public class DashboardConfigStore {
 		itsLogger.info("read configuration file " + configFile.getPath());
 		// Watch for changes to the configuration file
 		watchConfigFile();
+		// Watch for OME server XML output files
+		omeFileHandler.watchForOmeOutput();
 	}
 
 	/**
@@ -456,6 +475,8 @@ public class DashboardConfigStore {
 	 * removes this data store as the singleton instance of this class.
 	 */
 	public void shutdown() {
+		// Stop the watch for the OME server XML output files
+		omeFileHandler.cancelWatch();
 		// Shutdown all the VersionsedFileHandlers
 		userFileHandler.shutdown();
 		cruiseFileHandler.shutdown();
