@@ -779,7 +779,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 											throws IllegalArgumentException {
 		File mdataFile = getMetadataFile(mdata.getExpocode(), mdata.getFilename());
 
-		// Generate the pseudo-OME XML document
+		// Generate the OME XML document
 		Document omeDoc = mdata.createOmeXmlDoc();
 
 		// Save the XML document to the metadata document file
