@@ -26,8 +26,8 @@
 
 			<div class="section">
 				<h4>Success!</h4>
-				Thank you for using OME. Your file has been saved sucessfully.<br>
-				Also email notification has been sent to the Metadata approver. <br />
+				Your file has been saved and will be included with your data.<br>
+				<br />
 				<br />
 
 			</div>

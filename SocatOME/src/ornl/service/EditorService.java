@@ -308,14 +308,17 @@ public class EditorService {
 			fileName = fileName.replaceAll("[^A-Za-z0-9]+", "_");
 
 			// creating xml
-			xmlDoc = xmlWriter.buildDoc(fieldMap, "", 0, portsList, null,
-					xpath_map, multi_map);
+			xmlDoc = xmlWriter.buildDoc(fieldMap, "", 0, portsList, null, xpath_map, multi_map);
 
 			// creating file location
 			// String formtype = (String)
 			// fe.getElements().get("field_form_type");
-			// filepath = (String) hmProps.get("foldername");
-			filepath = loggedin_username;
+			String formStatus = (String) fe.getElements().get("field_filestatus");
+			if (formStatus == "draft")
+				filepath = loggedin_username;
+			else
+				filepath = (String) hmProps.get("datafolder");
+			// filepath = loggedin_username;
 
 			// saving the file
 			xmlWriter.outputDocToXML(xmlDoc, filepath, fileName + ".xml");
@@ -354,9 +357,7 @@ public class EditorService {
 				}
 				SaveFile saveFile = new SaveFile();
 				if (record_id != null && filepath != null)
-					saveFile.addfile(record_id, linkbasepath + filepath,
-							creator,
-							(String) fe.getElements().get("field_filestatus"));
+					saveFile.addfile(record_id, linkbasepath + filepath, creator, (String) fe.getElements().get("field_filestatus"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

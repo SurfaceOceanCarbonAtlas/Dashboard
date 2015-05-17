@@ -18,8 +18,7 @@
 						name="Start_Date" size="9" class="short" onchange="displayExpo()" style="background:#D3D3D3;" onfocus="blur()"/><span class="description">(yyyymmdd)</span>
 					<form:input path="field_start_date_dup" id="field_start_date_dup"
 						type="hidden" /></li>
-				<li class="Section2"><span style="width: 300px">Expocode:</span> <form:input path="field_cruise_id"
-						style="background:#D3D3D3;" id="field_cruise_id"  class="short" type="text" onfocus="blur()" /></li>
+				<li class="Section2"><span style="width: 300px">Expocode:</span> <form:input path="field_cruise_id" id="field_cruise_id"  class="short" type="text" style="background:#D3D3D3;" onfocus="blur()" /></li>
 
 			</ul>
 		</li>
@@ -90,21 +89,16 @@
 			<ul>				
 				<li class="Section1">Bounds:
 					<ul>
-						<li class="Section2">Westernmost Longitude:<br> Enter
-							decimal fractions of degrees: <form:input path="field_west"
-								class="short" name="Westernmost_Longitude" size="9" /><span class="description">(+ = E, - = W)</span> 
+						<li class="Section2">Westernmost Longitude:<br><form:input path="field_west"	class="short" name="Westernmost_Longitude" size="9" style="background:#D3D3D3;" onfocus="blur()"/><span class="description">(+ = E, - = W)</span> 
 						</li>
-						<li class="Section2">Easternmost Longitude:<br> Enter
-							decimal fractions of degrees: <form:input path="field_east"
-								class="short" name="Easternmost_Longitude" size="9" /><span class="description">(+ = E, - = W)</span>
+						<li class="Section2">Easternmost Longitude:<br><form:input path="field_east"
+								class="short" name="Easternmost_Longitude" size="9" style="background:#D3D3D3;" onfocus="blur()"/><span class="description">(+ = E, - = W)</span>
 						</li>
-						<li class="Section2">Northernmost Latitude:<br> Enter
-							decimal fractions of degrees: <form:input path="field_north"
-								class="short" name="Northernmost_Latitude" size="8" /><span class="description">(+ = N, - = S)</span>
+						<li class="Section2">Northernmost Latitude:<br><form:input path="field_north"
+								class="short" name="Northernmost_Latitude" size="8" style="background:#D3D3D3;" onfocus="blur()"/><span class="description">(+ = N, - = S)</span>
 						</li>
-						<li class="Section2">Southernmost Latitude:<br> Enter
-							decimal fractions of degrees: <form:input path="field_south"
-								class="short" name="Southernmost_Latitude" size="8" /><span class="description">(+ = N, - = S)</span>
+						<li class="Section2">Southernmost Latitude:<br><form:input path="field_south"
+								class="short" name="Southernmost_Latitude" size="8" style="background:#D3D3D3;" onfocus="blur()"/><span class="description">(+ = N, - = S)</span>
 						</li>
 					</ul>
 				</li>
