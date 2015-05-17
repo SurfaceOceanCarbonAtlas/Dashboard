@@ -137,9 +137,7 @@ public class EditorController extends BaseController {
 				editor.setFiles(((Editor) (model.get("files"))).getFiles());				
 				editor.setMdFile(((Editor) (model.get("editor"))).getMdFile());
 				editor.setaUser(((Editor) (model.get("editor"))).getUserName());
-				editor.setadminUser(((Editor) (model.get("editor")))
-						.getadminUser());
-
+				editor.setadminUser(((Editor) (model.get("editor"))).getadminUser());
 			}
 
 			model.addAttribute("editor", editor);

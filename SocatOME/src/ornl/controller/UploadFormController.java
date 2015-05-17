@@ -81,19 +81,19 @@ public class UploadFormController extends BaseController implements
 
 		}
 
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-
-				// System.out.println("initForm:loginName : " +name );
-			} else {
-				return "index";
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//
+//				// System.out.println("initForm:loginName : " +name );
+//			} else {
+//				return "index";
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		String users[] = { "admin","guest"};
 		String guest = name ;
 		// System.outout.println(guest);
@@ -148,19 +148,19 @@ public class UploadFormController extends BaseController implements
 		EditorService esd = new EditorService();
 		Metadata_Editor testMe = new Metadata_Editor();
 		UserInfo userInfo = new UserInfo();
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-				editor.setaUser(name);
-				// System.out.println("initForm:loginName : " +name );
-			} else {
-				return ("index");
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//				editor.setaUser(name);
+//				// System.out.println("initForm:loginName : " +name );
+//			} else {
+//				return ("index");
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		try {
 			if (userInfo.isAdmin(name)) {
 				editor.setadminUser("true");
@@ -183,7 +183,7 @@ public class UploadFormController extends BaseController implements
 			testMe = esd.readFGDC(doc_base+editor.getProfile()+fs+editor.getMdFile());
 			testMe.setField_filename(editor.getMdFile());
 			editor.setMed(testMe);		
-			model.addAttribute("fgdcMap", testMe);
+			// model.addAttribute("fgdcMap", testMe);
 			model.addAttribute("editor", editor);
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -226,19 +226,19 @@ public class UploadFormController extends BaseController implements
 
 		}
 		
-		try {
-			if (isLoggedIn()) {
-				user = (User) SecurityContextHolder.getContext()
-						.getAuthentication().getPrincipal();
-				name = user.getUsername();
-				editor.setaUser(name);
-				// System.out.println("initForm:Name : " +name );
-			} else {
-				return new ModelAndView("index");
-			}
-		} catch (Exception exc) {
-
-		}
+//		try {
+//			if (isLoggedIn()) {
+//				user = (User) SecurityContextHolder.getContext()
+//						.getAuthentication().getPrincipal();
+//				name = user.getUsername();
+//				editor.setaUser(name);
+//				// System.out.println("initForm:Name : " +name );
+//			} else {
+//				return new ModelAndView("index");
+//			}
+//		} catch (Exception exc) {
+//
+//		}
 		String users[] = { "guest","admin" };
 		String dir = doc_base+name+fs;
 		editor.setHomePath(dir);
@@ -301,7 +301,7 @@ public class UploadFormController extends BaseController implements
 					testMe = esd.readFGDC(filePath);
 
 					editor.setMed(testMe);
-					model.addAttribute("fgdcMap", testMe);
+					// model.addAttribute("fgdcMap", testMe);
 
 					// model.addAttribute("FORM", form);
 				} catch (Exception exc) {
