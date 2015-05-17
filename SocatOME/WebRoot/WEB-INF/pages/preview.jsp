@@ -23,7 +23,7 @@
 	<table width="985px">
 		<tr>
 			<td align="right"><c:if test="${editor.adminUser =='true'}">
-						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a>
+<%-- 						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
 					</c:if></td>
 		</tr>
 	</table>
