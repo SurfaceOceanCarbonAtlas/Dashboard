@@ -355,8 +355,7 @@ public class EditorController extends BaseController {
 		String datafolder = (String) hmProps.get("datafolder");
 		int datafilesize = Integer.parseInt((String) hmProps.get("datafilesize"));
 		String filetype = (String) hmProps.get("datafiletype");
-		Map<String, MultipartFile> files = ((MultipartHttpServletRequest) request)
-				.getFileMap();
+		Map<String, MultipartFile> files = ((MultipartHttpServletRequest) request).getFileMap();
 		Set<String> keys = files.keySet();
 		Iterator I = keys.iterator();
 		String key = "";
@@ -376,8 +375,7 @@ public class EditorController extends BaseController {
 					med.setLhm(hm);
 					modelMap.addAttribute("editor", editor);
 					modelMap.addAttribute("fgdcMap", med);
-					modelMap.addAttribute("error",
-							"Data file has to be " + filetype);
+					modelMap.addAttribute("error", "Data file has to be " + filetype);
 					return "form";
 				}
 				if (multipartfile.getSize() > datafilesize) {
