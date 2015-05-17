@@ -17,9 +17,7 @@
 			<div class="form-signin">
 				<center>
 					<div>Welcome to the Online Metadata Editor, an easy-to-use
-						tool to help you document your data. Guest users could simply
-						create new Metadata or view a existing metdata just by clicking
-						the button below.</div>
+						tool to help you document your data. </div>
 					<br />
 
 					<div>
@@ -35,9 +33,9 @@
 				</center>
 			</div>
 
-			<div class="request-signin">
-				<a href="<c:url value="/login.htm"/>">Admin Login</a>
-			</div>
+<!-- 			<div class="request-signin"> -->
+<%-- 				<a href="<c:url value="/login.htm"/>">Admin Login</a> --%>
+<!-- 			</div> -->
 
 
 		</div>
