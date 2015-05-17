@@ -85,9 +85,9 @@ color:red;
 }
 
 #header{
-	height: 70px;
+	height: 50px;
 	border-bottom: 1px solid rgb(229, 229, 229);
-	margin-bottom: 20px;
+	margin-bottom: 10px;
 	background-color: #006ca8;
 	background: -moz-linear-gradient(center top, #ACE,
 		#BDF) repeat scroll 0% 0% transparent;

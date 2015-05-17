@@ -20,9 +20,10 @@ function back() {
 				<span class="span2"> <input type="submit" name="expand-all"
 					id="back" value="Back" class="btn " onClick="back()" />
 
-				</span> <span class="offset8 span2 ">
-						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a>
-					</span>
+				</span> 
+<!-- 				<span class="offset8 span2 "> -->
+<%-- 						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
+<!-- 					</span> -->
 		</div>
 		<div class="row">
 		<div class="section">

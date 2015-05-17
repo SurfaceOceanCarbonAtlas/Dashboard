@@ -22,7 +22,7 @@
 	<table width="950">
 		<tr>
 			<td align="right"><a
-				href="<c:url value="j_spring_security_logout" />"> Logout</a>
+<%-- 				href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
 			</td>
 		</tr>
 	</table>
