@@ -33,9 +33,16 @@ class OMECompositeVariable {
 		if (null != element) {
 			value = element.getChildTextTrim(name);
 			if ( null == value ) {
-				// If no entry, try again with the first letter capitalized
-				String capName = name.substring(0, 1).toUpperCase() + name.substring(1);
-				value = element.getChildTextTrim(capName);
+				if ( Character.isLowerCase(name.charAt(0)) ) {
+					// Try again with the first letter capitalized
+					String capName = name.substring(0, 1).toUpperCase() + name.substring(1);
+					value = element.getChildTextTrim(capName);
+				}
+				if ( Character.isUpperCase(name.charAt(0)) ) {
+					// Try again with the first letter lower-cased
+					String lowName = name.substring(0, 1).toLowerCase() + name.substring(1);
+					value = element.getChildTextTrim(lowName);
+				}
 			}
 			if (null != value) {
 				addEntry(name, value);
@@ -45,7 +52,7 @@ class OMECompositeVariable {
 	
 	protected void addEntry(String name, String value) throws BadEntryNameException {
 		
-		if (!itsAllowedEntries.contains(name.toLowerCase())) {
+		if (!itsAllowedEntries.contains(name)) {
 			throw new BadEntryNameException("Cannot add an entry '" + name + "' to composite value '" + itsPath.getElementName() + "'");
 		}
 		
@@ -72,7 +79,7 @@ class OMECompositeVariable {
 		
 		for (OMECompositeVariableEntry entry : entries) {
 			
-			if (!itsAllowedEntries.contains(entry.getName().toLowerCase())) {
+			if (!itsAllowedEntries.contains(entry.getName())) {
 				throw new BadEntryNameException("Cannot add an entry '" + entry.getName() + "' to composite value '" + itsPath.getElementName() + "'");
 			}
 

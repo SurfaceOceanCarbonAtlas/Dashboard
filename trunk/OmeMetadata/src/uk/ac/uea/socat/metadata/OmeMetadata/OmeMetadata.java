@@ -30,20 +30,38 @@ public class OmeMetadata {
 		DATE_PARSER.setTimeZone(TimeZone.getTimeZone("GMT"));
 	}
 
+	// The following three element names are lower-case
 	private static final String ROOT_ELEMENT_NAME = "x_tags";
 	private static final String STATUS_ELEMENT_NAME = "status";
 	private static final String DRAFT_ELEMENT_NAME = "draft";
+
+	// Element names for User as well as the Investigator composite variables
+	private static final String NAME_ELEMENT_NAME = "Name";
+	private static final String ORGANIZATION_ELEMENT_NAME = "Organization";
+	private static final String ADDRESS_ELEMENT_NAME = "Address";
+	private static final String PHONE_ELEMENT_NAME = "Phone";
+	private static final String EMAIL_ELEMENT_NAME = "Email";
+
+	// Element names for the Sensor and Other_Sensor composite variables
+	private static final String LOCATION_ELEMENT_NAME = "Location";
+	private static final String MANUFACTURER_ELEMENT_NAME = "Manufacturer";
+	private static final String MODEL_ELEMENT_NAME = "Model";
+	private static final String ACCURACY_ELEMENT_NAME = "Accuracy";
+	private static final String PRECISION_ELEMENT_NAME = "Precision";
+	private static final String RESOLUTION_ELEMENT_NAME = "Resolution";
+	private static final String CALIBRATION_ELEMENT_NAME = "Calibration";
+	private static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
 
 	/**
 	 * Paths for simple variables
 	 */
 	private static final String USER_ELEMENT_NAME = "User";
 	private static final Path USER_PATH = new Path(null, USER_ELEMENT_NAME);
-	private static final Path USER_NAME_PATH = new Path(USER_PATH, "Name");
-	private static final Path USER_ORGANIZATION_PATH = new Path(USER_PATH, "Organization");
-	private static final Path USER_ADDRESS_PATH = new Path(USER_PATH, "Address");
-	private static final Path USER_PHONE_PATH = new Path(USER_PATH, "Phone");
-	private static final Path USER_EMAIL_PATH = new Path(USER_PATH, "Email");
+	private static final Path USER_NAME_PATH = new Path(USER_PATH, NAME_ELEMENT_NAME);
+	private static final Path USER_ORGANIZATION_PATH = new Path(USER_PATH, ORGANIZATION_ELEMENT_NAME);
+	private static final Path USER_ADDRESS_PATH = new Path(USER_PATH, ADDRESS_ELEMENT_NAME);
+	private static final Path USER_PHONE_PATH = new Path(USER_PATH, PHONE_ELEMENT_NAME);
+	private static final Path USER_EMAIL_PATH = new Path(USER_PATH, EMAIL_ELEMENT_NAME);
 
 	private static final String DATASET_INFO_ELEMENT_NAME = "Dataset_Info";
 	private static final Path DATASET_INFO_PATH = new Path(null, DATASET_INFO_ELEMENT_NAME);
@@ -148,8 +166,8 @@ public class OmeMetadata {
 	private static final Path CO2_SENSORS_PATH = new Path(METHOD_DESCRIPTION_PATH, CO2_SENSORS_ELEMENT_NAME);
 	private static final Path CO2_SENSOR_PATH = new Path(CO2_SENSORS_PATH, "CO2_Sensor");
 	private static final Path CO2_MEASUREMENT_METHOD_PATH = new Path(CO2_SENSOR_PATH, "Measurement_Method");
-	private static final Path CO2_MANUFACTURER_PATH = new Path(CO2_SENSOR_PATH, "Manufacturer");
-	private static final Path CO2_MODEL_PATH = new Path(CO2_SENSOR_PATH, "Model");
+	private static final Path CO2_MANUFACTURER_PATH = new Path(CO2_SENSOR_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final Path CO2_MODEL_PATH = new Path(CO2_SENSOR_PATH, MODEL_ELEMENT_NAME);
 	private static final Path CO2_FREQUENCY_PATH = new Path(CO2_SENSOR_PATH, "Frequency");
 	private static final Path CO2_WATER_RES_PATH = new Path(CO2_SENSOR_PATH, "Resolution_Water");
 	private static final Path CO2_WATER_UNC_PATH = new Path(CO2_SENSOR_PATH, "Uncertainty_Water");
@@ -165,61 +183,62 @@ public class OmeMetadata {
 
 	private static final String SST_ELEMENT_NAME = "Sea_Surface_Temperature";
 	private static final Path SST_PATH = new Path(METHOD_DESCRIPTION_PATH, SST_ELEMENT_NAME);
-	private static final Path SST_LOCATION_PATH = new Path(SST_PATH, "Location");
-	private static final Path SST_MANUFACTURER_PATH = new Path(SST_PATH, "Manufacturer");
-	private static final Path SST_MODEL_PATH = new Path(SST_PATH, "Model");
-	private static final Path SST_ACCURACY_PATH = new Path(SST_PATH, "Accuracy");
-	private static final Path SST_PRECISION_PATH = new Path(SST_PATH, "Precision");
-	private static final Path SST_CALIBRATION_PATH = new Path(SST_PATH, "Calibration");
-	private static final Path SST_COMMENTS_PATH = new Path(SST_PATH, "Other_Comments");
+	private static final Path SST_LOCATION_PATH = new Path(SST_PATH, LOCATION_ELEMENT_NAME);
+	private static final Path SST_MANUFACTURER_PATH = new Path(SST_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final Path SST_MODEL_PATH = new Path(SST_PATH, MODEL_ELEMENT_NAME);
+	private static final Path SST_ACCURACY_PATH = new Path(SST_PATH, ACCURACY_ELEMENT_NAME);
+	private static final Path SST_PRECISION_PATH = new Path(SST_PATH, PRECISION_ELEMENT_NAME);
+	private static final Path SST_CALIBRATION_PATH = new Path(SST_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final Path SST_COMMENTS_PATH = new Path(SST_PATH, COMMENTS_ELEMENT_NAME);
 
 	private static final String EQU_TEMP_ELEMENT_NAME = "Equilibrator_Temperature";
 	private static final Path EQU_TEMP_PATH = new Path(METHOD_DESCRIPTION_PATH, EQU_TEMP_ELEMENT_NAME);
-	private static final Path EQT_LOCATION_PATH = new Path(EQU_TEMP_PATH, "Location");
-	private static final Path EQT_MANUFACTURER_PATH = new Path(EQU_TEMP_PATH, "Manufacturer");
-	private static final Path EQT_MODEL_PATH = new Path(EQU_TEMP_PATH, "Model");
-	private static final Path EQT_ACCURACY_PATH = new Path(EQU_TEMP_PATH, "Accuracy");
-	private static final Path EQT_PRECISION_PATH = new Path(EQU_TEMP_PATH, "Precision");
-	private static final Path EQT_CALIBRATION_PATH = new Path(EQU_TEMP_PATH, "Calibration");
+	private static final Path EQT_LOCATION_PATH = new Path(EQU_TEMP_PATH, LOCATION_ELEMENT_NAME);
+	private static final Path EQT_MANUFACTURER_PATH = new Path(EQU_TEMP_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final Path EQT_MODEL_PATH = new Path(EQU_TEMP_PATH, MODEL_ELEMENT_NAME);
+	private static final Path EQT_ACCURACY_PATH = new Path(EQU_TEMP_PATH, ACCURACY_ELEMENT_NAME);
+	private static final Path EQT_PRECISION_PATH = new Path(EQU_TEMP_PATH, PRECISION_ELEMENT_NAME);
+	private static final Path EQT_CALIBRATION_PATH = new Path(EQU_TEMP_PATH, CALIBRATION_ELEMENT_NAME);
 	private static final Path EQT_WARMING_PATH = new Path(EQU_TEMP_PATH, "Warming");
-	private static final Path EQT_COMMENTS_PATH = new Path(EQU_TEMP_PATH, "Other_Comments");	
+	private static final Path EQT_COMMENTS_PATH = new Path(EQU_TEMP_PATH, COMMENTS_ELEMENT_NAME);	
 
 	private static final String EQU_PRESSURE_ELEMENT_NAME = "Equilibrator_Pressure";
 	private static final Path EQU_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, EQU_PRESSURE_ELEMENT_NAME);
-	private static final Path EQP_LOCATION_PATH = new Path(EQU_PRESSURE_PATH, "Location");
-	private static final Path EQP_MANUFACTURER_PATH = new Path(EQU_PRESSURE_PATH, "Manufacturer");
-	private static final Path EQP_MODEL_PATH = new Path(EQU_PRESSURE_PATH, "Model");
-	private static final Path EQP_ACCURACY_PATH = new Path(EQU_PRESSURE_PATH, "Accuracy");
-	private static final Path EQP_PRECISION_PATH = new Path(EQU_PRESSURE_PATH, "Precision");
-	private static final Path EQP_CALIBRATION_PATH = new Path(EQU_PRESSURE_PATH, "Calibration");
-	private static final Path EQP_COMMENTS_PATH = new Path(EQU_PRESSURE_PATH, "Other_Comments");
+	private static final Path EQP_LOCATION_PATH = new Path(EQU_PRESSURE_PATH, LOCATION_ELEMENT_NAME);
+	private static final Path EQP_MANUFACTURER_PATH = new Path(EQU_PRESSURE_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final Path EQP_MODEL_PATH = new Path(EQU_PRESSURE_PATH, MODEL_ELEMENT_NAME);
+	private static final Path EQP_ACCURACY_PATH = new Path(EQU_PRESSURE_PATH, ACCURACY_ELEMENT_NAME);
+	private static final Path EQP_PRECISION_PATH = new Path(EQU_PRESSURE_PATH, PRECISION_ELEMENT_NAME);
+	private static final Path EQP_CALIBRATION_PATH = new Path(EQU_PRESSURE_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final Path EQP_COMMENTS_PATH = new Path(EQU_PRESSURE_PATH, COMMENTS_ELEMENT_NAME);
 	private static final Path EQP_NORMALIZED_PATH = new Path(EQU_PRESSURE_PATH, "Normalized");
 
 	private static final String ATM_PRESSURE_ELEMENT_NAME = "Atmospheric_Pressure";
 	private static final Path ATM_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, ATM_PRESSURE_ELEMENT_NAME);
-	private static final Path ATM_LOCATION_PATH = new Path(ATM_PRESSURE_PATH, "Location");
-	private static final Path ATM_MANUFACTURER_PATH = new Path(ATM_PRESSURE_PATH, "Manufacturer");
-	private static final Path ATM_MODEL_PATH = new Path(ATM_PRESSURE_PATH, "Model");
-	private static final Path ATM_ACCURACY_PATH = new Path(ATM_PRESSURE_PATH, "Accuracy");
-	private static final Path ATM_PRECISION_PATH = new Path(ATM_PRESSURE_PATH, "Precision");
-	private static final Path ATM_CALIBRATION_PATH = new Path(ATM_PRESSURE_PATH, "Calibration");
-	private static final Path ATM_COMMENTS_PATH = new Path(ATM_PRESSURE_PATH, "Other_Comments");
+	private static final Path ATM_LOCATION_PATH = new Path(ATM_PRESSURE_PATH, LOCATION_ELEMENT_NAME);
+	private static final Path ATM_MANUFACTURER_PATH = new Path(ATM_PRESSURE_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final Path ATM_MODEL_PATH = new Path(ATM_PRESSURE_PATH, MODEL_ELEMENT_NAME);
+	private static final Path ATM_ACCURACY_PATH = new Path(ATM_PRESSURE_PATH, ACCURACY_ELEMENT_NAME);
+	private static final Path ATM_PRECISION_PATH = new Path(ATM_PRESSURE_PATH, PRECISION_ELEMENT_NAME);
+	private static final Path ATM_CALIBRATION_PATH = new Path(ATM_PRESSURE_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final Path ATM_COMMENTS_PATH = new Path(ATM_PRESSURE_PATH, COMMENTS_ELEMENT_NAME);
 
 	private static final String SSS_ELEMENT_NAME = "Sea_Surface_Salinity";
 	private static final Path SSS_PATH = new Path(METHOD_DESCRIPTION_PATH, SSS_ELEMENT_NAME);
-	private static final Path SSS_LOCATION_PATH = new Path(SSS_PATH, "Location");
-	private static final Path SSS_MANUFACTURER_PATH = new Path(SSS_PATH, "Manufacturer");
-	private static final Path SSS_MODEL_PATH = new Path(SSS_PATH, "Model");
-	private static final Path SSS_ACCURACY_PATH = new Path(SSS_PATH, "Accuracy");
-	private static final Path SSS_PRECISION_PATH = new Path(SSS_PATH, "Precision");
-	private static final Path SSS_CALIBRATION_PATH = new Path(SSS_PATH, "Calibration");
-	private static final Path SSS_COMMENTS_PATH = new Path(SSS_PATH, "Other_Comments");
+	private static final Path SSS_LOCATION_PATH = new Path(SSS_PATH, LOCATION_ELEMENT_NAME);
+	private static final Path SSS_MANUFACTURER_PATH = new Path(SSS_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final Path SSS_MODEL_PATH = new Path(SSS_PATH, MODEL_ELEMENT_NAME);
+	private static final Path SSS_ACCURACY_PATH = new Path(SSS_PATH, ACCURACY_ELEMENT_NAME);
+	private static final Path SSS_PRECISION_PATH = new Path(SSS_PATH, PRECISION_ELEMENT_NAME);
+	private static final Path SSS_CALIBRATION_PATH = new Path(SSS_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final Path SSS_COMMENTS_PATH = new Path(SSS_PATH, COMMENTS_ELEMENT_NAME);
 
 	private static final Path DATA_SET_REFS_PATH = new Path(null, "Data_set_References");
 	private static final Path ADD_INFO_PATH = new Path(null, "Additional_Information");
 	private static final Path CITATION_PATH = new Path(null, "Citation");
 	private static final Path MEAS_CALIB_REPORT_PATH = new Path(null, "Measurement_and_Calibration_Report");
 	private static final Path PRELIM_QC_PATH = new Path(null, "Preliminary_Quality_control");
+	// The following two element names are lowercase
 	private static final Path FORM_TYPE_PATH = new Path(null, "form_type");
 	private static final Path RECORD_ID_PATH = new Path(null, "record_id");
 	
@@ -353,22 +372,6 @@ public class OmeMetadata {
 	public static final String MEAS_CALIB_REPORT_STRING = "measurement_and_calibration_report";
 	public static final String PRELIM_QC_STRING = "preliminary_quality_control";
 	
-	public static final String INVESTIGATOR_NAME = "name";
-	public static final String INVESTIGATOR_ORGANIZATION = "organization";
-	public static final String INVESTIGATOR_ADDRESS = "address";
-	public static final String INVESTIGATOR_PHONE = "phone";
-	public static final String INVESTIGATOR_EMAIL = "email";
-	
-	public static final String VARIABLES_NAME = "variable_name";
-	public static final String VARIABLES_DESCRIPTION = "description_of_variable";
-	
-	public static final String OTHER_SENSORS_MANUFACTURER = "manufacturer";
-	public static final String OTHER_SENSORS_MODEL = "model";
-	public static final String OTHER_SENSORS_ACCURACY = "accuracy";
-	public static final String OTHER_SENSORS_RESOLUTION = "resolution";
-	public static final String OTHER_SENSORS_CALIBRATION = "calibration";
-	public static final String OTHER_SENSORS_COMMENTS = "other_comments";
-	
 	/**
 	 * Variables holding info about composite values
 	 */
@@ -376,24 +379,26 @@ public class OmeMetadata {
 	private static final String INVESTIGATOR_ELEMENT_NAME = "Investigator";
 	private static final Path INVESTIGATORS_PATH = new Path(null, INVESTIGATOR_ELEMENT_NAME);
 	private static final ArrayList<String> INVESTIGATOR_ENTRIES = 
-			new ArrayList<String>(Arrays.asList(INVESTIGATOR_NAME, 
-												INVESTIGATOR_ORGANIZATION, 
-												INVESTIGATOR_ADDRESS, 
-												INVESTIGATOR_PHONE, 
-												INVESTIGATOR_EMAIL));
+			new ArrayList<String>(Arrays.asList(NAME_ELEMENT_NAME, 
+												ORGANIZATION_ELEMENT_NAME, 
+												ADDRESS_ELEMENT_NAME, 
+												PHONE_ELEMENT_NAME, 
+												EMAIL_ELEMENT_NAME));
 	private static final ArrayList<String> INVESTIGATOR_ID_LIST = 
-			new ArrayList<String>(Arrays.asList(INVESTIGATOR_NAME, 
-												INVESTIGATOR_EMAIL));
+			new ArrayList<String>(Arrays.asList(NAME_ELEMENT_NAME, 
+												EMAIL_ELEMENT_NAME));
 	
 	private static final String VARIABLE_COMP_NAME = "variable";
 	private static final String VARIABLES_INFO_ELEMENT_NAME = "Variables_Info";
 	private static final String VARIABLE_ELEMENT_NAME = "Variable";
+	private static final String VARIABLES_NAME_ELEMENT_NAME = "Variable_Name";
+	private static final String VARIABLES_DESCRIPTION_ELEMENT_NAME = "Description_of_Variable";
 	private static final Path VARIABLES_INFO_PATH = new Path(null, VARIABLES_INFO_ELEMENT_NAME, VARIABLE_ELEMENT_NAME);
 	private static final ArrayList<String> VARIABLES_INFO_ENTRIES =
-			new ArrayList<String>(Arrays.asList(VARIABLES_NAME, 
-												VARIABLES_DESCRIPTION));
+			new ArrayList<String>(Arrays.asList(VARIABLES_NAME_ELEMENT_NAME, 
+												VARIABLES_DESCRIPTION_ELEMENT_NAME));
 	private static final ArrayList<String> VARIABLES_INFO_ID_LIST =
-			new ArrayList<String>(Arrays.asList(VARIABLES_NAME));
+			new ArrayList<String>(Arrays.asList(VARIABLES_NAME_ELEMENT_NAME));
 	
 	private static final String OTHER_SENSOR_COMP_NAME = "other_sensor";
 	private static final String OTHER_SENSORS_ELEMENT_NAME = "Other_Sensors";
@@ -401,15 +406,15 @@ public class OmeMetadata {
 	private static final Path OTHER_SENSORS_PATH = 
 			new Path(new Path(null, METHOD_DESCRIPTION_ELEMENT_NAME, OTHER_SENSORS_ELEMENT_NAME), SENSOR_ELEMENT_NAME);
 	private static final ArrayList<String> OTHER_SENSORS_ENTRIES = 
-			new ArrayList<String>(Arrays.asList(OTHER_SENSORS_MANUFACTURER,
-												OTHER_SENSORS_MODEL,
-												OTHER_SENSORS_ACCURACY,
-												OTHER_SENSORS_RESOLUTION,
-												OTHER_SENSORS_CALIBRATION,
-												OTHER_SENSORS_COMMENTS));
+			new ArrayList<String>(Arrays.asList(MANUFACTURER_ELEMENT_NAME,
+												MODEL_ELEMENT_NAME,
+												ACCURACY_ELEMENT_NAME,
+												RESOLUTION_ELEMENT_NAME,
+												CALIBRATION_ELEMENT_NAME,
+												COMMENTS_ELEMENT_NAME));
 	private static final ArrayList<String> OTHER_SENSORS_ID_LIST = 
-			new ArrayList<String>(Arrays.asList(OTHER_SENSORS_MANUFACTURER,
-												OTHER_SENSORS_MODEL));
+			new ArrayList<String>(Arrays.asList(MANUFACTURER_ELEMENT_NAME,
+												MODEL_ELEMENT_NAME));
 	
 	/**
 	 * The EXPO Code that this OmeMetadata object is related to.
@@ -699,7 +704,7 @@ public class OmeMetadata {
 	public ArrayList<String> getInvestigators() {
 		ArrayList<String> investigatorsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			investigatorsList.add(invst.getValue(INVESTIGATOR_NAME));
+			investigatorsList.add(invst.getValue(NAME_ELEMENT_NAME));
 		}
 		return investigatorsList;
 	}
@@ -710,7 +715,7 @@ public class OmeMetadata {
 	public ArrayList<String> getOrganizations() {
 		ArrayList<String> organizationsList = new ArrayList<String>(investigators.size());
 		for ( OMECompositeVariable invst : investigators ) {
-			organizationsList.add(invst.getValue(INVESTIGATOR_ORGANIZATION));
+			organizationsList.add(invst.getValue(ORGANIZATION_ELEMENT_NAME));
 		}
 		return organizationsList;
 	}
@@ -1873,11 +1878,11 @@ public class OmeMetadata {
 		investigators = new ArrayList<OMECompositeVariable>();
 		for (Element invElem : rootElem.getChildren(INVESTIGATOR_ELEMENT_NAME)) {
 			OMECompositeVariable invDetails = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST);
-			invDetails.addEntry(INVESTIGATOR_NAME, invElem);
-			invDetails.addEntry(INVESTIGATOR_ORGANIZATION, invElem);
-			invDetails.addEntry(INVESTIGATOR_ADDRESS, invElem);
-			invDetails.addEntry(INVESTIGATOR_PHONE, invElem);
-			invDetails.addEntry(INVESTIGATOR_EMAIL, invElem);
+			invDetails.addEntry(NAME_ELEMENT_NAME, invElem);
+			invDetails.addEntry(ORGANIZATION_ELEMENT_NAME, invElem);
+			invDetails.addEntry(ADDRESS_ELEMENT_NAME, invElem);
+			invDetails.addEntry(PHONE_ELEMENT_NAME, invElem);
+			invDetails.addEntry(EMAIL_ELEMENT_NAME, invElem);
 			
 			investigators.add(invDetails);
 		}
@@ -1971,8 +1976,8 @@ public class OmeMetadata {
 			for (Element variableElem : varsInfoElem.getChildren(VARIABLE_ELEMENT_NAME)) {
 				
 				OMECompositeVariable varDetails = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST);
-				varDetails.addEntry(VARIABLES_NAME, variableElem);
-				varDetails.addEntry(VARIABLES_DESCRIPTION, variableElem);
+				varDetails.addEntry(VARIABLES_NAME_ELEMENT_NAME, variableElem);
+				varDetails.addEntry(VARIABLES_DESCRIPTION_ELEMENT_NAME, variableElem);
 				
 				variablesInfo.add(varDetails);
 			}
@@ -2155,12 +2160,12 @@ public class OmeMetadata {
 		if (null != otherSensorsElem) {
 			for (Element sensorElem : otherSensorsElem.getChildren(SENSOR_ELEMENT_NAME)) {
 				OMECompositeVariable sensorDetails = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ENTRIES, OTHER_SENSORS_ID_LIST);
-				sensorDetails.addEntry(OTHER_SENSORS_MANUFACTURER, sensorElem);
-				sensorDetails.addEntry(OTHER_SENSORS_MODEL, sensorElem);
-				sensorDetails.addEntry(OTHER_SENSORS_ACCURACY, sensorElem);
-				sensorDetails.addEntry(OTHER_SENSORS_RESOLUTION, sensorElem);
-				sensorDetails.addEntry(OTHER_SENSORS_CALIBRATION, sensorElem);
-				sensorDetails.addEntry(OTHER_SENSORS_COMMENTS, sensorElem);
+				sensorDetails.addEntry(MANUFACTURER_ELEMENT_NAME, sensorElem);
+				sensorDetails.addEntry(MODEL_ELEMENT_NAME, sensorElem);
+				sensorDetails.addEntry(ACCURACY_ELEMENT_NAME, sensorElem);
+				sensorDetails.addEntry(RESOLUTION_ELEMENT_NAME, sensorElem);
+				sensorDetails.addEntry(CALIBRATION_ELEMENT_NAME, sensorElem);
+				sensorDetails.addEntry(COMMENTS_ELEMENT_NAME, sensorElem);
 				
 				otherSensors.add(sensorDetails);
 			}
