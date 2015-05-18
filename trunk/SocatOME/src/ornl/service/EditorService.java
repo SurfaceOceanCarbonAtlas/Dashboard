@@ -314,10 +314,11 @@ public class EditorService {
 			// String formtype = (String)
 			// fe.getElements().get("field_form_type");
 			String formStatus = (String) fe.getElements().get("field_filestatus");
-			if (formStatus == "draft")
-				filepath = loggedin_username;
-			else
-				filepath = (String) hmProps.get("datafolder");
+			filepath = loggedin_username;
+//			if (formStatus == "draft")
+//				filepath = loggedin_username;
+//			else
+//				filepath = (String) hmProps.get("datafolder");
 			// filepath = loggedin_username;
 
 			// saving the file
