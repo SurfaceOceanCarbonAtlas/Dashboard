@@ -100,9 +100,9 @@ public class FixOmeMetadata {
 
 					Element rootElem = omeXmlDoc.getRootElement();
 					for ( Element invElem : rootElem.getChildren("Investigator") ) {
-						Element invNameElem = invElem.getChild("name");
+						Element invNameElem = invElem.getChild("Name");
 						if ( invNameElem == null )
-							throw new IllegalArgumentException("Investigator element without a name");
+							throw new IllegalArgumentException("Investigator element without a Name");
 						String name = invNameElem.getTextTrim();
 						String stdName = SocatMetadata.PI_RENAME_MAP.get(name);
 						if ( stdName == null )

@@ -35,7 +35,6 @@ public class OmeFileHandler {
 	private Path omeServerOutputPath;
 	private WatchService watcher;
 	private Thread watcherThread;
-	private WatchKey registration;
 	private Logger itsLogger;
 
 	/**
@@ -65,12 +64,12 @@ public class OmeFileHandler {
 			if ( ! omeServerOutputDir.isDirectory() )
 				throw new IllegalArgumentException("Not a directory: " + omeServerOutputDirname);
 			omeServerOutputPath = omeServerOutputDir.toPath();
-			watcher = FileSystems.getDefault().newWatchService();
-			watcherThread = null;
 			// Verify the OME output directory can be registered with the watch service
-			registration = omeServerOutputPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
-			registration.cancel();
-			registration = null;
+			watcher = FileSystems.getDefault().newWatchService();
+			omeServerOutputPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY).cancel();
+			watcher.close();
+			watcher = null;
+			watcherThread = null;
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Invalid OME server output directory: " + ex.getMessage(), ex);
 		}
@@ -89,14 +88,28 @@ public class OmeFileHandler {
 		watcherThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				// Register the OME output directory with the watch service
+				// Create a new watch service for the OME server output directory
+				try {
+					watcher = FileSystems.getDefault().newWatchService();
+				} catch (Exception ex) {
+					itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
+					return;
+				}
+				// Register the OME server output directory with the watch service
+				WatchKey registration;
 				try {
 					registration = omeServerOutputPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
 				} catch (Exception ex) {
-					throw new RuntimeException("Unexpected error re-registering "
-							+ "the OME server output directory with the watch service", ex);
+					itsLogger.error("Unexpected error registering the OME server output directory for watching", ex);
+					try {
+						watcher.close();
+					} catch (Exception e) {
+						;
+					}
+					watcher = null;
+					return;
 				}
-				while ( registration != null ) {
+				for (;;) {
 					try {
 						WatchKey key = watcher.take();
 						for ( WatchEvent<?> event : key.pollEvents() ) {
@@ -106,13 +119,18 @@ public class OmeFileHandler {
 						if ( ! key.reset() )
 							break;
 					} catch (Exception ex) {
+						// Probably the watcher was closed
 						break;
 					}
 				}
-				if ( registration != null ) {
-					registration.cancel();
-					registration = null;
+				registration.cancel();
+				registration.pollEvents();
+				try {
+					watcher.close();
+				} catch (Exception ex) {
+					;
 				}
+				watcher = null;
 				return;
 			}
 		});
@@ -181,9 +199,11 @@ public class OmeFileHandler {
 	 * If the OME server output directory is not being monitored, this call does nothing. 
 	 */
 	public void cancelWatch() {
-		if ( registration != null ) {
-			registration.cancel();
-			registration = null;
+		try {
+			watcher.close();
+			// Only the thread modifies the value of watcher
+		} catch (Exception ex) {
+			// Might be NullPointerException
 		}
 		if ( watcherThread != null ) {
 			try {
