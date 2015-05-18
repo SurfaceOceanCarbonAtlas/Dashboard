@@ -5,12 +5,10 @@
 
 		<li class="section1">Cruise Information for the Expocode:
 			<ul>
-				<li class="Section2"><span style="width: 300px">NODC
+				<li class="Section2"><span style="width: 300px">
 						Platform (Ship) Code List:
-				</span> <form:input path="field_vessel_id" name="Vessel_ID" size="2"
-						MAXLENGTH="4" class="short" onkeyup="displayExpo()" style="background:#D3D3D3;" onfocus="blur()"/> <span><a class="fancy"
-					href="http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt">4
-						character NODC</a></li></span>
+				</span> <form:input path="field_vessel_id" name="Vessel_ID" size="2" MAXLENGTH="4" class="short" onkeyup="displayExpo()" style="background:#D3D3D3;" onfocus="blur()"/>
+				<br><span><a class="fancy" href="http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt" target="_blank">4 character NODC codes</a></span></li>
 				<li class="Section2"><span style="width: 350px">Start
 						Date (cruise or data set, for Expocode)<span class="form-required"
 						title="This field is required.">*</span>:

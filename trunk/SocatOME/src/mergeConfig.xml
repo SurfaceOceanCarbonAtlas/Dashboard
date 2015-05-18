@@ -341,37 +341,37 @@
 			<map>
 				<entry key="field_ownername" value="//x_tags/ Investigator[1]/ Name" />
 				<entry key="field_organizationame" value="//x_tags/ Investigator[1]/ Organization" />
-				<entry key="field_owneraddress" value="//x_tags/ Investigator[1]/ Address" />
-				<entry key="field_telephonenumber" value="//x_tags/ Investigator[1]/ Phone" />
-				<entry key="field_email" value="//x_tags/ Investigator[1]/ Email" />
+<!-- 				<entry key="field_owneraddress" value="//x_tags/ Investigator[1]/ Address" /> -->
+<!-- 				<entry key="field_telephonenumber" value="//x_tags/ Investigator[1]/ Phone" /> -->
+<!-- 				<entry key="field_email" value="//x_tags/ Investigator[1]/ Email" /> -->
 
 				<!-- Investigator 2 -->
 				<entry key="field_ownername2" value="//x_tags/ Investigator[2]/ Name" />
 				<entry key="field_organizationame2" value="//x_tags/ Investigator[2]/ Organization" />
-				<entry key="field_owneraddress2" value="//x_tags/ Investigator[2]/ Address" />
-				<entry key="field_telephonenumber2" value="//x_tags/ Investigator[2]/ Phone" />
-				<entry key="field_email2" value="//x_tags/ Investigator[2]/ Email" />
+<!-- 				<entry key="field_owneraddress2" value="//x_tags/ Investigator[2]/ Address" /> -->
+<!-- 				<entry key="field_telephonenumber2" value="//x_tags/ Investigator[2]/ Phone" /> -->
+<!-- 				<entry key="field_email2" value="//x_tags/ Investigator[2]/ Email" /> -->
 
 				<!-- Investigator 3 -->
 				<entry key="field_ownername3" value="//x_tags/ Investigator[3]/ Name" />
 				<entry key="field_organizationame3" value="//x_tags/ Investigator[3]/ Organization" />
-				<entry key="field_owneraddress3" value="//x_tags/ Investigator[3]/ Address" />
-				<entry key="field_telephonenumber3" value="//x_tags/ Investigator[3]/ Phone" />
-				<entry key="field_email3" value="//x_tags/ Investigator[3]/ Email" />
+<!-- 				<entry key="field_owneraddress3" value="//x_tags/ Investigator[3]/ Address" /> -->
+<!-- 				<entry key="field_telephonenumber3" value="//x_tags/ Investigator[3]/ Phone" /> -->
+<!-- 				<entry key="field_email3" value="//x_tags/ Investigator[3]/ Email" /> -->
 
 				<!-- Investigator 4 -->
 				<entry key="field_ownername4" value="//x_tags/ Investigator[4]/ Name" />
 				<entry key="field_organizationame4" value="//x_tags/ Investigator[4]/ Organization" />
-				<entry key="field_owneraddress4" value="//x_tags/ Investigator[4]/ Address" />
-				<entry key="field_telephonenumber4" value="//x_tags/ Investigator[4]/ Phone" />
-				<entry key="field_email4" value="//x_tags/ Investigator[4]/ Email" />
+<!-- 				<entry key="field_owneraddress4" value="//x_tags/ Investigator[4]/ Address" /> -->
+<!-- 				<entry key="field_telephonenumber4" value="//x_tags/ Investigator[4]/ Phone" /> -->
+<!-- 				<entry key="field_email4" value="//x_tags/ Investigator[4]/ Email" /> -->
 
 				<!-- Investigator 5 -->
 				<entry key="field_ownername5" value="//x_tags/ Investigator[5]/ Name" />
 				<entry key="field_organizationame5" value="//x_tags/ Investigator[5]/ Organization" />
-				<entry key="field_owneraddress5" value="//x_tags/ Investigator[5]/ Address" />
-				<entry key="field_telephonenumber5" value="//x_tags/ Investigator[5]/ Phone" />
-				<entry key="field_email5" value="//x_tags/ Investigator[5]/ Email" />
+<!-- 				<entry key="field_owneraddress5" value="//x_tags/ Investigator[5]/ Address" /> -->
+<!-- 				<entry key="field_telephonenumber5" value="//x_tags/ Investigator[5]/ Phone" /> -->
+<!-- 				<entry key="field_email5" value="//x_tags/ Investigator[5]/ Email" /> -->
 
 				<entry key="field_variable0"
 					value="//x_tags/ Variables_Info/ Variable[1]/ Variable_Name" />
