@@ -9,8 +9,9 @@
             <entry key="xmlStyle" value="fgdc" />
             <entry key="XMLStyleMap" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/fgdc_template.xml" />
             <entry key="XMLOutPath" value="/usr/local/apache-tomcat-7.0.59/webapps/SocatOME/" />
+<!--             The datafolder tag is not used, but an exception is thown if this is not in the configuration. -->
             <entry key="datafolder" value="output" />
-            <entry key="datafilesize" value="10000" />
+            <entry key="datafilesize" value="100000" />
             <entry key="delimiter" value="\|\|" />
             <entry key="linkbasepath" value="http://localhost/SocatOME/" />
             <entry key="sender" value="metadata_editor@usgs.gov" />
