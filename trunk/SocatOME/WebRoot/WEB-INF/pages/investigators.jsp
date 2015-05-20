@@ -27,7 +27,27 @@
 				<label for="Organization" style="width: 88px">Organization<span
 					class="form-required" title="This field is required.">*</span>:
 				</label>
-				<form:input path="field_organizationame" id="field_organizationame"	name="Organization" type="text" />
+				<form:input path="field_organizationame" id="field_organizationame"
+					name="Organization" type="text" />
+			</div>
+			<div class="Section2">
+
+				<label for="Address" style="width: 88px;">Address:
+				</label>
+				<form:textarea path="field_owneraddress" name="Address" cols="58"
+					rows="4" />
+			</div>
+			<div class="Section2">
+				<label for="Phone" style="width: 88px">Phone:
+				</label>
+				<form:input path="field_telephonenumber" id="field_telephonenumber"
+					name="Phone" type="text" />
+			</div>
+			<div class="Section2">
+				<label for="Email" style="width: 88px">Email:
+				</label>
+				<form:input path="field_email" id="field_email" name="Email"
+					type="text" />
 			</div>
 		</div>
 	</div>
