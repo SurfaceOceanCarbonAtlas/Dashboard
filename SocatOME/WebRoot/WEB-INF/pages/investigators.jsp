@@ -74,6 +74,19 @@
 				<label for="Organization2" style="width: 88px">Organization:</label>
 				<form:input path="field_organizationame2" name="Organization2" />
 			</div>
+						<div class="Section2">
+				Address:<br>
+				<form:textarea path="field_owneraddress2" name="Address2" cols="58"
+					rows="4" />
+			</div>
+			<div class="Section2">
+				<label for="Phone2" style="width: 88px">Phone:</label>
+				<form:input path="field_telephonenumber2" name="Phone2" />
+			</div>
+			<div class="Section2">
+				<label for="Email2" style="width: 88px">Email:</label>
+				<form:input path="field_email2" name="Email2" />
+			</div>
 		</div>
 	</div>
 	<div class="Section1 section" id="Investigator3" style="display: none">
@@ -97,6 +110,19 @@
 			<div class="Section2">
 				<label for="Organization3" style="width: 88px">Organization:</label>
 				<form:input path="field_organizationame3" name="Organization3" />
+			</div>
+			<div class="Section2">
+				Address:<br>
+				<form:textarea path="field_owneraddress3" name="Address3" cols="58"
+					rows="4" />
+			</div>
+			<div class="Section2">
+				<label for="Phone3" style="width: 88px">Phone:</label>
+				<form:input path="field_telephonenumber3" name="Phone3" />
+			</div>
+			<div class="Section2">
+				<label for="Email3" style="width: 88px">Email:</label>
+				<form:input path="field_email3" name="Email3" />
 			</div>
 		</div>
 	</div>
@@ -122,6 +148,19 @@
 				<label style="width: 88px">Organization:</label>
 				<form:input path="field_organizationame4" name="Organization4" />
 			</div>
+			<div class="Section2">
+				Address:<br>
+				<form:textarea path="field_owneraddress4" name="Address4" cols="58"
+					rows="4" />
+			</div>
+			<div class="Section2">
+				<label style="width: 88px">Phone:</label>
+				<form:input path="field_telephonenumber4" name="Phone4" />
+			</div>
+			<div class="Section2">
+				<label style="width: 88px">Email:</label>
+				<form:input path="field_email4" name="Email4" />
+			</div>
 		</div>
 	</div>
 	<div class="Section1 section" id="Investigator5" style="display: none">
@@ -145,6 +184,19 @@
 			<div class="Section2">
 				<label style="width: 88px">Organization:</label>
 				<form:input path="field_organizationame5" name="Organization5" />
+			</div>
+			<div class="Section2">
+				Address:<br>
+				<form:textarea path="field_owneraddress5" name="Address5" cols="58"
+					rows="4" />
+			</div>
+			<div class="Section2">
+				<label style="width: 88px">Phone:</label>
+				<form:input path="field_telephonenumber5" name="Phone5" />
+			</div>
+			<div class="Section2">
+				<label style="width: 88px">Email:</label>
+				<form:input path="field_email5" name="Email5" />
 			</div>
 		</div>
 	</div>
