@@ -52,13 +52,13 @@ jQuery(document)
 							"required" : true
 						});
 						$("#field_owneraddress").rules("add", {
-							"required" : true
+							"required" : false
 						});
 						$("#field_telephonenumber").rules("add", {
-							"required" : true
+							"required" : false
 						});
 						$("#field_email").rules("add", {
-							"required" : true
+							"required" : false
 						});
 						$("#field_vessel_id").rules("add", {
 							"required" : true
