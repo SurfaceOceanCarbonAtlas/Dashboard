@@ -2516,7 +2516,8 @@ public class OmeMetadata {
 	}
 
 	/**
-	 * Assigns the expocode for this OME metadata.
+	 * Assigns the expocode for this OME metadata.  Also assigns values associated 
+	 * with the expocode: cruise ID, dataset ID, vessel ID, cruise start date.
 	 * 
 	 * @param expocode
 	 * 		expocode to assign
@@ -2524,17 +2525,22 @@ public class OmeMetadata {
 	public void setExpocode(String expocode) {
 		itsExpoCode = expocode.toUpperCase();
 		String nodcCode;
+		String startDate;
 		try {
 			if ( Character.isLetter(itsExpoCode.charAt(4)) ) {
 				nodcCode = itsExpoCode.substring(0, 5);
+				startDate = itsExpoCode.substring(5, 13);
 			}
 			else {
 				nodcCode = itsExpoCode.substring(0, 4);
+				startDate = itsExpoCode.substring(4, 12);
 			}
 		} catch ( IndexOutOfBoundsException ex ) {
 			nodcCode = "";
+			startDate = "";
 		}
 		vesselID = new OMEVariable(vesselID.getPath(), nodcCode);
+		cruiseStartDate = new OMEVariable(cruiseStartDate.getPath(), startDate);
 		cruiseID = new OMEVariable(cruiseID.getPath(), itsExpoCode);
 		datasetID = new OMEVariable(datasetID.getPath(), itsExpoCode);
 	}
