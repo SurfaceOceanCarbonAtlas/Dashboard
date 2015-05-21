@@ -15,6 +15,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
@@ -169,8 +170,8 @@ public class DashboardCruiseSubmitter {
 				initQC.setExpocode(expocode);
 				initQC.setSocatVersion(socatVersion);
 				initQC.setFlagDate(new Date());
-				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
-				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+				initQC.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
+				initQC.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
 				// Add the initial QC flag in each region only for new and updated cruises
 				initQC.setFlag(flag);
 				if ( SocatQCEvent.QC_NEW_FLAG.equals(flag) )

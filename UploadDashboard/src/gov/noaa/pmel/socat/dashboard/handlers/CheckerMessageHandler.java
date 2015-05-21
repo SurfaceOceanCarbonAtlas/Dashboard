@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.BufferedReader;
@@ -631,7 +632,7 @@ public class CheckerMessageHandler {
 			info.flag = SocatWoceEvent.WOCE_QUESTIONABLE;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ PI-provided WOCE-3 flag";
+			info.comment = "ZZZZ " + SocatWoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
 			if ( userCommentsIndex >= 0 ) {
 				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
@@ -647,7 +648,7 @@ public class CheckerMessageHandler {
 			info.flag = SocatWoceEvent.WOCE_BAD;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ PI-provided WOCE-4 flag";
+			info.comment = "ZZZZ " + SocatWoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
 			if ( userCommentsIndex >= 0 ) {
 				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
@@ -695,10 +696,10 @@ public class CheckerMessageHandler {
 				woceEvent.setSocatVersion(version);
 				woceEvent.setFlag(info.flag);
 				woceEvent.setFlagDate(now);
-				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
-				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
+				woceEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
+				woceEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
 				// Remove the ZZZZ added to the PI-provided WOCE flag comment
-				if ( info.comment.startsWith("ZZZZ PI-provided WOCE") )
+				if ( info.comment.startsWith("ZZZZ " + SocatWoceEvent.PI_PROVIDED_WOCE_COMMENT_START) )
 					woceEvent.setComment(info.comment.substring(5));
 				else
 					woceEvent.setComment(info.comment);

@@ -594,7 +594,8 @@ public class DatabaseRequestHandler {
 	 * the DatumLocations to the WOCELocations table.
 	 * 
 	 * @param woceEvent
-	 * 		the WOCE event to add
+	 * 		the WOCE event to add; 
+	 * 		the ID for the WOCE event will be assigned on normal return
 	 * @throws SQLException
 	 * 		if accessing or updating the database throws one, or
 	 * 		if the reviewer cannot be found in the reviewers table, or
@@ -635,6 +636,7 @@ public class DatabaseRequestHandler {
 			} finally {
 				results.close();
 			}
+			woceEvent.setId(woceId);
 			// Add the DatumLocations to the WOCELocations table
 			prepStmt = catConn.prepareStatement("INSERT INTO `" + WOCELOCATIONS_TABLE_NAME + 
 					"` (`woce_id`, `region_id`, `row_num`, `longitude`, `latitude`, " +
