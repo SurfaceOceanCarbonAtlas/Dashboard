@@ -1502,6 +1502,18 @@ public class OmeMetadata {
 		case SECTION_STRING:
 			result = section.getValue();
 			break;
+		case WEST_BOUND_STRING:
+			result = westmostLongitude.getValue();
+			break;
+		case EAST_BOUND_STRING:
+			result = eastmostLongitude.getValue();
+			break;
+		case NORTH_BOUND_STRING:
+			result = northmostLatitude.getValue();
+			break;
+		case SOUTH_BOUND_STRING:
+			result = southmostLatitude.getValue();
+			break;
 		case START_DATE_STRING:
 			result = cruiseStartDate.getValue();
 			break;
