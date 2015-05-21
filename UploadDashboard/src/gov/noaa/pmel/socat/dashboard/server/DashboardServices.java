@@ -425,19 +425,30 @@ public class DashboardServices extends RemoteServiceServlet
 	}
 
 	@Override
-	public String getOmeXmlPath(String pageUsername, String activeExpocode, String previousExpocode) {
+	public String getOmeXmlPath(String pageUsername, String activeExpocode, 
+			String previousExpocode) throws IllegalArgumentException {
 		// Get the dashboard data store and current username, and validate that username
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
+		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 
 		if ( ! previousExpocode.isEmpty() ) {
-			// TODO: merge any current OME.xml for activeExpocode with the 
-			// OME.xml for previousExpocode and save it for activeExpocode
+			// Read the OME XML contents for previousExpocode 
+			DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardMetadata.OME_FILENAME);
+			DashboardOmeMetadata updatedOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
+			// Reset the expocode and related fields to that for activeExpocode 
+			updatedOmeMData.changeExpocode(activeExpocode);
+			// Read the OME XML contents currently saved for activeExpocode
+			mdata = metadataHandler.getMetadataInfo(activeExpocode, DashboardMetadata.OME_FILENAME);
+			DashboardOmeMetadata origOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
+			// Create the merged OME and save the results
+			DashboardOmeMetadata mergedOmeMData = origOmeMData.mergeModifiable(updatedOmeMData);
+			metadataHandler.saveAsOmeXmlDoc(mergedOmeMData, "Merged OME of " + previousExpocode + 
+															" into OME of " + activeExpocode);
 		}
 
 		// return the absolute path to the OME.xml for activeExpcode
-		File omeFile = configStore.getMetadataFileHandler()
-								.getMetadataFile(activeExpocode, DashboardMetadata.OME_FILENAME);
+		File omeFile = metadataHandler.getMetadataFile(activeExpocode, DashboardMetadata.OME_FILENAME);
 		return omeFile.getAbsolutePath();
 	}
 

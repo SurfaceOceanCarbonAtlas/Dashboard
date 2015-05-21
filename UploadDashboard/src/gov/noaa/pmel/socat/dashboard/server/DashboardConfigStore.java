@@ -306,7 +306,8 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			omeFileHandler = new OmeFileHandler(propVal, metadataFileHandler, socatUploadVersion);
+			omeFileHandler = new OmeFileHandler(propVal, metadataFileHandler, 
+										cruiseFileHandler, socatUploadVersion);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + OME_SERVER_OUTPUT_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
