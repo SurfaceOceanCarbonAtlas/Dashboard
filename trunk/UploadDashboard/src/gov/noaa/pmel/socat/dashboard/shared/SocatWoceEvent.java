@@ -16,7 +16,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -3576239116657788280L;
+	private static final long serialVersionUID = -5143559362703940885L;
+
+	public static final String PI_PROVIDED_WOCE_COMMENT_START = "PI provided WOCE-";
 
 	// flags for WOCE events of current cruises
 	public static final Character WOCE_GOOD = '2';

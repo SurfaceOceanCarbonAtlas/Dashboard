@@ -12,45 +12,44 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import java.util.Date;
 
 /**
- * Restores non-automated WOCE flags for the current data of a cruise. 
- * This is intended for cruises that are suspended and resubmitted with 
- * the same data but updated metadata.
+ * Regenerates appropriate, non-automated WOCE flags for the current data 
+ * of a cruise.  This is intended for cruises whose resubmitted data is a 
+ * reordering of the previous version, possibly with some minor changes.
  * 
  * @author Karl Smith
  */
-public class RestoreWoceFlags {
+public class RegenerateWoceFlags {
 
 	/**
-	 * Restores WOCE flags for the current data of a cruise, 
-	 * such as when a cruise is suspended and resubmitted with 
-	 * the same data but updated metadata.
+	 * Regenerate WOCE flags for the current data of a cruise, 
+	 * such as after resubmitting a reordering of the previous
+	 * version of the data.
 	 * 
 	 * @param args
-	 * 		Expocode - restore WOCE flags in the cruise with this expocode
+	 * 		Expocode - expocode of the cruise to restore.
 	 * 		Username - dashboard user requesting this update (for the QC comment).
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 2 ) {
 			System.err.println("Arguments:  Expocode  Username ");
 			System.err.println();
-			System.err.println("Restores non-automated WOCE flags for the data currently given ");
-			System.err.println("in the full-data DSG file for the indicated cruise.  If any WOCE ");
-			System.err.println("flags change as a result of this action, a QC comment is added ");
-			System.err.println("that WOCE flags were restored from resubmitted unchanged data.");
-			System.err.println("This application does not generate new WOCE events, it only ");
-			System.err.println("changes the WOCE flag for an existing WOCE event from an ");;
-			System.err.println("\"old\" WOCE flag to the appropriate standard WOCE flag. ");
+			System.err.println("Regenerates appropriate, non-automated WOCE flags for the data ");
+			System.err.println("currently given in the full-data DSG file for the indicated ");
+			System.err.println("cruise.  If any WOCE flags change as a result of this action, ");
+			System.err.println("a QC comment is added that WOCE flags were regenerated from a ");
+			System.err.println("previous version of the data.  This application generates new ");
+			System.err.println("WOCE events with information from old WOCE events for those ");
+			System.err.println("locations that match. ");
 			System.err.println();
 			System.err.println("NB: Use with caution as it only checks the data values recorded ");
 			System.err.println("    in the WOCE event locations against data in the corresponding ");
-			System.err.println("    DSG records.  However, this application does use the row ");
-			System.err.println("    numbers given in the WOCE locations making this comparison, ");
-			System.err.println("    and requires all WOCE locations to still be valid, thus greatly ");
-			System.err.println("    reducing the chance of restoring WOCE flags that no longer ");
-			System.err.println("    apply to the current dataset.");
+			System.err.println("    DSG records.  This application does not use the row numbers ");
+			System.err.println("    given in the WOCE locations, nor does it require a match for ");
+			System.err.println("    all locations, making this comparison more prone to assinging ");
+			System.err.println("    invalid WOCE flags. ");
 			System.err.println();
 			System.err.println("Expocode");
-			System.err.println("    restore WOCE flags in the cruise with this expocode ");
+			System.err.println("    regenerate WOCE flags in the cruise with this expocode ");
 			System.err.println("Username");
 			System.err.println("    dashboard user requesting this update. ");
 			System.err.println();
@@ -75,11 +74,11 @@ public class RestoreWoceFlags {
 			boolean changed = false;
 			String socatVersion = null;
 			try {
-				System.out.println("Restoring any matching old non-automated WOCE flags for " + expocode);
-				changed = restorer.restoreWoceFlags(expocode);
+				System.out.println("Regenerating any matching old non-automated WOCE flags for " + expocode);
+				changed = restorer.regenerateWoceFlags(expocode);
 				socatVersion = restorer.getRestoredSocatVersion();
 			} catch (Exception ex) {
-				System.err.println(expocode + ": problems restoring the WOCE flags - " + ex.getMessage());
+				System.err.println(expocode + ": problems regenerating the WOCE flags - " + ex.getMessage());
 				ex.printStackTrace();
 				System.err.println("========================================");
 				System.exit(1);
@@ -93,9 +92,9 @@ public class RestoreWoceFlags {
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 				qcEvent.setSocatVersion(socatVersion);
 				qcEvent.setUsername(username);
-				qcEvent.setComment("non-automated WOCE flags restored for resubmitted data");
+				qcEvent.setComment("non-automated WOCE flags regenerated for resubmitted data");
 				try {
-					System.out.println("Adding restored-WOCE-flags QC comment for " + expocode);
+					System.out.println("Adding regenerated-WOCE-flags QC comment for " + expocode);
 					dbHandler.addQCEvent(qcEvent);
 				} catch (Exception ex) {
 					System.err.println(expocode + ": problems adding a QC comment - " + ex.getMessage());

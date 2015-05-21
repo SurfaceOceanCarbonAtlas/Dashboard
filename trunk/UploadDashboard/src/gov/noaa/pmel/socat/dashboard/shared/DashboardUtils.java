@@ -72,10 +72,6 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
-	// Sanity Checker "username" and "realname" for flags
-	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
-	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
-
 	/**
 	 * Header names of the standard data columns that a user might provide
 	 */

@@ -16,7 +16,11 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6486161161849835442L;
+	private static final long serialVersionUID = 5502327863986841337L;
+
+	// Sanity Checker "username" and "realname" for flags
+	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
+	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
 
 	Long id;
 	Date flagDate;
