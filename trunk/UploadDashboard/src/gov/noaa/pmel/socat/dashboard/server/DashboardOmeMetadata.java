@@ -296,4 +296,65 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		return omeMData.createOmeXmlDoc();
 	}
 
+	/**
+	 * Creates a new DashboardOmeMetadata from merging, where appropriate, 
+	 * the OME content of this instance with the OME content of other.  
+	 * The expocodes in other must be the same as in this instance.  
+	 * Fields derived from the data are the same as those in this instance.
+	 *  
+	 * @param other
+	 * 		merge with this OME content
+	 * @return
+	 * 		new DasboardOmeMetadata with merged content, where appropriate
+	 * @throws IllegalArgumentException
+	 * 		if the expocodes in this instance and other do not match
+	 */
+	public DashboardOmeMetadata mergeModifiable(DashboardOmeMetadata other) 
+											throws IllegalArgumentException {
+		OmeMetadata mergedOmeMData;
+		try {
+			// Merge the OmeMetadata documents - requires the expocodes be the same
+			mergedOmeMData = OmeMetadata.merge(this.omeMData, other.omeMData);
+
+			// Some fields should not have been merged; reset to the values in this instance
+			// setExpcode sets
+			//   cruise ID = dataset ID = expocode, 
+			//   vessel ID = NODC code from expocode, 
+			//   cruise start date = start date from expocode
+			mergedOmeMData.setExpocode(this.expocode);
+
+			String value = this.omeMData.getValue(OmeMetadata.END_DATE_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.END_DATE_STRING, value, -1);
+
+			value = this.omeMData.getValue(OmeMetadata.TEMP_START_DATE_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.TEMP_START_DATE_STRING, value, -1);
+
+			value = this.omeMData.getValue(OmeMetadata.TEMP_END_DATE_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.TEMP_END_DATE_STRING, value, -1);
+
+			value = this.omeMData.getValue(OmeMetadata.WEST_BOUND_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.WEST_BOUND_STRING, value, -1);
+
+			value = this.omeMData.getValue(OmeMetadata.EAST_BOUND_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.EAST_BOUND_STRING, value, -1);
+
+			value = this.omeMData.getValue(OmeMetadata.SOUTH_BOUND_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.SOUTH_BOUND_STRING, value, -1);
+
+			value = this.omeMData.getValue(OmeMetadata.NORTH_BOUND_STRING);
+			if ( ! OmeMetadata.CONFLICT_STRING.equals(value) )
+				mergedOmeMData.replaceValue(OmeMetadata.NORTH_BOUND_STRING, value, -1);
+
+			mergedOmeMData.setDraft( ! mergedOmeMData.isAcceptable() );
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Unable to merge OME documents: " + ex.getMessage(), ex);
+		}
+		return new DashboardOmeMetadata(mergedOmeMData, this.uploadTimestamp, this.owner, this.version);
+	}
 }

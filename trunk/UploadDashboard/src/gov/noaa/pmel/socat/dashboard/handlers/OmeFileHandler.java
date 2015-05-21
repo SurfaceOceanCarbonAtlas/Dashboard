@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.handlers;
 
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 
 import java.io.File;
 import java.nio.file.FileSystems;
@@ -31,6 +32,7 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 public class OmeFileHandler {
 
 	private MetadataFileHandler metadataHandler;
+	private CruiseFileHandler dataHandler;
 	private String socatVersion;
 	private Path omeServerOutputPath;
 	private WatchService watcher;
@@ -45,6 +47,8 @@ public class OmeFileHandler {
 	 * 		OME server output directory to monitor
 	 * @param mdataHandler
 	 * 		dashboard metadata file handler to use
+	 * @param cruiseDataHandler
+	 * 		daskboard cruise data file handler to use
 	 * @param socatUploadVersion
 	 * 		socat version for the updated OME metadata files 
 	 * @throws IllegalArgumentException
@@ -52,11 +56,14 @@ public class OmeFileHandler {
 	 * 		or cannot be monitored, or if the dashboard metadata file handler is 
 	 * 		null.
 	 */
-	public OmeFileHandler(String omeServerOutputDirname, 
-			MetadataFileHandler mdataHandler, String socatUploadVersion) throws IllegalArgumentException {
+	public OmeFileHandler(String omeServerOutputDirname, MetadataFileHandler mdataHandler, 
+			CruiseFileHandler cruiseDataHandler, String socatUploadVersion) throws IllegalArgumentException {
 		metadataHandler = mdataHandler;
 		if ( metadataHandler == null )
 			throw new IllegalArgumentException("metadata file handler is null");
+		dataHandler = cruiseDataHandler;
+		if ( dataHandler == null )
+			throw new IllegalArgumentException("cruise data file handler is null");
 		socatVersion = socatUploadVersion;
 
 		try {
@@ -114,7 +121,7 @@ public class OmeFileHandler {
 						WatchKey key = watcher.take();
 						for ( WatchEvent<?> event : key.pollEvents() ) {
 							Path relPath = (Path) event.context();
-							handlerOmeServerFile(omeServerOutputPath.resolve(relPath).toFile());
+							handleOmeServerFile(omeServerOutputPath.resolve(relPath).toFile());
 						}
 						if ( ! key.reset() )
 							break;
@@ -139,7 +146,7 @@ public class OmeFileHandler {
 		watcherThread.start();
 	}
 
-	private void handlerOmeServerFile(File omeFile) {
+	private void handleOmeServerFile(File omeFile) {
 		itsLogger.info("Working with OME server XML file " + omeFile.getPath());
 		Document omeDoc;
 		try {
@@ -183,6 +190,7 @@ public class OmeFileHandler {
 							" from the contents of " + omeFile.getPath(), ex);
 			return;
 		}
+
 		itsLogger.info("Successful update of OME XML file for " + expocode + " from " + omeFile.getPath());
 
 		// Remove the OME server file
@@ -192,7 +200,18 @@ public class OmeFileHandler {
 			// Don't worry about this failure other than to log it
 			itsLogger.error("Problems deleting the OME server file " + omeFile.getPath(), ex);
 		}
+
+		// Update the cruise info with this update
+		try {
+			DashboardCruise cruise = dataHandler.getCruiseFromInfoFile(expocode);
+			cruise.setOmeTimestamp(timestamp);
+			dataHandler.saveCruiseInfoToFile(cruise, message);
+		} catch (Exception ex) {
+			itsLogger.error("Problems updating the cruise info for " + expocode + " for updated OME server output");
+		}
+
 	}
+
 
 	/**
 	 * Stops the monitoring the OME server output directory.  
