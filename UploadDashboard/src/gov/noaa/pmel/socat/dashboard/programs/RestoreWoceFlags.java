@@ -56,8 +56,8 @@ public class RestoreWoceFlags {
 			System.err.println();
 			System.exit(1);
 		}
-		String expocode = args[0];
-		String username = args[1];
+		String expocode = args[0].trim();
+		String username = args[1].trim();
 
 		DashboardConfigStore configStore = null;
 		try {

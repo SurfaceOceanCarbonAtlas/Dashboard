@@ -45,7 +45,7 @@ public class RegenerateWoceFlags {
 			System.err.println("    in the WOCE event locations against data in the corresponding ");
 			System.err.println("    DSG records.  This application does not use the row numbers ");
 			System.err.println("    given in the WOCE locations, nor does it require a match for ");
-			System.err.println("    all locations, making this comparison more prone to assinging ");
+			System.err.println("    all locations, making this comparison more prone to assigning ");
 			System.err.println("    invalid WOCE flags. ");
 			System.err.println();
 			System.err.println("Expocode");
@@ -55,8 +55,8 @@ public class RegenerateWoceFlags {
 			System.err.println();
 			System.exit(1);
 		}
-		String expocode = args[0];
-		String username = args[1];
+		String expocode = args[0].trim();
+		String username = args[1].trim();
 
 		DashboardConfigStore configStore = null;
 		try {
