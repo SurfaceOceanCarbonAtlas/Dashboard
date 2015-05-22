@@ -12,17 +12,14 @@
 	<div id="logo">
 		<table style="width: 100%;">
 			<tr>
-				<td>
-					<img src="images/socat_icon.png"></img>
-					</td>
+				<td><img src="images/socat_icon.png"></img></td>
 				<td id='header'><span>Metadata Collection Form</span></td>
 			</tr>
 		</table>
 	</div>
 	<table width="950">
 		<tr>
-			<td align="right"><a
-<%-- 				href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
+			<td align="right"><a<%-- 				href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
 			</td>
 		</tr>
 	</table>
@@ -31,8 +28,7 @@
 			<tr>
 				<td width="40%" style="text-align: right"><input type="submit"
 					name="expand-all" id="back" value="Back" class="form-submit"
-					onClick="javascript:history.back();" />
-				</td>
+					onClick="javascript:history.back();" /></td>
 			</tr>
 		</table>
 		<c:import url="./FGDCPlus.xsl" var="xslt"></c:import>

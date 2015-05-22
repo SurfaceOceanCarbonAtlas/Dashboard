@@ -7,7 +7,7 @@
 	href="bootstrap/css/bootstrap.css"></link>
 <script>function back() {
 	window.location.href = "/SocatOME/editor.htm";
-}</script>	
+}</script>
 </head>
 <body>
 	<div id="wrapper">
@@ -18,18 +18,17 @@
 				<span class="span2"> <input type="submit" name="expand-all"
 					id="back" value="Back" class="btn " onClick="back()" />
 
-				</span> 
-<!-- 				<span class="offset8 span2 "> <a -->
-<%-- 					href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
-<!-- 				</span> -->
+				</span>
+				<!-- 				<span class="offset8 span2 "> <a -->
+				<%-- 					href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
+				<!-- 				</span> -->
 			</div>
 
 
 			<div class="section">
 				<h4>Success!</h4>
 				Your file has been saved and will be included with your data.<br>
-				<br />
-				<br />
+				<br /> <br />
 
 			</div>
 		</div>

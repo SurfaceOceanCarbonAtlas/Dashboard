@@ -10,8 +10,9 @@
 				name="Link_Note" cols="80" rows="3" />
 		</li>
 	</ul>
-	<div><label for="Userfile0"> Attach
-		Files:</label></div>
+	<div>
+		<label for="Userfile0"> Attach Files:</label>
+	</div>
 	<div>
 
 		<form:input path="field_userfile0" id="field_userfile0"

@@ -37,5 +37,5 @@
 		<form:textarea path="field_citation" name="Citation" cols="60"
 			rows="5" />
 	</div>
-	
+
 </div>

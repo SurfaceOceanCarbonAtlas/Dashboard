@@ -26,7 +26,8 @@
 	</div>
 	<div class="Section2">
 		<label style="width: 88px"> Telephone:</label>
-		<form:input path="field_user_telephonenumber" id="field_user_telephonenumber" value="" />
+		<form:input path="field_user_telephonenumber"
+			id="field_user_telephonenumber" value="" />
 	</div>
 	<div class="Section2">
 		<label for="userEmail" style="width: 88px">Email:<span

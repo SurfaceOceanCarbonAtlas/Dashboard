@@ -20,11 +20,10 @@
 													</script></li>
 
 				<li class="Section2"><label for="VarDescr0" style="width: 260">Description
-						of Variable:</label> <form:input
-						path="field_variable_description0" name="VarDescr0" size="66" /></li>
-				<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit0"  size="66" /></li>
+						of Variable:</label> <form:input path="field_variable_description0"
+						name="VarDescr0" size="66" /></li>
+				<li class="Section2"><label style="width: 260">Unit of
+						Variable:</label> <form:input path="field_variable_unit0" size="66" /></li>
 
 			</ul> <!--</div>-->
 			<div id="divVar0" style="display: none">
@@ -45,11 +44,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr1" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description1" name="VarDescr1" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit1"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description1"
+							name="VarDescr1" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit1" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar1" style="display: none">
@@ -70,11 +68,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr2" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description2" name="VarDescr2" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit2"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description2"
+							name="VarDescr2" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit2" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar2" style="display: none">
@@ -97,9 +94,8 @@
 					<li class="Section2"><label for="VarDescr3" style="width: 260">
 							Description of Variable:</label> <form:input
 							path="field_variable_description3" name="VarDescr3" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit3"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit3" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar3" style="display: none">
@@ -120,11 +116,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr4" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description4" name="VarDescr4" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit4"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description4"
+							name="VarDescr4" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit4" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar4" style="display: none">
@@ -145,11 +140,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr5" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description5" name="VarDescr5" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit5"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description5"
+							name="VarDescr5" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit5" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar5" style="display: none">
@@ -170,11 +164,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr6" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description6" name="VarDescr6" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit6"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description6"
+							name="VarDescr6" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit6" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar6" style="display: none">
@@ -195,11 +188,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr7" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description7" name="VarDescr7" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit7"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description7"
+							name="VarDescr7" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit7" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar7" style="display: none">
@@ -220,11 +212,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr8" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description8" name="VarDescr8" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit8"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description8"
+							name="VarDescr8" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit8" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar8" style="display: none">
@@ -245,11 +236,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr9" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description9" name="VarDescr9" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit9"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description9"
+							name="VarDescr9" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit9" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar9" style="display: none">
@@ -272,9 +262,8 @@
 					<li class="Section2"><label for="VarDescr10"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description10" name="VarDescr10" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit10"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit10" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar10" style="display: none">
@@ -297,9 +286,8 @@
 					<li class="Section2"><label for="VarDescr11"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description11" name="VarDescr11" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit11"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit11" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar11" style="display: none">
@@ -322,9 +310,8 @@
 					<li class="Section2"><label for="VarDescr12"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description12" name="VarDescr12" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit12"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit12" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar12" style="display: none">
@@ -345,11 +332,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr1" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description13" name="VarDescr13" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit13"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description13"
+							name="VarDescr13" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit13" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar13" style="display: none">
@@ -372,9 +358,8 @@
 					<li class="Section2"><label for="VarDescr14"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description14" name="VarDescr14" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit14"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit14" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar14" style="display: none">
@@ -397,9 +382,8 @@
 					<li class="Section2"><label for="VarDescr15"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description15" name="VarDescr15" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit15"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit15" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar15" style="display: none">
@@ -422,9 +406,8 @@
 					<li class="Section2"><label for="VarDescr16"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description16" name="VarDescr16" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit16"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit16" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar16" style="display: none">
@@ -447,9 +430,8 @@
 					<li class="Section2"><label for="VarDescr17"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description17" name="VarDescr17" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit17"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit17" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar17" style="display: none">
@@ -472,9 +454,8 @@
 					<li class="Section2"><label for="VarDescr18"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description18" name="VarDescr18" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit18"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit18" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar18" style="display: none">
@@ -497,9 +478,8 @@
 					<li class="Section2"><label for="VarDescr19"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description19" name="VarDescr19" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit19"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit19" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar19" style="display: none">
@@ -522,9 +502,8 @@
 					<li class="Section2"><label for="VarDescr20"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description20" name="VarDescr20" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit20"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit20" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar20" style="display: none">
@@ -547,9 +526,8 @@
 					<li class="Section2"><label for="VarDescr21"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description21" name="VarDescr21" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit21"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit21" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar21" style="display: none">
@@ -572,9 +550,8 @@
 					<li class="Section2"><label for="VarDescr22"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description22" name="VarDescr22" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit22"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit22" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar22" style="display: none">
@@ -595,11 +572,10 @@
 																	});
 														</script></li>
 					<li class="Section2"><label for="VarDescr2" style="width: 260">Description
-							of Variable:</label> <form:input
-							path="field_variable_description23" name="VarDescr23" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit23"  size="66" /></li>
+							of Variable:</label> <form:input path="field_variable_description23"
+							name="VarDescr23" size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit23" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar23" style="display: none">
@@ -622,9 +598,8 @@
 					<li class="Section2"><label for="VarDescr24"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description24" name="VarDescr24" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit24"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit24" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar24" style="display: none">
@@ -647,9 +622,8 @@
 					<li class="Section2"><label for="VarDescr25"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description25" name="VarDescr25" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit25"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit25" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar25" style="display: none">
@@ -672,9 +646,8 @@
 					<li class="Section2"><label for="VarDescr26"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description26" name="VarDescr26" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit26"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit26" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar26" style="display: none">
@@ -697,9 +670,8 @@
 					<li class="Section2"><label for="VarDescr27"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description27" name="VarDescr27" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit27"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit27" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar27" style="display: none">
@@ -722,9 +694,8 @@
 					<li class="Section2"><label for="VarDescr28"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description28" name="VarDescr28" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit28"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit28" size="66" /></li>
 				</ul>
 			</div>
 			<div id="divVar28" style="display: none">
@@ -747,9 +718,8 @@
 					<li class="Section2"><label for="VarDescr29"
 						style="width: 260">Description of Variable:</label> <form:input
 							path="field_variable_description29" name="VarDescr29" size="66" /></li>
-					<li class="Section2"><label  style="width: 260">Unit
-						of Variable:</label> <form:input
-						path="field_variable_unit29"  size="66" /></li>
+					<li class="Section2"><label style="width: 260">Unit of
+							Variable:</label> <form:input path="field_variable_unit29" size="66" /></li>
 				</ul>
 			</div>
 			<div>

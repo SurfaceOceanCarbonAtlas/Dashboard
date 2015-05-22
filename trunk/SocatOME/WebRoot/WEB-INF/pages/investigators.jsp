@@ -6,10 +6,12 @@
 		</h4>
 		<div>
 			<div class="Section2">
-				<label>Name: <span class="form-required" title="This field is required.">*</span>
-				<span class="description">(example: Jones, Dr. Robert W.)</span></label> 
-				
-				<form:input name="field_ownername" id="field_ownername"	path="field_ownername" onkeyup="CheckOrg1();" />
+				<label>Name: <span class="form-required"
+					title="This field is required.">*</span> <span class="description">(example:
+						Jones, Dr. Robert W.)</span></label>
+
+				<form:input name="field_ownername" id="field_ownername"
+					path="field_ownername" onkeyup="CheckOrg1();" />
 				<div id="CodeList" class="auto_complete" onclick="CheckOrg1();"></div>
 				<script>
 											new Autocompleter.DWR(
@@ -21,7 +23,7 @@
 														partialChars : 0
 													});
 										</script>
-				
+
 			</div>
 			<div class="Section2">
 				<label for="Organization" style="width: 88px">Organization<span
@@ -32,20 +34,17 @@
 			</div>
 			<div class="Section2">
 
-				<label for="Address" style="width: 88px;">Address:
-				</label>
+				<label for="Address" style="width: 88px;">Address: </label>
 				<form:textarea path="field_owneraddress" name="Address" cols="58"
 					rows="4" />
 			</div>
 			<div class="Section2">
-				<label for="Phone" style="width: 88px">Phone:
-				</label>
+				<label for="Phone" style="width: 88px">Phone: </label>
 				<form:input path="field_telephonenumber" id="field_telephonenumber"
 					name="Phone" type="text" />
 			</div>
 			<div class="Section2">
-				<label for="Email" style="width: 88px">Email:
-				</label>
+				<label for="Email" style="width: 88px">Email: </label>
 				<form:input path="field_email" id="field_email" name="Email"
 					type="text" />
 			</div>
@@ -74,7 +73,7 @@
 				<label for="Organization2" style="width: 88px">Organization:</label>
 				<form:input path="field_organizationame2" name="Organization2" />
 			</div>
-						<div class="Section2">
+			<div class="Section2">
 				Address:<br>
 				<form:textarea path="field_owneraddress2" name="Address2" cols="58"
 					rows="4" />
