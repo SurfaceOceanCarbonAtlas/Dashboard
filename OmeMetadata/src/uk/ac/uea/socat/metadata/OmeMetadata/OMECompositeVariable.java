@@ -254,11 +254,8 @@ class OMECompositeVariable {
 	
 	public Object clone() {
 		OMECompositeVariable clone = new OMECompositeVariable((Path) itsPath.clone());
-		clone.itsIdFields = new ArrayList<String>();
-		for (String id : itsIdFields) {
-			clone.itsIdFields.add(id);
-		}
-		
+		clone.itsAllowedEntries = new ArrayList<String>(itsAllowedEntries);
+		clone.itsIdFields = new ArrayList<String>(itsIdFields);
 		for (OMECompositeVariableEntry value : itsEntries) {
 			clone.itsEntries.add((OMECompositeVariableEntry) value.clone());
 		}
