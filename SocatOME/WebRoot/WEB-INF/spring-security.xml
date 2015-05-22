@@ -7,7 +7,7 @@
 	<http auto-config="true">
 		<intercept-url pattern="/welcome*" access="ROLE_USER" />
 		<form-login login-page="/login" default-target-url="/editor.htm"
-			authentication-failure-url="/loginfailed.htm" />			
+			authentication-failure-url="/loginfailed.htm" />
 		<remember-me key="TwasBrillig" token-validity-seconds="2419200" />
 		<logout logout-success-url="/logout.htm" />
 	</http>

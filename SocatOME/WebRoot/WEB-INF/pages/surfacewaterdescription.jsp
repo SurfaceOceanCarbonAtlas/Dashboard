@@ -68,7 +68,7 @@
 						Method CO<sub>2</sub>:<span class="form-required"
 						title="This field is required.">*</span>
 				</label> <select type="text" class="select2">
-				<option value="IR">IR</option>
+						<option value="IR">IR</option>
 						<option value="Spectrophotometric">Spectrophotometric</option>
 						<option value="CRDS">CRDS</option>
 						<option value="GC">GC</option>
@@ -145,8 +145,6 @@
 				</select> <form:input class="short" id="field_calibration"
 						style="display:none" placeHolder="Describe Others Here"
 						path="field_calibration" />
-						
-						
 				<li class="Section2"><label>Number of non-zero gas
 						standards:<br>
 				</label> <form:input path="field_no_of_non_zero_gas_stds"

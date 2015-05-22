@@ -15,18 +15,15 @@
 		<div id="logo">
 			<table style="width: 100%;">
 				<tr>
-					<td>
-					<img src="images/socat_icon.png"></img>
-					</td>
-					<td id='header'><span>Metadata Collection Form</span>
-					</td>
+					<td><img src="images/socat_icon.png"></img></td>
+					<td id='header'><span>Metadata Collection Form</span></td>
 				</tr>
 			</table>
 		</div>
 		<table width="980">
 			<tr>
 				<td align="right"><c:if test="${editor.adminUser =='true'}">
-<%-- 						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
+						<%-- 						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
 					</c:if></td>
 			</tr>
 		</table>

@@ -8,6 +8,6 @@
 		</create>
 		<create creator="new" javascript="AutoCompleteService">
 			<param name="class" value="ornl.client.DWRUtil" />
-		</create>		
+		</create>
 	</allow>
 </dwr>

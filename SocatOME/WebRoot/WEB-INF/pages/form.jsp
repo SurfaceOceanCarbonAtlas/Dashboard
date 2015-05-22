@@ -24,7 +24,7 @@
 			<script type="text/javascript" src="js/jquery-1.7.1.js"></script>
 
 			<script type="text/javascript" src="js/jquery.validate.js"></script>
-		<!-- 	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
+			<!-- 	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
 
 			<script type="text/javascript" src="js/jquery.fancybox-1.3.4.js"></script> -->
 
@@ -39,7 +39,7 @@
 			<script type="text/javascript" src="js/script.aculo.us/controls.js"></script>
 			<script type='text/javascript' src="js/autocomplete.js"></script>
 			<script src="js/select2.js"></script>
-			<script type="text/javascript" src="js/main.js"></script> 
+			<script type="text/javascript" src="js/main.js"></script>
 </head>
 <body data-spy="scroll" data-target=".bs-docs-sidebar">
 
@@ -78,10 +78,10 @@
 
 				</span> <span class="offset3 span1"> <span
 					class="label label-important"> * = required </span>
-				</span> 
-<!-- 				<span class="offset3 span1"> <a -->
-<%-- 					href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
-<!-- 				</span> -->
+				</span>
+				<!-- 				<span class="offset3 span1"> <a -->
+				<%-- 					href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
+				<!-- 				</span> -->
 
 			</div>
 			<div class="row-fluid">
@@ -105,7 +105,8 @@
 			<div class="row-fluid">
 				<div class="span2 bs-docs-sidebar">
 					<ul class="nav nav-list bs-docs-sidenav affix-top">
-						<li><a href="#contact"><i class="icon-chevron-right"></i>Metadata Creator</a></li>
+						<li><a href="#contact"><i class="icon-chevron-right"></i>Metadata
+								Creator</a></li>
 
 						<li><a href="#investigators"><i
 								class="icon-chevron-right"></i> Investigators</a></li>
@@ -144,16 +145,16 @@
 					<div class="req-filter1">
 						<input class="btn btn-info cancel" type="submit"
 							value="Save Locally" name="savelocally" /> <input type="submit"
-							class="btn btn-info" name="draft"
-							value="Save as Draft" /> <input name="submit"
-							class="addfilter1 btn btn-success submit" value="Submit" type="submit" />
+							class="btn btn-info" name="draft" value="Save as Draft" /> <input
+							name="submit" class="addfilter1 btn btn-success submit"
+							value="Submit" type="submit" />
 					</div>
 					<div class="req-filter2">
 						<input type="submit" class="btn btn-info cancel"
 							value="Save Locally" name="savelocally" /> <input type="submit"
-							class="btn btn-info" name="draft"
-							value="Save as Draft" /> <input name="submit"
-							class="addfilter2 btn btn-success submit" value="Submit" type="submit" />
+							class="btn btn-info" name="draft" value="Save as Draft" /> <input
+							name="submit" class="addfilter2 btn btn-success submit"
+							value="Submit" type="submit" />
 
 					</div>
 					<c:if test="${editor.adminUser =='true'}">

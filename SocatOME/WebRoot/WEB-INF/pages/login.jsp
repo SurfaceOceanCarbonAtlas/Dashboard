@@ -42,7 +42,7 @@
 					<button class="btn btn-large btn-info" name="submit">Sign
 						in</button>
 				</div>
-			</div>			
+			</div>
 		</div>
 
 

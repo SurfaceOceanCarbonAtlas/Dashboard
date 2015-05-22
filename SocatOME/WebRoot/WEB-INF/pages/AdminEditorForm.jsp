@@ -39,21 +39,21 @@
 						commandName="editor" action="editor.htm">
 						<input class="btn btn-info" name="statistics" type="submit"
 							value="Statistics" />
-					</form:form></span> 
-					<span class="span6"><div class="alert alert-success">You
+					</form:form></span> <span class="span6"><div class="alert alert-success">You
 						are logged in as an Administrator !</div></span>
-<!-- 						 <span class="offset2 span1"> -->
-<%-- 					<a href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
-<!-- 				</span> -->
+				<!-- 						 <span class="offset2 span1"> -->
+				<%-- 					<a href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
+				<!-- 				</span> -->
 
 			</div>
 			<div class="section">
 				<form:form method="POST" commandName="editor" action="editor.htm">
 					<form:hidden path="homePath" />
 					<div class="row">
-						<span class="span11"><form:errors path="*" cssClass="errorblock" element="div" />
+						<span class="span11"><form:errors path="*"
+								cssClass="errorblock" element="div" />
 							<h5 class="alert alert-info">Edit Files on the Server:</h5></span>
-						
+
 					</div>
 					<div class="row">
 						<span class="span3">Select Users :</span> <span class="span4"><form:select

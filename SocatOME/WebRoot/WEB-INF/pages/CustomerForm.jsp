@@ -23,15 +23,11 @@
 	<div id="main-content">
 		<div id="logo">
 			<table style="width: 100%;">
-					<tr>
-						<td>
-						<img src="images/socat_icon.png"></img>
-						</td>
-						<td id='header'>
-							<span>Metadata Collection Form</span>
-						</td>
-					</tr>
-				</table>
+				<tr>
+					<td><img src="images/socat_icon.png"></img></td>
+					<td id='header'><span>Metadata Collection Form</span></td>
+				</tr>
+			</table>
 		</div>
 		<h2>Select Server side file for editing</h2>
 
@@ -43,25 +39,21 @@
 				<table>
 					<tr>
 						<td>UserName :</td>
-						<td><form:input path="userName" />
-						</td>
-						<td><form:errors path="userName" cssClass="error" />
-						</td>
+						<td><form:input path="userName" /></td>
+						<td><form:errors path="userName" cssClass="error" /></td>
 					</tr>
 					<tr>
 					<tr>
 						<td>Metadata Files :</td>
 						<td><form:select path="mdFile" items="${files}"
-								multiple="false" />
-						</td>
+								multiple="false" /></td>
 
 					</tr>
 
 					<form:hidden path="homePath" />
 
 					<tr>
-						<td colspan="3"><input type="submit" value="Edit" />
-						</td>
+						<td colspan="3"><input type="submit" value="Edit" /></td>
 
 					</tr>
 
@@ -74,8 +66,7 @@
 				<table>
 					<tr>
 						<td colspan="3"><input id="newForm" type="submit"
-							value="Create New Form for editing" />
-						</td>
+							value="Create New Form for editing" /></td>
 
 					</tr>
 
@@ -90,8 +81,7 @@
 			<form:form method="POST" action="serverForm.htm">
 				<ul>
 					<li><a href="<c:url value="/FileUploadForm.htm"/>">Select
-							local file for editing on USGS server</a>
-					</li>
+							local file for editing on USGS server</a></li>
 				</ul>
 
 
