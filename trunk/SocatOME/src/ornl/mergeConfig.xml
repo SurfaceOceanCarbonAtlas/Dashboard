@@ -121,8 +121,7 @@
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ Uncertainty_Air" />
 
 
-				<entry key="field_calibration"
-					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Sensor_Calibration" />
+				<entry key="field_calibration" value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Sensor_Calibration" />
 				<entry key="field_no_of_non_zero_gas_stds"
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ No_Of_Non_Zero_Gas_Stds" />
 				<entry key="field_manufacturer_calibration"

@@ -165,7 +165,7 @@
 				<li class="Section2"><label>Outcome of any comparison
 						to independent CO2 analysis or fCO2 calculated from other
 						carbonate parameters:<br>
-				</label> <form:textarea path="field_comparision_co2_analysis"
+				</label> <form:textarea path="field_comparison_co2_analysis"
 						id="field_comparision_co2_analysis" cols="66" rows="5" /></li>
 
 

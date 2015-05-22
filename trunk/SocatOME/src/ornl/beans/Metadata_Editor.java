@@ -871,6 +871,16 @@ public class Metadata_Editor {
 	private String field_no_of_non_zero_gas_stds;
 	private String field_uncertainity;
 	private String field_system_manufacturer;	
+	private String field_comparison_co2_analysis;
+
+	public String getField_comparison_co2_analysis() {
+		return field_comparison_co2_analysis;
+	}
+
+	public void setField_comparison_co2_analysis(
+			String field_comparison_co2_analysis) {
+		this.field_comparison_co2_analysis = field_comparison_co2_analysis;
+	}
 
 	public String getField_no_of_non_zero_gas_stds() {
 		return field_no_of_non_zero_gas_stds;
@@ -1628,8 +1638,7 @@ public class Metadata_Editor {
 		this.field_userfile1 = (String) lhm.get("field_userfile1");
 		this.field_userfile2 = (String) lhm.get("field_userfile2");
 		this.field_userfile3 = (String) lhm.get("field_userfile3");
-		this.field_additional_measurements = (String) lhm
-				.get("field_additional_measurements");
+		this.field_additional_measurements = (String) lhm.get("field_additional_measurements");
 		this.field_sensor_calibration = (String) lhm.get("field_sensor_calibration");
 		this.field_comparision_co2_analysis =(String) lhm.get("field_comparision_co2_analysis");
 		this.field_preliminary_quality_control = (String) lhm.get("field_preliminary_quality_control");
@@ -1638,6 +1647,7 @@ public class Metadata_Editor {
 		this.field_conflicts = (ArrayList<String>) lhm.get("field_conflicts");
 		this.field_system_manufacturer = (String) lhm.get("field_system_manufacturer");
 		this.field_no_of_non_zero_gas_stds = (String) lhm.get("field_no_of_non_zero_gas_stds");
+		this.field_comparison_co2_analysis = (String) lhm.get("field_comparison_co2_analysis");
 		this.field_variable_unit0 = (String) lhm.get("field_variable_unit0");
 		this.field_variable_unit1 = (String) lhm.get("field_variable_unit1");
 		this.field_variable_unit2 = (String) lhm.get("field_variable_unit2");

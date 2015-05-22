@@ -121,10 +121,13 @@
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ Uncertainty_Air" />
 
 
-				<entry key="field_calibration"
-					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Sensor_Calibration" />
+				<entry key="field_calibration" value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Sensor_Calibration" />
+				<entry key="field_no_of_non_zero_gas_stds"
+					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ No_Of_Non_Zero_Gas_Stds" />
 				<entry key="field_manufacturer_calibration"
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ Manufacturer_of_Calibration_Gas" />
+				<entry key="field_comparison_co2_analysis"
+					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Comparison_Analysis" />
 				<entry key="field_environmental_control"
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ Environmental_Control" />
 				<entry key="field_method_references"
@@ -135,7 +138,7 @@
 				<entry key="field_sensor_calibration"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Sensor_Calibration"></entry>
 				<entry key="field_comparision_co2_analysis"
-					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Analysis_of_Co2_Comparision" />
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Analysis_of_Co2_Comparison" />
 				<entry key="field_measured_co2_params"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Measured_Co2_Params" />
 
