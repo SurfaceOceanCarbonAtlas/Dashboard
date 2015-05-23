@@ -18,7 +18,6 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
@@ -85,7 +84,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException("Problem with " + mdataFile.getName() +
 					"\n    " + ex.getMessage(), ex);
 		}
-		// If conflicted or incomplete, set the conflicted flags in SocatMetadata
+		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata
 		setConflicted( ! omeMData.isAcceptable() );
 	}
 
@@ -93,7 +92,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * Creates with the given expocode and timestamp, and from the contents 
 	 * of the given OME XML document.  The owner and version is left empty.
 	 * 
-	 * @param expocode
+	 * @param expo
 	 * 		expocode for this metadata
 	 * @param timestamp
 	 * 		upload timestamp for this metadata
@@ -103,24 +102,24 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 		if expocode is invalid, or
 	 * 		if the contents of the metadata document are not valid
 	 */
-	public DashboardOmeMetadata(String expocode, String timestamp, Document omeDoc) 
+	public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc) 
 											throws IllegalArgumentException {
 		super();
-		this.filename = OME_FILENAME;
-		this.expocode = DashboardServerUtils.checkExpocode(expocode);
+		filename = OME_FILENAME;
+		expocode = DashboardServerUtils.checkExpocode(expo);
 		// Use the setter in case of null
 		setUploadTimestamp(timestamp);
 
 		// Read the document to create the OmeMetadata member of this object
 		try {
-			omeMData = new OmeMetadata(this.expocode);
+			omeMData = new OmeMetadata(expocode);
 			omeMData.assignFromOmeXmlDoc(omeDoc);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problems with the provided XML document:" +
 					"\n    " + ex.getMessage(), ex);
 		}
-		// If conflicted or otherwise draft, set the conflicted flags in SocatMetadata
-		setConflicted(omeMData.isDraft());
+		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata
+		setConflicted( ! omeMData.isAcceptable() );
 	}
 
 	/**
@@ -137,20 +136,14 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 */
 	public DashboardOmeMetadata(OmeMetadata omeMeta, String timestamp, String owner, String version) {
 		super();
-		this.filename = OME_FILENAME;
-		String expo;
-		try {
-			expo = omeMeta.getValue(OmeMetadata.EXPO_CODE_STRING);
-		} catch (OmeMetadataException ex) {
-			throw new RuntimeException(ex);
-		}
-		this.expocode = DashboardServerUtils.checkExpocode(expo);
+		filename = OME_FILENAME;
+		expocode = DashboardServerUtils.checkExpocode(omeMeta.getExpocode());
 		setUploadTimestamp(timestamp);
 		setOwner(owner);
 		setVersion(version);
-		this.omeMData = omeMeta;
-		// If conflicted or otherwise draft, set the conflicted flags in SocatMetadata
-		setConflicted(this.omeMData.isDraft());
+		omeMData = omeMeta;
+		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata
+		setConflicted( ! omeMData.isAcceptable() );
 	}
 
 	/**

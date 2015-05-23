@@ -146,6 +146,14 @@ public class OmeFileHandler {
 		watcherThread.start();
 	}
 
+	/**
+	 * Reads the given OME XML file in the OME server output directory and
+	 * updates the appropriate dashboard OME XML file from its contents.  
+	 * The OME server output file is deleted once the dashboard OME XML is updated. 
+	 * 
+	 * @param omeFile
+	 * 		OME server XML output file to 
+	 */
 	private void handleOmeServerFile(File omeFile) {
 		itsLogger.info("Working with OME server XML file " + omeFile.getPath());
 		Document omeDoc;
