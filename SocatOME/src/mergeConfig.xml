@@ -10,7 +10,7 @@
 			<map>
 				<entry key="field_filestatus" value="//x_tags/ status" />
 				<entry key="field_form_type" value="//x_tags/ form_type" />
-				<entry key="field_record_id" value="//x_tags/ record_id" />
+<!-- 				<entry key="field_record_id" value="//x_tags/ record_id" /> -->
 
 				<!-- User -->
 				<entry key="field_username" value="//x_tags/ User/ Name" />

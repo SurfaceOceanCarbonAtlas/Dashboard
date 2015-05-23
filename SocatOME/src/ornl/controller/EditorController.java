@@ -113,38 +113,39 @@ public class EditorController extends BaseController {
 
 		String[] regusers = {"admin","guest"};
 		Editor editor = new Editor();
-		try {
-			if (isLoggedIn())
-				b = request.isUserInRole("ROLE_ADMIN");
-
-			String adminUser = new Boolean(b).toString();
-
-			editor.setUserName(name);
-			editor.setadminUser(adminUser);
-			// System.out.println("just admin user" +adminUser);
-			// System.out.println("get admin user" +editor.getAdminUser());
-			
-			// editor.setUsers();
-			model.addAttribute("users", regusers);
-			// below to take care of distinguishing action taken in first
-			// versus subsequent visits to this method.
-			// if the editor object already exists, use it.
-			if (null == model.get("editor")) {
-				editor.setMdFile("fgdc_xml_test2.xml");
-				editor.setaUser(name);
-				editor.setadminUser(adminUser);
-			} else {
-				editor.setFiles(((Editor) (model.get("files"))).getFiles());				
-				editor.setMdFile(((Editor) (model.get("editor"))).getMdFile());
-				editor.setaUser(((Editor) (model.get("editor"))).getUserName());
-				editor.setadminUser(((Editor) (model.get("editor"))).getadminUser());
-			}
-
-			model.addAttribute("editor", editor);
-			myModel = model;
-
-		} catch (Exception exc) {
-		}
+		
+//		try {
+//			if (isLoggedIn())
+//				b = request.isUserInRole("ROLE_ADMIN");
+//
+//			String adminUser = new Boolean(b).toString();
+//
+//			editor.setUserName(name);
+//			editor.setadminUser(adminUser);
+//			// System.out.println("just admin user" +adminUser);
+//			// System.out.println("get admin user" +editor.getAdminUser());
+//			
+//			// editor.setUsers();
+//			model.addAttribute("users", regusers);
+//			// below to take care of distinguishing action taken in first
+//			// versus subsequent visits to this method.
+//			// if the editor object already exists, use it.
+//			if (null == model.get("editor")) {
+//				editor.setMdFile("fgdc_xml_test2.xml");
+//				editor.setaUser(name);
+//				editor.setadminUser(adminUser);
+//			} else {
+//				editor.setFiles(((Editor) (model.get("files"))).getFiles());				
+//				editor.setMdFile(((Editor) (model.get("editor"))).getMdFile());
+//				editor.setaUser(((Editor) (model.get("editor"))).getUserName());
+//				editor.setadminUser(((Editor) (model.get("editor"))).getadminUser());
+//			}
+//
+//			model.addAttribute("editor", editor);
+//			myModel = model;
+//
+//		} catch (Exception exc) {
+//		}
 
 		if ((null != fileURI) && (fileURI.trim().length() > 0)) {
 
