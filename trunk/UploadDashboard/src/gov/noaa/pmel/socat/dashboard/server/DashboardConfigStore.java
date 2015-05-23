@@ -457,6 +457,8 @@ public class DashboardConfigStore {
 		watchConfigFile();
 		// Watch for OME server XML output files
 		omeFileHandler.watchForOmeOutput();
+		// Watch for changes in the full-data DSG files
+		dsgNcFileHandler.watchForDsgFileUpdates();
 	}
 
 	/**
@@ -476,6 +478,8 @@ public class DashboardConfigStore {
 	 * removes this data store as the singleton instance of this class.
 	 */
 	public void shutdown() {
+		// Stop the watch for changes in the full-data DSG files
+		dsgNcFileHandler.cancelWatch();
 		// Stop the watch for the OME server XML output files
 		omeFileHandler.cancelWatch();
 		// Shutdown all the VersionsedFileHandlers
@@ -497,8 +501,8 @@ public class DashboardConfigStore {
 	 * the configuration file will be reread and this monitor will be restarted.
 	 */
 	private void watchConfigFile() {
-		// Just create a time to monitor the last modified timestamp 
-		// of the config file every few minutes
+		// Just create a timer to monitor the last modified timestamp 
+		// of the config file every MINUTES_CHECK_INTERVAL minutes
 		configWatcher = new Timer();
 		configWatcher.schedule(new TimerTask() {
 			@Override
@@ -509,8 +513,8 @@ public class DashboardConfigStore {
 					cancel(); 
 				}
 				else if ( configStore.configFile.lastModified() != 
-							configStore.configFileTimestamp ) {
-					// Shutdown all the handlers, cancel this timer, and remove the datastore
+						  configStore.configFileTimestamp ) {
+					// Shutdown all the handlers, cancel this timer, and remove the configstore
 					configStore.shutdown();
 				}
 			}

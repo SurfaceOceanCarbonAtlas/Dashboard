@@ -21,8 +21,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
 
 import ucar.ma2.InvalidRangeException;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
@@ -39,6 +47,9 @@ public class DsgNcFileHandler {
 	private File erddapDsgFlagFile;
 	private File erddapDecDsgFlagFile;
 	private FerretConfig ferretConfig;
+	private WatchService watcher;
+	private Thread watcherThread;
+	private Logger itsLogger;
 
 	/**
 	 * Handles storage and retrieval of full and decimated NetCDF DSG files 
@@ -80,6 +91,21 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException("parent directory of " + 
 					erddapDecDsgFlagFile.getPath() + " is not valid");
 		ferretConfig = ferretConf;
+
+		try {
+			Path dsgFilesDirPath = dsgFilesDir.toPath();
+			// Verify the OME output directory can be registered with the watch service
+			watcher = FileSystems.getDefault().newWatchService();
+			dsgFilesDirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY).cancel();
+			watcher.close();
+			watcher = null;
+			watcherThread = null;
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Problems creating a watcher for the DSG files directory: " + 
+					ex.getMessage(), ex);
+		}
+
+		itsLogger = Logger.getLogger("DsgNcFileHandler");
 	}
 
 	/**
@@ -669,6 +695,99 @@ public class DsgNcFileHandler {
 			dsgFile.updateWoceFlags(woceEvent, false);
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
+		}
+	}
+
+	/**
+	 * Starts a new Thread monitoring the full-data DSG directory.
+	 * If a Thread is currently monitoring the directory, this call does nothing.
+	 */
+	public void watchForDsgFileUpdates() {
+		// Make sure the watcher is not already running
+		if ( watcherThread != null )
+			return;
+		watcherThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Path dsgFilesDirPath = dsgFilesDir.toPath();
+				// Create a new watch service for the OME server output directory
+				try {
+					watcher = FileSystems.getDefault().newWatchService();
+				} catch (Exception ex) {
+					itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
+					return;
+				}
+				// Register the OME server output directory with the watch service
+				WatchKey registration;
+				try {
+					registration = dsgFilesDirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+				} catch (Exception ex) {
+					itsLogger.error("Unexpected error registering the full-data DSG files directory for watching", ex);
+					try {
+						watcher.close();
+					} catch (Exception e) {
+						;
+					}
+					watcher = null;
+					return;
+				}
+				for (;;) {
+					try {
+						WatchKey key = watcher.take();
+						for ( WatchEvent<?> event : key.pollEvents() ) {
+							Path relPath = (Path) event.context();
+							handleDsgFileChange(dsgFilesDirPath.resolve(relPath).toFile());
+						}
+						if ( ! key.reset() )
+							break;
+					} catch (Exception ex) {
+						// Probably the watcher was closed
+						break;
+					}
+				}
+				registration.cancel();
+				registration.pollEvents();
+				try {
+					watcher.close();
+				} catch (Exception ex) {
+					;
+				}
+				watcher = null;
+				return;
+			}
+		});
+		itsLogger.info("Starting new thread monitoring the full-data DSG directory: " + dsgFilesDir.getPath()); 
+		watcherThread.start();
+	}
+
+	private void handleDsgFileChange(File dsgFile) {
+		if ( dsgFile.isDirectory() ) {
+			itsLogger.info("Working with updated full-data DSG subdirectory " + dsgFile.getPath());
+		}
+		else {
+			itsLogger.info("Working with updated full-data DSG file " + dsgFile.getPath());
+		}
+	}
+
+	/**
+	 * Stops the monitoring the full-data DSG directory.  
+	 * If the full-data DSG directory is not being monitored, this call does nothing. 
+	 */
+	public void cancelWatch() {
+		try {
+			watcher.close();
+			// Only the thread modifies the value of watcher
+		} catch (Exception ex) {
+			// Might be NullPointerException
+		}
+		if ( watcherThread != null ) {
+			try {
+				watcherThread.join();
+			} catch (Exception ex) {
+				;
+			}
+			watcherThread = null;
+			itsLogger.info("End of thread monitoring the the full-data DSG directory: " + dsgFilesDir.getPath());
 		}
 	}
 
