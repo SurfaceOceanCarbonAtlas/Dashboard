@@ -59,7 +59,7 @@ import ornl.validator.EditorValidator;
 public class EditorController extends BaseController {
 
 	User user;
-	String name;
+	String name = "guest";
 	ModelMap myModel = new ModelMap();
 
 	EditorValidator customerValidator;

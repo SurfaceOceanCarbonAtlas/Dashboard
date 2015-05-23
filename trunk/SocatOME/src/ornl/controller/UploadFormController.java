@@ -51,7 +51,7 @@ import ornl.validator.EditorValidator;
 public class UploadFormController extends BaseController implements
 		HandlerExceptionResolver {
 	User user;
-	String name;
+	String name = "guest";
 	ArrayList<String> al1 = new ArrayList<String>();
 	EditorValidator customerValidator;
 
@@ -183,7 +183,7 @@ public class UploadFormController extends BaseController implements
 			testMe = esd.readFGDC(doc_base+editor.getProfile()+fs+editor.getMdFile());
 			testMe.setField_filename(editor.getMdFile());
 			editor.setMed(testMe);		
-			// model.addAttribute("fgdcMap", testMe);
+			model.addAttribute("fgdcMap", testMe);
 			model.addAttribute("editor", editor);
 		} catch (Exception exc) {
 			exc.printStackTrace();
@@ -301,7 +301,7 @@ public class UploadFormController extends BaseController implements
 					testMe = esd.readFGDC(filePath);
 
 					editor.setMed(testMe);
-					// model.addAttribute("fgdcMap", testMe);
+					model.addAttribute("fgdcMap", testMe);
 
 					// model.addAttribute("FORM", form);
 				} catch (Exception exc) {

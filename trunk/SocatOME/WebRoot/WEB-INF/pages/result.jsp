@@ -5,9 +5,12 @@
 <link rel="stylesheet" type="text/css" href="css/customer_form.css"></link>
 <link rel="stylesheet" type="text/css"
 	href="bootstrap/css/bootstrap.css"></link>
-<script>function back() {
-	window.location.href = "/SocatOME/editor.htm";
-}</script>
+<script>
+function closeWindow()
+{
+	window.close();
+}
+</script>
 </head>
 <body>
 	<div id="wrapper">
@@ -15,8 +18,7 @@
 		<div class="container">
 			<div class="row">
 
-				<span class="span2"> <input type="submit" name="expand-all"
-					id="back" value="Back" class="btn " onClick="back()" />
+<!-- 				<span class="span2"> <input type="submit" value="Close Window" class="btn" onclick="closeWindow()" /> -->
 
 				</span>
 				<!-- 				<span class="offset8 span2 "> <a -->
@@ -28,6 +30,7 @@
 			<div class="section">
 				<h4>Success!</h4>
 				Your file has been saved and will be included with your data.<br>
+				You can close this window.
 				<br /> <br />
 
 			</div>
