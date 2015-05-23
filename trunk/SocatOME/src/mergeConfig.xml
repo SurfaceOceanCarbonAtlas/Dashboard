@@ -136,7 +136,7 @@
 				<entry key="field_detail_sensing"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Details_Co2_Sensing" />
 				<entry key="field_sensor_calibration"
-					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Sensor_Calibration"></entry>
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Sensor_Calibration"/>
 				<entry key="field_comparision_co2_analysis"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Analysis_of_Co2_Comparison" />
 				<entry key="field_measured_co2_params"
