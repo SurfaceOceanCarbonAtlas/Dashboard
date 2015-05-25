@@ -4,8 +4,8 @@
 		<li class="Section1"><label style="width: 350">System
 				Manufacturer Description:<span class="form-required"
 				title="This field is required.">*</span>
-		</label> <form:input path="field_system_manufacturer"
-				id="field_system_manufacturer" /></li>
+		</label> <form:input path="field_system_manufacturer_desc"
+				id="field_system_manufacturer_desc" /></li>
 		<li class="Section1">Sampling and Equilibrator Design:
 			<ul>
 

@@ -66,10 +66,13 @@ public class EditorService {
 			"applicationContext.xml");
 
 	// find logged in user
-	User user = (User) SecurityContextHolder.getContext().getAuthentication()
-			.getPrincipal();
+	/*
+	 * Removed as this caused a Cast error exception if user used Windows. 
+	 */
+	//User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-	String loggedin_username = user.getUsername();
+	// String loggedin_username = user.getUsername();
+	String loggedin_username = "guest";
 
 	Configuration cv = (Configuration) factory.getBean("propertiesBean");
 
@@ -102,8 +105,6 @@ public class EditorService {
 		multiMapBean = (MultiMapBean) ctx.getBean("multiTags");
 		xpath_map = xmlBean.getFgdc();
 		multi_map = multiMapBean.getMultiBean();
-
-		// sb.append("New file saved: ");
 	}
 
 	public void buildXML(FormElements fe) {

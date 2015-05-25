@@ -73,6 +73,8 @@
 				<entry key="field_vessel_owner" value="//x_tags/ Cruise_Info/ Vessel/ Vessel_Owner" />
 
 				<!--Surface Water CO2 Method Description -->
+				<entry key="field_system_manufacturer_desc"
+					value="//x_tags/ Method_Description/ Equilibrator_Design/ System_Manufacturer_Description" />
 				<entry key="field_depth_seawater_intake"
 					value="//x_tags/ Method_Description/ Equilibrator_Design/ Depth_of_Sea_Water_Intake" />
 				<entry key="field_location_seawater_intake"

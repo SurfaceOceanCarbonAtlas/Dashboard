@@ -319,6 +319,7 @@
 	</CO2_Data_Info>
 	<Method_Description>
 		<Equilibrator_Design>
+		    <System_Manufacturer_Description></System_Manufacturer_Description>
 			<Depth_of_Sea_Water_Intake></Depth_of_Sea_Water_Intake>
 			<Location_of_Sea_Water_Intake></Location_of_Sea_Water_Intake>
 			<Equilibrator_Type></Equilibrator_Type>
