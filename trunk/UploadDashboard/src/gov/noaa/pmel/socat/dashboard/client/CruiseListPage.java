@@ -239,9 +239,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiField Button addlDocsButton;
 	@UiField Button reviewButton;
 	@UiField Button qcSubmitButton;
-	@UiField Button deleteButton;
+	@UiField Label firstSeparator;
 	@UiField Button showDatasetButton;
 	@UiField Button hideDatasetButton;
+	@UiField Label secondSeparator;
+	@UiField Button deleteButton;
 	@UiField DataGrid<DashboardCruise> datasetsGrid;
 
 	private ListDataProvider<DashboardCruise> listProvider;
@@ -393,13 +395,19 @@ public class CruiseListPage extends CompositeWithUsername {
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
 		if ( cruises.isManager() ) {
 			if ( ! managerButtonsShown ) {
-				// Add manager-specific buttons - currently no manager-specific buttons
+				// Add manager-specific buttons
+				firstSeparator.setVisible(true);
+				showDatasetButton.setVisible(true);
+				hideDatasetButton.setVisible(true);
 				managerButtonsShown = true;
 			}
 		}
 		else {
 			if ( managerButtonsShown ) {
-				// Remove manager-specific buttons - currently no manager-specific buttons
+				// Remove manager-specific buttons
+				firstSeparator.setVisible(false);
+				showDatasetButton.setVisible(false);
+				hideDatasetButton.setVisible(false);
 				managerButtonsShown = false;
 			}
 		}
