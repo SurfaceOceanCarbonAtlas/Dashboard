@@ -6,8 +6,9 @@
 <link rel="stylesheet" type="text/css"
 	href="bootstrap/css/bootstrap.css"></link>
 <script>
-function back() {
-	window.location.href = "/SocatOME/editor.htm";
+function closeWindow()
+{
+	window.close();
 }
 </script>
 </head>
@@ -16,22 +17,21 @@ function back() {
 		<%@include file="header.jsp"%>
 		<div class="container">
 			<div class="row">
-
-				<span class="span2"> <input type="submit" name="expand-all"
-					id="back" value="Back" class="btn " onClick="back()" />
-
-				</span>
-				<!-- 				<span class="offset8 span2 "> -->
-				<%-- 						<a href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
-				<!-- 					</span> -->
+ 				<span class="span2"> 
+ 					<input type="submit" value="Close Window" class="btn" onclick="closeWindow()" />
+ 				</span>
 			</div>
-			<div class="row">
-				<div class="section">
-					<h4>XML File Saved as Draft!</h4>
-					File has ONLY been saved as Draft: <a href="${filename.filepath}"
-						target="blank">${filename.filename}</a><br> <br />
-				</div>
+
+			<div class="section">
+				<h4>Saved</h4>
+				Your file has been saved but not validated. <br />  
+				It will be included with your data. <br />
+				You can close this window. <br />
+				<br />
 			</div>
 		</div>
 	</div>
+
+
 </body>
+</html>
