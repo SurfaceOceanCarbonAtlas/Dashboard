@@ -17,22 +17,17 @@ function closeWindow()
 		<%@include file="header.jsp"%>
 		<div class="container">
 			<div class="row">
-
-<!-- 				<span class="span2"> <input type="submit" value="Close Window" class="btn" onclick="closeWindow()" /> -->
-
-				</span>
-				<!-- 				<span class="offset8 span2 "> <a -->
-				<%-- 					href="<c:url value="j_spring_security_logout"/>"> Logout</a> --%>
-				<!-- 				</span> -->
+ 				<span class="span2"> 
+ 					<input type="submit" value="Close Window" class="btn" onclick="closeWindow()" />
+ 				</span>
 			</div>
 
-
 			<div class="section">
-				<h4>Success!</h4>
-				Your file has been saved and will be included with your data.<br>
-				You can close this window.
-				<br /> <br />
-
+				<h4>Success</h4>
+				Your file has been validated and saved. <br />  
+				It will be included with your data. <br />
+				You can close this window. <br />
+				<br />
 			</div>
 		</div>
 	</div>

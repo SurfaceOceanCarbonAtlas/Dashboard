@@ -151,11 +151,11 @@
 					</div>
 					<div class="req-filter2">
 						<input type="submit" class="btn btn-info cancel"
-							value="Save Locally" name="savelocally" /> <input type="submit"
-							class="btn btn-info" name="draft" value="Save as Draft" /> <input
-							name="submit" class="addfilter2 btn btn-success submit"
-							value="Submit" type="submit" />
-
+							value="Save Locally" name="savelocally" /> 
+						<input type="submit" class="btn btn-info" 
+							value="Submit without Validation" name="draft" /> 
+						<input type="submit" class="addfilter2 btn btn-success submit"
+							value="Submit with Validation" name="submit" />
 					</div>
 					<c:if test="${editor.adminUser =='true'}">
 						<input type="submit" class="btn btn-warning" name="approve"
