@@ -73,15 +73,19 @@
 				</div>
 			</c:if>
 			<div class="row-fluid">
-				<span class="offset2 span2"> <input type="button" id="back"
-					value="Back" class="btn" onclick="returnback()" />
-
-				</span> <span class="offset3 span1"> <span
-					class="label label-important"> * = required </span>
+				<!-- 
+				<span class="offset2 span2"> 
+					<input type="button" id="back" value="Back" class="btn" onclick="returnback()" />
+				</span> 
+				 -->
+				<span class="offset3 span1"> 
+					<span class="label label-important"> * = required </span>
 				</span>
-				<!-- 				<span class="offset3 span1"> <a -->
-				<%-- 					href="<c:url value="j_spring_security_logout" />"> Logout</a> --%>
-				<!-- 				</span> -->
+				<!--
+				<span class="offset3 span1"> 
+					<a href="<c:url value="j_spring_security_logout" />"> Logout</a>
+				</span> 
+				-->
 
 			</div>
 			<div class="row-fluid">
