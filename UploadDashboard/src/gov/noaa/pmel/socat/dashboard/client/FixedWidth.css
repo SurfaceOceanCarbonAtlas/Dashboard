@@ -51,6 +51,8 @@ body {
 .infobutton {
 	margin-top: 0.5em;
 	margin-bottom: 1em;
+	margin-left: 1em;
+	margin-right: 1em;
 }
 
 .labeledtextpanel {
