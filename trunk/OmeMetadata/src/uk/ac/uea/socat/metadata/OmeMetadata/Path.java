@@ -1,5 +1,8 @@
 package uk.ac.uea.socat.metadata.OmeMetadata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jdom2.Element;
 
 class Path {
@@ -44,6 +47,29 @@ class Path {
 		}
 		
 		return result;
+	}
+	
+	protected List<String> getPathTree() {
+		List<String> pathTree = new ArrayList<String>();
+		pathTree.add(itsElementName);
+		
+		if (hasParent()) {
+			itsParent.addParentToPathTree(pathTree);
+		}
+		
+		return pathTree;
+	}
+	
+	protected void addParentToPathTree(List<String> pathTree) {
+		pathTree.add(0, itsElementName);
+		
+		if (hasParent()) {
+			itsParent.addParentToPathTree(pathTree);
+		}
+	}
+	
+	private boolean hasParent() {
+		return !(null == itsParent);
 	}
 	
 	public Object clone() {
