@@ -27,15 +27,24 @@ class OMEVariable {
 	 * 
 	 * @param parentPath The path to the parent of this variable
 	 * @param parentElement The XML element containing the variable value
-	 * @param name The name of the variable.
+	 * @param fullDocument The complete XML document - used to extract conflict information
 	 */
-	protected OMEVariable(Path path, Element parentElement) {
+	protected OMEVariable(Path path, Element parentElement, Element conflictsElement) {
 		itsPath = path;
 		itsValues = new ArrayList<String>();
 		if (null != parentElement) {
 			String value = parentElement.getChildTextTrim(path.getElementName());
 			if (null != value) {
-				itsValues.add(value);
+				if (value.equals(OmeMetadata.CONFLICT_STRING)) {
+					
+					Element variableConflictElement = getVariableConflictElement(path, conflictsElement);
+					for (Element valueElement : variableConflictElement.getChildren(OmeMetadata.CONFLICT_VALUE_ELEMENT_NAME)) {
+						addValue(valueElement.getText());
+					}
+					
+				} else {
+					addValue(value);
+				}
 			}
 		}
 	}
@@ -157,6 +166,40 @@ class OMEVariable {
 			conflictParent.addContent(generateConflictElement());
 		}
 	}
+	
+	private Element getVariableConflictElement(Path path, Element conflictsElement) {
+		
+		List<String> variablePath = path.getPathTree();
+		List<Element> testElements = conflictsElement.getChildren(OmeMetadata.CONFLICT_ELEMENT_NAME);
+		
+		boolean foundConflict = false;
+		Element conflictElement = null;
+		
+		for (int i = 0; !foundConflict && i < testElements.size(); i++) {
+			Element testElement = testElements.get(i);
+			
+			for (int j = 0; j < variablePath.size(); j++) {
+				Element childElement = testElement.getChild(variablePath.get(j));
+				if (null == childElement) {
+					// This isn't the conflict element we're looking for. Move to the next one
+					foundConflict = false;
+					break;
+				} else {
+					
+					// If this is the last entry in the path, record the element					
+					if ((j + 1) == variablePath.size()) {
+						foundConflict = true;
+						conflictElement = childElement;
+					} else {
+						testElement = childElement;
+					}
+				}
+			}
+		}
+		
+		return conflictElement;
+	}
+
 	
 	public Object clone() {
 		OMEVariable clone = new OMEVariable((Path) itsPath.clone());

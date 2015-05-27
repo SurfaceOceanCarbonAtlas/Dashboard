@@ -23,6 +23,9 @@ import org.jdom2.Element;
 public class OmeMetadata {
 
 	public static final String CONFLICT_STRING = "%%CONFLICT%%";
+	private static final String CONFLICTS_ELEMENT_NAME = "CONFLICTS";
+	protected static final String CONFLICT_ELEMENT_NAME = "Conflict";
+	protected static final String CONFLICT_VALUE_ELEMENT_NAME = "VALUE";
 	
 	private static final SimpleDateFormat DATE_PARSER = 
 			new SimpleDateFormat("yyyyMMdd HH:mm:ss");
@@ -1817,6 +1820,7 @@ public class OmeMetadata {
 	public void assignFromOmeXmlDoc(Document omeDoc) throws BadEntryNameException {
 		
 		Element rootElem = omeDoc.getRootElement();
+		Element conflictsElem = rootElem.getChild(CONFLICTS_ELEMENT_NAME);
 
 		/*
 		 * First we extract the EXPO Code, which is the Cruise_ID. If we don't have this
@@ -1878,11 +1882,11 @@ public class OmeMetadata {
 		// <User>
 		Element userElem = rootElem.getChild(USER_ELEMENT_NAME);
 			
-		userName = new OMEVariable(USER_NAME_PATH, userElem);
-		userOrganization = new OMEVariable(USER_ORGANIZATION_PATH, userElem);
-		userAddress = new OMEVariable(USER_ADDRESS_PATH, userElem);
-		userPhone = new OMEVariable(USER_PHONE_PATH, userElem);
-		userEmail = new OMEVariable(USER_EMAIL_PATH, userElem);
+		userName = new OMEVariable(USER_NAME_PATH, userElem, conflictsElem);
+		userOrganization = new OMEVariable(USER_ORGANIZATION_PATH, userElem, conflictsElem);
+		userAddress = new OMEVariable(USER_ADDRESS_PATH, userElem, conflictsElem);
+		userPhone = new OMEVariable(USER_PHONE_PATH, userElem, conflictsElem);
+		userEmail = new OMEVariable(USER_EMAIL_PATH, userElem, conflictsElem);
 		
 		// End <User>
 
@@ -1903,8 +1907,8 @@ public class OmeMetadata {
 		// <DataSet_Info>
 		Element dataSetInfoElem = rootElem.getChild(DATASET_INFO_ELEMENT_NAME);
 		
-		datasetID = new OMEVariable(DATASET_ID_PATH, dataSetInfoElem);
-		fundingInfo = new OMEVariable(FUNDING_INFO_PATH, dataSetInfoElem);
+		datasetID = new OMEVariable(DATASET_ID_PATH, dataSetInfoElem, conflictsElem);
+		fundingInfo = new OMEVariable(FUNDING_INFO_PATH, dataSetInfoElem, conflictsElem);
 		
 		// <DataSet_Info><Submission_Dates>
 		Element submissionDatesElem = null;
@@ -1912,8 +1916,8 @@ public class OmeMetadata {
 			submissionDatesElem = dataSetInfoElem.getChild(SUBMISSION_DATES_ELEMENT_NAME);
 		}
 		
-		initialSubmission = new OMEVariable(INITIAL_SUBMISSION_PATH, submissionDatesElem);
-		revisedSubmission = new OMEVariable(REVISED_SUBMISSION_PATH, submissionDatesElem);
+		initialSubmission = new OMEVariable(INITIAL_SUBMISSION_PATH, submissionDatesElem, conflictsElem);
+		revisedSubmission = new OMEVariable(REVISED_SUBMISSION_PATH, submissionDatesElem, conflictsElem);
 
 		// End <DataSet_Info></Submission_Dates<
 		
@@ -1925,32 +1929,32 @@ public class OmeMetadata {
 		// The Cruise_Info and Experiment elements were created above to get the EXPO code
 		// We know they exist, otherwise we wouldn't have got this far.
 		
-		experimentName = new OMEVariable(EXPERIMENT_NAME_PATH, experimentElem);
-		experimentType = new OMEVariable(EXPERIMENT_TYPE_PATH, experimentElem);
-		platformType = new OMEVariable(PLATFORM_TYPE_PATH, experimentElem);
-		co2InstrumentType = new OMEVariable(CO2_INSTRUMENT_TYPE_PATH, experimentElem);
-		mooringId = new OMEVariable(MOORING_ID_PATH, experimentElem);
+		experimentName = new OMEVariable(EXPERIMENT_NAME_PATH, experimentElem, conflictsElem);
+		experimentType = new OMEVariable(EXPERIMENT_TYPE_PATH, experimentElem, conflictsElem);
+		platformType = new OMEVariable(PLATFORM_TYPE_PATH, experimentElem, conflictsElem);
+		co2InstrumentType = new OMEVariable(CO2_INSTRUMENT_TYPE_PATH, experimentElem, conflictsElem);
+		mooringId = new OMEVariable(MOORING_ID_PATH, experimentElem, conflictsElem);
 		
 		// <Cruise_Info><Experiment><Cruise>
 		
 		// CruiseID has already been assigned above
-		cruiseInfo = new OMEVariable(SUB_CRUISE_INFO_PATH, cruiseElem);
-		section = new OMEVariable(SECTION_PATH, cruiseElem);
+		cruiseInfo = new OMEVariable(SUB_CRUISE_INFO_PATH, cruiseElem, conflictsElem);
+		section = new OMEVariable(SECTION_PATH, cruiseElem, conflictsElem);
 		
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage>
 		Element geogCoverageElem = cruiseElem.getChild(GEO_COVERAGE_ELEMENT_NAME);
 		
-		geographicalRegion = new OMEVariable(GEO_REGION_PATH, geogCoverageElem);
+		geographicalRegion = new OMEVariable(GEO_REGION_PATH, geogCoverageElem, conflictsElem);
 			
 		// <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
 		Element boundsElem = null;
 		if (null != geogCoverageElem) {
 			boundsElem = geogCoverageElem.getChild(BOUNDS_ELEMENT_NAME);
 		}
-		westmostLongitude = new OMEVariable(WEST_BOUND_PATH, boundsElem);
-		eastmostLongitude = new OMEVariable(EAST_BOUND_PATH, boundsElem);
-		northmostLatitude = new OMEVariable(NORTH_BOUND_PATH, boundsElem);
-		southmostLatitude = new OMEVariable(SOUTH_BOUND_PATH, boundsElem);
+		westmostLongitude = new OMEVariable(WEST_BOUND_PATH, boundsElem, conflictsElem);
+		eastmostLongitude = new OMEVariable(EAST_BOUND_PATH, boundsElem, conflictsElem);
+		northmostLatitude = new OMEVariable(NORTH_BOUND_PATH, boundsElem, conflictsElem);
+		southmostLatitude = new OMEVariable(SOUTH_BOUND_PATH, boundsElem, conflictsElem);
 	
 		// End <Cruise_Info><Experiment><Cruise><Geographical_Coverage><Bounds>
 		
@@ -1959,12 +1963,12 @@ public class OmeMetadata {
 		// <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
 		Element tempCoverageElem = cruiseElem.getChild(TEMP_COVERAGE_ELEMENT_NAME);
 		
-		temporalCoverageStartDate = new OMEVariable(TEMP_START_DATE_PATH, tempCoverageElem);
-		temporalCoverageEndDate = new OMEVariable(TEMP_END_DATE_PATH, tempCoverageElem);
+		temporalCoverageStartDate = new OMEVariable(TEMP_START_DATE_PATH, tempCoverageElem, conflictsElem);
+		temporalCoverageEndDate = new OMEVariable(TEMP_END_DATE_PATH, tempCoverageElem, conflictsElem);
 		// End <Cruise_Info><Experiment><Cruise><Temporal_Coverage>
 		
-		cruiseStartDate = new OMEVariable(START_DATE_PATH, cruiseElem);
-		cruiseEndDate = new OMEVariable(END_DATE_PATH, cruiseElem);
+		cruiseStartDate = new OMEVariable(START_DATE_PATH, cruiseElem, conflictsElem);
+		cruiseEndDate = new OMEVariable(END_DATE_PATH, cruiseElem, conflictsElem);
 		
 		// End <Cruise_Info><Experiment><Cruise>
 		
@@ -1974,10 +1978,10 @@ public class OmeMetadata {
 		
 		Element vesselElem = cruiseInfoElem.getChild(VESSEL_ELEMENT_NAME);
 		
-		vesselName = new OMEVariable(VESSEL_NAME_PATH, vesselElem);
-		vesselID = new OMEVariable(VESSEL_ID_PATH, vesselElem);
-		country = new OMEVariable(COUNTRY_PATH, vesselElem);
-		vesselOwner = new OMEVariable(OWNER_PATH, vesselElem);
+		vesselName = new OMEVariable(VESSEL_NAME_PATH, vesselElem, conflictsElem);
+		vesselID = new OMEVariable(VESSEL_ID_PATH, vesselElem, conflictsElem);
+		country = new OMEVariable(COUNTRY_PATH, vesselElem, conflictsElem);
+		vesselOwner = new OMEVariable(OWNER_PATH, vesselElem, conflictsElem);
 		
 		// <Variables_Info>
 		
@@ -2001,18 +2005,18 @@ public class OmeMetadata {
 		Element co2DataInfoElem = rootElem.getChild(CO2_DATA_INFO_ELEMENT_NAME);
 		
 		// If the co2DataInfoElem is null, this is handled by extractSubElement
-		xCO2WaterEquDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_WATER_EQU_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		xCO2WaterSSTDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_WATER_SST_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		pCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		pCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		fCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		fCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		xCO2AirDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_AIR_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		pCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		fCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		xCO2AirDryInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_AIR_DRY_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		pCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
-		fCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+		xCO2WaterEquDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_WATER_EQU_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		xCO2WaterSSTDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_WATER_SST_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		pCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		pCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		fCO2WaterEquWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		fCO2WaterSSTWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		xCO2AirDryUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_AIR_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		pCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		fCO2AirWetUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		xCO2AirDryInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, XCO2_AIR_DRY_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		pCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, PCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
+		fCO2AirWetInterpolatedUnit = extractSubElement(CO2_DATA_INFO_PATH, co2DataInfoElem, FCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME, conflictsElem);
 		
 		// End <CO2_Data_Info>
 		
@@ -2025,15 +2029,15 @@ public class OmeMetadata {
 			equDesignElement = methodDescriptionElem.getChild(EQUILIBRATOR_DESIGN_ELEMENT_NAME);
 		}
 
-		depthOfSeaWaterIntake = new OMEVariable(INTAKE_DEPTH_PATH, equDesignElement);
-		locationOfSeaWaterIntake = new OMEVariable(INTAKE_LOCATION_PATH, equDesignElement);
-		equilibratorType = new OMEVariable(EQUI_TYPE_PATH, equDesignElement);
-		equilibratorVolume = new OMEVariable(EQUI_VOLUME_PATH, equDesignElement);
-		waterFlowRate = new OMEVariable(WATER_FLOW_RATE_PATH, equDesignElement);
-		headspaceGasFlowRate = new OMEVariable(GAS_FLOW_RATE_PATH, equDesignElement);
-		vented = new OMEVariable(VENTED_PATH, equDesignElement);
-		dryingMethodForCO2InWater = new OMEVariable(DRYING_METHOD_PATH, equDesignElement);
-		equAdditionalInformation = new OMEVariable(EQUI_ADDITIONAL_INFO_PATH, equDesignElement);
+		depthOfSeaWaterIntake = new OMEVariable(INTAKE_DEPTH_PATH, equDesignElement, conflictsElem);
+		locationOfSeaWaterIntake = new OMEVariable(INTAKE_LOCATION_PATH, equDesignElement, conflictsElem);
+		equilibratorType = new OMEVariable(EQUI_TYPE_PATH, equDesignElement, conflictsElem);
+		equilibratorVolume = new OMEVariable(EQUI_VOLUME_PATH, equDesignElement, conflictsElem);
+		waterFlowRate = new OMEVariable(WATER_FLOW_RATE_PATH, equDesignElement, conflictsElem);
+		headspaceGasFlowRate = new OMEVariable(GAS_FLOW_RATE_PATH, equDesignElement, conflictsElem);
+		vented = new OMEVariable(VENTED_PATH, equDesignElement, conflictsElem);
+		dryingMethodForCO2InWater = new OMEVariable(DRYING_METHOD_PATH, equDesignElement, conflictsElem);
+		equAdditionalInformation = new OMEVariable(EQUI_ADDITIONAL_INFO_PATH, equDesignElement, conflictsElem);
 		
 		// End <Method_Description><Equilibrator_Design>
 
@@ -2043,9 +2047,9 @@ public class OmeMetadata {
 			co2MarineAirElem = methodDescriptionElem.getChild(CO2_MARINE_AIR_ELEMENT_NAME);
 		}
 
-		co2InMarineAirMeasurement = new OMEVariable(MARINE_AIR_MEASUREMENT_PATH, co2MarineAirElem);
-		co2InMarineAirLocationAndHeight = new OMEVariable(MARINE_AIR_LOCATION_PATH, co2MarineAirElem);
-		co2InMarineAirDryingMethod = new OMEVariable(MARINE_AIR_DRYING_PATH, co2MarineAirElem);
+		co2InMarineAirMeasurement = new OMEVariable(MARINE_AIR_MEASUREMENT_PATH, co2MarineAirElem, conflictsElem);
+		co2InMarineAirLocationAndHeight = new OMEVariable(MARINE_AIR_LOCATION_PATH, co2MarineAirElem, conflictsElem);
+		co2InMarineAirDryingMethod = new OMEVariable(MARINE_AIR_DRYING_PATH, co2MarineAirElem, conflictsElem);
 		
 		// End <Method_Description><CO2_in_Marine_Air>
 
@@ -2062,21 +2066,21 @@ public class OmeMetadata {
 			co2SensorElem = co2SensorsElem.getChild("CO2_Sensor");
 		}
 
-		co2MeasurementMethod = new OMEVariable(CO2_MEASUREMENT_METHOD_PATH, co2SensorElem);
-		co2Manufacturer = new OMEVariable(CO2_MANUFACTURER_PATH, co2SensorElem);
-		co2Model = new OMEVariable(CO2_MODEL_PATH, co2SensorElem);
-		co2Frequency = new OMEVariable(CO2_FREQUENCY_PATH, co2SensorElem);
-		co2ResolutionWater = new OMEVariable(CO2_WATER_RES_PATH, co2SensorElem);
-		co2UncertaintyWater = new OMEVariable(CO2_WATER_UNC_PATH, co2SensorElem);
-		co2ResolutionAir = new OMEVariable(CO2_AIR_RES_PATH, co2SensorElem);
-		co2UncertaintyAir = new OMEVariable(CO2_AIR_UNC_PATH, co2SensorElem);
-		co2ManufacturerOfCalibrationGas = new OMEVariable(CO2_CALIBRATION_MANUFACTURER_PATH, co2SensorElem);
-		co2SensorCalibration = new OMEVariable(CO2_SENSOR_CALIBRATION_PATH, co2SensorElem);
-		co2EnvironmentalControl = new OMEVariable(ENVIRONMENTAL_CONTROL_PATH, co2SensorElem);
-		co2MethodReferences = new OMEVariable(METHOD_REFS_PATH, co2SensorElem);
-		detailsOfCO2Sensing = new OMEVariable(DETAILS_OF_CO2_SENSING_PATH, co2SensorElem);
-		analysisOfCO2Comparison = new OMEVariable(ANALYSIS_OF_COMPARISON_PATH, co2SensorElem);
-		measuredCO2Params = new OMEVariable(MEASURED_CO2_PARAMS_PATH, co2SensorElem);
+		co2MeasurementMethod = new OMEVariable(CO2_MEASUREMENT_METHOD_PATH, co2SensorElem, conflictsElem);
+		co2Manufacturer = new OMEVariable(CO2_MANUFACTURER_PATH, co2SensorElem, conflictsElem);
+		co2Model = new OMEVariable(CO2_MODEL_PATH, co2SensorElem, conflictsElem);
+		co2Frequency = new OMEVariable(CO2_FREQUENCY_PATH, co2SensorElem, conflictsElem);
+		co2ResolutionWater = new OMEVariable(CO2_WATER_RES_PATH, co2SensorElem, conflictsElem);
+		co2UncertaintyWater = new OMEVariable(CO2_WATER_UNC_PATH, co2SensorElem, conflictsElem);
+		co2ResolutionAir = new OMEVariable(CO2_AIR_RES_PATH, co2SensorElem, conflictsElem);
+		co2UncertaintyAir = new OMEVariable(CO2_AIR_UNC_PATH, co2SensorElem, conflictsElem);
+		co2ManufacturerOfCalibrationGas = new OMEVariable(CO2_CALIBRATION_MANUFACTURER_PATH, co2SensorElem, conflictsElem);
+		co2SensorCalibration = new OMEVariable(CO2_SENSOR_CALIBRATION_PATH, co2SensorElem, conflictsElem);
+		co2EnvironmentalControl = new OMEVariable(ENVIRONMENTAL_CONTROL_PATH, co2SensorElem, conflictsElem);
+		co2MethodReferences = new OMEVariable(METHOD_REFS_PATH, co2SensorElem, conflictsElem);
+		detailsOfCO2Sensing = new OMEVariable(DETAILS_OF_CO2_SENSING_PATH, co2SensorElem, conflictsElem);
+		analysisOfCO2Comparison = new OMEVariable(ANALYSIS_OF_COMPARISON_PATH, co2SensorElem, conflictsElem);
+		measuredCO2Params = new OMEVariable(MEASURED_CO2_PARAMS_PATH, co2SensorElem, conflictsElem);
 
 		// End <Method_Description><CO2_Sensors><CO2_Sensor>
 		// End <Method_Description><CO2_Sensors>
@@ -2087,13 +2091,13 @@ public class OmeMetadata {
 			sstElem = methodDescriptionElem.getChild(SST_ELEMENT_NAME);
 		}
 		
-		sstLocation = new OMEVariable(SST_LOCATION_PATH, sstElem);
-		sstManufacturer = new OMEVariable(SST_MANUFACTURER_PATH, sstElem);
-		sstModel = new OMEVariable(SST_MODEL_PATH, sstElem);
-		sstAccuracy = new OMEVariable(SST_ACCURACY_PATH, sstElem);
-		sstPrecision = new OMEVariable(SST_PRECISION_PATH, sstElem);
-		sstCalibration = new OMEVariable(SST_CALIBRATION_PATH, sstElem);
-		sstOtherComments = new OMEVariable(SST_COMMENTS_PATH, sstElem);
+		sstLocation = new OMEVariable(SST_LOCATION_PATH, sstElem, conflictsElem);
+		sstManufacturer = new OMEVariable(SST_MANUFACTURER_PATH, sstElem, conflictsElem);
+		sstModel = new OMEVariable(SST_MODEL_PATH, sstElem, conflictsElem);
+		sstAccuracy = new OMEVariable(SST_ACCURACY_PATH, sstElem, conflictsElem);
+		sstPrecision = new OMEVariable(SST_PRECISION_PATH, sstElem, conflictsElem);
+		sstCalibration = new OMEVariable(SST_CALIBRATION_PATH, sstElem, conflictsElem);
+		sstOtherComments = new OMEVariable(SST_COMMENTS_PATH, sstElem, conflictsElem);
 		
 		// End <Method_Description><Sea_Surface_Temperature>
 		
@@ -2103,14 +2107,14 @@ public class OmeMetadata {
 			eqtElem = methodDescriptionElem.getChild(EQU_TEMP_ELEMENT_NAME);
 		}
 				
-		eqtLocation = new OMEVariable(EQT_LOCATION_PATH, eqtElem);
-		eqtManufacturer = new OMEVariable(EQT_MANUFACTURER_PATH, eqtElem);
-		eqtModel = new OMEVariable(EQT_MODEL_PATH, eqtElem);
-		eqtAccuracy = new OMEVariable(EQT_ACCURACY_PATH, eqtElem);
-		eqtPrecision = new OMEVariable(EQT_PRECISION_PATH, eqtElem);
-		eqtCalibration = new OMEVariable(EQT_CALIBRATION_PATH, eqtElem);
-		eqtWarming = new OMEVariable(EQT_WARMING_PATH, eqtElem);
-		eqtOtherComments = new OMEVariable(EQT_COMMENTS_PATH, eqtElem);
+		eqtLocation = new OMEVariable(EQT_LOCATION_PATH, eqtElem, conflictsElem);
+		eqtManufacturer = new OMEVariable(EQT_MANUFACTURER_PATH, eqtElem, conflictsElem);
+		eqtModel = new OMEVariable(EQT_MODEL_PATH, eqtElem, conflictsElem);
+		eqtAccuracy = new OMEVariable(EQT_ACCURACY_PATH, eqtElem, conflictsElem);
+		eqtPrecision = new OMEVariable(EQT_PRECISION_PATH, eqtElem, conflictsElem);
+		eqtCalibration = new OMEVariable(EQT_CALIBRATION_PATH, eqtElem, conflictsElem);
+		eqtWarming = new OMEVariable(EQT_WARMING_PATH, eqtElem, conflictsElem);
+		eqtOtherComments = new OMEVariable(EQT_COMMENTS_PATH, eqtElem, conflictsElem);
 
 		// End <Method_Description><Equilibrator_Temperature>
 		
@@ -2120,14 +2124,14 @@ public class OmeMetadata {
 			eqpElem = methodDescriptionElem.getChild(EQU_PRESSURE_ELEMENT_NAME);
 		}
 				
-		eqpLocation = new OMEVariable(EQP_LOCATION_PATH, eqpElem);
-		eqpManufacturer = new OMEVariable(EQP_MANUFACTURER_PATH, eqpElem);
-		eqpModel = new OMEVariable(EQP_MODEL_PATH, eqpElem);
-		eqpAccuracy = new OMEVariable(EQP_ACCURACY_PATH, eqpElem);
-		eqpPrecision = new OMEVariable(EQP_PRECISION_PATH, eqpElem);
-		eqpCalibration = new OMEVariable(EQP_CALIBRATION_PATH, eqpElem);
-		eqpOtherComments = new OMEVariable(EQP_COMMENTS_PATH, eqpElem);
-		eqpNormalized = new OMEVariable(EQP_NORMALIZED_PATH, eqpElem);
+		eqpLocation = new OMEVariable(EQP_LOCATION_PATH, eqpElem, conflictsElem);
+		eqpManufacturer = new OMEVariable(EQP_MANUFACTURER_PATH, eqpElem, conflictsElem);
+		eqpModel = new OMEVariable(EQP_MODEL_PATH, eqpElem, conflictsElem);
+		eqpAccuracy = new OMEVariable(EQP_ACCURACY_PATH, eqpElem, conflictsElem);
+		eqpPrecision = new OMEVariable(EQP_PRECISION_PATH, eqpElem, conflictsElem);
+		eqpCalibration = new OMEVariable(EQP_CALIBRATION_PATH, eqpElem, conflictsElem);
+		eqpOtherComments = new OMEVariable(EQP_COMMENTS_PATH, eqpElem, conflictsElem);
+		eqpNormalized = new OMEVariable(EQP_NORMALIZED_PATH, eqpElem, conflictsElem);
 		
 		// End <Method_Description><Equilibrator_Pressure>
 		
@@ -2137,13 +2141,13 @@ public class OmeMetadata {
 			atpElem = methodDescriptionElem.getChild(ATM_PRESSURE_ELEMENT_NAME);
 		}
 				
-		atpLocation = new OMEVariable(ATM_LOCATION_PATH, atpElem);
-		atpManufacturer = new OMEVariable(ATM_MANUFACTURER_PATH, atpElem);
-		atpModel = new OMEVariable(ATM_MODEL_PATH, atpElem);
-		atpAccuracy = new OMEVariable(ATM_ACCURACY_PATH, atpElem);
-		atpPrecision = new OMEVariable(ATM_PRECISION_PATH, atpElem);
-		atpCalibration = new OMEVariable(ATM_CALIBRATION_PATH, atpElem);
-		atpOtherComments = new OMEVariable(ATM_COMMENTS_PATH, atpElem);
+		atpLocation = new OMEVariable(ATM_LOCATION_PATH, atpElem, conflictsElem);
+		atpManufacturer = new OMEVariable(ATM_MANUFACTURER_PATH, atpElem, conflictsElem);
+		atpModel = new OMEVariable(ATM_MODEL_PATH, atpElem, conflictsElem);
+		atpAccuracy = new OMEVariable(ATM_ACCURACY_PATH, atpElem, conflictsElem);
+		atpPrecision = new OMEVariable(ATM_PRECISION_PATH, atpElem, conflictsElem);
+		atpCalibration = new OMEVariable(ATM_CALIBRATION_PATH, atpElem, conflictsElem);
+		atpOtherComments = new OMEVariable(ATM_COMMENTS_PATH, atpElem, conflictsElem);
 
 		// End <Method_Description><Atmospheric_Pressure>
 		
@@ -2153,13 +2157,13 @@ public class OmeMetadata {
 			sssElem = methodDescriptionElem.getChild(SSS_ELEMENT_NAME);
 		}
 				
-		sssLocation = new OMEVariable(SSS_LOCATION_PATH, sssElem);
-		sssManufacturer = new OMEVariable(SSS_MANUFACTURER_PATH, sssElem);
-		sssModel = new OMEVariable(SSS_MODEL_PATH, sssElem);
-		sssAccuracy = new OMEVariable(SSS_ACCURACY_PATH, sssElem);
-		sssPrecision = new OMEVariable(SSS_PRECISION_PATH, sssElem);
-		sssCalibration = new OMEVariable(SSS_CALIBRATION_PATH, sssElem);
-		sssOtherComments = new OMEVariable(SSS_COMMENTS_PATH, sssElem);
+		sssLocation = new OMEVariable(SSS_LOCATION_PATH, sssElem, conflictsElem);
+		sssManufacturer = new OMEVariable(SSS_MANUFACTURER_PATH, sssElem, conflictsElem);
+		sssModel = new OMEVariable(SSS_MODEL_PATH, sssElem, conflictsElem);
+		sssAccuracy = new OMEVariable(SSS_ACCURACY_PATH, sssElem, conflictsElem);
+		sssPrecision = new OMEVariable(SSS_PRECISION_PATH, sssElem, conflictsElem);
+		sssCalibration = new OMEVariable(SSS_CALIBRATION_PATH, sssElem, conflictsElem);
+		sssOtherComments = new OMEVariable(SSS_COMMENTS_PATH, sssElem, conflictsElem);
 
 		// End <Method_Description><Sea_Surface_Salinity>
 		
@@ -2189,15 +2193,15 @@ public class OmeMetadata {
 		
 		// Miscellaneous tags under the root element
 		
-		dataSetReferences = new OMEVariable(DATA_SET_REFS_PATH, rootElem);
-		additionalInformation = new OMEVariable(ADD_INFO_PATH, rootElem);
-		citation = new OMEVariable(CITATION_PATH, rootElem);
-		measurementAndCalibrationReport = new OMEVariable(MEAS_CALIB_REPORT_PATH, rootElem);
-		preliminaryQualityControl = new OMEVariable(PRELIM_QC_PATH, rootElem);
+		dataSetReferences = new OMEVariable(DATA_SET_REFS_PATH, rootElem, conflictsElem);
+		additionalInformation = new OMEVariable(ADD_INFO_PATH, rootElem, conflictsElem);
+		citation = new OMEVariable(CITATION_PATH, rootElem, conflictsElem);
+		measurementAndCalibrationReport = new OMEVariable(MEAS_CALIB_REPORT_PATH, rootElem, conflictsElem);
+		preliminaryQualityControl = new OMEVariable(PRELIM_QC_PATH, rootElem, conflictsElem);
 		
 		// More miscellaneous root tags
-		form_type = new OMEVariable(FORM_TYPE_PATH, rootElem);
-		recordID = new OMEVariable(RECORD_ID_PATH, rootElem);
+		form_type = new OMEVariable(FORM_TYPE_PATH, rootElem, conflictsElem);
+		recordID = new OMEVariable(RECORD_ID_PATH, rootElem, conflictsElem);
 		
 	}
 
@@ -2802,7 +2806,7 @@ public class OmeMetadata {
 	 * @param subElementName The name of the sub-element
 	 * @return The variable containing details of the extracted sub-element
 	 */
-	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName) {
+	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName, Element conflictsElem) {
 		Path path = new Path(parentPath, elementName);
 	
 		// The OMEVariable constructor is quite happy to treat the null element
@@ -2813,7 +2817,7 @@ public class OmeMetadata {
 		}
 		
 		Path newPath = new Path(path, subElementName);
-		return new OMEVariable(newPath, subElement);
+		return new OMEVariable(newPath, subElement, conflictsElem);
 	}
 	
 	/**
