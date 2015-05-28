@@ -18,7 +18,7 @@ public class Message {
 	
 	public static final int SHIP_SPEED_COLUMN_INDEX = -2;
 	
-	public static final String SHIP_SPEED_COLUMN_NAME = "Ship Speed (Lon/Lat/Time)";
+	public static final String SHIP_SPEED_COLUMN_NAME = "Lon/Lat/Date/Time";
 	
 	public static final int NO_COLUMN_INDEX = -999;
 	

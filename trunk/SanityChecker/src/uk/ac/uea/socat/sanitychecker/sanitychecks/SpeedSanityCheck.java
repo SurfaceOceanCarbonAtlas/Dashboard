@@ -15,10 +15,10 @@ import uk.ac.uea.socat.sanitychecker.messages.MessageType;
  */
 public class SpeedSanityCheck extends SanityCheck {
 
-	private static final String SPEED_ID = "SHIP_SPEED";
-	
-	private static MessageType SPEED_TYPE = null;
-	
+	private static final String CALC_SPEED_ID = "CALC_SHIP_SPEED";
+
+	private static MessageType CALC_SPEED_TYPE = null;
+
 	private static final String BACKWARDS_TIME_ID = "BACKWARDS_TIME";
 	
 	private static MessageType BACKWARDS_TIME_TYPE = null;
@@ -70,8 +70,8 @@ public class SpeedSanityCheck extends SanityCheck {
 			BACKWARDS_TIME_TYPE = new MessageType(BACKWARDS_TIME_ID, "The timestamp is either identical to or before the previous record", "Times out of order");
 		}
 
-		if (null == SPEED_TYPE) {
-			SPEED_TYPE = new MessageType(SPEED_ID, "Ship speed is faster than " + MessageType.VALID_VALUE_IDENTIFIER + "km/h", "Ship speed is too fast");
+		if (null == CALC_SPEED_TYPE) {
+			CALC_SPEED_TYPE = new MessageType(CALC_SPEED_ID, "Computed ship speed is faster than " + MessageType.VALID_VALUE_IDENTIFIER + "km/h", "Computed ship speed is too fast");
 		}
 	}
 	
@@ -100,9 +100,9 @@ public class SpeedSanityCheck extends SanityCheck {
 					} else if (calcSecondsDiff(lastTime, thisTime) > 1) {
 						double speed = distance / hourDiff;
 						if (speed > itsBadSpeedLimit) {
-							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, Message.SHIP_SPEED_COLUMN_NAME, SPEED_TYPE, Message.ERROR, record.getLineNumber(), Double.toString(speed), Double.toString(itsBadSpeedLimit)));
+							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, Message.SHIP_SPEED_COLUMN_NAME, CALC_SPEED_TYPE, Message.ERROR, record.getLineNumber(), Double.toString(speed), Double.toString(itsBadSpeedLimit)));
 						} else if (speed > itsQuestionableSpeedLimit) {
-							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, Message.SHIP_SPEED_COLUMN_NAME, SPEED_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(speed), Double.toString(itsQuestionableSpeedLimit)));
+							itsMessages.add(new Message(Message.SHIP_SPEED_COLUMN_INDEX, Message.SHIP_SPEED_COLUMN_NAME, CALC_SPEED_TYPE, Message.WARNING, record.getLineNumber(), Double.toString(speed), Double.toString(itsQuestionableSpeedLimit)));
 						}
 					}
 				}
