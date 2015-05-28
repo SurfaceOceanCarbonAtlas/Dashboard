@@ -169,7 +169,7 @@ public class DashboardUtils {
 	public static final ArrayList<String> TEMPERATURE_UNITS = 
 			new ArrayList<String>(Arrays.asList("deg.C"));
 	public static final ArrayList<String> PRESSURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("hPa", "kPa"));
+			new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
 	public static final ArrayList<String> XCO2_UNITS = 
 			new ArrayList<String>(Arrays.asList("umol/mol"));
 	public static final ArrayList<String> PCO2_UNITS = 
