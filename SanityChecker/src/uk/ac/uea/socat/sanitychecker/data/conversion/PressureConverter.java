@@ -16,6 +16,8 @@ public class PressureConverter extends SpecifiedUnitsConverter {
 		itsSupportedUnits.add("kpa");
 		itsSupportedUnits.add("millibar");
 		itsSupportedUnits.add("inches");
+		itsSupportedUnits.add("mmhg");
+		itsSupportedUnits.add("torr");
 	}
 	
 	@Override
@@ -27,6 +29,10 @@ public class PressureConverter extends SpecifiedUnitsConverter {
 		}
 		else if (units.equalsIgnoreCase("kpa")) {
 			result = convertKilopascal(value);
+		}
+		else if ( units.equalsIgnoreCase("mmhg") ||
+				  units.equalsIgnoreCase("torr") ) {
+			result = convertTorr(value);
 		}
 		
 		return result;
@@ -61,6 +67,24 @@ public class PressureConverter extends SpecifiedUnitsConverter {
 		try {
 			Double doubleValue = Double.parseDouble(value);
 			result = Double.toString(doubleValue * 10.0);
+		} catch (NumberFormatException e) {
+			throw new ConversionException("Cannot parse value");
+		}
+		
+		return result;
+	}
+
+	/**
+	 * Convert Torr (millimeters of mercury) to hPa
+	 * @param value The input value in Torr (mmHg)
+	 * @return The converted hPa value
+	 * @throws ConversionException If the number cannot be parsed
+	 */
+	private String convertTorr(String value) throws ConversionException {
+		String result = value;
+		try {
+			Double doubleValue = Double.parseDouble(value);
+			result = Double.toString(doubleValue * 1.3332236842105);
 		} catch (NumberFormatException e) {
 			throw new ConversionException("Cannot parse value");
 		}
