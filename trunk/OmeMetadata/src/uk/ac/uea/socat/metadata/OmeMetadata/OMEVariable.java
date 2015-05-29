@@ -29,7 +29,7 @@ class OMEVariable {
 	 * @param parentElement The XML element containing the variable value
 	 * @param fullDocument The complete XML document - used to extract conflict information
 	 */
-	protected OMEVariable(Path path, Element parentElement, Element conflictsElement) {
+	protected OMEVariable(Path path, Element parentElement, Element conflictsElement) throws InvalidConflictException {
 		itsPath = path;
 		itsValues = new ArrayList<String>();
 		if (null != parentElement) {
@@ -167,7 +167,7 @@ class OMEVariable {
 		}
 	}
 	
-	private Element getVariableConflictElement(Path path, Element conflictsElement) {
+	private Element getVariableConflictElement(Path path, Element conflictsElement) throws InvalidConflictException {
 		
 		List<String> variablePath = path.getPathTree();
 		List<Element> testElements = conflictsElement.getChildren(OmeMetadata.CONFLICT_ELEMENT_NAME);
@@ -195,6 +195,10 @@ class OMEVariable {
 					}
 				}
 			}
+		}
+		
+		if (!foundConflict) {
+			throw new InvalidConflictException("A conflict was reported for '" + path.getElementName() + "', but no details were found in the CONFLICTS section");
 		}
 		
 		return conflictElement;
