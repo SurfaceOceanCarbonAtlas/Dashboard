@@ -10,12 +10,21 @@ class OMECompositeVariable {
 	private List<String> itsAllowedEntries;
 	private List<String> itsIdFields;
 	private List<OMECompositeVariableEntry> itsEntries = new ArrayList<OMECompositeVariableEntry>();
+	private Element itsConflictsElement = null;
 	
-	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, String idElement) {
+	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, String idElement, Element conflictsElement) {
 		itsPath = parentPath;
 		itsAllowedEntries = allowedEntries;
 		itsIdFields = new ArrayList<String>();
 		itsIdFields.add(idElement);
+		itsConflictsElement = conflictsElement;
+	}
+	
+	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, List<String> idElements, Element conflictsElement) {
+		itsPath = parentPath;
+		itsAllowedEntries = allowedEntries;
+		itsIdFields = idElements;
+		itsConflictsElement = conflictsElement;
 	}
 	
 	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, List<String> idElements) {
@@ -28,7 +37,7 @@ class OMECompositeVariable {
 		itsPath = parentPath;
 	}
 
-	protected void addEntry(String name, Element element) throws BadEntryNameException {
+	protected void addEntry(String name, Element element) throws BadEntryNameException, InvalidConflictException {
 		String value = null;
 		if (null != element) {
 			value = element.getChildTextTrim(name);
@@ -42,13 +51,84 @@ class OMECompositeVariable {
 				String lowName = name.substring(0, 1).toLowerCase() + name.substring(1);
 				value = element.getChildTextTrim(lowName);
 			}
+
 			if (null != value) {
-				addEntry(name, value);
+
+				if (value.equals(OmeMetadata.CONFLICT_STRING)) {
+					// If the conflict is in one of the ID fields, we can't deal with it.
+					if (itsIdFields.contains(name)) {
+						throw new InvalidConflictException("Cannot handle conflicts on field '" + name + "'");
+					} else {
+						Element entryConflictElement = getEntryConflictElement(name);
+						for (Element valueElement : entryConflictElement.getChildren(OmeMetadata.CONFLICT_VALUE_ELEMENT_NAME)) {
+							addEntry(name, valueElement.getText());
+						}
+					}
+				} else {
+					addEntry(name, value);
+				}
 			}
 		}
 	}
 	
-	protected void addEntry(String name, String value) throws BadEntryNameException {
+	private Element getEntryConflictElement(String entryName) throws InvalidConflictException {
+		
+		List<String> variablePath = itsPath.getPathTree();
+		List<Element> testElements = itsConflictsElement.getChildren(OmeMetadata.CONFLICT_ELEMENT_NAME);
+		
+		boolean foundConflict = false;
+		Element conflictElement = null;
+		
+		for (int i = 0; !foundConflict && i < testElements.size(); i++) {
+			Element testElement = testElements.get(i);
+			
+			for (int j = 0; j < variablePath.size(); j++) {
+				
+				if ((j + 1) < variablePath.size()) {
+					Element childElement = testElement.getChild(variablePath.get(j));
+					if (null == childElement) {
+						// This isn't the conflict element we're looking for. Move to the next one
+						foundConflict = false;
+						break;
+					} else {
+						testElement = childElement;
+					}
+				} else {
+					
+					// Get all the child elements and loop through them in turn
+					List<Element> childElements = testElement.getChildren(variablePath.get(j));
+
+					for (Element variableElement : childElements) {
+					
+						// We've found the top level of the composite variable.
+						// Checks its attributes to make sure we have the right one
+						boolean idsMatch = true;
+						for (String idField : itsIdFields) {
+							String attributeValue = variableElement.getAttributeValue(idField);
+							if (!attributeValue.equals(getValue(idField))) {
+								idsMatch = false;
+							}
+						}
+						
+						if (idsMatch) {
+							foundConflict = true;
+							Element entryElement = variableElement.getChild(entryName);
+							if (null == entryElement) {
+								throw new InvalidConflictException("Could not find conflict data for entry '" + entryName + "'");
+							} else {
+								conflictElement = entryElement;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return conflictElement;
+	}
+
+	protected void addEntry(String name, String value) throws BadEntryNameException, InvalidConflictException {
 		
 		if (!itsAllowedEntries.contains(name)) {
 			throw new BadEntryNameException("Cannot add an entry '" + name + "' to composite value '" + itsPath.getElementName() + "'");
@@ -59,7 +139,7 @@ class OMECompositeVariable {
 			if (searchEntry.getName().equals(name)) {
 				
 				if (itsIdFields.contains(name) && searchEntry.getValueCount() > 0) {
-					throw new BadEntryNameException("Cannot add multiple values to an identifier in a composite variable");
+					throw new InvalidConflictException("Cannot add multiple values to an identifier in a composite variable");
 				} else {
 					searchEntry.addValue(value);
 					foundEntry = true;

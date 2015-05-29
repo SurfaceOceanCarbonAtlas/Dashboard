@@ -623,6 +623,9 @@ public class OmeMetadata {
 		} catch (BadEntryNameException ex) {
 			// Should never happen, so throw a RunTime exception if it does
 			throw new RuntimeException(ex);
+		} catch (InvalidConflictException ex) {
+			// Should never happen, so throw a RunTime exception if it does
+			throw new RuntimeException(ex);
 		}
 
 		// Use setExpocode to also assign any fields associated with the expocode
@@ -724,7 +727,7 @@ public class OmeMetadata {
 	}
 
 	
-	public void assignFromHeaderText(String header) throws OmeMetadataException, BadEntryNameException {
+	public void assignFromHeaderText(String header) throws OmeMetadataException, BadEntryNameException, InvalidConflictException {
 		String[] lines = header.split("\n");
 		
 		String compositeName = null;
@@ -845,7 +848,7 @@ public class OmeMetadata {
 		}
 	}
 	
-	public void storeCompositeValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException {
+	public void storeCompositeValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException, InvalidConflictException {
 		
 		OMECompositeVariable compositeVar = null;
 		
@@ -1817,7 +1820,7 @@ public class OmeMetadata {
 	 * @param omeDoc
 	 * 		OME XML Document to use
 	 */
-	public void assignFromOmeXmlDoc(Document omeDoc) throws BadEntryNameException {
+	public void assignFromOmeXmlDoc(Document omeDoc) throws BadEntryNameException, InvalidConflictException {
 		
 		Element rootElem = omeDoc.getRootElement();
 		Element conflictsElem = rootElem.getChild(CONFLICTS_ELEMENT_NAME);
@@ -1893,12 +1896,12 @@ public class OmeMetadata {
 		// <Investigator> (repeating element)
 		investigators = new ArrayList<OMECompositeVariable>();
 		for (Element invElem : rootElem.getChildren(INVESTIGATOR_ELEMENT_NAME)) {
-			OMECompositeVariable invDetails = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST);
+			OMECompositeVariable invDetails = new OMECompositeVariable(INVESTIGATORS_PATH, INVESTIGATOR_ENTRIES, INVESTIGATOR_ID_LIST, conflictsElem);
 			invDetails.addEntry(NAME_ELEMENT_NAME, invElem);
+			invDetails.addEntry(EMAIL_ELEMENT_NAME, invElem);
 			invDetails.addEntry(ORGANIZATION_ELEMENT_NAME, invElem);
 			invDetails.addEntry(ADDRESS_ELEMENT_NAME, invElem);
 			invDetails.addEntry(PHONE_ELEMENT_NAME, invElem);
-			invDetails.addEntry(EMAIL_ELEMENT_NAME, invElem);
 			
 			investigators.add(invDetails);
 		}
@@ -1991,7 +1994,7 @@ public class OmeMetadata {
 		if (null != varsInfoElem) {
 			for (Element variableElem : varsInfoElem.getChildren(VARIABLE_ELEMENT_NAME)) {
 				
-				OMECompositeVariable varDetails = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST);
+				OMECompositeVariable varDetails = new OMECompositeVariable(VARIABLES_INFO_PATH, VARIABLES_INFO_ENTRIES, VARIABLES_INFO_ID_LIST, conflictsElem);
 				varDetails.addEntry(VARIABLES_NAME_ELEMENT_NAME, variableElem);
 				varDetails.addEntry(VARIABLES_DESCRIPTION_ELEMENT_NAME, variableElem);
 				
@@ -2175,7 +2178,7 @@ public class OmeMetadata {
 		}
 		if (null != otherSensorsElem) {
 			for (Element sensorElem : otherSensorsElem.getChildren(SENSOR_ELEMENT_NAME)) {
-				OMECompositeVariable sensorDetails = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ENTRIES, OTHER_SENSORS_ID_LIST);
+				OMECompositeVariable sensorDetails = new OMECompositeVariable(OTHER_SENSORS_PATH, OTHER_SENSORS_ENTRIES, OTHER_SENSORS_ID_LIST, conflictsElem);
 				sensorDetails.addEntry(MANUFACTURER_ELEMENT_NAME, sensorElem);
 				sensorDetails.addEntry(MODEL_ELEMENT_NAME, sensorElem);
 				sensorDetails.addEntry(ACCURACY_ELEMENT_NAME, sensorElem);

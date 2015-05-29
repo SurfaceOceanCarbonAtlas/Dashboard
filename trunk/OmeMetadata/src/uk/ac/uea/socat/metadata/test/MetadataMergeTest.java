@@ -41,9 +41,9 @@ public class MetadataMergeTest {
 	}
 	
 	private void runTests() {
-		//mergeTest();
+		mergeTest();
 		//makeHeaderTest();
-		readHeaderTest();
+		//readHeaderTest();
 	}
 	
 	private void readHeaderTest() {
@@ -92,6 +92,7 @@ public class MetadataMergeTest {
 	private void mergeTest() {
 		try {
 			// Load the input metadata
+			/*
 			File inputFile = new File("Test1.xml");
 			Document input = (new SAXBuilder()).build(inputFile);
 			OmeMetadata input1 = new OmeMetadata("");
@@ -106,9 +107,16 @@ public class MetadataMergeTest {
 			input = (new SAXBuilder()).build(inputFile);
 			OmeMetadata input3 = new OmeMetadata("");
 			input3.assignFromOmeXmlDoc(input);
+			*/
+
+			File inputFile = new File("conflict.xml");
+			Document input = (new SAXBuilder()).build(inputFile);
+			OmeMetadata input1 = new OmeMetadata("");
+			input1.assignFromOmeXmlDoc(input);
+
 			
 			//OmeMetadata merged = OmeMetadata.merge(input1, input2, input3);
-			OmeMetadata merged = OmeMetadata.merge(input1, input2);
+			OmeMetadata merged = OmeMetadata.merge(input1);
 			
 			Document output = merged.createOmeXmlDoc();
 			
@@ -116,6 +124,7 @@ public class MetadataMergeTest {
 		}
 		catch (Exception e) {
 			System.out.println("Test failed because of exception: " + e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }
