@@ -46,6 +46,7 @@ public class MetadataMergeTest {
 		//readHeaderTest();
 	}
 	
+	@SuppressWarnings("unused")
 	private void readHeaderTest() {
 		try {
 			StringBuffer fileData = new StringBuffer();
@@ -88,7 +89,6 @@ public class MetadataMergeTest {
 	 * to merge one file. It should return the exact same
 	 * file.
 	 */
-	@SuppressWarnings("unused")
 	private void mergeTest() {
 		try {
 			// Load the input metadata
