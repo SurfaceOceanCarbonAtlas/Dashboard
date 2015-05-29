@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
+import uk.ac.uea.socat.metadata.OmeMetadata.InvalidConflictException;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
@@ -261,7 +262,7 @@ public class Output {
 		itsMetadata.replaceValue(name, value, line);
 	}
 	
-	public void addCompositeMetadataValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException {
+	public void addCompositeMetadataValue(String name, Properties values, int line) throws OmeMetadataException, BadEntryNameException, InvalidConflictException {
 		itsMetadata.storeCompositeValue(name, values, line);
 	}
 	
