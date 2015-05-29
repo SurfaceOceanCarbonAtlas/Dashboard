@@ -17,6 +17,7 @@ import org.jdom2.output.XMLOutputter;
 import org.junit.Test;
 
 import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
+import uk.ac.uea.socat.metadata.OmeMetadata.InvalidConflictException;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 
 /**
@@ -442,7 +443,7 @@ public class ReadAndMergeConflictMetadataTest {
 	 * @throws BadEntryNameException 
 	 */
 	@Test
-	public void testReadAndMerge() throws JDOMException, IOException, BadEntryNameException {
+	public void testReadAndMerge() throws JDOMException, IOException, BadEntryNameException, InvalidConflictException {
 		OmeMetadata firstOme = new OmeMetadata(TEST_EXPOCODE);
 		CharArrayReader omeInput = new CharArrayReader(FIRST_XML_STRING.toCharArray());
 		Document omeDoc = (new SAXBuilder()).build(omeInput);
