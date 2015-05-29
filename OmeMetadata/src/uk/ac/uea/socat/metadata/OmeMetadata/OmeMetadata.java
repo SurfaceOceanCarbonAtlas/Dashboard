@@ -2809,7 +2809,7 @@ public class OmeMetadata {
 	 * @param subElementName The name of the sub-element
 	 * @return The variable containing details of the extracted sub-element
 	 */
-	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName, Element conflictsElem) {
+	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName, Element conflictsElem) throws InvalidConflictException {
 		Path path = new Path(parentPath, elementName);
 	
 		// The OMEVariable constructor is quite happy to treat the null element
