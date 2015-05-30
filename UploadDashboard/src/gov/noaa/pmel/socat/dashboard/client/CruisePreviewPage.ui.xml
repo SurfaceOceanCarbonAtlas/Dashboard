@@ -66,6 +66,12 @@
 					</g:tab>
 					<g:tab>
 						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="dtXco2Fco2Html" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="dtXco2Fco2Image" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
 							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2VsTimeHtml" />
 						</g:customHeader>
 						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2VsTimeImage" />

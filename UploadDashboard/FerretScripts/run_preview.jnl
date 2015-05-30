@@ -14,7 +14,7 @@ GO preview_14
 DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_sample_vs_time_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
-GO preview_11_color
+GO preview_11  ! now the same as preview_color.jnl
 DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_time_series_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 
@@ -37,6 +37,11 @@ SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
 GO preview_08
 DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_rec_fco2_vs_time_($result_time_tag).gif
 SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
+
+GO preview_15
+DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_delta_temp_xco2_fco2_($result_time_tag).gif
+SPAWN "/bin/mv" "($result_plot_image_filename)" "($final_plot_image_filename)"
+
 
 GO preview_09
 DEFINE SYMBOL final_plot_image_filename = ($result_directory)/($expocode_str)_rec_fco2_vs_sst_($result_time_tag).gif

@@ -15,11 +15,10 @@ let/title="Temp intake" tempr = reshape(temp, tt)
 let/title="Temp diff" dtemp = reshape(delta_temp, tt)
 let/title="Temp equ" itemp = reshape(temperature_equi, tt)
 
-let/title="Temp diff" ntemp = `2*vmax` + 0*reshape(delta_temp, tt)
-
 set view full
 
-plot($linestyle)/line/color/axes=1,1,1,0/vlim=`vmin`:`vmax`/key=title/set tempr, ntemp, itemp
+define symbol style1 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)
+plot($linestyle)($style1)/axes=1,1,1,0/vlim=`vmin`:`vmax`/set tempr
   ppl ylab Temp (`temperature_equi,return=units`)
   ($taxis_setting)
   ppl title " "
@@ -30,18 +29,14 @@ plot($linestyle)/line/color/axes=1,1,1,0/vlim=`vmin`:`vmax`/key=title/set tempr,
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl plot
-def sym lab_top = Expocode `EXPOCODE`
+
+define symbol style2 = /color=blue/thick=2
+plot($linestyle)($style2)/over/nolab itemp
 
 set view full2
-plot/axes=1,1,0,1/color=green/line($linestyle)/nolab/set dtemp
-  ($taxis_setting)
-  ppl ylab Temp Diff (`temperature_equi,return=units`)
-  ppl title " "
-  ppl xlab " "
-  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
-  go unlabel `labdat`
-  go unlabel `labttl`
-ppl plot
+define symbol style3 = /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
+plot($linestyle)($style3)/axes=1,1,0,1/nolab dtemp
+
 
 
 ! Label at the top with the Expocode and count
@@ -49,6 +44,15 @@ DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+
+! If no data, add a label
+IF `tempr[L=@ngd] + dtemp[L=@ngd] + itemp[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+! Make the color key
+
+GO keybox ($style1) "Temp intake" ($style2) "Temp equ" ($style3) "Difference"
+
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 

@@ -54,6 +54,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	private static final String MESSAGES_TEXT = "Show errors/warnings";
 
 	private static final String SUBMIT_TEXT = "Check Data";
+	private static final String ENABLED_SUBMIT_HOVER_HELP = "Submits the current data column types and checks the given data";
+	private static final String DISABLED_SUBMIT_HOVER_HELP = "This cruise has been submitted for QC.  Data column types cannot be modified.";
 
 	private static final String CANCEL_TEXT = "Done";
 
@@ -326,6 +328,15 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				msgText += Integer.toString(numWarns);
 			msgText += " warnings";
 			messagesLabel.setText(msgText);
+		}
+
+		if ( cruiseSpecs.isEditable() ) {
+			submitButton.setEnabled(true);
+			submitButton.setTitle(DISABLED_SUBMIT_HOVER_HELP);
+		}
+		else {
+			submitButton.setEnabled(false);
+			submitButton.setTitle(ENABLED_SUBMIT_HOVER_HELP);
 		}
 
 		// Clear the expocode in case the data provider gets called while clearing

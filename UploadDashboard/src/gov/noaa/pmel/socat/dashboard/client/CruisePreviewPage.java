@@ -56,10 +56,11 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String TEMPERATURES_TAB_TEXT = "temperatures";
 	private static final String SALINITIES_TAB_TEXT = "salinities";
 	private static final String XCO2S_TAB_TEXT = "xCO<sub>2</sub>s";
+	private static final String DT_XCO2_FCO2_TAB_TEXT = "dT, xCO<sub>2</sub>, fCO<sub>2</sub>";
 	private static final String REC_FCO2_VS_TIME_TAB_TEXT = "rec fCO<sub>2</sub> vs time";
 	private static final String REC_FCO2_VS_SST_TAB_TEXT = "rec fCO<sub>2</sub> vs SST";
 	private static final String REC_FCO2_VS_SAL_TAB_TEXT = "rec fCO<sub>2</sub> vs sal";
-	private static final String REC_FCO2_DELTA_TAB_TEXT = "rec fCO<sub>2</sub> delta";
+	private static final String REC_FCO2_DELTA_TAB_TEXT = "rec fCO<sub>2</sub> - CO<sub>2</sub>";
 	private static final String REC_FCO2_SOURCES_TAB_TEXT = "rec fCO<sub>2</sub> sources";
 
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
@@ -70,10 +71,11 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
 	private static final String SALINITIES_ALT_TEXT = "salinities versus time";
 	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time";
+	private static final String DT_XCO2_FCO2_ALT_TEXT = "Teq minus SST, xCO2 @ Teq dry, and rec fCO2 versus time";
 	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time";
 	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
 	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
-	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus given fCO2";
+	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus reported CO2";
 	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2";
 
 	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
@@ -84,6 +86,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	public static final String TEMPERATURES_IMAGE_NAME = "temperatures";
 	public static final String SALINITIES_IMAGE_NAME = "salinities";
 	public static final String XCO2S_IMAGE_NAME = "xco2s";
+	public static final String DT_XCO2_FCO2_IMAGE_NAME = "delta_temp_xco2_fco2";
 	public static final String REC_FCO2_VS_TIME_IMAGE_NAME = "rec_fco2_vs_time";
 	public static final String REC_FCO2_VS_SST_IMAGE_NAME = "rec_fco2_vs_sst";
 	public static final String REC_FCO2_VS_SAL_IMAGE_NAME = "rec_fco2_vs_sal";
@@ -114,6 +117,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField HTML temperaturesHtml;
 	@UiField HTML salinitiesHtml;
 	@UiField HTML xco2sHtml;
+	@UiField HTML dtXco2Fco2Html;
 	@UiField HTML recFco2VsTimeHtml;
 	@UiField HTML recFco2VsSstHtml;
 	@UiField HTML recFco2VsSalHtml;
@@ -128,6 +132,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	@UiField Image temperaturesImage;
 	@UiField Image salinitiesImage;
 	@UiField Image xco2sImage;
+	@UiField Image dtXco2Fco2Image;
 	@UiField Image recFco2VsTimeImage;
 	@UiField Image recFco2VsSstImage;
 	@UiField Image recFco2VsSalImage;
@@ -189,6 +194,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		temperaturesHtml.setHTML(TEMPERATURES_TAB_TEXT);
 		salinitiesHtml.setHTML(SALINITIES_TAB_TEXT);
 		xco2sHtml.setHTML(XCO2S_TAB_TEXT);
+		dtXco2Fco2Html.setHTML(DT_XCO2_FCO2_TAB_TEXT);
 		recFco2VsTimeHtml.setHTML(REC_FCO2_VS_TIME_TAB_TEXT);
 		recFco2VsSstHtml.setHTML(REC_FCO2_VS_SST_TAB_TEXT);
 		recFco2VsSalHtml.setHTML(REC_FCO2_VS_SAL_TAB_TEXT);
@@ -204,6 +210,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		temperaturesHtml.setTitle(TEMPERATURES_ALT_TEXT);
 		salinitiesHtml.setTitle(SALINITIES_ALT_TEXT);
 		xco2sHtml.setTitle(XCO2S_ALT_TEXT);
+		dtXco2Fco2Html.setTitle(DT_XCO2_FCO2_ALT_TEXT);
 		recFco2VsTimeHtml.setTitle(REC_FCO2_VS_TIME_ALT_TEXT);
 		recFco2VsSstHtml.setTitle(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalHtml.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
@@ -219,6 +226,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		temperaturesImage.setAltText(TEMPERATURES_ALT_TEXT);
 		salinitiesImage.setAltText(SALINITIES_ALT_TEXT);
 		xco2sImage.setAltText(XCO2S_ALT_TEXT);
+		dtXco2Fco2Image.setAltText(DT_XCO2_FCO2_ALT_TEXT);
 		recFco2VsTimeImage.setAltText(REC_FCO2_VS_TIME_ALT_TEXT);
 		recFco2VsSstImage.setAltText(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalImage.setAltText(REC_FCO2_VS_SAL_ALT_TEXT);
@@ -234,6 +242,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		temperaturesImage.setTitle(TEMPERATURES_ALT_TEXT);
 		salinitiesImage.setTitle(SALINITIES_ALT_TEXT);
 		xco2sImage.setTitle(XCO2S_ALT_TEXT);
+		dtXco2Fco2Image.setTitle(DT_XCO2_FCO2_ALT_TEXT);
 		recFco2VsTimeImage.setTitle(REC_FCO2_VS_TIME_ALT_TEXT);
 		recFco2VsSstImage.setTitle(REC_CO2_VS_SST_ALT_TEXT);
 		recFco2VsSalImage.setTitle(REC_FCO2_VS_SAL_ALT_TEXT);
@@ -322,6 +331,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		temperaturesImage.setUrl(UriUtils.fromString(imagePrefix + TEMPERATURES_IMAGE_NAME + imageSuffix));
 		salinitiesImage.setUrl(UriUtils.fromString(imagePrefix + SALINITIES_IMAGE_NAME + imageSuffix));
 		xco2sImage.setUrl(UriUtils.fromString(imagePrefix + XCO2S_IMAGE_NAME + imageSuffix));
+		dtXco2Fco2Image.setUrl(UriUtils.fromString(imagePrefix + DT_XCO2_FCO2_IMAGE_NAME + imageSuffix));
 		recFco2VsTimeImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_TIME_IMAGE_NAME + imageSuffix));
 		recFco2VsSstImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SST_IMAGE_NAME + imageSuffix));
 		recFco2VsSalImage.setUrl(UriUtils.fromString(imagePrefix + REC_FCO2_VS_SAL_IMAGE_NAME + imageSuffix));

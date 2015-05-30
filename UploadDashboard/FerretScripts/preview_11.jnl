@@ -16,8 +16,12 @@ let/title=Salinity salin = reshape(sal, tt)
 let/title=Temperature temper = reshape(temp, tt)
 let/title=fCO2_recommended fco2 = reshape(fco2_recommended, tt)
 
+
+LET woce4 = if woce_co2_water EQ 4 then 1
+LET n4 = `woce4[L=@ngd]`
+
 set view y1
-plot/noy/color=blue/title=" "($linestyle)/line/set lat
+ribbon($linestyle)/noy/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/title=" "/line/set lat, WOCE_CO2_water
   ppl ylab lat
   ppl xlab " "
   ppl axatic,,3
@@ -25,21 +29,41 @@ plot/noy/color=blue/title=" "($linestyle)/line/set lat
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-ppl plot
+ppl ribbon
+
+IF `n4 GT 0` THEN
+ let ov4 = lat*woce4
+ plot/over/nolab($woce4style)/color=black ov4
+ plot/over/nolab($ppstyle)/nolab/color=red ov4
+ENDIF
+! If no data, add a label
+IF `lat[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
 
 set view y2
-plot/noy/color=blue/title=" "($linestyle)/line/set lon
-  ppl ylab long
+ribbon($linestyle)/noy/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/title=" "/line/set lon, WOCE_CO2_water
+  ppl ylab lon
   ppl xlab " "
   ppl axatic,,3
   ppl txlabp,0
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-ppl plot
+ppl ribbon
+
+IF `n4 GT 0` THEN
+ let ov4 = lon*woce4
+ plot/over/nolab($woce4style)/color=black ov4
+ plot/over/nolab($ppstyle)/nolab/color=red ov4
+ENDIF
+! If no data, add a label
+IF `lon[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
 
 set view y3
-plot/noy/color=blue/title=" "($linestyle)/line/set salin
+ribbon($linestyle)/noy/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/title=" "/line/set salin, WOCE_CO2_water
   ppl ylab sal
   ppl xlab " "
   ppl axatic,,3
@@ -47,10 +71,20 @@ plot/noy/color=blue/title=" "($linestyle)/line/set salin
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-ppl plot
+ppl ribbon
+
+IF `n4 GT 0` THEN
+ let ov4 = salin*woce4
+ plot/over/nolab($woce4style)/color=black ov4
+ plot/over/nolab($ppstyle)/nolab/color=red ov4
+ENDIF
+! If no data, add a label
+IF `salin[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
 
 set view y4
-plot/noy/color=blue/title=" "($linestyle)/line/set temper
+ribbon($linestyle)/noy/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/title=" "/line/set temper, WOCE_CO2_water
   ppl ylab temp
   ppl xlab " "
   ppl axatic,,3
@@ -58,10 +92,20 @@ plot/noy/color=blue/title=" "($linestyle)/line/set temper
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-ppl plot
+ppl ribbon
+
+IF `n4 GT 0` THEN
+ let ov4 = temper*woce4
+ plot/over/nolab($woce4style)/color=black ov4
+ plot/over/nolab($ppstyle)/nolab/color=red ov4
+ENDIF
+! If no data, add a label
+IF `temper[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
 
 set view y5
-plot/noy/color=blue/title=" "($linestyle)/line/set fco2
+ribbon($linestyle)/noy/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/title=" "/line/set fco2, WOCE_CO2_water
   ppl ylab fCO2 rec
   ppl xlab " "
   ppl axatic,,3
@@ -69,19 +113,28 @@ plot/noy/color=blue/title=" "($linestyle)/line/set fco2
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-ppl plot
+ppl ribbon
 
-
+IF `n4 GT 0` THEN
+ let ov4 = fco2*woce4
+ plot/over/nolab($woce4style)/color=black ov4
+ plot/over/nolab($ppstyle)/nolab/color=red ov4
+ENDIF
+! If no data, add a label
+IF `fco2[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
 
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.5*($ppl$yorg)`, 0,0,0.14,  ($lab_top)
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.12, Count: `nobs` locations
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.12, \
+   Count: `nobs` locations Colored by `WOCE_CO2_water_in,return=title`
 
 
 ! reset
-ppl txlabp,0
-ppl axatic,5,5
 
+ppl txlabp,-1
+ppl axatic,5,5
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

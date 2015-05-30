@@ -2,19 +2,16 @@
 
 go preview_setup ($infile_dsg) 6
 
-! lines blk, red, green, blue
+! lines blk, red, green, blue/thick=2
 
 let/title="@AS@ SST wet" sstwet = reshape(xCO2_water_sst_wet_ppm, tt)
 let/title="@AS@ SST dry" sstdry = reshape(xCO2_water_sst_dry_ppm, tt)
 let/title="@AS@ Teq wet" teqwet = reshape(xCO2_water_equi_temp_wet_ppm, tt)
 let/title="@AS@ Teq dry" teqdry = reshape(xCO2_water_equi_temp_dry_ppm, tt)
 
-! Plot variables together to set common vertical scale
+
+ ! Plot variables together to set common vertical scale
 plot  sstwet, sstdry, teqwet, teqdry 
-if `sstwet[l=@ngd] eq 0` THEN let/title="@AS@ SST wet" sstwet = 1000*tt
-if `sstdry[l=@ngd] eq 0` THEN let/title="@AS@ SST dry" sstdry = 1000*tt
-if `teqwet[l=@ngd] eq 0` THEN let/title="@AS@ Teq wet" teqwet= 1000*tt
-if `teqdry[l=@ngd] eq 0` THEN let/title="@AS@ Teq dry" teqdry = 1000*tt
 let ymin = ($yaxis_min)
 let ymax = ($yaxis_max)
 
@@ -22,7 +19,11 @@ let ymax = ($yaxis_max)
 ! Plot xCO2 variables 
 set view full
 
-plot/line($linestyle)/vlim=`ymin`:`ymax`/key=title/set  sstwet, sstdry, teqwet, teqdry 
+! plot lines with individual line styles
+define symbol style1 = /color=black
+define symbol leglab1 "@AS@ SST wet"
+
+plot($linestyle)/vlim=`ymin`:`ymax`/titl=" "/set sstwet
   ($taxis_setting)
   ppl ylab xCO_2 (`xCO2_water_sst_wet_ppm,return=units`)
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
@@ -30,11 +31,29 @@ plot/line($linestyle)/vlim=`ymin`:`ymax`/key=title/set  sstwet, sstdry, teqwet, 
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl plot
 
+define symbol style2 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)
+define symbol leglab2 "@AS@ SST dry"
+plot($linestyle)($style2)/over/nolab sstdry
+
+define symbol style3 =  /color=green/thick=2/DASH=(0.15,0.05,0.15,0.05)
+define symbol leglab3 "@AS@ Teq wet"
+plot($linestyle)($style3)/over/nolab teqwet
+
+define symbol style4 =  /color=blue/thick=2
+define symbol leglab4 "@AS@ Teq dry"
+plot($linestyle)($style4)/over/nolab teqdry
 
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+
+! If no data, add a label
+IF `sstwet[L=@ngd] + sstdry[L=@ngd] + teqwet[L=@ngd] + teqdry[L=@ngd] EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+go keybox ($style1) "($leglab1)" ($style2) "($leglab2)" ($style3) "($leglab3)" ($style4) "($leglab4)"
+
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

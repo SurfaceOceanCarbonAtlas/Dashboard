@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
+import uk.ac.uea.socat.metadata.OmeMetadata.InvalidConflictException;
 import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
@@ -791,7 +792,7 @@ public class DashboardCruiseChecker {
 			oldOmeMData = new OmeMetadata(expocode);
 			try {
 				oldOmeMData.assignFromOmeXmlDoc(oldOmeDoc);
-			} catch (BadEntryNameException ex) {
+			} catch (BadEntryNameException | InvalidConflictException ex) {
 				throw new IllegalArgumentException("Unknown entry in the OME XML " + 
 						omeFile.getName() + "\n    " + ex.getMessage());
 			}
