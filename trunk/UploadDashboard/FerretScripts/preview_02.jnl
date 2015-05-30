@@ -3,14 +3,14 @@
 
 go preview_setup ($infile_dsg) 2
 
-
 let/title=Latitude lat = reshape(latitude, tt)
 let/title=Longitude lon = reshape(longitude, tt)
 
 ! Plot Longitude and Latitude, each with its own vertical axis
 
 set view full
-plot($linestyle)/line/color=blue/axes=1,1,1,0/title=" "/set lat
+define symbol style1 =/color=blue/thick=2
+plot($linestyle)($style1)/axes=1,1,1,0/title=" "/set lat
   ppl ylab Deg N
   ppl xlab " "
   ($taxis_setting)
@@ -20,7 +20,8 @@ plot($linestyle)/line/color=blue/axes=1,1,1,0/title=" "/set lat
 ppl plot
 
 set view full2
-plot($linestyle)/line/color=green/axes=1,1,0,1/title=" "/set lon
+define symbol style2 =  /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
+plot($linestyle)($style2)/axes=1,1,0,1/title=" "/set lon
   ppl ylab Deg E
   ppl xlab " "
   ($taxis_setting)
@@ -30,30 +31,14 @@ plot($linestyle)/line/color=green/axes=1,1,0,1/title=" "/set lon
 ppl plot
 
 
-! Make the color key - draw a plot withlines off the page, but 
-! with the Ferret key made by Ferret PLOT/KEY=TITLE
-! Redefine color 2 to blue (and afterwards back to red)
-
-
-set view full3
-ppl color,2,0,0,100
-plot/key=title/color/noax/set/vlim=1000:2000/axes=0,0,0,0/L=1:5/set lat, lon
-  ppl ylab " "
-  ppl xlab " "
-  ($taxis_setting)
-  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
-  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
-  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-PPL PLOT
-
-
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 
-! Restore color 2 definition
-ppl color,2,100,0,0
+! Make the color key
+Go keybox ($style1) Latitude ($style2) Longitude
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

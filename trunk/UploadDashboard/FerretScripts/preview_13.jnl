@@ -1,30 +1,13 @@
 ! Difference between reported and recalculated fCO_2
 
-
 GO preview_setup.jnl ($infile_dsg) 13
-
-
-LET var_sources = {\
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"pCO2_water_equi_temp", \
-"pCO2_water_sst_100humidity_uatm", \
-"fCO2_water_equi_uatm", \
-"fCO2_water_sst_100humidity_uatm", \
-"pCO2_water_equi_temp", \
-"pCO2_water_sst_100humidity_uatm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm"}
 
 ! We compute the fco2_source in calcSOCAT3.jnl
 !  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even
 !  if the values of xCO2_water_equi_temp_dry_ppm are valid, because the computed
 !  fCO2_insitu variable also depends on temperature and temperature_equi.)
-!
+!  Some of these are duplicates - e.g. fCO2_from_pCO2_water_water_equi_temp and
+!  fCO2_from_pCO2_water_water_equi_temp_ncep both come from pCO2_water_water_equi_temp
 
 LET vsrc1 = IF fco2_source EQ 1 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
 LET vsrc2 = IF fco2_source EQ 2 THEN xCO2_water_sst_dry_ppm ELSE 0
@@ -40,6 +23,7 @@ LET vsrc11 = IF fco2_source EQ 11 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
 LET vsrc12 = IF fco2_source EQ 12 THEN xCO2_water_sst_dry_ppm ELSE 0
 LET vsrc13 = IF fco2_source EQ 13 THEN xCO2_water_equi_temp_dry_ppm ELSE 0
 LET vsrc14 = IF fco2_source EQ 14 THEN xCO2_water_sst_dry_ppm ELSE 0
+
 
 LET sources = vsrc1 + vsrc2 + vsrc3 + vsrc4 + vsrc5 + vsrc6 + vsrc7 + vsrc8 + vsrc9 + vsrc10 + vsrc11 + vsrc12 + vsrc13 + vsrc14
 
@@ -57,21 +41,26 @@ SET VIEW FULL
 
 LET use_color = `fco2_source[i=@min] NE fco2_source[i=@max]`
 
+let drange = ABS(minmax(diff_t))
+let ymin = `-1.1*drange[i=@max]`
+let ymax = ` 1.1*drange[i=@max]`
+
 IF `use_color` THEN
-   PLOT($ppstyle)/RIBBON/PAL=fifteen_by_levels/LEV=(1,15,1)/KEY=cent/\
-   TITLE="@SRDifference: recalculated minus reported fCO_2<NL>Colored by source id "/SET diff_t, alg_id_t
-     PPL YLAB " "
-     PPL XLAB " "
+   ribbon($linestyle)/vlim=`ymin`:`ymax`/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/\
+   TITLE="@SRRecommended fCO_2 minus reported CO_2<NL>Colored by source id "/SET diff_t, alg_id_t
+     ppl ylab "Difference (`fco2_recommended,return=units`)"
+     ppl xlab " "
      ($taxis_setting)
      IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
      IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
      IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
    PPL RIBBON
 ELSE 
-   PLOT($ppstyle)/COLOR=blue/SET diff_t
-     PPL ylab " "
-     PPL xlab " "
-     PPL title "Difference: recalculated minus reported fCO_2<NL>Single source is `fco2_source[i=@min]`"
+   PLOT($linestyle)/vlim=`ymin`:`ymax`/COLOR=blue/SET diff_t
+     ppl ylab "Difference (`fco2_recommended,return=units`)"
+     ppl xlab " "
+     DEFINE SYMBOL src = `fco2_source[i=@min]`
+     PPL title "Recommended fCO_2 minus reported CO_2<NL>Single source is  `source_labels[i=($src)]`"
      ($taxis_setting)
      IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
      IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
@@ -83,6 +72,11 @@ ENDIF
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nfnoc` Valid fCO_2 recomputed
+
+
+set v full2
+plot/vs/line/color=6/vlim=0:1/hlim=0:1/noax/nolab {0,1}, {0.5,0.5}
+
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 

@@ -10,7 +10,7 @@ let samp = L[gt=tt]
 set view full
 
 
-ribbon($ppstyle)/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/line\
+ribbon($linestyle)/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/line\
 /title=" "/set samp,woce_co2_water
   ppl ylab Sample Number
   ppl xlab " "
@@ -20,11 +20,19 @@ ribbon($ppstyle)/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/line\
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl ribbon
 
-LABEL/NOUSER  `($ppl$xlen)/2`,`-0.6*($ppl$yorg)`, 0,0,0.13,  "Colored by `WOCE_CO2_water_in,return=title`"
+LET woce4 = if woce_co2_water EQ 4 then 1
+LET n4 = `woce4[L=@ngd]`
+IF `n4 GT 0` THEN
+   plot/over($woce4style)/color=black/nolab woce4*reshape(samp,tt)
+   plot/over($ppstyle)/nolab/color=red woce4*reshape(samp,tt)
+ENDIF
 
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, \
+   Count: `nobs` locations Colored by `WOCE_CO2_water_in,return=title`
+
+
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

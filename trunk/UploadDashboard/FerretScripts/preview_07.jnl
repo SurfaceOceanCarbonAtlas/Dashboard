@@ -1,5 +1,4 @@
 ! Salinity
-
 go preview_setup ($infile_dsg) 7
 
 
@@ -10,7 +9,11 @@ let/title="WOA sss" woa = reshape(woa_sss, tt)
 let/title="Sal" sal_t = reshape (sal, tt)
 
 set view full
-plot($linestyle)/line/color=blue/axes=1,1,1,0/title=" "/set woa
+
+define symbol style1 =  /color=blue/thick=2
+define symbol leglab1 WOA sss
+
+plot($linestyle)/color=blue/thick=2/axes=1,1,1,0/title=" "/set woa
   ppl ylab Salinity (`sal,return=units`)
   ppl xlab " "
   ($taxis_setting)
@@ -19,32 +22,11 @@ plot($linestyle)/line/color=blue/axes=1,1,1,0/title=" "/set woa
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
 ppl plot
 
+
+define symbol style2 = /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
+define symbol leglab2  Sal
 set view full2
-plot($linestyle)/line/color=green/axes=1,1,0,1/title=" "/set sal_t
-  ppl ylab " "
-  ppl xlab " "
-  ($taxis_setting)
-  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
-  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
-  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-ppl plot
-
-! Make the color key - draw a plot withlines off the page, but 
-! with the Ferret key made by Ferret PLOT/KEY=TITLE
-! Redefine color 2 to blue (and afterwards back to red)
-
-set view full3
-ppl color,2,0,0,100
-plot($linestyle)/line/key=title/color/noax/set/vlim=1000:2000/L=1:5/set woa, sal_t
-  ppl ylab " "
-  ppl xlab " "
-  ($taxis_setting)
-  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
-  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
-  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
-PPL PLOT
-
-
+plot($linestyle)($style2)/axes=1,1,0,1/nolab sal_t
 
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
@@ -52,8 +34,12 @@ LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_to
 
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
 
-FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 
-! Restore color 2 definition
-ppl color,2,100,0,0
+! If no data, add a label
+IF `woa[L=@ngd] + sal_t[L=@ngd] EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+go keybox ($style1) "($leglab1)" ($style2) "($leglab2)" 
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
 

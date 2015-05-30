@@ -3,37 +3,6 @@
 GO preview_setup.jnl ($infile_dsg) 12
 
 
-LET var_sources = {\
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"pCO2_water_equi_temp", \
-"pCO2_water_sst_100humidity_uatm", \
-"fCO2_water_equi_uatm", \
-"fCO2_water_sst_100humidity_uatm", \
-"pCO2_water_equi_temp", \
-"pCO2_water_sst_100humidity_uatm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm", \
-"xCO2_water_equi_temp_dry_ppm", \
-"xCO2_water_sst_dry_ppm"}
-
-LET source_labels = {\
-"xCO_2^s^w(teq) dry", \
-"xCO_2^s^w(sst) dry", \
-"pCO_2^s^w(teq)", \
-"pCO_2^s^w(sst)", \
-"fCO_2^s^w(teq)", \
-"fCO_2^s^w(sst)", \
-"pCO_2^s^w(teq) ncep", \
-"pCO_2^s^w(sst) ncep", \
-"xCO_2^s^w(teq) dry woa", \
-"xCO_2^s^w(sst) dry woa", \
-"xCO_2^s^w(teq) dry ncep", \
-"xCO_2^s^w(sst) dry ncep", \
-"xCO_2^s^w(teq) dry ncep_woa", \
-"xCO_2^s^w(sst) dry ncep_woa"}
 
 ! We compute the fco2_source in calcSOCAT3.jnl
 !  (Note that the fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm may not exist, even
@@ -110,7 +79,7 @@ LET colr = {($colors)}
 PPL %RANGE 0, `maxloc`, 5
 LET dely = `dely/2`
 
-POLYGON/PAL=fifteen_by_levels/LEV=(1,15,1)/KEY=cent/VLIM=0:15/HLIM=0:($ppl$range_high)/SET xp, yp, colr
+POLYGON/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/VLIM=0:15/HLIM=0:($ppl$range_high)/SET xp, yp, colr
   PPL xlab "Number of Measurements"
   PPL ylab "Sources"
   PPL title " "

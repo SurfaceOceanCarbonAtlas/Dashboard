@@ -271,7 +271,7 @@ public class DashboardServices extends RemoteServiceServlet
 		for ( String cruiseExpocode : allExpocodes ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
 		}
-		Logger.getLogger("DashboardServices").info("returned updated cruise information for " + username);
+		Logger.getLogger("DashboardServices").info("returned updated dataset information for " + username);
 		return cruiseList;
 	}
 
@@ -287,12 +287,12 @@ public class DashboardServices extends RemoteServiceServlet
 				.getCruiseDataFromFiles(expocode, 0, 
 						DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 		if ( cruiseData == null )
-			throw new IllegalArgumentException("cruise " + expocode + " does not exist");
+			throw new IllegalArgumentException(expocode + " does not exist");
 
 		// Remove any metadata preamble to reduced data transmitted
 		cruiseData.getPreamble().clear();
 
-		Logger.getLogger("DashboardServices").info("cruise data columns specs returned for " + 
+		Logger.getLogger("DashboardServices").info("data columns specs returned for " + 
 				expocode + " for " + username);
 		// Return the cruise with the partial data
 		return cruiseData;
@@ -309,7 +309,7 @@ public class DashboardServices extends RemoteServiceServlet
 		DashboardCruiseWithData cruiseWithData = configStore.getCruiseFileHandler()
 									.getCruiseDataFromFiles(expocode, firstRow, numRows);
 		if ( cruiseWithData == null )
-			throw new IllegalArgumentException("cruise " + expocode + " does not exist");
+			throw new IllegalArgumentException(expocode + " does not exist");
 		ArrayList<ArrayList<String>> cruiseDataRows = cruiseWithData.getDataValues();
 		if ( cruiseDataRows.size() != numRows )
 			throw new IllegalArgumentException("invalid requested row numbers: " + 
@@ -330,6 +330,9 @@ public class DashboardServices extends RemoteServiceServlet
 		// Retrieve all the current cruise data
 		DashboardCruiseWithData cruiseData = configStore.getCruiseFileHandler()
 						.getCruiseDataFromFiles(newSpecs.getExpocode(), 0, -1);
+		if ( ! cruiseData.isEditable() )
+			throw new IllegalArgumentException(newSpecs.getExpocode() + " has been submitted for QC; data column types cannot be modified.");
+
 		// Revise the cruise data column types and units 
 		if ( newSpecs.getDataColTypes().size() != cruiseData.getDataColTypes().size() )
 			throw new IllegalArgumentException("Unexpected number of data columns (" +
@@ -345,7 +348,7 @@ public class DashboardServices extends RemoteServiceServlet
 
 		// Save and commit the updated cruise columns
 		configStore.getCruiseFileHandler().saveCruiseInfoToFile(cruiseData, 
-				"Cruise data column types, units, and missing values for " + 
+				"Data column types, units, and missing values for " + 
 				cruiseData.getExpocode() + " updated by " + username);
 		// Update the user-specific data column names to types, units, and missing values 
 		configStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, username);
@@ -378,10 +381,12 @@ public class DashboardServices extends RemoteServiceServlet
 		Logger dataSpecsLogger = Logger.getLogger("DashboardServices");
 
 		for ( String expocode : cruiseExpocodes ) {
-			try {
-				// Retrieve all the current cruise data
-				DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+			// Retrieve all the current cruise data
+			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
+			if ( ! cruiseData.isEditable() )
+				throw new IllegalArgumentException("Dataset " + expocode + " has been submitted for QC; data column types cannot be modified.");
 
+			try {
 				// Identify the columns from stored names-to-types for this user
 				userHandler.assignDataColumnTypes(cruiseData);
 				// Save and commit these column assignments in case the sanity checker has problems
@@ -397,7 +402,7 @@ public class DashboardServices extends RemoteServiceServlet
 						" updated by " + username + " from post-processing a multiple-dataset upload");
 				dataSpecsLogger.info("Updated data column specs for " + expocode + " for " + username);
 			} catch (Exception ex) {
-				// ignore problems (such as unidentified columns)
+				// ignore problems (such as unidentified columns) - cruise will not have been updated
 				dataSpecsLogger.error("Unable to update data column specs for " + expocode + ": " + ex.getMessage());
 				continue;
 			}
