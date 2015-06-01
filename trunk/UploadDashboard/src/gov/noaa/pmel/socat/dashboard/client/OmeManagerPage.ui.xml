@@ -18,12 +18,14 @@
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
 						name="OmeRadioGroup" ui:field="editNewRadio" />
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
-						name="OmeRadioGroup" ui:field="editPreviousRadio" />
+						name="OmeRadioGroup" ui:field="editMergeRadio" />
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
 						name="OmeRadioGroup" ui:field="editUploadRadio" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="editButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="previousButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="nextButton" />
 				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="doneButton" />
 			</g:FlowPanel>
 		</g:FlowPanel>

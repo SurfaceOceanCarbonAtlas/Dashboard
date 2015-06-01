@@ -34,23 +34,33 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private static final String TITLE_TEXT = "Edit Metadata";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
+
 	private static final String EDIT_TEXT = "Open OME ...";
 	private static final String EDIT_TOOLTIP_HELP = "Opens the OME in another window " +
 			"with the indicated content and advances this page to the next dataset";
+
+	private static final String PREVIOUS_TEXT = "Jump Back";
+	private static final String PREVIOUS_TOOLTIP_HELP = "Goes to the previous dataset without opening the OME";
+
+	private static final String NEXT_TEXT = "Jump Ahead";
+	private static final String NEXT_TOOLTIP_HELP = "Goes to the next dataset without opening the OME";
+
 	private static final String DONE_TEXT = "Done";
 	private static final String DONE_TOOLTIP_HELP = "Returns to your list of displayed datasets";
 
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
-			"Sequentially open the online metadata editor (OME) " +
+			"<p>Sequentially open the online metadata editor (OME) " +
 			"for each of the following datasets: <ul>";
-	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</ul>";
+	private static final String CRUISE_HTML_INTRO_EPILOGUE = 
+			"</ul>" +
+			"(Note: you will need to allow popups from this site.)</p>";
 
 	private static final String CRUISE_HTML_ACTIVE_PROLOGUE = "Open the OME for <b>";
 	private static final String CRUISE_HTML_ACTIVE_EPILOGUE = "</b>:";
 	private static final String CRUISE_HTML_DONE_MSG = "Select Done when finished editing in the OME";
 
 	private static final String EDIT_NEW_RADIO_TEXT = "with any existing metadata for ";
-	private static final String EDIT_PREVIOUS_RADIO_TEXT = "copying applicable metadata from ";
+	private static final String EDIT_MERGED_RADIO_TEXT = "copying applicable metadata from ";
 	private static final String EDIT_UPLOAD_RADIO_TEXT = "using contents of your locally-saved OME XML file";
 
 	private static final String OPEN_OME_FAIL_MSG = "Opening the metadata editor failed";
@@ -77,9 +87,11 @@ public class OmeManagerPage extends CompositeWithUsername {
 	@UiField HTML introHtml;
 	@UiField HTML cruiseNameHtml;
 	@UiField RadioButton editNewRadio;
-	@UiField RadioButton editPreviousRadio;
+	@UiField RadioButton editMergeRadio;
 	@UiField RadioButton editUploadRadio;
 	@UiField Button editButton;
+	@UiField Button previousButton;
+	@UiField Button nextButton;
 	@UiField Button doneButton;
 
 	// Singleton instance of this page
@@ -121,10 +133,15 @@ public class OmeManagerPage extends CompositeWithUsername {
 		logoutButton.setText(LOGOUT_TEXT);
 
 		editNewRadio.setText(EDIT_NEW_RADIO_TEXT);
-		editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
+		editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT);
 		editUploadRadio.setText(EDIT_UPLOAD_RADIO_TEXT);
+
 		editButton.setText(EDIT_TEXT);
 		editButton.setTitle(EDIT_TOOLTIP_HELP);
+		previousButton.setText(PREVIOUS_TEXT);
+		previousButton.setTitle(PREVIOUS_TOOLTIP_HELP);
+		nextButton.setText(NEXT_TEXT);
+		nextButton.setTitle(NEXT_TOOLTIP_HELP);
 		doneButton.setText(DONE_TEXT);
 		doneButton.setTitle(DONE_TOOLTIP_HELP);
 	}
@@ -231,10 +248,10 @@ public class OmeManagerPage extends CompositeWithUsername {
 		if ( activeExpocode.isEmpty() ) {
 			// Gone through the list - only done button
 			editNewRadio.setText(EDIT_NEW_RADIO_TEXT);
-			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
+			editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT);
 			editNewRadio.setValue(true);
 			editNewRadio.setEnabled(false);
-			editPreviousRadio.setEnabled(false);
+			editMergeRadio.setEnabled(false);
 			editUploadRadio.setEnabled(false);
 			editButton.setEnabled(false);
 		}
@@ -242,10 +259,10 @@ public class OmeManagerPage extends CompositeWithUsername {
 			// First expocode in the list - no previous option
 			editNewRadio.setText(EDIT_NEW_RADIO_TEXT +
 					SafeHtmlUtils.htmlEscape(activeExpocode));
-			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT);
+			editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT);
 			editNewRadio.setValue(true);
 			editNewRadio.setEnabled(true);
-			editPreviousRadio.setEnabled(false);
+			editMergeRadio.setEnabled(false);
 			editUploadRadio.setEnabled(true);
 			editButton.setEnabled(true);
 		}
@@ -253,11 +270,11 @@ public class OmeManagerPage extends CompositeWithUsername {
 			// Middle of the list - all options available
 			editNewRadio.setText(EDIT_NEW_RADIO_TEXT +
 					SafeHtmlUtils.htmlEscape(activeExpocode));
-			editPreviousRadio.setText(EDIT_PREVIOUS_RADIO_TEXT + 
+			editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT + 
 					SafeHtmlUtils.htmlEscape(previousExpocode));
-			editPreviousRadio.setValue(true);
+			editMergeRadio.setValue(true);
 			editNewRadio.setEnabled(true);
-			editPreviousRadio.setEnabled(true);
+			editMergeRadio.setEnabled(true);
 			editUploadRadio.setEnabled(true);
 			editButton.setEnabled(true);
 		}
@@ -278,7 +295,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	void editButtonOnClick(ClickEvent event) {
 		// Get the selected option for opening the OME
 		String prevExpo;
-		if ( editPreviousRadio.getValue() ) {
+		if ( editMergeRadio.getValue() ) {
 			prevExpo = previousExpocode;
 		}
 		else {
