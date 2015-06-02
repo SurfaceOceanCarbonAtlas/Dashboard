@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
@@ -221,25 +222,36 @@ public class CruiseUploadService extends HttpServlet {
 			}
 
 			if ( cruiseExists ) {
+				// Read the original cruise info to get the current owner and QC status
+				DashboardCruise cruise;
 				String owner;
+				String qcstatus;
 				try {
-					owner = cruiseHandler.verifyOkayToDeleteCruise(expocode, username)
-										 .getOwner();
+					cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+					owner = cruise.getOwner();
+					qcstatus = cruise.getQcStatus();
 				} catch ( Exception ex ) {
-					owner = null;
+					owner = "";
+					qcstatus = "";
 				}
-				// If the cruise file exists, make sure the request was for an overwrite
-				// and that this user has permission to overwrite this cruise
-				if ( (owner == null) ||
-					 ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) {
+				// Make sure this user has permission to overwrite this cruise,
+				// and the request was for an overwrite
+				try {
+					cruise = cruiseHandler.verifyOkayToDeleteCruise(expocode, username);
+				} catch ( Exception ex ) {
+					cruise = null;
+				}
+				if ( (cruise == null) ||
+					 ( ! DashboardUtils.REQUEST_OVERWRITE_CRUISE_TAG.equals(action) ) ) {
 					messages.add(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG + " " + 
-								filename + " ; " + expocode + " ; " + owner);
+								filename + " ; " + expocode + " ; " + owner + " ; " + qcstatus);
 					continue;
 				}
 
-				// Preserve the original owner of the data
+				// Preserve the original owner of the data and the original QC status (for update)
 				if ( ! owner.isEmpty() )
 					cruiseData.setOwner(owner);
+				cruiseData.setQcStatus(qcstatus);
 			}
 			else {
 				// If the cruise file does not exist, make sure the request was for a new file
