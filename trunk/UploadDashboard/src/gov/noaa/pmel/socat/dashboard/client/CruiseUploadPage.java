@@ -118,10 +118,9 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"appears to this system and change the file encoding type if appropriate." +
 			"</p>";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG_START = 
-			"<br />A dataset already exists with this expocode.</h3>" +
-			"<p>";
+			"<br />A dataset already exists with this expocode.</h3>";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG_END = 
-			"<br />Either you specified that this file should create a new " +
+			"<p>Either you specified that this file should create a new " +
 			"dataset, or the existing dataset with this expocode cannot be " +
 			"overwritten.  Datasets cannot be overwritten if they have been " +
 			"submitted for QC, or if they do not belong to you.</p>";
@@ -437,14 +436,16 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			else if ( header.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
 				// Cruise file exists and not permitted to overwrite; 
 				String[] info = header.substring(
-						DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim().split(" ; ", 3);
+						DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG.length()).trim().split(" ; ", 4);
 				String failMsg = FAIL_MSG_HEADER;
 				if ( info.length > 1 ) 
 					failMsg += SafeHtmlUtils.htmlEscape(info[1].trim()) + " - ";
 				failMsg += SafeHtmlUtils.htmlEscape(info[0].trim());
 				failMsg += CANNOT_OVERWRITE_FAIL_MSG_START;
 				if ( info.length > 2 )
-					failMsg += "&nbsp;&nbsp;&nbsp;&nbsp;owner = " + SafeHtmlUtils.htmlEscape(info[2].trim());
+					failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;Owner = " + SafeHtmlUtils.htmlEscape(info[2].trim()) + "</p>";
+				if ( info.length > 3 )
+					failMsg += "<p>&nbsp;&nbsp;&nbsp;&nbsp;QC Status = " + SafeHtmlUtils.htmlEscape(info[3].trim()) + "</p>";
 				errMsgs.add(failMsg + CANNOT_OVERWRITE_FAIL_MSG_END); 
 			}
 			else if ( header.startsWith(DashboardUtils.NO_DATASET_HEADER_TAG) ) {
