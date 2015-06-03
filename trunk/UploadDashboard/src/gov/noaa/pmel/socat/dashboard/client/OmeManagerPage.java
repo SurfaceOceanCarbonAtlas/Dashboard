@@ -8,7 +8,8 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.TreeSet;
 
 import com.google.gwt.core.client.GWT;
@@ -24,6 +25,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -37,13 +39,13 @@ public class OmeManagerPage extends CompositeWithUsername {
 
 	private static final String EDIT_TEXT = "Open OME ...";
 	private static final String EDIT_TOOLTIP_HELP = "Opens the OME in another window " +
-			"with the indicated content and advances this page to the next dataset";
+			"with the indicated content and moves to the next dataset";
 
-	private static final String PREVIOUS_TEXT = "Jump Back";
-	private static final String PREVIOUS_TOOLTIP_HELP = "Goes to the previous dataset without opening the OME";
+	private static final String PREVIOUS_TEXT = "Previous";
+	private static final String PREVIOUS_TOOLTIP_HELP = "Moves to the previous dataset without opening the OME";
 
-	private static final String NEXT_TEXT = "Jump Ahead";
-	private static final String NEXT_TOOLTIP_HELP = "Goes to the next dataset without opening the OME";
+	private static final String NEXT_TEXT = "Next";
+	private static final String NEXT_TOOLTIP_HELP = "Moves to the next dataset without opening the OME";
 
 	private static final String DONE_TEXT = "Done";
 	private static final String DONE_TOOLTIP_HELP = "Returns to your list of displayed datasets";
@@ -59,9 +61,12 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private static final String CRUISE_HTML_ACTIVE_EPILOGUE = "</b>:";
 	private static final String CRUISE_HTML_DONE_MSG = "Select Done when finished editing in the OME";
 
-	private static final String EDIT_NEW_RADIO_TEXT = "with any existing metadata for ";
+	private static final String EDIT_EXISTING_RADIO_TEXT = "with any existing metadata for ";
 	private static final String EDIT_MERGED_RADIO_TEXT = "copying applicable metadata from ";
+	private static final String EDIT_MERGED_TEXT_HOVER_HELP = "expocode of the dataset from which to copy/merge applicable metadata values";
 	private static final String EDIT_UPLOAD_RADIO_TEXT = "using contents of your locally-saved OME XML file";
+
+	private static final String NO_EXPOCODE_ERRMSG = "No expocode is given for the dataset from which to copy/merge applicable metadata values";
 
 	private static final String OPEN_OME_FAIL_MSG = "Opening the metadata editor failed";
 
@@ -86,8 +91,9 @@ public class OmeManagerPage extends CompositeWithUsername {
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField HTML cruiseNameHtml;
-	@UiField RadioButton editNewRadio;
-	@UiField RadioButton editMergeRadio;
+	@UiField RadioButton editExistingRadio;
+	@UiField RadioButton editMergedRadio;
+	@UiField TextBox editMergedText;
 	@UiField RadioButton editUploadRadio;
 	@UiField Button editButton;
 	@UiField Button previousButton;
@@ -97,20 +103,17 @@ public class OmeManagerPage extends CompositeWithUsername {
 	// Singleton instance of this page
 	private static OmeManagerPage singleton;
 
-	// Ordered set of expocodes to work with
-	private TreeSet<String> expocodes;
+	// Ordered set of unique expocodes to work with
+	private ArrayList<String> expocodes;
 
-	// Iterator over the above set of expocodes
-	private Iterator<String> exposIter;
+	// Iterator over the list of expocodes;
+	private ListIterator<String> exposIter;
 
-	// First expocode in the ordered set
-	private String firstExpocode;
-
-	// Open the OME with metadata for this expocode
+	// Current expocode
 	private String activeExpocode;
 
-	// Expocode of the datasets immediately prior to the active expocode
-	private String previousExpocode;
+	// Previously active expocode
+	private String priorActiveExpocode;
 
 	/**
 	 * Creates an empty OME manager page.  Do not call this 
@@ -123,17 +126,18 @@ public class OmeManagerPage extends CompositeWithUsername {
 		singleton = this;
 
 		setUsername(null);
-		expocodes = new TreeSet<String>();
-		firstExpocode = "";
+		expocodes = new ArrayList<String>();
+		exposIter = expocodes.listIterator();
 		activeExpocode = "";
-		previousExpocode = "";
-		exposIter = expocodes.iterator();
+		priorActiveExpocode = "";
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
-		editNewRadio.setText(EDIT_NEW_RADIO_TEXT);
-		editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT);
+		editExistingRadio.setText(EDIT_EXISTING_RADIO_TEXT);
+		editMergedRadio.setText(EDIT_MERGED_RADIO_TEXT);
+		editMergedText.setText("");
+		editMergedText.setTitle(EDIT_MERGED_TEXT_HOVER_HELP);
 		editUploadRadio.setText(EDIT_UPLOAD_RADIO_TEXT);
 
 		editButton.setText(EDIT_TEXT);
@@ -172,53 +176,40 @@ public class OmeManagerPage extends CompositeWithUsername {
 		}
 		else {
 			SocatUploadDashboard.updateCurrentPage(singleton);
-			// If was complete, reset to the start
-			if ( singleton.activeExpocode.isEmpty() ) {
-				try {
-					singleton.exposIter = singleton.expocodes.iterator();
-					singleton.activeExpocode = singleton.exposIter.next();
-					singleton.previousExpocode = "";
-					singleton.updateIntro();
-				} catch ( Exception ex ) {
-					// Should never happen - leave empty
-				}
-			}
 		}
 	}
 
 	/**
-	 * Updates this page with the username and 
-	 * the cruises in the given set of cruise.
+	 * Updates this page with the username and the cruises in the given set of cruise.
 	 * 
 	 * @param cruises
 	 * 		open the OME with the metadata for this set of cruises
 	 */
 	private void updateCruise(DashboardCruiseList cruises) {
-		// Update the current username
 		setUsername(cruises.getUsername());
-		expocodes.clear();
+
+		TreeSet<String> exposSet = new TreeSet<String>();
 		for (String expo : cruises.keySet() ) {
-			expocodes.add(expo);
+			exposSet.add(expo);
 		}
-		exposIter = expocodes.iterator();
+		expocodes.clear();
+		expocodes.addAll(exposSet);
+		exposIter = expocodes.listIterator();
 		try {
-			firstExpocode = exposIter.next();
-		} catch ( Exception ex ) {
-			// Should not happen as the list should not be empty
-			firstExpocode = "";
+			activeExpocode = exposIter.next();
+		} catch (Exception ex) {
+			activeExpocode = "";
 		}
-		activeExpocode = firstExpocode;
-		previousExpocode = "";
+		priorActiveExpocode = "";
 
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
-
+		editExistingRadio.setValue(true);
 		updateIntro();
 	}
 
 	/**
 	 * Updates the HTML intro message to reflect the current set of
-	 * expocodes and the currently active expocode.  Also enables
-	 * or disables the radio buttons appropriately.
+	 * expocodes and the currently active expocode.
 	 */
 	private void updateIntro() {
 		// Update the HTML intro
@@ -245,44 +236,89 @@ public class OmeManagerPage extends CompositeWithUsername {
 		}
 		cruiseNameHtml.setHTML(cruiseNameMsg);
 
+		editMergedText.setText(SafeHtmlUtils.htmlEscape(priorActiveExpocode));
+
 		if ( activeExpocode.isEmpty() ) {
-			// Gone through the list - only done button
-			editNewRadio.setText(EDIT_NEW_RADIO_TEXT);
-			editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT);
-			editNewRadio.setValue(true);
-			editNewRadio.setEnabled(false);
-			editMergeRadio.setEnabled(false);
+			// Gone through the list
+			editExistingRadio.setText(EDIT_EXISTING_RADIO_TEXT);
+			editExistingRadio.setEnabled(false);
+			editMergedRadio.setEnabled(false);
 			editUploadRadio.setEnabled(false);
 			editButton.setEnabled(false);
 		}
-		else if ( previousExpocode.isEmpty() ) {
-			// First expocode in the list - no previous option
-			editNewRadio.setText(EDIT_NEW_RADIO_TEXT +
-					SafeHtmlUtils.htmlEscape(activeExpocode));
-			editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT);
-			editNewRadio.setValue(true);
-			editNewRadio.setEnabled(true);
-			editMergeRadio.setEnabled(false);
-			editUploadRadio.setEnabled(true);
-			editButton.setEnabled(true);
-		}
 		else {
-			// Middle of the list - all options available
-			editNewRadio.setText(EDIT_NEW_RADIO_TEXT +
-					SafeHtmlUtils.htmlEscape(activeExpocode));
-			editMergeRadio.setText(EDIT_MERGED_RADIO_TEXT + 
-					SafeHtmlUtils.htmlEscape(previousExpocode));
-			editMergeRadio.setValue(true);
-			editNewRadio.setEnabled(true);
-			editMergeRadio.setEnabled(true);
+			// Start or middle of the list
+			editExistingRadio.setText(EDIT_EXISTING_RADIO_TEXT + SafeHtmlUtils.htmlEscape(activeExpocode));
+			editExistingRadio.setEnabled(true);
+			editMergedRadio.setEnabled(true);
 			editUploadRadio.setEnabled(true);
 			editButton.setEnabled(true);
 		}
+
+		try {
+			if ( activeExpocode.equals(expocodes.get(0)) )
+				previousButton.setEnabled(false);
+			else
+				previousButton.setEnabled(true);
+		} catch (Exception ex) {
+			// No expocodes in the list - should not happen
+			previousButton.setEnabled(false);
+		}
+
+		nextButton.setEnabled(exposIter.hasNext());
 	}
 
 	@UiHandler("logoutButton")
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
+	}
+
+	@UiHandler("previousButton")
+	void previousButtonOnClick(ClickEvent event) {
+		priorActiveExpocode = activeExpocode;
+		if ( activeExpocode.isEmpty() ) {
+			// list iterator is at the end so get the final expocode
+			try {
+				// Move the list iterator back before the final expocode
+				exposIter.previous();
+				// Get the final expocode and move the list iterator to the end
+				activeExpocode = exposIter.next();
+			} catch (Exception ex) {
+				// No expocodes in the list - should not happen
+				activeExpocode = "";
+			}
+		}
+		else {
+			try {
+				// Move the list iterator back before the current expocode
+				exposIter.previous();
+				// Move the list iterator back before the previous expocode
+				exposIter.previous();
+			} catch (Exception ex) {
+				// Already at the start of the list - should not happen but continue on
+				;
+			}
+			try {
+				// Get the expocode and move the list iterator after it
+				activeExpocode = exposIter.next();
+			} catch (Exception ex) {
+				// No expocodes in the list - should not happen
+				activeExpocode = "";
+			}
+		}
+		updateIntro();
+	}
+
+	@UiHandler("nextButton")
+	void nextButtonOnClick(ClickEvent event) {
+		priorActiveExpocode = activeExpocode;
+		try {
+			activeExpocode = exposIter.next();
+		} catch (Exception ex) {
+			// At the end
+			activeExpocode = "";
+		}
+		updateIntro();
 	}
 
 	@UiHandler("doneButton")
@@ -295,8 +331,12 @@ public class OmeManagerPage extends CompositeWithUsername {
 	void editButtonOnClick(ClickEvent event) {
 		// Get the selected option for opening the OME
 		String prevExpo;
-		if ( editMergeRadio.getValue() ) {
-			prevExpo = previousExpocode;
+		if ( editMergedRadio.getValue() ) {
+			prevExpo = editMergedText.getText().trim();
+			if ( prevExpo.isEmpty() ) {
+				SocatUploadDashboard.showMessage(NO_EXPOCODE_ERRMSG);
+				return;
+			}
 		}
 		else {
 			prevExpo = "";
@@ -319,7 +359,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 			@Override
 			public void onSuccess(String fileAbsPath) {
 				// Go on to the next dataset
-				previousExpocode = activeExpocode;
+				priorActiveExpocode = activeExpocode;
 				try {
 					activeExpocode = exposIter.next();
 				} catch ( Exception ex ) {
@@ -343,7 +383,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 			@Override
 			public void onFailure(Throwable ex) {
 				// Go on to the next dataset
-				previousExpocode = activeExpocode;
+				priorActiveExpocode = activeExpocode;
 				try {
 					activeExpocode = exposIter.next();
 				} catch ( Exception ex1 ) {
