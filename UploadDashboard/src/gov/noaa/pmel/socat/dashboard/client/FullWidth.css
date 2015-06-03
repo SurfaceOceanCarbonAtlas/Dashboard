@@ -164,6 +164,21 @@ body {
 	margin-left: 1em;
 	margin-right: 1em;
 }
+.omeoptionradiopiece {
+	display: inline;
+	margin-top: 0em;
+	margin-bottom: 0em;
+	margin-left: 0em;
+	margin-right: 0.5em;
+}
+.omeoptiontext {
+	display: inline;
+	width: 16em;
+	margin-top: 0em;
+	margin-bottom: 0em;
+	margin-left: 0.5em;
+	margin-right: 0em;
+}
 
 .optionsborderpanel {
 	display: block;

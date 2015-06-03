@@ -16,9 +16,12 @@
 			<g:FlowPanel addStyleNames="{style.omeoptionpanel}">
 				<g:HTML addStyleNames="{style.omecruiselabel}" ui:field="cruiseNameHtml" />
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
-						name="OmeRadioGroup" ui:field="editNewRadio" />
-				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
-						name="OmeRadioGroup" ui:field="editMergeRadio" />
+						name="OmeRadioGroup" ui:field="editExistingRadio" />
+				<g:FlowPanel addStyleNames="{style.omeoptionradio}">
+					<g:RadioButton addStyleNames="{style.omeoptionradiopiece}" 
+							name="OmeRadioGroup" ui:field="editMergedRadio" />
+					<g:TextBox addStyleNames="{style.omeoptiontext}" ui:field="editMergedText" />
+				</g:FlowPanel>
 				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
 						name="OmeRadioGroup" ui:field="editUploadRadio" />
 			</g:FlowPanel>
