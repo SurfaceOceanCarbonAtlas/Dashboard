@@ -271,9 +271,11 @@ public class DsgNcFileHandler {
 	 * 		standardized new expocode for the cruise
 	 * @throws IllegalArgumentException
 	 * 		if a DSG or decimated DSG file for the new expocode already exists, or
-	 * 		if unable to rename the DSG or decimated DSG file
+	 * 		if the contents of the old DSG file are invalid
 	 * @throws IOException
-	 * 		if unable to update the expocode contained in the DSG files
+	 * 		if unable to regenerate the DSG or decimated DSG file with the new expocode
+	 * 		from the data and metadata (except for expocode-related fields) in the old 
+	 * 		DSG file, or if unable to delete the old DSG or decimated DSG file
 	 */
 	public void renameDsgFiles(String oldExpocode, String newExpocode) 
 									throws IllegalArgumentException, IOException {
@@ -287,38 +289,39 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException(
 					"Decimated DSG file for " + oldExpocode + " already exist");
 
-		String varName = Constants.SHORT_NAMES.get(Constants.expocode_VARNAME);
-
-		// Rename and update the DSG file
-		File oldDsgFile = getDsgNcFile(oldExpocode);
+		CruiseDsgNcFile oldDsgFile = getDsgNcFile(oldExpocode);
 		if ( oldDsgFile.exists() )  {
-			if ( ! oldDsgFile.renameTo(newDsgFile) ) 
-				throw new IllegalArgumentException("Unable to rename DSG "
-						+ "file from " + oldExpocode + " to " + newExpocode);
+			// Just re-create the DSG file with the updated metadata
+			ArrayList<String> missing = oldDsgFile.read(false);
+			if ( ! missing.isEmpty() )
+				throw new RuntimeException("Unexpected values missing from the DSG file: " + missing);
 			try {
-				newDsgFile.updateStringVarValue(varName, newExpocode);
-			} catch (InvalidRangeException ex) {
-				newDsgFile.renameTo(oldDsgFile);
+				ArrayList<SocatCruiseData> dataVals = oldDsgFile.getDataList();
+				SocatMetadata updatedMeta = oldDsgFile.getMetadata();
+				updatedMeta.setExpocode(newExpocode);
+				newDsgFile.create(updatedMeta, dataVals);
+				// Call Ferret to add lon360 and tmonth (calculated data should be the same)
+				SocatTool tool = new SocatTool(ferretConfig);
+				ArrayList<String> scriptArgs = new ArrayList<String>(1);
+				scriptArgs.add(newDsgFile.getPath());
+				tool.init(scriptArgs, newExpocode, FerretConfig.Action.COMPUTE);
+				tool.run();
+				if ( tool.hasError() )
+					throw new IllegalArgumentException(newExpocode + 
+							": Failure adding computed variables: " + tool.getErrorMessage());
+				// Re-create the decimated-data DSG file 
+				decimateCruise(newExpocode);
+				// Delete the old DSG and decimated-data DSG files
+				oldDsgFile.delete();
+				getDecDsgNcFile(oldExpocode).delete();
+			} catch ( Exception ex ) {
 				throw new IOException(ex);
 			}
+
+			// Tell ERDDAP there are changes
+			flagErddap(true, true);
 		}
 
-		// Rename and update the decimated DSG file
-		File oldDecDsgFile = getDecDsgNcFile(oldExpocode);
-		if ( oldDecDsgFile.exists() ) {
-			if ( ! oldDecDsgFile.renameTo(newDecDsgFile) ) 
-				throw new IllegalArgumentException("Unable to rename decimated "
-						+ "DSG file from " + oldExpocode + " to " + newExpocode);
-			try {
-				newDecDsgFile.updateStringVarValue(varName, newExpocode);
-			} catch (InvalidRangeException ex) {
-				newDecDsgFile.renameTo(oldDecDsgFile);
-				throw new IOException(ex);
-			}
-		}
-
-		// Tell ERDDAP there are changes
-		flagErddap(true, true);
 	}
 
 	/**
