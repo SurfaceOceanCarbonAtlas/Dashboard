@@ -1050,7 +1050,7 @@ public class CruiseDsgNcFile extends File {
 
 			String dataname = woceEvent.getDataVarName();
 			ArrayDouble.D1 datavalues;
-			if ( Constants.geoposition_VARNAME.equals(dataname) ) {
+			if ( dataname.isEmpty() || Constants.geoposition_VARNAME.equals(dataname) ) {
 				// WOCE based on longitude/latitude/time
 				datavalues = null;
 			}
@@ -1076,7 +1076,7 @@ public class CruiseDsgNcFile extends File {
 
 				// Check the values are close (data value roughly close)
 				if ( dataMatches(dataloc, longitudes, latitudes, times, 
-									datavalues, idx, 0.001, 0.1) ) {
+									datavalues, idx, 0.006, 0.01) ) {
 					wocevalues.set(idx, 0, newFlag);
 				}
 				else {
