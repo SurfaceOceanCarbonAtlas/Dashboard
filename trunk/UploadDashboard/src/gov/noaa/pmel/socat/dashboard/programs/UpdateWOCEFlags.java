@@ -136,15 +136,28 @@ public class UpdateWOCEFlags {
 						}
 					}
 				} catch (Exception ex) {
-					System.err.println("Error reassigning WOCE flags for " + 
+					System.err.println("Error reassigning WOCE flags in the full-data DSG file for " + 
 							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
 
-				System.err.println(expocode + " done");
+				// Re-create the decimated-data DSG file 
+				try {
+					dsgHandler.decimateCruise(expocode);
+				} catch (Exception ex) {
+					System.err.println("Error regenerating the decimated-data DSG file for " +
+							expocode + " : " + ex.getMessage());
+					success = false;
+					continue;
+				}
+
+				System.err.println(expocode + " success");
 			}
+
+			// Notify ERDDAP that DSG files have changed
 			dsgHandler.flagErddap(true, true);
+
 		} finally {
 			configStore.shutdown();
 		}
