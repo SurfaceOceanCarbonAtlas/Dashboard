@@ -22,7 +22,7 @@ public class UpdateQCFlags {
 
 	/**
 	 * @param args
-	 * 		ExpocodesFile - update dashboard status of these cruises
+	 * 		ExpocodesFile - update QC flags of these cruises
 	 */
 	public static void main(String[] args) {
 		if ( args.length != 1 ) {

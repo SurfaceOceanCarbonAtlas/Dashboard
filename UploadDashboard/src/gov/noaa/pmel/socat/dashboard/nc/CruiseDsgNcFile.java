@@ -1010,9 +1010,7 @@ public class CruiseDsgNcFile extends File {
 	 * @return
 	 * 		list of data mismatch messages; never null but may be empty
 	 * @throws IllegalArgumentException
-	 * 		if the DSG file or the WOCE flags are not valid, including
-	 * 		if the WOCE flag values are not close to the DSG values for
-	 * 		the indicated row in the WOCE flag
+	 * 		if the DSG file or the WOCE flags are not valid
 	 * @throws IOException
 	 * 		if opening, reading from, or writing to the DSG file throws one
 	 */
@@ -1077,8 +1075,11 @@ public class CruiseDsgNcFile extends File {
 				int idx = dataloc.getRowNumber() - 1;
 
 				// Check the values are close (data value roughly close)
-				if ( ! dataMatches(dataloc, longitudes, latitudes, times, 
+				if ( dataMatches(dataloc, longitudes, latitudes, times, 
 									datavalues, idx, 0.001, 0.1) ) {
+					wocevalues.set(idx, 0, newFlag);
+				}
+				else {
 					DataLocation dsgLoc = new DataLocation();
 					dsgLoc.setRowNumber(idx + 1);
 					dsgLoc.setRegionID(regionIDs.get(idx, 0));
@@ -1091,8 +1092,6 @@ public class CruiseDsgNcFile extends File {
 							"flag location (second): \n    " + dsgLoc.toString() + 
 							"\n    " + dataloc.toString());
 				}
-
-				wocevalues.set(idx, 0, newFlag);
 			}
 
 			// Save the updated WOCE flags to the DSG file
