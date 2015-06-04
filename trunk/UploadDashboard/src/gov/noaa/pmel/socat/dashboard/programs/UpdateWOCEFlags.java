@@ -98,13 +98,15 @@ public class UpdateWOCEFlags {
 					success = false;
 					continue;
 				}
+				for (int k = 0; k < currentWoceFlags.length; k++) {
+					currentWoceFlags[k] = SocatWoceEvent.WOCE_NOT_CHECKED;
+				}
 				try {
-					for (int k = 0; k < currentWoceFlags.length; k++)
-						currentWoceFlags[k] = SocatWoceEvent.WOCE_NOT_CHECKED;
 					dsgFile.writeCharVarDataValues(WOCE_CO2WATER_NC_VARNAME, currentWoceFlags);
 				} catch (Exception ex) {
 					System.err.println("Error clearing all the WOCE flags in the full-data DSG file for " +
 							expocode + " : " + ex.getMessage());
+					continue;
 				}
 
 				// Assign the applicable WOCE flags given in the database in the time order they were assigned
@@ -119,7 +121,7 @@ public class UpdateWOCEFlags {
 				}
 				try {
 					for ( SocatWoceEvent woce : woceList ) {
-						// Check if this is an application (not old) WOCE flag
+						// Check if this is an applicable (not old) WOCE flag
 						Character flag = woce.getFlag();
 						if ( flag.equals(SocatWoceEvent.WOCE_GOOD) ||
 							 flag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ||
