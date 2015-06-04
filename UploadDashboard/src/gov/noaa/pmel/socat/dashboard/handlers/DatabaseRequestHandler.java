@@ -766,7 +766,8 @@ public class DatabaseRequestHandler {
 	 * 		order with the latest first?
 	 * @return
 	 * 		list of WOCE events for the dataset, ordered by the dates
-	 * 		of the events (either latest first or latest last)
+	 * 		of the events (either latest first or latest last);
+	 * 		never null but may be empty
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
