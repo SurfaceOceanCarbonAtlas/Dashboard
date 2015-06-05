@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.SocatSummaryReporter;
+import gov.noaa.pmel.socat.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -52,7 +52,7 @@ public class GenerateSummaryCruiseReports {
 			System.exit(1);
 		}
 		try {
-			SocatSummaryReporter summaryReporter = new SocatSummaryReporter(configStore);
+			SocatCruiseReporter summaryReporter = new SocatCruiseReporter(configStore);
 
 			// Get the expocode of the cruises to report
 			TreeSet<String> allExpocodes = null; 
@@ -91,10 +91,10 @@ public class GenerateSummaryCruiseReports {
 			}
 
 			// Generate the report
-			System.out.println(summaryReporter.getCruiseSummaryHeader());
+			summaryReporter.printSummaryHeader(System.out);
 			for ( String expocode : allExpocodes ) {
 				try {
-					System.out.println(summaryReporter.getCruiseSummary(expocode));
+					summaryReporter.printCruiseSummary(expocode, System.out);
 				} catch (Exception ex) {
 					System.err.println("Error reporting on " + expocode + " : " + ex.getMessage());
 					success = false;

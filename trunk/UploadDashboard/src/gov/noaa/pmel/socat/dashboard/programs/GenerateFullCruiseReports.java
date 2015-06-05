@@ -99,7 +99,7 @@ public class GenerateFullCruiseReports {
 			System.exit(1);
 		}
 		try {
-			SocatCruiseReporter reporter = new SocatCruiseReporter(configStore.getDsgNcFileHandler());
+			SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
 			if ( multicruise ) {
 				try {
 					ArrayList<String> warnMsgs = 
