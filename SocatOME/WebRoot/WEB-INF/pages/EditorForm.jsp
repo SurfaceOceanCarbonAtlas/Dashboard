@@ -38,9 +38,9 @@
 
 			<div class="section">
 				<div class="row">
-					<!-- 					<div class="span5"> -->
-					<!-- 						<h5 class="alert alert-info">Create new record using editor</h5> -->
-					<!-- 					</div> -->
+										<div class="span5">
+											<h5 class="alert alert-info">Create new record using editor</h5>
+										</div>
 					<div class="span6">
 						<h5 class="alert alert-info">Upload metadata file from your
 							computer</h5>
@@ -49,11 +49,11 @@
 				</div>
 				<div class="row">
 
-					<%-- 					<span class="offset1 span4"> <form:form method="POST" --%>
-					<%-- 							action="newForm.htm" commandName="editor"> --%>
-					<!-- 							<input class="btn btn-success" value="Create New" type="submit" /> -->
-					<%-- 						</form:form> --%>
-					<!-- 					</span>  -->
+										<span class="offset1 span4"> <form:form method="POST"
+					 							action="newForm.htm" commandName="editor"> 
+												<input class="btn btn-success" value="Create New" type="submit" />
+					 						</form:form> 
+										</span> 
 
 					<span class="offset1 span5"> <form:form action="editor.htm"
 							commandName="FORM" enctype="multipart/form-data" method="POST">
