@@ -56,7 +56,7 @@ import uk.ac.uea.socat.sanitychecker.messages.MessageException;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseChecker {
+public class CruiseChecker {
 
 	/**
 	 * Indices of user-provided data columns. 
@@ -351,7 +351,7 @@ public class DashboardCruiseChecker {
 	 * @throws IOException
 	 * 		If the SanityChecker has problems with a configuration file
 	 */
-	public DashboardCruiseChecker(File configFile, CheckerMessageHandler checkerMsgHandler, 
+	public CruiseChecker(File configFile, CheckerMessageHandler checkerMsgHandler, 
 			MetadataFileHandler metaFileHandler) throws IOException {
 		try {
 			// Clear any previous configuration
@@ -369,11 +369,11 @@ public class DashboardCruiseChecker {
 		}
 		if ( checkerMsgHandler == null )
 			throw new NullPointerException(
-					"CheckerMsgHandler passed to DashboardCruiseChecker is null");
+					"CheckerMsgHandler passed to CruiseChecker is null");
 		msgHandler = checkerMsgHandler;
 		if ( metaFileHandler == null )
 			throw new NullPointerException(
-					"MetadataFileHandler passed to DashboardCruiseChecker is null");
+					"MetadataFileHandler passed to CruiseChecker is null");
 		metadataHandler = metaFileHandler;
 		lastCheckProcessedOkay = false;
 		lastCheckHadGeopositionErrors = false;

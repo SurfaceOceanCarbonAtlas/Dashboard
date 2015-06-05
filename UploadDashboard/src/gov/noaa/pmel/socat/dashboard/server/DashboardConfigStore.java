@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseSubmitter;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
@@ -123,10 +123,10 @@ public class DashboardConfigStore {
 	private OmeFileHandler omeFileHandler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
-	private DashboardCruiseChecker cruiseChecker;
+	private CruiseChecker cruiseChecker;
 	private DatabaseRequestHandler databaseRequestHandler;
 	private PreviewPlotsHandler plotsHandler;
-	private DashboardCruiseSubmitter cruiseSubmitter;
+	private CruiseSubmitter cruiseSubmitter;
 	private CruiseFlagsHandler cruiseFlagsHandler;
 	private Timer configWatcher;
 
@@ -409,7 +409,7 @@ public class DashboardConfigStore {
 
 		// SanityChecker initialization from this same properties file 
 		try {
-			cruiseChecker = new DashboardCruiseChecker(configFile, checkerMsgHandler, metadataFileHandler);
+			cruiseChecker = new CruiseChecker(configFile, checkerMsgHandler, metadataFileHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -419,8 +419,8 @@ public class DashboardConfigStore {
 		plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles", 
 				previewDirname + "plots", this);
 
-		// The DashboardCruiseSubmitter uses the various handlers just created
-		cruiseSubmitter = new DashboardCruiseSubmitter(this);
+		// The CruiseSubmitter uses the various handlers just created
+		cruiseSubmitter = new CruiseSubmitter(this);
 
 		// Read and assign the authorized users 
 		userInfoMap = new HashMap<String,DashboardUserInfo>();
@@ -600,7 +600,7 @@ public class DashboardConfigStore {
 	 * @return
 	 * 		the checker for cruise data and metadata
 	 */
-	public DashboardCruiseChecker getDashboardCruiseChecker() {
+	public CruiseChecker getDashboardCruiseChecker() {
 		return cruiseChecker;
 	}
 
@@ -616,7 +616,7 @@ public class DashboardConfigStore {
 	 * @return
 	 * 		the submitter for dashboard cruises
 	 */
-	public DashboardCruiseSubmitter getDashboardCruiseSubmitter() {
+	public CruiseSubmitter getDashboardCruiseSubmitter() {
 		return cruiseSubmitter;
 	}
 

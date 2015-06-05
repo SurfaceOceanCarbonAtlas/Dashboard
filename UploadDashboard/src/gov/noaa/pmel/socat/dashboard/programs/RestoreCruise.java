@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.CruiseRestorer;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseModifier;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
@@ -84,7 +84,7 @@ public class RestoreCruise {
 		String removeSocatVersion = configStore.getSocatUploadVersion();
 		ResubmitCruises resubmitter = new ResubmitCruises(configStore);
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
-		CruiseRestorer restorer = new CruiseRestorer(configStore);
+		CruiseModifier restorer = new CruiseModifier(configStore);
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 		try {

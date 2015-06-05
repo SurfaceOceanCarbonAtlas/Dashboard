@@ -608,7 +608,7 @@ public class CheckerMessageHandler {
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
 			// TODO: Only add SanityChecker WOCE-4 flags for now 
-			// (here and at the end of DashboardCruiseChecker.standardizeCruiseData)
+			// (here and at the end of CruiseChecker.standardizeCruiseData)
 			if ( ! info.flag.equals(SocatWoceEvent.WOCE_BAD) )
 				continue;
 
