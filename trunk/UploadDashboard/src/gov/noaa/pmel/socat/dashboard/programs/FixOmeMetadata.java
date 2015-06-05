@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
@@ -78,7 +78,7 @@ public class FixOmeMetadata {
 			}
 
 			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-			DashboardCruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
+			CruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
 
 			// update each of these cruises

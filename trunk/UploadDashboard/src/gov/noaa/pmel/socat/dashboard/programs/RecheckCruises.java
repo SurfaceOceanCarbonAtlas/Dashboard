@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -71,7 +71,7 @@ public class RecheckCruises {
 		int retVal = 0;
 		try {
 			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-			DashboardCruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
+			CruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 
 			for ( String expo : expocodes ) {
 				// Get all the data for this cruise

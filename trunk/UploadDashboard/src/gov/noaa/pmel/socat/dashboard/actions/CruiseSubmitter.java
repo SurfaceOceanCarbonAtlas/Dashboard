@@ -32,12 +32,12 @@ import java.util.TreeSet;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseSubmitter {
+public class CruiseSubmitter {
 
 	CruiseFileHandler cruiseHandler;
 	CheckerMessageHandler msgHandler;
 	MetadataFileHandler metadataHandler;
-	DashboardCruiseChecker cruiseChecker;
+	CruiseChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
 	DatabaseRequestHandler databaseHandler;
 	String socatVersion;
@@ -46,7 +46,7 @@ public class DashboardCruiseSubmitter {
 	 * @param configStore
 	 * 		create with the file handlers and data checker in this data store.
 	 */
-	public DashboardCruiseSubmitter(DashboardConfigStore configStore) {
+	public CruiseSubmitter(DashboardConfigStore configStore) {
 		cruiseHandler = configStore.getCruiseFileHandler();
 		msgHandler = configStore.getCheckerMsgHandler();
 		metadataHandler = configStore.getMetadataFileHandler();

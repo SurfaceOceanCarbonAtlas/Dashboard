@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
@@ -377,7 +377,7 @@ public class DashboardServices extends RemoteServiceServlet
 
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		UserFileHandler userHandler = configStore.getUserFileHandler();
-		DashboardCruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
+		CruiseChecker cruiseChecker = configStore.getDashboardCruiseChecker();
 		Logger dataSpecsLogger = Logger.getLogger("DashboardServices");
 
 		for ( String expocode : cruiseExpocodes ) {

@@ -3,15 +3,15 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.CruiseRenamer;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseModifier;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Renames cruises (changes the expocodes).  All files will be moved to the
@@ -83,7 +83,7 @@ public class RenameCruises {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
-			CruiseRenamer renamer = new CruiseRenamer(configStore);
+			CruiseModifier renamer = new CruiseModifier(configStore);
 			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
 				String oldExpocode = expoEntry.getKey();
 				String newExpocode = expoEntry.getValue();

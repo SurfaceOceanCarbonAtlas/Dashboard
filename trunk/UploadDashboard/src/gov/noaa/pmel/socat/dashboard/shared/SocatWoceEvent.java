@@ -153,7 +153,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
+				",\n    restoredSocatVersion=" + socatVersion.toString() + 
 				",\n    dataVarName=" + dataVarName.toString() + 
 				",\n    locations=" + locations.toString() + 
 				",\n    username=" + username + 

@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseSubmitter;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseSubmitter;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
@@ -35,16 +35,16 @@ import java.util.TreeSet;
 public class ResubmitCruises {
 
 	CruiseFileHandler cruiseHandler;
-	DashboardCruiseChecker cruiseChecker;
-	DashboardCruiseSubmitter cruiseSubmitter;
+	CruiseChecker cruiseChecker;
+	CruiseSubmitter cruiseSubmitter;
 	DsgNcFileHandler dsgHandler;
 	DatabaseRequestHandler databaseHandler;
 	String socatVersion;
 
 	/**
 	 * @param configStore
-	 * 		create using the CruiseFileHandler, DashboardCruiseChecker,
-	 * 		and DashboardCruiseSubmitter given in this DashboardConfigStore
+	 * 		create using the CruiseFileHandler, CruiseChecker,
+	 * 		and CruiseSubmitter given in this DashboardConfigStore
 	 */
 	public ResubmitCruises(DashboardConfigStore configStore) {
 		cruiseHandler = configStore.getCruiseFileHandler();

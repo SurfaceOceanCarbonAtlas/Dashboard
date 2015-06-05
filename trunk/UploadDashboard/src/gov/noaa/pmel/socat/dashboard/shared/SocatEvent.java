@@ -110,7 +110,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param socatVersion 
+	 * @param restoredSocatVersion 
 	 * 		the SOCAT version to set; if null, an empty string is assigned
 	 */
 	public void setSocatVersion(String socatVersion) {
@@ -222,7 +222,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 				"[\n    id=" + id.toString() +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
+				",\n    restoredSocatVersion=" + socatVersion.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 
 				",\n    comment=" + comment + 

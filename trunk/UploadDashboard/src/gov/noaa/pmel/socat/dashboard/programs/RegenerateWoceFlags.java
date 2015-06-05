@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.CruiseRestorer;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseModifier;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
@@ -94,7 +94,7 @@ public class RegenerateWoceFlags {
 			System.exit(1);
 		}
 
-		CruiseRestorer restorer = new CruiseRestorer(configStore);
+		CruiseModifier restorer = new CruiseModifier(configStore);
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 
 		try {

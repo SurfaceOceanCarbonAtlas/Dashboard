@@ -180,7 +180,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
+				",\n    restoredSocatVersion=" + socatVersion.toString() + 
 				",\n    regionID='" + regionID.toString() + "'" + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 

@@ -1,6 +1,6 @@
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.actions.DashboardCruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
@@ -21,7 +21,7 @@ public class PreviewPlotsHandler {
 	File dsgFilesDir;
 	File plotsDir;
 	CruiseFileHandler cruiseHandler;
-	DashboardCruiseChecker cruiseChecker;
+	CruiseChecker cruiseChecker;
 	MetadataFileHandler metadataHandler;
 	FerretConfig ferretConfig;
 
@@ -33,7 +33,7 @@ public class PreviewPlotsHandler {
 	 * @param plotsDirName
 	 * 		directory to contain the preview plots
 	 * @param configStore
-	 * 		get the CruiseFileHandler, DashboardCruiseChecker, 
+	 * 		get the CruiseFileHandler, CruiseChecker, 
 	 * 		MetadataFileHandler, and FerretConfig from here
 	 */
 	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, DashboardConfigStore configStore) {
