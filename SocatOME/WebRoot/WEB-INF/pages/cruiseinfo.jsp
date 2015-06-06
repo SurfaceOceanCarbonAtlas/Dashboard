@@ -6,10 +6,10 @@
 		<li class="section1">Cruise Information for the Expocode:
 			<ul>
 				<li class="Section2"><span style="width: 300px">
-						Platform (Ship) Code List: </span> <form:input path="field_vessel_id"
+						Platform (Ship) Code List <span class="form-required"
+					title="This field is required.">*</span>:</span> <form:input path="field_vessel_id"
 						name="Vessel_ID" size="2" MAXLENGTH="4" class="short"
-						onkeyup="displayExpo()" style="background:#D3D3D3;"
-						onfocus="blur()" /> <br>
+						onkeyup="displayExpo()" /> <br>
 				<span><a class="fancy"
 						href="http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt"
 						target="_blank">4 character NODC codes</a></span></li>
@@ -17,15 +17,13 @@
 						Date (cruise or data set, for Expocode)<span class="form-required"
 						title="This field is required.">*</span>:
 				</span> <form:input path="field_start_date" id="field_start_date"
-						name="Start_Date" size="9" class="short" onchange="displayExpo()"
-						style="background:#D3D3D3;" onfocus="blur()" /><span
+						name="Start_Date" size="9" class="short" onchange="displayExpo()"/><span
 					class="description">(yyyymmdd)</span> <form:input
 						path="field_start_date_dup" id="field_start_date_dup"
 						type="hidden" /></li>
 				<li class="Section2"><span style="width: 300px">Expocode:</span>
 					<form:input path="field_cruise_id" id="field_cruise_id"
-						class="short" type="text" style="background:#D3D3D3;"
-						onfocus="blur()" /></li>
+						class="short" type="text" /></li>
 
 			</ul>
 		</li>
@@ -103,28 +101,28 @@
 			<ul>
 				<li class="Section1">Bounds:
 					<ul>
-						<li class="Section2">Westernmost Longitude:<br>
+						<li class="Section2">Westernmost Longitude <span class="form-required"
+					title="This field is required.">*</span>:<br>
 						<form:input path="field_west" class="short"
-								name="Westernmost_Longitude" size="9"
-								style="background:#D3D3D3;" onfocus="blur()" /><span
+								name="Westernmost_Longitude" size="9"/><span
 							class="description">(+ = E, - = W)</span>
 						</li>
-						<li class="Section2">Easternmost Longitude:<br>
+						<li class="Section2">Easternmost Longitude <span class="form-required"
+					title="This field is required.">*</span>:<br>
 						<form:input path="field_east" class="short"
-								name="Easternmost_Longitude" size="9"
-								style="background:#D3D3D3;" onfocus="blur()" /><span
+								name="Easternmost_Longitude" size="9"/><span
 							class="description">(+ = E, - = W)</span>
 						</li>
-						<li class="Section2">Northernmost Latitude:<br>
+						<li class="Section2">Northernmost Latitude <span class="form-required"
+					title="This field is required.">*</span>:<br>
 						<form:input path="field_north" class="short"
-								name="Northernmost_Latitude" size="8"
-								style="background:#D3D3D3;" onfocus="blur()" /><span
+								name="Northernmost_Latitude" size="8"/><span
 							class="description">(+ = N, - = S)</span>
 						</li>
-						<li class="Section2">Southernmost Latitude:<br>
+						<li class="Section2">Southernmost Latitude <span class="form-required"
+					title="This field is required.">*</span>:<br>
 						<form:input path="field_south" class="short"
-								name="Southernmost_Latitude" size="8"
-								style="background:#D3D3D3;" onfocus="blur()" /><span
+								name="Southernmost_Latitude" size="8" /><span
 							class="description">(+ = N, - = S)</span>
 						</li>
 					</ul>
