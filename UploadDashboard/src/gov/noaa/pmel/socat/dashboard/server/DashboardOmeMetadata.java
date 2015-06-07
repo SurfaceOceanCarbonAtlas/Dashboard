@@ -10,6 +10,8 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
@@ -30,8 +32,15 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 4372813844320404620L;
+	private static final long serialVersionUID = 5517166413080961933L;
 
+	private static final SimpleDateFormat TIMEPARSER = new SimpleDateFormat("yyyyMMdd");
+	private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd");
+	static {
+		TimeZone utc = TimeZone.getTimeZone("UTC");
+		TIMEPARSER.setTimeZone(utc);
+		TIMESTAMPER.setTimeZone(utc);
+	}
 	private OmeMetadata omeMData;
 
 	/**
@@ -350,4 +359,182 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		}
 		return new DashboardOmeMetadata(mergedOmeMData, this.uploadTimestamp, this.owner, this.version);
 	}
+
+	/**
+	 * @return 
+	 * 		the westernmost longitude, in the range (-180,180]
+	 * @throws IllegalArgumentException
+	 * 		if the westernmost longitude is invalid
+	 */
+	public double getWestmostLongitude() throws IllegalArgumentException {
+		double westLon;
+		try {
+			westLon = Double.parseDouble(omeMData.getWestmostLongitude());
+			if ( (westLon < -540.0) || (westLon > 540.0) )
+				throw new IllegalArgumentException("not in [-540,540]");
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid westmost longitude: " + ex.getMessage());
+		}
+		while ( westLon <= -180.0 )
+			westLon += 360.0;
+		while ( westLon > 180.0 )
+			westLon -= 360.0;
+		return westLon;
+	}
+
+	/**
+	 * @return 
+	 * 		the easternmost longitude, in the range (-180,180]
+	 * @throws IllegalArgumentException
+	 * 		if the easternmost longitude is invalid
+	 */
+	public double getEastmostLongitude() throws IllegalArgumentException {
+		double eastLon;
+		try {
+			eastLon = Double.parseDouble(omeMData.getEastmostLongitude());
+			if ( (eastLon < -540.0) || (eastLon > 540.0) )
+				throw new IllegalArgumentException("not in [-540,540]");
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid eastmost longitude: " + ex.getMessage());
+		}
+		while ( eastLon <= -180.0 )
+			eastLon += 360.0;
+		while ( eastLon > 180.0 )
+			eastLon -= 360.0;
+		return eastLon;
+	}
+
+	/**
+	 * @return 
+	 * 		the southernmost latitude
+	 * @throws IllegalArgumentException
+	 * 		if the southernmost latitude is invalid
+	 */
+	public double getSouthmostLatitude() throws IllegalArgumentException {
+		double southLat;
+		try {
+			southLat = Double.parseDouble(omeMData.getSouthmostLatitude());
+			if ( (southLat < -90.0) || (southLat > 90.0) )
+				throw new IllegalArgumentException("not in [-90,90]");
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid southmost latitude: " + ex.getMessage());
+		}
+		return southLat;
+	}
+
+	/**
+	 * @return 
+	 * 		the northernmost latitude
+	 * @throws IllegalArgumentException
+	 * 		if the northernmost latitude is invalid
+	 */
+	public double getNorthmostLatitude() throws IllegalArgumentException {
+		double northLat;
+		try {
+			northLat = Double.parseDouble(omeMData.getNorthmostLatitude());
+			if ( (northLat < -90.0) || (northLat > 90.0) )
+				throw new IllegalArgumentException("not in [-90,90]");
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid northmost latitude: " + ex.getMessage());
+		}
+		return northLat;
+	}
+
+	/**
+	 * @return
+	 * 		the date stamp of the earliest data measurement
+	 * @throws IllegalArgumentException
+	 * 		if the date of the earliest data measurement is invalid
+	 */
+	public String getBeginDatestamp() throws IllegalArgumentException {
+		String beginTimestamp;
+		try {
+			Date beginTime = TIMEPARSER.parse(omeMData.getTemporalCoverageStartDate());
+			beginTimestamp = TIMESTAMPER.format(beginTime);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid begin time: " + ex.getMessage());
+		}
+		return beginTimestamp;
+	}
+
+	/**
+	 * @return
+	 * 		the date stamp of the latest data measurement
+	 * @throws IllegalArgumentException
+	 * 		if the date of the latest data measurement is invalid
+	 */
+	public String getEndDatestamp() throws IllegalArgumentException {
+		String endTimestamp;
+		try {
+			Date endTime = TIMEPARSER.parse(omeMData.getTemporalCoverageEndDate());
+			endTimestamp = TIMESTAMPER.format(endTime);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid begin time: " + ex.getMessage());
+		}
+		return endTimestamp;
+	}
+
+	/**
+	 * @return
+	 * 		the name given by the PI for this dataset; 
+	 * 		never null but may be empty
+	 */
+	public String getCruiseName() {
+		String cruiseName = omeMData.getExperimentName();
+		if ( cruiseName == null )
+			return "";
+		return cruiseName;
+	}
+
+	/**
+	 * @return
+	 * 		the vessel name for this dataset; 
+	 * 		never null but may be empty
+	 */
+	public String getVesselName() {
+		String vesselName = omeMData.getVesselName();
+		if ( vesselName == null )
+			return "";
+		return vesselName;
+	}
+
+	/**
+	 * @return
+	 * 		the semicolon-separated list of PI names for this dataset; 
+	 * 		never null but may be empty
+	 */
+	public String getScienceGroup() {
+		ArrayList<String> scienceGroup = omeMData.getInvestigators();
+		if ( scienceGroup == null )
+			return "";
+		String piNames = "";
+		boolean isFirst = true;
+		for ( String name : scienceGroup ) {
+			if ( isFirst )
+				isFirst = false;
+			else
+				piNames += "; ";
+			piNames += name;
+		}
+		return piNames;
+	}
+
+	/**
+	 * @return
+	 * 		the original reference(s) for this dataset; 
+	 * 		never null but may be empty
+	 */
+	public String getOrigDataRef() {
+		String dataSetRefs;
+		try {
+			dataSetRefs = omeMData.getValue(OmeMetadata.DATA_SET_REFS_STRING);
+			if ( dataSetRefs == null )
+				dataSetRefs = "";
+		} catch (Exception ex) {
+			// Should never happen
+			dataSetRefs = "";
+		}
+		return dataSetRefs;
+	}
+
 }
