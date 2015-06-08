@@ -202,9 +202,12 @@ public class DashboardServices extends RemoteServiceServlet
 		// Get the current metadata documents for the cruise
 		MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 		if ( DashboardMetadata.OME_FILENAME.equals(deleteFilename) ) {
+			// Remove the OME XML stub file
 			if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) 
 				throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted cruise");
-			// No more OME metadata for this cruise
+		}
+		else if ( DashboardMetadata.PI_OME_FILENAME.equals(deleteFilename) ) {
+			// No more PI-provided OME metadata for this cruise
 			cruise.setOmeTimestamp(null);
 		}
 		else {

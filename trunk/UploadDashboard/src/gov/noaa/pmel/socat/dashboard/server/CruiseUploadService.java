@@ -268,6 +268,9 @@ public class CruiseUploadService extends HttpServlet {
 			TreeSet<String> addlDocs = new TreeSet<String>();
 			for ( DashboardMetadata mdata : mdataList ) {
 				if ( DashboardMetadata.OME_FILENAME.equals(mdata.getFilename())) {
+					// Ignore the OME XML stub file
+				}
+				else if ( DashboardMetadata.PI_OME_FILENAME.equals(mdata.getFilename())) {
 					cruiseData.setOmeTimestamp(mdata.getUploadTimestamp());					
 				}
 				else {
