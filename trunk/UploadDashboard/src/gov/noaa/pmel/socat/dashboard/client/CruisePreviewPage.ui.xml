@@ -90,6 +90,12 @@
 					</g:tab>
 					<g:tab>
 						<g:customHeader>
+							<g:HTML addStyleNames="{style.plotslabel}" ui:field="reportRecFco2Html" />
+						</g:customHeader>
+						<g:Image addStyleNames="{style.plotsimage}" ui:field="reportRecFco2Image" />
+					</g:tab>
+					<g:tab>
+						<g:customHeader>
 							<g:HTML addStyleNames="{style.plotslabel}" ui:field="recFco2DeltaHtml" />
 						</g:customHeader>
 						<g:Image addStyleNames="{style.plotsimage}" ui:field="recFco2DeltaImage" />

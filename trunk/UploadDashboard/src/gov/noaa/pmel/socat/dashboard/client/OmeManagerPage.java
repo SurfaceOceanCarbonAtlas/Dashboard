@@ -43,12 +43,11 @@ public class OmeManagerPage extends CompositeWithUsername {
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
 			"<p>Upload XML metadata files generated from the CDIAC OME site.</p>" +
 			"<p>To generate a XML metadata file to upload: <ul>" +
-			"<li>in a new browser tab or window, go to the CDIAC OME site <br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;" +
+			"<li>Go to the CDIAC OME site " +
 			"<a href=\"http://mercury-ops2.ornl.gov/socatome/newForm.htm\" target=\"_blank\">" +
-			"http://mercury-ops2.ornl.gov/OceanOME/newForm.htsm</a></li>" +
-			"<li>fill in the appropriate metadata</li>" +
-			"<li>save a local copy (preferrably with valiation)</li>" +
+			"http://mercury-ops2.ornl.gov/socatome/newForm.htm</a></li>" +
+			"<li>Fill in the appropriate metadata</li>" +
+			"<li>Save a local copy (preferrably with valiation)</li>" +
 			"</ul>" +
 			"This will generate a metadata file on your system that can be uploaded here. " +
 			"</p><p>" +

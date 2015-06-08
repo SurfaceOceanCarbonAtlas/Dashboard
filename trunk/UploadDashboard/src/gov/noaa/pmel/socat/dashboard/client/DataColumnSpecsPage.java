@@ -54,8 +54,10 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	private static final String MESSAGES_TEXT = "Show errors/warnings";
 
 	private static final String SUBMIT_TEXT = "Check Data";
-	private static final String ENABLED_SUBMIT_HOVER_HELP = "Submits the current data column types and checks the given data";
-	private static final String DISABLED_SUBMIT_HOVER_HELP = "This cruise has been submitted for QC.  Data column types cannot be modified.";
+	private static final String ENABLED_SUBMIT_HOVER_HELP = 
+			"Submits the current data column types and checks the given data";
+	private static final String DISABLED_SUBMIT_HOVER_HELP = 
+			"This cruise has been submitted for QC.  Data column types cannot be modified.";
 
 	private static final String CANCEL_TEXT = "Done";
 
@@ -330,13 +332,13 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			messagesLabel.setText(msgText);
 		}
 
-		if ( cruiseSpecs.isEditable() ) {
+		if ( Boolean.TRUE.equals(cruiseSpecs.isEditable()) ) {
 			submitButton.setEnabled(true);
-			submitButton.setTitle(DISABLED_SUBMIT_HOVER_HELP);
+			submitButton.setTitle(ENABLED_SUBMIT_HOVER_HELP);
 		}
 		else {
 			submitButton.setEnabled(false);
-			submitButton.setTitle(ENABLED_SUBMIT_HOVER_HELP);
+			submitButton.setTitle(DISABLED_SUBMIT_HOVER_HELP);
 		}
 
 		// Clear the expocode in case the data provider gets called while clearing
@@ -359,6 +361,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		cruise.setMissingValues(cruiseSpecs.getMissingValues());
 		cruise.setWoceThreeRowIndices(cruiseSpecs.getWoceThreeRowIndices());
 		cruise.setWoceFourRowIndices(cruiseSpecs.getWoceFourRowIndices());
+		cruise.setQcStatus(cruiseSpecs.getQcStatus());
+		cruise.setArchiveStatus(cruiseSpecs.getArchiveStatus());
 
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 
@@ -513,6 +517,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
+		if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
+			// Should never get here, but just in case
+			SocatUploadDashboard.showMessage(DISABLED_SUBMIT_HOVER_HELP);
+			return;
+		}
+
 		// longitude given?
 		boolean hasLongitude = false;
 		// latitude given?

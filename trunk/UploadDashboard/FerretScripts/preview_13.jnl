@@ -1,4 +1,4 @@
-! Difference between reported and recalculated fCO_2
+! Difference between source and recalculated fCO_2
 
 GO preview_setup.jnl ($infile_dsg) 13
 
@@ -39,15 +39,41 @@ LET alg_id_t = reshape (fco2_source, tt)
 
 SET VIEW FULL
 
+LET nsrc = `fco2_source[i=@ngd]`
+IF `nsrc EQ 0` THEN
+  plot/nolab/vs/hlim=0:1/vlim=0:1/set {100,200},{100,200}
+  ppl axlabp,0,0
+  ppl plot
+  LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, (NO VALID DATA)
+ELSE
+
 LET use_color = `fco2_source[i=@min] NE fco2_source[i=@max]`
 
+! Compute the range, draw the plot centered on zero.
 let drange = ABS(minmax(diff_t))
-let ymin = `-1.1*drange[i=@max]`
-let ymax = ` 1.1*drange[i=@max]`
+let amin = `-1.1*drange[i=@max]`
+let amax = ` 1.1*drange[i=@max]`
+
+GO preview_xy_range amin amax 1
+
+LET yax_lo = ($ppl$range_low)
+LET yax_hi = ($ppl$range_high)
+
+ ! Not interested in tiny differences
+IF `drange[i=@max] - drange[i=@min] LT 0.5` THEN   
+   LET yax_lo = -1
+   LET yax_hi = 1
+ENDIF
+
+DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
+
+! Take care of pathological cases in the limits/bad values. pplus should handle this ok
+IF `ABS(yax_hi - yax_lo) GT 1000` THEN CANCEL SYMBOL vlimits
+
 
 IF `use_color` THEN
-   ribbon($linestyle)/vlim=`ymin`:`ymax`/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/\
-   TITLE="@SRRecommended fCO_2 minus reported CO_2<NL>Colored by source id "/SET diff_t, alg_id_t
+   ribbon($linestyle)($vlimits)/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/\
+   TITLE="@SRrecommended fCO_2 minus source CO_2<NL>Colored by source id "/SET diff_t, alg_id_t
      ppl ylab "Difference (`fco2_recommended,return=units`)"
      ppl xlab " "
      ($taxis_setting)
@@ -56,11 +82,11 @@ IF `use_color` THEN
      IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
    PPL RIBBON
 ELSE 
-   PLOT($linestyle)/vlim=`ymin`:`ymax`/COLOR=blue/SET diff_t
+   PLOT($linestyle)($vlimits)/COLOR=blue/SET diff_t
      ppl ylab "Difference (`fco2_recommended,return=units`)"
      ppl xlab " "
      DEFINE SYMBOL src = `fco2_source[i=@min]`
-     PPL title "Recommended fCO_2 minus reported CO_2<NL>Single source is  `source_labels[i=($src)]`"
+     PPL title "recommended fCO_2 minus source CO_2<NL>Single source is  `source_labels[i=($src)]`"
      ($taxis_setting)
      IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
      IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
@@ -68,15 +94,13 @@ ELSE
    PPL PLOT
 ENDIF
 
+plot/over/color=6/dash=(0.15,0.05,0.15,0.05)/nolab 0*tt
+
+ENDIF  ! fco2_source all missing
+
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nfnoc` Valid fCO_2 recomputed
-
-
-set v full2
-plot/vs/line/color=6/vlim=0:1/hlim=0:1/noax/nolab {0,1}, {0.5,0.5}
-
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10,  `nfnoc` Valid fCO_2 recommended
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
-

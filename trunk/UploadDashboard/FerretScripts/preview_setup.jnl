@@ -20,17 +20,30 @@ DEFINE SYMBOL result_plot_image_filename = ($result_directory)/($expocode_str)_(
 DEFINE SYMBOL gifplot_name = ($result_plot_image_filename)_($session_pid)
 SET GIFFILE "($gifplot_name)"
 
+! Further setup, done once for all the outputs
+IF ($preview_setup_done"0|*>1") THEN exit/script
+
+SET VAR/TITLE="WOCE flag for water CO_2" WOCE_CO2_water
+SET VAR/TITLE="fCO_2 recommended" fCO2_recommended
+
+
 ! reset the green pen to a darker green...
 ppl color,3,0,80,0    
 
 ! reset the blue pen to a lighter blue ...
 ppl color,4,20,30,100   
 
+! land map palette
+DEFINE SYMBOL land_palette = gray_light
+
 ! Reset color 6 to light gray - line underlay on map, marking woce-4 points
 ppl color,6,70,70,70 ! gray
 
-! Further setup, done once for all the outputs
-IF ($preview_setup_done"0|*>1") THEN exit/script
+
+! set up the color palette for WOCE flags
+DEFINE SYMBOL woce_palette = woce2
+
+
 
 can mode logo
 
@@ -43,7 +56,13 @@ LET nfnoc = `fCO2_recommended[i=@ngd]`
 
 
 ! Define time axis
+! If we cannot define the time axis, exit
+SET MODE ignore
 DEFINE AXIS/T/T0="1-Jan-1970"/UNITS=seconds tax = time
+IF ($fer_last_error"0|*>1") THEN exit/script
+
+CANCEL MODE ignore
+
 let tt = t[gt=tax]; 
 let tt1 = `tt[l=@min]`
 let ttn = `tt[l=@max]`

@@ -53,6 +53,7 @@ CANCEL SYMBOL colors
 LET nsrc = 0
 LET maxloc = 0
 
+let nsrc = 0
 REPEAT/RANGE=1:15/NAME=q (\
   DEFINE SYMBOL src = `q`;\
   IF `IS_ELEMENT_OF(($src), fco2_source) NE 0` THEN;\
@@ -68,8 +69,17 @@ REPEAT/RANGE=1:15/NAME=q (\
     LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW 0, `($src)+dely`;\
     LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW 0, `($src)-dely`;\
     LIST/QUIET/FILE="($dummy)"/APPEND/NOHEAD/NOROW miss, miss;\
+    LET nsrc = `nsrc+1`;\
   ENDIF;\
 )
+
+IF `nsrc EQ 0` THEN
+  plot/nolab/vs/hlim=0:1/vlim=0:1/set {100,200},{100,200}
+  ppl axlabp,0,0
+  ppl plot
+  LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, (NO VALID DATA)
+ELSE
+
 FILE/SKIP=1/VAR="xp, yp" "($dummy)"
 SET VAR/BAD=`miss` xp
 SET VAR/BAD=`miss` yp
@@ -81,7 +91,7 @@ LET dely = `dely/2`
 
 POLYGON/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/VLIM=0:15/HLIM=0:($ppl$range_high)/SET xp, yp, colr
   PPL xlab "Number of Measurements"
-  PPL ylab "Sources"
+  PPL ylab "Source number"
   PPL title " "
   IF ($labnum_year"0|*>1") THEN GO unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
@@ -105,9 +115,14 @@ REPEAT/RANGE=1:15/NAME=q (\
   ENDIF;\
 )
 
+ENDIF  ! fco2_source all missing
+
+
 
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
-LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.8*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Sources
+   
 
 FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"

@@ -20,7 +20,8 @@ plot($linestyle)($style1)/axes=1,1,1,0/title=" "/set lat
 ppl plot
 
 set view full2
-define symbol style2 =  /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
+define symbol style2 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)
+
 plot($linestyle)($style2)/axes=1,1,0,1/title=" "/set lon
   ppl ylab Deg E
   ppl xlab " "
@@ -35,7 +36,7 @@ ppl plot
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Latitude and Longitude vs time  `nobs` locations
 
 
 ! Make the color key

@@ -4,9 +4,10 @@
 !
 ! Given a min and max variables defined, see if they are valid data
 ! and use them to define axis min,max, delta. If min and max are not
-! valid then return nominal 0:100 and set an error flag.
+! valid then return nominal range and set an error flag.
 
 LET baddat = 0
+LET nominal_range = $3%1%
 
 CANCEL SYMBOL dm_labels
 
@@ -18,9 +19,9 @@ DEFINE SYMBOL ax_hi = `$2`
 IF `($ax_lo"0|bad>1|*>0") OR ($ax_hi"0|bad>1|*>0")` THEN 
   LET ax_lo = 0
   LET amin = 0
-  LET ax_hi = 100
-  LET amax = 100
-  LET del_ax = 100
+  LET ax_hi = `nominal_range`
+  LET amax = `nominal_range`
+  LET del_ax = `nominal_range`
   LET baddat = 1
   PPL axlabp,0,0
   PPL TICS,0,0,0,0

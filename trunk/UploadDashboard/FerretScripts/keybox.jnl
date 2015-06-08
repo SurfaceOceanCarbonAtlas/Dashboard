@@ -20,8 +20,8 @@ plot/vs/noax/nolab/vlim=0:1/hlim=0:1 {-10,10}, {-10,10}
 
 let yup = 0.5
 let ydn = 0.3
-let xlf = 0.2
-let xrt = 0.6
+let xlf = 0.1
+let xrt = 0.7
 let xlen = 0.15
 
 let csiz = 0.15
@@ -29,27 +29,27 @@ let csiz = 0.15
 IF `($1"0|*>1") AND ($2"0|*>1")` THEN
    define symbol style1 =  ($1"0")
    define symbol leglab1 = ($2"0")
-   plot/vs/line/nolab/over($style1) {`xlf`,0.3}, {`yup`,`yup`}
+   plot/vs/line/nolab/over($style1) {`xlf`,`xlf+0.1`}, {`yup`,`yup`}
    label/user `xlf+xlen+0.02`,`yup`,-1,0,`csiz`,($leglab1)
 ENDIF
 
 IF `($3"0|*>1") AND ($4"0|*>1")` THEN
    define symbol style2 =  ($3"0")
    define symbol leglab2 = ($4"0")
-   plot/vs/line/nolab/over($style2) {0.6,0.7}, {`yup`,`yup`}
+   plot/vs/line/nolab/over($style2) {`xrt`,`xrt+0.1`}, {`yup`,`yup`}
    label/user `xrt+xlen+0.02`,`yup`,-1,0,`csiz`,($leglab2)
 ENDIF
 
 IF `($5"0|*>1") AND ($6"0|*>1")` THEN
    define symbol style3 =  ($5"0")
    define symbol leglab3 = ($6"0")
-   plot/vs/line/nolab/over($style3) {`xlf`,0.3}, {`ydn`,`ydn`}
+   plot/vs/line/nolab/over($style3) {`xlf`,`xlf+0.1`}, {`ydn`,`ydn`}
    label/user `xlf+xlen+0.02`,`ydn`,-1,0,`csiz`,($leglab3)
 ENDIF
 
 IF `($7"0|*>1") AND ($8"0|*>1")` THEN
    define symbol style4 =  ($7"0")
    define symbol leglab4 = ($8"0")
-   plot/vs/line/nolab/over($style4) {0.6,0.7}, {`ydn`,`ydn`}
+   plot/vs/line/nolab/over($style4) {`xrt`,`xrt+0.1`}, {`ydn`,`ydn`}
    label/user `xrt+xlen+0.02`,`ydn`,-1,0,`csiz`,($leglab4)
 ENDIF
