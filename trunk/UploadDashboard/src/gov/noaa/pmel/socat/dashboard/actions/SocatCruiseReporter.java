@@ -617,7 +617,7 @@ public class SocatCruiseReporter {
 		report.println("The data use policy can be found at http://www.socat.info/DataUsePolicy.htm");
 		if ( ! multicruise ) {
 			report.println();
-			report.println("All standard SOCAT version 2 data columns are reported in this file,");
+			report.println("All standard SOCAT version 3 data columns are reported in this file,");
 			report.println("even if all values are missing ('NaN') for this cruise.");
 		}
 		report.println();
