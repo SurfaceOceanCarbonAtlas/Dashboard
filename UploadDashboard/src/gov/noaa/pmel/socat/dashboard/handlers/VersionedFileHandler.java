@@ -83,7 +83,7 @@ public class VersionedFileHandler {
 		}
 	}
 
-	// Check every minute
+	// Check every 60 seconds
 	private static long MILLISECONDS_CHECK_INTERVAL = 60 * 1000L;
 	// Keep working while less than 3 seconds have passed
 	private static long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;

@@ -102,7 +102,8 @@ public class SocatCruiseReporter {
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
 	 * @throws IOException 
-	 * 		if unable to read the DSG NC file
+	 * 		if unable to read the DSG NC file, or
+	 * 		if unable to create the cruise report file
 	 */
 	public ArrayList<String> generateReport(String expocode, File reportFile) 
 								throws IllegalArgumentException, IOException {
@@ -173,7 +174,8 @@ public class SocatCruiseReporter {
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
 	 * @throws IOException 
-	 * 		if unable to read the DSG NC 
+	 * 		if unable to read the DSG NC file, or
+	 * 		if unable to create the cruise report file
 	 */
 	public ArrayList<String> generateReport(TreeSet<String> expocodes, Character regionID, 
 			File reportFile) throws IllegalArgumentException, IOException {
