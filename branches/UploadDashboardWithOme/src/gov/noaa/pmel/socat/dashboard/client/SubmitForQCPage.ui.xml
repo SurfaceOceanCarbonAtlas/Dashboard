@@ -1,0 +1,50 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:cell="urn:import:com.google.gwt.user.cellview.client">
+
+	<ui:style src="FullWidth.css" />
+
+	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.titlepanel}">
+				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+				<g:Label addStyleNames="{style.titlereset}" />
+			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">
+				<g:Label addStyleNames="{style.optionsintro}" ui:field="archivePlanLabel" />
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
+							name="archiveRadioGroup" ui:field="socatRadio" />
+					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
+							ui:field="socatInfoAnchor" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
+							name="archiveRadioGroup" ui:field="cdiacRadio" />
+					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
+							ui:field="cdiacInfoAnchor" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="{style.optionpanel}">
+					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
+							name="archiveRadioGroup" ui:field="ownerRadio" />
+					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
+							ui:field="ownerInfoAnchor" />
+				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="ownerAddnHtml" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.agreepanel}">
+				<g:CheckBox addStyleNames="{style.agreecheckbox}" ui:field="agreeShareCheckBox" />
+				<g:Anchor addStyleNames="{style.optioninfoanchor}" ui:field="agreeShareInfoAnchor" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="submitButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="cancelButton" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
+
+</ui:UiBinder>

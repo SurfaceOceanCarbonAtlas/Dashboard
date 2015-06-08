@@ -1,0 +1,46 @@
+! SOCAT3_WOA_salinity.jnl
+!
+! Sample World Ocean Atlas salinity at the times and locations of a SOCAT cruise dataset
+! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
+
+!!!!!!!!!!!!!!!!!!!!  WOA salinity !!!!!!!!!!!!!!!!!!!! 
+
+use s0112an1.nc
+define symbol dwoa = `s0112an1,RETURN=dsetnum`
+set data "($cruise_filename)"
+
+DEFINE AXIS/T=1:12:1 monthaxis
+let monthindex_salinity = S0112AN1[d=($dwoa),z=0,gt=monthaxis@asn]
+
+! sample salinity at the cruise times and locations.  
+let woaSss_good = SAMPLEXYT_NRST(monthindex_salinity, longitude, latitude, month)
+
+
+! plot/vs/ribbon/thick/sym=21 longitude, latitude, woaSss_good; pause
+
+!for WOA cells labeled land, use default salinity 35 & set WOA land marker to 1, 0 otherwise. 
+!The effect of salinty on the fCO2 calculations is regardless minimal
+
+!For xCO2 = 300 and press = 1000
+!At 40C, changing salinity from 0 -40 changes fCO2 by 0.5
+!at 0C, it changes by 0.03
+!at 15C it changes by 0.01 when SSS is changed from 34 to 35.
+
+
+! This lets Ferret interpolate between grid points at the edge of missing data and
+! the value 35 filled in over land.
+
+let salinity_and_land = if monthindex_salinity then monthindex_salinity else 35
+
+LET/units="`S0112AN1[d=($dwoa)],return=units`"/title="`S0112AN1[d=($dwoa)],return=title`" \
+ woa_and_land = SAMPLEXYT_NRST(salinity_and_land, longitude, latitude, month)
+
+LET/units="`S0112AN1[d=($dwoa)],return=units`"/title="`S0112AN1[d=($dwoa)],return=title`" \
+ woa_and_land = SAMPLEXYT_NRST(salinity_and_land, longitude, latitude, month)
+
+! average over K to remove the Z axis entirely
+LET/units="`S0112AN1[d=($dwoa)],return=units`"/title="`S0112AN1[d=($dwoa)],return=title`" \
+ woaSss = woa_and_land[K=@ave]
+
+! plot/vs/ribbon/thick/sym=21 longitude, latitude, woaSss; pause
+

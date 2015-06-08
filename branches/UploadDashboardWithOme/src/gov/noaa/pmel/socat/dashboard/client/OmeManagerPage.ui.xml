@@ -1,0 +1,37 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+	<ui:style src="FullWidth.css" />
+
+	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
+		<g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.titlepanel}">
+				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
+				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
+				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
+				<g:Label addStyleNames="{style.titlereset}" />
+			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<g:FlowPanel addStyleNames="{style.omeoptionpanel}">
+				<g:HTML addStyleNames="{style.omecruiselabel}" ui:field="cruiseNameHtml" />
+				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
+						name="OmeRadioGroup" ui:field="editExistingRadio" />
+				<g:FlowPanel addStyleNames="{style.omeoptionradio}">
+					<g:RadioButton addStyleNames="{style.omeoptionradiopiece}" 
+							name="OmeRadioGroup" ui:field="editMergedRadio" />
+					<g:TextBox addStyleNames="{style.omeoptiontext}" ui:field="editMergedText" />
+				</g:FlowPanel>
+				<g:RadioButton addStyleNames="{style.omeoptionradio}" 
+						name="OmeRadioGroup" ui:field="editUploadRadio" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="{style.horizontalbuttonpanel}">
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="editButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="previousButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="nextButton" />
+				<g:Button addStyleNames="{style.horizontalbutton}" ui:field="doneButton" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:ScrollPanel>
+
+</ui:UiBinder>

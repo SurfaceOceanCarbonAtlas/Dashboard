@@ -1,0 +1,28 @@
+! SOCAT3_ETOPO2_depth.jnl
+!
+! Sample ETOPO-2 depths at the locations of a SOCAT cruise dataset
+! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
+
+!!!!!!!!!!!!!!!!!!!! ETOPO depth !!!!!!!!!!!!!!!!!!!!
+
+!Get bathymetry from etopo2
+! (The matlab script puts longitude in -180:180. No need for that in Ferret, I think)
+
+use etopo2.nc
+define symbol detop = `rose,return=dsetnum`
+set data "($cruise_filename)"
+
+LET minlon = MAX(longitude[x=@min]-1,-180)
+IF `minlon LT -179` THEN LET minlon = -180
+LET maxlon = MIN(longitude[x=@max]+1,180)
+IF `maxlon GT 179` THEN LET maxlon =  180
+
+define symbol xreg = ,x=`minlon`:`maxlon`
+IF `(minlon LT -179) or (maxlon GT 179)` THEN cancel symbol xreg
+
+define symbol yreg = ,y=`MAX(latitude[x=@min]-1,-90)`:`MIN(latitude[x=@max]+1,90)`
+
+define symbol data_rose_sample = rose[d=($detop)($xreg)($yreg)]
+LET/units="`rose[d=($detop)],return=units`"/title="`rose[d=($detop)],return=title`"  etopoDepth = samplexy(($data_rose_sample), longitude, latitude)
+
+! plot/vs/ribbon/thick/sym=21 longitude, latitude, etopoDepth

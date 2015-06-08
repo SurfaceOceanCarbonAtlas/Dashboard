@@ -1,0 +1,68 @@
+! SOCAT3_region_id.jnl
+!
+! Sample the computed distance-to-land dataset at the locations of a SOCAT cruise dataset
+! The cruise dataset is already open and its name is in the symbol cruise_cruise_filename
+
+
+!!!!!!!!!!!!!!!!!!!! Region id !!!!!!!!!!!!!!!!!!!! 
+! Dataset SOCAT_region_ids.nc is written by script masks_SOCAT_regions.jnl
+! 
+! region_id corresponds to the following region names as defined
+! in queries to the SOCAT2 database:
+! 
+! +-----------+-------------------+--------+
+! | region_ID | name              | region |
+! +-----------+-------------------+--------+
+! |           | land              |      0 |
+! | N         | North Pacific     |      1 |
+! | T         | Tropical Pacific  |      2 |
+! | O         | Southern Ocean    |      4 |
+! | I         | Indian            |      5 |
+! | A         | North Atlantic    |      6 |
+! | C         | Coastal           |      7 |
+! | Z         | Tropical Atlantic |      8 |
+! | R         | Arctic            |     10 |
+! +-----------+-------------------+--------+
+
+use SOCAT_region_ids.nc
+define symbol dmask = `region_id,return=dsetnum`
+set var/name=socat3regions region_id
+
+use  dist2land20_burke.nc
+define symbol dd2land = `dist2land,return=dsetnum`
+
+set data "($cruise_filename)"
+
+let region_num = SAMPLEXY_CLOSEST(socat3regions[d=($dmask),x=-180:180], longitude, latitude)
+let d2land_coast = SAMPLEXY_CLOSEST(dist2land[d=($dd2land),x=-180:180], longitude, latitude)
+
+
+! If there are any missing values, fill them with: Arctic, Coastal, or Southern.
+! Because datasets are at different resolutions, region_num may not have been assigned
+! for locations very near land. Mark these temporarily with code 88
+
+! Also mark all locations that may be on land as coastal - or Arctic/Southern in those regions. 
+! dont have the missing-ids over land.
+
+let region_num_fill = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
+let region_num_fill2 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
+
+IF `region_num_fill[i=@min] EQ 0` THEN
+   LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
+
+   LET region_num_fill2 = if region_num_fill1 EQ 88 then \
+    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE region_num_fill1
+ENDIF
+
+IF `region_num_fill[i=@max] EQ 88` THEN
+   LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
+
+   LET region_num_fill2 = if region_num_fill1 EQ 88 then \
+    SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE 7
+ENDIF
+
+LET region_num_fill = IF region_num_fill2 EQ 0 THEN 7 ELSE region_num_fill2
+
+! There is no region 3 and no region 9
+let region_codes = {"N", "T", "-", "O", "I", "A", "C", "Z", "-", "R"}
+let regionid = SAMPLEI(region_codes, region_num_fill)

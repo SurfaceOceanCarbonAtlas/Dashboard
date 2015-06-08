@@ -1,0 +1,64 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! preview_fland.jnl
+! Version of LAS_fland.jnl. Automatically adjusts the resolution, but
+! using lower-resolution land sets than LAS_fland.
+!
+! $1 = palette
+
+DEFINE SYMBOL fland_palette ($1"gray")
+
+LET lon_range = ($region_x_range)
+LET lat_range = ($region_y_range)
+LET fland_area = `ABS(lon_range * lat_range) / (360 * 180)`
+
+! If a tiny region then use the etopo2 or etopo1 from PMEL server
+
+CANCEL SYMBOL topo_url
+
+! For thumbnail plots, which we want to run extra-fast, draw a coarser
+! map for all but the tiniest regions.
+
+LET fland_cutoff = 0.008
+IF `fland_area LT fland_cutoff` THEN
+  
+   SET DATA/SAVE
+
+   DEF SYM xlo_hack ($xaxis_min%0%)
+   DEF SYM xhi_hack ($xaxis_max%360%)
+   DEF SYM ylo_hack ($yaxis_min%-90%)
+   DEF SYM yhi_hack ($yaxis_max%90%)
+
+   DEF SYM map_reg = [x=($xlo_hack):($xhi_hack),y=($ylo_hack):($yhi_hack)]
+
+   DEFINE SYMBOL land_levels = (0,10000,10000)
+
+   IF `TEST_OPENDAP("http://ferret.pmel.noaa.gov/thredds/dodsC/data/PMEL/etopo2.nc") EQ 0` THEN \
+     DEFINE SYMBOL topo_url = "http://ferret.pmel.noaa.gov/thredds/dodsC/data/PMEL/etopo2.nc"
+
+   IF `fland_area LT 0.001` THEN
+     IF `TEST_OPENDAP("http://ferret.pmel.noaa.gov/thredds/dodsC/data/PMEL/etopo1.nc") EQ 0` THEN \
+        DEFINE SYMBOL topo_url = "http://ferret.pmel.noaa.gov/thredds/dodsC/data/PMEL/etopo1.nc"
+   ENDIF
+
+   IF `($topo_url"0|*>1") EQ 0` THEN 
+      DEFINE SYMBOL topo_url = etopo5
+   ENDIF
+
+   USE ($topo_url)
+   SHADE/NOLAB/NOKEY/LEV=($land_levels)/PAL=($fland_palette)/OVERLAY rose($map_reg)
+   DEFINE SYMBOL toponame = `rose,return=dset`
+
+   CAN DATA ($toponame)
+   SET DATA/RESTORE
+   DEFINE SYMBOL fland_done = 1
+
+ELIF `fland_area LT 0.25` THEN
+  DEFINE SYMBOL fland_resolution 05
+ELSE
+  DEFINE SYMBOL fland_resolution 20
+ENDIF
+
+IF `($fland_done"0|*>1") EQ 0` THEN \
+GO fland ($fland_resolution) ($fland_palette)
+
+! End of review_fland.jnl --------------------------------------------------

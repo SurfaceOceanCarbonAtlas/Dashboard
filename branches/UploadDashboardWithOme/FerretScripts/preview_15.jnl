@@ -1,0 +1,71 @@
+! Tdiff and fco2_insitu temp
+
+go preview_setup ($infile_dsg) 15
+
+
+! Plot delta-temperature using left axis and xco2's using right axis
+
+let/title="`delta_temp,return=title`"/units="`delta_temp,return=units`" dtemp = reshape(delta_temp, tt)
+let either_teq = if xCO2_water_equi_temp_wet_ppm then xCO2_water_equi_temp_wet_ppm else xCO2_water_equi_temp_dry_ppm
+let/title="@AS@ Teq" teq = reshape(either_teq, tt)
+let/title="`fCO2_recommended,return=title`" fco2 = reshape(fco2_recommended, tt)
+
+set view full
+! Get vertical scale for 2 variables together
+let var2 = tcat( teq, fco2)
+ppl %range `var2[l=@min]`, `var2[l=@max]` 5
+
+
+define symbol style1 = /color=blue/thick=2
+plot($linestyle)($style1)/axes=1,1,1,0/vlim=($PPL$RANGE_LOW):($PPL$RANGE_HIGH)/set teq
+  ppl ylab "(`fco2_recommended,return=units`)"
+  if `teq[L=@ngd] eq 0 and fco2[L=@ngd] EQ 0` THEN ppl ylab fCO_2 and xCO_2 Teq NO VALID DATA
+  ($taxis_setting)
+  ppl title " "
+  ppl xlab " "
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  let labdat = ($labnum_dset)
+  let labttl = ($labnum_datitl)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+define symbol style2 = /color=black/thick=1
+plot($linestyle)($style2)/over/nolab fco2
+
+! delta temp in red, with axis on the right
+set view full2
+
+define symbol style3 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)
+plot($linestyle)($style3)/axes=1,1,0,1/set dtemp
+  ppl ylab "(Deg C)"
+  if `dtemp[L=@ngd] eq 0` THEN ppl ylab "delta-temp NO VALID DATA"
+  ($taxis_setting)
+  ppl title " "
+  ppl xlab " "
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  let labdat = ($labnum_dset)
+  let labttl = ($labnum_datitl)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
+
+! Label at the top with the Expocode and count
+DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
+LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
+
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+
+
+! If no data, add a label
+IF `dtemp[L=@ngd] + teq[L=@ngd] + fco2[L=@ngd]  EQ 0` THEN \
+   LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
+
+! Make the color key
+
+GO keybox ($style1) "xCO_2 Teq" ($style2) "`fCO2_recommended,return=title`" ($style3) "`delta_temp,return=title`"
+
+
+FRAME($trans)/FORMAT=gif/FILE="($result_plot_image_filename)"
+
+

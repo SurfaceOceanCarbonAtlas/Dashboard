@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+    <!--
+        The attributes are: 
+            base_dir - this will get pre-pended to any relative path name (including ".") in the environment section.
+            time_limit - maximum number of milliseconds a single invocation of Ferret will be allowed to run before it is killed.
+            temp_dir - a directory that will get created in which temporary files will be written.
+                    The Ferret script to be run is written here.
+            ..._driver - the script that gets invoked with the NC file name as the first and only argument.
+                    Ferret must be able to find the data file either by adding the data directory to the FER_DATA
+                    environment below or by passing the script a fully qualified path.
+    -->
+    <invoker
+        base_dir="/home/ksmith/Ferret/"
+        executable="/home/ksmith/Ferret/bin/ferret"
+        time_limit="10000"
+        temp_dir="/var/tmp/socat/"
+        compute_driver="calcSOCAT3"
+        decimate_driver="ddsg_socat3"
+        plots_driver="run_preview">
+        <!--
+            For PyFerret use:
+                executable="/usr/bin/python2.7"
+                <arg>-c import sys; import pyferret; (errval, errmsg) = pyferret.init(sys.argv[1:], True)</arg>
+        -->
+        <arg>-gif</arg>
+        <arg>-script</arg>
+    </invoker>
+    <environment>
+        <variable>
+            <name>FER_DIR</name>
+            <value>.</value>
+        </variable>
+        <variable>
+            <name>FER_DESCR</name>
+            <value>Datasets/descr</value>
+        </variable>
+        <variable>
+            <name>FER_DATA</name>
+            <value>Socat/datasets</value>
+            <value>Datasets/data</value>
+            <value>contrib</value>
+            <value>go</value>
+            <value>examples</value>
+        </variable>
+        <variable>
+            <name>FER_GRIDS</name>
+            <value>Datasets/grids</value>
+        </variable>
+        <variable>
+            <name>FER_PALETTE</name>
+            <value>ppl</value>
+        </variable>
+        <variable>
+            <name>FER_GO</name>
+            <value>Socat/scripts</value>
+            <value>go</value>
+            <value>contrib</value>
+            <value>examples</value>
+        </variable>
+        <variable>
+            <name>PLOTFONTS</name>
+            <value>ppl/fonts</value>
+        </variable>
+        <variable>
+            <name>FER_EXTERNAL_FUNCTIONS</name>
+            <value>ext_func/libs</value>
+        </variable>
+    </environment>
+    <!-- The remainder of this should not need any modifications -->
+    <messages>
+        <message type="startsWith" level="error">
+            <key>PPL+ error</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR Sorry. This server cannot yet perform a time analysis and a month-of-the-year constraint together.</key>
+            <text>
+                Sorry. This server cannot yet perform a time analysis and a month-of-the-year constraint together.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR "Desktop Access script not available for data on a Curvilinear grid</key>
+            <text>
+                Desktop Access script not available for data on a Curvilinear grid.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR The variables must have the same dimensions</key>
+            <text>
+                In order to compare multiple variables, they must all share the same dimensions.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR No t axis for variable</key>
+            <text>
+                Not all variables possess a time axis
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR No z axis for variable</key>
+            <text>
+                Not all variables possess a Z axis
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR No x axis for variable</key>
+            <text>
+                Not all variables possess a Longitude axis
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR No y axis for variable</key>
+            <text>
+                Not all variables possess a Latitude axis
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR The t region is too small. It reduces to a single point.</key>
+            <text>
+                The time region requested reduces to a single point and is too small.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR The z region is too small. It reduces to a single point.</key>
+            <text>
+                The Z region requested reduces to a single point and is too small.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR The x region is too small. It reduces to a single point.</key>
+            <text>
+                The longitude region requested reduces to a single point and is too small.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR The y region is too small. It reduces to a single point.</key>
+            <text>
+                The latitude region requested reduces to a single point and is too small.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>*** NOTE: unrepairable repeated axis coords</key>
+            <text>
+                The dataset has an invalid coordinate axis.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>*** NOTE: Coordinates out of order or missing</key>
+            <text>
+                The dataset has an invalid coordinate axis.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>*** NOTE: calendar attribute on axis</key>
+            <text>
+                A time axis in the dataset has an invalid calendar definition.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>*** NOTE: A dummy value of 1</key>
+            <text>
+                A coordinate axis has no coordinates.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**ERROR</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**Error</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**TMAP ERR</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>STOP</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>Segmentation</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>No such</key>
+            <text>
+                An error occurred in the service that was creating your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**Internet data error</key>
+            <text>
+                A remote server was unable to deliver the data LAS needs to make your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**netCDF error</key>
+            <text>
+                A remote server was unable to deliver the data LAS needs to make your product.
+            </text>
+        </message>
+        <message type="startsWith" level="error">
+            <key>**Internet Data error</key>
+            <text>
+                A remote server was unable to deliver the data LAS needs to make your product.
+            </text>
+        </message>
+    </messages>
+</application>
