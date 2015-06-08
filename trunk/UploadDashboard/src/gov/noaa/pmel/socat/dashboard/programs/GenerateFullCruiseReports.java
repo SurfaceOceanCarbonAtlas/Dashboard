@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.actions.SocatCruiseReporter;
+import gov.noaa.pmel.socat.dashboard.handlers.SocatFilesBundler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -52,7 +53,7 @@ public class GenerateFullCruiseReports {
 			System.exit(1);
 		}
 		String exposFilename = args[0];
-		File destFile = new File(args[1]);
+		String destName = args[1];
 		boolean multicruise;
 		Character regionID;
 		if ( args.length > 2 ) {
@@ -99,11 +100,11 @@ public class GenerateFullCruiseReports {
 			System.exit(1);
 		}
 		try {
-			SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
 			if ( multicruise ) {
+				SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
 				try {
 					ArrayList<String> warnMsgs = 
-							reporter.generateReport(expocodes, regionID, destFile);
+							reporter.generateReport(expocodes, regionID, new File(destName));
 					if ( warnMsgs.size() > 0 ) {
 						System.err.println("Warnings: ");
 						for ( String msg : warnMsgs )
@@ -117,20 +118,20 @@ public class GenerateFullCruiseReports {
 				}
 			}
 			else {
+				SocatFilesBundler bundler = new SocatFilesBundler(destName);
 				for ( String expo : expocodes ) {
-					File reportFile = new File(destFile, 
-							"SOCAT_" + expo + "_report.txt");
 					try {
-						ArrayList<String> warnMsgs = 
-								reporter.generateReport(expo, reportFile);
+						ArrayList<String> warnMsgs = bundler.createSocatEnhancedFilesBundle(expo);
+						System.err.println("Created single-cruise enhanced-data files bundle " + 
+								bundler.getBundleFile(expo).getPath());
 						if ( warnMsgs.size() > 0 ) {
 							System.err.println("Warnings for " + expo + ": ");
 							for ( String msg : warnMsgs )
 								System.err.println(expo + ": " + msg);
 						}
 					} catch (Exception ex) {
-						System.err.println("Problems generating the single cruise " +
-								"report " + reportFile.getPath() + ": " + ex.getMessage());
+						System.err.println("Problems generating the single-cruise enhanced-data " +
+								"files bundle for " + expo + ": " + ex.getMessage());
 						ex.printStackTrace();
 						System.exit(1);
 					}
