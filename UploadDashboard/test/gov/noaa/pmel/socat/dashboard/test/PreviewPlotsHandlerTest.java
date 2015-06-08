@@ -46,9 +46,11 @@ public class PreviewPlotsHandlerTest {
 				CruisePreviewPage.TEMPERATURES_IMAGE_NAME,
 				CruisePreviewPage.SALINITIES_IMAGE_NAME,
 				CruisePreviewPage.XCO2S_IMAGE_NAME,
+				CruisePreviewPage.DT_XCO2_FCO2_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_VS_TIME_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_VS_SST_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_VS_SAL_IMAGE_NAME,
+				CruisePreviewPage.REPORT_REC_FCO2_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_DELTA_IMAGE_NAME,
 				CruisePreviewPage.REC_FCO2_SOURCES_IMAGE_NAME } ) {
 			plotFile = new File(plotsDir, EXPOCODE + "_" + imgName + "_" + timetag + ".gif");

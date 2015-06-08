@@ -2,7 +2,6 @@
 
 go preview_setup ($infile_dsg) 4
 
-set view full
 ! Plot pressure variables each with its own vertical axis
 
 let/title="@ASP_NCEP" P_NCEP =  reshape(pressure_ncep_slp, tt)
@@ -10,14 +9,28 @@ let/title="@ASP_atm" patm = reshape(Pressure_atm, tt)
 let/title="@ASP_equi" pequi =  reshape(Pressure_equi, tt)
 
 ! Get vertical scale for 3 variables together
-let var2 = tcat( P_NCEP, patm)
-let var3 = tcat(pequi,var2)
-ppl %range `var3[l=@min]`, `var3[l=@max]` 5
+plot P_NCEP, patm,pequi
+
+CANCEL VIEW
+SET VIEW full
+
+LET amin = ($yaxis_min)
+LET amax = ($yaxis_max)
+
+GO preview_xy_range amin amax 1
+
+LET yax_lo = ($ppl$range_low)
+LET yax_hi = ($ppl$range_high)
+
+DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
+
+! Take care of pathological cases in the limits/bad values. pplus should handle this ok
+IF `ABS(yax_hi - yax_lo) GT 1000` THEN CANCEL SYMBOL vlimits
 
 ppl axlint,,2
 
 define symbol style1 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)
-plot($linestyle)($style1)/vlim=($PPL$RANGE_LOW):($PPL$RANGE_HIGH)/title=" "/set  P_NCEP
+plot($linestyle)($style1)($vlimits)/title=" "/set  P_NCEP
    ppl ylab Pressure (`Pressure_atm,return=units`)
   ($taxis_setting)
    IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
@@ -36,7 +49,7 @@ plot($linestyle)/over($style3)/nolab pequi
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Pressures  `nobs` locations
 
 ! If no data, add a label
 IF `P_NCEP[L=@ngd] + patm[L=@ngd] + pequi[L=@ngd]  EQ 0` THEN \

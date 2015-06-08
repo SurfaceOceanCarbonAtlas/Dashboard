@@ -220,7 +220,7 @@ body {
 
 .plotspanel {
 	display: block;
-	width: 90em;
+	width: 100em;
 	height: 710px;
 	margin-top: 1em;
 	margin-bottom: 1em;
@@ -277,6 +277,11 @@ body {
 	display: block;
 	margin-top: 1.5em;
 	margin-bottom: 1.5em;
+}
+.titleinfo {
+	display: block;
+	margin-top: 0.5em;
+	margin-botton: 0.5em
 }
 .titlemainpanel {
 	dislay: block;

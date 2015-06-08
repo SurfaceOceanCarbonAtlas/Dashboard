@@ -12,20 +12,33 @@ let/title="@AS@ Teq dry" teqdry = reshape(xCO2_water_equi_temp_dry_ppm, tt)
 
  ! Plot variables together to set common vertical scale
 plot  sstwet, sstdry, teqwet, teqdry 
-let ymin = ($yaxis_min)
-let ymax = ($yaxis_max)
+CANCEL VIEW
+SET VIEW full
 
+LET amin = ($yaxis_min)
+LET amax = ($yaxis_max)
+GO preview_xy_range amin amax 1
+
+LET yax_lo = ($ppl$range_low)
+LET yax_hi = ($ppl$range_high)
+
+DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
+
+! Take care of pathological cases in the limits/bad values. pplus should handle this ok
+IF `ABS(yax_hi - yax_lo) GT 1000` THEN CANCEL SYMBOL vlimits
 
 ! Plot xCO2 variables 
-set view full
 
 ! plot lines with individual line styles
 define symbol style1 = /color=black
 define symbol leglab1 "@AS@ SST wet"
 
-plot($linestyle)/vlim=`ymin`:`ymax`/titl=" "/set sstwet
+LET has_data = sstwet[L=@ngd] + sstdry[L=@ngd] + teqwet[L=@ngd] + teqdry[L=@ngd]
+
+plot($linestyle)($vlimits)/titl=" "/set sstwet
   ($taxis_setting)
-  ppl ylab xCO_2 (`xCO2_water_sst_wet_ppm,return=units`)
+  ppl ylab " "
+  IF `has_data GT 0` THEN ppl ylab xCO_2 (`xCO2_water_sst_wet_ppm,return=units`)
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
@@ -47,10 +60,10 @@ plot($linestyle)($style4)/over/nolab teqdry
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, xCO_2  `nobs` locations
 
 ! If no data, add a label
-IF `sstwet[L=@ngd] + sstdry[L=@ngd] + teqwet[L=@ngd] + teqdry[L=@ngd] EQ 0` THEN \
+IF `has_data EQ 0` THEN \
    LABEL/nouser `($ppl$xlen)/2`,`($ppl$ylen)/2`, 0, 0, 0.15, No Valid Data
 
 go keybox ($style1) "($leglab1)" ($style2) "($leglab2)" ($style3) "($leglab3)" ($style4) "($leglab4)"

@@ -8,17 +8,17 @@ LET/UNITS="`latitude,RETURN=units`"/TITLE="`latitude,RETURN=title`" lat = latitu
 
 LET amin = `min(lon[i=@MIN]-5, 180)`
 LET amax = `max(lon[i=@MAX]+5, -180)`
-GO preview_xy_range amin amax 
+GO preview_xy_range amin amax 100
 
 LET xax_lo = ($ppl$range_low)
 LET xax_hi = ($ppl$range_high)
-LET xax_del = ($ppl$range_inc)
+LET del_ax = ($ppl$range_inc)
 
 LET varnames = ..varnames
 IF `IS_ELEMENT_OF_STR(varnames, "lon360") GT 0` THEN
    
-   LET amin = `min(lon[i=@MIN]-5, 360)`
-   LET amax = `max(lon[i=@MAX]+5, 0)`
+   LET amin = `min(lon360[i=@MIN]-5, 360)`
+   LET amax = `max(lon360[i=@MAX]+5, 0)`
    
    GO preview_xy_range amin amax 
 
@@ -30,7 +30,7 @@ IF `IS_ELEMENT_OF_STR(varnames, "lon360") GT 0` THEN
       LET/UNITS="`longitude,RETURN=units`"/TITLE="`longitude,RETURN=title`" lon = lon360
       LET xax_lo = ax_lo360
       LET xax_hi = ax_hi360
-      LET xax_del = xax360_del
+      LET del_ax = xax360_del
    ENDIF
 
 ENDIF
@@ -67,26 +67,10 @@ DEFINE SYMBOL region_x_range = `xax_hi - xax_lo`
 DEFINE SYMBOL region_y_lo = `yax_lo`
 DEFINE SYMBOL region_y_hi = `yax_hi`
 DEFINE SYMBOL region_y_range = `yax_hi - yax_lo`
-DEFINE SYMBOL land_palette = gray_dark
 
 GO preview_fland ($land_palette)
 
-! Underlay to connect the points with a gray dashed line
-ppl color,6,70,70,70 ! gray
-
 PLOT/over/vs/LINE/DASH=(0.1,0.04,0.1,0.04)/line=6/NOLAB lon, lat
 
-! Mark woce-4 points with red and with a black-outline
-LET woce4 = if woce_co2_water EQ 4 then 1
-let/units=degrees_east lon4 = woce4*reshape(lon,tt)
-let/units=degrees_north lat4 = woce4*reshape(lat,tt)
-LET n4 = `woce4[L=@ngd]`
-IF `n4 GT 0` THEN \
- plot/over/vs($woce4style)/nokey/nolab/color=black lon4, lat4
-
 ! color the path with woce flag
-RIBBON/over/vs/missing=blank/NOLAB($ppstyle)/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT lon, lat, WOCE_CO2_water
-
-! redraw the red dots
-IF `n4 GT 0` THEN \
-plot/over/vs/NOLAB($ppstyle)/key/COLOR=red lon4, lat4
+RIBBON/over/vs/missing=blank/NOLAB($ppstyle)/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT lon, lat, WOCE_CO2_water

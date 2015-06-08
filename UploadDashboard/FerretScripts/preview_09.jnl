@@ -3,11 +3,12 @@
 go preview_setup ($infile_dsg) 9
 
 let/units="`temp,return=units`"/title="`temp,return=title`" temperature = reshape(temp,tt)
-let/title=fCO2_recommended fco2 = reshape(fco2_recommended, tt)
+let/title="fCO_2 recommended" fco2 = reshape(fco2_recommended, tt)
 
 set view full
-ribbon/vs($ppstyle)/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/set temperature, fco2, WOCE_CO2_water
+ribbon/vs($ppstyle)/key/PALETTE=($woce_palette)/levels=(2,4,1)/KEY=CENT/set temperature, fco2, WOCE_CO2_water
   ppl title
+  ppl ylab "fCO_2 recommended (`fco2_recommended,return=units`)"
   IF ($labnum_T"0|*>1") THEN go unlabel ($labnum_T)
   IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
   IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
@@ -15,21 +16,12 @@ ribbon/vs($ppstyle)/key/PALETTE=woce/levels=(2,4,1)/KEY=CENT/set temperature, fc
 ppl ribbon
 
 
-
-LET woce4 = if woce_co2_water EQ 4 then 1
-LET n4 = `woce4[L=@ngd]`
-IF `n4 GT 0` THEN
- plot/vs/over($woce4style)/nokey/nolab/color=black woce4*temperature, fco2
- plot/vs/over($ppstyle)/nolab/color=red woce4*temperature, fco2
-ENDIF
-
-
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
 label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, \
-Count: `nfnoc` Valid fCO_2 recomputed Colored by `WOCE_CO2_water_in,return=title`
+fCO_2 recommended `nfnoc` Valid points Colored by `WOCE_CO2_water_in,return=title`
 
 ! If no data, add a label
 IF `temperature[L=@ngd] EQ 0` THEN \

@@ -6,7 +6,7 @@ go preview_setup ($infile_dsg) 7
 
 
 let/title="WOA sss" woa = reshape(woa_sss, tt)
-let/title="Sal" sal_t = reshape (sal, tt)
+let/title="Sal"/units="`sal,return=units`" sal_t = reshape (sal, tt)
 
 set view full
 
@@ -14,7 +14,7 @@ define symbol style1 =  /color=blue/thick=2
 define symbol leglab1 WOA sss
 
 plot($linestyle)/color=blue/thick=2/axes=1,1,1,0/title=" "/set woa
-  ppl ylab Salinity (`sal,return=units`)
+  ppl ylab WOA Salinity (`woa_sss,return=units`)
   ppl xlab " "
   ($taxis_setting)
   IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
@@ -26,13 +26,20 @@ ppl plot
 define symbol style2 = /color=black/thick=1/DASH=(0.15,0.05,0.15,0.05)
 define symbol leglab2  Sal
 set view full2
-plot($linestyle)($style2)/axes=1,1,0,1/nolab sal_t
+plot($linestyle)($style2)/axes=1,1,0,1/title=" "/set sal_t
+  ppl ylab Salinity (`sal,return=units`)
+  ppl xlab " "
+  ($taxis_setting)
+  IF ($labnum_year"0|*>1") THEN go unlabel ($labnum_year)
+  IF ($labnum_dset"0|*>1") THEN go unlabel ($labnum_dset)
+  IF ($labnum_datitl"0|*>1") THEN go unlabel ($labnum_datitl)
+ppl plot
 
 ! Label at the top with the Expocode and count
 DEFINE SYMBOL lab_top = Expocode `EXPOCODE`
 LABEL/NOUSER  `($ppl$xlen)/2`,`($ppl$ylen)+0.6*($ppl$yorg)`, 0,0,0.13,  ($lab_top)
 
-label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Count: `nobs` locations
+label/nouser  `($ppl$xlen)/2`,`($ppl$ylen)+0.3*($ppl$yorg)`, 0,0,0.10, Salinities  `nobs` locations
 
 
 ! If no data, add a label
