@@ -139,14 +139,19 @@ public class MetadataUploadService extends HttpServlet {
 		DsgNcFileHandler dsgFileHandler = configStore.getDsgNcFileHandler();
 		String uploadFilename;
 		if ( isOme ) {
-			uploadFilename = DashboardMetadata.OME_FILENAME;
+			// Save under the PI_OME_FILENAME at this time.
+			// When CDIAC OME incorporated, change to OME_FILENAME
+			uploadFilename = DashboardMetadata.PI_OME_FILENAME;
 		}
 		else {
 			uploadFilename = DashboardUtils.baseName(metadataItem.getName());
-			if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ) {
+			if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ||
+				 uploadFilename.equals(DashboardMetadata.PI_OME_FILENAME) ) {
 				metadataItem.delete();
 				sendErrMsg(response, "Name of the uploaded file cannot be " + 
-						DashboardMetadata.OME_FILENAME + "\nPlease rename the file and try again.");
+						DashboardMetadata.OME_FILENAME + 
+						" nor " + DashboardMetadata.PI_OME_FILENAME + 
+						"\nPlease rename the file and try again.");
 			}
 		}
 

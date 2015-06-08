@@ -92,7 +92,11 @@ public class AddAllMetadata {
 					addlDocs.clear();
 					for ( DashboardMetadata mdata : metaHandler.getMetadataFiles(expocode) ) {
 						if ( mdata.getFilename().equals(DashboardMetadata.OME_FILENAME) ) {
-							// Set the OME upload timestamp
+							// Ignore the OME.xml stub
+							;
+						}
+						else if ( mdata.getFilename().equals(DashboardMetadata.PI_OME_FILENAME) ) {
+							// PI-provided OME.xml file - set the OME upload timestamp
 							cruise.setOmeTimestamp(mdata.getUploadTimestamp());
 						}
 						else {

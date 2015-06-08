@@ -888,6 +888,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) )
 				throw new IllegalArgumentException("Supplemental documents cannot " +
 						"have the upload filename of " + DashboardMetadata.OME_FILENAME);
+			if ( DashboardMetadata.PI_OME_FILENAME.equals(uploadFilename) )
+				throw new IllegalArgumentException("Supplemental documents cannot " +
+						"have the upload filename of " + DashboardMetadata.PI_OME_FILENAME);
 			// Work directly on the additional documents list in the cruise object
 			TreeSet<String> addlDocTitles = cruise.getAddlDocs();
 			String titleToDelete = null;
@@ -1113,13 +1116,22 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( deleteMetadata ) {
 			// Delete the metadata and additional documents associated with this cruise
 			MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-			String omeTimestamp = cruise.getOmeTimestamp();
-			if ( ! omeTimestamp.isEmpty() )
-				metadataHandler.removeMetadata(username, expocode, 
-						DashboardMetadata.OME_FILENAME);
-			for ( String mdataTitle : cruise.getAddlDocs() )
-				metadataHandler.removeMetadata(username, expocode, 
-						DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0]);
+			try {
+				metadataHandler.removeMetadata(username, expocode, DashboardMetadata.OME_FILENAME);
+			} catch (Exception ex) {
+				// Ignore - may not exist
+				;
+			}
+			try {
+				metadataHandler.removeMetadata(username, expocode, DashboardMetadata.PI_OME_FILENAME);
+			} catch (Exception ex) {
+				// Ignore - may not exist
+				;
+			}
+			for ( String mdataTitle : cruise.getAddlDocs() ) {
+				String filename = DashboardMetadata.splitAddlDocsTitle(mdataTitle)[0];
+				metadataHandler.removeMetadata(username, expocode, filename);
+			}
 		}
 	}
 

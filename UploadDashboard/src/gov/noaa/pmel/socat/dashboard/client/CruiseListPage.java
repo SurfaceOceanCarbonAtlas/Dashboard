@@ -626,9 +626,14 @@ public class CruiseListPage extends CompositeWithUsername {
 	void omeOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( cruiseSet.size() < 1 ) {
-			// TODO: need to allow user to enter a new expocode
 			SocatUploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_OME_ERR_END);
+			return;
+		}
+		// Until the OME is in place, only accept one cruise
+		if ( cruiseSet.size() > 1 ) {
+			SocatUploadDashboard.showMessage(
+					MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
 		OmeManagerPage.showPage(cruiseSet);
