@@ -43,6 +43,19 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
+	private static final String UPLOAD_FILE_DESCRIPTION_HTML = 
+			"<p>An acceptable data file starts with lines of metadata," +
+			"then has a line of column headers, " +
+			"an optional lines of column units, " +
+			"and finally a line of data values for each data sample.</p>" +
+			"<p>The expocode, vessel (ship) name, and investigators names " +
+			"must be provided either in the metadata lines: <ul>" +
+			"<li>expocode = ...</li>" +
+			"<li>vessel = ...</li>" +
+			"<li>investigators = ...</li>" +
+			"</ul> or in columns with recognized headers for the expocode, " +
+			"ship name, and investigator names.</p>";
+
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
 	private static final String COMMA_FORMAT_TEXT = "file contains comma-separated values";
@@ -142,6 +155,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	@UiField InlineLabel titleLabel;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
+	@UiField HTML introHtml;
 	@UiField FormPanel uploadForm;
 	@UiField HTML cruiseUpload;
 	@UiField Hidden timestampToken;
@@ -180,6 +194,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
+		introHtml.setHTML(UPLOAD_FILE_DESCRIPTION_HTML);
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
