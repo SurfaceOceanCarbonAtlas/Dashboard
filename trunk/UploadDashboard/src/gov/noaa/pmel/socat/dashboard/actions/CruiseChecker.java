@@ -275,6 +275,7 @@ public class CruiseChecker {
 		CHECKER_DATA_UNITS.put(DataColumnType.CRUISE_NAME, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.SHIP_NAME, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(DataColumnType.GROUP_NAME, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(DataColumnType.INVESTIGATOR_NAMES, DashboardUtils.NO_UNITS);
 
 		CHECKER_DATA_UNITS.put(DataColumnType.TIMESTAMP, checkerTimestampDateUnits);
 		CHECKER_DATA_UNITS.put(DataColumnType.DATE, DashboardUtils.DATE_UNITS);
@@ -656,6 +657,7 @@ public class CruiseChecker {
 					  colType.equals(DataColumnType.CRUISE_NAME) || 
 					  colType.equals(DataColumnType.SHIP_NAME) || 
 					  colType.equals(DataColumnType.GROUP_NAME) || 
+					  colType.equals(DataColumnType.INVESTIGATOR_NAMES) || 
 
 					  colType.equals(DataColumnType.TIMESTAMP) ||
 					  colType.equals(DataColumnType.DATE) ||
@@ -1084,6 +1086,7 @@ public class CruiseChecker {
 					 colType.equals(DataColumnType.CRUISE_NAME) || 
 					 colType.equals(DataColumnType.SHIP_NAME) || 
 					 colType.equals(DataColumnType.GROUP_NAME) || 
+					 colType.equals(DataColumnType.INVESTIGATOR_NAMES) || 
 
 					 colType.equals(DataColumnType.TIMESTAMP) || 
 					 colType.equals(DataColumnType.DATE) || 

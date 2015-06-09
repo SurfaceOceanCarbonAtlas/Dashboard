@@ -34,6 +34,10 @@ public enum DataColumnType implements Serializable, IsSerializable {
 	 * GROUP_NAME is the user-provided name of the group (metadata)
 	 */
 	GROUP_NAME,
+	/**
+	 * INVESTIGATOR_NAMES is the names of the investigators (metadata)
+	 */
+	INVESTIGATOR_NAMES,
 
 	/**
 	 * TIMESTAMP has both date and time.
