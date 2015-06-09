@@ -11,6 +11,7 @@
 				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
+			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
 					<g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload" />
