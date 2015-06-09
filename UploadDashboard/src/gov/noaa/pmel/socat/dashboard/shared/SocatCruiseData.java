@@ -281,6 +281,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 					 type.equals(DataColumnType.CRUISE_NAME) ||
 					 type.equals(DataColumnType.SHIP_NAME) ||
 					 type.equals(DataColumnType.GROUP_NAME) ||
+					 type.equals(DataColumnType.INVESTIGATOR_NAMES) ||
 					 type.equals(DataColumnType.TIMESTAMP) ||
 					 type.equals(DataColumnType.DATE) ||
 					 type.equals(DataColumnType.TIME) ||

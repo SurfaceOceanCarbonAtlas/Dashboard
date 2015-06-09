@@ -83,6 +83,7 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
 		STD_HEADER_NAMES.put(DataColumnType.SHIP_NAME, "ship_name");
 		STD_HEADER_NAMES.put(DataColumnType.GROUP_NAME, "group_name");
+		STD_HEADER_NAMES.put(DataColumnType.INVESTIGATOR_NAMES, "PI_names");
 
 		STD_HEADER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
 		STD_HEADER_NAMES.put(DataColumnType.DATE, "date");
@@ -197,6 +198,7 @@ public class DashboardUtils {
 		STD_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.SHIP_NAME, NO_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.GROUP_NAME, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.INVESTIGATOR_NAMES, NO_UNITS);
 
 		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, TIMESTAMP_UNITS);
 		STD_DATA_UNITS.put(DataColumnType.DATE, DATE_UNITS);
