@@ -49,10 +49,10 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"an optional lines of column units, " +
 			"and finally a line of data values for each data sample.</p>" +
 			"<p>The expocode, vessel (ship) name, and investigators names " +
-			"must be provided either in the metadata lines: <ul>" +
-			"<li>expocode = ...</li>" +
-			"<li>vessel = ...</li>" +
-			"<li>investigators = ...</li>" +
+			"must be provided in the metadata lines such as: <ul>" +
+			"<li>expocode: ZZZZ20051231</li>" +
+			"<li>ship: Pacific Minnow</li>" +
+			"<li>PIs: Smith, K.; Doe, J.</li>" +
 			"</ul> or in columns with recognized headers for the expocode, " +
 			"ship name, and investigator names.</p>";
 
@@ -113,11 +113,12 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String EXPLAINED_FAIL_MSG_END = 
 			"</pre></p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<br />No valid expocode found.</h3>" +
+			"<br />No valid expocode, ship, or PIs found.</h3>" +
 			"<p>The data file needs to contain the dataset expocode in the lines " +
 			"of metadata preceding the data, or in an expocode data column.  " +
-			"The expocode metadata line should look something like<br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218" +
+			"The expocode metadata line should look something like one of<br />" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218<br />" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;expocode:&nbsp;49P120101218" +
 			"</p><p>" +
 			"The 12 character expocode is the NODC code for the vessel carrying " +
 			"the instrumentation followed by the numeric year, month, and day of " +
@@ -125,10 +126,22 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"a cruise on the Japanese (49) ship of opportunity Pyxis (P1) with the " +
 			"first day of the cruise on 18 December 2010." +
 			"</p><p>" +
-			"Please verify a valid expocode is given in your file.  You might want " +
-			"to click the Advanced Settings option on this page and then click the " +
-			"Preview Data File button.  This will enable you to see how your file " +
-			"appears to this system and change the file encoding type if appropriate." +
+			"The ship or vessel name is similarly assigned using one of the " +
+			"tags 'ship', 'ship name', 'vessel', or 'vessel name', a '=' or ':', " +
+			"and finally the name of the ship or vessel.  For example: <br />" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;ship:&nbsp;Minnow" +
+			"</p><p>" +
+			"The investigator name(s) is similarly assigned using one of the " +
+			"tags 'Investigator', 'Investigators', 'PI', or 'PIs', a '=' or ':', " +
+			"and finally a semicolon-separated list of investigator names.  " +
+			"For example: <br />" +
+			"&nbsp;&nbsp;&nbsp;&nbsp;PIs:&nbsp;Smith,&nbsp;K.,;&nbsp;Doe,&nbspJ." +
+			"</p><p>" +
+			"Please verify a valid expocode, ship or vessel name, and investigator name(s) " +
+			"are given in your file.  You might want to click the Advanced Settings option " +
+			"on this page and then click the Preview Data File button.  This will enable " + 
+			"you to see how your file appears to this system and change the file encoding " +
+			"type if appropriate." +
 			"</p>";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG_START = 
 			"<br />A dataset already exists with this expocode.</h3>";
