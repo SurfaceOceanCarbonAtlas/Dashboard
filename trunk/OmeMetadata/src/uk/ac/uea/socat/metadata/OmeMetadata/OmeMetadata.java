@@ -39,21 +39,21 @@ public class OmeMetadata {
 	private static final String DRAFT_ELEMENT_NAME = "draft";
 
 	// Element names for User as well as the Investigator composite variables
-	private static final String NAME_ELEMENT_NAME = "Name";
-	private static final String ORGANIZATION_ELEMENT_NAME = "Organization";
-	private static final String ADDRESS_ELEMENT_NAME = "Address";
-	private static final String PHONE_ELEMENT_NAME = "Phone";
-	private static final String EMAIL_ELEMENT_NAME = "Email";
+	public static final String NAME_ELEMENT_NAME = "Name";
+	public static final String ORGANIZATION_ELEMENT_NAME = "Organization";
+	public static final String ADDRESS_ELEMENT_NAME = "Address";
+	public static final String PHONE_ELEMENT_NAME = "Phone";
+	public static final String EMAIL_ELEMENT_NAME = "Email";
 
 	// Element names for the Sensor and Other_Sensor composite variables
-	private static final String LOCATION_ELEMENT_NAME = "Location";
-	private static final String MANUFACTURER_ELEMENT_NAME = "Manufacturer";
-	private static final String MODEL_ELEMENT_NAME = "Model";
-	private static final String ACCURACY_ELEMENT_NAME = "Accuracy";
-	private static final String PRECISION_ELEMENT_NAME = "Precision";
-	private static final String RESOLUTION_ELEMENT_NAME = "Resolution";
-	private static final String CALIBRATION_ELEMENT_NAME = "Calibration";
-	private static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
+	public static final String LOCATION_ELEMENT_NAME = "Location";
+	public static final String MANUFACTURER_ELEMENT_NAME = "Manufacturer";
+	public static final String MODEL_ELEMENT_NAME = "Model";
+	public static final String ACCURACY_ELEMENT_NAME = "Accuracy";
+	public static final String PRECISION_ELEMENT_NAME = "Precision";
+	public static final String RESOLUTION_ELEMENT_NAME = "Resolution";
+	public static final String CALIBRATION_ELEMENT_NAME = "Calibration";
+	public static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
 
 	/**
 	 * Paths for simple variables
@@ -378,7 +378,7 @@ public class OmeMetadata {
 	/**
 	 * Variables holding info about composite values
 	 */
-	private static final String INVESTIGATOR_COMP_NAME = "investigator";
+	public static final String INVESTIGATOR_COMP_NAME = "investigator";
 	private static final String INVESTIGATOR_ELEMENT_NAME = "Investigator";
 	private static final Path INVESTIGATORS_PATH = new Path(null, INVESTIGATOR_ELEMENT_NAME);
 	private static final ArrayList<String> INVESTIGATOR_ENTRIES = 
@@ -391,11 +391,11 @@ public class OmeMetadata {
 			new ArrayList<String>(Arrays.asList(NAME_ELEMENT_NAME, 
 												EMAIL_ELEMENT_NAME));
 	
-	private static final String VARIABLE_COMP_NAME = "variable";
+	public static final String VARIABLE_COMP_NAME = "variable";
 	private static final String VARIABLES_INFO_ELEMENT_NAME = "Variables_Info";
 	private static final String VARIABLE_ELEMENT_NAME = "Variable";
-	private static final String VARIABLES_NAME_ELEMENT_NAME = "Variable_Name";
-	private static final String VARIABLES_DESCRIPTION_ELEMENT_NAME = "Description_of_Variable";
+	public static final String VARIABLES_NAME_ELEMENT_NAME = "Variable_Name";
+	public static final String VARIABLES_DESCRIPTION_ELEMENT_NAME = "Description_of_Variable";
 	private static final Path VARIABLES_INFO_PATH = new Path(null, VARIABLES_INFO_ELEMENT_NAME, VARIABLE_ELEMENT_NAME);
 	private static final ArrayList<String> VARIABLES_INFO_ENTRIES =
 			new ArrayList<String>(Arrays.asList(VARIABLES_NAME_ELEMENT_NAME, 
@@ -403,7 +403,7 @@ public class OmeMetadata {
 	private static final ArrayList<String> VARIABLES_INFO_ID_LIST =
 			new ArrayList<String>(Arrays.asList(VARIABLES_NAME_ELEMENT_NAME));
 	
-	private static final String OTHER_SENSOR_COMP_NAME = "other_sensor";
+	public static final String OTHER_SENSOR_COMP_NAME = "other_sensor";
 	private static final String OTHER_SENSORS_ELEMENT_NAME = "Other_Sensors";
 	private static final String SENSOR_ELEMENT_NAME = "Sensor";
 	private static final Path OTHER_SENSORS_PATH = 
