@@ -63,19 +63,16 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 	private static final int MIN_NUM_DATA_COLUMNS = 6;
 
-	// Patterns for getting the expocode from the metadata header
-	private static final Pattern[] expocodePatterns = new Pattern[] {
-		Pattern.compile("\\s*Cruise\\s*Expocode\\s*:\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+	// Pattern to match for trimming CSV metadata lines - implicit ^ at the start and $ at the end
+	private static final Pattern CSV_CLEANUP_PATTERN = Pattern.compile("[,\\s]*(.*?)[,\\s]*");
+
+	// Patterns for getting the expocode from the metadata preamble
+	private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
+		Pattern.compile("Cruise\\s*Expocode\\s*[=:]\\s*([" + 
+				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)", 
 				Pattern.CASE_INSENSITIVE),
-		Pattern.compile("\\s*Expocode\\s*:\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
-				Pattern.CASE_INSENSITIVE),
-		Pattern.compile("\\s*Cruise\\s*Expocode\\s*=\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
-				Pattern.CASE_INSENSITIVE),
-		Pattern.compile("\\s*Expocode\\s*=\\s*([" + 
-				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)\\s*", 
+		Pattern.compile("Expocode\\s*[=:]\\s*([" + 
+				DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]+)", 
 				Pattern.CASE_INSENSITIVE)
 	};
 
@@ -280,18 +277,23 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			String dataFormat, BufferedReader cruiseReader, int firstDataRow, 
 			int numDataRows, boolean assignCruiseInfo) throws IOException {
 		String separator;
-		if ( DashboardUtils.CRUISE_FORMAT_TAB.equals(dataFormat) )
+		Pattern cleanupPattern;
+		if ( DashboardUtils.CRUISE_FORMAT_TAB.equals(dataFormat) ) {
 			separator = "\t";
-		else if ( DashboardUtils.CRUISE_FORMAT_COMMA.equals(dataFormat) )
+			// Clean-up using trim() and replacing whitespace characters with space characters
+			cleanupPattern = null;
+		}
+		else if ( DashboardUtils.CRUISE_FORMAT_COMMA.equals(dataFormat) ) {
 			separator = ",";
+			cleanupPattern = CSV_CLEANUP_PATTERN;
+		}
 		else
-			throw new IOException(
-					"Unexpected invalid data format '" + dataFormat + "'");
+			throw new IOException("Unexpected invalid data format '" + dataFormat + "'");
+
 		// Directly add the metadata strings to the list in cruiseData
 		ArrayList<String> preamble = cruiseData.getPreamble();
 		preamble.clear();
 
-		// Read the metadata preamble
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
 		String dataline = cruiseReader.readLine();
@@ -300,7 +302,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			String[] datavals = dataline.split(separator, -1);
 			if ( datavals.length >= MIN_NUM_DATA_COLUMNS ) {
 				// These could be the column headers;
-				// clean them up and make sure there are no blank values
+				// clean them up and check for empty entries
 				numDataColumns = 0;
 				for (int k = 0; k < datavals.length; k++) {
 					numDataColumns++;
@@ -316,45 +318,50 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						colNames.clear();
 						colNames.addAll(Arrays.asList(datavals));
 					}
-					else if ( cruiseData.getUserColNames().size() != numDataColumns ) {
-						throw new IOException("Unexpected number of data columns (" + 
-								numDataColumns + " instead of " + 
-								cruiseData.getUserColNames().size()  + ")");
-					}
 					// Treat the rest of the lines as data value lines
 					break;
 				}
-				else if ( numDataColumns > MIN_NUM_DATA_COLUMNS ) {
-					// Blank header after MIN_NUM_DATA_COLUMNS non-blank headers
-					throw new IOException("Data column header " + 
-										numDataColumns + " is blank");
+				else {
+					// Empty entries - still metadata
+					numDataColumns = 0;
 				}
 			}
-			if ( ! dataline.trim().isEmpty() ) {
-				if ( ! expocodeFound ) {
-					// Check if this is an expocode identification line
-					for ( Pattern pat : expocodePatterns ) {
-						Matcher mat = pat.matcher(dataline);
-						if ( mat.matches() ) {
-							String expocode = mat.group(1).toUpperCase();
-							if ( assignCruiseInfo ) {
-								// Get the expocode from this line
-								cruiseData.setExpocode(expocode);
-							}
-							else if ( ! cruiseData.getExpocode().equals(expocode) ) {
-								throw new IOException("Unexpected expocode (" +
-										expocode + " instead of " +
-										cruiseData.getExpocode());
-							}
-							expocodeFound = true;
-							break;
-						}
+			// Clean-up this line of metadata
+			String metaline;
+			if ( cleanupPattern == null ) {
+				metaline = dataline.trim().replaceAll("\\s", " ");
+			}
+			else {
+				Matcher mat = cleanupPattern.matcher(dataline);
+				if ( ! mat.matches() )
+					throw new RuntimeException("Unexpected failure to match cleanup patthern");
+				metaline = mat.group(1);
+				if ( metaline == null )
+					throw new RuntimeException("Unexpected null group from cleanup pattern");
+			}
+			// Examine this metadata line for the expocode
+			if ( ! ( metaline.isEmpty() || expocodeFound ) ) {
+				// Check if this is an expocode identification line
+				for ( Pattern pat : EXPOCODE_PATTERNS ) {
+					Matcher mat = pat.matcher(metaline);
+					if ( ! mat.matches() )
+						continue;
+					String expocode = mat.group(1).toUpperCase();
+					if ( expocode == null )
+						continue;
+					if ( assignCruiseInfo ) {
+						cruiseData.setExpocode(expocode);
 					}
+					else if ( ! expocode.equals(cruiseData.getExpocode()) ) {
+						throw new IOException("Unexpected expocode (" + expocode + 
+								" instead of " + cruiseData.getExpocode());
+					}
+					expocodeFound = true;
+					break;
 				}
 			}
-
-			// Still a metadata preamble line; save it and read the next line
-			preamble.add(dataline);
+			// Save the cleaned-up metadata line in the preamble and read the next line
+			preamble.add(metaline);
 			dataline = cruiseReader.readLine();
 		}
 
@@ -463,17 +470,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		// Check if there was an expocode column
 		String expocode = "";
-		ArrayList<DataColumnType> colTypes = cruiseData.getDataColTypes();
-		for (int k = 0; k < colTypes.size(); k++) {
-			if ( DataColumnType.EXPOCODE.equals(colTypes.get(k)) ) {
-				expocode = cruiseData.getDataValues().get(0).get(k)
-									 .trim().toUpperCase();
-				break;
-			}
+		int k = cruiseData.getDataColTypes().indexOf(DataColumnType.EXPOCODE);
+		if ( k >= 0 ) {
+			expocode = cruiseData.getDataValues().get(0).get(k).toUpperCase();
 		}
 		if ( ! expocode.isEmpty() ) {
-			if ( assignCruiseInfo && ! expocodeFound ) {
-				cruiseData.setExpocode(expocode);
+			if ( assignCruiseInfo ) {
+				if ( ! expocodeFound ) {
+					cruiseData.setExpocode(expocode);
+				}
 			}
 			else if ( ! expocode.equals(cruiseData.getExpocode()) ){
 				throw new IOException("First expocode given in the expocode data " +
@@ -966,7 +971,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		for (int k = 0; k < preamble.size(); k++) {
 			String dataline = preamble.get(k);
 			// Check if this is an expocode identification line
-			for ( Pattern pat : expocodePatterns ) {
+			for ( Pattern pat : EXPOCODE_PATTERNS ) {
 				Matcher mat = pat.matcher(dataline);
 				if ( mat.matches() ) {
 					preamble.set(k, dataline.replace(oldExpocode, newExpocode));

@@ -73,9 +73,9 @@ public class CruiseListPage extends CompositeWithUsername {
 			"review and modify data column type assignments for the " +
 			"selected dataset; identify issues in the data";
 
-	static final String OME_METADATA_TEXT = "Edit Metadata";
+	static final String OME_METADATA_TEXT = "Edit OME Metadata";
 	private static final String OME_METADATA_HOVER_HELP =
-			"edit the metadata for the selected datasets";
+			"edit the OME metadata for the selected datasets";
 
 	private static final String ADDL_DOCS_TEXT = "Supplemental Documents";
 	private static final String ADDL_DOCS_HOVER_HELP =
@@ -201,7 +201,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
 	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
-	private static final String OME_METADATA_COLUMN_NAME = "Metadata";
+	private static final String OME_METADATA_COLUMN_NAME = "OME Metadata";
 	private static final String SUBMITTED_COLUMN_NAME = "QC Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
@@ -851,11 +851,11 @@ public class CruiseListPage extends CompositeWithUsername {
 		expocodeColumn = buildExpocodeColumn();
 		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
 		Column<DashboardCruise,String> omeMetadataColumn = buildOmeMetadataColumn();
+		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
 		Column<DashboardCruise,String> qcStatusColumn = buildQCStatusColumn();
 		Column<DashboardCruise,String> archiveStatusColumn = buildArchiveStatusColumn();
 		timestampColumn = buildTimestampColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
-		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 
 		// Add the columns, with headers, to the table
@@ -869,14 +869,14 @@ public class CruiseListPage extends CompositeWithUsername {
 				SafeHtmlUtils.fromSafeConstant(DATA_CHECK_COLUMN_NAME));
 		datasetsGrid.addColumn(omeMetadataColumn, 
 				SafeHtmlUtils.fromSafeConstant(OME_METADATA_COLUMN_NAME));
+		datasetsGrid.addColumn(addlDocsColumn, 
+				SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
 		datasetsGrid.addColumn(qcStatusColumn, 
 				SafeHtmlUtils.fromSafeConstant(SUBMITTED_COLUMN_NAME));
 		datasetsGrid.addColumn(archiveStatusColumn, 
 				SafeHtmlUtils.fromSafeConstant(ARCHIVED_COLUMN_NAME));
 		datasetsGrid.addColumn(filenameColumn, 
 				SafeHtmlUtils.fromSafeConstant(FILENAME_COLUMN_NAME));
-		datasetsGrid.addColumn(addlDocsColumn, 
-				SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
 		datasetsGrid.addColumn(ownerColumn, 
 				SafeHtmlUtils.fromSafeConstant(OWNER_COLUMN_NAME));
 
@@ -900,6 +900,9 @@ public class CruiseListPage extends CompositeWithUsername {
 		datasetsGrid.setColumnWidth(omeMetadataColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(addlDocsColumn, 
+				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(qcStatusColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
@@ -907,9 +910,6 @@ public class CruiseListPage extends CompositeWithUsername {
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(filenameColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
-		datasetsGrid.setColumnWidth(addlDocsColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(ownerColumn, 
@@ -928,10 +928,10 @@ public class CruiseListPage extends CompositeWithUsername {
 		timestampColumn.setSortable(true);
 		dataCheckColumn.setSortable(true);
 		omeMetadataColumn.setSortable(true);
+		addlDocsColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
 		filenameColumn.setSortable(true);
-		addlDocsColumn.setSortable(true);
 		ownerColumn.setSortable(true);
 
 		// Add a column sorting handler for these columns
@@ -945,14 +945,14 @@ public class CruiseListPage extends CompositeWithUsername {
 				DashboardCruise.dataCheckComparator);
 		columnSortHandler.setComparator(omeMetadataColumn, 
 				DashboardCruise.omeTimestampComparator);
+		columnSortHandler.setComparator(addlDocsColumn, 
+				DashboardCruise.addlDocsComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
 				DashboardCruise.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
 				DashboardCruise.archiveStatusComparator);
 		columnSortHandler.setComparator(filenameColumn, 
 				DashboardCruise.filenameComparator);
-		columnSortHandler.setComparator(addlDocsColumn, 
-				DashboardCruise.addlDocsComparator);
 		columnSortHandler.setComparator(ownerColumn, 
 				DashboardCruise.ownerComparator);
 
@@ -1193,6 +1193,56 @@ public class CruiseListPage extends CompositeWithUsername {
 	}
 
 	/**
+	 * @return the additional metadata files column for the table
+	 */
+	private Column<DashboardCruise,String> buildAddnDocsColumn() {
+		Column<DashboardCruise,String> addnDocsColumn = 
+				new Column<DashboardCruise,String>(new ClickableTextCell()) {
+			@Override
+			public String getValue(DashboardCruise cruise) {
+				TreeSet<String> addlDocTitles = cruise.getAddlDocs();
+				if ( addlDocTitles.size() == 0 )
+					return NO_ADDL_DOCS_STATUS_STRING;
+				SafeHtmlBuilder sb = new SafeHtmlBuilder();
+				boolean firstEntry = true;
+				for ( String title : addlDocTitles ) {
+					if ( firstEntry )
+						firstEntry = false;
+					else
+						sb.appendHtmlConstant("<br />");
+					String[] pieces = DashboardMetadata.splitAddlDocsTitle(title);
+					sb.appendEscaped(pieces[0]);
+					sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;(");
+					sb.appendEscaped(pieces[1]);
+					sb.appendHtmlConstant(")</small>");
+				}
+				return sb.toSafeHtml().asString();
+			}
+			@Override
+			public void render(Cell.Context ctx, DashboardCruise cruise, 
+													SafeHtmlBuilder sb) {
+				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
+				sb.appendHtmlConstant(getValue(cruise));
+				sb.appendHtmlConstant("</em></u></div>");
+			}
+		};
+		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
+			@Override
+			public void update(int index, DashboardCruise cruise, String value) {
+				// Save the currently selected cruises (in expocodeSet)
+				getSelectedCruises(null);
+				// Go to the additional docs page with just this one cruise
+				// Go to the QC page after performing the client-side checks on this one cruise
+				checkSet.clear();
+				checkSet.setUsername(getUsername());
+				checkSet.put(cruise.getExpocode(), cruise);
+				AddlDocsManagerPage.showPage(checkSet);
+			}
+		});
+		return addnDocsColumn;
+	}
+
+	/**
 	 * @return the QC submission status column for the table
 	 */
 	private Column<DashboardCruise,String> buildQCStatusColumn() {
@@ -1303,56 +1353,6 @@ public class CruiseListPage extends CompositeWithUsername {
 			}
 		};
 		return filenameColumn;
-	}
-
-	/**
-	 * @return the additional metadata files column for the table
-	 */
-	private Column<DashboardCruise,String> buildAddnDocsColumn() {
-		Column<DashboardCruise,String> addnDocsColumn = 
-				new Column<DashboardCruise,String>(new ClickableTextCell()) {
-			@Override
-			public String getValue(DashboardCruise cruise) {
-				TreeSet<String> addlDocTitles = cruise.getAddlDocs();
-				if ( addlDocTitles.size() == 0 )
-					return NO_ADDL_DOCS_STATUS_STRING;
-				SafeHtmlBuilder sb = new SafeHtmlBuilder();
-				boolean firstEntry = true;
-				for ( String title : addlDocTitles ) {
-					if ( firstEntry )
-						firstEntry = false;
-					else
-						sb.appendHtmlConstant("<br />");
-					String[] pieces = DashboardMetadata.splitAddlDocsTitle(title);
-					sb.appendEscaped(pieces[0]);
-					sb.appendHtmlConstant("<br /><small>&nbsp;&nbsp;(");
-					sb.appendEscaped(pieces[1]);
-					sb.appendHtmlConstant(")</small>");
-				}
-				return sb.toSafeHtml().asString();
-			}
-			@Override
-			public void render(Cell.Context ctx, DashboardCruise cruise, 
-													SafeHtmlBuilder sb) {
-				sb.appendHtmlConstant("<div style=\"cursor:pointer;\"><u><em>");
-				sb.appendHtmlConstant(getValue(cruise));
-				sb.appendHtmlConstant("</em></u></div>");
-			}
-		};
-		addnDocsColumn.setFieldUpdater(new FieldUpdater<DashboardCruise,String>() {
-			@Override
-			public void update(int index, DashboardCruise cruise, String value) {
-				// Save the currently selected cruises (in expocodeSet)
-				getSelectedCruises(null);
-				// Go to the additional docs page with just this one cruise
-				// Go to the QC page after performing the client-side checks on this one cruise
-				checkSet.clear();
-				checkSet.setUsername(getUsername());
-				checkSet.put(cruise.getExpocode(), cruise);
-				AddlDocsManagerPage.showPage(checkSet);
-			}
-		});
-		return addnDocsColumn;
 	}
 
 	/**

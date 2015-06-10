@@ -34,31 +34,31 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class OmeManagerPage extends CompositeWithUsername {
 
-	private static final String TITLE_TEXT = "Edit Metadata";
+	private static final String TITLE_TEXT = "Edit OME Metadata";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 	private static final String UPLOAD_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
 
 	private static final String CRUISE_HTML_INTRO_PROLOGUE = 
-			"<p>Upload XML metadata files generated from the CDIAC OME site.</p>" +
-			"<p>To generate a XML metadata file to upload: <ul>" +
+			"<p>At this time, the system only uploads SOCAT OME XML metadata files.</p>" +
+			"<p>To generate a SOCAT OME XML metadata file to upload: <ul>" +
 			"<li>Go to the CDIAC OME site " +
 			"<a href=\"http://mercury-ops2.ornl.gov/socatome/newForm.htm\" target=\"_blank\">" +
 			"http://mercury-ops2.ornl.gov/socatome/newForm.htm</a></li>" +
 			"<li>Fill in the appropriate metadata</li>" +
-			"<li>Save a local copy (preferrably with valiation)</li>" +
+			"<li>Save a local copy (preferrably with validation)</li>" +
 			"</ul>" +
-			"This will generate a metadata file on your system that can be uploaded here. " +
+			"This will creates a SOCAT OME XML metadata file on your system that can be uploaded here. " +
 			"</p><p>" +
 			"Dataset: <ul><li>";
 	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul></p>";
 
 	private static final String NO_FILE_ERROR_MSG = 
-			"Please select an metadata file to upload";
+			"Please select an SOCAT OME XML metadata file to upload";
 
 	private static final String OVERWRITE_WARNING_MSG = 
-			"The metadata for this dataset will be overwritten.  Do you wish to proceed?";
+			"The SOCAT OME XML metadata for this dataset will be overwritten.  Do you wish to proceed?";
 	private static final String OVERWRITE_YES_TEXT = "Yes";
 	private static final String OVERWRITE_NO_TEXT = "No";
 

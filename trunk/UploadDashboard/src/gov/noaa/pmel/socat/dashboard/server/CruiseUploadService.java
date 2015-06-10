@@ -4,10 +4,12 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +17,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +30,8 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
+import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+
 /**
  * Service to receive the uploaded cruise file from the client
  * 
@@ -32,7 +39,23 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
  */
 public class CruiseUploadService extends HttpServlet {
 
-	private static final long serialVersionUID = 273235043648709372L;
+	private static final long serialVersionUID = -739243103440408304L;
+
+	// Patterns for getting the vessel name from the metadata preamble
+	private static final Pattern[] SHIP_NAME_PATTERNS = new Pattern[] {
+		Pattern.compile("Ship\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Ship\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Vessel\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Vessel\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+	};
+
+	// Patterns for getting the vessel name from the metadata preamble
+	private static final Pattern[] PI_NAMES_PATTERNS = new Pattern[] {
+		Pattern.compile("Investigator\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Investigators?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("PI\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+	};
 
 	private ServletFileUpload cruiseUpload;
 
@@ -262,7 +285,99 @@ public class CruiseUploadService extends HttpServlet {
 				}
 			}
 
-			// Check if an OME metadata file or supplemental documents already exist for this cruise
+			String shipName = null;
+			ArrayList<String> piNames = null;
+			// Get the ship name and PI names from the metadata preamble
+			for ( String metaline : cruiseData.getPreamble() ) {
+				boolean lineMatched = false;
+				if ( shipName == null ) {
+					for ( Pattern pat : SHIP_NAME_PATTERNS ) {
+						Matcher mat = pat.matcher(metaline);
+						if ( ! mat.matches() )
+							continue;
+						lineMatched = true;
+						shipName = mat.group(1);
+						if ( (shipName != null) && ! shipName.isEmpty() ) 
+							break;
+						shipName = null;
+					}
+				}
+				if ( (piNames == null) && ! lineMatched ) {
+					for ( Pattern pat : PI_NAMES_PATTERNS ) {
+						Matcher mat = pat.matcher(metaline);
+						if ( ! mat.matches() )
+							continue;
+						String allNames = mat.group(1);
+						if ( allNames != null ) {
+							piNames = new ArrayList<String>();
+							for ( String name : allNames.split(";") ) {
+								name = name.trim();
+								if ( ! name.isEmpty() )
+									piNames.add(name);
+							}
+							if ( ! piNames.isEmpty() )
+								break;
+							piNames = null;
+						}
+					}
+				}
+			}
+			// If ship name not found in preamble, check if there is a matching column type
+			if ( shipName == null ) {
+				int k = cruiseData.getDataColTypes().indexOf(DataColumnType.SHIP_NAME);
+				if ( k >= 0 ) {
+					shipName = cruiseData.getDataValues().get(0).get(k);
+					if ( shipName.isEmpty() )
+						shipName = null;
+				}
+			}
+			// If PI names not found in preamble, check if there is a matching column type
+			if ( piNames == null ) {
+				int k = cruiseData.getDataColTypes().indexOf(DataColumnType.INVESTIGATOR_NAMES);
+				if ( k >= 0 ) {
+					piNames = new ArrayList<String>();
+					for ( String name : cruiseData.getDataValues().get(0).get(k).split(";") ) {
+						name = name.trim();
+						if ( ! name.isEmpty() )
+							piNames.add(name);
+					}
+					if ( piNames.isEmpty() )
+						piNames = null;
+				}
+			}
+
+			// Verify there is a ship name and at least one PI name
+			if ( (shipName == null) || (piNames == null) ) {
+				// Use the NO_EXPOCODE error message for any missing metadata
+				messages.add(DashboardUtils.NO_EXPOCODE_HEADER_TAG + " " + filename);
+				continue;
+			}
+
+			// Create the OME XML stub file from the expocode, ship name, and PI names
+			try {
+				OmeMetadata omeMData = new OmeMetadata(expocode);
+				omeMData.storeValue(OmeMetadata.VESSEL_NAME_STRING, shipName, -1);
+				for ( String name : piNames ) {
+					Properties props = new Properties();
+					props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, name);
+					omeMData.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
+				}
+				DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
+						timestamp, username, cruiseData.getVersion());
+				String msg = "New OME XML document from uploaded data file";
+				MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
+				mdataHandler.saveMetadataInfo(mdata, msg);
+				mdataHandler.saveAsOmeXmlDoc(mdata, msg);
+			} catch (Exception ex) {
+				// should not happen
+				messages.add(DashboardUtils.UNEXPECTED_FAILURE_HEADER_TAG + " " + 
+						filename + " ; " + expocode);
+				messages.add(ex.getMessage());
+				messages.add(DashboardUtils.END_OF_ERROR_MESSAGE_TAG);
+				continue;
+			}
+
+			// Add any existing documents for this cruise
 			ArrayList<DashboardMetadata> mdataList = 
 					configStore.getMetadataFileHandler().getMetadataFiles(expocode);
 			TreeSet<String> addlDocs = new TreeSet<String>();
