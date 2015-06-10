@@ -44,16 +44,18 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String LOGOUT_TEXT = "Logout";
 
 	private static final String UPLOAD_FILE_DESCRIPTION_HTML = 
-			"<p>An acceptable data file starts with lines of metadata," +
+			"<p>An acceptable data file starts with lines of metadata, " +
 			"then has a line of column headers, " +
 			"an optional lines of column units, " +
 			"and finally a line of data values for each data sample.</p>" +
 			"<p>The expocode, vessel (ship) name, and investigators names " +
-			"must be provided in the metadata lines such as: <ul>" +
+			"must be provided in the metadata lines such as: " +
+			"<ul style=\"list-style-type: none\">" +
 			"<li>expocode: ZZZZ20051231</li>" +
 			"<li>ship: Pacific Minnow</li>" +
 			"<li>PIs: Smith, K.; Doe, J.</li>" +
-			"</ul> or in columns with recognized headers for the expocode, " +
+			"</ul> " +
+			"or in columns with recognized headers for the expocode, " +
 			"ship name, and investigator names.</p>";
 
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
@@ -113,30 +115,38 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String EXPLAINED_FAIL_MSG_END = 
 			"</pre></p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<br />No valid expocode, ship, or PIs found.</h3>" +
-			"<p>The data file needs to contain the dataset expocode in the lines " +
-			"of metadata preceding the data, or in an expocode data column.  " +
-			"The expocode metadata line should look something like one of<br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;expocode&nbsp;=&nbsp;49P120101218<br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;expocode:&nbsp;49P120101218" +
+			"<br />Expocode, Vessel Name, or PI(s) not found.</h3>" +
+			"<p>The data file needs to contain the dataset expocode, " +
+			"the ship or vessel name, and the investigator name(s) " +
+			"in the lines of metadata preceding the data, or in the " +
+			"data columns. " +
 			"</p><p>" +
-			"The 12 character expocode is the NODC code for the vessel carrying " +
-			"the instrumentation followed by the numeric year, month, and day of " +
-			"departure or initial measurement.  For example, 49P120101218 indicates " +
-			"a cruise on the Japanese (49) ship of opportunity Pyxis (P1) with the " +
-			"first day of the cruise on 18 December 2010." +
+			"The expocode metadata line should look " +
+			"something like one of " +
+			"<ul style=\"list-style-type: none\">" +
+			"<li>expocode = 49P120101218</li>" +
+			"<li>expocode: 49P120101218</li>" +
+			"</ul>" +
+			"The 12 character expocode is the NODC code for the vessel " +
+			"carrying the instrumentation followed by the numeric year, " +
+			"month, and day of departure or initial measurement.  For " +
+			"example, 49P120101218 indicates a cruise on the Japanese " +
+			"(49) ship of opportunity Pyxis (P1) with the first day of " +
+			"the cruise on 18 December 2010. " +
 			"</p><p>" +
 			"The ship or vessel name is similarly assigned using one of the " +
 			"tags 'ship', 'ship name', 'vessel', or 'vessel name', a '=' or ':', " +
-			"and finally the name of the ship or vessel.  For example: <br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;ship:&nbsp;Minnow" +
-			"</p><p>" +
+			"and finally the name of the ship or vessel.  For example: " +
+			"<ul style=\"list-style-type: none\">" +
+			"<li>ship: Pacific Minnow</li>" +
+			"</ul>" +
 			"The investigator name(s) is similarly assigned using one of the " +
 			"tags 'Investigator', 'Investigators', 'PI', or 'PIs', a '=' or ':', " +
 			"and finally a semicolon-separated list of investigator names.  " +
-			"For example: <br />" +
-			"&nbsp;&nbsp;&nbsp;&nbsp;PIs:&nbsp;Smith,&nbsp;K.,;&nbsp;Doe,&nbspJ." +
-			"</p><p>" +
+			"For example: " +
+			"<ul style=\"list-style-type: none\">" +
+			"<li>PIs: Smith, K.; Doe, J.</li>" +
+			"</ul>" +
 			"Please verify a valid expocode, ship or vessel name, and investigator name(s) " +
 			"are given in your file.  You might want to click the Advanced Settings option " +
 			"on this page and then click the Preview Data File button.  This will enable " + 
