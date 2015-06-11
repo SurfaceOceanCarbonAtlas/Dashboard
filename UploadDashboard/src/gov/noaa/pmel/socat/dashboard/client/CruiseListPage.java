@@ -143,21 +143,21 @@ public class CruiseListPage extends CompositeWithUsername {
 			"with longitude, latitude, or time errors.";
 
 	private static final String NO_METADATA_HTML_PROLOGUE = 
-			"The following datasets do not have appropriate metadata " +
-			"and cannot be submitted for QC: <ul>";
+			"The following datasets do not have appropriate metadata: <ul>";
 	private static final String NO_METADATA_HTML_EPILOGUE = 
-			"</ul>";
+			"</ul> Appropriate metadata needs to be uploaded " +
+			"for these datasets before submitting them for QC or archival. ";
 	private static final String CANNOT_SUBMIT_HTML_PROLOGUE = 
 			"The following datasets have not been checked, or have very " +
 			"serious errors detected by the automated data checker: <ul>";
 	private static final String CANNOT_SUBMIT_HTML_EPILOGUE =
-			"</ul> These datasets cannot be submitted for QC " +
+			"</ul> These datasets cannot be submitted for QC or archival " +
 			"until these problems have been resolved.";
 	private static final String DATA_AUTOFAIL_HTML_PROLOGUE = 
 			"The following datasets have errors detected " +
 			"by the automated data checker: <ul>";
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
-			"</ul> These datasets can be submitted for QC, " +
+			"</ul> These datasets can be submitted for QC and archival, " +
 			"but because of the number of errors, a QC flag of " + 
 			SocatQCEvent.QC_F_FLAG + " (unacceptable) " +
 			"will <em>probably</em> be assigned by reviewers.<br />" +
