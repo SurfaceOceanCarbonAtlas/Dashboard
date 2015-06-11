@@ -44,6 +44,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 			"Plots of the dataset: ";
 
 	private static final String REFRESH_TEXT = "Refresh plots";
+	private static final String REFRESH_HOVER_HELP = "Refresh the display the generated plots";
 	private static final String DISMISS_TEXT = "Done";
 
 	private static final String PLOT_GENERATION_FAILURE_HTML = "<b>Problems generating the plot previews</b>";
@@ -60,25 +61,28 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REC_FCO2_VS_TIME_TAB_TEXT = "rec fCO<sub>2</sub> vs time";
 	private static final String REC_FCO2_VS_SST_TAB_TEXT = "rec fCO<sub>2</sub> vs SST";
 	private static final String REC_FCO2_VS_SAL_TAB_TEXT = "rec fCO<sub>2</sub> vs sal";
-	private static final String REPORT_REC_FCO2_TAB_TEXT = "given and rec fCO<sub>2</sub>";
+	private static final String REPORT_REC_FCO2_TAB_TEXT = "given &amp; rec fCO<sub>2</sub>";
 	private static final String REC_FCO2_DELTA_TAB_TEXT = "rec fCO<sub>2</sub> - src CO<sub>2</sub>";
 	private static final String REC_FCO2_SOURCES_TAB_TEXT = "rec fCO<sub>2</sub> sources";
 
-	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
-	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
-	private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time";
-	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
-	private static final String PRESSURES_ALT_TEXT = "pressures versus time";
-	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
-	private static final String SALINITIES_ALT_TEXT = "salinities versus time";
-	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time";
-	private static final String DT_XCO2_FCO2_ALT_TEXT = "Teq minus SST, xCO2 @ Teq dry, and rec fCO2 versus time";
-	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time";
-	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
-	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
-	private static final String REPORT_REC_FCO2_ALT_TEXT = "reported and recommended fCO<sub>2</sub>";
-	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus reported source CO2";
-	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2";
+	private static final String REFRESH_HELP_ADDENDUM = 
+			"\n -- if plots to not show after awhile, try pressing the " + REFRESH_TEXT + " button";
+
+	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude" + REFRESH_HELP_ADDENDUM;
+	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String PRESSURES_ALT_TEXT = "pressures versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String SALINITIES_ALT_TEXT = "salinities versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String DT_XCO2_FCO2_ALT_TEXT = "Teq minus SST, xCO2 @ Teq dry, and rec fCO2 versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time" + REFRESH_HELP_ADDENDUM;
+	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature" + REFRESH_HELP_ADDENDUM;
+	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity" + REFRESH_HELP_ADDENDUM;
+	private static final String REPORT_REC_FCO2_ALT_TEXT = "reported and recommended fCO2" + REFRESH_HELP_ADDENDUM;
+	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus reported source CO2" + REFRESH_HELP_ADDENDUM;
+	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2" + REFRESH_HELP_ADDENDUM;
 
 	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
 	public static final String LAT_LON_IMAGE_NAME = "lat_lon";
@@ -188,6 +192,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		logoutButton.setText(LOGOUT_TEXT);
 
 		refreshButton.setText(REFRESH_TEXT);
+		refreshButton.setTitle(REFRESH_HOVER_HELP);
 		dismissButton.setText(DISMISS_TEXT);
 
 		// Set the HTML for the tabs
