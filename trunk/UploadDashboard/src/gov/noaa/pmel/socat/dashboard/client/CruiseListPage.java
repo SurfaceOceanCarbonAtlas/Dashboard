@@ -135,6 +135,13 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String FOR_HIDE_ERR_END = 
 			"for hiding from your list of displayed datasets.";
 
+	private static final String CANNOT_PREVIEW_UNCHECKED_ERRMSG =
+			"Preview plots cannot be generated for datasets " +
+			"with unidentified columns or unchecked data.";
+	private static final String CANNOT_PREVIEW_WITH_SERIOUS_ERRORS_ERRMSG =
+			"Preview plots cannot be generated for datasets " +
+			"with longitude, latitude, or time errors.";
+
 	private static final String NO_METADATA_HTML_PROLOGUE = 
 			"The following datasets do not have appropriate metadata " +
 			"and cannot be submitted for QC: <ul>";
@@ -662,6 +669,17 @@ public class CruiseListPage extends CompositeWithUsername {
 			SocatUploadDashboard.showMessage(
 					MANY_DATASETS_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
 			return;
+		}
+		for ( DashboardCruise cruise : cruiseSet.values() ) {
+			String status = cruise.getDataCheckStatus();
+			if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ) {
+				SocatUploadDashboard.showMessage(CANNOT_PREVIEW_UNCHECKED_ERRMSG);
+				return;
+			}
+			else if ( status.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) {
+				SocatUploadDashboard.showMessage(CANNOT_PREVIEW_WITH_SERIOUS_ERRORS_ERRMSG);
+				return;				
+			}
 		}
 		CruisePreviewPage.showPage(cruiseSet);
 		return;

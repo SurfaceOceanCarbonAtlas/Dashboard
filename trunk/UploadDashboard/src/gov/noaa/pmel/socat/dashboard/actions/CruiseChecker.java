@@ -1285,7 +1285,8 @@ public class CruiseChecker {
 				for ( Message msg : output.getMessages().getMessages() ) {
 					String colName = msg.getColumnName();
 					String summary = msg.getMessageType().getSummaryMessage(colName);
-					if ( "Date/time could not be parsed".equals(summary) ) {
+					if ( "Date/time could not be parsed".equals(summary) ||
+						 "Times out of order".equals(summary) ) {
 						lastCheckHadGeopositionErrors = true;
 					}
 				}
