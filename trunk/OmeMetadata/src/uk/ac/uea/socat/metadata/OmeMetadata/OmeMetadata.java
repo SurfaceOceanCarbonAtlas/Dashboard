@@ -1857,9 +1857,9 @@ public class OmeMetadata {
 		if ( itsExpoCode.length() == 0) {
 			itsExpoCode = cruiseIDText.toUpperCase();
 		} else if ( ! itsExpoCode.equals(cruiseIDText.toUpperCase()) )
-			throw new BadEntryNameException("Expocode of cruise (" + 
-					itsExpoCode + ") does not match that the Cruise ID in " +
-					"the OME document (" + cruiseID + ")");
+			throw new BadEntryNameException("Dataset expocode (" + itsExpoCode +
+					") does not match the Cruise ID in the OME document (" + 
+					cruiseIDText + ")");
 		
 		cruiseID = new OMEVariable(CRUISE_ID_PATH, cruiseIDText);
 		
