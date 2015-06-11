@@ -190,12 +190,12 @@ public class CruiseListPage extends CompositeWithUsername {
 			" (unexpected invalid datasets list returned)";
 
 	// Select options
-	private static final String MIXED_SELECTION_OPTION = " ";
+	private static final String SELECTION_OPTION_LABEL = "Select...";
 	private static final String ALL_SELECTION_OPTION = "All";
 	private static final String EDITABLE_SELECTION_OPTION = "Editable";
 	private static final String SUBMITTED_SELECTION_OPTION = "Submitted";
 	private static final String PUBLISHED_SELECTION_OPTION = "Published";
-	private static final String CLEAR_SELECTION_OPTION = "Clear";
+	private static final String CLEAR_SELECTION_OPTION = "None";
 
 	// Column header strings
 	private static final String EXPOCODE_COLUMN_NAME = "Expocode";
@@ -254,8 +254,8 @@ public class CruiseListPage extends CompositeWithUsername {
 	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
 	private boolean managerButtonsShown;
-	TextColumn<DashboardCruise> timestampColumn;
-	TextColumn<DashboardCruise> expocodeColumn;
+	private TextColumn<DashboardCruise> timestampColumn;
+	private TextColumn<DashboardCruise> expocodeColumn;
 
 	// The singleton instance of this page
 	private static CruiseListPage singleton;
@@ -435,7 +435,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * 
 	 * @param option
 	 * 		string indicating the cruise types to select;  one of: <br />
-	 * 		MIXED_SELECTION_OPTION - does nothing; <br />
+	 * 		SELECTION_OPTION_LABEL - does nothing; <br />
 	 * 		ALL_SELECTION_OPTION - selects all cruises; <br />
 	 * 		EDITABLE_SELECTION_OPTION - selects editable cruises; <br />
 	 * 		SUBMITTED_SELECTION_OPTION - selects submitted cruises; <br />
@@ -443,8 +443,8 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * 		CLEAR_SELECTION_OPTION - clears all selected cruises.
 	 */
 	private void setCruiseSelection(String option) {
-		// Do nothing is MIXED_SELECTION_OPTION is given
-		if ( MIXED_SELECTION_OPTION.equals(option) )
+		// Do nothing is SELECTION_OPTION_LABEL is given
+		if ( SELECTION_OPTION_LABEL.equals(option) )
 			return;
 		// Modify the cruise selection
 		List<DashboardCruise> cruiseList = listProvider.getList();
@@ -491,7 +491,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	/**
 	 * @return
 	 * 		the ..._SELECTION_OPTION String that describes the currently selected cruises;
-	 * 		one of MIXED_SELECTION_OPTION, ALL_SELECTION_OPTION, EDITABLE_SELECTION_OPTION, 
+	 * 		one of SELECTION_OPTION_LABEL, ALL_SELECTION_OPTION, EDITABLE_SELECTION_OPTION, 
 	 * 		SUBMITTED_SELECTION_OPTION, PUBLISHED_SELECTION_OPTION, CLEAR_SELECTION_OPTION
 	 * - unused at this time, thus commented out
 	private String getSelectedCruisesType() {
@@ -555,7 +555,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		else if ( Boolean.TRUE.equals(isAllPublished) )
 			selectType = PUBLISHED_SELECTION_OPTION;
 		else
-			selectType = MIXED_SELECTION_OPTION;
+			selectType = SELECTION_OPTION_LABEL;
 		return selectType;
 	}
 	*/
@@ -843,7 +843,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * to be populated using {@link #updateCruises(DashboardCruiseList)}.
 	 */
 	private void buildCruiseListTable() {
-		Header<String> selectedHeader = buildSelectionHeader();
+		Header<String> selectHeader = buildSelectionHeader();
 
 		// Create the columns for this table
 		TextColumn<DashboardCruise> rowNumColumn = buildRowNumColumn();
@@ -860,7 +860,7 @@ public class CruiseListPage extends CompositeWithUsername {
 
 		// Add the columns, with headers, to the table
 		datasetsGrid.addColumn(rowNumColumn, "");
-		datasetsGrid.addColumn(selectedColumn, selectedHeader);
+		datasetsGrid.addColumn(selectedColumn, selectHeader);
 		datasetsGrid.addColumn(expocodeColumn, 
 				SafeHtmlUtils.fromSafeConstant(EXPOCODE_COLUMN_NAME));
 		datasetsGrid.addColumn(timestampColumn, 
@@ -1006,20 +1006,20 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * @return the selection header for the table
 	 */
 	private Header<String> buildSelectionHeader() {
-		SelectionCell selectCell = new SelectionCell(Arrays.asList(
-				MIXED_SELECTION_OPTION, 
+		SelectionCell selectHeaderCell = new SelectionCell(Arrays.asList(
+				SELECTION_OPTION_LABEL, 
 				ALL_SELECTION_OPTION, 
 				EDITABLE_SELECTION_OPTION, 
 				SUBMITTED_SELECTION_OPTION, 
 				PUBLISHED_SELECTION_OPTION, 
 				CLEAR_SELECTION_OPTION));
-		Header<String> selectedHeader = new Header<String>(selectCell) {
+		Header<String> selectHeader = new Header<String>(selectHeaderCell) {
 			@Override
 			public String getValue() {
-				return MIXED_SELECTION_OPTION;
+				return SELECTION_OPTION_LABEL;
 			}
 		};
-		selectedHeader.setUpdater(new ValueUpdater<String>() {
+		selectHeader.setUpdater(new ValueUpdater<String>() {
 			@Override
 			public void update(String option) {
 				if ( option == null )
@@ -1027,7 +1027,7 @@ public class CruiseListPage extends CompositeWithUsername {
 				setCruiseSelection(option);
 			}
 		});
-		return selectedHeader;
+		return selectHeader;
 	}
 
 	/**
@@ -1390,16 +1390,17 @@ public class CruiseListPage extends CompositeWithUsername {
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;
 		for ( DashboardCruise cruise : checkSet.values() ) {
-			// At this time, just check that a metadata file exists
+			// At this time, just check that some metadata file exists
 			// and do not worry about the contents
-			if ( cruise.getOmeTimestamp().isEmpty() ) {
+			if ( cruise.getOmeTimestamp().isEmpty() &&
+				 cruise.getAddlDocs().isEmpty() ) {
 				errMsg += "<li>" + 
 						SafeHtmlUtils.htmlEscape(cruise.getExpocode()) + "</li>";
 				cannotSubmit = true;
 			}
 		}
 
-		// If missing metadata, cannot submit
+		// If no metadata documents, cannot submit
 		if ( cannotSubmit ) {
 			errMsg += NO_METADATA_HTML_EPILOGUE;
 			SocatUploadDashboard.showMessage(errMsg);
@@ -1424,6 +1425,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					  ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) &&
 						(cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS) ) ) {
 				// Acceptable
+				;
 			}
 			else {
 				warnMsg += "<li>" + 

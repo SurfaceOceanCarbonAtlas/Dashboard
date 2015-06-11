@@ -79,16 +79,17 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"verify these references are in the metadata in SOCAT for these datasets.";
 
 	private static final String OWNER_ARCHIVE_TEXT =
-			"do not archive at CDIAC; I will manage archival myself";
+			"do not archive at CDIAC; already archived or I will manage archival myself";
 	private static final String OWNER_ARCHIVE_ADDN_HTML =
 			"<em>(and I understand it is my responsibility to include DOIs " +
 			"in SOCAT metadata)</em>";
 	private static final String OWNER_ARCHIVE_INFO_HTML = 
-			"By selecting this option I am agreeing to archive the uploaded files " +
-			"for these datasets at a data center of my choice before the SOCAT public " +
-			"release containing these datasets.  If I am provided a DOI or other " +
-			"reference for these archived files, I will include these references " +
-			"in the metadata supplied to SOCAT for these datasets.";
+			"By selecting this option I am agreeing the uploaded files for these " +
+			"datasets are archived or will be archived at a data center of my choice " +
+			"before the SOCAT public release containing these datasets.  If I am " +
+			"provided a DOI or other reference for these archived files, I will " +
+			"include these references in the metadata supplied to SOCAT for these " +
+			"datasets.";
 
 	private static final String ALREADY_SENT_CDIAC_HTML =
 			"<h3>WARNING</h3>" +
