@@ -65,6 +65,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 	// Pattern to match for trimming CSV metadata lines - implicit ^ at the start and $ at the end
 	private static final Pattern CSV_CLEANUP_PATTERN = Pattern.compile("[,\\s]*(.*?)[,\\s]*");
+	// Pattern to match for finding an empty CSV data lines - implicit ^ at the start and $ at the end
+	private static final Pattern CSV_EMPTYLINE_PATTERN = Pattern.compile("[,\\s]*");
 
 	// Patterns for getting the expocode from the metadata preamble
 	private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
@@ -278,14 +280,18 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			int numDataRows, boolean assignCruiseInfo) throws IOException {
 		String separator;
 		Pattern cleanupPattern;
+		Pattern emptyLinePattern;
 		if ( DashboardUtils.CRUISE_FORMAT_TAB.equals(dataFormat) ) {
 			separator = "\t";
 			// Clean-up using trim() and replacing whitespace characters with space characters
 			cleanupPattern = null;
+			// Check for empty lines using trim().isEmpty()
+			emptyLinePattern = null;
 		}
 		else if ( DashboardUtils.CRUISE_FORMAT_COMMA.equals(dataFormat) ) {
 			separator = ",";
 			cleanupPattern = CSV_CLEANUP_PATTERN;
+			emptyLinePattern = CSV_EMPTYLINE_PATTERN;
 		}
 		else
 			throw new IOException("Unexpected invalid data format '" + dataFormat + "'");
@@ -445,7 +451,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		int dataRowNum = 0;
 		while ( dataline != null ) {
 			// Ignore blank lines
-			if ( ! dataline.trim().isEmpty() ) {
+			boolean isEmpty;
+			if ( emptyLinePattern == null ) {
+				isEmpty = dataline.trim().isEmpty();
+			}
+			else {
+				Matcher mat = emptyLinePattern.matcher(dataline);
+				isEmpty = mat.matches();
+			}
+			if ( ! isEmpty ) {
 				if ( dataRowNum >= firstDataRow ) {
 					// Get the values from this data line
 					String[] datavals = dataline.split(separator, -1);
