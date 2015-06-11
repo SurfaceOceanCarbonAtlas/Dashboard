@@ -15,7 +15,7 @@ import java.util.Date;
 import org.junit.Test;
 
 /**
- * Unit test for methods in gov.noaa.pmel.socat.dashboard.nc.SocatMetadata.
+ * Unit test for methods in gov.noaa.pmel.socat.dashboard.shared.SocatMetadata.
  * 
  * @author Karl Smith
  */
