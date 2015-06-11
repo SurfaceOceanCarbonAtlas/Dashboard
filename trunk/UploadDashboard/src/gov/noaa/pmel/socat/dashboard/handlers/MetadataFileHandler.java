@@ -804,7 +804,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			commitVersion(mdataFile, message);
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException(
-					"Problems committing updated pseudo-OME metadata information " + 
+					"Problems committing updated OME metadata information " + 
 					mdataFile.getPath() + ":\n    " + ex.getMessage());
 		}
 	}

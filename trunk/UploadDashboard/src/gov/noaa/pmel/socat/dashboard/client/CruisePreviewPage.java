@@ -68,21 +68,21 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REFRESH_HELP_ADDENDUM = 
 			"\n -- if plots to not show after awhile, try pressing the " + REFRESH_TEXT + " button";
 
-	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude" + REFRESH_HELP_ADDENDUM;
-	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String PRESSURES_ALT_TEXT = "pressures versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String SALINITIES_ALT_TEXT = "salinities versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String DT_XCO2_FCO2_ALT_TEXT = "Teq minus SST, xCO2 @ Teq dry, and rec fCO2 versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time" + REFRESH_HELP_ADDENDUM;
-	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature" + REFRESH_HELP_ADDENDUM;
-	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity" + REFRESH_HELP_ADDENDUM;
-	private static final String REPORT_REC_FCO2_ALT_TEXT = "reported and recommended fCO2" + REFRESH_HELP_ADDENDUM;
-	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus reported source CO2" + REFRESH_HELP_ADDENDUM;
-	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2" + REFRESH_HELP_ADDENDUM;
+	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
+	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";
+	private static final String SAMPLE_VS_TIME_ALT_TEXT = "sample number (row number) versus time";
+	private static final String TIME_SERIES_ALT_TEXT = "recommended fCO2, temperature, salinity, longitude, and latitude versus time";
+	private static final String PRESSURES_ALT_TEXT = "pressures versus time";
+	private static final String TEMPERATURES_ALT_TEXT = "temperatures versus time";
+	private static final String SALINITIES_ALT_TEXT = "salinities versus time";
+	private static final String XCO2S_ALT_TEXT = "xCO2 values versus time";
+	private static final String DT_XCO2_FCO2_ALT_TEXT = "Teq minus SST, xCO2 @ Teq dry, and rec fCO2 versus time";
+	private static final String REC_FCO2_VS_TIME_ALT_TEXT = "recommended fCO2 versus time";
+	private static final String REC_CO2_VS_SST_ALT_TEXT = "recommended fCO2 versus temperature";
+	private static final String REC_FCO2_VS_SAL_ALT_TEXT = "recommended fCO2 versus salinity";
+	private static final String REPORT_REC_FCO2_ALT_TEXT = "reported and recommended fCO2";
+	private static final String REC_FCO2_DELTA_ALT_TEXT = "recommended fCO2 minus reported source CO2";
+	private static final String REC_FCO2_SOURCES_ALT_TEXT = "histogram of source types of recommended fCO2";
 
 	public static final String LAT_VS_LON_IMAGE_NAME = "lat_vs_lon";
 	public static final String LAT_LON_IMAGE_NAME = "lat_lon";
@@ -230,21 +230,21 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		recFco2SourcesHtml.setTitle(REC_FCO2_SOURCES_ALT_TEXT);
 
 		// Set text alternative for the images
-		latVsLonImage.setAltText(LAT_VS_LON_ALT_TEXT);
-		latLonImage.setAltText(LAT_LON_ALT_TEXT);
-		sampleVsTimeImage.setAltText(SAMPLE_VS_TIME_ALT_TEXT);
-		timeSeriesImage.setAltText(TIME_SERIES_ALT_TEXT);
-		pressuresImage.setAltText(PRESSURES_ALT_TEXT);
-		temperaturesImage.setAltText(TEMPERATURES_ALT_TEXT);
-		salinitiesImage.setAltText(SALINITIES_ALT_TEXT);
-		xco2sImage.setAltText(XCO2S_ALT_TEXT);
-		dtXco2Fco2Image.setAltText(DT_XCO2_FCO2_ALT_TEXT);
-		recFco2VsTimeImage.setAltText(REC_FCO2_VS_TIME_ALT_TEXT);
-		recFco2VsSstImage.setAltText(REC_CO2_VS_SST_ALT_TEXT);
-		recFco2VsSalImage.setAltText(REC_FCO2_VS_SAL_ALT_TEXT);
-		reportRecFco2Image.setAltText(REPORT_REC_FCO2_ALT_TEXT);
-		recFco2DeltaImage.setAltText(REC_FCO2_DELTA_ALT_TEXT);
-		recFco2SourcesImage.setAltText(REC_FCO2_SOURCES_ALT_TEXT);
+		latVsLonImage.setAltText(LAT_VS_LON_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		latLonImage.setAltText(LAT_LON_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		sampleVsTimeImage.setAltText(SAMPLE_VS_TIME_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		timeSeriesImage.setAltText(TIME_SERIES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		pressuresImage.setAltText(PRESSURES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		temperaturesImage.setAltText(TEMPERATURES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		salinitiesImage.setAltText(SALINITIES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		xco2sImage.setAltText(XCO2S_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		dtXco2Fco2Image.setAltText(DT_XCO2_FCO2_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		recFco2VsTimeImage.setAltText(REC_FCO2_VS_TIME_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		recFco2VsSstImage.setAltText(REC_CO2_VS_SST_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		recFco2VsSalImage.setAltText(REC_FCO2_VS_SAL_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		reportRecFco2Image.setAltText(REPORT_REC_FCO2_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		recFco2DeltaImage.setAltText(REC_FCO2_DELTA_ALT_TEXT + REFRESH_HELP_ADDENDUM);
+		recFco2SourcesImage.setAltText(REC_FCO2_SOURCES_ALT_TEXT + REFRESH_HELP_ADDENDUM);
 
 		// Set hover helps for the images
 		latVsLonImage.setTitle(LAT_VS_LON_ALT_TEXT);
