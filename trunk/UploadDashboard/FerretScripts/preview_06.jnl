@@ -9,7 +9,6 @@ let/title="@AS@ SST dry" sstdry = reshape(xCO2_water_sst_dry_ppm, tt)
 let/title="@AS@ Teq wet" teqwet = reshape(xCO2_water_equi_temp_wet_ppm, tt)
 let/title="@AS@ Teq dry" teqdry = reshape(xCO2_water_equi_temp_dry_ppm, tt)
 
-
  ! Plot variables together to set common vertical scale
 plot  sstwet, sstdry, teqwet, teqdry 
 CANCEL VIEW
@@ -24,8 +23,6 @@ LET yax_hi = ($ppl$range_high)
 
 DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
 
-! Take care of pathological cases in the limits/bad values. pplus should handle this ok
-IF `ABS(yax_hi - yax_lo) GT 1000` THEN CANCEL SYMBOL vlimits
 
 ! Plot xCO2 variables 
 
