@@ -24,9 +24,6 @@ LET yax_hi = ($ppl$range_high)
 
 DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
 
-! Take care of pathological cases in the limits/bad values. pplus should handle this ok
-IF `ABS(yax_hi - yax_lo) GT 1000` THEN CANCEL SYMBOL vlimits
-
 ppl axlint,,2
 
 define symbol style1 = /color=red/thick=2/DASH=(0.04,0.04,0.04,0.04)

@@ -67,9 +67,6 @@ ENDIF
 
 DEFINE SYMBOL vlimits = /vlim=`yax_lo`:`yax_hi`
 
-! Take care of pathological cases in the limits/bad values. pplus should handle this ok
-IF `ABS(yax_hi - yax_lo) GT 1000` THEN CANCEL SYMBOL vlimits
-
 
 IF `use_color` THEN
    ribbon($linestyle)($vlimits)/PAL=thirty_by_levels/LEV=(1,15,1)/KEY=cent/\
