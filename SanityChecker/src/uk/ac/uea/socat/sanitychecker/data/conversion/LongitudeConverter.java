@@ -1,28 +1,35 @@
 package uk.ac.uea.socat.sanitychecker.data.conversion;
 
+import java.util.ArrayList;
+
 /**
  * Performs temperature conversions
  */
-public class LongitudeConverter extends AnyUnitsConverter {
+public class LongitudeConverter extends SpecifiedUnitsConverter {
 
-	/**
-	 * Dummy constructor - nothing to be done here!
-	 */
 	public LongitudeConverter() {
-		// Nothing to do!
+		itsSupportedUnits = new ArrayList<String>();
+		itsSupportedUnits.add("decimal_degrees_east");
+		itsSupportedUnits.add("decimal_degrees_west");
 	}
 	
 	@Override
 	public String convert(String value, String units) throws ConversionException {
 		
-		String result = value;
-		
+		String result;
 		// SOCAT uses negative longitudes for degrees west
 		try {
 			Double sourceLon = Double.parseDouble(value);
-			if (sourceLon > 180) {
-				result = Double.toString((360 - sourceLon) * -1);
+			if ( units.equalsIgnoreCase("decimal_degrees_west") ) {
+				sourceLon *= -1.0;
 			}
+			while (sourceLon <= -180.0 ) {
+				sourceLon += 360.0;
+			}
+			while (sourceLon > 180.0) {
+				sourceLon -= 360.0;
+			}
+			result = Double.toString(sourceLon);
 		} catch (NumberFormatException ex) {
 			throw new ConversionException("Invalid longitude '" + value + "'");
 		}
