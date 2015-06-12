@@ -368,7 +368,7 @@ public class CruiseUploadService extends HttpServlet {
 				}
 				DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
 						timestamp, username, cruiseData.getVersion());
-				String msg = "New OME XML document from uploaded data file";
+				String msg = "New OME XML document from data file for " + expocode + " uploaded by " + username;
 				MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
 				mdataHandler.saveMetadataInfo(mdata, msg);
 				mdataHandler.saveAsOmeXmlDoc(mdata, msg);
