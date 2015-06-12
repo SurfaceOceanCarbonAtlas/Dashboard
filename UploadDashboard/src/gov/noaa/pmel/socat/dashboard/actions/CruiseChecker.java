@@ -257,9 +257,9 @@ public class CruiseChecker {
 		for ( String fmt : DashboardUtils.TIMESTAMP_UNITS ) 
 			checkerTimestampDateUnits.add(fmt.split(" ", 2)[0]);
 		final ArrayList<String> checkerLongitudeUnits = 
-				new ArrayList<String>(Arrays.asList("decimal_degrees"));
+				new ArrayList<String>(Arrays.asList("decimal_degrees_east", "decimal_degrees_west"));
 		final ArrayList<String> checkerLatitudeUnits = 
-				new ArrayList<String>(Arrays.asList("decimal_degrees"));
+				new ArrayList<String>(Arrays.asList("decimal_degrees_north", "decimal_degrees_south"));
 		final ArrayList<String> checkerSalinityUnits = 
 				new ArrayList<String>(Arrays.asList("psu"));
 		final ArrayList<String> checkerTemperatureUnits = 
