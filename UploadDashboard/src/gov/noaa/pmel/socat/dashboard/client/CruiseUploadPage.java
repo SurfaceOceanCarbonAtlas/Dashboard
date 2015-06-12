@@ -115,43 +115,71 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String EXPLAINED_FAIL_MSG_END = 
 			"</pre></p>";
 	private static final String NO_EXPOCODE_FAIL_MSG = 
-			"<br />Expocode, Vessel Name, or PI(s) not found.</h3>" +
-			"<p>The data file needs to contain the dataset expocode, " +
-			"the ship or vessel name, and the investigator name(s) " +
-			"in the lines of metadata preceding the data, or in the " +
-			"data columns. " +
+			"<br />Expocode not found.</h3>" +
+			"<p>The data file needs to contain the dataset expocode in the " +
+			"lines of metadata preceding the data, or in a data column. " +
 			"</p><p>" +
-			"The expocode metadata line should look " +
-			"something like one of " +
+			"The expocode metadata line or column header should use the " +
+			"tag 'Expocode' or 'Cruise Expocode' (uppercase or lowercase " +
+			"does not matter).  The metadata line should look something " +
+			"like one of the following (when using the 'Expocode' tag): " +
 			"<ul style=\"list-style-type: none\">" +
-			"<li>expocode = 49P120101218</li>" +
-			"<li>expocode: 49P120101218</li>" +
+			"<li>Expocode = 49P120101218</li>" +
+			"<li>Expocode: 49P120101218</li>" +
 			"</ul>" +
 			"The 12 character expocode is the NODC code for the vessel " +
 			"carrying the instrumentation followed by the numeric year, " +
-			"month, and day of departure or initial measurement.  For " +
+			"month, and day of departure.  For " +
 			"example, 49P120101218 indicates a cruise on the Japanese " +
 			"(49) ship of opportunity Pyxis (P1) with the first day of " +
 			"the cruise on 18 December 2010. " +
 			"</p><p>" +
-			"The ship or vessel name is similarly assigned using one of the " +
-			"tags 'ship', 'ship name', 'vessel', or 'vessel name', a '=' or ':', " +
-			"and finally the name of the ship or vessel.  For example: " +
+			"Please verify a valid expocode is given in your file.  You " +
+			"might want to click the Advanced Settings option on this " + 
+			"page and then click the Preview Data File button.  This will " +
+			"enable you to see how your file appears to this system and " +
+			"change the file encoding type if appropriate." +
+			"</p>";
+	private static final String NO_SHIPNAME_FAIL_MSG = 
+			"<br />Ship (Vessel) Name not found.</h3>" +
+			"<p>The data file needs to contain the ship or vessel name in " +
+			"the lines of metadata preceding the data, or in a data column. " +
+			"</p><p>" +
+			"The ship/vessel name metadata line or column header should use " +
+			"one of the tags 'ship', 'ship name', 'vessel', or 'vessel name' " +
+			"(uppercase or lowercase does not matter).  The metadata line " +
+			"should look something like one of the following (when using the " +
+			"'ship' tag): " +
 			"<ul style=\"list-style-type: none\">" +
+			"<li>ship = Pacific Minnow</li>" +
 			"<li>ship: Pacific Minnow</li>" +
 			"</ul>" +
-			"The investigator name(s) is similarly assigned using one of the " +
-			"tags 'Investigator', 'Investigators', 'PI', or 'PIs', a '=' or ':', " +
-			"and finally a semicolon-separated list of investigator names.  " +
-			"For example: " +
+			"Please verify a ship or vessel name is given in your file.  " +
+			"You might want to click the Advanced Settings option on this " + 
+			"page and then click the Preview Data File button.  This will " +
+			"enable you to see how your file appears to this system and " +
+			"change the file encoding type if appropriate." +
+			"</p>";
+	private static final String NO_PINAMES_FAIL_MSG = 
+			"<br />Investigator Name(s) not found.</h3>" +
+			"<p>The data file needs to contain the investigator name(s) in " +
+			"the lines of metadata preceding the data, or in a data column. " +
+			"</p><p>" +
+			"The investigator name(s) metadata line or column header should use " +
+			"one of the tags 'investigator', 'investigator name', 'investigators', " +
+			"'investigator names', 'PI', 'PI name', 'PIs', or 'PI names' " +
+			"(uppercase or lowercase does not matter).  Use a semicolon ';' to " +
+			"separate different investigator names.  The metadata line should " +
+			"look something like one of the following (when using the 'PI names' tag): " +
 			"<ul style=\"list-style-type: none\">" +
-			"<li>PIs: Smith, K.; Doe, J.</li>" +
+			"<li>PI names: Smith, K.; Doe, J.</li>" +
+			"<li>PI names = Smith, K.; Doe, J.</li>" +
 			"</ul>" +
-			"Please verify a valid expocode, ship or vessel name, and investigator name(s) " +
-			"are given in your file.  You might want to click the Advanced Settings option " +
-			"on this page and then click the Preview Data File button.  This will enable " + 
-			"you to see how your file appears to this system and change the file encoding " +
-			"type if appropriate." +
+			"Please verify investigator names are given in your file.  " +
+			"You might want to click the Advanced Settings option on this " + 
+			"page and then click the Preview Data File button.  This will " +
+			"enable you to see how your file appears to this system and " +
+			"change the file encoding type if appropriate." +
 			"</p>";
 	private static final String CANNOT_OVERWRITE_FAIL_MSG_START = 
 			"<br />A dataset already exists with this expocode.</h3>";
@@ -470,6 +498,18 @@ public class CruiseUploadPage extends CompositeWithUsername {
 				String filename = header.substring(
 						DashboardUtils.NO_EXPOCODE_HEADER_TAG.length()).trim();
 				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_EXPOCODE_FAIL_MSG);
+			}
+			else if ( header.startsWith(DashboardUtils.NO_SHIPNAME_HEADER_TAG) ) {
+				// No ship name was found in the file
+				String filename = header.substring(
+						DashboardUtils.NO_SHIPNAME_HEADER_TAG.length()).trim();
+				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_SHIPNAME_FAIL_MSG);
+			}
+			else if ( header.startsWith(DashboardUtils.NO_PINAMES_HEADER_TAG) ) {
+				// No investigator name was found in the file
+				String filename = header.substring(
+						DashboardUtils.NO_PINAMES_HEADER_TAG.length()).trim();
+				errMsgs.add(FAIL_MSG_HEADER + SafeHtmlUtils.htmlEscape(filename) + NO_PINAMES_FAIL_MSG);
 			}
 			else if ( header.startsWith(DashboardUtils.CANNOT_OVERWRITE_HEADER_TAG) ) {
 				// Cruise file exists and not permitted to overwrite; 
