@@ -347,9 +347,13 @@ public class CruiseUploadService extends HttpServlet {
 			}
 
 			// Verify there is a ship name and at least one PI name
-			if ( (shipName == null) || (piNames == null) ) {
+			if ( shipName == null ) {
+				messages.add(DashboardUtils.NO_SHIPNAME_HEADER_TAG + " " + filename);
+				continue;
+			}
+			if ( piNames == null ) {
 				// Use the NO_EXPOCODE error message for any missing metadata
-				messages.add(DashboardUtils.NO_EXPOCODE_HEADER_TAG + " " + filename);
+				messages.add(DashboardUtils.NO_PINAMES_HEADER_TAG + " " + filename);
 				continue;
 			}
 

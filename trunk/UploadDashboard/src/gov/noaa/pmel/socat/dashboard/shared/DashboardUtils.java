@@ -32,6 +32,8 @@ public class DashboardUtils {
 	public static final String FILE_PREVIEW_HEADER_TAG = "FILE PREVIEW HEADER TAG";
 	public static final String FILE_INVALID_HEADER_TAG = "FILE INVALID HEADER TAG";
 	public static final String NO_EXPOCODE_HEADER_TAG = "NO EXPOCODE HEADER TAG";
+	public static final String NO_SHIPNAME_HEADER_TAG = "NO SHIPNAME HEADER TAG";
+	public static final String NO_PINAMES_HEADER_TAG = "NO PINAMES HEADER TAG";
 	public static final String CANNOT_OVERWRITE_HEADER_TAG = "CANNOT OVERWRITE HEADER TAG";
 	public static final String NO_DATASET_HEADER_TAG = "NO DATASET HEADER TAG";
 	public static final String UNEXPECTED_FAILURE_HEADER_TAG = "UNEXPECTED FAILURE HEADER TAG";

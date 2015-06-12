@@ -317,6 +317,21 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						break;
 				}
 				if ( numDataColumns == datavals.length ) {
+					// Check that this is not a line of data - assume all headers are non-numeric
+					boolean hasNumber = false;
+					for ( String name : datavals ) {
+						try {
+							Double.parseDouble(name);
+							// Numeric - appears to be data
+							hasNumber = true;
+							break;
+						} catch (Exception ex) {
+							// Expected result
+							;
+						}
+					}
+					if ( hasNumber)
+						throw new IOException("No data column headers found (header cannot be a number)");
 					// These indeed are the column headers
 					if ( assignCruiseInfo ) {
 						// Just directly add the column names to the list in cruiseData
