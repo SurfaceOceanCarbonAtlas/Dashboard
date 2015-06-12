@@ -162,9 +162,9 @@ public class DashboardUtils {
 	public static final ArrayList<String> DAY_OF_YEAR_UNITS = 
 			new ArrayList<String>(Arrays.asList("Jan1=1.0", "Jan1=0.0"));
 	public static final ArrayList<String> LONGITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.E"));
+			new ArrayList<String>(Arrays.asList("deg.E", "deg.W"));
 	public static final ArrayList<String> LATITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.N"));
+			new ArrayList<String>(Arrays.asList("deg.N", "deg.S"));
 	public static final ArrayList<String> DEPTH_UNITS = 
 			new ArrayList<String>(Arrays.asList("meters"));
 	public static final ArrayList<String> SALINITY_UNITS = 

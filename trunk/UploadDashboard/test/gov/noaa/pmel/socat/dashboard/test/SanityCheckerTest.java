@@ -44,11 +44,11 @@ public class SanityCheckerTest {
 				"<Expocode_" + expocode + ">" + 
 					"<socat_column name=\"longitude\">" +
 						"<input_column index=\"10\">longitude [deg.E]</input_column>" +
-						"<input_units>decimal_degrees</input_units>" +
+						"<input_units>decimal_degrees_east</input_units>" +
 					"</socat_column>" +
 					"<socat_column name=\"latitude\">" +
 						"<input_column index=\"11\">latitude [deg.N]</input_column>" +
-						"<input_units>decimal_degress</input_units>" +
+						"<input_units>decimal_degrees_north</input_units>" +
 					"</socat_column>" +
 					"<socat_column name=\"sample_depth\">" +
 						"<input_column index=\"12\">sample_depth [m]</input_column>" +
