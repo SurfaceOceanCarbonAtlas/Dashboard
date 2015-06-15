@@ -18,6 +18,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CaptionPanel;
 import com.google.gwt.user.client.ui.DisclosurePanel;
@@ -42,21 +43,72 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String TITLE_TEXT = "Upload Data Files";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
+	private static final String MORE_HELP_TEXT = "more help...";
 
 	private static final String UPLOAD_FILE_DESCRIPTION_HTML = 
-			"<p>An acceptable data file starts with lines of metadata, " +
-			"then has a line of column headers, " +
-			"an optional lines of column units, " +
-			"and finally a line of data values for each data sample.</p>" +
-			"<p>The expocode, vessel (ship) name, and investigators names " +
-			"must be provided in the metadata lines such as: " +
+			"<p>A data file for upload has the general format:<ul>" +
+			"<li>a line of metadata for each metadata item,</li> " +
+			"<li>a line of data column headers,</li>" +
+			"<li>a line of data column units (optional),</li>" +
+			"<li>a line of data values for each data sample</li>" +
+			"</ul></p>" +
+			"<p>The expocode, vessel (ship) name, and investigators " +
+			"names must be given in either the metadata lines: " +
 			"<ul style=\"list-style-type: none\">" +
 			"<li>expocode: ZZZZ20051231</li>" +
 			"<li>ship: Pacific Minnow</li>" +
 			"<li>PIs: Smith, K.; Doe, J.</li>" +
 			"</ul> " +
-			"or in columns with recognized headers for the expocode, " +
-			"ship name, and investigator names.</p>";
+			"or they can be in columns with appropriate names.  </p>";
+	private static final String MORE_HELP_HTML = 
+			"<p>" +
+			"The first few lines of a comma-separated upload datafile " +
+			"should look something like the follow.  Note that the data" +
+			"lines were truncated to make it easier to see the format" +
+			"</p><p>" +
+			"Expocode: 33AT20120417<br />" +
+			"Ship: Atlantis<br />" +
+			"PI: Wanninkhof, R.<br />" +
+			"<br />" +
+			"CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...<br />" +
+			"20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...<br />" +
+			"20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...<br />" +
+			"20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...<br />" +
+			"20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...<br />" +
+			"20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...<br />" +
+			"</p><p>" +
+			"The 12 character expocode is the " +
+			"<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
+			"for the vessel carrying the instrumentation followed by the " +
+			"numeric year, month, and day of departure.  For example, " +
+			"49P120101218 indicates a cruise on the Japanese (49) ship" +
+			" of opportunity Pyxis (P1) with the first day of the cruise " +
+			"on 18 December 2010.  " +
+			"</p><p>" +
+			"Tags for metadata items are case insensitive.  The tag is followed " +
+			"by either a colon or and equals sign, which can have spaces around them.  " +
+			"Tags for the expocode include 'expoocode' and 'cruise expocode'.  " +
+			"Tags for the ship/vessel name include 'ship', 'ship name', 'vessel', " +
+			"and 'vessel name'.  Tags fro the investigator names include 'investigator', " +
+			"'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
+			"'PI name', and PI names'.  For datasets with multiple investigators, " +
+			"put all names on one metadata line and separate the names with semicolons.  " +
+			"</p><p>" +
+			"Units for the columns can be given on a second column header line, " +
+			"such as the following:" +
+			"</p><p>" +
+			"Expocode = 33AT20120417<br />" +
+			"Vessel Name = Atlantis<br />" +
+			"Investigator = Wanninkhof, R.<br />" +
+			"<br />" +
+			"CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...<br />" +
+			",Jan1=1,ddmmyyyy,hh:mm:ss,dec.deg.,dec.deg.,...<br />" +
+			"20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...<br />" +
+			"20-01B,110.79391,19042012,19:03:14,12.633,-59.233,...<br />" +
+			"20-01B,110.79564,19042012,19:05:43,12.628,-59.228,...<br />" +
+			"20-01B,110.79736,19042012,19:08:12,12.622,-59.222,...<br />" +
+			"20-01B,110.79910,19042012,19:10:42,12.617,-59.216,...<br />" +
+			"</p>";
 
 	private static final String SETTINGS_CAPTION_TEXT = "Settings";
 
@@ -127,12 +179,13 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"<li>Expocode = 49P120101218</li>" +
 			"<li>Expocode: 49P120101218</li>" +
 			"</ul>" +
-			"The 12 character expocode is the NODC code for the vessel " +
-			"carrying the instrumentation followed by the numeric year, " +
-			"month, and day of departure.  For " +
-			"example, 49P120101218 indicates a cruise on the Japanese " +
-			"(49) ship of opportunity Pyxis (P1) with the first day of " +
-			"the cruise on 18 December 2010. " +
+			"The 12 character expocode is the " +
+			"<a href=\"http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt\" target=\"_blank\">NODC code</a> " +
+			"for the vessel carrying the instrumentation followed by the " +
+			"numeric year, month, and day of departure.  For example, " +
+			"49P120101218 indicates a cruise on the Japanese (49) ship" +
+			" of opportunity Pyxis (P1) with the first day of the cruise " +
+			"on 18 December 2010. " +
 			"</p><p>" +
 			"Please verify a valid expocode is given in your file.  You " +
 			"might want to click the Advanced Settings option on this " + 
@@ -207,6 +260,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
+	@UiField Anchor moreHelpAnchor;
 	@UiField FormPanel uploadForm;
 	@UiField HTML cruiseUpload;
 	@UiField Hidden timestampToken;
@@ -227,6 +281,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	@UiField Button submitButton;
 	@UiField Button cancelButton;
 
+	private DashboardInfoPopup moreHelpPopup;
 	private Element uploadElement;
 
 	// Singleton instance of this page
@@ -246,6 +301,8 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 		introHtml.setHTML(UPLOAD_FILE_DESCRIPTION_HTML);
+		moreHelpAnchor.setText(MORE_HELP_TEXT);
+		moreHelpPopup = null;
 
 		uploadForm.setEncoding(FormPanel.ENCODING_MULTIPART);
 		uploadForm.setMethod(FormPanel.METHOD_POST);
@@ -361,6 +418,16 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		DashboardLogoutPage.showPage();
 		// Make sure the normal cursor is shown
 		SocatUploadDashboard.showAutoCursor();
+	}
+
+	@UiHandler("moreHelpAnchor")
+	void moreHelpOnClick(ClickEvent event) {
+		// Create the popup only when needed and if it does not exist
+		if ( moreHelpPopup == null ) {
+			moreHelpPopup = new DashboardInfoPopup();
+			moreHelpPopup.setInfoMessage(MORE_HELP_HTML);
+		}
+		moreHelpPopup.showCentered();
 	}
 
 	/**

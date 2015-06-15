@@ -66,7 +66,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	private static final String REC_FCO2_SOURCES_TAB_TEXT = "rec fCO<sub>2</sub> sources";
 
 	private static final String REFRESH_HELP_ADDENDUM = 
-			" -- if plots to not show after awhile, try pressing the " + REFRESH_TEXT + " button";
+			" -- if plots to not show after awhile, try pressing the '" + REFRESH_TEXT + "' button given below this image.";
 
 	private static final String LAT_VS_LON_ALT_TEXT = "latitude versus longitude";
 	private static final String LAT_LON_ALT_TEXT = "latitude, longitude versus time";

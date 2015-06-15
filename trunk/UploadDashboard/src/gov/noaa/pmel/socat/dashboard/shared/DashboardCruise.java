@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7667588095811121038L;
+	private static final long serialVersionUID = -9211678123974749505L;
 
 	boolean selected;
 	String version;
@@ -832,6 +832,25 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
+	 * Compare using the upload timestamp of the cruises.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
+	 */
+	public static Comparator<DashboardCruise> timestampComparator = 
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getUploadTimestamp().compareTo(c2.getUploadTimestamp());
+		}
+	};
+
+	/**
 	 * Compare using the data check status of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
@@ -904,6 +923,25 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	};
 
 	/**
+	 * Compare using the SOCAT version of the cruises.
+	 * Note that this is inconsistent with DashboardCruise.equals 
+	 * in that this is only examining one field of DashboardCruise.
+	 */
+	public static Comparator<DashboardCruise> versionComparator = 
+			new Comparator<DashboardCruise>() {
+		@Override
+		public int compare(DashboardCruise c1, DashboardCruise c2) {
+			if ( c1 == c2 )
+				return 0;
+			if ( c1 == null )
+				return -1;
+			if ( c2 == null )
+				return 1;
+			return c1.getVersion().compareTo(c2.getVersion());
+		}
+	};
+
+	/**
 	 * Compare using the QC status string of the cruises.
 	 * Note that this is inconsistent with DashboardCruise.equals 
 	 * in that this is only examining one field of DashboardCruise.
@@ -957,25 +995,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			if ( c2 == null )
 				return 1;
 			return c1.getUploadFilename().compareTo(c2.getUploadFilename());
-		}
-	};
-
-	/**
-	 * Compare using the upload timestamp of the cruises.
-	 * Note that this is inconsistent with DashboardCruise.equals 
-	 * in that this is only examining one field of DashboardCruise.
-	 */
-	public static Comparator<DashboardCruise> timestampComparator = 
-			new Comparator<DashboardCruise>() {
-		@Override
-		public int compare(DashboardCruise c1, DashboardCruise c2) {
-			if ( c1 == c2 )
-				return 0;
-			if ( c1 == null )
-				return -1;
-			if ( c2 == null )
-				return 1;
-			return c1.getUploadTimestamp().compareTo(c2.getUploadTimestamp());
 		}
 	};
 
