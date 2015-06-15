@@ -209,10 +209,11 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String TIMESTAMP_COLUMN_NAME = "Upload Date";
 	private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
 	private static final String OME_METADATA_COLUMN_NAME = "OME Metadata";
+	private static final String ADDL_DOCS_COLUMN_NAME = "Supplemental<br />Documents";
+	private static final String SOCAT_VERSION_COLUMN_NAME = "SOCAT<br />Version";
 	private static final String SUBMITTED_COLUMN_NAME = "QC Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
-	private static final String ADDL_DOCS_COLUMN_NAME = "Supplemental<br />Documents";
 	private static final String OWNER_COLUMN_NAME = "Owner";
 
 	// Replacement strings for empty or null values
@@ -867,12 +868,13 @@ public class CruiseListPage extends CompositeWithUsername {
 		TextColumn<DashboardCruise> rowNumColumn = buildRowNumColumn();
 		Column<DashboardCruise,Boolean> selectedColumn = buildSelectedColumn();
 		expocodeColumn = buildExpocodeColumn();
+		timestampColumn = buildTimestampColumn();
 		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
 		Column<DashboardCruise,String> omeMetadataColumn = buildOmeMetadataColumn();
 		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
+		TextColumn<DashboardCruise> socatVersionColumn = buildSocatVersionColumn();
 		Column<DashboardCruise,String> qcStatusColumn = buildQCStatusColumn();
 		Column<DashboardCruise,String> archiveStatusColumn = buildArchiveStatusColumn();
-		timestampColumn = buildTimestampColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
 		TextColumn<DashboardCruise> ownerColumn = buildOwnerColumn();
 
@@ -889,6 +891,8 @@ public class CruiseListPage extends CompositeWithUsername {
 				SafeHtmlUtils.fromSafeConstant(OME_METADATA_COLUMN_NAME));
 		datasetsGrid.addColumn(addlDocsColumn, 
 				SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
+		datasetsGrid.addColumn(socatVersionColumn,
+				SafeHtmlUtils.fromSafeConstant(SOCAT_VERSION_COLUMN_NAME));
 		datasetsGrid.addColumn(qcStatusColumn, 
 				SafeHtmlUtils.fromSafeConstant(SUBMITTED_COLUMN_NAME));
 		datasetsGrid.addColumn(archiveStatusColumn, 
@@ -921,6 +925,9 @@ public class CruiseListPage extends CompositeWithUsername {
 		datasetsGrid.setColumnWidth(addlDocsColumn, 
 				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+		datasetsGrid.setColumnWidth(socatVersionColumn,
+				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(qcStatusColumn, 
 				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
@@ -947,6 +954,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		dataCheckColumn.setSortable(true);
 		omeMetadataColumn.setSortable(true);
 		addlDocsColumn.setSortable(true);
+		socatVersionColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
 		filenameColumn.setSortable(true);
@@ -965,6 +973,8 @@ public class CruiseListPage extends CompositeWithUsername {
 				DashboardCruise.omeTimestampComparator);
 		columnSortHandler.setComparator(addlDocsColumn, 
 				DashboardCruise.addlDocsComparator);
+		columnSortHandler.setComparator(socatVersionColumn, 
+				DashboardCruise.versionComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
 				DashboardCruise.qcStatusComparator);
 		columnSortHandler.setComparator(archiveStatusColumn, 
@@ -1258,6 +1268,20 @@ public class CruiseListPage extends CompositeWithUsername {
 			}
 		});
 		return addnDocsColumn;
+	}
+
+	/**
+	 * @return the cruise SOCAT version number column for the table 
+	 */
+	private TextColumn<DashboardCruise> buildSocatVersionColumn() {
+		TextColumn<DashboardCruise> socatVersionColumn = 
+				new TextColumn<DashboardCruise> () {
+			@Override
+			public String getValue(DashboardCruise cruise) {
+				return cruise.getVersion();
+			}
+		};
+		return socatVersionColumn;
 	}
 
 	/**

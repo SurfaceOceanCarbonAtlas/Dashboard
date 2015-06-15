@@ -12,6 +12,7 @@
 				<g:Label addStyleNames="{style.titlereset}" />
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
+			<g:Anchor addStyleNames="{style.morehelpanchor}" ui:field="moreHelpAnchor" />
 			<g:FormPanel ui:field="uploadForm">
 				<g:FlowPanel>
 					<g:HTML addStyleNames="{style.uploadfile}" ui:field="cruiseUpload" />

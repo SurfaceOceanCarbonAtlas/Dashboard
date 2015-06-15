@@ -140,6 +140,13 @@ body {
 	margin-left: 0.5em;
 }
 
+.morehelpanchor {
+	display: block;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	margin-left: 3em;
+}
+
 .omeoptionpanel {
 	display: block;
 	border-style: solid;
