@@ -89,7 +89,10 @@ public class AddAllMetadata {
 					}
 					// Directly manipulate the set of additional documents for the cruise
 					TreeSet<String> addlDocs = cruise.getAddlDocs();
+					// Clear the OME upload timestamp and current additional documents
+					cruise.setOmeTimestamp(null);
 					addlDocs.clear();
+					// And add all existing metadata documents
 					for ( DashboardMetadata mdata : metaHandler.getMetadataFiles(expocode) ) {
 						if ( mdata.getFilename().equals(DashboardMetadata.OME_FILENAME) ) {
 							// Ignore the OME.xml stub
