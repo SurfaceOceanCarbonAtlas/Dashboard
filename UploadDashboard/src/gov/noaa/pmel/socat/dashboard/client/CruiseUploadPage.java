@@ -86,8 +86,8 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"on 18 December 2010.  " +
 			"</p><p>" +
 			"Tags for metadata items are case insensitive.  The tag is followed " +
-			"by either a colon or and equals sign, which can have spaces around them.  " +
-			"Tags for the expocode include 'expoocode' and 'cruise expocode'.  " +
+			"by either a colon or equals sign, which can have spaces around them.  " +
+			"Tags for the expocode include 'expocode' and 'cruise expocode'.  " +
 			"Tags for the ship/vessel name include 'ship', 'ship name', 'vessel', " +
 			"and 'vessel name'.  Tags fro the investigator names include 'investigator', " +
 			"'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
