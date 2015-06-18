@@ -13,6 +13,7 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -1008,6 +1009,7 @@ public class SocatCruiseReporter {
 		String oldExpocode;
 		String regions;
 		String numRows;
+		String numMissRows;
 		String numErrRows;
 		String numWarnRows;
 		String numOkayRows;
@@ -1022,29 +1024,22 @@ public class SocatCruiseReporter {
 			 SocatQCEvent.QC_STATUS_PREVIEW.equals(qcStatus) ) {
 			// No official DSG file - get what we can from the dashboard cruise data and OME metadata
 			numRows = Integer.toString(cruiseInfo.getNumDataRows());
-			if ( cruiseInfo.getDataCheckStatus().isEmpty() ) {
-				numErrRows = "-";
-				numWarnRows = "-";
-				numOkayRows = "-";
-			}
-			else {
-				numErrRows = Integer.toString(cruiseInfo.getNumErrorRows());
-				numWarnRows = Integer.toString(cruiseInfo.getNumWarnRows());
-				numOkayRows = Integer.toString(cruiseInfo.getNumDataRows() 
-						- cruiseInfo.getNumWarnRows() - cruiseInfo.getNumErrorRows());
-			}
+			numMissRows = "-";
+			numErrRows = "-";
+			numWarnRows = "-";
+			numOkayRows = "-";
 			regions = "-";
+			socatVersion = "-";
+			dsgQCFlag = "-";
+			// databaseQCFlag = "-";
+			oldExpocode = "-";
 			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
 			if ( metadata == null )
 				throw new IllegalArgumentException("No OME metadata for " + expocode);
 			DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
 			SocatMetadata socatMetadata = omeMeta.createSocatMetadata(null, null, null);
-			socatVersion = "-";
 			vesselName = socatMetadata.getVesselName();
 			pis = socatMetadata.getScienceGroup();
-			dsgQCFlag = "-";
-			// databaseQCFlag = "-";
-			oldExpocode = "-";
 		}
 		else {
 			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(expocode);
@@ -1058,20 +1053,29 @@ public class SocatCruiseReporter {
 			}
 			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
 			numRows = Integer.toString(dataList.size());
+			int numMissing = 0;
 			int numWoceOkay = 0;
 			int numWoceBad = 0;
 			int numWoceWarn = 0;
 			TreeSet<String> regionNames = new TreeSet<String>();
 			for ( SocatCruiseData data : dataList ) {
 				Character woceCO2Water = data.getWoceCO2Water();
-				if ( woceCO2Water.equals(SocatWoceEvent.WOCE_BAD) )
+				if ( DashboardUtils.closeTo(data.getfCO2Rec(), 
+						SocatCruiseData.FP_MISSING_VALUE, 1.0E-7, 1.0E-3) ) {
+					numMissing++;
+				}
+				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_BAD) ) {
 					numWoceBad++;
-				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) )
+				}
+				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) ) {
 					numWoceWarn++;
-				else 
+				}
+				else { 
 					numWoceOkay++;
+				}
 				regionNames.add(DataLocation.REGION_NAMES.get(data.getRegionID()));
 			}
+			numMissRows = Integer.toString(numMissing);
 			numErrRows = Integer.toString(numWoceBad);
 			numWarnRows = Integer.toString(numWoceWarn);
 			numOkayRows = Integer.toString(numWoceOkay);
@@ -1133,6 +1137,7 @@ public class SocatCruiseReporter {
 			numOkayRows + "\t" +
 			numWarnRows + "\t" +
 			numErrRows + "\t" +
+			numMissRows + "\t" +
 			regions + "\t" +
 			vesselName + "\t" +
 			pis);
@@ -1143,10 +1148,11 @@ public class SocatCruiseReporter {
 			"QC_Flag\t" + 
 			"Version\t" +
 			"Renamed_From\t" + 
-			"Num_Data_Pts\t" + 
+			"Num_Obs\t" + 
 			"Num_WOCE-2\t" +
 			"Num_WOCE-3\t" +
 			"Num_WOCE-4\t" + 
+			"Num_WOCE-9\t" + 
 			"Regions\t" + 
 			"Vessel\t" + 
 			"Investigators";
