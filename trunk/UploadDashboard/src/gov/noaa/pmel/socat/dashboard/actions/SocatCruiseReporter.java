@@ -1003,7 +1003,7 @@ public class SocatCruiseReporter {
 	public void printCruiseSummary(String expocode, PrintStream out) 
 											throws IllegalArgumentException {
 		String dsgQCFlag;
-		String databaseQCFlag;
+		// String databaseQCFlag;
 		String socatVersion;
 		String oldExpocode;
 		String regions;
@@ -1043,7 +1043,7 @@ public class SocatCruiseReporter {
 			vesselName = socatMetadata.getVesselName();
 			pis = socatMetadata.getScienceGroup();
 			dsgQCFlag = "-";
-			databaseQCFlag = "-";
+			// databaseQCFlag = "-";
 			oldExpocode = "-";
 		}
 		else {
@@ -1085,12 +1085,14 @@ public class SocatCruiseReporter {
 			vesselName = socatMetadata.getVesselName();
 			pis = socatMetadata.getScienceGroup();
 			dsgQCFlag = socatMetadata.getQcFlag();
-			try {
-				databaseQCFlag = databaseHandler.getQCFlag(expocode).toString();
-			} catch (SQLException ex) {
-				throw new IllegalArgumentException("Problems generating \"the\" database QC flag for " +
-						expocode + ": " + ex.getMessage());
-			}
+			/*
+			 * try {
+			 * 	databaseQCFlag = databaseHandler.getQCFlag(expocode).toString();
+			 * } catch (SQLException ex) {
+			 * 	throw new IllegalArgumentException("Problems generating \"the\" database QC flag for " +
+			 * 			expocode + ": " + ex.getMessage());
+			 * }
+			 */
 			ArrayList<SocatQCEvent> qcEvents;
 			try {
 				qcEvents = databaseHandler.getQCEvents(expocode);
@@ -1125,7 +1127,6 @@ public class SocatCruiseReporter {
 		out.println(
 			expocode + "\t" +
 			dsgQCFlag + "\t" +
-			databaseQCFlag + "\t" +
 			socatVersion + "\t" +
 			oldExpocode + "\t" +
 			numRows + "\t" +
@@ -1139,8 +1140,7 @@ public class SocatCruiseReporter {
 
 	private static final String CRUISE_SUMMARY_HEADER = 
 			"Expocode\t" + 
-			"QC_DSG\t" + 
-			"QC_Database\t" + 
+			"QC_Flag\t" + 
 			"Version\t" +
 			"Renamed_From\t" + 
 			"Num_Data_Pts\t" + 
