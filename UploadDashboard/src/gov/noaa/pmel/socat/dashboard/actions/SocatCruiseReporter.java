@@ -143,11 +143,13 @@ public class SocatCruiseReporter {
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
-			ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion, qcFlag, addlDocs, report);
+			ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion, 
+														qcFlag, addlDocs, report);
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, false);
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
-				report.println(dataReportString(dataVals, upperExpo, socatVersion, qcFlag, false));
+				report.println(dataReportString(dataVals, upperExpo, socatVersion, 
+												SOCAT_ENHANCED_DOI_TAG, qcFlag, false));
 			}
 		} finally {
 			report.close();
@@ -266,7 +268,8 @@ public class SocatCruiseReporter {
 					Character woceFlag = dataVals.getWoceCO2Water();
 					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
 						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
-						report.println(dataReportString(dataVals, upperExpo, socatVersion, qcFlag, true));
+						report.println(dataReportString(dataVals, upperExpo, 
+								socatVersion, SOCAT_ENHANCED_DOI_TAG, qcFlag, true));
 					}
 				}
 			}
@@ -418,6 +421,8 @@ public class SocatCruiseReporter {
 					   "Ship/Vessel Name\t" +
 					   "PI(s)\t" +
 					   "Original Data DOI\t" +
+					   "SOCAT DOI\t" +
+					   "SOCAT DOI link\t" +
 					   "Westmost Longitude\t" +
 					   "Eastmost Longitude\t" +
 					   "Southmost Latitude\t" +
@@ -636,6 +641,7 @@ public class SocatCruiseReporter {
 	private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the cruise from which this data was obtained",
 		"version: version of SOCAT where this enhanced cruise data first appears",
+		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
 		"QC_Flag: Cruise QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
@@ -679,6 +685,7 @@ public class SocatCruiseReporter {
 	private static final String SINGLE_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" +
 			"version\t" +
+			"SOCAT_DOI\t" +
 			"QC_Flag\t" +
 			"yr\t" +
 			"mon\t" +
@@ -716,6 +723,7 @@ public class SocatCruiseReporter {
 	private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the cruise from which this data was obtained",
 		"version: version of SOCAT where this enhanced cruise data first appears",
+		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
 		"QC_Flag: Cruise QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
@@ -753,6 +761,7 @@ public class SocatCruiseReporter {
 	private static final String MULTI_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" + 
 			"version\t" +
+			"SOCAT_DOI\t" +
 			"QC_Flag\t" +
 			"yr\t" +
 			"mon\t" +
@@ -784,6 +793,8 @@ public class SocatCruiseReporter {
 	 * 		expocode for the cruise data report string
 	 * @param socatVersion
 	 * 		SOCAT Version for the cruise data report string
+	 * @param socatDOI
+	 * 		SOCAT DOI for the cruise data report string
 	 * @param cruiseQCFlag
 	 * 		cruise QC flag for the cruise
 	 * @param multicruise
@@ -793,12 +804,13 @@ public class SocatCruiseReporter {
 	 * 		tab-separated data values for SOCAT data reporting.
 	 */
 	private static String dataReportString(SocatCruiseData dataVals, 
-			String expocode, String socatVersion, String cruiseQCFlag, 
-			boolean multicruise) throws IllegalArgumentException {
+			String expocode, String socatVersion, String socatDOI,
+			String cruiseQCFlag, boolean multicruise) throws IllegalArgumentException {
 		// Generate the string for this data point
 		Formatter fmtr = new Formatter();
 		fmtr.format("%s\t", expocode);
 		fmtr.format("%s\t", socatVersion);
+		fmtr.format("%s\t", socatDOI);
 		fmtr.format("%s\t", cruiseQCFlag);
 
 		Integer intVal = dataVals.getYear();
