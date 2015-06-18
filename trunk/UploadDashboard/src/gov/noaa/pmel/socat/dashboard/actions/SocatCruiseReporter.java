@@ -1001,7 +1001,7 @@ public class SocatCruiseReporter {
 	 * @throws IllegalArgumentException
 	 * 		if there are problems generating the summary for the cruise
 	 */
-	public void printCruiseSummary(String expocode, PrintStream out) 
+	public void printCruiseSummary(String expocode, PrintWriter out) 
 											throws IllegalArgumentException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 
@@ -1143,7 +1143,7 @@ public class SocatCruiseReporter {
 	 * @param out
 	 * 		print the summary to here
 	 */
-	public void printSummaryHeader(PrintStream out) {
+	public void printSummaryHeader(PrintWriter out) {
 		out.println(CRUISE_SUMMARY_HEADER);
 	}
 
