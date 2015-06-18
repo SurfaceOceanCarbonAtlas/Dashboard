@@ -1002,7 +1002,6 @@ public class SocatCruiseReporter {
 	 */
 	public void printCruiseSummary(String expocode, PrintStream out) 
 											throws IllegalArgumentException {
-		String datasetName;
 		String dsgQCFlag;
 		String databaseQCFlag;
 		String socatVersion;
@@ -1011,8 +1010,8 @@ public class SocatCruiseReporter {
 		String numRows;
 		String numErrRows;
 		String numWarnRows;
+		String numOkayRows;
 		String pis;
-		String addlDocs;
 
 		DashboardCruise cruiseInfo = cruiseHandler.getCruiseFromInfoFile(expocode);
 		if ( cruiseInfo == null )
@@ -1025,10 +1024,13 @@ public class SocatCruiseReporter {
 			if ( cruiseInfo.getDataCheckStatus().isEmpty() ) {
 				numErrRows = "-";
 				numWarnRows = "-";
+				numOkayRows = "-";
 			}
 			else {
 				numErrRows = Integer.toString(cruiseInfo.getNumErrorRows());
 				numWarnRows = Integer.toString(cruiseInfo.getNumWarnRows());
+				numOkayRows = Integer.toString(cruiseInfo.getNumDataRows() 
+						- cruiseInfo.getNumWarnRows() - cruiseInfo.getNumErrorRows());
 			}
 			regions = "-";
 			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
@@ -1036,10 +1038,8 @@ public class SocatCruiseReporter {
 				throw new IllegalArgumentException("No OME metadata for " + expocode);
 			DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
 			SocatMetadata socatMetadata = omeMeta.createSocatMetadata(null, null, null);
-			datasetName = socatMetadata.getCruiseName();
 			socatVersion = "-";
 			pis = socatMetadata.getScienceGroup();
-			addlDocs = socatMetadata.getAddlDocs();
 			dsgQCFlag = "-";
 			databaseQCFlag = "-";
 			oldExpocode = "-";
@@ -1056,6 +1056,7 @@ public class SocatCruiseReporter {
 			}
 			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
 			numRows = Integer.toString(dataList.size());
+			int numWoceOkay = 0;
 			int numWoceBad = 0;
 			int numWoceWarn = 0;
 			TreeSet<String> regionNames = new TreeSet<String>();
@@ -1065,20 +1066,21 @@ public class SocatCruiseReporter {
 					numWoceBad++;
 				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) )
 					numWoceWarn++;
+				else 
+					numWoceOkay++;
 				regionNames.add(DataLocation.REGION_NAMES.get(data.getRegionID()));
 			}
 			numErrRows = Integer.toString(numWoceBad);
 			numWarnRows = Integer.toString(numWoceWarn);
+			numOkayRows = Integer.toString(numWoceOkay);
 			regionNames.remove(DataLocation.REGION_NAMES.get(DataLocation.GLOBAL_REGION_ID));
 			regions = "";
 			for ( String name : regionNames )
 				regions += "; " + name;
 			regions = regions.substring(2);
 			SocatMetadata socatMetadata = dsgFile.getMetadata();
-			datasetName = socatMetadata.getCruiseName();
 			socatVersion = socatMetadata.getSocatVersion();
 			pis = socatMetadata.getScienceGroup();
-			addlDocs = socatMetadata.getAddlDocs();
 			dsgQCFlag = socatMetadata.getQcFlag();
 			try {
 				databaseQCFlag = databaseHandler.getQCFlag(expocode).toString();
@@ -1108,20 +1110,6 @@ public class SocatCruiseReporter {
 					oldExpocode = msgWords[2];
 			}
 		}
-		// Add any supplemental documents found in the documents directory
-		// (just to be safe) since this is what the reviewers will see
-		ArrayList<DashboardMetadata> cruiseDocs = metadataHandler.getMetadataFiles(expocode);
-		TreeSet<String> addlDocNames = new TreeSet<String>();
-		for ( DashboardMetadata mdata : cruiseDocs )
-			addlDocNames.add(mdata.getFilename());
-		for ( String name : addlDocs.split(SocatMetadata.NAMES_SEPARATOR) )
-			addlDocNames.add(name);
-		addlDocNames.remove(DashboardMetadata.OME_FILENAME);
-		addlDocs = "";
-		for ( String name : addlDocNames ) {
-			addlDocs += "; " + name;
-		}
-		addlDocs = addlDocs.substring(2);
 
 		// Clean up the listing of PIs
 		String[] pisArray = pis.split(SocatMetadata.NAMES_SEPARATOR);
@@ -1131,33 +1119,32 @@ public class SocatCruiseReporter {
 		}
 		pis = pis.substring(2);
 
-		out.println(expocode + "\t" + 
-			   datasetName + "\t" +
-			   dsgQCFlag + "\t" + 
-			   databaseQCFlag + "\t" +
-			   socatVersion + "\t" +
-			   oldExpocode + "\t" +
-			   regions + "\t" +
-			   numRows + "\t" +
-			   numErrRows + "\t" +
-			   numWarnRows + "\t" + 
-			   pis + "\t" +
-			   addlDocs);
+		out.println(
+			expocode + "\t" + 
+			dsgQCFlag + "\t" + 
+			databaseQCFlag + "\t" +
+			socatVersion + "\t" +
+			oldExpocode + "\t" +
+			numRows + "\t" +
+			numOkayRows + "\t" +
+			numWarnRows + "\t" + 
+			numErrRows + "\t" +
+			regions + "\t" +
+			pis);
 	}
 
 	private static final String CRUISE_SUMMARY_HEADER = 
 			"Expocode\t" + 
-			"Dataset Name\t" + 
 			"QC (DSG)\t" + 
 			"QC (Database)\t" + 
 			"Socat Version\t" +
 			"Renamed From\t" + 
-			"Regions\t" + 
 			"Num Data Pts\t" + 
-			"Num Err Pts\t" + 
-			"Num Warn Pts\t" +
-			"PIs\t" +
-			"Addl Docs";
+			"Num WOCE-2\t" +
+			"Num WOCE-3\t" +
+			"Num WOCE-4\t" + 
+			"Regions\t" + 
+			"Investigators";
 
 	/**
 	 * Prints the summary header to the given PrintStream
