@@ -8,6 +8,7 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.PrintWriter;
 import java.util.TreeSet;
 
 /**
@@ -25,19 +26,18 @@ public class GenerateSummaryCruiseReports {
 	 * 				or all cruises if '-'
 	 */
 	public static void main(String[] args) {
-		if ( args.length != 1 ) {
-			System.err.println("Arguments:  [ - | ExpocodesFile ]");
+		if ( args.length != 2 ) {
+			System.err.println("Arguments:  ExpocodesFile  SummaryFile");
 			System.err.println();
-			System.err.println("Generates a summary of the cruises specified in ExpocodesFile, ");
-			System.err.println("or all cruises if ExpocodesFile is '-'. The default dashboard ");
+			System.err.println("Generates a summary of the cruises specified in ExpocodesFile ");
+			System.err.println("which is written to SummaryFile. The default dashboard ");
 			System.err.println("configuration is used for this process. ");
 			System.err.println();
 			System.exit(1);
 		}
 
 		String expocodesFilename = args[0];
-		if ( "-".equals(expocodesFilename) )
-			expocodesFilename = null;
+		String summaryFilename = args[1];
 
 		boolean success = true;
 
@@ -52,55 +52,50 @@ public class GenerateSummaryCruiseReports {
 			System.exit(1);
 		}
 		try {
-			SocatCruiseReporter summaryReporter = new SocatCruiseReporter(configStore);
-
-			// Get the expocode of the cruises to report
-			TreeSet<String> allExpocodes = null; 
-			if ( expocodesFilename != null ) {
-				allExpocodes = new TreeSet<String>();
+			TreeSet<String> allExpocodes = new TreeSet<String>();
+			try {
+				// Get the expocode of the cruises to report
+				BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFilename));
 				try {
-					BufferedReader expoReader = 
-							new BufferedReader(new FileReader(expocodesFilename));
-					try {
-						String dataline = expoReader.readLine();
-						while ( dataline != null ) {
-							dataline = dataline.trim();
-							if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
-								allExpocodes.add(dataline);
-							dataline = expoReader.readLine();
-						}
-					} finally {
-						expoReader.close();
+					String dataline = expoReader.readLine();
+					while ( dataline != null ) {
+						dataline = dataline.trim();
+						if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+							allExpocodes.add(dataline);
+						dataline = expoReader.readLine();
 					}
-				} catch (Exception ex) {
-					System.err.println("Error getting expocodes from " + 
-							expocodesFilename + ": " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
+				} finally {
+					expoReader.close();
 				}
-			} 
-			else {
-				try {
-					allExpocodes = new TreeSet<String>(
-							configStore.getCruiseFileHandler().getMatchingExpocodes("*"));
-				} catch (Exception ex) {
-					System.err.println("Error getting all expocodes: " + ex.getMessage());
-					ex.printStackTrace();
-					System.exit(1);
-				}
+			} catch (Exception ex) {
+				System.err.println("Problems reading the file of expocodes: " + ex.getMessage());
+				ex.printStackTrace();
+				System.exit(1);
 			}
 
 			// Generate the report
-			summaryReporter.printSummaryHeader(System.out);
-			for ( String expocode : allExpocodes ) {
-				try {
-					summaryReporter.printCruiseSummary(expocode, System.out);
-				} catch (Exception ex) {
-					System.err.println("Error reporting on " + expocode + " : " + ex.getMessage());
-					success = false;
-				}
+			PrintWriter report = null;
+			try {
+				report = new PrintWriter(summaryFilename, "ISO-8859-1");
+			} catch (Exception ex) {
+				System.err.println("Problems opening the summary file for writing: " + ex.getMessage());
+				ex.printStackTrace();
+				System.exit(1);
 			}
-
+			SocatCruiseReporter summaryReporter = new SocatCruiseReporter(configStore);
+			try {
+				summaryReporter.printSummaryHeader(report);
+				for ( String expocode : allExpocodes ) {
+					try {
+						summaryReporter.printCruiseSummary(expocode, report);
+					} catch (Exception ex) {
+						System.err.println("Error reporting on " + expocode + " : " + ex.getMessage());
+						success = false;
+					}
+				}
+			} finally {
+				report.close();
+			}
 		} finally {
 			configStore.shutdown();
 		}
