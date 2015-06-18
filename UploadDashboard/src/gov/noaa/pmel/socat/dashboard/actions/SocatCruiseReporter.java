@@ -1011,6 +1011,7 @@ public class SocatCruiseReporter {
 		String numErrRows;
 		String numWarnRows;
 		String numOkayRows;
+		String vesselName;
 		String pis;
 
 		DashboardCruise cruiseInfo = cruiseHandler.getCruiseFromInfoFile(expocode);
@@ -1039,6 +1040,7 @@ public class SocatCruiseReporter {
 			DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
 			SocatMetadata socatMetadata = omeMeta.createSocatMetadata(null, null, null);
 			socatVersion = "-";
+			vesselName = socatMetadata.getVesselName();
 			pis = socatMetadata.getScienceGroup();
 			dsgQCFlag = "-";
 			databaseQCFlag = "-";
@@ -1080,6 +1082,7 @@ public class SocatCruiseReporter {
 			regions = regions.substring(2);
 			SocatMetadata socatMetadata = dsgFile.getMetadata();
 			socatVersion = socatMetadata.getSocatVersion();
+			vesselName = socatMetadata.getVesselName();
 			pis = socatMetadata.getScienceGroup();
 			dsgQCFlag = socatMetadata.getQcFlag();
 			try {
@@ -1120,30 +1123,32 @@ public class SocatCruiseReporter {
 		pis = pis.substring(2);
 
 		out.println(
-			expocode + "\t" + 
-			dsgQCFlag + "\t" + 
+			expocode + "\t" +
+			dsgQCFlag + "\t" +
 			databaseQCFlag + "\t" +
 			socatVersion + "\t" +
 			oldExpocode + "\t" +
 			numRows + "\t" +
 			numOkayRows + "\t" +
-			numWarnRows + "\t" + 
+			numWarnRows + "\t" +
 			numErrRows + "\t" +
 			regions + "\t" +
+			vesselName + "\t" +
 			pis);
 	}
 
 	private static final String CRUISE_SUMMARY_HEADER = 
 			"Expocode\t" + 
-			"QC (DSG)\t" + 
-			"QC (Database)\t" + 
-			"Socat Version\t" +
-			"Renamed From\t" + 
-			"Num Data Pts\t" + 
-			"Num WOCE-2\t" +
-			"Num WOCE-3\t" +
-			"Num WOCE-4\t" + 
+			"QC_DSG\t" + 
+			"QC_Database\t" + 
+			"Version\t" +
+			"Renamed_From\t" + 
+			"Num_Data_Pts\t" + 
+			"Num_WOCE-2\t" +
+			"Num_WOCE-3\t" +
+			"Num_WOCE-4\t" + 
 			"Regions\t" + 
+			"Vessel\t" + 
 			"Investigators";
 
 	/**
