@@ -1003,6 +1003,8 @@ public class SocatCruiseReporter {
 	 */
 	public void printCruiseSummary(String expocode, PrintStream out) 
 											throws IllegalArgumentException {
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+
 		String dsgQCFlag;
 		// String databaseQCFlag;
 		String socatVersion;
@@ -1016,120 +1018,99 @@ public class SocatCruiseReporter {
 		String vesselName;
 		String pis;
 
-		DashboardCruise cruiseInfo = cruiseHandler.getCruiseFromInfoFile(expocode);
+		DashboardCruise cruiseInfo = cruiseHandler.getCruiseFromInfoFile(upperExpo);
 		if ( cruiseInfo == null )
-			throw new IllegalArgumentException("No cruise data for " + expocode);
+			throw new IllegalArgumentException("No cruise data for " + upperExpo);
 		String qcStatus = cruiseInfo.getQcStatus();
 		if ( SocatQCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ||
-			 SocatQCEvent.QC_STATUS_PREVIEW.equals(qcStatus) ) {
-			// No official DSG file - get what we can from the dashboard cruise data and OME metadata
-			numRows = Integer.toString(cruiseInfo.getNumDataRows());
-			numMissRows = "-";
-			numErrRows = "-";
-			numWarnRows = "-";
-			numOkayRows = "-";
-			regions = "-";
-			socatVersion = "-";
-			dsgQCFlag = "-";
-			// databaseQCFlag = "-";
-			oldExpocode = "-";
-			DashboardMetadata metadata = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
-			if ( metadata == null )
-				throw new IllegalArgumentException("No OME metadata for " + expocode);
-			DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
-			SocatMetadata socatMetadata = omeMeta.createSocatMetadata(null, null, null);
-			vesselName = socatMetadata.getVesselName();
-			pis = socatMetadata.getScienceGroup();
-		}
-		else {
-			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(expocode);
-			if ( ! dsgFile.exists() )
-				throw new IllegalArgumentException("DSG file does not exist for " + expocode);
-			try {
-				dsgFile.read(false);
-			} catch (IOException ex) {
-				throw new IllegalArgumentException("Problems reading the metdata from the DSG file for " + 
-						expocode + ": " + ex.getMessage());
-			}
-			ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
-			numRows = Integer.toString(dataList.size());
-			int numMissing = 0;
-			int numWoceOkay = 0;
-			int numWoceBad = 0;
-			int numWoceWarn = 0;
-			TreeSet<String> regionNames = new TreeSet<String>();
-			for ( SocatCruiseData data : dataList ) {
-				Character woceCO2Water = data.getWoceCO2Water();
-				if ( DashboardUtils.closeTo(data.getfCO2Rec(), 
-						SocatCruiseData.FP_MISSING_VALUE, 1.0E-7, 1.0E-3) ) {
-					numMissing++;
-				}
-				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_BAD) ) {
-					numWoceBad++;
-				}
-				else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) ) {
-					numWoceWarn++;
-				}
-				else { 
-					numWoceOkay++;
-				}
-				regionNames.add(DataLocation.REGION_NAMES.get(data.getRegionID()));
-			}
-			numMissRows = Integer.toString(numMissing);
-			numErrRows = Integer.toString(numWoceBad);
-			numWarnRows = Integer.toString(numWoceWarn);
-			numOkayRows = Integer.toString(numWoceOkay);
-			regionNames.remove(DataLocation.REGION_NAMES.get(DataLocation.GLOBAL_REGION_ID));
-			regions = "";
-			for ( String name : regionNames )
-				regions += "; " + name;
-			regions = regions.substring(2);
-			SocatMetadata socatMetadata = dsgFile.getMetadata();
-			socatVersion = socatMetadata.getSocatVersion();
-			vesselName = socatMetadata.getVesselName();
-			pis = socatMetadata.getScienceGroup();
-			dsgQCFlag = socatMetadata.getQcFlag();
-			/*
-			 * try {
-			 * 	databaseQCFlag = databaseHandler.getQCFlag(expocode).toString();
-			 * } catch (SQLException ex) {
-			 * 	throw new IllegalArgumentException("Problems generating \"the\" database QC flag for " +
-			 * 			expocode + ": " + ex.getMessage());
-			 * }
-			 */
-			ArrayList<SocatQCEvent> qcEvents;
-			try {
-				qcEvents = databaseHandler.getQCEvents(expocode);
-			} catch (SQLException ex) {
-				throw new IllegalArgumentException("Problems reading database QC events for " +
-						expocode + ": " + ex.getMessage());
-			}
-			oldExpocode = "-";
-			for ( SocatQCEvent evt : qcEvents ) {
-				if ( ! SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) )
-					continue;
-				String msg = evt.getComment();
-				String[] msgWords = msg.split("\\s+");
-				if ( ! ( (msgWords.length >= 5) &&
-						 "Rename".equalsIgnoreCase(msgWords[0]) && 
-						 "from".equalsIgnoreCase(msgWords[1]) && 
-						 "to".equalsIgnoreCase(msgWords[3]) ) )
-					throw new IllegalArgumentException("Unexpected comment for rename: " + msg);
-				if ( expocode.equals(msgWords[4]) )
-					oldExpocode = msgWords[2];
-			}
+			 SocatQCEvent.QC_STATUS_PREVIEW.equals(qcStatus) )
+			throw new IllegalArgumentException(upperExpo + " has not been submitted for QC");
+
+		DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(
+				metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME), metadataHandler);
+		vesselName = omeMetadata.getVesselName();
+		pis = omeMetadata.getScienceGroup();
+
+		CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
+		if ( ! dsgFile.exists() )
+			throw new IllegalArgumentException("DSG file does not exist for " + upperExpo);
+		try {
+			dsgFile.read(false);
+		} catch (IOException ex) {
+			throw new IllegalArgumentException("Problems reading the metdata from the DSG file for " + 
+					upperExpo + ": " + ex.getMessage());
 		}
 
-		// Clean up the listing of PIs
-		String[] pisArray = pis.split(SocatMetadata.NAMES_SEPARATOR);
-		pis = "";
-		for ( String name : pisArray ) {
-			pis += "; " + name;
+		ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
+		numRows = Integer.toString(dataList.size());
+		int numMissing = 0;
+		int numWoceOkay = 0;
+		int numWoceBad = 0;
+		int numWoceWarn = 0;
+		TreeSet<String> regionNames = new TreeSet<String>();
+		for ( SocatCruiseData data : dataList ) {
+			Character woceCO2Water = data.getWoceCO2Water();
+			if ( DashboardUtils.closeTo(data.getfCO2Rec(), 
+					SocatCruiseData.FP_MISSING_VALUE, 1.0E-7, 1.0E-3) ) {
+				numMissing++;
+			}
+			else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_BAD) ) {
+				numWoceBad++;
+			}
+			else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) ) {
+				numWoceWarn++;
+			}
+			else { 
+				numWoceOkay++;
+			}
+			regionNames.add(DataLocation.REGION_NAMES.get(data.getRegionID()));
 		}
-		pis = pis.substring(2);
+		numMissRows = Integer.toString(numMissing);
+		numErrRows = Integer.toString(numWoceBad);
+		numWarnRows = Integer.toString(numWoceWarn);
+		numOkayRows = Integer.toString(numWoceOkay);
+		regionNames.remove(DataLocation.REGION_NAMES.get(DataLocation.GLOBAL_REGION_ID));
+		regions = "";
+		for ( String name : regionNames )
+			regions += "; " + name;
+		regions = regions.substring(2);
+
+		SocatMetadata socatMetadata = dsgFile.getMetadata();
+		socatVersion = socatMetadata.getSocatVersion();
+		dsgQCFlag = socatMetadata.getQcFlag();
+		/*
+		 * try {
+		 * 	databaseQCFlag = databaseHandler.getQCFlag(upperExpo).toString();
+		 * } catch (SQLException ex) {
+		 * 	throw new IllegalArgumentException("Problems generating \"the\" database QC flag for " +
+		 * 			upperExpo + ": " + ex.getMessage());
+		 * }
+		 */
+
+		ArrayList<SocatQCEvent> qcEvents;
+		try {
+			qcEvents = databaseHandler.getQCEvents(upperExpo);
+		} catch (SQLException ex) {
+			throw new IllegalArgumentException("Problems reading database QC events for " +
+					upperExpo + ": " + ex.getMessage());
+		}
+		oldExpocode = "-";
+		for ( SocatQCEvent evt : qcEvents ) {
+			if ( ! SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) )
+				continue;
+			String msg = evt.getComment();
+			String[] msgWords = msg.split("\\s+");
+			if ( ! ( (msgWords.length >= 5) &&
+					"Rename".equalsIgnoreCase(msgWords[0]) && 
+					"from".equalsIgnoreCase(msgWords[1]) && 
+					"to".equalsIgnoreCase(msgWords[3]) ) )
+				throw new IllegalArgumentException("Unexpected comment for rename: " + msg);
+			if ( upperExpo.equals(msgWords[4]) )
+				oldExpocode = msgWords[2];
+		}
 
 		out.println(
-			expocode + "\t" +
+			upperExpo + "\t" +
 			dsgQCFlag + "\t" +
 			socatVersion + "\t" +
 			oldExpocode + "\t" +
@@ -1144,17 +1125,17 @@ public class SocatCruiseReporter {
 	}
 
 	private static final String CRUISE_SUMMARY_HEADER = 
-			"Expocode\t" + 
-			"QC_Flag\t" + 
-			"Version\t" +
-			"Renamed_From\t" + 
-			"Num_Obs\t" + 
-			"Num_WOCE-2\t" +
-			"Num_WOCE-3\t" +
-			"Num_WOCE-4\t" + 
-			"Num_WOCE-9\t" + 
-			"Regions\t" + 
-			"Vessel\t" + 
+			"Expocode\t" +
+			"QC_Flag\t" +
+			"SOCAT_Version\t" +
+			"Renamed_From\t" +
+			"Num_Observations\t" +
+			"Num_WOCE-2_fCO2Rec\t" +
+			"Num_WOCE-3_fCO2Rec\t" +
+			"Num_WOCE-4_fCO2Rec\t" +
+			"Num_Missing_fCO2Rec\t" +
+			"Regions\t" +
+			"Vessel\t" +
 			"Investigators";
 
 	/**
