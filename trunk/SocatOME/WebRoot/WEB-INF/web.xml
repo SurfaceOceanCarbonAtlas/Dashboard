@@ -11,8 +11,7 @@
   <param-name>contextConfigLocation</param-name>
   <param-value>/WEB-INF/mvc-dispatcher-servlet.xml,
 	               /WEB-INF/applicationContext.xml,
-	               /WEB-INF/spring-database.xml,
-	               /WEB-INF/spring-security.xml</param-value>
+	          </param-value>
  </context-param>
  <!-- Spring Security -->
   <filter>
@@ -33,14 +32,7 @@
     <url-pattern>/*</url-pattern>
  </filter-mapping>
 
- <filter> 
-  <filter-name>springSecurityFilterChain</filter-name>
-  <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
- </filter>
- <filter-mapping>
-  <filter-name>springSecurityFilterChain</filter-name>
-  <url-pattern>/*</url-pattern>
- </filter-mapping>
+
  <filter>
 <filter-name>multipartFilter</filter-name>
 <filter-class>org.springframework.web.multipart.support.MultipartFilter</filter-class>
@@ -80,6 +72,7 @@
  <servlet-mapping>
   <servlet-name>mvc-dispatcher</servlet-name>
   <url-pattern>*.htm</url-pattern>
+  <url-pattern>/editor.htm</url-pattern>
  </servlet-mapping>
  <servlet-mapping>
   <servlet-name>dwr-invoker</servlet-name>
@@ -89,7 +82,7 @@
   <session-timeout>10080</session-timeout>
  </session-config>
  <welcome-file-list>
-  <welcome-file>/WEB-INF/pages/index.jsp</welcome-file>
+  <welcome-file>/editor.htm</welcome-file>
  </welcome-file-list>
  <jsp-config> 	
   <taglib>
