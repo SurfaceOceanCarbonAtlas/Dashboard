@@ -11,7 +11,7 @@
 						Jones, Dr. Robert W.)</span></label>
 
 				<form:input name="field_ownername" id="field_ownername"
-					path="field_ownername" onkeyup="CheckOrg1();" />
+					path="field_ownername" />
 				<div id="CodeList" class="auto_complete" onclick="CheckOrg1();"></div>
 				<script>
 											new Autocompleter.DWR(
@@ -30,12 +30,12 @@
 					class="form-required" title="This field is required.">*</span>:
 				</label>
 				<form:input path="field_organizationame" id="field_organizationame"
-					name="Organization" type="text" />
+					 type="text" />
 			</div>
 			<div class="Section2">
 
 				<label for="Address" style="width: 88px;">Address: </label>
-				<form:textarea path="field_owneraddress" name="Address" cols="58"
+				<form:textarea path="field_owneraddress" id="field_owneraddress" cols="58"
 					rows="4" />
 			</div>
 			<div class="Section2">
@@ -44,8 +44,9 @@
 					name="Phone" type="text" />
 			</div>
 			<div class="Section2">
-				<label for="Email" style="width: 88px">Email: </label>
-				<form:input path="field_email" id="field_email" name="Email"
+				<label for="Email" style="width: 88px">Email: <span class="form-required"
+					title="This field is required.">*</span></label>
+				<form:input path="field_email" id="field_email" name="field_email"
 					type="text" />
 			</div>
 		</div>

@@ -20,8 +20,7 @@
 			id="field_user_organizationame" disabled="false" />
 	</div>
 	<div class="Section2">
-		<label style="width: 88px"> Address:<span
-			class="form-required" title="This field is required.">*</span></label>
+		<label style="width: 88px"> Address:</label>
 		<form:input path="field_user_adress" id="field_user_adress" value="" />
 	</div>
 	<div class="Section2">

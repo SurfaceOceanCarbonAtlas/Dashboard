@@ -24,15 +24,8 @@
 			<script type="text/javascript" src="js/jquery-1.7.1.js"></script>
 
 			<script type="text/javascript" src="js/jquery.validate.js"></script>
-			<!-- 	<script type="text/javascript" src="js/jquery-ui.min.js"></script>
 
-			<script type="text/javascript" src="js/jquery.fancybox-1.3.4.js"></script> -->
-
-			<script type='text/javascript'
-				src='/SocatOME/dwr/interface/AutoCompleteService.js'></script>
-			<script type='text/javascript' src='/SocatOME/dwr/engine.js'></script>
-			<script type='text/javascript' src='/SocatOME/dwr/util.js'></script>
-			<!--<script type='text/javascript' src='/SocatOME/dwr/interface/Place1.js'></script>-->
+		
 			<script type='text/javascript' src="js/dwrspring.js"></script>
 			<script type="text/javascript" src="js/prototype/prototype.js"></script>
 			<script type="text/javascript" src="js/script.aculo.us/effects.js"></script>
@@ -148,26 +141,19 @@
 
 					<div class="req-filter1">
 						<input class="btn btn-info cancel" type="submit"
-							value="Save Locally" name="savelocally" /> <input type="submit"
-							class="btn btn-info" name="draft" value="Save as Draft" /> <input
-							name="submit" class="addfilter1 btn btn-success submit"
-							value="Submit" type="submit" />
+							value="Save Locally" name="savelocally" /> 
+					   <input
+							name="savelocally" class="addfilter1 btn btn-success submit"
+							value="Validate and Save Locally" type="submit" />
 					</div>
 					<div class="req-filter2">
 						<input type="submit" class="btn btn-info cancel"
 							value="Save Locally" name="savelocally" /> 
-						<input type="submit" class="btn btn-info" 
-							value="Submit without Validation" name="draft" /> 
+						
 						<input type="submit" class="addfilter2 btn btn-success submit"
-							value="Submit with Validation" name="submit" />
+							value="Validate and Save Locally" name="savelocally" />
 					</div>
-					<c:if test="${editor.adminUser =='true'}">
-						<input type="submit" class="btn btn-warning" name="approve"
-							value="Approve Record" style="background: orange" />
-						<input type="submit" class="btn btn-danger" name="delete"
-							value="Delete Record" />
-
-					</c:if>
+					
 
 				</div>
 			</div>
