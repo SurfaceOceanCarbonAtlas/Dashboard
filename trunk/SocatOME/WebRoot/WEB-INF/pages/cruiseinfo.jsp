@@ -13,8 +13,7 @@
 				<span><a class="fancy"
 						href="http://www.nodc.noaa.gov/General/NODC-Archive/platformlist.txt"
 						target="_blank">4 character NODC codes</a></span></li>
-				<li class="Section2"><span style="width: 350px">Start
-						Date (cruise or data set, for Expocode)<span class="form-required"
+				<li class="Section2"><span style="width: 350px">Start Date (departure date from port for Expocode)<span class="form-required"
 						title="This field is required.">*</span>:
 				</span> <form:input path="field_start_date" id="field_start_date"
 						name="Start_Date" size="9" class="short" onchange="displayExpo()"/><span
@@ -22,7 +21,7 @@
 						path="field_start_date_dup" id="field_start_date_dup"
 						type="hidden" /></li>
 				<li class="Section2"><span style="width: 300px">Expocode:</span>
-					<form:input path="field_cruise_id" id="field_cruise_id"
+					<form:input path="field_cruise_id" id="field_cruise_id" style="background:#D3D3D3;" onfocus="blur()"
 						class="short" type="text" /></li>
 
 			</ul>

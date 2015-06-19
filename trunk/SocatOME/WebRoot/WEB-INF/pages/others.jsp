@@ -26,14 +26,12 @@
 			cols="60" rows="5" />
 	</div>
 	<div class="Section2 section">
-		<h4 class="alert alert-info">Data Set References: (Publication(s)
-			describing data set)</h4>
+		<h4 class="alert alert-info">Data Set References (Publication(s) describing data set and any available URL)</h4>
 		<form:textarea path="field_data_set_references"
 			name="Data_set_References" cols="60" rows="5" />
 	</div>
 	<div class="Section2 section">
-		<h4 class="alert alert-info">Citation: (How to cite this data
-			set)</h4>
+		<h4 class="alert alert-info">Citation: (How to cite, including reference and doi, if available)</h4>
 		<form:textarea path="field_citation" name="Citation" cols="60"
 			rows="5" />
 	</div>

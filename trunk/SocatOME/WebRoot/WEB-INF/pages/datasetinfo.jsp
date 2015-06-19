@@ -3,10 +3,7 @@
 	<h4 class="alert alert-info">Dataset Info:</h4>
 	<ul>
 
-		<li class="Section2"><label for="Dataset_ID" style="width: 100px">Expocode<span class="form-required"
-						title="This field is required.">*</span>:
-		</label> <form:input name="Dataset_ID" path="field_title" id="field_title"
-				type="text" /></li>
+	
 
 		<!-- 		<label for="Dataset_ID" style="width: 100px">Expocode:</label> -->
 		<!-- 		<form:input name="Dataset_ID" path="field_cruise_id" id="field_cruise_id"  type="text" style="background:#D3D3D3;" onfocus="blur()"/> -->

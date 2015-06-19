@@ -24,24 +24,24 @@
 					style="width: 350">Type of equilibration (equilibrator
 						design, membrane equilibration):<span class="form-required"
 						title="This field is required.">*</span>
-				</label> <form:input path="field_equilibrator_type"
-						name="Equilibration_Type" /></li>
+				</label> <form:input path="field_equilibrator_type" 
+						id="field_equilibrator_type" /></li>
 				<li class="Section2"><label for="Equilibrator_Volume"
 					style="width: 350">Equilibrator volume (L):<span
-						class="form-required req-filter1" title="This field is required.">*</span></label>
+						class="form-required" title="This field is required.">*</span></label>
 					<form:input path="field_equilibration_volume"
-						name="Equilibration_Volume" /></li>
+						id="field_equilibration_volume" /></li>
 
 				<li class="Section2"><label for="Headspace_Gas_Flow_Rate"
 					style="width: 450">Headspace_Gas_Flow_Rate (mL/min):<span
 						class="form-required req-filter1" title="This field is required.">*</span>
 				</label> <form:input path="field_gas_flow_rate"
-						name="Headspace_Gas_Flow_Rate" /></li>
+						id="field_gas_flow_rate" /></li>
 
 				<li class="Section2"><label for="Water_Flow_Rate"
 					style="width: 350">Equilibrator Water Flow (L/min):<span
 						class="form-required" title="This field is required.">*</span></label> <form:input
-						path="field_water_flow_rate" name="Water_Flow_Rate" />
+						path="field_water_flow_rate" id="field_water_flow_rate" />
 				<li class="Section2">Equilibrator Vented:<span
 					class="form-required req-filter1" title="This field is required.">*</span>
 					<form:select path="field_vented">
@@ -145,10 +145,9 @@
 				</select> <form:input class="short" id="field_calibration"
 						style="display:none" placeHolder="Describe Others Here"
 						path="field_calibration" />
-				<li class="Section2"><label>Number of non-zero gas
-						standards:<br>
+				<li class="Section2"><label>Number of non-zero gas standards:<br>
 				</label> <form:input path="field_no_of_non_zero_gas_stds"
-						id="field_no_of_non_zero_gas_stds" type="number" step="" cols="66"
+						id="field_no_of_non_zero_gas_stds" type="number" min="1" step="" cols="66"
 						rows="2" /></li>
 
 
