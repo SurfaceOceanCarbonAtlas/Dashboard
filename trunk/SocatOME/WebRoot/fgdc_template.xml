@@ -58,7 +58,7 @@
 			<Co2_Instrument_type></Co2_Instrument_type>
 			<Mooring_ID></Mooring_ID>
 			<Cruise>
-				<Cruise_ID></Cruise_ID>
+				<Expocode></Expocode>
 				<Cruise_Info></Cruise_Info>
 				<Section></Section>
 				<Geographical_Coverage>
@@ -89,6 +89,77 @@
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
+		</Variable>
+		<Variable>
+			<Variable_Name></Variable_Name>
+			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
@@ -97,187 +168,163 @@
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-			<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
-		</Variable>	
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
 		<Variable>
 			<Variable_Name></Variable_Name>
 			<Description_of_Variable></Description_of_Variable>
+			<Unit_of_Variable></Unit_of_Variable>
 		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>	
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>
-		<Variable>
-			<Variable_Name></Variable_Name>
-			<Description_of_Variable></Description_of_Variable>
-		</Variable>		
 	</Variables_Info>
 	<CO2_Data_Info>
 		<xCO2water_equ_dry>
@@ -319,7 +366,7 @@
 	</CO2_Data_Info>
 	<Method_Description>
 		<Equilibrator_Design>
-		    <System_Manufacturer_Description></System_Manufacturer_Description>
+			<System_Manufacturer_Description></System_Manufacturer_Description>
 			<Depth_of_Sea_Water_Intake></Depth_of_Sea_Water_Intake>
 			<Location_of_Sea_Water_Intake></Location_of_Sea_Water_Intake>
 			<Equilibrator_Type></Equilibrator_Type>
@@ -405,85 +452,95 @@
 		</Sea_Surface_Salinity>
 		<Other_Sensors>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
 			</Sensor>
 			<Sensor>
+				<Description></Description>
 				<Manufacturer></Manufacturer>
 				<Accuracy></Accuracy>
 				<Model></Model>
-				<Resolution></Resolution>
+				<Precision></Precision>
 				<Calibration></Calibration>
 				<Other_Comments></Other_Comments>
-			</Sensor>			
+			</Sensor>
 		</Other_Sensors>
 	</Method_Description>
 	<Data_set_References></Data_set_References>
@@ -495,7 +552,7 @@
 		<URL></URL>
 		<Label></Label>
 		<Link_Note></Link_Note>
-	</Data_Set_Link>	
+	</Data_Set_Link>
 	<Data_Set_Link>
 		<URL></URL>
 	</Data_Set_Link>
