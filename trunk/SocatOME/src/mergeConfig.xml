@@ -10,7 +10,7 @@
 			<map>
 				<entry key="field_filestatus" value="//x_tags/ status" />
 				<entry key="field_form_type" value="//x_tags/ form_type" />
-<!-- 				<entry key="field_record_id" value="//x_tags/ record_id" /> -->
+				<!-- <entry key="field_record_id" value="//x_tags/ record_id" /> -->
 
 				<!-- User -->
 				<entry key="field_username" value="//x_tags/ User/ Name" />
@@ -22,8 +22,9 @@
 				<!-- Investigator -->
 
 				<!-- Dataset Info -->
-				<entry key="field_title" 	value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Cruise_ID" />
-<!-- 				value="//x_tags/ Dataset_Info/ Dataset_IDs" /> -->
+				<entry key="field_title"
+					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Cruise_ID" />
+				<!-- value="//x_tags/ Dataset_Info/ Dataset_IDs" /> -->
 				<entry key="field_funding_info" value="//x_tags/ Dataset_Info/ Funding_Info" />
 				<entry key="field_initial_submission"
 					value="//x_tags/ Dataset_Info/ Submission_Dates/ Initial_Submission" />
@@ -42,7 +43,7 @@
 
 
 				<entry key="field_cruise_id"
-					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Cruise_ID" />
+					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Expocode" />
 				<entry key="field_cruise_info"
 					value="//x_tags/ Cruise_Info/ Experiment/ Cruise/ Cruise_Info" />
 				<entry key="field_section"
@@ -123,7 +124,8 @@
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ Uncertainty_Air" />
 
 
-				<entry key="field_calibration" value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Sensor_Calibration" />
+				<entry key="field_calibration"
+					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ CO2_Sensor_Calibration" />
 				<entry key="field_no_of_non_zero_gas_stds"
 					value="//x_tags/ Method_Description/ CO2_Sensors/ CO2_Sensor/ No_Of_Non_Zero_Gas_Stds" />
 				<entry key="field_manufacturer_calibration"
@@ -138,7 +140,7 @@
 				<entry key="field_detail_sensing"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Details_Co2_Sensing" />
 				<entry key="field_sensor_calibration"
-					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Sensor_Calibration"/>
+					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Sensor_Calibration" />
 				<entry key="field_comparision_co2_analysis"
 					value="//x_tags/ Method_Description/  CO2_Sensors/ CO2_Sensor/ Analysis_of_Co2_Comparison" />
 				<entry key="field_measured_co2_params"
@@ -300,8 +302,7 @@
 				<entry key="field_PCO2_method_references"
 					value="//x_tags/ Method_Description/ pCO2_Data/ Method_References" />
 
-				<entry key="field_ph_scale" 
-				    value="//x_tags/ Method_Description/ pH_Data/ pH_Scale" />
+				<entry key="field_ph_scale" value="//x_tags/ Method_Description/ pH_Data/ pH_Scale" />
 				<entry key="field_ph_analysis_method"
 					value="//x_tags/ Method_Description/ pH_Data/ pH_Analysis_Method" />
 				<entry key="field_calibration_description"
@@ -346,37 +347,52 @@
 			<map>
 				<entry key="field_ownername" value="//x_tags/ Investigator[1]/ Name" />
 				<entry key="field_organizationame" value="//x_tags/ Investigator[1]/ Organization" />
-<!-- 				<entry key="field_owneraddress" value="//x_tags/ Investigator[1]/ Address" /> -->
-<!-- 				<entry key="field_telephonenumber" value="//x_tags/ Investigator[1]/ Phone" /> -->
-<!-- 				<entry key="field_email" value="//x_tags/ Investigator[1]/ Email" /> -->
+				<entry key="field_owneraddress" value="//x_tags/ Investigator[1]/ 
+					Address" />
+				<entry key="field_telephonenumber" value="//x_tags/ Investigator[1]/ 
+					Phone" />
+				<entry key="field_email" value="//x_tags/ Investigator[1]/ Email" 
+					/>
 
-				<!-- Investigator 2 -->
+				<!--  Investigator 2-->
 				<entry key="field_ownername2" value="//x_tags/ Investigator[2]/ Name" />
 				<entry key="field_organizationame2" value="//x_tags/ Investigator[2]/ Organization" />
-<!-- 				<entry key="field_owneraddress2" value="//x_tags/ Investigator[2]/ Address" /> -->
-<!-- 				<entry key="field_telephonenumber2" value="//x_tags/ Investigator[2]/ Phone" /> -->
-<!-- 				<entry key="field_email2" value="//x_tags/ Investigator[2]/ Email" /> -->
+				<entry key="field_owneraddress2" value="//x_tags/ Investigator[2]/ 
+					Address" />
+				<entry key="field_telephonenumber2" value="//x_tags/ Investigator[2]/ 
+					Phone" />
+				<entry key="field_email2" value="//x_tags/ Investigator[2]/ Email" 
+					/>
 
 				<!-- Investigator 3 -->
 				<entry key="field_ownername3" value="//x_tags/ Investigator[3]/ Name" />
 				<entry key="field_organizationame3" value="//x_tags/ Investigator[3]/ Organization" />
-<!-- 				<entry key="field_owneraddress3" value="//x_tags/ Investigator[3]/ Address" /> -->
-<!-- 				<entry key="field_telephonenumber3" value="//x_tags/ Investigator[3]/ Phone" /> -->
-<!-- 				<entry key="field_email3" value="//x_tags/ Investigator[3]/ Email" /> -->
+				<entry key="field_owneraddress3" value="//x_tags/ Investigator[3]/ 
+					Address" />
+				<entry key="field_telephonenumber3" value="//x_tags/ Investigator[3]/ 
+					Phone" />
+				<entry key="field_email3" value="//x_tags/ Investigator[3]/ Email" 
+					/>
 
-				<!-- Investigator 4 -->
+				<!--   Investigator 4-->
 				<entry key="field_ownername4" value="//x_tags/ Investigator[4]/ Name" />
 				<entry key="field_organizationame4" value="//x_tags/ Investigator[4]/ Organization" />
-<!-- 				<entry key="field_owneraddress4" value="//x_tags/ Investigator[4]/ Address" /> -->
-<!-- 				<entry key="field_telephonenumber4" value="//x_tags/ Investigator[4]/ Phone" /> -->
-<!-- 				<entry key="field_email4" value="//x_tags/ Investigator[4]/ Email" /> -->
+				<entry key="field_owneraddress4" value="//x_tags/ Investigator[4]/ 
+					Address" />
+				<entry key="field_telephonenumber4" value="//x_tags/ Investigator[4]/ 
+					Phone" />
+				<entry key="field_email4" value="//x_tags/ Investigator[4]/ Email" 
+					/>
 
-				<!-- Investigator 5 -->
+				<!--  Investigator 5-->
 				<entry key="field_ownername5" value="//x_tags/ Investigator[5]/ Name" />
 				<entry key="field_organizationame5" value="//x_tags/ Investigator[5]/ Organization" />
-<!-- 				<entry key="field_owneraddress5" value="//x_tags/ Investigator[5]/ Address" /> -->
-<!-- 				<entry key="field_telephonenumber5" value="//x_tags/ Investigator[5]/ Phone" /> -->
-<!-- 				<entry key="field_email5" value="//x_tags/ Investigator[5]/ Email" /> -->
+				<entry key="field_owneraddress5" value="//x_tags/ Investigator[5]/ 
+					Address" />
+				<entry key="field_telephonenumber5" value="//x_tags/ Investigator[5]/ 
+					Phone" />
+				<entry key="field_email5" value="//x_tags/ Investigator[5]/ Email" 
+					/>
 
 				<entry key="field_variable0"
 					value="//x_tags/ Variables_Info/ Variable[1]/ Variable_Name" />
@@ -503,7 +519,76 @@
 					value="//x_tags/ Variables_Info/ Variable[30]/ Description_of_Variable" />
 
 
+				<entry key="field_variable_unit0"
+					value="//x_tags/ Variables_Info/ Variable[1]/ Unit_of_Variable" />
+				<entry key="field_variable_unit1"
+					value="//x_tags/ Variables_Info/ Variable[2]/ Unit_of_Variable" />
+				<entry key="field_variable_unit2"
+					value="//x_tags/ Variables_Info/ Variable[3]/ Unit_of_Variable" />
+				<entry key="field_variable_unit3"
+					value="//x_tags/ Variables_Info/ Variable[4]/ Unit_of_Variable" />
+				<entry key="field_variable_unit4"
+					value="//x_tags/ Variables_Info/ Variable[5]/ Unit_of_Variable" />
+				<entry key="field_variable_unit5"
+					value="//x_tags/ Variables_Info/ Variable[6]/ Unit_of_Variable" />
+				<entry key="field_variable_unit6"
+					value="//x_tags/ Variables_Info/ Variable[7]/ Unit_of_Variable" />
+				<entry key="field_variable_unit7"
+					value="//x_tags/ Variables_Info/ Variable[8]/ Unit_of_Variable" />
+				<entry key="field_variable_unit8"
+					value="//x_tags/ Variables_Info/ Variable[9]/ Unit_of_Variable" />
+				<entry key="field_variable_unit9"
+					value="//x_tags/ Variables_Info/ Variable[10]/ Unit_of_Variable" />
+					
+				<entry key="field_variable_unit10"
+					value="//x_tags/ Variables_Info/ Variable[11]/ Unit_of_Variable" />
+				<entry key="field_variable_unit11"
+					value="//x_tags/ Variables_Info/ Variable[12]/ Unit_of_Variable" />
+				<entry key="field_variable_unit12"
+					value="//x_tags/ Variables_Info/ Variable[13]/ Unit_of_Variable" />
+				<entry key="field_variable_unit13"
+					value="//x_tags/ Variables_Info/ Variable[14]/ Unit_of_Variable" />
+				<entry key="field_variable_unit14"
+					value="//x_tags/ Variables_Info/ Variable[15]/ Unit_of_Variable" />
+				<entry key="field_variable_unit15"
+					value="//x_tags/ Variables_Info/ Variable[16]/ Unit_of_Variable" />
+				<entry key="field_variable_unit16"
+					value="//x_tags/ Variables_Info/ Variable[17]/ Unit_of_Variable" />
+				<entry key="field_variable_unit17"
+					value="//x_tags/ Variables_Info/ Variable[18]/ Unit_of_Variable" />
+				<entry key="field_variable_unit18"
+					value="//x_tags/ Variables_Info/ Variable[19]/ Unit_of_Variable" />
+				<entry key="field_variable_unit19"
+					value="//x_tags/ Variables_Info/ Variable[20]/ Unit_of_Variable" />
+					
+				<entry key="field_variable_unit20"
+					value="//x_tags/ Variables_Info/ Variable[21]/ Unit_of_Variable" />
+				<entry key="field_variable_unit21"
+					value="//x_tags/ Variables_Info/ Variable[22]/ Unit_of_Variable" />
+				<entry key="field_variable_unit22"
+					value="//x_tags/ Variables_Info/ Variable[23]/ Unit_of_Variable" />
+				<entry key="field_variable_unit23"
+					value="//x_tags/ Variables_Info/ Variable[24]/ Unit_of_Variable" />
+				<entry key="field_variable_unit24"
+					value="//x_tags/ Variables_Info/ Variable[25]/ Unit_of_Variable" />
+				<entry key="field_variable_unit25"
+					value="//x_tags/ Variables_Info/ Variable[26]/ Unit_of_Variable" />
+				<entry key="field_variable_unit26"
+					value="//x_tags/ Variables_Info/ Variable[27]/ Unit_of_Variable" />
+				<entry key="field_variable_unit27"
+					value="//x_tags/ Variables_Info/ Variable[28]/ Unit_of_Variable" />
+				<entry key="field_variable_unit28"
+					value="//x_tags/ Variables_Info/ Variable[29]/ Unit_of_Variable" />
+				<entry key="field_variable_unit29"
+					value="//x_tags/ Variables_Info/ Variable[30]/ Unit_of_Variable" />	
+
+
+
+
+
 				<!-- Other sensors -->
+				<entry key="field_sensor_desciption"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Description" />
 				<entry key="field_manufaturer_other"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Manufacturer" />
 				<entry key="field_accuracy_other"
@@ -511,12 +596,14 @@
 				<entry key="field_model_other"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Model" />
 				<entry key="field_resolution_other"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Precision" />
 				<entry key="field_calibration_other"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Calibration" />
 				<entry key="field_comment_other"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[1]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption1"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Description" />
 				<entry key="field_manufaturer_other1"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Manufacturer" />
 				<entry key="field_accuracy_other1"
@@ -524,12 +611,14 @@
 				<entry key="field_model_other1"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Model" />
 				<entry key="field_resolution_other1"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Precision" />
 				<entry key="field_calibration_other1"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Calibration" />
 				<entry key="field_comment_other1"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[2]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption2"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Description" />
 				<entry key="field_manufaturer_other2"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Manufacturer" />
 				<entry key="field_accuracy_other2"
@@ -537,12 +626,14 @@
 				<entry key="field_model_other2"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Model" />
 				<entry key="field_resolution_other2"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Precision" />
 				<entry key="field_calibration_other2"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Calibration" />
 				<entry key="field_comment_other2"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[3]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption3"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Description" />
 				<entry key="field_manufaturer_other3"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Manufacturer" />
 				<entry key="field_accuracy_other3"
@@ -550,12 +641,14 @@
 				<entry key="field_model_other3"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Model" />
 				<entry key="field_resolution_other3"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Precision" />
 				<entry key="field_calibration_other3"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Calibration" />
 				<entry key="field_comment_other3"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[4]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption4"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Description" />
 				<entry key="field_manufaturer_other4"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Manufacturer" />
 				<entry key="field_accuracy_other4"
@@ -563,12 +656,14 @@
 				<entry key="field_model_other4"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Model" />
 				<entry key="field_resolution_other4"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Precision" />
 				<entry key="field_calibration_other4"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Calibration" />
 				<entry key="field_comment_other4"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[5]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption5"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Description" />
 				<entry key="field_manufaturer_other5"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Manufacturer" />
 				<entry key="field_accuracy_other5"
@@ -576,12 +671,14 @@
 				<entry key="field_model_other5"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Model" />
 				<entry key="field_resolution_other5"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Precision" />
 				<entry key="field_calibration_other5"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Calibration" />
 				<entry key="field_comment_other5"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[6]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption6"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Description" />
 				<entry key="field_manufaturer_other6"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Manufacturer" />
 				<entry key="field_accuracy_other6"
@@ -589,12 +686,14 @@
 				<entry key="field_model_other6"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Model" />
 				<entry key="field_resolution_other6"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Precision" />
 				<entry key="field_calibration_other6"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Calibration" />
 				<entry key="field_comment_other6"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[7]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption7"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Description" />
 				<entry key="field_manufaturer_other7"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Manufacturer" />
 				<entry key="field_accuracy_other7"
@@ -602,12 +701,14 @@
 				<entry key="field_model_other7"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Model" />
 				<entry key="field_resolution_other7"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Precision" />
 				<entry key="field_calibration_other7"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Calibration" />
 				<entry key="field_comment_other7"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[8]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption8"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Description" />
 				<entry key="field_manufaturer_other8"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Manufacturer" />
 				<entry key="field_accuracy_other8"
@@ -615,12 +716,14 @@
 				<entry key="field_model_other8"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Model" />
 				<entry key="field_resolution_other8"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Precision" />
 				<entry key="field_calibration_other8"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Calibration" />
 				<entry key="field_comment_other8"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[9]/ Other_Comments" />
 
+				<entry key="field_sensor_desciption9"
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Description" />
 				<entry key="field_manufaturer_other9"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Manufacturer" />
 				<entry key="field_accuracy_other9"
@@ -628,7 +731,7 @@
 				<entry key="field_model_other9"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Model" />
 				<entry key="field_resolution_other9"
-					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Resolution" />
+					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Precision" />
 				<entry key="field_calibration_other9"
 					value="//x_tags/ Method_Description/ Other_Sensors/ Sensor[10]/ Calibration" />
 				<entry key="field_comment_other9"
