@@ -1139,7 +1139,7 @@ public class USGS_Core_Science_Metadata_Editor {
 		this.field_equilibrium_comments = (String) lhm.get("field_equilibrium_comments");
 		this.field_co2_measurement = (String) lhm.get("field_co2_measurement");
 		this.field_marine_airtake = (String) lhm.get("field_marine_airtake");
-		this.field_co2_drying = (String) lhm.get("field_co2_dryings");
+		this.field_co2_drying = (String) lhm.get("field_co2_drying");
 		this.field_measurement_method = (String) lhm.get("field_measurement_method");
 		this.field_manufacturer_calibration = (String) lhm
 				.get("field_manufacturer_calibration");
