@@ -19,6 +19,7 @@ jQuery(document)
 
 						}
 					});
+					
 					$.validator.addClassRules("conflicts", {
 						required : true
 					});
@@ -45,10 +46,13 @@ jQuery(document)
 						$("#field_user_email").rules("add", {
 							"required" : true
 						});
-						$("#field_ownername").rules("add", {
+						/*$("#field_ownername").rules("add", {
 							"required" : true
 						});
 						$("#field_organizationame").rules("add", {
+							"required" : true
+						});
+						$("#field_email").rules("add", {
 							"required" : true
 						});
 						$("#field_owneraddress").rules("add", {
@@ -56,10 +60,8 @@ jQuery(document)
 						});
 						$("#field_telephonenumber").rules("add", {
 							"required" : false
-						});
-						$("#field_email").rules("add", {
-							"required" : false
-						});
+						});*/
+						
 						$("#field_vessel_id").rules("add", {
 							"required" : true
 						});
@@ -183,35 +185,35 @@ jQuery(document)
 						// end of common//
 
 						// for filter 2//
-						$("#field_equilibration_volume").rules("remove", {
-							"required" : true
+						$("#field_equilibration_volume").rules("add", {
+							"required" : false
 						});
-						$("#field_gas_flow_rate").rules("remove", {
-							"required" : true
+						$("#field_gas_flow_rate").rules("add", {
+							"required" : false
 						});
-						$("#field_vented").rules("remove", {
-							"required" : true
+						$("#field_vented").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_sensor").rules("remove", {
-							"required" : true
+						$("#field_Patm_sensor").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_normalized").rules("remove", {
-							"required" : true
+						$("#field_Patm_normalized").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_manufacturer").rules("remove", {
-							"required" : true
+						$("#field_Patm_manufacturer").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_model").rules("remove", {
-							"required" : true
+						$("#field_Patm_model").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_accutacy").rules("remove", {
-							"required" : true
+						$("#field_Patm_accuracy").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_precision").rules("remove", {
-							"required" : true
+						$("#field_Patm_precision").rules("add", {
+							"required" : false
 						});
-						$("#field_Patm_calibration").rules("remove", {
-							"required" : true
+						$("#field_Patm_calibration").rules("add", {
+							"required" : false
 						});
 
 						// for filter 1//
@@ -226,9 +228,6 @@ jQuery(document)
 
 					$(".addfilter1").click(function() {
 						// common//
-						$("#field_ownername").rules("add", {
-							"required" : true
-						});
 						$("#field_username").rules("add", {
 							"required" : true
 						});
@@ -244,10 +243,10 @@ jQuery(document)
 						$("#field_user_email").rules("add", {
 							"required" : true
 						});
-						$("#field_ownername").rules("add", {
+						/*$("#field_ownername").rules("add", {
 							"required" : true
 						});
-						$("#field_organizationname").rules("add", {
+						$("#field_organizationame").rules("add", {
 							"required" : true
 						});
 						$("#field_owneraddress").rules("add", {
@@ -258,7 +257,7 @@ jQuery(document)
 						});
 						$("#field_email").rules("add", {
 							"required" : true
-						});
+						});*/
 						$("#field_vessel_id").rules("add", {
 							"required" : true
 						});
@@ -405,7 +404,7 @@ jQuery(document)
 						$("#field_Patm_model").rules("add", {
 							"required" : true
 						});
-						$("#field_Patm_accutacy").rules("add", {
+						$("#field_Patm_accuracy").rules("add", {
 							"required" : true
 						});
 						$("#field_Patm_precision").rules("add", {
@@ -416,11 +415,11 @@ jQuery(document)
 						});
 
 						// for filter 2
-						$("#field_detail_sensing").rules("remove", {
-							"required" : true
+						$("#field_detail_sensing").rules("add", {
+							"required" : false
 						});
-						$("#field_method_references").rules("remove", {
-							"required" : true
+						$("#field_method_references").rules("add", {
+							"required" : false
 						});
 
 					});
@@ -428,13 +427,15 @@ jQuery(document)
 					$(".select2").change(function() {
 
 						var val = $(this).val();
+						
 
 						if (val.trim() == 'Others') {
-							$(this).next("input").css("display", "block");
-							$(this).next("input").val("");
+							$(this).siblings("input").css("display", "block");
+							$(this).siblings("input").val("");
 						} else {
-							$(this).next("input").val(val);
-							$(this).next("input").css("display", "none");
+							$(this).siblings(".error").css("display", "none");
+							$(this).siblings(".short").val(val);							
+							$(this).siblings(".short").css("display", "none");
 
 						}
 					});
