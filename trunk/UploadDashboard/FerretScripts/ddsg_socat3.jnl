@@ -39,6 +39,9 @@ LET control = 2
 USE "($infile)"
 DEFINE SYMBOL num_obs_original = `num_obs`
 
+! also save the size of the original dataset
+LET/title="number obs in undecimated dataset"/BAD=-99 num_obs_original = `num_obs`
+
 ! The names in the input and output file must match.
 ! To accomplish that we will rename the variables in the input file.
 ! varnames_list is a stable list of the original names. Check that it 
@@ -164,8 +167,13 @@ SET ATT/OUTPUT=all num_obs
 DEFINE SYMBOL num_obs_sampled = `nsample`
 
 ! write a global attribute with the decimation parameters.
-DEFINE ATT/QUIETRIBUTE/OUTPUT ..decimation =  "Piecewise decimated with tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
+DEFINE ATT/QUIETRIBUTE/OUTPUT ..decimation =  \
+"($num_obs_original) original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
+
 SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
+
+! Add the original number of obs.
+SAVE/QUIET/APPEND/OUTTYPE=int/FILE="($outfile)" num_obs_original
 
 ! Write the traj variables
 
