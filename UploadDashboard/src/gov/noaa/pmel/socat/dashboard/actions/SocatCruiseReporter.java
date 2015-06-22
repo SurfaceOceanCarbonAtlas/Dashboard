@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.HashSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -1107,24 +1108,45 @@ public class SocatCruiseReporter {
 					upperExpo + ": " + ex.getMessage());
 		}
 		oldExpocode = "-";
+		HashSet<Double> qcVersions = new HashSet<Double>();
 		for ( SocatQCEvent evt : qcEvents ) {
-			if ( ! SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) )
-				continue;
-			String msg = evt.getComment();
-			String[] msgWords = msg.split("\\s+");
-			if ( ! ( (msgWords.length >= 5) &&
-					"Rename".equalsIgnoreCase(msgWords[0]) && 
-					"from".equalsIgnoreCase(msgWords[1]) && 
-					"to".equalsIgnoreCase(msgWords[3]) ) )
-				throw new IllegalArgumentException("Unexpected comment for rename: " + msg);
-			if ( upperExpo.equals(msgWords[4]) )
-				oldExpocode = msgWords[2];
+			if ( SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
+				// Get the old expocode for this rename
+				String msg = evt.getComment();
+				String[] msgWords = msg.split("\\s+");
+				if ( ! ( (msgWords.length >= 5) &&
+						"Rename".equalsIgnoreCase(msgWords[0]) &&
+						"from".equalsIgnoreCase(msgWords[1]) &&
+						"to".equalsIgnoreCase(msgWords[3]) ) )
+					throw new IllegalArgumentException("Unexpected comment for rename: " + msg);
+				if ( upperExpo.equals(msgWords[4]) )
+					oldExpocode = msgWords[2];
+			}
+			else {
+				// Collect the socat_versions for QC events that are not renames
+				Double vers;
+				try {
+					vers = Double.valueOf(evt.getSocatVersion());
+				} catch (Exception ex) {
+					// Should not happen - ignore this event
+					vers = 0.0;
+				}
+				if ( vers > 0.0 )
+					qcVersions.add(vers);
+			}
+		}
+		String newOld;
+		if ( qcVersions.size() > 1 ) {
+			newOld = " (U)";
+		}
+		else {
+			newOld = " (N)";
 		}
 
 		out.println(
 			upperExpo + "\t" +
 			dsgQCFlag + "\t" +
-			socatVersion + "\t" +
+			socatVersion + newOld + "\t" +
 			oldExpocode + "\t" +
 			numRows + "\t" +
 			numOkayRows + "\t" +
