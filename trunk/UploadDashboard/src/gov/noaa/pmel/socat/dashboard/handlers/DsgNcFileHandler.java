@@ -181,6 +181,9 @@ public class DsgNcFileHandler {
 	 * 		metadata for the cruise
 	 * @param cruiseData
 	 * 		data for the cruise
+	 * @param socatVersionStatus
+	 * 		SOCAT version number and status to assign
+	 * 		(see: {@link DatabaseRequestHandler#getSocatVersionStatus(String)}) 
 	 * @param qcFlag
 	 * 		cruise QC flag to assign
 	 * @throws IllegalArgumentException
@@ -188,7 +191,7 @@ public class DsgNcFileHandler {
 	 * 		if there are problems creating or writing the full-data DSG file
 	 */
 	public void saveCruise(DashboardOmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
-									String qcFlag) throws IllegalArgumentException {
+			String socatVersionStatus, String qcFlag) throws IllegalArgumentException {
 		// Get the location and name for the NetCDF DSG file
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
@@ -197,9 +200,10 @@ public class DsgNcFileHandler {
 		for ( String docInfo : cruiseData.getAddlDocs() ) {
 			addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
 		}
+
 		// Get the metadata needed for creating the DSG file
 		SocatMetadata socatMData = omeMData.createSocatMetadata(
-				cruiseData.getVersion(), addlDocs, qcFlag);
+				socatVersionStatus, addlDocs, qcFlag);
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);

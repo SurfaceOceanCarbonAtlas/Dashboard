@@ -160,8 +160,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * Any known non-standard PI or vessel names will be changed to
 	 * the standard format (which might be intentionally misspelled).
 	 * 
-	 * @param socatVersion
-	 * 		SOCAT version to assign
+	 * @param socatVersionStatus
+	 * 		SOCAT version number and status String to assign
 	 * @param addlDocs
 	 * 		additional documents to assign
 	 * @param qcFlag
@@ -169,7 +169,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * @return
 	 *		created SocatMetadata object 
 	 */
-	public SocatMetadata createSocatMetadata(String socatVersion, 
+	public SocatMetadata createSocatMetadata(String socatVersionStatus, 
 			Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
 
 		// We cannot create a SocatMetadata object if there are conflicts
@@ -267,8 +267,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		}
 		scMData.setAddlDocs(docsString);
 
-		// Add SOCAT version and QC flag
-		scMData.setSocatVersion(socatVersion);
+		// Add SOCAT version number and status string, and the QC flag
+		scMData.setSocatVersion(socatVersionStatus);
 		scMData.setQcFlag(qcFlag);
 
 		return scMData;

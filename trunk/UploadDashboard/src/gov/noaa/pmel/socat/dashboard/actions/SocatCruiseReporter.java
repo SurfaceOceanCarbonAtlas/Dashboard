@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Formatter;
-import java.util.HashSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -1020,7 +1019,7 @@ public class SocatCruiseReporter {
 
 		String dsgQCFlag;
 		// String databaseQCFlag;
-		String socatVersion;
+		String socatVersionStatus;
 		String oldExpocode;
 		String regions;
 		String numRows;
@@ -1089,7 +1088,7 @@ public class SocatCruiseReporter {
 		regions = regions.substring(2);
 
 		SocatMetadata socatMetadata = dsgFile.getMetadata();
-		socatVersion = socatMetadata.getSocatVersion();
+		socatVersionStatus = socatMetadata.getSocatVersion();
 		dsgQCFlag = socatMetadata.getQcFlag();
 		/*
 		 * try {
@@ -1108,7 +1107,6 @@ public class SocatCruiseReporter {
 					upperExpo + ": " + ex.getMessage());
 		}
 		oldExpocode = "-";
-		HashSet<Double> qcVersions = new HashSet<Double>();
 		for ( SocatQCEvent evt : qcEvents ) {
 			if ( SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
 				// Get the old expocode for this rename
@@ -1122,31 +1120,12 @@ public class SocatCruiseReporter {
 				if ( upperExpo.equals(msgWords[4]) )
 					oldExpocode = msgWords[2];
 			}
-			else {
-				// Collect the socat_versions for QC events that are not renames
-				Double vers;
-				try {
-					vers = Double.valueOf(evt.getSocatVersion());
-				} catch (Exception ex) {
-					// Should not happen - ignore this event
-					vers = 0.0;
-				}
-				if ( vers > 0.0 )
-					qcVersions.add(vers);
-			}
-		}
-		String newOld;
-		if ( qcVersions.size() > 1 ) {
-			newOld = " (U)";
-		}
-		else {
-			newOld = " (N)";
 		}
 
 		out.println(
 			upperExpo + "\t" +
 			dsgQCFlag + "\t" +
-			socatVersion + newOld + "\t" +
+			socatVersionStatus + "\t" +
 			oldExpocode + "\t" +
 			numRows + "\t" +
 			numOkayRows + "\t" +

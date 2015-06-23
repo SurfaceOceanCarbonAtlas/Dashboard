@@ -36,7 +36,7 @@ public class SocatMetadataTest {
 	static final String ADDL_DOCS = "MySupplementalDoc1.doc : MySupplementalDoc2.pdf";
 	static final String SOCAT_DOI = "doi:pangaea12345";
 	static final String SOCAT_DOI_HREF = "http://www.socat.info/doi/xxxx20140113.html";
-	static final String SOCAT_VERSION = "3.0";
+	static final String SOCAT_VERSION = "3.0U";
 	static final String CRUISE_FLAG = "C";
 
 	/**

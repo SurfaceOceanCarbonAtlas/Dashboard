@@ -146,11 +146,45 @@ public class CruiseSubmitter {
 				try {
 					// Get the OME metadata for this cruise
 					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
+					if ( ! socatVersion.equals(omeInfo.getVersion()) ) {
+						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata SOCAT version number to " + socatVersion + " with submit for QC of " + expocode);
+					}
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 
+					String socatVersionStatus = databaseHandler.getSocatVersionStatus(expocode);
+					if ( socatVersionStatus.isEmpty() ) {
+						// New dataset to the database
+						socatVersionStatus = socatVersion + "N";
+					}
+					else {
+						String status = socatVersionStatus.substring(socatVersionStatus.length() - 1);
+						if ( ! "U".equals(status) ) {
+							double newVers;
+							try {
+								newVers = Math.floor(Double.parseDouble(socatVersion) * 10.0) / 10.0;
+							} catch (NumberFormatException ex) {
+								throw new RuntimeException("Unexpected new SOCAT version of '" + socatVersion + "'");
+							}
+							String oldVersion = socatVersionStatus.substring(0, socatVersionStatus.length() - 1);
+							double oldVers;
+							try {
+								oldVers = Math.floor(Double.parseDouble(oldVersion) * 10.0) / 10.0;
+							} catch (NumberFormatException ex) {
+								throw new RuntimeException("Unexpected old SOCAT version of '" + oldVersion + "'");
+							}
+							if ( newVers > oldVers ) {
+								status = "U";
+							}
+							else {
+								status = "N";
+							}
+						}
+						socatVersionStatus = socatVersion + status;
+						
+					}
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data
-					dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
+					dsgNcHandler.saveCruise(omeMData, cruiseData, socatVersionStatus, flag.toString());
 
 					// Generate the decimated-data DSG file from the full-data DSG file
 					dsgNcHandler.decimateCruise(expocode);
@@ -161,6 +195,7 @@ public class CruiseSubmitter {
 
 				// Update cruise info with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
+				cruise.setVersion(socatVersion);
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());

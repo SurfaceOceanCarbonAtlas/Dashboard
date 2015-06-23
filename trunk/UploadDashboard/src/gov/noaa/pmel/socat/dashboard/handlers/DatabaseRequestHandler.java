@@ -395,7 +395,7 @@ public class DatabaseRequestHandler {
 		return numDeleted;
 	}
 
-	private static final long MIN_FLAG_TIME = Math.round(30.0 * 365.2425 * 24.0 * 60.0 * 60.0);
+	private static final long MIN_FLAG_SEC_TIME = Math.round(30.0 * 365.2425 * 24.0 * 60.0 * 60.0);
 	/**
 	 * Get "the" QC flag for a dataset.  If the latest QC flag for different 
 	 * regions are in conflict, and a global flag does not later resolve
@@ -412,6 +412,7 @@ public class DatabaseRequestHandler {
 	 */
 	public Character getQCFlag(String expocode) throws SQLException {
 		HashMap<Character,SocatQCEvent> regionFlags = new HashMap<Character,SocatQCEvent>();
+		long lastUpdateTime = MIN_FLAG_SEC_TIME * 1000L;
 		Connection catConn = makeConnection(false);
 		try {
 			// Get all the QC events for this data set, ordered so the latest are last
@@ -431,12 +432,14 @@ public class DatabaseRequestHandler {
 						 flagStr.equals(SocatQCEvent.QC_COMMENT.toString()) ||
 						 flagStr.equals(SocatQCEvent.QC_RENAMED_FLAG.toString()) )
 						continue;
+					Character flag = flagStr.charAt(0);
 					if ( (flagStr.length() > 1) ||
-						 (SocatQCEvent.FLAG_STATUS_MAP.get(flagStr.charAt(0)) == null) ) 
+						 (SocatQCEvent.FLAG_STATUS_MAP.get(flag) == null) ) 
 						throw new SQLException("Unexpected QC flag of '" + flagStr + "'");
-					Long time = rslts.getLong(2);
-					if ( time < MIN_FLAG_TIME )
-						throw new SQLException("Unexpected null or invalid flag time of " + time.toString());
+					long time = rslts.getLong(2);
+					if ( time < MIN_FLAG_SEC_TIME )
+						throw new SQLException("Unexpected null or invalid flag time of " + Long.toString(time));
+					time *= 1000L;
 					String region = rslts.getString(3);
 					if ( region == null )
 						throw new SQLException("Unexpected null region ID");
@@ -444,13 +447,18 @@ public class DatabaseRequestHandler {
 					// Ignore missing region IDs
 					if ( region.length() < 1 )
 						continue;
-					if ( (region.length() > 1) ||
-						 (DataLocation.REGION_NAMES.get(region.charAt(0)) == null) )
-						throw new SQLException("Unexpected region ID of '" + region + "'");
 					Character regionID = region.charAt(0);
+					if ( (region.length() > 1) ||
+						 (DataLocation.REGION_NAMES.get(regionID) == null) )
+						throw new SQLException("Unexpected region ID of '" + region + "'");
+					if ( DataLocation.GLOBAL_REGION_ID.equals(regionID) && 
+						 ( SocatQCEvent.QC_NEW_FLAG.equals(flag) || 
+						   SocatQCEvent.QC_UPDATED_FLAG.equals(flag) ) ) {
+						lastUpdateTime = time;
+					}
 					SocatQCEvent qcFlag = new SocatQCEvent();
-					qcFlag.setFlag(flagStr.charAt(0));
-					qcFlag.setFlagDate(new Date(time * 1000L));
+					qcFlag.setFlag(flag);
+					qcFlag.setFlagDate(new Date(time));
 					qcFlag.setRegionID(regionID);
 					// last are latest, so no need to check the return value
 					regionFlags.put(regionID, qcFlag);
@@ -465,15 +473,15 @@ public class DatabaseRequestHandler {
 		// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
 		SocatQCEvent globalEvent = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
 		Character globalFlag;
-		Date globalDate;
+		long globalTime;
 		if ( globalEvent == null ) {
 			// Some v1 cruises do not have global flags
 			globalFlag = SocatQCEvent.QC_NEW_FLAG;
-			globalDate = new Date(MIN_FLAG_TIME * 1000L);
+			globalTime = lastUpdateTime;
 		}
 		else {
 			globalFlag = globalEvent.getFlag();
-			globalDate = globalEvent.getFlagDate();
+			globalTime = globalEvent.getFlagDate().getTime();
 		}
 
 		// Go through the latest flags for each region, making sure:
@@ -485,12 +493,18 @@ public class DatabaseRequestHandler {
 			// Just compare non-global entries
 			if ( DataLocation.GLOBAL_REGION_ID.equals(regionEntry.getKey()) )
 				continue;
-			// Use the region flag if assigned after the global flag; otherwise use the global flag
+			// Ignore regional flags assigned (more than 1 s) before the last update
+			SocatQCEvent qcEvent = regionEntry.getValue();
+			long time = qcEvent.getFlagDate().getTime();
+			if  ( time - lastUpdateTime < -1000L )
+				continue;
 			Character flag;
-			if ( regionEntry.getValue().getFlagDate().after(globalDate) ) {
-				flag = regionEntry.getValue().getFlag();
+			if ( time >  globalTime ) {
+				// last flag for this region set after the last global flag; its flag applies
+				flag = qcEvent.getFlag();
 			}
-			else {
+			else { 
+				// last flag for this region set before the last global flag; the global flag applies
 				flag = globalFlag;
 			}
 			if ( latestFlag == null ) {
@@ -501,10 +515,73 @@ public class DatabaseRequestHandler {
 			}
 		}
 		if ( latestFlag == null ) {
-			// Only a global flag; should never happen, but just return the global flag
+			// should not happen as region N/U assigned at same time as global N/U
 			latestFlag = globalFlag;
 		}
 		return latestFlag;
+	}
+
+	/**
+	 * Returns the SOCAT version number String for a dataset appended with
+	 * and 'N', indicating the dataset is new to this version, or a 'U',
+	 * indicating the dataset is an update to a dataset from a previous 
+	 * SOCAT version.  Updates within a SOCAT version do NOT change an 'N' 
+	 * to a 'U'.  The SOCAT version number used is the largest SOCAT version 
+	 * number of global new and update QC flags for this dataset in the database.
+	 * 
+	 * @param expocode
+	 * 		get the SOCAT version status String for the dataset with this expocode 
+	 * @return
+	 * 		the SOCAT version number status String; never null but may be empty
+	 * 		if no global new or update QC flags exist.
+	 * @throws SQLException
+	 * 		if an error occurs retrieving the SOCAT version numbers
+	 */
+	public String getSocatVersionStatus(String expocode) throws SQLException {
+		Double versionNum = null;
+		Character status = null;
+		Connection catConn = makeConnection(false);
+		try {
+			// Get all the QC events for this data set, ordered so the latest are last
+			PreparedStatement getPrepStmt = catConn.prepareStatement(
+					"SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME + 
+					"` WHERE `expocode` = ? AND `region_id` = '" + DataLocation.GLOBAL_REGION_ID +
+					"' AND `qc_flag` IN ('" + SocatQCEvent.QC_NEW_FLAG + 
+					"', '" + SocatQCEvent.QC_UPDATED_FLAG + "');");
+			getPrepStmt.setString(1, expocode);
+			ResultSet rslts = getPrepStmt.executeQuery();
+			try {
+				while ( rslts.next() ) {
+					String versionStr = rslts.getString(1);
+					if ( (versionStr == null) || versionStr.trim().isEmpty() ) {
+						throw new SQLException("Unexpected missing SOCAT version");
+					}
+					try {
+						Double version = Math.floor(Double.valueOf(versionStr) * 10.0) / 10.0;
+						if ( versionNum == null ) {
+							versionNum = version;
+							status = 'N';
+						}
+						else if ( versionNum < version ) {
+							versionNum = version;
+							status = 'U';
+						}
+						else if ( versionNum > version ) {
+							status = 'U';
+						}
+					} catch (NumberFormatException ex) {
+						throw new SQLException("Unexpected non-numeric SOCAT version '" + versionStr + "'");
+					}
+				}
+			} finally {
+				rslts.close();
+			}
+		} finally {
+			catConn.close();
+		}
+		if ( (versionNum == null) || (status == null) )
+			return "";
+		return String.format("%.1f%c", versionNum, status);
 	}
 
 	/**
