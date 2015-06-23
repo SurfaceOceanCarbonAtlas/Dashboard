@@ -388,8 +388,14 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
+	 * The SOCAT version number and status is the SOCAT version number 
+	 * followed by an 'N', indicating the dataset is new in this
+	 * SOCAT version, or a 'U', indicating the dataset is an update
+	 * from a previous SOCAT version.  Updates within a SOCAT version
+	 * do NOT change an 'N' to a 'U'.
+	 * 
 	 * @return
-	 * 		the SOCAT version associated with this instance;
+	 * 		the SOCAT version number and status associated with this instance;
 	 * 		never null but could be empty if not assigned
 	 */
 	public String getSocatVersion() {
@@ -397,8 +403,14 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
+	 * The SOCAT version number and status is the SOCAT version number 
+	 * followed by an 'N', indicating the dataset is new in this
+	 * SOCAT version, or a 'U', indicating the dataset is an update
+	 * from a previous SOCAT version.  Updates within a SOCAT version
+	 * do NOT change an 'N' to a 'U'.
+	 * 
 	 * @param restoredSocatVersion 
-	 * 		the SOCAT version to set; 
+	 * 		the SOCAT version number and status to set; 
 	 * 		if null, an empty string is assigned
 	 */
 	public void setSocatVersion(String socatVersion) {
