@@ -576,6 +576,40 @@ public class DatabaseRequestHandler {
 			} finally {
 				rslts.close();
 			}
+
+			// Some old versions do not have global N or U flags - only have a regional A, B, C, or D flags
+			if ( versionNum == null ) {
+				getPrepStmt = catConn.prepareStatement("SELECT `socat_version` FROM `" + 
+						QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('A','B','C','D');");
+				getPrepStmt.setString(1, expocode);
+				rslts = getPrepStmt.executeQuery();
+				try {
+					while ( rslts.next() ) {
+						String versionStr = rslts.getString(1);
+						if ( (versionStr == null) || versionStr.trim().isEmpty() ) {
+							throw new SQLException("Unexpected missing SOCAT version");
+						}
+						try {
+							Double version = Math.floor(Double.valueOf(versionStr) * 10.0) / 10.0;
+							if ( versionNum == null ) {
+								versionNum = version;
+								status = 'N';
+							}
+							else if ( versionNum < version ) {
+								versionNum = version;
+								status = 'U';
+							}
+							else if ( versionNum > version ) {
+								status = 'U';
+							}
+						} catch (NumberFormatException ex) {
+							throw new SQLException("Unexpected non-numeric SOCAT version '" + versionStr + "'");
+						}
+					}
+				} finally {
+					rslts.close();
+				}
+			}
 		} finally {
 			catConn.close();
 		}
