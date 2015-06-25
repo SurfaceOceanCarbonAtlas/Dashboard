@@ -22,26 +22,30 @@ import java.util.zip.ZipOutputStream;
  * 
  * @author Karl Smith
  */
-public class SocatFilesBundler {
+public class SocatFilesBundler extends VersionedFileHandler {
 
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
-	private File outputDir;
-	
 	/**
 	 * A file bundler that saves the file bundles under the given directory
 	 * and sends an email with the bundle to the given email address.
 	 * 
 	 * @param outputDirname
 	 * 		save the file bundles under this directory
+	 * @param svnUsername
+	 * 		username for SVN authentication; 
+	 * 		if null, the directory is not checked for version control 
+	 * 		and no version control is performed
+	 * @param svnPassword
+	 * 		password for SVN authentication
 	 * @throws IllegalArgumentException
-	 * 		if the specified directory does not exist or is not a directory 
+	 * 		if the specified directory does not exist, is not a directory 
+	 * 		or is not under version control
 	 */
-	public SocatFilesBundler(String outputDirname) throws IllegalArgumentException {
-		outputDir = new File(outputDirname);
-		if ( ! outputDir.isDirectory() )
-			throw new IllegalArgumentException("Not a directory: " + outputDirname);
+	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword) 
+			throws IllegalArgumentException {
+		super(outputDirname, svnUsername, svnPassword);
 	}
 
 	/**
@@ -60,7 +64,7 @@ public class SocatFilesBundler {
 		// Check and standardize the expocode
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		// Create 
-		File parentFile = new File(outputDir, upperExpo.substring(0,4));
+		File parentFile = new File(filesDir, upperExpo.substring(0,4));
 		if ( ! parentFile.isDirectory() ) {
 			if ( parentFile.exists() )
 				throw new IllegalArgumentException(
@@ -77,7 +81,7 @@ public class SocatFilesBundler {
 	/**
 	 * Generates a single-cruise SOCAT-enhanced data file, then bundles 
 	 * that report with all the metadata documents for that cruise.
-	 * Use {@link #getBundleFile(String)} to get the virtural File of
+	 * Use {@link #getBundleFile(String)} to get the virtual File of
 	 * the created bundle.
 	 * 
 	 * @param expocode
