@@ -57,8 +57,9 @@ ENDIF
 IF `region_num_fill[i=@max] EQ 88` THEN
    LET region_num_fill1 = if d2land_coast le 50 and region_num eq 0 then 88 else region_num
 
-   LET region_num_fill2 = if region_num_fill1 EQ 88 then \
+   LET region_num_fill2a = if region_num_fill1 EQ 88 then \
     SAMPLEXY_CLOSEST(southern_coast_arctic[d=($dmask),x=-180:180], longitude, latitude) ELSE 7
+   LET region_num_fill2 = if latitude LT 30 THEN 4 else region_num_fill2a
 ENDIF
 
 LET region_num_fill = IF region_num_fill2 EQ 0 THEN 7 ELSE region_num_fill2
