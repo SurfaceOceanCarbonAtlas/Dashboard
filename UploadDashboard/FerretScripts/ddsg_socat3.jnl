@@ -193,13 +193,20 @@ SAVE/QUIET/FILE="($outfile)"/APPEND($qual) ($vname))
 ! Numeric variables
 REPEAT/RANGE=`indx_meta+1`:`nvars`/NAME=q (DEFINE SYMBOL qq = `q`;\
 DEFINE SYMBOL vname = `varnames_list[i=($qq)]`;\
+IF ($vname"0|sample_number>1|*>0") THEN EXIT/CYCLE;\
 DEFINE SYMBOL vtype = `($vname)_in,RETURN=dtype`;\
 IF ($vtype"0|CHAR>1|*>0") THEN EXIT/CYCLE;\
 LET/BAD=`($vname)_in,RETURN=bad,PREC=9` ($vname) = SAMPLE_FAST_I(($vname)_in, samplevar);\
 SET ATT/LIKE=($vname)_in ($vname);\
 SET ATT/OUTPUT=all ($vname);\
 SAVE/QUIET/APPEND/OUTTYPE=($vtype)/FILE="($outfile)" ($vname);\
-CANCEL VAR ($vname))
+)
+
+! sample_number will be the sequence number within the decimated data
+! We can use this to skip drawing lines where the constraints have skipped data
+
+LET/BAD=-1/TITLE="sequence number for decimated dataset" sample_number = i[gx=latitude]
+SAVE/QUIET/APPEND/OUTTYPE=INT/FILE="($outfile)" sample_number
 
 ! Character variables
 

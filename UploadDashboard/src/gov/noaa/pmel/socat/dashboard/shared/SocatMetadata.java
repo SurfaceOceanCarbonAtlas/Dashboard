@@ -409,7 +409,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * from a previous SOCAT version.  Updates within a SOCAT version
 	 * do NOT change an 'N' to a 'U'.
 	 * 
-	 * @param restoredSocatVersion 
+	 * @param socatVersion 
 	 * 		the SOCAT version number and status to set; 
 	 * 		if null, an empty string is assigned
 	 */
@@ -568,7 +568,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    addlDocs=" + addlDocs + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    socatDOIHRef=" + socatDOIHRef + 
-				",\n    restoredSocatVersion=" + socatVersion + 
+				",\n    socatVersion=" + socatVersion + 
 				",\n    qcFlag=" + qcFlag + 
 				" ]";
 	}

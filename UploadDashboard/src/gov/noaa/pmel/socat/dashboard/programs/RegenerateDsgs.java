@@ -12,6 +12,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -33,6 +34,126 @@ import java.util.TreeSet;
  */
 public class RegenerateDsgs {
 
+	CruiseFileHandler cruiseHandler;
+	DsgNcFileHandler dsgHandler;
+	MetadataFileHandler metaHandler;
+	DatabaseRequestHandler dbHandler;
+	FerretConfig ferretConfig;
+
+	/**
+	 * Regenerate DSG files using the given configuration data.
+	 * 
+	 * @param configStore
+	 * 		configuration data to use
+	 */
+	public RegenerateDsgs(DashboardConfigStore configStore) {
+		cruiseHandler = configStore.getCruiseFileHandler();
+		dsgHandler = configStore.getDsgNcFileHandler();
+		metaHandler = configStore.getMetadataFileHandler();
+		dbHandler = configStore.getDatabaseRequestHandler();
+		ferretConfig = configStore.getFerretConfig();
+	}
+
+	/**
+	 * Regenerate the DSG files for the given dataset.
+	 * 
+	 * @param expocode
+	 * 		regenerate the DSG files the the dataset with this expocode
+	 * @param forceIt
+	 * 		if true, always regenerate the DSG files;
+	 * 		if false, regenerate the DSG files only if the metadata has changed
+	 * @return
+	 * 		if the DSG files were regenerated
+	 * @throws IllegalArgumentException
+	 * 		if there was a problem regenerating the DSG files
+	 */
+	public boolean regenerateDsgFiles(String expocode, boolean forceIt) throws IllegalArgumentException {
+		boolean updateIt = forceIt;
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		CruiseDsgNcFile fullDataDsg;
+		ArrayList<SocatCruiseData> dataVals;
+		SocatMetadata updatedMeta;
+		try {
+			// Get just the filenames from the set of addition document
+			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
+			TreeSet<String> addlDocs = new TreeSet<String>();
+			for ( String docInfo : cruise.getAddlDocs() ) {
+				addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
+			}
+
+			// Read the current metadata in the full-data DSG file
+			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
+			ArrayList<String> missing = fullDataDsg.read(false);
+			if ( ! missing.isEmpty() )
+				throw new IllegalArgumentException("Unexpected values missing from the DSG file: " + missing);
+			SocatMetadata fullDataMeta = fullDataDsg.getMetadata();
+			dataVals = fullDataDsg.getDataList();
+
+			// Get the QC flag and SOCAT version from the database
+			Character qcFlag = dbHandler.getQCFlag(upperExpo);
+			String qcStatus = SocatQCEvent.FLAG_STATUS_MAP.get(qcFlag);
+			String socatVersionStatus = dbHandler.getSocatVersionStatus(upperExpo);
+			if ( socatVersionStatus.isEmpty() )
+				throw new IllegalArgumentException("Unable to get the version and status from the database");
+			String socatVersion = socatVersionStatus.substring(0, socatVersionStatus.length() - 1);
+
+			// Update (but do not commit) the cruise info version number and QC status if not correct 
+			if ( ! ( socatVersion.equals(cruise.getVersion()) && qcStatus.equals(cruise.getQcStatus()) ) ) {
+				cruise.setVersion(socatVersion);
+				cruise.setQcStatus(qcStatus);
+				cruiseHandler.saveCruiseInfoToFile(cruise, null);
+			}
+
+			// Get the metadata in the OME XML file
+			DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
+					metaHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME), metaHandler);
+			// Update (but do not commit) the metadata info version number if not correct
+			if ( ! socatVersion.equals(omeMData.getVersion()) ) {
+				omeMData.setVersion(socatVersion);
+				metaHandler.saveMetadataInfo(omeMData, null);
+			}
+			updatedMeta = omeMData.createSocatMetadata(socatVersionStatus, addlDocs, qcFlag.toString());
+			if ( ! fullDataMeta.equals(updatedMeta) )
+				updateIt = true;
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Problems reading the dataset " + upperExpo + ": " + ex.getMessage());
+		}
+
+		if ( updateIt ) {
+			try {
+				// Regenerate the DSG file with the updated metadata
+				fullDataDsg.create(updatedMeta, dataVals);
+				// Call Ferret to add lon360 and tmonth (calculated data should be the same)
+				SocatTool tool = new SocatTool(ferretConfig);
+				ArrayList<String> scriptArgs = new ArrayList<String>(1);
+				scriptArgs.add(fullDataDsg.getPath());
+				tool.init(scriptArgs, upperExpo, FerretConfig.Action.COMPUTE);
+				tool.run();
+				if ( tool.hasError() )
+					throw new IllegalArgumentException("Failure in adding computed variables: " + 
+							tool.getErrorMessage());
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException("Problems regenerating the full-data DSG files for " + 
+							upperExpo + ": " + ex.getMessage());
+			}
+			try {
+				// Regenerate the decimated-data DSG file 
+				dsgHandler.decimateCruise(upperExpo);
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException("Problems regenerating the decimated-data DSG files for " + 
+							upperExpo + ": " + ex.getMessage());
+			}
+		}
+		return updateIt;		
+	}
+
+	/**
+	 * Flag ERDDAP that the full-data and decimated-data DSG files have changed
+	 */
+	public void flagErddap() {
+		dsgHandler.flagErddap(true, true);
+	}
+
 	/**
 	 * @param args
 	 * 		ExpocodesFile - update DSG files of these cruises
@@ -52,12 +173,31 @@ public class RegenerateDsgs {
 		}
 
 		String expocodesFilename = args[0];
-		boolean forceIt = false;
+		boolean always = false;
 		if ( "T".equals(args[1]) || "True".equals(args[1]) )
-			forceIt = true;
+			always = true;
 
-		boolean success = true;
-		boolean changed = false;
+		// Get the expocodes of the datasets to update
+		TreeSet<String> allExpocodes = new TreeSet<String>();
+		try {
+			BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFilename));
+			try {
+				String dataline = expoReader.readLine();
+				while ( dataline != null ) {
+					dataline = dataline.trim();
+					if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
+						allExpocodes.add(dataline);
+					dataline = expoReader.readLine();
+				}
+			} finally {
+				expoReader.close();
+			}
+		} catch (Exception ex) {
+			System.err.println("Error getting expocodes from " + 
+					expocodesFilename + ": " + ex.getMessage());
+			ex.printStackTrace();
+			System.exit(1);
+		}
 
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;		
@@ -68,128 +208,26 @@ public class RegenerateDsgs {
 			ex.printStackTrace();
 			System.exit(1);
 		}
+		RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
+
+		boolean changed = false;
+		boolean success = true;
 		try {
-
-			// Get the expocode of the cruises to update
-			TreeSet<String> allExpocodes = new TreeSet<String>();
-			try {
-				BufferedReader expoReader = new BufferedReader(new FileReader(expocodesFilename));
-				try {
-					String dataline = expoReader.readLine();
-					while ( dataline != null ) {
-						dataline = dataline.trim();
-						if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) )
-							allExpocodes.add(dataline);
-						dataline = expoReader.readLine();
-					}
-				} finally {
-					expoReader.close();
-				}
-			} catch (Exception ex) {
-				System.err.println("Error getting expocodes from " + 
-						expocodesFilename + ": " + ex.getMessage());
-				ex.printStackTrace();
-				System.exit(1);
-			}
-
-			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-			DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
-			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
-			DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
-			FerretConfig ferretConfig = configStore.getFerretConfig();
-
-			// update each of these cruises
+			// update each of the datasets
 			for ( String expocode : allExpocodes ) {
 				try {
-
-					// Get just the filenames from the set of addition document
-					DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
-					TreeSet<String> addlDocs = new TreeSet<String>();
-					for ( String docInfo : cruise.getAddlDocs() ) {
-						addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
-					}
-
-					// Read the current metadata in the full-data DSG file
-					CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
-					ArrayList<String> missing = fullDataDsg.read(false);
-					if ( ! missing.isEmpty() )
-						throw new RuntimeException("Unexpected values missing from the DSG file: " + missing);
-					SocatMetadata fullDataMeta = fullDataDsg.getMetadata();
-					ArrayList<SocatCruiseData> dataVals = fullDataDsg.getDataList();
-
-					// Get the QC flag and SOCAT version from the database
-					Character qcFlag = dbHandler.getQCFlag(expocode);
-					String qcStatus = SocatQCEvent.FLAG_STATUS_MAP.get(qcFlag);
-					String socatVersionStatus = dbHandler.getSocatVersionStatus(expocode);
-					if ( socatVersionStatus.isEmpty() )
-						throw new RuntimeException("No global N or U flags in the database");
-					String socatVersion = socatVersionStatus.substring(0, socatVersionStatus.length() - 1);
-
-					// Update (but do not commit) the cruise info version number and QC status if not correct 
-					if ( ! ( socatVersion.equals(cruise.getVersion()) &&
-							 qcStatus.equals(cruise.getQcStatus()) ) ) {
-						cruise.setVersion(socatVersion);
-						cruise.setQcStatus(qcStatus);
-						cruiseHandler.saveCruiseInfoToFile(cruise, null);
-					}
-
-					// Get the metadata in the OME XML file
-					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
-							metaHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME), metaHandler);
-					// Update (but do not commit) the metadata info version number if not correct
-					if ( ! socatVersion.equals(omeMData.getVersion()) ) {
-						omeMData.setVersion(socatVersion);
-						metaHandler.saveMetadataInfo(omeMData, null);
-					}
-					SocatMetadata updatedMeta = omeMData.createSocatMetadata(
-							socatVersionStatus, addlDocs, qcFlag.toString());
-
-					if ( forceIt || ! fullDataMeta.equals(updatedMeta) ) {
-						// Regenerate the DSG file with the updated metadata
-						try {
-
-							fullDataDsg.create(updatedMeta, dataVals);
-							// Call Ferret to add lon360 and tmonth (calculated data should be the same)
-							SocatTool tool = new SocatTool(ferretConfig);
-							ArrayList<String> scriptArgs = new ArrayList<String>(1);
-							scriptArgs.add(fullDataDsg.getPath());
-							tool.init(scriptArgs, expocode, FerretConfig.Action.COMPUTE);
-							tool.run();
-							if ( tool.hasError() )
-								throw new IllegalArgumentException(expocode + 
-										": Failure adding computed variables: " + tool.getErrorMessage());
-						} catch ( Exception ex ) {
-							System.err.println("Problems regenerating the full-data DSG files for " + 
-									expocode + ": " + ex.getMessage());
-							success = false;
-							continue;
-						}
-						try {
-							// Regenerate the decimated-data DSG file 
-							dsgHandler.decimateCruise(expocode);
-						} catch ( Exception ex ) {
-							System.err.println("Problems regenerating the decimated-data DSG files for " + 
-									expocode + ": " + ex.getMessage());
-							success = false;
-							continue;
-						}
+					if ( regenerator.regenerateDsgFiles(expocode, always) ) {
+						System.err.println("Regenerated the DSG files for " + expocode);
 						changed = true;
-						System.out.println("Regenerated the DSG files for " + expocode);
 					}
-
-				} catch ( Exception ex ) {
-					System.err.println("Problems working with the full-data DSG file for " + 
-							expocode + ": " + ex.getMessage());
+				} catch (Exception ex) {
+					System.err.println(ex.getMessage());
 					success = false;
-					continue;
 				}
-
 			}
-
 			if ( changed ) {
-				dsgHandler.flagErddap(true, true);
+				regenerator.flagErddap();
 			}
-
 		} finally {
 			configStore.shutdown();
 		}
