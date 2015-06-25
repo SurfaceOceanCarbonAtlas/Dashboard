@@ -91,7 +91,7 @@ LET varnames_list2 = {\
 "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa",\
 "fCO2_recommended","fCO2_source","delta_temp","region_id",\
 "calc_speed","etopo2","gvCO2","dist_to_land",\
-"day_of_year","time","lon360","tmonth"\
+"day_of_year","time","num_obs_original","lon360","tmonth"\
 }
 
 LET varnames_list = XCAT(varnames_list1, varnames_list2)
