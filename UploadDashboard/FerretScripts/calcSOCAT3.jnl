@@ -288,7 +288,8 @@ cancel mode upcase
 ! has the same value as num_obs, just needed so set of variables is identical
 ! to what is in the decimated versions.
 
-LET/title="`num_obs,return=title`"/BAD=-99 num_obs_original = `num_obs[d=($cruise_filename)]`
+LET/title="`num_obs,return=title`"/BAD=-99 num_obs_original = `num_obs[d=($cruise_filename)]` + 0*num_obs
+
 SAVE/QUIET/APPEND/OUTTYPE=int/FILE="($cruise_filename)" num_obs_original
 
 ! fCO2 recomputed

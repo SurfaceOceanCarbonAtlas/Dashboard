@@ -18,6 +18,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -121,6 +122,45 @@ public class RegenerateDsgs {
 
 		if ( updateIt ) {
 			try {
+				// Change date/time of old dataset problem points to something valid, but WOCE them as bad
+				if ( "49K619871028".equals(upperExpo) ) {
+					for ( SocatCruiseData data : dataVals ) {
+						if ( (data.getMonth() == 11) && (data.getDay() > 30) ) {
+							// 11-31 in 49K619871028
+							data.setMonth(12);
+							data.setDay(1);
+							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+						}
+					}
+				}
+				else if ( "49NB19881228".equals(upperExpo) ) {
+					for ( SocatCruiseData data : dataVals ) {
+						if ( (data.getMonth() == 2) && (data.getDay() > 29) ) {
+							// 2-31 in 49NB19881228
+							data.setMonth(3);
+							data.setDay(1);
+							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+						}
+					}
+				}
+				else if ( "74JC20061024".equals(upperExpo) ) {
+					for ( SocatCruiseData data : dataVals ) {
+						if ( data.getMinute() > 59 ) {
+							// 12:99 in 74JC20061024
+							data.setMinute(59);
+							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+						}
+					}
+				}
+				else if ( "77FF20020226".equals(upperExpo) ) {
+					for ( SocatCruiseData data : dataVals ) {
+						if ( data.getSecond() >= 60.0 ) {
+							// 13:54:60 in 77FF20020226
+							data.setSecond(59.99);
+							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+						}
+					}
+				}
 				// Regenerate the DSG file with the updated metadata
 				fullDataDsg.create(updatedMeta, dataVals);
 				// Call Ferret to add lon360 and tmonth (calculated data should be the same)

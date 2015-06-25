@@ -164,7 +164,7 @@ DEFINE SYMBOL num_obs_sampled = `nsample`
 
 ! write a global attribute with the decimation parameters.
 DEFINE ATT/QUIET/OUTPUT ..decimation =  \
-"(`num_obs_original_in`) original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
+"`num_obs_original_in` original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
 
 SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
 
