@@ -14,6 +14,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.OmeFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.PreviewPlotsHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.SocatFilesBundler;
 import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
@@ -71,6 +72,8 @@ public class DashboardConfigStore {
 	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
+	private static final String CDIAC_BUNDLES_DIR_NAME_TAG = "CDIACBundlesDir";
+	private static final String CDIAC_BUNDLES_EMAIL_ADDRESS_TAG = "CDIACBundlesEmailAddress";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -86,7 +89,9 @@ public class DashboardConfigStore {
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
-			OME_SERVER_OUTPUT_DIR_NAME_TAG + "=/Path/To/SocatOME/guest/output/dir \n" +
+			OME_SERVER_OUTPUT_DIR_NAME_TAG + "=/Path/To/SocatOME/Guest/Output/Dir \n" +
+			CDIAC_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/CDIAC/Bundles \n" + 
+			CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + "=email.address@bundles.for.cdiac \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
@@ -121,6 +126,8 @@ public class DashboardConfigStore {
 	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
 	private OmeFileHandler omeFileHandler;
+	private SocatFilesBundler cdiacFilesBundler;
+	private String cdiacBundlesEmailAddress;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
 	private CruiseChecker cruiseChecker;
@@ -260,8 +267,7 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			userFileHandler = new UserFileHandler(propVal, 
-					svnUsername, svnPassword);
+			userFileHandler = new UserFileHandler(propVal, svnUsername, svnPassword);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -274,8 +280,7 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cruiseFileHandler = new CruiseFileHandler(propVal,
-					svnUsername, svnPassword);
+			cruiseFileHandler = new CruiseFileHandler(propVal, svnUsername, svnPassword);
 			// Put SanityChecker message files in the same directory
 			checkerMsgHandler = new CheckerMessageHandler(propVal);
 		} catch ( Exception ex ) {
@@ -290,12 +295,37 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			metadataFileHandler = new MetadataFileHandler(propVal,
-					svnUsername, svnPassword);
+			metadataFileHandler = new MetadataFileHandler(propVal, svnUsername, svnPassword);
 			// Put the flag messages file in the same directory
 			cruiseFlagsHandler = new CruiseFlagsHandler(propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
+		// Read the CDIAC bundles directory name
+		try {
+			propVal = configProps.getProperty(CDIAC_BUNDLES_DIR_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			cdiacFilesBundler = new SocatFilesBundler(propVal, svnUsername, svnPassword);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + CDIAC_BUNDLES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
+		// Read the CDIAC email address
+		try {
+			propVal = configProps.getProperty(CDIAC_BUNDLES_EMAIL_ADDRESS_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			cdiacBundlesEmailAddress = propVal;
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -486,6 +516,7 @@ public class DashboardConfigStore {
 		userFileHandler.shutdown();
 		cruiseFileHandler.shutdown();
 		metadataFileHandler.shutdown();
+		cdiacFilesBundler.shutdown();
 		// Stop the configuration watcher
 		configWatcher.cancel();
 		// Discard this DashboardConfigStore as the singleton instance
@@ -618,6 +649,22 @@ public class DashboardConfigStore {
 	 */
 	public CruiseSubmitter getDashboardCruiseSubmitter() {
 		return cruiseSubmitter;
+	}
+
+	/**
+	 * @return
+	 * 		the files bundler for "send to CDIAC" datasets
+	 */
+	public SocatFilesBundler getCdiacFilesBundler() {
+		return cdiacFilesBundler;
+	}
+
+	/**
+	 * @return
+	 * 		the e-mail address to send "send to CDIAC" file bundles
+	 */
+	public String getCdiacBundlesEmailAddress() {
+		return cdiacBundlesEmailAddress;
 	}
 
 	/**

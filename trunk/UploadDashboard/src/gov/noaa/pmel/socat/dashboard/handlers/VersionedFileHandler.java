@@ -25,7 +25,13 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
  */
 public class VersionedFileHandler {
 
+	// File to write commit command to - when not actually performing the commits
 	private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
+	// Check every 60 seconds
+	private static final long MILLISECONDS_CHECK_INTERVAL = 60 * 1000L;
+	// Keep working while less than 3 seconds have passed
+	private static final long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;
+
 	File filesDir;
 	SVNClientManager svnManager;
 	ArrayDeque<File[]> filesToCommit;
@@ -39,7 +45,9 @@ public class VersionedFileHandler {
 	 * @param filesDirName
 	 * 		name of the working copy directory
 	 * @param svnUsername
-	 * 		username for SVN authentication
+	 * 		username for SVN authentication; 
+	 * 		if null, the directory is not checked for version control 
+	 * 		and no version control is performed
 	 * @param svnPassword
 	 * 		password for SVN authentication
 	 * @throws IllegalArgumentException
@@ -53,16 +61,25 @@ public class VersionedFileHandler {
 		if ( ! filesDir.isDirectory() )
 			throw new IllegalArgumentException(
 					filesDirName + " is not a directory");
-		if ( ! SVNWCUtil.isVersionedDirectory(filesDir) ) 
-			throw new IllegalArgumentException(
-					filesDirName + " is not under version control");
-		// Create the version control manager with the provided credentials
-		svnManager = SVNClientManager.newInstance(
-				SVNWCUtil.createDefaultOptions(true), svnUsername, svnPassword);
-		filesToCommit = new ArrayDeque<File[]>();
-		parentToUpdate = new ArrayDeque<File>();
-		commitMessage = new ArrayDeque<String>();
-		watchCommitQueue();
+		if ( svnUsername == null ) {
+			// Ordinary directory - not actually version-controlled - for SocatFilesBundler
+			svnManager = null;
+			filesToCommit = null;
+			parentToUpdate = null;
+			commitMessage = null;
+		}
+		else {
+			// Version-controlled directory
+			if ( ! SVNWCUtil.isVersionedDirectory(filesDir) ) 
+				throw new IllegalArgumentException(filesDirName + " is not under version control");
+			// Create the version control manager with the provided credentials
+			svnManager = SVNClientManager.newInstance(
+					SVNWCUtil.createDefaultOptions(true), svnUsername, svnPassword);
+			filesToCommit = new ArrayDeque<File[]>();
+			parentToUpdate = new ArrayDeque<File>();
+			commitMessage = new ArrayDeque<String>();
+			watchCommitQueue();
+		}
 	}
 
 	/**
@@ -76,6 +93,8 @@ public class VersionedFileHandler {
 	 * 		message to accompany the commit
 	 */
 	private void addFilesToCommit(File[] commitFiles, File parent, String message) {
+		if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+			throw new NullPointerException("addFilesToCommit called for VersionedFileHandler that is not version controlled");
 		synchronized(filesToCommit) {
 			filesToCommit.addLast(commitFiles);
 			parentToUpdate.addLast(parent);
@@ -83,15 +102,13 @@ public class VersionedFileHandler {
 		}
 	}
 
-	// Check every 60 seconds
-	private static long MILLISECONDS_CHECK_INTERVAL = 60 * 1000L;
-	// Keep working while less than 3 seconds have passed
-	private static long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;
 	/**
 	 * Periodically checks the queue of files to be committed, and 
 	 * commits any files present.  Stops when filesDir is set to null.
 	 */
 	private void watchCommitQueue() {
+		if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+			throw new NullPointerException("watchCommitQueue called for VersionedFileHandler that is not version controlled");
 		(new Timer()).schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -163,6 +180,8 @@ public class VersionedFileHandler {
 	 * 		if the version control engine throws one
 	 */
 	void commitVersion(File wcfile, String message) throws SVNException {
+		if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+			throw new NullPointerException("commitVersion called for VersionedFileHandler that is not version controlled");
 		boolean needsAdd = false;
 		try {
 			SVNStatus status = svnManager.getStatusClient()
@@ -233,6 +252,8 @@ public class VersionedFileHandler {
 	 * 		if the version control engine throws one
 	 */
 	void moveVersionedFile(File oldWcFile, File newWcFile, String message) throws SVNException {
+		if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+			throw new NullPointerException("moveVersionedFile called for VersionedFileHandler that is not version controlled");
 		// Make sure the parent directory of the new file is under version control
 		File parent = newWcFile.getParentFile();
 		boolean needsAdd = false;
@@ -304,6 +325,8 @@ public class VersionedFileHandler {
 	 * 		if deleting the file or committing the deletion throws one
 	 */
 	void deleteVersionedFile(File wcFile, String message) throws SVNException {
+		if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
+			throw new NullPointerException("moveVersionedFile called for VersionedFileHandler that is not version controlled");
 		// Delete the file (force) from the working directory and version control
 		svnManager.getWCClient().doDelete(wcFile, true, true, false);
 		// schedule committing the changes
