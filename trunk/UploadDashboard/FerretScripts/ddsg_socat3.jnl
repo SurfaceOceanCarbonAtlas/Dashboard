@@ -37,10 +37,6 @@ let tol3 = ($tol_var)
 LET control = 2
 
 USE "($infile)"
-DEFINE SYMBOL num_obs_original = `num_obs`
-
-! also save the size of the original dataset
-LET/title="number obs in undecimated dataset"/BAD=-99 num_obs_original = `num_obs`
 
 ! The names in the input and output file must match.
 ! To accomplish that we will rename the variables in the input file.
@@ -53,7 +49,7 @@ LET nvars =  ..nvars
 ! The text is too long for one Ferret command. Define two variables and concatenate them.
 
 LET varnames_list1 = {\
-"num_obs","expocode","dataset_name","vessel_name","organization",\
+"num_obs","num_obs_original","expocode","dataset_name","vessel_name","organization",\
 "geospatial_lon_min","geospatial_lon_max","geospatial_lat_min",\
 "geospatial_lat_max","time_coverage_start","time_converage_end",\
 "investigators","orig_data_ref","addl_docs","socat_data_doi",\
@@ -91,7 +87,7 @@ LET varnames_list2 = {\
 "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa",\
 "fCO2_recommended","fCO2_source","delta_temp","region_id",\
 "calc_speed","etopo2","gvCO2","dist_to_land",\
-"day_of_year","time","num_obs_original","lon360","tmonth"\
+"day_of_year","time","lon360","tmonth"\
 }
 
 LET varnames_list = XCAT(varnames_list1, varnames_list2)
@@ -167,13 +163,10 @@ SET ATT/OUTPUT=all num_obs
 DEFINE SYMBOL num_obs_sampled = `nsample`
 
 ! write a global attribute with the decimation parameters.
-DEFINE ATT/QUIETRIBUTE/OUTPUT ..decimation =  \
-"($num_obs_original) original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
+DEFINE ATT/QUIET/OUTPUT ..decimation =  \
+"(`num_obs_original_in`) original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
 
 SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
-
-! Add the original number of obs.
-SAVE/QUIET/APPEND/OUTTYPE=int/FILE="($outfile)" num_obs_original
 
 ! Write the traj variables
 
