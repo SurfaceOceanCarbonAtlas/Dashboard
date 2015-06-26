@@ -122,7 +122,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the cruise expocode is invalid
 	 */
-	private File cruiseDataFile(String expocode) throws IllegalArgumentException {
+	File cruiseDataFile(String expocode) throws IllegalArgumentException {
 		// Check that the expocode is somewhat reasonable
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		// Get the name of the saved cruise data file

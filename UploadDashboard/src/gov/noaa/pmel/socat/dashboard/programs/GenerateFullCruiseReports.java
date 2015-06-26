@@ -118,7 +118,7 @@ public class GenerateFullCruiseReports {
 				}
 			}
 			else {
-				SocatFilesBundler bundler = new SocatFilesBundler(destName, null, null);
+				SocatFilesBundler bundler = new SocatFilesBundler(destName, null, null, null);
 				for ( String expo : expocodes ) {
 					try {
 						ArrayList<String> warnMsgs = bundler.createSocatEnhancedFilesBundle(expo);
