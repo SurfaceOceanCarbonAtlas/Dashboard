@@ -127,7 +127,6 @@ public class DashboardConfigStore {
 	private MetadataFileHandler metadataFileHandler;
 	private OmeFileHandler omeFileHandler;
 	private SocatFilesBundler cdiacFilesBundler;
-	private String cdiacBundlesEmailAddress;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
 	private CruiseChecker cruiseChecker;
@@ -304,28 +303,30 @@ public class DashboardConfigStore {
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
+		// Read the CDIAC email address
+		String cdiacEmailAddress;
+		try {
+			propVal = configProps.getProperty(CDIAC_BUNDLES_EMAIL_ADDRESS_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			cdiacEmailAddress = propVal;
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
 		// Read the CDIAC bundles directory name
 		try {
 			propVal = configProps.getProperty(CDIAC_BUNDLES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cdiacFilesBundler = new SocatFilesBundler(propVal, svnUsername, svnPassword);
+			cdiacFilesBundler = new SocatFilesBundler(propVal, svnUsername, 
+					svnPassword, cdiacEmailAddress);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + CDIAC_BUNDLES_DIR_NAME_TAG + 
-					" value specified in " + configFile.getPath() + "\n" + 
-					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-		}
-
-		// Read the CDIAC email address
-		try {
-			propVal = configProps.getProperty(CDIAC_BUNDLES_EMAIL_ADDRESS_TAG);
-			if ( propVal == null )
-				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
-			cdiacBundlesEmailAddress = propVal;
-		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -657,14 +658,6 @@ public class DashboardConfigStore {
 	 */
 	public SocatFilesBundler getCdiacFilesBundler() {
 		return cdiacFilesBundler;
-	}
-
-	/**
-	 * @return
-	 * 		the e-mail address to send "send to CDIAC" file bundles
-	 */
-	public String getCdiacBundlesEmailAddress() {
-		return cdiacBundlesEmailAddress;
 	}
 
 	/**

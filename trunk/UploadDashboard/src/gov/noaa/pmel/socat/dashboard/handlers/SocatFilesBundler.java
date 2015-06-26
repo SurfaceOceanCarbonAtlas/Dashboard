@@ -27,6 +27,20 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
+	private static final String EMAIL_MESSAGE_START =
+			"Dear CDIAC team, \n" +
+			"\n" +
+			"The SOCAT dashboard user ";
+	private static final String EMAIL_MESSAGE_END = 
+			",\n" +
+			"when submitting a dataset for QC, has requested \n" +
+			"immediate archival of the attached data and metadata. \n" +
+			"\n" +
+			"Best regards, \n" +
+			"SOCAT team \n";
+
+	private String archivalEmailAddress;
+
 	/**
 	 * A file bundler that saves the file bundles under the given directory
 	 * and sends an email with the bundle to the given email address.
@@ -39,13 +53,16 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		and no version control is performed
 	 * @param svnPassword
 	 * 		password for SVN authentication
+	 * @param emailAddress
+	 * 		e-mail address to send bundles for archival
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a directory 
 	 * 		or is not under version control
 	 */
-	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword) 
-			throws IllegalArgumentException {
+	public SocatFilesBundler(String outputDirname, String svnUsername, 
+			String svnPassword, String emailAddress) throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
+		archivalEmailAddress = emailAddress;
 	}
 
 	/**
@@ -85,9 +102,10 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * the created bundle.
 	 * 
 	 * @param expocode
-	 * 		create the bundles for the cruise with this expocode
+	 * 		create the bundle for the cruise with this expocode
 	 * @return
-	 * 		the warning messages from generating the single-cruise SOCAT-enhanced data file
+	 * 		the warning messages from generating the single-cruise 
+	 * 		SOCAT-enhanced data file
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 * @throws IOException
@@ -109,7 +127,8 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		ArrayList<File> addlDocs = new ArrayList<File>();
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(expocode) ) {
-			// Exclude the OME XML document at this time
+			// Exclude the (expocode)_OME.xml document at this time;
+			// do include the (expocode)_PI_OME.xml 
 			String filename = mdata.getFilename();
 			if ( ! filename.equals(DashboardMetadata.OME_FILENAME) ) {
 				addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
@@ -127,6 +146,180 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		}
 
 		return warnings;
+	}
+
+	/**
+	 * Creates the file bundle of original data and metadata, 
+	 * and sends this bundle to the email address, if given, 
+	 * associated with this instance for archival.  This bundle 
+	 * is also committed to version control using the given message. 
+	 * 
+	 * @param expocode
+	 * 		create the bundle for the cruise with this expocode
+	 * @param message
+	 * 		version control commit message for the bundle file; 
+	 * 		if null or empty, the bundle file is not committed 
+	 * 		to version control
+	 * @param userRealName
+	 * 		real name of the user make this archival request
+	 * @param userEmailAddress
+	 * 		email address of the user making this archival request;
+	 * 		this address will be cc'd on the bundle email sent for archival
+	 * @return
+	 * 		an message indicating what was sent and to whom
+	 * @throws IllegalArgumentException
+	 * 		if this SocatFilesBundler does not have a valid archivalEmailAddress,
+	 * 		if the userRealName is not given,
+	 * 		if the userEmailAddress is not valid, or
+	 * 		if the expocode is not valid
+	 * @throws IOException
+	 * 		if unable to read the default DashboardConfigStore, 
+	 * 		if the dataset is has no data or metadata files,
+	 * 		if unable to create the bundle file, or
+	 * 		if unable to commit the bundle to version control
+	 */
+	public String sendOrigFilesBundle(String expocode, String message, 
+			String userRealName, String userEmailAddress) throws IllegalArgumentException, IOException {
+		if ( (archivalEmailAddress == null) || archivalEmailAddress.isEmpty() )
+			throw new IllegalArgumentException("no archival email address");
+		if ( (userRealName == null) || userRealName.isEmpty() ) 
+			throw new IllegalArgumentException("no user name");
+		if ( (userEmailAddress == null) || userEmailAddress.isEmpty() )
+			throw new IllegalArgumentException("no user email address");
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		DashboardConfigStore configStore = DashboardConfigStore.get();
+
+		// Get the original data file for this dataset
+		File origDataFile = configStore.getCruiseFileHandler().cruiseDataFile(upperExpo);
+		if ( ! origDataFile.exists() )
+			throw new IOException("No original data file for " + upperExpo);
+
+		// Get the list of metadata documents to be bundled with this data file
+		ArrayList<File> addlDocs = new ArrayList<File>();
+		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
+		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo) ) {
+			// Exclude the (expocode)_OME.xml document at this time;
+			// do include the (expocode)_PI_OME.xml 
+			String filename = mdata.getFilename();
+			if ( ! filename.equals(DashboardMetadata.OME_FILENAME) ) {
+				addlDocs.add(metadataHandler.getMetadataFile(upperExpo, filename));
+			}
+		}
+		if ( addlDocs.isEmpty() )
+			throw new IOException("No metadata/supplemental documents for " + upperExpo);
+
+		// Generate the bundle as a zip file
+		File bundleFile = getBundleFile(upperExpo);
+		String infoMsg = "Created files bundle " + bundleFile.getName() + " containing files:\n";
+		ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
+		try {
+			copyFileToBundle(zipOut, origDataFile);
+			infoMsg += "    " + origDataFile.getName() + "\n";
+			for ( File metaFile : addlDocs ) {
+				copyFileToBundle(zipOut, metaFile);
+				infoMsg += "    " + metaFile.getName() + "\n";
+			}
+		} finally {
+			zipOut.close();
+		}
+
+		// Commit the bundle to version control
+		if ( (message != null) && ! message.isEmpty() ) {
+			try {
+				commitVersion(bundleFile, message);				
+			} catch (Exception ex) {
+				throw new IOException(
+						"Problems committing the CDIAC file bundle for " + 
+								upperExpo + ": " + ex.getMessage());
+			}
+		}
+
+		String emailMessage = EMAIL_MESSAGE_START + userRealName + EMAIL_MESSAGE_END;
+		/*
+	String to = args[0];
+	String from = args[1];
+	String host = args[2];
+	String filename = args[3];
+	boolean debug = Boolean.valueOf(args[4]).booleanValue();
+	String msgText1 = "Sending a file.\n";
+	String subject = "Sending a file";
+	
+	// create some properties and get the default Session
+	Properties props = System.getProperties();
+	props.put("mail.smtp.host", host);
+	
+	Session session = Session.getInstance(props, null);
+	session.setDebug(debug);
+	
+	try {
+	    // create a message
+	    MimeMessage msg = new MimeMessage(session);
+	    msg.setFrom(new InternetAddress(from));
+	    InternetAddress[] address = {new InternetAddress(to)};
+	    msg.setRecipients(Message.RecipientType.TO, address);
+	    msg.setSubject(subject);
+
+	    // create and fill the first message part
+	    MimeBodyPart mbp1 = new MimeBodyPart();
+	    mbp1.setText(msgText1);
+
+	    // create the second message part
+	    MimeBodyPart mbp2 = new MimeBodyPart();
+
+	    // attach the file to the message
+	    mbp2.attachFile(filename);
+
+	     *
+	     * Use the following approach instead of the above line if
+	     * you want to control the MIME type of the attached file.
+	     * Normally you should never need to do this.
+	     *
+	    FileDataSource fds = new FileDataSource(filename) {
+		public String getContentType() {
+		    return "application/octet-stream";
+		}
+	    };
+	    mbp2.setDataHandler(new DataHandler(fds));
+	    mbp2.setFileName(fds.getName());
+	     *
+
+	    // create the Multipart and add its parts to it
+	    Multipart mp = new MimeMultipart();
+	    mp.addBodyPart(mbp1);
+	    mp.addBodyPart(mbp2);
+
+	    // add the Multipart to the message
+	    msg.setContent(mp);
+
+	    // set the Date: header
+	    msg.setSentDate(new Date());
+
+	     *
+	     * If you want to control the Content-Transfer-Encoding
+	     * of the attached file, do the following.  Normally you
+	     * should never need to do this.
+	     *
+	    msg.saveChanges();
+	    mbp2.setHeader("Content-Transfer-Encoding", "base64");
+	     *
+
+	    // send the message
+	    Transport.send(msg);
+	    
+	} catch (MessagingException mex) {
+	    mex.printStackTrace();
+	    Exception ex = null;
+	    if ((ex = mex.getNextException()) != null) {
+		ex.printStackTrace();
+	    }
+	} catch (IOException ioex) {
+	    ioex.printStackTrace();
+	}
+
+		 */
+
+		infoMsg += "Files bundle sent to " + archivalEmailAddress + " and cc'd to " + userEmailAddress + "\n";
+		return infoMsg;
 	}
 
 	/**
