@@ -74,6 +74,8 @@ public class DashboardConfigStore {
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
 	private static final String CDIAC_BUNDLES_DIR_NAME_TAG = "CDIACBundlesDir";
 	private static final String CDIAC_BUNDLES_EMAIL_ADDRESS_TAG = "CDIACBundlesEmailAddress";
+	private static final String SOCAT_BUNDLES_EMAIL_ADDRESS_TAG = "SocatBundlesEmailAddress";
+	private static final String SOCAT_SMTP_HOST_ADDRESS_TAG = "SocatSMTPHostAddress";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -91,7 +93,9 @@ public class DashboardConfigStore {
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
 			OME_SERVER_OUTPUT_DIR_NAME_TAG + "=/Path/To/SocatOME/Guest/Output/Dir \n" +
 			CDIAC_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/CDIAC/Bundles \n" + 
-			CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + "=email.address@bundles.for.cdiac \n" +
+			CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + "=cdiac.archiver@bundles.for.cdiac \n" +
+			SOCAT_BUNDLES_EMAIL_ADDRESS_TAG + "=socat.support@bundles.from.socat \n" +
+			SOCAT_SMTP_HOST_ADDRESS_TAG + "=smtp.server.for.socat \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
@@ -303,7 +307,7 @@ public class DashboardConfigStore {
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
-		// Read the CDIAC email address
+		// Read the CDIAC email address to send archival bundles
 		String cdiacEmailAddress;
 		try {
 			propVal = configProps.getProperty(CDIAC_BUNDLES_EMAIL_ADDRESS_TAG);
@@ -316,15 +320,40 @@ public class DashboardConfigStore {
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
-
-		// Read the CDIAC bundles directory name
+		// Read the SOCAT email address for the from address for archival bundles
+		String socatEmailAddress;
+		try {
+			propVal = configProps.getProperty(SOCAT_BUNDLES_EMAIL_ADDRESS_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			socatEmailAddress = propVal;
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + SOCAT_BUNDLES_EMAIL_ADDRESS_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// Read the SOCAT SMTP server host name/address
+		String smtpHostAddress;
+		try {
+			propVal = configProps.getProperty(SOCAT_SMTP_HOST_ADDRESS_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			smtpHostAddress = propVal;
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + SOCAT_SMTP_HOST_ADDRESS_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		// Read the CDIAC bundles directory name and create the CDIAC archival bundler
 		try {
 			propVal = configProps.getProperty(CDIAC_BUNDLES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			cdiacFilesBundler = new SocatFilesBundler(propVal, svnUsername, 
-					svnPassword, cdiacEmailAddress);
+					svnPassword, cdiacEmailAddress, socatEmailAddress, smtpHostAddress);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + CDIAC_BUNDLES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 

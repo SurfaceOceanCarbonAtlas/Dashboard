@@ -264,7 +264,7 @@ public class DatabaseRequestHandler {
 	 * @param username
 	 * 		username for a reviewer
 	 * @return
-	 * 		actual name of the reviewer
+	 * 		actual name of the reviewer; may be null if not found
 	 * @throws SQLException
 	 * 		if accessing the database throws one 
 	 */
@@ -298,7 +298,7 @@ public class DatabaseRequestHandler {
 	 * @param realname
 	 * 		actual name of the reviewer
 	 * @return
-	 * 		username for a reviewer
+	 * 		username for a reviewer; may be null if not found
 	 * @throws SQLException
 	 * 		if accessing the database throws one 
 	 */
@@ -323,6 +323,40 @@ public class DatabaseRequestHandler {
 			catConn.close();
 		}
 		return username;
+	}
+
+	/**
+	 * Retrieves the e-mail address for a reviewer from the Reviewers table
+	 * using the reviewer's username.
+	 * 
+	 * @param username
+	 * 		username for a reviewer
+	 * @return
+	 * 		e-mail address of the reviewer; may be null if not found
+	 * @throws SQLException
+	 * 		if accessing the database throws one 
+	 */
+	public String getReviewerEmail(String username) throws SQLException {
+		String userEmail = null;
+		Connection catConn = makeConnection(false);
+		try {
+			PreparedStatement prepStmt = catConn.prepareStatement("SELECT `email` FROM `" + 
+					REVIEWERS_TABLE_NAME + "` WHERE `username` = ?;");
+			prepStmt.setString(1, username);
+			ResultSet results = prepStmt.executeQuery();
+			try {
+				while ( results.next() ) {
+					if ( userEmail != null ) 
+						throw new SQLException("More than one e-mail address for " + username);
+					userEmail = results.getString(1);
+				}
+			} finally {
+				results.close();
+			}
+		} finally {
+			catConn.close();
+		}
+		return userEmail;
 	}
 
 	/**
