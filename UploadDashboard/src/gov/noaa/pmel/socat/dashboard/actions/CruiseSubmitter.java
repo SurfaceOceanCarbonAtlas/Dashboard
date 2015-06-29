@@ -22,7 +22,6 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -44,8 +43,6 @@ public class CruiseSubmitter {
 	DatabaseRequestHandler databaseHandler;
 	SocatFilesBundler cdiacBundler;
 	String socatVersion;
-
-	private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
 
 	/**
 	 * @param configStore
@@ -71,7 +68,7 @@ public class CruiseSubmitter {
 	 * {@link DashboardUtils#QC_STATUS_EXCLUDED}.
 	 * For all cruises, the archive status is updated to that given.
 	 * 
-	 * TODO (stubbed): If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_CDIAC},
+	 * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_CDIAC},
 	 * the archive request is sent to CDIAC for dataset which have not been sent,
 	 * or for all datasets if repeatSend is true.
 	 * 
@@ -98,7 +95,6 @@ public class CruiseSubmitter {
 			boolean repeatSend, String submitter) throws IllegalArgumentException {
 
 		HashSet<String> ingestExpos = new HashSet<String>();
-		HashSet<String> archiveExpos = new HashSet<String>();
 		HashSet<String> cdiacExpos = new HashSet<String>();
 		ArrayList<String> errorMsgs = new ArrayList<String>();
 		for ( String expocode : cruiseExpocodes ) {
@@ -287,15 +283,11 @@ public class CruiseSubmitter {
 				cruise.setArchiveStatus(archiveStatus);
 				changed = true;
 				commitMsg += " archive status '" + archiveStatus + "'"; 
-				archiveExpos.add(expocode);
 			}
 
 			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
 				if ( repeatSend || cruise.getCdiacDate().isEmpty() ) {
-					// Send (or re-send) the original cruise data and metadata to CDIAC
-					cruise.setCdiacDate(localTimestamp);
-					changed = true;
-					commitMsg += " send to CDIAC '" + localTimestamp + "'";
+					// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
 					cdiacExpos.add(expocode);
 				}
 			}
@@ -310,8 +302,6 @@ public class CruiseSubmitter {
 		// notify ERDDAP of new/updated cruises
 		if ( ! ingestExpos.isEmpty() )
 			dsgNcHandler.flagErddap(true, true);
-
-		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 
 		// Send original cruise data to CDIAC where user requested immediate archival
 		if ( ! cdiacExpos.isEmpty() ) {
@@ -333,16 +323,20 @@ public class CruiseSubmitter {
 			if ( (userEmail == null) || userEmail.isEmpty() )
 				throw new IllegalArgumentException("Unknown e-mail address for user " + submitter);
 
-			String timestamp = DATETIME_FORMATTER.format(new Date());
 			for ( String expocode : cdiacExpos ) {
-				String message = "Immediate archival of dataset " + expocode + 
-						" requested by " + userRealName + " (" + userEmail + ") at " + timestamp;
+				String commitMsg = "Immediate archival of dataset " + expocode + 
+						" requested by " + userRealName + " (" + userEmail + ") at " + localTimestamp;
 				try {
-					cdiacBundler.sendOrigFilesBundle(expocode, message, userRealName, userEmail);
+					cdiacBundler.sendOrigFilesBundle(expocode, commitMsg, userRealName, userEmail);
 				} catch (Exception ex) {
 					errorMsgs.add("Failed to submit request for immediate archival of " + 
 							expocode + ": " + ex.getMessage());
+					continue;
 				}
+				// When successful, update the "sent to CDIAC" timestamp
+				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+				cruise.setCdiacDate(localTimestamp);
+				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
 			}
 		}
 
