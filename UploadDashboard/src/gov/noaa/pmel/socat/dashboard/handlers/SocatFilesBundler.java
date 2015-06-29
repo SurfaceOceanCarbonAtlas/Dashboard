@@ -13,9 +13,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 /**
  * Bundles files, either original or SOCAT-enhanced documents, for sending out to be archived.
@@ -27,19 +38,23 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
-	private static final String EMAIL_MESSAGE_START =
+	private static final String EMAIL_SUBJECT_MSG = 
+			"Request for immediate archival from SOCAT dashboard user ";
+	private static final String EMAIL_MSG_START =
 			"Dear CDIAC team, \n" +
 			"\n" +
 			"The SOCAT dashboard user ";
-	private static final String EMAIL_MESSAGE_END = 
+	private static final String EMAIL_MSG_END = 
 			",\n" +
-			"when submitting a dataset for QC, has requested \n" +
-			"immediate archival of the attached data and metadata. \n" +
+			"as part of submitting a dataset to SOCAT for QC, \n" +
+			"has requested immediate archival of the attached data and metadata. \n" +
 			"\n" +
 			"Best regards, \n" +
 			"SOCAT team \n";
 
-	private String archivalEmailAddress;
+	private String archivalEmail;
+	private String socatEmail;
+	private String smtpHost;
 
 	/**
 	 * A file bundler that saves the file bundles under the given directory
@@ -53,16 +68,23 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		and no version control is performed
 	 * @param svnPassword
 	 * 		password for SVN authentication
-	 * @param emailAddress
+	 * @param archivalEmailAddress
 	 * 		e-mail address to send bundles for archival
+	 * @param socatEmailAddress
+	 * 		e-mail address from which these bundles are being sent
+	 * @param smtpHostAddress
+	 * 		address of the SMTP host to use for email
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a directory 
 	 * 		or is not under version control
 	 */
-	public SocatFilesBundler(String outputDirname, String svnUsername, 
-			String svnPassword, String emailAddress) throws IllegalArgumentException {
+	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
+			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress) 
+					throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
-		archivalEmailAddress = emailAddress;
+		archivalEmail = archivalEmailAddress;
+		socatEmail = socatEmailAddress;
+		smtpHost = smtpHostAddress;
 	}
 
 	/**
@@ -168,20 +190,20 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * @return
 	 * 		an message indicating what was sent and to whom
 	 * @throws IllegalArgumentException
-	 * 		if this SocatFilesBundler does not have a valid archivalEmailAddress,
-	 * 		if the userRealName is not given,
-	 * 		if the userEmailAddress is not valid, or
-	 * 		if the expocode is not valid
+	 * 		if the expocode is not valid, or
+	 * 		if there is a problem sending the archival request email
 	 * @throws IOException
 	 * 		if unable to read the default DashboardConfigStore, 
 	 * 		if the dataset is has no data or metadata files,
 	 * 		if unable to create the bundle file, or
 	 * 		if unable to commit the bundle to version control
 	 */
-	public String sendOrigFilesBundle(String expocode, String message, 
-			String userRealName, String userEmailAddress) throws IllegalArgumentException, IOException {
-		if ( (archivalEmailAddress == null) || archivalEmailAddress.isEmpty() )
+	public String sendOrigFilesBundle(String expocode, String message, String userRealName, 
+			String userEmailAddress) throws IllegalArgumentException, IOException {
+		if ( (archivalEmail == null) || archivalEmail.isEmpty() )
 			throw new IllegalArgumentException("no archival email address");
+		if ( (smtpHost == null) || smtpHost.isEmpty() )
+			throw new IllegalArgumentException("no SMTP host");
 		if ( (userRealName == null) || userRealName.isEmpty() ) 
 			throw new IllegalArgumentException("no user name");
 		if ( (userEmailAddress == null) || userEmailAddress.isEmpty() )
@@ -228,97 +250,73 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			try {
 				commitVersion(bundleFile, message);				
 			} catch (Exception ex) {
-				throw new IOException(
-						"Problems committing the CDIAC file bundle for " + 
-								upperExpo + ": " + ex.getMessage());
+				throw new IOException("Problems committing the CDIAC file bundle for " + 
+						upperExpo + ": " + ex.getMessage());
 			}
 		}
 
-		String emailMessage = EMAIL_MESSAGE_START + userRealName + EMAIL_MESSAGE_END;
-		/*
-	String to = args[0];
-	String from = args[1];
-	String host = args[2];
-	String filename = args[3];
-	boolean debug = Boolean.valueOf(args[4]).booleanValue();
-	String msgText1 = "Sending a file.\n";
-	String subject = "Sending a file";
-	
-	// create some properties and get the default Session
-	Properties props = System.getProperties();
-	props.put("mail.smtp.host", host);
-	
-	Session session = Session.getInstance(props, null);
-	session.setDebug(debug);
-	
-	try {
-	    // create a message
-	    MimeMessage msg = new MimeMessage(session);
-	    msg.setFrom(new InternetAddress(from));
-	    InternetAddress[] address = {new InternetAddress(to)};
-	    msg.setRecipients(Message.RecipientType.TO, address);
-	    msg.setSubject(subject);
-
-	    // create and fill the first message part
-	    MimeBodyPart mbp1 = new MimeBodyPart();
-	    mbp1.setText(msgText1);
-
-	    // create the second message part
-	    MimeBodyPart mbp2 = new MimeBodyPart();
-
-	    // attach the file to the message
-	    mbp2.attachFile(filename);
-
-	     *
-	     * Use the following approach instead of the above line if
-	     * you want to control the MIME type of the attached file.
-	     * Normally you should never need to do this.
-	     *
-	    FileDataSource fds = new FileDataSource(filename) {
-		public String getContentType() {
-		    return "application/octet-stream";
+		// Get the default Session for e-mailing
+		Properties props = System.getProperties();
+		props.put("mail.smtp.host", smtpHost);
+		Session session = Session.getDefaultInstance(props);
+		// Create the email message
+		MimeMessage msg = new MimeMessage(session);
+		try {
+			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected problems assigning the email subject: " + ex.getMessage(), ex);
 		}
-	    };
-	    mbp2.setDataHandler(new DataHandler(fds));
-	    mbp2.setFileName(fds.getName());
-	     *
+		try {
+			msg.setFrom(new InternetAddress(socatEmail));
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Invalid SOCAT email address: " + ex.getMessage(), ex);
+		}
+		try {
+			InternetAddress[] toAddress = { new InternetAddress(archivalEmail)};
+			msg.setRecipients(Message.RecipientType.TO, toAddress);
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Invalid CDIAC email address: " + ex.getMessage(), ex);
+		}
+		try {
+			InternetAddress[] ccAddress = { new InternetAddress(userEmailAddress) };
+			msg.setRecipients(Message.RecipientType.CC, ccAddress);
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Invalid user email address: " + ex.getMessage(), ex);
+		}
+		try {
+			// Create the text message part
+			MimeBodyPart textMsgPart = new MimeBodyPart();
+			textMsgPart.setText(EMAIL_MSG_START + userRealName + EMAIL_MSG_END);
+			// Create the attachment message part
+			MimeBodyPart attMsgPart = new MimeBodyPart();
+			attMsgPart.attachFile(bundleFile);
+			// Create and add the multipart document to the message
+			Multipart mp = new MimeMultipart();
+			mp.addBodyPart(textMsgPart);
+			mp.addBodyPart(attMsgPart);
+			msg.setContent(mp);
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected problems assigning the multipart document: " + ex.getMessage(), ex);
+		}
+		try {
+			msg.setSentDate(new Date());
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected problems assigning the email date: " + ex.getMessage(), ex);
+		}
+		try {
+			Transport.send(msg);
+		} catch (MessagingException ex) {
+			throw new IllegalArgumentException(
+					"Problems sending the archival request email: " + ex.getMessage(), ex);
+		}
 
-	    // create the Multipart and add its parts to it
-	    Multipart mp = new MimeMultipart();
-	    mp.addBodyPart(mbp1);
-	    mp.addBodyPart(mbp2);
-
-	    // add the Multipart to the message
-	    msg.setContent(mp);
-
-	    // set the Date: header
-	    msg.setSentDate(new Date());
-
-	     *
-	     * If you want to control the Content-Transfer-Encoding
-	     * of the attached file, do the following.  Normally you
-	     * should never need to do this.
-	     *
-	    msg.saveChanges();
-	    mbp2.setHeader("Content-Transfer-Encoding", "base64");
-	     *
-
-	    // send the message
-	    Transport.send(msg);
-	    
-	} catch (MessagingException mex) {
-	    mex.printStackTrace();
-	    Exception ex = null;
-	    if ((ex = mex.getNextException()) != null) {
-		ex.printStackTrace();
-	    }
-	} catch (IOException ioex) {
-	    ioex.printStackTrace();
-	}
-
-		 */
-
-		infoMsg += "Files bundle sent to " + archivalEmailAddress + " and cc'd to " + userEmailAddress + "\n";
+		infoMsg += "Files bundle sent to " + archivalEmail + " and cc'd to " + userEmailAddress + "\n";
 		return infoMsg;
 	}
 

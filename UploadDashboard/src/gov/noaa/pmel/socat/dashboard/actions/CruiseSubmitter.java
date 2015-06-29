@@ -8,6 +8,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.SocatFilesBundler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
@@ -21,6 +22,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -40,7 +42,10 @@ public class CruiseSubmitter {
 	CruiseChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
 	DatabaseRequestHandler databaseHandler;
+	SocatFilesBundler cdiacBundler;
 	String socatVersion;
+
+	private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
 
 	/**
 	 * @param configStore
@@ -53,6 +58,7 @@ public class CruiseSubmitter {
 		cruiseChecker = configStore.getDashboardCruiseChecker();
 		dsgNcHandler = configStore.getDsgNcFileHandler();
 		databaseHandler = configStore.getDatabaseRequestHandler();
+		cdiacBundler = configStore.getCdiacFilesBundler();
 		socatVersion = configStore.getSocatUploadVersion();
 	}
 
@@ -219,7 +225,7 @@ public class CruiseSubmitter {
 				try {
 					regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
 				} catch (Exception ex) {
-					throw new RuntimeException("Unexpected problems reading region IDs " +
+					throw new IllegalArgumentException("Unable to read region IDs " +
 							"from the newly created full-data DSG file for " + 
 							expocode + ": " + ex.getMessage());
 				}
@@ -307,7 +313,38 @@ public class CruiseSubmitter {
 
 		// TODO: ?modify cruise archive info in SOCAT for cruises in archiveExpos?
 
-		// TODO: send data to CDIAC for cruises in cdiacExpos
+		// Send original cruise data to CDIAC where user requested immediate archival
+		if ( ! cdiacExpos.isEmpty() ) {
+			String userRealName;
+			try {
+				userRealName = databaseHandler.getReviewerRealname(submitter);
+			} catch (Exception ex) {
+				userRealName = null;
+			}
+			if ( (userRealName == null) || userRealName.isEmpty() )
+				throw new IllegalArgumentException("Unknown real name for user " + submitter);
+
+			String userEmail;
+			try {
+				userEmail = databaseHandler.getReviewerEmail(submitter);
+			} catch (Exception ex) {
+				userEmail = null;
+			}
+			if ( (userEmail == null) || userEmail.isEmpty() )
+				throw new IllegalArgumentException("Unknown e-mail address for user " + submitter);
+
+			String timestamp = DATETIME_FORMATTER.format(new Date());
+			for ( String expocode : cdiacExpos ) {
+				String message = "Immediate archival of dataset " + expocode + 
+						" requested by " + userRealName + " (" + userEmail + ") at " + timestamp;
+				try {
+					cdiacBundler.sendOrigFilesBundle(expocode, message, userRealName, userEmail);
+				} catch (Exception ex) {
+					errorMsgs.add("Failed to submit request for immediate archival of " + 
+							expocode + ": " + ex.getMessage());
+				}
+			}
+		}
 
 		// If any cruise submit errors, return the error messages
 		// TODO: do this in a return message, not an IllegalArgumentException
