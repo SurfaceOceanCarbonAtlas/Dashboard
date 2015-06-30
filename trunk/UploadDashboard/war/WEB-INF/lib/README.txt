@@ -11,7 +11,8 @@ The jar files:
 	antlr-runtime-3.4.jar
 were obtained from the SVNKit (version 1.7.11) site http://svnkit.com/
 The jar file javax.mail-1.5.4.jar was obtained as javax.mail.jar (version 1.5.4) from the JavaMail site https://java.net/projects/javamail/
-The jar file netcdfAll-4.3.jar was obtained from the Unidata netCDF downloads site http://www.unidata.ucar.edu/downloads/netcdf/
+The jar file netcdfAll-4.6.jar was obtained from the Unidata netCDF downloads site http://www.unidata.ucar.edu/downloads/netcdf/
+The jar file slf4j-log4j12-1.7.12.jar was obtained from the slf4j-1.7.12 distribution from the SLF4J downloads site http://www.slf4j.org/
 The jar file mysql-connector-java-5.1.17.jar was obtained as part of the RHEL-6 distribution, but can be obtained from https://dev.mysql.com/downloads/connector/j/
 The jar file sanitychecker.jar is created from the Java classes under SanityChecker/src in this project and added to this location.
 The jar file omemetadata.jar is created from the Java classes under OmeMetadata/src in this project and added to this location.
