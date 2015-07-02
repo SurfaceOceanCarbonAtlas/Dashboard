@@ -18,7 +18,7 @@ import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;

@@ -21,7 +21,7 @@ import org.jdom2.input.SAXBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * Handler for the transfer of the contents from files saved from the OME server 

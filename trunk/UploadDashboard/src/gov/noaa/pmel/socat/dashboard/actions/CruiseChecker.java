@@ -34,9 +34,9 @@ import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
-import uk.ac.uea.socat.metadata.OmeMetadata.InvalidConflictException;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.BadEntryNameException;
+import uk.ac.uea.socat.omemetadata.InvalidConflictException;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
