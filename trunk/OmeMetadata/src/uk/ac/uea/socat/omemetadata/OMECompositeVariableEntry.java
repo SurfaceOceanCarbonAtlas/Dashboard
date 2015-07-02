@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OMECompositeVariableEntry {
 	private String itsName;
-	private List<String> itsValues;
+	private ArrayList<String> itsValues;
 	
 	protected OMECompositeVariableEntry(String name, String value) {
 		this.itsName = name;
@@ -78,14 +78,19 @@ public class OMECompositeVariableEntry {
 	protected List<String> getAllValues() {
 		return itsValues;
 	}
-	
+
+	@Override
 	protected Object clone() {
 		OMECompositeVariableEntry clone = new OMECompositeVariableEntry(itsName);
 		for (String value : itsValues) {
 			clone.itsValues.add(value);
 		}
-		
 		return clone;
+	}
+
+	@Override
+	public String toString() {
+		return "[itsName=" + itsName + ", itsValues=" + itsValues.toString() + "]";
 	}
 
 }

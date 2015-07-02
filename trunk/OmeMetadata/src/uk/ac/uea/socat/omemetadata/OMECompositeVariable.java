@@ -9,7 +9,7 @@ class OMECompositeVariable {
 	private OMEPath itsPath;
 	private List<String> itsAllowedEntries;
 	private List<String> itsIdFields;
-	private List<OMECompositeVariableEntry> itsEntries = new ArrayList<OMECompositeVariableEntry>();
+	private ArrayList<OMECompositeVariableEntry> itsEntries = new ArrayList<OMECompositeVariableEntry>();
 	private Element itsConflictsElement = null;
 	
 	protected OMECompositeVariable(OMEPath parentPath, List<String> allowedEntries, String idElement, Element conflictsElement) {
@@ -329,7 +329,8 @@ class OMECompositeVariable {
 		
 		return result;
 	}
-	
+
+	@Override
 	public Object clone() {
 		OMECompositeVariable clone = new OMECompositeVariable((OMEPath) itsPath.clone());
 		clone.itsAllowedEntries = new ArrayList<String>(itsAllowedEntries);
@@ -340,4 +341,11 @@ class OMECompositeVariable {
 		
 		return clone;
 	}
+
+	@Override
+	public String toString() {
+		return "OMECompositeVariable[itsPath=" + itsPath.toString()
+				+ ", itsEntries=" + itsEntries.toString() + "]";
+	}
+
 }

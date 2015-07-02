@@ -71,7 +71,8 @@ class OMEPath {
 	private boolean hasParent() {
 		return !(null == itsParent);
 	}
-	
+
+	@Override
 	public Object clone() {
 		OMEPath clone = new OMEPath(itsElementName);
 		if (null != itsParent) {
@@ -80,4 +81,23 @@ class OMEPath {
 		
 		return clone;
 	}
+
+	@Override
+	public String toString() {
+		String repr;
+		if ( itsParent != null ) {
+			repr = itsParent.toString() + ".";
+		}
+		else {
+			repr = "";
+		}
+		if ( itsElementName != null ) {
+			repr += itsElementName;
+		}
+		else {
+			repr += "null";
+		}
+		return repr;
+	}
+
 }
