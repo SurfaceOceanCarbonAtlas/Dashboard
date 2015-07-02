@@ -19,7 +19,7 @@ import org.jdom2.Element;
 class OMEVariable {
 
 	private OMEPath itsPath;
-	private List<String> itsValues;
+	private ArrayList<String> itsValues;
 	
 	/**
 	 * Create an OMEVariable object based on the contents of an XML element.
@@ -204,7 +204,7 @@ class OMEVariable {
 		return conflictElement;
 	}
 
-	
+	@Override
 	public Object clone() {
 		OMEVariable clone = new OMEVariable((OMEPath) itsPath.clone());
 		for (String value : itsValues) {
@@ -213,4 +213,12 @@ class OMEVariable {
 		
 		return clone;
 	}
+
+	@Override
+	public String toString() {
+		return "OMEVariable[itsPath=" + itsPath 
+				+ ", itsValues=" + itsValues.toString() + "]";
+	}
+
+
 }
