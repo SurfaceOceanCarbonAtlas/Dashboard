@@ -33,7 +33,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 
 import ucar.ma2.InvalidRangeException;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * NetCDF DSG file handler for the SOCAT upload dashboard.

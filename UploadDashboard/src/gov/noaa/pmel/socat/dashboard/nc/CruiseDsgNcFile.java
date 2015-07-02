@@ -30,7 +30,7 @@ import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.Variable;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 
 public class CruiseDsgNcFile extends File {

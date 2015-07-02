@@ -19,7 +19,7 @@ import java.util.TimeZone;
 import org.jdom2.Document;
 import org.jdom2.input.SAXBuilder;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * Class for the one special metadata file per cruise that must be present,
@@ -32,7 +32,7 @@ import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 5517166413080961933L;
+	private static final long serialVersionUID = -8213249918017236877L;
 
 	private static final SimpleDateFormat TIMEPARSER = new SimpleDateFormat("yyyyMMdd");
 	private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd");
