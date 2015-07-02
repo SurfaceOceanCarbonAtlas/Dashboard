@@ -1,4 +1,4 @@
-package uk.ac.uea.socat.metadata.OmeMetadata;
+package uk.ac.uea.socat.omemetadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import org.jdom2.Element;
  */
 class OMEVariable {
 
-	private Path itsPath;
+	private OMEPath itsPath;
 	private List<String> itsValues;
 	
 	/**
@@ -29,7 +29,7 @@ class OMEVariable {
 	 * @param parentElement The XML element containing the variable value
 	 * @param fullDocument The complete XML document - used to extract conflict information
 	 */
-	protected OMEVariable(Path path, Element parentElement, Element conflictsElement) throws InvalidConflictException {
+	protected OMEVariable(OMEPath path, Element parentElement, Element conflictsElement) throws InvalidConflictException {
 		itsPath = path;
 		itsValues = new ArrayList<String>();
 		if (null != parentElement) {
@@ -54,13 +54,13 @@ class OMEVariable {
 	 * @param path The variable path
 	 * @param value The value
 	 */
-	protected OMEVariable(Path path, String value) {
+	protected OMEVariable(OMEPath path, String value) {
 		itsPath = path;
 		itsValues = new ArrayList<String>();
 		addValue(value);
 	}
 	
-	private OMEVariable(Path path) {
+	private OMEVariable(OMEPath path) {
 		itsPath = path;
 		itsValues = new ArrayList<String>();
 	}
@@ -122,7 +122,7 @@ class OMEVariable {
 		return (itsValues.size() > 1);
 	}
 	
-	protected Path getPath() {
+	protected OMEPath getPath() {
 		return itsPath;
 	}
 	
@@ -167,7 +167,7 @@ class OMEVariable {
 		}
 	}
 	
-	private Element getVariableConflictElement(Path path, Element conflictsElement) throws InvalidConflictException {
+	private Element getVariableConflictElement(OMEPath path, Element conflictsElement) throws InvalidConflictException {
 		
 		List<String> variablePath = path.getPathTree();
 		List<Element> testElements = conflictsElement.getChildren(OmeMetadata.CONFLICT_ELEMENT_NAME);
@@ -206,7 +206,7 @@ class OMEVariable {
 
 	
 	public Object clone() {
-		OMEVariable clone = new OMEVariable((Path) itsPath.clone());
+		OMEVariable clone = new OMEVariable((OMEPath) itsPath.clone());
 		for (String value : itsValues) {
 			clone.addValue(value);
 		}

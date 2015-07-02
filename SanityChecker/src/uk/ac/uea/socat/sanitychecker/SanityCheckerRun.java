@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;

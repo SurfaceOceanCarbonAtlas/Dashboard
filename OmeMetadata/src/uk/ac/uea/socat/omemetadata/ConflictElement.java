@@ -1,4 +1,4 @@
-package uk.ac.uea.socat.metadata.OmeMetadata;
+package uk.ac.uea.socat.omemetadata;
 
 import org.jdom2.Content;
 import org.jdom2.Element;

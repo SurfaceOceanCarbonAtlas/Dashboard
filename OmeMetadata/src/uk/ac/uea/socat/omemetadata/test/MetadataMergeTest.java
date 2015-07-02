@@ -1,4 +1,4 @@
-package uk.ac.uea.socat.metadata.test;
+package uk.ac.uea.socat.omemetadata.test;
 
 
 import java.io.BufferedReader;
@@ -10,7 +10,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class MetadataMergeTest {
 	

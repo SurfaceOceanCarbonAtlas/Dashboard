@@ -1,7 +1,7 @@
 /**
  * 
  */
-package uk.ac.uea.socat.metadata.test;
+package uk.ac.uea.socat.omemetadata.test;
 
 import static org.junit.Assert.*;
 
@@ -16,9 +16,9 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.junit.Test;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
-import uk.ac.uea.socat.metadata.OmeMetadata.InvalidConflictException;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.BadEntryNameException;
+import uk.ac.uea.socat.omemetadata.InvalidConflictException;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * @author Karl Smith

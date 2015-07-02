@@ -1,7 +1,7 @@
 /**
  * 
  */
-package uk.ac.uea.socat.metadata.OmeMetadata;
+package uk.ac.uea.socat.omemetadata;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,191 +59,191 @@ public class OmeMetadata {
 	 * Paths for simple variables
 	 */
 	private static final String USER_ELEMENT_NAME = "User";
-	private static final Path USER_PATH = new Path(null, USER_ELEMENT_NAME);
-	private static final Path USER_NAME_PATH = new Path(USER_PATH, NAME_ELEMENT_NAME);
-	private static final Path USER_ORGANIZATION_PATH = new Path(USER_PATH, ORGANIZATION_ELEMENT_NAME);
-	private static final Path USER_ADDRESS_PATH = new Path(USER_PATH, ADDRESS_ELEMENT_NAME);
-	private static final Path USER_PHONE_PATH = new Path(USER_PATH, PHONE_ELEMENT_NAME);
-	private static final Path USER_EMAIL_PATH = new Path(USER_PATH, EMAIL_ELEMENT_NAME);
+	private static final OMEPath USER_PATH = new OMEPath(null, USER_ELEMENT_NAME);
+	private static final OMEPath USER_NAME_PATH = new OMEPath(USER_PATH, NAME_ELEMENT_NAME);
+	private static final OMEPath USER_ORGANIZATION_PATH = new OMEPath(USER_PATH, ORGANIZATION_ELEMENT_NAME);
+	private static final OMEPath USER_ADDRESS_PATH = new OMEPath(USER_PATH, ADDRESS_ELEMENT_NAME);
+	private static final OMEPath USER_PHONE_PATH = new OMEPath(USER_PATH, PHONE_ELEMENT_NAME);
+	private static final OMEPath USER_EMAIL_PATH = new OMEPath(USER_PATH, EMAIL_ELEMENT_NAME);
 
 	private static final String DATASET_INFO_ELEMENT_NAME = "Dataset_Info";
-	private static final Path DATASET_INFO_PATH = new Path(null, DATASET_INFO_ELEMENT_NAME);
-	private static final Path DATASET_ID_PATH = new Path(DATASET_INFO_PATH, "Dataset_ID");
-	private static final Path FUNDING_INFO_PATH = new Path(DATASET_INFO_PATH, "Funding_Info");
+	private static final OMEPath DATASET_INFO_PATH = new OMEPath(null, DATASET_INFO_ELEMENT_NAME);
+	private static final OMEPath DATASET_ID_PATH = new OMEPath(DATASET_INFO_PATH, "Dataset_ID");
+	private static final OMEPath FUNDING_INFO_PATH = new OMEPath(DATASET_INFO_PATH, "Funding_Info");
 
 	private static final String SUBMISSION_DATES_ELEMENT_NAME = "Submission_Dates";
-	private static final Path SUBMISSION_DATES_PATH = new Path(DATASET_INFO_PATH, SUBMISSION_DATES_ELEMENT_NAME);
-	private static final Path INITIAL_SUBMISSION_PATH = new Path(SUBMISSION_DATES_PATH, "Initial_Submission");
-	private static final Path REVISED_SUBMISSION_PATH = new Path(SUBMISSION_DATES_PATH, "Revised_Submission");
+	private static final OMEPath SUBMISSION_DATES_PATH = new OMEPath(DATASET_INFO_PATH, SUBMISSION_DATES_ELEMENT_NAME);
+	private static final OMEPath INITIAL_SUBMISSION_PATH = new OMEPath(SUBMISSION_DATES_PATH, "Initial_Submission");
+	private static final OMEPath REVISED_SUBMISSION_PATH = new OMEPath(SUBMISSION_DATES_PATH, "Revised_Submission");
 	
 	private static final String CRUISE_INFO_ELEMENT_NAME = "Cruise_Info";
-	private static final Path CRUISE_INFO_PATH = new Path(null, CRUISE_INFO_ELEMENT_NAME);
+	private static final OMEPath CRUISE_INFO_PATH = new OMEPath(null, CRUISE_INFO_ELEMENT_NAME);
 	private static final String EXPERIMENT_ELEMENT_NAME = "Experiment";
-	private static final Path EXPERIMENT_PATH = new Path(CRUISE_INFO_PATH, EXPERIMENT_ELEMENT_NAME);
-	private static final Path EXPERIMENT_NAME_PATH = new Path(EXPERIMENT_PATH, "Experiment_Name");
-	private static final Path EXPERIMENT_TYPE_PATH = new Path(EXPERIMENT_PATH, "Experiment_Type");
-	private static final Path PLATFORM_TYPE_PATH = new Path(EXPERIMENT_PATH, "Platform_Type");
-	private static final Path CO2_INSTRUMENT_TYPE_PATH = new Path(EXPERIMENT_PATH, "Co2_Instrument_type");
-	private static final Path MOORING_ID_PATH = new Path(EXPERIMENT_PATH, "Mooring_ID");
+	private static final OMEPath EXPERIMENT_PATH = new OMEPath(CRUISE_INFO_PATH, EXPERIMENT_ELEMENT_NAME);
+	private static final OMEPath EXPERIMENT_NAME_PATH = new OMEPath(EXPERIMENT_PATH, "Experiment_Name");
+	private static final OMEPath EXPERIMENT_TYPE_PATH = new OMEPath(EXPERIMENT_PATH, "Experiment_Type");
+	private static final OMEPath PLATFORM_TYPE_PATH = new OMEPath(EXPERIMENT_PATH, "Platform_Type");
+	private static final OMEPath CO2_INSTRUMENT_TYPE_PATH = new OMEPath(EXPERIMENT_PATH, "Co2_Instrument_type");
+	private static final OMEPath MOORING_ID_PATH = new OMEPath(EXPERIMENT_PATH, "Mooring_ID");
 	
 	private static final String CRUISE_ELEMENT_NAME = "Cruise";
-	private static final Path CRUISE_PATH = new Path(EXPERIMENT_PATH, CRUISE_ELEMENT_NAME);
+	private static final OMEPath CRUISE_PATH = new OMEPath(EXPERIMENT_PATH, CRUISE_ELEMENT_NAME);
 	private static final String CRUISE_ID_ELEMENT_NAME = "Cruise_ID";
-	private static final Path CRUISE_ID_PATH = new Path(CRUISE_PATH, CRUISE_ID_ELEMENT_NAME);
-	private static final Path SUB_CRUISE_INFO_PATH = new Path(CRUISE_PATH, "Cruise_Info");
-	private static final Path SECTION_PATH = new Path(CRUISE_PATH, "Section");
+	private static final OMEPath CRUISE_ID_PATH = new OMEPath(CRUISE_PATH, CRUISE_ID_ELEMENT_NAME);
+	private static final OMEPath SUB_CRUISE_INFO_PATH = new OMEPath(CRUISE_PATH, "Cruise_Info");
+	private static final OMEPath SECTION_PATH = new OMEPath(CRUISE_PATH, "Section");
 
 	private static final String GEO_COVERAGE_ELEMENT_NAME = "Geographical_Coverage";
-	private static final Path GEO_COVERAGE_PATH = new Path(CRUISE_PATH, GEO_COVERAGE_ELEMENT_NAME);
-	private static final Path GEO_REGION_PATH = new Path(GEO_COVERAGE_PATH, "Geographical_Region");
+	private static final OMEPath GEO_COVERAGE_PATH = new OMEPath(CRUISE_PATH, GEO_COVERAGE_ELEMENT_NAME);
+	private static final OMEPath GEO_REGION_PATH = new OMEPath(GEO_COVERAGE_PATH, "Geographical_Region");
 	private static final String BOUNDS_ELEMENT_NAME = "Bounds";
-	private static final Path BOUNDS_PATH = new Path(GEO_COVERAGE_PATH, BOUNDS_ELEMENT_NAME);
-	private static final Path WEST_BOUND_PATH = new Path(BOUNDS_PATH, "Westernmost_Longitude");
-	private static final Path EAST_BOUND_PATH = new Path(BOUNDS_PATH, "Easternmost_Longitude");
-	private static final Path NORTH_BOUND_PATH = new Path(BOUNDS_PATH, "Northernmost_Latitude");
-	private static final Path SOUTH_BOUND_PATH = new Path(BOUNDS_PATH, "Southernmost_Latitude");
+	private static final OMEPath BOUNDS_PATH = new OMEPath(GEO_COVERAGE_PATH, BOUNDS_ELEMENT_NAME);
+	private static final OMEPath WEST_BOUND_PATH = new OMEPath(BOUNDS_PATH, "Westernmost_Longitude");
+	private static final OMEPath EAST_BOUND_PATH = new OMEPath(BOUNDS_PATH, "Easternmost_Longitude");
+	private static final OMEPath NORTH_BOUND_PATH = new OMEPath(BOUNDS_PATH, "Northernmost_Latitude");
+	private static final OMEPath SOUTH_BOUND_PATH = new OMEPath(BOUNDS_PATH, "Southernmost_Latitude");
 
 	private static final String TEMP_COVERAGE_ELEMENT_NAME = "Temporal_Coverage";
-	private static final Path TEMP_COVERAGE_PATH = new Path(CRUISE_PATH, TEMP_COVERAGE_ELEMENT_NAME);
-	private static final Path TEMP_START_DATE_PATH = new Path(TEMP_COVERAGE_PATH, "Start_Date");
-	private static final Path TEMP_END_DATE_PATH = new Path(TEMP_COVERAGE_PATH, "End_Date");
-	private static final Path START_DATE_PATH = new Path(CRUISE_PATH, "Start_Date");
-	private static final Path END_DATE_PATH = new Path(CRUISE_PATH, "End_Date");
+	private static final OMEPath TEMP_COVERAGE_PATH = new OMEPath(CRUISE_PATH, TEMP_COVERAGE_ELEMENT_NAME);
+	private static final OMEPath TEMP_START_DATE_PATH = new OMEPath(TEMP_COVERAGE_PATH, "Start_Date");
+	private static final OMEPath TEMP_END_DATE_PATH = new OMEPath(TEMP_COVERAGE_PATH, "End_Date");
+	private static final OMEPath START_DATE_PATH = new OMEPath(CRUISE_PATH, "Start_Date");
+	private static final OMEPath END_DATE_PATH = new OMEPath(CRUISE_PATH, "End_Date");
 
 	private static final String VESSEL_ELEMENT_NAME = "Vessel";
-	private static final Path VESSEL_PATH = new Path(CRUISE_INFO_PATH, VESSEL_ELEMENT_NAME);
-	private static final Path VESSEL_NAME_PATH = new Path(VESSEL_PATH, "Vessel_Name");
-	private static final Path VESSEL_ID_PATH = new Path(VESSEL_PATH, "Vessel_ID");
-	private static final Path COUNTRY_PATH = new Path(VESSEL_PATH, "Country");
-	private static final Path OWNER_PATH = new Path(VESSEL_PATH, "Vessel_Owner");
+	private static final OMEPath VESSEL_PATH = new OMEPath(CRUISE_INFO_PATH, VESSEL_ELEMENT_NAME);
+	private static final OMEPath VESSEL_NAME_PATH = new OMEPath(VESSEL_PATH, "Vessel_Name");
+	private static final OMEPath VESSEL_ID_PATH = new OMEPath(VESSEL_PATH, "Vessel_ID");
+	private static final OMEPath COUNTRY_PATH = new OMEPath(VESSEL_PATH, "Country");
+	private static final OMEPath OWNER_PATH = new OMEPath(VESSEL_PATH, "Vessel_Owner");
 
 	private static final String CO2_DATA_INFO_ELEMENT_NAME = "CO2_Data_Info";
-	private static final Path CO2_DATA_INFO_PATH = new Path(null, CO2_DATA_INFO_ELEMENT_NAME);
+	private static final OMEPath CO2_DATA_INFO_PATH = new OMEPath(null, CO2_DATA_INFO_ELEMENT_NAME);
 	private static final String UNIT_ELEMENT_NAME = "Unit";
 	private static final String XCO2_WATER_EQU_DRY_ELEMENT_NAME = "xCO2water_equ_dry";
-	private static final Path XCO2_WATER_EQU_DRY_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_WATER_EQU_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath XCO2_WATER_EQU_DRY_PATH = new OMEPath(CO2_DATA_INFO_PATH, XCO2_WATER_EQU_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String XCO2_WATER_SST_DRY_ELEMENT_NAME = "xCO2water_SST_dry";
-	private static final Path XCO2_WATER_SST_DRY_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_WATER_SST_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath XCO2_WATER_SST_DRY_PATH = new OMEPath(CO2_DATA_INFO_PATH, XCO2_WATER_SST_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String PCO2_WATER_EQU_WET_ELEMENT_NAME = "pCO2water_equ_wet";
-	private static final Path PCO2_WATER_EQU_WET_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath PCO2_WATER_EQU_WET_PATH = new OMEPath(CO2_DATA_INFO_PATH, PCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String PCO2_WATER_SST_WET_ELEMENT_NAME = "pCO2water_SST_wet";
-	private static final Path PCO2_WATER_SST_WET_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath PCO2_WATER_SST_WET_PATH = new OMEPath(CO2_DATA_INFO_PATH, PCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String FCO2_WATER_EQU_WET_ELEMENT_NAME = "fCO2water_equ_wet";
-	private static final Path FCO2_WATER_EQU_WET_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath FCO2_WATER_EQU_WET_PATH = new OMEPath(CO2_DATA_INFO_PATH, FCO2_WATER_EQU_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String FCO2_WATER_SST_WET_ELEMENT_NAME = "fCO2water_SST_wet";
-	private static final Path FCO2_WATER_SST_WET_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath FCO2_WATER_SST_WET_PATH = new OMEPath(CO2_DATA_INFO_PATH, FCO2_WATER_SST_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String XCO2_AIR_DRY_ELEMENT_NAME = "xCO2air_dry";
-	private static final Path XCO2_AIR_DRY_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_AIR_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath XCO2_AIR_DRY_PATH = new OMEPath(CO2_DATA_INFO_PATH, XCO2_AIR_DRY_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String PCO2_AIR_WET_ELEMENT_NAME = "pCO2air_wet";
-	private static final Path PCO2_AIR_WET_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath PCO2_AIR_WET_PATH = new OMEPath(CO2_DATA_INFO_PATH, PCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String FCO2_AIR_WET_ELEMENT_NAME = "fCO2air_wet";
-	private static final Path FCO2_AIR_WET_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath FCO2_AIR_WET_PATH = new OMEPath(CO2_DATA_INFO_PATH, FCO2_AIR_WET_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String XCO2_AIR_DRY_INTERP_ELEMENT_NAME = "xCO2air_dry_interpolated";
-	private static final Path XCO2_AIR_DRY_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, XCO2_AIR_DRY_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath XCO2_AIR_DRY_INTERP_PATH = new OMEPath(CO2_DATA_INFO_PATH, XCO2_AIR_DRY_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String PCO2_AIR_WET_INTERP_ELEMENT_NAME = "pCO2air_wet_interpolated";
-	private static final Path PCO2_AIR_WET_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, PCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath PCO2_AIR_WET_INTERP_PATH = new OMEPath(CO2_DATA_INFO_PATH, PCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 	private static final String FCO2_AIR_WET_INTERP_ELEMENT_NAME = "fCO2air_wet_interpolated";
-	private static final Path FCO2_AIR_WET_INTERP_PATH = new Path(CO2_DATA_INFO_PATH, FCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
+	private static final OMEPath FCO2_AIR_WET_INTERP_PATH = new OMEPath(CO2_DATA_INFO_PATH, FCO2_AIR_WET_INTERP_ELEMENT_NAME, UNIT_ELEMENT_NAME);
 
 	private static final String METHOD_DESCRIPTION_ELEMENT_NAME = "Method_Description";
-	private static final Path METHOD_DESCRIPTION_PATH = new Path(null, METHOD_DESCRIPTION_ELEMENT_NAME);
+	private static final OMEPath METHOD_DESCRIPTION_PATH = new OMEPath(null, METHOD_DESCRIPTION_ELEMENT_NAME);
 	private static final String EQUILIBRATOR_DESIGN_ELEMENT_NAME = "Equilibrator_Design";
-	private static final Path EQUILIBRATOR_DESIGN_PATH = new Path(METHOD_DESCRIPTION_PATH, EQUILIBRATOR_DESIGN_ELEMENT_NAME);
-	private static final Path INTAKE_DEPTH_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Depth_of_Sea_Water_Intake");
-	private static final Path INTAKE_LOCATION_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Location_of_Sea_Water_Intake");
-	private static final Path EQUI_TYPE_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Equilibrator_Type");
-	private static final Path EQUI_VOLUME_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Equilibrator_Volume");
-	private static final Path WATER_FLOW_RATE_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Water_Flow_Rate");
-	private static final Path GAS_FLOW_RATE_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Headspace_Gas_Flow_Rate");
-	private static final Path VENTED_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Vented");
-	private static final Path DRYING_METHOD_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Drying_Method_for_CO2_in_water");
-	private static final Path EQUI_ADDITIONAL_INFO_PATH = new Path(EQUILIBRATOR_DESIGN_PATH, "Additional_Information");
+	private static final OMEPath EQUILIBRATOR_DESIGN_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, EQUILIBRATOR_DESIGN_ELEMENT_NAME);
+	private static final OMEPath INTAKE_DEPTH_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Depth_of_Sea_Water_Intake");
+	private static final OMEPath INTAKE_LOCATION_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Location_of_Sea_Water_Intake");
+	private static final OMEPath EQUI_TYPE_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Equilibrator_Type");
+	private static final OMEPath EQUI_VOLUME_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Equilibrator_Volume");
+	private static final OMEPath WATER_FLOW_RATE_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Water_Flow_Rate");
+	private static final OMEPath GAS_FLOW_RATE_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Headspace_Gas_Flow_Rate");
+	private static final OMEPath VENTED_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Vented");
+	private static final OMEPath DRYING_METHOD_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Drying_Method_for_CO2_in_water");
+	private static final OMEPath EQUI_ADDITIONAL_INFO_PATH = new OMEPath(EQUILIBRATOR_DESIGN_PATH, "Additional_Information");
 
 	private static final String CO2_MARINE_AIR_ELEMENT_NAME = "CO2_in_Marine_Air";
-	private static final Path CO2_MARINE_AIR_PATH = new Path(METHOD_DESCRIPTION_PATH, CO2_MARINE_AIR_ELEMENT_NAME);
-	private static final Path MARINE_AIR_MEASUREMENT_PATH = new Path(CO2_MARINE_AIR_PATH, "Measurement");
-	private static final Path MARINE_AIR_LOCATION_PATH = new Path(CO2_MARINE_AIR_PATH, "Location_and_Height");
-	private static final Path MARINE_AIR_DRYING_PATH = new Path(CO2_MARINE_AIR_PATH, "Drying_Method");
+	private static final OMEPath CO2_MARINE_AIR_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, CO2_MARINE_AIR_ELEMENT_NAME);
+	private static final OMEPath MARINE_AIR_MEASUREMENT_PATH = new OMEPath(CO2_MARINE_AIR_PATH, "Measurement");
+	private static final OMEPath MARINE_AIR_LOCATION_PATH = new OMEPath(CO2_MARINE_AIR_PATH, "Location_and_Height");
+	private static final OMEPath MARINE_AIR_DRYING_PATH = new OMEPath(CO2_MARINE_AIR_PATH, "Drying_Method");
 
 	private static final String CO2_SENSORS_ELEMENT_NAME = "CO2_Sensors";
-	private static final Path CO2_SENSORS_PATH = new Path(METHOD_DESCRIPTION_PATH, CO2_SENSORS_ELEMENT_NAME);
-	private static final Path CO2_SENSOR_PATH = new Path(CO2_SENSORS_PATH, "CO2_Sensor");
-	private static final Path CO2_MEASUREMENT_METHOD_PATH = new Path(CO2_SENSOR_PATH, "Measurement_Method");
-	private static final Path CO2_MANUFACTURER_PATH = new Path(CO2_SENSOR_PATH, MANUFACTURER_ELEMENT_NAME);
-	private static final Path CO2_MODEL_PATH = new Path(CO2_SENSOR_PATH, MODEL_ELEMENT_NAME);
-	private static final Path CO2_FREQUENCY_PATH = new Path(CO2_SENSOR_PATH, "Frequency");
-	private static final Path CO2_WATER_RES_PATH = new Path(CO2_SENSOR_PATH, "Resolution_Water");
-	private static final Path CO2_WATER_UNC_PATH = new Path(CO2_SENSOR_PATH, "Uncertainty_Water");
-	private static final Path CO2_AIR_RES_PATH = new Path(CO2_SENSOR_PATH, "Resolution_Air");
-	private static final Path CO2_AIR_UNC_PATH = new Path(CO2_SENSOR_PATH, "Uncertainty_Air");
-	private static final Path CO2_CALIBRATION_MANUFACTURER_PATH = new Path(CO2_SENSOR_PATH, "Manufacturer_of_Calibration_Gas");
-	private static final Path CO2_SENSOR_CALIBRATION_PATH = new Path(CO2_SENSOR_PATH, "CO2_Sensor_Calibration");
-	private static final Path ENVIRONMENTAL_CONTROL_PATH = new Path(CO2_SENSOR_PATH, "Environmental_Control");
-	private static final Path METHOD_REFS_PATH = new Path(CO2_SENSOR_PATH, "Method_References");
-	private static final Path DETAILS_OF_CO2_SENSING_PATH = new Path(CO2_SENSOR_PATH, "Details_Co2_Sensing");
-	private static final Path ANALYSIS_OF_COMPARISON_PATH = new Path(CO2_SENSOR_PATH, "Analysis_of_Co2_Comparision");
-	private static final Path MEASURED_CO2_PARAMS_PATH = new Path(CO2_SENSOR_PATH, "Measured_Co2_Params");
+	private static final OMEPath CO2_SENSORS_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, CO2_SENSORS_ELEMENT_NAME);
+	private static final OMEPath CO2_SENSOR_PATH = new OMEPath(CO2_SENSORS_PATH, "CO2_Sensor");
+	private static final OMEPath CO2_MEASUREMENT_METHOD_PATH = new OMEPath(CO2_SENSOR_PATH, "Measurement_Method");
+	private static final OMEPath CO2_MANUFACTURER_PATH = new OMEPath(CO2_SENSOR_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final OMEPath CO2_MODEL_PATH = new OMEPath(CO2_SENSOR_PATH, MODEL_ELEMENT_NAME);
+	private static final OMEPath CO2_FREQUENCY_PATH = new OMEPath(CO2_SENSOR_PATH, "Frequency");
+	private static final OMEPath CO2_WATER_RES_PATH = new OMEPath(CO2_SENSOR_PATH, "Resolution_Water");
+	private static final OMEPath CO2_WATER_UNC_PATH = new OMEPath(CO2_SENSOR_PATH, "Uncertainty_Water");
+	private static final OMEPath CO2_AIR_RES_PATH = new OMEPath(CO2_SENSOR_PATH, "Resolution_Air");
+	private static final OMEPath CO2_AIR_UNC_PATH = new OMEPath(CO2_SENSOR_PATH, "Uncertainty_Air");
+	private static final OMEPath CO2_CALIBRATION_MANUFACTURER_PATH = new OMEPath(CO2_SENSOR_PATH, "Manufacturer_of_Calibration_Gas");
+	private static final OMEPath CO2_SENSOR_CALIBRATION_PATH = new OMEPath(CO2_SENSOR_PATH, "CO2_Sensor_Calibration");
+	private static final OMEPath ENVIRONMENTAL_CONTROL_PATH = new OMEPath(CO2_SENSOR_PATH, "Environmental_Control");
+	private static final OMEPath METHOD_REFS_PATH = new OMEPath(CO2_SENSOR_PATH, "Method_References");
+	private static final OMEPath DETAILS_OF_CO2_SENSING_PATH = new OMEPath(CO2_SENSOR_PATH, "Details_Co2_Sensing");
+	private static final OMEPath ANALYSIS_OF_COMPARISON_PATH = new OMEPath(CO2_SENSOR_PATH, "Analysis_of_Co2_Comparision");
+	private static final OMEPath MEASURED_CO2_PARAMS_PATH = new OMEPath(CO2_SENSOR_PATH, "Measured_Co2_Params");
 
 	private static final String SST_ELEMENT_NAME = "Sea_Surface_Temperature";
-	private static final Path SST_PATH = new Path(METHOD_DESCRIPTION_PATH, SST_ELEMENT_NAME);
-	private static final Path SST_LOCATION_PATH = new Path(SST_PATH, LOCATION_ELEMENT_NAME);
-	private static final Path SST_MANUFACTURER_PATH = new Path(SST_PATH, MANUFACTURER_ELEMENT_NAME);
-	private static final Path SST_MODEL_PATH = new Path(SST_PATH, MODEL_ELEMENT_NAME);
-	private static final Path SST_ACCURACY_PATH = new Path(SST_PATH, ACCURACY_ELEMENT_NAME);
-	private static final Path SST_PRECISION_PATH = new Path(SST_PATH, PRECISION_ELEMENT_NAME);
-	private static final Path SST_CALIBRATION_PATH = new Path(SST_PATH, CALIBRATION_ELEMENT_NAME);
-	private static final Path SST_COMMENTS_PATH = new Path(SST_PATH, COMMENTS_ELEMENT_NAME);
+	private static final OMEPath SST_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, SST_ELEMENT_NAME);
+	private static final OMEPath SST_LOCATION_PATH = new OMEPath(SST_PATH, LOCATION_ELEMENT_NAME);
+	private static final OMEPath SST_MANUFACTURER_PATH = new OMEPath(SST_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final OMEPath SST_MODEL_PATH = new OMEPath(SST_PATH, MODEL_ELEMENT_NAME);
+	private static final OMEPath SST_ACCURACY_PATH = new OMEPath(SST_PATH, ACCURACY_ELEMENT_NAME);
+	private static final OMEPath SST_PRECISION_PATH = new OMEPath(SST_PATH, PRECISION_ELEMENT_NAME);
+	private static final OMEPath SST_CALIBRATION_PATH = new OMEPath(SST_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final OMEPath SST_COMMENTS_PATH = new OMEPath(SST_PATH, COMMENTS_ELEMENT_NAME);
 
 	private static final String EQU_TEMP_ELEMENT_NAME = "Equilibrator_Temperature";
-	private static final Path EQU_TEMP_PATH = new Path(METHOD_DESCRIPTION_PATH, EQU_TEMP_ELEMENT_NAME);
-	private static final Path EQT_LOCATION_PATH = new Path(EQU_TEMP_PATH, LOCATION_ELEMENT_NAME);
-	private static final Path EQT_MANUFACTURER_PATH = new Path(EQU_TEMP_PATH, MANUFACTURER_ELEMENT_NAME);
-	private static final Path EQT_MODEL_PATH = new Path(EQU_TEMP_PATH, MODEL_ELEMENT_NAME);
-	private static final Path EQT_ACCURACY_PATH = new Path(EQU_TEMP_PATH, ACCURACY_ELEMENT_NAME);
-	private static final Path EQT_PRECISION_PATH = new Path(EQU_TEMP_PATH, PRECISION_ELEMENT_NAME);
-	private static final Path EQT_CALIBRATION_PATH = new Path(EQU_TEMP_PATH, CALIBRATION_ELEMENT_NAME);
-	private static final Path EQT_WARMING_PATH = new Path(EQU_TEMP_PATH, "Warming");
-	private static final Path EQT_COMMENTS_PATH = new Path(EQU_TEMP_PATH, COMMENTS_ELEMENT_NAME);	
+	private static final OMEPath EQU_TEMP_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, EQU_TEMP_ELEMENT_NAME);
+	private static final OMEPath EQT_LOCATION_PATH = new OMEPath(EQU_TEMP_PATH, LOCATION_ELEMENT_NAME);
+	private static final OMEPath EQT_MANUFACTURER_PATH = new OMEPath(EQU_TEMP_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final OMEPath EQT_MODEL_PATH = new OMEPath(EQU_TEMP_PATH, MODEL_ELEMENT_NAME);
+	private static final OMEPath EQT_ACCURACY_PATH = new OMEPath(EQU_TEMP_PATH, ACCURACY_ELEMENT_NAME);
+	private static final OMEPath EQT_PRECISION_PATH = new OMEPath(EQU_TEMP_PATH, PRECISION_ELEMENT_NAME);
+	private static final OMEPath EQT_CALIBRATION_PATH = new OMEPath(EQU_TEMP_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final OMEPath EQT_WARMING_PATH = new OMEPath(EQU_TEMP_PATH, "Warming");
+	private static final OMEPath EQT_COMMENTS_PATH = new OMEPath(EQU_TEMP_PATH, COMMENTS_ELEMENT_NAME);	
 
 	private static final String EQU_PRESSURE_ELEMENT_NAME = "Equilibrator_Pressure";
-	private static final Path EQU_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, EQU_PRESSURE_ELEMENT_NAME);
-	private static final Path EQP_LOCATION_PATH = new Path(EQU_PRESSURE_PATH, LOCATION_ELEMENT_NAME);
-	private static final Path EQP_MANUFACTURER_PATH = new Path(EQU_PRESSURE_PATH, MANUFACTURER_ELEMENT_NAME);
-	private static final Path EQP_MODEL_PATH = new Path(EQU_PRESSURE_PATH, MODEL_ELEMENT_NAME);
-	private static final Path EQP_ACCURACY_PATH = new Path(EQU_PRESSURE_PATH, ACCURACY_ELEMENT_NAME);
-	private static final Path EQP_PRECISION_PATH = new Path(EQU_PRESSURE_PATH, PRECISION_ELEMENT_NAME);
-	private static final Path EQP_CALIBRATION_PATH = new Path(EQU_PRESSURE_PATH, CALIBRATION_ELEMENT_NAME);
-	private static final Path EQP_COMMENTS_PATH = new Path(EQU_PRESSURE_PATH, COMMENTS_ELEMENT_NAME);
-	private static final Path EQP_NORMALIZED_PATH = new Path(EQU_PRESSURE_PATH, "Normalized");
+	private static final OMEPath EQU_PRESSURE_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, EQU_PRESSURE_ELEMENT_NAME);
+	private static final OMEPath EQP_LOCATION_PATH = new OMEPath(EQU_PRESSURE_PATH, LOCATION_ELEMENT_NAME);
+	private static final OMEPath EQP_MANUFACTURER_PATH = new OMEPath(EQU_PRESSURE_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final OMEPath EQP_MODEL_PATH = new OMEPath(EQU_PRESSURE_PATH, MODEL_ELEMENT_NAME);
+	private static final OMEPath EQP_ACCURACY_PATH = new OMEPath(EQU_PRESSURE_PATH, ACCURACY_ELEMENT_NAME);
+	private static final OMEPath EQP_PRECISION_PATH = new OMEPath(EQU_PRESSURE_PATH, PRECISION_ELEMENT_NAME);
+	private static final OMEPath EQP_CALIBRATION_PATH = new OMEPath(EQU_PRESSURE_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final OMEPath EQP_COMMENTS_PATH = new OMEPath(EQU_PRESSURE_PATH, COMMENTS_ELEMENT_NAME);
+	private static final OMEPath EQP_NORMALIZED_PATH = new OMEPath(EQU_PRESSURE_PATH, "Normalized");
 
 	private static final String ATM_PRESSURE_ELEMENT_NAME = "Atmospheric_Pressure";
-	private static final Path ATM_PRESSURE_PATH = new Path(METHOD_DESCRIPTION_PATH, ATM_PRESSURE_ELEMENT_NAME);
-	private static final Path ATM_LOCATION_PATH = new Path(ATM_PRESSURE_PATH, LOCATION_ELEMENT_NAME);
-	private static final Path ATM_MANUFACTURER_PATH = new Path(ATM_PRESSURE_PATH, MANUFACTURER_ELEMENT_NAME);
-	private static final Path ATM_MODEL_PATH = new Path(ATM_PRESSURE_PATH, MODEL_ELEMENT_NAME);
-	private static final Path ATM_ACCURACY_PATH = new Path(ATM_PRESSURE_PATH, ACCURACY_ELEMENT_NAME);
-	private static final Path ATM_PRECISION_PATH = new Path(ATM_PRESSURE_PATH, PRECISION_ELEMENT_NAME);
-	private static final Path ATM_CALIBRATION_PATH = new Path(ATM_PRESSURE_PATH, CALIBRATION_ELEMENT_NAME);
-	private static final Path ATM_COMMENTS_PATH = new Path(ATM_PRESSURE_PATH, COMMENTS_ELEMENT_NAME);
+	private static final OMEPath ATM_PRESSURE_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, ATM_PRESSURE_ELEMENT_NAME);
+	private static final OMEPath ATM_LOCATION_PATH = new OMEPath(ATM_PRESSURE_PATH, LOCATION_ELEMENT_NAME);
+	private static final OMEPath ATM_MANUFACTURER_PATH = new OMEPath(ATM_PRESSURE_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final OMEPath ATM_MODEL_PATH = new OMEPath(ATM_PRESSURE_PATH, MODEL_ELEMENT_NAME);
+	private static final OMEPath ATM_ACCURACY_PATH = new OMEPath(ATM_PRESSURE_PATH, ACCURACY_ELEMENT_NAME);
+	private static final OMEPath ATM_PRECISION_PATH = new OMEPath(ATM_PRESSURE_PATH, PRECISION_ELEMENT_NAME);
+	private static final OMEPath ATM_CALIBRATION_PATH = new OMEPath(ATM_PRESSURE_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final OMEPath ATM_COMMENTS_PATH = new OMEPath(ATM_PRESSURE_PATH, COMMENTS_ELEMENT_NAME);
 
 	private static final String SSS_ELEMENT_NAME = "Sea_Surface_Salinity";
-	private static final Path SSS_PATH = new Path(METHOD_DESCRIPTION_PATH, SSS_ELEMENT_NAME);
-	private static final Path SSS_LOCATION_PATH = new Path(SSS_PATH, LOCATION_ELEMENT_NAME);
-	private static final Path SSS_MANUFACTURER_PATH = new Path(SSS_PATH, MANUFACTURER_ELEMENT_NAME);
-	private static final Path SSS_MODEL_PATH = new Path(SSS_PATH, MODEL_ELEMENT_NAME);
-	private static final Path SSS_ACCURACY_PATH = new Path(SSS_PATH, ACCURACY_ELEMENT_NAME);
-	private static final Path SSS_PRECISION_PATH = new Path(SSS_PATH, PRECISION_ELEMENT_NAME);
-	private static final Path SSS_CALIBRATION_PATH = new Path(SSS_PATH, CALIBRATION_ELEMENT_NAME);
-	private static final Path SSS_COMMENTS_PATH = new Path(SSS_PATH, COMMENTS_ELEMENT_NAME);
+	private static final OMEPath SSS_PATH = new OMEPath(METHOD_DESCRIPTION_PATH, SSS_ELEMENT_NAME);
+	private static final OMEPath SSS_LOCATION_PATH = new OMEPath(SSS_PATH, LOCATION_ELEMENT_NAME);
+	private static final OMEPath SSS_MANUFACTURER_PATH = new OMEPath(SSS_PATH, MANUFACTURER_ELEMENT_NAME);
+	private static final OMEPath SSS_MODEL_PATH = new OMEPath(SSS_PATH, MODEL_ELEMENT_NAME);
+	private static final OMEPath SSS_ACCURACY_PATH = new OMEPath(SSS_PATH, ACCURACY_ELEMENT_NAME);
+	private static final OMEPath SSS_PRECISION_PATH = new OMEPath(SSS_PATH, PRECISION_ELEMENT_NAME);
+	private static final OMEPath SSS_CALIBRATION_PATH = new OMEPath(SSS_PATH, CALIBRATION_ELEMENT_NAME);
+	private static final OMEPath SSS_COMMENTS_PATH = new OMEPath(SSS_PATH, COMMENTS_ELEMENT_NAME);
 
-	private static final Path DATA_SET_REFS_PATH = new Path(null, "Data_set_References");
-	private static final Path ADD_INFO_PATH = new Path(null, "Additional_Information");
-	private static final Path CITATION_PATH = new Path(null, "Citation");
-	private static final Path MEAS_CALIB_REPORT_PATH = new Path(null, "Measurement_and_Calibration_Report");
-	private static final Path PRELIM_QC_PATH = new Path(null, "Preliminary_Quality_control");
+	private static final OMEPath DATA_SET_REFS_PATH = new OMEPath(null, "Data_set_References");
+	private static final OMEPath ADD_INFO_PATH = new OMEPath(null, "Additional_Information");
+	private static final OMEPath CITATION_PATH = new OMEPath(null, "Citation");
+	private static final OMEPath MEAS_CALIB_REPORT_PATH = new OMEPath(null, "Measurement_and_Calibration_Report");
+	private static final OMEPath PRELIM_QC_PATH = new OMEPath(null, "Preliminary_Quality_control");
 	// The following two element names are lowercase
-	private static final Path FORM_TYPE_PATH = new Path(null, "form_type");
-	private static final Path RECORD_ID_PATH = new Path(null, "record_id");
+	private static final OMEPath FORM_TYPE_PATH = new OMEPath(null, "form_type");
+	private static final OMEPath RECORD_ID_PATH = new OMEPath(null, "record_id");
 	
 	/**
 	 * Names of fields in the data file headers
@@ -380,7 +380,7 @@ public class OmeMetadata {
 	 */
 	public static final String INVESTIGATOR_COMP_NAME = "investigator";
 	private static final String INVESTIGATOR_ELEMENT_NAME = "Investigator";
-	private static final Path INVESTIGATORS_PATH = new Path(null, INVESTIGATOR_ELEMENT_NAME);
+	private static final OMEPath INVESTIGATORS_PATH = new OMEPath(null, INVESTIGATOR_ELEMENT_NAME);
 	private static final ArrayList<String> INVESTIGATOR_ENTRIES = 
 			new ArrayList<String>(Arrays.asList(NAME_ELEMENT_NAME, 
 												ORGANIZATION_ELEMENT_NAME, 
@@ -396,7 +396,7 @@ public class OmeMetadata {
 	private static final String VARIABLE_ELEMENT_NAME = "Variable";
 	public static final String VARIABLES_NAME_ELEMENT_NAME = "Variable_Name";
 	public static final String VARIABLES_DESCRIPTION_ELEMENT_NAME = "Description_of_Variable";
-	private static final Path VARIABLES_INFO_PATH = new Path(null, VARIABLES_INFO_ELEMENT_NAME, VARIABLE_ELEMENT_NAME);
+	private static final OMEPath VARIABLES_INFO_PATH = new OMEPath(null, VARIABLES_INFO_ELEMENT_NAME, VARIABLE_ELEMENT_NAME);
 	private static final ArrayList<String> VARIABLES_INFO_ENTRIES =
 			new ArrayList<String>(Arrays.asList(VARIABLES_NAME_ELEMENT_NAME, 
 												VARIABLES_DESCRIPTION_ELEMENT_NAME));
@@ -406,8 +406,8 @@ public class OmeMetadata {
 	public static final String OTHER_SENSOR_COMP_NAME = "other_sensor";
 	private static final String OTHER_SENSORS_ELEMENT_NAME = "Other_Sensors";
 	private static final String SENSOR_ELEMENT_NAME = "Sensor";
-	private static final Path OTHER_SENSORS_PATH = 
-			new Path(new Path(null, METHOD_DESCRIPTION_ELEMENT_NAME, OTHER_SENSORS_ELEMENT_NAME), SENSOR_ELEMENT_NAME);
+	private static final OMEPath OTHER_SENSORS_PATH = 
+			new OMEPath(new OMEPath(null, METHOD_DESCRIPTION_ELEMENT_NAME, OTHER_SENSORS_ELEMENT_NAME), SENSOR_ELEMENT_NAME);
 	private static final ArrayList<String> OTHER_SENSORS_ENTRIES = 
 			new ArrayList<String>(Arrays.asList(MANUFACTURER_ELEMENT_NAME,
 												MODEL_ELEMENT_NAME,
@@ -1798,7 +1798,7 @@ public class OmeMetadata {
 	}
 
 	
-	private OMEVariable setValue(OMEVariable target, Path path, String name, String value, int lineCount, boolean replace) throws OmeMetadataException {
+	private OMEVariable setValue(OMEVariable target, OMEPath path, String name, String value, int lineCount, boolean replace) throws OmeMetadataException {
 		
 		OMEVariable result = null;
 		
@@ -2803,14 +2803,14 @@ public class OmeMetadata {
 	 * the subElement ({@code <Unit>}). The parent element is the element at the level
 	 * above these.
 	 * 
-	 * @param parentPath The Path object representing the parent element
+	 * @param parentPath The OMEPath object representing the parent element
 	 * @param parentElement The XML elemenet of the parent
 	 * @param elementName The name of the element
 	 * @param subElementName The name of the sub-element
 	 * @return The variable containing details of the extracted sub-element
 	 */
-	private OMEVariable extractSubElement(Path parentPath, Element parentElement, String elementName, String subElementName, Element conflictsElem) throws InvalidConflictException {
-		Path path = new Path(parentPath, elementName);
+	private OMEVariable extractSubElement(OMEPath parentPath, Element parentElement, String elementName, String subElementName, Element conflictsElem) throws InvalidConflictException {
+		OMEPath path = new OMEPath(parentPath, elementName);
 	
 		// The OMEVariable constructor is quite happy to treat the null element
 		// as an empty value. So we can leave it as null here if the parent element is also null.
@@ -2819,20 +2819,20 @@ public class OmeMetadata {
 			subElement = parentElement.getChild(elementName);
 		}
 		
-		Path newPath = new Path(path, subElementName);
+		OMEPath newPath = new OMEPath(path, subElementName);
 		return new OMEVariable(newPath, subElement, conflictsElem);
 	}
 	
 	/**
 	 * This method constructs an XML Element object for a variable that
-	 * represents a single sub-element (see {@link #extractSubElement(Path, Element, String, String)}
+	 * represents a single sub-element (see {@link #extractSubElement(OMEPath, Element, String, String)}
 	 * for details of these special elements).
 	 * 
 	 * @param variable The variable object
 	 * @return The XML element containing its sub-element.
 	 */
 	private Element buildSubElement(OMEVariable variable, ConflictElement conflictElem) {
-		Path varPath = variable.getPath();
+		OMEPath varPath = variable.getPath();
 		Element elem = new Element(varPath.getParent().getElementName());
 		variable.generateXMLContent(elem, conflictElem);
 		

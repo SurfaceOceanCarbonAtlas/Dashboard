@@ -1,4 +1,4 @@
-package uk.ac.uea.socat.metadata.MetadataChecker;
+package uk.ac.uea.socat.omemetadata.checker;
 
 /**
  * Contains the results of a metadata check.

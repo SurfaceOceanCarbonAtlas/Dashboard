@@ -11,8 +11,8 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.ConfigException;
