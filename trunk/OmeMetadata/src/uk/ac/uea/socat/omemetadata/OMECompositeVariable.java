@@ -1,4 +1,4 @@
-package uk.ac.uea.socat.metadata.OmeMetadata;
+package uk.ac.uea.socat.omemetadata;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,13 +6,13 @@ import java.util.List;
 import org.jdom2.Element;
 
 class OMECompositeVariable {
-	private Path itsPath;
+	private OMEPath itsPath;
 	private List<String> itsAllowedEntries;
 	private List<String> itsIdFields;
 	private List<OMECompositeVariableEntry> itsEntries = new ArrayList<OMECompositeVariableEntry>();
 	private Element itsConflictsElement = null;
 	
-	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, String idElement, Element conflictsElement) {
+	protected OMECompositeVariable(OMEPath parentPath, List<String> allowedEntries, String idElement, Element conflictsElement) {
 		itsPath = parentPath;
 		itsAllowedEntries = allowedEntries;
 		itsIdFields = new ArrayList<String>();
@@ -20,20 +20,20 @@ class OMECompositeVariable {
 		itsConflictsElement = conflictsElement;
 	}
 	
-	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, List<String> idElements, Element conflictsElement) {
+	protected OMECompositeVariable(OMEPath parentPath, List<String> allowedEntries, List<String> idElements, Element conflictsElement) {
 		itsPath = parentPath;
 		itsAllowedEntries = allowedEntries;
 		itsIdFields = idElements;
 		itsConflictsElement = conflictsElement;
 	}
 	
-	protected OMECompositeVariable(Path parentPath, List<String> allowedEntries, List<String> idElements) {
+	protected OMECompositeVariable(OMEPath parentPath, List<String> allowedEntries, List<String> idElements) {
 		itsPath = parentPath;
 		itsAllowedEntries = allowedEntries;
 		itsIdFields = idElements;
 	}
 	
-	private OMECompositeVariable(Path parentPath) {
+	private OMECompositeVariable(OMEPath parentPath) {
 		itsPath = parentPath;
 	}
 
@@ -331,7 +331,7 @@ class OMECompositeVariable {
 	}
 	
 	public Object clone() {
-		OMECompositeVariable clone = new OMECompositeVariable((Path) itsPath.clone());
+		OMECompositeVariable clone = new OMECompositeVariable((OMEPath) itsPath.clone());
 		clone.itsAllowedEntries = new ArrayList<String>(itsAllowedEntries);
 		clone.itsIdFields = new ArrayList<String>(itsIdFields);
 		for (OMECompositeVariableEntry value : itsEntries) {

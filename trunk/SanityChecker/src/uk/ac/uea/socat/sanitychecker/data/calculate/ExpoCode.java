@@ -1,7 +1,7 @@
 package uk.ac.uea.socat.sanitychecker.data.calculate;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;

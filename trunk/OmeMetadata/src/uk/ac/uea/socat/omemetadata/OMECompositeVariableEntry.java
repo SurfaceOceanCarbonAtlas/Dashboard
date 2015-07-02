@@ -1,4 +1,4 @@
-package uk.ac.uea.socat.metadata.OmeMetadata;
+package uk.ac.uea.socat.omemetadata;
 
 import java.util.ArrayList;
 import java.util.List;

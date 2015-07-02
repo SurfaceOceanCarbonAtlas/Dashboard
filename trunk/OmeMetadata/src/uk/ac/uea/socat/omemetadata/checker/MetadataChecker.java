@@ -1,6 +1,6 @@
-package uk.ac.uea.socat.metadata.MetadataChecker;
+package uk.ac.uea.socat.omemetadata.checker;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 /**
  * Checks OmeMetadata objects for errors

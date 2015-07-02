@@ -6,10 +6,10 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-import uk.ac.uea.socat.metadata.OmeMetadata.BadEntryNameException;
-import uk.ac.uea.socat.metadata.OmeMetadata.InvalidConflictException;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadata;
-import uk.ac.uea.socat.metadata.OmeMetadata.OmeMetadataException;
+import uk.ac.uea.socat.omemetadata.BadEntryNameException;
+import uk.ac.uea.socat.omemetadata.InvalidConflictException;
+import uk.ac.uea.socat.omemetadata.OmeMetadata;
+import uk.ac.uea.socat.omemetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.messages.Message;
