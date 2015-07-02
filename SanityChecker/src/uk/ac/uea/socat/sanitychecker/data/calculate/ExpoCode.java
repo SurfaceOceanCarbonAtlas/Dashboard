@@ -30,7 +30,7 @@ public class ExpoCode implements DataCalculator {
 		 */
 		String result = null;
 		
-		String expocode = metadata.getValue(OmeMetadata.EXPO_CODE_STRING);
+		String expocode = metadata.getValue(OmeMetadata.EXPOCODE_STRING);
 		String shipCode = metadata.getValue(OmeMetadata.VESSEL_ID_STRING);
 		String startDate = metadata.getValue(OmeMetadata.START_DATE_STRING);
 		

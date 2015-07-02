@@ -51,7 +51,6 @@ public class OmeMetadata {
 	public static final String MODEL_ELEMENT_NAME = "Model";
 	public static final String ACCURACY_ELEMENT_NAME = "Accuracy";
 	public static final String PRECISION_ELEMENT_NAME = "Precision";
-	public static final String RESOLUTION_ELEMENT_NAME = "Resolution";
 	public static final String CALIBRATION_ELEMENT_NAME = "Calibration";
 	public static final String COMMENTS_ELEMENT_NAME = "Other_Comments";
 
@@ -68,7 +67,6 @@ public class OmeMetadata {
 
 	private static final String DATASET_INFO_ELEMENT_NAME = "Dataset_Info";
 	private static final OMEPath DATASET_INFO_PATH = new OMEPath(null, DATASET_INFO_ELEMENT_NAME);
-	private static final OMEPath DATASET_ID_PATH = new OMEPath(DATASET_INFO_PATH, "Dataset_ID");
 	private static final OMEPath FUNDING_INFO_PATH = new OMEPath(DATASET_INFO_PATH, "Funding_Info");
 
 	private static final String SUBMISSION_DATES_ELEMENT_NAME = "Submission_Dates";
@@ -88,8 +86,8 @@ public class OmeMetadata {
 	
 	private static final String CRUISE_ELEMENT_NAME = "Cruise";
 	private static final OMEPath CRUISE_PATH = new OMEPath(EXPERIMENT_PATH, CRUISE_ELEMENT_NAME);
-	private static final String CRUISE_ID_ELEMENT_NAME = "Cruise_ID";
-	private static final OMEPath CRUISE_ID_PATH = new OMEPath(CRUISE_PATH, CRUISE_ID_ELEMENT_NAME);
+	private static final String EXPOCODE_ELEMENT_NAME = "Expocode";
+	private static final OMEPath EXPOCODE_PATH = new OMEPath(CRUISE_PATH, EXPOCODE_ELEMENT_NAME);
 	private static final OMEPath SUB_CRUISE_INFO_PATH = new OMEPath(CRUISE_PATH, "Cruise_Info");
 	private static final OMEPath SECTION_PATH = new OMEPath(CRUISE_PATH, "Section");
 
@@ -254,7 +252,6 @@ public class OmeMetadata {
 	public static final String USER_PHONE_STRING = "user_phone";
 	public static final String USER_EMAIL_STRING = "user_email";
 	
-	public static final String DATASET_ID_STRING = "dataset_id";
 	public static final String FUNDING_INFO_STRING = "funding_info";
 	
 	public static final String EXPERIMENT_NAME_STRING = "experiment_name";
@@ -263,8 +260,7 @@ public class OmeMetadata {
 	public static final String CO2_INSTRUMENT_TYPE_STRING = "co2_instrument_type";
 	public static final String MOORING_ID_STRING = "mooring_id";
 	
-	public static final String EXPO_CODE_STRING = "expocode";
-	public static final String CRUISE_ID_STRING = "cruise_id";
+	public static final String EXPOCODE_STRING = "expocode";
 	public static final String SUB_CRUISE_INFO_STRING = "cruise_info";
 	public static final String SECTION_STRING = "section";
 	
@@ -412,7 +408,7 @@ public class OmeMetadata {
 			new ArrayList<String>(Arrays.asList(MANUFACTURER_ELEMENT_NAME,
 												MODEL_ELEMENT_NAME,
 												ACCURACY_ELEMENT_NAME,
-												RESOLUTION_ELEMENT_NAME,
+												PRECISION_ELEMENT_NAME,
 												CALIBRATION_ELEMENT_NAME,
 												COMMENTS_ELEMENT_NAME));
 	private static final ArrayList<String> OTHER_SENSORS_ID_LIST = 
@@ -451,7 +447,6 @@ public class OmeMetadata {
 	private List<OMECompositeVariable> investigators;
 	
 	// <Dataset Info>
-	private OMEVariable datasetID;
 	private OMEVariable fundingInfo;
 	
 	// <DatasetInfo><Submission_Dates>
@@ -466,7 +461,7 @@ public class OmeMetadata {
 	private OMEVariable mooringId;
 	
 	// <Cruise_Info><Experiment><Cruise>
-	private OMEVariable cruiseID;
+	private OMEVariable expocode;
 	private OMEVariable cruiseInfo;
 	private OMEVariable section;
 
@@ -612,8 +607,8 @@ public class OmeMetadata {
 		// Use assignFromOmeXmlDoc to initialize all the OMEVariables with empty values
 		// This avoids having to do an insane amount of null-checking everywhere
 		itsExpoCode = expoCode.toUpperCase();
-		Element cruiseIdElem = new Element(CRUISE_ID_ELEMENT_NAME).setText(itsExpoCode);
-		Element cruiseElem = new Element(CRUISE_ELEMENT_NAME).addContent(cruiseIdElem);
+		Element expocodeElem = new Element(EXPOCODE_ELEMENT_NAME).setText(itsExpoCode);
+		Element cruiseElem = new Element(CRUISE_ELEMENT_NAME).addContent(expocodeElem);
 		Element experimentElem = new Element(EXPERIMENT_ELEMENT_NAME).addContent(cruiseElem);
 		Element cruiseInfoElem = new Element(CRUISE_INFO_ELEMENT_NAME).addContent(experimentElem);
 		Element rootElem = new Element(ROOT_ELEMENT_NAME).addContent(cruiseInfoElem);
@@ -922,11 +917,6 @@ public class OmeMetadata {
 			userEmail = setValue(userEmail, USER_EMAIL_PATH, name, value, lineCount, replace);
 			break;
 		}
-		case DATASET_ID_STRING:
-		{
-			datasetID = setValue(datasetID, DATASET_ID_PATH, name, value, lineCount, replace);
-			break;
-		}
 		case FUNDING_INFO_STRING:
 		{
 			fundingInfo = setValue(fundingInfo, FUNDING_INFO_PATH, name, value, lineCount, replace);
@@ -957,11 +947,10 @@ public class OmeMetadata {
 			mooringId = setValue(mooringId, MOORING_ID_PATH, name, value, lineCount, replace);
 			break;
 		}
-		case EXPO_CODE_STRING:
-		case CRUISE_ID_STRING:
+		case EXPOCODE_STRING:
 		{
 			itsExpoCode = value;
-			cruiseID = setValue(cruiseID, CRUISE_ID_PATH, name, value, lineCount, replace);
+			expocode = setValue(expocode, EXPOCODE_PATH, name, value, lineCount, replace);
 			break;
 		}
 		case SUB_CRUISE_INFO_STRING:
@@ -1477,9 +1466,6 @@ public class OmeMetadata {
 		case USER_EMAIL_STRING:
 			result = userEmail.getValue();
 			break;
-		case DATASET_ID_STRING:
-			result = datasetID.getValue();
-			break;
 		case FUNDING_INFO_STRING:
 			result = fundingInfo.getValue();
 			break;
@@ -1498,8 +1484,7 @@ public class OmeMetadata {
 		case MOORING_ID_STRING:
 			result = mooringId.getValue();
 			break;
-		case EXPO_CODE_STRING:
-		case CRUISE_ID_STRING:
+		case EXPOCODE_STRING:
 			result = itsExpoCode;
 			break;
 		case SUB_CRUISE_INFO_STRING:
@@ -1848,20 +1833,20 @@ public class OmeMetadata {
 					"No Cruise_Info->Experiment->Cruise " +
 					"element in the OME XML contents");
 		
-		String cruiseIDText = cruiseElem.getChildTextTrim(CRUISE_ID_ELEMENT_NAME);
-		if ( cruiseIDText == null )
+		String expocodeText = cruiseElem.getChildTextTrim(EXPOCODE_ELEMENT_NAME);
+		if ( expocodeText == null )
 			throw new BadEntryNameException(
 					"No Cruise_Info->Experiment->Cruise->Cruise_ID " +
 					"element in the OME XML contents");
 		
 		if ( itsExpoCode.length() == 0) {
-			itsExpoCode = cruiseIDText.toUpperCase();
-		} else if ( ! itsExpoCode.equals(cruiseIDText.toUpperCase()) )
+			itsExpoCode = expocodeText.toUpperCase();
+		} else if ( ! itsExpoCode.equals(expocodeText.toUpperCase()) )
 			throw new BadEntryNameException("Dataset expocode (" + itsExpoCode +
 					") does not match the Cruise ID in the OME document (" + 
-					cruiseIDText + ")");
+					expocodeText + ")");
 		
-		cruiseID = new OMEVariable(CRUISE_ID_PATH, cruiseIDText);
+		expocode = new OMEVariable(EXPOCODE_PATH, expocodeText);
 		
 		/*
 		 * So now we've got the EXPO code (aka Cruise_ID), we can extract everything else.
@@ -1910,7 +1895,6 @@ public class OmeMetadata {
 		// <DataSet_Info>
 		Element dataSetInfoElem = rootElem.getChild(DATASET_INFO_ELEMENT_NAME);
 		
-		datasetID = new OMEVariable(DATASET_ID_PATH, dataSetInfoElem, conflictsElem);
 		fundingInfo = new OMEVariable(FUNDING_INFO_PATH, dataSetInfoElem, conflictsElem);
 		
 		// <DataSet_Info><Submission_Dates>
@@ -2182,7 +2166,7 @@ public class OmeMetadata {
 				sensorDetails.addEntry(MANUFACTURER_ELEMENT_NAME, sensorElem);
 				sensorDetails.addEntry(MODEL_ELEMENT_NAME, sensorElem);
 				sensorDetails.addEntry(ACCURACY_ELEMENT_NAME, sensorElem);
-				sensorDetails.addEntry(RESOLUTION_ELEMENT_NAME, sensorElem);
+				sensorDetails.addEntry(PRECISION_ELEMENT_NAME, sensorElem);
 				sensorDetails.addEntry(CALIBRATION_ELEMENT_NAME, sensorElem);
 				sensorDetails.addEntry(COMMENTS_ELEMENT_NAME, sensorElem);
 				
@@ -2249,7 +2233,6 @@ public class OmeMetadata {
 		
 		// <Dataset_Info>
 		Element datasetInfoElem = new Element(DATASET_INFO_ELEMENT_NAME);
-		datasetID.generateXMLContent(datasetInfoElem,  conflictElem);
 		fundingInfo.generateXMLContent(datasetInfoElem,  conflictElem);
 		
 		// <Dataset_Info><Submission_Dates>
@@ -2278,7 +2261,7 @@ public class OmeMetadata {
 		// <Cruise_Info><Experiment><Cruise>
 		Element cruiseElem = new Element(CRUISE_ELEMENT_NAME);
 		
-		cruiseID.generateXMLContent(cruiseElem, conflictElem);
+		expocode.generateXMLContent(cruiseElem, conflictElem);
 		cruiseInfo.generateXMLContent(cruiseElem, conflictElem);
 		section.generateXMLContent(cruiseElem, conflictElem);
 		
@@ -2541,8 +2524,8 @@ public class OmeMetadata {
 	 * @param expocode
 	 * 		expocode to assign
 	 */
-	public void setExpocode(String expocode) {
-		itsExpoCode = expocode.toUpperCase();
+	public void setExpocode(String newExpocode) {
+		itsExpoCode = newExpocode.toUpperCase();
 		String nodcCode;
 		String startDate;
 		try {
@@ -2560,8 +2543,7 @@ public class OmeMetadata {
 		}
 		vesselID = new OMEVariable(vesselID.getPath(), nodcCode);
 		cruiseStartDate = new OMEVariable(cruiseStartDate.getPath(), startDate);
-		cruiseID = new OMEVariable(cruiseID.getPath(), itsExpoCode);
-		datasetID = new OMEVariable(datasetID.getPath(), itsExpoCode);
+		expocode = new OMEVariable(expocode.getPath(), itsExpoCode);
 	}
 
 	/**
@@ -2576,7 +2558,7 @@ public class OmeMetadata {
 	 */
 	public boolean isAcceptable() {
 
-		if ( cruiseID.hasConflict() ) {
+		if ( expocode.hasConflict() ) {
 			return false;
 		}
 
@@ -2594,8 +2576,7 @@ public class OmeMetadata {
 			 }
 		}
 
-		if ( datasetID.hasConflict() ||
-			 fundingInfo.hasConflict() ) {
+		if ( fundingInfo.hasConflict() ) {
 			return false;
 		}
 
@@ -2776,7 +2757,7 @@ public class OmeMetadata {
 		// Check for absolutely required content; at this time only
 		// what is required for the UploadDashboard submission 
 		// (expocode, at least one investigator name, vessel name)
-		if ( cruiseID.getAllValues().isEmpty() ||
+		if ( expocode.getAllValues().isEmpty() ||
 			 investigators.isEmpty() ||
 			 vesselName.getAllValues().isEmpty() ) {
 			return false;
@@ -2867,7 +2848,6 @@ public class OmeMetadata {
 			output.append(getCompositeHeaderString(investigator, INVESTIGATOR_COMP_NAME, INVESTIGATOR_ENTRIES));
 		}
 		
-		output.append(getSingleHeaderString(datasetID, DATASET_ID_STRING));
 		output.append(getSingleHeaderString(fundingInfo, FUNDING_INFO_STRING));
 		
 		// initialSubmission and revisedSubmission not included
@@ -2877,7 +2857,7 @@ public class OmeMetadata {
 		output.append(getSingleHeaderString(platformType, PLATFORM_TYPE_STRING));
 		output.append(getSingleHeaderString(co2InstrumentType, CO2_INSTRUMENT_TYPE_STRING));
 		output.append(getSingleHeaderString(mooringId, MOORING_ID_STRING));
-		output.append(getEmptyHeaderString(CRUISE_ID_STRING));
+		output.append(getEmptyHeaderString(EXPOCODE_STRING));
 		output.append(getSingleHeaderString(cruiseInfo, SUB_CRUISE_INFO_STRING));
 		output.append(getSingleHeaderString(section, SECTION_STRING));
 		output.append(getEmptyHeaderString(START_DATE_STRING));
@@ -3083,8 +3063,8 @@ public class OmeMetadata {
 		// The first thing to copy is the cruise ID (aka EXPO Code).
 		// If these are different, it implies that we have metadata from
 		// different cruises so they should not be merged.
-		dest.cruiseID.addValues(newValues.cruiseID.getAllValues());
-		if (dest.cruiseID.hasConflict()) {
+		dest.expocode.addValues(newValues.expocode.getAllValues());
+		if (dest.expocode.hasConflict()) {
 			throw new BadEntryNameException("Cruise IDs do not match - cannot merge");
 		}
 
@@ -3098,7 +3078,6 @@ public class OmeMetadata {
 		
 		dest.investigators = OMECompositeVariable.mergeVariables(dest.investigators, newValues.investigators);
 		
-		dest.datasetID.addValues(newValues.datasetID.getAllValues());
 		dest.fundingInfo.addValues(newValues.fundingInfo.getAllValues());
 		
 		dest.initialSubmission.addValues(newValues.initialSubmission.getAllValues());
@@ -3110,7 +3089,7 @@ public class OmeMetadata {
 		dest.co2InstrumentType.addValues(newValues.co2InstrumentType.getAllValues());
 		dest.mooringId.addValues(newValues.mooringId.getAllValues());
 
-		dest.cruiseID.addValues(newValues.cruiseID.getAllValues());
+		dest.expocode.addValues(newValues.expocode.getAllValues());
 		dest.cruiseInfo.addValues(newValues.cruiseInfo.getAllValues());
 		dest.section.addValues(newValues.section.getAllValues());
 
@@ -3245,7 +3224,6 @@ public class OmeMetadata {
 			clone.investigators.add((OMECompositeVariable) investigator.clone());
 		}
 
-		clone.datasetID = (OMEVariable) datasetID.clone();
 		clone.fundingInfo = (OMEVariable) fundingInfo.clone();
 
 		clone.initialSubmission = (OMEVariable) initialSubmission.clone();
@@ -3257,7 +3235,7 @@ public class OmeMetadata {
 		clone.co2InstrumentType = (OMEVariable) co2InstrumentType.clone();
 		clone.mooringId = (OMEVariable) mooringId.clone();
 
-		clone.cruiseID = (OMEVariable) cruiseID.clone();
+		clone.expocode = (OMEVariable) expocode.clone();
 		clone.cruiseInfo = (OMEVariable) cruiseInfo.clone();
 		clone.section = (OMEVariable) section.clone();
 
