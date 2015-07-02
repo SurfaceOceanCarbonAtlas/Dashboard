@@ -87,6 +87,7 @@ public class OmeMetadata {
 	private static final String CRUISE_ELEMENT_NAME = "Cruise";
 	private static final OMEPath CRUISE_PATH = new OMEPath(EXPERIMENT_PATH, CRUISE_ELEMENT_NAME);
 	private static final String EXPOCODE_ELEMENT_NAME = "Expocode";
+	private static final String CRUISE_ID_ELEMENT_NAME = "Cruise_ID";
 	private static final OMEPath EXPOCODE_PATH = new OMEPath(CRUISE_PATH, EXPOCODE_ELEMENT_NAME);
 	private static final OMEPath SUB_CRUISE_INFO_PATH = new OMEPath(CRUISE_PATH, "Cruise_Info");
 	private static final OMEPath SECTION_PATH = new OMEPath(CRUISE_PATH, "Section");
@@ -1811,8 +1812,8 @@ public class OmeMetadata {
 		Element conflictsElem = rootElem.getChild(CONFLICTS_ELEMENT_NAME);
 
 		/*
-		 * First we extract the EXPO Code, which is the Cruise_ID. If we don't have this
-		 * then we can't get anywhere.
+		 * First we extract the Expocode (previously cruise_ID). 
+		 * If we don't have this then we can't get anywhere.
 		 * 
 		 * This is the only element that's accessed out of order.
 		 * All the others are done in the order they appear in the XML.
@@ -1835,21 +1836,24 @@ public class OmeMetadata {
 		
 		String expocodeText = cruiseElem.getChildTextTrim(EXPOCODE_ELEMENT_NAME);
 		if ( expocodeText == null )
+			expocodeText = cruiseElem.getChildTextTrim(CRUISE_ID_ELEMENT_NAME);
+		if ( expocodeText == null )
 			throw new BadEntryNameException(
-					"No Cruise_Info->Experiment->Cruise->Cruise_ID " +
+					"No Cruise_Info->Experiment->Cruise->Expocode or " +
+					"Cruise_Info->Experiment->Cruise->Cruise_ID " +
 					"element in the OME XML contents");
 		
 		if ( itsExpoCode.length() == 0) {
 			itsExpoCode = expocodeText.toUpperCase();
 		} else if ( ! itsExpoCode.equals(expocodeText.toUpperCase()) )
 			throw new BadEntryNameException("Dataset expocode (" + itsExpoCode +
-					") does not match the Cruise ID in the OME document (" + 
+					") does not match the Expocode or Cruise ID in the OME document (" + 
 					expocodeText + ")");
 		
 		expocode = new OMEVariable(EXPOCODE_PATH, expocodeText);
 		
 		/*
-		 * So now we've got the EXPO code (aka Cruise_ID), we can extract everything else.
+		 * So now we've got the Expocode (previously Cruise_ID), we can extract everything else.
 		 * We don't care if anything is missing, and we assume everything is a String.
 		 * 
 		 * Elements can always be missing from the XML, in which case getChild will return null.
