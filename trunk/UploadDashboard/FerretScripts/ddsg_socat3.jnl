@@ -22,8 +22,6 @@ CAN MODE VER
 DEFINE SYMBOL infile = ($1)
 DEFINE SYMBOL outfile = ($2)
 
-
-
 ! Set the tolerances and control parameter
 
 DEFINE SYMBOL tol_lon = 1
@@ -46,14 +44,17 @@ USE "($infile)"
 LET varnames =  ..varnames
 LET nvars =  ..nvars
 
-! The text is too long for one Ferret command. Define two variables and concatenate them.
 
-LET varnames_list1 = {\
-"num_obs","num_obs_original","expocode","dataset_name","vessel_name","organization",\
+LET varnames_traj = {\
+"num_obs","expocode","dataset_name","vessel_name","organization",\
 "geospatial_lon_min","geospatial_lon_max","geospatial_lat_min",\
 "geospatial_lat_max","time_coverage_start","time_converage_end",\
 "investigators","orig_data_ref","addl_docs","socat_data_doi",\
-"socat_data_ref","socat_version","qc_flag",\
+"socat_data_ref","socat_version","qc_flag","num_obs_original"}
+
+! The text is too long for one Ferret command. Define two variables and concatenate them.
+
+LET varnames_list1 = {\
 "sample_number","year","month","day","hour","minute","second",\
 "longitude","latitude","sample_depth","sal","Temperature_equi",\
 "temp","Temperature_atm","Pressure_equi","Pressure_atm",\
@@ -91,30 +92,39 @@ LET varnames_list2 = {\
 }
 
 LET varnames_list = XCAT(varnames_list1, varnames_list2)
-LET nlist = `varnames_list[i=@ngd]`
-IF `nvars NE nlist` THEN
+
+LET ntraj = `varnames_traj,return=isize`
+LET nlist = `varnames_list,return=isize`
+
+IF `nvars NE (ntraj+nlist)` THEN
    say **ERROR List of variables in the script does not match list in the dataset 
    say **ERROR "($infile)" has `nvars` variables, script list has `nlist`
    exit/script
 ENDIF
 
-! Check that the variable names in varnames and varnames_list match.
+! Check that the variable names in the lists are in the file.
 ! If so rename the variables in the input file to varname_in
-! Save the index of qc_flag, the last instance variable.
 
 LET vdiff = 0
-REPEAT/range=1:`nvars`/name=v (DEFINE SYMBOL  vv = `v`;\
- DEFINE SYMBOL name1 = `varnames[i=($vv)]`;\
- IF `IS_ELEMENT_OF_STR_N(varnames_list, "($name1)") EQ 0` THEN LET vdiff = `v`;\
+REPEAT/range=1:`ntraj`/name=v (DEFINE SYMBOL  vv = `v`;\
+ DEFINE SYMBOL vname = `varnames_traj[i=($vv)]`;\
+ IF `IS_ELEMENT_OF_STR_N(varnames, "($vname)") EQ 0` THEN LET vdiff = `v`;\
  IF `vdiff GT 0` THEN EXIT/LOOP;\
- IF `STRCMP("($name1)", "qc_flag") EQ 0` THEN LET indx_meta = `v`;\
- SET VAR/NAME=($name1)_in ($name1))
+ SET VAR/NAME=($vname)_in ($vname))
+
+LET vdiff = 0
+REPEAT/range=1:`nlist`/name=v (DEFINE SYMBOL  vv = `v`;\
+ DEFINE SYMBOL vname = `varnames_list[i=($vv)]`;\
+ IF `IS_ELEMENT_OF_STR_N(varnames, "($vname)") EQ 0` THEN LET vdiff = `v`;\
+ IF `vdiff GT 0` THEN EXIT/LOOP;\
+ SET VAR/NAME=($vname)_in ($vname))
 
 IF `vdiff GT 0` THEN
    say **ERROR List of variables in the script does not match list in the dataset "($infile)"
-   say **ERROR Dataset has variable *** ($name1) *** which is not in variable-name list in script
+   say **ERROR variable lists have *** ($vname) *** which is not in the file
    exit/script
 ENDIF
+
 
 ! Which longitude to use for decimating: lon360 or longitude
 
@@ -170,8 +180,8 @@ SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
 
 ! Write the traj variables
 
-REPEAT/RANGE=2:`indx_meta`/NAME=q (DEFINE SYMBOL qq = `q`;\
-DEFINE SYMBOL vname = `varnames_list[i=($qq)]`;\
+REPEAT/RANGE=2:`ntraj`/NAME=q (DEFINE SYMBOL qq = `q`;\
+DEFINE SYMBOL vname = `varnames_traj[i=($qq)]`;\
 DEFINE SYMBOL vtype = `($vname)_in,RETURN=dtype`;\
 DEFINE SYMBOL qual = /OUTTYPE=($vtype);\
 IF ($vtype"0|CHAR>1|*>0") THEN CAN SYM qual;\
@@ -180,11 +190,10 @@ SET ATT/LIKE=($vname)_in ($vname);\
 SET ATT/OUTPUT=all ($vname);\
 SAVE/QUIET/FILE="($outfile)"/APPEND($qual) ($vname))
 
-
 ! Sample the obs variables. Keep attributes, make missing-data flags match.
 
 ! Numeric variables
-REPEAT/RANGE=`indx_meta+1`:`nvars`/NAME=q (DEFINE SYMBOL qq = `q`;\
+REPEAT/RANGE=1:`nlist`/NAME=q (DEFINE SYMBOL qq = `q`;\
 DEFINE SYMBOL vname = `varnames_list[i=($qq)]`;\
 IF ($vname"0|sample_number>1|*>0") THEN EXIT/CYCLE;\
 DEFINE SYMBOL vtype = `($vname)_in,RETURN=dtype`;\
@@ -196,14 +205,15 @@ SAVE/QUIET/APPEND/OUTTYPE=($vtype)/FILE="($outfile)" ($vname);\
 )
 
 ! sample_number will be the sequence number within the decimated data
-! We can use this to skip drawing lines where the constraints have skipped data
+! We can use this to pick up the pen when drawing lines where the constraints 
+! (on the decimated set) have skipped data
 
 LET/BAD=-1/TITLE="sequence number for decimated dataset" sample_number = i[gx=latitude]
 SAVE/QUIET/APPEND/OUTTYPE=INT/FILE="($outfile)" sample_number
 
 ! Character variables
 
-REPEAT/RANGE=`indx_meta+1`:`nvars`/NAME=q (DEFINE SYMBOL qq = `q`;\
+REPEAT/RANGE=1:`nlist`/NAME=q (DEFINE SYMBOL qq = `q`;\
 DEFINE SYMBOL vname = `varnames_list[i=($qq)]`;\
 DEFINE SYMBOL vtype = `($vname)_in,RETURN=dtype`;\
 IF `($vtype"0|CHAR>1|*>0") EQ 0` THEN EXIT/CYCLE;\
