@@ -44,7 +44,7 @@ public class CruiseDsgNcFile extends File {
 	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
 	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
 
-	private static final String VERSION = "CruiseDsgNcFile 1.2";
+	private static final String VERSION = "CruiseDsgNcFile 1.3";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
@@ -115,6 +115,9 @@ public class CruiseDsgNcFile extends File {
 			// There will be a number of trajectory variables of type character from the metadata.
 			// Which is the longest?
 			int maxchar = metadata.getMaxStringLength();
+			// Round up to the closest multiple of 64 greater that this value
+			// just to give good alignment and give some space for edits 
+			maxchar = (int) Math.round( 64.0 * Math.ceil((maxchar + 1) / 64.0) );
 			Dimension stringlen = ncfile.addDimension(null, "string_length", maxchar);
 			List<Dimension> trajStringDims = new ArrayList<Dimension>();
 			trajStringDims.add(traj);
@@ -143,9 +146,13 @@ public class CruiseDsgNcFile extends File {
 			ncfile.addGroupAttribute(null, new Attribute("Conventions", "CF-1.6"));
 			ncfile.addGroupAttribute(null, new Attribute("history", VERSION));
 
-			Variable var = ncfile.addVariable(null, "num_obs", DataType.DOUBLE, trajDims);
+			// Add the "num_obs" variable which will be assigned using the number of data points
+			Variable var = ncfile.addVariable(null, "num_obs", DataType.INT, trajDims);
 			ncfile.addVariableAttribute(var, new Attribute("sample_dimension", "obs"));
 			ncfile.addVariableAttribute(var, new Attribute("long_name", "Number of Observations"));
+			Number missVal = Integer.valueOf(-99);
+			ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
+			ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
 
 			String name;
 			String varName;
@@ -158,7 +165,7 @@ public class CruiseDsgNcFile extends File {
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = null;
-					Number missVal = null;
+					missVal = null;
 					Class<?> type = f.getType();
 					if ( type.equals(String.class) ) {
 						var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
@@ -213,7 +220,7 @@ public class CruiseDsgNcFile extends File {
 					if ( varName == null )
 						throw new RuntimeException("Unexpected missing short name for " + name);
 					var = null;
-					Number missVal = null;
+					missVal = null;
 					Class<?> type = f.getType();
 					if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
 						var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
@@ -260,6 +267,8 @@ public class CruiseDsgNcFile extends File {
 				}
 			}
 
+			// Add the "time" variable which will be assigned using the year, month, day, hour, minute, 
+			// and (optionally) second values for each data point
 			name = Constants.time_VARNAME;
 			varName = Constants.SHORT_NAMES.get(name);
 			var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
@@ -279,8 +288,8 @@ public class CruiseDsgNcFile extends File {
 			var = ncfile.findVariable("num_obs");
 			if ( var == null )
 				throw new RuntimeException("Unexpected failure to find ncfile variable num_obs");
-			ArrayDouble.D1 obscount = new ArrayDouble.D1(1);
-			obscount.set(0, (double) dataList.size());
+			ArrayInt.D1 obscount = new ArrayInt.D1(1);
+			obscount.set(0, dataList.size());
 			ncfile.write(var, obscount);
 
 			for ( Field f : metaFields ) {

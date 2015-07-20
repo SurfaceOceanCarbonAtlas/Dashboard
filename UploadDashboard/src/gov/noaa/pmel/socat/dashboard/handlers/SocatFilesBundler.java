@@ -248,7 +248,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		// Commit the bundle to version control
 		if ( (message != null) && ! message.isEmpty() ) {
 			try {
-				commitVersion(bundleFile, message);				
+				commitVersion(bundleFile, message);
 			} catch (Exception ex) {
 				throw new IOException("Problems committing the CDIAC file bundle for " + 
 						upperExpo + ": " + ex.getMessage());
