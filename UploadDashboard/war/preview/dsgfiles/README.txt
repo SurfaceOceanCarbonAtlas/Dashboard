@@ -1,0 +1,1 @@
+This directory is for temporary DSG files used in connection with preview plots.

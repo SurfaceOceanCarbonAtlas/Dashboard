@@ -54,7 +54,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 
 	private String archivalEmail;
 	private String socatEmail;
-	private String smtpHost;
+	private String smtpsHost;
 
 	/**
 	 * A file bundler that saves the file bundles under the given directory
@@ -72,19 +72,19 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		e-mail address to send bundles for archival
 	 * @param socatEmailAddress
 	 * 		e-mail address from which these bundles are being sent
-	 * @param smtpHostAddress
-	 * 		address of the SMTP host to use for email
+	 * @param smtpsHostAddress
+	 * 		address of the SMTPS host to use for email
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a directory 
 	 * 		or is not under version control
 	 */
 	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
-			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress) 
+			String archivalEmailAddress, String socatEmailAddress, String smtpsHostAddress) 
 					throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
 		archivalEmail = archivalEmailAddress;
 		socatEmail = socatEmailAddress;
-		smtpHost = smtpHostAddress;
+		smtpsHost = smtpsHostAddress;
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			String userEmailAddress) throws IllegalArgumentException, IOException {
 		if ( (archivalEmail == null) || archivalEmail.isEmpty() )
 			throw new IllegalArgumentException("no archival email address");
-		if ( (smtpHost == null) || smtpHost.isEmpty() )
+		if ( (smtpsHost == null) || smtpsHost.isEmpty() )
 			throw new IllegalArgumentException("no SMTP host");
 		if ( (userRealName == null) || userRealName.isEmpty() ) 
 			throw new IllegalArgumentException("no user name");
@@ -257,7 +257,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 
 		// Get the default Session for e-mailing
 		Properties props = System.getProperties();
-		props.put("mail.smtp.host", smtpHost);
+		props.put("mail.smtps.host", smtpsHost);
 		Session session = Session.getDefaultInstance(props);
 		// Create the email message
 		MimeMessage msg = new MimeMessage(session);
