@@ -278,18 +278,16 @@ public class CruiseSubmitter {
 				ingestExpos.add(expocode);
 			}
 
-			if ( ! archiveStatus.equals(cruise.getArchiveStatus()) ) {
-				// Update the archive status
+			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) && 
+				 ( repeatSend || cruise.getCdiacDate().isEmpty() ) ) {
+				// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
+				cdiacExpos.add(expocode);
+			}
+			else if ( ! archiveStatus.equals(cruise.getArchiveStatus()) ) {
+				// Update the archive status now
 				cruise.setArchiveStatus(archiveStatus);
 				changed = true;
 				commitMsg += " archive status '" + archiveStatus + "'"; 
-			}
-
-			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
-				if ( repeatSend || cruise.getCdiacDate().isEmpty() ) {
-					// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
-					cdiacExpos.add(expocode);
-				}
 			}
 
 			if ( changed ) {
@@ -335,6 +333,7 @@ public class CruiseSubmitter {
 				}
 				// When successful, update the "sent to CDIAC" timestamp
 				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+				cruise.setArchiveStatus(archiveStatus);
 				cruise.setCdiacDate(localTimestamp);
 				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
 			}
