@@ -45,8 +45,9 @@ define symbol keep_conventions = `..conventions`
 set var/name=sec_in second
 let second = missing(sec_in, 0)
 
-! Get output type for variables in the incoming dataset. Except for a couple that are INT, 
-! or CHAR, they should all be the same numeric type; variables we write here will match that type.
+! Get output type for variables in the incoming dataset. Except 
+! for a couple that are INT, or CHAR, they should all be the same 
+! numeric type; variables we write here will match that type.
 
 define symbol outtype=`longitude,return=dtype`
 
@@ -284,13 +285,13 @@ GO SOCAT3_gvco2
 !!!!!!!Save output
 cancel mode upcase
 
-! Add the variable num_obs_original.  For full resolution original data this
-! has the same value as num_obs, just needed so set of variables is identical
-! to what is in the decimated versions.
+! Add the variables nobs_full and nobs_deci.  For full- resolution original data 
+! these the same value as each other and as num_obs. Both are needed so set of 
+! variables is identical to what is in the decimated versions.
+! Note that num_obs is the "count variable" with the sample_dimension attribute
+! making it an essential part of the DSG file
 
-LET/title="`num_obs,return=title`"/BAD=-99 num_obs_original = `num_obs[d=($cruise_filename)]` + 0*num_obs
-
-SAVE/QUIET/APPEND/OUTTYPE=int/FILE="($cruise_filename)" num_obs_original
+GO nobs_deci_full
 
 ! fCO2 recomputed
 let/title="fCO2 Recommended"/units="uatm" fCO2_recommended = fco2_rec

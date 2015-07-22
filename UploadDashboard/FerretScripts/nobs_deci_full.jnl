@@ -1,0 +1,13 @@
+
+! Add the variables nobs_full and nobs_deci.  For full- resolution original data 
+! these the same value as each other and as num_obs. Both are needed so set of 
+! variables is identical to what is in the decimated versions.
+! Note that num_obs is the "count variable" with the sample_dimension attribute
+! making it an essential part of the DSG file
+
+LET/title="Count in original trajectory"/BAD=-99 nobs_full = `num_obs` + 0*num_obs
+SAVE/QUIET/APPEND/OUTTYPE=int/FILE="($cruise_filename)" nobs_full
+
+LET/title="Count in decimated trajectory"/BAD=-99 nobs_deci = `num_obs` + 0*num_obs
+DEFINE ATTRIBUTE/output nobs_deci.note = "This dataset is not decimated"
+SAVE/QUIET/APPEND/OUTTYPE=int/FILE="($cruise_filename)" nobs_deci

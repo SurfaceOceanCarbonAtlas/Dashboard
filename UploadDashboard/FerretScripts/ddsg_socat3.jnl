@@ -44,13 +44,14 @@ USE "($infile)"
 LET varnames =  ..varnames
 LET nvars =  ..nvars
 
+! Will also add nobs_deci.
 
 LET varnames_traj = {\
 "num_obs","expocode","dataset_name","vessel_name","organization",\
 "geospatial_lon_min","geospatial_lon_max","geospatial_lat_min",\
 "geospatial_lat_max","time_coverage_start","time_converage_end",\
 "investigators","orig_data_ref","addl_docs","socat_data_doi",\
-"socat_data_ref","socat_version","qc_flag","num_obs_original"}
+"socat_data_ref","socat_version","qc_flag","nobs_full"}
 
 ! The text is too long for one Ferret command. Define two variables and concatenate them.
 
@@ -96,14 +97,17 @@ LET varnames_list = XCAT(varnames_list1, varnames_list2)
 LET ntraj = `varnames_traj,return=isize`
 LET nlist = `varnames_list,return=isize`
 
-IF `nvars NE (ntraj+nlist)` THEN
-   say **ERROR List of variables in the script does not match list in the dataset 
-   say **ERROR "($infile)" has `nvars` variables, script list has `nlist`
-   exit/script
-ENDIF
+!IF `nvars NE (ntraj+nlist)` THEN
+!   say **ERROR List of variables in the script does not match list in the dataset 
+!   say **ERROR "($infile)" has `nvars` variables, script list has `nlist`
+!   exit/script
+!ENDIF
 
 ! Check that the variable names in the lists are in the file.
 ! If so rename the variables in the input file to varname_in
+
+
+SET VAR/NAME=nobs_deci_in nobs_deci
 
 LET vdiff = 0
 REPEAT/range=1:`ntraj`/name=v (DEFINE SYMBOL  vv = `v`;\
@@ -174,11 +178,15 @@ DEFINE SYMBOL num_obs_sampled = `nsample`
 
 ! write a global attribute with the decimation parameters.
 DEFINE ATT/QUIET/OUTPUT ..decimation =  \
-"`num_obs_original_in` original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
+"`nobs_full_in` original number of obs. Piecewise decimated to ($num_obs_sampled) obs using tolerances: lon ($tol_lon), lat ($tol_lon), fco2_rec ($tol_var) ($comment)" 
 
 SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
 
 ! Write the traj variables
+
+LET/TITLE="`nobs_deci_in,RETURN=title`"/BAD=-99 nobs_deci = ($num_obs_sampled)
+DEFINE ATTRIBUTE/OUTPUT/OUTPUT nobs_deci.note = "Piecewise decimated"
+SAVE/QUIET/FILE="($outfile)"/APPEND/OUTTYPE=int nobs_deci
 
 REPEAT/RANGE=2:`ntraj`/NAME=q (DEFINE SYMBOL qq = `q`;\
 DEFINE SYMBOL vname = `varnames_traj[i=($qq)]`;\
