@@ -182,11 +182,8 @@ DEFINE ATT/QUIET/OUTPUT ..decimation =  \
 
 SAVE/QUIET/FILE="($outfile)"/OUTTYPE=INT/CLOBBER num_obs
 
-! Write the traj variables
 
-LET/TITLE="`nobs_deci_in,RETURN=title`"/BAD=-99 nobs_deci = ($num_obs_sampled)
-DEFINE ATTRIBUTE/OUTPUT/OUTPUT nobs_deci.note = "Piecewise decimated"
-SAVE/QUIET/FILE="($outfile)"/APPEND/OUTTYPE=int nobs_deci
+! Write the traj variables
 
 REPEAT/RANGE=2:`ntraj`/NAME=q (DEFINE SYMBOL qq = `q`;\
 DEFINE SYMBOL vname = `varnames_traj[i=($qq)]`;\
@@ -197,6 +194,11 @@ LET ($vname) = ($vname)_in[ge=traj@asn];\
 SET ATT/LIKE=($vname)_in ($vname);\
 SET ATT/OUTPUT=all ($vname);\
 SAVE/QUIET/FILE="($outfile)"/APPEND($qual) ($vname))
+
+! add nobs_deci on the same axis
+LET/TITLE="`nobs_deci_in,RETURN=title`"/BAD=-99 nobs_deci = ($num_obs_sampled) + 0* nobs_full
+DEFINE ATTRIBUTE/OUTPUT/OUTPUT nobs_deci.note = "Piecewise decimated"
+SAVE/QUIET/FILE="($outfile)"/APPEND/OUTTYPE=int nobs_deci
 
 ! Sample the obs variables. Keep attributes, make missing-data flags match.
 

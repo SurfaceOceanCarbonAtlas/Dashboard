@@ -36,6 +36,7 @@ import javax.mail.internet.MimeMultipart;
 public class SocatFilesBundler extends VersionedFileHandler {
 
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
+	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
 	private static final String EMAIL_SUBJECT_MSG = 
@@ -43,11 +44,11 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	private static final String EMAIL_MSG_START =
 			"Dear CDIAC team, \n" +
 			"\n" +
-			"The SOCAT dashboard user ";
+			"As part of submitting a dataset to SOCAT for QC, the SOCAT Upload Dashboard user \n";
 	private static final String EMAIL_MSG_END = 
-			",\n" +
-			"as part of submitting a dataset to SOCAT for QC, \n" +
-			"has requested immediate archival of the attached data and metadata. \n" +
+			" has requested immediate archival of the attached data and metadata. \n" +
+			"The attached file is a ZIP file of the data and metadata, but \"" + MAILED_BUNDLE_NAME_ADDENDUM + "\" \n" +
+			"has been appended to the name for sending as an email attachment. \n" +
 			"\n" +
 			"Best regards, \n" +
 			"SOCAT team \n";
@@ -294,6 +295,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			// Create the attachment message part
 			MimeBodyPart attMsgPart = new MimeBodyPart();
 			attMsgPart.attachFile(bundleFile);
+			attMsgPart.setFileName(bundleFile.getName() + MAILED_BUNDLE_NAME_ADDENDUM);
 			// Create and add the multipart document to the message
 			Multipart mp = new MimeMultipart();
 			mp.addBodyPart(textMsgPart);
