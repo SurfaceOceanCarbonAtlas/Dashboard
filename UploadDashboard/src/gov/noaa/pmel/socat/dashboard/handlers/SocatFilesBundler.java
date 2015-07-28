@@ -19,7 +19,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -55,7 +54,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 
 	private String archivalEmail;
 	private String socatEmail;
-	private String smtpsHost;
+	private String smtpHost;
 
 	/**
 	 * A file bundler that saves the file bundles under the given directory
@@ -73,19 +72,20 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		e-mail address to send bundles for archival
 	 * @param socatEmailAddress
 	 * 		e-mail address from which these bundles are being sent
-	 * @param smtpsHostAddress
-	 * 		address of the SMTPS host to use for email
+	 * @param smtpHostAddress
+	 * 		address of the SMTP host to use for email.  Uses port 25
+	 * 		and requires the use of the STARTTLS command
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a directory 
 	 * 		or is not under version control
 	 */
 	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
-			String archivalEmailAddress, String socatEmailAddress, String smtpsHostAddress) 
+			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress) 
 					throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
 		archivalEmail = archivalEmailAddress;
 		socatEmail = socatEmailAddress;
-		smtpsHost = smtpsHostAddress;
+		smtpHost = smtpHostAddress;
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			String userEmailAddress) throws IllegalArgumentException, IOException {
 		if ( (archivalEmail == null) || archivalEmail.isEmpty() )
 			throw new IllegalArgumentException("no archival email address");
-		if ( (smtpsHost == null) || smtpsHost.isEmpty() )
+		if ( (smtpHost == null) || smtpHost.isEmpty() )
 			throw new IllegalArgumentException("no SMTP host");
 		if ( (userRealName == null) || userRealName.isEmpty() ) 
 			throw new IllegalArgumentException("no user name");
@@ -251,42 +251,51 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			try {
 				commitVersion(bundleFile, message);
 			} catch (Exception ex) {
-				throw new IOException("Problems committing the CDIAC file bundle for " + 
+				throw new IOException("Problems committing the archival file bundle for " + 
 						upperExpo + ": " + ex.getMessage());
 			}
 		}
 
 		// Get the default Session for e-mailing
 		Properties props = System.getProperties();
-		props.put("mail.smtps.host", smtpsHost);
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.host", smtpHost);
+		props.put("mail.smtp.port", "25");
+		props.put("mail.smtp.starttls.enabled", "true");
+		props.put("mail.smtp.starttls.required", "true");
 		Session session = Session.getDefaultInstance(props);
 		// Create the email message
 		MimeMessage msg = new MimeMessage(session);
 		try {
 			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Unexpected problems assigning the email subject: " + ex.getMessage(), ex);
 		}
+		InternetAddress socatAddress;
 		try {
-			msg.setFrom(new InternetAddress(socatEmail));
-		} catch (MessagingException ex) {
-			throw new IllegalArgumentException(
-					"Invalid SOCAT email address: " + ex.getMessage(), ex);
+			socatAddress = new InternetAddress(socatEmail);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid SOCAT email address: " + ex.getMessage(), ex);
+		}
+		InternetAddress archivalAddress;
+		try {
+			archivalAddress = new InternetAddress(archivalEmail);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid archival email address: " + ex.getMessage(), ex);
+		}
+		InternetAddress userAddress;
+		try {
+			userAddress = new InternetAddress(userEmailAddress);
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Invalid user email address: " + ex.getMessage(), ex);
 		}
 		try {
-			InternetAddress[] toAddress = { new InternetAddress(archivalEmail)};
-			msg.setRecipients(Message.RecipientType.TO, toAddress);
-		} catch (MessagingException ex) {
-			throw new IllegalArgumentException(
-					"Invalid CDIAC email address: " + ex.getMessage(), ex);
-		}
-		try {
-			InternetAddress[] ccAddress = { new InternetAddress(userEmailAddress) };
-			msg.setRecipients(Message.RecipientType.CC, ccAddress);
-		} catch (MessagingException ex) {
-			throw new IllegalArgumentException(
-					"Invalid user email address: " + ex.getMessage(), ex);
+			msg.setFrom(socatAddress);
+			msg.setRecipients(Message.RecipientType.TO, new InternetAddress[] { archivalAddress });
+			msg.setRecipients(Message.RecipientType.CC, new InternetAddress[] { userAddress, socatAddress });
+		} catch (Exception ex) {
+			throw new IllegalArgumentException("Unexpected problems assigning addresses: " + ex.getMessage(), ex);
 		}
 		try {
 			// Create the text message part
@@ -301,19 +310,19 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			mp.addBodyPart(textMsgPart);
 			mp.addBodyPart(attMsgPart);
 			msg.setContent(mp);
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Unexpected problems assigning the multipart document: " + ex.getMessage(), ex);
 		}
 		try {
 			msg.setSentDate(new Date());
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Unexpected problems assigning the email date: " + ex.getMessage(), ex);
 		}
 		try {
 			Transport.send(msg);
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Problems sending the archival request email: " + ex.getMessage(), ex);
 		}
