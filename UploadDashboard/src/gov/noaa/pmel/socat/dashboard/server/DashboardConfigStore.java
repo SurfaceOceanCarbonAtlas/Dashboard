@@ -725,12 +725,10 @@ public class DashboardConfigStore {
 	 * 		privileges over othername
 	 */
 	public boolean userManagesOver(String username, String othername) {
-		DashboardUserInfo userInfo = userInfoMap.get(
-				DashboardUtils.cleanUsername(username));
+		DashboardUserInfo userInfo = userInfoMap.get(DashboardUtils.cleanUsername(username));
 		if ( userInfo == null )
 			return false;
-		return userInfo.managesOver(userInfoMap.get(
-				DashboardUtils.cleanUsername(othername)));
+		return userInfo.managesOver(userInfoMap.get(DashboardUtils.cleanUsername(othername)));
 	}
 
 	/**
@@ -741,8 +739,7 @@ public class DashboardConfigStore {
 	 * 		(regardless of whether there is anyone else in the group)
 	 */
 	public boolean isManager(String username) {
-		DashboardUserInfo userInfo = userInfoMap.get(
-				DashboardUtils.cleanUsername(username));
+		DashboardUserInfo userInfo = userInfoMap.get(DashboardUtils.cleanUsername(username));
 		if ( userInfo == null )
 			return false;
 		return userInfo.isManager();
@@ -755,8 +752,7 @@ public class DashboardConfigStore {
 	 * 		true is this user is an admin
 	 */
 	public boolean isAdmin(String username) {
-		DashboardUserInfo userInfo = userInfoMap.get(
-				DashboardUtils.cleanUsername(username));
+		DashboardUserInfo userInfo = userInfoMap.get(DashboardUtils.cleanUsername(username));
 		if ( userInfo == null )
 			return false;
 		return userInfo.isAdmin();

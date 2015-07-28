@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -73,8 +74,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * @param socatEmailAddress
 	 * 		e-mail address from which these bundles are being sent
 	 * @param smtpHostAddress
-	 * 		address of the SMTP host to use for email.  Uses port 25
-	 * 		and requires the use of the STARTTLS command
+	 * 		address of the SMTP host to use for email.
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a directory 
 	 * 		or is not under version control
@@ -185,7 +185,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		to version control
 	 * @param userRealName
 	 * 		real name of the user make this archival request
-	 * @param userEmailAddress
+	 * @param userEmail
 	 * 		email address of the user making this archival request;
 	 * 		this address will be cc'd on the bundle email sent for archival
 	 * @return
@@ -200,14 +200,14 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		if unable to commit the bundle to version control
 	 */
 	public String sendOrigFilesBundle(String expocode, String message, String userRealName, 
-			String userEmailAddress) throws IllegalArgumentException, IOException {
+			String userEmail) throws IllegalArgumentException, IOException {
 		if ( (archivalEmail == null) || archivalEmail.isEmpty() )
 			throw new IllegalArgumentException("no archival email address");
 		if ( (smtpHost == null) || smtpHost.isEmpty() )
 			throw new IllegalArgumentException("no SMTP host");
 		if ( (userRealName == null) || userRealName.isEmpty() ) 
 			throw new IllegalArgumentException("no user name");
-		if ( (userEmailAddress == null) || userEmailAddress.isEmpty() )
+		if ( (userEmail == null) || userEmail.isEmpty() )
 			throw new IllegalArgumentException("no user email address");
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		DashboardConfigStore configStore = DashboardConfigStore.get();
@@ -260,42 +260,45 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		Properties props = System.getProperties();
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.host", smtpHost);
-		props.put("mail.smtp.port", "25");
-		props.put("mail.smtp.starttls.enabled", "true");
-		props.put("mail.smtp.starttls.required", "true");
 		Session session = Session.getDefaultInstance(props);
 		// Create the email message
 		MimeMessage msg = new MimeMessage(session);
 		try {
 			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
-		} catch (Exception ex) {
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
 			throw new IllegalArgumentException(
-					"Unexpected problems assigning the email subject: " + ex.getMessage(), ex);
+					"Unexpected problems assigning the email subject: " + errmsg, ex);
 		}
 		InternetAddress socatAddress;
 		try {
 			socatAddress = new InternetAddress(socatEmail);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException("Invalid SOCAT email address: " + ex.getMessage(), ex);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Invalid SOCAT email address: " + errmsg, ex);
 		}
 		InternetAddress archivalAddress;
 		try {
 			archivalAddress = new InternetAddress(archivalEmail);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException("Invalid archival email address: " + ex.getMessage(), ex);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Invalid archival email address: " + errmsg, ex);
 		}
 		InternetAddress userAddress;
 		try {
-			userAddress = new InternetAddress(userEmailAddress);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException("Invalid user email address: " + ex.getMessage(), ex);
+			userAddress = new InternetAddress(userEmail);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Invalid user email address: " + errmsg, ex);
 		}
 		try {
 			msg.setFrom(socatAddress);
+			msg.setReplyTo(new InternetAddress[] { socatAddress });
 			msg.setRecipients(Message.RecipientType.TO, new InternetAddress[] { archivalAddress });
 			msg.setRecipients(Message.RecipientType.CC, new InternetAddress[] { userAddress, socatAddress });
-		} catch (Exception ex) {
-			throw new IllegalArgumentException("Unexpected problems assigning addresses: " + ex.getMessage(), ex);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Unexpected problems assigning addresses: " + errmsg, ex);
 		}
 		try {
 			// Create the text message part
@@ -310,25 +313,62 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			mp.addBodyPart(textMsgPart);
 			mp.addBodyPart(attMsgPart);
 			msg.setContent(mp);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Unexpected problems assigning the multipart document: " + ex.getMessage(), ex);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Unexpected problems assigning the multipart document: " + errmsg, ex);
 		}
 		try {
 			msg.setSentDate(new Date());
-		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Unexpected problems assigning the email date: " + ex.getMessage(), ex);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Unexpected problems assigning the email date: " + errmsg, ex);
 		}
 		try {
 			Transport.send(msg);
-		} catch (Exception ex) {
-			throw new IllegalArgumentException(
-					"Problems sending the archival request email: " + ex.getMessage(), ex);
+		} catch (MessagingException ex) {
+			String errmsg = getMessageExceptionMsgs(ex);
+			throw new IllegalArgumentException("Problems sending the archival request email: " + errmsg, ex);
 		}
 
-		infoMsg += "Files bundle sent to " + archivalEmail + " and cc'd to " + userEmailAddress + "\n";
+		infoMsg += "Files bundle sent to " + archivalEmail +
+				   " and cc'd to " + userEmail + " and " + socatEmail + "\n";
 		return infoMsg;
+	}
+
+	/**
+	 * Returns all messages in a possibly-nested MessagingException. 
+	 * The messages are returned as a single String by joining 
+	 * all the Exception messages together using a comma and space.
+	 * 
+	 * @param ex
+	 * 		get the error messages from this MessagingException
+	 * @return
+	 * 		all error messages concatenated together using a comma and a space;
+	 * 		if no messages are present, an empty String is returned
+	 */
+	private String getMessageExceptionMsgs(MessagingException ex) {
+		String fullErrMsg = null;
+		Exception nextEx = ex;
+		while ( nextEx != null ) {
+			String errMsg = nextEx.getMessage();
+			if ( errMsg != null ) {
+				if ( fullErrMsg == null ) {
+					fullErrMsg = errMsg;
+				}
+				else {
+					fullErrMsg += ", " + errMsg;
+				}
+			}
+			if ( nextEx instanceof MessagingException ) {
+				nextEx = ((MessagingException) nextEx).getNextException();
+			}
+			else {
+				nextEx = null;
+			}
+		}
+		if ( fullErrMsg == null )
+			fullErrMsg = "";
+		return fullErrMsg;
 	}
 
 	/**

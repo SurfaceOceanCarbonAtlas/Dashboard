@@ -261,7 +261,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private DashboardCruiseList checkSet;
 	private TreeSet<String> expocodeSet;
 	private DashboardAskPopup askDataAutofailPopup;
-	private boolean managerButtonsShown;
+	// private boolean managerButtonsShown;
 	private TextColumn<DashboardCruise> timestampColumn;
 	private TextColumn<DashboardCruise> expocodeColumn;
 
@@ -317,7 +317,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
 
-		managerButtonsShown = true;
+		// managerButtonsShown = true;
 		askDeletePopup = null;
 		askRemovePopup = null;
 		askDataAutofailPopup = null;
@@ -401,6 +401,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		// Update the username
 		setUsername(cruises.getUsername());
 		userInfoLabel.setText(WELCOME_INTRO + getUsername());
+		/*
 		if ( cruises.isManager() ) {
 			if ( ! managerButtonsShown ) {
 				// Add manager-specific buttons
@@ -419,6 +420,7 @@ public class CruiseListPage extends CompositeWithUsername {
 				managerButtonsShown = false;
 			}
 		}
+		*/
 		// Update the cruises shown by resetting the data in the data provider
 		List<DashboardCruise> cruiseList = listProvider.getList();
 		cruiseList.clear();

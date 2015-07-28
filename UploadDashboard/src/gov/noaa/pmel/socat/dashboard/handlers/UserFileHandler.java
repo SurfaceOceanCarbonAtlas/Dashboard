@@ -299,15 +299,16 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Adds an entries to a user's list of cruises, and saves the resulting 
-	 * list of cruises.
+	 * Adds matching entries to a user's list of cruises, and saves the resulting 
+	 * list of cruises.  Only cruises that are modifiable by the use (owned by
+	 * the user or owned by someone the user manages) are added. 
 	 * 
 	 * @param wildExpocode
-	 * 		expocode, possibly with wildcards * and ?, to use
+	 * 		expocode, possibly with wildcards * and ?, to add
 	 * @param username
 	 * 		user whose cruise list is to be updated
 	 * @return
-	 * 		updated list of cruises for user
+	 * 		updated list of cruises for the user
 	 * @throws IllegalArgumentException
 	 * 		if username is invalid, 
 	 * 		if wildExpocode is invalid,
@@ -318,37 +319,44 @@ public class UserFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardCruiseList addCruisesToListing(String wildExpocode, 
 						String username) throws IllegalArgumentException {
-		CruiseFileHandler cruiseHandler;
+		DashboardConfigStore configStore;
 		try {
-			cruiseHandler = DashboardConfigStore.get().getCruiseFileHandler();
+			configStore = DashboardConfigStore.get();
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
-					"Unexpected failure to get the cruise file handler");
+					"Unexpected failure to get the default dashboard config store");
 		}
-		HashSet<String> matchExpocodes = 
-				cruiseHandler.getMatchingExpocodes(wildExpocode);
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+		HashSet<String> matchExpocodes = cruiseHandler.getMatchingExpocodes(wildExpocode);
 		if ( matchExpocodes.size() == 0 ) 
 			throw new IllegalArgumentException(
 					"No datasets with an expocode matching " + wildExpocode);
 		DashboardCruiseList cruiseList = getCruiseListing(username);
 		String commitMsg = "Added cruise(s) ";
 		boolean needsCommit = false;
+		boolean viewableFound = false;
 		for ( String expocode : matchExpocodes ) {
 			// Create a cruise entry for this data
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 			if ( cruise == null ) 
 				throw new IllegalArgumentException("Unexpected error: dataset " +
 						expocode + " does not exist");
-			// Add or replace this cruise entry in the cruise list
-			// Only the expocodes (keys) are saved in the cruise list
-			if ( cruiseList.put(expocode, cruise) == null ) {
-				commitMsg += expocode + ", ";
-				needsCommit = true;
+			if ( configStore.userManagesOver(username, cruise.getOwner()) ) {
+				// Add or replace this cruise entry in the cruise list
+				// Only the expocodes (keys) are saved in the cruise list
+				viewableFound = true;
+				if ( cruiseList.put(expocode, cruise) == null ) {
+					commitMsg += expocode + ", ";
+					needsCommit = true;
+				}
 			}
 		}
+		if ( ! viewableFound )
+			throw new IllegalArgumentException(
+					"No datasets with an expocode matching " + wildExpocode + 
+					" that can be viewed by " + username);
 		if ( needsCommit )
-			saveCruiseListing(cruiseList, 
-					commitMsg + " to the listing for " + username); 
+			saveCruiseListing(cruiseList, commitMsg + " to the listing for " + username);
 		return cruiseList;
 	}
 
