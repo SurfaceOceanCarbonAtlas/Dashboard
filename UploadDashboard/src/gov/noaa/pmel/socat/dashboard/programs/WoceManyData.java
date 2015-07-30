@@ -76,7 +76,7 @@ public class WoceManyData {
 
 		DashboardConfigStore configStore = null;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (IOException ex) {
 			System.err.println("Problem getting the default DashboardConfigStore");
 			ex.printStackTrace();

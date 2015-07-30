@@ -3,7 +3,6 @@
  */
 package gov.noaa.pmel.socat.dashboard.actions;
 
-import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
@@ -12,6 +11,8 @@ import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
@@ -40,29 +41,48 @@ public class CruiseModifier {
 	private static final String REGION_ID_VAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
 	private static final String WOCE_CO2_WATER_NAME = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
 
-	CruiseFileHandler cruiseHandler;
-	CheckerMessageHandler msgHandler;
-	MetadataFileHandler metadataHandler;
-	DsgNcFileHandler dsgHandler;
-	DatabaseRequestHandler databaseHandler;
-	String socatUploadVersion;
 	String restoredSocatVersion;
 
 	/**
-	 * Restores cruises using the handlers provided by the given DashboardDataStore
+	 * Modifies information about datasets or restores previous versions of data or WOCE flags for datasets.
+	 */
+	public CruiseModifier() {
+		restoredSocatVersion = null;
+	}
+
+	/**
+	 * Changes the owner of the data and metadata files for a dataset.
 	 * 
 	 * @param configStore
-	 * 		DashboardDataStore to use
-	 * 		
+	 * 		configuration store to use
+	 * @param expocode
+	 * 		change the owner of the data and metadata files for the dataset with this expocode 
+	 * @param newOwner
+	 * 		change the owner of the data and metadata files to this username
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid,
+	 * 		if the new owner username is not recognized,
+	 * 		if there is no data file for the indicated dataset
 	 */
-	public CruiseModifier(DashboardConfigStore configStore) {
-		cruiseHandler = configStore.getCruiseFileHandler();
-		msgHandler = configStore.getCheckerMsgHandler();
-		metadataHandler = configStore.getMetadataFileHandler();
-		dsgHandler = configStore.getDsgNcFileHandler();
-		databaseHandler = configStore.getDatabaseRequestHandler();
-		socatUploadVersion = configStore.getSocatUploadVersion();
-		restoredSocatVersion = null;
+	public void changeCruiseOwner(DashboardConfigStore configStore, 
+			String expocode, String newOwner) throws IllegalArgumentException {
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		if ( ! configStore.validateUser(newOwner) )
+			throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
+
+		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
+		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
+		String oldOwner = cruise.getOwner();
+		cruise.setOwner(newOwner);
+		cruiseHandler.saveCruiseInfoToFile(cruise, "Owner changed from " + oldOwner + " to " + newOwner);
+
+		MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
+		ArrayList<DashboardMetadata> metaList = metaHandler.getMetadataFiles(upperExpo);
+		for ( DashboardMetadata mdata : metaList ) {
+			oldOwner = mdata.getOwner();
+			mdata.setOwner(newOwner);
+			metaHandler.saveMetadataInfo(mdata, "Owner changed from " + oldOwner + " to " + newOwner);
+		}
 	}
 
 	/**
@@ -70,6 +90,8 @@ public class CruiseModifier {
 	 * database flags if the cruise has been submitted.  If an exception is thrown,
 	 * the system is likely have a corrupt mix of renamed and original-name files.
 	 * 
+	 * @param configStore
+	 * 		configuration store to use
 	 * @param oldExpocode
 	 * 		current expocode for the cruise
 	 * @param newExpocode
@@ -87,22 +109,23 @@ public class CruiseModifier {
 	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
 	 */
-	public void renameCruise(String oldExpocode, String newExpocode, String username) 
-			throws IllegalArgumentException, IOException, SQLException {
+	public void renameCruise(DashboardConfigStore configStore, String oldExpocode, String newExpocode, 
+			String username) throws IllegalArgumentException, IOException, SQLException {
 		// check and standardized the expocodes
 		String oldExpo = DashboardServerUtils.checkExpocode(oldExpocode);
 		String newExpo = DashboardServerUtils.checkExpocode(newExpocode);
 		// rename the cruise data and info files; update the expocode in the data file
-		cruiseHandler.renameCruiseFiles(oldExpo, newExpo);
+		configStore.getCruiseFileHandler().renameCruiseFiles(oldExpo, newExpo);
 		// rename the SanityChecker messages file, if it exists
-		msgHandler.renameMsgsFile(oldExpo, newExpo);
+		configStore.getCheckerMsgHandler().renameMsgsFile(oldExpo, newExpo);
 		// TODO: rename the WOCE messages file, if it exists
 		// rename metadata files; update the expocode in the OME metadata
-		metadataHandler.renameMetadataFiles(oldExpo, newExpo);
+		configStore.getMetadataFileHandler().renameMetadataFiles(oldExpo, newExpo);
 		// rename the DSG and decimated DSG files; update the expocode in these files
-		dsgHandler.renameDsgFiles(oldExpo, newExpo);
+		configStore.getDsgNcFileHandler().renameDsgFiles(oldExpo, newExpo);
 		// generate a rename QC comment and modify expocodes for the flags
-		databaseHandler.renameCruiseFlags(oldExpo, newExpo, socatUploadVersion, username);
+		configStore.getDatabaseRequestHandler().renameCruiseFlags(
+				oldExpo, newExpo, configStore.getSocatUploadVersion(), username);
 	}
 
 	/**
@@ -122,6 +145,8 @@ public class CruiseModifier {
 	 * WOCE locations must match, and all WOCE locations for an event must match for 
 	 * a WOCE event to be restored. 
 	 * 
+	 * @param configStore
+	 * 		configuration store to use
 	 * @param expocode
 	 * 		restore and update WOCE flags for this cruise
 	 * @return
@@ -134,8 +159,9 @@ public class CruiseModifier {
 	 * @throws IOException
 	 * 		if problems reading or writing to the DSG files
 	 */
-	public boolean restoreWoceFlags(String expocode) 
+	public boolean restoreWoceFlags(DashboardConfigStore configStore, String expocode) 
 			throws IllegalArgumentException, SQLException, IOException {
+		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
 		dsgFile.read(true);
 		SocatMetadata metaData = dsgFile.getMetadata();
@@ -154,6 +180,7 @@ public class CruiseModifier {
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
+		DatabaseRequestHandler databaseHandler = configStore.getDatabaseRequestHandler();
 		for ( SocatWoceEvent woceEvent : databaseHandler.getWoceEvents(expocode, false) ) {
 			// SOCAT version for this WOCE event must match that of the data
 			if ( ! restoredSocatVersion.equals(woceEvent.getSocatVersion()) )
@@ -250,6 +277,8 @@ public class CruiseModifier {
 	 * number of old WOCE locations are not used, and not all WOCE locations do not 
 	 * have to match in order for a WOCE flag to be regenerated. 
 	 * 
+	 * @param configStore
+	 * 		configuration store to use
 	 * @param expocode
 	 * 		restore and update WOCE flags for this cruise
 	 * @param maxTimeDiff
@@ -270,8 +299,10 @@ public class CruiseModifier {
 	 * @throws IOException
 	 * 		if problems reading or writing to the DSG files
 	 */
-	public boolean regenerateWoceFlags(String expocode, double maxTimeDiff, double maxValueDiff)
+	public boolean regenerateWoceFlags(DashboardConfigStore configStore, 
+			String expocode, double maxTimeDiff, double maxValueDiff)
 		throws IllegalArgumentException, SQLException, IOException {
+		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
 		dsgFile.read(true);
 		SocatMetadata metaData = dsgFile.getMetadata();
@@ -291,6 +322,7 @@ public class CruiseModifier {
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
+		DatabaseRequestHandler databaseHandler = configStore.getDatabaseRequestHandler();
 		for ( SocatWoceEvent woceEvent : databaseHandler.getWoceEvents(expocode, false) ) {
 			// Skip WOCE events generated by the automated data-checker;
 			// they should have been regenerated, if appropriate, when resubmitted

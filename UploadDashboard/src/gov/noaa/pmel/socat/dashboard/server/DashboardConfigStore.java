@@ -138,7 +138,7 @@ public class DashboardConfigStore {
 	private PreviewPlotsHandler plotsHandler;
 	private CruiseSubmitter cruiseSubmitter;
 	private CruiseFlagsHandler cruiseFlagsHandler;
-	private Timer configWatcher;
+	private Timer configWatcher = null;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -148,10 +148,12 @@ public class DashboardConfigStore {
 	 * Do not create an instance of this class; 
 	 * instead use {@link #get()} to retrieve the singleton instance
 	 * 
+	 * @param startMonitors
+	 * 		start monitors of the configuration and other files?
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
-	private DashboardConfigStore() throws IOException {
+	private DashboardConfigStore(boolean startMonitors) throws IOException {
 		String baseDir = System.getProperty("catalina.base");
 		// The following is just for debugging under Eclipse
 		if ( baseDir == null ) 
@@ -511,25 +513,29 @@ public class DashboardConfigStore {
 			}
 			userInfoMap.put(username, userInfo);
 		}
-
 		itsLogger.info("read configuration file " + configFile.getPath());
-		// Watch for changes to the configuration file
-		watchConfigFile();
-		// Watch for OME server XML output files
-		omeFileHandler.watchForOmeOutput();
-		// Watch for changes in the full-data DSG files
-		dsgNcFileHandler.watchForDsgFileUpdates();
+		if ( startMonitors ) {
+			// Watch for changes to the configuration file
+			watchConfigFile();
+			// Watch for OME server XML output files
+			omeFileHandler.watchForOmeOutput();
+			// Watch for changes in the full-data DSG files
+			dsgNcFileHandler.watchForDsgFileUpdates();
+		}
 	}
 
 	/**
+	 * @param startMonitors
+	 * 		start the monitors of the configuration and other files? 
+	 * 		(only used when the singleton instance is being created)
 	 * @return
 	 * 		the singleton instance of the DashboardConfigStore
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
-	public static DashboardConfigStore get() throws IOException {
+	public static DashboardConfigStore get(boolean startMonitors) throws IOException {
 		if ( singleton.get() == null )
-			singleton.compareAndSet(null, new DashboardConfigStore());
+			singleton.compareAndSet(null, new DashboardConfigStore(startMonitors));
 		return singleton.get();
 	}
 
@@ -548,7 +554,8 @@ public class DashboardConfigStore {
 		metadataFileHandler.shutdown();
 		cdiacFilesBundler.shutdown();
 		// Stop the configuration watcher
-		configWatcher.cancel();
+		if ( configWatcher != null )
+			configWatcher.cancel();
 		// Discard this DashboardConfigStore as the singleton instance
 		singleton.set(null);
 	}

@@ -69,7 +69,7 @@ public class CruiseFileHandlerTest {
 	 */
 	@Test
 	public void testAssignCruiseDataFromInput() throws IOException {
-		CruiseFileHandler dataHandler = DashboardConfigStore.get().getCruiseFileHandler();
+		CruiseFileHandler dataHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
 		BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA)); 
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		dataHandler.assignCruiseDataFromInput(cruiseData, DashboardUtils.CRUISE_FORMAT_COMMA, cruiseReader, 0, -1, true);

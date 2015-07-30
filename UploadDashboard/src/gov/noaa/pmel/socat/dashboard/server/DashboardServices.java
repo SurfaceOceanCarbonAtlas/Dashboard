@@ -96,7 +96,7 @@ public class DashboardServices extends RemoteServiceServlet
 
 		configStore = null;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(true);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Unexpected configuration error: " + ex.getMessage());
 		}

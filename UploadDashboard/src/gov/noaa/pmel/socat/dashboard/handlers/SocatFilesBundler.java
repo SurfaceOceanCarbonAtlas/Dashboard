@@ -139,7 +139,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	public ArrayList<String> createSocatEnhancedFilesBundle(String expocode) 
 			throws IllegalArgumentException, IOException {
 		File bundleFile = getBundleFile(expocode);
-		DashboardConfigStore configStore = DashboardConfigStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
 		// Generate the single-cruise SOCAT-enhanced data file
 		SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
@@ -210,7 +210,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		if ( (userEmail == null) || userEmail.isEmpty() )
 			throw new IllegalArgumentException("no user email address");
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
-		DashboardConfigStore configStore = DashboardConfigStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 
 		// Get the original data file for this dataset
 		File origDataFile = configStore.getCruiseFileHandler().cruiseDataFile(upperExpo);

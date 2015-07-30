@@ -109,7 +109,7 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		// Verify page contents seem okay
-		DashboardConfigStore configStore = DashboardConfigStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get(true);
 		if ( (username == null) || (expocodes == null) || (uploadTimestamp == null) ||
 			 (omeIndicator == null) || (metadataItem == null) || 
 			 ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) || 

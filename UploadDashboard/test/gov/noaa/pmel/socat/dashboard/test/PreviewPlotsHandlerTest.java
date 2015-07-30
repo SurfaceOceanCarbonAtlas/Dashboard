@@ -25,7 +25,7 @@ public class PreviewPlotsHandlerTest {
 	@Test
 	public void testCreatePreviewPlots() throws IOException {
 		final String timetag = "testing";
-		DashboardConfigStore configStore = DashboardConfigStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 		PreviewPlotsHandler plotsHandler = configStore.getPreviewPlotsHandler();
 		File dsgFilesDir = plotsHandler.getCruisePreviewDsgDir(EXPOCODE);
 		File plotsDir = plotsHandler.getCruisePreviewPlotsDir(EXPOCODE);

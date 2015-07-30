@@ -434,7 +434,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			// from the data column names
 			DashboardConfigStore configStore;
 			try {
-				configStore = DashboardConfigStore.get();
+				configStore = DashboardConfigStore.get(false);
 			} catch ( IOException ex ) {
 				throw new IOException(
 						"Unexpected failure to get the dashboard configuration");
@@ -663,7 +663,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			// Delete the messages file (for old data) if it exists
 			DashboardConfigStore configStore;
 			try {
-				configStore = DashboardConfigStore.get();
+				configStore = DashboardConfigStore.get(false);
 			} catch ( IOException ex ) {
 				throw new IllegalArgumentException(
 						"Unexpected failure to get the dashboard configuration");
@@ -1068,7 +1068,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Check if the user has permission to delete the cruise
 		try {
 			String owner = cruise.getOwner();
-			if ( ! DashboardConfigStore.get().userManagesOver(username, owner) )
+			if ( ! DashboardConfigStore.get(false).userManagesOver(username, owner) )
 				throw new IllegalArgumentException("cruise owner is " + owner);
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
@@ -1110,7 +1110,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		DashboardConfigStore configStore;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the dashboard configuration");

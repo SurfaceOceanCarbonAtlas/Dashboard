@@ -140,7 +140,7 @@ public class CruiseUploadService extends HttpServlet {
 			sendErrMsg(response, "No upload files specified");
 			return;
 		}
-		DashboardConfigStore configStore = DashboardConfigStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get(true);
 		if ( (username == null) || (dataFormat == null) || (encoding == null) || 
 			 (action == null)   || (timestamp == null)  || 
 			 ( ! configStore.validateUser(username) ) ||

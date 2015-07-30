@@ -44,7 +44,7 @@ public class GenerateSummaryCruiseReports {
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;		
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());

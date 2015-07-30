@@ -71,7 +71,7 @@ public class RenameCruises {
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;		
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
 			System.err.println("Problems reading the default dashboard " +
 					"configuration file: " + ex.getMessage());
@@ -83,12 +83,12 @@ public class RenameCruises {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
-			CruiseModifier renamer = new CruiseModifier(configStore);
+			CruiseModifier renamer = new CruiseModifier();
 			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
 				String oldExpocode = expoEntry.getKey();
 				String newExpocode = expoEntry.getValue();
 				try {
-					renamer.renameCruise(oldExpocode, newExpocode, username);
+					renamer.renameCruise(configStore, oldExpocode, newExpocode, username);
 				} catch (Exception ex) {
 					System.err.println("Error renaming " + oldExpocode + " to " + newExpocode);
 					ex.printStackTrace();

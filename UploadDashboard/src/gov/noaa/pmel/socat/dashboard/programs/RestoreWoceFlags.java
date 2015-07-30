@@ -61,14 +61,14 @@ public class RestoreWoceFlags {
 
 		DashboardConfigStore configStore = null;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard configuration: " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
 
-		CruiseModifier restorer = new CruiseModifier(configStore);
+		CruiseModifier restorer = new CruiseModifier();
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 
 		try {
@@ -76,7 +76,7 @@ public class RestoreWoceFlags {
 			String socatVersion = null;
 			try {
 				System.out.println("Restoring any matching old non-automated WOCE flags for " + expocode);
-				changed = restorer.restoreWoceFlags(expocode);
+				changed = restorer.restoreWoceFlags(configStore, expocode);
 				socatVersion = restorer.getRestoredSocatVersion();
 			} catch (Exception ex) {
 				System.err.println(expocode + ": problems restoring the WOCE flags - " + ex.getMessage());

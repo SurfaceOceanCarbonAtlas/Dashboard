@@ -183,10 +183,9 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Get the cruise file handler
 		DashboardConfigStore configStore;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Unexpected failure to get settings");
+			throw new IllegalArgumentException("Unexpected failure to get settings");
 		}
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		// Create the cruise list (map) for these cruises
@@ -321,7 +320,7 @@ public class UserFileHandler extends VersionedFileHandler {
 						String username) throws IllegalArgumentException {
 		DashboardConfigStore configStore;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the default dashboard config store");
@@ -382,7 +381,7 @@ public class UserFileHandler extends VersionedFileHandler {
 							String username) throws IllegalArgumentException {
 		CruiseFileHandler cruiseHandler;
 		try {
-			cruiseHandler = DashboardConfigStore.get().getCruiseFileHandler();
+			cruiseHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
 		} catch ( IOException ex ) {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the cruise file handler");

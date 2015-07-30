@@ -72,7 +72,7 @@ public class RestoreCruise {
 
 		DashboardConfigStore configStore = null;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());
@@ -84,7 +84,7 @@ public class RestoreCruise {
 		String removeSocatVersion = configStore.getSocatUploadVersion();
 		ResubmitCruises resubmitter = new ResubmitCruises(configStore);
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
-		CruiseModifier restorer = new CruiseModifier(configStore);
+		CruiseModifier restorer = new CruiseModifier();
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 		try {
@@ -135,7 +135,7 @@ public class RestoreCruise {
 			String restoredVersion = null;
 			try {
 				System.out.println("Restoring WOCE flags for the current data");
-				restorer.restoreWoceFlags(expo);
+				restorer.restoreWoceFlags(configStore, expo);
 				restoredVersion = restorer.getRestoredSocatVersion();
 			} catch (Exception ex) {
 				System.err.println(expo + ": problems restoring the WOCE flags - " + ex.getMessage());

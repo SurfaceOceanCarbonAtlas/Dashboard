@@ -88,7 +88,7 @@ public class GetCruiseCrossovers {
 
 		DashboardConfigStore configStore = null;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (Exception ex) {
 			System.err.println("Problems obtaining the default dashboard " +
 					"configuration: " + ex.getMessage());

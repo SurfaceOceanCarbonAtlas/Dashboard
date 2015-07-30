@@ -28,7 +28,7 @@ public class OmeMergeTest {
 		final String previousExpocode = "32HQ20110517";
 		final String activeExpocode = "Z2HQ20110517";
 
-		DashboardConfigStore configStore = DashboardConfigStore.get();
+		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		// Read the OME XML contents for previousExpocode 
 		DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardMetadata.OME_FILENAME);

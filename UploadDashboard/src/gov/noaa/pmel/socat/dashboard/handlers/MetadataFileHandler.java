@@ -163,7 +163,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			return;
 		DashboardConfigStore configStore;
 		try {
-			configStore = DashboardConfigStore.get();
+			configStore = DashboardConfigStore.get(false);
 		} catch (IOException ex) {
 			throw new IllegalArgumentException(
 					"Unexpected error obtaining the dashboard configuration");
