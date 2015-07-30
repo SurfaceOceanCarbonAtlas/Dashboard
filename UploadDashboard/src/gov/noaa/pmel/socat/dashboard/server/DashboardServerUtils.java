@@ -47,4 +47,24 @@ public class DashboardServerUtils {
 		return upperExpo;
 	}
 
+	/**
+	 * Checks the validity of the given "NODC code" (first four characters of a standard expocode).
+	 * This does not actually check that the value is listed in the NODC registry of ships.
+	 * 
+	 * @param nodccode
+	 * 		expocode start to check
+	 * @return
+	 * 		false if nodccode is not exactly four characters from 
+	 * 		{@link DashboardUtils#VALID_EXPOCODE_CHARACTERS};
+	 * 		otherwise true
+	 */
+	public static boolean isLikeNODCCode(String nodccode) {
+		if ( (nodccode == null) || (nodccode.length() != 4) )
+			return false;
+		Matcher mat = invalidExpocodePattern.matcher(nodccode);
+		if ( mat.find() )
+			return false;
+		return true;
+	}
+
 }

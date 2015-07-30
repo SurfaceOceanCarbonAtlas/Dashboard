@@ -7,6 +7,7 @@ import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
+import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -18,6 +19,7 @@ import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
+import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
@@ -41,6 +44,8 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  * @author Karl Smith
  */
 public class DsgNcFileHandler {
+
+	private static final String DSG_FILE_SUFFIX = ".nc";
 
 	private File dsgFilesDir;
 	private File decDsgFilesDir;
@@ -135,7 +140,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException("Unable to create the new subdirectory " + 
 					parentDir.getPath());
 		}
-		return new CruiseDsgNcFile(parentDir, upperExpo + ".nc");
+		return new CruiseDsgNcFile(parentDir, upperExpo + DSG_FILE_SUFFIX);
 	}
 
 	/**
@@ -167,7 +172,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException("Unable to create the new subdirectory " + 
 					parentDir.getPath());
 		}
-		return new CruiseDsgNcFile(parentDir, upperExpo + ".nc");
+		return new CruiseDsgNcFile(parentDir, upperExpo + DSG_FILE_SUFFIX);
 	}
 
 	/**
@@ -716,20 +721,21 @@ public class DsgNcFileHandler {
 		watcherThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				Path dsgFilesDirPath = dsgFilesDir.toPath();
-				// Create a new watch service for the OME server output directory
+				// Create a new watch service for the DSG file directories
 				try {
 					watcher = FileSystems.getDefault().newWatchService();
 				} catch (Exception ex) {
 					itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
 					return;
 				}
-				// Register the OME server output directory with the watch service
-				WatchKey registration;
+				// Watch for directory creation in the root DSG directory
+				WatchKey rootReg;
 				try {
-					registration = dsgFilesDirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+					itsLogger.info("Start watching full-data DSG directory " + dsgFilesDir.getPath());
+					rootReg = dsgFilesDir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
 				} catch (Exception ex) {
-					itsLogger.error("Unexpected error registering the full-data DSG files directory for watching", ex);
+					itsLogger.error("Unexpected error registering the root full-data DSG directory " +
+							"for watching", ex);
 					try {
 						watcher.close();
 					} catch (Exception e) {
@@ -738,22 +744,71 @@ public class DsgNcFileHandler {
 					watcher = null;
 					return;
 				}
+				// Watch for file modification in each of the DSG subdirectories
+				File[] subdirs = dsgFilesDir.listFiles(new FileFilter() {
+					@Override
+					public boolean accept(File subfile) {
+						if ( subfile.isDirectory() )
+							return true;
+						return false;
+					}
+				});
+				ArrayList<WatchKey> subRegs = new ArrayList<WatchKey>(subdirs.length + 4);
+				for ( File dsgSubDir : subdirs ) {
+					try {
+						handleDsgDirChange(subRegs, StandardWatchEventKinds.ENTRY_CREATE, dsgSubDir);
+					} catch (Exception ex) {
+						itsLogger.error("Unexpected error registering the full-data DSG subdirectory " + 
+								dsgSubDir.getName() + " for watching", ex);
+						for ( WatchKey reg : subRegs) {
+							reg.cancel();
+							reg.pollEvents();
+						}
+						rootReg.cancel();
+						rootReg.pollEvents();
+						try {
+							watcher.close();
+						} catch (Exception e) {
+							;
+						}
+						watcher = null;
+						return;
+					}
+				}
+				subdirs = null;
+				// Start watching and handle changes
 				for (;;) {
 					try {
 						WatchKey key = watcher.take();
+						Path parentPath = (Path) key.watchable();
+						File lastFile = null;
+						Kind<?> lastKind = null;
 						for ( WatchEvent<?> event : key.pollEvents() ) {
 							Path relPath = (Path) event.context();
-							handleDsgFileChange(dsgFilesDirPath.resolve(relPath).toFile());
+							File thisFile = parentPath.resolve(relPath).toFile();
+							Kind<?> thisKind = event.kind();
+							// Ignore repeated events of what was just handled
+							if ( thisFile.equals(lastFile) && thisKind.equals(lastKind) )
+								continue;
+							handleDsgDirChange(subRegs, thisKind, thisFile);
+							lastFile = thisFile;
+							lastKind = thisKind;
 						}
 						if ( ! key.reset() )
 							break;
+						// Sleep a moment to allow multiple updates to coalesce
+						Thread.sleep(100);
 					} catch (Exception ex) {
 						// Probably the watcher was closed
 						break;
 					}
 				}
-				registration.cancel();
-				registration.pollEvents();
+				for ( WatchKey reg : subRegs) {
+					reg.cancel();
+					reg.pollEvents();
+				}
+				rootReg.cancel();
+				rootReg.pollEvents();
 				try {
 					watcher.close();
 				} catch (Exception ex) {
@@ -767,12 +822,55 @@ public class DsgNcFileHandler {
 		watcherThread.start();
 	}
 
-	private void handleDsgFileChange(File dsgFile) {
-		if ( dsgFile.isDirectory() ) {
-			itsLogger.info("Working with updated full-data DSG subdirectory " + dsgFile.getPath());
+	/**
+	 * Handles changes detected by the monitor of the DSG directory.  If the change is the creation of
+	 * an appropriately named directory, this will start watching for modifications of files in that 
+	 * directory.  If the change is the a modification of an appropriately named DSG file, the QC flag
+	 * is checked for possible updates to the dashboard status.
+	 *   
+	 * @param subRegs
+	 * 		add the WatchKey returned from registering a directory to be monitored to this list 
+	 * @param changeKind
+	 * 		kind of change to be handled
+	 * @param changedFile
+	 * 		file or directory to be handled 
+	 * @throws IOException
+	 * 		if registering a directory to be watched throws one
+	 */
+	private void handleDsgDirChange(ArrayList<WatchKey> subRegs, Kind<?> changeKind, File changedFile) throws IOException {
+		if ( changedFile.isDirectory() ) {
+			if ( StandardWatchEventKinds.ENTRY_CREATE.equals(changeKind) &&
+				 DashboardServerUtils.isLikeNODCCode(changedFile.getName()) ) {
+				// new DSG file subdirectory to start watching for modifications to DSG files
+				itsLogger.info("Start watching full-data DSG subdirectory " + changedFile.getName());
+				subRegs.add(changedFile.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY));
+			}
 		}
-		else {
-			itsLogger.info("Working with updated full-data DSG file " + dsgFile.getPath());
+		else if ( StandardWatchEventKinds.ENTRY_MODIFY.equals(changeKind) ) {
+			String filename = changedFile.getName();
+			if ( ! filename.endsWith(DSG_FILE_SUFFIX) ) {
+				// Not a DSG file - ignore this call
+				return;
+			}
+			String expocode = filename.substring(0, filename.length() - DSG_FILE_SUFFIX.length());
+			try {
+				String upperExpocode = DashboardServerUtils.checkExpocode(expocode);
+				if ( ! expocode.equals(upperExpocode) )
+					throw new IllegalArgumentException();
+			} catch (Exception ex) {
+				// Not a DSG file used by this system - ignore this call
+				return;
+			}
+			itsLogger.info("Checking QC flag given in " + changedFile.getPath());
+			try {
+				CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(changedFile.getPath());
+				char qcFlag = dsgFile.getQCFlag();
+				CruiseFileHandler fileHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
+				if ( fileHandler.updateCruiseDashboardStatus(expocode, qcFlag) )
+					itsLogger.info("Updated dashboard status for " + expocode + " to that for QC flag '" + qcFlag + "'");
+			} catch (Exception ex) {
+				itsLogger.error("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
+			}
 		}
 	}
 
