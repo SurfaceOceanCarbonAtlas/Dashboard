@@ -54,13 +54,7 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  */
 public class DashboardConfigStore {
 
-	private static final String SERVER_APP_NAME = "SocatUploadDashboard";
-	private static final String LOGGER_CONFIG_RELATIVE_FILENAME = "content" + File.separator + 
-			SERVER_APP_NAME + File.separator + "log4j.properties";
-	private static final String CONFIG_RELATIVE_FILENAME = "content" + File.separator + 
-			SERVER_APP_NAME + File.separator + "SocatUploadDashboard.properties";
-	private static final String PREVIEW_RELATIVE_DIRNAME = "webapps" + File.separator + 
-			SERVER_APP_NAME + File.separator + "preview" + File.separator;
+	private static final String DEFAULT_SERVER_APP_NAME = "SocatUploadDashboard";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
 	private static final String SOCAT_UPLOAD_VERSION_NAME_TAG = "SocatUploadVersion";
@@ -161,22 +155,29 @@ public class DashboardConfigStore {
 	 * 		if unable to read the standard configuration file
 	 */
 	private DashboardConfigStore(boolean startMonitors) throws IOException {
-		String baseDir = System.getProperty("catalina.base");
-		// The following is just for debugging under Eclipse
+		String baseDir = System.getenv("CATALINA_BASE");
 		if ( baseDir == null ) 
-			baseDir = System.getProperty("user.home");
+			throw new IOException("CATALINA_BASE environment variable is not defined");
+		baseDir += File.separator;
+
+		// The following is just for running the dashboard.programs.* apps with a different configuration
+		String serverAppName = System.getenv("UPLOAD_DASHBOARD_SERVER_NAME");
+		if ( serverAppName == null )
+			serverAppName = DEFAULT_SERVER_APP_NAME;
+		String contentAppDir = baseDir + "content" + File.separator + serverAppName + File.separator;
+		String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator + 
+				"preview" + File.separator;
 
 		// Configure the log4j logger
-		PropertyConfigurator.configure(baseDir + File.separator + 
-				LOGGER_CONFIG_RELATIVE_FILENAME);
-		itsLogger = Logger.getLogger(SERVER_APP_NAME);
+		PropertyConfigurator.configure(contentAppDir + "log4j.properties");
+		itsLogger = Logger.getLogger(serverAppName);
 
 		// Record configuration files that should be monitored for changes 
 		filesToWatch = new HashSet<File>();
 
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
-		File configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
+		File configFile = new File(contentAppDir + serverAppName + ".properties");
 		filesToWatch.add(configFile);
 		FileReader reader;
 		try {
@@ -518,7 +519,6 @@ public class DashboardConfigStore {
 		}
 
 		// The PreviewPlotsHandler uses the various handlers just created
-		String previewDirname = baseDir + File.separator + PREVIEW_RELATIVE_DIRNAME;
 		plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles", 
 				previewDirname + "plots", this);
 
