@@ -140,7 +140,7 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		get cruises for this user
 	 * @return
 	 * 		the list of cruises for the user; will not be null 
-	 * 		but may have a null cruise list if there is no saved listing
+	 * 		but may be empty (including if there is no saved listing)
 	 * @throws IllegalArgumentException
 	 * 		if username was invalid, if there was a problem
 	 * 		reading an existing cruise listing, or 

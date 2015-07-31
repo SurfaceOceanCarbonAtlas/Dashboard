@@ -7,11 +7,13 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
@@ -52,6 +54,8 @@ public class CruiseModifier {
 
 	/**
 	 * Changes the owner of the data and metadata files for a dataset.
+	 * The dataset is removed from the list of datasets for the old owner 
+	 * of the data file and added to the list of datasets for the new owner.
 	 * 
 	 * @param configStore
 	 * 		configuration store to use
@@ -74,14 +78,31 @@ public class CruiseModifier {
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
 		String oldOwner = cruise.getOwner();
 		cruise.setOwner(newOwner);
-		cruiseHandler.saveCruiseInfoToFile(cruise, "Owner changed from " + oldOwner + " to " + newOwner);
+		cruiseHandler.saveCruiseInfoToFile(cruise, "Owner of " + upperExpo + 
+				" data file changed from " + oldOwner + " to " + newOwner);
 
 		MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
 		ArrayList<DashboardMetadata> metaList = metaHandler.getMetadataFiles(upperExpo);
 		for ( DashboardMetadata mdata : metaList ) {
-			oldOwner = mdata.getOwner();
+			String oldMetaOwner = mdata.getOwner();
 			mdata.setOwner(newOwner);
-			metaHandler.saveMetadataInfo(mdata, "Owner changed from " + oldOwner + " to " + newOwner);
+			metaHandler.saveMetadataInfo(mdata, "Owner of " + upperExpo + 
+					" metadata file changed from " + oldMetaOwner + " to " + newOwner);
+		}
+
+		UserFileHandler userHandler = configStore.getUserFileHandler();
+		String commitMsg = "Dataset " + upperExpo + " moved from " + oldOwner + " to " + newOwner;
+
+		DashboardCruiseList cruiseList = userHandler.getCruiseListing(newOwner);
+		if ( cruiseList.put(upperExpo, cruise) == null ) {
+			// This expocode was not in the list, so save the update
+			userHandler.saveCruiseListing(cruiseList, commitMsg);
+		}
+
+		cruiseList = userHandler.getCruiseListing(oldOwner);
+		if ( cruiseList.remove(upperExpo) != null ) {
+			// This expocode was in the list, so save the update
+			userHandler.saveCruiseListing(cruiseList, commitMsg);
 		}
 	}
 
