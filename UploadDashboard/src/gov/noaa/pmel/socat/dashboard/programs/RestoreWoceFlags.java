@@ -105,7 +105,7 @@ public class RestoreWoceFlags {
 				}
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		System.exit(0);

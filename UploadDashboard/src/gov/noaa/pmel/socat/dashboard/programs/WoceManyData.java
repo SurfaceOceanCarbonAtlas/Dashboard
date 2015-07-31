@@ -197,7 +197,7 @@ public class WoceManyData {
 			// TODO: redecimate - done by hand
 			// TODO: flag ERDDAP - done by hand
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		System.exit(0);

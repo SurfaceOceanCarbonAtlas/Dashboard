@@ -98,7 +98,7 @@ public class UpdateDashboardStatuses {
 				}
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

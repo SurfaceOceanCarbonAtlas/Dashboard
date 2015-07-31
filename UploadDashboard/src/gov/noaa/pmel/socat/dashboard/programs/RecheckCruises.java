@@ -93,7 +93,7 @@ public class RecheckCruises {
 				System.err.println("Success - " + expo);
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		// Done - return zero if no problems

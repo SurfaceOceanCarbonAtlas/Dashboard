@@ -869,7 +869,8 @@ public class DsgNcFileHandler {
 				if ( fileHandler.updateCruiseDashboardStatus(expocode, qcFlag) )
 					itsLogger.info("Updated dashboard status for " + expocode + " to that for QC flag '" + qcFlag + "'");
 			} catch (Exception ex) {
-				itsLogger.error("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
+				// Caught mid-update?  Another update call should occur, so log only as info
+				itsLogger.info("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
 			}
 		}
 	}

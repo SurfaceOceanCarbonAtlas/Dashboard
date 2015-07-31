@@ -239,7 +239,7 @@ public class RestoreCruise {
 				System.exit(1);
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		System.exit(0);

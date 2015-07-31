@@ -103,7 +103,7 @@ public class DecimateCruises {
 			// Flag ERDDAP that (only) the decimated files have been updated
 			dsgHandler.flagErddap(false, true);
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

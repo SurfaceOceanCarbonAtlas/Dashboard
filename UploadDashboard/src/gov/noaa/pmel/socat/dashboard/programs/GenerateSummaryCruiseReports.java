@@ -97,7 +97,7 @@ public class GenerateSummaryCruiseReports {
 				report.close();
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

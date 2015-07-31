@@ -119,9 +119,10 @@ public class OmeFileHandler {
 				for (;;) {
 					try {
 						WatchKey key = watcher.take();
+						Path parentPath = (Path) key.watchable();
 						for ( WatchEvent<?> event : key.pollEvents() ) {
 							Path relPath = (Path) event.context();
-							handleOmeServerFile(omeServerOutputPath.resolve(relPath).toFile());
+							handleOmeServerFile(parentPath.resolve(relPath).toFile());
 						}
 						if ( ! key.reset() )
 							break;

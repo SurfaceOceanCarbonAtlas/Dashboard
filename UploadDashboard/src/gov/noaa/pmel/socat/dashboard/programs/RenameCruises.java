@@ -95,7 +95,7 @@ public class RenameCruises {
 				}
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 		System.exit(0);
 	}

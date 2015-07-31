@@ -119,7 +119,7 @@ public class AddAllMetadata {
 				}
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 		if ( ! success )
 			System.exit(1);

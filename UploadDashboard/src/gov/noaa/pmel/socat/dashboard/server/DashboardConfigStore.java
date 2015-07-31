@@ -23,12 +23,17 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -114,11 +119,9 @@ public class DashboardConfigStore {
 			"The EncryptionKey should be 24 random integer values in [-128,127] \n" +
 			"The hexidecimal keys for users can be generated using the mkpasshash.sh script. \n";
 
-	private static final AtomicReference<DashboardConfigStore> singleton = 
-			new AtomicReference<DashboardConfigStore>();
+	private static final Object SINGLETON_SYNC_OBJECT = new Object();
+	private static DashboardConfigStore singleton = null;
 
-	private File configFile;
-	private long configFileTimestamp;
 	private TripleDesCipher cipher;
 	private String encryptionSalt;
 	// Map of username to user info
@@ -138,7 +141,11 @@ public class DashboardConfigStore {
 	private PreviewPlotsHandler plotsHandler;
 	private CruiseSubmitter cruiseSubmitter;
 	private CruiseFlagsHandler cruiseFlagsHandler;
-	private Timer configWatcher = null;
+	private HashSet<File> filesToWatch;
+	private Thread watcherThread;
+	private WatchService watcher;
+	private boolean needToRestart;
+	private Logger itsLogger;
 
 	/**
 	 * Creates a data store initialized from the contents of the standard 
@@ -149,7 +156,7 @@ public class DashboardConfigStore {
 	 * instead use {@link #get()} to retrieve the singleton instance
 	 * 
 	 * @param startMonitors
-	 * 		start monitors of the configuration and other files?
+	 * 		start the file change monitors? 
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
@@ -162,12 +169,15 @@ public class DashboardConfigStore {
 		// Configure the log4j logger
 		PropertyConfigurator.configure(baseDir + File.separator + 
 				LOGGER_CONFIG_RELATIVE_FILENAME);
-		Logger itsLogger = Logger.getLogger(SERVER_APP_NAME);
+		itsLogger = Logger.getLogger(SERVER_APP_NAME);
+
+		// Record configuration files that should be monitored for changes 
+		filesToWatch = new HashSet<File>();
 
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
-		configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
-		configFileTimestamp = configFile.lastModified();
+		File configFile = new File(baseDir, CONFIG_RELATIVE_FILENAME);
+		filesToWatch.add(configFile);
 		FileReader reader;
 		try {
 			reader = new FileReader(configFile);
@@ -383,7 +393,9 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			// Read the Ferret configuration given in this file
-		    InputStream stream = new FileInputStream(new File(propVal));
+			File ferretPropsFile = new File(propVal);
+			filesToWatch.add(ferretPropsFile);
+		    InputStream stream = new FileInputStream(ferretPropsFile);
 		    try {
 			    SAXBuilder sb = new SAXBuilder();
 		    	Document jdom = sb.build(stream);
@@ -461,6 +473,7 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
+			filesToWatch.add(new File(propVal));
 			databaseRequestHandler = new DatabaseRequestHandler(propVal);
 		    itsLogger.info("read Database configuration file " + propVal);
 		} catch ( Exception ex ) {
@@ -474,6 +487,34 @@ public class DashboardConfigStore {
 			cruiseChecker = new CruiseChecker(configFile, checkerMsgHandler, metadataFileHandler);
 		} catch ( IOException ex ) {
 			throw new IOException(ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
+		// Add the SanityChecker configuration files listed in this config file to the files to be watched
+		try {
+			filesToWatch.add(new File(configProps.getProperty(BaseConfig.METADATA_CONFIG_FILE)));
+		} catch ( Exception ex ) {
+			// Should not happen but ignore if it did
+		}
+		try {
+			filesToWatch.add(new File(configProps.getProperty(BaseConfig.SOCAT_CONFIG_FILE)));
+		} catch ( Exception ex ) {
+			// Should not happen but ignore if it did
+		}
+		try {
+			filesToWatch.add(new File(configProps.getProperty(BaseConfig.SANITY_CHECK_CONFIG_FILE)));
+		} catch ( Exception ex ) {
+			// Should not happen but ignore if it did
+		}
+		try {
+			filesToWatch.add(new File(configProps.getProperty(BaseConfig.COLUMN_SPEC_SCHEMA_FILE)));
+		} catch ( Exception ex ) {
+			// Should not happen but ignore if it did
+		}
+		try {
+			propVal = configProps.getProperty(BaseConfig.COLUMN_CONVERSION_FILE);
+			filesToWatch.add(new File(propVal));
+		} catch ( Exception ex ) {
+			// Should not happen but ignore if it did
 		}
 
 		// The PreviewPlotsHandler uses the various handlers just created
@@ -514,9 +555,12 @@ public class DashboardConfigStore {
 			userInfoMap.put(username, userInfo);
 		}
 		itsLogger.info("read configuration file " + configFile.getPath());
+		watcher = null;
+		watcherThread = null;
+		needToRestart = false;
 		if ( startMonitors ) {
 			// Watch for changes to the configuration file
-			watchConfigFile();
+			watchConfigFiles();
 			// Watch for OME server XML output files
 			omeFileHandler.watchForOmeOutput();
 			// Watch for changes in the full-data DSG files
@@ -526,24 +570,45 @@ public class DashboardConfigStore {
 
 	/**
 	 * @param startMonitors
-	 * 		start the monitors of the configuration and other files? 
-	 * 		(only used when the singleton instance is being created)
+	 * 		start the file change monitors? 
+	 * 		(ignored if the singleton instance of the DashboardConfigStore already exists)
 	 * @return
 	 * 		the singleton instance of the DashboardConfigStore
 	 * @throws IOException 
 	 * 		if unable to read the standard configuration file
 	 */
 	public static DashboardConfigStore get(boolean startMonitors) throws IOException {
-		if ( singleton.get() == null )
-			singleton.compareAndSet(null, new DashboardConfigStore(startMonitors));
-		return singleton.get();
+		synchronized(SINGLETON_SYNC_OBJECT) {
+			if ( (singleton != null) && singleton.needToRestart ) {
+				singleton.stopMonitors();
+				singleton = null;
+			}
+			if ( singleton == null ) {
+				singleton = new DashboardConfigStore(startMonitors);
+			}
+		}
+		return singleton;
 	}
 
 	/**
-	 * Shuts down the handlers and timers associated with this data store and 
-	 * removes this data store as the singleton instance of this class.
+	 * Shuts down the handlers and monitors associated with the current singleton 
+	 * data store and removes it as the singleton instance of this class.
 	 */
-	public void shutdown() {
+	public static void shutdown() {
+		synchronized(SINGLETON_SYNC_OBJECT) {
+			if ( singleton != null ) {
+				// stop the handler and monitors for the singleton instance
+				singleton.stopMonitors();
+				// Discard this DashboardConfigStore as the singleton instance
+				singleton = null;
+			}
+		}
+	}
+
+	/**
+	 * Shuts down the handlers and monitors associated with this data store.
+	 */
+	private void stopMonitors() {
 		// Stop the watch for changes in the full-data DSG files
 		dsgNcFileHandler.cancelWatch();
 		// Stop the watch for the OME server XML output files
@@ -554,39 +619,108 @@ public class DashboardConfigStore {
 		metadataFileHandler.shutdown();
 		cdiacFilesBundler.shutdown();
 		// Stop the configuration watcher
-		if ( configWatcher != null )
-			configWatcher.cancel();
-		// Discard this DashboardConfigStore as the singleton instance
-		singleton.set(null);
+		cancelWatch();
 	}
 
-	private static final long MINUTES_CHECK_INTERVAL = 1;
 	/**
-	 * Monitors the configuration file creating the current DashboardConfigStore 
-	 * singleton object.  If the configuration file has changed, shuts down the 
-	 * current DashboardConfigStore singleton object and stops monitoring the 
-	 * configuration file.  Thus, the next time the DashboardConfigStore is needed, 
-	 * the configuration file will be reread and this monitor will be restarted.
+	 * Monitors the configuration files for the current DashboardConfigStore 
+	 * singleton object.  If a configuration file has changed, sets 
+	 * needsToRestart to true and the monitoring thread exits.
 	 */
-	private void watchConfigFile() {
-		// Just create a timer to monitor the last modified timestamp 
-		// of the config file every MINUTES_CHECK_INTERVAL minutes
-		configWatcher = new Timer();
-		configWatcher.schedule(new TimerTask() {
+	private void watchConfigFiles() {
+		// Make sure the watcher is not already running
+		if ( watcherThread != null )
+			return;
+		watcherThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				DashboardConfigStore configStore = singleton.get();
-				if ( configStore == null ) {
-					// datastore already removed so cancel this timer
-					cancel(); 
+				// Create a new watch service for the dashboard configuration files
+				try {
+					watcher = FileSystems.getDefault().newWatchService();
+				} catch (Exception ex) {
+					itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
+					return;
 				}
-				else if ( configStore.configFile.lastModified() != 
-						  configStore.configFileTimestamp ) {
-					// Shutdown all the handlers, cancel this timer, and remove the configstore
-					configStore.shutdown();
+				// Register the the directories containing the dashboard configuration files with the watch service
+				HashSet<File> parentDirs = new HashSet<File>();
+				for ( File configFile : filesToWatch ) {
+					parentDirs.add(configFile.getParentFile());
 				}
+				ArrayList<WatchKey> registrations = new ArrayList<WatchKey>(parentDirs.size());
+				for ( File watchDir : parentDirs ) {
+					try {
+						registrations.add(watchDir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY));
+					} catch (Exception ex) {
+						itsLogger.error("Unexpected error registering " + watchDir.getPath() + " for watching", ex);
+						for ( WatchKey reg : registrations ) {
+							reg.cancel();
+							reg.pollEvents();
+						}
+						try {
+							watcher.close();
+						} catch (Exception e) {
+							;
+						}
+						watcher = null;
+						return;
+					}
+				}
+				for (;;) {
+					try {
+						WatchKey key = watcher.take();
+						Path parentPath = (Path) key.watchable();
+						for ( WatchEvent<?> event : key.pollEvents() ) {
+							Path relPath = (Path) event.context();
+							File thisFile = parentPath.resolve(relPath).toFile();
+							if ( filesToWatch.contains(thisFile) ) {
+								needToRestart = true;
+								throw new Exception();
+							}
+						}
+						if ( ! key.reset() )
+							break;
+					} catch (Exception ex) {
+						// Probably the watcher was closed
+						break;
+					}
+				}
+				for ( WatchKey reg : registrations ) {
+					reg.cancel();
+					reg.pollEvents();
+				}
+				try {
+					watcher.close();
+				} catch (Exception ex) {
+					;
+				}
+				watcher = null;
+				return;
 			}
-		}, MINUTES_CHECK_INTERVAL * 60 * 1000, MINUTES_CHECK_INTERVAL * 60 * 1000);
+		});
+		itsLogger.info("Starting new thread monitoring the dashboard configuration files");
+		watcherThread.start();
+	}
+
+	/**
+	 * Stops the monitoring the dashboard configuration files.  
+	 * If the dashboard configuration files are not being monitored, this call does nothing. 
+	 */
+	private void cancelWatch() {
+		try {
+			watcher.close();
+			// Only the thread modifies the value of watcher
+		} catch (Exception ex) {
+			// Might be NullPointerException
+		}
+		if ( watcherThread != null ) {
+			try {
+				watcherThread.join();
+			} catch (Exception ex) {
+				;
+			}
+			watcherThread = null;
+			itsLogger.info("End of thread monitoring the dashboard configuration files");
+		}
 	}
 
 	/**

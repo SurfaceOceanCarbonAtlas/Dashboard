@@ -139,7 +139,7 @@ public class GenerateFullCruiseReports {
 				}
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		System.exit(0);

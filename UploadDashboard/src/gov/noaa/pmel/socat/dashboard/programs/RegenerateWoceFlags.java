@@ -131,7 +131,7 @@ public class RegenerateWoceFlags {
 				}
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		System.exit(0);

@@ -83,7 +83,7 @@ public class GenerateWoceReports {
 				System.err.println("Success - " + expo);
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		// Done - return zero if no problems

@@ -269,7 +269,7 @@ public class RegenerateDsgs {
 				regenerator.flagErddap();
 			}
 		} finally {
-			configStore.shutdown();
+			DashboardConfigStore.shutdown();
 		}
 
 		if ( ! success )
