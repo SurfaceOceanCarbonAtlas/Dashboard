@@ -196,12 +196,20 @@ public class UserFileHandler extends VersionedFileHandler {
 			// Create the DashboardCruise from the info file
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 			if ( cruise == null ) {
-				// Remove this expocode from the saved list
+				// Cruise no longer exists - remove this expocode from the saved list
 				needsCommit = true;
-				commitMessage += "remove cruise " + expocode + "; ";
+				commitMessage += "remove non-existant dataset " + expocode + "; ";
 			}
 			else {
-				cruiseList.put(expocode, cruise);
+				String owner = cruise.getOwner();
+				if ( ! configStore.userManagesOver(username, owner) ) {
+					// No longer authorized to view - remove this expocode from the saved list
+					needsCommit = true;
+					commitMessage += "remove unauthorized dataset " + expocode + "; ";
+				}
+				else {
+					cruiseList.put(expocode, cruise);
+				}
 			}
 		}
 		if ( needsCommit )

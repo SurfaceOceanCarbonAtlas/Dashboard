@@ -82,6 +82,23 @@ public interface DashboardServicesInterface extends RemoteService {
 			throws IllegalArgumentException;
 
 	/**
+	 * Changes the owner of the given cruises to the indicated new owner.
+	 * 
+	 * @param username
+	 * 		name of the current user - for validation and current ownership of cruises
+	 * @param expocodeSet
+	 * 		change the owner of the cruises with these expocodes
+	 * @param newOwner
+	 * 		dashboard username of the new owner of these cruises
+	 * @return
+	 * 		the updated list of cruises for the user
+	 * @throws IllegalArgumentException
+	 * 		if problems changing the ownership of any of the cruises
+	 */
+	DashboardCruiseList changeCruiseOwner(String username, TreeSet<String> expocodeSet, 
+			String newOwner) throws IllegalArgumentException;
+
+	/**
 	 * Returns the latest cruise information for the indicated cruises.
 	 * 
 	 * @param username

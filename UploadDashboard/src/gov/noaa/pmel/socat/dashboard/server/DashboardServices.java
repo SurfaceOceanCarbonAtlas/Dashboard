@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
+import gov.noaa.pmel.socat.dashboard.actions.CruiseModifier;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.UserFileHandler;
@@ -39,7 +40,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class DashboardServices extends RemoteServiceServlet
 								implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = 6522763403680226864L;
+	private static final long serialVersionUID = 4238185873850896369L;
 
 	private String username = null;
 	private DashboardConfigStore configStore = null;
@@ -166,6 +167,23 @@ public class DashboardServices extends RemoteServiceServlet
 		DashboardCruiseList cruiseList = configStore.getUserFileHandler()
 				.removeCruisesFromListing(expocodeSet, username);
 		Logger.getLogger("DashboardServices").info("removed cruises " + expocodeSet.toString() + " for " + username);
+		return cruiseList;
+	}
+
+	@Override
+	public DashboardCruiseList changeCruiseOwner(String pageUsername, 
+			TreeSet<String> expocodeSet, String newOwner) throws IllegalArgumentException {
+		if ( ! validateRequest(pageUsername) ) 
+			throw new IllegalArgumentException("Invalid user request");
+		// Change the owner of the cruises
+		CruiseModifier modifier = new CruiseModifier();
+		Logger itsLogger = Logger.getLogger("DashboardServices");
+		for ( String expocode : expocodeSet ) {
+			modifier.changeCruiseOwner(configStore, expocode, newOwner);
+			itsLogger.info("changed owner of " + expocode + " to " + newOwner);
+		}
+		// Return the updated list of cruises for this user
+		DashboardCruiseList cruiseList = configStore.getUserFileHandler().getCruiseListing(pageUsername);
 		return cruiseList;
 	}
 

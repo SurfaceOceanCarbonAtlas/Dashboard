@@ -31,9 +31,10 @@ public class ChangeCruiseOwner {
 			System.err.println("Changes the owner of the data and metadata files for the datasets and ");
 			System.err.println("owners specified in ExpocodesOwnersFile.  Each line of ExpocodesOwnersFile ");
 			System.err.println("has a space-separated expocode and new owner dashboard username.  The ");
-			System.err.println("datasets are removed from the listing of old owner of each data file and ");
-			System.err.println("added to the listing of the new owner.  The default dashboard configuration ");
-			System.err.println("is used for this process. ");
+			System.err.println("datasets are added to the listing of the new owner.  The update-on-read ");
+			System.err.println("of dataset listings will remove datasets that should no longer be seen ");
+			System.err.println("by old owners, and others, due to the change.  The default dashboard ");
+			System.err.println("configuration is used for this process. ");
 			System.err.println();
 			System.exit(1);
 		}

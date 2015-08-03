@@ -54,8 +54,7 @@ public class CruiseModifier {
 
 	/**
 	 * Changes the owner of the data and metadata files for a dataset.
-	 * The dataset is removed from the list of datasets for the old owner 
-	 * of the data file and added to the list of datasets for the new owner.
+	 * The dataset is added to the list of datasets for the new owner.
 	 * 
 	 * @param configStore
 	 * 		configuration store to use
@@ -93,17 +92,14 @@ public class CruiseModifier {
 		UserFileHandler userHandler = configStore.getUserFileHandler();
 		String commitMsg = "Dataset " + upperExpo + " moved from " + oldOwner + " to " + newOwner;
 
+		// Add this cruise to the list for the new owner
 		DashboardCruiseList cruiseList = userHandler.getCruiseListing(newOwner);
 		if ( cruiseList.put(upperExpo, cruise) == null ) {
-			// This expocode was not in the list, so save the update
 			userHandler.saveCruiseListing(cruiseList, commitMsg);
 		}
 
-		cruiseList = userHandler.getCruiseListing(oldOwner);
-		if ( cruiseList.remove(upperExpo) != null ) {
-			// This expocode was in the list, so save the update
-			userHandler.saveCruiseListing(cruiseList, commitMsg);
-		}
+		// Rely on update-on-read to remove the cruise from the list of the old owner 
+		// (and others) if they no longer should be able to see this cruise 
 	}
 
 	/**

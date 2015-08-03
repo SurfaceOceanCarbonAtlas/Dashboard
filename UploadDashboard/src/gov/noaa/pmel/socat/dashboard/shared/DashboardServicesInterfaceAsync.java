@@ -78,6 +78,22 @@ public interface DashboardServicesInterfaceAsync {
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
+	 * Client side request to change the owner of the given cruises 
+	 * to the indicated new owner.
+	 * 
+	 * @param username
+	 * 		name of the current user - for validation and current ownership of cruises
+	 * @param expocodeSet
+	 * 		change the owner of the cruises with these expocodes
+	 * @param newOwner
+	 * 		dashboard username of the new owner of these cruises
+	 * @param callback
+	 * 		the callback to make with the current user's updated cruise list
+	 */
+	void changeCruiseOwner(String username, TreeSet<String> expocodeSet,
+			String newOwner, AsyncCallback<DashboardCruiseList> callback);
+
+	/**
 	 * Client side request to return the latest cruise information 
 	 * for the indicated cruises.
 	 * 
