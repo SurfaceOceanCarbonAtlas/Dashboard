@@ -55,19 +55,27 @@ body {
 	margin-right: 1em;
 }
 
-.labeledtextpanel {
-	margin-top: 0.25em;
-	margin-bottom: 0.25em;
+.inputpanel {
+	background-color: #AACCEE;
+	width: 35em;
 }
-.labeledtextlabel {
+.inputhtml {
+	text-align: justify;
+	padding: 0.5em;
+}
+.inputtextpanel {
+	margin-top: 0em;
+	margin-bottom: 2em;
+}
+.inputtextlabel {
 	font-family: monospace;
 	font-weight: bold;
 	font-size: large;
-	margin-right: 0.25em;
+	margin-right: 0.5em;
 }
-.labeledtextbox {
-	width: 16em;
-	margin-left: 0.25em;
+.inputtextbox {
+	width: 15em;
+	margin-left: 0.5em;
 }
 
 .loginbutton {

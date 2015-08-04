@@ -175,12 +175,28 @@ public class DashboardServices extends RemoteServiceServlet
 			TreeSet<String> expocodeSet, String newOwner) throws IllegalArgumentException {
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
+		// Get the dashboard username of the new owner
+		String newUsername;
+		if ( configStore.validateUser(newOwner) ) {
+			// dashboard username was given
+			newUsername = newOwner;
+		}
+		else {
+			// actual name given?
+			try {
+				newUsername = configStore.getDatabaseRequestHandler().getReviewerUsername(newOwner);
+			} catch (Exception ex) {
+				newUsername = null;
+			}
+			if ( (newUsername == null) || ! configStore.validateUser(newUsername) ) 
+				throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
+		}
 		// Change the owner of the cruises
 		CruiseModifier modifier = new CruiseModifier();
 		Logger itsLogger = Logger.getLogger("DashboardServices");
 		for ( String expocode : expocodeSet ) {
-			modifier.changeCruiseOwner(configStore, expocode, newOwner);
-			itsLogger.info("changed owner of " + expocode + " to " + newOwner);
+			modifier.changeCruiseOwner(configStore, expocode, newUsername);
+			itsLogger.info("changed owner of " + expocode + " to " + newUsername);
 		}
 		// Return the updated list of cruises for this user
 		DashboardCruiseList cruiseList = configStore.getUserFileHandler().getCruiseListing(pageUsername);

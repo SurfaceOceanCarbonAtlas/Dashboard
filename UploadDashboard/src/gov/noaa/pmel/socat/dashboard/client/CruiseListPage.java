@@ -100,6 +100,11 @@ public class CruiseListPage extends CompositeWithUsername {
 			"hides the selected datasets from your list of displayed datasets; " +
 			"this will NOT delete the datasets from the system";
 
+	private static final String CHANGE_OWNER_TEXT =
+			"Change Datasets Owner";
+	private static final String CHANGE_OWNER_HOVER_HELP = 
+			"change the owner of the selected datasets to a dashboard user you specify";
+
 	private static final String DELETE_TEXT = "Delete Datasets";
 	private static final String DELETE_HOVER_HELP =
 			"delete the selected datasets from the system";
@@ -134,6 +139,8 @@ public class CruiseListPage extends CompositeWithUsername {
 			"for deletion from the system.";
 	private static final String FOR_HIDE_ERR_END = 
 			"for hiding from your list of displayed datasets.";
+	private static final String FOR_CHANGE_OWNER_ERR_END = 
+			"for changing ownership";
 
 	private static final String CANNOT_PREVIEW_UNCHECKED_ERRMSG =
 			"Preview plots cannot be generated for datasets " +
@@ -183,6 +190,17 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String HIDE_DATASET_FAIL_MSG = 
 			"Unable to hide the selected datasets from " +
 			"your list of displayed datasets";
+
+	private static final String CHANGE_OWNER_HTML_PROLOGUE = 
+			"The owner of the following datasets will be " +
+			"changed to the new owner you specify below: <ul>";
+	private static final String CHANGE_OWNER_HTML_EPILOGUE = 
+			"</ul>";
+	private static final String CHANGE_OWNER_INPUT_TEXT = "New Owner:";
+	private static final String CHANGE_OWNER_YES_TEXT = "Proceed";
+	private static final String CHANGE_OWNER_NO_TEXT = "Cancel";
+	private static final String CHANGE_OWNER_FAIL_MSG = 
+			"An error occurred when changing ownership of these datasets";
 
 	private static final String DELETE_DATASET_HTML_PROLOGUE = 
 			"All data will be deleted for the following datasets: <ul>";
@@ -250,6 +268,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiField Label firstSeparator;
 	@UiField Button showDatasetButton;
 	@UiField Button hideDatasetButton;
+	@UiField Button changeOwnerButton;
 	@UiField Label secondSeparator;
 	@UiField Button deleteButton;
 	@UiField DataGrid<DashboardCruise> datasetsGrid;
@@ -257,6 +276,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private ListDataProvider<DashboardCruise> listProvider;
 	private DashboardAskPopup askDeletePopup;
 	private DashboardAskPopup askRemovePopup;
+	private DashboardInputPopup changeOwnerPopup;
 	private DashboardCruiseList cruiseSet;
 	private DashboardCruiseList checkSet;
 	private TreeSet<String> expocodeSet;
@@ -313,6 +333,9 @@ public class CruiseListPage extends CompositeWithUsername {
 
 		hideDatasetButton.setText(HIDE_DATASETS_TEXT);
 		hideDatasetButton.setTitle(HIDE_DATASETS_HOVER_HELP);
+
+		changeOwnerButton.setText(CHANGE_OWNER_TEXT);
+		changeOwnerButton.setTitle(CHANGE_OWNER_HOVER_HELP);
 
 		deleteButton.setText(DELETE_TEXT);
 		deleteButton.setTitle(DELETE_HOVER_HELP);
@@ -854,6 +877,65 @@ public class CruiseListPage extends CompositeWithUsername {
 			@Override
 			public void onFailure(Throwable ex) {
 				SocatUploadDashboard.showFailureMessage(HIDE_DATASET_FAIL_MSG, ex);
+				SocatUploadDashboard.showAutoCursor();
+			}
+		});
+	}
+
+	@UiHandler("changeOwnerButton")
+	void changeOwnerOnClick(ClickEvent event) {
+		getSelectedCruises(null);
+		if ( expocodeSet.size() == 0 ) {
+			SocatUploadDashboard.showMessage(
+					NO_DATASET_SELECTED_ERR_START + FOR_CHANGE_OWNER_ERR_END);
+			return;
+		}
+		// Confirm cruises to be removed
+		String message = CHANGE_OWNER_HTML_PROLOGUE;
+		for ( String expocode : expocodeSet )
+			message += "<li>" + SafeHtmlUtils.htmlEscape(expocode) + "</li>";
+		message += CHANGE_OWNER_HTML_EPILOGUE;
+		if ( changeOwnerPopup == null ) {
+			changeOwnerPopup = new DashboardInputPopup(CHANGE_OWNER_INPUT_TEXT, 
+					CHANGE_OWNER_YES_TEXT, CHANGE_OWNER_NO_TEXT, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String newOwner) {
+					if ( newOwner != null ) {
+						continueChangeOwner(newOwner);
+					}
+				}
+				@Override
+				public void onFailure(Throwable ex) {
+					// Never called
+					;
+				}
+			});
+		}
+		changeOwnerPopup.askForInput(message);
+	}
+
+	/**
+	 * Makes the request to remove cruises from a user's list,
+	 * and processes the results.
+	 */
+	private void continueChangeOwner(String newOwner) {
+		SocatUploadDashboard.showWaitCursor();
+		service.changeCruiseOwner(getUsername(), expocodeSet, newOwner, 
+				new AsyncCallback<DashboardCruiseList>() {
+			@Override
+			public void onSuccess(DashboardCruiseList cruises) {
+				if ( getUsername().equals(cruises.getUsername()) ) {
+					CruiseListPage.this.updateCruises(cruises);
+				}
+				else {
+					SocatUploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG + 
+							UNEXPECTED_INVALID_DATESET_LIST_MSG);
+				}
+				SocatUploadDashboard.showAutoCursor();
+			}
+			@Override
+			public void onFailure(Throwable ex) {
+				SocatUploadDashboard.showFailureMessage(CHANGE_OWNER_FAIL_MSG, ex);
 				SocatUploadDashboard.showAutoCursor();
 			}
 		});

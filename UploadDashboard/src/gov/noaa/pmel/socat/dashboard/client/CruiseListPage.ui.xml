@@ -27,6 +27,7 @@
 						<g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="firstSeparator" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="showDatasetButton" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="hideDatasetButton" />
+						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="changeOwnerButton" />
 						<g:Label addStyleNames="{style.cruisebuttonpanelseparator}" ui:field="secondSeparator" />
 						<g:Button addStyleNames="{style.cruisepanelbutton}" ui:field="deleteButton" />
 					</g:FlowPanel>
