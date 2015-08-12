@@ -1,0 +1,24 @@
+! Define some blank data to finish out the year.
+! here data through Aug 10 has been downloaded and added
+! to /home/data/socat/ncep_slp_data/ncep_slp.nc
+! Definitions such as scale offset bad are from append_ncep.jnl
+
+use "/home/data/socat/ncep_slp_data/ncep_slp.nc"
+set axis/name=time1 time
+set var/name=slp_in slp
+
+define axis/t="11-aug-2015:00:00":"31-dec-2015:18:00":4/t0=1-jan-1800/units=hours  time
+
+def sym offst = 119765
+def sym newbad = `32766+($offst)`
+
+! keep the input attributes; title, units, etc
+let/bad=($newbad)/units="`slp_in,return=units`"/title="`slp_in,return=title`" slp = 1./0+x[gx=slp_in] + y[gy=slp_in] + t[gt=time]
+
+! set up scale and offset
+def att/output slp.scale_factor = 1
+def att/output slp.add_offset = ($offst)
+
+set att/output=all slp
+save/append/outtype=short/file="/home/data/socat/ncep_slp_data/ncep_slp.nc" slp
+

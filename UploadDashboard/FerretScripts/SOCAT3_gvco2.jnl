@@ -6,10 +6,10 @@
 
 !!!!!!!!!!!!!!!!!!!! GlobalViewMarineCarbon !!!!!!!!!!!!!!!!!!!! 
 
-! gvco2_2012 from  http://www.esrl.noaa.gov/gmd/ccgg/mbl/
+! gvco2_201x from  http://www.esrl.noaa.gov/gmd/ccgg/mbl/
 ! and written by the scripts GlobalViewMarineCarbon_2013.jnl
 
-use gvco2_2013.nc
+use gvco2.nc
 def sym dco2 = `co2,return=dsetnum`
 
 set data "($cruise_filename)"

@@ -5,6 +5,9 @@
 ! The slp dataset can be updated from the Sea level pressure, 4-times Daily set at
 !   http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html 
 !  (note scroll down to Sea Level Pressure, NOT the Pressure set).
+!
+!  See the script in this directory, append_ncep.jnl to apppend the 
+!  data to the master set as short integers.
 
 !!!!!!!!!!!!!!!!!!!! NCEP sea level pressure !!!!!!!!!!!!!!!!!!!! 
 
