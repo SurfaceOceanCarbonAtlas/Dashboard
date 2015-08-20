@@ -18,9 +18,11 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -56,6 +58,9 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	private String archivalEmail;
 	private String socatEmail;
 	private String smtpHost;
+	private String smtpPort;
+	private PasswordAuthentication auth;
+	private boolean debugIt;
 
 	/**
 	 * A file bundler that saves the file bundles under the given directory
@@ -74,18 +79,36 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * @param socatEmailAddress
 	 * 		e-mail address from which these bundles are being sent
 	 * @param smtpHostAddress
-	 * 		address of the SMTP host to use for email.
+	 * 		address of the SMTP host to use for email; if null or empty, "localhost" is used
+	 * @param smtpHostPort
+	 * 		port number of the SMTP host to use for email; if null or empty, the appropriate default port is used
+	 * @param smtpUsername
+	 * 		username for SMTPS authentication; if null or empty, SMTP is used without authentication
+	 * @param smtpPassword
+	 * 		password for SMTPS authentication; if null or empty, SMTP is used without authentication
+	 * @param setDebug
+	 * 		debug the SMTP connection?
 	 * @throws IllegalArgumentException
-	 * 		if the specified directory does not exist, is not a directory 
-	 * 		or is not under version control
+	 * 		if the outputDirname directory does not exist, 
+	 * 		is not a directory, or is not under version control
 	 */
 	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
-			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress) 
+			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress,
+			String smtpHostPort, String smtpUsername, String smtpPassword, boolean setDebug) 
 					throws IllegalArgumentException {
 		super(outputDirname, svnUsername, svnPassword);
 		archivalEmail = archivalEmailAddress;
 		socatEmail = socatEmailAddress;
 		smtpHost = smtpHostAddress;
+		smtpPort = smtpHostPort;
+		if ( (smtpUsername == null) || smtpUsername.isEmpty() || 
+			 (smtpPassword == null) || smtpPassword.isEmpty() ) {
+			auth = null;
+		}
+		else {
+			auth = new PasswordAuthentication(smtpUsername, smtpPassword);
+		}
+		debugIt = setDebug;
 	}
 
 	/**
@@ -203,8 +226,6 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			String userEmail) throws IllegalArgumentException, IOException {
 		if ( (archivalEmail == null) || archivalEmail.isEmpty() )
 			throw new IllegalArgumentException("no archival email address");
-		if ( (smtpHost == null) || smtpHost.isEmpty() )
-			throw new IllegalArgumentException("no SMTP host");
 		if ( (userRealName == null) || userRealName.isEmpty() ) 
 			throw new IllegalArgumentException("no user name");
 		if ( (userEmail == null) || userEmail.isEmpty() )
@@ -256,20 +277,35 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			}
 		}
 
-		// Get the default Session for e-mailing
+		// Create a Session for sending out the email
 		Properties props = System.getProperties();
-		props.put("mail.transport.protocol", "smtp");
-		props.put("mail.smtp.host", smtpHost);
-		Session session = Session.getDefaultInstance(props);
-		// Create the email message
-		MimeMessage msg = new MimeMessage(session);
-		try {
-			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
-		} catch (MessagingException ex) {
-			String errmsg = getMessageExceptionMsgs(ex);
-			throw new IllegalArgumentException(
-					"Unexpected problems assigning the email subject: " + errmsg, ex);
+		if ( debugIt )
+			props.setProperty("mail.debug", "true");
+		props.setProperty("mail.transport.protocol", "smtp");
+		if ( (smtpHost != null) && ! smtpHost.isEmpty() )
+			props.put("mail.smtp.host", smtpHost);
+		else
+			props.put("mail.smtp.host", "localhost");
+		if ( (smtpPort != null) && ! smtpPort.isEmpty() )
+			props.put("mail.smtp.port", smtpPort);
+		Session sessn;
+		if ( auth != null ) {
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtp.ssl.enable", "true");
+			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.smtp.starttls.required", "true");
+			sessn = Session.getInstance(props, new Authenticator() {
+				@Override
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return auth;
+				}
+			});
 		}
+		else {
+			sessn = Session.getInstance(props, null);
+		}
+
+		// Parse all the email addresses
 		InternetAddress socatAddress;
 		try {
 			socatAddress = new InternetAddress(socatEmail);
@@ -291,16 +327,18 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			String errmsg = getMessageExceptionMsgs(ex);
 			throw new IllegalArgumentException("Invalid user email address: " + errmsg, ex);
 		}
+
+		// Create the email message with the renamed zip attachment
+		MimeMessage msg = new MimeMessage(sessn);
 		try {
+			msg.setHeader("X-Mailer", "SocatFilesBundler");
+			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
+			msg.setSentDate(new Date());
+			// Set the addresses
 			msg.setFrom(socatAddress);
 			msg.setReplyTo(new InternetAddress[] { socatAddress });
 			msg.setRecipients(Message.RecipientType.TO, new InternetAddress[] { archivalAddress });
 			msg.setRecipients(Message.RecipientType.CC, new InternetAddress[] { userAddress, socatAddress });
-		} catch (MessagingException ex) {
-			String errmsg = getMessageExceptionMsgs(ex);
-			throw new IllegalArgumentException("Unexpected problems assigning addresses: " + errmsg, ex);
-		}
-		try {
 			// Create the text message part
 			MimeBodyPart textMsgPart = new MimeBodyPart();
 			textMsgPart.setText(EMAIL_MSG_START + userRealName + EMAIL_MSG_END);
@@ -313,16 +351,14 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			mp.addBodyPart(textMsgPart);
 			mp.addBodyPart(attMsgPart);
 			msg.setContent(mp);
+			// Update the headers
+			msg.saveChanges();
 		} catch (MessagingException ex) {
 			String errmsg = getMessageExceptionMsgs(ex);
-			throw new IllegalArgumentException("Unexpected problems assigning the multipart document: " + errmsg, ex);
+			throw new IllegalArgumentException("Unexpected problems creating the email: " + errmsg, ex);
 		}
-		try {
-			msg.setSentDate(new Date());
-		} catch (MessagingException ex) {
-			String errmsg = getMessageExceptionMsgs(ex);
-			throw new IllegalArgumentException("Unexpected problems assigning the email date: " + errmsg, ex);
-		}
+
+		// Send the email
 		try {
 			Transport.send(msg);
 		} catch (MessagingException ex) {
