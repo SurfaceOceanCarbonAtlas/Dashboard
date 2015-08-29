@@ -47,9 +47,9 @@ public class SocatCruiseReporter {
 	private static final String SOCAT_MAIN_DOI = "doi:10.1594/PANGAEA.811776";
 	private static final String SOCAT_MAIN_DOI_HREF = "http://doi.pangaea.de/10.1594/PANGAEA.811776";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"B. Pfeil, A. Olsen, D. C. E. Bakker, et. al. \"A uniform, quality controlled",
-		"Surface Ocean CO2 Atlas (SOCAT)\" Earth Syst. Sci. Data, 5, 125-143, 2013",
-		"doi:10.5194/essd-5-125-2013  http://www.earth-syst-sci-data.net/5/125/2013/",
+		"D. C. E. Bakker, B. Pfeil, K. Smith, et. al. \"An update to the Surface ",
+		"Ocean CO2 Atlas (SOCAT version 2)\" Earth Syst. Sci. Data, 6, 69-90, 2014 ",
+		"doi:10.5194/essd-6-69-2014  http://www.earth-syst-sci-data.net/6/69/2014/ ",
 	};
 
     // Expocodes for cruises missing hours and minutes (hour:minute time is 00:00)
