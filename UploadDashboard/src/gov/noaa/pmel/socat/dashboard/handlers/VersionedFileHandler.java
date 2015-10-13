@@ -4,8 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.handlers;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayDeque;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,6 +11,7 @@ import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
@@ -26,7 +25,7 @@ import org.tmatesoft.svn.core.wc.SVNWCUtil;
 public class VersionedFileHandler {
 
 	// File to write commit command to - when not actually performing the commits
-	private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
+	// private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
 	// Check every 60 seconds
 	private static final long MILLISECONDS_CHECK_INTERVAL = 60 * 1000L;
 	// Keep working while less than 3 seconds have passed
@@ -125,7 +124,6 @@ public class VersionedFileHandler {
 					if ( commitFiles != null ) {
 						if ( (parent != null) && (message != null) ) {
 							try {
-								/*
 								// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
 								// and not any other updated files under any directories specified
 								svnManager.getCommitClient().doCommit(commitFiles, false, 
@@ -133,16 +131,18 @@ public class VersionedFileHandler {
 								// Update the parent directory
 								svnManager.getUpdateClient().doUpdate(parent, 
 										SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
-								*/
-								// For v3, just write the svn commands to file to be dealt with manually
+								/*
+								// Or just write the svn commands to file to be dealt with manually
 								PrintWriter cmdsWriter = new PrintWriter(new FileWriter(
 										new File(filesDir, SVN_COMMIT_COMMANDS_FILENAME), true));
+								// Need to fix issues with single quotes in message
 								cmdsWriter.print("svn commit --depth=empty -m '" + message + "'");
 								for ( File svnfile : commitFiles )
 									cmdsWriter.print(" " + svnfile.getPath());
 								cmdsWriter.println();
 								cmdsWriter.println("svn update --depth=infinity " + parent.getPath());
 								cmdsWriter.close();
+								*/
 							} catch (Exception ex) {
 								// Should not happen, but nothing can be done about it if it does
 							}
