@@ -44,7 +44,7 @@ public class CruiseDsgNcFile extends File {
 	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
 	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
 
-	private static final String VERSION = "CruiseDsgNcFile 1.3";
+	private static final String VERSION = "CruiseDsgNcFile 1.4";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);

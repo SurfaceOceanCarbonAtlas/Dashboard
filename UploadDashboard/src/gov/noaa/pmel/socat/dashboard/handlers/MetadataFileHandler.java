@@ -43,6 +43,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	private static final String METADATA_OWNER_ID = "metadataowner";
 	private static final String METADATA_CONFLICTED_ID = "metadataconflicted";
 	private static final String METADATA_VERSION_ID = "metadataversion";
+	private static final String METADATA_DOI_ID = "metadatadoi";
 	private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
 
 	/**
@@ -582,6 +583,9 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Version
 		value = metaProps.getProperty(METADATA_VERSION_ID);
 		metadata.setVersion(value);
+		// DOI
+		value = metaProps.getProperty(METADATA_DOI_ID);
+		metadata.setDOI(value);
 
 		return metadata;
 	}
@@ -621,6 +625,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		metaProps.setProperty(METADATA_CONFLICTED_ID, Boolean.toString(metadata.isConflicted()));
 		// Version 
 		metaProps.setProperty(METADATA_VERSION_ID, metadata.getVersion());
+		// DOI
+		metaProps.setProperty(METADATA_DOI_ID, metadata.getDOI());
 		// Save the properties to the metadata properties file
 		try {
 			FileWriter propsWriter = new FileWriter(propsFile);

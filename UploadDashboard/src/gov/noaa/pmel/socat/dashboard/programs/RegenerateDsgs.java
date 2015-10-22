@@ -77,10 +77,6 @@ public class RegenerateDsgs {
 		try {
 			// Get just the filenames from the set of addition document
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
-			TreeSet<String> addlDocs = new TreeSet<String>();
-			for ( String docInfo : cruise.getAddlDocs() ) {
-				addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
-			}
 
 			// Read the current metadata in the full-data DSG file
 			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
@@ -113,7 +109,7 @@ public class RegenerateDsgs {
 				omeMData.setVersion(socatVersion);
 				metaHandler.saveMetadataInfo(omeMData, null);
 			}
-			updatedMeta = omeMData.createSocatMetadata(socatVersionStatus, addlDocs, qcFlag.toString());
+			updatedMeta = omeMData.createSocatMetadata(socatVersionStatus, qcFlag.toString());
 			if ( ! fullDataMeta.equals(updatedMeta) )
 				updateIt = true;
 		} catch (Exception ex) {

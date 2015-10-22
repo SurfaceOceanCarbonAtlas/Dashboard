@@ -44,10 +44,14 @@ public class SocatCruiseReporter {
 	private static final String SOCAT_ENHANCED_HREF_TAG = "SOCATENHANCEDHREF";
 
 	// SOCAT main DOI, DOI HRef, and publication citation
-	private static final String SOCAT_MAIN_DOI = "doi:10.1594/PANGAEA.811776";
-	private static final String SOCAT_MAIN_DOI_HREF = "http://doi.pangaea.de/10.1594/PANGAEA.811776";
+	private static final String SOCAT_MAIN_DOI = "doi:10.1594/PANGAEA.849770";
+	private static final String SOCAT_MAIN_DOI_HREF = "http://doi.pangaea.de/10.1594/PANGAEA.849770";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"D. C. E. Bakker, B. Pfeil, K. Smith, et. al. \"An update to the Surface ",
+		"Bakker, D. C. E., Pfeil, B., Smith, K., et. al.  \"A 58-year record of ",
+		"high quality data in version 3 of the Surface Ocean CO2 Atlas (SOCAT)\" ",
+		"In preparation for Earth System Science Data. ",
+		"    Also see: ",
+		"D. C. E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
 		"Ocean CO2 Atlas (SOCAT version 2)\" Earth Syst. Sci. Data, 6, 69-90, 2014 ",
 		"doi:10.5194/essd-6-69-2014  http://www.earth-syst-sci-data.net/6/69/2014/ ",
 	};

@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -352741262251298253L;
+	private static final long serialVersionUID = 8945465267070076966L;
 
 	/**
 	 * The "upload filename" for all OME metadata files.  The name of the 
@@ -48,6 +48,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	protected String owner;
 	protected boolean conflicted;
 	protected String version;
+	protected String doi; 
 
 	/**
 	 * Creates an empty metadata document record
@@ -60,6 +61,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		owner = "";
 		conflicted = false;
 		version = "";
+		doi = "";
 	}
 
 	/**
@@ -224,6 +226,25 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			this.version = "";
 	}
 
+	/**
+	 * @return 
+	 * 		the DOI of this document; never null but may be empty if not assigned
+	 */
+	public String getDOI() {
+		return doi;
+	}
+
+	/**
+	 * @param doi 
+	 * 		the DOI of this document to set; if null, an empty string is assigned
+	 */
+	public void setDOI(String doi) {
+		if ( doi != null )
+			this.doi = doi;
+		else
+			this.doi = "";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 37;
@@ -234,6 +255,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 		result = result * prime + owner.hashCode();
 		result = result * prime + Boolean.valueOf(conflicted).hashCode();
 		result = result * prime + version.hashCode();
+		result = result * prime + doi.hashCode();
 		return result;
 	}
 
@@ -262,6 +284,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 			return false;
 		if ( ! version.equals(other.version) )
 			return false;
+		if ( ! doi.equals(other.doi) )
+			return false;
 		return true;
 	}
 
@@ -275,6 +299,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 				",\n  owner=" + owner + 
 				",\n  conflicted=" + conflicted + 
 				",\n  version=" + version + 
+				",\n  doi=" + doi + 
 				" ]";
 	}
 

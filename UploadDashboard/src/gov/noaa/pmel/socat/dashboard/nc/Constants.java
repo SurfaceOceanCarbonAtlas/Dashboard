@@ -24,10 +24,6 @@ public class Constants {
 	public static final String beginTime_VARNAME = "beginTime";
 	public static final String endTime_VARNAME = "endTime";
 	public static final String scienceGroup_VARNAME = "scienceGroup";
-	public static final String origDataRef_VARNAME = "origDataRef";
-	public static final String addlDocs_VARNAME = "addlDocs";
-	public static final String socatDOI_VARNAME = "socatDOI";
-	public static final String socatDOIHRef_VARNAME = "socatDOIHRef";
 	public static final String socatVersion_VARNAME = "socatVersion";
 	public static final String qcFlag_VARNAME = "qcFlag";
 
@@ -131,10 +127,6 @@ public class Constants {
 		shortNameMap.put(beginTime_VARNAME, "time_coverage_start");
 		shortNameMap.put(endTime_VARNAME, "time_converage_end");
 		shortNameMap.put(scienceGroup_VARNAME, "investigators");
-		shortNameMap.put(origDataRef_VARNAME, "orig_data_ref");
-		shortNameMap.put(addlDocs_VARNAME, "addl_docs");
-		shortNameMap.put(socatDOI_VARNAME, "socat_data_doi");
-		shortNameMap.put(socatDOIHRef_VARNAME, "socat_data_ref");
 		shortNameMap.put(socatVersion_VARNAME, "socat_version");
 		shortNameMap.put(qcFlag_VARNAME, "qc_flag");
 
@@ -239,10 +231,6 @@ public class Constants {
 		longNameMap.put(beginTime_VARNAME, "beginning time");
 		longNameMap.put(endTime_VARNAME, "ending time");
 		longNameMap.put(scienceGroup_VARNAME, "investigators");
-		longNameMap.put(origDataRef_VARNAME, "original data reference");
-		longNameMap.put(addlDocs_VARNAME, "additional documents");
-		longNameMap.put(socatDOI_VARNAME, "SOCAT data DOI");
-		longNameMap.put(socatDOIHRef_VARNAME, "SOCAT data reference");
 		longNameMap.put(socatVersion_VARNAME, "SOCAT version");
 		longNameMap.put(qcFlag_VARNAME, "QC flag");
 
@@ -535,9 +523,6 @@ public class Constants {
 		ioosCatMap.put(beginTime_VARNAME, time_category);
 		ioosCatMap.put(endTime_VARNAME, time_category);
 		ioosCatMap.put(scienceGroup_VARNAME, identifier_category);
-		ioosCatMap.put(origDataRef_VARNAME, identifier_category);
-		ioosCatMap.put(socatDOI_VARNAME, identifier_category);
-		ioosCatMap.put(socatDOIHRef_VARNAME, identifier_category);
 		ioosCatMap.put(socatVersion_VARNAME, identifier_category);
 		ioosCatMap.put(qcFlag_VARNAME, quality_category);
 

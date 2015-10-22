@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 2333369801131318590L;
+	private static final long serialVersionUID = -5448684230023976233L;
 
 	/**
 	 * Date used as a missing value; 
@@ -42,10 +42,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	Date beginTime;
 	Date endTime;
 	String scienceGroup;
-	String origDataRef;
-	String addlDocs;
-	String socatDOI;
-	String socatDOIHRef;
 	String socatVersion;
 	String qcFlag;
 
@@ -64,10 +60,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		beginTime = DATE_MISSING_VALUE;
 		endTime = DATE_MISSING_VALUE;
 		scienceGroup = "";
-		origDataRef = "";
-		addlDocs = "";
-		socatDOI = "";
-		socatDOIHRef = "";
 		socatVersion = "";
 		qcFlag = " ";
 	}
@@ -304,90 +296,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @return
-	 * 		the original data reference associated with this instance; 
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getOrigDataRef() {
-		return origDataRef;
-	}
-
-	/**
-	 * @param origDataRef 
-	 * 		the original data reference to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setOrigDataRef(String origDataRef) {
-		if ( origDataRef == null )
-			this.origDataRef = "";
-		else
-			this.origDataRef = origDataRef;
-	}
-
-	/**
-	 * @return
-	 * 		the additional document names associated with this instance; 
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getAddlDocs() {
-		return addlDocs;
-	}
-
-	/**
-	 * @param addlDocs 
-	 * 		the additional document names to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setAddlDocs(String addlDocs) {
-		if ( addlDocs == null )
-			this.addlDocs = "";
-		else
-			this.addlDocs = addlDocs;
-	}
-
-	/**
-	 * @return
-	 * 		the SOCAT enhanced data DOI associated with this instance; 
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getSocatDOI() {
-		return socatDOI;
-	}
-
-	/**
-	 * @param socatDOI 
-	 * 		the SOCAT enhanced DOI to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setSocatDOI(String socatDOI) {
-		if ( socatDOI == null )
-			this.socatDOI = "";
-		else
-			this.socatDOI = socatDOI;
-	}
-
-	/**
-	 * @return
-	 * 		the SOCAT enhanced data DOI http address associated with 
-	 * 		this instance; never null but could be empty if not assigned
-	 */
-	public String getSocatDOIHRef() {
-		return socatDOIHRef;
-	}
-
-	/**
-	 * @param socatDOIHRef 
-	 * 		the SOCAT enhance data DOI http address to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setSocatDOIHRef(String socatDOIHRef) {
-		if ( socatDOIHRef == null )
-			this.socatDOIHRef = "";
-		else
-			this.socatDOIHRef = socatDOIHRef;
-	}
-
-	/**
 	 * The SOCAT version number and status is the SOCAT version number 
 	 * followed by an 'N', indicating the dataset is new in this
 	 * SOCAT version, or a 'U', indicating the dataset is an update
@@ -457,14 +365,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			maxLength = organization.length();
 		if ( maxLength < scienceGroup.length() ) 
 			maxLength = scienceGroup.length();
-		if ( maxLength < origDataRef.length() ) 
-			maxLength = origDataRef.length();
-		if ( maxLength < addlDocs.length() )
-			maxLength = addlDocs.length();
-		if ( maxLength < socatDOI.length() ) 
-			maxLength = socatDOI.length();
-		if ( maxLength < socatDOIHRef.length() ) 
-			maxLength = socatDOIHRef.length();
 		if ( maxLength < socatVersion.length() )
 			maxLength = socatVersion.length();
 		if ( maxLength < qcFlag.length() )
@@ -484,10 +384,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		result = result * prime + beginTime.hashCode();
 		result = result * prime + endTime.hashCode();
 		result = result * prime + scienceGroup.hashCode();
-		result = result * prime + origDataRef.hashCode();
-		result = result * prime + addlDocs.hashCode();
-		result = result * prime + socatDOI.hashCode();
-		result = result * prime + socatDOIHRef.hashCode();
 		result = result * prime + socatVersion.hashCode();
 		result = result * prime + qcFlag.hashCode();
 		return result;
@@ -520,14 +416,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		if ( ! organization.equals(other.organization) )
 			return false;
 		if ( ! scienceGroup.equals(other.scienceGroup) )
-			return false;
-		if ( ! origDataRef.equals(other.origDataRef) ) 
-			return false;
-		if ( ! addlDocs.equals(other.addlDocs) )
-			return false;
-		if ( ! socatDOI.equals(other.socatDOI) )
-			return false;
-		if ( ! socatDOIHRef.equals(other.socatDOIHRef) )
 			return false;
 		if ( ! socatVersion.equals(other.socatVersion) )
 			return false;
@@ -564,10 +452,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    startDate=" + beginTime.toString() + 
 				",\n    endDate=" + endTime.toString() + 
 				",\n    scienceGroup=" + scienceGroup + 
-				",\n    origDataRef=" + origDataRef + 
-				",\n    addlDocs=" + addlDocs + 
-				",\n    socatDOI=" + socatDOI + 
-				",\n    socatDOIHRef=" + socatDOIHRef + 
 				",\n    socatVersion=" + socatVersion + 
 				",\n    qcFlag=" + qcFlag + 
 				" ]";

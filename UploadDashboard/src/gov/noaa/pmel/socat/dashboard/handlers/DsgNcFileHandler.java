@@ -11,7 +11,6 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
@@ -200,15 +199,8 @@ public class DsgNcFileHandler {
 		// Get the location and name for the NetCDF DSG file
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
-		// Get just the filenames from the set of additional documents
-		TreeSet<String> addlDocs = new TreeSet<String>();
-		for ( String docInfo : cruiseData.getAddlDocs() ) {
-			addlDocs.add(DashboardMetadata.splitAddlDocsTitle(docInfo)[0]);
-		}
-
 		// Get the metadata needed for creating the DSG file
-		SocatMetadata socatMData = omeMData.createSocatMetadata(
-				socatVersionStatus, addlDocs, qcFlag);
+		SocatMetadata socatMData = omeMData.createSocatMetadata(socatVersionStatus, qcFlag);
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);

@@ -104,7 +104,6 @@ public class CruiseDsgNcFileTest {
 		metadata.setCruiseName("GM0606");
 		metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
 		metadata.setVesselName("Caribbean Cruiser");
-		metadata.setOrigDataRef("doi:cdiac12345");
 		metadata.setSouthmostLatitude(20.04);
 		metadata.setNorthmostLatitude(29.07);
 		metadata.setWestmostLongitude(-92.77);
@@ -190,7 +189,6 @@ public class CruiseDsgNcFileTest {
 			metadata.setCruiseName("GM0606");
 			metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
 			metadata.setVesselName("Caribbean Cruiser");
-			metadata.setOrigDataRef("doi:cdiac12345");
 			metadata.setSouthmostLatitude(20.04);
 			metadata.setNorthmostLatitude(29.07);
 			metadata.setWestmostLongitude(-92.77);

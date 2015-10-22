@@ -531,6 +531,114 @@ public class DashboardCruiseTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getUploadTimestamp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setUploadTimestamp(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetUploadTimestamp() {
+		String uploadTimestamp = "2015-10-20 13:14:15";
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals("", cruise.getUploadTimestamp());
+		cruise.setUploadTimestamp(uploadTimestamp);
+		assertEquals(uploadTimestamp, cruise.getUploadTimestamp());
+		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
+		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
+		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNumWarnRows());
+		assertEquals(0, cruise.getNumErrorRows());
+		assertEquals(0, cruise.getMissingValues().size());
+		assertEquals(0, cruise.getDataColUnits().size());
+		assertEquals(0, cruise.getUserColNames().size());
+		assertEquals(0, cruise.getDataColTypes().size());
+		assertEquals(0, cruise.getNumDataRows());
+		assertEquals("", cruise.getUploadFilename());
+		assertEquals("", cruise.getArchiveStatus());
+		assertEquals("", cruise.getQcStatus());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
+		assertFalse( cruise.isSelected() );
+		cruise.setUploadTimestamp(null);
+		assertEquals("", cruise.getUploadTimestamp());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getOrigDOI()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setOrigDOI(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetOrigDOI() {
+		String origDOI = "DOI12345";
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals("", cruise.getOrigDOI());
+		cruise.setOrigDOI(origDOI);
+		assertEquals(origDOI, cruise.getOrigDOI());
+		assertEquals("", cruise.getUploadTimestamp());
+		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
+		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
+		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNumWarnRows());
+		assertEquals(0, cruise.getNumErrorRows());
+		assertEquals(0, cruise.getMissingValues().size());
+		assertEquals(0, cruise.getDataColUnits().size());
+		assertEquals(0, cruise.getUserColNames().size());
+		assertEquals(0, cruise.getDataColTypes().size());
+		assertEquals(0, cruise.getNumDataRows());
+		assertEquals("", cruise.getUploadFilename());
+		assertEquals("", cruise.getArchiveStatus());
+		assertEquals("", cruise.getQcStatus());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
+		assertFalse( cruise.isSelected() );
+		cruise.setOrigDOI(null);
+		assertEquals("", cruise.getOrigDOI());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getSocatDOI()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setSocatDOI(java.lang.String)}.
+	 */
+	@Test
+	public void testSetGetSocatDOI() {
+		String socatDOI = "DOI12345";
+		DashboardCruise cruise = new DashboardCruise();
+		assertEquals("", cruise.getSocatDOI());
+		cruise.setSocatDOI(socatDOI);
+		assertEquals(socatDOI, cruise.getSocatDOI());
+		assertEquals("", cruise.getOrigDOI());
+		assertEquals("", cruise.getUploadTimestamp());
+		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
+		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
+		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNumWarnRows());
+		assertEquals(0, cruise.getNumErrorRows());
+		assertEquals(0, cruise.getMissingValues().size());
+		assertEquals(0, cruise.getDataColUnits().size());
+		assertEquals(0, cruise.getUserColNames().size());
+		assertEquals(0, cruise.getDataColTypes().size());
+		assertEquals(0, cruise.getNumDataRows());
+		assertEquals("", cruise.getUploadFilename());
+		assertEquals("", cruise.getArchiveStatus());
+		assertEquals("", cruise.getQcStatus());
+		assertEquals(0, cruise.getAddlDocs().size());
+		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals("", cruise.getExpocode() );
+		assertEquals("", cruise.getOwner());
+		assertFalse( cruise.isSelected() );
+		cruise.setSocatDOI(null);
+		assertEquals("", cruise.getSocatDOI());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#equals(java.lang.Object)}.
 	 */
@@ -547,6 +655,9 @@ public class DashboardCruiseTest {
 		String myQCStatus = "Submitted";
 		String myArchiveStatus = "Next SOCAT release";
 		String myFilename = "myUploadFilename.tsv";
+		String myUploadTimestamp = "2015-10-20 13:14:15";
+		String myOrigDOI = "DOI122345";
+		String mySocatDOI = "DOI67890";
 		int myNumDataRows = 2581;
 		int myNumErrorMsgs = 4;
 		int myNumWarnMsgs = 14;
@@ -715,6 +826,27 @@ public class DashboardCruiseTest {
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
 		secondCruise.setUserWoceFourRowIndices(userWoceFours);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setUploadTimestamp(myUploadTimestamp);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setUploadTimestamp(myUploadTimestamp);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setOrigDOI(myOrigDOI);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setOrigDOI(myOrigDOI);
+		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
+		assertEquals(firstCruise, secondCruise);
+
+		firstCruise.setSocatDOI(mySocatDOI);
+		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
+		assertFalse( firstCruise.equals(secondCruise) );
+		secondCruise.setSocatDOI(mySocatDOI);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 	}

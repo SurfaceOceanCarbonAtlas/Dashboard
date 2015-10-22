@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.jdom2.Document;
@@ -32,7 +31,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -8213249918017236877L;
+	private static final long serialVersionUID = -8585963236894606375L;
 
 	private static final SimpleDateFormat TIMEPARSER = new SimpleDateFormat("yyyyMMdd");
 	private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd");
@@ -162,15 +161,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 * 
 	 * @param socatVersionStatus
 	 * 		SOCAT version number and status String to assign
-	 * @param addlDocs
-	 * 		additional documents to assign
 	 * @param qcFlag
 	 * 		dataset QC flag to assign
 	 * @return
 	 *		created SocatMetadata object 
 	 */
 	public SocatMetadata createSocatMetadata(String socatVersionStatus, 
-			Set<String> addlDocs, String qcFlag) throws IllegalArgumentException {
+			String qcFlag) throws IllegalArgumentException {
 
 		// We cannot create a SocatMetadata object if there are conflicts
 		if ( isConflicted() ) {
@@ -254,18 +251,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			}
 		}
 		scMData.setOrganization(orgGroup.toString());
-
-		// Add names of any ancillary documents
-		String docsString = "";
-		if ( addlDocs != null ) {
-			for ( String docName : addlDocs ) {
-				if ( docsString.isEmpty() )
-					docsString = docName;
-				else
-					docsString += SocatMetadata.NAMES_SEPARATOR + docName;
-			}
-		}
-		scMData.setAddlDocs(docsString);
 
 		// Add SOCAT version number and status string, and the QC flag
 		scMData.setSocatVersion(socatVersionStatus);

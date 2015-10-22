@@ -118,6 +118,49 @@ public class DashboardMetadataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getVersion()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setVersion(String)}.
+	 */
+	@Test
+	public void testGetSetVersion() {
+		String version = "3.0";
+		DashboardMetadata mdata = new DashboardMetadata();
+		assertEquals("", mdata.getVersion());
+		mdata.setVersion(version);
+		assertEquals(version, mdata.getVersion());
+		assertEquals(false, mdata.isConflicted());
+		assertEquals("", mdata.getUploadTimestamp());
+		assertEquals("", mdata.getFilename());
+		assertEquals("", mdata.getOwner());
+		assertEquals("", mdata.getExpocode());
+		assertFalse( mdata.isSelected() );
+		mdata.setVersion(null);
+		assertEquals("", mdata.getVersion());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#getDOI()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#setDOI(String)}.
+	 */
+	@Test
+	public void testGetSetDOI() {
+		String doi = "DOI12345";
+		DashboardMetadata mdata = new DashboardMetadata();
+		assertEquals("", mdata.getDOI());
+		mdata.setDOI(doi);
+		assertEquals(doi, mdata.getDOI());
+		assertEquals("", mdata.getVersion());
+		assertEquals(false, mdata.isConflicted());
+		assertEquals("", mdata.getUploadTimestamp());
+		assertEquals("", mdata.getFilename());
+		assertEquals("", mdata.getOwner());
+		assertEquals("", mdata.getExpocode());
+		assertFalse( mdata.isSelected() );
+		mdata.setDOI(null);
+		assertEquals("", mdata.getDOI());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#hashCode()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata#equals(java.lang.Object)}.
 	 */
@@ -127,6 +170,8 @@ public class DashboardMetadataTest {
 		String myOwner = "SocatUser";
 		String myFilename = "NatalieSchulte_2013.doc";
 		String myTimestamp = "2013-12-11 10:09";
+		String myVersion = "3.0";
+		String myDOI = "DOI12345";
 
 		DashboardMetadata firstMData = new DashboardMetadata();
 		assertFalse( firstMData.equals(null) );
@@ -176,6 +221,20 @@ public class DashboardMetadataTest {
 		secondMData.setConflicted(true);
 		assertEquals(firstMData.hashCode(), secondMData.hashCode());
 		assertEquals(firstMData, secondMData);
+
+		firstMData.setVersion(myVersion);
+		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
+		assertFalse( firstMData.equals(secondMData) );
+		secondMData.setVersion(myVersion);
+		assertEquals(firstMData.hashCode(), secondMData.hashCode());
+		assertEquals(firstMData, secondMData);
+
+		firstMData.setDOI(myDOI);
+		assertTrue( firstMData.hashCode() != secondMData.hashCode() );
+		assertFalse( firstMData.equals(secondMData) );
+		secondMData.setDOI(myDOI);
+		assertEquals(firstMData.hashCode(), secondMData.hashCode());
+		assertEquals(firstMData, secondMData);
 	}
 
 	/**
@@ -188,6 +247,8 @@ public class DashboardMetadataTest {
 		String myOwner = "SocatUser";
 		String myFilename = "NatalieSchulte_2013.doc";
 		String myTimestamp = "2013-12-11 10:09";
+		String myVersion = "3.0";
+		String myDOI = "DOI12345";
 
 		DashboardMetadata mdata = new DashboardMetadata();
 		assertEquals("", mdata.getAddlDocsTitle());
@@ -198,6 +259,8 @@ public class DashboardMetadataTest {
 		mdata.setSelected(true);
 		mdata.setExpocode(myExpocode);
 		mdata.setOwner(myOwner);
+		mdata.setVersion(myVersion);
+		mdata.setDOI(myDOI);
 		assertEquals("", mdata.getAddlDocsTitle());
 		mdata.setFilename(myFilename);
 		assertEquals(myFilename, mdata.getAddlDocsTitle());
