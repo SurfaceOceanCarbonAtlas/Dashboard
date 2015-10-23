@@ -61,7 +61,7 @@ public class DerivedVariablesTest {
 		tool.run();
 		assertFalse(tool.hasError());
 
-		ArrayList<String> unknownNames = dsgFile.read(false);
+		ArrayList<String> unknownNames = dsgFile.read(true);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		assertEquals(numData, dsgFile.getDataList().size());
@@ -82,7 +82,7 @@ public class DerivedVariablesTest {
 		assertFalse(tool.hasError());
 
 		CruiseDsgNcFile decDsgFile = new CruiseDsgNcFile(decDataFilename);
-		unknownNames = decDsgFile.read(false);
+		unknownNames = decDsgFile.read(true);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		int lastRowNum = 0;

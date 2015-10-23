@@ -293,7 +293,7 @@ public class DsgNcFileHandler {
 		CruiseDsgNcFile oldDsgFile = getDsgNcFile(oldExpocode);
 		if ( oldDsgFile.exists() )  {
 			// Just re-create the DSG file with the updated metadata
-			ArrayList<String> missing = oldDsgFile.read(false);
+			ArrayList<String> missing = oldDsgFile.read(true);
 			if ( ! missing.isEmpty() )
 				throw new RuntimeException("Unexpected values missing from the DSG file: " + missing);
 			try {

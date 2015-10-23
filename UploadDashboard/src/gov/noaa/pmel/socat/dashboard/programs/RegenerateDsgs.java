@@ -80,7 +80,7 @@ public class RegenerateDsgs {
 
 			// Read the current metadata in the full-data DSG file
 			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
-			ArrayList<String> missing = fullDataDsg.read(false);
+			ArrayList<String> missing = fullDataDsg.read(true);
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected values missing from the DSG file: " + missing);
 			SocatMetadata fullDataMeta = fullDataDsg.getMetadata();

@@ -100,8 +100,6 @@ public class UpdateQCFlags {
 				}
 				try {
 					if ( ! qcFlag.equals(oldFlag) ) {
-						CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
-						dsgFile.read(true);
 						// Update the QC flag in the DSG files
 						dsgHandler.getDsgNcFile(expocode).updateQCFlag(qcFlag);
 						dsgHandler.getDecDsgNcFile(expocode).updateQCFlag(qcFlag);

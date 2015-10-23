@@ -213,7 +213,7 @@ public class AddOldNFlags {
 					}
 					CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
 					try {
-						ArrayList<String> missing = fullDataDsg.read(true);
+						ArrayList<String> missing = fullDataDsg.read(false);
 						if ( ! missing.isEmpty() ) 
 							throw new IllegalArgumentException("missing values: " + missing.toString());
 					} catch (Exception ex) {

@@ -419,8 +419,8 @@ public class CruiseDsgNcFile extends File {
 	 * Creates and assigns the internal metadata and data list
 	 * references from the contents of this netCDF DSG file.
 	 * 
-	 * @param onlyMetadata
-	 * 		only read the metadata?
+	 * @param readData
+	 * 		read all the data (or just the metadata)?
 	 * @return
 	 * 		names of metadata and data fields not assigned from this 
 	 * 		netCDF file (will have its default/missing value)
@@ -431,7 +431,7 @@ public class CruiseDsgNcFile extends File {
 	 * 		'time' variable and all data variables must have the same
 	 * 		number of values as this variable.
 	 */
-	public ArrayList<String> read(boolean onlyMetadata) 
+	public ArrayList<String> read(boolean readData) 
 								throws IOException, IllegalArgumentException {
 		ArrayList<String> namesNotFound = new ArrayList<String>();
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
@@ -490,7 +490,7 @@ public class CruiseDsgNcFile extends File {
 				}
 			}
 
-			if ( onlyMetadata )
+			if ( ! readData )
 				return namesNotFound;
 
 			// Create the complete list of data values, 

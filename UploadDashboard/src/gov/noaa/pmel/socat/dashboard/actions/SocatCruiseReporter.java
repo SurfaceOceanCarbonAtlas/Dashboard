@@ -130,7 +130,7 @@ public class SocatCruiseReporter {
 
 		// Get the metadata and data from the DSG file
 		CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-		ArrayList<String> unknownVars = dsgFile.read(false);
+		ArrayList<String> unknownVars = dsgFile.read(true);
 		if ( unknownVars.size() > 0 ) {
 			String msg = "Unknown variables: ";
 			for (String var : unknownVars)
@@ -209,17 +209,21 @@ public class SocatCruiseReporter {
 			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(expo);
 			boolean inRegion;
 			if ( regionID != null ) {
-				dsgFile.read(false);
+				dsgFile.read(true);
 				inRegion = false;
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					if ( regionID.equals(dataVals.getRegionID()) ) {
-						inRegion = true;
-						break;
+						Character woceFlag = dataVals.getWoceCO2Water();
+						if ( SocatWoceEvent.WOCE_GOOD.equals(woceFlag) || 
+							 SocatWoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) {
+							inRegion = true;
+							break;
+						}
 					}
 				}
 			}
 			else {
-				dsgFile.read(true);
+				dsgFile.read(false);
 				inRegion = true;
 			}
 			if ( inRegion ) {
@@ -270,7 +274,7 @@ public class SocatCruiseReporter {
 				String socatVersion = socatVersionList.get(k);
 				String qcFlag = qcFlagList.get(k);
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.read(false);
+				ArrayList<String> unknownVars = dsgFile.read(true);
 				if ( unknownVars.size() > 0 ) {
 					String msg = upperExpo + " unknown variables: ";
 					for (String var : unknownVars)
@@ -1070,7 +1074,7 @@ public class SocatCruiseReporter {
 		if ( ! dsgFile.exists() )
 			throw new IllegalArgumentException("DSG file does not exist for " + upperExpo);
 		try {
-			dsgFile.read(false);
+			dsgFile.read(true);
 		} catch (IOException ex) {
 			throw new IllegalArgumentException("Problems reading the metdata from the DSG file for " + 
 					upperExpo + ": " + ex.getMessage());
@@ -1336,7 +1340,7 @@ public class SocatCruiseReporter {
 				// Read the data for this cruise
 				String upperExpo = DashboardServerUtils.checkExpocode(expo);
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.read(false);
+				ArrayList<String> unknownVars = dsgFile.read(true);
 				if ( unknownVars.size() > 0 ) {
 					String msg = upperExpo + " unknown variables: ";
 					for (String var : unknownVars)
