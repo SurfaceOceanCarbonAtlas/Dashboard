@@ -213,9 +213,9 @@ public class AddOldNFlags {
 					}
 					CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
 					try {
-						ArrayList<String> missing = fullDataDsg.read(false);
+						ArrayList<String> missing = fullDataDsg.readMetadata();
 						if ( ! missing.isEmpty() ) 
-							throw new IllegalArgumentException("missing values: " + missing.toString());
+							throw new IllegalArgumentException("unassigned fields: " + missing.toString());
 					} catch (Exception ex) {
 						System.err.println("Problems getting the SOCAT version status from the full-data DSG file for " + 
 								expocode + ": " + ex.getMessage());

@@ -42,10 +42,10 @@ public class SocatCruiseReporter {
 
 	private static final String SOCAT_ENHANCED_DOI_TAG = "SOCATENHANCEDDOI";
 	private static final String SOCAT_ENHANCED_HREF_TAG = "SOCATENHANCEDHREF";
+	private static final String SOCAT_ENHANCED_HREF_PREFIX = "http://doi.pangaea.de/";
 
 	// SOCAT main DOI, DOI HRef, and publication citation
-	private static final String SOCAT_MAIN_DOI = "doi:10.1594/PANGAEA.849770";
-	private static final String SOCAT_MAIN_DOI_HREF = "http://doi.pangaea.de/10.1594/PANGAEA.849770";
+	private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.849770";
 	private static final String[] SOCAT_MAIN_CITATION = {
 		"Bakker, D. C. E., Pfeil, B., Smith, K., et. al.  \"A 58-year record of ",
 		"high quality data in version 3 of the Surface Ocean CO2 Atlas (SOCAT)\" ",
@@ -130,9 +130,16 @@ public class SocatCruiseReporter {
 
 		// Get the metadata and data from the DSG file
 		CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-		ArrayList<String> unknownVars = dsgFile.read(true);
+		ArrayList<String> unknownVars = dsgFile.readMetadata();
 		if ( unknownVars.size() > 0 ) {
-			String msg = "Unknown variables: ";
+			String msg = "Unassigned metadata variables: ";
+			for (String var : unknownVars)
+				msg += var + "; ";
+			warnMsgs.add(msg);
+		}
+		unknownVars = dsgFile.readData();
+		if ( unknownVars.size() > 0 ) {
+			String msg = "Unassigned data variables: ";
 			for (String var : unknownVars)
 				msg += var + "; ";
 			warnMsgs.add(msg);
@@ -157,16 +164,19 @@ public class SocatCruiseReporter {
 			}
 		}
 
+		// Get the SOCAT-enhanced data document DOI for this cruise to be included in every data line
+		String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDOI();
+
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
-			ArrayList<String> msgs = printMetadataPreamble(omeMeta, socatVersion, 
-														qcFlag, addlDocs, report);
+			ArrayList<String> msgs = printMetadataPreamble(omeMeta, 
+					socatVersion, socatDOI, qcFlag, addlDocs, report);
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, false);
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
-				report.println(dataReportString(dataVals, upperExpo, socatVersion, 
-												SOCAT_ENHANCED_DOI_TAG, qcFlag, false));
+				report.println(dataReportString(dataVals, upperExpo, 
+						socatVersion, socatDOI, qcFlag, false));
 			}
 		} finally {
 			report.close();
@@ -201,19 +211,31 @@ public class SocatCruiseReporter {
 			File reportFile) throws IllegalArgumentException, IOException {
 		ArrayList<String> upperExpoList = new ArrayList<String>();
 		ArrayList<String> socatVersionList = new ArrayList<String>();
+		ArrayList<String> socatDOIList = new ArrayList<String>();
 		ArrayList<String> qcFlagList = new ArrayList<String>();
+		ArrayList<String> warnMsgs = new ArrayList<String>();
+
 		for ( String expo : expocodes ) {
 			// Get the expocodes, SOCAT version, and QC flags 
 			// of the datasets to report (checking region IDs, if appropriate)
 			String upperExpo = DashboardServerUtils.checkExpocode(expo);
-			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(expo);
+			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
+			ArrayList<String> unknownVars = dsgFile.readMetadata();
+			if ( unknownVars.size() > 0 ) {
+				String msg = upperExpo + " unknown metadata variables: ";
+				for (String var : unknownVars)
+					msg += var + "; ";
+				warnMsgs.add(msg);
+			}
 			boolean inRegion;
 			if ( regionID != null ) {
-				dsgFile.read(true);
 				inRegion = false;
+				dsgFile.readData();
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					if ( regionID.equals(dataVals.getRegionID()) ) {
 						Character woceFlag = dataVals.getWoceCO2Water();
+						// Ignore WOCE-3 and WOCE-4 as they are not reported 
+						// and may be indicating invalid locations for this cruise
 						if ( SocatWoceEvent.WOCE_GOOD.equals(woceFlag) || 
 							 SocatWoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) {
 							inRegion = true;
@@ -223,17 +245,17 @@ public class SocatCruiseReporter {
 				}
 			}
 			else {
-				dsgFile.read(false);
 				inRegion = true;
 			}
 			if ( inRegion ) {
 				SocatMetadata socatMeta = dsgFile.getMetadata();
 				socatVersionList.add(socatMeta.getSocatVersion());
 				qcFlagList.add(socatMeta.getQcFlag());
+				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
+				socatDOIList.add(cruise.getSocatDOI());
 				upperExpoList.add(upperExpo);
 			}
 		}
-		ArrayList<String> warnMsgs = new ArrayList<String>();
 
 		// Get the rest of the metadata info from the OME XML
 		ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
@@ -265,7 +287,7 @@ public class SocatCruiseReporter {
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
 			ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList, 
-					socatVersionList, qcFlagList, addlDocsList, report);
+					socatVersionList, socatDOIList, qcFlagList, addlDocsList, report);
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, true);
 			// Read and report the data for one cruise at a time
@@ -273,10 +295,11 @@ public class SocatCruiseReporter {
 				String upperExpo = upperExpoList.get(k);
 				String socatVersion = socatVersionList.get(k);
 				String qcFlag = qcFlagList.get(k);
+				String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDOI();
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.read(true);
+				ArrayList<String> unknownVars = dsgFile.readData();
 				if ( unknownVars.size() > 0 ) {
-					String msg = upperExpo + " unknown variables: ";
+					String msg = upperExpo + " unknown data variables: ";
 					for (String var : unknownVars)
 						msg += var + "; ";
 					warnMsgs.add(msg);
@@ -290,7 +313,7 @@ public class SocatCruiseReporter {
 					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
 						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
 						report.println(dataReportString(dataVals, upperExpo, 
-								socatVersion, SOCAT_ENHANCED_DOI_TAG, qcFlag, true));
+								socatVersion, socatDOI, qcFlag, true));
 					}
 				}
 			}
@@ -310,6 +333,8 @@ public class SocatCruiseReporter {
 	 * 		OME XML document with metadata values to report in the preamble
 	 * @param socatVersion
 	 * 		SOCAT version to report in the preamble
+	 * @param socatDOI
+	 * 		DOI for this SOCAT-enhanced data file
 	 * @param qcFlag
 	 * 		QC flag to report in the preamble
 	 * @param addlDocs
@@ -321,7 +346,8 @@ public class SocatCruiseReporter {
 	 * 		never null but may be empty
 	 */
 	private static ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta, 
-			String socatVersion, String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
+									String socatVersion, String socatDOI, String qcFlag, 
+									TreeSet<String> addlDocs, PrintWriter report) {
 		String upperExpo = omeMeta.getExpocode();
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -332,10 +358,16 @@ public class SocatCruiseReporter {
 		report.println("Ship/Vessel Name: " + omeMeta.getVesselName());
 		report.println("Principal Investigator(s): " + omeMeta.getScienceGroup());
 		report.println("Reference for the original data: " + omeMeta.getOrigDataRef());
-		report.println("DOI of this SOCAT-enhanced data: " + SOCAT_ENHANCED_DOI_TAG);
-		report.println("    or see: " + SOCAT_ENHANCED_HREF_TAG);
+		if ( socatDOI.isEmpty() ) {
+			report.println("DOI of this SOCAT-enhanced data: " + SOCAT_ENHANCED_DOI_TAG);
+			report.println("    or see: " + SOCAT_ENHANCED_HREF_TAG);
+		}
+		else {
+			report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
+			report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
+		}
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
-		report.println("    or see: " + SOCAT_MAIN_DOI_HREF);
+		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
 		report.println();
 
 		// Additional references - add expocode suffix for clarity
@@ -414,8 +446,18 @@ public class SocatCruiseReporter {
 	 * If successful, any warnings about the generated preamble
 	 * are returned.
 	 * 
-	 * @param metaList
-	 * 		list of metadata values to report in the preamble
+	 * @param regionName
+	 * 		name of the region being reported; use null for no region
+	 * @param omeMetaList
+	 * 		list of metadata values, one per dataset, to use for information to report
+	 * @param socatVersionList
+	 * 		list of SOCAT version numbers, one per dataset, to report
+	 * @param socatDOIList
+	 * 		list of DOIs, one per dataset, for the SOCAT-enhanced data files
+	 * @param qcFlagList
+	 * 		list of QC flags, one per dataset, to report
+	 * @param addlDocsList
+	 * 		list of additional documents, one set of names per dataset, to report
 	 * @param report
 	 * 		print with this PrintWriter
 	 * @return
@@ -424,13 +466,13 @@ public class SocatCruiseReporter {
 	 */
 	private static ArrayList<String> printMetadataPreamble(String regionName, 
 			ArrayList<DashboardOmeMetadata> omeMetaList, ArrayList<String> socatVersionList, 
-			ArrayList<String> qcFlagList, ArrayList<TreeSet<String>> addlDocsList, 
-			PrintWriter report) {
+			ArrayList<String> socatDOIList, ArrayList<String> qcFlagList, 
+			ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
 		report.println("SOCAT data report created: " + TIMESTAMPER.format(new Date()));
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
-		report.println("    or see: " + SOCAT_MAIN_DOI_HREF);
+		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
 		if ( regionName == null )
 			report.println("SOCAT cruise data for the following cruises:");
 		else
@@ -459,6 +501,7 @@ public class SocatCruiseReporter {
 			String socatVersion = socatVersionList.get(k);
 			String qcFlag = qcFlagList.get(k);
 			TreeSet<String> addlDocs = addlDocsList.get(k);
+			String socatDOI = socatDOIList.get(k);
 
 			report.print(upperExpo);
 			report.print("\t");
@@ -478,11 +521,20 @@ public class SocatCruiseReporter {
 			report.print(omeMeta.getOrigDataRef());
 			report.print("\t");
 
-			report.print(SOCAT_ENHANCED_DOI_TAG);
-			report.print("\t");
+			if ( socatDOI.isEmpty() ) {
+				report.print(SOCAT_ENHANCED_DOI_TAG);
+				report.print("\t");
 
-			report.print(SOCAT_ENHANCED_HREF_TAG);
-			report.print("\t");
+				report.print(SOCAT_ENHANCED_HREF_TAG);
+				report.print("\t");
+			}
+			else {
+				report.print(socatDOI);
+				report.print("\t");
+
+				report.print(SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
+				report.print("\t");
+			}
 
 			try {
 				double westLon = omeMeta.getWestmostLongitude();
@@ -1074,9 +1126,10 @@ public class SocatCruiseReporter {
 		if ( ! dsgFile.exists() )
 			throw new IllegalArgumentException("DSG file does not exist for " + upperExpo);
 		try {
-			dsgFile.read(true);
+			dsgFile.readMetadata();
+			dsgFile.readData();
 		} catch (IOException ex) {
-			throw new IllegalArgumentException("Problems reading the metdata from the DSG file for " + 
+			throw new IllegalArgumentException("Problems reading the DSG file for " + 
 					upperExpo + ": " + ex.getMessage());
 		}
 
@@ -1340,13 +1393,14 @@ public class SocatCruiseReporter {
 				// Read the data for this cruise
 				String upperExpo = DashboardServerUtils.checkExpocode(expo);
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.read(true);
+				ArrayList<String> unknownVars = dsgFile.readData();
 				if ( unknownVars.size() > 0 ) {
-					String msg = upperExpo + " unknown variables: ";
+					String msg = upperExpo + " unassigned data variables: ";
 					for (String var : unknownVars)
 						msg += var + "; ";
 					throw new IllegalArgumentException(msg);
 				}
+				// Get the computed values of time in seconds since 1970-01-01 00:00:00
 				double[] sectimes = dsgFile.readDoubleVarDataValues(TIME_NC_VAR_NAME);
 				// Collect and sort the acceptable data for this cruise
 				// Any duplicates are eliminated in this process

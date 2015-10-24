@@ -293,9 +293,12 @@ public class DsgNcFileHandler {
 		CruiseDsgNcFile oldDsgFile = getDsgNcFile(oldExpocode);
 		if ( oldDsgFile.exists() )  {
 			// Just re-create the DSG file with the updated metadata
-			ArrayList<String> missing = oldDsgFile.read(true);
+			ArrayList<String> missing = oldDsgFile.readMetadata();
 			if ( ! missing.isEmpty() )
-				throw new RuntimeException("Unexpected values missing from the DSG file: " + missing);
+				throw new RuntimeException("Unexpected metadata fields missing from the DSG file: " + missing);
+			missing = oldDsgFile.readData();
+			if ( ! missing.isEmpty() )
+				throw new RuntimeException("Unexpected data fields missing from the DSG file: " + missing);
 			try {
 				ArrayList<SocatCruiseData> dataVals = oldDsgFile.getDataList();
 				SocatMetadata updatedMeta = oldDsgFile.getMetadata();

@@ -46,7 +46,8 @@ public class RegenerateDsgsTest {
 
 		// Read the original data and metadata
 		CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
-		fullDataDsg.read(true);
+		fullDataDsg.readMetadata();
+		fullDataDsg.readData();
 		SocatMetadata origMeta = fullDataDsg.getMetadata();
 		ArrayList<SocatCruiseData> origData = fullDataDsg.getDataList();
 
@@ -57,7 +58,8 @@ public class RegenerateDsgsTest {
 		}
 
 		// Re-read the data and metadata
-		fullDataDsg.read(true);
+		fullDataDsg.readMetadata();
+		fullDataDsg.readData();
 		SocatMetadata updatedMeta = fullDataDsg.getMetadata();
 		ArrayList<SocatCruiseData> updatedData = fullDataDsg.getDataList();
 

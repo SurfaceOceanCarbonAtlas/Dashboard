@@ -416,35 +416,19 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Creates and assigns the internal metadata and data list
-	 * references from the contents of this netCDF DSG file.
+	 * Creates and assigns the internal metadata 
+	 * reference from the contents of this netCDF DSG file.
 	 * 
-	 * @param readData
-	 * 		read all the data (or just the metadata)?
 	 * @return
-	 * 		names of metadata and data fields not assigned from this 
+	 * 		names of the metadata fields not assigned from this 
 	 * 		netCDF file (will have its default/missing value)
 	 * @throws IOException
 	 * 		if there are problems opening or reading from the netCDF file
-	 * @throws IllegalArgumentException
-	 * 		if the netCDF file is invalid.  Currently it must have a
-	 * 		'time' variable and all data variables must have the same
-	 * 		number of values as this variable.
 	 */
-	public ArrayList<String> read(boolean readData) 
-								throws IOException, IllegalArgumentException {
+	public ArrayList<String> readMetadata() throws IOException {
 		ArrayList<String> namesNotFound = new ArrayList<String>();
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
-			// Get the number of data points from the length of the time 1D array
-			String name = Constants.time_VARNAME;
-			String varName = Constants.SHORT_NAMES.get(name);
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			int numData = var.getShape(0);
-
 			// Create the metadata with default (missing) values
 			metadata = new SocatMetadata();
 
@@ -456,12 +440,12 @@ public class CruiseDsgNcFile extends File {
 			// Assign the metadata values from the netCDF file.
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					name = f.getName();
-					varName = Constants.SHORT_NAMES.get(name);
+					String name = f.getName();
+					String varName = Constants.SHORT_NAMES.get(name);
 					if ( varName == null )
 						throw new RuntimeException(
 								"Unexpected missing short name for " + name);
-					var = ncfile.findVariable(varName);
+					Variable var = ncfile.findVariable(varName);
 					if ( var == null ) {
 						namesNotFound.add(name);
 						continue;
@@ -490,8 +474,38 @@ public class CruiseDsgNcFile extends File {
 				}
 			}
 
-			if ( ! readData )
-				return namesNotFound;
+		} finally {
+			ncfile.close();
+		}
+		return namesNotFound;
+	}
+
+	/**
+	 * Creates and assigns the internal data list
+	 * reference from the contents of this netCDF DSG file.
+	 * 
+	 * @return
+	 * 		names of the data fields not assigned from this 
+	 * 		netCDF file (will have its default/missing value)
+	 * @throws IOException
+	 * 		if there are problems opening or reading from the netCDF file
+	 * @throws IllegalArgumentException
+	 * 		if the netCDF file is invalid.  Currently it must have a
+	 * 		'time' variable and all data variables must have the same
+	 * 		number of values as this variable.
+	 */
+	public ArrayList<String> readData() throws IOException, IllegalArgumentException {
+		ArrayList<String> namesNotFound = new ArrayList<String>();
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
+		try {
+			// Get the number of data points from the length of the time 1D array
+			String name = Constants.time_VARNAME;
+			String varName = Constants.SHORT_NAMES.get(name);
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			int numData = var.getShape(0);
 
 			// Create the complete list of data values, 
 			// all with default (missing) values

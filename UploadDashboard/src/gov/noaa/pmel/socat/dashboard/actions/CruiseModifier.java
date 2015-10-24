@@ -180,7 +180,7 @@ public class CruiseModifier {
 			throws IllegalArgumentException, SQLException, IOException {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
-		dsgFile.read(false);
+		dsgFile.readMetadata();
 		SocatMetadata metaData = dsgFile.getMetadata();
 		restoredSocatVersion = metaData.getSocatVersion();
 
@@ -321,7 +321,7 @@ public class CruiseModifier {
 		throws IllegalArgumentException, SQLException, IOException {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
-		dsgFile.read(false);
+		dsgFile.readMetadata();
 		SocatMetadata metaData = dsgFile.getMetadata();
 		restoredSocatVersion = metaData.getSocatVersion();
 		

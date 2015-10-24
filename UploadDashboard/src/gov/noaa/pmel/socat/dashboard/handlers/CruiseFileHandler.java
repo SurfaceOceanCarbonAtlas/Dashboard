@@ -45,7 +45,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String SOCAT_VERSION_ID = "socatversion";
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
-	private static final String ORIG_DOI_ID = "origdoi";
 	private static final String SOCAT_DOI_ID = "socatdoi";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
 	private static final String OME_TIMESTAMP_ID = "ometimestamp";
@@ -562,8 +561,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruiseProps.setProperty(UPLOAD_FILENAME_ID, cruise.getUploadFilename());
 		// Upload timestamp
 		cruiseProps.setProperty(UPLOAD_TIMESTAMP_ID, cruise.getUploadTimestamp());
-		// DOI of this data document
-		cruiseProps.setProperty(ORIG_DOI_ID, cruise.getOrigDOI());
 		// DOI of the SOCAT-enhanced version of this data document
 		cruiseProps.setProperty(SOCAT_DOI_ID, cruise.getSocatDOI());
 		// Data-check status string
@@ -1238,9 +1235,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					UPLOAD_TIMESTAMP_ID + " given in " + infoFile.getPath());			
 		cruise.setUploadTimestamp(value);
 
-		// DOIs - allow them to be missing
-		value = cruiseProps.getProperty(ORIG_DOI_ID);
-		cruise.setOrigDOI(value);
+		// SOCAT enhanced data DOI - allow it to be missing
 		value = cruiseProps.getProperty(SOCAT_DOI_ID);
 		cruise.setSocatDOI(value);
 
