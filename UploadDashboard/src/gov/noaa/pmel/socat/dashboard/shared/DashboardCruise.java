@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4383347366322110563L;
+	private static final long serialVersionUID = 1591302858887965904L;
 
 	boolean selected;
 	String version;
@@ -33,7 +33,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	String cdiacDate;
 	String uploadFilename;
 	String uploadTimestamp;
-	String socatDOI;
+	String origDoi;
+	String socatDoi;
 	int numDataRows;
 	int numErrorRows;
 	int numWarnRows;
@@ -67,7 +68,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		cdiacDate = "";
 		uploadFilename = "";
 		uploadTimestamp = "";
-		socatDOI = "";
+		origDoi = "";
+		socatDoi = "";
 		numDataRows = 0;
 		numErrorRows = 0;
 		numWarnRows = 0;
@@ -351,23 +353,44 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the DOI of the SOCAT-enhanced data document;
+	 * 		the DOI of the original data document;
 	 * 		never null but may be empty
 	 */
-	public String getSocatDOI() {
-		return socatDOI;
+	public String getOrigDoi() {
+		return origDoi;
 	}
 
 	/**
-	 * @param socatDOI
+	 * @param socatDoi
+	 * 		the DOI (after trimming) of the original data document to set;
+	 * 		if null, sets to an empty string
+	 */
+	public void setOrigDoi(String origDoi) {
+		if ( origDoi == null )
+			this.origDoi = "";
+		else
+			this.origDoi = origDoi.trim();
+	}
+
+	/**
+	 * @return 
+	 * 		the DOI of the SOCAT-enhanced data document;
+	 * 		never null but may be empty
+	 */
+	public String getSocatDoi() {
+		return socatDoi;
+	}
+
+	/**
+	 * @param socatDoi
 	 * 		the DOI (after trimming) of the SOCAT-enhanced data document to set;
 	 * 		if null, sets to an empty string
 	 */
-	public void setSocatDOI(String socatDOI) {
-		if ( socatDOI == null )
-			this.socatDOI = "";
+	public void setSocatDoi(String socatDoi) {
+		if ( socatDoi == null )
+			this.socatDoi = "";
 		else
-			this.socatDOI = socatDOI.trim();
+			this.socatDoi = socatDoi.trim();
 	}
 
 	/**
@@ -685,7 +708,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + cdiacDate.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
-		result = result * prime + socatDOI.hashCode();
+		result = result * prime + origDoi.hashCode();
+		result = result * prime + socatDoi.hashCode();
 		result = result * prime + numDataRows;
 		result = result * prime + numErrorRows;
 		result = result * prime + numWarnRows;
@@ -737,7 +761,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
 			return false;
-		if ( ! socatDOI.equals(other.socatDOI) )
+		if ( ! origDoi.equals(other.origDoi) )
+			return false;
+		if ( ! socatDoi.equals(other.socatDoi) )
 			return false;
 		if ( numDataRows != other.numDataRows )
 			return false;
@@ -783,7 +809,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    cdiacDate=" + cdiacDate + 
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
-				",\n    socatDOI=" + socatDOI +
+				",\n    origDoi=" + origDoi +
+				",\n    socatDoi=" + socatDoi +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
 				",\n    numErrorRows=" + Integer.toString(numErrorRows) +
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +

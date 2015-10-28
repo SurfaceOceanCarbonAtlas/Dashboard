@@ -4,12 +4,9 @@
 package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -35,7 +32,7 @@ public class AddDOIs {
 	 * @throws IllegalArgumentException
 	 * 		if an invalid expocode / DOI data line is found
 	 * @throws IOException
-	 * 		if opening or reading the expocode /DOI file throws one
+	 * 		if opening or reading the expocode / DOI file throws one
 	 */
 	private static TreeMap<String,String> readExpoDOIFile(String expoDOIsFilename) 
 			throws IllegalArgumentException, IOException {
@@ -46,8 +43,8 @@ public class AddDOIs {
 			while ( dataline != null ) {
 				if ( ! ( dataline.isEmpty() || dataline.startsWith("#") ) ) {
 					String[] expodoi = dataline.split("\\s+");
-					if ( expodoi.length <= 2 )
-						throw new IllegalArgumentException("Invalid entry: " + dataline.trim());
+					if ( expodoi.length < 2 )
+						throw new IllegalArgumentException("Less than two words in " + dataline.trim());
 					String upperExpo = DashboardServerUtils.checkExpocode(expodoi[0]);
 					expoDOIMap.put(upperExpo, expodoi[1]);
 				}
@@ -121,30 +118,31 @@ public class AddDOIs {
 		boolean success = true;
 		try {
 			CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-			MetadataFileHandler metaHandler = configStore.getMetadataFileHandler();
 			for ( String expocode : exposSet ) {
+				DashboardCruise cruise = null;
+				try {
+					cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+				} catch (Exception ex) {
+					System.err.println("Problems reading the cruise data properties for " + expocode + ": " + ex.getMessage());
+					success = false;
+					continue;
+				}
 				String doi = socatDOIMap.get(expocode);
 				if ( doi != null ) {
-					try {
-						DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
-						cruise.setSocatDOI(doi);
-						cruiseHandler.saveCruiseInfoToFile(cruise, "Updated the SOCAT-enhanced DOI for " + expocode + " to " + doi);
-					} catch (Exception ex) {
-						System.err.println("Problems updating the DOI for the SOCAT-enhanced data document for " + expocode + ": " + ex.getMessage());
-						success = false;
-					}
+					cruise.setSocatDoi(doi);
+					System.out.println("Updating the SOCAT-enhanced DOI for " + expocode + " to " + doi);
 				}
 				doi = origDOIMap.get(expocode);
 				if ( doi != null ) {
-					try {
-						DashboardMetadata mdata = metaHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
-						DashboardOmeMetadata omeData = new DashboardOmeMetadata(mdata, metaHandler);
-						omeData.setDOI(doi);
-						metaHandler.saveAsOmeXmlDoc(omeData, "Updated the original-data DOI for " + expocode + " to " + doi);
-					} catch (Exception ex) {
-						System.err.println("Problems updating the DOI of the original-data document for " + expocode + ": " + ex.getMessage());
-						success = false;
-					}
+					cruise.setOrigDoi(doi);
+					System.out.println("Updating the original-data DOI for " + expocode + " to " + doi);
+				}
+				try {
+					cruiseHandler.saveCruiseInfoToFile(cruise, null);
+				} catch (Exception ex) {
+					System.err.println("Problems saving the cruise data properties for " + expocode + ": " + ex.getMessage());
+					success = false;
+					continue;
 				}
 			}
 		} finally {

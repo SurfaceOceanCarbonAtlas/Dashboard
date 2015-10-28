@@ -164,14 +164,16 @@ public class SocatCruiseReporter {
 			}
 		}
 
-		// Get the SOCAT-enhanced data document DOI for this cruise to be included in every data line
-		String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDOI();
+		// Get the original and SOCAT-enhanced data document DOIs for this cruise 
+		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
+		String origDOI = cruise.getOrigDoi();
+		String socatDOI = cruise.getSocatDoi();
 
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
 			ArrayList<String> msgs = printMetadataPreamble(omeMeta, 
-					socatVersion, socatDOI, qcFlag, addlDocs, report);
+					socatVersion, origDOI, socatDOI, qcFlag, addlDocs, report);
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, false);
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
@@ -209,11 +211,13 @@ public class SocatCruiseReporter {
 	 */
 	public ArrayList<String> generateReport(TreeSet<String> expocodes, Character regionID, 
 			File reportFile) throws IllegalArgumentException, IOException {
-		ArrayList<String> upperExpoList = new ArrayList<String>();
-		ArrayList<String> socatVersionList = new ArrayList<String>();
-		ArrayList<String> socatDOIList = new ArrayList<String>();
-		ArrayList<String> qcFlagList = new ArrayList<String>();
-		ArrayList<String> warnMsgs = new ArrayList<String>();
+		int numDatasets = expocodes.size();
+		ArrayList<String> upperExpoList = new ArrayList<String>(numDatasets);
+		ArrayList<String> socatVersionList = new ArrayList<String>(numDatasets);
+		ArrayList<String> origDOIList = new ArrayList<String>(numDatasets);
+		ArrayList<String> socatDOIList = new ArrayList<String>(numDatasets);
+		ArrayList<String> qcFlagList = new ArrayList<String>(numDatasets);
+		ArrayList<String> warnMsgs = new ArrayList<String>(numDatasets);
 
 		for ( String expo : expocodes ) {
 			// Get the expocodes, SOCAT version, and QC flags 
@@ -252,7 +256,8 @@ public class SocatCruiseReporter {
 				socatVersionList.add(socatMeta.getSocatVersion());
 				qcFlagList.add(socatMeta.getQcFlag());
 				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
-				socatDOIList.add(cruise.getSocatDOI());
+				origDOIList.add(cruise.getOrigDoi());
+				socatDOIList.add(cruise.getSocatDoi());
 				upperExpoList.add(upperExpo);
 			}
 		}
@@ -287,7 +292,7 @@ public class SocatCruiseReporter {
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
 			ArrayList<String> msgs = printMetadataPreamble(regionName, omeMetaList, 
-					socatVersionList, socatDOIList, qcFlagList, addlDocsList, report);
+					socatVersionList, origDOIList, socatDOIList, qcFlagList, addlDocsList, report);
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, true);
 			// Read and report the data for one cruise at a time
@@ -295,7 +300,7 @@ public class SocatCruiseReporter {
 				String upperExpo = upperExpoList.get(k);
 				String socatVersion = socatVersionList.get(k);
 				String qcFlag = qcFlagList.get(k);
-				String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDOI();
+				String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDoi();
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
 				ArrayList<String> unknownVars = dsgFile.readData();
 				if ( unknownVars.size() > 0 ) {
@@ -333,6 +338,8 @@ public class SocatCruiseReporter {
 	 * 		OME XML document with metadata values to report in the preamble
 	 * @param socatVersion
 	 * 		SOCAT version to report in the preamble
+	 * @param origDOI
+	 * 		DOI for the original data file
 	 * @param socatDOI
 	 * 		DOI for this SOCAT-enhanced data file
 	 * @param qcFlag
@@ -346,8 +353,8 @@ public class SocatCruiseReporter {
 	 * 		never null but may be empty
 	 */
 	private static ArrayList<String> printMetadataPreamble(DashboardOmeMetadata omeMeta, 
-									String socatVersion, String socatDOI, String qcFlag, 
-									TreeSet<String> addlDocs, PrintWriter report) {
+									String socatVersion, String origDOI, String socatDOI, 
+									String qcFlag, TreeSet<String> addlDocs, PrintWriter report) {
 		String upperExpo = omeMeta.getExpocode();
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -357,7 +364,8 @@ public class SocatCruiseReporter {
 		report.println("Cruise/Dataset Name: " + omeMeta.getCruiseName());
 		report.println("Ship/Vessel Name: " + omeMeta.getVesselName());
 		report.println("Principal Investigator(s): " + omeMeta.getScienceGroup());
-		report.println("Reference for the original data: " + omeMeta.getOrigDataRef());
+		report.println("DOI for the original data: " + origDOI);
+		report.println("    or see: " + omeMeta.getOrigDataRef());
 		if ( socatDOI.isEmpty() ) {
 			report.println("DOI of this SOCAT-enhanced data: " + SOCAT_ENHANCED_DOI_TAG);
 			report.println("    or see: " + SOCAT_ENHANCED_HREF_TAG);
@@ -452,6 +460,8 @@ public class SocatCruiseReporter {
 	 * 		list of metadata values, one per dataset, to use for information to report
 	 * @param socatVersionList
 	 * 		list of SOCAT version numbers, one per dataset, to report
+	 * @param origDOIList
+	 * 		list of DOIs, one per dataset, for the original data files
 	 * @param socatDOIList
 	 * 		list of DOIs, one per dataset, for the SOCAT-enhanced data files
 	 * @param qcFlagList
@@ -466,7 +476,7 @@ public class SocatCruiseReporter {
 	 */
 	private static ArrayList<String> printMetadataPreamble(String regionName, 
 			ArrayList<DashboardOmeMetadata> omeMetaList, ArrayList<String> socatVersionList, 
-			ArrayList<String> socatDOIList, ArrayList<String> qcFlagList, 
+			ArrayList<String> origDOIList, ArrayList<String> socatDOIList, ArrayList<String> qcFlagList, 
 			ArrayList<TreeSet<String>> addlDocsList, PrintWriter report) {
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -484,8 +494,9 @@ public class SocatCruiseReporter {
 					   "Ship/Vessel Name\t" +
 					   "PI(s)\t" +
 					   "Original Data DOI\t" +
+					   "Original Data Reference\t" +
 					   "SOCAT DOI\t" +
-					   "SOCAT DOI link\t" +
+					   "SOCAT Reference\t" +
 					   "Westmost Longitude\t" +
 					   "Eastmost Longitude\t" +
 					   "Southmost Latitude\t" +
@@ -493,7 +504,7 @@ public class SocatCruiseReporter {
 					   "Start Time\t" +
 					   "End Time\t" +
 					   "QC Flag\t" +
-					   "Additional Metadata Reference(s)");
+					   "Additional Metadata Document(s)");
 		boolean needsFakeHoursMsg = false;
 		for (int k = 0; k < omeMetaList.size(); k++) {
 			DashboardOmeMetadata omeMeta = omeMetaList.get(k);
@@ -501,6 +512,7 @@ public class SocatCruiseReporter {
 			String socatVersion = socatVersionList.get(k);
 			String qcFlag = qcFlagList.get(k);
 			TreeSet<String> addlDocs = addlDocsList.get(k);
+			String origDOI = origDOIList.get(k);
 			String socatDOI = socatDOIList.get(k);
 
 			report.print(upperExpo);
@@ -516,6 +528,9 @@ public class SocatCruiseReporter {
 			report.print("\t");
 
 			report.print(omeMeta.getScienceGroup());
+			report.print("\t");
+
+			report.print(origDOI);
 			report.print("\t");
 
 			report.print(omeMeta.getOrigDataRef());
