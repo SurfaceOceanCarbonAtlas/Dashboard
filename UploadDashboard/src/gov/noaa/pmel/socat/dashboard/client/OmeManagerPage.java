@@ -44,8 +44,8 @@ public class OmeManagerPage extends CompositeWithUsername {
 			"<p>At this time, the system only uploads SOCAT OME XML metadata files.</p>" +
 			"<p>To generate a SOCAT OME XML metadata file to upload: <ul>" +
 			"<li>Go to the CDIAC OME site " +
-			"<a href=\"http://mercury-ops2.ornl.gov/socatome/newForm.htm\" target=\"_blank\">" +
-			"http://mercury-ops2.ornl.gov/socatome/newForm.htm</a></li>" +
+			"<a href=\"http://mercury.ornl.gov/socatome/\" target=\"_blank\">" +
+			"http://mercury.ornl.gov/socatome/</a></li>" +
 			"<li>Fill in the appropriate metadata</li>" +
 			"<li>Save a local copy (preferrably with validation)</li>" +
 			"</ul>" +
