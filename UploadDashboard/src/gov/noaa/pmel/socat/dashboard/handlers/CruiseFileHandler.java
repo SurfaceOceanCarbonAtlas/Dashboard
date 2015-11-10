@@ -1420,8 +1420,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( oldStatus.equals(newStatus) )
 			return false;
 		cruise.setQcStatus(newStatus);
-		saveCruiseInfoToFile(cruise, "Update cruise dashboard status from '" + 
-				oldStatus + "' to '" + newStatus + "'");
+		saveCruiseInfoToFile(cruise, "Update cruise dashboard status for " + 
+				expocode + " from '" + oldStatus + "' to '" + newStatus + "'");
 		return true;
 	}
 
