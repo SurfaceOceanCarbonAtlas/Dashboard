@@ -28,6 +28,8 @@
 						<g:RadioButton addStyleNames="{style.settingsradiobutton}" 
 								name="formatRadioGroup" ui:field="commaRadio" />
 						<g:RadioButton addStyleNames="{style.settingsradiobutton}" 
+								name="formatRadioGroup" ui:field="semicolonRadio" />
+						<g:RadioButton addStyleNames="{style.settingsradiobutton}" 
 								name="formatRadioGroup" ui:field="tabRadio" />
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="{style.settingsradiopanel}">

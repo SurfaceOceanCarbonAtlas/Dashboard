@@ -26,8 +26,8 @@ public class VersionedFileHandler {
 
 	// File to write commit command to - when not actually performing the commits
 	// private static final String SVN_COMMIT_COMMANDS_FILENAME = "commit_commands.sh";
-	// Check every 60 seconds
-	private static final long MILLISECONDS_CHECK_INTERVAL = 60 * 1000L;
+	// Check every 15 seconds
+	private static final long MILLISECONDS_CHECK_INTERVAL = 15 * 1000L;
 	// Keep working while less than 3 seconds have passed
 	private static final long MILLISECONDS_WORK_INTERVAL = 3 * 1000L;
 

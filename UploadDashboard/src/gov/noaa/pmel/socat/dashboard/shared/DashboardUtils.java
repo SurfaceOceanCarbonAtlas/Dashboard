@@ -26,6 +26,7 @@ public class DashboardUtils {
 
 	// Recognized data formats
 	public static final String CRUISE_FORMAT_COMMA = "COMMA-SEPARATED VALUES";
+	public static final String CRUISE_FORMAT_SEMICOLON = "SEMICOLON-SEPARATED VALUES";
 	public static final String CRUISE_FORMAT_TAB = "TAB-SEPARATED VALUES";
 
 	// Cruise upload result strings

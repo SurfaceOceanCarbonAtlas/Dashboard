@@ -117,6 +117,11 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"the data file starts with lines of metadata, " +
 			"then has a line of comma-separated column headers, and finally " +
 			"a line of comma-separated data values for each data sample";
+	private static final String SEMICOLON_FORMAT_TEXT = "file contains semicolon-separated values";
+	private static final String SEMICOLON_FORMAT_HELP = 
+			"the data file starts with lines of metadata, " +
+			"then has a line of semicolon-separated column headers, and finally " +
+			"a line of semicolon-separated data values for each data sample";
 	private static final String TAB_FORMAT_TEXT = "file contains tab-separated values";
 	private static final String TAB_FORMAT_HELP =
 			"the data file starts with lines of metadata, " +
@@ -269,6 +274,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	@UiField Hidden formatToken;
 	@UiField CaptionPanel settingsCaption;
 	@UiField RadioButton commaRadio;
+	@UiField RadioButton semicolonRadio;
 	@UiField RadioButton tabRadio;
 	@UiField DisclosurePanel advancedPanel;
 	@UiField HTML advancedHtml;
@@ -326,10 +332,13 @@ public class CruiseUploadPage extends CompositeWithUsername {
 
 		commaRadio.setText(COMMA_FORMAT_TEXT);
 		commaRadio.setTitle(COMMA_FORMAT_HELP);
+		semicolonRadio.setText(SEMICOLON_FORMAT_TEXT);
+		semicolonRadio.setTitle(SEMICOLON_FORMAT_HELP);
 		tabRadio.setText(TAB_FORMAT_TEXT);
 		tabRadio.setTitle(TAB_FORMAT_HELP);
-		commaRadio.setValue(false, false);
-		tabRadio.setValue(true, false);
+		commaRadio.setValue(true, false);
+		semicolonRadio.setValue(false, false);
+		tabRadio.setValue(false, false);
 
 		createRadio.setText(CREATE_TEXT);
 		createRadio.setTitle(CREATE_HOVER_HELP);
@@ -394,6 +403,8 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		String format;
 		if ( commaRadio.getValue() )
 			format = DashboardUtils.CRUISE_FORMAT_COMMA;
+		else if ( semicolonRadio.getValue() )
+			format = DashboardUtils.CRUISE_FORMAT_SEMICOLON;
 		else
 			format = DashboardUtils.CRUISE_FORMAT_TAB;
 		

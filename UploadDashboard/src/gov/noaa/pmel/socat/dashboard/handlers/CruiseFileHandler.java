@@ -22,7 +22,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -30,6 +29,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.tmatesoft.svn.core.SVNException;
 
 /**
@@ -64,11 +66,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String WOCE_FOUR_ROWS_ID = "wocefourrows";
 
 	private static final int MIN_NUM_DATA_COLUMNS = 6;
-
-	// Pattern to match for trimming CSV metadata lines - implicit ^ at the start and $ at the end
-	private static final Pattern CSV_CLEANUP_PATTERN = Pattern.compile("[,\\s]*(.*?)[,\\s]*");
-	// Pattern to match for finding an empty CSV data lines - implicit ^ at the start and $ at the end
-	private static final Pattern CSV_EMPTYLINE_PATTERN = Pattern.compile("[,\\s]*");
 
 	// Patterns for getting the expocode from the metadata preamble
 	private static final Pattern[] EXPOCODE_PATTERNS = new Pattern[] {
@@ -280,20 +277,19 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	public void assignCruiseDataFromInput(DashboardCruiseWithData cruiseData,
 			String dataFormat, BufferedReader cruiseReader, int firstDataRow, 
 			int numDataRows, boolean assignCruiseInfo) throws IOException {
-		String separator;
-		Pattern cleanupPattern;
-		Pattern emptyLinePattern;
+		CSVFormat format = CSVFormat.EXCEL.withIgnoreSurroundingSpaces().withIgnoreEmptyLines();
+		String spacer;
 		if ( DashboardUtils.CRUISE_FORMAT_TAB.equals(dataFormat) ) {
-			separator = "\t";
-			// Clean-up using trim() and replacing whitespace characters with space characters
-			cleanupPattern = null;
-			// Check for empty lines using trim().isEmpty()
-			emptyLinePattern = null;
+			format = format.withDelimiter('\t');
+			spacer = " ";
 		}
 		else if ( DashboardUtils.CRUISE_FORMAT_COMMA.equals(dataFormat) ) {
-			separator = ",";
-			cleanupPattern = CSV_CLEANUP_PATTERN;
-			emptyLinePattern = CSV_EMPTYLINE_PATTERN;
+			format = format.withDelimiter(',');
+			spacer = ",";
+		}
+		else if ( DashboardUtils.CRUISE_FORMAT_SEMICOLON.equals(dataFormat) ) {
+			format = format.withDelimiter(';');
+			spacer = ";";
 		}
 		else
 			throw new IOException("Unexpected invalid data format '" + dataFormat + "'");
@@ -301,201 +297,173 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Directly add the metadata strings to the list in cruiseData
 		ArrayList<String> preamble = cruiseData.getPreamble();
 		preamble.clear();
+		// Directly add the data column values to the list in cruiseData
+		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
+		dataValues.clear();
 
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
-		String dataline = cruiseReader.readLine();
-		while ( dataline != null ) {
-			// Check if we have gotten to non-blank header values 
-			String[] datavals = dataline.split(separator, -1);
-			if ( datavals.length >= MIN_NUM_DATA_COLUMNS ) {
-				// These could be the column headers;
-				// clean them up and check for empty entries
-				numDataColumns = 0;
-				for (int k = 0; k < datavals.length; k++) {
-					numDataColumns++;
-					datavals[k] = datavals[k].trim();
-					if ( datavals[k].isEmpty() )
-						break;
-				}
-				if ( numDataColumns == datavals.length ) {
-					// Check that this is not a line of data - assume all headers are non-numeric
-					boolean hasNumber = false;
-					for ( String name : datavals ) {
+		int dataRowNum = 0;
+		boolean checkForUnits = false;
+		
+		CSVParser dataParser = new CSVParser(cruiseReader, format);
+		try {
+			for ( CSVRecord record : dataParser ) {
+
+				// Still looking for headers?
+				if ( (numDataColumns == 0) && (record.size() >= MIN_NUM_DATA_COLUMNS) ) {
+					// These could be the column headers
+					// Check for empty entries or numeric entries
+					// Headers must be given and non-numeric
+					boolean isHeader = true;
+					for ( String val : record ) {
+						if ( val.isEmpty() ) {
+							isHeader = false;
+							break;
+						}
 						try {
-							Double.parseDouble(name);
+							Double.parseDouble(val);
 							// Numeric - appears to be data
-							hasNumber = true;
+							isHeader = false;
 							break;
 						} catch (Exception ex) {
 							// Expected result
 							;
 						}
 					}
-					if ( hasNumber)
-						throw new IOException("No data column headers found (header cannot be a number)");
-					// These indeed are the column headers
-					if ( assignCruiseInfo ) {
-						// Just directly add the column names to the list in cruiseData
-						ArrayList<String> colNames = cruiseData.getUserColNames();
-						colNames.clear();
-						colNames.addAll(Arrays.asList(datavals));
-					}
-					// Treat the rest of the lines as data value lines
-					break;
-				}
-				else {
-					// Empty entries - still metadata
-					numDataColumns = 0;
-				}
-			}
-			// Clean-up this line of metadata
-			String metaline;
-			if ( cleanupPattern == null ) {
-				metaline = dataline.trim().replaceAll("\\s", " ");
-			}
-			else {
-				Matcher mat = cleanupPattern.matcher(dataline);
-				if ( ! mat.matches() )
-					throw new RuntimeException("Unexpected failure to match cleanup patthern");
-				metaline = mat.group(1);
-				if ( metaline == null )
-					throw new RuntimeException("Unexpected null group from cleanup pattern");
-			}
-			// Examine this metadata line for the expocode
-			if ( ! ( metaline.isEmpty() || expocodeFound ) ) {
-				// Check if this is an expocode identification line
-				for ( Pattern pat : EXPOCODE_PATTERNS ) {
-					Matcher mat = pat.matcher(metaline);
-					if ( ! mat.matches() )
+					if ( isHeader ) {
+						// These indeed are the column headers
+						if ( assignCruiseInfo ) {
+							// Just directly add the column names to the list in cruiseData
+							ArrayList<String> colNames = cruiseData.getUserColNames();
+							colNames.clear();
+							for ( String val : record ) {
+								colNames.add(val);
+							}
+						}
+						numDataColumns = record.size();
+						// Check for units in the next record
+						checkForUnits = true;
 						continue;
-					String expocode = mat.group(1).toUpperCase();
-					if ( expocode == null )
-						continue;
-					if ( assignCruiseInfo ) {
-						cruiseData.setExpocode(expocode);
 					}
-					else if ( ! expocode.equals(cruiseData.getExpocode()) ) {
-						throw new IOException("Unexpected expocode (" + expocode + 
-								" instead of " + cruiseData.getExpocode());
-					}
-					expocodeFound = true;
-					break;
 				}
-			}
-			// Save the cleaned-up metadata line in the preamble and read the next line
-			preamble.add(metaline);
-			dataline = cruiseReader.readLine();
-		}
 
-		if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
-			throw new IOException(
-					"No data columns found, possibly due to incorrect format");
+				// Still reading metadata?
+				if ( numDataColumns == 0 ) {
+					// Put this line of metadata back together using spacer
+					String metaline = rebuildDataline(record, spacer);
 
-		// Get the next non-blank line;
-		// probably data but maybe a second header line with units
-		dataline = cruiseReader.readLine();
-		while ( (dataline != null) && dataline.trim().isEmpty() ) {
-			dataline = cruiseReader.readLine();
-		}
-		if ( dataline != null ) {
-			String[] datavals = dataline.split(separator, -1);
-			if ( datavals.length != numDataColumns )
-				throw new IOException("Inconsistent number of data columns (" + 
-						datavals.length + " instead of " + numDataColumns + 
-						") in \n" + dataline);
-			// Check if there is anything numeric (thus not a units header)
-			boolean hasNumber = false;
-			for (String strVal : datavals) {
-				try {
-					Double.valueOf(strVal);
-					hasNumber = true;
-					break;
-				} catch (NumberFormatException ex) {
+					// Examine this metadata line for the expocode
+					if ( ! ( metaline.isEmpty() || expocodeFound ) ) {
+						// Check if this is an expocode identification line
+						for ( Pattern pat : EXPOCODE_PATTERNS ) {
+							Matcher mat = pat.matcher(metaline);
+							if ( ! mat.matches() )
+								continue;
+							String expocode = mat.group(1).toUpperCase();
+							if ( expocode == null )
+								continue;
+							if ( assignCruiseInfo ) {
+								cruiseData.setExpocode(expocode);
+							}
+							else if ( ! expocode.equals(cruiseData.getExpocode()) ) {
+								throw new IOException("Unexpected expocode (" + expocode + 
+										" instead of " + cruiseData.getExpocode());
+							}
+							expocodeFound = true;
+							break;
+						}
+					}
+
+					// Save this metadata line in the preamble for the cruise
+					preamble.add(metaline);
 					continue;
 				}
-			}
-			if ( ! hasNumber ) {
-				// The current data line is a second header line of units
-				if ( assignCruiseInfo ) {
-					// Add the units to the column header names
-					ArrayList<String> colNames = cruiseData.getUserColNames();
-					for (int k = 0; k < colNames.size(); k++) {
-						String units = datavals[k].trim();
-						if ( ! units.isEmpty() )
-							colNames.set(k, colNames.get(k) + " [" + units + "]");
+
+				if ( record.size() != numDataColumns )
+					throw new IOException("Inconsistent number of data columns (" + 
+							record.size() + " instead of " + numDataColumns + 
+							") for record " + dataParser.getRecordNumber() + ":\n    " +
+							rebuildDataline(record, spacer));
+
+				// Checking for second header with units?
+				if ( checkForUnits ) {
+					boolean isUnits = true;
+					// A unit specification cannot be pure numeric
+					for ( String val : record ) {
+						try {
+							Double.valueOf(val);
+							isUnits = false;
+							break;
+						} catch (NumberFormatException ex) {
+							continue;
+						}
 					}
+					if ( assignCruiseInfo ) {
+						if ( isUnits ) {
+							// Add the units to the column header names 
+							ArrayList<String> colNames = cruiseData.getUserColNames();
+							for (int k = 0; k < colNames.size(); k++) {
+								String units = record.get(k);
+								if ( ! units.isEmpty() )
+									colNames.set(k, colNames.get(k) + " [" + units + "]");
+							}
+						}
+						// Assign the data column types, units, and missing values 
+						// from the data column names, possibly with user-provided units
+						DashboardConfigStore configStore;
+						try {
+							configStore = DashboardConfigStore.get(false);
+						} catch ( IOException ex ) {
+							throw new IOException(
+									"Unexpected failure to get the dashboard configuration");
+						}
+						configStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
+						cruiseData.setVersion(configStore.getSocatUploadVersion());
+						// Set all WOCE-3 row index sets to empty
+						ArrayList<HashSet<Integer>> woceFlags = cruiseData.getWoceThreeRowIndices();
+						woceFlags.clear();
+						for (int k = 0; k < numDataColumns; k++)
+							woceFlags.add(new HashSet<Integer>());
+						// Set all WOCE-4 row index sets to empty
+						woceFlags = cruiseData.getWoceFourRowIndices();
+						woceFlags.clear();
+						for (int k = 0; k < numDataColumns; k++)
+							woceFlags.add(new HashSet<Integer>());
+					}
+					// Rest of the records must be data
+					checkForUnits = false;
+					if ( isUnits )
+						continue;
 				}
-				// Go to the next line which now must be data
-				dataline = cruiseReader.readLine();
-			}
-		}
 
-		if ( assignCruiseInfo ) {
-			// Assign the data column types, units, and missing values 
-			// from the data column names
-			DashboardConfigStore configStore;
-			try {
-				configStore = DashboardConfigStore.get(false);
-			} catch ( IOException ex ) {
-				throw new IOException(
-						"Unexpected failure to get the dashboard configuration");
-			}
-			configStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
-			cruiseData.setVersion(configStore.getSocatUploadVersion());
-			// Set all WOCE-3 row index sets to empty
-			ArrayList<HashSet<Integer>> woceFlags = 
-									cruiseData.getWoceThreeRowIndices();
-			woceFlags.clear();
-			for (int k = 0; k < numDataColumns; k++)
-				woceFlags.add(new HashSet<Integer>());
-			// Set all WOCE-4 row index sets to empty
-			woceFlags = cruiseData.getWoceFourRowIndices();
-			woceFlags.clear();
-			for (int k = 0; k < numDataColumns; k++)
-				woceFlags.add(new HashSet<Integer>());
-		}
+				// Must be a data record
 
-		// Read the data column values;
-		// just directly add them to the list in cruiseData
-		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
-		dataValues.clear();
-		if ( numDataRows == 0 ) {
-			if ( assignCruiseInfo )
-				cruiseData.setNumDataRows(0);
-			return;
-		}
-		int dataRowNum = 0;
-		while ( dataline != null ) {
-			// Ignore blank lines
-			boolean isEmpty;
-			if ( emptyLinePattern == null ) {
-				isEmpty = dataline.trim().isEmpty();
-			}
-			else {
-				Matcher mat = emptyLinePattern.matcher(dataline);
-				isEmpty = mat.matches();
-			}
-			if ( ! isEmpty ) {
-				if ( dataRowNum >= firstDataRow ) {
-					// Get the values from this data line
-					String[] datavals = dataline.split(separator, -1);
-					if ( datavals.length != numDataColumns )
-						throw new IOException("Inconsistent number of data columns (" + 
-								datavals.length + " instead of " + numDataColumns + 
-								") in \n" + dataline);
-					ArrayList<String> dataList = new ArrayList<String>(datavals.length);
-					for (int k = 0; k < datavals.length; k++)
-						dataList.add(datavals[k].trim());
-					dataValues.add(dataList);
+				if ( numDataRows == 0 ) {
+					// No reading of the data requested - done
+					if ( assignCruiseInfo )
+						cruiseData.setNumDataRows(0);
+					return;
+				}
+
+				dataRowNum++;
+				if ( dataRowNum > firstDataRow ) {
+					ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
+					for ( String val : record )
+						datavals.add(val);
+					dataValues.add(datavals);
 					if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
 						break;
 				}
-				dataRowNum++;
+
 			}
-			// Read the next line
-			dataline = cruiseReader.readLine();
+		} finally {
+			dataParser.close();
 		}
+
+		if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
+			throw new IOException("No data columns found, possibly due to incorrect format");
+
 		if ( assignCruiseInfo )
 			cruiseData.setNumDataRows(dataValues.size());
 
@@ -506,16 +474,42 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			expocode = cruiseData.getDataValues().get(0).get(k).toUpperCase();
 		}
 		if ( ! expocode.isEmpty() ) {
-			if ( assignCruiseInfo ) {
-				if ( ! expocodeFound ) {
-					cruiseData.setExpocode(expocode);
-				}
+			if ( assignCruiseInfo && ! expocodeFound ) {
+				cruiseData.setExpocode(expocode);
 			}
 			else if ( ! expocode.equals(cruiseData.getExpocode()) ){
 				throw new IOException("First expocode given in the expocode data " +
 						"column does not match the expocode given for the dataset");
 			}
 		}
+	}
+
+	/**
+	 * Returns a version of the string that was parsed to create the given record 
+	 * but using the given spacer between the entries in the record.
+	 * 
+	 * @param record
+	 * 		record to use
+	 * @param spacer
+	 * 		spacer to use
+	 * @return
+	 * 		recreated string for this record
+	 */
+	private String rebuildDataline(CSVRecord record, String spacer) {
+		StringBuilder builder = new StringBuilder();
+		boolean first = true;
+		for ( String val : record ) {
+			if ( ! val.isEmpty() ) {
+				if ( first ) {
+					first = false;
+				}
+				else {
+					builder.append(spacer);							
+				}
+				builder.append(val);
+			}
+		}
+		return builder.toString();
 	}
 
 	/**
