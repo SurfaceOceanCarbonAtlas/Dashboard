@@ -69,7 +69,7 @@ public class MetadataUploadService extends HttpServlet {
 		// Get the contents from the post request
 		String username = null;
 		try {
-			username = request.getUserPrincipal().getName().trim();
+			username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
 		} catch (Exception ex) {
 			; // leave username null for error message later
 		}

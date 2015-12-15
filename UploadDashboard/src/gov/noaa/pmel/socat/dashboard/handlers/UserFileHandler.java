@@ -6,6 +6,7 @@ package gov.noaa.pmel.socat.dashboard.handlers;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
 import java.io.BufferedReader;
@@ -150,10 +151,11 @@ public class UserFileHandler extends VersionedFileHandler {
 	public DashboardCruiseList getCruiseListing(String username) 
 										throws IllegalArgumentException {
 		// Get the name of the cruise list file for this user
-		if ( (username == null) || username.trim().isEmpty() )
+		String cleanUsername = DashboardUtils.cleanUsername(username);
+		if ( cleanUsername.isEmpty() )
 			throw new IllegalArgumentException("invalid username");
 		File userDataFile = new File(filesDir, 
-				username + USER_CRUISE_LIST_NAME_EXTENSION);
+				cleanUsername + USER_CRUISE_LIST_NAME_EXTENSION);
 		boolean needsCommit = false;
 		String commitMessage = "";
 		// Read the cruise expocodes from the cruise list file
@@ -173,7 +175,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		} catch ( FileNotFoundException ex ) {
 			// Return a valid cruise listing with no cruises
 			needsCommit = true;
-			commitMessage = "add new cruise listing for " + username + "; ";
+			commitMessage = "add new cruise listing for " + cleanUsername + "; ";
 		} catch ( Exception ex ) {
 			// Problems with the listing in the existing file
 			throw new IllegalArgumentException(
@@ -190,7 +192,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		// Create the cruise list (map) for these cruises
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
-		cruiseList.setUsername(username);
+		cruiseList.setUsername(cleanUsername);
 		cruiseList.setSocatVersion(configStore.getSocatUploadVersion());
 		for ( String expocode : expocodeSet ) {
 			// Create the DashboardCruise from the info file
@@ -202,7 +204,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			}
 			else {
 				String owner = cruise.getOwner();
-				if ( ! configStore.userManagesOver(username, owner) ) {
+				if ( ! configStore.userManagesOver(cleanUsername, owner) ) {
 					// No longer authorized to view - remove this expocode from the saved list
 					needsCommit = true;
 					commitMessage += "remove unauthorized dataset " + expocode + "; ";
@@ -215,7 +217,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		if ( needsCommit )
 			saveCruiseListing(cruiseList, commitMessage);
 		// Determine whether or not this user is a manager/admin 
-		cruiseList.setManager(configStore.isManager(username));
+		cruiseList.setManager(configStore.isManager(cleanUsername));
 		// Return the listing of cruises
 		return cruiseList;
 	}
@@ -287,10 +289,13 @@ public class UserFileHandler extends VersionedFileHandler {
 	public DashboardCruiseList removeCruisesFromListing(
 							TreeSet<String> expocodeSet, String username) 
 										throws IllegalArgumentException {
-		DashboardCruiseList cruiseList = getCruiseListing(username);
+		String cleanUsername = DashboardUtils.cleanUsername(username);
+		if ( cleanUsername.isEmpty() )
+			throw new IllegalArgumentException("invalid username");
+		DashboardCruiseList cruiseList = getCruiseListing(cleanUsername);
 		boolean changeMade = false;
 		String commitMessage = 
-				"cruises removed from the listing for " + username + ": ";
+				"cruises removed from the listing for " + cleanUsername + ": ";
 		for ( String expocode : expocodeSet ) {
 			if ( cruiseList.containsKey(expocode) ) {
 				cruiseList.remove(expocode);
@@ -326,6 +331,9 @@ public class UserFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardCruiseList addCruisesToListing(String wildExpocode, 
 						String username) throws IllegalArgumentException {
+		String cleanUsername = DashboardUtils.cleanUsername(username);
+		if ( cleanUsername.isEmpty() )
+			throw new IllegalArgumentException("invalid username");
 		DashboardConfigStore configStore;
 		try {
 			configStore = DashboardConfigStore.get(false);
@@ -338,7 +346,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		if ( matchExpocodes.size() == 0 ) 
 			throw new IllegalArgumentException(
 					"No datasets with an expocode matching " + wildExpocode);
-		DashboardCruiseList cruiseList = getCruiseListing(username);
+		DashboardCruiseList cruiseList = getCruiseListing(cleanUsername);
 		String commitMsg = "Added cruise(s) ";
 		boolean needsCommit = false;
 		boolean viewableFound = false;
@@ -348,7 +356,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			if ( cruise == null ) 
 				throw new IllegalArgumentException("Unexpected error: dataset " +
 						expocode + " does not exist");
-			if ( configStore.userManagesOver(username, cruise.getOwner()) ) {
+			if ( configStore.userManagesOver(cleanUsername, cruise.getOwner()) ) {
 				// Add or replace this cruise entry in the cruise list
 				// Only the expocodes (keys) are saved in the cruise list
 				viewableFound = true;
@@ -361,9 +369,9 @@ public class UserFileHandler extends VersionedFileHandler {
 		if ( ! viewableFound )
 			throw new IllegalArgumentException(
 					"No datasets with an expocode matching " + wildExpocode + 
-					" that can be viewed by " + username);
+					" that can be viewed by " + cleanUsername);
 		if ( needsCommit )
-			saveCruiseListing(cruiseList, commitMsg + " to the listing for " + username);
+			saveCruiseListing(cruiseList, commitMsg + " to the listing for " + cleanUsername);
 		return cruiseList;
 	}
 
@@ -387,6 +395,9 @@ public class UserFileHandler extends VersionedFileHandler {
 	 */
 	public DashboardCruiseList addCruisesToListing(ArrayList<String> expocodeList, 
 							String username) throws IllegalArgumentException {
+		String cleanUsername = DashboardUtils.cleanUsername(username);
+		if ( cleanUsername.isEmpty() )
+			throw new IllegalArgumentException("invalid username");
 		CruiseFileHandler cruiseHandler;
 		try {
 			cruiseHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
@@ -394,7 +405,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Unexpected failure to get the cruise file handler");
 		}
-		DashboardCruiseList cruiseList = getCruiseListing(username);
+		DashboardCruiseList cruiseList = getCruiseListing(cleanUsername);
 		String commitMsg = "Added cruises ";
 		// Create a cruise entry for this data
 		for ( String expocode : expocodeList) {
@@ -407,7 +418,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			cruiseList.put(expocode, cruise);
 			commitMsg += expocode + ", ";
 		}
-		commitMsg += " to the listing for " + username;
+		commitMsg += " to the listing for " + cleanUsername;
 		saveCruiseListing(cruiseList, commitMsg);
 		return cruiseList;
 	}

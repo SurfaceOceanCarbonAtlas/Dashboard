@@ -50,7 +50,7 @@ public class DashboardServices extends RemoteServiceServlet
 		HttpServletRequest request = getThreadLocalRequest();
 		username = null;
 		try {
-			username = request.getUserPrincipal().getName().trim();
+			username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
 		} catch (Exception ex) {
 			// Probably null pointer exception - leave username null
 		}
@@ -87,7 +87,7 @@ public class DashboardServices extends RemoteServiceServlet
 		username = null;
 		HttpServletRequest request = getThreadLocalRequest();
 		try {
-			username = request.getUserPrincipal().getName().trim();
+			username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
 		} catch (Exception ex) {
 			// Probably null pointer exception
 			return false;

@@ -90,7 +90,7 @@ public class CruiseUploadService extends HttpServlet {
 
 		String username = null;
 		try {
-			username = request.getUserPrincipal().getName().trim();
+			username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
 		} catch (Exception ex) {
 			; // leave username null for error message later
 		}

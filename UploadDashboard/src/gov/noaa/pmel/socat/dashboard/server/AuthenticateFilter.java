@@ -1,5 +1,7 @@
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -46,7 +48,7 @@ public class AuthenticateFilter implements Filter {
 		// Check for the username used by the dashboard service methods
 		String username;
 		try {
-			username = request.getUserPrincipal().getName().trim();
+			username = DashboardUtils.cleanUsername(request.getUserPrincipal().getName().trim());
 		} catch ( Exception ex ) {
 			// No user principal or name in old session - unexpected
 			username = "";

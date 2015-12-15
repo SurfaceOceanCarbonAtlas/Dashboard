@@ -267,6 +267,7 @@ public class DashboardUtils {
 	 * "Cleans" a username for use by substituting characters that are  
 	 * problematic (such as space characters).  
 	 * Also converts all alphabetic characters to lowercase.
+	 * An empty string is returned if username is null.
 	 * 
 	 * @param username
 	 * 		username to clean

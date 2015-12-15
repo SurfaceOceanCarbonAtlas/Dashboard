@@ -3,6 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+
 import java.util.HashSet;
 
 /**
@@ -33,11 +35,10 @@ public class DashboardUserInfo {
 	 * @throws IllegalArgumentException
 	 * 		if username is invalid (null or too short)
 	 */
-	public DashboardUserInfo(String username) 
-			throws IllegalArgumentException {
+	public DashboardUserInfo(String username) throws IllegalArgumentException {
 		if ( (username == null) || (username.trim().length() < 4) )
 			throw new IllegalArgumentException("User name too short");
-		this.username = username;
+		this.username = DashboardUtils.cleanUsername(username);
 		memberNums = new HashSet<Integer>();
 		managerNums = new HashSet<Integer>();
 		admin = false;
