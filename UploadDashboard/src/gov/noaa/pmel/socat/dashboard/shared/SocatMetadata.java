@@ -4,7 +4,6 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -16,7 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5448684230023976233L;
+	private static final long serialVersionUID = -1654437463486825106L;
 
 	/**
 	 * Date used as a missing value; 
@@ -455,177 +454,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    socatVersion=" + socatVersion + 
 				",\n    qcFlag=" + qcFlag + 
 				" ]";
-	}
-
-	// Use the Unicode code points to define these characters
-	// so we know exactly what value is being used in the String
-	public static final String aAcute = "\u00E1";
-	public static final String aRing = "\u00E5";
-	public static final String eGrave = "\u00E8";
-	public static final String eAcute = "\u00E9";
-	public static final String iAcute = "\u00ED";
-	public static final String oUmlaut = "\u00F6";
-	public static final String yAcute = "\u00FD";
-
-	/**
-	 * Standardized known alternate or misspelled PI names.  Note that 
-	 * some of these "standard" names are intentionally misspelled and 
-	 * {@link #PI_NAME_CORRECTIONS} should be used for the proper spelling.  
-	 * Also note that these are single PI names only; each name in a 
-	 * multiple-name science group needs to be checked individually.
-	 */
-	public static final HashMap<String,String> PI_RENAME_MAP;
-	static {
-		PI_RENAME_MAP = new HashMap<String,String>();
-		PI_RENAME_MAP.put("", "unknown");
-		PI_RENAME_MAP.put("Abdirahman Omar", "Omar, A.");
-		PI_RENAME_MAP.put("Adrienne J. Sutton", "Sutton, A.");
-		PI_RENAME_MAP.put("Adrienne Sutton", "Sutton, A.");
-		PI_RENAME_MAP.put("Agneta Fransson", "Fransson, A.");
-		PI_RENAME_MAP.put("Aida F. Rios", "Rios A.F.");
-		PI_RENAME_MAP.put("Akihiko Murata", "Murata, A.");
-		PI_RENAME_MAP.put("Akira Nakadate", "Nakadate, A.");
-		PI_RENAME_MAP.put("Alan Poisson", "Poisson, A.");
-		PI_RENAME_MAP.put("Alberto Borges", "Borges, A.");
-		PI_RENAME_MAP.put("Andrew Watson", "Watson, A.");
-		PI_RENAME_MAP.put("Are Olsen", "Olsen, A.");
-		PI_RENAME_MAP.put("Arne Koertzinger", "Koertzinger, A.");
-		PI_RENAME_MAP.put("Arne K" + oUmlaut + "tzinger", "Koertzinger, A.");
-		PI_RENAME_MAP.put("B" + eAcute + "govic, M.", "Begovic, M.");
-		PI_RENAME_MAP.put("B" + yAcute + "govic, M.", "Begovic, M.");
-		PI_RENAME_MAP.put("Bernd Schneider", "Schneider, B.");
-		PI_RENAME_MAP.put("Bronte Tilbrook", "Tilbrook, B.");
-		PI_RENAME_MAP.put("Catherine Goyet", "Goyet, C.");
-		PI_RENAME_MAP.put("Cathy Cosca", "Cosca, C.");
-		PI_RENAME_MAP.put("Christopher Sabine", "Sabine, C.");
-		PI_RENAME_MAP.put("Christopher W. Hunt", "Hunt C.W.");
-		PI_RENAME_MAP.put("Claire Copin-Montegut", "Copin-Montegut, C.");
-		PI_RENAME_MAP.put("Copin-Mont" + eAcute + "gut, C.", "Copin-Montegut, C.");
-		PI_RENAME_MAP.put("Copin-Mont" + yAcute + "gut, C.", "Copin-Montegut, C.");
-		PI_RENAME_MAP.put("C. S. Wong", "Wong, C.S.");
-		PI_RENAME_MAP.put("D. Vandemark", "Vandemark, D.");
-		PI_RENAME_MAP.put("David Hydes", "Hydes. D.");
-		PI_RENAME_MAP.put("de Baar, H.J.W", "de Baar, H.J.W.");
-		PI_RENAME_MAP.put("Dorothee Bakker", "Bakker, D.");
-		PI_RENAME_MAP.put("Douglas Wallace", "Wallace, D.");
-		PI_RENAME_MAP.put("Doug Vandemark", "Vandemark, D.");
-		PI_RENAME_MAP.put("Fiz F. Perez", "Perez, F.F.");
-		PI_RENAME_MAP.put("Goyet, C", "Goyet, C.");
-		PI_RENAME_MAP.put("Helmuth Thomas", "Thomas, H.");
-		PI_RENAME_MAP.put("Hein de Baar", "de Baar, H.J.W.");
-		PI_RENAME_MAP.put("Hisayuki Inoue", "Inoue, H.");
-		PI_RENAME_MAP.put("Ingunn Skjelvan", "Skjelvan, I.");
-		PI_RENAME_MAP.put("J. Magdalena Santana-Casiano", "Santana-Casiano, J.M.");
-		PI_RENAME_MAP.put("Jane Robertson", "Robertson, J.");
-		PI_RENAME_MAP.put("Jaqueline Boutin", "Boutin, J.");
-		PI_RENAME_MAP.put("Jeremy Matthis", "Mathis, J.");
-		PI_RENAME_MAP.put("Joe Salisbury", "Salisbury, J.");
-		PI_RENAME_MAP.put("Kim Currie", "Currie, K.I.");
-		PI_RENAME_MAP.put("K" + oUmlaut + "tzinger, A.", "Koertzinger, A.");
-		PI_RENAME_MAP.put("Liliane Merlivat", "Merlivat, L.");
-		PI_RENAME_MAP.put("Ludger Mintrop", "Mintrop, L.");
-		PI_RENAME_MAP.put("Mario Hoppema", "Hoppema, M.");
-		PI_RENAME_MAP.put("Melchor Gonzalez-Davila", "Gonzalez-Davila, M.");
-		PI_RENAME_MAP.put("Melissa Chierici"," Chierici, M.");
-		PI_RENAME_MAP.put("Michel Frankignoulle", "Frankignoulle, M.");
-		PI_RENAME_MAP.put("Michel Stoll", "Stoll, M.");
-		PI_RENAME_MAP.put("Milena Begovic", "Begovic, M.");
-		PI_RENAME_MAP.put("Naoami Greenwood", "Greenwood, N.");
-		PI_RENAME_MAP.put("Nathalie Lefevre", "Lefevre, N.");
-		PI_RENAME_MAP.put("Nick Hardman-Mountford", "Hardman-Mountford, N.J.");
-		PI_RENAME_MAP.put("Nicolas Metzl", "Metzl, N.");
-		PI_RENAME_MAP.put("OMEX Project Members", "OMEX Project Members");
-		PI_RENAME_MAP.put("Pedro Monteiro", "Monteiro, P.");
-		PI_RENAME_MAP.put("Ray Weiss", "Weiss, R.");
-		PI_RENAME_MAP.put("Richard Bellerby", "Bellerby, R.");
-		PI_RENAME_MAP.put("Richard Feely", "Feely, R.");
-		PI_RENAME_MAP.put("Rik Wanninkhof", "Wanninkhof, R.");
-		PI_RENAME_MAP.put("Robert Key", "Key, R.");
-		PI_RENAME_MAP.put("S. Saito", "Saito, S.");
-		PI_RENAME_MAP.put("Sara Jutterstrom", "Jutterstrom, S.");
-		PI_RENAME_MAP.put("Taro Takahashi", "Takahashi, T.");
-		PI_RENAME_MAP.put("Tobias Steinhoff", "Steinhoff, T.");
-		PI_RENAME_MAP.put("Tr" + eAcute + "guer, P.", "Treguer, P.");
-		PI_RENAME_MAP.put("Tr" + yAcute + "guer, P.", "Treguer, P.");
-		PI_RENAME_MAP.put("Truls Johannessen", "Johannessen, T.");
-		PI_RENAME_MAP.put("Tsuneo Ono", "Ono, T.");
-		PI_RENAME_MAP.put("Tsurushima Nobuo", "Nobuo, T.");
-		PI_RENAME_MAP.put("Ute Schuster", "Schuster, U.");
-		PI_RENAME_MAP.put("Vassilis Kitidis", "Kitidis, V.");
-		PI_RENAME_MAP.put("Wannikhof, R.", "Wanninkhof, R.");
-		PI_RENAME_MAP.put("Wei-Jun Cai", "Cai, W.-J.");
-		PI_RENAME_MAP.put("W.-J. Cai", "Cai, W.-J.");
-		PI_RENAME_MAP.put("Yukihiro Nojiri", "Nojiri, Y.");
-		PI_RENAME_MAP.put("Yves Dandonneau", "Dandonneau, Y.");
-	}
-
-	/**
-	 * Correctly spelled "standard" PI names that are intentionally misspelled.
-	 * Note that these are single PI names only; each name in a multiple-name 
-	 * science group needs to be checked individually.
-	 */
-	public static final HashMap<String,String> PI_NAME_CORRECTIONS;
-	static {
-		PI_NAME_CORRECTIONS = new HashMap<String,String>();
-		PI_NAME_CORRECTIONS.put("Begovic, M.", "B" + eAcute + "govic, M.");
-		PI_NAME_CORRECTIONS.put("Copin-Montegut, C.", "Copin-Mont" + eAcute + "gut, C.");
-		PI_NAME_CORRECTIONS.put("Gonzalez-Davila, M.", "Gonz" + aAcute + "lez-D" +  aAcute + "vila, M.");
-		PI_NAME_CORRECTIONS.put("Jutterstrom, S.", "Jutterstr" + oUmlaut + "m, S.");
-		PI_NAME_CORRECTIONS.put("Koertzinger, A.", "K" + oUmlaut + "rtzinger, A.");
-		PI_NAME_CORRECTIONS.put("Lefevre, N.", "Lef" + eGrave + "vre, N.");
-		PI_NAME_CORRECTIONS.put("Perez, F.F.", "P" + eAcute + "rez, F.F.");
-		PI_NAME_CORRECTIONS.put("Rios, A.F.", "R" + iAcute + "os, A.F.");
-		PI_NAME_CORRECTIONS.put("Treguer, P.", "Tr" + eAcute + "guer, P.");
-	}
-
-	/**
-	 * Standardized known alternate or misspelled vessel names.
-	 * Note that some of these "standard" name are intentionally 
-	 * misspelled and {@link #VESSEL_NAME_CORRECTIONS} should be
-	 * used for the proper spelling.
-	 */
-	public static final HashMap<String,String> VESSEL_RENAME_MAP;
-	static {
-		VESSEL_RENAME_MAP = new HashMap<String,String>();
-		VESSEL_RENAME_MAP.put("Almirante irizar", "Almirante Irizar");
-		VESSEL_RENAME_MAP.put("Atlantic  Companion", "Atlantic Companion");
-		VESSEL_RENAME_MAP.put("A. V. Humboldt", "A.V. Humboldt");
-		VESSEL_RENAME_MAP.put("CAPE HATTERAS", "Cape Hatteras");
-		VESSEL_RENAME_MAP.put("CEFAS ENDEAVOUR", "Cefas Endeavour");
-		VESSEL_RENAME_MAP.put("Drifting Buoy", "Drifting buoy");
-		VESSEL_RENAME_MAP.put("Drifting Bouy", "Drifting buoy");
-		VESSEL_RENAME_MAP.put("Drifting buoy", "Drifting buoy");
-		VESSEL_RENAME_MAP.put("G. O. Sars", "G.O. Sars");
-		VESSEL_RENAME_MAP.put("GULF CHALLENGER", "Gulf Challenger");
-		VESSEL_RENAME_MAP.put("HENRY B. BIGELOW", "Henry B. Bigelow");
-		VESSEL_RENAME_MAP.put("Ka'imimoana", "Ka imimoana");
-		VESSEL_RENAME_MAP.put("L'Astrolabe", "L Astrolabe");
-		VESSEL_RENAME_MAP.put("L'Atalante", "L Atalante");
-		VESSEL_RENAME_MAP.put("L'Atlante", "L Atalante");
-		VESSEL_RENAME_MAP.put("L. M. Gould", "Laurence M. Gould");
-		VESSEL_RENAME_MAP.put("L.M. Gould", "Laurence M. Gould");
-		VESSEL_RENAME_MAP.put("PMEL/Natalie Schulte", "Natalie Schulte");
-		VESSEL_RENAME_MAP.put("Ronald Brown", "Ronald H. Brown");
-		VESSEL_RENAME_MAP.put("R/V AEGAEO", "R/V Aegaeo");
-		VESSEL_RENAME_MAP.put("S. A. Agulhas", "S.A. Agulhas");
-		VESSEL_RENAME_MAP.put("Station M", "Mooring");
-		VESSEL_RENAME_MAP.put("Tethys 2", "Tethys II");
-		VESSEL_RENAME_MAP.put("Tethyss II", "Tethys II");
-		VESSEL_RENAME_MAP.put("Trans Future-5", "Trans Future 5");
-		VESSEL_RENAME_MAP.put("Unknown", "unknown");
-	}
-
-	/**
-	 * Correctly spelled "standard" vessel names that are intentionally misspelled. 
-	 */
-	public static final HashMap<String,String> VESSEL_NAME_CORRECTIONS = 
-			new HashMap<String,String>();
-	static {
-		VESSEL_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
-		VESSEL_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
-		VESSEL_NAME_CORRECTIONS.put("Ka imimoana", "Ka'imimoana");
-		VESSEL_NAME_CORRECTIONS.put("L Astrolabe", "L'Astrolabe");
-		VESSEL_NAME_CORRECTIONS.put("L Atalante", "L'Atalante");
 	}
 
 }

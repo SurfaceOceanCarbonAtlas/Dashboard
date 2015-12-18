@@ -10,7 +10,6 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -104,13 +103,9 @@ public class FixOmeMetadata {
 						if ( invNameElem == null )
 							throw new IllegalArgumentException("Investigator element without a Name");
 						String name = invNameElem.getTextTrim();
-						String stdName = SocatMetadata.PI_RENAME_MAP.get(name);
-						if ( stdName == null )
-							stdName = name;
-						String correctName = SocatMetadata.PI_NAME_CORRECTIONS.get(stdName);
-						if ( correctName == null )
-							correctName = stdName;
-						if ( ! correctName.equals(name) ) {
+						String angName = DashboardOmeMetadata.anglicizeName(name);
+						String correctName = DashboardOmeMetadata.correctInvestigatorName(angName);
+						if ( (correctName != null) && ! correctName.equals(name) ) {
 							invNameElem.setText(correctName);
 							changed = true;
 						}
@@ -123,13 +118,9 @@ public class FixOmeMetadata {
 						throw new IllegalArgumentException("No vessel name element");
 					}
 					String name = vesselNameElem.getTextTrim();
-					String stdName = SocatMetadata.VESSEL_RENAME_MAP.get(name);
-					if ( stdName == null )
-						stdName = name;
-					String correctName = SocatMetadata.VESSEL_NAME_CORRECTIONS.get(stdName);
-					if ( correctName == null )
-						correctName = stdName;
-					if ( ! correctName.equals(name) ) {
+					String angName = DashboardOmeMetadata.anglicizeName(name);
+					String correctName = DashboardOmeMetadata.correctVesselName(angName);
+					if ( (correctName != null) && ! correctName.equals(name) ) {
 						vesselNameElem.setText(correctName);
 						changed = true;
 					}
