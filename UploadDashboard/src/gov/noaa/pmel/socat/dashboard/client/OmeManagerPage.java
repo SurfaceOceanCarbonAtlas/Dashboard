@@ -49,7 +49,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 			"<li>Fill in the appropriate metadata</li>" +
 			"<li>Save a local copy (preferrably with validation)</li>" +
 			"</ul>" +
-			"This will creates a SOCAT OME XML metadata file on your system that can be uploaded here. " +
+			"This will create a SOCAT OME XML metadata file on your system that can be uploaded here. " +
 			"</p><p>" +
 			"Dataset: <ul><li>";
 	private static final String CRUISE_HTML_INTRO_EPILOGUE = "</li></ul></p>";
