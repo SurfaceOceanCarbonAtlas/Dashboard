@@ -21,5 +21,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/netcdfAll-4.6.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/slf4j-log4j12-1.7.12.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/commons-csv-1.2.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/fop-2.1.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/xmlgraphics-commons-2.1.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

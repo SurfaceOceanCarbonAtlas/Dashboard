@@ -349,6 +349,8 @@ public class CruiseChecker {
 	 * 		for each SanityChecker component
 	 * @param checkerMsgHandler
 	 * 		handler for SanityChecker messages
+	 * @param metaFileHandler
+	 * 		handler for dashboard OME metadata files
 	 * @throws IOException
 	 * 		If the SanityChecker has problems with a configuration file
 	 */
