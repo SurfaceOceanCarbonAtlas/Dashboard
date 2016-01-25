@@ -27,9 +27,6 @@ import org.apache.fop.apps.MimeConstants;
  */
 public class OmeXmlPdfGenerator {
 
-	private static final String FOP_RESOURCES_SUBDIR_NAME = "fopresources";
-	private static final String OME_XSL_FILENAME = "ome_xml.xsl";
-	
 	private MetadataFileHandler metadataHandler;
 	private File fopResourcesDir;
 	private File xsltFile;
@@ -38,28 +35,34 @@ public class OmeXmlPdfGenerator {
 
 	/**
 	 * Converts OME XML documents provided by the given metadata file handler 
-	 * to a human-friendly PDF format.  Uses the XSL file {@value #OME_XSL_FILENAME} 
-	 * and other any other needed resources under {@value #FOP_RESOURCES_SUBDIR_NAME}.
+	 * to a human-friendly PDF format.  Uses the "omexml.xsl" stylesheet
+	 * file, along with any other required resource files, in the given
+	 * resources directory to format the OME XML.
 	 * 
+	 * @param resourcesDir
+	 * 		directory containing the omexml.xsl stylesheet file as well as
+	 * 		and other required Fop resource files
 	 * @param metaFileHandler
 	 * 		handler for dashboard OME metadata files
-	 * 
+	 * @throws IllegalArgumentException
+	 * 		if resourcesDir does not exist or is not a directory, or
+	 * 		if the omexml.csl file under resourcesDir does not exist, or
+	 * 		if metaFileHandler is null
 	 * @throws IOException
-	 * 		if the fopresources subdirectory does not exist, or
-	 * 		if FopFactory.newInstance fails, or
+=	 * 		if FopFactory.newInstance fails, or
 	 * 		if the TranformerFactor.newIntance fails
 	 */
-	public OmeXmlPdfGenerator(MetadataFileHandler metaFileHandler) throws IOException {
+	public OmeXmlPdfGenerator(File resourcesDir, MetadataFileHandler metaFileHandler) 
+			throws IllegalArgumentException, IOException {
 		if ( metaFileHandler == null )
-			throw new NullPointerException(
-					"MetadataFileHandler passed to OmeXmlPdfGenerator is null");
+			throw new IllegalArgumentException("MetadataFileHandler passed to OmeXmlPdfGenerator is null");
 		metadataHandler = metaFileHandler;
-		fopResourcesDir = new File(FOP_RESOURCES_SUBDIR_NAME);
-		if ( ! fopResourcesDir.isDirectory() )
-			throw new IOException("Does not exist or is not a directory: " + fopResourcesDir.getPath());
-		xsltFile = new File(fopResourcesDir, OME_XSL_FILENAME);
-		if ( ! xsltFile.exists() )
-			throw new IOException("Does not exist: " + xsltFile.getPath());
+		if ( ! resourcesDir.isDirectory() )
+			throw new IOException("Does not exist or is not a directory: " + resourcesDir.getPath());
+		fopResourcesDir = resourcesDir;
+		xsltFile = new File(fopResourcesDir, "omexml.xsl");
+		if ( ! xsltFile.canRead() )
+			throw new IllegalArgumentException("Cannot read XSL file: " + xsltFile.getPath());
 		try {
 			fopFactory = FopFactory.newInstance(fopResourcesDir.toURI());
 		} catch (Throwable ex) {
@@ -88,7 +91,12 @@ public class OmeXmlPdfGenerator {
 		if ( ! xmlFile.exists() )
 			throw new IllegalArgumentException("PI-provided OME XMl file does not exist for " + expocode);
 		File pdfFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.PI_OME_PDF_FILENAME);
-		BufferedOutputStream pdfOut = new BufferedOutputStream(new FileOutputStream(pdfFile));
+		BufferedOutputStream pdfOut;
+		try {
+			pdfOut = new BufferedOutputStream(new FileOutputStream(pdfFile));
+		} catch (Exception ex) {
+			throw new IOException("Cannot create a new PDF for the PI-provided OME: " + ex.getMessage());
+		}
 		try {
 			Fop fop;
 			try {
