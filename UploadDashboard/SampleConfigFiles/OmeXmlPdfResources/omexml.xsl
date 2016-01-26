@@ -414,11 +414,15 @@
 					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer_of_Calibration_Gas" />
 					<br />
 					<b> Comparison to Other CO<sub>2</sub> Analyses: </b>
-					<!--  don't know the value for this field; not saved by the OME -->
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Comparison" />
+					<!--
+						Currently comments get mapped to Enviromental_Control and the value for 
+						this field is not saved by the OME.  I am assuming that this field should
+						be Environmental_Control and comments should go under Other_Comments.
+					-->
+					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control" />
 					<br />
 					<b> Comments: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control" />
+					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Other_Comments" />
 					<br />
 					<b> Method Reference: </b>
 					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Method_References" />

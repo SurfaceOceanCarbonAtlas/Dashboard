@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.socat.dashboard.actions.CruiseSubmitter;
+import gov.noaa.pmel.socat.dashboard.actions.OmeXmlPdfGenerator;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
@@ -79,6 +80,7 @@ public class DashboardConfigStore {
 	private static final String SOCAT_SMTP_USERNAME_TAG = "SocatSMTPUsername";
 	private static final String SOCAT_SMTP_PASSWORD_TAG = "SocatSMTPPassword";
 	private static final String SOCAT_SMTP_DEBUG_TAG = "SocatSMTPDebug";
+	private static final String OME_XML_PDF_RESOURCES_DIR_NAME_TAG = "OmeXmlPdfResourcesDir";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -113,6 +115,7 @@ public class DashboardConfigStore {
 			BaseConfig.SANITY_CHECK_CONFIG_FILE + "/Path/To/SanityConfig/CSVFile \n" + 
 			BaseConfig.COLUMN_SPEC_SCHEMA_FILE + "=/Path/To/ColumnSpecSchema/XMLFile \n" + 
 			BaseConfig.COLUMN_CONVERSION_FILE + "=/Path/To/ColumnConversion/PropsFile \n" + 
+			OME_XML_PDF_RESOURCES_DIR_NAME_TAG + "=/Path/To/OmeXmlPdfResourcesDir \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeUserName=MemberOf1,MemberOf2 \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeManagerName=ManagerOf1,MemberOf2 \n" +
 			USER_ROLE_NAME_TAG_PREFIX + "SomeAdminName=Admin \n" +
@@ -142,6 +145,7 @@ public class DashboardConfigStore {
 	private PreviewPlotsHandler plotsHandler;
 	private CruiseSubmitter cruiseSubmitter;
 	private CruiseFlagsHandler cruiseFlagsHandler;
+	private OmeXmlPdfGenerator omePdfGenerator;
 	private HashSet<File> filesToWatch;
 	private Thread watcherThread;
 	private WatchService watcher;
@@ -539,6 +543,19 @@ public class DashboardConfigStore {
 		plotsHandler = new PreviewPlotsHandler(previewDirname + "dsgfiles", 
 				previewDirname + "plots", this);
 
+		// Create the OME XML to PDF generator
+		try {
+			propVal = configProps.getProperty(OME_XML_PDF_RESOURCES_DIR_NAME_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			omePdfGenerator = new OmeXmlPdfGenerator(new File(propVal), metadataFileHandler);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + OME_XML_PDF_RESOURCES_DIR_NAME_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
 		// The CruiseSubmitter uses the various handlers just created
 		cruiseSubmitter = new CruiseSubmitter(this);
 
@@ -845,6 +862,14 @@ public class DashboardConfigStore {
 	 */
 	public SocatFilesBundler getCdiacFilesBundler() {
 		return cdiacFilesBundler;
+	}
+
+	/**
+	 * @return
+	 * 		the OME XML to PDF generator
+	 */
+	public OmeXmlPdfGenerator getOmePdfGenerator() {
+		return omePdfGenerator;
 	}
 
 	/**
