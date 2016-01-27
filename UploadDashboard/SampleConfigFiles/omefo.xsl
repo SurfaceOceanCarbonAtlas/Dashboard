@@ -432,8 +432,21 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Normalized to Sea Level: </fo:inline> 
-								<!-- misleading parent tag for this answer -->
-								<xsl:value-of select="Method_Description/Equilibrator_Pressure/Normalized" />
+								<xsl:variable name="patmnormalized">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Normalized" />
+								</xsl:variable>
+								<xsl:variable name="tequnormalized">
+									<!-- misleading parent tag for this answer -->
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Normalized" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$patmnormalized != ''">
+										<xsl:value-of select="$patmnormalized" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$tequnormalized" />
+									</xsl:otherwise>
+								</xsl:choose>
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Manufacturer: </fo:inline> 
