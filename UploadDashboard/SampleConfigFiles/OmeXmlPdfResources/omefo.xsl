@@ -24,18 +24,6 @@
 			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="westlon">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Westernmost_Longitude" />
-		</xsl:variable>
-		<xsl:variable name="eastlon">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Easternmost_Longitude" />
-		</xsl:variable>
-		<xsl:variable name="northlat">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Northernmost_Latitude" />
-		</xsl:variable>
-		<xsl:variable name="southlat">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Southernmost_Latitude" />
-		</xsl:variable>
 
 		<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
 
@@ -230,6 +218,9 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Westernmost Longitude: </fo:inline> 
+								<xsl:variable name="westlon">
+									<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Westernmost_Longitude" />
+								</xsl:variable>
 								<xsl:choose>
 									<xsl:when test="$westlon &lt; 0.0">
 										<xsl:value-of select="0.0 - $westlon" /> W
@@ -241,6 +232,9 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Easternmost Longitude: </fo:inline> 
+								<xsl:variable name="eastlon">
+									<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Easternmost_Longitude" />
+								</xsl:variable>
 								<xsl:choose>
 									<xsl:when test="$eastlon &lt; 0.0">
 										<xsl:value-of select="0.0 - $eastlon" /> W
@@ -252,6 +246,9 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Northernmost Latitude: </fo:inline> 
+								<xsl:variable name="northlat">
+									<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Northernmost_Latitude" />
+								</xsl:variable>
 								<xsl:choose>
 									<xsl:when test="$northlat &lt; 0.0">
 										<xsl:value-of select="0.0 - $northlat" /> S
@@ -263,6 +260,9 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Southernmost Latitude: </fo:inline> 
+								<xsl:variable name="southlat">
+									<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Southernmost_Latitude" />
+								</xsl:variable>
 								<xsl:choose>
 									<xsl:when test="$southlat &lt; 0.0">
 										<xsl:value-of select="0.0 - $southlat" /> S
@@ -326,11 +326,49 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Accuracy: </fo:inline> 
-								<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy" />
+								<xsl:variable name="sstaccuracy0">
+									<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy" />
+								</xsl:variable>
+								<xsl:variable name="sstaccuracy1">
+									<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy_degC" />
+								</xsl:variable>
+								<xsl:variable name="sstaccuracy2">
+									<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy_degC_degC" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$sstaccuracy0 != ''">
+										<xsl:value-of select="$sstaccuracy0" />
+									</xsl:when>
+									<xsl:when test="$sstaccuracy1 != ''">
+										<xsl:value-of select="$sstaccuracy1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$sstaccuracy2" />
+									</xsl:otherwise>
+								</xsl:choose>
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Precision: </fo:inline> 
-								<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision" />
+								<xsl:variable name="sstprecision0">
+									<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision" />
+								</xsl:variable>
+								<xsl:variable name="sstprecision1">
+									<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision_degC" />
+								</xsl:variable>
+								<xsl:variable name="sstprecision2">
+									<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision_degC_degC" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$sstprecision0 != ''">
+										<xsl:value-of select="$sstprecision0" />
+									</xsl:when>
+									<xsl:when test="$sstprecision1 != ''">
+										<xsl:value-of select="$sstprecision1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$sstprecision2" />
+									</xsl:otherwise>
+								</xsl:choose>
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
@@ -407,11 +445,49 @@
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Accuracy: </fo:inline> 
-								<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy" />
+								<xsl:variable name="ppppaccuracy0">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy" />
+								</xsl:variable>
+								<xsl:variable name="ppppaccuracy1">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy_hPa" />
+								</xsl:variable>
+								<xsl:variable name="ppppaccuracy2">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy_hPa_hPa" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$ppppaccuracy0 != ''">
+										<xsl:value-of select="$ppppaccuracy0" />
+									</xsl:when>
+									<xsl:when test="$ppppaccuracy1 != ''">
+										<xsl:value-of select="$ppppaccuracy1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$ppppaccuracy2" />
+									</xsl:otherwise>
+								</xsl:choose>
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Precision: </fo:inline> 
-								<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision" />
+								<xsl:variable name="ppppprecision0">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision" />
+								</xsl:variable>
+								<xsl:variable name="ppppprecision1">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision_hPa" />
+								</xsl:variable>
+								<xsl:variable name="ppppprecision2">
+									<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision_hPa_hPa" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$ppppprecision0 != ''">
+										<xsl:value-of select="$ppppprecision0" />
+									</xsl:when>
+									<xsl:when test="$ppppprecision1 != ''">
+										<xsl:value-of select="$ppppprecision1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$ppppprecision2" />
+									</xsl:otherwise>
+								</xsl:choose>
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
@@ -504,179 +580,300 @@
 						</fo:table-cell>
 					</fo:table-row>
 
+					<fo:table-row>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Aqueous CO2 Sensor Details </fo:inline>
+							</fo:block>
+						</fo:table-cell>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Measurement Method: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Measurement_Method" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Method details: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Details_Co2_Sensing" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Manufacturer: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Model: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Model" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Measured CO2 Values: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Measured_Co2_Params" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Measurement Frequency: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Frequency" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Aqueous CO2 Accuracy: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Uncertainty_Water" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Aqueous CO2 Precision: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Resolution_Water" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Sensor Calibrations: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Sensor_Calibration" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Calibration of Calibration Gases: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/CO2_Sensor_Calibration" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Number Non-Zero Gas Standards: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/No_Of_Non_Zero_Gas_Stds" />
+							</fo:block>
+							<fo:block linefeed-treatment="preserve">
+								<fo:block font-weight="bold"> Calibration Gases: </fo:block> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer_of_Calibration_Gas" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Comparison to Other CO2 Analyses: </fo:inline> 
+								<!--
+									Currently comments get mapped to Enviromental_Control and the value for 
+									this field is not saved by the OME.  I suspect that this field should
+									be Environmental_Control and comments should go under Other_Comments.
+								-->
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Comments: </fo:inline> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control" />
+							</fo:block>
+							<fo:block linefeed-treatment="preserve">
+								<fo:block font-weight="bold"> Method Reference: </fo:block> 
+								<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Method_References" />
+							</fo:block>
+						</fo:table-cell>
+					</fo:table-row>
+
+					<fo:table-row>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Equilibrator Temperature Sensor </fo:inline>
+							</fo:block>
+						</fo:table-cell>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Location: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Temperature/Location" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Manufacturer: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Temperature/Manufacturer" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Model: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Temperature/Model" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Accuracy: </fo:inline> 
+								<xsl:variable name="teqaccuracy0">
+									<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy" />
+								</xsl:variable>
+								<xsl:variable name="teqaccuracy1">
+									<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy_degC" />
+								</xsl:variable>
+								<xsl:variable name="teqaccuracy2">
+									<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy_degC_degC" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$teqaccuracy0 != ''">
+										<xsl:value-of select="$teqaccuracy0" />
+									</xsl:when>
+									<xsl:when test="$teqaccuracy1 != ''">
+										<xsl:value-of select="$teqaccuracy1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$teqaccuracy2" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Precision: </fo:inline> 
+								<xsl:variable name="teqprecision0">
+									<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision" />
+								</xsl:variable>
+								<xsl:variable name="teqprecision1">
+									<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision_degC" />
+								</xsl:variable>
+								<xsl:variable name="teqprecision2">
+									<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision_degC_degC" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$teqprecision0 != ''">
+										<xsl:value-of select="$teqprecision0" />
+									</xsl:when>
+									<xsl:when test="$teqprecision1 != ''">
+										<xsl:value-of select="$teqprecision1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$teqprecision2" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Temperature/Calibration" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Comments: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Temperature/Other_Comments" />
+							</fo:block>
+						</fo:table-cell>
+					</fo:table-row>
+
+					<fo:table-row>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Equilibrator Pressure Sensor </fo:inline>
+							</fo:block>
+						</fo:table-cell>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Location: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Pressure/Location" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Manufacturer: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Pressure/Manufacturer" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Model: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Pressure/Model" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Accuracy: </fo:inline> 
+								<xsl:variable name="peqaccuracy0">
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy" />
+								</xsl:variable>
+								<xsl:variable name="peqaccuracy1">
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy_hPa" />
+								</xsl:variable>
+								<xsl:variable name="peqaccuracy2">
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy_hPa_hPa" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$peqaccuracy0 != ''">
+										<xsl:value-of select="$peqaccuracy0" />
+									</xsl:when>
+									<xsl:when test="$peqaccuracy1 != ''">
+										<xsl:value-of select="$peqaccuracy1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$peqaccuracy2" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Precision: </fo:inline> 
+								<xsl:variable name="peqprecision0">
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision" />
+								</xsl:variable>
+								<xsl:variable name="peqprecision1">
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision_hPa" />
+								</xsl:variable>
+								<xsl:variable name="peqprecision2">
+									<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision_hPa_hPa" />
+								</xsl:variable>
+								<xsl:choose>
+									<xsl:when test="$peqprecision0 != ''">
+										<xsl:value-of select="$peqprecision0" />
+									</xsl:when>
+									<xsl:when test="$peqprecision1 != ''">
+										<xsl:value-of select="$peqprecision1" />
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="$peqprecision2" />
+									</xsl:otherwise>
+								</xsl:choose>
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Pressure/Calibration" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Comments: </fo:inline> 
+								<xsl:value-of select="Method_Description/Equilibrator_Pressure/Other_Comments" />
+							</fo:block>
+						</fo:table-cell>
+					</fo:table-row>
+
+					<xsl:for-each select="Method_Description/Other_Sensors/Sensor">
+						<fo:table-row>
+							<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+								<fo:block>
+									<fo:inline font-weight="bold"> Other Sensor </fo:inline>
+								</fo:block>
+							</fo:table-cell>
+							<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+								<fo:block>
+									<fo:inline font-weight="bold"> Description: </fo:inline> 
+									<xsl:value-of select="Description" />
+								</fo:block>
+								<fo:block>
+									<fo:inline font-weight="bold"> Manufacturer: </fo:inline> 
+									<xsl:value-of select="Manufacturer" />
+								</fo:block>
+								<fo:block>
+									<fo:inline font-weight="bold"> Model: </fo:inline> 
+									<xsl:value-of select="Model" />
+								</fo:block>
+								<fo:block>
+									<fo:inline font-weight="bold"> Accuracy: </fo:inline> 
+									<xsl:value-of select="Accuracy" />
+								</fo:block>
+								<fo:block>
+									<fo:inline font-weight="bold"> Precision: </fo:inline> 
+									<xsl:value-of select="Precision" />
+								</fo:block>
+								<fo:block>
+									<fo:inline font-weight="bold"> Calibration: </fo:inline> 
+									<xsl:value-of select="Calibration" />
+								</fo:block>
+								<fo:block>
+									<fo:inline font-weight="bold"> Comments: </fo:inline> 
+									<xsl:value-of select="Other_Comments" />
+								</fo:block>
+							</fo:table-cell>
+						</fo:table-row>
+					</xsl:for-each>
+
+					<fo:table-row>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Additional Information </fo:inline>
+							</fo:block>
+						</fo:table-cell>
+						<fo:table-cell border-width="6pt" border-style="solid" border-color="white">
+							<fo:block>
+								<fo:inline font-weight="bold"> Suggested QC flag from Data Provider: </fo:inline> 
+								<xsl:value-of select="Preliminary_Quality_control" />
+							</fo:block>
+							<fo:block>
+								<fo:inline font-weight="bold"> Additional Comments: </fo:inline> 
+								<xsl:value-of select="Additional_Information" />
+							</fo:block>
+							<fo:block linefeed-treatment="preserve">
+								<fo:block font-weight="bold"> Citation for this Dataset: </fo:block> 
+								<xsl:value-of select="Citation" />
+							</fo:block>
+							<fo:block linefeed-treatment="preserve">
+								<fo:block font-weight="bold"> Other References for this Dataset: </fo:block> 
+								<xsl:value-of select="Data_set_References" />
+							</fo:block>
+						</fo:table-cell>
+					</fo:table-row>
+
 				</fo:table-body>
 			</fo:table>
-
-	<!-- 
-
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Aqueous CO<sub>2</sub><br />
-						Sensor Details</b>
-				</td>
-				<td>
-					<b> Measurement Method: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Measurement_Method" />
-					<br />
-					<b> Method details: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Details_Co2_Sensing" />
-					<br />
-					<b> Manufacturer: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer" />
-					<br />
-					<b> Model: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Model" />
-					<br />
-					<b> Measured CO<sub>2</sub> Values: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Measured_Co2_Params" />
-					<br />
-					<b> Measurement Frequency: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Frequency" />
-					<br />
-					<b> Aqueous CO<sub>2</sub> Accuracy: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Uncertainty_Water" />
-					<br />
-					<b> Aqueous CO<sub>2</sub> Precision: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Resolution_Water" />
-					<br />
-					<b> Sensor Calibrations: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Sensor_Calibration" />
-					<br />
-					<b> Calibration of Calibration Gases: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/CO2_Sensor_Calibration" />
-					<br />
-					<b> Number Non-Zero Gas Standards: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/No_Of_Non_Zero_Gas_Stds" />
-					<br />
-					<b> Calibration Gases: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Manufacturer_of_Calibration_Gas" />
-					<br />
-					<b> Comparison to Other CO<sub>2</sub> Analyses: </b>
-					++
-						Currently comments get mapped to Enviromental_Control and the value for 
-						this field is not saved by the OME.  I am assuming that this field should
-						be Environmental_Control and comments should go under Other_Comments.
-					++
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control" />
-					<br />
-					<b> Comments: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Other_Comments" />
-					<br />
-					<b> Method Reference: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Method_References" />
-					<br /><br />
-				</td>
-			</tr>
-
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Equilibrator Temperature Sensor </b>
-				</td>
-				<td>
-					<b> Location: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Location" />
-					<br />
-					<b> Manufacturer: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Manufacturer" />
-					<br />
-					<b> Model: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Model" />
-					<br />
-					<b> Accuracy: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy" />
-					<br />
-					<b> Precision: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision" />
-					<br />
-					<b> Calibration: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Calibration" />
-					<br />
-					<b> Comments: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Other_Comments" />
-					<br /><br />
-				</td>
-			</tr>
-
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Equilibrator Pressure Sensor </b>
-				</td>
-				<td>
-					<b> Location: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Location" />
-					<br />
-					<b> Manufacturer: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Manufacturer" />
-					<br />
-					<b> Model: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Model" />
-					<br />
-					<b> Accuracy: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy" />
-					<br />
-					<b> Precision: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision" />
-					<br />
-					<b> Calibration: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Calibration" />
-					<br />
-					<b> Comments: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Other_Comments" />
-					<br /><br />
-				</td>
-			</tr>
-
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Other Sensor </b>
-				</td>
-				<td>
-					<xsl:for-each select="Method_Description/Other_Sensors/Sensor">
-						<b> Description: </b>
-						<xsl:value-of select="Description" />
-						<br />
-						<b> Manufacturer: </b>
-						<xsl:value-of select="Manufacturer" />
-						<br />
-						<b> Model: </b>
-						<xsl:value-of select="Model" />
-						<br />
-						<b> Accuracy: </b>
-						<xsl:value-of select="Accuracy" />
-						<br />
-						<b> Precision: </b>
-						<xsl:value-of select="Precision" />
-						<br />
-						<b> Calibration: </b>
-						<xsl:value-of select="Calibration" />
-						<br />
-						<b> Comments: </b>
-						<xsl:value-of select="Other_Comments" />
-						<br /><br />
-					</xsl:for-each>
-				</td>
-			</tr>
-
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Additional Information </b>
-				</td>
-				<td>
-					<b> Suggested QC flag from Data Provider: </b>
-					<xsl:value-of select="Preliminary_Quality_control" />
-					<br />
-					<b> Additional Comments: </b>
-					<xsl:value-of select="Additional_Information" />
-					<br />
-					<b> Citation for this Dataset: </b>
-					<xsl:value-of select="Citation" />
-					<br />
-					<b> Other References for this Dataset: </b>
-					<xsl:value-of select="Data_set_References" />
-					<br /><br />
-				</td>
-			</tr>
-	 -->
 
 			</fo:flow>
 		</fo:page-sequence>

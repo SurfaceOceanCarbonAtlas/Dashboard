@@ -23,21 +23,46 @@ import org.junit.Test;
  */
 public class OmeXmlPdfGeneratorTest {
 
-	private static final String LOG4J_PROPERTIES_FILE = "/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
-	private static final String METADATA_DOCS_DIR = "/home/flat/ksmith/content/SocatUploadDashboard/MetadataDocs";
-	private static final String OME_XML_PDF_RESOURCES = "/home/flat/ksmith/content/SocatUploadDashboard/OmeXmlPdfResources";
-	private static final String EXPOCODE = "33LG20150621";
+	private static final String LOG4J_PROPERTIES_FILE = "/Users/ksmith/content/SocatUploadDashboard/log4j.properties";
+	private static final String METADATA_DOCS_DIR = "/Users/ksmith/content/SocatUploadDashboard/MetadataDocs";
+	private static final String OME_XML_PDF_RESOURCES = "/Users/ksmith/content/SocatUploadDashboard/OmeXmlPdfResources";
+	private static final String[] EXPOCODE_ARRAY = {
+		"06AQ20151030",
+		"33GG20131126",
+		"33GG20150619",
+		"33HH20151027",
+		"33HH20151112",
+		"33LG20150516",
+		"33LG20150621",
+		"33RO20150806",
+		"33RO20150822",
+		"61TG20150905",
+		"61TG20151012",
+		"642B20150808",
+		"642B20150819",
+		"74EQ20140320",
+		"74EQ20141027",
+		"77OG20050601",
+		"MLCE20150521",
+		"MLCE20150602",
+		"PANC20150826",
+		"PANC20150924",
+		"PAT520151007",
+		"PAT520151021"
+	};
 
 	@Test
 	public void testCreatePiOmePdf() throws IOException {
 		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILE);
 		MetadataFileHandler metaHandler = new MetadataFileHandler(METADATA_DOCS_DIR, null, null);
-		File pdfFile = metaHandler.getMetadataFile(EXPOCODE, DashboardMetadata.PI_OME_PDF_FILENAME);
-		// Make sure the PDF file does not exist, then generate it
-		pdfFile.delete();
-		OmeXmlPdfGenerator omePdfGenerator = new OmeXmlPdfGenerator(new File(OME_XML_PDF_RESOURCES), metaHandler);
-		omePdfGenerator.createPiOmePdf(EXPOCODE);
-		assertTrue( pdfFile.exists() );
+		for ( String expo : EXPOCODE_ARRAY ) {
+			File pdfFile = metaHandler.getMetadataFile(expo, DashboardMetadata.PI_OME_PDF_FILENAME);
+			// Make sure the PDF file does not exist, then generate it
+			pdfFile.delete();
+			OmeXmlPdfGenerator omePdfGenerator = new OmeXmlPdfGenerator(new File(OME_XML_PDF_RESOURCES), metaHandler);
+			omePdfGenerator.createPiOmePdf(expo);
+			assertTrue( pdfFile.exists() );
+		}
 	}
 
 }

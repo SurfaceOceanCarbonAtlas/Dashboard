@@ -77,12 +77,12 @@
 				</td>
 			</tr>
 
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Investigator(s) </b>
-				</td>
-				<td>
-					<xsl:for-each select="Investigator">
+			<xsl:for-each select="Investigator">
+				<tr>
+					<td style="vertical-align: top;">
+						<b> Investigator </b>
+					</td>
+					<td>
 						<b> Name: </b>
 						<xsl:value-of select="Name" />
 						<br />
@@ -98,9 +98,9 @@
 					    <b> Email: </b>
 						<xsl:value-of select="Email" />
 						<br /><br />
-					</xsl:for-each>	
-				</td>
-			</tr>
+					</td>
+				</tr>
+			</xsl:for-each>	
 
 			<tr>
 				<td style="vertical-align: top;">
@@ -215,12 +215,12 @@
 				</td>
 			</tr>
 
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Variables </b>
-				</td>
-				<td>
-					<xsl:for-each select="Variables_Info/Variable">
+			<xsl:for-each select="Variables_Info/Variable">
+				<tr>
+					<td style="vertical-align: top;">
+						<b> Variable </b>
+					</td>
+					<td>
 						<b> Name: </b>
 						<xsl:value-of select="Variable_Name" />
 						<br />
@@ -230,9 +230,9 @@
 						<b> Description: </b>
 						<xsl:value-of select="Description_of_Variable" />
 						<br /><br />
-					</xsl:for-each>
-				</td>
-			</tr>
+					</td>
+				</tr>
+			</xsl:for-each>
 
 			<tr>
 				<td style="vertical-align: top;">
@@ -432,13 +432,12 @@
 					<b> Comparison to Other CO<sub>2</sub> Analyses: </b>
 					<!--
 						Currently comments get mapped to Enviromental_Control and the value for 
-						this field is not saved by the OME.  I am assuming that this field should
+						this field is not saved by the OME.  I suspect that this field should
 						be Environmental_Control and comments should go under Other_Comments.
 					-->
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control" />
 					<br />
 					<b> Comments: </b>
-					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Other_Comments" />
+					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Environmental_Control" />
 					<br />
 					<b> Method Reference: </b>
 					<xsl:value-of select="Method_Description/CO2_Sensors/CO2_Sensor/Method_References" />
