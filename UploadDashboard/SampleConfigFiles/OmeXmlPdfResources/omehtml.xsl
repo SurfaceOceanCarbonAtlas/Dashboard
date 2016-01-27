@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
 	<xsl:output method="html" version="4.0" encoding="UTF-8" indent="yes" />
 	<xsl:template match="/x_tags">
+
 		<html>
 
-		<xsl:variable name="expocode">
+		<xsl:variable name="actexpocode">
 			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Expocode" />
+		</xsl:variable>
+		<xsl:variable name="altexpocode">
+			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Cruise_ID" />
+		</xsl:variable>
+		<xsl:variable name="expocode">
+			<xsl:choose>
+			<xsl:when test="$actexpocode != ''">
+				<xsl:value-of select="$actexpocode" />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$altexpocode" />
+			</xsl:otherwise>
+			</xsl:choose>
 		</xsl:variable>
 		<xsl:variable name="westlon">
 			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Westernmost_Longitude" />
@@ -24,8 +39,9 @@
 		<head>
 		<title><xsl:value-of select="$expocode" /> OME Metadata</title>
 		</head>
-
+ 
 		<body>
+
 		<table style="width: 100%">
 
 			<tr>
@@ -543,5 +559,6 @@
 
 		</body>
 		</html>
+
 	</xsl:template>
 </xsl:stylesheet>

@@ -4,6 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
 import java.io.BufferedOutputStream;
@@ -16,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
@@ -60,7 +62,7 @@ public class OmeXmlPdfGenerator {
 		if ( ! resourcesDir.isDirectory() )
 			throw new IOException("Does not exist or is not a directory: " + resourcesDir.getPath());
 		fopResourcesDir = resourcesDir;
-		xsltFile = new File(fopResourcesDir, "omexml.xsl");
+		xsltFile = new File(fopResourcesDir, "omefo.xsl");
 		if ( ! xsltFile.canRead() )
 			throw new IllegalArgumentException("Cannot read XSL file: " + xsltFile.getPath());
 		try {
@@ -86,11 +88,11 @@ public class OmeXmlPdfGenerator {
 	 * 		if the conversion fails
 	 */
 	public void createPiOmePdf(String expocode) throws IllegalArgumentException, IOException {
-		// The following throws IllegalArgumentException if expocode is invalid
-		File xmlFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.PI_OME_FILENAME);
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		File xmlFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_FILENAME);
 		if ( ! xmlFile.exists() )
-			throw new IllegalArgumentException("PI-provided OME XMl file does not exist for " + expocode);
-		File pdfFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.PI_OME_PDF_FILENAME);
+			throw new IllegalArgumentException("PI-provided OME XMl file does not exist for " + upperExpo);
+		File pdfFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_PDF_FILENAME);
 		BufferedOutputStream pdfOut;
 		try {
 			pdfOut = new BufferedOutputStream(new FileOutputStream(pdfFile));
@@ -98,16 +100,23 @@ public class OmeXmlPdfGenerator {
 			throw new IOException("Cannot create a new PDF for the PI-provided OME: " + ex.getMessage());
 		}
 		try {
+			FOUserAgent foUserAgent;
+			try {
+				foUserAgent = fopFactory.newFOUserAgent();
+				foUserAgent.setTitle(upperExpo + " OME Metadata");
+			} catch (Throwable ex) {
+				throw new IOException("Unable to create the FOUserAgent: " + ex.getMessage());
+			}
 			Fop fop;
 			try {
-				fop = fopFactory.newFop(MimeConstants.MIME_PDF, pdfOut);
-			} catch (Exception ex) {
+				fop = foUserAgent.newFop(MimeConstants.MIME_PDF, pdfOut);
+			} catch (Throwable ex) {
 				throw new IOException("Unable to create the Fop: " + ex.getMessage());
 			}
 			Transformer transformer;
 			try {
 				transformer = transFactory.newTransformer(new StreamSource(xsltFile));
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				throw new IOException("Unable to create the Tranformer: " + ex.getMessage());
 			}
 			transformer.setParameter("versionParam", "1.0");
@@ -115,12 +124,12 @@ public class OmeXmlPdfGenerator {
 			SAXResult res;
 			try {
 				res = new SAXResult(fop.getDefaultHandler());
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				throw new IOException("Unable to get the default fop handler: " + ex.getMessage());
 			}
 			try {
 				transformer.transform(src, res);
-			} catch (Exception ex) {
+			} catch (Throwable ex) {
 				throw new IOException("Unable to to transform: " + ex.getMessage());
 			}
 		} finally {
