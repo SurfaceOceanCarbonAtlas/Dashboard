@@ -5,8 +5,6 @@
 	<xsl:output method="html" version="4.0" encoding="UTF-8" indent="yes" />
 	<xsl:template match="/x_tags">
 
-		<html>
-
 		<xsl:variable name="actexpocode">
 			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Expocode" />
 		</xsl:variable>
@@ -23,18 +21,8 @@
 			</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
-		<xsl:variable name="westlon">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Westernmost_Longitude" />
-		</xsl:variable>
-		<xsl:variable name="eastlon">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Easternmost_Longitude" />
-		</xsl:variable>
-		<xsl:variable name="northlat">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Northernmost_Latitude" />
-		</xsl:variable>
-		<xsl:variable name="southlat">
-			<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Southernmost_Latitude" />
-		</xsl:variable>
+
+		<html>
 
 		<head>
 		<title><xsl:value-of select="$expocode" /> OME Metadata</title>
@@ -166,6 +154,9 @@
 					<xsl:value-of select="Cruise_Info/Experiment/Cruise/Temporal_Coverage/End_Date" />
 					<br />
 					<b> Westernmost Longitude: </b>
+					<xsl:variable name="westlon">
+						<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Westernmost_Longitude" />
+					</xsl:variable>
 					<xsl:choose>
 						<xsl:when test="$westlon &lt; 0.0">
 							<xsl:value-of select="0.0 - $westlon" /> W
@@ -176,6 +167,9 @@
 					</xsl:choose>
 					<br />
 					<b> Easternmost Longitude: </b>
+					<xsl:variable name="eastlon">
+						<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Easternmost_Longitude" />
+					</xsl:variable>
 					<xsl:choose>
 						<xsl:when test="$eastlon &lt; 0.0">
 							<xsl:value-of select="0.0 - $eastlon" /> W
@@ -186,6 +180,9 @@
 					</xsl:choose>
 					<br />
 					<b> Northernmost Latitude: </b>
+					<xsl:variable name="northlat">
+						<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Northernmost_Latitude" />
+					</xsl:variable>
 					<xsl:choose>
 						<xsl:when test="$northlat &lt; 0.0">
 							<xsl:value-of select="0.0 - $northlat" /> S
@@ -196,6 +193,9 @@
 					</xsl:choose>
 					<br />
 					<b> Southernmost Latitude: </b>
+					<xsl:variable name="southlat">
+						<xsl:value-of select="Cruise_Info/Experiment/Cruise/Geographical_Coverage/Bounds/Southernmost_Latitude" />
+					</xsl:variable>
 					<xsl:choose>
 						<xsl:when test="$southlat &lt; 0.0">
 							<xsl:value-of select="0.0 - $southlat" /> S
@@ -249,10 +249,50 @@
 					<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Model" />
 					<br />
 					<b> Accuracy: </b>
-					<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy" />
+					<xsl:variable name="sstaccuracy0">
+						<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy" />
+					</xsl:variable>
+					<xsl:variable name="sstaccuracy1">
+						<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy_degC" />
+					</xsl:variable>
+					<xsl:variable name="sstaccuracy2">
+						<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Accuracy_degC_degC" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$sstaccuracy0 != ''">
+							<xsl:value-of select="$sstaccuracy0" />
+						</xsl:when>
+						<xsl:when test="$sstaccuracy1 != ''">
+							<xsl:value-of select="$sstaccuracy1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$sstaccuracy2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					&#176;C
 					<br />
 					<b> Precision: </b>
-					<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision" />
+					<xsl:variable name="sstprecision0">
+						<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision" />
+					</xsl:variable>
+					<xsl:variable name="sstprecision1">
+						<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision_degC" />
+					</xsl:variable>
+					<xsl:variable name="sstprecision2">
+						<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Precision_degC_degC" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$sstprecision0 != ''">
+							<xsl:value-of select="$sstprecision0" />
+						</xsl:when>
+						<xsl:when test="$sstprecision1 != ''">
+							<xsl:value-of select="$sstprecision1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$sstprecision2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					&#176;C
 					<br />
 					<b> Calibration: </b>
 					<xsl:value-of select="Method_Description/Sea_Surface_Temperature/Calibration" />
@@ -301,8 +341,21 @@
 					<xsl:value-of select="Method_Description/Atmospheric_Pressure/Location" />
 					<br />
 					<b> Normalized to Sea Level: </b>
-					<!--  misleading parent tag for this answer -->
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Normalized" />
+					<xsl:variable name="patmnormalized">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Normalized" />
+					</xsl:variable>
+					<xsl:variable name="tequnormalized">
+						<!-- misleading parent tag for this answer -->
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Normalized" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$patmnormalized != ''">
+							<xsl:value-of select="$patmnormalized" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$tequnormalized" />
+						</xsl:otherwise>
+					</xsl:choose>
 					<br />
 					<b> Manufacturer: </b>
 					<xsl:value-of select="Method_Description/Atmospheric_Pressure/Manufacturer" />
@@ -311,10 +364,50 @@
 					<xsl:value-of select="Method_Description/Atmospheric_Pressure/Model" />
 					<br />
 					<b> Accuracy: </b>
-					<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy" />
+					<xsl:variable name="ppppaccuracy0">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy" />
+					</xsl:variable>
+					<xsl:variable name="ppppaccuracy1">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy_hPa" />
+					</xsl:variable>
+					<xsl:variable name="ppppaccuracy2">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Accuracy_hPa_hPa" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$ppppaccuracy0 != ''">
+							<xsl:value-of select="$ppppaccuracy0" />
+						</xsl:when>
+						<xsl:when test="$ppppaccuracy1 != ''">
+							<xsl:value-of select="$ppppaccuracy1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$ppppaccuracy2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					hPa
 					<br />
 					<b> Precision: </b>
-					<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision" />
+					<xsl:variable name="ppppprecision0">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision" />
+					</xsl:variable>
+					<xsl:variable name="ppppprecision1">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision_hPa" />
+					</xsl:variable>
+					<xsl:variable name="ppppprecision2">
+						<xsl:value-of select="Method_Description/Atmospheric_Pressure/Precision_hPa_hPa" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$ppppprecision0 != ''">
+							<xsl:value-of select="$ppppprecision0" />
+						</xsl:when>
+						<xsl:when test="$ppppprecision1 != ''">
+							<xsl:value-of select="$ppppprecision1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$ppppprecision2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					hPa
 					<br />
 					<b> Calibration: </b>
 					<xsl:value-of select="Method_Description/Atmospheric_Pressure/Calibration" />
@@ -460,10 +553,50 @@
 					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Model" />
 					<br />
 					<b> Accuracy: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy" />
+					<xsl:variable name="teqaccuracy0">
+						<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy" />
+					</xsl:variable>
+					<xsl:variable name="teqaccuracy1">
+						<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy_degC" />
+					</xsl:variable>
+					<xsl:variable name="teqaccuracy2">
+						<xsl:value-of select="Method_Description/Equilibrator_Temperature/Accuracy_degC_degC" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$teqaccuracy0 != ''">
+							<xsl:value-of select="$teqaccuracy0" />
+						</xsl:when>
+						<xsl:when test="$teqaccuracy1 != ''">
+							<xsl:value-of select="$teqaccuracy1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$teqaccuracy2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					&#176;C
 					<br />
 					<b> Precision: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision" />
+					<xsl:variable name="teqprecision0">
+						<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision" />
+					</xsl:variable>
+					<xsl:variable name="teqprecision1">
+						<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision_degC" />
+					</xsl:variable>
+					<xsl:variable name="teqprecision2">
+						<xsl:value-of select="Method_Description/Equilibrator_Temperature/Precision_degC_degC" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$teqprecision0 != ''">
+							<xsl:value-of select="$teqprecision0" />
+						</xsl:when>
+						<xsl:when test="$teqprecision1 != ''">
+							<xsl:value-of select="$teqprecision1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$teqprecision2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					&#176;C
 					<br />
 					<b> Calibration: </b>
 					<xsl:value-of select="Method_Description/Equilibrator_Temperature/Calibration" />
@@ -489,10 +622,50 @@
 					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Model" />
 					<br />
 					<b> Accuracy: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy" />
+					<xsl:variable name="peqaccuracy0">
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy" />
+					</xsl:variable>
+					<xsl:variable name="peqaccuracy1">
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy_hPa" />
+					</xsl:variable>
+					<xsl:variable name="peqaccuracy2">
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Accuracy_hPa_hPa" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$peqaccuracy0 != ''">
+							<xsl:value-of select="$peqaccuracy0" />
+						</xsl:when>
+						<xsl:when test="$peqaccuracy1 != ''">
+							<xsl:value-of select="$peqaccuracy1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$peqaccuracy2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					hPa
 					<br />
 					<b> Precision: </b>
-					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision" />
+					<xsl:variable name="peqprecision0">
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision" />
+					</xsl:variable>
+					<xsl:variable name="peqprecision1">
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision_hPa" />
+					</xsl:variable>
+					<xsl:variable name="peqprecision2">
+						<xsl:value-of select="Method_Description/Equilibrator_Pressure/Precision_hPa_hPa" />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test="$peqprecision0 != ''">
+							<xsl:value-of select="$peqprecision0" />
+						</xsl:when>
+						<xsl:when test="$peqprecision1 != ''">
+							<xsl:value-of select="$peqprecision1" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$peqprecision2" />
+						</xsl:otherwise>
+					</xsl:choose>
+					hPa
 					<br />
 					<b> Calibration: </b>
 					<xsl:value-of select="Method_Description/Equilibrator_Pressure/Calibration" />
@@ -503,12 +676,12 @@
 				</td>
 			</tr>
 
-			<tr>
-				<td style="vertical-align: top;">
-					<b> Other Sensor </b>
-				</td>
-				<td>
-					<xsl:for-each select="Method_Description/Other_Sensors/Sensor">
+			<xsl:for-each select="Method_Description/Other_Sensors/Sensor">
+				<tr>
+					<td style="vertical-align: top;">
+						<b> Other Sensor </b>
+					</td>
+					<td>
 						<b> Description: </b>
 						<xsl:value-of select="Description" />
 						<br />
@@ -530,9 +703,9 @@
 						<b> Comments: </b>
 						<xsl:value-of select="Other_Comments" />
 						<br /><br />
-					</xsl:for-each>
-				</td>
-			</tr>
+					</td>
+				</tr>
+			</xsl:for-each>
 
 			<tr>
 				<td style="vertical-align: top;">

@@ -346,6 +346,7 @@
 										<xsl:value-of select="$sstaccuracy2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								&#176;C
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Precision: </fo:inline> 
@@ -369,6 +370,7 @@
 										<xsl:value-of select="$sstprecision2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								&#176;C
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
@@ -478,6 +480,7 @@
 										<xsl:value-of select="$ppppaccuracy2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								hPa
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Precision: </fo:inline> 
@@ -501,6 +504,7 @@
 										<xsl:value-of select="$ppppprecision2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								hPa
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
@@ -708,6 +712,7 @@
 										<xsl:value-of select="$teqaccuracy2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								&#176;C
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Precision: </fo:inline> 
@@ -731,6 +736,7 @@
 										<xsl:value-of select="$teqprecision2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								&#176;C
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
@@ -784,6 +790,7 @@
 										<xsl:value-of select="$peqaccuracy2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								hPa
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Precision: </fo:inline> 
@@ -807,6 +814,7 @@
 										<xsl:value-of select="$peqprecision2" />
 									</xsl:otherwise>
 								</xsl:choose>
+								hPa
 							</fo:block>
 							<fo:block>
 								<fo:inline font-weight="bold"> Calibration: </fo:inline> 
