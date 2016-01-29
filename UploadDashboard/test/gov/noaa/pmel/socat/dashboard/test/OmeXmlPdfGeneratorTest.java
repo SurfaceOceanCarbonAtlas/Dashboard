@@ -23,9 +23,9 @@ import org.junit.Test;
  */
 public class OmeXmlPdfGeneratorTest {
 
-	private static final String LOG4J_PROPERTIES_FILE = "/Users/ksmith/content/SocatUploadDashboard/log4j.properties";
-	private static final String METADATA_DOCS_DIR = "/Users/ksmith/content/SocatUploadDashboard/MetadataDocs";
-	private static final String OME_XML_PDF_RESOURCES = "/Users/ksmith/content/SocatUploadDashboard";
+	private static final String LOG4J_PROPERTIES_FILE = "/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
+	private static final String METADATA_DOCS_DIR = "/home/flat/ksmith/content/SocatUploadDashboard/MetadataDocs";
+	private static final String OME_XML_PDF_RESOURCES = "/home/flat/ksmith/content/SocatUploadDashboard";
 	private static final String[] EXPOCODE_ARRAY = {
 		"06AQ20151030",
 		"33GG20131126",

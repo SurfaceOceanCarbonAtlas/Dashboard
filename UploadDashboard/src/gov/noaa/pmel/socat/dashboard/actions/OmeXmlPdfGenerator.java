@@ -89,10 +89,15 @@ public class OmeXmlPdfGenerator {
 	 */
 	public void createPiOmePdf(String expocode) throws IllegalArgumentException, IOException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+		// Get the full path filename for the PI_OME.xml file
 		File xmlFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_FILENAME);
 		if ( ! xmlFile.exists() )
 			throw new IllegalArgumentException("PI-provided OME XMl file does not exist for " + upperExpo);
+		// Get the information about this file
+		DashboardMetadata mdata = metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.PI_OME_FILENAME);
+		// Get the full path filename for the PI_OME.pdf file
 		File pdfFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_PDF_FILENAME);
+		// Output stream for the PDF that will be generated
 		BufferedOutputStream pdfOut;
 		try {
 			pdfOut = new BufferedOutputStream(new FileOutputStream(pdfFile));
@@ -100,6 +105,7 @@ public class OmeXmlPdfGenerator {
 			throw new IOException("Cannot create a new PDF for the PI-provided OME: " + ex.getMessage());
 		}
 		try {
+			// Get the Fop for converting XSL-FORMAT into PDF to be written to the PDF output stream
 			FOUserAgent foUserAgent;
 			try {
 				foUserAgent = fopFactory.newFOUserAgent();
@@ -113,6 +119,8 @@ public class OmeXmlPdfGenerator {
 			} catch (Throwable ex) {
 				throw new IOException("Unable to create the Fop: " + ex.getMessage());
 			}
+			// Get the Transformer to convert the PI_OME.xml to XSL-FORMAT using the omefo.xsl stylesheet
+			StreamSource src = new StreamSource(xmlFile);
 			Transformer transformer;
 			try {
 				transformer = transFactory.newTransformer(new StreamSource(xsltFile));
@@ -120,18 +128,22 @@ public class OmeXmlPdfGenerator {
 				throw new IOException("Unable to create the Tranformer: " + ex.getMessage());
 			}
 			transformer.setParameter("versionParam", "1.0");
-			StreamSource src = new StreamSource(xmlFile);
+			// Create the Transformer output to go to the Fop input
 			SAXResult res;
 			try {
 				res = new SAXResult(fop.getDefaultHandler());
 			} catch (Throwable ex) {
 				throw new IOException("Unable to get the default fop handler: " + ex.getMessage());
 			}
+			// Perform the transform, which then triggers the Fop to generate the PDF
 			try {
 				transformer.transform(src, res);
 			} catch (Throwable ex) {
 				throw new IOException("Unable to to transform: " + ex.getMessage());
 			}
+			// Add a properties file for the successfully generated PDF
+			mdata.setFilename(DashboardMetadata.PI_OME_PDF_FILENAME);
+			metadataHandler.saveMetadataInfo(mdata, upperExpo + ": PI_OME.pdf generated from the PI_OME.xml file");
 		} finally {
 			pdfOut.close();
 		}
