@@ -4,6 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.handlers;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayDeque;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,7 +13,6 @@ import java.util.TimerTask;
 import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.wc.SVNClientManager;
-import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNStatus;
 import org.tmatesoft.svn.core.wc.SVNStatusType;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
@@ -105,6 +106,7 @@ public class VersionedFileHandler {
 	 * Periodically checks the queue of files to be committed, and 
 	 * commits any files present.  Stops when filesDir is set to null.
 	 */
+	private static final String SVN_COMMIT_COMMANDS_FILENAME = "svn_commit_commands.sh";
 	private void watchCommitQueue() {
 		if ( (filesToCommit == null) || (parentToUpdate == null) || (commitMessage == null) )
 			throw new NullPointerException("watchCommitQueue called for VersionedFileHandler that is not version controlled");
@@ -124,6 +126,10 @@ public class VersionedFileHandler {
 					if ( commitFiles != null ) {
 						if ( (parent != null) && (message != null) ) {
 							try {
+								/*
+								 * TODO: still having issues with the loack still being present
+								 * when committing and adding files to be committed
+								 * 
 								// Use SVNDepth.EMPTY so exactly the files/directory specified are committed
 								// and not any other updated files under any directories specified
 								svnManager.getCommitClient().doCommit(commitFiles, false, 
@@ -131,7 +137,7 @@ public class VersionedFileHandler {
 								// Update the parent directory
 								svnManager.getUpdateClient().doUpdate(parent, 
 										SVNRevision.HEAD, SVNDepth.INFINITY, false, false);
-								/*
+								*/
 								// Or just write the svn commands to file to be dealt with manually
 								PrintWriter cmdsWriter = new PrintWriter(new FileWriter(
 										new File(filesDir, SVN_COMMIT_COMMANDS_FILENAME), true));
@@ -142,7 +148,7 @@ public class VersionedFileHandler {
 								cmdsWriter.println();
 								cmdsWriter.println("svn update --depth=infinity " + parent.getPath());
 								cmdsWriter.close();
-								*/
+								//
 							} catch (Exception ex) {
 								// Should not happen, but nothing can be done about it if it does
 							}
