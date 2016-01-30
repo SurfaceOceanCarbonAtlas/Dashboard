@@ -730,7 +730,7 @@ public class CheckerMessageHandler {
 			dataLoc.setLatitude(latitudes[info.rowIndex]);
 			dataLoc.setLongitude(longitudes[info.rowIndex]);
 			dataLoc.setRegionID(regionIDs[info.rowIndex]);
-			if ( dataValues != null )
+			if ( (info.columnIndex != Integer.MAX_VALUE) && (dataValues != null) )
 				dataLoc.setDataValue(dataValues[info.rowIndex]);
 			locations.add(dataLoc);
 		}
