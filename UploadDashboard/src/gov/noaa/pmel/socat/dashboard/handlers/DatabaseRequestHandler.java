@@ -1082,21 +1082,28 @@ public class DatabaseRequestHandler {
 			PreparedStatement addQcPrepStmt = catConn.prepareStatement(
 					"INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
 					"`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
-					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
+					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
 			addQcPrepStmt.setString(1, SocatQCEvent.QC_RENAMED_FLAG.toString());
 			addQcPrepStmt.setString(8, SocatQCEvent.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(15, SocatQCEvent.QC_COMMENT.toString());
 			addQcPrepStmt.setLong(2, nowSec);
 			addQcPrepStmt.setLong(9, nowSec);
+			addQcPrepStmt.setLong(16, nowSec);
 			addQcPrepStmt.setString(3, oldExpocode);
 			addQcPrepStmt.setString(10, newExpocode);
+			addQcPrepStmt.setString(17, newExpocode);
 			addQcPrepStmt.setString(4, socatVersion);
 			addQcPrepStmt.setString(11, socatVersion);
+			addQcPrepStmt.setString(18, socatVersion);
 			addQcPrepStmt.setString(5, DataLocation.GLOBAL_REGION_ID.toString());
 			addQcPrepStmt.setString(12, DataLocation.GLOBAL_REGION_ID.toString());
+			addQcPrepStmt.setString(19, DataLocation.GLOBAL_REGION_ID.toString());
 			addQcPrepStmt.setInt(6, reviewerId);
 			addQcPrepStmt.setInt(13, reviewerId);
+			addQcPrepStmt.setInt(20, reviewerId);
 			addQcPrepStmt.setString(7, renameComment);
 			addQcPrepStmt.setString(14, renameComment);
+			addQcPrepStmt.setString(21, renameComment);
 			addQcPrepStmt.executeUpdate();
 
 			// Update the old expocode to the new expocode in the appropriate WOCE events
