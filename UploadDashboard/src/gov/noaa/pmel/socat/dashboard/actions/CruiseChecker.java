@@ -1179,7 +1179,6 @@ public class CruiseChecker {
 
 		// Only add SanityChecker WOCE-4 flags for now 
 		// (here and in the middle of CheckerMessageHandler.generateWoceEvents)
-		// TODO: also do WOCE-3 flags?
 		for ( int rowIdx : errRows ) {
 			dataVals.get(rowIdx).set(woceCO2WaterColumnIndex, "4");
 		}

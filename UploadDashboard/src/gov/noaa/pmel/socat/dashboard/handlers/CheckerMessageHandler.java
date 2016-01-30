@@ -607,7 +607,7 @@ public class CheckerMessageHandler {
 				info.flag = SocatWoceEvent.WOCE_QUESTIONABLE;
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
-			// TODO: Only add SanityChecker WOCE-4 flags for now 
+			// Only add SanityChecker WOCE-4 flags for now 
 			// (here and at the end of CruiseChecker.standardizeCruiseData)
 			if ( ! info.flag.equals(SocatWoceEvent.WOCE_BAD) )
 				continue;
@@ -730,7 +730,7 @@ public class CheckerMessageHandler {
 			dataLoc.setLatitude(latitudes[info.rowIndex]);
 			dataLoc.setLongitude(longitudes[info.rowIndex]);
 			dataLoc.setRegionID(regionIDs[info.rowIndex]);
-			if ( info.columnIndex != Integer.MAX_VALUE )
+			if ( dataValues != null )
 				dataLoc.setDataValue(dataValues[info.rowIndex]);
 			locations.add(dataLoc);
 		}
