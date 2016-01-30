@@ -122,7 +122,7 @@ public class CheckerUtils {
 		
 		try {
 			Double.parseDouble(value);
-		} catch (NumberFormatException e) {
+		} catch (Exception e) {
 			result = false;
 		}
 		

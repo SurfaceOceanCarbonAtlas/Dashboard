@@ -123,14 +123,18 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 
 			// Get the longitude from the record - covert to 0-360 range
 			Double position = Double.parseDouble(longitudeColumn.getValue());
-			while ( position < 0.0 ) {
+			// Only allow out to [-540,540]
+			if ( (position >= -540.0) && (position < -360.0) ) {
+				position += 720.0;
+			}
+			else if ( (position >= -360.0) && (position < 0.0) ) {
 				position += 360.0;
 			}
-			while ( position >= 360.0 ) {
+			else if ( (position >= 360.0) && (position < 540.0) ) {
 				position -= 360.0;
 			}
 			
-			// Add the latitude to the list of all latitudes
+			// Add the longitude to the list of all longitudes
 			allLons.add(position);
 			hasValue = true;
 			

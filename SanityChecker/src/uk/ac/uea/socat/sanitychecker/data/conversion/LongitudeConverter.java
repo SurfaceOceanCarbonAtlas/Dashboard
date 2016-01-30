@@ -23,10 +23,11 @@ public class LongitudeConverter extends SpecifiedUnitsConverter {
 			if ( units.equalsIgnoreCase("decimal_degrees_west") ) {
 				sourceLon *= -1.0;
 			}
-			while (sourceLon <= -180.0 ) {
+			// Only allow out to [-540,540]
+			if ( (sourceLon >= -540.0) && (sourceLon <= -180.0) ) {
 				sourceLon += 360.0;
 			}
-			while (sourceLon > 180.0) {
+			else if ( (sourceLon > 180.0) && (sourceLon <= 540.0) ) {
 				sourceLon -= 360.0;
 			}
 			result = Double.toString(sourceLon);
