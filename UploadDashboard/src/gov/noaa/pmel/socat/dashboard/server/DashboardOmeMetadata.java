@@ -80,7 +80,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			omeDoc = (new SAXBuilder()).build(mdataFile);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problems interpreting " +
-					"the OME XML contents in " + mdataFile.getName() + 
+					"the OME XML contents in " + mdataFile.getPath() + 
 					"\n    " + ex.getMessage());
 		}
 
@@ -90,7 +90,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			omeMData = new OmeMetadata(expocode);
 			omeMData.assignFromOmeXmlDoc(omeDoc);
 		} catch (Exception ex) {
-			throw new IllegalArgumentException("Problem with " + mdataFile.getName() +
+			throw new IllegalArgumentException("Problem with " + mdataFile.getPath() +
 					"\n    " + ex.getMessage(), ex);
 		}
 		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata

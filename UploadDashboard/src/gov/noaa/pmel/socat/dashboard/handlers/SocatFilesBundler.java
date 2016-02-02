@@ -173,8 +173,8 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		ArrayList<File> addlDocs = new ArrayList<File>();
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(expocode) ) {
-			// Exclude the (expocode)_OME.xml document at this time;
-			// do include the (expocode)_PI_OME.xml 
+			// Exclude the (expocode)/OME.xml document at this time;
+			// do include the (expocode)/PI_OME.xml 
 			String filename = mdata.getFilename();
 			if ( ! filename.equals(DashboardMetadata.OME_FILENAME) ) {
 				addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
@@ -242,8 +242,8 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		ArrayList<File> addlDocs = new ArrayList<File>();
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo) ) {
-			// Exclude the (expocode)_OME.xml document at this time;
-			// do include the (expocode)_PI_OME.xml 
+			// Exclude the (expocode)/OME.xml document at this time;
+			// do include the (expocode)/PI_OME.xml 
 			String filename = mdata.getFilename();
 			if ( ! filename.equals(DashboardMetadata.OME_FILENAME) ) {
 				addlDocs.add(metadataHandler.getMetadataFile(upperExpo, filename));

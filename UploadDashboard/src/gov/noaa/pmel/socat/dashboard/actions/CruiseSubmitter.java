@@ -295,6 +295,15 @@ public class CruiseSubmitter {
 				commitMsg += " by user '" + submitter + "'";
 				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
 			}
+			try {
+				// Wait just a moment to let other things (mysql? svn?) catch up 
+				// or clear;  submits of lots of datasets can sometimes cause 
+				// messed-up DSG files not seen when submitted in small numbers.
+				Thread.sleep(100);
+			} catch (InterruptedException ex) {
+				// Ignore
+				;
+			}
 		}
 
 		// notify ERDDAP of new/updated cruises

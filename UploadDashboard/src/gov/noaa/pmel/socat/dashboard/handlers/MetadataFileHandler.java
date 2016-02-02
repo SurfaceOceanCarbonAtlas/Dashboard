@@ -92,7 +92,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 					"Invalid metadate document name " + uploadName);
 		// Generate the full path filename for this cruise metadata
 		File metadataFile = new File(filesDir, expocode.substring(0,4) +
-				File.separator + expocode + "_" + basename);
+				File.separator + expocode + File.separator + basename);
 		return metadataFile;
 	}
 
@@ -114,22 +114,21 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		final String expocode = DashboardServerUtils.checkExpocode(cruiseExpocode);
 		// Get the parent directory for these metadata documents;
 		// if it does not exist, return the empty list
-		File parentDir = new File(filesDir, expocode.substring(0,4));
+		File parentDir = new File(filesDir, expocode.substring(0,4) + File.separator + expocode);
 		if ( ! parentDir.isDirectory() )
 			return metadataList;
 		// Get all the metadata info files for this expocode 
 		File[] metafiles = parentDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				if ( name.startsWith(expocode + "_") && 
-					 name.endsWith(METADATA_INFOFILE_SUFFIX) )
+				if ( name.endsWith(METADATA_INFOFILE_SUFFIX) )
 					return true;
 				return false;
 			}
 		});
 		// Record the metadata file for each metadata info files (may be an empty array)
 		for ( File mfile : metafiles ) {
-			String basename = mfile.getName().substring(expocode.length() + 1, 
+			String basename = mfile.getName().substring(0, 
 					mfile.getName().length() - METADATA_INFOFILE_SUFFIX.length());
 			try {
 				DashboardMetadata mdata = getMetadataInfo(expocode, basename);
@@ -191,9 +190,6 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param uploadFilename
 	 * 		upload filename to use for this metadata document; 
 	 * 		may or may not match the basename of uploadFileItem.getName()
-	 * 		If the name starts with the expocode and an underscore, this
-	 * 		prefix is removed from the upload filename recorded in this 
-	 * 		metadata record.
 	 * @param version
 	 * 		SOCAT version for this metadata item
 	 * @param uploadFileItem
@@ -210,16 +206,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	public DashboardMetadata saveMetadataFileItem(String cruiseExpocode, 
 			String owner, String uploadTimestamp, String uploadFilename,
 			String version, FileItem uploadFileItem) throws IllegalArgumentException {
-		String filename;
-		if ( uploadFilename.toUpperCase().startsWith(cruiseExpocode.toUpperCase() + "_") && 
-			(uploadFilename.length() > cruiseExpocode.length() + 3) ) {
-			filename = uploadFilename.substring(cruiseExpocode.length()+1);
-		}
-		else
-			filename = uploadFilename;
-
 		// Create the metadata filename
-		File metadataFile = getMetadataFile(cruiseExpocode, filename);
+		File metadataFile = getMetadataFile(cruiseExpocode, uploadFilename);
 
 		// Make sure the parent directory exists 
 		File parentDir = metadataFile.getParentFile();
@@ -233,7 +221,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Check if this will overwrite existing metadata
 		boolean isUpdate;
 		if ( metadataFile.exists() ) {
-			verifyOkayToDelete(owner, cruiseExpocode, filename);
+			verifyOkayToDelete(owner, cruiseExpocode, uploadFilename);
 			isUpdate = true;
 		}
 		else {
@@ -252,12 +240,12 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the appropriate check-in message
 		String message;
 		if ( isUpdate ) {
-			message = "Updated metadata document " + filename + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+			message = "Updated metadata document " + uploadFilename + 
+					  " for expocode " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
-			message = "Added metadata document " + filename + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+			message = "Added metadata document " + uploadFilename + 
+					  " for expocode " + cruiseExpocode + " and owner " + owner;
 		}
 
 		// Commit the new/updated metadata document to version control
@@ -272,19 +260,19 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		// Create the DashboardMetadata to return
 		DashboardMetadata metadata = new DashboardMetadata();
 		metadata.setExpocode(cruiseExpocode);
-		metadata.setFilename(filename);
+		metadata.setFilename(uploadFilename);
 		metadata.setUploadTimestamp(uploadTimestamp);
 		metadata.setOwner(owner);
 		metadata.setVersion(version);
 
 		// Save the metadata properties
 		if ( isUpdate ) {
-			message = "Updated properties of metadata document " + filename + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+			message = "Updated properties of metadata document " + uploadFilename + 
+					  " for expocode " + cruiseExpocode + " and owner " + owner;
 		}
 		else {
-			message = "Added properties of metadata document " + filename + 
-					  " for cruise " + cruiseExpocode + " and owner " + owner;
+			message = "Added properties of metadata document " + uploadFilename + 
+					  " for expocode " + cruiseExpocode + " and owner " + owner;
 		}
 		saveMetadataInfo(metadata, message);
 
@@ -334,7 +322,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		} catch (IOException ex) {
 			// file not found; negligible possibility comes from close()
 			throw new IllegalArgumentException(
-					"Problems with the metadata source file " + srcFile.getName() + 
+					"Problems with the metadata source file " + srcFile.getPath() + 
 					":\n    " + ex.getMessage());
 		}
 		return mdata;
@@ -441,8 +429,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		if ( ! parentDir.exists() ) {
 			if ( ! parentDir.mkdirs() )
 				throw new IllegalArgumentException(
-						"Problems creating the parent directory for " + 
-						destFile.getName());
+						"Problems creating the parent directory for " + destFile.getPath());
 		}
 
 		// Check if this will overwrite existing metadata
