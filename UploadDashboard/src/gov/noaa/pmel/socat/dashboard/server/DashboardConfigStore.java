@@ -9,7 +9,6 @@ import gov.noaa.pmel.socat.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
@@ -142,7 +141,6 @@ public class DashboardConfigStore {
 	private DatabaseRequestHandler databaseRequestHandler;
 	private PreviewPlotsHandler plotsHandler;
 	private CruiseSubmitter cruiseSubmitter;
-	private CruiseFlagsHandler cruiseFlagsHandler;
 	private OmePdfGenerator omePdfGenerator;
 	private HashSet<File> filesToWatch;
 	private Thread watcherThread;
@@ -321,8 +319,6 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			metadataFileHandler = new MetadataFileHandler(propVal, svnUsername, svnPassword);
-			// Put the flag messages file in the same directory
-			cruiseFlagsHandler = new CruiseFlagsHandler(propVal);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + METADATA_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -778,9 +774,6 @@ public class DashboardConfigStore {
 		return cruiseFileHandler;
 	}
 
-	public CruiseFlagsHandler getCruiseFlagsHandler() {
-		return cruiseFlagsHandler;
-	}
 	/**
 	 * @return
 	 * 		the handler for SanityChecker messages

@@ -3,8 +3,8 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.handlers.CruiseFlagsHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
+import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -69,7 +69,7 @@ public class GenerateWoceReports {
 		int retVal = 0;
 		try {
 			DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
-			CruiseFlagsHandler flagsHandler = configStore.getCruiseFlagsHandler();
+			MetadataFileHandler flagsHandler = configStore.getMetadataFileHandler();
 
 			for ( String expo : expocodes ) {
 				// Generate the WOCE flags report file from the summary messages and current WOCE flags

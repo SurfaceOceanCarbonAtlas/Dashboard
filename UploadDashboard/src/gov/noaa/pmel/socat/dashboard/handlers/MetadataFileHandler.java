@@ -6,8 +6,11 @@ package gov.noaa.pmel.socat.dashboard.handlers;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,8 +21,10 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +50,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	private static final String METADATA_VERSION_ID = "metadataversion";
 	private static final String METADATA_DOI_ID = "metadatadoi";
 	private static final SimpleDateFormat DATETIME_FORMATTER = new SimpleDateFormat("YYYY-MM-dd HH:mm");
+	private static final String FLAG_MSGS_FILENAME = "WOCE_flags.tsv";
 
 	/**
 	 * Handles storage and retrieval of metadata files 
@@ -811,6 +817,65 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(
 					"Problems committing updated OME metadata information " + 
 					mdataFile.getPath() + ":\n    " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Create the WOCE flags messages file from the WOCE flags in the database.
+	 * This file is NOT committed to version control.
+	 * 
+	 * @param expocode
+	 * 		create the WOCE flags messages file for this cruise
+	 * @param dbHandler
+	 * 		get the WOCE flags from the database using this handler
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid
+	 * @throws SQLException
+	 * 		if there are problems getting WOCE flags from the database
+	 */
+	public void generateWoceFlagMsgsFile(String expocode, DatabaseRequestHandler dbHandler) 
+											throws IllegalArgumentException, SQLException {
+		File msgsFile = getMetadataFile(expocode, FLAG_MSGS_FILENAME);
+		PrintWriter msgsWriter;
+		try {
+			msgsWriter = new PrintWriter(msgsFile);
+		} catch (FileNotFoundException ex) {
+			throw new IllegalArgumentException(
+					"Unexpected error opening WOCE flag messages file " + 
+					msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
+		}
+		try {
+			RowNumSet rowNums = new RowNumSet();
+			// Get the current WOCE flags for this cruise and print them to file
+			msgsWriter.println("Expocode: " + expocode);
+			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + 
+					(new SimpleDateFormat("yyyy-MM-dd HH:mm Z")).format(new Date()));
+			msgsWriter.println("Flag\tCol.Type\tNum.Rows\tMessage\tRows");
+			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
+			for ( SocatWoceEvent woceEvent : woceEventsList ) {
+				// Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
+				Character woceFlag = woceEvent.getFlag();
+				if ( ! (woceFlag.equals('3') || woceFlag.equals('4')) )
+					continue;
+				rowNums.clear();
+				for ( DataLocation dloc : woceEvent.getLocations() )
+					rowNums.add(dloc.getRowNumber());
+				msgsWriter.print(woceFlag);
+				msgsWriter.print('\t');
+				String dataColName = woceEvent.getDataVarName();
+				if ( dataColName.trim().isEmpty() )
+					dataColName = "(none)";
+				msgsWriter.print(dataColName);
+				msgsWriter.print('\t');
+				msgsWriter.print(rowNums.size());
+				msgsWriter.print('\t');
+				msgsWriter.print(woceEvent.getComment().replaceAll("\n", "  ").replaceAll("\t", " "));
+				msgsWriter.print('\t');
+				msgsWriter.print(rowNums.toString());
+				msgsWriter.println();
+			}			
+		} finally {
+			msgsWriter.close();
 		}
 	}
 
