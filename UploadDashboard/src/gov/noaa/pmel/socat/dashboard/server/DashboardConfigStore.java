@@ -5,7 +5,7 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.socat.dashboard.actions.CruiseSubmitter;
-import gov.noaa.pmel.socat.dashboard.actions.OmeXmlPdfGenerator;
+import gov.noaa.pmel.socat.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
@@ -143,7 +143,7 @@ public class DashboardConfigStore {
 	private PreviewPlotsHandler plotsHandler;
 	private CruiseSubmitter cruiseSubmitter;
 	private CruiseFlagsHandler cruiseFlagsHandler;
-	private OmeXmlPdfGenerator omePdfGenerator;
+	private OmePdfGenerator omePdfGenerator;
 	private HashSet<File> filesToWatch;
 	private Thread watcherThread;
 	private WatchService watcher;
@@ -542,7 +542,8 @@ public class DashboardConfigStore {
 				previewDirname + "plots", this);
 
 		// Create the OME XML to PDF generator
-		omePdfGenerator = new OmeXmlPdfGenerator(new File(contentAppDir), metadataFileHandler);
+		omePdfGenerator = new OmePdfGenerator(new File(contentAppDir), 
+				metadataFileHandler, cruiseFileHandler);
 
 		// The CruiseSubmitter uses the various handlers just created
 		cruiseSubmitter = new CruiseSubmitter(this);
@@ -856,7 +857,7 @@ public class DashboardConfigStore {
 	 * @return
 	 * 		the OME XML to PDF generator
 	 */
-	public OmeXmlPdfGenerator getOmePdfGenerator() {
+	public OmePdfGenerator getOmePdfGenerator() {
 		return omePdfGenerator;
 	}
 

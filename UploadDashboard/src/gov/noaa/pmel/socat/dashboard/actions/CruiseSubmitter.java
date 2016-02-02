@@ -149,7 +149,8 @@ public class CruiseSubmitter {
 					// Get the OME metadata for this cruise
 					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
 					if ( ! socatVersion.equals(omeInfo.getVersion()) ) {
-						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata SOCAT version number to " + socatVersion + " with submit for QC of " + expocode);
+						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata SOCAT version number to " + 
+								socatVersion + " with submit for QC of " + expocode, false);
 					}
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 

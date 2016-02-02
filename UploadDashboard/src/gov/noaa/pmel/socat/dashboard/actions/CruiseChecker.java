@@ -863,7 +863,7 @@ public class CruiseChecker {
 					timestamp, cruiseData.getOwner(), cruiseData.getVersion());
 
 			String message = "Update of OME metadata from cruise checker";
-			metadataHandler.saveMetadataInfo(dashOmeMData, message);
+			metadataHandler.saveMetadataInfo(dashOmeMData, message, false);
 			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
 		}
 

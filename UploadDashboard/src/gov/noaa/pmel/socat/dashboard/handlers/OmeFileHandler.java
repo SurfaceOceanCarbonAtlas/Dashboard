@@ -192,7 +192,7 @@ public class OmeFileHandler {
 		// a SanityCheck will update those values
 		String message  = "Update of OME XML for " + expocode + " from OME server output";
 		try {
-			metadataHandler.saveMetadataInfo(dashOmeMData, message);
+			metadataHandler.saveMetadataInfo(dashOmeMData, message, false);
 			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
 		} catch (Exception ex) {
 			itsLogger.error("Problems saving the OME XML for " + expocode + 

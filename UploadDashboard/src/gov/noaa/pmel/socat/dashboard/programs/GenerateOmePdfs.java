@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.programs;
 
-import gov.noaa.pmel.socat.dashboard.actions.OmeXmlPdfGenerator;
+import gov.noaa.pmel.socat.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -15,7 +15,7 @@ import java.util.TreeSet;
  * 
  * @author Karl Smith
  */
-public class GenerateOmePDFs {
+public class GenerateOmePdfs {
 
 	/**
 	 * Generates PDFs from the PI_OME.xml documents for specified expocodes.
@@ -68,7 +68,7 @@ public class GenerateOmePDFs {
 			System.exit(1);
 		}
 		try {
-			OmeXmlPdfGenerator pdfGenerator = configStore.getOmePdfGenerator();
+			OmePdfGenerator pdfGenerator = configStore.getOmePdfGenerator();
 			for ( String expo : expocodes ) {
 				try {
 					pdfGenerator.createPiOmePdf(expo);

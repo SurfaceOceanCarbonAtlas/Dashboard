@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.actions;
 
+import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
@@ -27,9 +28,10 @@ import org.apache.fop.apps.MimeConstants;
  * 
  * @author Karl Smith
  */
-public class OmeXmlPdfGenerator {
+public class OmePdfGenerator {
 
 	private MetadataFileHandler metadataHandler;
+	private CruiseFileHandler cruiseHandler;
 	private File fopResourcesDir;
 	private File xsltFile;
 	private FopFactory fopFactory;
@@ -46,6 +48,10 @@ public class OmeXmlPdfGenerator {
 	 * 		and other required Fop resource files
 	 * @param metaFileHandler
 	 * 		handler for dashboard OME metadata files
+	 * @param cruiseFileHandler
+	 * 		handler for dashboard cruise files - for adding the PDF as an
+	 * 		additional document to a dataset; can be null, in which case 
+	 * 		this final step after generating the PDF will not be performed.
 	 * @throws IllegalArgumentException
 	 * 		if resourcesDir does not exist or is not a directory, or
 	 * 		if the omexml.csl file under resourcesDir does not exist, or
@@ -54,11 +60,12 @@ public class OmeXmlPdfGenerator {
 =	 * 		if FopFactory.newInstance fails, or
 	 * 		if the TranformerFactor.newIntance fails
 	 */
-	public OmeXmlPdfGenerator(File resourcesDir, MetadataFileHandler metaFileHandler) 
-			throws IllegalArgumentException, IOException {
+	public OmePdfGenerator(File resourcesDir, MetadataFileHandler metaFileHandler, 
+			CruiseFileHandler cruiseFileHandler) throws IllegalArgumentException, IOException {
 		if ( metaFileHandler == null )
-			throw new IllegalArgumentException("MetadataFileHandler passed to OmeXmlPdfGenerator is null");
+			throw new IllegalArgumentException("MetadataFileHandler passed to OmePdfGenerator is null");
 		metadataHandler = metaFileHandler;
+		cruiseHandler = cruiseFileHandler;
 		if ( ! resourcesDir.isDirectory() )
 			throw new IOException("Does not exist or is not a directory: " + resourcesDir.getPath());
 		fopResourcesDir = resourcesDir;
@@ -83,7 +90,10 @@ public class OmeXmlPdfGenerator {
 	 * @param expocode
 	 * 		convert the PI-provided OME XML file for this dataset
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid or if the PI-provided OME XML file does not exist
+	 * 		if the expocode is invalid, or 
+	 * 		if the PI-provided OME XML file does not exist, or
+	 * 		if unable to add the PDF as an additional document to the dataset 
+	 * 			(if a CruiseFileHandler was provided in the constructor)
 	 * @throws IOException
 	 * 		if the conversion fails
 	 */
@@ -141,11 +151,17 @@ public class OmeXmlPdfGenerator {
 			} catch (Throwable ex) {
 				throw new IOException("Unable to to transform: " + ex.getMessage());
 			}
-			// Add a properties file for the successfully generated PDF
-			mdata.setFilename(DashboardMetadata.PI_OME_PDF_FILENAME);
-			metadataHandler.saveMetadataInfo(mdata, upperExpo + ": PI_OME.pdf generated from the PI_OME.xml file");
 		} finally {
 			pdfOut.close();
+		}
+		// Add a properties file for the successfully generated PDF
+		mdata.setFilename(DashboardMetadata.PI_OME_PDF_FILENAME);
+		// Commit the PDF to version control and save/commit the properties file for the PDF
+		metadataHandler.saveMetadataInfo(mdata, upperExpo + 
+				": PI_OME.pdf generated from the PI_OME.xml file", true);
+		// Add the PDF as an additional document for this dataset
+		if ( cruiseHandler != null ) {
+			cruiseHandler.addAddlDocToCruise(upperExpo, mdata);
 		}
 	}
 

@@ -86,7 +86,7 @@ public class CruiseModifier {
 			String oldMetaOwner = mdata.getOwner();
 			mdata.setOwner(newOwner);
 			metaHandler.saveMetadataInfo(mdata, "Owner of " + upperExpo + 
-					" metadata file changed from " + oldMetaOwner + " to " + newOwner);
+					" metadata file changed from " + oldMetaOwner + " to " + newOwner, false);
 		}
 
 		UserFileHandler userHandler = configStore.getUserFileHandler();

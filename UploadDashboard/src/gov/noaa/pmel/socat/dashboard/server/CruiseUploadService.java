@@ -370,7 +370,7 @@ public class CruiseUploadService extends HttpServlet {
 						timestamp, username, cruiseData.getVersion());
 				String msg = "New OME XML document from data file for " + expocode + " uploaded by " + username;
 				MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
-				mdataHandler.saveMetadataInfo(mdata, msg);
+				mdataHandler.saveMetadataInfo(mdata, msg, false);
 				mdataHandler.saveAsOmeXmlDoc(mdata, msg);
 			} catch (Exception ex) {
 				// should not happen

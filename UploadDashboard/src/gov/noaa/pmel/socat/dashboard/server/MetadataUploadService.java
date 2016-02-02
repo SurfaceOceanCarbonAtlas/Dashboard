@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.server;
 
+import gov.noaa.pmel.socat.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
@@ -137,6 +138,7 @@ public class MetadataUploadService extends HttpServlet {
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 		DsgNcFileHandler dsgFileHandler = configStore.getDsgNcFileHandler();
+		OmePdfGenerator omePdfGenerator = configStore.getOmePdfGenerator();
 		String uploadFilename;
 		if ( isOme ) {
 			// Save under the PI_OME_FILENAME at this time.
@@ -179,6 +181,13 @@ public class MetadataUploadService extends HttpServlet {
 						throw new IllegalArgumentException("Invalid OME metadata file: " + ex.getMessage());
 					}
 					cruise = cruiseHandler.addAddlDocToCruise(expo, omedata);
+					try {
+						// This is using the PI OME XML file at this time
+						omePdfGenerator.createPiOmePdf(expo);
+					} catch ( Exception ex ) {
+						throw new IllegalArgumentException(
+								"Unable to create the PDF from the OME XML: " + ex.getMessage());
+					}
 				}
 				else {
 					cruise = cruiseHandler.addAddlDocToCruise(expo, metadata);

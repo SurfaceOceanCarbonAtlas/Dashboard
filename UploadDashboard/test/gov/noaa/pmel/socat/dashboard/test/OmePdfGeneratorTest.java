@@ -4,7 +4,7 @@
 package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.socat.dashboard.actions.OmeXmlPdfGenerator;
+import gov.noaa.pmel.socat.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 
@@ -21,11 +21,14 @@ import org.junit.Test;
  * 
  * @author Karl Smith
  */
-public class OmeXmlPdfGeneratorTest {
+public class OmePdfGeneratorTest {
 
-	private static final String LOG4J_PROPERTIES_FILE = "/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
-	private static final String METADATA_DOCS_DIR = "/home/flat/ksmith/content/SocatUploadDashboard/MetadataDocs";
-	private static final String OME_XML_PDF_RESOURCES = "/home/flat/ksmith/content/SocatUploadDashboard";
+	private static final String LOG4J_PROPERTIES_FILE = 
+			"/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
+	private static final String METADATA_DOCS_DIR = 
+			"/home/flat/ksmith/content/SocatUploadDashboard/MetadataDocs";
+	private static final String OME_XML_PDF_RESOURCES = 
+			"/home/flat/ksmith/content/SocatUploadDashboard";
 	private static final String[] EXPOCODE_ARRAY = {
 		"06AQ20151030",
 		"33GG20131126",
@@ -59,7 +62,8 @@ public class OmeXmlPdfGeneratorTest {
 			File pdfFile = metaHandler.getMetadataFile(expo, DashboardMetadata.PI_OME_PDF_FILENAME);
 			// Make sure the PDF file does not exist, then generate it
 			pdfFile.delete();
-			OmeXmlPdfGenerator omePdfGenerator = new OmeXmlPdfGenerator(new File(OME_XML_PDF_RESOURCES), metaHandler);
+			OmePdfGenerator omePdfGenerator = new OmePdfGenerator(
+					new File(OME_XML_PDF_RESOURCES), metaHandler, null);
 			omePdfGenerator.createPiOmePdf(expo);
 			assertTrue( pdfFile.exists() );
 		}

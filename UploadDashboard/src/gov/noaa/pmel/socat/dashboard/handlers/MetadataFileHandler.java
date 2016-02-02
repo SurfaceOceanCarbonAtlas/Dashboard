@@ -274,7 +274,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			message = "Added properties of metadata document " + uploadFilename + 
 					  " for expocode " + cruiseExpocode + " and owner " + owner;
 		}
-		saveMetadataInfo(metadata, message);
+		saveMetadataInfo(metadata, message, false);
 
 		return metadata;
 	}
@@ -510,7 +510,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		}
 
 		// Save the metadata properties
-		saveMetadataInfo(metadata, message);
+		saveMetadataInfo(metadata, message, false);
 
 		return metadata;
 	}
@@ -588,15 +588,28 @@ public class MetadataFileHandler extends VersionedFileHandler {
 	 * @param message
 	 * 		version control commit message; if null, the commit is not
 	 * 		performed
+	 * @param alsoCommitFile
+	 * 		also commit the metadata file itself?
 	 * @throws IllegalArgumentException
 	 * 		if there were problems saving the properties to file, or
 	 * 		if there were problems committing the properties file 
 	 */
-	public void saveMetadataInfo(DashboardMetadata metadata, String message) 
-											throws IllegalArgumentException {
-		// Get full path name of the properties file
+	public void saveMetadataInfo(DashboardMetadata metadata, String message,
+			boolean alsoCommitFile) throws IllegalArgumentException {
+		// Get full path name of the metadata file
 		File metadataFile = getMetadataFile(metadata.getExpocode(), 
 											metadata.getFilename());
+		// Commit this metadata file if requested
+		if ( alsoCommitFile && (message != null) && ( ! message.trim().isEmpty() ) ) {
+			// Submit the metadata file to version control
+			try {
+				commitVersion(metadataFile, message);
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException("Problems committing the metadata file  " + 
+						metadataFile.getPath() + ":\n    " + ex.getMessage());
+			}
+		}
+		// Create the full path name of the metadata properties file
 		File propsFile = new File(metadataFile.getPath() + METADATA_INFOFILE_SUFFIX);
 		// Make sure the parent subdirectory exists
 		File parentDir = propsFile.getParentFile();
@@ -636,8 +649,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 		try {
 			commitVersion(propsFile, message);
 		} catch ( Exception ex ) {
-			throw new IllegalArgumentException(
-					"Problems committing updated metadata information for  " + 
+			throw new IllegalArgumentException("Problems committing updated metadata information for  " + 
 					metadata.getFilename() + ":\n    " + ex.getMessage());
 		}
 	}

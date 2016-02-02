@@ -110,7 +110,7 @@ public class RegenerateDsgs {
 			// Update (but do not commit) the metadata info version number if not correct
 			if ( ! socatVersion.equals(omeMData.getVersion()) ) {
 				omeMData.setVersion(socatVersion);
-				metaHandler.saveMetadataInfo(omeMData, null);
+				metaHandler.saveMetadataInfo(omeMData, null, false);
 			}
 			updatedMeta = omeMData.createSocatMetadata(socatVersionStatus, qcFlag.toString());
 			if ( ! fullDataMeta.equals(updatedMeta) )
