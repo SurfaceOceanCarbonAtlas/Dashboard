@@ -54,6 +54,7 @@ public class DsgNcFileHandler {
 	private WatchService watcher;
 	private Thread watcherThread;
 	private Logger itsLogger;
+	private static Object savingDsgFileLock;
 
 	/**
 	 * Handles storage and retrieval of full and decimated NetCDF DSG files 
@@ -95,6 +96,7 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException("parent directory of " + 
 					erddapDecDsgFlagFile.getPath() + " is not valid");
 		ferretConfig = ferretConf;
+		savingDsgFileLock = new Object();
 
 		try {
 			Path dsgFilesDirPath = dsgFilesDir.toPath();
@@ -204,25 +206,33 @@ public class DsgNcFileHandler {
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);
-		// Create the NetCDF DSG file
-		try {
-			dsgFile.create(socatMData, socatDatalist);
-		} catch (Exception ex) {
-			dsgFile.delete();
-			throw new IllegalArgumentException(
-					"Problems creating the SOCAT DSG file " + dsgFile.getName() +
-					"\n    " + ex.getMessage(), ex);
-		}
 
-		// Call Ferret to add the computed variables to the NetCDF DSG file
-		SocatTool tool = new SocatTool(ferretConfig);
-		ArrayList<String> scriptArgs = new ArrayList<String>(1);
-		scriptArgs.add(dsgFile.getPath());
-		tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
-		tool.run();
-		if ( tool.hasError() )
-			throw new IllegalArgumentException("Failure adding computed variables: " + 
-					tool.getErrorMessage());
+		// synchronize on savingDsgFileLock to block examination 
+		// of this DSG files until we finished creating it
+		synchronized(savingDsgFileLock) {
+
+			// Create the NetCDF DSG file
+			try {
+				dsgFile.create(socatMData, socatDatalist);
+			} catch (Exception ex) {
+				dsgFile.delete();
+				throw new IllegalArgumentException(
+						"Problems creating the SOCAT DSG file " + dsgFile.getName() +
+						"\n    " + ex.getMessage(), ex);
+			}
+
+			// Call Ferret to add the computed variables to the NetCDF DSG file
+			SocatTool tool = new SocatTool(ferretConfig);
+			ArrayList<String> scriptArgs = new ArrayList<String>(1);
+			scriptArgs.add(dsgFile.getPath());
+			tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
+			tool.run();
+			if ( tool.hasError() )
+				throw new IllegalArgumentException("Failure adding computed variables: " + 
+						tool.getErrorMessage());
+
+			// end of synchronized block
+		}
 
 		// TODO: ? archive ncdump of the NetCDF DSG file ?
 	}
@@ -785,7 +795,10 @@ public class DsgNcFileHandler {
 							// Ignore repeated events of what was just handled
 							if ( thisFile.equals(lastFile) && thisKind.equals(lastKind) )
 								continue;
-							handleDsgDirChange(subRegs, thisKind, thisFile);
+							// If a DSG file is being saved, block until done saving
+							synchronized(savingDsgFileLock) {
+								handleDsgDirChange(subRegs, thisKind, thisFile);
+							}
 							lastFile = thisFile;
 							lastKind = thisKind;
 						}
