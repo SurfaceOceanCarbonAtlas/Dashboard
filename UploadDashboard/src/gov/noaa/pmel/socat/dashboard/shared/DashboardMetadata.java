@@ -16,19 +16,22 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1603524608482191448L;
+	private static final long serialVersionUID = -7086025255895299534L;
 
 	/**
-	 * The "upload filename" for all OME metadata files.  The name of the 
-	 * actual file on the server has the expocode prefixed to this name.
+	 * The "upload filename" for all OME metadata files.
 	 */
 	public static final String OME_FILENAME = "OME.xml";
 
 	/**
+	 * THe PDF version of the OME XML files.
+	 */
+	public static final String OME_PDF_FILENAME = "OME.pdf";
+
+	/**
 	 * The "upload filename" for all PI-provided OME metadata files 
 	 * that are not used for anything other than generating a supplemental 
-	 * document.  The name of the actual file on the server has the 
-	 * expocode prefixed to this name.
+	 * document.
 	 * 
 	 * The use of this name is just a temporary measure 
 	 * until the CDIAC OME brought into the dashboard.
@@ -36,8 +39,7 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	public static final String PI_OME_FILENAME = "PI_OME.xml";
 
 	/**
-	 * The PDF version of the PI OME XML file.  The name of the actual file 
-	 * on the server has the expocode prefixed to this name.
+	 * The PDF version of the PI OME XML file.
 	 */
 	public static final String PI_OME_PDF_FILENAME = "PI_OME.pdf";
 

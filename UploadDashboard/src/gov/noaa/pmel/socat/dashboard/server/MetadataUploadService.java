@@ -148,11 +148,15 @@ public class MetadataUploadService extends HttpServlet {
 		else {
 			uploadFilename = DashboardUtils.baseName(metadataItem.getName());
 			if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ||
-				 uploadFilename.equals(DashboardMetadata.PI_OME_FILENAME) ) {
+				 uploadFilename.equals(DashboardMetadata.OME_PDF_FILENAME) ||
+				 uploadFilename.equals(DashboardMetadata.PI_OME_FILENAME) ||
+				 uploadFilename.equals(DashboardMetadata.PI_OME_PDF_FILENAME) ) {
 				metadataItem.delete();
 				sendErrMsg(response, "Name of the uploaded file cannot be " + 
 						DashboardMetadata.OME_FILENAME + 
+						" nor " + DashboardMetadata.OME_PDF_FILENAME + 
 						" nor " + DashboardMetadata.PI_OME_FILENAME + 
+						" nor " + DashboardMetadata.PI_OME_PDF_FILENAME + 
 						"\nPlease rename the file and try again.");
 			}
 		}
