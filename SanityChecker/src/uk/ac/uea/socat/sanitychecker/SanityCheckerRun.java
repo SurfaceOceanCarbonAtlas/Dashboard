@@ -314,28 +314,34 @@ public class SanityCheckerRun {
 	 */
 	private boolean checkCommandArgs() {
 		boolean result = true;
-		
-		// Check the input dir
-		File inputDir = new File(itsInputDir);
-		if (!inputDir.exists()) {
-			System.out.println("Input directory '" + itsInputDir + "' doesn't exist");
-			result = false;
-		} else if (!inputDir.isDirectory()) {
-			System.out.println("Input directory '" + itsInputDir + "' isn't a directory");
+
+		if (null == itsInputDir || null == itsOutputDir || null == itsDataFilename || null == itsColSpecFilename) {
+			System.out.println("Usage: java -jar SanityChecker.jar -I<input dir> -O<output dir> -F<data file> -C<column spec file> -D<date format>");
 			result = false;
 		}
-		
-		// Check the output dir
-		File outputDir = new File(itsOutputDir);
-		if (!outputDir.exists()) {
-			System.out.println("Output directory '" + itsOutputDir + "' doesn't exist");
-			result = false;
-		} else if (!outputDir.isDirectory()) {
-			System.out.println("Output directory '" + itsOutputDir + "' isn't a directory");
-			result = false;
-		} else if (!outputDir.canWrite()) {
-			System.out.println("Output directroy '" + itsOutputDir + "' isn't writeable");
-			result = false;
+		if (result) {
+			// Check the input dir
+			File inputDir = new File(itsInputDir);
+			if (!inputDir.exists()) {
+				System.out.println("Input directory '" + itsInputDir + "' doesn't exist");
+				result = false;
+			} else if (!inputDir.isDirectory()) {
+				System.out.println("Input directory '" + itsInputDir + "' isn't a directory");
+				result = false;
+			}
+			
+			// Check the output dir
+			File outputDir = new File(itsOutputDir);
+			if (!outputDir.exists()) {
+				System.out.println("Output directory '" + itsOutputDir + "' doesn't exist");
+				result = false;
+			} else if (!outputDir.isDirectory()) {
+				System.out.println("Output directory '" + itsOutputDir + "' isn't a directory");
+				result = false;
+			} else if (!outputDir.canWrite()) {
+				System.out.println("Output directroy '" + itsOutputDir + "' isn't writeable");
+				result = false;
+			}
 		}
 		
 		// Only do these checks if the others passed
