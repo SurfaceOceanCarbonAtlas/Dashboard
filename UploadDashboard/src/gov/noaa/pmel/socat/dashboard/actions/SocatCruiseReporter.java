@@ -1185,6 +1185,13 @@ public class SocatCruiseReporter {
 		SocatMetadata socatMetadata = dsgFile.getMetadata();
 		socatVersionStatus = socatMetadata.getSocatVersion();
 		dsgQCFlag = socatMetadata.getQcFlag();
+		String westmost = String.format("%#.2f", socatMetadata.getWestmostLongitude());
+		String eastmost = String.format("%#.2f", socatMetadata.getEastmostLongitude());
+		String southmost = String.format("%#.2f", socatMetadata.getSouthmostLatitude());
+		String northmost = String.format("%#.2f", socatMetadata.getNorthmostLatitude());
+		String firsttime = String.format("%1$tF %1$tR", socatMetadata.getBeginTime());
+		String lasttime = String.format("%1$tF %1$tR", socatMetadata.getEndTime());
+
 		/*
 		 * try {
 		 * 	databaseQCFlag = databaseHandler.getQCFlag(upperExpo).toString();
@@ -1228,6 +1235,12 @@ public class SocatCruiseReporter {
 			numErrRows + "\t" +
 			numMissRows + "\t" +
 			regions + "\t" +
+			westmost + "\t" +
+			eastmost + "\t" +
+			southmost + "\t" + 
+			northmost + "\t" +
+			firsttime + "\t" +
+			lasttime + "\t" +
 			vesselName + "\t" +
 			pis);
 	}
@@ -1247,6 +1260,12 @@ public class SocatCruiseReporter {
 			"Num_WOCE-4_fCO2Rec\t" +
 			"Num_Missing_fCO2Rec\t" +
 			"Regions\t" +
+			"Westmost\t" +
+			"Eastmost\t" +
+			"Southmost\t" + 
+			"Northmost\t" +
+			"Firsttime\t" + 
+			"Lasttime\t" + 
 			"Vessel\t" +
 			"Investigators";
 
