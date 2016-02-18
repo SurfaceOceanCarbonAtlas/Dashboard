@@ -202,7 +202,12 @@ public class DsgNcFileHandler {
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
 		// Get the metadata needed for creating the DSG file
-		SocatMetadata socatMData = omeMData.createSocatMetadata(socatVersionStatus, qcFlag);
+		SocatMetadata socatMData = omeMData.createSocatMetadata();
+		// Add SOCAT version number and status string, QC flag, and SOCAT DOI
+		socatMData.setSocatVersion(socatVersionStatus);
+		socatMData.setQcFlag(qcFlag);
+		socatMData.setSocatDOI(cruiseData.getSocatDoi());
+		// The value of allRegionsIDs will be empty - needs IDs from Ferret
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
 				SocatCruiseData.dataListFromDashboardCruise(cruiseData);
@@ -230,6 +235,14 @@ public class DsgNcFileHandler {
 			if ( tool.hasError() )
 				throw new IllegalArgumentException("Failure adding computed variables: " + 
 						tool.getErrorMessage());
+
+			// Assign the metadata String of all region IDs from the region IDs from Ferret
+			try {
+				dsgFile.updateAllRegionIDs();
+			} catch (Exception ex) {
+				dsgFile.delete();
+				throw new IllegalArgumentException("Failure to update the String of all region IDs: " + ex.getMessage());
+			}
 
 			// end of synchronized block
 		}

@@ -32,7 +32,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -8805705402655148326L;
+	private static final long serialVersionUID = 7844591631038781927L;
 
 	private static final SimpleDateFormat TIMEPARSER = new SimpleDateFormat("yyyyMMdd");
 	private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd");
@@ -157,17 +157,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 	/**
 	 * Create a SocatMetadata object from the data in this object.
-	 * Any PI or vessel names will be anglicized.
+	 * Any PI or vessel names will be anglicized.  
+	 * The SOCAT version status and QC flag are not assigned.
 	 * 
-	 * @param socatVersionStatus
-	 * 		SOCAT version number and status String to assign
-	 * @param qcFlag
-	 * 		dataset QC flag to assign
 	 * @return
 	 *		created SocatMetadata object 
 	 */
-	public SocatMetadata createSocatMetadata(String socatVersionStatus, 
-			String qcFlag) throws IllegalArgumentException {
+	public SocatMetadata createSocatMetadata() throws IllegalArgumentException {
 
 		// We cannot create a SocatMetadata object if there are conflicts
 		if ( isConflicted() ) {
@@ -239,10 +235,6 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			}
 		}
 		scMData.setOrganization(orgGroup.toString());
-
-		// Add SOCAT version number and status string, and the QC flag
-		scMData.setSocatVersion(socatVersionStatus);
-		scMData.setQcFlag(qcFlag);
 
 		return scMData;
 	}

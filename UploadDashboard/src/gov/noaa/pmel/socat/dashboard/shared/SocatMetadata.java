@@ -15,7 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1654437463486825106L;
+	private static final long serialVersionUID = 8632155495490906964L;
 
 	/**
 	 * Date used as a missing value; 
@@ -42,6 +42,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	Date endTime;
 	String scienceGroup;
 	String socatVersion;
+	String allRegionIDs;
+	String socatDOI;
 	String qcFlag;
 
 	/**
@@ -60,6 +62,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		endTime = DATE_MISSING_VALUE;
 		scienceGroup = "";
 		socatVersion = "";
+		allRegionIDs = "";
+		socatDOI = "";
 		qcFlag = " ";
 	}
 
@@ -329,6 +333,48 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
+	 * 		the String of all region IDs;
+	 * 		never null but could be a empty string if not assigned
+	 */
+	public String getAllRegionIDs() {
+		return allRegionIDs;
+	}
+
+	/**
+	 * @param allRegionIDs
+	 * 		the String of all region IDs to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setAllRegionIDs(String allRegionIDs) {
+		if ( allRegionIDs == null )
+			this.allRegionIDs = "";
+		else
+			this.allRegionIDs = allRegionIDs;
+	}
+
+	/**
+	 * @return
+	 * 		the SOCAT DOI for this dataset;
+	 * 		never null but could be a empty string if not assigned
+	 */
+	public String getSocatDOI() {
+		return socatDOI;
+	}
+
+	/**
+	 * @param socatDOI
+	 * 		the SOCAT DOI for this dataset to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setSocatDOI(String socatDOI) {
+		if ( socatDOI == null )
+			this.socatDOI = "";
+		else
+			this.socatDOI = socatDOI;
+	}
+
+	/**
+	 * @return
 	 * 		the QC flag;
 	 * 		never null but could be a string with a single blank character if not assigned
 	 */
@@ -350,10 +396,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return
-	 * 		the maximum length of String values given in the fields of this instance
+	 * 		the maximum length of String values given in the fields 
+	 * 		of this instance, or 16, whichever is larger.
 	 */
 	public int getMaxStringLength() {
-		int maxLength = 12;
+		int maxLength = 16;
 		if ( maxLength < expocode.length() )
 			maxLength = expocode.length();
 		if ( maxLength < cruiseName.length() ) 
@@ -366,6 +413,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			maxLength = scienceGroup.length();
 		if ( maxLength < socatVersion.length() )
 			maxLength = socatVersion.length();
+		if ( maxLength < allRegionIDs.length() )
+			maxLength = allRegionIDs.length();
+		if ( maxLength < socatDOI.length() )
+			maxLength = socatDOI.length();
 		if ( maxLength < qcFlag.length() )
 			maxLength = qcFlag.length();
 		return maxLength;
@@ -384,6 +435,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		result = result * prime + endTime.hashCode();
 		result = result * prime + scienceGroup.hashCode();
 		result = result * prime + socatVersion.hashCode();
+		result = result * prime + allRegionIDs.hashCode();
+		result = result * prime + socatDOI.hashCode();
 		result = result * prime + qcFlag.hashCode();
 		return result;
 	}
@@ -417,6 +470,10 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		if ( ! scienceGroup.equals(other.scienceGroup) )
 			return false;
 		if ( ! socatVersion.equals(other.socatVersion) )
+			return false;
+		if ( ! allRegionIDs.equals(other.allRegionIDs) )
+			return false;
+		if ( ! socatDOI.equals(other.socatDOI) )
 			return false;
 		if ( ! qcFlag.equals(other.qcFlag) )
 			return false;
@@ -452,6 +509,8 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    endDate=" + endTime.toString() + 
 				",\n    scienceGroup=" + scienceGroup + 
 				",\n    socatVersion=" + socatVersion + 
+				",\n    allRegionIDs=" + allRegionIDs + 
+				",\n    socatDOI=" + socatDOI + 
 				",\n    qcFlag=" + qcFlag + 
 				" ]";
 	}

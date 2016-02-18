@@ -25,6 +25,8 @@ public class Constants {
 	public static final String endTime_VARNAME = "endTime";
 	public static final String scienceGroup_VARNAME = "scienceGroup";
 	public static final String socatVersion_VARNAME = "socatVersion";
+	public static final String allRegionIDs_VARNAME = "allRegionIDs";
+	public static final String socatDOI_VARNAME = "socatDOI";
 	public static final String qcFlag_VARNAME = "qcFlag";
 
 	public static final String rowNum_VARNAME = "rowNum";
@@ -128,6 +130,8 @@ public class Constants {
 		shortNameMap.put(endTime_VARNAME, "time_converage_end");
 		shortNameMap.put(scienceGroup_VARNAME, "investigators");
 		shortNameMap.put(socatVersion_VARNAME, "socat_version");
+		shortNameMap.put(allRegionIDs_VARNAME, "all_region_ids");
+		shortNameMap.put(socatDOI_VARNAME, "socat_doi");
 		shortNameMap.put(qcFlag_VARNAME, "qc_flag");
 
 		shortNameMap.put(rowNum_VARNAME, "sample_number");
@@ -232,6 +236,8 @@ public class Constants {
 		longNameMap.put(endTime_VARNAME, "ending time");
 		longNameMap.put(scienceGroup_VARNAME, "investigators");
 		longNameMap.put(socatVersion_VARNAME, "SOCAT version");
+		longNameMap.put(allRegionIDs_VARNAME, "alphabetical list of all unique region IDs");
+		longNameMap.put(socatDOI_VARNAME, "SOCAT DOI of this dataset");
 		longNameMap.put(qcFlag_VARNAME, "QC flag");
 
 		longNameMap.put(rowNum_VARNAME, "sample number");
@@ -524,6 +530,8 @@ public class Constants {
 		ioosCatMap.put(endTime_VARNAME, time_category);
 		ioosCatMap.put(scienceGroup_VARNAME, identifier_category);
 		ioosCatMap.put(socatVersion_VARNAME, identifier_category);
+		ioosCatMap.put(allRegionIDs_VARNAME, identifier_category);
+		ioosCatMap.put(socatDOI_VARNAME, identifier_category);
 		ioosCatMap.put(qcFlag_VARNAME, quality_category);
 
 		ioosCatMap.put(rowNum_VARNAME, identifier_category);

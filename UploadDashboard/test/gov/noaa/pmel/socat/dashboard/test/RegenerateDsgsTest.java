@@ -30,7 +30,7 @@ public class RegenerateDsgsTest {
 	 */
 	@Test
 	public void testRegenerateDsgFiles() throws IllegalArgumentException, IOException {
-		final String expocode = "06AQ19951206";
+		final String expocode = "06AQ19911114";
 
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;		

@@ -42,7 +42,11 @@ let ttzero = t[gt=time_to_zero,L=1]
 
 LET dates_for_ncep = 24* days1900(year, month, day) + hour + minute/60 + second/(60*60) + `ttzero`
 
-LET dates_for_ncep = 24* (days1900(year, month, day)+2) + hour + minute/60 + second/(60*60) + `ttzero`
+! The 2-day time shift is not in the data and is not introduced by Ferret as the NCEP data now 
+! comes with its origin at the start of year 1800.
+! data from  http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html
+
+!LET dates_for_ncep = 24* (days1900(year, month, day)+2) + hour + minute/60 + second/(60*60) + `ttzero`
 
 ! Load just the range of time we will need in the call to SAMPLEXYT
 let data_t_lo = INT(dates_for_ncep[i=@min] - 10) 

@@ -81,6 +81,9 @@ public class RegenerateDsgs {
 			// Read the current metadata in the full-data DSG file
 			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
 			ArrayList<String> missing = fullDataDsg.readMetadata();
+			// At this time allow allRegionIDs and socatDOI to be missed
+			missing.remove("allRegionIDs");
+			missing.remove("socatDOI");
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected metadata fields missing from the DSG file: " + missing);
 			missing = fullDataDsg.readData();
@@ -112,7 +115,16 @@ public class RegenerateDsgs {
 				omeMData.setVersion(socatVersion);
 				metaHandler.saveMetadataInfo(omeMData, null, false);
 			}
-			updatedMeta = omeMData.createSocatMetadata(socatVersionStatus, qcFlag.toString());
+			updatedMeta = omeMData.createSocatMetadata();
+			// Add SOCAT version number and status string, QC flag, and SOCAT DOI
+			updatedMeta.setSocatVersion(socatVersionStatus);
+			updatedMeta.setQcFlag(qcFlag.toString());
+			updatedMeta.setSocatDOI(cruise.getSocatDoi());
+
+			// allRegionIDs should still be the same since the data has not changed;
+			// must force if not the case
+			updatedMeta.setAllRegionIDs(fullDataMeta.getAllRegionIDs());
+
 			if ( ! fullDataMeta.equals(updatedMeta) )
 				updateIt = true;
 		} catch (Exception ex) {
@@ -171,6 +183,14 @@ public class RegenerateDsgs {
 				if ( tool.hasError() )
 					throw new IllegalArgumentException("Failure in adding computed variables: " + 
 							tool.getErrorMessage());
+
+				// Assign the metadata String of all region IDs from the region IDs from Ferret
+				try {
+					fullDataDsg.updateAllRegionIDs();
+				} catch (Exception ex) {
+					throw new IllegalArgumentException("Failure to update the String of all region IDs: " + ex.getMessage());
+				}
+
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Problems regenerating the full-data DSG files for " + 
 							upperExpo + ": " + ex.getMessage());

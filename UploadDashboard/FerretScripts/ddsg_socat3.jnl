@@ -50,8 +50,8 @@ LET varnames_traj = {\
 "num_obs","expocode","dataset_name","vessel_name","organization",\
 "geospatial_lon_min","geospatial_lon_max","geospatial_lat_min",\
 "geospatial_lat_max","time_coverage_start","time_converage_end",\
-"investigators","orig_data_ref","addl_docs","socat_data_doi",\
-"socat_data_ref","socat_version","qc_flag","nobs_full"}
+"investigators","socat_version","all_region_ids","socat_doi",\
+"qc_flag","nobs_full"}
 
 ! The text is too long for one Ferret command. Define two variables and concatenate them.
 

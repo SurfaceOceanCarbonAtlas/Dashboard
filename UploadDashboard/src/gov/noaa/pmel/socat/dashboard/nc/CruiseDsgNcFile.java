@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
@@ -35,7 +36,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = -8033968233628871901L;
+	private static final long serialVersionUID = 7050518214208672807L;
 
 	// Names of the variables in the DSG files
 	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
@@ -43,8 +44,10 @@ public class CruiseDsgNcFile extends File {
 	public static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
 	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
 	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
+	public static final String REGION_ID_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
+	public static final String ALL_REGION_IDS_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.allRegionIDs_VARNAME);
 
-	private static final String VERSION = "CruiseDsgNcFile 1.4";
+	private static final String VERSION = "CruiseDsgNcFile 1.5";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
@@ -1014,6 +1017,48 @@ public class CruiseDsgNcFile extends File {
 			ArrayChar.D2 flagArray = new ArrayChar.D2(1, var.getShape(1));
 			flagArray.setString(0, qcFlag.toString());
 			ncfile.write(var, flagArray);
+		} finally {
+			ncfile.close();
+		}
+	}
+
+	/**
+	 * Updates the all_region_ids metadata variable in this DSG file 
+	 * from the values in the region_id data variable in this DSG file.
+	 * 
+	 * @throws IllegalArgumentException
+	 * 		if this DSG file is not valid
+	 * @throws IOException
+	 * 		if opening or writing to the DSG file throws one
+	 * @throws InvalidRangeException 
+	 * 		if writing the updated QC flag to the DSG file throws one 
+	 */
+	public void updateAllRegionIDs() throws IllegalArgumentException, IOException, InvalidRangeException {
+		// Read the region IDs assigned by Ferret
+		char[] regionIDs = readCharVarDataValues(REGION_ID_NCVAR_NAME);
+		// Generate the String of sorted unique IDs
+		TreeSet<Character> allRegionIDsSet = new TreeSet<Character>();
+		for ( char id : regionIDs ) {
+			allRegionIDsSet.add(id);
+		}
+		String allRegionIDs = "";
+		for ( Character id : allRegionIDsSet ) {
+			allRegionIDs += id.toString();
+		}
+		// Write this String of all region IDs to the NetCDF file
+		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
+		try {
+			Variable var = ncfile.findVariable(ALL_REGION_IDS_NCVAR_NAME);
+			if ( var == null ) 
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						ALL_REGION_IDS_NCVAR_NAME + "' in " + getName());
+			if ( var.getShape(1) < allRegionIDs.length() )
+				throw new IllegalArgumentException("Not enough space (max " + 
+						Integer.toString(var.getShape(1)) + 
+						") for the string of all region IDs (" + allRegionIDs + ")");
+			ArrayChar.D2 allRegionIDsArray = new ArrayChar.D2(1, var.getShape(1));
+			allRegionIDsArray.setString(0, allRegionIDs);
+			ncfile.write(var, allRegionIDsArray);
 		} finally {
 			ncfile.close();
 		}
