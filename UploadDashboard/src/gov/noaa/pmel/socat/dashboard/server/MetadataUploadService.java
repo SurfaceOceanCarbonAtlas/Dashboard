@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServlet;
@@ -75,31 +77,44 @@ public class MetadataUploadService extends HttpServlet {
 			; // leave username null for error message later
 		}
 
+		// Get the contents from the post request
 		String expocodes = null;
 		String uploadTimestamp = null;
 		String omeIndicator = null;
 		FileItem metadataItem = null;
 		try {
-			// Go through each item in the request
-			for ( FileItem item : metadataUpload.parseRequest(request) ) {
-				String itemName = item.getFieldName();
-				if ( "expocodes".equals(itemName) ) {
-					expocodes = item.getString();
-					item.delete();
+			Map<String,List<FileItem>> paramMap = metadataUpload.parseParameterMap(request);
+			try {
+				List<FileItem> itemList;
+
+				itemList = paramMap.get("expocodes");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					expocodes = itemList.get(0).getString();
 				}
-				else if ( "timestamp".equals(itemName) ) {
-					uploadTimestamp = item.getString();
-					item.delete();
+	
+				itemList = paramMap.get("timestamp");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					uploadTimestamp = itemList.get(0).getString();
 				}
-				else if ( "ometoken".equals(itemName) ) {
-					omeIndicator = item.getString();
-					item.delete();
+	
+				itemList = paramMap.get("ometoken");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					omeIndicator = itemList.get(0).getString();
 				}
-				else if ( "metadataupload".equals(itemName) ) {
-					metadataItem = item;
+	
+				itemList = paramMap.get("metadataupload");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					metadataItem = itemList.get(0);
 				}
-				else {
-					item.delete();
+				
+			} finally {
+				// Delete everything except for the uploaded metadata file
+				for ( List<FileItem> itemList : paramMap.values() ) {
+					for ( FileItem item : itemList ) {
+						if ( ! item.equals(metadataItem) ) {
+							item.delete();
+						}
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -115,7 +130,8 @@ public class MetadataUploadService extends HttpServlet {
 			 (omeIndicator == null) || (metadataItem == null) || 
 			 ( ! (omeIndicator.equals("false") || omeIndicator.equals("true")) ) || 
 			 ! configStore.validateUser(username) ) {
-			metadataItem.delete();
+			if ( metadataItem != null )
+				metadataItem.delete();
 			sendErrMsg(response, "Invalid request contents for this service.");
 			return;
 		}

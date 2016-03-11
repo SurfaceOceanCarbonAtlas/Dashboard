@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -100,43 +103,56 @@ public class CruiseUploadService extends HttpServlet {
 		String dataFormat = null;
 		String encoding = null;
 		String action = null;
-		ArrayList<FileItem> cruiseItems = new ArrayList<FileItem>();
+		List<FileItem> cruiseItems = null;
 		try {
-			// Go through each item in the request
-			for ( FileItem item : cruiseUpload.parseRequest(request) ) {
-				String itemName = item.getFieldName();
-				if ( "timestamp".equals(itemName) ) {
-					timestamp = item.getString();
-					item.delete();
+			Map<String,List<FileItem>> paramMap = cruiseUpload.parseParameterMap(request);
+			try {
+				List<FileItem> itemList;
+
+				itemList = paramMap.get("timestamp");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					timestamp = itemList.get(0).getString();
 				}
-				else if ( "cruiseformat".equals(itemName) ) {
-					dataFormat = item.getString();
-					item.delete();
+	
+				itemList = paramMap.get("cruiseformat");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					dataFormat = itemList.get(0).getString();
 				}
-				else if ( "cruiseencoding".equals(itemName) ) {
-					encoding = item.getString();
-					item.delete();
+	
+				itemList = paramMap.get("cruiseencoding");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					encoding = itemList.get(0).getString();
 				}
-				else if ( "cruiseaction".equals(itemName) ) {
-					action = item.getString();
-					item.delete();
+	
+				itemList = paramMap.get("cruiseaction");
+				if ( (itemList != null) && (itemList.size() == 1) ) {
+					action = itemList.get(0).getString();
 				}
-				else if ( "cruisedata".equals(itemName) ) {
-					cruiseItems.add(item);
-				}
-				else {
-					item.delete();
+	
+				cruiseItems = paramMap.get("cruisedata");
+
+			} finally {
+				// Delete everything except for the uploaded data files
+				for ( Entry<String,List<FileItem>> paramEntry : paramMap.entrySet() ) {
+					if ( ! "cruisedata".equals(paramEntry.getKey()) ) {
+						for ( FileItem item : paramEntry.getValue() ) {
+							item.delete();
+						}
+					}
 				}
 			}
 		} catch (Exception ex) {
-			for ( FileItem item : cruiseItems )
-				item.delete();
+			// also delete the uploaded data files when an error occurs
+			if ( cruiseItems != null ) {
+				for ( FileItem item : cruiseItems )
+					item.delete();
+			}
 			sendErrMsg(response, "Error processing the request \n" + ex.getMessage());
 			return;
 		}
 
 		// Verify contents seem okay
-		if ( cruiseItems.isEmpty() ) {
+		if ( (cruiseItems == null) || cruiseItems.isEmpty() ) {
 			sendErrMsg(response, "No upload files specified");
 			return;
 		}
@@ -180,7 +196,7 @@ public class CruiseUploadService extends HttpServlet {
 					item.delete();
 				return;
 			}
-			// done with the uploaded files
+			// done with the uploaded data files
 			for ( FileItem item : cruiseItems )
 				item.delete();
 
