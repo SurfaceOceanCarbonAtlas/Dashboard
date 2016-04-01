@@ -6,15 +6,14 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.messages.Flag;
+import uk.ac.exeter.QCRoutines.messages.Message;
 import uk.ac.uea.socat.omemetadata.BadEntryNameException;
 import uk.ac.uea.socat.omemetadata.InvalidConflictException;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.omemetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.messages.Message;
-import uk.ac.uea.socat.sanitychecker.messages.MessageException;
-import uk.ac.uea.socat.sanitychecker.messages.Messages;
 
 /**
  * Class to hold the complete output of the Sanity Checker from processing
@@ -78,7 +77,7 @@ public class Output {
 	/**
 	 * The set of output messages
 	 */
-	private Messages itsMessages;
+	private List<Message> itsMessages;
 	
 	/**
 	 * The original filename to which this object pertains. This is a copy
@@ -98,7 +97,7 @@ public class Output {
 		itsFilename = filename;
 		itsMetadata = metadata;
 		itsDataRecords = new ArrayList<SocatDataRecord>(dataLength);
-		itsMessages = new Messages(columnSpec);
+		itsMessages = new ArrayList<Message>();
 		
 		itsLogger = logger;
 		
@@ -216,24 +215,24 @@ public class Output {
 	 * Add a data message to the output
 	 * @param message The message
 	 */
-	public void addMessage(Message message) throws MessageException {
-		itsMessages.addMessage(message);
+	public void addMessage(Message message) {
+		itsMessages.add(message);
 		itsLogger.trace("Message added to output::-> " + message.getMessageString());
 		setExitFlag(message);
 	}
 	
-	public void addMessages(List<Message> messages) throws MessageException {
+	public void addMessages(List<Message> messages) {
 		for (Message message : messages) {
-			itsMessages.addMessage(message);
+			itsMessages.add(message);
 			itsLogger.trace("Message added to output::-> " + message.getMessageString());
 			setExitFlag(message);
 		}
 	}
 
 	private void setExitFlag(Message message) {
-		if (message.isError()) {
+		if (message.getFlag().equals(Flag.BAD)) {
 			setExitFlag(ERRORS_FLAG);
-		} else if (message.isWarning()) {
+		} else if (message.getFlag().equals(Flag.QUESTIONABLE)) {
 			setExitFlag(WARNINGS_FLAG);
 		}
 	}
@@ -278,7 +277,7 @@ public class Output {
 	 * Return the collection of messages generated while processing the data file.
 	 * @return The collection of messages.
 	 */
-	public Messages getMessages() {
+	public List<Message> getMessages() {
 		return itsMessages;
 	}
 }
