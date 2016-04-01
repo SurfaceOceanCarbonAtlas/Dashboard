@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.config.RoutinesConfig;
+
 /**
  * The base configuration for the Sanity Checker.
  * 
@@ -156,7 +158,12 @@ public class BaseConfig extends Properties {
 		MetadataConfig.init(loadedConfig.getMetadataConfigFile(), itsLogger);
 		ColumnConversionConfig.init(loadedConfig.getColumnConversionConfigFile(), itsLogger);
 		SocatColumnConfig.init(loadedConfig.getSocatConfigFile(), itsLogger);
-		SanityCheckConfig.init(loadedConfig.getSanityCheckConfigFile(), itsLogger);
+		
+		try {
+			RoutinesConfig.init(loadedConfig.getSanityCheckConfigFile());
+		} catch (uk.ac.exeter.QCRoutines.config.ConfigException e) {
+			throw new ConfigException(loadedConfig.getSanityCheckConfigFile(), e.getMessage(), e);
+		}
 		
 		// Store the loaded configuration as the singleton instance
 		baseConfigInstance = loadedConfig;
