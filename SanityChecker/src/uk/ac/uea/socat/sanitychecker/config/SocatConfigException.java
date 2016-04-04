@@ -4,7 +4,7 @@ package uk.ac.uea.socat.sanitychecker.config;
  * An exception class for errors encountered in configuration files.
  *
  */
-public class ConfigException extends Exception {
+public class SocatConfigException extends Exception {
 	
 	/**
 	 * Version string for the BaseConfig class. This should be changed if the
@@ -32,7 +32,7 @@ public class ConfigException extends Exception {
 	 * @param file The path of the file being worked on when the exception occurred.
 	 * @param message The error message.
 	 */
-	public ConfigException(String file, String message) {
+	public SocatConfigException(String file, String message) {
 		super(message);
 		itsFile = file;
 	}
@@ -43,7 +43,7 @@ public class ConfigException extends Exception {
 	 * @param lineNumber The line number of the file on which the error occurred
 	 * @param message The error message.
 	 */
-	public ConfigException(String file, int lineNumber, String message) {
+	public SocatConfigException(String file, int lineNumber, String message) {
 		super(message);
 		itsFile = file;
 		itsLineNumber = lineNumber;
@@ -56,7 +56,7 @@ public class ConfigException extends Exception {
 	 * @param message The error message.
 	 * @param cause The underlying cause of the exception
 	 */
-	public ConfigException(String file, int lineNumber, String message, Throwable cause) {
+	public SocatConfigException(String file, int lineNumber, String message, Throwable cause) {
 		super(message, cause);
 		itsFile = file;
 		itsLineNumber = lineNumber;
@@ -69,7 +69,7 @@ public class ConfigException extends Exception {
 	 * @param lineNumber The line number of the file on which the error occurred
 	 * @param message The error message
 	 */
-	public ConfigException(String file, String item, int lineNumber, String message) {
+	public SocatConfigException(String file, String item, int lineNumber, String message) {
 		super(message);
 		itsFile = file;
 		itsItemName = item;
@@ -84,7 +84,7 @@ public class ConfigException extends Exception {
 	 * @param message The error message.
 	 * @param cause The underlying cause of the exception
 	 */
-	public ConfigException(String file, String item, int lineNumber, String message, Throwable cause) {
+	public SocatConfigException(String file, String item, int lineNumber, String message, Throwable cause) {
 		super(message, cause);
 		itsFile = file;
 		itsItemName = item;
@@ -97,7 +97,7 @@ public class ConfigException extends Exception {
 	 * @param message The error message.
 	 * @param cause The exception that caused the error.
 	 */
-	public ConfigException(String file, String message, Throwable cause) {
+	public SocatConfigException(String file, String message, Throwable cause) {
 		super(message, cause);
 		itsFile = file;
 	}
