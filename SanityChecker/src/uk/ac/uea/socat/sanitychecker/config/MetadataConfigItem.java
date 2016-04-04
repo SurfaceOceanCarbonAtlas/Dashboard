@@ -43,7 +43,7 @@ public class MetadataConfigItem {
 	 */
 	public MetadataConfigItem(String name, boolean required, boolean generate,
 			Class<? extends MetadataItem> itemClass,
-			String generatorParameter, Logger logger) throws ConfigException {
+			String generatorParameter, Logger logger) throws SocatConfigException {
 		
 		logger.trace("Creating Metadata Config Item " + name);
 		
