@@ -106,10 +106,10 @@ public class MetadataConfig {
 	 * @param filename The name of the file where the configuration is stored
 	 * @throws IOException If the file cannot be accessed
 	 */
-	private MetadataConfig() throws ConfigException {
+	private MetadataConfig() throws SocatConfigException {
 		
 		if (itsConfigFilename == null) {
-			throw new ConfigException(null, "Config filename has not been set - must run init() first");
+			throw new SocatConfigException(null, "Config filename has not been set - must run init() first");
 		}
 		
 		itsConfigItems = new HashMap<String, MetadataConfigItem>(200);
@@ -123,7 +123,7 @@ public class MetadataConfig {
 	 * 
 	 * @return The singleton instance of this class
 	 */
-	public static MetadataConfig getInstance() throws ConfigException {
+	public static MetadataConfig getInstance() throws SocatConfigException {
 		if (metadataConfigInstance == null) {
 			metadataConfigInstance = new MetadataConfig();
 		}
@@ -144,9 +144,9 @@ public class MetadataConfig {
 	 * @param filename The name of the config file
 	 * @param logger The logger to which message should be sent
 	 * @throws IOException If an error occurs in accessing the file
-	 * @throws ConfigException If an error occurs while processing the config data
+	 * @throws SocatConfigException If an error occurs while processing the config data
 	 */
-	private void readFile() throws ConfigException {
+	private void readFile() throws SocatConfigException {
 
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(itsConfigFilename));
@@ -161,7 +161,7 @@ public class MetadataConfig {
 						String name = fields.get(NAME_COL).toLowerCase();
 
 						if (contains(name)) {
-							throw new ConfigException(itsConfigFilename, name, lineCount, "Item is configured more than once");
+							throw new SocatConfigException(itsConfigFilename, name, lineCount, "Item is configured more than once");
 						}
 
 						try {
@@ -210,7 +210,7 @@ public class MetadataConfig {
 
 						} catch (Exception e) {
 							itsLogger.error("Error processing Metadata config", e);
-							throw new ConfigException(itsConfigFilename, name, lineCount, e.getMessage());
+							throw new SocatConfigException(itsConfigFilename, name, lineCount, e.getMessage());
 						}
 					}
 
@@ -222,7 +222,7 @@ public class MetadataConfig {
 				reader.close();
 			}
 		} catch (IOException e) {
-			throw new ConfigException(itsConfigFilename, "I/O Error while reading from file", e);
+			throw new SocatConfigException(itsConfigFilename, "I/O Error while reading from file", e);
 		}
 		itsLogger.info("read MetadataConfig configuration file " + itsConfigFilename);
 	}
