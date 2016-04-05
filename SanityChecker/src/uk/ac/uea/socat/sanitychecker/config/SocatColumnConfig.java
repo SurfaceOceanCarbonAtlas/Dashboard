@@ -55,7 +55,7 @@ public class SocatColumnConfig extends ColumnConfig {
 	/**
 	 * The column name for the ISO date
 	 */
-	private static final String ISO_DATE_COLUMN_NAME = "iso_date";
+	public static final String ISO_DATE_COLUMN_NAME = "iso_date";
 	
 	/**
 	 * The column name for the latitude

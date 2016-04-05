@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import uk.ac.exeter.QCRoutines.data.NoSuchColumnException;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
@@ -43,33 +44,37 @@ public class DataDateMetadataItem extends MetadataItem {
 	@Override
 	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 		
-		// Get the record's date
-		if (!record.getColumn(SocatColumnConfig.YEAR_COLUMN_NAME).getValue().equalsIgnoreCase("NaN")) {
-		
-			int year = Integer.parseInt(record.getColumn(SocatColumnConfig.YEAR_COLUMN_NAME).getValue());
-			int month = Integer.parseInt(record.getColumn(SocatColumnConfig.MONTH_COLUMN_NAME).getValue());
-			int day = Integer.parseInt(record.getColumn(SocatColumnConfig.DAY_COLUMN_NAME).getValue());
-			DateTime newDate = new DateTime(year, month, day, 0, 0, 0, DateTimeZone.UTC).withTimeAtStartOfDay();
+		try {
+			// Get the record's date
+			if (!record.getColumn(SocatColumnConfig.YEAR_COLUMN_NAME).getValue().equalsIgnoreCase("NaN")) {
 			
-			// If no date is currently set, then this record's date is be recorded
-			if (null == itsDate) {
-				itsDate = newDate;
-			} else {
+				int year = Integer.parseInt(record.getColumn(SocatColumnConfig.YEAR_COLUMN_NAME).getValue());
+				int month = Integer.parseInt(record.getColumn(SocatColumnConfig.MONTH_COLUMN_NAME).getValue());
+				int day = Integer.parseInt(record.getColumn(SocatColumnConfig.DAY_COLUMN_NAME).getValue());
+				DateTime newDate = new DateTime(year, month, day, 0, 0, 0, DateTimeZone.UTC).withTimeAtStartOfDay();
 				
-				/* If we're looking for the start date, only store this date if it's before
-				   what we already have */ 
-				if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("start")) {
-					if (newDate.isBefore(itsDate)) {
-						itsDate = newDate;
-					}
-				/* If we're looking for the end date, only store this date if it's after
-				   what we already have */ 
-				} else if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("end")) {
-					if (newDate.isAfter(itsDate)) {
-						itsDate = newDate;
+				// If no date is currently set, then this record's date is be recorded
+				if (null == itsDate) {
+					itsDate = newDate;
+				} else {
+					
+					/* If we're looking for the start date, only store this date if it's before
+					   what we already have */ 
+					if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("start")) {
+						if (newDate.isBefore(itsDate)) {
+							itsDate = newDate;
+						}
+					/* If we're looking for the end date, only store this date if it's after
+					   what we already have */ 
+					} else if (itsConfigItem.getGeneratorParameter().equalsIgnoreCase("end")) {
+						if (newDate.isAfter(itsDate)) {
+							itsDate = newDate;
+						}
 					}
 				}
 			}
+		} catch (NoSuchColumnException e) {
+			throw new MetadataException("Error while retrieving date values", e);
 		}
 	}
 }
