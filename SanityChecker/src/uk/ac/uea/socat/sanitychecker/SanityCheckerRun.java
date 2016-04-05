@@ -9,19 +9,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.messages.Message;
+import uk.ac.exeter.QCRoutines.messages.MessageSummary;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
-import uk.ac.uea.socat.sanitychecker.config.ConfigException;
+import uk.ac.uea.socat.sanitychecker.config.SocatConfigException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
-import uk.ac.uea.socat.sanitychecker.messages.Message;
-import uk.ac.uea.socat.sanitychecker.messages.MessageException;
-import uk.ac.uea.socat.sanitychecker.messages.MessageSummary;
-import uk.ac.uea.socat.sanitychecker.messages.Messages;
 
 /**
  * This is an executable that can run the Sanity Checker as a standalone program.
@@ -110,7 +109,7 @@ public class SanityCheckerRun {
 			} catch (InvalidColumnSpecException e) {
 				System.out.println("The Column Spec is invalid:" + e.getMessage());
 				ok = false;
-			} catch (ConfigException e) {
+			} catch (SocatConfigException e) {
 				System.out.println("Configuration error:" + e.getMessage());
 				ok = false;
 			}  
@@ -144,7 +143,7 @@ public class SanityCheckerRun {
 					//System.out.println("Records: " + checkerOutput.getRecordCount());
 				}
 				
-				Messages messages = checkerOutput.getMessages();
+				List<Message> messages = checkerOutput.getMessages();
 				if (messages != null) {
 					try {
 						writeMessages(messages);
@@ -166,17 +165,17 @@ public class SanityCheckerRun {
 	 * @param messages The messages to be written
 	 * @throws IOException If writing to the file fails.
 	 */
-	private void writeMessages(Messages messages) throws IOException, MessageException {
+	private void writeMessages(List<Message> messages) throws IOException {
 		
 		PrintWriter writer = new PrintWriter(new File(itsOutputDir, getMessagesFilename()));
-		for (MessageSummary summary : messages.getMessageSummaries()) {
-			writer.println(summary.getSummaryString() + " - " + summary.getWarningCount() + " warnings, " + summary.getErrorCount() + " errors");
+		for (MessageSummary summary : MessageSummary.getMessageSummaries(messages)) {
+			writer.println(summary.getMessageString() + " - " + summary.getQuestionableCount() + " warnings, " + summary.getBadCount() + " errors");
 		}
 		
 		writer.print("\n\n\n");
 		
-		for (Message message : messages.getMessages()) {
-			writer.println(message.getMessageString());
+		for (Message message : messages) {
+			writer.println(message.getFullMessage());
 		}
 
 		writer.close();
