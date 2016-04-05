@@ -139,9 +139,7 @@ public class StandardColumnInfo {
 		boolean result = false;
 		
 		if (null != value) {
-			if (value.equals(SocatDataColumn.MISSING_VALUE)) {
-				result = true;
-			} else if (hasMissingValue()) {
+			if (hasMissingValue()) {
 				try {
 					if (Double.parseDouble(value) == itsMissingValue.doubleValue()) {
 						result = true;
