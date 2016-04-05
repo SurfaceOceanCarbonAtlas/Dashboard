@@ -217,14 +217,14 @@ public class Output {
 	 */
 	public void addMessage(Message message) {
 		itsMessages.add(message);
-		itsLogger.trace("Message added to output::-> " + message.getMessageString());
+		itsLogger.trace("Message added to output::-> " + message.getFullMessage());
 		setExitFlag(message);
 	}
 	
 	public void addMessages(List<Message> messages) {
 		for (Message message : messages) {
 			itsMessages.add(message);
-			itsLogger.trace("Message added to output::-> " + message.getMessageString());
+			itsLogger.trace("Message added to output::-> " + message.getFullMessage());
 			setExitFlag(message);
 		}
 	}
