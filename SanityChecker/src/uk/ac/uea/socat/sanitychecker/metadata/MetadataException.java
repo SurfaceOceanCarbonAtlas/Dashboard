@@ -22,6 +22,15 @@ public class MetadataException extends Exception {
 	}
 	
 	/**
+	 * Basic constructor for an error that is not linked to a specific metadata item.
+	 * Only an error message is required.
+	 * @param message The error message
+	 */
+	public MetadataException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
+	/**
 	 * Constructor for an error relating to a specific metadata item.
 	 * @param name The name of the metadata item
 	 * @param message The error message

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.data.NoSuchColumnException;
 import uk.ac.exeter.QCRoutines.messages.Flag;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
@@ -119,35 +120,39 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	@Override
 	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 
-		SocatDataColumn longitudeColumn = record.getColumn(SocatColumnConfig.LONGITUDE_COLUMN_NAME);
-		if (!longitudeColumn.getFlag().equals(Flag.BAD)) {
-
-			// Get the longitude from the record - covert to 0-360 range
-			Double position = Double.parseDouble(longitudeColumn.getValue());
-			// Only allow out to [-540,540]
-			if ( (position >= -540.0) && (position < -360.0) ) {
-				position += 720.0;
-			}
-			else if ( (position >= -360.0) && (position < 0.0) ) {
-				position += 360.0;
-			}
-			else if ( (position >= 360.0) && (position < 540.0) ) {
-				position -= 360.0;
-			}
-			
-			// Add the longitude to the list of all longitudes
-			allLons.add(position);
-			hasValue = true;
-			
-			// See if the cruise has crossed the zero line, if it hasn't already.
-			if (!crossesZero) {
-				if (lastPosition != -9999.0) {
-					if (Math.abs(position - lastPosition) > 180) {
-						crossesZero = true;
-					}
+		try {
+			SocatDataColumn longitudeColumn = (SocatDataColumn) record.getColumn(SocatColumnConfig.LONGITUDE_COLUMN_NAME);
+			if (!longitudeColumn.getFlag().equals(Flag.BAD)) {
+	
+				// Get the longitude from the record - covert to 0-360 range
+				Double position = Double.parseDouble(longitudeColumn.getValue());
+				// Only allow out to [-540,540]
+				if ( (position >= -540.0) && (position < -360.0) ) {
+					position += 720.0;
 				}
-				lastPosition = position;
+				else if ( (position >= -360.0) && (position < 0.0) ) {
+					position += 360.0;
+				}
+				else if ( (position >= 360.0) && (position < 540.0) ) {
+					position -= 360.0;
+				}
+				
+				// Add the longitude to the list of all longitudes
+				allLons.add(position);
+				hasValue = true;
+				
+				// See if the cruise has crossed the zero line, if it hasn't already.
+				if (!crossesZero) {
+					if (lastPosition != -9999.0) {
+						if (Math.abs(position - lastPosition) > 180) {
+							crossesZero = true;
+						}
+					}
+					lastPosition = position;
+				}
 			}
+		} catch (NoSuchColumnException e) {
+			throw new MetadataException("Error retrieving longitude value", e);
 		}
 	}
 }

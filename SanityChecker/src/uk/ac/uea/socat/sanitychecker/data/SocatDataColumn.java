@@ -77,4 +77,8 @@ public class SocatDataColumn extends DataColumn {
 	private SocatColumnConfigItem getConfigItem() {
 		return (SocatColumnConfigItem) columnConfig;
 	}
+	
+	public String getRequiredGroup() {
+		return getConfigItem().getRequiredGroup();
+	}
 }
