@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.messages.Flag;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
-import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
@@ -120,7 +120,7 @@ public class LongitudeLimitMetadataItem extends MetadataItem {
 	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 
 		SocatDataColumn longitudeColumn = record.getColumn(SocatColumnConfig.LONGITUDE_COLUMN_NAME);
-		if (longitudeColumn.getFlag() != SocatColumnConfigItem.BAD_FLAG) {
+		if (!longitudeColumn.getFlag().equals(Flag.BAD)) {
 
 			// Get the longitude from the record - covert to 0-360 range
 			Double position = Double.parseDouble(longitudeColumn.getValue());
