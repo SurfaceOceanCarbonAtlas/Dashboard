@@ -10,7 +10,7 @@ public class CantCalculateExpoCodeMessage extends Message {
 	}
 
 	@Override
-	protected String getFullMessage() {
+	public String getFullMessage() {
 		return "Cannot generate EXPO Code for record";
 	}
 
