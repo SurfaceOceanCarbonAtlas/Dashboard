@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
@@ -73,7 +74,7 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 	@Override
 	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 		
-		SocatDataColumn latitudeColumn = record.getColumn(SocatDataRecord.LATITUDE_COLUMN_NAME);
+		SocatDataColumn latitudeColumn = record.getColumn(SocatColumnConfig.LATITUDE_COLUMN_NAME);
 		if (latitudeColumn.getFlag() != SocatColumnConfigItem.BAD_FLAG) {
 			double position = Double.parseDouble(latitudeColumn.getValue());
 			updateLimits(position);
