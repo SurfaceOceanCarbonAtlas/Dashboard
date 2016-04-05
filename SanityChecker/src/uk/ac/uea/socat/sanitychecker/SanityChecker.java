@@ -11,29 +11,30 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import uk.ac.exeter.QCRoutines.config.ConfigException;
+import uk.ac.exeter.QCRoutines.config.RoutinesConfig;
+import uk.ac.exeter.QCRoutines.data.DataRecord;
+import uk.ac.exeter.QCRoutines.data.NoSuchColumnException;
+import uk.ac.exeter.QCRoutines.messages.Message;
+import uk.ac.exeter.QCRoutines.messages.MessageException;
+import uk.ac.exeter.QCRoutines.routines.Routine;
+import uk.ac.exeter.QCRoutines.routines.RoutineException;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.omemetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
-import uk.ac.uea.socat.sanitychecker.config.ConfigException;
+import uk.ac.uea.socat.sanitychecker.config.SocatConfigException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
-import uk.ac.uea.socat.sanitychecker.config.SanityCheckConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
-import uk.ac.uea.socat.sanitychecker.config.SocatDataBaseException;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeException;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
-import uk.ac.uea.socat.sanitychecker.messages.Message;
-import uk.ac.uea.socat.sanitychecker.messages.MessageException;
-import uk.ac.uea.socat.sanitychecker.messages.MessageType;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataException;
 import uk.ac.uea.socat.sanitychecker.metadata.MetadataItem;
-import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheck;
-import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
 
 /**
  * Startup class for the SOCAT Sanity Checker.
@@ -46,18 +47,6 @@ import uk.ac.uea.socat.sanitychecker.sanitychecks.SanityCheckException;
  * 
  */
 public class SanityChecker {
-	
-	private static final String INTERNAL_ERROR_ID = "INTERNAL";
-	
-	private MessageType itsInternalErrorType;
-	
-	private static final String MISSING_VALUE_ID = "MISSING_VALUE";
-	
-	private MessageType itsMissingValueType;
-	
-	private static final String RANGE_ID = "RANGE";
-	
-	private MessageType itsRangeType;
 	
 	/**
 	 * The standard output output format for dates
@@ -90,16 +79,11 @@ public class SanityChecker {
 	private Output itsOutput;
 	
 	/**
-	 * A counter for the number of records processed
-	 */
-	private int itsRecordCount = 0;
-	
-	/**
 	 * Initialise the configuration of the Sanity Checker
 	 * 
 	 * @param filename The location of the {@link BaseConfig} file. 
 	 */
-	public static void initConfig(String filename) throws ConfigException, SanityCheckerException {
+	public static void initConfig(String filename) throws SocatConfigException, SanityCheckerException {
 		Logger initLogger = Logger.getLogger("SanityChecker");
 		BaseConfig.init(filename, initLogger);
 		
@@ -122,8 +106,12 @@ public class SanityChecker {
 		BaseConfig.getInstance();
 		MetadataConfig.getInstance();
 		ColumnConversionConfig.getInstance();
-		SocatColumnConfig.getInstance();
-		SanityCheckConfig.getInstance();
+		try {
+			SocatColumnConfig.getInstance();
+			RoutinesConfig.getInstance();
+		} catch (uk.ac.exeter.QCRoutines.config.ConfigException e) {
+			throw new SocatConfigException(filename, e.getMessage(), e);
+		}
 	}
 	
 	/**
@@ -141,20 +129,13 @@ public class SanityChecker {
 	 * @param colSpec The column specification of the data file.
 	 * @param dataInput The data values from the input file
 	 * @param dateTimeFormat The date format to be used for parsing date strings. Do not include the time specification!
-	 * @throws ConfigException If the base configuration has not been initialised
+	 * @throws SocatConfigException If the base configuration has not been initialised
 	 */
 	public SanityChecker(String filename, OmeMetadata metadata, ColumnSpec colSpec, 
 			ArrayList<ArrayList<String>> dataInput, String dateFormat) throws SanityCheckerException {
 		
 		itsLogger = Logger.getLogger("Sanity Checker - " + filename);
 		itsLogger.trace("SanityChecker initialised");
-		
-		/*
-		 * Initialise message types
-		 */
-		itsInternalErrorType = new MessageType(INTERNAL_ERROR_ID, "Internal Error", "Internal Error");
-		itsMissingValueType = new MessageType(MISSING_VALUE_ID, "Missing value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "'", "Missing value for column '" + MessageType.COLUMN_NAME_IDENTIFIER + "'");
-		itsRangeType = new MessageType(RANGE_ID, "Value '" + MessageType.FIELD_VALUE_IDENTIFIER + "' in column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' is outside the range '" + MessageType.VALID_VALUE_IDENTIFIER + "'", "Column '" + MessageType.COLUMN_NAME_IDENTIFIER + "' out of range");
 		
 		// Make sure the the base configuration is set up. Otherwise we can't do anything!
 		if (!BaseConfig.isInitialised()) {
@@ -183,11 +164,11 @@ public class SanityChecker {
 
 		try {
 			itsLogger.debug("Processing data records");
-			
+			int recordCount = 0;
 			for (List<String> record: itsInputData) {
-				itsRecordCount++;
-				itsLogger.trace("Processing record " + itsRecordCount);
-				SocatDataRecord socatRecord = new SocatDataRecord(record, itsRecordCount, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler, itsLogger);
+				recordCount++;
+				itsLogger.trace("Processing record " + recordCount);
+				SocatDataRecord socatRecord = new SocatDataRecord(recordCount, SocatColumnConfig.getInstance(), record, itsColumnSpec, itsOutput.getMetadata(), itsDateTimeHandler); 
 				itsOutput.addRecord(socatRecord);
 				itsOutput.addMessages(socatRecord.getMessages());
 			}
@@ -199,11 +180,11 @@ public class SanityChecker {
 			generateMetadataFromData();
 			
 			// Run data sanity checks
-			runSanityChecks();
+			runRoutines();
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
-			Message message = new Message(Message.NO_COLUMN_INDEX, null, itsInternalErrorType, Message.ERROR, Message.NO_LINE_NUMBER, e.getClass().getCanonicalName() + ": " + e.getMessage(), "");
+			Message message = new InternalErrorMessage(e);
 			try {
 				itsOutput.addMessage(message);
 				itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
@@ -218,32 +199,21 @@ public class SanityChecker {
 
 	/**
 	 * Runs the individual sanity check modules over the processed data.
-	 * @throws ConfigException If the Sanity Checker modules are badly configured.
+	 * @throws SocatConfigException If the Sanity Checker modules are badly configured.
 	 * @throws SanityCheckException If errors are encountered while performing the sanity checks.
 	 * @throws MessageException If errors occur while generating and storing messages
 	 */
-	private void runSanityChecks() throws ConfigException, SanityCheckException, MessageException {
+	private void runRoutines() throws ConfigException, RoutineException, MessageException {
 		
-		List<SanityCheck> checkers = SanityCheckConfig.getInstance().getCheckers();
+		List<Routine> routines = RoutinesConfig.getInstance().getRoutines();
 		
-		// Reset the line count
-		itsRecordCount = 0;
-		
-		// Loop through all the records
-		for (SocatDataRecord record : itsOutput.getRecords()) {
-			itsRecordCount++;
+		for (Routine routine : routines) {
+			@SuppressWarnings("unchecked")
+			List<DataRecord> records = (List<DataRecord>)(List<?>) itsOutput.getRecords();
 			
-			// Loop through all known sanity checkers, and pass the record to them
-			for (SanityCheck checker : checkers) {
-				checker.processRecord(record);
-			}
-		}
-		
-		// Call the final check method for all the checkers,
-		// then get any messages and add them to the output
-		for (SanityCheck checker : checkers) {
-			checker.performFinalCheck();
-			itsOutput.addMessages(checker.getMessages());
+			
+			routine.processRecords(records);
+			itsOutput.addMessages(routine.getMessages());
 		}
 	}
 	
@@ -252,7 +222,7 @@ public class SanityChecker {
 	 * Any conflicting metadata items already present will be overwritten
 	 * @param metadataSet The metadata that has been extracted thus far. New metadata will be added to this.
 	 */
-	private void generateMetadataFromData() throws SanityCheckerException, ConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, DateTimeException, OmeMetadataException {
+	private void generateMetadataFromData() throws SanityCheckerException, SocatConfigException, MetadataException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, DateTimeException, OmeMetadataException {
 		
 		List<MetadataItem> allRecordItems = new ArrayList<MetadataItem>();
 		
@@ -302,8 +272,10 @@ public class SanityChecker {
 	 * missing data (e.g. -999), but it is currently disabled. It may be reinstated
 	 * at a later date if automatically detecting this is better than asking users
 	 * to specify it.
+	 * @throws ConfigException 
+	 * @throws NoSuchColumnException 
 	 */
-	private void checkDataValues() throws ConfigException, SocatDataBaseException, MessageException {
+	private void checkDataValues() throws SocatConfigException, MessageException, NoSuchColumnException, ConfigException {
 		/*
 		 * Loop through all the numeric columns, searching for candidates for
 		 * values that indicate missing data. For each column this is the
@@ -316,6 +288,8 @@ public class SanityChecker {
 /* 
 		 * This method of auto-detecting 'missing' value denoters has been removed.
 		 * It may be reinstated at a later date, but needs careful testing for false positives/negatives.
+		 * 
+		 * Also note that this section has not been updated to use the new QC_Routines API.
 		 * 
 		 * 
 		for (String columnName : SocatColumnConfig.getInstance().getColumnList()) {
@@ -370,22 +344,22 @@ public class SanityChecker {
 		List<Message> messages = new ArrayList<Message>();
 		
 		for (String columnName : SocatColumnConfig.getInstance().getColumnList()) {
-			SocatColumnConfigItem columnConfig = SocatColumnConfig.getInstance().getColumnConfig(columnName);
+			SocatColumnConfigItem columnConfig = (SocatColumnConfigItem) SocatColumnConfig.getInstance().getColumnConfig(columnName);
 
 			int currentRecord = 0;
 			for (SocatDataRecord record : itsOutput.getRecords()) {
 				currentRecord++;
-				SocatDataColumn column = record.getColumn(columnName);
+				SocatDataColumn column = (SocatDataColumn) record.getColumn(columnName);
 				
 				// If the column is empty, see if it's required and set the flag if it is.
 				if (column.isEmpty()) {
-					if (columnConfig.isRequired()) {
+					if (column.isRequired()) {
 						
 						// Check the Required Group
 						if (CheckerUtils.isEmpty(columnConfig.getRequiredGroup())) {
 							// No required group, so we just report the missing value
 							itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-							column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), column.getInputColumnName(), itsMissingValueType, null, null);
+							record.addMessage(new MissingValueMessage(record.getLineNumber(), column, columnConfig.getMissingFlag()));
 						} else {
 							// We're in a required group, so check the values from the other fields.
 							// Only if they're all missing do we set the missing flag
@@ -395,43 +369,9 @@ public class SanityChecker {
 								// Only report required group columns that are in the input file
 								if (null != column.getInputColumnName()) {
 									itsLogger.trace("Missing required value on line " + currentRecord + ", column '" + columnName + "'");
-									column.setFlag(columnConfig.getMissingFlag(), messages, currentRecord, column.getInputColumnIndex(), column.getInputColumnName(), itsMissingValueType, null, null);
+									record.addMessage(new MissingValueMessage(record.getLineNumber(), column, columnConfig.getMissingFlag()));
 								}
 							}
-						}
-					}
-				} else if (columnConfig.isNumeric()) {
-					
-					// Double-check that the value is actually numeric. If it's not, we don't take
-					// any action here as it will already have been handled when the values in the record were set.
-					if (CheckerUtils.isNumeric(column.getValue())) {						
-						int rangeCheckFlag = columnConfig.checkRange(Double.parseDouble(column.getValue()));
-						StringBuffer rangeString = null;
-
-						switch (rangeCheckFlag) {
-						case SocatColumnConfigItem.GOOD_FLAG: {
-							// Do nothing
-							break;
-						}
-						case SocatColumnConfigItem.QUESTIONABLE_FLAG: {
-							rangeString = new StringBuffer();
-							rangeString.append(columnConfig.getQuestionableRangeMin());
-							rangeString.append(":");
-							rangeString.append(columnConfig.getQuestionableRangeMax());
-							break;
-						}
-						case SocatColumnConfigItem.BAD_FLAG:
-						{
-							rangeString = new StringBuffer("Value ");
-							rangeString.append(columnConfig.getBadRangeMin());
-							rangeString.append(":");
-							rangeString.append(columnConfig.getBadRangeMax());
-							break;
-						}
-						}
-						
-						if (null != rangeString) {
-							column.setFlag(rangeCheckFlag, messages, currentRecord, column.getInputColumnIndex(), column.getInputColumnName(), itsRangeType, column.getValue(), rangeString.toString());
 						}
 					}
 				}
