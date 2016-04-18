@@ -183,6 +183,8 @@ public class CruiseModifier {
 		dsgFile.readMetadata();
 		SocatMetadata metaData = dsgFile.getMetadata();
 		restoredSocatVersion = metaData.getSocatVersion();
+		// Remove the terminal 'N' or 'U'
+		restoredSocatVersion = restoredSocatVersion.substring(0, restoredSocatVersion.length()-1);
 
 		// Read longitudes, latitude, and times for all data
 		double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_VAR_NAME);
@@ -324,6 +326,8 @@ public class CruiseModifier {
 		dsgFile.readMetadata();
 		SocatMetadata metaData = dsgFile.getMetadata();
 		restoredSocatVersion = metaData.getSocatVersion();
+		// Remove the terminal 'N' or 'U'
+		restoredSocatVersion = restoredSocatVersion.substring(0, restoredSocatVersion.length()-1);
 		
 		// Read longitudes, latitude, and times for all data
 		double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_VAR_NAME);
