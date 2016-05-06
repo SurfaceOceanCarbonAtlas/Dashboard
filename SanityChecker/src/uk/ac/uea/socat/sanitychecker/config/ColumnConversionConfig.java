@@ -65,10 +65,10 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	 * @throws FileNotFoundException If the file doesn't exist.
 	 * @throws IOException If an error occurs while reading the file
 	 */
-	private ColumnConversionConfig() throws ConfigException {
+	private ColumnConversionConfig() throws SocatConfigException {
 		
 		if (itsFilename == null) {
-			throw new ConfigException(null, "ColumnConversionConfig filename has not been set - must run init first");
+			throw new SocatConfigException(null, "ColumnConversionConfig filename has not been set - must run init first");
 		}
 		
 		try {
@@ -81,7 +81,7 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 				reader.close();
 			}
 		} catch (IOException e) {
-			throw new ConfigException(itsFilename, e.getMessage(), e);
+			throw new SocatConfigException(itsFilename, e.getMessage(), e);
 		}
 		itsLogger.info("read ColumnConversionConfig configuration file " + itsFilename);
 	}
@@ -90,9 +90,9 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	 * Retrieves the singleton instance of this class
 	 * 
 	 * @return The singleton instance of this class
-	 * @throws ConfigException
+	 * @throws SocatConfigException
 	 */
-	public static ColumnConversionConfig getInstance() throws ConfigException {
+	public static ColumnConversionConfig getInstance() throws SocatConfigException {
 		if (columnConversionConfigInstance == null) {
 			columnConversionConfigInstance = new ColumnConversionConfig();
 		}
@@ -115,7 +115,7 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 	 * @throws InstantiationException If an error occurs while instantiating the data conversion class
 	 * @throws IllegalAccessException If an error occurs while instantiating the data conversion class
 	 */
-	private void buildMap(Properties config, Logger logger) throws ConfigException {
+	private void buildMap(Properties config, Logger logger) throws SocatConfigException {
 		Enumeration<?> columns = config.propertyNames();
 		while (columns.hasMoreElements()) {
 			String column = (String) columns.nextElement();
@@ -129,12 +129,12 @@ public class ColumnConversionConfig extends HashMap<String, Converter> {
 					
 					logger.trace("Added converter for SOCAT column " + column + ": " + className);
 				} catch(ClassNotFoundException e) {
-					throw new ConfigException(itsFilename, "Error processing configuration for column '" + column + "', converter class '" + className + "': Cannot find class " + e.getMessage());
+					throw new SocatConfigException(itsFilename, "Error processing configuration for column '" + column + "', converter class '" + className + "': Cannot find class " + e.getMessage());
 				} catch(Exception e) {
-					throw new ConfigException(itsFilename, "Error processing configuration for column '" + column + "', converter class '" + className + "': " + e.getMessage());
+					throw new SocatConfigException(itsFilename, "Error processing configuration for column '" + column + "', converter class '" + className + "': " + e.getMessage());
 				}
 			} else {
-				throw new ConfigException(itsFilename, "Invalid configuration for column '" + column + "', converter class '" + className + "'");
+				throw new SocatConfigException(itsFilename, "Invalid configuration for column '" + column + "', converter class '" + className + "'");
 			}
 		}
 	}

@@ -7,6 +7,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.config.RoutinesConfig;
+
 /**
  * The base configuration for the Sanity Checker.
  * 
@@ -75,9 +77,9 @@ public class BaseConfig extends Properties {
 	/**
 	 * Retrieves an instance of the {@link BaseConfig}. If it doesn't exist, create it.
 	 * @return The {@link BaseConfig} instance
-	 * @throws ConfigException If an error occurs while loading the configuration
+	 * @throws SocatConfigException If an error occurs while loading the configuration
 	 */
-	public static BaseConfig getInstance() throws ConfigException {
+	public static BaseConfig getInstance() throws SocatConfigException {
 		if (baseConfigInstance == null) {
 			loadConfig();
 		}
@@ -116,11 +118,11 @@ public class BaseConfig extends Properties {
 	 * Load a configuration from the specified file location.
 	 * @param configFile The name of the file containing the configuration.
 	 * @return The loaded configuration.
-	 * @throws ConfigException If the configuration cannot be loaded or is invalid.
+	 * @throws SocatConfigException If the configuration cannot be loaded or is invalid.
 	 */
-	private static void loadConfig() throws ConfigException {
+	private static void loadConfig() throws SocatConfigException {
 		if (itsConfigFile == null) {
-			throw new ConfigException(null, "Base config file location has not been set");
+			throw new SocatConfigException(null, "Base config file location has not been set");
 		}
 		
 		BaseConfig loadedConfig = new BaseConfig();
@@ -128,9 +130,9 @@ public class BaseConfig extends Properties {
 		// Make sure the file exists and we can read it.
 		File fileCheck = new File(itsConfigFile);
 		if (!fileCheck.exists()) {
-			throw new ConfigException(itsConfigFile, "File does not exist");
+			throw new SocatConfigException(itsConfigFile, "File does not exist");
 		} else if (!fileCheck.canRead()) {
-			throw new ConfigException(itsConfigFile, "Cannot access file for reading");
+			throw new SocatConfigException(itsConfigFile, "Cannot access file for reading");
 		}
 		
 		// Load the file.
@@ -138,7 +140,7 @@ public class BaseConfig extends Properties {
 			Reader configReader = new FileReader(itsConfigFile);
 			loadedConfig.load(configReader);
 		} catch (Exception e) {
-			throw new ConfigException(itsConfigFile, "Error reading base configuration file", e);
+			throw new SocatConfigException(itsConfigFile, "Error reading base configuration file", e);
 		}
 		
 		// Validate the file.
@@ -155,8 +157,13 @@ public class BaseConfig extends Properties {
 		// Initialise the configurations specified in the base config
 		MetadataConfig.init(loadedConfig.getMetadataConfigFile(), itsLogger);
 		ColumnConversionConfig.init(loadedConfig.getColumnConversionConfigFile(), itsLogger);
-		SocatColumnConfig.init(loadedConfig.getSocatConfigFile(), itsLogger);
-		SanityCheckConfig.init(loadedConfig.getSanityCheckConfigFile(), itsLogger);
+		SocatColumnConfig.init(loadedConfig.getSocatConfigFile());
+		
+		try {
+			RoutinesConfig.init(loadedConfig.getSanityCheckConfigFile());
+		} catch (uk.ac.exeter.QCRoutines.config.ConfigException e) {
+			throw new SocatConfigException(loadedConfig.getSanityCheckConfigFile(), e.getMessage(), e);
+		}
 		
 		// Store the loaded configuration as the singleton instance
 		baseConfigInstance = loadedConfig;
@@ -204,16 +211,16 @@ public class BaseConfig extends Properties {
 
 	/**
 	 * Ensures that the configuration file contains all the required values, and that they are valid.
-	 * @throws ConfigException If any of the configuration entries fails validation.
+	 * @throws SocatConfigException If any of the configuration entries fails validation.
 	 */
-	private void validate() throws ConfigException {
+	private void validate() throws SocatConfigException {
 		File columnSpecSchemaFile = new File(getProperty(COLUMN_SPEC_SCHEMA_FILE));
 		if (!columnSpecSchemaFile.exists()) {
-			throw new ConfigException(itsConfigFile, "Specified " + COLUMN_SPEC_SCHEMA_FILE + " does not exist");
+			throw new SocatConfigException(itsConfigFile, "Specified " + COLUMN_SPEC_SCHEMA_FILE + " does not exist");
 		} else if (!columnSpecSchemaFile.isFile()) {
-			throw new ConfigException(itsConfigFile, "Specified " + COLUMN_SPEC_SCHEMA_FILE + " is not a file");
+			throw new SocatConfigException(itsConfigFile, "Specified " + COLUMN_SPEC_SCHEMA_FILE + " is not a file");
 		} else if (!columnSpecSchemaFile.canRead()) {
-			throw new ConfigException(itsConfigFile, "No permission to read specified " + COLUMN_SPEC_SCHEMA_FILE);
+			throw new SocatConfigException(itsConfigFile, "No permission to read specified " + COLUMN_SPEC_SCHEMA_FILE);
 		}
 		
 		validateMetadataConfig();
@@ -225,60 +232,60 @@ public class BaseConfig extends Properties {
 	/**
 	 * Ensure the metadata config file location has been configured correctly, and that the Sanity Checker
 	 * can access it.
-	 * @throws ConfigException If the file isn't specified or can't be accessed.
+	 * @throws SocatConfigException If the file isn't specified or can't be accessed.
 	 */
-	private void validateMetadataConfig() throws ConfigException {
+	private void validateMetadataConfig() throws SocatConfigException {
 		
 		// Get the log file value. If it's missing, throw an exception.
 		String configFile = getMetadataConfigFile();
 		if (null == configFile) {
-			throw new ConfigException(itsConfigFile, "Missing config value " + METADATA_CONFIG_FILE);
+			throw new SocatConfigException(itsConfigFile, "Missing config value " + METADATA_CONFIG_FILE);
 		}
 		
 		File theFile = new File(configFile);
 		
 		// Make sure the file exists
 		if (!theFile.exists()) {
-			throw new ConfigException(itsConfigFile, "The specified " + METADATA_CONFIG_FILE + " does not exist");
+			throw new SocatConfigException(itsConfigFile, "The specified " + METADATA_CONFIG_FILE + " does not exist");
 		}
 		
 		// Make sure we can read it
 		if (!theFile.isFile()) {
-			throw new ConfigException(itsConfigFile, "The specified " + METADATA_CONFIG_FILE + " is not a regular file");
+			throw new SocatConfigException(itsConfigFile, "The specified " + METADATA_CONFIG_FILE + " is not a regular file");
 		}
 		
 		if (!theFile.canRead()) {
-			throw new ConfigException(itsConfigFile, "Cannot access specified " + METADATA_CONFIG_FILE);
+			throw new SocatConfigException(itsConfigFile, "Cannot access specified " + METADATA_CONFIG_FILE);
 		}
 	}
 
 	/**
 	 * Ensure the data config file location has been configured correctly, and that the Sanity Checker
 	 * can access it.
-	 * @throws ConfigException If the file isn't specified or can't be accessed.
+	 * @throws SocatConfigException If the file isn't specified or can't be accessed.
 	 */
-	private void validateColumnConversionConfig() throws ConfigException {
+	private void validateColumnConversionConfig() throws SocatConfigException {
 		
 		// Get the log file value. If it's missing, throw an exception.
 		String configFile = getColumnConversionConfigFile();
 		if (null == configFile) {
-			throw new ConfigException(itsConfigFile, "Missing config value " + COLUMN_CONVERSION_FILE);
+			throw new SocatConfigException(itsConfigFile, "Missing config value " + COLUMN_CONVERSION_FILE);
 		}
 		
 		File theFile = new File(configFile);
 		
 		// Make sure the file exists
 		if (!theFile.exists()) {
-			throw new ConfigException(itsConfigFile, "The specified " + COLUMN_CONVERSION_FILE + " does not exist");
+			throw new SocatConfigException(itsConfigFile, "The specified " + COLUMN_CONVERSION_FILE + " does not exist");
 		}
 		
 		// Make sure we can read it
 		if (!theFile.isFile()) {
-			throw new ConfigException(itsConfigFile, "The specified " + COLUMN_CONVERSION_FILE + " is not a regular file");
+			throw new SocatConfigException(itsConfigFile, "The specified " + COLUMN_CONVERSION_FILE + " is not a regular file");
 		}
 
 		if (!theFile.canRead()) {
-			throw new ConfigException(itsConfigFile, "Cannot access specified " + COLUMN_CONVERSION_FILE);
+			throw new SocatConfigException(itsConfigFile, "Cannot access specified " + COLUMN_CONVERSION_FILE);
 		}
 	}
 }

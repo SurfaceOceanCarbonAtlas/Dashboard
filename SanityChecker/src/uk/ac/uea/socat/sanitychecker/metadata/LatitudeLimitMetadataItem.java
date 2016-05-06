@@ -4,9 +4,11 @@ import java.text.ParseException;
 
 import org.apache.log4j.Logger;
 
+import uk.ac.exeter.QCRoutines.data.NoSuchColumnException;
+import uk.ac.exeter.QCRoutines.messages.Flag;
 import uk.ac.uea.socat.sanitychecker.SanityCheckerException;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfigItem;
-import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfigItem;
+import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
 import uk.ac.uea.socat.sanitychecker.data.datetime.DateTimeHandler;
@@ -73,11 +75,15 @@ public class LatitudeLimitMetadataItem extends MetadataItem {
 	@Override
 	public void processRecordForValue(SocatDataRecord record) throws MetadataException {
 		
-		SocatDataColumn latitudeColumn = record.getColumn(SocatDataRecord.LATITUDE_COLUMN_NAME);
-		if (latitudeColumn.getFlag() != SocatColumnConfigItem.BAD_FLAG) {
-			double position = Double.parseDouble(latitudeColumn.getValue());
-			updateLimits(position);
-			hasValue = true;
+		try {
+			SocatDataColumn latitudeColumn = (SocatDataColumn) record.getColumn(SocatColumnConfig.LATITUDE_COLUMN_NAME);
+			if (!latitudeColumn.getFlag().equals(Flag.BAD)) {
+				double position = Double.parseDouble(latitudeColumn.getValue());
+				updateLimits(position);
+				hasValue = true;
+			}
+		} catch (NoSuchColumnException e) {
+			throw new MetadataException("Error retrieving latitude", e);
 		}
 	}
 	
