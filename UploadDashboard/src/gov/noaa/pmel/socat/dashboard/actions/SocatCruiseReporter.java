@@ -84,6 +84,118 @@ public class SocatCruiseReporter {
 	}
 	private static final String TIME_NC_VAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
 
+	/**
+	 * Class for collecting and sorting time/lat/lon/fco2rec data
+	 */
+	private static class DataInfo implements Comparable<DataInfo> {
+		final Date datetime;
+		final Double latitude;
+		final Double longitude;
+		final Double fco2rec;
+
+		/**
+		 * @param expocode
+		 * 		dataset expocode; only used for error reporting
+		 * @param sectime
+		 * 		measurement time in seconds since Jan 1, 1970 00:00:00
+		 * @param latitude
+		 * 		measurement latitude in decimal degrees north
+		 * @param longitude
+		 * 		measurment longitude in decimal degrees east in the range [-180,180]
+		 * @param fco2rec
+		 * 		measurement recommended fCO2
+		 * @throws IllegalArgumentException
+		 * 		if the sectime, latitude, longitude, or fco2rec values are invalid
+		 */
+		DataInfo(String expocode, Double sectime, Double latitude, 
+				Double longitude, Double fco2rec) throws IllegalArgumentException {
+			if ( sectime == null )
+				throw new IllegalArgumentException("null time for " + expocode);
+			this.datetime = new Date(Math.round(sectime * 1000.0));
+			Date now = new Date();
+			if ( this.datetime.before(EARLIEST_DATE) || this.datetime.after(now) )
+				throw new IllegalArgumentException("invalid time of " + this.datetime.toString() + " for " + expocode);
+
+			if ( latitude == null )
+				throw new IllegalArgumentException("null latitude for " + expocode);
+			if ( (latitude < -90.0) || (latitude > 90.0) )
+				throw new IllegalArgumentException("invalid latitude of " + latitude + " for " + expocode);
+			this.latitude = latitude;
+
+			if ( longitude == null )
+				throw new IllegalArgumentException("null longitude for " + expocode);
+			if ( (longitude < -180.0) || (longitude > 180.0) )
+				throw new IllegalArgumentException("invalid longitude of " + longitude + " for " + expocode);
+			this.longitude = longitude;
+
+			if ( fco2rec == null )
+				throw new IllegalArgumentException("null fco2rec in " + expocode);
+			if ( (fco2rec < 0.0) || (fco2rec > 100000.0) )
+				throw new IllegalArgumentException("invalid fCO2rec of " + fco2rec + " in " + expocode);
+			this.fco2rec = fco2rec;
+		}
+
+		@Override
+		public int compareTo(DataInfo other) {
+			// the primary sort must be on datetime
+			int result = this.datetime.compareTo(other.datetime);
+			if ( result != 0 )
+				return result;
+			result = this.latitude.compareTo(other.latitude);
+			if ( result != 0 )
+				return result;
+			result = this.longitude.compareTo(other.longitude);
+			if ( result != 0 )
+				return result;
+			result = this.fco2rec.compareTo(other.fco2rec);
+			if ( result != 0 )
+				return result;
+			return 0;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 37;
+			int result = 1;
+			result = prime * result + datetime.hashCode();
+			result = prime * result + latitude.hashCode();
+			result = prime * result + longitude.hashCode();
+			result = prime * result + fco2rec.hashCode();
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) 
+				return true;
+			if ( obj == null ) 
+				return false;
+			if ( ! (obj instanceof DataInfo) )
+				return false;
+			DataInfo other = (DataInfo) obj;
+			if ( ! datetime.equals(other.datetime) )
+				return false;
+			if ( ! latitude.equals(other.latitude) ) 
+				return false;
+			if ( ! longitude.equals(other.longitude) ) 
+				return false;
+			if ( ! fco2rec.equals(other.fco2rec) ) 
+				return false;
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return  "DataInfo" +
+					"[ datetime=" + DATETIMESTAMPER.format(datetime) + 
+					", latitude=" + latitude + 
+					", longitude=" + longitude + 
+					", fco2rec=" + fco2rec + 
+					" ]";
+		}
+
+	}
+
 	private CruiseFileHandler cruiseHandler;
 	private MetadataFileHandler metadataHandler;
 	private DsgNcFileHandler dsgFileHandler;
@@ -169,6 +281,12 @@ public class SocatCruiseReporter {
 		String origDOI = cruise.getOrigDoi();
 		String socatDOI = cruise.getSocatDoi();
 
+		// Get the computed values of time in seconds since 1970-01-01 00:00:00
+		double[] sectimes = dsgFile.readDoubleVarDataValues(TIME_NC_VAR_NAME);
+
+		// Create the set for holding previous lon/lat/time/fCO2_rec data
+		TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
+
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
@@ -176,9 +294,14 @@ public class SocatCruiseReporter {
 					socatVersion, origDOI, socatDOI, qcFlag, addlDocs, report);
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, false);
+			int j = -1;
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
-				report.println(dataReportString(dataVals, upperExpo, 
-						socatVersion, socatDOI, qcFlag, false));
+				j++;
+				String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
+						socatVersion, socatDOI, qcFlag, false, prevDatInf, j+1);
+				if ( ! tsvdat.isEmpty() ) {
+					report.println(tsvdat);
+				}
 			}
 		} finally {
 			report.close();
@@ -309,7 +432,13 @@ public class SocatCruiseReporter {
 						msg += var + "; ";
 					warnMsgs.add(msg);
 				}
+				// Get the computed values of time in seconds since 1970-01-01 00:00:00
+				double[] sectimes = dsgFile.readDoubleVarDataValues(TIME_NC_VAR_NAME);
+				// Create the set for holding previous lon/lat/time/fCO2_rec data
+				TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
+				int j = -1;
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+					j++;
 					if ( (regionID != null) && ! regionID.equals(dataVals.getRegionID()) )
 						continue;
 					if ( SocatCruiseData.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
@@ -317,8 +446,11 @@ public class SocatCruiseReporter {
 					Character woceFlag = dataVals.getWoceCO2Water();
 					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
 						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
-						report.println(dataReportString(dataVals, upperExpo, 
-								socatVersion, socatDOI, qcFlag, true));
+						String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
+								socatVersion, socatDOI, qcFlag, true, prevDatInf, j+1);
+						if ( ! tsvdat.isEmpty() ) {
+							report.println(tsvdat);
+						}
 					}
 				}
 			}
@@ -894,12 +1026,31 @@ public class SocatCruiseReporter {
 	 * @param multicruise
 	 * 		create the multi-cruise data string
 	 * 		(no original-data CO2 measurements) ?
+	 * @param prevDataInf
+	 * 		set of DataInfo objects for previous datapoints
+	 * 		in this dataset.  This method will add the current 
+	 * 		datapoint to this set. 
+	 * @param num
+	 * 		data point number of this dataset 
+	 * 		used for reporting a duplicate
 	 * @return 
-	 * 		tab-separated data values for SOCAT data reporting.
+	 * 		tab-separated data values for SOCAT data reporting, or
+	 * 		an empty string if this lon/lat/time/fCO2_rec duplicates
+	 * 		that for a previous datapoint.
 	 */
 	private static String dataReportString(SocatCruiseData dataVals, 
-			String expocode, String socatVersion, String socatDOI,
-			String cruiseQCFlag, boolean multicruise) throws IllegalArgumentException {
+			Double sectime, String expocode, String socatVersion, 
+			String socatDOI, String cruiseQCFlag, boolean multicruise, 
+			TreeSet<DataInfo> prevDataInf, int num) throws IllegalArgumentException {
+		// Add this lon/lat/time/fCO2_rec datapoint to the set; checking for duplicates
+		DataInfo datinf = new DataInfo(expocode, sectime, dataVals.getLatitude(), 
+				dataVals.getLongitude(), dataVals.getfCO2Rec());
+		if ( ! prevDataInf.add(datinf) ) {
+			System.err.println("Duplicate datapoint " + Integer.toString(num) + 
+					" in " + expocode + " : " + datinf.toString());
+			return "";
+		}
+
 		// Generate the string for this data point
 		Formatter fmtr = new Formatter();
 		fmtr.format("%s\t", expocode);
@@ -1279,114 +1430,6 @@ public class SocatCruiseReporter {
 	}
 
 	/**
-	 * Class for collecting and sorting time/lat/lon/fco2rec data
-	 */
-	private class DataInfo implements Comparable<DataInfo> {
-		final Date datetime;
-		final Double latitude;
-		final Double longitude;
-		final Double fco2rec;
-
-		/**
-		 * @param expocode
-		 * 		dataset expocode; only used for error reporting
-		 * @param sectime
-		 * 		measurement time in seconds since Jan 1, 1970 00:00:00
-		 * @param latitude
-		 * 		measurement latitude in decimal degrees north
-		 * @param longitude
-		 * 		measurment longitude in decimal degrees east in the range [-180,180]
-		 * @param fco2rec
-		 * 		measurement recommended fCO2
-		 * @throws IllegalArgumentException
-		 * 		if the sectime, latitude, longitude, or fco2rec values are invalid
-		 */
-		DataInfo(String expocode, Double sectime, Double latitude, 
-				Double longitude, Double fco2rec) throws IllegalArgumentException {
-			if ( sectime == null )
-				throw new IllegalArgumentException("null time for " + expocode);
-			this.datetime = new Date(Math.round(sectime * 1000.0));
-			Date now = new Date();
-			if ( this.datetime.before(EARLIEST_DATE) || this.datetime.after(now) )
-				throw new IllegalArgumentException("invalid time of " + this.datetime.toString() + " for " + expocode);
-
-			if ( latitude == null )
-				throw new IllegalArgumentException("null latitude for " + expocode);
-			if ( (latitude < -90.0) || (latitude > 90.0) )
-				throw new IllegalArgumentException("invalid latitude of " + latitude + " for " + expocode);
-			this.latitude = latitude;
-
-			if ( longitude == null )
-				throw new IllegalArgumentException("null longitude for " + expocode);
-			if ( (longitude < -180.0) || (longitude > 180.0) )
-				throw new IllegalArgumentException("invalid longitude of " + longitude + " for " + expocode);
-			this.longitude = longitude;
-
-			if ( fco2rec == null )
-				throw new IllegalArgumentException("null fco2rec in " + expocode);
-			if ( (fco2rec < 0.0) || (fco2rec > 100000.0) )
-				throw new IllegalArgumentException("invalid fCO2rec of " + fco2rec + " in " + expocode);
-			this.fco2rec = fco2rec;
-		}
-
-		@Override
-		public int compareTo(DataInfo other) {
-			// the primary sort must be on datetime
-			int result = this.datetime.compareTo(other.datetime);
-			if ( result != 0 )
-				return result;
-			result = this.latitude.compareTo(other.latitude);
-			if ( result != 0 )
-				return result;
-			result = this.longitude.compareTo(other.longitude);
-			if ( result != 0 )
-				return result;
-			result = this.fco2rec.compareTo(other.fco2rec);
-			if ( result != 0 )
-				return result;
-			return 0;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 37;
-			int result = 1;
-			result = prime * result + datetime.hashCode();
-			result = prime * result + latitude.hashCode();
-			result = prime * result + longitude.hashCode();
-			result = prime * result + fco2rec.hashCode();
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( this == obj ) 
-				return true;
-			if ( obj == null ) 
-				return false;
-			if ( ! (obj instanceof DataInfo) )
-				return false;
-			DataInfo other = (DataInfo) obj;
-			if ( ! datetime.equals(other.datetime) )
-				return false;
-			if ( ! latitude.equals(other.latitude) ) 
-				return false;
-			if ( ! longitude.equals(other.longitude) ) 
-				return false;
-			if ( ! fco2rec.equals(other.fco2rec) ) 
-				return false;
-			return true;
-		}
-
-		@Override
-		public String toString() {
-			return "DataInfo[datetime=" + datetime + ", latitude=" + latitude + 
-					", longitude=" + longitude + ", fco2rec=" + fco2rec + "]";
-		}
-
-	}
-
-	/**
 	 * Tab-separated data column names for the data printed by 
 	 * {@link #generateDataFileForGrids(TreeSet, File)}
 	 */
@@ -1439,18 +1482,21 @@ public class SocatCruiseReporter {
 				// Collect and sort the acceptable data for this cruise
 				// Any duplicates are eliminated in this process
 				TreeSet<DataInfo> dataSet = new TreeSet<DataInfo>();
-				int k = -1;
+				int j = -1;
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
-					k++;
+					j++;
 					Double fco2rec = dataVals.getfCO2Rec();
 					if ( SocatCruiseData.FP_MISSING_VALUE.equals(fco2rec) )
 						continue;
 					Character woceFlag = dataVals.getWoceCO2Water();
 					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
 						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
-						DataInfo datinf = new DataInfo(upperExpo, sectimes[k], 
+						DataInfo datinf = new DataInfo(upperExpo, sectimes[j], 
 								dataVals.getLatitude(), dataVals.getLongitude(), fco2rec);
-						dataSet.add(datinf);
+						if ( ! dataSet.add(datinf) ) {
+							System.err.println("Duplicate datapoint " + Integer.toString(j+1) + 
+									" in " + upperExpo + " : " + datinf.toString());
+						}
 					}
 				}
 				// Print the sorted data for this cruise
