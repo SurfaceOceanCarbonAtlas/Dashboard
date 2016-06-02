@@ -83,12 +83,12 @@ public class RenameCruises {
 				System.err.println(username + " is not an admin for the dashboard");
 				System.exit(1);
 			}
-			CruiseModifier renamer = new CruiseModifier();
+			CruiseModifier renamer = new CruiseModifier(configStore);
 			for ( Entry<String, String> expoEntry: oldNewExpoMap.entrySet() ) {
 				String oldExpocode = expoEntry.getKey();
 				String newExpocode = expoEntry.getValue();
 				try {
-					renamer.renameCruise(configStore, oldExpocode, newExpocode, username);
+					renamer.renameCruise(oldExpocode, newExpocode, username);
 				} catch (Exception ex) {
 					System.err.println("Error renaming " + oldExpocode + " to " + newExpocode);
 					ex.printStackTrace();

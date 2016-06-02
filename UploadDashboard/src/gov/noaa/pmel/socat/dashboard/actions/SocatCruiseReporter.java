@@ -7,7 +7,6 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
@@ -47,9 +46,10 @@ public class SocatCruiseReporter {
 	// SOCAT main DOI, DOI HRef, and publication citation
 	private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.849770";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"Bakker, D. C. E., Pfeil, B., Smith, K., et. al.  \"A 58-year record of ",
-		"high quality data in version 3 of the Surface Ocean CO2 Atlas (SOCAT)\" ",
-		"In preparation for Earth System Science Data. ",
+		"Bakker, D. C. E., Pfeil, B. Landa, C. S., et. al. \"A multi-decade record of ",
+		"high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas (SOCAT)\" ",
+		"Under review in Earth System Science Data Discussions, 2016, 55 pp. ",
+		"doi:10.5194/essd-2016-15 ",
 		"    Also see: ",
 		"D. C. E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
 		"Ocean CO2 Atlas (SOCAT version 2)\" Earth Syst. Sci. Data, 6, 69-90, 2014 ",
@@ -82,12 +82,11 @@ public class SocatCruiseReporter {
 			throw new RuntimeException(ex);
 		}
 	}
-	private static final String TIME_NC_VAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
 
 	/**
 	 * Class for collecting and sorting time/lat/lon/fco2rec data
 	 */
-	private static class DataInfo implements Comparable<DataInfo> {
+	private static class DataPoint implements Comparable<DataPoint> {
 		final Date datetime;
 		final Double latitude;
 		final Double longitude;
@@ -95,7 +94,7 @@ public class SocatCruiseReporter {
 
 		/**
 		 * @param expocode
-		 * 		dataset expocode; only used for error reporting
+		 * 		dataset expocode, only used for error message when raising exceptions
 		 * @param sectime
 		 * 		measurement time in seconds since Jan 1, 1970 00:00:00
 		 * @param latitude
@@ -107,36 +106,39 @@ public class SocatCruiseReporter {
 		 * @throws IllegalArgumentException
 		 * 		if the sectime, latitude, longitude, or fco2rec values are invalid
 		 */
-		DataInfo(String expocode, Double sectime, Double latitude, 
+		DataPoint(String expocode, Double sectime, Double latitude, 
 				Double longitude, Double fco2rec) throws IllegalArgumentException {
 			if ( sectime == null )
 				throw new IllegalArgumentException("null time for " + expocode);
 			this.datetime = new Date(Math.round(sectime * 1000.0));
-			Date now = new Date();
-			if ( this.datetime.before(EARLIEST_DATE) || this.datetime.after(now) )
-				throw new IllegalArgumentException("invalid time of " + this.datetime.toString() + " for " + expocode);
+			if ( this.datetime.before(EARLIEST_DATE) || this.datetime.after(new Date()) )
+				throw new IllegalArgumentException("invalid time of " + 
+						this.datetime.toString() + " for " + expocode);
 
 			if ( latitude == null )
 				throw new IllegalArgumentException("null latitude for " + expocode);
 			if ( (latitude < -90.0) || (latitude > 90.0) )
-				throw new IllegalArgumentException("invalid latitude of " + latitude + " for " + expocode);
+				throw new IllegalArgumentException("invalid latitude of " + 
+						Double.toString(latitude) + " for " + expocode);
 			this.latitude = latitude;
 
 			if ( longitude == null )
 				throw new IllegalArgumentException("null longitude for " + expocode);
 			if ( (longitude < -180.0) || (longitude > 180.0) )
-				throw new IllegalArgumentException("invalid longitude of " + longitude + " for " + expocode);
+				throw new IllegalArgumentException("invalid longitude of " + 
+						Double.toString(longitude) + " for " + expocode);
 			this.longitude = longitude;
 
 			if ( fco2rec == null )
-				throw new IllegalArgumentException("null fco2rec in " + expocode);
+				throw new IllegalArgumentException("null fco2rec for " + expocode);
 			if ( (fco2rec < 0.0) || (fco2rec > 100000.0) )
-				throw new IllegalArgumentException("invalid fCO2rec of " + fco2rec + " in " + expocode);
+				throw new IllegalArgumentException("invalid fCO2rec of " + 
+						Double.toString(fco2rec) + " for " + expocode);
 			this.fco2rec = fco2rec;
 		}
 
 		@Override
-		public int compareTo(DataInfo other) {
+		public int compareTo(DataPoint other) {
 			// the primary sort must be on datetime
 			int result = this.datetime.compareTo(other.datetime);
 			if ( result != 0 )
@@ -170,9 +172,9 @@ public class SocatCruiseReporter {
 				return true;
 			if ( obj == null ) 
 				return false;
-			if ( ! (obj instanceof DataInfo) )
+			if ( ! (obj instanceof DataPoint) )
 				return false;
-			DataInfo other = (DataInfo) obj;
+			DataPoint other = (DataPoint) obj;
 			if ( ! datetime.equals(other.datetime) )
 				return false;
 			if ( ! latitude.equals(other.latitude) ) 
@@ -186,11 +188,10 @@ public class SocatCruiseReporter {
 
 		@Override
 		public String toString() {
-			return  "DataInfo" +
-					"[ datetime=" + DATETIMESTAMPER.format(datetime) + 
-					", latitude=" + latitude + 
-					", longitude=" + longitude + 
-					", fco2rec=" + fco2rec + 
+			return  "[ datetime=" + DATETIMESTAMPER.format(datetime) + 
+					", latitude=" + String.format("%#.6f", latitude) + 
+					", longitude=" + String.format("%#.6f", longitude) + 
+					", fco2rec=" + String.format("%#.6f", fco2rec) + 
 					" ]";
 		}
 
@@ -236,7 +237,7 @@ public class SocatCruiseReporter {
 	 * 		if unable to create the cruise report file
 	 */
 	public ArrayList<String> generateReport(String expocode, File reportFile) 
-								throws IllegalArgumentException, IOException {
+			throws IllegalArgumentException, IOException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		ArrayList<String> warnMsgs = new ArrayList<String>();
 
@@ -282,10 +283,7 @@ public class SocatCruiseReporter {
 		String socatDOI = cruise.getSocatDoi();
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
-		double[] sectimes = dsgFile.readDoubleVarDataValues(TIME_NC_VAR_NAME);
-
-		// Create the set for holding previous lon/lat/time/fCO2_rec data
-		TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
+		double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
 
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
@@ -297,8 +295,9 @@ public class SocatCruiseReporter {
 			int j = -1;
 			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 				j++;
+				// Reported WOCE-4 might be duplicates, so do not check for duplicates
 				String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
-						socatVersion, socatDOI, qcFlag, false, prevDatInf, j+1);
+						socatVersion, socatDOI, qcFlag, false, null);
 				if ( ! tsvdat.isEmpty() ) {
 					report.println(tsvdat);
 				}
@@ -433,9 +432,9 @@ public class SocatCruiseReporter {
 					warnMsgs.add(msg);
 				}
 				// Get the computed values of time in seconds since 1970-01-01 00:00:00
-				double[] sectimes = dsgFile.readDoubleVarDataValues(TIME_NC_VAR_NAME);
+				double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
 				// Create the set for holding previous lon/lat/time/fCO2_rec data
-				TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
+				TreeSet<DataPoint> prevDatPts = new TreeSet<DataPoint>();
 				int j = -1;
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					j++;
@@ -447,7 +446,7 @@ public class SocatCruiseReporter {
 					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
 						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
 						String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
-								socatVersion, socatDOI, qcFlag, true, prevDatInf, j+1);
+								socatVersion, socatDOI, qcFlag, true, prevDatPts);
 						if ( ! tsvdat.isEmpty() ) {
 							report.println(tsvdat);
 						}
@@ -858,7 +857,7 @@ public class SocatCruiseReporter {
 	 * Explanation lines for the data columns given by the header string 
 	 * {@link #SINGLE_CRUISE_DATA_REPORT_HEADER} 
 	 * and data strings returned by the single-cruise version of 
-	 * {@link #dataReportString(SocatCruiseData, String, String, String, String, boolean)}
+	 * {@link #dataReportString}
 	 */
 	private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the cruise from which this data was obtained",
@@ -903,7 +902,7 @@ public class SocatCruiseReporter {
 
 	/**
 	 * Tab-separated data column names for the data Strings returned by the single-cruise version of 
-	 * {@link #dataReportString(SocatCruiseData, String, String, String, String, boolean)}
+	 * {@link #dataReportString}
 	 */
 	private static final String SINGLE_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" +
@@ -943,7 +942,7 @@ public class SocatCruiseReporter {
 	 * Explanation lines for the data columns given by the header string 
 	 * {@link #MULTI_CRUISE_DATA_REPORT_HEADER} 
 	 * and data strings returned by the multi-cruise version of 
-	 * {@link #dataReportString(SocatCruiseData, String, String, String, String, boolean)}
+	 * {@link #dataReportString}
 	 */
 	private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the cruise from which this data was obtained",
@@ -982,7 +981,7 @@ public class SocatCruiseReporter {
 
 	/**
 	 * Tab-separated data column names for the data Strings returned by the multi-cruise version of 
-	 * {@link #dataReportString(SocatCruiseData, String, String, String, String, boolean)}
+	 * {@link #dataReportString}
 	 */
 	private static final String MULTI_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" + 
@@ -1015,6 +1014,8 @@ public class SocatCruiseReporter {
 	/**
 	 * @param dataVals
 	 * 		data point values to report
+	 * @param sectime
+	 * 		date/time of this data point in seconds since 01-JAN-1970 00:00:00 UTC
 	 * @param expocode
 	 * 		expocode for the cruise data report string
 	 * @param socatVersion
@@ -1026,13 +1027,10 @@ public class SocatCruiseReporter {
 	 * @param multicruise
 	 * 		create the multi-cruise data string
 	 * 		(no original-data CO2 measurements) ?
-	 * @param prevDataInf
-	 * 		set of DataInfo objects for previous datapoints
-	 * 		in this dataset.  This method will add the current 
-	 * 		datapoint to this set. 
-	 * @param num
-	 * 		data point number of this dataset 
-	 * 		used for reporting a duplicate
+	 * @param prevDatPts
+	 * 		if not null, a set of DataPoint objects for previous datapoints 
+	 * 		in this dataset.  This method will add the current datapoint, 
+	 * 		if not a duplicate, to this set.
 	 * @return 
 	 * 		tab-separated data values for SOCAT data reporting, or
 	 * 		an empty string if this lon/lat/time/fCO2_rec duplicates
@@ -1041,14 +1039,16 @@ public class SocatCruiseReporter {
 	private static String dataReportString(SocatCruiseData dataVals, 
 			Double sectime, String expocode, String socatVersion, 
 			String socatDOI, String cruiseQCFlag, boolean multicruise, 
-			TreeSet<DataInfo> prevDataInf, int num) throws IllegalArgumentException {
-		// Add this lon/lat/time/fCO2_rec datapoint to the set; checking for duplicates
-		DataInfo datinf = new DataInfo(expocode, sectime, dataVals.getLatitude(), 
-				dataVals.getLongitude(), dataVals.getfCO2Rec());
-		if ( ! prevDataInf.add(datinf) ) {
-			System.err.println("Duplicate datapoint " + Integer.toString(num) + 
-					" in " + expocode + " : " + datinf.toString());
-			return "";
+			TreeSet<DataPoint> prevDatPts) throws IllegalArgumentException {
+
+		if ( prevDatPts != null ) {
+			// Add this lon/lat/time/fCO2_rec datapoint to the set; checking for duplicates
+			DataPoint datpt = new DataPoint(expocode, sectime, dataVals.getLatitude(), 
+											dataVals.getLongitude(), dataVals.getfCO2Rec());
+			if ( ! prevDatPts.add(datpt) ) {
+				System.err.println("Ignored duplicate datapoint for " + expocode + ": " + datpt.toString());
+				return "";
+			}
 		}
 
 		// Generate the string for this data point
@@ -1478,10 +1478,10 @@ public class SocatCruiseReporter {
 					throw new IllegalArgumentException(msg);
 				}
 				// Get the computed values of time in seconds since 1970-01-01 00:00:00
-				double[] sectimes = dsgFile.readDoubleVarDataValues(TIME_NC_VAR_NAME);
+				double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
 				// Collect and sort the acceptable data for this cruise
 				// Any duplicates are eliminated in this process
-				TreeSet<DataInfo> dataSet = new TreeSet<DataInfo>();
+				TreeSet<DataPoint> datSet = new TreeSet<DataPoint>();
 				int j = -1;
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					j++;
@@ -1491,21 +1491,20 @@ public class SocatCruiseReporter {
 					Character woceFlag = dataVals.getWoceCO2Water();
 					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
 						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
-						DataInfo datinf = new DataInfo(upperExpo, sectimes[j], 
+						DataPoint datpt = new DataPoint(upperExpo, sectimes[j], 
 								dataVals.getLatitude(), dataVals.getLongitude(), fco2rec);
-						if ( ! dataSet.add(datinf) ) {
-							System.err.println("Duplicate datapoint " + Integer.toString(j+1) + 
-									" in " + upperExpo + " : " + datinf.toString());
+						if ( ! datSet.add(datpt) ) {
+							System.err.println("Ignored duplicate datapoint for " + upperExpo + ": " + datpt.toString());
 						}
 					}
 				}
 				// Print the sorted data for this cruise
-				for ( DataInfo datinf : dataSet ) {
+				for ( DataPoint datPt : datSet ) {
 					dataID++;
-					String datetime = DATETIMESTAMPER.format(datinf.datetime);
+					String datetime = DATETIMESTAMPER.format(datPt.datetime);
 					report.format("%d\t%.6f\t%.6f\t%s\t%s\t%.6f\n", 
-							Long.valueOf(dataID), datinf.latitude, datinf.longitude, 
-							datetime, upperExpo, datinf.fco2rec);
+							Long.valueOf(dataID), datPt.latitude, datPt.longitude, 
+							datetime, upperExpo, datPt.fco2rec);
 				}
 			}
 		} finally {

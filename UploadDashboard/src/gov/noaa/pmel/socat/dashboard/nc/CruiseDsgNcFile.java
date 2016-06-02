@@ -36,7 +36,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 7050518214208672807L;
+	private static final long serialVersionUID = 6999488098229188645L;
 
 	// Names of the variables in the DSG files
 	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
@@ -44,6 +44,7 @@ public class CruiseDsgNcFile extends File {
 	public static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
 	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
 	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
+	public static final String WOCECO2WATER_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
 	public static final String REGION_ID_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
 	public static final String ALL_REGION_IDS_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.allRegionIDs_VARNAME);
 

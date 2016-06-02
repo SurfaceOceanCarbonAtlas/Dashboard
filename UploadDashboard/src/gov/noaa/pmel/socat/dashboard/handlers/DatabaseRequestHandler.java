@@ -749,7 +749,7 @@ public class DatabaseRequestHandler {
 				results.close();
 			}
 			woceEvent.setId(woceId);
-			// Add the DatumLocations to the WOCELocations table
+			// Add the DataLocations to the WOCELocations table
 			prepStmt = catConn.prepareStatement("INSERT INTO `" + WOCELOCATIONS_TABLE_NAME + 
 					"` (`woce_id`, `region_id`, `row_num`, `longitude`, `latitude`, " +
 					"`data_time`, `data_value`) VALUES (?, ?, ?, ?, ?, ?, ?);");

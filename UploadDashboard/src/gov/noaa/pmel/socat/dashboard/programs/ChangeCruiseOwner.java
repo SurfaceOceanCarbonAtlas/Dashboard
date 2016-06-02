@@ -94,12 +94,12 @@ public class ChangeCruiseOwner {
 				System.exit(1);
 			}
 
-			CruiseModifier modifier = new CruiseModifier();
+			CruiseModifier modifier = new CruiseModifier(configStore);
 			for ( Map.Entry<String,String> expoOwner : exposOwners.entrySet() ) {
 				String expocode = expoOwner.getKey();
 				String newOwner = expoOwner.getValue();
 				try {
-					modifier.changeCruiseOwner(configStore, expocode, newOwner);
+					modifier.changeCruiseOwner(expocode, newOwner);
 				} catch (Exception ex) {
 					System.err.println("Problems changing the owner of " + expocode + 
 							" to " + newOwner + ": " + ex.getMessage());
