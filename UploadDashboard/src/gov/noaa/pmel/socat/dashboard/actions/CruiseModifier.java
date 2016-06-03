@@ -631,7 +631,10 @@ public class CruiseModifier {
 
 	/**
 	 * Applies WOCE-4 flags to any duplicated lon/lat/time/fCO2_rec data 
-	 * points found within a data set.
+	 * points found within a data set.  Add the WOCE event to the database, 
+	 * modifies the full-data DSG file, and recreates the decimated-data
+	 * DSG file.  Does not flag ERDDAP as this may be called repeatedly
+	 * with different expocodes. 
 	 * 
 	 * @param expocode
 	 * 		examine the data of the cruise with this expocode 
@@ -641,8 +644,8 @@ public class CruiseModifier {
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid,
 	 * @throws IOException 
-	 * 		if unable to read or update the DSG NC file, or
-	 * 		if unable to read or update the database:w
+	 * 		if unable to read or update a DSG NC file, or
+	 * 		if unable to read or update the database
 	 * 
 	 */
 	public ArrayList<String> woceDuplicateDatapoints(String expocode)
@@ -708,7 +711,7 @@ public class CruiseModifier {
 				locations.add(loc);
 			}
 			SocatWoceEvent woceEvent = new SocatWoceEvent();
-			woceEvent.setExpocode(expocode);
+			woceEvent.setExpocode(upperExpo);
 			woceEvent.setSocatVersion(socatVersion);
 			woceEvent.setFlag(SocatWoceEvent.WOCE_BAD);
 			woceEvent.setFlagDate(new Date());
@@ -717,19 +720,25 @@ public class CruiseModifier {
 			woceEvent.setComment("duplicate lon/lat/time/fCO2_rec data points detected by automation");
 			woceEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
 			woceEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+			// Add the WOCE event to the database
 			try {
 				configStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);
 			} catch (SQLException ex) {
-				throw new IOException("Problem assigning WOCE-4 flags in database " +
-						"for duplicate lon/lat/time/fCO2_rec data points: " + ex.getMessage());
+				throw new IOException("Problem assigning WOCE-4 flags in database: " + ex.getMessage());
 			}
+			// Assign the WOCE-4 flags in the full-data DSG file
 			ArrayList<String> issues = dsgFile.assignWoceFlags(woceEvent);
 			if ( ! issues.isEmpty() ) {
 				for ( String msg : issues ) {
 					System.err.println(msg);
 				}
-				throw new IOException("Problem assigning WOCE-4 flags in DSG file " + 
-						"for duplicate lon/lat/time/fCO2_rec data points");
+				throw new IOException("Problem assigning WOCE-4 flags in the full-data DSG file");
+			}
+			// Re-create the decimated-data DSG file
+			try {
+				configStore.getDsgNcFileHandler().decimateCruise(upperExpo);
+			} catch (Exception ex) {
+				throw new IOException("Unable to decimate the updated full-data DSG file: " + ex.getMessage());
 			}
 			// Report WOCE-4 of duplicates
 			for ( DataInfo datinf : dupDatInf ) {

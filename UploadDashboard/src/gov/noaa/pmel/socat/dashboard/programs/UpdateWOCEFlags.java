@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
@@ -22,9 +21,6 @@ import java.util.TreeSet;
  * @author Karl Smith
  */
 public class UpdateWOCEFlags {
-
-	private static final String WOCE_CO2WATER_NC_VARNAME = 
-			Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
 
 	/**
 	 * @param args
@@ -91,7 +87,7 @@ public class UpdateWOCEFlags {
 				char[] currentWoceFlags = null;
 				try {
 					dsgFile = dsgHandler.getDsgNcFile(expocode);
-					currentWoceFlags = dsgFile.readCharVarDataValues(WOCE_CO2WATER_NC_VARNAME);
+					currentWoceFlags = dsgFile.readCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME);
 				} catch (Exception ex) {
 					System.err.println("Error reading the WOCE flags from the full-data DSG file for " + 
 							expocode + " : " + ex.getMessage());
@@ -102,7 +98,7 @@ public class UpdateWOCEFlags {
 					currentWoceFlags[k] = SocatWoceEvent.WOCE_NOT_CHECKED;
 				}
 				try {
-					dsgFile.writeCharVarDataValues(WOCE_CO2WATER_NC_VARNAME, currentWoceFlags);
+					dsgFile.writeCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME, currentWoceFlags);
 				} catch (Exception ex) {
 					System.err.println("Error clearing all the WOCE flags in the full-data DSG file for " +
 							expocode + " : " + ex.getMessage());

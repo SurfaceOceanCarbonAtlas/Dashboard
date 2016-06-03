@@ -703,7 +703,7 @@ public class DatabaseRequestHandler {
 
 	/**
 	 * Adds a new WOCE event for a dataset.  This includes assigning
-	 * the DatumLocations to the WOCELocations table.
+	 * the DataLocations to the WOCELocations table.
 	 * 
 	 * @param woceEvent
 	 * 		the WOCE event to add; 

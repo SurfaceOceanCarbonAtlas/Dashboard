@@ -4,7 +4,6 @@
 package gov.noaa.pmel.socat.dashboard.programs;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.socat.dashboard.nc.Constants;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
@@ -25,10 +24,6 @@ import java.util.TreeSet;
 public class ReportMissing {
 
 	// Names of the variables in the DSG files
-	private static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
-	private static final String LATITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
-	private static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
-	private static final String REGION_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
 	private static final double REL_TOLER = 1.0E-12;
 	private static final double ABS_TOLER = 1.0E-6;
 
@@ -48,10 +43,10 @@ public class ReportMissing {
 	 */
 	private static void checkMissing(CruiseDsgNcFile dsgFile, String expocode, 
 			String typeName) throws IOException, IllegalArgumentException {
-		double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_NCVAR_NAME);
-		double[] latitudes = dsgFile.readDoubleVarDataValues(LATITUDE_NCVAR_NAME);
-		double[] times = dsgFile.readDoubleVarDataValues(TIME_NCVAR_NAME);
-		char[] regionIDs = dsgFile.readCharVarDataValues(REGION_NCVAR_NAME);
+		double[] longitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LONGITUDE_NCVAR_NAME);
+		double[] latitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LATITUDE_NCVAR_NAME);
+		double[] times = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
+		char[] regionIDs = dsgFile.readCharVarDataValues(CruiseDsgNcFile.REGION_ID_NCVAR_NAME);
 		int numObs = longitudes.length;
 		if ( latitudes.length != numObs )
 			throw new IllegalArgumentException("number of latitudes (" + 
