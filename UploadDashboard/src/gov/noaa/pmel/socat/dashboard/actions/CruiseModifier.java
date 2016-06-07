@@ -120,7 +120,8 @@ public class CruiseModifier {
 
 			if ( fco2rec == null )
 				throw new IllegalArgumentException("null fco2rec for " + expocode);
-			if ( (fco2rec < 0.0) || (fco2rec > 100000.0) )
+			if ( ( ! SocatCruiseData.FP_MISSING_VALUE.equals(fco2rec) ) && 
+				 ( (fco2rec < 0.0) || (fco2rec > 100000.0) ) )
 				throw new IllegalArgumentException("invalid fCO2rec of " + fco2rec + " in " + expocode);
 			this.fco2rec = fco2rec;
 		}
@@ -680,7 +681,8 @@ public class CruiseModifier {
 		TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
 		// Create a list for holding any duplicate lon/lat/tim/fCO2_rec data
 		ArrayList<DataInfo> dupDatInf = new ArrayList<DataInfo>();
-		// Process all the data points, looking for duplicate lon/lat/time/fCO2_rec
+		// Process all the data points that are not already WOCE-4, 
+		// looking for duplicate lon/lat/time/fCO2_rec
 		int j = -1;
 		for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 			j++;
@@ -715,11 +717,11 @@ public class CruiseModifier {
 			woceEvent.setSocatVersion(socatVersion);
 			woceEvent.setFlag(SocatWoceEvent.WOCE_BAD);
 			woceEvent.setFlagDate(new Date());
-			woceEvent.setDataVarName(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
-			woceEvent.setLocations(locations);
 			woceEvent.setComment("duplicate lon/lat/time/fCO2_rec data points detected by automation");
 			woceEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
 			woceEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+			woceEvent.setDataVarName(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
+			woceEvent.setLocations(locations);
 			// Add the WOCE event to the database
 			try {
 				configStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);

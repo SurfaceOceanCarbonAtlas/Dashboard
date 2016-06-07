@@ -131,7 +131,8 @@ public class SocatCruiseReporter {
 
 			if ( fco2rec == null )
 				throw new IllegalArgumentException("null fco2rec for " + expocode);
-			if ( (fco2rec < 0.0) || (fco2rec > 100000.0) )
+			if ( ( ! SocatCruiseData.FP_MISSING_VALUE.equals(fco2rec) ) && 
+				 ( (fco2rec < 0.0) || (fco2rec > 100000.0) ) )
 				throw new IllegalArgumentException("invalid fCO2rec of " + 
 						Double.toString(fco2rec) + " for " + expocode);
 			this.fco2rec = fco2rec;
