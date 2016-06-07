@@ -84,7 +84,7 @@ public class RestoreCruise {
 		String removeSocatVersion = configStore.getSocatUploadVersion();
 		ResubmitCruises resubmitter = new ResubmitCruises(configStore);
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
-		CruiseModifier restorer = new CruiseModifier();
+		CruiseModifier restorer = new CruiseModifier(configStore);
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 		try {
@@ -135,7 +135,7 @@ public class RestoreCruise {
 			String restoredVersion = null;
 			try {
 				System.out.println("Restoring WOCE flags for the current data");
-				restorer.restoreWoceFlags(configStore, expo);
+				restorer.restoreWoceFlags(expo);
 				restoredVersion = restorer.getRestoredSocatVersion();
 			} catch (Exception ex) {
 				System.err.println(expo + ": problems restoring the WOCE flags - " + ex.getMessage());

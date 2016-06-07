@@ -36,7 +36,8 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 7050518214208672807L;
+
+	private static final long serialVersionUID = 8195248681298504062L;
 
 	// Names of the variables in the DSG files
 	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
@@ -44,8 +45,10 @@ public class CruiseDsgNcFile extends File {
 	public static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
 	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
 	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
+	public static final String WOCECO2WATER_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
 	public static final String REGION_ID_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
 	public static final String ALL_REGION_IDS_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.allRegionIDs_VARNAME);
+	public static final String SOCAT_VERSION_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.socatVersion_VARNAME);
 
 	private static final String VERSION = "CruiseDsgNcFile 1.5";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -1088,28 +1091,28 @@ public class CruiseDsgNcFile extends File {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
 
-			String varName = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
+			String varName = LONGITUDE_NCVAR_NAME;
 			Variable var = ncfile.findVariable(varName);
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
 
-			varName = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
+			varName = LATITUDE_NCVAR_NAME;
 			var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
 
-			varName = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+			varName = TIME_NCVAR_NAME;
 			var = ncfile.findVariable(varName);
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" +
 						varName + "' in " + getName());
 			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
 
-			varName = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
+			varName = REGION_ID_NCVAR_NAME;
 			var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new IllegalArgumentException("Unable to find variable '" +
@@ -1131,7 +1134,7 @@ public class CruiseDsgNcFile extends File {
 			}
 
 			// WOCE flags - currently only WOCE_CO2_water
-			varName = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
+			varName = WOCECO2WATER_NCVAR_NAME;
 			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
@@ -1200,21 +1203,21 @@ public class CruiseDsgNcFile extends File {
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
 
-			String varName = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
+			String varName = LONGITUDE_NCVAR_NAME;
 			Variable var = ncfile.findVariable(varName);
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayDouble.D1 longitudes = (ArrayDouble.D1) var.read();
 
-			varName = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
+			varName = LATITUDE_NCVAR_NAME;
 			var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
 						varName + "' in " + getName());
 			ArrayDouble.D1 latitudes = (ArrayDouble.D1) var.read();
 
-			varName = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+			varName = TIME_NCVAR_NAME;
 			var = ncfile.findVariable(varName);
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" +
@@ -1223,7 +1226,7 @@ public class CruiseDsgNcFile extends File {
 
 			ArrayChar.D2 regionIDs;
 			if ( updateWoceEvent ) {
-				varName = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
+				varName = REGION_ID_NCVAR_NAME;
 				var = ncfile.findVariable(varName);
 				if ( var == null )
 					throw new IllegalArgumentException("Unable to find variable '" +
@@ -1249,7 +1252,7 @@ public class CruiseDsgNcFile extends File {
 			}
 
 			// WOCE flags - currently only WOCE_CO2_water
-			varName = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
+			varName = WOCECO2WATER_NCVAR_NAME;
 			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 

@@ -94,7 +94,7 @@ public class RegenerateWoceFlags {
 			System.exit(1);
 		}
 
-		CruiseModifier restorer = new CruiseModifier();
+		CruiseModifier restorer = new CruiseModifier(configStore);
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 
 		try {
@@ -102,7 +102,7 @@ public class RegenerateWoceFlags {
 			String socatVersion = null;
 			try {
 				System.out.println("Regenerating any matching old non-automated WOCE flags for " + expocode);
-				changed = restorer.regenerateWoceFlags(configStore, expocode, maxTimeDiff, maxValueDiff);
+				changed = restorer.regenerateWoceFlags(expocode, maxTimeDiff, maxValueDiff);
 				socatVersion = restorer.getRestoredSocatVersion();
 			} catch (Exception ex) {
 				System.err.println(expocode + ": problems regenerating the WOCE flags - " + ex.getMessage());

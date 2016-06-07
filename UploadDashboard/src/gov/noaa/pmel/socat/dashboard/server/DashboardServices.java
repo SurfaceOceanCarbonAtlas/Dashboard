@@ -192,10 +192,10 @@ public class DashboardServices extends RemoteServiceServlet
 				throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
 		}
 		// Change the owner of the cruises
-		CruiseModifier modifier = new CruiseModifier();
+		CruiseModifier modifier = new CruiseModifier(configStore);
 		Logger itsLogger = Logger.getLogger("DashboardServices");
 		for ( String expocode : expocodeSet ) {
-			modifier.changeCruiseOwner(configStore, expocode, newUsername);
+			modifier.changeCruiseOwner(expocode, newUsername);
 			itsLogger.info("changed owner of " + expocode + " to " + newUsername);
 		}
 		// Return the updated list of cruises for this user

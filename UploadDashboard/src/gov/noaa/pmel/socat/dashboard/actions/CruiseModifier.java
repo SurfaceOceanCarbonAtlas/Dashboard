@@ -17,15 +17,20 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
 import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.TimeZone;
+import java.util.TreeSet;
 
 /**
  * Restores the cruise DSG files to the data currently given in the text data file.  
@@ -37,27 +42,172 @@ import java.util.Date;
  */
 public class CruiseModifier {
 
-	private static final String LONGITUDE_VAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
-	private static final String LATITUDE_VAR_NAME = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
-	private static final String TIME_VAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
-	private static final String REGION_ID_VAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
-	private static final String WOCE_CO2_WATER_NAME = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
+	private static final SimpleDateFormat DATETIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	/** Jan 1, 1940 - reasonable lower limit on data dates */
+	private static final Date EARLIEST_DATE;
+	static {
+		DATETIMESTAMPER.setTimeZone(TimeZone.getTimeZone("UTC"));
+		try {
+			EARLIEST_DATE = DATETIMESTAMPER.parse("1940-01-01 00:00:00");
+		} catch (ParseException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
+	/**
+	 * Class for collecting and sorting time/lat/lon/fco2rec data
+	 * for possible later WOCE-4 flagging.
+	 */
+	private static class DataInfo implements Comparable<DataInfo> {
+		final String expocode;
+		final int num;
+		final char regionID;
+		final Date datetime;
+		final Double latitude;
+		final Double longitude;
+		final Double fco2rec;
+
+		/**
+		 * @param expocode
+		 * 		dataset expocode (ignored for comparisons)
+		 * @param num
+		 * 		row number of this datapoint in the dataset (ignored for comparisons)
+		 * @param regionId
+		 * 		region ID of this datapoint (ignored for comparisons)
+		 * @param sectime
+		 * 		measurement time in seconds since Jan 1, 1970 00:00:00
+		 * @param latitude
+		 * 		measurement latitude in decimal degrees north
+		 * @param longitude
+		 * 		measurment longitude in decimal degrees east in the range [-180,180]
+		 * @param fco2rec
+		 * 		measurement recommended fCO2
+		 * @throws IllegalArgumentException
+		 * 		if the sectime, latitude, longitude, or fco2rec values are invalid
+		 */
+		DataInfo(String expocode, int num, char regionID, Double sectime, Double latitude, 
+				Double longitude, Double fco2rec) throws IllegalArgumentException {
+			if ( expocode == null )
+				throw new IllegalArgumentException("null expocode");
+			this.expocode = expocode;
+
+			if ( num <= 0 )
+				throw new IllegalArgumentException("invalid row number of " + Integer.toString(num) + " for " + expocode);
+			this.num = num;
+
+			if ( DataLocation.REGION_NAMES.get(regionID) == null )
+				throw new IllegalArgumentException("invalid region ID of '" + regionID + "' for " + expocode);
+			this.regionID = regionID;
+
+			if ( sectime == null )
+				throw new IllegalArgumentException("null time for " + expocode);
+			this.datetime = new Date(Math.round(sectime * 1000.0));
+			Date now = new Date();
+			if ( this.datetime.before(EARLIEST_DATE) || this.datetime.after(now) )
+				throw new IllegalArgumentException("invalid time of " + this.datetime.toString() + " for " + expocode);
+
+			if ( latitude == null )
+				throw new IllegalArgumentException("null latitude for " + expocode);
+			if ( (latitude < -90.0) || (latitude > 90.0) )
+				throw new IllegalArgumentException("invalid latitude of " + latitude + " for " + expocode);
+			this.latitude = latitude;
+
+			if ( longitude == null )
+				throw new IllegalArgumentException("null longitude for " + expocode);
+			if ( (longitude < -180.0) || (longitude > 180.0) )
+				throw new IllegalArgumentException("invalid longitude of " + longitude + " for " + expocode);
+			this.longitude = longitude;
+
+			if ( fco2rec == null )
+				throw new IllegalArgumentException("null fco2rec for " + expocode);
+			if ( (fco2rec < 0.0) || (fco2rec > 100000.0) )
+				throw new IllegalArgumentException("invalid fCO2rec of " + fco2rec + " in " + expocode);
+			this.fco2rec = fco2rec;
+		}
+
+		@Override
+		public int compareTo(DataInfo other) {
+			// the primary sort must be on datetime
+			int result = this.datetime.compareTo(other.datetime);
+			if ( result != 0 )
+				return result;
+			result = this.latitude.compareTo(other.latitude);
+			if ( result != 0 )
+				return result;
+			result = this.longitude.compareTo(other.longitude);
+			if ( result != 0 )
+				return result;
+			result = this.fco2rec.compareTo(other.fco2rec);
+			if ( result != 0 )
+				return result;
+			// Ignore expocode, num, and regionID
+			return 0;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 37;
+			int result = 1;
+			result = prime * result + datetime.hashCode();
+			result = prime * result + latitude.hashCode();
+			result = prime * result + longitude.hashCode();
+			result = prime * result + fco2rec.hashCode();
+			// Ignore expocode, num, and regionID
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( this == obj ) 
+				return true;
+			if ( obj == null ) 
+				return false;
+			if ( ! (obj instanceof DataInfo) )
+				return false;
+			DataInfo other = (DataInfo) obj;
+			if ( ! datetime.equals(other.datetime) )
+				return false;
+			if ( ! latitude.equals(other.latitude) ) 
+				return false;
+			if ( ! longitude.equals(other.longitude) ) 
+				return false;
+			if ( ! fco2rec.equals(other.fco2rec) ) 
+				return false;
+			// Ignore expocode, num, and regionID
+			return true;
+		}
+
+		@Override
+		public String toString() {
+			return  "[ expocode=" + expocode +
+					", num=" + Integer.toString(num) +
+					", regionID=" + Character.toString(regionID) +
+					", datetime=" + DATETIMESTAMPER.format(datetime) + 
+					", latitude=" + String.format("%#.6f", latitude) + 
+					", longitude=" + String.format("%#.6f", longitude) + 
+					", fco2rec=" + String.format("%#.6f", fco2rec) + 
+					" ]";
+		}
+
+	}
+
+	DashboardConfigStore configStore;
 	String restoredSocatVersion;
 
 	/**
 	 * Modifies information about datasets or restores previous versions of data or WOCE flags for datasets.
+	 * @param configStore
+	 * 		configuration store to use
 	 */
-	public CruiseModifier() {
-		restoredSocatVersion = null;
+	public CruiseModifier(DashboardConfigStore configStore) {
+		this.configStore = configStore;
+		this.restoredSocatVersion = null;
 	}
 
 	/**
 	 * Changes the owner of the data and metadata files for a dataset.
 	 * The dataset is added to the list of datasets for the new owner.
 	 * 
-	 * @param configStore
-	 * 		configuration store to use
 	 * @param expocode
 	 * 		change the owner of the data and metadata files for the dataset with this expocode 
 	 * @param newOwner
@@ -67,8 +217,8 @@ public class CruiseModifier {
 	 * 		if the new owner username is not recognized,
 	 * 		if there is no data file for the indicated dataset
 	 */
-	public void changeCruiseOwner(DashboardConfigStore configStore, 
-			String expocode, String newOwner) throws IllegalArgumentException {
+	public void changeCruiseOwner(String expocode, String newOwner) 
+									throws IllegalArgumentException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		if ( ! configStore.validateUser(newOwner) )
 			throw new IllegalArgumentException("Unknown dashboard user " + newOwner);
@@ -107,8 +257,6 @@ public class CruiseModifier {
 	 * database flags if the cruise has been submitted.  If an exception is thrown,
 	 * the system is likely have a corrupt mix of renamed and original-name files.
 	 * 
-	 * @param configStore
-	 * 		configuration store to use
 	 * @param oldExpocode
 	 * 		current expocode for the cruise
 	 * @param newExpocode
@@ -126,8 +274,8 @@ public class CruiseModifier {
 	 * 		if username is not a known user, or
 	 * 		if accessing or updating the database throws one
 	 */
-	public void renameCruise(DashboardConfigStore configStore, String oldExpocode, String newExpocode, 
-			String username) throws IllegalArgumentException, IOException, SQLException {
+	public void renameCruise(String oldExpocode, String newExpocode, String username) 
+						throws IllegalArgumentException, IOException, SQLException {
 		// check and standardized the expocodes
 		String oldExpo = DashboardServerUtils.checkExpocode(oldExpocode);
 		String newExpo = DashboardServerUtils.checkExpocode(newExpocode);
@@ -162,8 +310,6 @@ public class CruiseModifier {
 	 * WOCE locations must match, and all WOCE locations for an event must match for 
 	 * a WOCE event to be restored. 
 	 * 
-	 * @param configStore
-	 * 		configuration store to use
 	 * @param expocode
 	 * 		restore and update WOCE flags for this cruise
 	 * @return
@@ -176,7 +322,7 @@ public class CruiseModifier {
 	 * @throws IOException
 	 * 		if problems reading or writing to the DSG files
 	 */
-	public boolean restoreWoceFlags(DashboardConfigStore configStore, String expocode) 
+	public boolean restoreWoceFlags(String expocode) 
 			throws IllegalArgumentException, SQLException, IOException {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
@@ -187,15 +333,15 @@ public class CruiseModifier {
 		restoredSocatVersion = restoredSocatVersion.substring(0, restoredSocatVersion.length()-1);
 
 		// Read longitudes, latitude, and times for all data
-		double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_VAR_NAME);
+		double[] longitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LONGITUDE_NCVAR_NAME);
 		int numData = longitudes.length;
-		double[] latitudes = dsgFile.readDoubleVarDataValues(LATITUDE_VAR_NAME);
+		double[] latitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LATITUDE_NCVAR_NAME);
 		if ( latitudes.length != numData )
 			throw new RuntimeException("Unexpected mismatch in number of longitudes and latitudes");
-		double[] times = dsgFile.readDoubleVarDataValues(TIME_VAR_NAME);
+		double[] times = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
 		if ( times.length != numData )
 			throw new RuntimeException("Unexpected mismatch in the number of longitudes and times");
-		char[] currentWoceFlags = dsgFile.readCharVarDataValues(WOCE_CO2_WATER_NAME);
+		char[] currentWoceFlags = dsgFile.readCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME);
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
@@ -281,7 +427,7 @@ public class CruiseModifier {
 		if ( ! Arrays.equals(revisedWoceFlags, currentWoceFlags) ) {
 			changed = true;
 			// Update the full-data DSG file with the reassigned WOCE flags
-			dsgFile.writeCharVarDataValues(WOCE_CO2_WATER_NAME, revisedWoceFlags);
+			dsgFile.writeCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME, revisedWoceFlags);
 			// Generate the decimated DSG file from the updated full-data DSG file
 			dsgHandler.decimateCruise(expocode);
 			System.out.println("WOCE flags updated in the DSG files for " + expocode);
@@ -296,8 +442,6 @@ public class CruiseModifier {
 	 * number of old WOCE locations are not used, and not all WOCE locations do not 
 	 * have to match in order for a WOCE flag to be regenerated. 
 	 * 
-	 * @param configStore
-	 * 		configuration store to use
 	 * @param expocode
 	 * 		restore and update WOCE flags for this cruise
 	 * @param maxTimeDiff
@@ -318,9 +462,8 @@ public class CruiseModifier {
 	 * @throws IOException
 	 * 		if problems reading or writing to the DSG files
 	 */
-	public boolean regenerateWoceFlags(DashboardConfigStore configStore, 
-			String expocode, double maxTimeDiff, double maxValueDiff)
-		throws IllegalArgumentException, SQLException, IOException {
+	public boolean regenerateWoceFlags(String expocode, double maxTimeDiff, double maxValueDiff) 
+			throws IllegalArgumentException, SQLException, IOException {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
 		dsgFile.readMetadata();
@@ -330,16 +473,16 @@ public class CruiseModifier {
 		restoredSocatVersion = restoredSocatVersion.substring(0, restoredSocatVersion.length()-1);
 		
 		// Read longitudes, latitude, and times for all data
-		double[] longitudes = dsgFile.readDoubleVarDataValues(LONGITUDE_VAR_NAME);
+		double[] longitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LONGITUDE_NCVAR_NAME);
 		int numData = longitudes.length;
-		double[] latitudes = dsgFile.readDoubleVarDataValues(LATITUDE_VAR_NAME);
+		double[] latitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LATITUDE_NCVAR_NAME);
 		if ( latitudes.length != numData )
 			throw new RuntimeException("Unexpected mismatch in number of longitudes and latitudes");
-		double[] times = dsgFile.readDoubleVarDataValues(TIME_VAR_NAME);
+		double[] times = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
 		if ( times.length != numData )
 			throw new RuntimeException("Unexpected mismatch in the number of longitudes and times");
-		char[] regionIDs = dsgFile.readCharVarDataValues(REGION_ID_VAR_NAME);
-		char[] currentWoceFlags = dsgFile.readCharVarDataValues(WOCE_CO2_WATER_NAME);
+		char[] regionIDs = dsgFile.readCharVarDataValues(CruiseDsgNcFile.REGION_ID_NCVAR_NAME);
+		char[] currentWoceFlags = dsgFile.readCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME);
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
@@ -478,12 +621,132 @@ public class CruiseModifier {
 		if ( ! Arrays.equals(revisedWoceFlags, currentWoceFlags) ) {
 			changed = true;
 			// Update the full-data DSG file with the reassigned WOCE flags
-			dsgFile.writeCharVarDataValues(WOCE_CO2_WATER_NAME, revisedWoceFlags);
+			dsgFile.writeCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME, revisedWoceFlags);
 			// Generate the decimated DSG file from the updated full-data DSG file
 			dsgHandler.decimateCruise(expocode);
 			System.out.println("WOCE flags updated in the DSG files for " + expocode);
 		}
 		return changed;
+	}
+
+	/**
+	 * Applies WOCE-4 flags to any duplicated lon/lat/time/fCO2_rec data 
+	 * points found within a data set.  Add the WOCE event to the database, 
+	 * modifies the full-data DSG file, and recreates the decimated-data
+	 * DSG file.  Does not flag ERDDAP as this may be called repeatedly
+	 * with different expocodes. 
+	 * 
+	 * @param expocode
+	 * 		examine the data of the cruise with this expocode 
+	 * @return
+	 * 		list of messages describing the duplicate lon/lat/time/fCO2_rec 
+	 * 		data points given a WOCE-4 flag
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is invalid,
+	 * @throws IOException 
+	 * 		if unable to read or update a DSG NC file, or
+	 * 		if unable to read or update the database
+	 * 
+	 */
+	public ArrayList<String> woceDuplicateDatapoints(String expocode)
+			throws IllegalArgumentException, IOException {
+		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
+
+		// Get the metadata and data from the DSG file
+		CruiseDsgNcFile dsgFile = configStore.getDsgNcFileHandler().getDsgNcFile(upperExpo);
+		ArrayList<String> unknownVars = dsgFile.readMetadata();
+		if ( unknownVars.size() > 0 ) {
+			String msg = "Unassigned metadata variables: ";
+			for (String var : unknownVars)
+				msg += var + "; ";
+			System.err.println(msg);
+		}
+		unknownVars = dsgFile.readData();
+		if ( unknownVars.size() > 0 ) {
+			String msg = "Unassigned data variables: ";
+			for (String var : unknownVars)
+				msg += var + "; ";
+			System.err.println(msg);
+		}
+
+		// Get the SOCAT version from the DSG metadata
+		SocatMetadata socatMeta = dsgFile.getMetadata();
+		String socatVersion = socatMeta.getSocatVersion();
+
+		// Get the computed values of time in seconds since 1970-01-01 00:00:00
+		double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
+
+		// Create the set for holding previous lon/lat/time/fCO2_rec data
+		TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
+		// Create a list for holding any duplicate lon/lat/tim/fCO2_rec data
+		ArrayList<DataInfo> dupDatInf = new ArrayList<DataInfo>();
+		// Process all the data points, looking for duplicate lon/lat/time/fCO2_rec
+		int j = -1;
+		for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+			j++;
+			Character woceFlag = dataVals.getWoceCO2Water();
+			if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
+				 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ||
+				 woceFlag.equals(SocatWoceEvent.WOCE_QUESTIONABLE) ) {
+				DataInfo datinf = new DataInfo(upperExpo, j+1, dataVals.getRegionID(), sectimes[j], 
+						dataVals.getLatitude(), dataVals.getLongitude(), dataVals.getfCO2Rec());
+				if ( ! prevDatInf.add(datinf) ) {
+					dupDatInf.add(datinf);
+				}
+			}
+		}
+
+		ArrayList<String> warnMsgs = new ArrayList<String>(dupDatInf.size());
+		if ( ! dupDatInf.isEmpty() ) {
+			// Assign the WOCE-4 flag for duplicates
+			ArrayList<DataLocation> locations = new ArrayList<DataLocation>(dupDatInf.size());
+			for ( DataInfo datinf : dupDatInf ) {
+				DataLocation loc = new DataLocation();
+				loc.setDataDate(datinf.datetime);
+				loc.setDataValue(datinf.fco2rec);
+				loc.setLatitude(datinf.latitude);
+				loc.setLongitude(datinf.longitude);
+				loc.setRegionID(datinf.regionID);
+				loc.setRowNumber(datinf.num);
+				locations.add(loc);
+			}
+			SocatWoceEvent woceEvent = new SocatWoceEvent();
+			woceEvent.setExpocode(upperExpo);
+			woceEvent.setSocatVersion(socatVersion);
+			woceEvent.setFlag(SocatWoceEvent.WOCE_BAD);
+			woceEvent.setFlagDate(new Date());
+			woceEvent.setDataVarName(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
+			woceEvent.setLocations(locations);
+			woceEvent.setComment("duplicate lon/lat/time/fCO2_rec data points detected by automation");
+			woceEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
+			woceEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+			// Add the WOCE event to the database
+			try {
+				configStore.getDatabaseRequestHandler().addWoceEvent(woceEvent);
+			} catch (SQLException ex) {
+				throw new IOException("Problem assigning WOCE-4 flags in database: " + ex.getMessage());
+			}
+			// Assign the WOCE-4 flags in the full-data DSG file
+			ArrayList<String> issues = dsgFile.assignWoceFlags(woceEvent);
+			if ( ! issues.isEmpty() ) {
+				for ( String msg : issues ) {
+					System.err.println(msg);
+				}
+				throw new IOException("Problem assigning WOCE-4 flags in the full-data DSG file");
+			}
+			// Re-create the decimated-data DSG file
+			try {
+				configStore.getDsgNcFileHandler().decimateCruise(upperExpo);
+			} catch (Exception ex) {
+				throw new IOException("Unable to decimate the updated full-data DSG file: " + ex.getMessage());
+			}
+			// Report WOCE-4 of duplicates
+			for ( DataInfo datinf : dupDatInf ) {
+				warnMsgs.add("WOCE-4 assigned to duplicate datapoint: " + datinf.toString());
+			}
+		}
+
+		return warnMsgs;		
 	}
 
 }

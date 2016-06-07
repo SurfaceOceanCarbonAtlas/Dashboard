@@ -50,7 +50,7 @@ public class RecreateDsgs {
 		metaHandler = configStore.getMetadataFileHandler();
 		dbHandler = configStore.getDatabaseRequestHandler();
 		dsgHandler = configStore.getDsgNcFileHandler();
-		cruiseModifier = new CruiseModifier();
+		cruiseModifier = new CruiseModifier(configStore);
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class RecreateDsgs {
 		dsgHandler.decimateCruise(expocode);
 		// Restore any WOCE flags from the database - redecimates if necessary
 		try {
-			cruiseModifier.restoreWoceFlags(confStore, upperExpo);
+			cruiseModifier.restoreWoceFlags(upperExpo);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problems restoring the WOCE flags for " + 
 					upperExpo + ": " + ex.getMessage());
