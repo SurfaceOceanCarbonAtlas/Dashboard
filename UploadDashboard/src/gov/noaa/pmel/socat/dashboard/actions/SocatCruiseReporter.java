@@ -579,10 +579,10 @@ public class SocatCruiseReporter {
 			report.println();
 			report.println("Observation times were not provided to a resolution of hours;");
 			report.println("the hours, minutes, and seconds given are artificially generated values");
-			warnMsgs.add("Cruise was marked as having artificial hours, minutes, and seconds");
+			warnMsgs.add("Data set was marked as having artificial hours, minutes, and seconds");
 		}
 		report.println();
-		report.println("Cruise QC flag: " + qcFlag + " (see below)");
+		report.println("Data set QC flag: " + qcFlag + " (see below)");
 		report.println();
 
 		return warnMsgs;
@@ -623,10 +623,10 @@ public class SocatCruiseReporter {
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
 		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
 		if ( regionName == null )
-			report.println("SOCAT cruise data for the following cruises:");
+			report.println("SOCAT data for the following data sets:");
 		else
-			report.println("SOCAT cruise data in SOCAT region \"" + 
-					regionName + "\" for the following cruises:");
+			report.println("SOCAT data in SOCAT region \"" + 
+					regionName + "\" for the following data sets:");
 		report.println("Expocode\t" +
 					   "version\t" +
 					   "Cruise/Dataset Name\t" +
@@ -784,7 +784,7 @@ public class SocatCruiseReporter {
 
 		if ( needsFakeHoursMsg ) {
 			boolean isFirst = true;
-			report.print("Note for cruise(s): ");
+			report.print("Note for data set(s): ");
 			for ( DashboardOmeMetadata omeMeta : omeMetaList ) {
 				String upperExpo = omeMeta.getExpocode();
 				if ( DAY_RESOLUTION_CRUISE_EXPOCODES.contains(upperExpo) ) {
@@ -828,28 +828,29 @@ public class SocatCruiseReporter {
 				report.println(SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS[k]);
 		}
 		report.println();
-		report.println("The quality assessments given by the Cruise QC flag and fCO2rec_flag only apply");
-		report.println("to the fCO2rec value.  For more information about the recomputed fCO2 value and");
-		report.println("the meaning of the Cruise QC flag, fCO2rec_src, and fCO2rec_flag values, see:");
+		report.println("The quality assessments given by the QC flag and fCO2rec_flag only apply to");
+		report.println("the fCO2rec value.  For more information about the recomputed fCO2 value and");
+		report.println("the meaning of the QC flag, fCO2rec_src, and fCO2rec_flag values, see:");
 		for (int k = 0; k < SOCAT_MAIN_CITATION.length; k++)
 			report.println(SOCAT_MAIN_CITATION[k]);
 		if ( multicruise ) {
 			report.println();
-			report.println("This is a report of only cruise data points with recomputed fCO2 values");
+			report.println("This is a report of only data points with recomputed fCO2 values");
 			report.println("which were deemed acceptable (WOCE flag 2). ");
 		}
 		else {
 			report.println();
-			report.println("This is a report of all cruise data points, including those with missing");
+			report.println("This is a report of all data points, including those with missing");
 			report.println("recomputed fCO2 values and those with a WOCE flag indicating questionable (3)");
 			report.println("or bad (4) recomputed fCO2 values.");
 		}
 		report.println();
-		report.println("The data use policy can be found at http://www.socat.info/DataUsePolicy.htm");
+		report.println("Terms of use of this data are given in the SOCAT Fair Data Use Statement ");
+		report.println("http://www.socat.info/SOCAT_fair_data_use_statement.htm");
 		if ( ! multicruise ) {
 			report.println();
-			report.println("All standard SOCAT version 3 data columns are reported in this file,");
-			report.println("even if all values are missing ('NaN') for this cruise.");
+			report.println("All standard SOCAT data columns are reported in this file,");
+			report.println("even if all values are missing ('NaN') for this data set.");
 		}
 		report.println();
 
@@ -866,10 +867,10 @@ public class SocatCruiseReporter {
 	 * {@link #dataReportString}
 	 */
 	private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
-		"Expocode: unique identifier for the cruise from which this data was obtained",
-		"version: version of SOCAT where this enhanced cruise data first appears",
-		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
-		"QC_Flag: Cruise QC flag",
+		"Expocode: unique identifier for the data set from which this data was obtained",
+		"version: version of SOCAT where this enhanced data first appears",
+		"SOCAT_DOI: DOI for this SOCAT-enhanced data",
+		"QC_Flag: Data set QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
 		"day: day of the time (UTC) of the measurement",
@@ -951,10 +952,10 @@ public class SocatCruiseReporter {
 	 * {@link #dataReportString}
 	 */
 	private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
-		"Expocode: unique identifier for the cruise from which this data was obtained",
-		"version: version of SOCAT where this enhanced cruise data first appears",
-		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
-		"QC_Flag: Cruise QC flag",
+		"Expocode: unique identifier for the data set from which this data was obtained",
+		"version: version of SOCAT where this enhanced data first appears",
+		"SOCAT_DOI: DOI for this SOCAT-enhanced data",
+		"QC_Flag: Data set QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
 		"day: day of the time (UTC) of the measurement",
@@ -970,7 +971,7 @@ public class SocatCruiseReporter {
 		"PPPP: measured atmospheric pressure in hectopascals",
 		"Pequ: equilibrator chamber pressure in hectopascals",
 		"WOA_SSS: sea surface salinity on the Practical Salinity Scale interpolated from the",
-		"    World Ocean Atlas 2005 (see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
+		"    World Ocean Atlas 2005 (see: http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
 		"NCEP_SLP: sea level pressure in hectopascals interpolated from the NCEP/NCAR Reanalysis Project",
 		"    (see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)",
 		"ETOPO2_depth: bathymetry in meters interpolated from the ETOPO2 2 arc-minute Gridded ",
