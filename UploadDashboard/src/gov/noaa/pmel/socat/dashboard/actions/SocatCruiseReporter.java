@@ -39,19 +39,20 @@ import java.util.TreeSet;
  */
 public class SocatCruiseReporter {
 
+	private static final String NOT_AVAILABLE_TAG = "N/A";
 	private static final String SOCAT_ENHANCED_DOI_TAG = "SOCATENHANCEDDOI";
-	private static final String SOCAT_ENHANCED_HREF_TAG = "SOCATENHANCEDHREF";
 	private static final String SOCAT_ENHANCED_HREF_PREFIX = "http://doi.pangaea.de/";
 
 	// SOCAT main DOI, DOI HRef, and publication citation
-	private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.849770";
+	private static final String SOCAT_MAIN_DOI = "SOCATMAINDOI";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"Bakker, D. C. E., Pfeil, B. Landa, C. S., et. al. \"A multi-decade record of ",
-		"high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas (SOCAT)\" ",
-		"Under review in Earth System Science Data Discussions, 2016, 55 pp. ",
-		"doi:10.5194/essd-2016-15 ",
-		"    Also see: ",
-		"D. C. E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
+		"SOCATMAINHREF",
+		"Also see: ",
+		"  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade record ",
+		"of high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas ",
+		"(SOCAT)\"  Under review in Earth System Science Data Discussions, 2016, ",
+		"55 pp.  doi:10.5194/essd-2016-15; ",
+		"  D.C.E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
 		"Ocean CO2 Atlas (SOCAT version 2)\" Earth Syst. Sci. Data, 6, 69-90, 2014 ",
 		"doi:10.5194/essd-6-69-2014  http://www.earth-syst-sci-data.net/6/69/2014/ ",
 	};
@@ -281,7 +282,11 @@ public class SocatCruiseReporter {
 		// Get the original and SOCAT-enhanced data document DOIs for this cruise 
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
 		String origDOI = cruise.getOrigDoi();
+		if ( origDOI.isEmpty() )
+			origDOI = NOT_AVAILABLE_TAG;
 		String socatDOI = cruise.getSocatDoi();
+		if ( socatDOI.isEmpty() )
+			socatDOI = SOCAT_ENHANCED_DOI_TAG;
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
 		double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
@@ -379,8 +384,14 @@ public class SocatCruiseReporter {
 				socatVersionList.add(socatMeta.getSocatVersion());
 				qcFlagList.add(socatMeta.getQcFlag());
 				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
-				origDOIList.add(cruise.getOrigDoi());
-				socatDOIList.add(cruise.getSocatDoi());
+				String origDOI = cruise.getOrigDoi();
+				if ( origDOI.isEmpty() )
+					origDOI = NOT_AVAILABLE_TAG;
+				origDOIList.add(origDOI);
+				String socatDOI = cruise.getSocatDoi();
+				if ( socatDOI.isEmpty() )
+					socatDOI = SOCAT_ENHANCED_DOI_TAG;
+				socatDOIList.add(socatDOI);
 				upperExpoList.add(upperExpo);
 			}
 		}
@@ -424,6 +435,8 @@ public class SocatCruiseReporter {
 				String socatVersion = socatVersionList.get(k);
 				String qcFlag = qcFlagList.get(k);
 				String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDoi();
+				if ( socatDOI.isEmpty() )
+					socatDOI = SOCAT_ENHANCED_DOI_TAG;
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
 				ArrayList<String> unknownVars = dsgFile.readData();
 				if ( unknownVars.size() > 0 ) {
@@ -498,14 +511,8 @@ public class SocatCruiseReporter {
 		report.println("Principal Investigator(s): " + omeMeta.getScienceGroup());
 		report.println("DOI for the original data: " + origDOI);
 		report.println("    or see: " + omeMeta.getOrigDataRef());
-		if ( socatDOI.isEmpty() ) {
-			report.println("DOI of this SOCAT-enhanced data: " + SOCAT_ENHANCED_DOI_TAG);
-			report.println("    or see: " + SOCAT_ENHANCED_HREF_TAG);
-		}
-		else {
-			report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
-			report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
-		}
+		report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
+		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
 		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
 		report.println();
@@ -645,7 +652,11 @@ public class SocatCruiseReporter {
 			String qcFlag = qcFlagList.get(k);
 			TreeSet<String> addlDocs = addlDocsList.get(k);
 			String origDOI = origDOIList.get(k);
+			String origHRef = omeMeta.getOrigDataRef();
+			if ( origHRef.isEmpty() )
+				origHRef = NOT_AVAILABLE_TAG;
 			String socatDOI = socatDOIList.get(k);
+			String socatHRef = SOCAT_ENHANCED_HREF_PREFIX + socatDOI;
 
 			report.print(upperExpo);
 			report.print("\t");
@@ -665,23 +676,14 @@ public class SocatCruiseReporter {
 			report.print(origDOI);
 			report.print("\t");
 
-			report.print(omeMeta.getOrigDataRef());
+			report.print(origHRef);
 			report.print("\t");
 
-			if ( socatDOI.isEmpty() ) {
-				report.print(SOCAT_ENHANCED_DOI_TAG);
-				report.print("\t");
+			report.print(socatDOI);
+			report.print("\t");
 
-				report.print(SOCAT_ENHANCED_HREF_TAG);
-				report.print("\t");
-			}
-			else {
-				report.print(socatDOI);
-				report.print("\t");
-
-				report.print(SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
-				report.print("\t");
-			}
+			report.print(socatHRef);
+			report.print("\t");
 
 			try {
 				double westLon = omeMeta.getWestmostLongitude();
