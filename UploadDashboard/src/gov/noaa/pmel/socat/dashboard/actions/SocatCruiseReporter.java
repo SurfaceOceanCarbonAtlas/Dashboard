@@ -46,7 +46,7 @@ public class SocatCruiseReporter {
 	// SOCAT main DOI, DOI HRef, and publication citation
 	private static final String SOCAT_MAIN_DOI = "SOCATMAINDOI";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"SOCATMAINHREF",
+		"  SOCATMAINHREF",
 		"Also see: ",
 		"  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade record ",
 		"of high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas ",
@@ -520,7 +520,7 @@ public class SocatCruiseReporter {
 		// Additional references - add expocode suffix for clarity
 		report.println("Supplemental documentation reference(s):");
 		for (String filename : addlDocs) {
-			report.println("    " + upperExpo + "_" + filename);
+			report.println("    " + filename);
 		}
 		report.println();
 
@@ -649,6 +649,9 @@ public class SocatCruiseReporter {
 			DashboardOmeMetadata omeMeta = omeMetaList.get(k);
 			String upperExpo = omeMeta.getExpocode();
 			String socatVersion = socatVersionList.get(k);
+			String cruiseName = omeMeta.getCruiseName();
+			if ( cruiseName.isEmpty() )
+				cruiseName = NOT_AVAILABLE_TAG;
 			String qcFlag = qcFlagList.get(k);
 			TreeSet<String> addlDocs = addlDocsList.get(k);
 			String origDOI = origDOIList.get(k);
@@ -664,7 +667,7 @@ public class SocatCruiseReporter {
 			report.print(socatVersion);
 			report.print("\t");
 
-			report.print(omeMeta.getCruiseName());
+			report.print(cruiseName);
 			report.print("\t");
 
 			report.print(omeMeta.getVesselName());
@@ -882,7 +885,7 @@ public class SocatCruiseReporter {
 		"PPPP: measured atmospheric pressure in hectopascals",
 		"Pequ: equilibrator chamber pressure in hectopascals",
 		"WOA_SSS: sea surface salinity on the Practical Salinity Scale interpolated from the",
-		"    World Ocean Atlas 2005 (see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
+		"    World Ocean Atlas 2005 (see: http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
 		"NCEP_SLP: sea level pressure in hectopascals interpolated from the NCEP/NCAR Reanalysis Project",
 		"    (see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)",
 		"ETOPO2_depth: bathymetry in meters interpolated from the ETOPO2 2 arc-minute Gridded ",
