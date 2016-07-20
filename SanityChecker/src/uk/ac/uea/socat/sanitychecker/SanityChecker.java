@@ -184,8 +184,8 @@ public class SanityChecker {
 		} catch (Exception e) {
 			itsLogger.fatal("Unhandled exception encountered", e);
 			
-			Message message = new InternalErrorMessage(e);
 			try {
+				Message message = new InternalErrorMessage(e);
 				itsOutput.addMessage(message);
 				itsOutput.setExitFlag(Output.INTERNAL_ERROR_FLAG);
 				itsOutput.clear(true);
