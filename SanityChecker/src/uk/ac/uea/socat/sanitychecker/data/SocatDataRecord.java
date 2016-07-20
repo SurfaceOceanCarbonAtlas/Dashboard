@@ -3,6 +3,7 @@ package uk.ac.uea.socat.sanitychecker.data;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -82,13 +83,13 @@ public class SocatDataRecord extends DataRecord {
 		} catch (MissingDateTimeElementException e) {
 			try {
 				setDateFlag(Flag.BAD);
-				addMessage(new MissingDateTimeElementMessage(lineNumber));
+				addMessage(new MissingDateTimeElementMessage(this));
 			} catch(DataRecordException e2) {
 				throw new DataRecordException(lineNumber, "Error while processing date/time", e2);
 			}
 			
 		} catch (DateTimeParseException e) {
-			addMessage(new UnparseableDateMessage(lineNumber, CheckerUtils.listToString(dataFields)));
+			addMessage(new UnparseableDateMessage(this, CheckerUtils.listToString(dataFields)));
 			setDateFlag(Flag.BAD);
 		} catch (DateTimeException e) {
 			setDateFlag(Flag.BAD);
@@ -229,6 +230,53 @@ public class SocatDataRecord extends DataRecord {
 					result.add(column.getValue());
 				}
 			}
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public TreeSet<Integer> getDateTimeColumns() {
+		
+		TreeSet<Integer> result = new TreeSet<Integer>();
+		
+		try {
+			result.add(getColumnIndex(SocatColumnConfig.YEAR_COLUMN_NAME));
+			result.add(getColumnIndex(SocatColumnConfig.MONTH_COLUMN_NAME));
+			result.add(getColumnIndex(SocatColumnConfig.DAY_COLUMN_NAME));
+			result.add(getColumnIndex(SocatColumnConfig.HOUR_COLUMN_NAME));
+			result.add(getColumnIndex(SocatColumnConfig.MINUTE_COLUMN_NAME));
+
+		} catch (NoSuchColumnException e) {
+			// We shall ignore this error.
+		}
+
+		return result;
+	}
+	
+	@Override
+	public int getLongitudeColumn() {
+		
+		int result = -1;
+		
+		try {
+			result = getColumnIndex(SocatColumnConfig.LONGITUDE_COLUMN_NAME);
+		} catch (NoSuchColumnException e) {
+			// We shall ignore this error.
+		}
+		
+		return result;
+	}
+
+	@Override
+	public int getLatitudeColumn() {
+		
+		int result = -1;
+		
+		try {
+			result = getColumnIndex(SocatColumnConfig.LATITUDE_COLUMN_NAME);
+		} catch (NoSuchColumnException e) {
+			// We shall ignore this error.
 		}
 		
 		return result;
