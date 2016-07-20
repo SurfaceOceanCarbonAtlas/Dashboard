@@ -1,6 +1,5 @@
 package uk.ac.uea.socat.sanitychecker.data.calculate;
 
-import uk.ac.exeter.QCRoutines.data.NoSuchColumnException;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 import uk.ac.uea.socat.omemetadata.OmeMetadataException;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataException;
@@ -31,7 +30,7 @@ public class ExpoCode implements DataCalculator {
 			if (null == shipCode || null == startDate) {
 				try {
 					record.addMessage(new CantCalculateExpoCodeMessage());
-				} catch(NoSuchColumnException e) {
+				} catch(Exception e) {
 					throw new SocatDataException(record.getLineNumber(), colIndex, null, "Error while adding message to record", e); 
 				}
 			} else { 
