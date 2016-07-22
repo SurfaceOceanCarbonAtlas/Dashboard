@@ -37,6 +37,11 @@ import javax.mail.internet.MimeMultipart;
  */
 public class SocatFilesBundler extends VersionedFileHandler {
 
+	/** Value of userRealName to use to skip sending the email request in sendOrigFilesBundle */
+	public static final String NOMAIL_USER_REAL_NAME = "nobody";
+	/** Value of userEmail to use to skip sending the email request in sendOrigFileBundles */
+	public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
+
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
 	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
 	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
@@ -277,6 +282,11 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			}
 		}
 
+		// If userRealName is "nobody" and userEmail is "nobody@nowhere" then skip the email
+		if ( NOMAIL_USER_REAL_NAME.equals(userRealName) && NOMAIL_USER_EMAIL.equals(userEmail) ) {
+			return "Original data files bundle archived but not emailed";
+		}
+
 		// Create a Session for sending out the email
 		Properties props = System.getProperties();
 		if ( debugIt )
@@ -366,7 +376,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			throw new IllegalArgumentException("Problems sending the archival request email: " + errmsg, ex);
 		}
 
-		infoMsg += "Files bundle sent to " + archivalEmail +
+		infoMsg += "Original files bundle sent to " + archivalEmail +
 				   " and cc'd to " + userEmail + " and " + socatEmail + "\n";
 		return infoMsg;
 	}
