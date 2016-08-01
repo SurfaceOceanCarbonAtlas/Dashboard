@@ -39,19 +39,20 @@ import java.util.TreeSet;
  */
 public class SocatCruiseReporter {
 
+	private static final String NOT_AVAILABLE_TAG = "N/A";
 	private static final String SOCAT_ENHANCED_DOI_TAG = "SOCATENHANCEDDOI";
-	private static final String SOCAT_ENHANCED_HREF_TAG = "SOCATENHANCEDHREF";
 	private static final String SOCAT_ENHANCED_HREF_PREFIX = "http://doi.pangaea.de/";
 
 	// SOCAT main DOI, DOI HRef, and publication citation
-	private static final String SOCAT_MAIN_DOI = "10.1594/PANGAEA.849770";
+	private static final String SOCAT_MAIN_DOI = "SOCATMAINDOI";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"Bakker, D. C. E., Pfeil, B. Landa, C. S., et. al. \"A multi-decade record of ",
-		"high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas (SOCAT)\" ",
-		"Under review in Earth System Science Data Discussions, 2016, 55 pp. ",
-		"doi:10.5194/essd-2016-15 ",
-		"    Also see: ",
-		"D. C. E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
+		"  SOCATMAINHREF",
+		"Also see: ",
+		"  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade record ",
+		"of high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas ",
+		"(SOCAT)\"  Under review in Earth System Science Data Discussions, 2016, ",
+		"55 pp.  doi:10.5194/essd-2016-15; ",
+		"  D.C.E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
 		"Ocean CO2 Atlas (SOCAT version 2)\" Earth Syst. Sci. Data, 6, 69-90, 2014 ",
 		"doi:10.5194/essd-6-69-2014  http://www.earth-syst-sci-data.net/6/69/2014/ ",
 	};
@@ -281,7 +282,11 @@ public class SocatCruiseReporter {
 		// Get the original and SOCAT-enhanced data document DOIs for this cruise 
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
 		String origDOI = cruise.getOrigDoi();
+		if ( origDOI.isEmpty() )
+			origDOI = NOT_AVAILABLE_TAG;
 		String socatDOI = cruise.getSocatDoi();
+		if ( socatDOI.isEmpty() )
+			socatDOI = SOCAT_ENHANCED_DOI_TAG;
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
 		double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
@@ -379,8 +384,14 @@ public class SocatCruiseReporter {
 				socatVersionList.add(socatMeta.getSocatVersion());
 				qcFlagList.add(socatMeta.getQcFlag());
 				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
-				origDOIList.add(cruise.getOrigDoi());
-				socatDOIList.add(cruise.getSocatDoi());
+				String origDOI = cruise.getOrigDoi();
+				if ( origDOI.isEmpty() )
+					origDOI = NOT_AVAILABLE_TAG;
+				origDOIList.add(origDOI);
+				String socatDOI = cruise.getSocatDoi();
+				if ( socatDOI.isEmpty() )
+					socatDOI = SOCAT_ENHANCED_DOI_TAG;
+				socatDOIList.add(socatDOI);
 				upperExpoList.add(upperExpo);
 			}
 		}
@@ -424,6 +435,8 @@ public class SocatCruiseReporter {
 				String socatVersion = socatVersionList.get(k);
 				String qcFlag = qcFlagList.get(k);
 				String socatDOI = cruiseHandler.getCruiseFromInfoFile(upperExpo).getSocatDoi();
+				if ( socatDOI.isEmpty() )
+					socatDOI = SOCAT_ENHANCED_DOI_TAG;
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
 				ArrayList<String> unknownVars = dsgFile.readData();
 				if ( unknownVars.size() > 0 ) {
@@ -498,14 +511,8 @@ public class SocatCruiseReporter {
 		report.println("Principal Investigator(s): " + omeMeta.getScienceGroup());
 		report.println("DOI for the original data: " + origDOI);
 		report.println("    or see: " + omeMeta.getOrigDataRef());
-		if ( socatDOI.isEmpty() ) {
-			report.println("DOI of this SOCAT-enhanced data: " + SOCAT_ENHANCED_DOI_TAG);
-			report.println("    or see: " + SOCAT_ENHANCED_HREF_TAG);
-		}
-		else {
-			report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
-			report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
-		}
+		report.println("DOI of this SOCAT-enhanced data: " + socatDOI);
+		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
 		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
 		report.println();
@@ -513,7 +520,7 @@ public class SocatCruiseReporter {
 		// Additional references - add expocode suffix for clarity
 		report.println("Supplemental documentation reference(s):");
 		for (String filename : addlDocs) {
-			report.println("    " + upperExpo + "_" + filename);
+			report.println("    " + filename);
 		}
 		report.println();
 
@@ -572,10 +579,10 @@ public class SocatCruiseReporter {
 			report.println();
 			report.println("Observation times were not provided to a resolution of hours;");
 			report.println("the hours, minutes, and seconds given are artificially generated values");
-			warnMsgs.add("Cruise was marked as having artificial hours, minutes, and seconds");
+			warnMsgs.add("Data set was marked as having artificial hours, minutes, and seconds");
 		}
 		report.println();
-		report.println("Cruise QC flag: " + qcFlag + " (see below)");
+		report.println("Data set QC flag: " + qcFlag + " (see below)");
 		report.println();
 
 		return warnMsgs;
@@ -616,10 +623,10 @@ public class SocatCruiseReporter {
 		report.println("DOI of the entire SOCAT collection: " + SOCAT_MAIN_DOI);
 		report.println("    or see: " + SOCAT_ENHANCED_HREF_PREFIX + SOCAT_MAIN_DOI);
 		if ( regionName == null )
-			report.println("SOCAT cruise data for the following cruises:");
+			report.println("SOCAT data for the following data sets:");
 		else
-			report.println("SOCAT cruise data in SOCAT region \"" + 
-					regionName + "\" for the following cruises:");
+			report.println("SOCAT data in SOCAT region \"" + 
+					regionName + "\" for the following data sets:");
 		report.println("Expocode\t" +
 					   "version\t" +
 					   "Cruise/Dataset Name\t" +
@@ -642,10 +649,17 @@ public class SocatCruiseReporter {
 			DashboardOmeMetadata omeMeta = omeMetaList.get(k);
 			String upperExpo = omeMeta.getExpocode();
 			String socatVersion = socatVersionList.get(k);
+			String cruiseName = omeMeta.getCruiseName();
+			if ( cruiseName.isEmpty() )
+				cruiseName = NOT_AVAILABLE_TAG;
 			String qcFlag = qcFlagList.get(k);
 			TreeSet<String> addlDocs = addlDocsList.get(k);
 			String origDOI = origDOIList.get(k);
+			String origHRef = omeMeta.getOrigDataRef();
+			if ( origHRef.isEmpty() )
+				origHRef = NOT_AVAILABLE_TAG;
 			String socatDOI = socatDOIList.get(k);
+			String socatHRef = SOCAT_ENHANCED_HREF_PREFIX + socatDOI;
 
 			report.print(upperExpo);
 			report.print("\t");
@@ -653,7 +667,7 @@ public class SocatCruiseReporter {
 			report.print(socatVersion);
 			report.print("\t");
 
-			report.print(omeMeta.getCruiseName());
+			report.print(cruiseName);
 			report.print("\t");
 
 			report.print(omeMeta.getVesselName());
@@ -665,23 +679,14 @@ public class SocatCruiseReporter {
 			report.print(origDOI);
 			report.print("\t");
 
-			report.print(omeMeta.getOrigDataRef());
+			report.print(origHRef);
 			report.print("\t");
 
-			if ( socatDOI.isEmpty() ) {
-				report.print(SOCAT_ENHANCED_DOI_TAG);
-				report.print("\t");
+			report.print(socatDOI);
+			report.print("\t");
 
-				report.print(SOCAT_ENHANCED_HREF_TAG);
-				report.print("\t");
-			}
-			else {
-				report.print(socatDOI);
-				report.print("\t");
-
-				report.print(SOCAT_ENHANCED_HREF_PREFIX + socatDOI);
-				report.print("\t");
-			}
+			report.print(socatHRef);
+			report.print("\t");
 
 			try {
 				double westLon = omeMeta.getWestmostLongitude();
@@ -779,7 +784,7 @@ public class SocatCruiseReporter {
 
 		if ( needsFakeHoursMsg ) {
 			boolean isFirst = true;
-			report.print("Note for cruise(s): ");
+			report.print("Note for data set(s): ");
 			for ( DashboardOmeMetadata omeMeta : omeMetaList ) {
 				String upperExpo = omeMeta.getExpocode();
 				if ( DAY_RESOLUTION_CRUISE_EXPOCODES.contains(upperExpo) ) {
@@ -823,28 +828,29 @@ public class SocatCruiseReporter {
 				report.println(SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS[k]);
 		}
 		report.println();
-		report.println("The quality assessments given by the Cruise QC flag and fCO2rec_flag only apply");
-		report.println("to the fCO2rec value.  For more information about the recomputed fCO2 value and");
-		report.println("the meaning of the Cruise QC flag, fCO2rec_src, and fCO2rec_flag values, see:");
+		report.println("The quality assessments given by the QC flag and fCO2rec_flag only apply to");
+		report.println("the fCO2rec value.  For more information about the recomputed fCO2 value and");
+		report.println("the meaning of the QC flag, fCO2rec_src, and fCO2rec_flag values, see:");
 		for (int k = 0; k < SOCAT_MAIN_CITATION.length; k++)
 			report.println(SOCAT_MAIN_CITATION[k]);
 		if ( multicruise ) {
 			report.println();
-			report.println("This is a report of only cruise data points with recomputed fCO2 values");
+			report.println("This is a report of only data points with recomputed fCO2 values");
 			report.println("which were deemed acceptable (WOCE flag 2). ");
 		}
 		else {
 			report.println();
-			report.println("This is a report of all cruise data points, including those with missing");
+			report.println("This is a report of all data points, including those with missing");
 			report.println("recomputed fCO2 values and those with a WOCE flag indicating questionable (3)");
 			report.println("or bad (4) recomputed fCO2 values.");
 		}
 		report.println();
-		report.println("The data use policy can be found at http://www.socat.info/DataUsePolicy.htm");
+		report.println("Terms of use of this data are given in the SOCAT Fair Data Use Statement ");
+		report.println("http://www.socat.info/SOCAT_fair_data_use_statement.htm");
 		if ( ! multicruise ) {
 			report.println();
-			report.println("All standard SOCAT version 3 data columns are reported in this file,");
-			report.println("even if all values are missing ('NaN') for this cruise.");
+			report.println("All standard SOCAT data columns are reported in this file,");
+			report.println("even if all values are missing ('NaN') for this data set.");
 		}
 		report.println();
 
@@ -861,10 +867,10 @@ public class SocatCruiseReporter {
 	 * {@link #dataReportString}
 	 */
 	private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
-		"Expocode: unique identifier for the cruise from which this data was obtained",
-		"version: version of SOCAT where this enhanced cruise data first appears",
-		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
-		"QC_Flag: Cruise QC flag",
+		"Expocode: unique identifier for the data set from which this data was obtained",
+		"version: version of SOCAT where this enhanced data first appears",
+		"SOCAT_DOI: DOI for this SOCAT-enhanced data",
+		"QC_Flag: Data set QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
 		"day: day of the time (UTC) of the measurement",
@@ -880,7 +886,7 @@ public class SocatCruiseReporter {
 		"PPPP: measured atmospheric pressure in hectopascals",
 		"Pequ: equilibrator chamber pressure in hectopascals",
 		"WOA_SSS: sea surface salinity on the Practical Salinity Scale interpolated from the",
-		"    World Ocean Atlas 2005 (see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
+		"    World Ocean Atlas 2005 (see: http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
 		"NCEP_SLP: sea level pressure in hectopascals interpolated from the NCEP/NCAR Reanalysis Project",
 		"    (see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)",
 		"ETOPO2_depth: bathymetry in meters interpolated from the ETOPO2 2 arc-minute Gridded ",
@@ -946,10 +952,10 @@ public class SocatCruiseReporter {
 	 * {@link #dataReportString}
 	 */
 	private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
-		"Expocode: unique identifier for the cruise from which this data was obtained",
-		"version: version of SOCAT where this enhanced cruise data first appears",
-		"SOCAT_DOI: DOI for this SOCAT-enhanced cruise data",
-		"QC_Flag: Cruise QC flag",
+		"Expocode: unique identifier for the data set from which this data was obtained",
+		"version: version of SOCAT where this enhanced data first appears",
+		"SOCAT_DOI: DOI for this SOCAT-enhanced data",
+		"QC_Flag: Data set QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
 		"day: day of the time (UTC) of the measurement",
@@ -965,7 +971,7 @@ public class SocatCruiseReporter {
 		"PPPP: measured atmospheric pressure in hectopascals",
 		"Pequ: equilibrator chamber pressure in hectopascals",
 		"WOA_SSS: sea surface salinity on the Practical Salinity Scale interpolated from the",
-		"    World Ocean Atlas 2005 (see: //http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
+		"    World Ocean Atlas 2005 (see: http://www.nodc.noaa.gov/OC5/WOA05/pr_woa05.html)",
 		"NCEP_SLP: sea level pressure in hectopascals interpolated from the NCEP/NCAR Reanalysis Project",
 		"    (see: http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.surface.html)",
 		"ETOPO2_depth: bathymetry in meters interpolated from the ETOPO2 2 arc-minute Gridded ",
