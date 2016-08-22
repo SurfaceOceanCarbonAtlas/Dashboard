@@ -24,15 +24,15 @@ import org.junit.Test;
 public class OmePdfGeneratorTest {
 
 	private static final String LOG4J_PROPERTIES_FILE = 
-			"/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
+			"/home/flat/ksmith/Socat/Tomcat/content/SocatUploadDashboard/log4j.properties";
 	private static final String METADATA_DOCS_DIR = 
-			"/home/flat/ksmith/content/SocatUploadDashboard/MetadataDocs";
+			"/home/flat/ksmith/Socat/Tomcat/content/SocatUploadDashboard/MetadataDocs";
 	private static final String OME_XML_PDF_RESOURCES = 
-			"/home/flat/ksmith/content/SocatUploadDashboard";
+			"/home/flat/ksmith/Socat/Tomcat/content/SocatUploadDashboard";
+	private static final String SVN_USERNAME = "ksmith";
 	private static final String[] EXPOCODE_ARRAY = {
 		"06AQ20151030",
 		"33GG20131126",
-		"33GG20150619",
 		"33HH20151027",
 		"33HH20151112",
 		"33LG20150516",
@@ -57,7 +57,7 @@ public class OmePdfGeneratorTest {
 	@Test
 	public void testCreatePiOmePdf() throws IOException {
 		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILE);
-		MetadataFileHandler metaHandler = new MetadataFileHandler(METADATA_DOCS_DIR, null, null);
+		MetadataFileHandler metaHandler = new MetadataFileHandler(METADATA_DOCS_DIR, SVN_USERNAME, null);
 		for ( String expo : EXPOCODE_ARRAY ) {
 			File pdfFile = metaHandler.getMetadataFile(expo, DashboardMetadata.PI_OME_PDF_FILENAME);
 			// Make sure the PDF file does not exist, then generate it

@@ -31,7 +31,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.Map.Entry;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -324,7 +326,7 @@ public class SocatCruiseReporter {
 	 * @param expocodes
 	 * 		report the data for the cruises with these expocodes
 	 * @param regionID
-	 * 		report only data for the region with this ID; 
+	 * 		report only data in the region with this ID; 
 	 * 		if null, no region restriction is made on the data
 	 * @param reportFile
 	 * 		print the report to this file
@@ -332,9 +334,9 @@ public class SocatCruiseReporter {
 	 * 		list of warnings about the generated report;
 	 * 		never null but may be empty
 	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid,
+	 * 		if an expocode is invalid,
 	 * @throws IOException 
-	 * 		if unable to read the DSG NC file, or
+	 * 		if unable to read a DSG NC file, or
 	 * 		if unable to create the cruise report file
 	 */
 	public ArrayList<String> generateReport(TreeSet<String> expocodes, Character regionID, 
@@ -1518,4 +1520,108 @@ public class SocatCruiseReporter {
 			report.close();
 		}
 	}
+
+	/**
+	 * Print a count of valid fCO2_rec data points in a collection 
+	 * of data sets.  Data points with a WOCE-3 or WOCE-4 flag, 
+	 * as well as data points without fCO2_rec are ignored.
+	 * Data point counts reported are grouped by year and QC flag.
+	 * 
+	 * @param expocodes
+	 * 		print a summary of the data for data sets with these expocodes
+	 * @param regionID
+	 * 		consider only data in the region with this ID; 
+	 * 		if null, no region restriction is made on the data
+	 * @param reportFile
+	 * 		print the report to this file
+	 * @return
+	 * 		list of warnings about the generated report;
+	 * 		never null but may be empty
+	 * @throws IllegalArgumentException
+	 * 		if an expocode is invalid,
+	 * @throws IOException 
+	 * 		if unable to read a DSG NC file, or
+	 * 		if unable to create the cruise report file
+	 */
+	public ArrayList<String> printDataCounts(TreeSet<String> expocodes, Character regionID, 
+			File reportFile) throws IllegalArgumentException, IOException {
+		// Map with Year + QC Flag as the keys, and number of data points as the values. 
+		TreeMap<String,Integer> counts = new TreeMap<String,Integer>();
+		// List of warning messages to return
+		ArrayList<String> warnMsgs = new ArrayList<String>();
+
+		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
+		try {
+			if ( regionID != null )
+				report.println(DataLocation.REGION_NAMES.get(regionID) + " region data point counts for data sets:");
+			else
+				report.println("Global data point counts for data sets:");
+			int k = 0;
+			for ( String expo : expocodes ) {
+				String upperExpo = DashboardServerUtils.checkExpocode(expo);
+				report.print("\t" + expo);
+				k++;
+				if ( ( k % 5 ) == 0 )
+					report.println();
+				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
+				ArrayList<String> unknownVars = dsgFile.readMetadata();
+				if ( unknownVars.size() > 0 ) {
+					String msg = upperExpo + " unknown metadata variables: ";
+					for (String var : unknownVars)
+						msg += var + "; ";
+					warnMsgs.add(msg);
+				}
+				// QC flag part of the map key string
+				String qcFlag = "\t" + dsgFile.getMetadata().getQcFlag();
+
+				unknownVars = dsgFile.readData();
+				if ( unknownVars.size() > 0 ) {
+					String msg = upperExpo + " unknown data variables: ";
+					for (String var : unknownVars)
+						msg += var + "; ";
+					warnMsgs.add(msg);
+				}
+				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+					// Check that fCO2_rec is given
+					if ( SocatCruiseData.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
+						continue;
+					// Check WOCE flag for fCO2_rec
+					Character woceFlag = dataVals.getWoceCO2Water();
+					if ( ! ( SocatWoceEvent.WOCE_GOOD.equals(woceFlag) || 
+							SocatWoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) )
+						continue;
+					// Check region, if appropriate
+					if ( (regionID != null) && 
+							( ! regionID.equals(dataVals.getRegionID()) ) )
+						continue;
+					// Increment the count for this year + QC flag.  This could be made 
+					// much more efficient since year is monotonically increasing, but 
+					// since this method is rarely called, it is not worth the effort.
+					String key = dataVals.getYear().toString() + qcFlag;
+					Integer value = counts.get(key);
+					if ( value == null ) {
+						value = 1;
+					}
+					else {
+						value++;
+					}
+					counts.put(key, value);
+				}
+			}
+
+			if ( ( k % 5 ) != 0 )
+				report.println();
+			report.println();
+
+			// Print out all the counts in the map (ordered by year then QC flag)
+			for ( Entry<String,Integer> entry : counts.entrySet() ) {
+				report.println(entry.getKey() + "\t" + entry.getValue().toString());
+			}
+		} finally {
+			report.close();
+		}
+
+		return warnMsgs;
+	}
+
 }

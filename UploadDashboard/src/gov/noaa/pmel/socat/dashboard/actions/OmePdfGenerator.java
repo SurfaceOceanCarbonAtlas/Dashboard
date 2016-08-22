@@ -102,7 +102,7 @@ public class OmePdfGenerator {
 		// Get the full path filename for the PI_OME.xml file
 		File xmlFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_FILENAME);
 		if ( ! xmlFile.exists() )
-			throw new IllegalArgumentException("PI-provided OME XMl file does not exist for " + upperExpo);
+			throw new IllegalArgumentException("PI-provided OME XML file does not exist for " + upperExpo);
 		// Get the information about this file
 		DashboardMetadata mdata = metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.PI_OME_FILENAME);
 		// Get the full path filename for the PI_OME.pdf file
