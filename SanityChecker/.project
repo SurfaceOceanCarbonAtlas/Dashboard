@@ -3,6 +3,8 @@
 	<name>SanityChecker</name>
 	<comment></comment>
 	<projects>
+		<project>OmeMetadata</project>
+		<project>QC_Routines</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
