@@ -32,11 +32,12 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import uk.ac.exeter.QCRoutines.messages.Flag;
+import uk.ac.exeter.QCRoutines.messages.Message;
+import uk.ac.exeter.QCRoutines.messages.MessageException;
+import uk.ac.exeter.QCRoutines.messages.MessageSummary;
 import uk.ac.uea.socat.sanitychecker.Output;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.messages.Message;
-import uk.ac.uea.socat.sanitychecker.messages.MessageException;
-import uk.ac.uea.socat.sanitychecker.messages.MessageSummary;
 
 /**
  * Processes SanityChecker messages for a cruise.
@@ -204,28 +205,29 @@ public class CheckerMessageHandler {
 			List<SocatDataRecord> dataRecs = output.getRecords();
 			int numRecs = dataRecs.size();
 			try {
-				for ( MessageSummary summary : output.getMessages().getMessageSummaries() ) {
-					String msg = summary.getSummaryString();
-					int count = summary.getErrorCount();
+				for ( MessageSummary summary : MessageSummary.getMessageSummaries(output.getMessages()) ) {
+					String msgstr = summary.getMessageString();
+					int count = summary.getBadCount();
 					if ( count > 0 ) {
 						msgsWriter.println(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP  + 
-								Integer.toString(count) + " errors of type: " + msg);
+								Integer.toString(count) + " errors of type: " + msgstr);
 					}
-					count = summary.getWarningCount();
+					count = summary.getQuestionableCount();
 					if ( count > 0 ) {
 						msgsWriter.println(SCMSG_SUMMARY_MSG_KEY + SCMSG_KEY_VALUE_SEP + 
-								Integer.toString(count) + " warnings of type: " + msg);
+								Integer.toString(count) + " warnings of type: " + msgstr);
 					}
 				}
-				for ( Message msg : output.getMessages().getMessages() ) {
+				for ( Message msg : output.getMessages() ) {
 					// Generate a list of key-value strings describing this message
 					ArrayList<String> mappings = new ArrayList<String>();
+					Flag msgFlag = msg.getFlag();
 
-					if ( msg.isError() ) {
+					if ( Flag.BAD.equals(msgFlag) ) {
 						mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
 								SCMsgSeverity.ERROR.name());
 					}
-					else if ( msg.isWarning() ) {
+					else if ( Flag.QUESTIONABLE.equals(msgFlag) ) {
 						mappings.add(SCMSG_SEVERITY_KEY + SCMSG_KEY_VALUE_SEP + 
 								SCMsgSeverity.WARNING.name());
 					}
@@ -262,21 +264,24 @@ public class CheckerMessageHandler {
 						}
 					}
 
+					// Now a list of column numbers and column names
+					// TODO: need to iterate over column numbers?  list all column numbers?
 					int colNum = msg.getColumnIndex();
 					if ( colNum > 0 )
 						mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 								Integer.toString(colNum));
 
+					// TODO: get column name for the corresponding column number(s)
 					String colName = msg.getColumnName();
 					if ( colName != null )
 						mappings.add(SCMSG_COLUMN_NAME_KEY + SCMSG_KEY_VALUE_SEP + colName);
 
 					// Assign the general message - escape newlines
-					String checkerMsg = msg.getMessageType().getSummaryMessage(colName).replace("\n",  "\\n");
+					String checkerMsg = msg.getShortMessage().replace("\n",  "\\n");
 					mappings.add(SCMSG_GENERAL_MSG_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg);
 
 					// Assign the detailed message - escape newlines
-					checkerMsg = msg.getMessageString().replace("\n",  "\\n");
+					checkerMsg = msg.getFullMessage().replace("\n",  "\\n");
 					mappings.add(SCMSG_DETAILED_MSG_KEY + SCMSG_KEY_VALUE_SEP + checkerMsg);
 
 					// Write this array list of key-value strings to file
@@ -284,7 +289,7 @@ public class CheckerMessageHandler {
 
 					// Assign the WOCE flag
 					if ( rowNum > 0 ) {
-						if ( msg.isError() ) {
+						if ( Flag.BAD.equals(msgFlag) ) {
 							if ( colNum > 0 ) {
 								woceFourSets.get(colNum - 1).add(rowNum - 1);
 							}
@@ -292,7 +297,7 @@ public class CheckerMessageHandler {
 								noColumnWoceFourSet.add(rowNum - 1);
 							}
 						}
-						else if ( msg.isWarning() ) {
+						else if ( Flag.QUESTIONABLE.equals(msgFlag) ) {
 							if ( colNum > 0 ) {
 								woceThreeSets.get(colNum - 1).add(rowNum - 1);
 							}

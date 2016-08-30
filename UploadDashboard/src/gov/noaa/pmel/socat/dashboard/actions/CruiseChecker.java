@@ -34,6 +34,10 @@ import org.jdom2.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import uk.ac.exeter.QCRoutines.data.DataColumn;
+import uk.ac.exeter.QCRoutines.data.DataRecordException;
+import uk.ac.exeter.QCRoutines.messages.Message;
+import uk.ac.exeter.QCRoutines.messages.ParsingMessages.DateTimeMessage;
 import uk.ac.uea.socat.omemetadata.BadEntryNameException;
 import uk.ac.uea.socat.omemetadata.InvalidConflictException;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
@@ -42,14 +46,10 @@ import uk.ac.uea.socat.sanitychecker.SanityChecker;
 import uk.ac.uea.socat.sanitychecker.config.BaseConfig;
 import uk.ac.uea.socat.sanitychecker.config.ColumnConversionConfig;
 import uk.ac.uea.socat.sanitychecker.config.MetadataConfig;
-import uk.ac.uea.socat.sanitychecker.config.SanityCheckConfig;
 import uk.ac.uea.socat.sanitychecker.config.SocatColumnConfig;
 import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
 import uk.ac.uea.socat.sanitychecker.data.InvalidColumnSpecException;
-import uk.ac.uea.socat.sanitychecker.data.SocatDataColumn;
 import uk.ac.uea.socat.sanitychecker.data.SocatDataRecord;
-import uk.ac.uea.socat.sanitychecker.messages.Message;
-import uk.ac.uea.socat.sanitychecker.messages.MessageException;
 
 /**
  * Class for working with the SanityChecker 
@@ -358,7 +358,6 @@ public class CruiseChecker {
 			MetadataFileHandler metaFileHandler) throws IOException {
 		try {
 			// Clear any previous configuration
-			SanityCheckConfig.destroy();
 			SocatColumnConfig.destroy();
 			ColumnConversionConfig.destroy();
 			MetadataConfig.destroy();
@@ -1107,10 +1106,24 @@ public class CruiseChecker {
 					;
 				}
 				else if ( colType.equals(DataColumnType.LONGITUDE) ) {
-					rowData.set(k, Double.toString(stdVals.getLongitude()));
+					try {
+						rowData.set(k, Double.toString(stdVals.getLongitude()));
+					} catch ( DataRecordException ex ) {
+						// Problem with the longitude of this record
+						// Should have been caught earlier, but just in case....
+						lastCheckHadGeopositionErrors = true;
+						return false;
+					}
 				}
 				else if ( colType.equals(DataColumnType.LATITUDE) ) {
-					rowData.set(k, Double.toString(stdVals.getLatitude()));
+					try {
+						rowData.set(k, Double.toString(stdVals.getLatitude()));
+					} catch ( DataRecordException ex ) {
+						// Problem with the latitude of this record
+						// Should have been caught earlier, but just in case....
+						lastCheckHadGeopositionErrors = true;
+						return false;
+					}
 				}
 				else if ( colType.equals(DataColumnType.DAY_OF_YEAR) || 
 						  colType.equals(DataColumnType.SECOND_OF_DAY) || 
@@ -1155,7 +1168,12 @@ public class CruiseChecker {
 						  colType.equals(DataColumnType.WOCE_CO2_WATER) || 
 						  colType.equals(DataColumnType.WOCE_CO2_ATM) ) {
 					String chkName = DashboardUtils.STD_HEADER_NAMES.get(colType);
-					SocatDataColumn stdCol = stdVals.getColumn(chkName);
+					DataColumn stdCol;
+					try {
+						stdCol = stdVals.getColumn(chkName);
+					} catch ( Exception ex ) {
+						stdCol = null;
+					}
 					if ( stdCol == null )
 						throw new IllegalArgumentException("SocatDataColumn not found for " + 
 								chkName + " (column type " + colType + ")");
@@ -1282,17 +1300,11 @@ public class CruiseChecker {
 		if ( ! lastCheckHadGeopositionErrors ) {
 			// Date/time errors may not be associated with any column
 			// so check the sanity checker messages
-			try {
-				for ( Message msg : output.getMessages().getMessages() ) {
-					String colName = msg.getColumnName();
-					String summary = msg.getMessageType().getSummaryMessage(colName);
-					if ( "Date/time could not be parsed".equals(summary) ||
-						 "Times out of order".equals(summary) ) {
-						lastCheckHadGeopositionErrors = true;
-					}
+			for ( Message msg : output.getMessages() ) {
+				if ( msg instanceof DateTimeMessage ) {
+					lastCheckHadGeopositionErrors = true;
+					break;
 				}
-			} catch ( MessageException ex ) {
-				throw new RuntimeException(ex);
 			}
 		}
 
