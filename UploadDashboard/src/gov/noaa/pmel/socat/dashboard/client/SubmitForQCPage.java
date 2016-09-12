@@ -22,14 +22,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineLabel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -60,18 +58,25 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			")</em>";
 
 	private static final String ARCHIVE_PLAN_INTRO = 
-			"Archival plan for the uploaded files for these datasets: ";
+			"Archival plan for the uploaded files for these datasets: <br />" +
+			"<small><em>(this option can be modified on submitted datasets without affecting QC)</em></small>";
+
 	private static final String SOCAT_ARCHIVE_TEXT = 
-			"archive at CDIAC at the time of the next SOCAT public release";
+			"delay archiving at this time";
+	private static final String SOCAT_ARCHIVE_ADDN_HTML = 
+			"<em>(if not archived before the next SOCAT public release, archive at CDIAC)</em>";
 	private static final String SOCAT_ARCHIVE_INFO_HTML = 
-			"By selecting this option I am giving permission for my uploaded files " +
-			"for these datasets to be archived at CDIAC.  This will occur, for " +
-			"datasets deemed acceptable, at the time of the next SOCAT public " +
-			"release, after which the files will be made accessible to the public " +
-			"through the CDIAC Web site.";
+			"By selecting this option I wish to delay archival at this time.  " +
+			"If another archive option has not been selected before the next SOCAT " +
+			"public release, I am giving permission for my uploaded files for these " +
+			"datasets, if deemed acceptable, to be archived at CDIAC at the time " +
+			"of the next SOCAT public release, after which the files will be made " +
+			"accessible to the public through the CDIAC Web site.";
 
 	private static final String CDIAC_ARCHIVE_TEXT = 
-			"archive at CDIAC as soon as possible";
+			"archive at CDIAC now";
+	private static final String CDIAC_ARCHIVE_ADDN_HTML = 
+			"<em>(an e-mail with the data and metadata files will be sent to CDIAC)</em>";
 	private static final String CDIAC_ARCHIVE_INFO_HTML =
 			"By selecting this option I am requesting that my uploaded files for " +
 			"these datasets be archived at CDIAC as soon as possible.  When CDIAC " +
@@ -79,10 +84,9 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"verify these references are in the metadata in SOCAT for these datasets.";
 
 	private static final String OWNER_ARCHIVE_TEXT =
-			"do not archive at CDIAC; already archived or I will manage archival myself";
+			"already archived or I will manage archival";
 	private static final String OWNER_ARCHIVE_ADDN_HTML =
-			"<em>(and I understand it is my responsibility to include DOIs " +
-			"in SOCAT metadata)</em>";
+			"<em>(and I understand it is my responsibility to include DOIs in SOCAT metadata)</em>";
 	private static final String OWNER_ARCHIVE_INFO_HTML = 
 			"By selecting this option I am agreeing the uploaded files for these " +
 			"datasets are archived or will be archived at a data center of my choice " +
@@ -96,9 +100,9 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"<p>The files for some or all of these dataset were earlier sent to CDIAC " +
 			"for archival.  Normally you do not want to change the archival option " +
 			"for these datasets. </p>" +
-			"<p>If you are managing the archival of a mix of datasets that have and have " +
-			"not been sent to CDIAC, we strongly recommend you cancel this action and " +
-			"manage only those datasets that have not been sent to CDIAC.</p>";
+			"<p>If you are working with a mix of datasets that have and have not been " +
+			"sent to CDIAC, we strongly recommend you cancel this action and work with " +
+			"datasets already sent to CDIAC separately from those not sent.</p>";
 
 	private static final String RESEND_CDIAC_QUESTION = 
 			"<p>Some or all of these datasets were earlier sent to CDIAC for archival.  " +
@@ -119,8 +123,12 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"above selected archival option.";
 
 	private static final String AGREE_SHARE_REQUIRED_MSG =
-			"You must give permission to share the datasets for QC " +
-			"assessment before the cruises can be submitted for QC.";
+			"You must give permission to share the dataset(s) for QC " +
+			"assessment before the dataset(s) can be submitted for QC.";
+
+	private static final String ARCHIVE_PLAN_REQUIRED_MSG =
+			"You must select an archival option for the uploaded data and metadata " +
+			"files before the dataset(s) can be submitted for QC.";
 
 	private static final String SUBMIT_FAILURE_MSG = 
 			"Unexpected failure with submitting datasets for QC: ";
@@ -141,11 +149,13 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
-	@UiField Label archivePlanLabel;
+	@UiField HTML archivePlanHtml;
 	@UiField RadioButton socatRadio;
 	@UiField Anchor socatInfoAnchor;
+	@UiField HTML socatAddnHtml;
 	@UiField RadioButton cdiacRadio;
 	@UiField Anchor cdiacInfoAnchor;
+	@UiField HTML cdiacAddnHtml;
 	@UiField RadioButton ownerRadio;
 	@UiField Anchor ownerInfoAnchor;
 	@UiField HTML ownerAddnHtml;
@@ -180,13 +190,16 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		titleLabel.setText(TITLE_TEXT);
 		logoutButton.setText(LOGOUT_TEXT);
 
-		archivePlanLabel.setText(ARCHIVE_PLAN_INTRO);
+		archivePlanHtml.setHTML(ARCHIVE_PLAN_INTRO);
+
 		socatRadio.setText(SOCAT_ARCHIVE_TEXT);
 		socatInfoAnchor.setText(MORE_INFO_TEXT);
+		socatAddnHtml.setHTML(SOCAT_ARCHIVE_ADDN_HTML);
 		socatArchivePopup = null;
 
 		cdiacRadio.setText(CDIAC_ARCHIVE_TEXT);
 		cdiacInfoAnchor.setText(MORE_INFO_TEXT);
+		cdiacAddnHtml.setHTML(CDIAC_ARCHIVE_ADDN_HTML);
 		cdiacInfoPopup = null;
 
 		ownerRadio.setText(OWNER_ARCHIVE_TEXT);
@@ -252,18 +265,15 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			String expo = cruise.getExpocode();
 			// Add the status of this cruise to the counts 
 			String archiveStatus = cruise.getArchiveStatus();
-			if ( archiveStatus.equals(
-					DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ) {
+			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ) {
 				// Archive with next SOCAT release
 				numSocat++;
 			}
-			else if ( archiveStatus.equals(
-					DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
+			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
 				// Archive at CDIAC now
 				numCdiac++;
 			}
-			else if ( archiveStatus.equals(
-					DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
+			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
 				// Owner will archive
 				numOwner++;
 			}
@@ -305,21 +315,24 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		introHtml.setHTML(introMsg);
 
 		// Check the appropriate radio button
-		if ( (numOwner == 0) && (numCdiac == 0) ) {
-			// All "with next SOCAT" or not assigned
+		int numCruises = cruises.size();
+		if ( numSocat == numCruises ) {
+			// All "with next SOCAT", so keep that setting
 			socatRadio.setValue(true, true);
 		}
-		else if ( (numSocat == 0) && (numOwner == 0) ) {
+		else if ( numCdiac == numCruises ) {
 			// All "sent to CDIAC", so keep that setting
 			cdiacRadio.setValue(true, true);
 		}
-		else if ( (numSocat == 0) && (numCdiac == 0) ) {
+		else if ( numOwner == numCruises ) {
 			// All "owner will archive", so keep that setting
 			ownerRadio.setValue(true, true);
 		}
 		else {
-			// A mix, so set to "with next SOCAT" and let the user decide
-			socatRadio.setValue(true, true);
+			// A mix, so unset all and make the user decide
+			socatRadio.setValue(false, true);
+			cdiacRadio.setValue(false, true);
+			ownerRadio.setValue(false, true);
 		}
 
 		// Unselect the agree-to-share check box
@@ -395,8 +408,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
 		if ( ! agreeShareCheckBox.getValue() ) {
-			SocatUploadDashboard.showMessageAt(
-					AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
+			SocatUploadDashboard.showMessageAt(AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
 			return;
 		}
 		if ( hasSentCruise && cdiacRadio.getValue() ) {
@@ -447,8 +459,8 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
 		}
 		else {
-			// Should never happen
-			Window.alert("Unexpect state where no radio buttons are selected");
+			// Archive option not selected - fail
+			SocatUploadDashboard.showMessageAt(ARCHIVE_PLAN_REQUIRED_MSG, archivePlanHtml);
 			return;
 		}
 
