@@ -36,10 +36,9 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-
 	private static final long serialVersionUID = 8195248681298504062L;
 
-	// Names of the variables in the DSG files
+	// Names of some of the variables in the DSG files
 	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
 	public static final String LATITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
 	public static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
