@@ -15,19 +15,21 @@
 			</g:FlowPanel>
 			<g:HTML addStyleNames="{style.introhtml}" ui:field="introHtml" />
 			<g:FlowPanel addStyleNames="{style.optionsborderpanel}">
-				<g:Label addStyleNames="{style.optionsintro}" ui:field="archivePlanLabel" />
+				<g:HTML addStyleNames="{style.optionsintro}" ui:field="archivePlanHtml" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="socatRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
 							ui:field="socatInfoAnchor" />
 				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="socatAddnHtml" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="cdiacRadio" />
 					<g:Anchor addStyleNames="{style.optioninfoanchor}" 
 							ui:field="cdiacInfoAnchor" />
 				</g:FlowPanel>
+				<g:HTML addStyleNames="{style.optionaddninfo}" ui:field="cdiacAddnHtml" />
 				<g:FlowPanel addStyleNames="{style.optionpanel}">
 					<g:RadioButton addStyleNames="{style.optionradiobutton}" 
 							name="archiveRadioGroup" ui:field="ownerRadio" />
