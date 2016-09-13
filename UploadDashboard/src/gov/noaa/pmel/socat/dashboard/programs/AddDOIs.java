@@ -7,6 +7,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -135,7 +136,8 @@ public class AddDOIs {
 				doi = origDOIMap.get(expocode);
 				if ( doi != null ) {
 					cruise.setOrigDoi(doi);
-					System.out.println("Updating the original-data DOI for " + expocode + " to " + doi);
+					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_ARCHIVED);
+					System.out.println("Updating the original-data DOI for " + expocode + " to " + doi + " and marking as archived");
 				}
 				try {
 					cruiseHandler.saveCruiseInfoToFile(cruise, null);
