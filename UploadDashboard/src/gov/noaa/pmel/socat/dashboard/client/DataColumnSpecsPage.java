@@ -252,8 +252,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	 * 		show the specifications for this cruise
 	 */
 	static void showPage(String username, ArrayList<String> expocodes) {
-		if ( singleton == null )
+		if ( singleton == null ) {
 			singleton = new DataColumnSpecsPage();
+		}
 		singleton.setUsername(username);
 		singleton.expocodes.clear();
 		singleton.expocodes.addAll(expocodes);
@@ -263,8 +264,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			@Override
 			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
-					if ( singleton == null )
-						singleton = new DataColumnSpecsPage();
 					SocatUploadDashboard.updateCurrentPage(singleton);
 					singleton.updateCruiseColumnSpecs(cruiseSpecs);
 					History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);

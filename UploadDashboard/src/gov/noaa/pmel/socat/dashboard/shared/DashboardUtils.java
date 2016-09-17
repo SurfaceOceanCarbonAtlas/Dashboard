@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -75,9 +74,7 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
-	/**
-	 * Header names of the standard data columns that a user might provide
-	 */
+/*
 	public static final EnumMap<DataColumnType,String> STD_HEADER_NAMES = 
 			new EnumMap<DataColumnType,String>(DataColumnType.class);
 	static {
@@ -148,26 +145,6 @@ public class DashboardUtils {
 		STD_HEADER_NAMES.put(DataColumnType.OTHER, "other");
 	}
 
-	/*
-	 * known data units of the standard data columns
-	 */
-	public static final ArrayList<String> NO_UNITS = 
-			new ArrayList<String>(Arrays.asList(""));
-	public static final ArrayList<String> TIMESTAMP_UNITS = new ArrayList<String>(Arrays.asList(
-			"yyyy-mm-dd hh:mm:ss", "mm-dd-yyyy hh:mm:ss", "dd-mm-yyyy hh:mm:ss",
-			"mm-dd-yy hh:mm:ss", "dd-mm-yy hh:mm:ss"));
-	public static final ArrayList<String> DATE_UNITS = new ArrayList<String>(Arrays.asList(
-			"yyyy-mm-dd", "mm-dd-yyyy", "dd-mm-yyyy", "mm-dd-yy", "dd-mm-yy"));
-	public static final ArrayList<String> TIME_UNITS = 
-			new ArrayList<String>(Arrays.asList("hh:mm:ss"));
-	public static final ArrayList<String> DAY_OF_YEAR_UNITS = 
-			new ArrayList<String>(Arrays.asList("Jan1=1.0", "Jan1=0.0"));
-	public static final ArrayList<String> LONGITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.E", "deg.W"));
-	public static final ArrayList<String> LATITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.N", "deg.S"));
-	public static final ArrayList<String> DEPTH_UNITS = 
-			new ArrayList<String>(Arrays.asList("meters"));
 	public static final ArrayList<String> SALINITY_UNITS = 
 			new ArrayList<String>(Arrays.asList("PSU"));
 	public static final ArrayList<String> TEMPERATURE_UNITS = 
@@ -189,10 +166,6 @@ public class DashboardUtils {
 	public static final ArrayList<String> XH2O_UNITS = 
 			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
 
-	/**
-	 * Available data units for the standard data columns that a user might provide.
-	 * The first unit is the standard unit.
-	 */
 	public static final EnumMap<DataColumnType,ArrayList<String>> STD_DATA_UNITS = 
 			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
 	static {
@@ -262,6 +235,7 @@ public class DashboardUtils {
 
 		STD_DATA_UNITS.put(DataColumnType.OTHER, NO_UNITS);
 	}
+*/
 
 	/**
 	 * "Cleans" a username for use by substituting characters that are  

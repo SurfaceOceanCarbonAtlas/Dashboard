@@ -4,6 +4,8 @@
 package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -12,124 +14,133 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public enum DataColumnType implements Serializable, IsSerializable {
-	/**
-	 * UNKNOWN needs to be respecified as one of the (other) user-provided types.
-	 */
-	UNKNOWN, 
-	/**
-	 * EXPOCODE is NODCYYYYMMDD where NODC is the ship code and 
-	 * YYYY-MM-DD is the start date (metadata)
-	 */
-	EXPOCODE,
-	/**
-	 * CRUISE_NAME is the user-provided name for the cruise or dataset (metadata)
-	 */
-	CRUISE_NAME,
-	/**
-	 * SHIP_NAME is the name of the ship or vessel (metadata)
-	 */
-	SHIP_NAME,
-	/**
-	 * GROUP_NAME is the user-provided name of the group (metadata)
-	 */
-	GROUP_NAME,
-	/**
-	 * INVESTIGATOR_NAMES is the names of the investigators (metadata)
-	 */
-	INVESTIGATOR_NAMES,
+public class DataColumnType implements Serializable, IsSerializable {
+
+	private static final long serialVersionUID = 8785256066854181603L;
 
 	/**
-	 * TIMESTAMP has both date and time.
+	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */
-	TIMESTAMP, 
-	/**
-	 * DATE has only the date; no time.
-	 */
-	DATE, 
-	YEAR, 
-	MONTH, 
-	DAY, 
-	/**
-	 * TIME has only the time; no date.
-	 */
-	TIME, 
-	HOUR, 
-	MINUTE, 
-	SECOND, 
-	/**
-	 * DAY_OF_YEAR is possibly floating point with time.
-	 */
-	DAY_OF_YEAR,
-	/**
-	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
-	 * be used to specify date and time.
-	 */
-	SECOND_OF_DAY,
+	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null);
 
-	LONGITUDE, 
-	LATITUDE, 
-	SAMPLE_DEPTH, 
-	SALINITY, 
-	EQUILIBRATOR_TEMPERATURE, 
-	SEA_SURFACE_TEMPERATURE, 
-	ATMOSPHERIC_TEMPERATURE,
-	EQUILIBRATOR_PRESSURE, 
-	SEA_LEVEL_PRESSURE, 
-
-	XCO2_WATER_TEQU_DRY, 
-	XCO2_WATER_SST_DRY, 
-	XCO2_WATER_TEQU_WET, 
-	XCO2_WATER_SST_WET, 
-	PCO2_WATER_TEQU_WET, 
-	PCO2_WATER_SST_WET, 
-	FCO2_WATER_TEQU_WET, 
-	FCO2_WATER_SST_WET, 
-
-	XCO2_ATM_DRY_ACTUAL,
-	XCO2_ATM_DRY_INTERP,
-	PCO2_ATM_WET_ACTUAL,
-	PCO2_ATM_WET_INTERP,
-	FCO2_ATM_WET_ACTUAL,
-	FCO2_ATM_WET_INTERP,
-
-	DELTA_XCO2,
-	DELTA_PCO2,
-	DELTA_FCO2,
-
-	XH2O_EQU,
-	RELATIVE_HUMIDITY,
-	SPECIFIC_HUMIDITY,
-	SHIP_SPEED, 
-	SHIP_DIRECTION, 
-	WIND_SPEED_TRUE,
-	WIND_SPEED_RELATIVE,
-	WIND_DIRECTION_TRUE,
-	WIND_DIRECTION_RELATIVE,
+	private String name;
+	private ArrayList<String> units;
 
 	/**
-	 * WOCE flag on any/all aqueous CO2 values.
+	 * Create an empty data column type 
+	 * (empty name string and empty unit string)
 	 */
-	WOCE_CO2_WATER,
-	/**
-	 * WOCE flag on any/all atmospheric CO2 values.
-	 */
-	WOCE_CO2_ATM,
+	public DataColumnType() {
+		this.name = "";
+		// Use the default initial capacity since a name and units should be added
+		this.units = new ArrayList<String>();
+		this.units.add("");
+	}
 
 	/**
-	 * Comment to go with the WOCE flag on aqueous CO2 values.
+	 * Create a data column type with the given name and list of units.
+	 * 
+	 * @param name
+	 * 		name of the data column type; 
+	 * 		if null, an empty string is assigned
+	 * @param units
+	 * 		unit strings associated with this type;
+	 * 		if null or empty, a single empty unit string is assigned
 	 */
-	COMMENT_WOCE_CO2_WATER,
+	public DataColumnType(String name, Collection<String> units) {
+		if ( name != null ) {
+			this.name = name;
+		}
+		else {
+			this.name = "";
+		}
+		if ( (units != null) && (units.size() > 0) ) {
+			this.units = new ArrayList<String>(units);
+		}
+		else {
+			// Assume no units are going to be added
+			this.units = new ArrayList<String>(1);
+			this.units.add("");
+		}
+	}
+
 	/**
-	 * Comment to go with the WOCE flag on atmospheric CO2 values.
+	 * @return 
+	 * 		the name for this data column type;
+	 * 		never null but may be empty
 	 */
-	COMMENT_WOCE_CO2_ATM,
-	
+	public String getName() {
+		return name;
+	}
+
 	/**
-	 * OTHER is for supplementary data in the user's original data file but 
-	 * not part of SOCAT.  A description of each column with this type must 
-	 * be part of the metadata, but the values are not validated or used. 
-	 * Multiple columns may have this type.
+	 * @param name 
+	 * 		the name of this data column type to set;
+	 * 		if null, an empty string is assigned
 	 */
-	OTHER,
+	public void setName(String name) {
+		if ( name != null ) {
+			this.name = name;
+		}
+		else {
+			this.name = "";
+		}
+	}
+
+	/**
+	 * @return 
+	 * 		the units associated with this data column type;
+	 * 		never null or empty, but may have a single empty string.
+	 * 		The actual ArrayList in this object is returned.
+	 */
+	public ArrayList<String> getUnits() {
+		return units;
+	}
+
+	/**
+	 * @param units 
+	 * 		the list of units to associate with this data column type; 
+	 * 		if null or empty, a single empty unit string is assigned
+	 */
+	public void setUnits(Collection<String> units) {
+		this.units.clear();
+		if ( (units != null) && (units.size() > 0) ) {
+			this.units.addAll(units);
+		}
+		else {
+			this.units.add("");
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 37;
+		int result = name.hashCode();
+		result = result * prime + units.hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+
+		if ( ! (obj instanceof DataColumnType) )
+			return false;
+
+		DataColumnType other = (DataColumnType) obj;
+		if ( ! name.equals(other.name) )
+			return false;
+		if ( ! units.equals(other.units) )
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "DataColumnType[name=" + name + ", units=" + units.toString() + "]";
+	}
+
 }
