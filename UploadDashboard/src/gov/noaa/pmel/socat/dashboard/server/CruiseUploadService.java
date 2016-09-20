@@ -340,19 +340,35 @@ public class CruiseUploadService extends HttpServlet {
 			}
 			// If ship name not found in preamble, check if there is a matching column type
 			if ( shipName == null ) {
-				int k = cruiseData.getDataColTypes().indexOf(DataColumnType.SHIP_NAME);
-				if ( k >= 0 ) {
-					shipName = cruiseData.getDataValues().get(0).get(k);
+				int colIdx = -1;
+				int k = 0;
+				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
+					if ( dtype.sameType(KnownDataColumnTypes.SHIP_NAME) ) {
+						colIdx = k;
+						break;
+					}
+					k++;
+				}
+				if ( colIdx >= 0 ) {
+					shipName = cruiseData.getDataValues().get(0).get(colIdx);
 					if ( shipName.isEmpty() )
 						shipName = null;
 				}
 			}
 			// If PI names not found in preamble, check if there is a matching column type
 			if ( piNames == null ) {
-				int k = cruiseData.getDataColTypes().indexOf(DataColumnType.INVESTIGATOR_NAMES);
-				if ( k >= 0 ) {
+				int colIdx = -1;
+				int k = 0;
+				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
+					if ( dtype.sameType(KnownDataColumnTypes.INVESTIGATOR_NAMES) ) {
+						colIdx = k;
+						break;
+					}
+					k++;
+				}
+				if ( colIdx >= 0 ) {
 					piNames = new ArrayList<String>();
-					for ( String name : cruiseData.getDataValues().get(0).get(k).split(";") ) {
+					for ( String name : cruiseData.getDataValues().get(0).get(colIdx).split(";") ) {
 						name = name.trim();
 						if ( ! name.isEmpty() )
 							piNames.add(name);
@@ -368,7 +384,6 @@ public class CruiseUploadService extends HttpServlet {
 				continue;
 			}
 			if ( piNames == null ) {
-				// Use the NO_EXPOCODE error message for any missing metadata
 				messages.add(DashboardUtils.NO_PINAMES_HEADER_TAG + " " + filename);
 				continue;
 			}

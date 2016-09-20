@@ -7,8 +7,8 @@ import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

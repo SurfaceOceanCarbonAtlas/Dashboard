@@ -56,11 +56,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	 */
 	public DataLocation() {
 		regionID = GLOBAL_REGION_ID;
-		rowNumber = SocatCruiseData.INT_MISSING_VALUE;
-		dataDate = SocatMetadata.DATE_MISSING_VALUE;
-		longitude = SocatCruiseData.FP_MISSING_VALUE;
-		latitude = SocatCruiseData.FP_MISSING_VALUE;
-		dataValue = SocatCruiseData.FP_MISSING_VALUE;
+		rowNumber = DashboardUtils.INT_MISSING_VALUE;
+		dataDate = DashboardUtils.DATE_MISSING_VALUE;
+		longitude = DashboardUtils.FP_MISSING_VALUE;
+		latitude = DashboardUtils.FP_MISSING_VALUE;
+		dataValue = DashboardUtils.FP_MISSING_VALUE;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the data row number; 
-	 * 		never null but may be {@link SocatCruiseData#INT_MISSING_VALUE}
+	 * 		never null but may be {@link DashboardUtils#INT_MISSING_VALUE}
 	 */
 	public Integer getRowNumber() {
 		return rowNumber;
@@ -95,11 +95,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param rowNumber 
 	 * 		the data row number to set;
-	 * 		if null, {@link SocatCruiseData#INT_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
 	 */
 	public void setRowNumber(Integer rowNumber) {
 		if ( rowNumber == null )
-			this.rowNumber = SocatCruiseData.INT_MISSING_VALUE;
+			this.rowNumber = DashboardUtils.INT_MISSING_VALUE;
 		else
 			this.rowNumber = rowNumber;
 	}
@@ -107,7 +107,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the data date;
-	 * 		never null but may be {@link SocatMetadata#DATE_MISSING_VALUE}
+	 * 		never null but may be {@link DashboardUtils#DATE_MISSING_VALUE}
 	 */
 	public Date getDataDate() {
 		return dataDate;
@@ -116,11 +116,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param dataDate 
 	 * 		the data date to set;
-	 * 		if null, {@link SocatMetadata#DATE_MISSING_VALUE} is assigned.
+	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned.
 	 */
 	public void setDataDate(Date dataDate) {
 		if ( dataDate == null )
-			this.dataDate = SocatMetadata.DATE_MISSING_VALUE;
+			this.dataDate = DashboardUtils.DATE_MISSING_VALUE;
 		else
 			this.dataDate = dataDate;
 	}
@@ -128,7 +128,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the longitude in the range [-180.0, 180.0)
-	 * 		never null but may be {@link SocatCruiseData#FP_MISSING_VALUE}
+	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
 	 */
 	public Double getLongitude() {
 		return longitude;
@@ -137,11 +137,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param longitude 
 	 * 		the longitude to set, which will be adjust the range [-180.0, 180.0);
-	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned.
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
 	 */
 	public void setLongitude(Double longitude) {
 		if ( longitude == null ) {
-			this.longitude = SocatCruiseData.FP_MISSING_VALUE;
+			this.longitude = DashboardUtils.FP_MISSING_VALUE;
 		}
 		else {
 			this.longitude = longitude;
@@ -155,7 +155,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the latitude;
-	 * 		never null but may be {@link SocatCruiseData#FP_MISSING_VALUE}
+	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
 	 */
 	public Double getLatitude() {
 		return latitude;
@@ -164,11 +164,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param latitude 
 	 * 		the latitude to set;
-	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned.
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
 	 */
 	public void setLatitude(Double latitude) {
 		if ( latitude == null )
-			this.latitude = SocatCruiseData.FP_MISSING_VALUE;
+			this.latitude = DashboardUtils.FP_MISSING_VALUE;
 		else
 			this.latitude = latitude;
 	}
@@ -176,7 +176,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the data value;
-	 * 		never null but may be {@link SocatCruiseData#FP_MISSING_VALUE}
+	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
 	 */
 	public Double getDataValue() {
 		return dataValue;
@@ -185,11 +185,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param dataValue 
 	 * 		the data value to set;
-	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned.
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
 	 */
 	public void setDataValue(Double dataValue) {
 		if ( dataValue == null )
-			this.dataValue = SocatCruiseData.FP_MISSING_VALUE;
+			this.dataValue = DashboardUtils.FP_MISSING_VALUE;
 		else
 			this.dataValue = dataValue;
 	}
@@ -222,11 +222,14 @@ public class DataLocation implements Serializable, IsSerializable {
 		if ( ! dataDate.equals(other.dataDate) )
 			return false;
 
-		if ( ! DashboardUtils.closeTo(dataValue, other.dataValue, SocatCruiseData.MAX_RELATIVE_ERROR, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(dataValue, other.dataValue, 
+				DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		return true;

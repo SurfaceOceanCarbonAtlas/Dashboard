@@ -24,7 +24,7 @@ public class Constants {
 	public static final String beginTime_VARNAME = "beginTime";
 	public static final String endTime_VARNAME = "endTime";
 	public static final String scienceGroup_VARNAME = "scienceGroup";
-	public static final String socatVersion_VARNAME = "socatVersion";
+	public static final String socatVersion_VARNAME = "version";
 	public static final String allRegionIDs_VARNAME = "allRegionIDs";
 	public static final String socatDOI_VARNAME = "socatDOI";
 	public static final String qcFlag_VARNAME = "qcFlag";

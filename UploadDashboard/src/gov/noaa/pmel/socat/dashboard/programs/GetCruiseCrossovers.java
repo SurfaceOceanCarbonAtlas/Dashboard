@@ -6,9 +6,9 @@ package gov.noaa.pmel.socat.dashboard.programs;
 import gov.noaa.pmel.socat.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.Crossover;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,26 +27,26 @@ public class GetCruiseCrossovers {
 	/** QC flags of cruises to report any crossovers */
 	static final TreeSet<Character> reportFlagsSet = new TreeSet<Character>(
 			Arrays.asList(
-					SocatQCEvent.QC_A_FLAG, 
-					SocatQCEvent.QC_B_FLAG,
-					SocatQCEvent.QC_C_FLAG,
-					SocatQCEvent.QC_D_FLAG,
-					SocatQCEvent.QC_E_FLAG,
-					SocatQCEvent.QC_NEW_FLAG,
-					SocatQCEvent.QC_CONFLICT_FLAG,
-					SocatQCEvent.QC_UPDATED_FLAG ) );
+					QCEvent.QC_A_FLAG, 
+					QCEvent.QC_B_FLAG,
+					QCEvent.QC_C_FLAG,
+					QCEvent.QC_D_FLAG,
+					QCEvent.QC_E_FLAG,
+					QCEvent.QC_NEW_FLAG,
+					QCEvent.QC_CONFLICT_FLAG,
+					QCEvent.QC_UPDATED_FLAG ) );
 
 	/** QC flags of cruises that can be involved in crossovers */
 	static final TreeSet<Character> acceptableFlagsSet = new TreeSet<Character>(
 			Arrays.asList(
-					SocatQCEvent.QC_A_FLAG, 
-					SocatQCEvent.QC_B_FLAG,
-					SocatQCEvent.QC_C_FLAG,
-					SocatQCEvent.QC_D_FLAG,
-					SocatQCEvent.QC_E_FLAG,
-					SocatQCEvent.QC_NEW_FLAG,
-					SocatQCEvent.QC_CONFLICT_FLAG,
-					SocatQCEvent.QC_UPDATED_FLAG ) );
+					QCEvent.QC_A_FLAG, 
+					QCEvent.QC_B_FLAG,
+					QCEvent.QC_C_FLAG,
+					QCEvent.QC_D_FLAG,
+					QCEvent.QC_E_FLAG,
+					QCEvent.QC_NEW_FLAG,
+					QCEvent.QC_CONFLICT_FLAG,
+					QCEvent.QC_UPDATED_FLAG ) );
 
 	/**
 	 * @param args
@@ -150,7 +150,7 @@ public class GetCruiseCrossovers {
 			}
 
 			CrossoverChecker crossChecker = new CrossoverChecker(configStore.getDsgNcFileHandler());
-			TreeMap<String,SocatCrossover> crossoversMap = new TreeMap<String,SocatCrossover>();
+			TreeMap<String,Crossover> crossoversMap = new TreeMap<String,Crossover>();
 			for ( String firstExpo : cruiseFlagsMap.keySet() ) {
 				double[] firstTimeMinMax = cruiseTimeMinMaxMap.get(firstExpo);
 				double[] firstLatMinMax = cruiseLatMinMaxMap.get(firstExpo);
@@ -169,22 +169,22 @@ public class GetCruiseCrossovers {
 						continue;
 					// Check that there is some overlap in time
 					double[] secondTimeMinMax = cruiseTimeMinMaxMap.get(secondExpo);
-					if ( (firstTimeMinMax[1] + SocatCrossover.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
-							(secondTimeMinMax[1] + SocatCrossover.MAX_TIME_DIFF < firstTimeMinMax[0]) )
+					if ( (firstTimeMinMax[1] + Crossover.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
+							(secondTimeMinMax[1] + Crossover.MAX_TIME_DIFF < firstTimeMinMax[0]) )
 						continue;
 					// Check that there is some overlap in latitude
 					double[] secondLatMinMax = cruiseLatMinMaxMap.get(secondExpo);
-					if ( (firstLatMinMax[1] + SocatCrossover.MAX_TIME_DIFF < secondLatMinMax[0]) ||
-							(secondLatMinMax[1] + SocatCrossover.MAX_TIME_DIFF < firstLatMinMax[0]) )
+					if ( (firstLatMinMax[1] + Crossover.MAX_TIME_DIFF < secondLatMinMax[0]) ||
+							(secondLatMinMax[1] + Crossover.MAX_TIME_DIFF < firstLatMinMax[0]) )
 						continue;
 					checkExpos.add(secondExpo);
 				}
 				// Find any crossovers with this cruise with the selected set of cruises
 				if ( checkExpos.size() > 0 ) {
 					try {
-						ArrayList<SocatCrossover> crossList = 
+						ArrayList<Crossover> crossList = 
 								crossChecker.getCrossovers(firstExpo, checkExpos, System.err, startTime);
-						for ( SocatCrossover cross : crossList ) {
+						for ( Crossover cross : crossList ) {
 							String[] expos = cross.getExpocodes();
 							Long[] cruiseMinTimes = new Long[2];
 							Long[] cruiseMaxTimes = new Long[2];
@@ -233,7 +233,7 @@ public class GetCruiseCrossovers {
 
 			// Check for 'A' cruises without high-quality crossovers
 			for ( String expo : cruiseFlagsMap.keySet() ) {
-				if ( ! SocatQCEvent.QC_A_FLAG.equals( cruiseFlagsMap.get(expo) ) )
+				if ( ! QCEvent.QC_A_FLAG.equals( cruiseFlagsMap.get(expo) ) )
 					continue;
 				boolean found = false;
 				for ( String expocodePair : crossoversMap.keySet() ) {
@@ -248,7 +248,7 @@ public class GetCruiseCrossovers {
 				}
 			}
 			System.out.println(Integer.toString(reportStrings.size()) + 
-					" cruises with a QC flag of " + SocatQCEvent.QC_A_FLAG + 
+					" cruises with a QC flag of " + QCEvent.QC_A_FLAG + 
 					" with no high-quality crossovers: ");
 			for ( String report : reportStrings )
 				System.out.println(report);

@@ -13,12 +13,12 @@ import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -94,7 +94,7 @@ public class RegenerateDsgs {
 
 			// Get the QC flag and SOCAT version from the database
 			Character qcFlag = dbHandler.getQCFlag(upperExpo);
-			String qcStatus = SocatQCEvent.FLAG_STATUS_MAP.get(qcFlag);
+			String qcStatus = QCEvent.FLAG_STATUS_MAP.get(qcFlag);
 			String socatVersionStatus = dbHandler.getSocatVersionStatus(upperExpo);
 			if ( socatVersionStatus.isEmpty() )
 				throw new IllegalArgumentException("Unable to get the version and status from the database");
@@ -140,7 +140,7 @@ public class RegenerateDsgs {
 							// 11-31 in 49K619871028
 							data.setMonth(12);
 							data.setDay(1);
-							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
 						}
 					}
 				}
@@ -150,7 +150,7 @@ public class RegenerateDsgs {
 							// 2-31 in 49NB19881228
 							data.setMonth(3);
 							data.setDay(1);
-							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
 						}
 					}
 				}
@@ -159,7 +159,7 @@ public class RegenerateDsgs {
 						if ( data.getMinute() > 59 ) {
 							// 12:99 in 74JC20061024
 							data.setMinute(59);
-							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
 						}
 					}
 				}
@@ -168,7 +168,7 @@ public class RegenerateDsgs {
 						if ( data.getSecond() >= 60.0 ) {
 							// 13:54:60 in 77FF20020226
 							data.setSecond(59.99);
-							data.setWoceCO2Water(SocatWoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
 						}
 					}
 				}

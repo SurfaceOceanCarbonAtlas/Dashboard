@@ -13,9 +13,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SocatCrossover implements Serializable, IsSerializable {
+public class Crossover implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1480644418805338101L;
+	private static final long serialVersionUID = 2025134071497874015L;
 
 	/** Max "distance", in kilometers, still considered a crossover */
 	public static final double MAX_CROSSOVER_DIST = 80.0;
@@ -45,7 +45,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 	/**
 	 * Creates an crossover with no information (all null).
 	 */
-	public SocatCrossover() {
+	public Crossover() {
 		setExpocodes(null);
 		setMinDistance(null);
 		setRowNumsAtMin(null);
@@ -296,20 +296,17 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		final double rtoler = 1.0E-8;
-		final double atoler = 1.0E-4;
-
 		if ( this == obj ) {
 			return true;
 		}
 		if ( obj == null ) {
 			return false;
 		}
-		if ( ! (obj instanceof SocatCrossover) ) {
+		if ( ! (obj instanceof Crossover) ) {
 			return false;
 		}
 
-		SocatCrossover other = (SocatCrossover) obj;
+		Crossover other = (Crossover) obj;
 
 		if ( ! Arrays.equals(expocodes, other.expocodes) )
 			return false;
@@ -329,7 +326,8 @@ public class SocatCrossover implements Serializable, IsSerializable {
 		else if ( other.minDistance == null ) {
 			return false;
 		}
-		else if ( ! DashboardUtils.closeTo(minDistance, other.minDistance, rtoler, atoler) ) {
+		else if ( ! DashboardUtils.closeTo(minDistance, other.minDistance, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 			return false;
 		}
 
@@ -341,7 +339,8 @@ public class SocatCrossover implements Serializable, IsSerializable {
 			else if ( other.latsAtMin[k] == null ) {
 				return false;
 			}
-			else if ( ! DashboardUtils.closeTo(latsAtMin[k], other.latsAtMin[k], rtoler, atoler) ) {
+			else if ( ! DashboardUtils.closeTo(latsAtMin[k], other.latsAtMin[k],
+					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 				return false;
 			}
 		}
@@ -354,7 +353,8 @@ public class SocatCrossover implements Serializable, IsSerializable {
 			else if ( other.lonsAtMin[k] == null ) {
 				return false;
 			}
-			else if ( ! DashboardUtils.longitudeCloseTo(lonsAtMin[k], other.lonsAtMin[k], rtoler, atoler) ) {
+			else if ( ! DashboardUtils.longitudeCloseTo(lonsAtMin[k], other.lonsAtMin[k],
+					0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 				return false;
 			}			
 		}
@@ -364,7 +364,7 @@ public class SocatCrossover implements Serializable, IsSerializable {
 
 	@Override
 	public String toString() {
-		return "SocatCrossover" + 
+		return "Crossover" + 
 				"[ expocodes=" + Arrays.toString(expocodes) + 
 				", minDistance=" + minDistance + 
 				", rowNumsAtMin=" + Arrays.toString(rowNumsAtMin) + 

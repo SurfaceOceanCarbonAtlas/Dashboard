@@ -7,13 +7,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
+import gov.noaa.pmel.socat.dashboard.shared.Crossover;
 
 import org.junit.Test;
 
 /**
- * Unit tests for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover}
+ * Unit tests for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover}
  * 
  * @author Karl Smith
  */
@@ -36,12 +35,12 @@ public class SocatCrossoverTest {
 	private static final Long secondMaxTime =  secondTime + (15L * 24L * 60L * 60L);
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getExpocodes()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setExpocodes(java.lang.String[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getExpocodes()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setExpocodes(java.lang.String[])}.
 	 */
 	@Test
 	public void testGetSetExpocodes() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		String[] expos = cross.getExpocodes();
 		assertEquals(2, expos.length);
 		assertNull(expos[0]);
@@ -61,12 +60,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getMinDistance()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setMinDistance(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getMinDistance()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setMinDistance(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetMinDistance() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		assertNull(cross.getMinDistance());
 
 		cross.setMinDistance(minDist);
@@ -82,12 +81,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getRowNumsAtMin()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setRowNumsAtMin(java.lang.Integer[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getRowNumsAtMin()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setRowNumsAtMin(java.lang.Integer[])}.
 	 */
 	@Test
 	public void testGetSetRowNumsAtMin() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		Integer[] rowNums = cross.getRowNumsAtMin();
 		assertEquals(2, rowNums.length);
 		assertNull(rowNums[0]);
@@ -113,12 +112,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getLonsAtMin()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setLonsAtMin(java.lang.Double[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getLonsAtMin()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setLonsAtMin(java.lang.Double[])}.
 	 */
 	@Test
 	public void testGetSetLonsAtMin() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		Double[] lons = cross.getLonsAtMin();
 		assertEquals(2, lons.length);
 		assertNull(lons[0]);
@@ -148,12 +147,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getLatsAtMin()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setLatsAtMin(java.lang.Double[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getLatsAtMin()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setLatsAtMin(java.lang.Double[])}.
 	 */
 	@Test
 	public void testGetSetLatsAtMin() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		Double[] lats = cross.getLatsAtMin();
 		assertEquals(2, lats.length);
 		assertNull(lats[0]);
@@ -187,12 +186,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getTimesAtMin()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setTimesAtMin(java.util.Long[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getTimesAtMin()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setTimesAtMin(java.util.Long[])}.
 	 */
 	@Test
 	public void testGetSetTimesAtMin() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		Long[] times = cross.getTimesAtMin();
 		assertEquals(2, times.length);
 		assertNull(times[0]);
@@ -230,12 +229,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getCruiseMinTimes()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setCruiseMinTimes(java.util.Long[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getCruiseMinTimes()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setCruiseMinTimes(java.util.Long[])}.
 	 */
 	@Test
 	public void testGetCruiseMinTimes() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		Long[] minTimes = cross.getCruiseMinTimes();
 		assertEquals(2, minTimes.length);
 		assertNull(minTimes[0]);
@@ -277,12 +276,12 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#getCruiseMaxTimes()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#setCruiseMaxTimes(java.util.Long[])}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#getCruiseMaxTimes()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#setCruiseMaxTimes(java.util.Long[])}.
 	 */
 	@Test
 	public void testGetCruiseMaxTimes() {
-		SocatCrossover cross = new SocatCrossover();
+		Crossover cross = new Crossover();
 		Long[] maxTimes = cross.getCruiseMaxTimes();
 		assertEquals(2, maxTimes.length);
 		assertNull(maxTimes[0]);
@@ -328,16 +327,16 @@ public class SocatCrossoverTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCrossover#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.Crossover#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		SocatCrossover first = new SocatCrossover();
+		Crossover first = new Crossover();
 		assertFalse( first.equals(null) );
 		assertFalse( first.equals(firstExpo) );
 
-		SocatCrossover second = new SocatCrossover();
+		Crossover second = new Crossover();
 		assertTrue( first.hashCode() == second.hashCode());
 		assertTrue( first.equals(second) );
 

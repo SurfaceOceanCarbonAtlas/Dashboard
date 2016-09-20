@@ -12,7 +12,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,8 +61,7 @@ public class MetadataUploadService extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-																throws IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		// Verify the post has the correct encoding
 		if ( ! ServletFileUpload.isMultipartContent(request) ) {
 			sendErrMsg(response, "Invalid request contents format for this service.");
@@ -148,7 +147,7 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		boolean isOme = omeIndicator.equals("true");
-		String socatVersion = configStore.getSocatUploadVersion();
+		String version = configStore.getSocatUploadVersion();
 
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
@@ -183,7 +182,7 @@ public class MetadataUploadService extends HttpServlet {
 				// Save the metadata document for this cruise
 				if ( metadata == null ) {
 					metadata = metadataHandler.saveMetadataFileItem(expo, 
-							username, uploadTimestamp, uploadFilename, socatVersion, metadataItem);
+							username, uploadTimestamp, uploadFilename, version, metadataItem);
 				}
 				else {
 					metadata = metadataHandler.copyMetadataFile(expo, metadata, true);
@@ -213,12 +212,12 @@ public class MetadataUploadService extends HttpServlet {
 					cruise = cruiseHandler.addAddlDocToCruise(expo, metadata);
 				}
 				if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
-					SocatQCEvent qcEvent = new SocatQCEvent();
+					QCEvent qcEvent = new QCEvent();
 					qcEvent.setExpocode(expo);
-					qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
+					qcEvent.setFlag(QCEvent.QC_UPDATED_FLAG);
 					qcEvent.setFlagDate(new Date());
 					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-					qcEvent.setSocatVersion(socatVersion);
+					qcEvent.setVersion(version);
 					qcEvent.setUsername(username);
 					String comment;
 					if ( isOme )
@@ -232,7 +231,7 @@ public class MetadataUploadService extends HttpServlet {
 						dbHandler.addQCEvent(qcEvent);
 						dsgFileHandler.updateQCFlag(qcEvent);
 						// Update the dashboard status for the 'U' QC flag
-						cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+						cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
 						// If archived, reset the archived status so the updated metadata will be archived
 						if ( cruise.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
 							cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);

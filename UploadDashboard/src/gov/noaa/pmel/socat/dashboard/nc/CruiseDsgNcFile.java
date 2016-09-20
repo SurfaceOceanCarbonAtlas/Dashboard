@@ -1,12 +1,12 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -1084,7 +1084,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IOException
 	 * 		if opening, reading from, or writing to the DSG file throws one
 	 */
-	public ArrayList<String> assignWoceFlags(SocatWoceEvent woceEvent) 
+	public ArrayList<String> assignWoceFlags(WoceEvent woceEvent) 
 								throws IllegalArgumentException, IOException {
 		ArrayList<String> issues = new ArrayList<String>();
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
@@ -1118,7 +1118,7 @@ public class CruiseDsgNcFile extends File {
 						varName + "' in " + getName());
 			ArrayChar.D2 regionIDs = (ArrayChar.D2) var.read(); 
 
-			String dataname = woceEvent.getDataVarName();
+			String dataname = woceEvent.getVarName();
 			ArrayDouble.D1 datavalues;
 			if ( dataname.isEmpty() || Constants.geoposition_VARNAME.equals(dataname) ) {
 				// WOCE based on longitude/latitude/time
@@ -1195,7 +1195,7 @@ public class CruiseDsgNcFile extends File {
 	 * @throws InvalidRangeException 
 	 * 		if writing the update WOCE flags to the DSG file throws one 
 	 */
-	public ArrayList<DataLocation> updateWoceFlags(SocatWoceEvent woceEvent, 
+	public ArrayList<DataLocation> updateWoceFlags(WoceEvent woceEvent, 
 			boolean updateWoceEvent) 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		ArrayList<DataLocation> unidentified = new ArrayList<DataLocation>();
@@ -1236,7 +1236,7 @@ public class CruiseDsgNcFile extends File {
 				regionIDs = null;
 			}
 
-			String dataname = woceEvent.getDataVarName();
+			String dataname = woceEvent.getVarName();
 			ArrayDouble.D1 datavalues;
 			if ( Constants.geoposition_VARNAME.equals(dataname) ) {
 				// WOCE based on longitude/latitude/time

@@ -10,7 +10,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -104,7 +104,7 @@ public class RestoreCruise {
 				System.err.println("========================================");
 				System.exit(1);
 			}
-			Character oldQCFlag = SocatQCEvent.STATUS_FLAG_MAP.get(cruise.getQcStatus());
+			Character oldQCFlag = QCEvent.STATUS_FLAG_MAP.get(cruise.getQcStatus());
 			if ( oldQCFlag == null ) {
 				System.err.println(expo + ": problems interpreting the cruise qc status - " + cruise.getQcStatus());
 				System.err.println("========================================");
@@ -150,9 +150,9 @@ public class RestoreCruise {
 				System.exit(1);
 			}
 			// Add a QC comment regarding the restoring of old version data
-			SocatQCEvent qcEvent = new SocatQCEvent();
+			QCEvent qcEvent = new QCEvent();
 			qcEvent.setExpocode(expo);
-			qcEvent.setFlag(SocatQCEvent.QC_COMMENT);
+			qcEvent.setFlag(QCEvent.QC_COMMENT);
 			qcEvent.setFlagDate(new Date());
 			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 			qcEvent.setSocatVersion(removeSocatVersion);
@@ -209,7 +209,7 @@ public class RestoreCruise {
 				}
 			}
 			if ( metadataUpdated ) {
-				qcFlag = SocatQCEvent.QC_UPDATED_FLAG;
+				qcFlag = QCEvent.QC_UPDATED_FLAG;
 				qcEvent.setExpocode(expo);
 				qcEvent.setFlag(qcFlag);
 				qcEvent.setFlagDate(new Date());

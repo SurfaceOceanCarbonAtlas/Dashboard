@@ -10,7 +10,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,7 +166,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String AUTOFAIL_HTML_EPILOGUE = 
 			"</ul> These datasets can be submitted for QC and archival, " +
 			"but because of the number of errors, a QC flag of " + 
-			SocatQCEvent.QC_F_FLAG + " (unacceptable) " +
+			QCEvent.QC_F_FLAG + " (unacceptable) " +
 			"will <em>probably</em> be assigned by reviewers.<br />" +
 			"Do you want to continue? ";
 	private static final String AUTOFAIL_YES_TEXT = "Yes";

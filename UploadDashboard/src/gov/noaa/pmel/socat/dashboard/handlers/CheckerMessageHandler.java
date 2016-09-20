@@ -12,8 +12,8 @@ import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
-import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -557,7 +557,7 @@ public class CheckerMessageHandler {
 	 * @throws IOException
 	 * 		if there is a problem opening or reading the full-data DSG file for the cruise
 	 */
-	public ArrayList<SocatWoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData, 
+	public ArrayList<WoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData, 
 			DsgNcFileHandler dsgHandler) 
 					throws IllegalArgumentException, FileNotFoundException, IOException {
 		// Get the info needed from the DashboardCruise
@@ -602,14 +602,14 @@ public class CheckerMessageHandler {
 			WoceInfo info = new WoceInfo();
 
 			if ( severity.equals(SCMsgSeverity.ERROR) )
-				info.flag = SocatWoceEvent.WOCE_BAD;
+				info.flag = WoceEvent.WOCE_BAD;
 			else if ( severity.equals(SCMsgSeverity.WARNING) )
-				info.flag = SocatWoceEvent.WOCE_QUESTIONABLE;
+				info.flag = WoceEvent.WOCE_QUESTIONABLE;
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
 			// Only add SanityChecker WOCE-4 flags for now 
 			// (here and at the end of CruiseChecker.standardizeCruiseData)
-			if ( ! info.flag.equals(SocatWoceEvent.WOCE_BAD) )
+			if ( ! info.flag.equals(WoceEvent.WOCE_BAD) )
 				continue;
 
 			if ( colNum > 0 )
@@ -629,10 +629,10 @@ public class CheckerMessageHandler {
 		// Add any PI WOCE-3 flags 
 		for ( Integer rowIdx : userWoceThrees ) {
 			WoceInfo info = new WoceInfo();
-			info.flag = SocatWoceEvent.WOCE_QUESTIONABLE;
+			info.flag = WoceEvent.WOCE_QUESTIONABLE;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ " + SocatWoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
+			info.comment = "ZZZZ " + WoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
 			if ( userCommentsIndex >= 0 ) {
 				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
@@ -645,10 +645,10 @@ public class CheckerMessageHandler {
 		// Add any PI WOCE-4 flags 
 		for ( Integer rowIdx : userWoceFours ) {
 			WoceInfo info = new WoceInfo();
-			info.flag = SocatWoceEvent.WOCE_BAD;
+			info.flag = WoceEvent.WOCE_BAD;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ " + SocatWoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
+			info.comment = "ZZZZ " + WoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
 			if ( userCommentsIndex >= 0 ) {
 				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
@@ -658,7 +658,7 @@ public class CheckerMessageHandler {
 			orderedWoceInfo.add(info);
 		}
 
-		ArrayList<SocatWoceEvent> woceList = new ArrayList<SocatWoceEvent>();
+		ArrayList<WoceEvent> woceList = new ArrayList<WoceEvent>();
 		// If no WOCE flags, return now before we read data from the DSG file
 		if ( orderedWoceInfo.isEmpty() )
 			return woceList;
@@ -691,15 +691,15 @@ public class CheckerMessageHandler {
 				lastColumnIndex = info.columnIndex;
 				lastComment = info.comment;
 
-				SocatWoceEvent woceEvent = new SocatWoceEvent();
+				WoceEvent woceEvent = new WoceEvent();
 				woceEvent.setExpocode(expocode);
 				woceEvent.setSocatVersion(version);
 				woceEvent.setFlag(info.flag);
 				woceEvent.setFlagDate(now);
-				woceEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
-				woceEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+				woceEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
+				woceEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
 				// Remove the ZZZZ added to the PI-provided WOCE flag comment
-				if ( info.comment.startsWith("ZZZZ " + SocatWoceEvent.PI_PROVIDED_WOCE_COMMENT_START) )
+				if ( info.comment.startsWith("ZZZZ " + WoceEvent.PI_PROVIDED_WOCE_COMMENT_START) )
 					woceEvent.setComment(info.comment.substring(5));
 				else
 					woceEvent.setComment(info.comment);
@@ -710,7 +710,7 @@ public class CheckerMessageHandler {
 					DataColumnType dataType = columnTypes.get(info.columnIndex);
 					String dataVarName = Constants.TYPE_TO_VARNAME_MAP.get(dataType);
 					if ( dataVarName != null ) {
-						woceEvent.setDataVarName(dataVarName);
+						woceEvent.setVarName(dataVarName);
 						if ( ! dataVarName.equals(lastDataVarName) ) {
 							dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);
 							lastDataVarName = dataVarName;

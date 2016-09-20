@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.programs;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -47,8 +47,8 @@ public class WoceManyData {
 			if ( args[4].length() != 1 )
 				throw new IllegalArgumentException("not a single character");
 			woceFlag = args[4].charAt(0);
-			if ( ! (woceFlag.equals(SocatWoceEvent.WOCE_BAD) || 
-					woceFlag.equals(SocatWoceEvent.WOCE_QUESTIONABLE)) )
+			if ( ! (woceFlag.equals(WoceEvent.WOCE_BAD) || 
+					woceFlag.equals(WoceEvent.WOCE_QUESTIONABLE)) )
 				throw new IllegalArgumentException("unrecognized flag");
 		} catch ( Exception ex ) {
 			System.err.println("Problems with WOCE flag '" + args[4] + "': " + ex.getMessage());
@@ -141,9 +141,9 @@ public class WoceManyData {
 			int numRows = woceFlags.length;
 
 			// Create the WOCE event
-			SocatWoceEvent woceEvent = new SocatWoceEvent();
+			WoceEvent woceEvent = new WoceEvent();
 			woceEvent.setComment(woceComment);
-			woceEvent.setDataVarName(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
+			woceEvent.setVarName(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
 			woceEvent.setExpocode(expocode);
 			woceEvent.setFlag(woceFlag);
 			woceEvent.setFlagDate(new Date());

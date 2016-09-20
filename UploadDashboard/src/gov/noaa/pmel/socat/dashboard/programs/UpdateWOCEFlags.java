@@ -7,7 +7,7 @@ import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -95,7 +95,7 @@ public class UpdateWOCEFlags {
 					continue;
 				}
 				for (int k = 0; k < currentWoceFlags.length; k++) {
-					currentWoceFlags[k] = SocatWoceEvent.WOCE_NOT_CHECKED;
+					currentWoceFlags[k] = WoceEvent.WOCE_NOT_CHECKED;
 				}
 				try {
 					dsgFile.writeCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME, currentWoceFlags);
@@ -106,7 +106,7 @@ public class UpdateWOCEFlags {
 				}
 
 				// Assign the applicable WOCE flags given in the database in the time order they were assigned
-				ArrayList<SocatWoceEvent> woceList = null;
+				ArrayList<WoceEvent> woceList = null;
 				try {
 					woceList = dbHandler.getWoceEvents(expocode, false);
 				} catch (Exception ex) {
@@ -116,14 +116,14 @@ public class UpdateWOCEFlags {
 					continue;
 				}
 				try {
-					for ( SocatWoceEvent woce : woceList ) {
+					for ( WoceEvent woce : woceList ) {
 						// Check if this is an applicable (not old) WOCE flag
 						Character flag = woce.getFlag();
-						if ( flag.equals(SocatWoceEvent.WOCE_GOOD) ||
-							 flag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ||
-							 flag.equals(SocatWoceEvent.WOCE_QUESTIONABLE) ||
-							 flag.equals(SocatWoceEvent.WOCE_BAD) ||
-							 flag.equals(SocatWoceEvent.WOCE_NO_DATA) ) {
+						if ( flag.equals(WoceEvent.WOCE_GOOD) ||
+							 flag.equals(WoceEvent.WOCE_NOT_CHECKED) ||
+							 flag.equals(WoceEvent.WOCE_QUESTIONABLE) ||
+							 flag.equals(WoceEvent.WOCE_BAD) ||
+							 flag.equals(WoceEvent.WOCE_NO_DATA) ) {
 							ArrayList<String> issues = dsgFile.assignWoceFlags(woce);
 							for ( String msg : issues )
 								System.err.println(msg);

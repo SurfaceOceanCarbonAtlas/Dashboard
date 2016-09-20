@@ -7,7 +7,7 @@ import gov.noaa.pmel.socat.dashboard.actions.CruiseModifier;
 import gov.noaa.pmel.socat.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.util.Date;
 
@@ -86,9 +86,9 @@ public class RestoreWoceFlags {
 			}
 			if ( changed ) {
 				// Add a QC comment regarding the restoration of WOCE flags
-				SocatQCEvent qcEvent = new SocatQCEvent();
+				QCEvent qcEvent = new QCEvent();
 				qcEvent.setExpocode(expocode);
-				qcEvent.setFlag(SocatQCEvent.QC_COMMENT);
+				qcEvent.setFlag(QCEvent.QC_COMMENT);
 				qcEvent.setFlagDate(new Date());
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 				qcEvent.setSocatVersion(socatVersion);

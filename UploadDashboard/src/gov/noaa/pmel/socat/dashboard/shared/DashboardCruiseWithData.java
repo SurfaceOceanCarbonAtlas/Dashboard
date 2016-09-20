@@ -13,8 +13,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseWithData extends DashboardCruise 
-						implements Serializable, IsSerializable {
+public class DashboardCruiseWithData extends DashboardCruise implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = 5625861651254670342L;
 
@@ -134,8 +133,6 @@ public class DashboardCruiseWithData extends DashboardCruise
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
-				",\n    dataColUnits=" + dataColUnits.toString() +
-				",\n    missingValues=" + missingValues.toString() +
 				";\n    woceThreeRowIndices = " + woceThreeRowIndices.toString() +
 				";\n    woceFourRowIndices = " + woceFourRowIndices.toString() +
 				";\n    preamble = " + preamble.toString() +

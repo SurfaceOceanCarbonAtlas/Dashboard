@@ -3,11 +3,10 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.socat.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.socat.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 
 import java.io.File;
 import java.io.FileInputStream;

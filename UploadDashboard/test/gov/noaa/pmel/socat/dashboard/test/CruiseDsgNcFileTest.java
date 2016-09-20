@@ -8,10 +8,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.KnownDataColumnTypes;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

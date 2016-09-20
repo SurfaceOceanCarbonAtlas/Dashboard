@@ -6,10 +6,10 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,15 +52,15 @@ public class SocatWoceEventTest {
 	private static final Date MY_FLAG_DATE = new Date();
 	private static final String MY_USERNAME = "Karl.Smith";
 	private static final String MY_REALNAME = "Karl M. Smith";
-	private static final String MY_COMMENT = "from SocatWoceEvent unit test";
+	private static final String MY_COMMENT = "from WoceEvent unit test";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getID()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setId(java.lang.Long)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getID()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setId(java.lang.Long)}.
 	 */
 	@Test
 	public void testGetSetId() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setId(MY_QC_ID);
 		assertEquals(MY_QC_ID, myflag.getId());
@@ -69,160 +69,160 @@ public class SocatWoceEventTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getFlag()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#getFlag()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#setFlag(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetFlag() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		WoceEvent myflag = new WoceEvent();
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setFlag(MY_WOCE_FLAG);
 		assertEquals(MY_WOCE_FLAG, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlag(null);
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getExpocode()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getExpocode()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setExpocode(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetExpocode() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getExpocode());
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setExpocode(null);
 		assertEquals("", myflag.getExpocode());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getSocatVersion()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setSocatVersion(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getSocatVersion()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setSocatVersion(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSocatVersion() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getSocatVersion());
 		myflag.setSocatVersion(MY_SOCAT_VERSION);
 		assertEquals(MY_SOCAT_VERSION, myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setSocatVersion(null);
 		assertEquals("", myflag.getSocatVersion());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getDataVarName()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setDataVarName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#getVarName()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#setVarName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetColumnName() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
-		assertEquals("", myflag.getDataVarName());
-		myflag.setDataVarName(MY_DATA_VAR_NAME);
-		assertEquals(MY_DATA_VAR_NAME, myflag.getDataVarName());
+		WoceEvent myflag = new WoceEvent();
+		assertEquals("", myflag.getVarName());
+		myflag.setVarName(MY_DATA_VAR_NAME);
+		assertEquals(MY_DATA_VAR_NAME, myflag.getVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
-		myflag.setDataVarName(null);
-		assertEquals("", myflag.getDataVarName());
+		myflag.setVarName(null);
+		assertEquals("", myflag.getVarName());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#getLocations()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#setLocations(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#getLocations()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#setLocations(java.util.ArrayList)}.
 	 */
 	@Test
 	public void testGetSetLocations() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals(0, myflag.getLocations().size());
 		myflag.setLocations(MY_LOCATIONS);
 		assertEquals(MY_LOCATIONS, myflag.getLocations());
-		assertEquals("", myflag.getDataVarName());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setLocations(null);
 		assertEquals(0, myflag.getLocations().size());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getFlagDate()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setFlagDate(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getFlagDate()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setFlagDate(java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetFlagDate() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		myflag.setFlagDate(MY_FLAG_DATE);
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getDataVarName());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlagDate(null);
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getUsername()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setUsername(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getUsername()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setUsername(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetUsername() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getUsername());
 		myflag.setUsername(MY_USERNAME);
 		assertEquals(MY_USERNAME, myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getDataVarName());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setUsername(null);
 		assertEquals("", myflag.getUsername());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getRealname()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setRealname(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getRealname()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setRealname(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetRealname() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getRealname());
 		myflag.setRealname(MY_REALNAME);
 		assertEquals(MY_REALNAME, myflag.getRealname());
 		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getDataVarName());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setRealname(null);
 		assertEquals("", myflag.getRealname());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#getComment()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatEvent#setComment(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getComment()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#setComment(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetComment() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getComment());
 		myflag.setComment(MY_COMMENT);
 		assertEquals(MY_COMMENT, myflag.getComment());
@@ -230,26 +230,26 @@ public class SocatWoceEventTest {
 		assertEquals("", myflag.getUsername());
 		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getDataVarName());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getSocatVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setComment(null);
 		assertEquals("", myflag.getComment());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
-		SocatWoceEvent myflag = new SocatWoceEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertFalse( myflag.equals(null) );
-		assertFalse( myflag.equals(new SocatEvent()) );
+		assertFalse( myflag.equals(new DashboardEvent()) );
 
-		SocatWoceEvent otherflag = new SocatWoceEvent();
+		WoceEvent otherflag = new WoceEvent();
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
@@ -280,10 +280,10 @@ public class SocatWoceEventTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
-		myflag.setDataVarName(MY_DATA_VAR_NAME);
+		myflag.setVarName(MY_DATA_VAR_NAME);
 		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
-		otherflag.setDataVarName(MY_DATA_VAR_NAME);
+		otherflag.setVarName(MY_DATA_VAR_NAME);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

@@ -12,7 +12,7 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -77,16 +77,16 @@ public class ResubmitCruises {
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 		String qcStatus = cruise.getQcStatus();
 
-		if ( qcStatus.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) ) {
+		if ( qcStatus.equals(QCEvent.QC_STATUS_NOT_SUBMITTED) ) {
 			// Only check (do not submit) if the cruise in not submitted
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 			// If the DSG file exists, this is an unsubmitted update, so mark as suspended
 			if ( dsgHandler.getDsgNcFile(expocode).exists() ) {
-				cruiseData.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
+				cruiseData.setQcStatus(QCEvent.QC_STATUS_SUSPENDED);
 
-				SocatQCEvent qcEvent = new SocatQCEvent();
+				QCEvent qcEvent = new QCEvent();
 				qcEvent.setExpocode(expocode);
-				qcEvent.setFlag(SocatQCEvent.QC_SUSPEND_FLAG);
+				qcEvent.setFlag(QCEvent.QC_SUSPEND_FLAG);
 				qcEvent.setFlagDate(new Date());
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 				qcEvent.setSocatVersion(socatVersion);
@@ -109,9 +109,9 @@ public class ResubmitCruises {
 		else {
 			// Un-submit the cruise but do not bother committing the change at this time
 			if ( dsgHandler.getDsgNcFile(expocode).exists() )
-				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUSPENDED);
+				cruise.setQcStatus(QCEvent.QC_STATUS_SUSPENDED);
 			else
-				cruise.setQcStatus(SocatQCEvent.QC_STATUS_NOT_SUBMITTED);
+				cruise.setQcStatus(QCEvent.QC_STATUS_NOT_SUBMITTED);
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));

@@ -5,7 +5,6 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
 
 import java.io.File;
 import java.text.ParseException;
@@ -32,7 +31,14 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 7844591631038781927L;
+	private static final long serialVersionUID = -2787310294282209759L;
+
+	/**
+	 * String separating each PI listed in scienceGroup, each organization 
+	 * listed in organizations, and each additional document filename listed 
+	 * in addlDocs.  This is cannot be a semicolon due to Ferret issues.
+	 */
+	private static final String NAMES_SEPARATOR = " : ";
 
 	private static final SimpleDateFormat TIMEPARSER = new SimpleDateFormat("yyyyMMdd");
 	private static final SimpleDateFormat TIMESTAMPER = new SimpleDateFormat("yyyy-MM-dd");
@@ -218,7 +224,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		StringBuffer scienceGroup = new StringBuffer();
 		for ( String investigator : omeMData.getInvestigators() ) {
 			if ( scienceGroup.length() > 0 )
-				scienceGroup.append(SocatMetadata.NAMES_SEPARATOR);
+				scienceGroup.append(NAMES_SEPARATOR);
 			// Anglicize investigator names for NetCDF/LAS
 			scienceGroup.append(anglicizeName(investigator));
 		}
@@ -229,7 +235,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		for ( String org : omeMData.getOrganizations() ) {
 			if ( (null != org) && usedOrganizations.add(org) ) {
 				if ( orgGroup.length() > 0 )
-					orgGroup.append(SocatMetadata.NAMES_SEPARATOR);
+					orgGroup.append(NAMES_SEPARATOR);
 				// Anglicize organizations names for NetCDF/LAS
 				orgGroup.append(anglicizeName(org));
 			}

@@ -5,9 +5,9 @@ package gov.noaa.pmel.socat.dashboard.actions;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.Crossover;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class CrossoverChecker {
 	 * @throws IOException
 	 * 		if problems reading from either full-data DSG file
 	 */
-	public SocatCrossover checkForCrossover(String[] expocodes) 
+	public Crossover checkForCrossover(String[] expocodes) 
 			throws IllegalArgumentException, FileNotFoundException, IOException {
 		if ( (expocodes == null) || (expocodes.length != 2) || 
 			 (expocodes[0] == null) || (expocodes[1] == null) )
@@ -102,8 +102,8 @@ public class CrossoverChecker {
 			dataMinTimes[q] = Math.round(minMaxVals[0]);
 			dataMaxTimes[q] = Math.round(minMaxVals[1]);
 		}
-		if ( (dataMaxTimes[0] + SocatCrossover.MAX_TIME_DIFF < dataMinTimes[1]) ||
-			 (dataMaxTimes[1] + SocatCrossover.MAX_TIME_DIFF < dataMinTimes[0]) )
+		if ( (dataMaxTimes[0] + Crossover.MAX_TIME_DIFF < dataMinTimes[1]) ||
+			 (dataMaxTimes[1] + Crossover.MAX_TIME_DIFF < dataMinTimes[0]) )
 			return null;
 
 		// Check for any possibility of latitude overlap
@@ -117,12 +117,12 @@ public class CrossoverChecker {
 			dataMinLats[q] = minMaxVals[0];
 			dataMaxLats[q] = minMaxVals[1];
 		}
-		if ( (dataMaxLats[0] + SocatCrossover.MAX_LAT_DIFF < dataMinLats[1]) ||
-			 (dataMaxLats[1] + SocatCrossover.MAX_LAT_DIFF < dataMinLats[0]) )
+		if ( (dataMaxLats[0] + Crossover.MAX_LAT_DIFF < dataMinLats[1]) ||
+			 (dataMaxLats[1] + Crossover.MAX_LAT_DIFF < dataMinLats[0]) )
 			return null;
 
 		// Check for a crossover
-		SocatCrossover crossover = checkForCrossover(lons, lats, times, ssts, fco2s);
+		Crossover crossover = checkForCrossover(lons, lats, times, ssts, fco2s);
 		if ( crossover != null ) {
 			// crossover found; add the expocodes, dataMinTimes, and dataMaxTimes
 			crossover.setExpocodes(upperExpos);
@@ -165,10 +165,10 @@ public class CrossoverChecker {
 	 * @throws IOException
 	 * 		if problems reading from any full-data DSG file
 	 */
-	public ArrayList<SocatCrossover> getCrossovers(String expocode, 
+	public ArrayList<Crossover> getCrossovers(String expocode, 
 			Iterable<String> checkExpos, PrintStream progressPrinter, long progStartMilliTime) 
 					throws IllegalArgumentException, FileNotFoundException, IOException {
-		ArrayList<SocatCrossover> crossList = new ArrayList<SocatCrossover>();
+		ArrayList<Crossover> crossList = new ArrayList<Crossover>();
 
 		String[] upperExpos = new String[2];
 		double[][] lons = new double[2][];
@@ -218,7 +218,7 @@ public class CrossoverChecker {
 			}
 
 			// Check for a crossover
-			SocatCrossover crossover = checkForCrossover(lons, lats, times, ssts, fco2s);
+			Crossover crossover = checkForCrossover(lons, lats, times, ssts, fco2s);
 			if ( crossover != null ) {
 				// crossover found; add the expocodes (only the values in the array are used)
 				crossover.setExpocodes(upperExpos);
@@ -263,7 +263,7 @@ public class CrossoverChecker {
 	 * 		if the number of longitude, latitude, time, SST, or 
 	 * 		fCO2_recommended data differ for a cruise 
 	 */
-	public static SocatCrossover checkForCrossover(double[][] longitudes, double[][] latitudes, 
+	public static Crossover checkForCrossover(double[][] longitudes, double[][] latitudes, 
 			double[][] times, double[][] ssts, double[][] fco2s) throws IllegalArgumentException {
 		if ( (longitudes == null) || (longitudes.length != 2) || 
 			 (longitudes[0] == null) || (longitudes[1] == null) )
@@ -291,8 +291,8 @@ public class CrossoverChecker {
 		if ( (fco2s[0].length != numRows[0]) || (fco2s[1].length != numRows[1]) )
 			throw new IllegalArgumentException("Sizes of longitudes and fco2s arrays do not match");
 
-		double minDistance = SocatCrossover.MAX_CROSSOVER_DIST;
-		SocatCrossover crossover = null;
+		double minDistance = Crossover.MAX_CROSSOVER_DIST;
+		Crossover crossover = null;
 		for (int j = 0; j < numRows[0]; j++) {
 			// Skip this point if any missing values
 			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, longitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
@@ -319,7 +319,7 @@ public class CrossoverChecker {
 				if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, fco2s[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
 
-				if ( times[1][k] > times[0][j] + SocatCrossover.MAX_TIME_DIFF ) {
+				if ( times[1][k] > times[0][j] + Crossover.MAX_TIME_DIFF ) {
 					/* 
 					 * The rest of the second cruise occurred far 
 					 * later than the point of first cruise.  
@@ -327,7 +327,7 @@ public class CrossoverChecker {
 					 */
 					 break;
 				}
-				if ( times[1][k] < times[0][j] - SocatCrossover.MAX_TIME_DIFF ) {
+				if ( times[1][k] < times[0][j] - Crossover.MAX_TIME_DIFF ) {
 					/* 
 					 * This point of the second cruise occurred far 
 					 * earlier than the point of the first cruise.
@@ -335,17 +335,17 @@ public class CrossoverChecker {
 					 */
 					continue;
 				}
-				if ( Math.abs(ssts[1][k] - ssts[0][j]) > SocatCrossover.MAX_TEMP_DIFF ) {
+				if ( Math.abs(ssts[1][k] - ssts[0][j]) > Crossover.MAX_TEMP_DIFF ) {
 					// SST difference too large.  
 					// Go on to the next point of the second cruise.
 					continue;
 				}
-				if ( Math.abs(fco2s[1][k] - fco2s[0][j]) > SocatCrossover.MAX_FCO2_DIFF ) {
+				if ( Math.abs(fco2s[1][k] - fco2s[0][j]) > Crossover.MAX_FCO2_DIFF ) {
 					// fCO2 difference too large.
 					// Go on to the next point of the second cruise.
 					continue;
 				}
-				if ( Math.abs(latitudes[1][k] - latitudes[0][j]) > SocatCrossover.MAX_LAT_DIFF ) {
+				if ( Math.abs(latitudes[1][k] - latitudes[0][j]) > Crossover.MAX_LAT_DIFF ) {
 					/*
 					 * Differences in latitudes are too large.
 					 * Go on to the next point of the second cruise. 
@@ -358,7 +358,7 @@ public class CrossoverChecker {
 				if ( locTimeDist < minDistance ) {
 					// Update this minimum distance and record the crossover
 					minDistance = locTimeDist;
-					crossover = new SocatCrossover();
+					crossover = new Crossover();
 					crossover.setMinDistance(minDistance);
 					crossover.setRowNumsAtMin(new Integer[] {j+1, k+1});
 					crossover.setLonsAtMin(new Double[] {longitudes[0][j], longitudes[1][k]});
@@ -373,9 +373,9 @@ public class CrossoverChecker {
 
 	/**
 	 * Returns the location-time "distance" between two location-time point.
-	 * Uses {@link SocatCrossover#SEAWATER_SPEED} for converting differences 
+	 * Uses {@link Crossover#SEAWATER_SPEED} for converting differences 
 	 * in time into distance.  Uses the haversine formula, and 
-	 * {@link SocatCrossover#EARTH_AUTHALIC_RADIUS} for the radius of a 
+	 * {@link Crossover#EARTH_AUTHALIC_RADIUS} for the radius of a 
 	 * spherical Earth, to compute the great circle distance from the 
 	 * longitudes and latitudes.
 	 * 
@@ -412,12 +412,12 @@ public class CrossoverChecker {
 		dellon *= dellon * Math.cos(lat1) * Math.cos(lat2);
 		double distance = 2.0 * Math.asin(Math.sqrt(dellon + dellat));
 		// Convert the great circle distance from radians to kilometers
-		distance *= SocatCrossover.EARTH_AUTHALIC_RADIUS;
+		distance *= Crossover.EARTH_AUTHALIC_RADIUS;
 
 		// Get the time difference in days (24 hours)
 		double deltime = (otherTime - time) / (24.0 * 60.0 * 60.0);
 		// Convert to the time difference to kilometers
-		deltime *= SocatCrossover.SEAWATER_SPEED;
+		deltime *= Crossover.SEAWATER_SPEED;
 		// Combine the time distance with the surface distance
 		distance = Math.sqrt(distance * distance + deltime * deltime);
 

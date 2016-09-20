@@ -14,8 +14,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DashboardCruiseList extends HashMap<String,DashboardCruise> 
-								implements Serializable, IsSerializable {
+public class DashboardCruiseList extends HashMap<String,DashboardCruise> implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = -5319194803938768319L;
 
@@ -63,7 +62,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 	}
 
 	/**
-	 * @param socatVersion 
+	 * @param version 
 	 * 		the SOCAT version to set; if null, set to an empty string
 	 */
 	public void setSocatVersion(String socatVersion) {
@@ -128,7 +127,7 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise>
 	@Override
 	public String toString() {
 		String repr = "DashboardCruiseList[ username=" + username + 
-					  ",\n    socatVersion=" + socatVersion + 
+					  ",\n    version=" + socatVersion + 
 					  ",\n    manager=" + Boolean.valueOf(manager).toString();
 		for ( String expocode : keySet() )
 			repr += ",\n    " + expocode + ":" + get(expocode).toString();

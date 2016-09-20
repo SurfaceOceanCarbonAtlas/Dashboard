@@ -11,7 +11,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1401,12 +1401,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		String newStatus;
 		// Special check for null or blank QC flag == not submitted
 		if ( (qcFlag == null) || Character.isWhitespace(qcFlag) ) {
-			newStatus = SocatQCEvent.QC_STATUS_NOT_SUBMITTED;
+			newStatus = QCEvent.QC_STATUS_NOT_SUBMITTED;
 		}
 		else {
-			newStatus = SocatQCEvent.FLAG_STATUS_MAP.get(qcFlag);
+			newStatus = QCEvent.FLAG_STATUS_MAP.get(qcFlag);
 			if ( newStatus == null ) {
-				// SocatQCEvent.QC_COMMENT or unknown flag
+				// QCEvent.QC_COMMENT or unknown flag
 				throw new IllegalArgumentException("Unexpected QC flag of '" + 
 						qcFlag + "' given to updateCruiseDashboardStatus");
 			}

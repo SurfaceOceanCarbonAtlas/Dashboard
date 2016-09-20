@@ -15,8 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SCMessageList extends HashSet<SCMessage> 
-							implements Serializable, IsSerializable {
+public class SCMessageList extends HashSet<SCMessage> implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = 7402339885946675181L;
 

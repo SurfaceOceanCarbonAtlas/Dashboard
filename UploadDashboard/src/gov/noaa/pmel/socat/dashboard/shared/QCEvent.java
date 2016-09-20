@@ -14,9 +14,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializable {
+public class QCEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2998774807126254182L;
+	private static final long serialVersionUID = 1603174921370614877L;
 
 	// All possible QC flags
 	public static final Character QC_A_FLAG = 'A';
@@ -24,10 +24,8 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	public static final Character QC_C_FLAG = 'C';
 	public static final Character QC_D_FLAG = 'D';
 	public static final Character QC_E_FLAG = 'E';
-	public static final Character QC_F_FLAG = 'F';
 	public static final Character QC_COMMENT = 'H';
 	public static final Character QC_NEW_FLAG = 'N';
-	public static final Character QC_PREVIEW_FLAG = 'P';
 	public static final Character QC_CONFLICT_FLAG = 'Q';
 	public static final Character QC_RENAMED_FLAG = 'R';
 	public static final Character QC_SUSPEND_FLAG = 'S';
@@ -36,7 +34,6 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 
 	// Cruise QC strings - cruises that can be modified
 	public static final String QC_STATUS_NOT_SUBMITTED = "";
-	public static final String QC_STATUS_PREVIEW = "Previewing";
 	public static final String QC_STATUS_SUSPENDED = "Suspended";
 	public static final String QC_STATUS_EXCLUDED = "Excluded";
 
@@ -47,7 +44,6 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	public static final String QC_STATUS_ACCEPTED_C = "Flag C";
 	public static final String QC_STATUS_ACCEPTED_D = "Flag D";
 	public static final String QC_STATUS_ACCEPTED_E = "Flag E";
-	public static final String QC_STATUS_UNACCEPTABLE = "Unacceptable";
 	public static final String QC_STATUS_CONFLICT = "Conflict";
 	public static final String QC_STATUS_RENAMED = "Renamed";
 
@@ -62,9 +58,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		FLAG_STATUS_MAP.put(QC_C_FLAG, QC_STATUS_ACCEPTED_C);
 		FLAG_STATUS_MAP.put(QC_D_FLAG, QC_STATUS_ACCEPTED_D);
 		FLAG_STATUS_MAP.put(QC_E_FLAG, QC_STATUS_ACCEPTED_E);
-		FLAG_STATUS_MAP.put(QC_F_FLAG, QC_STATUS_UNACCEPTABLE);
 		FLAG_STATUS_MAP.put(QC_NEW_FLAG, QC_STATUS_SUBMITTED);
-		FLAG_STATUS_MAP.put(QC_PREVIEW_FLAG, QC_STATUS_PREVIEW);
 		FLAG_STATUS_MAP.put(QC_CONFLICT_FLAG, QC_STATUS_CONFLICT);
 		FLAG_STATUS_MAP.put(QC_RENAMED_FLAG, QC_STATUS_RENAMED);
 		FLAG_STATUS_MAP.put(QC_SUSPEND_FLAG, QC_STATUS_SUSPENDED);
@@ -84,8 +78,6 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_C, QC_C_FLAG);
 		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_D, QC_D_FLAG);
 		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_E, QC_E_FLAG);
-		STATUS_FLAG_MAP.put(QC_STATUS_UNACCEPTABLE, QC_F_FLAG);
-		STATUS_FLAG_MAP.put(QC_STATUS_PREVIEW, QC_PREVIEW_FLAG);
 		STATUS_FLAG_MAP.put(QC_STATUS_CONFLICT, QC_CONFLICT_FLAG);
 		STATUS_FLAG_MAP.put(QC_STATUS_RENAMED, QC_RENAMED_FLAG);
 		STATUS_FLAG_MAP.put(QC_STATUS_SUSPENDED, QC_SUSPEND_FLAG);
@@ -98,7 +90,7 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 	/**
 	 * Creates an empty QC flag as a comment in the global region 
 	 */
-	public SocatQCEvent() {
+	public QCEvent() {
 		super();
 		flag = QC_COMMENT;
 		regionID = DataLocation.GLOBAL_REGION_ID;
@@ -159,9 +151,9 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatQCEvent) )
+		if ( ! (obj instanceof QCEvent) )
 			return false;
-		SocatQCEvent other = (SocatQCEvent) obj;
+		QCEvent other = (QCEvent) obj;
 
 		if ( ! super.equals(other) )
 			return false;
@@ -175,12 +167,12 @@ public class SocatQCEvent extends SocatEvent implements Serializable, IsSerializ
 
 	@Override
 	public String toString() {
-		return "SocatQCEvent" +
+		return "QCEvent" +
 				"[\n    id=" + id.toString() +
 				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
+				",\n    version=" + version.toString() + 
 				",\n    regionID='" + regionID.toString() + "'" + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 

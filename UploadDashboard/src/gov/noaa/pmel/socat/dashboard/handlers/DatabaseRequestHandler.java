@@ -3,11 +3,11 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -368,7 +368,7 @@ public class DatabaseRequestHandler {
 	 * 		if accessing or updating the database throws one, or
 	 * 		if the reviewer cannot be found in the reviewers table.
 	 */
-	public void addQCEvent(SocatQCEvent qcEvent) throws SQLException {
+	public void addQCEvent(QCEvent qcEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
 			int reviewerId = getReviewerId(catConn, 
@@ -418,7 +418,7 @@ public class DatabaseRequestHandler {
 		try {
 			PreparedStatement removeCoastalPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
 					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('" + 
-					SocatQCEvent.QC_NEW_FLAG + "','" + SocatQCEvent.QC_UPDATED_FLAG + 
+					QCEvent.QC_NEW_FLAG + "','" + QCEvent.QC_UPDATED_FLAG + 
 					"') AND `region_id` = '" + DataLocation.COASTAL_REGION_ID + 
 					"' AND `qc_comment` LIKE 'Initial%'");
 			removeCoastalPrepStmt.setString(1, expocode);
@@ -433,7 +433,7 @@ public class DatabaseRequestHandler {
 	/**
 	 * Get "the" QC flag for a dataset.  If the latest QC flag for different 
 	 * regions are in conflict, and a global flag does not later resolve
-	 * this conflict, the {@link SocatQCEvent#QC_CONFLICT_FLAG} flag is 
+	 * this conflict, the {@link QCEvent#QC_CONFLICT_FLAG} flag is 
 	 * returned.
 	 * 
 	 * @param expocode
@@ -445,7 +445,7 @@ public class DatabaseRequestHandler {
 	 * 		if the QC flags in the dataset are corrupt.
 	 */
 	public Character getQCFlag(String expocode) throws SQLException {
-		HashMap<Character,SocatQCEvent> regionFlags = new HashMap<Character,SocatQCEvent>();
+		HashMap<Character,QCEvent> regionFlags = new HashMap<Character,QCEvent>();
 		long lastUpdateTime = MIN_FLAG_SEC_TIME * 1000L;
 		Connection catConn = makeConnection(false);
 		try {
@@ -463,12 +463,12 @@ public class DatabaseRequestHandler {
 					flagStr = flagStr.trim();
 					// Should not be blank, but might be from older code for a comment
 					if ( (flagStr.length() < 1) || 
-						 flagStr.equals(SocatQCEvent.QC_COMMENT.toString()) ||
-						 flagStr.equals(SocatQCEvent.QC_RENAMED_FLAG.toString()) )
+						 flagStr.equals(QCEvent.QC_COMMENT.toString()) ||
+						 flagStr.equals(QCEvent.QC_RENAMED_FLAG.toString()) )
 						continue;
 					Character flag = flagStr.charAt(0);
 					if ( (flagStr.length() > 1) ||
-						 (SocatQCEvent.FLAG_STATUS_MAP.get(flag) == null) ) 
+						 (QCEvent.FLAG_STATUS_MAP.get(flag) == null) ) 
 						throw new SQLException("Unexpected QC flag of '" + flagStr + "'");
 					long time = rslts.getLong(2);
 					if ( time < MIN_FLAG_SEC_TIME )
@@ -486,11 +486,11 @@ public class DatabaseRequestHandler {
 						 (DataLocation.REGION_NAMES.get(regionID) == null) )
 						throw new SQLException("Unexpected region ID of '" + region + "'");
 					if ( DataLocation.GLOBAL_REGION_ID.equals(regionID) && 
-						 ( SocatQCEvent.QC_NEW_FLAG.equals(flag) || 
-						   SocatQCEvent.QC_UPDATED_FLAG.equals(flag) ) ) {
+						 ( QCEvent.QC_NEW_FLAG.equals(flag) || 
+						   QCEvent.QC_UPDATED_FLAG.equals(flag) ) ) {
 						lastUpdateTime = time;
 					}
-					SocatQCEvent qcFlag = new SocatQCEvent();
+					QCEvent qcFlag = new QCEvent();
 					qcFlag.setFlag(flag);
 					qcFlag.setFlagDate(new Date(time));
 					qcFlag.setRegionID(regionID);
@@ -505,12 +505,12 @@ public class DatabaseRequestHandler {
 		}
 
 		// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
-		SocatQCEvent globalEvent = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
+		QCEvent globalEvent = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
 		Character globalFlag;
 		long globalTime;
 		if ( globalEvent == null ) {
 			// Some v1 cruises do not have global flags
-			globalFlag = SocatQCEvent.QC_NEW_FLAG;
+			globalFlag = QCEvent.QC_NEW_FLAG;
 			globalTime = lastUpdateTime;
 		}
 		else {
@@ -523,12 +523,12 @@ public class DatabaseRequestHandler {
 		// (2) all region flags are after global flag and match, or
 		// (3) region flags after global flag match global flag  
 		Character latestFlag = null;
-		for ( Entry<Character,SocatQCEvent> regionEntry : regionFlags.entrySet() ) {
+		for ( Entry<Character,QCEvent> regionEntry : regionFlags.entrySet() ) {
 			// Just compare non-global entries
 			if ( DataLocation.GLOBAL_REGION_ID.equals(regionEntry.getKey()) )
 				continue;
 			// Ignore regional flags assigned (more than 1 s) before the last update
-			SocatQCEvent qcEvent = regionEntry.getValue();
+			QCEvent qcEvent = regionEntry.getValue();
 			long time = qcEvent.getFlagDate().getTime();
 			if  ( time - lastUpdateTime < -1000L )
 				continue;
@@ -545,7 +545,7 @@ public class DatabaseRequestHandler {
 				latestFlag = flag;
 			}
 			else if ( ! latestFlag.equals(flag) ) {
-				return SocatQCEvent.QC_CONFLICT_FLAG;
+				return QCEvent.QC_CONFLICT_FLAG;
 			}
 		}
 		if ( latestFlag == null ) {
@@ -580,8 +580,8 @@ public class DatabaseRequestHandler {
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
 					"SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME + 
 					"` WHERE `expocode` = ? AND `region_id` = '" + DataLocation.GLOBAL_REGION_ID +
-					"' AND `qc_flag` IN ('" + SocatQCEvent.QC_NEW_FLAG + 
-					"', '" + SocatQCEvent.QC_UPDATED_FLAG + "');");
+					"' AND `qc_flag` IN ('" + QCEvent.QC_NEW_FLAG + 
+					"', '" + QCEvent.QC_UPDATED_FLAG + "');");
 			getPrepStmt.setString(1, expocode);
 			ResultSet rslts = getPrepStmt.executeQuery();
 			try {
@@ -620,7 +620,7 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Creates a SocatQCEvent object from the values in the current row 
+	 * Creates a QCEvent object from the values in the current row 
 	 * of a ResultSet.
 	 * 
 	 * @param results
@@ -632,8 +632,8 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if getting values from the ResultSet throws one
 	 */
-	private SocatQCEvent createQCEvent(ResultSet results) throws SQLException {
-		SocatQCEvent qcEvent = new SocatQCEvent();
+	private QCEvent createQCEvent(ResultSet results) throws SQLException {
+		QCEvent qcEvent = new QCEvent();
 		Long id = results.getLong("qc_id");
 		if ( id < 1L )
 			throw new SQLException("Unexpected invalid qc_id");
@@ -676,8 +676,8 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<SocatQCEvent> getQCEvents(String expocode) throws SQLException {
-		ArrayList<SocatQCEvent> eventsList = new ArrayList<SocatQCEvent>();
+	public ArrayList<QCEvent> getQCEvents(String expocode) throws SQLException {
+		ArrayList<QCEvent> eventsList = new ArrayList<QCEvent>();
 		Connection catConn = makeConnection(false);
 		try {
 			PreparedStatement prepStmt = catConn.prepareStatement(
@@ -713,7 +713,7 @@ public class DatabaseRequestHandler {
 	 * 		if the reviewer cannot be found in the reviewers table, or
 	 * 		if a problem occurs adding the WOCE event
 	 */
-	public void addWoceEvent(SocatWoceEvent woceEvent) throws SQLException {
+	public void addWoceEvent(WoceEvent woceEvent) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
 			int reviewerId = getReviewerId(catConn, 
@@ -731,7 +731,7 @@ public class DatabaseRequestHandler {
 				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			prepStmt.setString(3, woceEvent.getExpocode());
 			prepStmt.setString(4, woceEvent.getSocatVersion());
-			prepStmt.setString(5, woceEvent.getDataVarName());
+			prepStmt.setString(5, woceEvent.getVarName());
 			prepStmt.setInt(6, reviewerId);
 			prepStmt.setString(7, woceEvent.getComment());
 			if ( prepStmt.executeUpdate() != 1 )
@@ -791,7 +791,7 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Creates a SocatWoceEvent without any locations 
+	 * Creates a WoceEvent without any locations 
 	 * from the values in the current row of a ResultSet.
 	 * 
 	 * @param results
@@ -804,8 +804,8 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if getting values from the ResultSet throws one
 	 */
-	private SocatWoceEvent createWoceEvent(ResultSet results) throws SQLException {
-		SocatWoceEvent woceEvent = new SocatWoceEvent();
+	private WoceEvent createWoceEvent(ResultSet results) throws SQLException {
+		WoceEvent woceEvent = new WoceEvent();
 		Long id = results.getLong("woce_id");
 		if ( id < 1 )
 			throw new SQLException("Unexpected invalid woce_id");
@@ -824,7 +824,7 @@ public class DatabaseRequestHandler {
 		woceEvent.setSocatVersion(results.getString("socat_version"));
 		if ( results.wasNull() )
 			woceEvent.setSocatVersion(null);
-		woceEvent.setDataVarName(results.getString("data_name"));
+		woceEvent.setVarName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
 		woceEvent.setRealname(results.getString("realname"));
 		woceEvent.setComment(results.getString("woce_comment"));
@@ -883,9 +883,9 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if accessing the database or reading the results throws one
 	 */
-	public ArrayList<SocatWoceEvent> getWoceEvents(String expocode, 
+	public ArrayList<WoceEvent> getWoceEvents(String expocode, 
 									boolean latestFirst) throws SQLException {
-		ArrayList<SocatWoceEvent> eventsList = new ArrayList<SocatWoceEvent>();
+		ArrayList<WoceEvent> eventsList = new ArrayList<WoceEvent>();
 		Connection catConn = makeConnection(false);
 		try {
 			String order;
@@ -910,7 +910,7 @@ public class DatabaseRequestHandler {
 			}
 			prepStmt = catConn.prepareStatement("SELECT * FROM `" + WOCELOCATIONS_TABLE_NAME + 
 					"` WHERE `woce_id` = ? ORDER BY `row_num`;");
-			for (SocatWoceEvent event : eventsList) {
+			for (WoceEvent event : eventsList) {
 				// Directly modify the list of locations in the WOCE event
 				ArrayList<DataLocation> locations = event.getLocations();
 				prepStmt.setLong(1, event.getId());
@@ -947,24 +947,24 @@ public class DatabaseRequestHandler {
 					"WHERE `expocode` = ? AND `woce_flag` = ?;");
 			modifyWocePrepStmt.setString(2, expocode);
 
-			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_GOOD.toString());
-			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_GOOD.toString());
+			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_GOOD.toString());
+			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_GOOD.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_NOT_CHECKED.toString());
-			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_NOT_CHECKED.toString());
+			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_NOT_CHECKED.toString());
+			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_NOT_CHECKED.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_QUESTIONABLE.toString());
-			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_QUESTIONABLE.toString());
+			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_QUESTIONABLE.toString());
+			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_QUESTIONABLE.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_BAD.toString());
-			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_BAD.toString());
+			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_BAD.toString());
+			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_BAD.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, SocatWoceEvent.OLD_WOCE_NO_DATA.toString());
-			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_NO_DATA.toString());
+			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_NO_DATA.toString());
+			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_NO_DATA.toString());
 			modifyWocePrepStmt.executeUpdate();
 		} finally {
 			catConn.close();
@@ -987,27 +987,27 @@ public class DatabaseRequestHandler {
 	 * @throws SQLException
 	 * 		if modifying the WOCE event in the database throws one
 	 */
-	public Character restoreWoceEvent(SocatWoceEvent woceEvent) 
+	public Character restoreWoceEvent(WoceEvent woceEvent) 
 								throws IllegalArgumentException, SQLException {
 		if ( woceEvent.getId() < 1 )
 			throw new IllegalArgumentException("Invalid ID for WOCE event");
 
 		Character newFlag;
 		Character oldFlag = woceEvent.getFlag();
-		if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_GOOD) ) {
-			newFlag = SocatWoceEvent.WOCE_GOOD;
+		if ( oldFlag.equals(WoceEvent.OLD_WOCE_GOOD) ) {
+			newFlag = WoceEvent.WOCE_GOOD;
 		}
-		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_NOT_CHECKED) ) {
-			newFlag = SocatWoceEvent.WOCE_NOT_CHECKED;
+		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_NOT_CHECKED) ) {
+			newFlag = WoceEvent.WOCE_NOT_CHECKED;
 		}
-		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_QUESTIONABLE) ) {
-			newFlag = SocatWoceEvent.WOCE_QUESTIONABLE;
+		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_QUESTIONABLE) ) {
+			newFlag = WoceEvent.WOCE_QUESTIONABLE;
 		}
-		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_BAD) ) {
-			newFlag = SocatWoceEvent.WOCE_BAD;
+		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_BAD) ) {
+			newFlag = WoceEvent.WOCE_BAD;
 		}
-		else if ( oldFlag.equals(SocatWoceEvent.OLD_WOCE_NO_DATA) ) {
-			newFlag = SocatWoceEvent.WOCE_NO_DATA;
+		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_NO_DATA) ) {
+			newFlag = WoceEvent.WOCE_NO_DATA;
 		}
 		else {
 			throw new IllegalArgumentException("Invalid \"old\" WOCE flag of '" + oldFlag + "'");
@@ -1045,7 +1045,7 @@ public class DatabaseRequestHandler {
 	 * 		standardized old expocode 
 	 * @param newExpocode
 	 * 		standardized new expocode
-	 * @param socatVersion
+	 * @param version
 	 * 		SOCAT version to associate with the rename QC and WOCE events
 	 * @param username
 	 * 		name of the user to associate with the rename QC and WOCE events 
@@ -1067,7 +1067,7 @@ public class DatabaseRequestHandler {
 					"WHERE `expocode` = ? AND `qc_flag` <> ?;");
 			modifyQcPrepStmt.setString(1, newExpocode);
 			modifyQcPrepStmt.setString(2, oldExpocode);
-			modifyQcPrepStmt.setString(3, SocatQCEvent.QC_RENAMED_FLAG.toString());
+			modifyQcPrepStmt.setString(3, QCEvent.QC_RENAMED_FLAG.toString());
 			modifyQcPrepStmt.executeUpdate();
 			int updateCount = modifyQcPrepStmt.getUpdateCount();
 			if ( updateCount < 0 )
@@ -1083,9 +1083,9 @@ public class DatabaseRequestHandler {
 					"INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
 					"`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
-			addQcPrepStmt.setString(1, SocatQCEvent.QC_RENAMED_FLAG.toString());
-			addQcPrepStmt.setString(8, SocatQCEvent.QC_RENAMED_FLAG.toString());
-			addQcPrepStmt.setString(15, SocatQCEvent.QC_COMMENT.toString());
+			addQcPrepStmt.setString(1, QCEvent.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(8, QCEvent.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(15, QCEvent.QC_COMMENT.toString());
 			addQcPrepStmt.setLong(2, nowSec);
 			addQcPrepStmt.setLong(9, nowSec);
 			addQcPrepStmt.setLong(16, nowSec);
@@ -1112,7 +1112,7 @@ public class DatabaseRequestHandler {
 					"WHERE `expocode` = ? AND `woce_flag` <> ?;");
 			modifyWocePrepStmt.setString(1, newExpocode);
 			modifyWocePrepStmt.setString(2, oldExpocode);
-			modifyWocePrepStmt.setString(3, SocatWoceEvent.WOCE_RENAME.toString());
+			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_RENAME.toString());
 			modifyWocePrepStmt.executeUpdate();
 
 			// Add two rename WOCE events; one for the old expocode and one for the new expocode
@@ -1120,8 +1120,8 @@ public class DatabaseRequestHandler {
 					WOCEEVENTS_TABLE_NAME + "` (`woce_flag`, `woce_time`, `expocode`, " +
 					"`socat_version`, `reviewer_id`, `woce_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);");
-			addWocePrepStmt.setString(1, SocatWoceEvent.WOCE_RENAME.toString());
-			addWocePrepStmt.setString(7, SocatWoceEvent.WOCE_RENAME.toString());
+			addWocePrepStmt.setString(1, WoceEvent.WOCE_RENAME.toString());
+			addWocePrepStmt.setString(7, WoceEvent.WOCE_RENAME.toString());
 			addWocePrepStmt.setLong(2, nowSec);
 			addWocePrepStmt.setLong(8, nowSec);
 			addWocePrepStmt.setString(3, oldExpocode);
@@ -1143,7 +1143,7 @@ public class DatabaseRequestHandler {
 	 * 
 	 * @param expocode
 	 * 		expocode to use
-	 * @param socatVersion
+	 * @param version
 	 * 		socat version to use
 	 * @throws SQLException
 	 * 		if generating the prepared statements or deleting the flags throws one

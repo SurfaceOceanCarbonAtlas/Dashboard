@@ -16,7 +16,7 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.SCMessageList;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -37,8 +37,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  * 
  * @author Karl Smith
  */
-public class DashboardServices extends RemoteServiceServlet
-								implements DashboardServicesInterface {
+public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
 	private static final long serialVersionUID = 4238185873850896369L;
 
@@ -271,12 +270,12 @@ public class DashboardServices extends RemoteServiceServlet
 									deleteFilename + " from cruise " + expocode);
 		// If submitted cruise, add QC update ('U') global flag about removal of metadata
 		if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
-			SocatQCEvent qcEvent = new SocatQCEvent();
+			QCEvent qcEvent = new QCEvent();
 			qcEvent.setExpocode(expocode);
-			qcEvent.setFlag(SocatQCEvent.QC_UPDATED_FLAG);
+			qcEvent.setFlag(QCEvent.QC_UPDATED_FLAG);
 			qcEvent.setFlagDate(new Date());
 			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-			qcEvent.setSocatVersion(configStore.getSocatUploadVersion());
+			qcEvent.setVersion(configStore.getSocatUploadVersion());
 			qcEvent.setUsername(username);
 			String comment = "Deleted metadata file \"" + deleteFilename + 
 					"\".  Data and WOCE flags were not changed.";
@@ -286,7 +285,7 @@ public class DashboardServices extends RemoteServiceServlet
 				configStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
 				configStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
 				// Update the dashboard status for the 'U' QC flag
-				cruise.setQcStatus(SocatQCEvent.QC_STATUS_SUBMITTED);
+				cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
 				if ( cruise.isEditable() == null ) {
 					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 				}
@@ -376,8 +375,6 @@ public class DashboardServices extends RemoteServiceServlet
 					newSpecs.getDataColTypes().size() + " instead of " + 
 					cruiseData.getDataColTypes().size());
 		cruiseData.setDataColTypes(newSpecs.getDataColTypes());
-		cruiseData.setDataColUnits(newSpecs.getDataColUnits());
-		cruiseData.setMissingValues(newSpecs.getMissingValues());
 
 		// Run the SanityCheck on the updated cruise.
 		// Assigns the data check status and the WOCE-3 and WOCE-4 data flags.

@@ -1,6 +1,8 @@
 /**
  */
-package gov.noaa.pmel.socat.dashboard.shared;
+package gov.noaa.pmel.socat.dashboard.server;
+
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,20 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8632155495490906964L;
-
-	/**
-	 * Date used as a missing value; 
-	 * corresponds to Jan 2, 3000 00:00:00 GMT
-	 */
-	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
-
-	/**
-	 * String separating each PI listed in scienceGroup, each organization 
-	 * listed in organizations, and each additional document filename listed 
-	 * in addlDocs.  This is cannot be a semicolon due to Ferret issues.
-	 */
-	public static final String NAMES_SEPARATOR = " : ";
+	private static final long serialVersionUID = 3695681255935683044L;
 
 	String expocode;
 	String cruiseName;
@@ -54,12 +43,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 		cruiseName = "";
 		vesselName = "";
 		organization = "";
-		westmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
-		eastmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
-		southmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
-		northmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
-		beginTime = DATE_MISSING_VALUE;
-		endTime = DATE_MISSING_VALUE;
+		westmostLongitude = DashboardUtils.FP_MISSING_VALUE;
+		eastmostLongitude = DashboardUtils.FP_MISSING_VALUE;
+		southmostLatitude = DashboardUtils.FP_MISSING_VALUE;
+		northmostLatitude = DashboardUtils.FP_MISSING_VALUE;
+		beginTime = DashboardUtils.DATE_MISSING_VALUE;
+		endTime = DashboardUtils.DATE_MISSING_VALUE;
 		scienceGroup = "";
 		socatVersion = "";
 		allRegionIDs = "";
@@ -154,7 +143,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the west-most longitude for the cruise;
-	 * 		never null could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
+	 * 		never null could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getWestmostLongitude() {
 		return westmostLongitude;
@@ -163,11 +152,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param westmostLongitude 
 	 * 		the west-most longitude to set;
-	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
 	 */
 	public void setWestmostLongitude(Double westmostLongitude) {
 		if ( westmostLongitude == null )
-			this.westmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
+			this.westmostLongitude = DashboardUtils.FP_MISSING_VALUE;
 		else 
 			this.westmostLongitude = westmostLongitude;
 	}
@@ -175,7 +164,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the east-most longitude for the cruise;
-	 * 		never null but could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
+	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getEastmostLongitude() {
 		return eastmostLongitude;
@@ -184,11 +173,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param eastmostLongitude 
 	 * 		the east-most longitude to set;
-	 * 		if null, {@link SocatCruiseData.FP_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils.FP_MISSING_VALUE} is assigned
 	 */
 	public void setEastmostLongitude(Double eastmostLongitude) {
 		if ( eastmostLongitude == null )
-			this.eastmostLongitude = SocatCruiseData.FP_MISSING_VALUE;
+			this.eastmostLongitude = DashboardUtils.FP_MISSING_VALUE;
 		else
 			this.eastmostLongitude = eastmostLongitude;
 	}
@@ -196,7 +185,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the south-most latitude for the cruise;
-	 * 		never null but could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
+	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getSouthmostLatitude() {
 		return southmostLatitude;
@@ -205,11 +194,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param southmostLatitude 
 	 * 		the south-most latitude to set;
-	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
 	 */
 	public void setSouthmostLatitude(Double southmostLatitude) {
 		if ( southmostLatitude == null )
-			this.southmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
+			this.southmostLatitude = DashboardUtils.FP_MISSING_VALUE;
 		else
 			this.southmostLatitude = southmostLatitude;
 	}
@@ -217,7 +206,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the south-most latitude for the cruise;
-	 * 		never null but could be {@link SocatCruiseData#FP_MISSING_VALUE} if not assigned.
+	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getNorthmostLatitude() {
 		return northmostLatitude;
@@ -226,11 +215,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param northmostLatitude 
 	 * 		the north-most latitude to set;
-	 * 		if null, {@link SocatCruiseData#FP_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
 	 */
 	public void setNorthmostLatitude(Double northmostLatitude) {
 		if ( northmostLatitude == null )
-			this.northmostLatitude = SocatCruiseData.FP_MISSING_VALUE;
+			this.northmostLatitude = DashboardUtils.FP_MISSING_VALUE;
 		else
 			this.northmostLatitude = northmostLatitude;
 	}
@@ -238,7 +227,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the beginning time for the cruise;
-	 * 		never null but could be {@link #DATE_MISSING_VALUE} if not assigned.
+	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getBeginTime() {
 		return beginTime;
@@ -247,11 +236,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param beginTime 
 	 * 		the beginning time for the cruise to set;
-	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
 	 */
 	public void setBeginTime(Date beginTime) {
 		if ( beginTime == null )
-			this.beginTime = DATE_MISSING_VALUE;
+			this.beginTime = DashboardUtils.DATE_MISSING_VALUE;
 		else 
 			this.beginTime = beginTime;
 	}
@@ -259,7 +248,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @return
 	 * 		the ending time for the cruise;
-	 * 		never null but could be {@link #DATE_MISSING_VALUE} if not assigned.
+	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getEndTime() {
 		return endTime;
@@ -268,11 +257,11 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	/**
 	 * @param endTime 
 	 * 		the ending time for the cruise to set;
-	 * 		if null, {@link #DATE_MISSING_VALUE} is assigned
+	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
 	 */
 	public void setEndTime(Date endTime) {
 		if ( endTime == null )
-			this.endTime = DATE_MISSING_VALUE;
+			this.endTime = DashboardUtils.DATE_MISSING_VALUE;
 		else 
 			this.endTime = endTime;
 	}
@@ -320,7 +309,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * from a previous SOCAT version.  Updates within a SOCAT version
 	 * do NOT change an 'N' to a 'U'.
 	 * 
-	 * @param socatVersion 
+	 * @param version 
 	 * 		the SOCAT version number and status to set; 
 	 * 		if null, an empty string is assigned
 	 */
@@ -480,16 +469,18 @@ public class SocatMetadata implements Serializable, IsSerializable {
 
 		// Floating-point comparisons
 		if ( ! DashboardUtils.closeTo(southmostLatitude, 
-				other.southmostLatitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+				other.southmostLatitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(northmostLatitude, 
-				other.northmostLatitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+				other.northmostLatitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( ! DashboardUtils.longitudeCloseTo(westmostLongitude, other.westmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.longitudeCloseTo(westmostLongitude, other.westmostLongitude, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
-		if ( ! DashboardUtils.longitudeCloseTo(eastmostLongitude, other.eastmostLongitude, 0.0, SocatCruiseData.MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.longitudeCloseTo(eastmostLongitude, other.eastmostLongitude, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		return true;
@@ -508,7 +499,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 				",\n    startDate=" + beginTime.toString() + 
 				",\n    endDate=" + endTime.toString() + 
 				",\n    scienceGroup=" + scienceGroup + 
-				",\n    socatVersion=" + socatVersion + 
+				",\n    version=" + socatVersion + 
 				",\n    allRegionIDs=" + allRegionIDs + 
 				",\n    socatDOI=" + socatDOI + 
 				",\n    qcFlag=" + qcFlag + 

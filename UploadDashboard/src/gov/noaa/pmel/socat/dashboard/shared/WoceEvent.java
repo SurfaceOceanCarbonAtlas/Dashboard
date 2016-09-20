@@ -14,9 +14,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerializable {
+public class WoceEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5143559362703940885L;
+	private static final long serialVersionUID = -4562962135016168711L;
 
 	public static final String PI_PROVIDED_WOCE_COMMENT_START = "PI provided WOCE-";
 
@@ -38,16 +38,16 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	public static final Character WOCE_RENAME = 'R';
 
 	Character flag;
-	String dataVarName;
+	String varName;
 	ArrayList<DataLocation> locations;
 
 	/**
 	 * Creates an empty WOCE event with flag {@link #WOCE_NOT_CHECKED}
 	 */
-	public SocatWoceEvent() {
+	public WoceEvent() {
 		super();
 		flag = WOCE_NOT_CHECKED;
-		dataVarName = "";
+		varName = "";
 		locations = new ArrayList<DataLocation>();
 	}
 
@@ -75,20 +75,20 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 	 * 		the data variable name in the DSG file;
 	 * 		never null but may be empty
 	 */
-	public String getDataVarName() {
-		return dataVarName;
+	public String getVarName() {
+		return varName;
 	}
 
 	/**
-	 * @param dataVarName 
+	 * @param varName 
 	 * 		the data variable name in the DSG file to set;
 	 * 		if null, an empty string is assigned.
 	 */
-	public void setDataVarName(String dataVarName) {
-		if ( dataVarName == null )
-			this.dataVarName = "";
+	public void setVarName(String varName) {
+		if ( varName == null )
+			this.varName = "";
 		else
-			this.dataVarName = dataVarName;
+			this.varName = varName;
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 		final int prime = 37;
 		int result = super.hashCode();
 		result = result * prime + flag.hashCode();
-		result = result * prime + dataVarName.hashCode();
+		result = result * prime + varName.hashCode();
 		result = result * prime + locations.hashCode();
 		return result;
 	}
@@ -130,15 +130,15 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatWoceEvent) )
+		if ( ! (obj instanceof WoceEvent) )
 			return false;
-		SocatWoceEvent other = (SocatWoceEvent) obj;
+		WoceEvent other = (WoceEvent) obj;
 
 		if ( ! super.equals(other) )
 			return false;
 		if ( ! flag.equals(other.flag) )
 			return false;
-		if ( ! dataVarName.equals(other.dataVarName) )
+		if ( ! varName.equals(other.varName) )
 			return false;
 		if ( ! locations.equals(other.locations) )
 			return false;
@@ -148,13 +148,13 @@ public class SocatWoceEvent extends SocatEvent implements Serializable, IsSerial
 
 	@Override
 	public String toString() {
-		return "SocatWoceEvent" +
+		return "WoceEvent" +
 				"[\n    id=" + id.toString() +
 				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
-				",\n    dataVarName=" + dataVarName.toString() + 
+				",\n    version=" + version.toString() + 
+				",\n    varName=" + varName.toString() + 
 				",\n    locations=" + locations.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 

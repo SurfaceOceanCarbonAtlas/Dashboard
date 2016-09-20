@@ -9,14 +9,14 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Base class for SocatQCEvent and SocatWoceEvent.  
+ * Base class for QCEvent and WoceEvent.  
  * Note that the id field is ignored in the hashCode and equals methods.
  * 
  * @author Karl Smith
  */
-public class SocatEvent implements Serializable, IsSerializable {
+public class DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 5502327863986841337L;
+	private static final long serialVersionUID = -6527780793453412746L;
 
 	// Sanity Checker "username" and "realname" for flags
 	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
@@ -25,7 +25,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 	Long id;
 	Date flagDate;
 	String expocode;
-	String socatVersion;
+	String version;
 	String username;
 	String realname;
 	String comment;
@@ -33,11 +33,11 @@ public class SocatEvent implements Serializable, IsSerializable {
 	/**
 	 * Creates an empty flag
 	 */
-	public SocatEvent() {
+	public DashboardEvent() {
 		id = 0L;
-		flagDate = SocatMetadata.DATE_MISSING_VALUE;
+		flagDate = DashboardUtils.DATE_MISSING_VALUE;
 		expocode = "";
-		socatVersion = "";
+		version = "";
 		username = "";
 		realname = "";
 		comment = "";
@@ -65,7 +65,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the date of the flag; never null 
-	 * 		but may be {@link SocatMetadata#DATE_MISSING_VALUE}
+	 * 		but may be {@link DashboardUtils#DATE_MISSING_VALUE}
 	 */
 	public Date getFlagDate() {
 		return flagDate;
@@ -73,11 +73,11 @@ public class SocatEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param flagDate 
-	 * 		the date of the flag to set; if null, {@link SocatMetadata#DATE_MISSING_VALUE}
+	 * 		the date of the flag to set; if null, {@link DashboardUtils#DATE_MISSING_VALUE}
 	 */
 	public void setFlagDate(Date flagDate) {
 		if ( flagDate == null )
-			this.flagDate = SocatMetadata.DATE_MISSING_VALUE;
+			this.flagDate = DashboardUtils.DATE_MISSING_VALUE;
 		else
 			this.flagDate = flagDate;
 	}
@@ -103,21 +103,21 @@ public class SocatEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the SOCAT version; never null but may be empty
+	 * 		the data collection version; never null but may be empty
 	 */
-	public String getSocatVersion() {
-		return socatVersion;
+	public String getVersion() {
+		return version;
 	}
 
 	/**
-	 * @param socatVersion 
-	 * 		the SOCAT version to set; if null, an empty string is assigned
+	 * @param version 
+	 * 		the data collection version to set; if null, an empty string is assigned
 	 */
-	public void setSocatVersion(String socatVersion) {
-		if ( socatVersion == null )
-			this.socatVersion = "";
+	public void setVersion(String version) {
+		if ( version == null )
+			this.version = "";
 		else
-			this.socatVersion = socatVersion;
+			this.version = version;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class SocatEvent implements Serializable, IsSerializable {
 		final int prime = 37;
 		int result = flagDate.hashCode();
 		result = result * prime + expocode.hashCode();
-		result = result * prime + socatVersion.hashCode();
+		result = result * prime + version.hashCode();
 		result = result * prime + username.hashCode();
 		result = result * prime + realname.hashCode();
 		result = result * prime + comment.hashCode();
@@ -196,15 +196,15 @@ public class SocatEvent implements Serializable, IsSerializable {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatEvent) )
+		if ( ! (obj instanceof DashboardEvent) )
 			return false;
-		SocatEvent other = (SocatEvent) obj;
+		DashboardEvent other = (DashboardEvent) obj;
 
 		if ( ! flagDate.equals(other.flagDate) )
 			return false;
 		if ( ! expocode.equals(other.expocode) )
 			return false;
-		if ( ! socatVersion.equals(other.socatVersion) )
+		if ( ! version.equals(other.version) )
 			return false;
 		if ( ! username.equals(other.username) )
 			return false;
@@ -218,11 +218,11 @@ public class SocatEvent implements Serializable, IsSerializable {
 
 	@Override
 	public String toString() {
-		return "SocatEvent" +
+		return "DashboardEvent" +
 				"[\n    id=" + id.toString() +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 
-				",\n    socatVersion=" + socatVersion.toString() + 
+				",\n    version=" + version.toString() + 
 				",\n    username=" + username + 
 				",\n    realname=" + realname + 
 				",\n    comment=" + comment + 

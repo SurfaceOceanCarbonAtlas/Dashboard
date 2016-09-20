@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1591302858887965904L;
+	private static final long serialVersionUID = -6765595664218624492L;
 
 	boolean selected;
 	String version;
@@ -39,9 +39,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	int numErrorRows;
 	int numWarnRows;
 	ArrayList<String> userColNames;
+	// For each data column, a DataColumnType with type, unit, and missing value
 	ArrayList<DataColumnType> dataColTypes;
-	ArrayList<String> dataColUnits;
-	ArrayList<String> missingValues;
 	// For each data column, a set of row indices with questionable data
 	ArrayList<HashSet<Integer>> woceThreeRowIndices;
 	// For each data column, a set of row indices with bad data
@@ -73,10 +72,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		numDataRows = 0;
 		numErrorRows = 0;
 		numWarnRows = 0;
-		dataColTypes = new ArrayList<DataColumnType>();
 		userColNames = new ArrayList<String>();
-		dataColUnits = new ArrayList<String>();
-		missingValues = new ArrayList<String>();
+		dataColTypes = new ArrayList<DataColumnType>();
 		woceThreeRowIndices = new ArrayList<HashSet<Integer>>();
 		woceFourRowIndices = new ArrayList<HashSet<Integer>>();
 		noColumnWoceThreeRowIndices = new HashSet<Integer>();
@@ -91,15 +88,14 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 * @return
 	 * 		Boolean.TRUE if the cruise is suspended, excluded, in preview, or not submitted, 
 	 * 		Boolean.FALSE if the cruise is submitted or acceptable but unpublished cruise,
-	 * 		null if the cruise is (acceptable and) published (previous SOCAT version)
+	 * 		null if the cruise is (acceptable and) published (previous version)
 	 */
 	public Boolean isEditable() {
-		// true for cruises that are unacceptable, suspended, excluded, in preview, or not submitted
+		// true for cruises that are not submitted, suspended, or excluded
 		String status = getQcStatus();
-		if ( status.equals(SocatQCEvent.QC_STATUS_NOT_SUBMITTED) || 
-			 status.equals(SocatQCEvent.QC_STATUS_PREVIEW) ||
-			 status.equals(SocatQCEvent.QC_STATUS_SUSPENDED) ||
-			 status.equals(SocatQCEvent.QC_STATUS_EXCLUDED)  ) 
+		if ( status.equals(QCEvent.QC_STATUS_NOT_SUBMITTED) || 
+			 status.equals(QCEvent.QC_STATUS_SUSPENDED) ||
+			 status.equals(QCEvent.QC_STATUS_EXCLUDED)  ) 
 			return Boolean.TRUE;
 		// false for submitted or acceptable unpublished cruises
 		status = getArchiveStatus();
@@ -489,49 +485,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @return 
-	 * 		the list of data column units for this cruise; may be empty 
-	 * 		but never null.  The actual list in this object is returned. 
-	 */
-	public ArrayList<String> getDataColUnits() {
-		return dataColUnits;
-	}
-
-	/**
-	 * @param dataColUnits 
-	 * 		the list of data column units for this cruise.  The list 
-	 * 		in this object is cleared and all the contents of the given 
-	 * 		list, if not null, are added. 
-	 */
-	public void setDataColUnits(ArrayList<String> dataColUnits) {
-		this.dataColUnits.clear();
-		if ( dataColUnits != null )
-			this.dataColUnits.addAll(dataColUnits);
-	}
-
-	/**
-	 * @return 
-	 * 		the list giving the missing value for each data column in this 
-	 * 		cruise; may be empty but never null.  The actual list in this 
-	 * 		object is returned. 
-	 */
-	public ArrayList<String> getMissingValues() {
-		return missingValues;
-	}
-
-	/**
-	 * @param missingValues 
-	 * 		the list giving the missing value for each data column in this 
-	 * 		cruise.  The list in this object is cleared and all the contents 
-	 * 		of the given list, if not null, are added. 
-	 */
-	public void setMissingValues(ArrayList<String> missingValues) {
-		this.missingValues.clear();
-		if ( missingValues != null )
-			this.missingValues.addAll(missingValues);
-	}
-
-	/**
 	 * The list of sets of WOCE-3 data row indices iterates over the 
 	 * columns of the data table.  A set in this list specifies the 
 	 * row indices where the data of the column has a WOCE-3 
@@ -715,8 +668,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + numWarnRows;
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
-		result = result * prime + dataColUnits.hashCode();
-		result = result * prime + missingValues.hashCode();
 		result = result * prime + woceThreeRowIndices.hashCode();
 		result = result * prime + woceFourRowIndices.hashCode();
 		result = result * prime + noColumnWoceThreeRowIndices.hashCode();
@@ -775,10 +726,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! dataColTypes.equals(other.dataColTypes) )
 			return false;
-		if ( ! dataColUnits.equals(other.dataColUnits) )
-			return false;
-		if ( ! missingValues.equals(other.missingValues) )
-			return false;
 		if ( ! woceThreeRowIndices.equals(other.woceThreeRowIndices) ) 
 			return false;
 		if ( ! woceFourRowIndices.equals(other.woceFourRowIndices) ) 
@@ -816,8 +763,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
-				",\n    dataColUnits=" + dataColUnits.toString() +
-				",\n    missingValues=" + missingValues.toString() +
 				";\n    woceThreeRowIndices = " + woceThreeRowIndices.toString() +
 				";\n    woceFourRowIndices = " + woceFourRowIndices.toString() +
 				";\n    noColumnWoceThreeRowIndices = " + noColumnWoceThreeRowIndices.toString() +

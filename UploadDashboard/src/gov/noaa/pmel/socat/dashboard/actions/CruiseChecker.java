@@ -6,12 +6,12 @@ package gov.noaa.pmel.socat.dashboard.actions;
 import gov.noaa.pmel.socat.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.socat.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

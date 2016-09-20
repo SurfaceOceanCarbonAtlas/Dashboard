@@ -6,11 +6,10 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.util.Date;
 
@@ -137,7 +136,7 @@ public class DataLocationTest {
 	public void testHashCodeEquals() {
 		DataLocation myflag = new DataLocation();
 		assertFalse( myflag.equals(null) );
-		assertFalse( myflag.equals(new SocatQCEvent()) );
+		assertFalse( myflag.equals(new QCEvent()) );
 
 		DataLocation otherflag = new DataLocation();
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );

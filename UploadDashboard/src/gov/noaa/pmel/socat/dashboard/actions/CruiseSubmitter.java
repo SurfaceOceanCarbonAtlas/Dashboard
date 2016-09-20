@@ -15,10 +15,10 @@ import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -110,13 +110,13 @@ public class CruiseSubmitter {
 				// QC flag to assign with this cruise
 				Character flag;
 				String qcStatus = cruise.getQcStatus();
-				if ( SocatQCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ) {
-					flag = SocatQCEvent.QC_NEW_FLAG;
-					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
+				if ( QCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ) {
+					flag = QCEvent.QC_NEW_FLAG;
+					qcStatus = QCEvent.QC_STATUS_SUBMITTED;
 				}
 				else {
-					flag = SocatQCEvent.QC_UPDATED_FLAG;
-					qcStatus = SocatQCEvent.QC_STATUS_SUBMITTED;
+					flag = QCEvent.QC_UPDATED_FLAG;
+					qcStatus = QCEvent.QC_STATUS_SUBMITTED;
 				}
 
 				// Get the complete original cruise data
@@ -204,15 +204,15 @@ public class CruiseSubmitter {
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
 
 				// Create the QCEvent for submitting the initial QC flags
-				SocatQCEvent initQC = new SocatQCEvent();
+				QCEvent initQC = new QCEvent();
 				initQC.setExpocode(expocode);
 				initQC.setSocatVersion(socatVersion);
 				initQC.setFlagDate(new Date());
-				initQC.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
-				initQC.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+				initQC.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
+				initQC.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
 				// Add the initial QC flag in each region only for new and updated cruises
 				initQC.setFlag(flag);
-				if ( SocatQCEvent.QC_NEW_FLAG.equals(flag) )
+				if ( QCEvent.QC_NEW_FLAG.equals(flag) )
 					initQC.setComment("Initial QC flag for new dataset");
 				else
 					initQC.setComment("Initial QC flag for updated dataset");
@@ -241,7 +241,7 @@ public class CruiseSubmitter {
 
 				// All cruises - remark on the number of data rows with error and warnings
 				initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
-				initQC.setFlag(SocatQCEvent.QC_COMMENT);
+				initQC.setFlag(QCEvent.QC_COMMENT);
 				initQC.setComment("Automated data check found " + 
 						Integer.toString(cruiseData.getNumErrorRows()) + 
 						" data points with errors and " + 
@@ -257,7 +257,7 @@ public class CruiseSubmitter {
 
 				// Generate and add the WOCE flags from the SanityChecker results,
 				// as well as the user-provided WOCE flags, to the database
-				ArrayList<SocatWoceEvent> initWoceList;
+				ArrayList<WoceEvent> initWoceList;
 				try {
 					initWoceList = msgHandler.generateWoceEvents(cruiseData, dsgNcHandler);
 				} catch (IOException ex) {
@@ -265,7 +265,7 @@ public class CruiseSubmitter {
 				}
 				try {
 					databaseHandler.resetWoceEvents(expocode);
-					for ( SocatWoceEvent woceEvent : initWoceList ) {
+					for ( WoceEvent woceEvent : initWoceList ) {
 						databaseHandler.addWoceEvent(woceEvent);
 					}
 				} catch (SQLException ex) {

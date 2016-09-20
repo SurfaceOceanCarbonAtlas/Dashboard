@@ -18,8 +18,6 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	private static final long serialVersionUID = -5266561940930742763L;
 
-	private static final double MAX_ABSOLUTE_ERROR = 1.0E-4;
-
 	/**
 	 * Enumerated type for the severity of the issue in the message
 	 */
@@ -271,10 +269,12 @@ public class SCMessage implements Serializable, IsSerializable {
 			return false;
 
 		// Dashboard.closeTo returns true if both values are NaN
-		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 0, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
-		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 0.0, MAX_ABSOLUTE_ERROR) )
+		if ( ! DashboardUtils.longitudeCloseTo(longitude, other.longitude, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 
 		return true;

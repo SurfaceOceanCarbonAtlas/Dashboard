@@ -8,10 +8,10 @@ import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -96,7 +96,7 @@ public class AddOldNFlags {
 
 			// check and possibly update each of these datasets
 			for ( String expocode : allExpocodes ) {
-				ArrayList<SocatQCEvent> qcEvents;
+				ArrayList<QCEvent> qcEvents;
 				try {
 					qcEvents = dbHandler.getQCEvents(expocode);
 				} catch (Exception ex) {
@@ -111,8 +111,8 @@ public class AddOldNFlags {
 				boolean hasV13QC = false;
 				boolean hasV14NU = false;
 				boolean hasV14QC = false;
-				SocatQCEvent earliestQC = null;
-				for ( SocatQCEvent evnt : qcEvents ) {
+				QCEvent earliestQC = null;
+				for ( QCEvent evnt : qcEvents ) {
 					// Ordered by qc_time descending, so earliest is last
 					earliestQC = evnt;
 					String socatVersion = evnt.getSocatVersion();
@@ -120,7 +120,7 @@ public class AddOldNFlags {
 						hasV13QC = true;
 						Character flag = evnt.getFlag();
 						Character regionID = evnt.getRegionID();
-						if ( ( flag.equals(SocatQCEvent.QC_NEW_FLAG) || flag.equals(SocatQCEvent.QC_UPDATED_FLAG) ) 
+						if ( ( flag.equals(QCEvent.QC_NEW_FLAG) || flag.equals(QCEvent.QC_UPDATED_FLAG) ) 
 								&& regionID.equals(DataLocation.GLOBAL_REGION_ID) ) {
 							hasV13NU = true;
 						}
@@ -129,7 +129,7 @@ public class AddOldNFlags {
 						hasV14QC = true;
 						Character flag = evnt.getFlag();
 						Character regionID = evnt.getRegionID();
-						if ( ( flag.equals(SocatQCEvent.QC_NEW_FLAG) || flag.equals(SocatQCEvent.QC_UPDATED_FLAG) ) 
+						if ( ( flag.equals(QCEvent.QC_NEW_FLAG) || flag.equals(QCEvent.QC_UPDATED_FLAG) ) 
 								&& regionID.equals(DataLocation.GLOBAL_REGION_ID) ) {
 							hasV14NU = true;
 						}
@@ -140,13 +140,13 @@ public class AddOldNFlags {
 				if ( hasV13QC ) {
 					if ( ! hasV13NU ) {
 						// Add a old global v1.3 N flag
-						SocatQCEvent qcEvent = new SocatQCEvent();
+						QCEvent qcEvent = new QCEvent();
 						qcEvent.setExpocode(expocode);
-						qcEvent.setFlag(SocatQCEvent.QC_NEW_FLAG);
+						qcEvent.setFlag(QCEvent.QC_NEW_FLAG);
 						qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 						qcEvent.setSocatVersion("1.3");
-						qcEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
-						qcEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+						qcEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
+						qcEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
 						Date oldDate = earliestQC.getFlagDate();
 						if ( oldDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
 							System.err.println("No date for oldest QC flag of " + expocode);
@@ -169,13 +169,13 @@ public class AddOldNFlags {
 				}
 				else if ( hasV14QC && ! hasV14NU ) {
 					// Add a old global v1.4 N flags - only if v1.4 QC but no v1.3 QC flags
-					SocatQCEvent qcEvent = new SocatQCEvent();
+					QCEvent qcEvent = new QCEvent();
 					qcEvent.setExpocode(expocode);
-					qcEvent.setFlag(SocatQCEvent.QC_NEW_FLAG);
+					qcEvent.setFlag(QCEvent.QC_NEW_FLAG);
 					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
 					qcEvent.setSocatVersion("1.4");
-					qcEvent.setUsername(SocatEvent.SANITY_CHECKER_USERNAME);
-					qcEvent.setRealname(SocatEvent.SANITY_CHECKER_REALNAME);
+					qcEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
+					qcEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
 					Date oldDate = earliestQC.getFlagDate();
 					if ( oldDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
 						System.err.println("No date for oldest QC flag of " + expocode);

@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6936360462743605945L;
+	private static final long serialVersionUID = -5811819591623980901L;
 
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
@@ -176,20 +176,20 @@ public class DataColumnType implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * Case-insensitive check if the name of this data column type 
-	 * matches the name of another data column type.
+	 * Check if the upper-cased name of this data column type 
+	 * matches the upper-cased name of another data column type.
 	 * 
 	 * @param other
 	 * 		data column type to compare to
 	 * @return
-	 * 		if the data column type names match, case-insensitive
+	 * 		if the upper-cased data column type names match
 	 */
-	public boolean nameMatches(DataColumnType other) {
+	public boolean sameType(DataColumnType other) {
 		if ( this == other )
 			return true;
 		if ( other == null )
 			return false;
-		return this.name.equalsIgnoreCase(other.name);
+		return this.name.toUpperCase().equals(other.name.toUpperCase());
 	}
 
 	@Override

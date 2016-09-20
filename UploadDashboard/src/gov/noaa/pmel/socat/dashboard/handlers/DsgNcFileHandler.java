@@ -10,12 +10,12 @@ import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -637,7 +637,7 @@ public class DsgNcFileHandler {
 	 * @throws IOException
 	 * 		if problems opening or writing to a DSG file 
 	 */
-	public void updateQCFlag(SocatQCEvent qcEvent) 
+	public void updateQCFlag(QCEvent qcEvent) 
 			throws IllegalArgumentException, IOException {
 		// Get the location and name for the NetCDF DSG file
 		String expocode = qcEvent.getExpocode();
@@ -676,7 +676,7 @@ public class DsgNcFileHandler {
 	 * @throws IOException
 	 * 		if problems opening, reading from, or writing to the DSG file
 	 */
-	public void updateWoceFlags(SocatWoceEvent woceEvent, String tempDsgFilename) 
+	public void updateWoceFlags(WoceEvent woceEvent, String tempDsgFilename) 
 								throws IllegalArgumentException, IOException {
 		String expocode = woceEvent.getExpocode();
 		// Assign the WOCE flags in the full-data DSG file, and get missing data

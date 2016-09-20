@@ -11,14 +11,14 @@ import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatMetadata;
-import gov.noaa.pmel.socat.dashboard.shared.SocatQCEvent;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -134,7 +134,7 @@ public class SocatCruiseReporter {
 
 			if ( fco2rec == null )
 				throw new IllegalArgumentException("null fco2rec for " + expocode);
-			if ( ( ! SocatCruiseData.FP_MISSING_VALUE.equals(fco2rec) ) && 
+			if ( ( ! DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) ) && 
 				 ( (fco2rec < 0.0) || (fco2rec > 100000.0) ) )
 				throw new IllegalArgumentException("invalid fCO2rec of " + 
 						Double.toString(fco2rec) + " for " + expocode);
@@ -370,8 +370,8 @@ public class SocatCruiseReporter {
 						Character woceFlag = dataVals.getWoceCO2Water();
 						// Ignore WOCE-3 and WOCE-4 as they are not reported 
 						// and may be indicating invalid locations for this cruise
-						if ( SocatWoceEvent.WOCE_GOOD.equals(woceFlag) || 
-							 SocatWoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) {
+						if ( WoceEvent.WOCE_GOOD.equals(woceFlag) || 
+							 WoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) {
 							inRegion = true;
 							break;
 						}
@@ -456,11 +456,11 @@ public class SocatCruiseReporter {
 					j++;
 					if ( (regionID != null) && ! regionID.equals(dataVals.getRegionID()) )
 						continue;
-					if ( SocatCruiseData.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
+					if ( DashboardUtils.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
 						continue;
 					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
-						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
+					if ( woceFlag.equals(WoceEvent.WOCE_GOOD) || 
+						 woceFlag.equals(WoceEvent.WOCE_NOT_CHECKED) ) {
 						String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
 								socatVersion, socatDOI, qcFlag, true, prevDatPts);
 						if ( ! tsvdat.isEmpty() ) {
@@ -483,7 +483,7 @@ public class SocatCruiseReporter {
 	 * 
 	 * @param omeMeta
 	 * 		OME XML document with metadata values to report in the preamble
-	 * @param socatVersion
+	 * @param version
 	 * 		SOCAT version to report in the preamble
 	 * @param origDOI
 	 * 		DOI for the original data file
@@ -1027,7 +1027,7 @@ public class SocatCruiseReporter {
 	 * 		date/time of this data point in seconds since 01-JAN-1970 00:00:00 UTC
 	 * @param expocode
 	 * 		expocode for the cruise data report string
-	 * @param socatVersion
+	 * @param version
 	 * 		SOCAT Version for the cruise data report string
 	 * @param socatDOI
 	 * 		SOCAT DOI for the cruise data report string
@@ -1068,43 +1068,43 @@ public class SocatCruiseReporter {
 		fmtr.format("%s\t", cruiseQCFlag);
 
 		Integer intVal = dataVals.getYear();
-		if ( SocatCruiseData.INT_MISSING_VALUE.equals(intVal) )
+		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%04d\t", intVal);
 
 		intVal = dataVals.getMonth();
-		if ( SocatCruiseData.INT_MISSING_VALUE.equals(intVal) )
+		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%02d\t", intVal);
 
 		intVal = dataVals.getDay();
-		if ( SocatCruiseData.INT_MISSING_VALUE.equals(intVal) )
+		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%02d\t", intVal);
 
 		intVal = dataVals.getHour();
-		if ( SocatCruiseData.INT_MISSING_VALUE.equals(intVal) )
+		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%02d\t", intVal);
 
 		intVal = dataVals.getMinute();
-		if ( SocatCruiseData.INT_MISSING_VALUE.equals(intVal) )
+		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%02d\t", intVal);
 
 		Double dblVal = dataVals.getSecond();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#03.0f\t", dblVal);
 
 		dblVal = dataVals.getLongitude();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) ) {
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) ) {
 			fmtr.format("NaN\t");
 		}
 		else {
@@ -1116,125 +1116,125 @@ public class SocatCruiseReporter {
 		}
 
 		dblVal = dataVals.getLatitude();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.5f\t", dblVal);
 
 		dblVal = dataVals.getSampleDepth();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.0f\t", dblVal);
 
 		dblVal = dataVals.getSalinity();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.getSst();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.gettEqu();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.getSlp();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.getpEqu();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.getWoaSss();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.getNcepSlp();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		dblVal = dataVals.getEtopo2Depth();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.0f\t", dblVal);
 
 		dblVal = dataVals.getDistToLand();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.0f\t", dblVal);
 
 		dblVal = dataVals.getGvCO2();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		if ( ! multicruise ) {
 			dblVal = dataVals.getxCO2WaterTEquDry();
-			if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
 			dblVal = dataVals.getxCO2WaterSstDry();
-			if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
 			dblVal = dataVals.getpCO2WaterTEquWet();
-			if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
 			dblVal = dataVals.getpCO2WaterSstWet();
-			if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
 			dblVal = dataVals.getfCO2WaterSstWet();
-			if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
 			dblVal = dataVals.getfCO2WaterSstWet();
-			if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 		}
 
 		dblVal = dataVals.getfCO2Rec();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
 		// if fCO2_rec not given, always set source to zero
 		intVal = dataVals.getfCO2Source();
-		if ( SocatCruiseData.INT_MISSING_VALUE.equals(intVal) || 
-			 SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) || 
+			 DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("0\t");
 		else
 			fmtr.format("%d\t", intVal);
@@ -1242,7 +1242,7 @@ public class SocatCruiseReporter {
 		// if fCO2_rec not given, always set to nine ("bottle not sampled");
 		// otherwise if missing or zero, it is presumed to be good (two)
 		Character charVal = dataVals.getWoceCO2Water();
-		if ( SocatCruiseData.FP_MISSING_VALUE.equals(dblVal) )
+		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("9");
 		else if ( Character.valueOf(' ').equals(charVal) || 
 				  Character.valueOf('0').equals(charVal) )
@@ -1288,8 +1288,7 @@ public class SocatCruiseReporter {
 		if ( cruiseInfo == null )
 			throw new IllegalArgumentException("No cruise data for " + upperExpo);
 		String qcStatus = cruiseInfo.getQcStatus();
-		if ( SocatQCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ||
-			 SocatQCEvent.QC_STATUS_PREVIEW.equals(qcStatus) )
+		if ( QCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) )
 			throw new IllegalArgumentException(upperExpo + " has not been submitted for QC");
 
 		DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(
@@ -1317,14 +1316,13 @@ public class SocatCruiseReporter {
 		TreeSet<String> regionNames = new TreeSet<String>();
 		for ( SocatCruiseData data : dataList ) {
 			Character woceCO2Water = data.getWoceCO2Water();
-			if ( DashboardUtils.closeTo(data.getfCO2Rec(), 
-					SocatCruiseData.FP_MISSING_VALUE, 1.0E-7, 1.0E-3) ) {
+			if ( DashboardUtils.FP_MISSING_VALUE.equals(data.getfCO2Rec()) ) {
 				numMissing++;
 			}
-			else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_BAD) ) {
+			else if ( woceCO2Water.equals(WoceEvent.WOCE_BAD) ) {
 				numWoceBad++;
 			}
-			else if ( woceCO2Water.equals(SocatWoceEvent.WOCE_QUESTIONABLE) ) {
+			else if ( woceCO2Water.equals(WoceEvent.WOCE_QUESTIONABLE) ) {
 				numWoceWarn++;
 			}
 			else { 
@@ -1361,7 +1359,7 @@ public class SocatCruiseReporter {
 		 * }
 		 */
 
-		ArrayList<SocatQCEvent> qcEvents;
+		ArrayList<QCEvent> qcEvents;
 		try {
 			qcEvents = databaseHandler.getQCEvents(upperExpo);
 		} catch (SQLException ex) {
@@ -1369,8 +1367,8 @@ public class SocatCruiseReporter {
 					upperExpo + ": " + ex.getMessage());
 		}
 		oldExpocode = "-";
-		for ( SocatQCEvent evt : qcEvents ) {
-			if ( SocatQCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
+		for ( QCEvent evt : qcEvents ) {
+			if ( QCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
 				// Get the old expocode for this rename
 				String msg = evt.getComment();
 				String[] msgWords = msg.split("\\s+");
@@ -1495,11 +1493,11 @@ public class SocatCruiseReporter {
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					j++;
 					Double fco2rec = dataVals.getfCO2Rec();
-					if ( SocatCruiseData.FP_MISSING_VALUE.equals(fco2rec) )
+					if ( DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) )
 						continue;
 					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( woceFlag.equals(SocatWoceEvent.WOCE_GOOD) || 
-						 woceFlag.equals(SocatWoceEvent.WOCE_NOT_CHECKED) ) {
+					if ( woceFlag.equals(WoceEvent.WOCE_GOOD) || 
+						 woceFlag.equals(WoceEvent.WOCE_NOT_CHECKED) ) {
 						DataPoint datpt = new DataPoint(upperExpo, sectimes[j], 
 								dataVals.getLatitude(), dataVals.getLongitude(), fco2rec);
 						if ( ! datSet.add(datpt) ) {
@@ -1583,12 +1581,12 @@ public class SocatCruiseReporter {
 				}
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					// Check that fCO2_rec is given
-					if ( SocatCruiseData.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
+					if ( DashboardUtils.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
 						continue;
 					// Check WOCE flag for fCO2_rec
 					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( ! ( SocatWoceEvent.WOCE_GOOD.equals(woceFlag) || 
-							SocatWoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) )
+					if ( ! ( WoceEvent.WOCE_GOOD.equals(woceFlag) || 
+							WoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) )
 						continue;
 					// Check region, if appropriate
 					if ( (regionID != null) && 

@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -73,6 +74,36 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
 	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
+
+	/**
+	 *  Missing value for floating-point variables - not NaN for Ferret
+	 */
+	public static final Double FP_MISSING_VALUE = -1.0E+34;
+
+	/**
+	 *  Missing value for integer variables
+	 */
+	public static final Integer INT_MISSING_VALUE = -1;
+
+	/**
+	 * Date used as a missing value; 
+	 * corresponds to Jan 2, 3000 00:00:00 GMT
+	 */
+	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
+
+	/** 
+	 * Maximum relative error between two floating point values 
+	 * still considered the same value for practical purposes. 
+	 * Typically used for rtol in {@link #closeTo(Double, Double, double, double)}
+	 */
+	public static final double MAX_RELATIVE_ERROR = 1.0E-6;
+
+	/** 
+	 * Maximum absolute error between two floating point values 
+	 * still considered the same value for practical purposes. 
+	 * Typically used for atol in {@link #closeTo(Double, Double, double, double)}
+	 */
+	public static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
 
 /*
 	public static final EnumMap<DataColumnType,String> STD_HEADER_NAMES = 

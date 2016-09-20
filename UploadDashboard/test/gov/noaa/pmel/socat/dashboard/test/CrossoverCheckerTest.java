@@ -5,8 +5,8 @@ package gov.noaa.pmel.socat.dashboard.test;
 
 import static org.junit.Assert.*;
 import gov.noaa.pmel.socat.dashboard.actions.CrossoverChecker;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCrossover;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.socat.dashboard.shared.Crossover;
 
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class CrossoverCheckerTest {
 		double[][] ssts = new double[][] { ssts_09AR20120105, ssts_353L20120107 };
 		double[][] fco2s = new double[][] { fco2s_09AR20120105, fco2s_353L20120107 };
 
-		SocatCrossover cross = CrossoverChecker.checkForCrossover(lons, lats, times, ssts, fco2s);
+		Crossover cross = CrossoverChecker.checkForCrossover(lons, lats, times, ssts, fco2s);
 		assertNotNull( cross );
 		String[] expocodes = cross.getExpocodes();
 		assertNotNull( expocodes );
@@ -65,12 +65,12 @@ public class CrossoverCheckerTest {
 	@Test
 	public void testDistanceBetween() {
 		double[] lons = { -5.0, 15.0 };
-		double lonDist = SocatCrossover.EARTH_AUTHALIC_RADIUS * Math.abs(lons[1] - lons[0]) * Math.PI / 180.0;
+		double lonDist = Crossover.EARTH_AUTHALIC_RADIUS * Math.abs(lons[1] - lons[0]) * Math.PI / 180.0;
 		double[] lats = { 60.0, 75.0 };
-		double latDist = SocatCrossover.EARTH_AUTHALIC_RADIUS * Math.abs(lats[1] - lats[0]) * Math.PI / 180.0;
+		double latDist = Crossover.EARTH_AUTHALIC_RADIUS * Math.abs(lats[1] - lats[0]) * Math.PI / 180.0;
 		double[] times = { System.currentTimeMillis() / 1000.0,
 				   2560 + (System.currentTimeMillis() / 1000.0) };
-		double timeDist = SocatCrossover.SEAWATER_SPEED * Math.abs(times[1] - times[0]) / (60.0 * 60.0 * 24.0);
+		double timeDist = Crossover.SEAWATER_SPEED * Math.abs(times[1] - times[0]) / (60.0 * 60.0 * 24.0);
 
 		double dist;
 		// Check longitude distance along the equator 
@@ -92,7 +92,7 @@ public class CrossoverCheckerTest {
 		double[] dallas = { -96.80667, 32.78306, austin[2] + (24.0 * 60.0 * 60.0) };
 		double austinDallasDist = 158.5 * 1.8537936;  // 200.0 miles on interstate a few hundred feet above sea level
 		double expected = Math.sqrt(austinDallasDist * austinDallasDist + 
-									SocatCrossover.SEAWATER_SPEED * SocatCrossover.SEAWATER_SPEED);
+									Crossover.SEAWATER_SPEED * Crossover.SEAWATER_SPEED);
 		dist = CrossoverChecker.distanceBetween(austin[0], austin[1], austin[2], dallas[0], dallas[1], dallas[2]);
 		assertEquals(expected, dist, 1.0);
 	}

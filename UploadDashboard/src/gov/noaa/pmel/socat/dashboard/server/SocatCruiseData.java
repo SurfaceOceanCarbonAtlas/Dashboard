@@ -1,10 +1,17 @@
 /**
  */
-package gov.noaa.pmel.socat.dashboard.shared;
+package gov.noaa.pmel.socat.dashboard.server;
 
+
+import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -16,22 +23,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SocatCruiseData implements Serializable, IsSerializable {
+public class SocatCruiseData {
 
-	private static final long serialVersionUID = 1918665099211273971L;
-
-	static final double MAX_RELATIVE_ERROR = 1.0E-6;
-	static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
-
-	/**
-	 *  Missing value for floating-point variables - not NaN for Ferret
-	 */
-	public static final Double FP_MISSING_VALUE = -1.0E+34;
-	/**
-	 *  Missing value for integer variables
-	 */
-	public static final Integer INT_MISSING_VALUE = -1;
-
+/*
 	// Sequence number (starts with one) of this data point in the data set
 	Integer rowNum;
 
@@ -147,7 +141,10 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	Double distToLand;
 	// days of the year; Jan 1 00:00 == 1.0
 	Double dayOfYear;
-
+*/
+	private LinkedHashMap<String,Integer> intValsMap;
+	private LinkedHashMap<String,Double> doubleValsMap;
+	private LinkedHashMap<String,Character> charValsMap;
 	/**
 	 * Generates an empty SOCAT data record
 	 */
@@ -201,8 +198,8 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 		windDirectionTrue = FP_MISSING_VALUE;
 		windDirectionRelative = FP_MISSING_VALUE;
 
-		woceCO2Water = SocatWoceEvent.WOCE_NOT_CHECKED;
-		woceCO2Atm = SocatWoceEvent.WOCE_NOT_CHECKED;
+		woceCO2Water = WoceEvent.WOCE_NOT_CHECKED;
+		woceCO2Atm = WoceEvent.WOCE_NOT_CHECKED;
 
 		woaSss = FP_MISSING_VALUE;
 		ncepSlp = FP_MISSING_VALUE;
@@ -480,45 +477,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		sequence number (starting with one) of this data point in the 
-	 * 		data set; never null but could be {@link #INT_MISSING_VALUE} 
-	 * 		if not assigned
-	 */
-	public Integer getRowNum() {
-		return rowNum;
-	}
-
-	/**
-	 * @param rowNum 
-	 * 		sequence number (starting with one) of this data point in the 
-	 * 		data set to assign; if null, {@link #INT_MISSING_VALUE} is assigned
-	 */
-	public void setRowNum(Integer rowNum) {
-		if ( rowNum == null )
-			this.rowNum = INT_MISSING_VALUE;
-		else
-			this.rowNum = rowNum;
-	}
-
-	/**
-	 * @return 
 	 * 		the year of the data measurement; 
 	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getYear() {
 		return year;
-	}
-
-	/**
-	 * @param year 
-	 * 		the year of the data measurement to set; 
-	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
-	 */
-	public void setYear(Integer year) {
-		if ( year == null )
-			this.year = INT_MISSING_VALUE;
-		else
-			this.year = year;
 	}
 
 	/**
@@ -636,36 +599,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param longitude 
-	 * 		the longitude of the data measurement to set; 
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setLongitude(Double longitude) {
-		if ( longitude == null )
-			this.longitude = FP_MISSING_VALUE;
-		else
-			this.longitude = longitude;
-	}
-
-	/**
 	 * @return 
 	 * 		the latitude of the data measurement; 
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLatitude() {
 		return latitude;
-	}
-
-	/**
-	 * @param latitude 
-	 * 		the latitude of the data measurement to set; 
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setLatitude(Double latitude) {
-		if ( latitude == null )
-			this.latitude = FP_MISSING_VALUE;
-		else
-			this.latitude = latitude;
 	}
 
 	/**
@@ -678,36 +617,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param sampleDepth 
-	 * 		the sampling depth to set
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setSampleDepth(Double sampleDepth) {
-		if ( sampleDepth == null )
-			this.sampleDepth = FP_MISSING_VALUE;
-		else
-			this.sampleDepth = sampleDepth;
-	}
-
-	/**
 	 * @return 
 	 * 		the sea surface salinity;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSalinity() {
 		return salinity;
-	}
-
-	/**
-	 * @param salinity
-	 * 		the sea surface salinity to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setSalinity(Double salinity) {
-		if ( salinity == null )
-			this.salinity = FP_MISSING_VALUE;
-		else
-			this.salinity = salinity;
 	}
 
 	/**
@@ -720,57 +635,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param tEqu
-	 * 		the equilibrator temperature to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void settEqu(Double tEqu) {
-		if ( tEqu == null )
-			this.tEqu = FP_MISSING_VALUE;
-		else
-			this.tEqu = tEqu;
-	}
-
-	/**
 	 * @return 
 	 * 		the sea surface temperature;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSst() {
 		return sst;
-	}
-
-	/**
-	 * @param sst 
-	 * 		the sea surface temperature to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setSst(Double sst) {
-		if ( sst == null )
-			this.sst = FP_MISSING_VALUE;
-		else
-			this.sst = sst;
-	}
-
-	/**
-	 * @return 
-	 * 		the atmospheric temperature;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double gettAtm() {
-		return tAtm;
-	}
-
-	/**
-	 * @param tAtm 
-	 * 		the atmospheric temperature to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void settAtm(Double tAtm) {
-		if ( tAtm == null )
-			this.tAtm = FP_MISSING_VALUE;
-		else
-			this.tAtm = tAtm;
 	}
 
 	/**
@@ -783,36 +653,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param slp 
-	 * 		the atmospheric sea-level pressure to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setSlp(Double slp) {
-		if ( slp == null )
-			this.slp = FP_MISSING_VALUE;
-		else
-			this.slp = slp;
-	}
-
-	/**
 	 * @return 
 	 * 		the equilibrator pressure;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getpEqu() {
 		return pEqu;
-	}
-
-	/**
-	 * @param pEqu
-	 * 		the equilibrator pressure to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setpEqu(Double pEqu) {
-		if ( pEqu == null )
-			this.pEqu = FP_MISSING_VALUE;
-		else
-			this.pEqu = pEqu;
 	}
 
 	/**
@@ -825,57 +671,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param xCO2WaterTEquDry 
-	 * 		the xCO2WaterTEquDry to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxCO2WaterTEquDry(Double xCO2WaterTEquDry) {
-		if ( xCO2WaterTEquDry == null )
-			this.xCO2WaterTEquDry = FP_MISSING_VALUE;
-		else
-			this.xCO2WaterTEquDry = xCO2WaterTEquDry;
-	}
-
-	/**
 	 * @return 
 	 * 		the xCO2WaterSstDry;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getxCO2WaterSstDry() {
 		return xCO2WaterSstDry;
-	}
-
-	/**
-	 * @param xCO2WaterSstDry 
-	 * 		the xCO2WaterSstDry to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxCO2WaterSstDry(Double xCO2WaterSstDry) {
-		if ( xCO2WaterSstDry == null )
-			this.xCO2WaterSstDry = FP_MISSING_VALUE;
-		else
-			this.xCO2WaterSstDry = xCO2WaterSstDry;
-	}
-
-	/**
-	 * @return 
-	 * 		the xCO2WaterTEquWet;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getxCO2WaterTEquWet() {
-		return xCO2WaterTEquWet;
-	}
-
-	/**
-	 * @param xCO2WaterTEquWet 
-	 * 		the xCO2WaterTEquWet to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxCO2WaterTEquWet(Double xCO2WaterTEquWet) {
-		if ( xCO2WaterTEquWet == null )
-			this.xCO2WaterTEquWet = FP_MISSING_VALUE;
-		else
-			this.xCO2WaterTEquWet = xCO2WaterTEquWet;
 	}
 
 	/**
@@ -888,36 +689,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param xCO2WaterSstWet 
-	 * 		the xCO2WaterSstWet to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxCO2WaterSstWet(Double xCO2WaterSstWet) {
-		if ( xCO2WaterSstWet == null )
-			this.xCO2WaterSstWet = FP_MISSING_VALUE;
-		else
-			this.xCO2WaterSstWet = xCO2WaterSstWet;
-	}
-
-	/**
 	 * @return 
 	 * 		the pCO2WaterTEquWet;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getpCO2WaterTEquWet() {
 		return pCO2WaterTEquWet;
-	}
-
-	/**
-	 * @param pCO2WaterTEquWet 
-	 * 		the pCO2WaterTEquWet to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setpCO2WaterTEquWet(Double pCO2WaterTEquWet) {
-		if ( pCO2WaterTEquWet == null )
-			this.pCO2WaterTEquWet = FP_MISSING_VALUE;
-		else
-			this.pCO2WaterTEquWet = pCO2WaterTEquWet;
 	}
 
 	/**
@@ -930,39 +707,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param pCO2WaterSstWet 
-	 * 		the pCO2WaterSstWet to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setpCO2WaterSstWet(Double pCO2WaterSstWet) {
-		if ( pCO2WaterSstWet == null )
-			this.pCO2WaterSstWet = FP_MISSING_VALUE;
-		else
-			this.pCO2WaterSstWet = pCO2WaterSstWet;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2WaterTEquWet;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2WaterTEquWet() {
-		return fCO2WaterTEquWet;
-	}
-
-	/**
-	 * @param fCO2WaterTEquWet 
-	 * 		the fCO2WaterTEquWet to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2WaterTEquWet(Double fCO2WaterTEquWet) {
-		if ( fCO2WaterTEquWet == null )
-			this.fCO2WaterTEquWet = FP_MISSING_VALUE;
-		else
-			this.fCO2WaterTEquWet = fCO2WaterTEquWet;
-	}
-
-	/**
 	 * @return 
 	 * 		the fCO2WaterSstWet;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
@@ -972,399 +716,9 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param fCO2WaterSstWet 
-	 * 		the fCO2WaterSstWet to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2WaterSstWet(Double fCO2WaterSstWet) {
-		if ( fCO2WaterSstWet == null )
-			this.fCO2WaterSstWet = FP_MISSING_VALUE;
-		else
-			this.fCO2WaterSstWet = fCO2WaterSstWet;
-	}
-
-	/**
-	 * @return 
-	 * 		the xCO2AtmDryActual;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getxCO2AtmDryActual() {
-		return xCO2AtmDryActual;
-	}
-
-	/**
-	 * @param xCO2AtmDryActual 
-	 * 		the xCO2AtmDryActual to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxCO2AtmDryActual(Double xCO2AtmDryActual) {
-		if ( xCO2AtmDryActual == null )
-			this.xCO2AtmDryActual = FP_MISSING_VALUE;
-		else
-			this.xCO2AtmDryActual = xCO2AtmDryActual;
-	}
-
-	/**
-	 * @return 
-	 * 		the xCO2AtmDryInterp;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getxCO2AtmDryInterp() {
-		return xCO2AtmDryInterp;
-	}
-
-	/**
-	 * @param xCO2AtmDryInterp 
-	 * 		the xCO2AtmDryInterp to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxCO2AtmDryInterp(Double xCO2AtmDryInterp) {
-		if ( xCO2AtmDryInterp == null )
-			this.xCO2AtmDryInterp = FP_MISSING_VALUE;
-		else
-			this.xCO2AtmDryInterp = xCO2AtmDryInterp;
-	}
-
-	/**
-	 * @return 
-	 * 		the pCO2AtmWetActual;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getpCO2AtmWetActual() {
-		return pCO2AtmWetActual;
-	}
-
-	/**
-	 * @param pCO2AtmWetActual 
-	 * 		the pCO2AtmWetActual to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setpCO2AtmWetActual(Double pCO2AtmWetActual) {
-		if ( pCO2AtmWetActual == null )
-			this.pCO2AtmWetActual = FP_MISSING_VALUE;
-		else
-			this.pCO2AtmWetActual = pCO2AtmWetActual;
-	}
-
-	/**
-	 * @return 
-	 * 		the pCO2AtmWetInterp;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getpCO2AtmWetInterp() {
-		return pCO2AtmWetInterp;
-	}
-
-	/**
-	 * @param pCO2AtmWetInterp 
-	 * 		the pCO2AtmWetInterp to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setpCO2AtmWetInterp(Double pCO2AtmWetInterp) {
-		if ( pCO2AtmWetInterp == null )
-			this.pCO2AtmWetInterp = FP_MISSING_VALUE;
-		else
-			this.pCO2AtmWetInterp = pCO2AtmWetInterp;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2AtmWetActual;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2AtmWetActual() {
-		return fCO2AtmWetActual;
-	}
-
-	/**
-	 * @param fCO2AtmWetActual 
-	 * 		the fCO2AtmWetActual to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2AtmWetActual(Double fCO2AtmWetActual) {
-		if ( fCO2AtmWetActual == null )
-			this.fCO2AtmWetActual = FP_MISSING_VALUE;
-		else
-			this.fCO2AtmWetActual = fCO2AtmWetActual;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2AtmWetInterp;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2AtmWetInterp() {
-		return fCO2AtmWetInterp;
-	}
-
-	/**
-	 * @param fCO2AtmWetInterp 
-	 * 		the fCO2AtmWetInterp to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2AtmWetInterp(Double fCO2AtmWetInterp) {
-		if ( fCO2AtmWetInterp == null )
-			this.fCO2AtmWetInterp = FP_MISSING_VALUE;
-		else
-			this.fCO2AtmWetInterp = fCO2AtmWetInterp;
-	}
-
-	/**
-	 * @return 
-	 * 		the difference water xCO2 - average air xCO2;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getDeltaXCO2() {
-		return deltaXCO2;
-	}
-
-	/**
-	 * @param deltaXCO2 
-	 * 		the difference water xCO2 - average air xCO2 to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setDeltaXCO2(Double deltaXCO2) {
-		if ( deltaXCO2 == null )
-			this.deltaXCO2 = FP_MISSING_VALUE;
-		else
-			this.deltaXCO2 = deltaXCO2;
-	}
-
-	/**
-	 * @return 
-	 * 		the difference water pCO2 - average air pCO2;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getDeltaPCO2() {
-		return deltaPCO2;
-	}
-
-	/**
-	 * @param deltaPCO2 
-	 * 		the difference water pCO2 - average air pCO2 to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setDeltaPCO2(Double deltaPCO2) {
-		if ( deltaPCO2 == null )
-			this.deltaPCO2 = FP_MISSING_VALUE;
-		else
-			this.deltaPCO2 = deltaPCO2;
-	}
-
-	/**
-	 * @return 
-	 * 		the difference water fCO2 - average air fCO2;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getDeltaFCO2() {
-		return deltaFCO2;
-	}
-
-	/**
-	 * @param deltaFCO2 
-	 * 		the difference water fCO2 - average air fCO2 to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setDeltaFCO2(Double deltaFCO2) {
-		if ( deltaFCO2 == null )
-			this.deltaFCO2 = FP_MISSING_VALUE;
-		else
-			this.deltaFCO2 = deltaFCO2;
-	}
-
-	/**
-	 * @return 
-	 * 		the xH2OEqu;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getxH2OEqu() {
-		return xH2OEqu;
-	}
-
-	/**
-	 * @param xH2OEqu 
-	 * 		the xH2OEqu to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setxH2OEqu(Double xH2OEqu) {
-		if ( xH2OEqu == null )
-			this.xH2OEqu = FP_MISSING_VALUE;
-		else
-			this.xH2OEqu = xH2OEqu;
-	}
-
-	/**
-	 * @return 
-	 * 		the relative humidity;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getRelativeHumidity() {
-		return relativeHumidity;
-	}
-
-	/**
-	 * @param relativeHumidity 
-	 * 		the relative humidity to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setRelativeHumidity(Double relativeHumidity) {
-		if ( relativeHumidity == null )
-			this.relativeHumidity = FP_MISSING_VALUE;
-		else
-			this.relativeHumidity = relativeHumidity;
-	}
-
-	/**
-	 * @return 
-	 * 		the specific humidity;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getSpecificHumidity() {
-		return specificHumidity;
-	}
-
-	/**
-	 * @param specificHumidity 
-	 * 		the specific humidity to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setSpecificHumidity(Double specificHumidity) {
-		if ( specificHumidity == null )
-			this.specificHumidity = FP_MISSING_VALUE;
-		else
-			this.specificHumidity = specificHumidity;
-	}
-
-	/**
-	 * @return 
-	 * 		the ship speed in knots;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getShipSpeed() {
-		return shipSpeed;
-	}
-
-	/**
-	 * @param shipSpeed 
-	 * 		the ship speed in knots to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setShipSpeed(Double shipSpeed) {
-		if ( shipSpeed == null )
-			this.shipSpeed = FP_MISSING_VALUE;
-		else
-			this.shipSpeed = shipSpeed;
-	}
-
-	/**
-	 * @return 
-	 * 		the ship direction in degrees clockwise from N;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getShipDirection() {
-		return shipDirection;
-	}
-
-	/**
-	 * @param shipDirection 
-	 * 		the ship direction in degrees clockwise from N to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setShipDirection(Double shipDirection) {
-		if ( shipDirection == null )
-			this.shipDirection = FP_MISSING_VALUE;
-		else
-			this.shipDirection = shipDirection;
-	}
-
-	/**
-	 * @return 
-	 * 		the true wind speed in m/s;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getWindSpeedTrue() {
-		return windSpeedTrue;
-	}
-
-	/**
-	 * @param windSpeedTrue 
-	 * 		the true wind speed in m/s to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setWindSpeedTrue(Double windSpeedTrue) {
-		if ( windSpeedTrue == null )
-			this.windSpeedTrue = FP_MISSING_VALUE;
-		else
-			this.windSpeedTrue = windSpeedTrue;
-	}
-
-	/**
-	 * @return 
-	 * 		the relative wind speed in m/s;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getWindSpeedRelative() {
-		return windSpeedRelative;
-	}
-
-	/**
-	 * @param windSpeedRelative
-	 * 		the relative wind speed in m/s to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setWindSpeedRelative(Double windSpeedRelative) {
-		if ( windSpeedRelative == null )
-			this.windSpeedRelative = FP_MISSING_VALUE;
-		else
-			this.windSpeedRelative = windSpeedRelative;
-	}
-
-	/**
-	 * @return 
-	 * 		the true wind direction in degrees clockwise from N;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getWindDirectionTrue() {
-		return windDirectionTrue;
-	}
-
-	/**
-	 * @param windDirectionTrue 
-	 * 		the true wind direction in degrees clockwise from N to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setWindDirectionTrue(Double windDirectionTrue) {
-		if ( windDirectionTrue == null )
-			this.windDirectionTrue = FP_MISSING_VALUE;
-		else
-			this.windDirectionTrue = windDirectionTrue;
-	}
-
-	/**
-	 * @return 
-	 * 		the relative wind direction in degrees clockwise from N;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getWindDirectionRelative() {
-		return windDirectionRelative;
-	}
-
-	/**
-	 * @param windDirectionRelative 
-	 * 		the relative wind direction in degrees clockwise from N to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setWindDirectionRelative(Double windDirectionRelative) {
-		if ( windDirectionRelative == null )
-			this.windDirectionRelative = FP_MISSING_VALUE;
-		else
-			this.windDirectionRelative = windDirectionRelative;
-	}
-
-	/**
 	 * @return 
 	 * 		the woceCO2Water;
-	 * 		never null but could be {@link SocatWoceEvent#WOCE_NOT_CHECKED} if not assigned
+	 * 		never null but could be {@link WoceEvent#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Water() {
 		return woceCO2Water;
@@ -1373,11 +727,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woceCO2Water 
 	 * 		the woceCO2Water to set;
-	 * 		if null, {@link SocatWoceEvent#WOCE_NOT_CHECKED} is assigned
+	 * 		if null, {@link WoceEvent#WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setWoceCO2Water(Character woceCO2Water) {
 		if ( woceCO2Water == null )
-			this.woceCO2Water = SocatWoceEvent.WOCE_NOT_CHECKED;
+			this.woceCO2Water = WoceEvent.WOCE_NOT_CHECKED;
 		else
 			this.woceCO2Water = woceCO2Water;
 	}
@@ -1385,7 +739,7 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the woceCO2Atm;
-	 * 		never null but could be {@link SocatWoceEvent#WOCE_NOT_CHECKED} if not assigned
+	 * 		never null but could be {@link WoceEvent#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Atm() {
 		return woceCO2Atm;
@@ -1394,11 +748,11 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	/**
 	 * @param woceCO2Atm 
 	 * 		the woceCO2Atm to set;
-	 * 		if null, {@link #SocatWoceEvent#WOCE_NOT_CHECKED} is assigned
+	 * 		if null, {@link #WoceEvent#WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setWoceCO2Atm(Character woceCO2Atm) {
 		if ( woceCO2Atm == null )
-			this.woceCO2Atm = SocatWoceEvent.WOCE_NOT_CHECKED;
+			this.woceCO2Atm = WoceEvent.WOCE_NOT_CHECKED;
 		else
 			this.woceCO2Atm = woceCO2Atm;
 	}
@@ -1413,330 +767,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param woaSss 
-	 * 		the WOA sea surface salinity to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setWoaSss(Double woaSss) {
-		if ( woaSss == null )
-			this.woaSss = FP_MISSING_VALUE;
-		else
-			this.woaSss = woaSss;
-	}
-
-	/**
 	 * @return 
 	 * 		the NCEP sea level pressure;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getNcepSlp() {
 		return ncepSlp;
-	}
-
-	/**
-	 * @param ncepSlp 
-	 * 		the NCEP sea level pressure to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setNcepSlp(Double ncepSlp) {
-		if ( ncepSlp == null )
-			this.ncepSlp = FP_MISSING_VALUE;
-		else
-			this.ncepSlp = ncepSlp;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 TEqu;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2TEqu() {
-		return fCO2FromXCO2TEqu;
-	}
-
-	/**
-	 * @param fCO2FromXCO2TEqu 
-	 * 		the fCO2 from xCO2 TEqu to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2TEqu(Double fCO2FromXCO2TEqu) {
-		if ( fCO2FromXCO2TEqu == null )
-			this.fCO2FromXCO2TEqu = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2TEqu = fCO2FromXCO2TEqu;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 SST;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2Sst() {
-		return fCO2FromXCO2Sst;
-	}
-
-	/**
-	 * @param fCO2FromXCO2Sst 
-	 * 		the fCO2 from xCO2 SST to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2Sst(Double fCO2FromXCO2Sst) {
-		if ( fCO2FromXCO2Sst == null )
-			this.fCO2FromXCO2Sst = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2Sst = fCO2FromXCO2Sst;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from pCO2 TEqu;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromPCO2TEqu() {
-		return fCO2FromPCO2TEqu;
-	}
-
-	/**
-	 * @param fCO2FromPCO2TEqu 
-	 * 		the fCO2 from pCO2 TEqu to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromPCO2TEqu(Double fCO2FromPCO2TEqu) {
-		if ( fCO2FromPCO2TEqu == null )
-			this.fCO2FromPCO2TEqu = FP_MISSING_VALUE;
-		else
-			this.fCO2FromPCO2TEqu = fCO2FromPCO2TEqu;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from pCO2 SST;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned 
-	 */
-	public Double getfCO2FromPCO2Sst() {
-		return fCO2FromPCO2Sst;
-	}
-
-	/**
-	 * @param fCO2FromPCO2Sst 
-	 * 		the fCO2 from pCO2 SST to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromPCO2Sst(Double fCO2FromPCO2Sst) {
-		if ( fCO2FromPCO2Sst == null )
-			this.fCO2FromPCO2Sst = FP_MISSING_VALUE;
-		else
-			this.fCO2FromPCO2Sst = fCO2FromPCO2Sst;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from fCO2 TEqu;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromFCO2TEqu() {
-		return fCO2FromFCO2TEqu;
-	}
-
-	/**
-	 * @param fCO2FromFCO2TEqu
-	 * 		the fCO2 from fCO2 TEqu to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromFCO2TEqu(Double fCO2FromFCO2TEqu) {
-		if ( fCO2FromFCO2TEqu == null )
-			this.fCO2FromFCO2TEqu = FP_MISSING_VALUE;
-		else
-			this.fCO2FromFCO2TEqu = fCO2FromFCO2TEqu;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from fCO2 SST;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromFCO2Sst() {
-		return fCO2FromFCO2Sst;
-	}
-
-	/**
-	 * @param fCO2FromFCO2Sst 
-	 * 		the fCO2 from fCO2 SST to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromFCO2Sst(Double fCO2FromFCO2Sst) {
-		if ( fCO2FromFCO2Sst == null )
-			this.fCO2FromFCO2Sst = FP_MISSING_VALUE;
-		else
-			this.fCO2FromFCO2Sst = fCO2FromFCO2Sst;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from pCO2 TEqu NCEP;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromPCO2TEquNcep() {
-		return fCO2FromPCO2TEquNcep;
-	}
-
-	/**
-	 * @param fCO2FromPCO2TEquNcep 
-	 * 		the fCO2 from pCO2 TEqu NCEP to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromPCO2TEquNcep(Double fCO2FromPCO2TEquNcep) {
-		if ( fCO2FromPCO2TEquNcep == null )
-			this.fCO2FromPCO2TEquNcep = FP_MISSING_VALUE;
-		else
-			this.fCO2FromPCO2TEquNcep = fCO2FromPCO2TEquNcep;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from pCO2 SST NCEP;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromPCO2SstNcep() {
-		return fCO2FromPCO2SstNcep;
-	}
-
-	/**
-	 * @param fCO2FromPCO2SstNcep 
-	 * 		the fCO2 from pCO2 SST NCEP to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromPCO2SstNcep(Double fCO2FromPCO2SstNcep) {
-		if ( fCO2FromPCO2SstNcep == null )
-			this.fCO2FromPCO2SstNcep = FP_MISSING_VALUE;
-		else
-			this.fCO2FromPCO2SstNcep = fCO2FromPCO2SstNcep;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 TEqu WOA;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2TEquWoa() {
-		return fCO2FromXCO2TEquWoa;
-	}
-
-	/**
-	 * @param fCO2FromXCO2TEquWoa 
-	 * 		the fCO2 from xCO2 TEqu WOA to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2TEquWoa(Double fCO2FromXCO2TEquWoa) {
-		if ( fCO2FromXCO2TEquWoa == null )
-			this.fCO2FromXCO2TEquWoa = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2TEquWoa = fCO2FromXCO2TEquWoa;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from XCO2 SST WOA;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2SstWoa() {
-		return fCO2FromXCO2SstWoa;
-	}
-
-	/**
-	 * @param fCO2FromXCO2SstWoa 
-	 * 		the fCO2 from xCO2 SST WOA to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2SstWoa(Double fCO2FromXCO2SstWoa) {
-		if ( fCO2FromXCO2SstWoa == null )
-			this.fCO2FromXCO2SstWoa = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2SstWoa = fCO2FromXCO2SstWoa;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 TEqu NCEP;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2TEquNcep() {
-		return fCO2FromXCO2TEquNcep;
-	}
-
-	/**
-	 * @param fCO2FromXCO2TEquNcep 
-	 * 		the fCO2 from xCO2 TEqu NCEP to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2TEquNcep(Double fCO2FromXCO2TEquNcep) {
-		if ( fCO2FromXCO2TEquNcep == null )
-			this.fCO2FromXCO2TEquNcep = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2TEquNcep = fCO2FromXCO2TEquNcep;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 SST NCEP;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2SstNcep() {
-		return fCO2FromXCO2SstNcep;
-	}
-
-	/**
-	 * @param fCO2 from xCO2 SST NCEP 
-	 * 		the fCO2 from xCO2 SST NCEP to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2SstNcep(Double fCO2FromXCO2SstNcep) {
-		if ( fCO2FromXCO2SstNcep == null )
-			this.fCO2FromXCO2SstNcep = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2SstNcep = fCO2FromXCO2SstNcep;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 TEqu NCEP WOA;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2TEquNcepWoa() {
-		return fCO2FromXCO2TEquNcepWoa;
-	}
-
-	/**
-	 * @param fCO2FromXCO2TEquNcepWoa 
-	 * 		the fCO2 from xCO2 TEqu NCEP WOA to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2TEquNcepWoa(Double fCO2FromXCO2TEquNcepWoa) {
-		if ( fCO2FromXCO2TEquNcepWoa == null )
-			this.fCO2FromXCO2TEquNcepWoa = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2TEquNcepWoa = fCO2FromXCO2TEquNcepWoa;
-	}
-
-	/**
-	 * @return 
-	 * 		the fCO2 from xCO2 SST NCEP WOA;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getfCO2FromXCO2SstNcepWoa() {
-		return fCO2FromXCO2SstNcepWoa;
-	}
-
-	/**
-	 * @param fCO2FromXCO2SstNcepWoa 
-	 * 		the fCO2 from xCO2 SST NCEP WOA to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2FromXCO2SstNcepWoa(Double fCO2FromXCO2SstNcepWoa) {
-		if ( fCO2FromXCO2SstNcepWoa == null )
-			this.fCO2FromXCO2SstNcepWoa = FP_MISSING_VALUE;
-		else
-			this.fCO2FromXCO2SstNcepWoa = fCO2FromXCO2SstNcepWoa;
 	}
 
 	/**
@@ -1749,57 +785,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param fCO2Rec 
-	 * 		the recomputed fCO2 to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2Rec(Double fCO2Rec) {
-		if ( fCO2Rec == null )
-			this.fCO2Rec = FP_MISSING_VALUE;
-		else
-			this.fCO2Rec = fCO2Rec;
-	}
-
-	/**
 	 * @return 
 	 * 		the method used to create the recomputed fCO2;
 	 * 		never null but could be {@link #INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getfCO2Source() {
 		return fCO2Source;
-	}
-
-	/**
-	 * @param fCO2Source
-	 * 		the method used to create the recomputed fCO2 to set;
-	 * 		if null, {@link #INT_MISSING_VALUE} is assigned
-	 */
-	public void setfCO2Source(Integer fCO2Source) {
-		if ( fCO2Source == null )
-			this.fCO2Source = INT_MISSING_VALUE;
-		else
-			this.fCO2Source = fCO2Source;
-	}
-
-	/**
-	 * @return 
-	 * 		the difference between sea surface and equilibrator temperature;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getDeltaT() {
-		return deltaT;
-	}
-
-	/**
-	 * @param deltaT
-	 * 		the difference between sea surface and equilibrator temperature to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setDeltaT(Double deltaT) {
-		if ( deltaT == null )
-			this.deltaT = FP_MISSING_VALUE;
-		else
-			this.deltaT = deltaT;
 	}
 
 	/**
@@ -1812,57 +803,12 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param regionID 
-	 * 		the region ID to set;
-	 * 		if null, {@link DataLocation#GLOBAL_REGION_ID} is assigned
-	 */
-	public void setRegionID(Character regionID) {
-		if ( regionID == null )
-			this.regionID = DataLocation.GLOBAL_REGION_ID;
-		else
-			this.regionID = regionID;
-	}
-
-	/**
-	 * @return 
-	 * 		the calculated speed of the ship;
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getCalcSpeed() {
-		return calcSpeed;
-	}
-
-	/**
-	 * @param calcSpeed 
-	 * 		the calculated speed of the ship to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setCalcSpeed(Double calcSpeed) {
-		if ( calcSpeed == null )
-			this.calcSpeed = FP_MISSING_VALUE;
-		else
-			this.calcSpeed = calcSpeed;
-	}
-
-	/**
 	 * @return 
 	 * 		the ETOPO2 depth;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getEtopo2Depth() {
 		return etopo2Depth;
-	}
-
-	/**
-	 * @param etopo2Depth
-	 * 		the ETOPO2_DEPTH depth to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setEtopo2Depth(Double etopo2Depth) {
-		if ( etopo2Depth == null )
-			this.etopo2Depth = FP_MISSING_VALUE;
-		else
-			this.etopo2Depth = etopo2Depth;
 	}
 
 	/**
@@ -1875,18 +821,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @param gvCO2 
-	 * 		the GlobablView CO2 to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setGvCO2(Double gvCO2) {
-		if ( gvCO2 == null )
-			this.gvCO2 = FP_MISSING_VALUE;
-		else
-			this.gvCO2 = gvCO2;
-	}
-
-	/**
 	 * @return 
 	 * 		the distance to nearest major land mass;
 	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
@@ -1894,40 +828,6 @@ public class SocatCruiseData implements Serializable, IsSerializable {
 	public Double getDistToLand() {
 		return distToLand;
 	}
-
-	/**
-	 * @param distToLand 
-	 * 		the distance to nearest major land mass to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setDistToLand(Double distToLand) {
-		if ( distToLand == null )
-			this.distToLand = FP_MISSING_VALUE;
-		else
-			this.distToLand = distToLand;
-	}
-
-	/**
-	 * @return 
-	 * 		the fractional day of the year (Jan 1 00:00 == 1.0);
-	 * 		never null but could be {@link #FP_MISSING_VALUE} if not assigned
-	 */
-	public Double getDayOfYear() {
-		return dayOfYear;
-	}
-
-	/**
-	 * @param dayOfYear 
-	 * 		the fractional day of the year (Jan 1 00:00 == 1.0) to set;
-	 * 		if null, {@link #FP_MISSING_VALUE} is assigned
-	 */
-	public void setDayOfYear(Double dayOfYear) {
-		if ( dayOfYear == null )
-			this.dayOfYear = FP_MISSING_VALUE;
-		else
-			this.dayOfYear = dayOfYear;
-	}
-
 
 	@Override 
 	public int hashCode() {

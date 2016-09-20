@@ -6,11 +6,11 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,8 +103,8 @@ public class SocatCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#SocatCruiseData(java.util.List, java.util.List)}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#dataListFromDashboardCruise(gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#SocatCruiseData(java.util.List, java.util.List)}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#dataListFromDashboardCruise(gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData)}.
 	 */
 	@Test
 	public void testSocatCruiseDataList() {
@@ -167,15 +167,15 @@ public class SocatCruiseDataTest {
 			assertEquals(SocatCruiseData.FP_MISSING_VALUE, dataRow.getDistToLand());
 			assertEquals(SocatCruiseData.INT_MISSING_VALUE, dataRow.getfCO2Source());
 			assertEquals(DataLocation.GLOBAL_REGION_ID, dataRow.getRegionID());
-			assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Water());
-			assertEquals(SocatWoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Atm());
+			assertEquals(WoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Water());
+			assertEquals(WoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Atm());
 		}
 	}
 
 	static final Integer YEAR = 2014;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getYear()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setYear(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getYear()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setYear(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetYear() {
@@ -189,8 +189,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer MONTH = 1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getMonth()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setMonth(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getMonth()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setMonth(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetMonth() {
@@ -205,8 +205,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer DAY = 13;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getDay()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setDay(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getDay()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setDay(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetDay() {
@@ -222,8 +222,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer HOUR = 19;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getHour()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setHour(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getHour()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setHour(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetHour() {
@@ -240,8 +240,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer MINUTE = 35;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getMinute()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setMinute(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getMinute()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setMinute(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetMinute() {
@@ -259,8 +259,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SECOND = 18.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSecond()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSecond(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getSecond()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setSecond(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSecond() {
@@ -279,8 +279,8 @@ public class SocatCruiseDataTest {
 
 	static final Double LONGITUDE = -125.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getLongitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getLongitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetLongitude() {
@@ -300,8 +300,8 @@ public class SocatCruiseDataTest {
 
 	static final Double LATITUDE = 46.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getLatitude()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getLatitude()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetLatitude() {
@@ -322,8 +322,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SAMPLE_DEPTH = 5.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSampleDepth()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSampleDepth(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getSampleDepth()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setSampleDepth(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSampleDepth() {
@@ -345,8 +345,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SST = 15.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getSst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setSst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSst() {
@@ -369,8 +369,8 @@ public class SocatCruiseDataTest {
 
 	static final Double T_EQU = 16.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#gettEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#settEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#gettEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#settEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetTEqu() {
@@ -394,8 +394,8 @@ public class SocatCruiseDataTest {
 
 	static final Double SAL = 31.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSalinity()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSalinity(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getSalinity()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setSalinity(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSal() {
@@ -420,8 +420,8 @@ public class SocatCruiseDataTest {
 
 	static final Double P_ATM = 1003.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getSlp()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setSlp(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getSlp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setSlp(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPAtm() {
@@ -447,8 +447,8 @@ public class SocatCruiseDataTest {
 
 	static final Double P_EQU = 1003.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getpEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setpEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getpEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setpEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPEqu() {
@@ -475,8 +475,8 @@ public class SocatCruiseDataTest {
 
 	static final Double X_CO2_WATER_SST = 451.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getxCO2WaterSstDry()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setxCO2WaterSstDry(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getxCO2WaterSstDry()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setxCO2WaterSstDry(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetXCO2WaterSst() {
@@ -525,8 +525,8 @@ public class SocatCruiseDataTest {
 
 	static final Double X_CO2_WATER_T_EQU = 450.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getxCO2WaterTEquDry()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setxCO2WaterTEquDry(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getxCO2WaterTEquDry()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setxCO2WaterTEquDry(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetXCO2WaterTEqu() {
@@ -579,8 +579,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_WATER_SST = 451.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2WaterSstWet()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2WaterSstWet(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2WaterSstWet()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2WaterSstWet(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2WaterSst() {
@@ -610,8 +610,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_WATER_T_EQU = 451.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2WaterTEquWet()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2WaterTEquWet(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2WaterTEquWet()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2WaterTEquWet(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2WaterTEqu() {
@@ -642,8 +642,8 @@ public class SocatCruiseDataTest {
 
 	static final Double P_CO2_WATER_SST = 451.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getpCO2WaterSstWet()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setpCO2WaterSstWet(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getpCO2WaterSstWet()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setpCO2WaterSstWet(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPCO2WaterSst() {
@@ -675,8 +675,8 @@ public class SocatCruiseDataTest {
 
 	static final Double P_CO2_WATER_T_EQU = 451.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getpCO2WaterTEquWet()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setpCO2WaterTEquWet(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getpCO2WaterTEquWet()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setpCO2WaterTEquWet(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetPCO2WaterTEqu() {
@@ -709,8 +709,8 @@ public class SocatCruiseDataTest {
 
 	static final Double WOA_SSS = 31.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getWoaSss()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setWoaSss(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getWoaSss()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setWoaSss(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWoaSss() {
@@ -744,8 +744,8 @@ public class SocatCruiseDataTest {
 
 	static final Double NCEP_SLP = 1003.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getNcepSlp()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setNcepSlp(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getNcepSlp()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setNcepSlp(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetNcepSlp() {
@@ -780,8 +780,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU = 452.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEqu() {
@@ -817,8 +817,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST = 452.1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2Sst() {
@@ -855,8 +855,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_T_EQU = 452.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromPCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromPCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2TEqu() {
@@ -894,8 +894,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_SST = 452.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromPCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromPCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2Sst() {
@@ -934,8 +934,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_F_CO2_T_EQU = 452.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromFCO2TEqu()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromFCO2TEqu(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromFCO2TEqu()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromFCO2TEqu(java.lang.Double)}.
 	 */
 	@Test
 	public void testSetFCO2FromFCO2TEqu() {
@@ -975,8 +975,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_F_CO2_SST = 452.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromFCO2Sst()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromFCO2Sst(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromFCO2Sst()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromFCO2Sst(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromFCO2Sst() {
@@ -1017,8 +1017,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_T_EQU_NCEP = 452.6;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2TEquNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2TEquNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromPCO2TEquNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromPCO2TEquNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2TEquNcep() {
@@ -1060,8 +1060,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_P_CO2_SST_NCEP = 452.7;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromPCO2SstNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromPCO2SstNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromPCO2SstNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromPCO2SstNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromPCO2SstNcep() {
@@ -1104,8 +1104,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_WOA = 452.8;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEquWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEquWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2TEquWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2TEquWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquWoa() {
@@ -1149,8 +1149,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST_WOA = 452.9;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2SstWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2SstWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2SstWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2SstWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstWoa() {
@@ -1195,8 +1195,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_NCEP = 453.0;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEquNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEquNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2TEquNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2TEquNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquNcsp() {
@@ -1242,8 +1242,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST_NCEP = 453.1;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2SstNcep()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2SstNcep(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2SstNcep()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2SstNcep(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstNcep() {
@@ -1290,8 +1290,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_T_EQU_NCEP_WOA = 453.2;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2TEquNcepWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2TEquNcepWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2TEquNcepWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2TEquNcepWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2TEquNcepWoa() {
@@ -1339,8 +1339,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_FROM_X_CO2_SST_NCEP_WOA = 453.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2FromXCO2SstNcepWoa()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2FromXCO2SstNcepWoa(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2FromXCO2SstNcepWoa()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2FromXCO2SstNcepWoa(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2FromXCO2SstNcepWoa() {
@@ -1389,8 +1389,8 @@ public class SocatCruiseDataTest {
 
 	static final Double F_CO2_REC = 453.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2Rec()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2Rec(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2Rec()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2Rec(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetFCO2Rec() {
@@ -1440,8 +1440,8 @@ public class SocatCruiseDataTest {
 
 	static final Integer F_CO2_SOURCE = 15;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getfCO2Source()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setfCO2Source(java.lang.Integer)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getfCO2Source()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setfCO2Source(java.lang.Integer)}.
 	 */
 	@Test
 	public void testGetSetFCO2Source() {
@@ -1492,8 +1492,8 @@ public class SocatCruiseDataTest {
 
 	static final Double DELTA_T = 0.3;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getDeltaT()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setDeltaT(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getDeltaT()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setDeltaT(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDeltaT() {
@@ -1545,8 +1545,8 @@ public class SocatCruiseDataTest {
 
 	static final Character REGION_ID = 'C';
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getRegionID()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setRegionID(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getRegionID()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setRegionID(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetRegionID() {
@@ -1599,8 +1599,8 @@ public class SocatCruiseDataTest {
 
 	static final Double CALC_SPEED = 2.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getCalcSpeed()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setCalcSpeed(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getCalcSpeed()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setCalcSpeed(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetCalcSpeed() {
@@ -1654,8 +1654,8 @@ public class SocatCruiseDataTest {
 
 	static final Double ETOPO2 = 293.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getEtopo2Depth()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setEtopo2Depth(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getEtopo2Depth()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setEtopo2Depth(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetEtopo2Depth() {
@@ -1710,8 +1710,8 @@ public class SocatCruiseDataTest {
 
 	static final Double GVCO2 = 428.4;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getGvCO2()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setGvCO2(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getGvCO2()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setGvCO2(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetGVCO2() {
@@ -1767,8 +1767,8 @@ public class SocatCruiseDataTest {
 
 	static final Double DIST_TO_LAND = 232.5;
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#getDistToLand()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#setDistToLand(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#getDistToLand()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#setDistToLand(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDistToLand() {
@@ -1824,8 +1824,8 @@ public class SocatCruiseDataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#hashCode()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#hashCode()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatCruiseData#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {

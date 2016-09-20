@@ -10,7 +10,7 @@ import gov.noaa.pmel.socat.dashboard.server.RowNumSet;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.SocatWoceEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -851,8 +851,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + 
 					(new SimpleDateFormat("yyyy-MM-dd HH:mm Z")).format(new Date()));
 			msgsWriter.println("Flag\tCol.Type\tNum.Rows\tMessage\tRows");
-			ArrayList<SocatWoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
-			for ( SocatWoceEvent woceEvent : woceEventsList ) {
+			ArrayList<WoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
+			for ( WoceEvent woceEvent : woceEventsList ) {
 				// Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
 				Character woceFlag = woceEvent.getFlag();
 				if ( ! (woceFlag.equals('3') || woceFlag.equals('4')) )
@@ -862,7 +862,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 					rowNums.add(dloc.getRowNumber());
 				msgsWriter.print(woceFlag);
 				msgsWriter.print('\t');
-				String dataColName = woceEvent.getDataVarName();
+				String dataColName = woceEvent.getVarName();
 				if ( dataColName.trim().isEmpty() )
 					dataColName = "(none)";
 				msgsWriter.print(dataColName);
