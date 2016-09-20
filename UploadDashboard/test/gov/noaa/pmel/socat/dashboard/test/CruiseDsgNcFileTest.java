@@ -6,8 +6,8 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
 import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
+import gov.noaa.pmel.socat.dashboard.server.KnownDataColumnTypes;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.SocatCruiseData;
@@ -34,21 +34,21 @@ public class CruiseDsgNcFileTest {
 	@Test
 	public void testCreate() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				DataColumnType.EXPOCODE,
-				DataColumnType.CRUISE_NAME,
-				DataColumnType.MONTH, 
-				DataColumnType.DAY, 
-				DataColumnType.YEAR, 
-				DataColumnType.HOUR, 
-				DataColumnType.MINUTE, 
-				DataColumnType.LATITUDE, 
-				DataColumnType.LONGITUDE, 
-				DataColumnType.SEA_SURFACE_TEMPERATURE,
-				DataColumnType.SALINITY,
-				DataColumnType.XCO2_WATER_SST_DRY,
-				DataColumnType.PCO2_WATER_TEQU_WET,
-				DataColumnType.SEA_LEVEL_PRESSURE,
-				DataColumnType.SHIP_SPEED));
+				KnownDataColumnTypes.EXPOCODE,
+				KnownDataColumnTypes.CRUISE_NAME,
+				KnownDataColumnTypes.MONTH, 
+				KnownDataColumnTypes.DAY, 
+				KnownDataColumnTypes.YEAR, 
+				KnownDataColumnTypes.HOUR, 
+				KnownDataColumnTypes.MINUTE, 
+				KnownDataColumnTypes.LATITUDE, 
+				KnownDataColumnTypes.LONGITUDE, 
+				KnownDataColumnTypes.SEA_SURFACE_TEMPERATURE,
+				KnownDataColumnTypes.SALINITY,
+				KnownDataColumnTypes.XCO2_WATER_SST_DRY,
+				KnownDataColumnTypes.PCO2_WATER_TEQU_WET,
+				KnownDataColumnTypes.SEA_LEVEL_PRESSURE,
+				KnownDataColumnTypes.SHIP_SPEED));
 		String[] dataValueStrings = {
 				"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
 				"31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3", 
@@ -133,21 +133,21 @@ public class CruiseDsgNcFileTest {
 	@Test
 	public void testBadMissingValuesFail() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				DataColumnType.EXPOCODE,
-				DataColumnType.CRUISE_NAME,
-				DataColumnType.MONTH, 
-				DataColumnType.DAY, 
-				DataColumnType.YEAR, 
-				DataColumnType.HOUR, 
-				DataColumnType.MINUTE, 
-				DataColumnType.LATITUDE, 
-				DataColumnType.LONGITUDE, 
-				DataColumnType.SEA_SURFACE_TEMPERATURE,
-				DataColumnType.SALINITY,
-				DataColumnType.XCO2_WATER_SST_DRY,
-				DataColumnType.PCO2_WATER_TEQU_WET,
-				DataColumnType.SEA_LEVEL_PRESSURE,
-				DataColumnType.SHIP_SPEED));
+				KnownDataColumnTypes.EXPOCODE,
+				KnownDataColumnTypes.CRUISE_NAME,
+				KnownDataColumnTypes.MONTH, 
+				KnownDataColumnTypes.DAY, 
+				KnownDataColumnTypes.YEAR, 
+				KnownDataColumnTypes.HOUR, 
+				KnownDataColumnTypes.MINUTE, 
+				KnownDataColumnTypes.LATITUDE, 
+				KnownDataColumnTypes.LONGITUDE, 
+				KnownDataColumnTypes.SEA_SURFACE_TEMPERATURE,
+				KnownDataColumnTypes.SALINITY,
+				KnownDataColumnTypes.XCO2_WATER_SST_DRY,
+				KnownDataColumnTypes.PCO2_WATER_TEQU_WET,
+				KnownDataColumnTypes.SEA_LEVEL_PRESSURE,
+				KnownDataColumnTypes.SHIP_SPEED));
 		String[][] badTimeDataValueStringsSets = {
 				{
 					"11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 

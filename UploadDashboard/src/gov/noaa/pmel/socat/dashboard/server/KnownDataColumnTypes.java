@@ -5,6 +5,9 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -15,7 +18,7 @@ import java.util.Properties;
  *  
  * @author Karl Smith
  */
-public class KnownDataColumnTypes extends LinkedHashSet<DataColumnType> {
+public class KnownDataColumnTypes {
 
 	/** Formats for date-time stamps */
 	private static final ArrayList<String> TIMESTAMP_UNITS = 
@@ -48,14 +51,6 @@ public class KnownDataColumnTypes extends LinkedHashSet<DataColumnType> {
 	/** Units of depths */
 	private static final ArrayList<String> DEPTH_UNITS = 
 			new ArrayList<String>(Arrays.asList("meters"));
-
-	/**
-	 * OTHER is for supplementary data in the user's original data file but 
-	 * not part of SOCAT.  A description of each column with this type must 
-	 * be part of the metadata, but the values are not validated or used. 
-	 * Multiple columns may have this type.
-	 */
-	public static final DataColumnType OTHER = new DataColumnType("other", null);
 
 	/**
 	 * EXPOCODE is NODCYYYYMMDD where NODC is the ship code and 
@@ -155,6 +150,8 @@ public class KnownDataColumnTypes extends LinkedHashSet<DataColumnType> {
 	 */
 	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth", DEPTH_UNITS);
 
+	private LinkedHashSet<DataColumnType> knownTypes;
+
 	/**
 	 * Creates with the default well-known data column types:
 	 *     UNKNOWN, OTHER, EXPOCODE, CRUISE_NAME, SHIP_NAME, GROUP_NAME,
@@ -164,42 +161,81 @@ public class KnownDataColumnTypes extends LinkedHashSet<DataColumnType> {
 	 */
 	public KnownDataColumnTypes() {
 		// Give plenty of capacity for expansion
-		super(64);
-		add(UNKNOWN);
-		add(OTHER);
-		add(EXPOCODE);
-		add(CRUISE_NAME);
-		add(SHIP_NAME);
-		add(GROUP_NAME);
-		add(INVESTIGATOR_NAMES);
-		add(TIMESTAMP);
-		add(DATE);
-		add(YEAR);
-		add(MONTH);
-		add(DAY);
-		add(TIME);
-		add(HOUR);
-		add(MINUTE);
-		add(SECOND);
-		add(DAY_OF_YEAR);
-		add(SECOND_OF_DAY);
-		add(LONGITUDE);
-		add(LATITUDE);
-		add(SAMPLE_DEPTH);
+		// since this is a LinkedHashMap, extra capacity not really a problem
+		knownTypes = new LinkedHashSet<DataColumnType>(64);
+		knownTypes.add(DataColumnType.UNKNOWN);
+		knownTypes.add(DataColumnType.OTHER);
+		knownTypes.add(EXPOCODE);
+		knownTypes.add(CRUISE_NAME);
+		knownTypes.add(SHIP_NAME);
+		knownTypes.add(GROUP_NAME);
+		knownTypes.add(INVESTIGATOR_NAMES);
+		knownTypes.add(TIMESTAMP);
+		knownTypes.add(DATE);
+		knownTypes.add(YEAR);
+		knownTypes.add(MONTH);
+		knownTypes.add(DAY);
+		knownTypes.add(TIME);
+		knownTypes.add(HOUR);
+		knownTypes.add(MINUTE);
+		knownTypes.add(SECOND);
+		knownTypes.add(DAY_OF_YEAR);
+		knownTypes.add(SECOND_OF_DAY);
+		knownTypes.add(LONGITUDE);
+		knownTypes.add(LATITUDE);
+		knownTypes.add(SAMPLE_DEPTH);
 	}
 
 	/**
+	 * Create additional known column types from values in a Properties file.
+	 * Only the data column type name and list of units are assigned in the known 
+	 * data types.
 	 * 
-	 * @param props
+	 * @param knownTypesFile
+	 * 		properties file of data column types to add to the known list 
+	 * 		with the simple line format:
+	 * 			type=unit1,unit2,... 
+	 * @throws IllegalArgumentException
+	 * 		if a data column type name matches, compared case-insensitive, 
+	 * 		an existing known data column type name.
+	 * @throws IOException
+	 * 		if problems reading the Properties file
 	 */
-	public void addTypeFromProperties(Properties props) {
-		
+	public void addTypeFromProperties(File knownTypesFile) throws IllegalArgumentException, IOException {
+		Properties typeProps = new Properties();
+		try {
+			FileReader reader = new FileReader(knownTypesFile);
+			try {
+				typeProps.load(reader);
+			} finally {
+				reader.close();
+			}
+		} catch ( Exception ex ) {
+			throw new IOException("Problems reading " + knownTypesFile.getPath() + ": " + ex.getMessage());
+		}
+		for ( String name : typeProps.stringPropertyNames() ) {
+			for ( DataColumnType dtype : knownTypes ) {
+				if ( dtype.getName().equalsIgnoreCase(name) )
+					throw new IllegalArgumentException("Duplicate known data column type name '" + name + "'");
+			}
+			String unitsString = typeProps.getProperty(name).trim();
+			if ( ! unitsString.isEmpty() ) {
+				LinkedHashSet<String> units = new LinkedHashSet<String>();
+				for ( String val : unitsString.split(",") ) {
+					units.add(val.trim());
+				}
+				knownTypes.add(new DataColumnType(name, units));
+			}
+			else {
+				knownTypes.add(new DataColumnType(name, null));
+			}
+		}
 	}
 
 	@Override
 	public String toString() {
 		String strval = "KnownDataColumnTypes[\n";
-		for ( DataColumnType dtype : this )
+		for ( DataColumnType dtype : knownTypes )
 			strval += "    " + dtype.toString() + "\n";
 		strval += "]";
 		return strval;
