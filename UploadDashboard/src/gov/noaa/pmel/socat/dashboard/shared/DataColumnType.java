@@ -11,19 +11,20 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Types of the data columns in a user-provided cruise data file.
- * Includes a list of possible units for this data type as well as
- * the selected unit and missing value(s).
+ * Includes information about this data column type to present
+ * and assign on the client side, as well as information for 
+ * creating the variable in a NetCDF file on the server side.
  * 
  * @author Karl Smith
  */
 public class DataColumnType implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5811819591623980901L;
+	private static final long serialVersionUID = -2988202602030736939L;
 
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */
-	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null);
+	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null, null, null, null, null);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -31,48 +32,85 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * be part of the metadata, but the values are not validated or used. 
 	 * Multiple columns may have this type.
 	 */
-	public static final DataColumnType OTHER = new DataColumnType("other", null);
+	public static final DataColumnType OTHER = new DataColumnType("other", null, null, null, null, null);
 
-	private String name;
+	private String varName;
+	private String dataClassName;
+	private String description;
+	private String standardName;
+	private String categoryName;
 	private ArrayList<String> units;
-	private Integer selectedUnit;
+	private Integer selectedUnitIndex;
 	private String selectedMissingValue;
 
 	/**
 	 * Create an empty data column type: 
-	 * 		data type name is an empty string, 
-	 * 		units list only contains an empty string,
-	 * 		selected units is the first unit in the list (0),
-	 * 		selected missing value is an empty string (default missing values). 
+	 * varName, dataClassName, description, standardName, and categoryName are empty strings,
+	 * units list only contains an empty string,
+	 * index of the selected unit is zero,
+	 * selected missing value is an empty string (default missing values). 
 	 */
 	public DataColumnType() {
-		this.name = "";
+		varName = "";
+		dataClassName = "";
+		description = "";
+		standardName = "";
+		categoryName = "";
 		// Use the default initial capacity since a name and units should be added
-		this.units = new ArrayList<String>();
-		this.units.add("");
-		this.selectedUnit = Integer.valueOf(0);
-		this.selectedMissingValue = "";
+		units = new ArrayList<String>();
+		units.add("");
+		selectedUnitIndex = Integer.valueOf(0);
+		selectedMissingValue = "";
 	}
 
 	/**
-	 * Create a data column type with the given name and list of units.
-	 * The select unit is the first unit is the list (0) and
-	 * the selected missing value is an empty string (default missing values).
+	 * Create a data column type with the given values.  The index of the 
+	 * selected unit is zero and the selected missing value is an empty 
+	 * string (default missing values).
 	 * 
-	 * @param name
-	 * 		name of the data column type; 
+	 * @param varName
+	 * 		name for a variable of this type; 
+	 * 		if null, an empty string is assigned
+	 * @param dataClassName
+	 * 		name of the class for a variable of this type
+	 * 		(e.g., Character, Double, Integer, String);
+	 * 		if null, an empty string is assigned
+	 * @param description
+	 * 		description of a variable of this type;
+	 * 		if null, an empty string is assigned
+	 * @param standardName
+	 * 		standard name for a variable of this type
+	 * 		(can duplicate standard names of other data column types);
+	 * 		if null, an empty string is assigned
+	 * @param categoryName
+	 * 		category name for a variable of this type;
 	 * 		if null, an empty string is assigned
 	 * @param units
 	 * 		unit strings associated with this type;
 	 * 		if null or empty, a list with a single empty unit string is assigned
 	 */
-	public DataColumnType(String name, Collection<String> units) {
-		if ( name != null ) {
-			this.name = name;
-		}
-		else {
-			this.name = "";
-		}
+	public DataColumnType(String varName, String dataClassName, String description,
+			String standardName, String categoryName, Collection<String> units) {
+		if ( varName != null )
+			this.varName = varName;
+		else
+			this.varName = "";
+		if ( dataClassName != null )
+			this.dataClassName = dataClassName;
+		else
+			this.dataClassName = "";
+		if ( description != null )
+			this.description = description;
+		else
+			this.description = "";
+		if ( standardName != null )
+			this.standardName = standardName;
+		else
+			this.standardName = "";
+		if ( categoryName != null )
+			this.categoryName = categoryName;
+		else
+			this.categoryName = "";
 		if ( (units != null) && (units.size() > 0) ) {
 			this.units = new ArrayList<String>(units);
 		}
@@ -81,31 +119,117 @@ public class DataColumnType implements Serializable, IsSerializable {
 			this.units = new ArrayList<String>(1);
 			this.units.add("");
 		}
-		this.selectedUnit = Integer.valueOf(0);
+		this.selectedUnitIndex = Integer.valueOf(0);
 		this.selectedMissingValue = "";
 	}
 
 	/**
 	 * @return 
-	 * 		the name for this data column type;
+	 * 		the variable name for this data column type;
 	 * 		never null but may be empty
 	 */
-	public String getName() {
-		return name;
+	public String getVarName() {
+		return varName;
 	}
 
 	/**
-	 * @param name 
-	 * 		the name of this data column type to set;
+	 * @param varName 
+	 * 		the variable name to set for this of this data column type;
 	 * 		if null, an empty string is assigned
 	 */
-	public void setName(String name) {
-		if ( name != null ) {
-			this.name = name;
+	public void setVarName(String varName) {
+		if ( varName != null ) {
+			this.varName = varName;
 		}
 		else {
-			this.name = "";
+			this.varName = "";
 		}
+	}
+
+	/**
+	 * @return 
+	 * 		the data class name for this data column type
+	 * 		(e.g., Character, Double, Integer, String);
+	 * 		never null but may be empty
+	 */
+	public String getDataClassName() {
+		return dataClassName;
+	}
+
+	/**
+	 * @param dataClassName 
+	 * 		the data class name to set for this data column type
+	 * 		(e.g., Character, Double, Integer, String);
+	 * 		if null, an empty string is assigned
+	 */
+	public void setDataClassName(String dataClassName) {
+		if ( dataClassName != null )
+			this.dataClassName = dataClassName;
+		else
+			this.dataClassName = "";
+	}
+
+	/**
+	 * @return 
+	 * 		description of a variable of this type;
+	 * 		never null but may be empty
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * @param description 
+	 * 		description of a variable of this type to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setDescription(String description) {
+		if ( description != null )
+			this.description = description;
+		else
+			this.description = "";
+	}
+
+	/**
+	 * @return 
+	 * 		standard name of a variable of this type;
+	 * 		never null but may be empty
+	 */
+	public String getStandardName() {
+		return standardName;
+	}
+
+	/**
+	 * @param standardName 
+	 * 		standard name of a variable of this type to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setStandardName(String standardName) {
+		if ( standardName != null )
+			this.standardName = standardName;
+		else
+			this.standardName = "";
+	}
+
+	/**
+	 * @return
+	 * 		category name of a variable of this type;
+	 * 		never null but may be empty
+	 */
+	public String getCategoryName() {
+		return categoryName;
+	}
+
+	/**
+	 * @param categoryName 
+	 * 		category name of a variable of this type;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setCategoryName(String categoryName) {
+		if ( categoryName != null )
+			this.categoryName = categoryName;
+		else
+			this.categoryName = "";
 	}
 
 	/**
@@ -135,22 +259,26 @@ public class DataColumnType implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the index in the units list of the selected unit
+	 * 		the index in the units list of the selected unit;
+	 * 		if the index is not valid for the current list of units,
+	 * 		zero is returned
 	 */
-	public Integer getSelectedUnit() {
-		return selectedUnit;
+	public Integer getSelectedUnitIndex() {
+		if ( (selectedUnitIndex < 0) || (selectedUnitIndex >= units.size()) )
+			return 0;
+		return selectedUnitIndex;
 	}
 
 	/**
-	 * @param selectedUnit 
+	 * @param selectedUnitIndex 
 	 * 		the index in the units list of the selected unit to set;
 	 * 		if null, zero is assigned
 	 */
-	public void setSelectedUnit(Integer selectedUnit) {
-		if ( selectedUnit != null )
-			this.selectedUnit = selectedUnit;
+	public void setSelectedUnitIndex(Integer selectedUnitIndex) {
+		if ( selectedUnitIndex != null )
+			this.selectedUnitIndex = selectedUnitIndex;
 		else
-			this.selectedUnit = Integer.valueOf(0);
+			this.selectedUnitIndex = Integer.valueOf(0);
 	}
 
 	/**
@@ -176,27 +304,32 @@ public class DataColumnType implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * Check if the upper-cased name of this data column type 
-	 * matches the upper-cased name of another data column type.
+	 * Checks if the "type" of this DataColumnType matches that of another.
+	 * This only examines the varName fields of these objects, checking the 
+	 * upper-cased version of these fields.
 	 * 
 	 * @param other
 	 * 		data column type to compare to
 	 * @return
-	 * 		if the upper-cased data column type names match
+	 * 		whether the "types" match
 	 */
-	public boolean sameType(DataColumnType other) {
+	public boolean typeEquals(DataColumnType other) {
 		if ( this == other )
 			return true;
 		if ( other == null )
 			return false;
-		return this.name.toUpperCase().equals(other.name.toUpperCase());
+		return this.varName.toUpperCase().equals(other.varName.toUpperCase());
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = name.hashCode();
-		result = result * prime + selectedUnit.hashCode();
+		int result = varName.hashCode();
+		result = result * prime + dataClassName.hashCode();
+		result = result * prime + description.hashCode();
+		result = result * prime + standardName.hashCode();
+		result = result * prime + categoryName.hashCode();
+		result = result * prime + selectedUnitIndex.hashCode();
 		result = result * prime + selectedMissingValue.hashCode();
 		result = result * prime + units.hashCode();
 		return result;
@@ -213,9 +346,17 @@ public class DataColumnType implements Serializable, IsSerializable {
 			return false;
 
 		DataColumnType other = (DataColumnType) obj;
-		if ( ! name.equals(other.name) )
+		if ( ! varName.equals(other.varName) )
 			return false;
-		if ( ! selectedUnit.equals(other.selectedUnit) )
+		if ( ! dataClassName.equals(other.dataClassName) )
+			return false;
+		if ( ! description.equals(other.description) )
+			return false;
+		if ( ! standardName.equals(other.standardName) )
+			return false;
+		if ( ! categoryName.equals(other.categoryName) )
+			return false;
+		if ( ! selectedUnitIndex.equals(other.selectedUnitIndex) )
 			return false;
 		if ( ! selectedMissingValue.equals(other.selectedMissingValue) )
 			return false;
@@ -226,9 +367,13 @@ public class DataColumnType implements Serializable, IsSerializable {
 
 	@Override
 	public String toString() {
-		return "DataColumnType[name=" + name + 
+		return "DataColumnType[varName=" + varName + 
+				", dataClassName=" + dataClassName + 
+				", description=" + description + 
+				", standardName=" + standardName + 
+				", categoryName=" + categoryName + 
 				", units=" + units.toString() + 
-				", selectedUnit=" + selectedUnit.toString() + 
+				", selectedUnitIndex=" + selectedUnitIndex.toString() + 
 				", selectedMissingValue=" + selectedMissingValue + 
 				"]";
 	}
