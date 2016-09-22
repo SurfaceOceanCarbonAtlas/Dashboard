@@ -10,6 +10,7 @@ import gov.noaa.pmel.socat.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.socat.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardEvent;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
@@ -115,7 +116,7 @@ public class AddOldNFlags {
 				for ( QCEvent evnt : qcEvents ) {
 					// Ordered by qc_time descending, so earliest is last
 					earliestQC = evnt;
-					String socatVersion = evnt.getSocatVersion();
+					String socatVersion = evnt.getVersion();
 					if ( socatVersion.equals("1.3") ) {
 						hasV13QC = true;
 						Character flag = evnt.getFlag();
@@ -144,11 +145,11 @@ public class AddOldNFlags {
 						qcEvent.setExpocode(expocode);
 						qcEvent.setFlag(QCEvent.QC_NEW_FLAG);
 						qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-						qcEvent.setSocatVersion("1.3");
+						qcEvent.setVersion("1.3");
 						qcEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
 						qcEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
 						Date oldDate = earliestQC.getFlagDate();
-						if ( oldDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
+						if ( oldDate.equals(DashboardUtils.DATE_MISSING_VALUE) ) {
 							System.err.println("No date for oldest QC flag of " + expocode);
 							success = false;
 							continue;
@@ -173,11 +174,11 @@ public class AddOldNFlags {
 					qcEvent.setExpocode(expocode);
 					qcEvent.setFlag(QCEvent.QC_NEW_FLAG);
 					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-					qcEvent.setSocatVersion("1.4");
+					qcEvent.setVersion("1.4");
 					qcEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
 					qcEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
 					Date oldDate = earliestQC.getFlagDate();
-					if ( oldDate.equals(SocatMetadata.DATE_MISSING_VALUE) ) {
+					if ( oldDate.equals(DashboardUtils.DATE_MISSING_VALUE) ) {
 						System.err.println("No date for oldest QC flag of " + expocode);
 						success = false;
 						continue;

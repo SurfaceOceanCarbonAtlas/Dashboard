@@ -14,8 +14,8 @@ The jar file netcdfAll-4.6.4.jar was obtained from the Unidata netCDF downloads 
 The jar file slf4j-log4j12-1.7.18.jar was obtained from the slf4j-1.7.18 distribution from the SLF4J downloads site http://www.slf4j.org/
 The jar file commons-csv-1.2.jar was obtained from the Apache Commons CSV download site http://commons.apache.org/proper/commons-csv/download_csv.cgi
 The jar file mysql-connector-java-5.1.38.jar was obtained from https://dev.mysql.com/downloads/connector/j/
+The jar file gson-2.7.jar was obtained from http://repo1.maven.org/maven2/com/google/code/gson/gson/2.7/
 
 The jar file sanitychecker.jar is created from the Java classes under SanityChecker/src in this project and added to this location.
 The jar file omemetadata.jar is created from the Java classes under OmeMetadata/src in this project and added to this location.
 The jar file gwt-servlet.jar is obtained from the GWT SDK package used to build this GWT code.  The GWT SDK packages can be found at http://www.gwtproject.org 
-

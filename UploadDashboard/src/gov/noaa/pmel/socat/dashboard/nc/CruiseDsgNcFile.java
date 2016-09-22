@@ -1,6 +1,7 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
 import gov.noaa.pmel.socat.dashboard.handlers.DsgNcFileHandler;
+import gov.noaa.pmel.socat.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruiseWithData;
@@ -36,18 +37,17 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 8195248681298504062L;
 
 	// Names of some of the variables in the DSG files
-	public static final String LONGITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.longitude_VARNAME);
-	public static final String LATITUDE_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.latitude_VARNAME);
-	public static final String TIME_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
-	public static final String SST_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.sst_VARNAME);
-	public static final String FCO2REC_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.fCO2Rec_VARNAME);
-	public static final String WOCECO2WATER_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.woceCO2Water_VARNAME);
-	public static final String REGION_ID_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.regionID_VARNAME);
-	public static final String ALL_REGION_IDS_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.allRegionIDs_VARNAME);
-	public static final String SOCAT_VERSION_NCVAR_NAME = Constants.SHORT_NAMES.get(Constants.socatVersion_VARNAME);
+	public static final String LONGITUDE_NCVAR_NAME = KnownDataTypes.LONGITUDE.getVarName();
+	public static final String LATITUDE_NCVAR_NAME = KnownDataTypes.LATITUDE.getVarName();
+	public static final String TIME_NCVAR_NAME = KnownDataTypes.TIME.getVarName();
+	public static final String SST_NCVAR_NAME = KnownDataTypes.SST.getVarName();
+	public static final String FCO2REC_NCVAR_NAME = KnownDataTypes.FCO2_REC.getVarName();
+	public static final String WOCECO2WATER_NCVAR_NAME = KnownDataTypes.WOCE_CO2_WATER.getVarName();
+	public static final String REGION_ID_NCVAR_NAME = KnownDataTypes.REGION_ID.getVarName();
+	public static final String ALL_REGION_IDS_NCVAR_NAME = KnownDataTypes.ALL_REGION_IDS.getVarName();
+	public static final String SOCAT_VERSION_NCVAR_NAME = KnownDataTypes.SOCAT_VERSION.getVarName();
 
 	private static final String VERSION = "CruiseDsgNcFile 1.5";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;

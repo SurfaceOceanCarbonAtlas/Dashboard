@@ -179,7 +179,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		SocatMetadata scMData = new SocatMetadata();
 		
 		scMData.setExpocode(expocode);
-		scMData.setCruiseName(omeMData.getExperimentName());
+		scMData.setDatasetName(omeMData.getExperimentName());
 
 		// Anglicize the vessel name for NetCDF/LAS
 		scMData.setVesselName(anglicizeName(omeMData.getVesselName()));

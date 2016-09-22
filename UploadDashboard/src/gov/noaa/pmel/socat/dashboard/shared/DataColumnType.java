@@ -5,6 +5,7 @@ package gov.noaa.pmel.socat.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -19,12 +20,15 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2988202602030736939L;
+	private static final long serialVersionUID = 6941776365120214644L;
+
+	/** For data without any specific units */
+	public static final ArrayList<String> NO_UNITS = new ArrayList<String>(Arrays.asList(""));
 
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */
-	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null, null, null, null, null);
+	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null, null, null, null, NO_UNITS);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -32,7 +36,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * be part of the metadata, but the values are not validated or used. 
 	 * Multiple columns may have this type.
 	 */
-	public static final DataColumnType OTHER = new DataColumnType("other", null, null, null, null, null);
+	public static final DataColumnType OTHER = new DataColumnType("other", null, null, null, null, NO_UNITS);
 
 	private String varName;
 	private String dataClassName;
@@ -86,7 +90,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * 		category name for a variable of this type;
 	 * 		if null, an empty string is assigned
 	 * @param units
-	 * 		unit strings associated with this type;
+	 * 		unit strings associated with this type (copied);
 	 * 		if null or empty, a list with a single empty unit string is assigned
 	 */
 	public DataColumnType(String varName, String dataClassName, String description,
@@ -116,8 +120,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 		}
 		else {
 			// Assume no units are going to be added
-			this.units = new ArrayList<String>(1);
-			this.units.add("");
+			this.units = new ArrayList<String>(NO_UNITS);
 		}
 		this.selectedUnitIndex = Integer.valueOf(0);
 		this.selectedMissingValue = "";
@@ -244,7 +247,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 
 	/**
 	 * @param units 
-	 * 		the list of units to associate with this data column type; 
+	 * 		the list of units to associate with this data column type (copied); 
 	 * 		if null or empty, a single empty unit string is assigned
 	 */
 	public void setUnits(Collection<String> units) {
@@ -301,6 +304,18 @@ public class DataColumnType implements Serializable, IsSerializable {
 			this.selectedMissingValue = selectedMissingValue;
 		else
 			this.selectedMissingValue = "";
+	}
+
+	/**
+	 * @return
+	 * 		a deep of this data column type instance in which copies are 
+	 * 		made of any mutable data (namely, the list of units).
+	 */
+	public DataColumnType duplicate() {
+		DataColumnType dup = new DataColumnType(varName, dataClassName, description, standardName, categoryName, units);
+		dup.selectedUnitIndex = selectedUnitIndex;
+		dup.selectedMissingValue = selectedMissingValue;
+		return dup;
 	}
 
 	/**

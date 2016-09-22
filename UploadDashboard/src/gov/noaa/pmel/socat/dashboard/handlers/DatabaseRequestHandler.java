@@ -3,8 +3,7 @@
  */
 package gov.noaa.pmel.socat.dashboard.handlers;
 
-import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
@@ -379,12 +378,12 @@ public class DatabaseRequestHandler {
 					"VALUES(?, ?, ?, ?, ?, ?, ?);");
 			addPrepStmt.setString(1, qcEvent.getFlag().toString());
 			Date flagDate = qcEvent.getFlagDate();
-			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
+			if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
 				addPrepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
 			else
 				addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			addPrepStmt.setString(3, qcEvent.getExpocode());
-			addPrepStmt.setString(4, qcEvent.getSocatVersion());
+			addPrepStmt.setString(4, qcEvent.getVersion());
 			addPrepStmt.setString(5, qcEvent.getRegionID().toString());
 			addPrepStmt.setInt(6, reviewerId);
 			addPrepStmt.setString(7, qcEvent.getComment());
@@ -649,9 +648,9 @@ public class DatabaseRequestHandler {
 		if ( results.wasNull() )
 			qcEvent.setFlagDate(null);
 		qcEvent.setExpocode(results.getString("expocode"));
-		qcEvent.setSocatVersion(results.getString("socat_version"));
+		qcEvent.setVersion(results.getString("socat_version"));
 		if ( results.wasNull() )
-			qcEvent.setSocatVersion(null);
+			qcEvent.setVersion(null);
 		try {
 			qcEvent.setRegionID(results.getString("region_id").charAt(0));
 		} catch (NullPointerException ex) {
@@ -725,12 +724,12 @@ public class DatabaseRequestHandler {
 					"VALUES(?, ?, ?, ?, ?, ?, ?);");
 			prepStmt.setString(1, woceEvent.getFlag().toString());
 			Date flagDate = woceEvent.getFlagDate();
-			if ( flagDate.equals(SocatMetadata.DATE_MISSING_VALUE) )
+			if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
 				prepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
 			else
 				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			prepStmt.setString(3, woceEvent.getExpocode());
-			prepStmt.setString(4, woceEvent.getSocatVersion());
+			prepStmt.setString(4, woceEvent.getVersion());
 			prepStmt.setString(5, woceEvent.getVarName());
 			prepStmt.setInt(6, reviewerId);
 			prepStmt.setString(7, woceEvent.getComment());
@@ -757,27 +756,27 @@ public class DatabaseRequestHandler {
 				prepStmt.setLong(1, woceId);
 				prepStmt.setString(2, location.getRegionID().toString());
 				Integer intVal = location.getRowNumber();
-				if ( intVal.equals(SocatCruiseData.INT_MISSING_VALUE) )
+				if ( intVal.equals(DashboardUtils.INT_MISSING_VALUE) )
 					prepStmt.setNull(3, java.sql.Types.INTEGER);
 				else
 					prepStmt.setInt(3, intVal);
 				Double dblVal = location.getLongitude();
-				if ( dblVal.equals(SocatCruiseData.FP_MISSING_VALUE) )
+				if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
 					prepStmt.setNull(4, java.sql.Types.DOUBLE);
 				else
 					prepStmt.setDouble(4, dblVal);
 				dblVal = location.getLatitude();
-				if ( dblVal.equals(SocatCruiseData.FP_MISSING_VALUE) )
+				if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
 					prepStmt.setNull(5, java.sql.Types.DOUBLE);
 				else
 					prepStmt.setDouble(5, dblVal);
 				Date dateVal = location.getDataDate();
-				if ( dateVal.equals(SocatMetadata.DATE_MISSING_VALUE) )
+				if ( dateVal.equals(DashboardUtils.DATE_MISSING_VALUE) )
 					prepStmt.setNull(6, java.sql.Types.BIGINT);
 				else
 					prepStmt.setLong(6, Math.round(dateVal.getTime() / 1000.0));
 				dblVal = location.getDataValue();
-				if ( dblVal.equals(SocatCruiseData.FP_MISSING_VALUE) )
+				if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
 					prepStmt.setNull(7, java.sql.Types.DOUBLE);
 				else
 					prepStmt.setDouble(7, dblVal);
@@ -821,9 +820,9 @@ public class DatabaseRequestHandler {
 		if ( results.wasNull() )
 			woceEvent.setFlagDate(null);
 		woceEvent.setExpocode(results.getString("expocode"));
-		woceEvent.setSocatVersion(results.getString("socat_version"));
+		woceEvent.setVersion(results.getString("socat_version"));
 		if ( results.wasNull() )
-			woceEvent.setSocatVersion(null);
+			woceEvent.setVersion(null);
 		woceEvent.setVarName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
 		woceEvent.setRealname(results.getString("realname"));

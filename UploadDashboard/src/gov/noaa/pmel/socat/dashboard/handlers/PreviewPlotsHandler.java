@@ -171,7 +171,7 @@ public class PreviewPlotsHandler {
 		SocatMetadata socatMData = new SocatMetadata();
 		socatMData.setExpocode(upperExpo);
 		socatMData.setSocatVersion(cruiseData.getVersion());
-		socatMData.setQcFlag(QCEvent.QC_PREVIEW_FLAG.toString());
+		socatMData.setQcFlag(QCEvent.QC_NEW_FLAG.toString());
 
 		// Convert the cruise data strings into the appropriate list of data objects
 		ArrayList<SocatCruiseData> socatDatalist = SocatCruiseData.dataListFromDashboardCruise(cruiseData);

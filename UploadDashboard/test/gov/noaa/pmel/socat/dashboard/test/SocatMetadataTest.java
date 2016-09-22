@@ -52,16 +52,16 @@ public class SocatMetadataTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.server.SocatMetadata#getCruiseName()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatMetadata#setCruiseName(java.lang.String)}.
+	 * and {@link gov.noaa.pmel.socat.dashboard.server.SocatMetadata#setDatasetName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetCruiseName() {
 		SocatMetadata mdata = new SocatMetadata();
 		assertEquals("", mdata.getCruiseName());
-		mdata.setCruiseName(CRUISE_NAME);
+		mdata.setDatasetName(CRUISE_NAME);
 		assertEquals(CRUISE_NAME, mdata.getCruiseName());
 		assertEquals("", mdata.getExpocode());
-		mdata.setCruiseName(null);
+		mdata.setDatasetName(null);
 		assertEquals("", mdata.getCruiseName());
 	}
 
@@ -371,10 +371,10 @@ public class SocatMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setCruiseName(CRUISE_NAME);
+		mdata.setDatasetName(CRUISE_NAME);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setCruiseName(CRUISE_NAME);
+		other.setDatasetName(CRUISE_NAME);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 

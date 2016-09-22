@@ -343,7 +343,7 @@ public class CruiseUploadService extends HttpServlet {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
-					if ( dtype.typeEquals(KnownDataColumnTypes.VESSEL_NAME) ) {
+					if ( dtype.typeEquals(KnownDataTypes.VESSEL_NAME) ) {
 						colIdx = k;
 						break;
 					}
@@ -360,7 +360,7 @@ public class CruiseUploadService extends HttpServlet {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
-					if ( dtype.typeEquals(KnownDataColumnTypes.INVESTIGATOR_NAMES) ) {
+					if ( dtype.typeEquals(KnownDataTypes.INVESTIGATOR_NAMES) ) {
 						colIdx = k;
 						break;
 					}

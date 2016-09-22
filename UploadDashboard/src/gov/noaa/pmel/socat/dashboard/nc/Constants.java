@@ -1,18 +1,8 @@
 package gov.noaa.pmel.socat.dashboard.nc;
 
-import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
-
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Constant maps of SocatCruiseData variable names to short names, 
- * units, and long names for the NetCDF DSG files.
- */
 public class Constants {
 
+/*
 	public static final String expocode_VARNAME = "expocode";
 	public static final String cruiseName_VARNAME = "cruiseName";
 	public static final String vesselName_VARNAME = "vesselName";
@@ -111,9 +101,9 @@ public class Constants {
 
 	public static final String geoposition_VARNAME = "geoposition";
 
-	/**
+	**
 	 * Variable names for netCDF files
-	 */
+	 *
 	public static final Map<String, String> SHORT_NAMES;
 	static {
 		HashMap<String, String> shortNameMap = new HashMap<String, String>();
@@ -217,9 +207,9 @@ public class Constants {
 		SHORT_NAMES = Collections.unmodifiableMap(shortNameMap);
 	}
 
-	/**
+	**
 	 *  Full length names of the variables for netCDF files
-	 */
+	 *
 	public static final Map<String, String> LONG_NAMES;
 	static {
 		HashMap<String, String> longNameMap = new HashMap<String, String>();
@@ -323,9 +313,9 @@ public class Constants {
 		LONG_NAMES = Collections.unmodifiableMap(longNameMap);
 	}
 
-	/**
+	**
 	 * Standard units of each variable appropriate for netCDF files
-	 */
+	 *
 	public static final Map<String, String> UNITS;
 	static {
 		final String longitude_units = "degrees_east";
@@ -422,9 +412,9 @@ public class Constants {
 		UNITS = Collections.unmodifiableMap(unitsMap);
 	}
 
-	/**
+	**
 	 * Standardized names for netCDF files
-	 */
+	 *
 	public static final Map<String, String> STANDARD_NAMES;
 	static {
 		HashMap<String, String> stdNamesMap = new HashMap<String, String>();
@@ -499,9 +489,9 @@ public class Constants {
 		STANDARD_NAMES = Collections.unmodifiableMap(stdNamesMap);
 	}
 
-	/**
+	**
 	 * IOOS categories for netCDF files
-	 */
+	 *
 	public static final Map<String, String> IOOS_CATEGORIES;
 	static {
 		String bathymetry_category = "Bathymetry";
@@ -614,9 +604,10 @@ public class Constants {
 		IOOS_CATEGORIES = Collections.unmodifiableMap(ioosCatMap);
 	}
 
-	/**
-	 * Data variable names for the NetCDF files from an all-uppercase name.
-	 */
+
+	**
+	 * Data variable names for the NetCDF files from an all-upper-case name.
+	 *
 	public static final Map<String, String> VARIABLE_NAMES;
 	static {
 		HashMap<String, String> varNamesMap = new HashMap<String, String>();
@@ -627,15 +618,14 @@ public class Constants {
 		VARIABLE_NAMES = Collections.unmodifiableMap(varNamesMap);
 	}
 
-	/**
+	**
 	 * Variable names for netCDF files from the type of user-provided data columns.
 	 * These are for generating WOCE events, only those types and variable names 
 	 * that a reviewer could WOCE are provided.
-	 */
-	public static final Map<DataColumnType, String> TYPE_TO_VARNAME_MAP;
+	 *
+	public static final Map<String, String> TYPE_TO_VARNAME_MAP;
 	static {
-		EnumMap<DataColumnType,String> typeToNameMap = 
-				new EnumMap<DataColumnType,String>(DataColumnType.class);
+		HashMap<String,String> typeToNameMap = new HashMap<String,String>();
 
 		// UNKNOWN, metadata-types, WOCE flags, COMMENT, and OTHER not available to WOCE
 
@@ -694,5 +684,6 @@ public class Constants {
 
 		TYPE_TO_VARNAME_MAP = Collections.unmodifiableMap(typeToNameMap);
 	}
+*/
 
 }

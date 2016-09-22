@@ -4,10 +4,10 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
-import java.io.Serializable;
 import java.util.Date;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 
 /**
  * Class for working with metadata values of interest from SOCAT,
@@ -15,54 +15,82 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class SocatMetadata implements Serializable, IsSerializable {
+public class SocatMetadata {
 
-	private static final long serialVersionUID = 3695681255935683044L;
+	public static final String SOCAT_VERSION_VARNAME = "socat_version";
+	public static final String ALL_REGION_IDS_VARNAME = "all_region_ids";
+	public static final String SOCAT_DOI_VARNAME = "socat_doi";
 
-	String expocode;
-	String cruiseName;
-	String vesselName;
-	String organization;
-	Double westmostLongitude;
-	Double eastmostLongitude;
-	Double southmostLatitude;
-	Double northmostLatitude;
-	Date beginTime;
-	Date endTime;
-	String scienceGroup;
-	String socatVersion;
-	String allRegionIDs;
-	String socatDOI;
-	String qcFlag;
+	// Set for the order of all the variable names
+	LinkedHashSet<String> varNamesSet;
+	// Maps of variable names to values
+	HashMap<String,String> stringValuesMap;
+	HashMap<String,Double> doubleValuesMap;
+	HashMap<String,Date> dateValuesMap;
 
 	/**
 	 * Generates an empty SocatMetadata object.
 	 */
 	public SocatMetadata() {
-		expocode = "";
-		cruiseName = "";
-		vesselName = "";
-		organization = "";
-		westmostLongitude = DashboardUtils.FP_MISSING_VALUE;
-		eastmostLongitude = DashboardUtils.FP_MISSING_VALUE;
-		southmostLatitude = DashboardUtils.FP_MISSING_VALUE;
-		northmostLatitude = DashboardUtils.FP_MISSING_VALUE;
-		beginTime = DashboardUtils.DATE_MISSING_VALUE;
-		endTime = DashboardUtils.DATE_MISSING_VALUE;
-		scienceGroup = "";
-		socatVersion = "";
-		allRegionIDs = "";
-		socatDOI = "";
-		qcFlag = " ";
-	}
+		String varName = KnownDataTypes.EXPOCODE.getVarName();
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
 
-	/**
-	 * @return
-	 * 		the expocode;
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getExpocode() {
-		return expocode;
+		varName = KnownDataTypes.DATASET_NAME.getVarName();
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = KnownDataTypes.VESSEL_NAME.getVarName();
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = KnownDataTypes.ORGANIZATION_NAME.getVarName();
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName();
+		varNamesSet.add(varName);
+		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+
+		varName = KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName();
+		varNamesSet.add(varName);
+		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+
+		varName = KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName();
+		varNamesSet.add(varName);
+		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+
+		varName = KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName();
+		varNamesSet.add(varName);
+		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+
+		varName = KnownDataTypes.TIME_COVERAGE_START.getVarName();
+		varNamesSet.add(varName);
+		dateValuesMap.put(varName, DashboardUtils.DATE_MISSING_VALUE);
+
+		varName = KnownDataTypes.TIME_COVERAGE_END.getVarName();
+		varNamesSet.add(varName);
+		dateValuesMap.put(varName, DashboardUtils.DATE_MISSING_VALUE);
+
+		varName = KnownDataTypes.INVESTIGATOR_NAMES.getVarName();
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = SOCAT_VERSION_VARNAME;
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = ALL_REGION_IDS_VARNAME;
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = SOCAT_DOI_VARNAME;
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
+
+		varName = KnownDataTypes.QC_FLAG.getVarName();
+		varNamesSet.add(varName);
+		stringValuesMap.put(varName, "");
 	}
 
 	/**
@@ -71,40 +99,26 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, an empty string is assigned
 	 */
 	public void setExpocode(String expocode) {
-		if ( expocode == null )
-			this.expocode = "";
+		String value;
+		if ( expocode != null )
+			value = expocode;
 		else
-			this.expocode = expocode;
+			value = "";
+		stringValuesMap.put(KnownDataTypes.EXPOCODE.getVarName(), value);
 	}
 
 	/**
-	 * @return
-	 * 		the cruise/dataset name;
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getCruiseName() {
-		return cruiseName;
-	}
-
-	/**
-	 * @param cruiseName
-	 * 		the cruise name to set;
+	 * @param datasetName
+	 * 		the dataset name to set;
 	 * 		if null, an empty string is assigned
 	 */
-	public void setCruiseName(String cruiseName) {
-		if ( cruiseName == null )
-			this.cruiseName = "";
+	public void setDatasetName(String datasetName) {
+		String value;
+		if ( datasetName != null )
+			value = datasetName;
 		else
-			this.cruiseName = cruiseName;
-	}
-
-	/**
-	 * @return
-	 * 		the vessel (ship) name; 
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getVesselName() {
-		return vesselName;
+			value = "";
+		stringValuesMap.put(KnownDataTypes.DATASET_NAME.getVarName(), value);
 	}
 
 	/**
@@ -113,19 +127,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, an empty string is assigned
 	 */
 	public void setVesselName(String vesselName) {
-		if ( vesselName == null )
-			this.vesselName = "";
+		String value;
+		if ( vesselName != null )
+			value = vesselName;
 		else
-			this.vesselName = vesselName;
-	}
-
-	/**
-	 * @return 
-	 * 		the organization/institution;
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getOrganization() {
-		return organization;
+			value = "";
+		stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), value);
 	}
 
 	/**
@@ -134,10 +141,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, an empty string is assigned
 	 */
 	public void setOrganization(String organization) {
-		if ( organization == null )
-			this.organization = "";
+		String value;
+		if ( organization != null )
+			value = organization;
 		else
-			this.organization = organization;
+			value = "";
+		stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), value);
 	}
 
 	/**
@@ -146,7 +155,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		never null could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getWestmostLongitude() {
-		return westmostLongitude;
+		return doubleValuesMap.get(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName());
 	}
 
 	/**
@@ -155,10 +164,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
 	 */
 	public void setWestmostLongitude(Double westmostLongitude) {
-		if ( westmostLongitude == null )
-			this.westmostLongitude = DashboardUtils.FP_MISSING_VALUE;
-		else 
-			this.westmostLongitude = westmostLongitude;
+		Double value;
+		if ( westmostLongitude != null )
+			value = westmostLongitude;
+		else
+			value = DashboardUtils.FP_MISSING_VALUE;
+		doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(), value);
 	}
 
 	/**
@@ -167,7 +178,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getEastmostLongitude() {
-		return eastmostLongitude;
+		return doubleValuesMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName());
 	}
 
 	/**
@@ -176,10 +187,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, {@link DashboardUtils.FP_MISSING_VALUE} is assigned
 	 */
 	public void setEastmostLongitude(Double eastmostLongitude) {
-		if ( eastmostLongitude == null )
-			this.eastmostLongitude = DashboardUtils.FP_MISSING_VALUE;
+		Double value;
+		if ( eastmostLongitude != null )
+			value = eastmostLongitude;
 		else
-			this.eastmostLongitude = eastmostLongitude;
+			value = DashboardUtils.FP_MISSING_VALUE;
+		doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(), value);
 	}
 
 	/**
@@ -188,7 +201,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getSouthmostLatitude() {
-		return southmostLatitude;
+		return doubleValuesMap.get(KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName());
 	}
 
 	/**
@@ -197,10 +210,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
 	 */
 	public void setSouthmostLatitude(Double southmostLatitude) {
-		if ( southmostLatitude == null )
-			this.southmostLatitude = DashboardUtils.FP_MISSING_VALUE;
+		Double value;
+		if ( southmostLatitude != null )
+			value = southmostLatitude;
 		else
-			this.southmostLatitude = southmostLatitude;
+			value = DashboardUtils.FP_MISSING_VALUE;
+		doubleValuesMap.put(KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName(), value);
 	}
 
 	/**
@@ -209,7 +224,7 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getNorthmostLatitude() {
-		return northmostLatitude;
+		return doubleValuesMap.get(KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName());
 	}
 
 	/**
@@ -218,10 +233,12 @@ public class SocatMetadata implements Serializable, IsSerializable {
 	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
 	 */
 	public void setNorthmostLatitude(Double northmostLatitude) {
-		if ( northmostLatitude == null )
-			this.northmostLatitude = DashboardUtils.FP_MISSING_VALUE;
+		Double value;
+		if ( northmostLatitude != null )
+			value = northmostLatitude;
 		else
-			this.northmostLatitude = northmostLatitude;
+			value = DashboardUtils.FP_MISSING_VALUE;
+		doubleValuesMap.put(KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName(), value);
 	}
 
 	/**
@@ -264,15 +281,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			this.endTime = DashboardUtils.DATE_MISSING_VALUE;
 		else 
 			this.endTime = endTime;
-	}
-
-	/**
-	 * @return
-	 * 		the science group associated with this instance; 
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getScienceGroup() {
-		return scienceGroup;
 	}
 
 	/**
@@ -339,15 +347,6 @@ public class SocatMetadata implements Serializable, IsSerializable {
 			this.allRegionIDs = "";
 		else
 			this.allRegionIDs = allRegionIDs;
-	}
-
-	/**
-	 * @return
-	 * 		the SOCAT DOI for this dataset;
-	 * 		never null but could be a empty string if not assigned
-	 */
-	public String getSocatDOI() {
-		return socatDOI;
 	}
 
 	/**
