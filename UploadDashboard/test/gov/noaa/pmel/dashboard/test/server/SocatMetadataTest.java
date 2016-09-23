@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.test.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -15,6 +16,8 @@ import org.junit.Test;
 
 /**
  * Unit test for methods in gov.noaa.pmel.dashboard.shared.SocatMetadata.
+ * The convenience getters and setters still work properly when their type 
+ * is not part of the known types.
  * 
  * @author Karl Smith
  */
@@ -42,7 +45,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetExpocode() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getExpocode());
 		mdata.setExpocode(EXPOCODE);
 		assertEquals(EXPOCODE, mdata.getExpocode());
@@ -56,7 +61,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetDatasetName() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getDatasetName());
 		mdata.setDatasetName(CRUISE_NAME);
 		assertEquals(CRUISE_NAME, mdata.getDatasetName());
@@ -71,7 +78,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetVesselName() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getVesselName());
 		mdata.setVesselName(VESSEL_NAME);
 		assertEquals(VESSEL_NAME, mdata.getVesselName());
@@ -87,7 +96,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetOrganization() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getOrganizationName());
 		mdata.setOrganizationName(ORGANIZATION_NAME);
 		assertEquals(ORGANIZATION_NAME, mdata.getOrganizationName());
@@ -104,7 +115,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetInvestigatorNames() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getInvestigatorNames());
 		mdata.setInvestigatorNames(INVESTIGATOR_NAMES);
 		assertEquals(INVESTIGATOR_NAMES, mdata.getInvestigatorNames());
@@ -122,7 +135,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetSocatVersion() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getSocatVersion());
 		mdata.setSocatVersion(SOCAT_VERSION);
 		assertEquals(SOCAT_VERSION, mdata.getSocatVersion());
@@ -141,7 +156,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetAllRegionIDs() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getAllRegionIDs());
 		mdata.setAllRegionIDs(ALL_REGION_IDS);
 		assertEquals(ALL_REGION_IDS, mdata.getAllRegionIDs());
@@ -161,7 +178,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetSocatDOI() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals("", mdata.getSocatDOI());
 		mdata.setSocatDOI(SOCAT_DOI);
 		assertEquals(SOCAT_DOI, mdata.getSocatDOI());
@@ -182,7 +201,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetQCFlag() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals(" ", mdata.getQcFlag());
 		mdata.setQcFlag(QC_FLAG);
 		assertEquals(QC_FLAG, mdata.getQcFlag());
@@ -204,7 +225,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetWestmostLongitude() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		mdata.setWestmostLongitude(WESTMOST_LONGITUDE);
 		assertTrue( WESTMOST_LONGITUDE.equals(mdata.getWestmostLongitude()) );
@@ -227,7 +250,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetEastmostLongitude() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		mdata.setEastmostLongitude(EASTMOST_LONGITUDE);
 		assertTrue( EASTMOST_LONGITUDE.equals(mdata.getEastmostLongitude()) );
@@ -251,7 +276,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetSouthmostLatitude() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		mdata.setSouthmostLatitude(SOUTHMOST_LATITUDE);
 		assertTrue( SOUTHMOST_LATITUDE.equals(mdata.getSouthmostLatitude()) );
@@ -276,7 +303,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetNorthmostLatitude() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 		mdata.setNorthmostLatitude(NORTHMOST_LATITUDE);
 		assertTrue( NORTHMOST_LATITUDE.equals(mdata.getNorthmostLatitude()) );
@@ -302,7 +331,9 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testSetBeginTime() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
 		mdata.setBeginTime(BEGIN_TIME);
 		assertEquals(BEGIN_TIME, mdata.getBeginTime());
@@ -329,7 +360,7 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetEndTime() {
-		SocatMetadata mdata = new SocatMetadata();
+		SocatMetadata mdata = new SocatMetadata(null);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
 		mdata.setEndTime(END_TIME);
 		assertEquals(END_TIME, mdata.getEndTime());
@@ -358,11 +389,14 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
-		SocatMetadata mdata = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertFalse( mdata.equals(null) );
 		assertFalse( mdata.equals(EXPOCODE) );
 
-		SocatMetadata other = new SocatMetadata();
+		SocatMetadata other = new SocatMetadata(knownTypes);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 

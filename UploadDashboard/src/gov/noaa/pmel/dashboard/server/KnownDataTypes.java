@@ -5,9 +5,6 @@ package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -201,19 +198,19 @@ public class KnownDataTypes {
 	private LinkedHashMap<String,DataColumnType> knownTypes;
 
 	/**
-	 * Creates withonly the well-known data column types
-	 * UNKNOWN and OTHER (defined in DataColumnType).
+	 * Creates with no well-know data types.
 	 */
 	public KnownDataTypes() {
-		// Give plenty of capacity for expansion
+		// Give plenty of capacity;
 		// since this is a LinkedHashMap, extra capacity not really a problem
-		knownTypes = new LinkedHashMap<String,DataColumnType>(64);
-		addDataType(DataColumnType.UNKNOWN);
-		addDataType(DataColumnType.OTHER);
+		knownTypes = new LinkedHashMap<String,DataColumnType>(96);
 	}
 
 	/**
-	 * Adds the default well-known data column types for the client
+	 * Adds the default well-known data column types for the users
+	 * to select from.
+	 * (from DataColumType, not used in files):
+	 * 		UNKNOWN, OTHER
 	 * (metadata):
 	 * 		EXPOCODE, DATASET_NAME, VESSEL_NAME, ORGANIZATION_NAME, 
 	 * 		INVESTIGATOR_NAMES, QC_FLAG
@@ -223,7 +220,7 @@ public class KnownDataTypes {
 	 * 		DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, LATITUDE, SAMPLE_DEPTH
 	 * This should be called before adding any custom types.
 	 */
-	public void addStandardTypesForClient() {
+	public void addStandardTypesForUsers() {
 		addDataType(DataColumnType.UNKNOWN);
 		addDataType(DataColumnType.OTHER);
 		addDataType(EXPOCODE);
@@ -249,18 +246,15 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Adds the default well-known data column types for the server,
-	 * for generating the NetCDF DSG files:
-	 * (metadata):
+	 * Adds the default well-known metadata column types for the generating 
+	 * the NetCDF DSG files.
 	 * 		EXPOCODE, DATASET_NAME, VESSEL_NAME, ORGANIZATION_NAME, 
-	 * 		INVESTIGATOR_NAMES, QC_FLAG
-	 * (data):
-	 * 		YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, 
-	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE,
-	 * 		LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIME.
+	 * 		INVESTIGATOR_NAMES, WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, 
+	 * 		SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, TIME_COVERAGE_START, 
+	 * 		TIME_COVERAGE_END, QC_FLAG
 	 * This should be called before adding any custom types.
 	 */
-	public void addStandardTypesForServer() {
+	public void addStandardTypesForMetadataFiles() {
 		addDataType(EXPOCODE);
 		addDataType(DATASET_NAME);
 		addDataType(VESSEL_NAME);
@@ -273,6 +267,17 @@ public class KnownDataTypes {
 		addDataType(TIME_COVERAGE_START);
 		addDataType(TIME_COVERAGE_END);
 		addDataType(QC_FLAG);
+	}
+
+	/**
+	 * Adds the default well-known data column types for the generating 
+	 * the NetCDF DSG files.
+	 * 		SAMPLE_NUMBER, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, HOUR_OF_DAY, 
+	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE, TIME, LONGITUDE, LATITUDE, 
+	 * 		SAMPLE_DEPTH
+	 * This should be called before adding any custom types.
+	 */
+	public void addStandardTypesForDataFiles() {
 		addDataType(SAMPLE_NUMBER);
 		addDataType(YEAR);
 		addDataType(MONTH_OF_YEAR);
@@ -346,7 +351,15 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Create additional known data types from values in a Properties file.
+	 * @return
+	 * 		the number of known data types in this instance
+	 */
+	public int size() {
+		return knownTypes.size();
+	}
+
+	/**
+	 * Create additional known data types from values in a Properties object.
 	 * 
 	 * @param knownTypesFile
 	 * 		properties file of data types to add to the known list; 
@@ -361,33 +374,19 @@ public class KnownDataTypes {
 	 * 		The data class name must be given, but other tags may
 	 * 		be omitted in which case the DataColumnType default value 
 	 * 		is assigned.
+	 * @param userTypes
+	 * 		add types with "user" or "both" visibility to this
+	 * @param fileTypes
+	 * 		add types with "file" or "both" visibility to this
 	 * @throws IllegalArgumentException
-	 * 		if the variable name of a data type to add to the known lists 
-	 * 			matches the variable name of a data type in either of the 
-	 * 			known lists (using {@link #containsTypeName(String)},
+	 * 		if the variable name of a data type to add as already known,
+	 * 			(using {@link #containsTypeName(String)},
 	 * 		if the JSON description cannot be parsed, or
 	 * 		if the dataClassName tag is not given in the JSON description.
-	 * @throws IOException
-	 * 		if problems occur when reading the Properties file
 	 */
-	public static void addTypesFromProperties(File knownTypesFile, 
-			KnownDataTypes clientTypes, KnownDataTypes serverTypes) 
-					throws IllegalArgumentException, IOException {
-		Properties typeProps = new Properties();
-		try {
-			FileReader reader = new FileReader(knownTypesFile);
-			try {
-				typeProps.load(reader);
-			} finally {
-				reader.close();
-			}
-		} catch ( Exception ex ) {
-			throw new IOException("Problems reading " + knownTypesFile.getPath() + ": " + ex.getMessage());
-		}
+	public void addTypesFromProperties(Properties typeProps) throws IllegalArgumentException {
 		JsonParser parser = new JsonParser();
 		for ( String name : typeProps.stringPropertyNames() ) {
-			if ( clientTypes.containsTypeName(name) || serverTypes.containsTypeName(name) )
-				throw new IllegalArgumentException("Duplicate known data type name \"" + name + "\"");
 			String dataClassName = null;
 			String description = null;
 			String standardName = null;
@@ -404,6 +403,9 @@ public class KnownDataTypes {
 						}
 						else if ( "description".equals(tag) ) {
 							description = prop.getValue().getAsString();
+						}
+						else if ( "standardName".equals(tag) ) {
+							standardName = prop.getValue().getAsString();
 						}
 						else if ( "categoryName".equals(tag) ) {
 							categoryName = prop.getValue().getAsString();
@@ -431,15 +433,10 @@ public class KnownDataTypes {
 			if ( dataClassName == null )
 				throw new IllegalArgumentException("\"dataClassName\" tag is not given "
 						+ "in the JSON description of \"" + name + "\"");
-			clientTypes.addDataType(new DataColumnType(name, dataClassName, 
-					description, standardName, categoryName, units));
-			serverTypes.addDataType(new DataColumnType(name, dataClassName, 
-					description, standardName, categoryName, units));
+			if ( containsTypeName(name) )
+				throw new IllegalArgumentException("Duplicate user-known data type \"" + name + "\"");
+			addDataType( new DataColumnType(name, dataClassName, description, standardName, categoryName, units) );
 		}
-	}
-
-	public int size() {
-		return knownTypes.size();
 	}
 
 	@Override
