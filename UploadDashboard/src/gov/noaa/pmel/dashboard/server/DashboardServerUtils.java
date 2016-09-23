@@ -1,0 +1,70 @@
+/**
+ * 
+ */
+package gov.noaa.pmel.dashboard.server;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author Karl Smith
+ *
+ */
+public class DashboardServerUtils {
+
+	// Pattern for checking for invalid characters in the expocode
+	private static final Pattern invalidExpocodePattern = 
+			Pattern.compile("[^" + DashboardUtils.VALID_EXPOCODE_CHARACTERS + "]");
+
+	/**
+	 * Checks and standardized a given expocode.
+	 * 
+	 * @param expocode
+	 * 		expocode to check
+	 * @return
+	 * 		standardized (uppercase) expocode
+	 * @throws IllegalArgumentException
+	 * 		if the expocode is unreasonable
+	 * 		(invalid characters, too short, too long)
+	 */
+	public static String checkExpocode(String expocode) throws IllegalArgumentException {
+		if ( expocode == null )
+			throw new IllegalArgumentException("Expocode not given");
+		// Do some automatic clean-up
+		String upperExpo = expocode.trim().toUpperCase();
+		// Make sure it is the proper length
+		if ( (upperExpo.length() < DashboardUtils.MIN_EXPOCODE_LENGTH) || 
+			 (upperExpo.length() > DashboardUtils.MAX_EXPOCODE_LENGTH) )
+			throw new IllegalArgumentException(
+					"Invalid Expocode length");
+		// Make sure there are no invalid characters
+		Matcher mat = invalidExpocodePattern.matcher(upperExpo);
+		if ( mat.find() )
+			throw new IllegalArgumentException(
+					"Invalid characters in the Expocode");
+		return upperExpo;
+	}
+
+	/**
+	 * Checks the validity of the given "NODC code" (first four characters of a standard expocode).
+	 * This does not actually check that the value is listed in the NODC registry of ships.
+	 * 
+	 * @param nodccode
+	 * 		expocode start to check
+	 * @return
+	 * 		false if nodccode is not exactly four characters from 
+	 * 		{@link DashboardUtils#VALID_EXPOCODE_CHARACTERS};
+	 * 		otherwise true
+	 */
+	public static boolean isLikeNODCCode(String nodccode) {
+		if ( (nodccode == null) || (nodccode.length() != 4) )
+			return false;
+		Matcher mat = invalidExpocodePattern.matcher(nodccode);
+		if ( mat.find() )
+			return false;
+		return true;
+	}
+
+}
