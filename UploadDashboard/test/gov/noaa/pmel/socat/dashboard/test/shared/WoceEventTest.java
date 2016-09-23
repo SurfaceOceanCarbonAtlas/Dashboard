@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.test;
+package gov.noaa.pmel.socat.dashboard.test.shared;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,28 +9,50 @@ import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
-import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
+import gov.noaa.pmel.socat.dashboard.shared.WoceEvent;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.Test;
 
 /**
- * Tests for methods in QCEvent
+ * Unit test for methods of SocatWoceFlag
+ * 
  * @author Karl Smith
  */
-public class QCEventTest {
+public class WoceEventTest {
 
 	private static final Long DEFAULT_QC_ID = 0L;
 	private static final Long MY_QC_ID = 123L;
-	private static final Character MY_QC_FLAG = 'B';
+	private static final Character MY_WOCE_FLAG = '3';
 	private static final String MY_EXPOCODE = "26NA20140427";
 	private static final String MY_SOCAT_VERSION = "3.0";
-	private static final Character MY_REGION_ID = 'T';
+	private static final String MY_DATA_VAR_NAME = "Pressure_atm";
+	private static final ArrayList<DataLocation> MY_LOCATIONS;
+	static {
+		MY_LOCATIONS = new ArrayList<DataLocation>(2);
+		DataLocation loc = new DataLocation();
+		loc.setRegionID('T');
+		loc.setRowNumber(345);
+		loc.setDataDate(new Date(3458139048000L));
+		loc.setLongitude(-179.5);
+		loc.setLatitude(3.5);
+		loc.setDataValue(1105.450);
+		MY_LOCATIONS.add(loc);
+		loc = new DataLocation();
+		loc.setRegionID('T');
+		loc.setRowNumber(346);
+		loc.setDataDate(new Date(3458139203000L));
+		loc.setLongitude(-179.6);
+		loc.setLatitude(3.4);
+		loc.setDataValue(1105.453);
+		MY_LOCATIONS.add(loc);
+	}
 	private static final Date MY_FLAG_DATE = new Date();
 	private static final String MY_USERNAME = "Karl.Smith";
 	private static final String MY_REALNAME = "Karl M. Smith";
-	private static final String MY_COMMENT = "from QCEvent unit test";
+	private static final String MY_COMMENT = "from WoceEvent unit test";
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardEvent#getID()} 
@@ -38,7 +60,7 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetId() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setId(MY_QC_ID);
 		assertEquals(MY_QC_ID, myflag.getId());
@@ -47,18 +69,18 @@ public class QCEventTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.QCEvent#getFlag()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.QCEvent#setFlag(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#getFlag()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#setFlag(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetFlag() {
-		QCEvent myflag = new QCEvent();
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
-		myflag.setFlag(MY_QC_FLAG);
-		assertEquals(MY_QC_FLAG, myflag.getFlag());
+		WoceEvent myflag = new WoceEvent();
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		myflag.setFlag(MY_WOCE_FLAG);
+		assertEquals(MY_WOCE_FLAG, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlag(null);
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 	}
 
 	/**
@@ -67,11 +89,11 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetExpocode() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getExpocode());
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setExpocode(null);
 		assertEquals("", myflag.getExpocode());
@@ -83,33 +105,52 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetSocatVersion() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getVersion());
 		myflag.setVersion(MY_SOCAT_VERSION);
 		assertEquals(MY_SOCAT_VERSION, myflag.getVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setVersion(null);
 		assertEquals("", myflag.getVersion());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.QCEvent#getRegionID()} 
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.QCEvent#setRegionID(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#getVarName()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#setVarName(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetRegionID() {
-		QCEvent myflag = new QCEvent();
-		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
-		myflag.setRegionID(MY_REGION_ID);
-		assertEquals(MY_REGION_ID, myflag.getRegionID());
+	public void testGetSetColumnName() {
+		WoceEvent myflag = new WoceEvent();
+		assertEquals("", myflag.getVarName());
+		myflag.setVarName(MY_DATA_VAR_NAME);
+		assertEquals(MY_DATA_VAR_NAME, myflag.getVarName());
 		assertEquals("", myflag.getVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
-		myflag.setRegionID(null);
-		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
+		myflag.setVarName(null);
+		assertEquals("", myflag.getVarName());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#getLocations()} 
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#setLocations(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testGetSetLocations() {
+		WoceEvent myflag = new WoceEvent();
+		assertEquals(0, myflag.getLocations().size());
+		myflag.setLocations(MY_LOCATIONS);
+		assertEquals(MY_LOCATIONS, myflag.getLocations());
+		assertEquals("", myflag.getVarName());
+		assertEquals("", myflag.getVersion());
+		assertEquals("", myflag.getExpocode());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
+		myflag.setLocations(null);
+		assertEquals(0, myflag.getLocations().size());
 	}
 
 	/**
@@ -118,14 +159,15 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetFlagDate() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
 		myflag.setFlagDate(MY_FLAG_DATE);
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
-		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
+		assertEquals(0, myflag.getLocations().size());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlagDate(null);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
@@ -137,15 +179,16 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetUsername() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getUsername());
 		myflag.setUsername(MY_USERNAME);
 		assertEquals(MY_USERNAME, myflag.getUsername());
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
-		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
+		assertEquals(0, myflag.getLocations().size());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setUsername(null);
 		assertEquals("", myflag.getUsername());
@@ -157,16 +200,17 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetRealname() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getRealname());
 		myflag.setRealname(MY_REALNAME);
 		assertEquals(MY_REALNAME, myflag.getRealname());
 		assertEquals("", myflag.getUsername());
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
-		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
+		assertEquals(0, myflag.getLocations().size());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setRealname(null);
 		assertEquals("", myflag.getRealname());
@@ -178,33 +222,34 @@ public class QCEventTest {
 	 */
 	@Test
 	public void testGetSetComment() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertEquals("", myflag.getComment());
 		myflag.setComment(MY_COMMENT);
 		assertEquals(MY_COMMENT, myflag.getComment());
 		assertEquals("", myflag.getRealname());
 		assertEquals("", myflag.getUsername());
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
-		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
+		assertEquals(0, myflag.getLocations().size());
+		assertEquals("", myflag.getVarName());
 		assertEquals("", myflag.getVersion());
 		assertEquals("", myflag.getExpocode());
-		assertEquals(QCEvent.QC_COMMENT, myflag.getFlag());
+		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setComment(null);
 		assertEquals("", myflag.getComment());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.QCEvent#hashCode()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.QCEvent#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#hashCode()}
+	 * and {@link gov.noaa.pmel.socat.dashboard.shared.WoceEvent#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
-		QCEvent myflag = new QCEvent();
+		WoceEvent myflag = new WoceEvent();
 		assertFalse( myflag.equals(null) );
 		assertFalse( myflag.equals(new DashboardEvent()) );
 
-		QCEvent otherflag = new QCEvent();
+		WoceEvent otherflag = new WoceEvent();
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
@@ -214,10 +259,10 @@ public class QCEventTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
-		myflag.setFlag(MY_QC_FLAG);
+		myflag.setFlag(MY_WOCE_FLAG);
 		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
-		otherflag.setFlag(MY_QC_FLAG);
+		otherflag.setFlag(MY_WOCE_FLAG);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
@@ -235,10 +280,17 @@ public class QCEventTest {
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
-		myflag.setRegionID(MY_REGION_ID);
+		myflag.setVarName(MY_DATA_VAR_NAME);
 		assertFalse( myflag.hashCode() == otherflag.hashCode() );
 		assertFalse( myflag.equals(otherflag) );
-		otherflag.setRegionID(MY_REGION_ID);
+		otherflag.setVarName(MY_DATA_VAR_NAME);
+		assertTrue( myflag.hashCode() == otherflag.hashCode() );
+		assertTrue( myflag.equals(otherflag) );
+
+		myflag.setLocations(MY_LOCATIONS);
+		assertFalse( myflag.hashCode() == otherflag.hashCode() );
+		assertFalse( myflag.equals(otherflag) );
+		otherflag.setLocations(MY_LOCATIONS);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 

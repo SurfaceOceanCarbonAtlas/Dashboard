@@ -6,7 +6,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile;
+import gov.noaa.pmel.socat.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.socat.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
@@ -29,7 +29,7 @@ public class CruiseDsgNcFileTest {
  
     /**
 	 * Test method for successfully creating a DSG file using 
-	 * {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create}.
+	 * {@link gov.noaa.pmel.socat.dashboard.server.CruiseDsgNcFile#create}.
 	 */
 	@Test
 	public void testCreate() throws Exception {
@@ -128,7 +128,7 @@ public class CruiseDsgNcFileTest {
 
     /**
 	 * Test method for checking expected failures to a DSG file using 
-	 * {@link gov.noaa.pmel.socat.dashboard.nc.CruiseDsgNcFile#create}.
+	 * {@link gov.noaa.pmel.socat.dashboard.server.CruiseDsgNcFile#create}.
 	 */
 	@Test
 	public void testBadMissingValuesFail() throws Exception {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.socat.dashboard.test;
+package gov.noaa.pmel.socat.dashboard.test.server;
 
 import static org.junit.Assert.*;
 
