@@ -25,209 +25,182 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SocatCruiseData {
 
-/*
-	// Sequence number (starts with one) of this data point in the data set
-	Integer rowNum;
+	// Double types
+	public static final String SALINITY_VARNAME = "sal";
+	public static final String WOA_SALINITY_VARNAME = "woa_sss";
 
-	// Time of measurement
-	Integer year;
-	Integer month;
-	Integer day;
-	Integer hour;
-	Integer minute;
-	Double second;
+	public static final String TEQU_VARNAME = "Temperature_equi";
+	public static final String SST_VARNAME = "temp";
+	public static final String TATM_VARNAME = "Temperature_atm";
 
-	// Longitude of measurement
-	Double longitude;
-	// Latitude of measurement
-	Double latitude;
-	// Sampling depth for the measurement
-	Double sampleDepth;
-	// salinity
-	Double salinity;
-	// Equilibrator temperature
-	Double tEqu;
-	// Sea surface temperature
-	Double sst;
-	// Atmospheric temperature
-	Double tAtm;
-	// Equilibrator pressure
-	Double pEqu;
-	// Atmospheric pressure / sea level pressure
-	Double slp;
+	public static final String PEQU_VARNAME = "Pressure_equi";
+	public static final String PATM_VARNAME = "Pressure_atm";
+	public static final String NCEP_SLP_VARNAME = "pressure_ncep_slp";
 
-	// Eight possible water CO2 measurements reported
-	Double xCO2WaterTEquDry;
-	Double xCO2WaterSstDry;
-	Double xCO2WaterTEquWet;
-	Double xCO2WaterSstWet;
-	Double pCO2WaterTEquWet;
-	Double pCO2WaterSstWet;
-	Double fCO2WaterTEquWet;
-	Double fCO2WaterSstWet;
+	public static final String XCO2_WATER_TEQU_DRY_VARNAME = "xCO2_water_equi_temp_dry_ppm";
+	public static final String XCO2_WATER_SST_DRY_VARNAME = "xCO2_water_sst_dry_ppm";
+	public static final String XCO2_WATER_TEQU_WET_VARNAME = "xCO2_water_equi_temp_wet_ppm";
+	public static final String XCO2_WATER_SST_WET_VARNAME = "xCO2_water_sst_wet_ppm";
+	public static final String PCO2_WATER_TEQU_WET_VARNAME = "pCO2_water_equi_temp";
+	public static final String PCO2_WATER_SST_WET_VARNAME = "pCO2_water_sst_100humidity_uatm";
+	public static final String FCO2_WATER_TEQU_WET_VARNAME = "fCO2_water_equi_uatm";
+	public static final String FCO2_WATER_SST_WET_VARNAME = "fCO2_water_sst_100humidity_uatm";
 
-	// Six possible air CO2 measurements reported
-	Double xCO2AtmDryActual;
-	Double xCO2AtmDryInterp;
-	Double pCO2AtmWetActual;
-	Double pCO2AtmWetInterp;
-	Double fCO2AtmWetActual;
-	Double fCO2AtmWetInterp;
+	public static final String XCO2_ATM_DRY_ACTUAL_VARNAME = "xCO2_atm_dry_actual";
+	public static final String XCO2_ATM_DRY_INTERP_VARNAME = "xCO2_atm_dry_interp";
+	public static final String PCO2_ATM_DRY_ACTUAL_VARNAME = "pCO2_atm_wet_actual";
+	public static final String PCO2_ATM_DRY_INTERP_VARNAME = "pCO2_atm_wet_interp";
+	public static final String FCO2_ATM_DRY_ACTUAL_VARNAME = "fCO2_atm_wet_actual";
+	public static final String FCO2_ATM_DRY_INTERP_VARNAME = "fCO2_atm_wet_interp";
 
-	// CO2Water - (interpolated) CO2Atm; only user-provided
-	Double deltaXCO2;
-	Double deltaPCO2;
-	Double deltaFCO2;
+	public static final String DELTA_XCO2_VARNAME = "delta_xCO2";
+	public static final String DELTA_PCO2_VARNAME = "delta_pCO2";
+	public static final String DELTA_FCO2_VARNAME = "delta_fCO2";
 
-	// mole fraction water (mmol/mol) in equilibrator gas sample
-	Double xH2OEqu;
-	// Humdity
-	Double relativeHumidity;
-	Double specificHumidity;
-	// Ship speed in knots
-	Double shipSpeed; 
-	// Ship direction in degrees clockwise from N
-	Double shipDirection; 
-	// Wind speed in m/s
-	Double windSpeedTrue;
-	Double windSpeedRelative;
-	// Wind direction in degrees clockwise from N
-	Double windDirectionTrue;
-	Double windDirectionRelative;
+	public static final String XH2O_EQU_VARNAME = "xH2O_equi";
+	public static final String RELATIVE_HUMIDITY_VARNAME =  "relative_humidity";
+	public static final String SPECIFIC_HUMIDITY_VARNAME = "specific_humidity";
 
-	// WOCE flags on water CO2 values and air CO2 values
-	Character woceCO2Water;
-	Character woceCO2Atm;
+	public static final String SHIP_SPEED_VARNAME = "ship_speed";
+	public static final String SHIP_DIRECTION_VARNAME = "ship_dir";
+	public static final String WIND_SPEED_TRUE_VARNAME = "wind_speed_true";
+	public static final String WIND_SPEED_RELATIVE_VARNAME = "wind_speed_rel";
+	public static final String WIND_DIRECTION_TRUE_VARNAME = "wind_dir_true";
+	public static final String WIND_DIRECTION_RELATIVE_VARNAME = "wind_dir_rel";
 
-	// The following are provided by Ferret calculations using the above data
+	public static final String FCO2_FROM_XCO2_TEQU_VARNAME = "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm";
+	public static final String FCO2_FROM_XCO2_SST_VARNMAE = "fCO2_insitu_from_xCO2_water_sst_dry_ppm";
+	public static final String FCO2_FROM_PCO2_TEQU_VARNAME = "fCO2_from_pCO2_water_water_equi_temp";
+	public static final String FCO2_FROM_PCO2_SST_VARNAME = "fCO2_from_pCO2_water_sst_100humidity_uatm";
+	public static final String FCO2_FROM_FCO2_TEQU_VARNAME = "fCO2_insitu_from_fCO2_water_equi_uatm";
+	public static final String FCO2_FROM_FCO2_SST_VARNAME = "fCO2_insitu_from_fCO2_water_sst_100humidty_uatm";
+	public static final String FCO2_FROM_PCO2_TEQU_NCEP_VARNAME = "fCO2_from_pCO2_water_water_equi_temp_ncep";
+	public static final String FCO2_FROM_PCO2_SST_NCEP_VARNAME = "fCO2_from_pCO2_water_sst_100humidity_uatm_ncep";
+	public static final String FCO2_FROM_XCO2_TEQU_WOA_VARNAME = "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa";
+	public static final String FCO2_FROM_XCO2_SST_WOA_VARNAME = "fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa";
+	public static final String FCO2_FROM_XCO2_TEQU_NCEP_VARNAME = "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep";
+	public static final String FCO2_FROM_XCO2_SST_NCEP_VARNAME = "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep";
+	public static final String FOC2_FROM_XCO2_TEQU_NCEP_WOA_VARNAME = "fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa";
+	public static final String FCO2_FROM_XCO2_SST_NCEP_WOA_VARNAME = "fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa";
 
-	// WOA Sea Surface Salinity at this measurement's time and location
-	Double woaSss;
-	// NCEP sea level pressure at this measurement's time and location
-	Double ncepSlp;
+	public static final String FCO2_REC_VARNAME = "fCO2_recommended";
 
-	// Fourteen different recomputed fCO2 possibilities 
-	// depending on what was and was not provided by the PI
-	Double fCO2FromXCO2TEqu;
-	Double fCO2FromXCO2Sst;
-	Double fCO2FromPCO2TEqu;
-	Double fCO2FromPCO2Sst;
-	Double fCO2FromFCO2TEqu;
-	Double fCO2FromFCO2Sst;
-	Double fCO2FromPCO2TEquNcep;
-	Double fCO2FromPCO2SstNcep;
-	Double fCO2FromXCO2TEquWoa;
-	Double fCO2FromXCO2SstWoa;
-	Double fCO2FromXCO2TEquNcep;
-	Double fCO2FromXCO2SstNcep;
-	Double fCO2FromXCO2TEquNcepWoa;
-	Double fCO2FromXCO2SstNcepWoa;
+			// deltaT = tEqu - SST
+	public static final String DELTA_TEMP_VARNAME = "delta_temp";
 
-	// Recommended recomputed fCO2 value
-	Double fCO2Rec;
-    // Marker 1-14 indicating which of the recomputed fCO2 values was the recommended one
-	Integer fCO2Source;
-	// tEqu - SST
-	Double deltaT;
-	// ID of the cruise region in which this measurement lies
-	Character regionID;
-	// calculated ship speed from adjacent measurements
-	Double calcSpeed;
-	// ETOPO2 depth
-	Double etopo2Depth;
-	// GlobalView xCO2 value
-	Double gvCO2;
-	// distance to closest land mass (up to 1000 km)
-	Double distToLand;
-	// days of the year; Jan 1 00:00 == 1.0
-	Double dayOfYear;
-*/
+	public static final String CALC_SPEED_VARNAME = "calc_speed";
+	public static final String ETOPO2_DEPTH_VARNAME = "etopo2";
+	public static final String GVCO2_VARNAME = "gvCO2";
+	public static final String DIST_TO_LAND_VARNAME = "dist_to_land";
+	public static final String DAY_OF_YEAR_VARNAME = "day_of_year";
+
+	// Integer types
+	public static final String FCO2_SOURCE_VARNAME = "fCO2_source";
+
+	// Character types
+	public static final String REGION_ID_VARNAME = "region_id";
+	public static final String WOCE_CO2_WATER_VARNAME = "WOCE_CO2_water";
+	public static final String WOCE_CO2_ATM_VARNAME = "WOCE_CO2_atm";
+
+
 	private LinkedHashMap<String,Integer> intValsMap;
 	private LinkedHashMap<String,Double> doubleValsMap;
 	private LinkedHashMap<String,Character> charValsMap;
+
 	/**
 	 * Generates an empty SOCAT data record
 	 */
 	public SocatCruiseData() {
-		rowNum = INT_MISSING_VALUE;
+		
+		intValsMap = new LinkedHashMap<String,Integer>();
 
-		year = INT_MISSING_VALUE;
-		month = INT_MISSING_VALUE;
-		day = INT_MISSING_VALUE;
-		hour = INT_MISSING_VALUE;
-		minute = INT_MISSING_VALUE;
-		second = FP_MISSING_VALUE;
+		intValsMap.put(KnownDataTypes.SAMPLE_NUMBER.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+		intValsMap.put(KnownDataTypes.YEAR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+		intValsMap.put(KnownDataTypes.MONTH_OF_YEAR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+		intValsMap.put(KnownDataTypes.DAY_OF_MONTH.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+		intValsMap.put(KnownDataTypes.HOUR_OF_DAY.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+		intValsMap.put(KnownDataTypes.MINUTE_OF_HOUR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+		intValsMap.put(KnownDataTypes.SECOND_OF_MINUTE.getVarName(), DashboardUtils.INT_MISSING_VALUE);
 
-		longitude = FP_MISSING_VALUE;
-		latitude = FP_MISSING_VALUE;
-		sampleDepth = FP_MISSING_VALUE;
-		salinity = FP_MISSING_VALUE;
-		tEqu = FP_MISSING_VALUE;
-		sst = FP_MISSING_VALUE;
-		tAtm = FP_MISSING_VALUE;
-		pEqu = FP_MISSING_VALUE;
-		slp = FP_MISSING_VALUE;
+		intValsMap.put(FCO2_SOURCE_VARNAME, DashboardUtils.INT_MISSING_VALUE);
 
-		xCO2WaterSstDry = FP_MISSING_VALUE;
-		xCO2WaterTEquDry = FP_MISSING_VALUE;
-		xCO2WaterSstWet = FP_MISSING_VALUE;
-		xCO2WaterTEquWet = FP_MISSING_VALUE;
-		fCO2WaterSstWet = FP_MISSING_VALUE;
-		fCO2WaterTEquWet = FP_MISSING_VALUE;
-		pCO2WaterSstWet = FP_MISSING_VALUE;
-		pCO2WaterTEquWet = FP_MISSING_VALUE;
+		doubleValsMap = new LinkedHashMap<String,Double>(64);
 
-		xCO2AtmDryActual = FP_MISSING_VALUE;
-		xCO2AtmDryInterp = FP_MISSING_VALUE;
-		pCO2AtmWetActual = FP_MISSING_VALUE;
-		pCO2AtmWetInterp = FP_MISSING_VALUE;
-		fCO2AtmWetActual = FP_MISSING_VALUE;
-		fCO2AtmWetInterp = FP_MISSING_VALUE;
+		doubleValsMap.put(KnownDataTypes.LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(KnownDataTypes.LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(KnownDataTypes.SAMPLE_DEPTH.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+		
+		doubleValsMap.put(SALINITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(WOA_SALINITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
-		deltaXCO2 = FP_MISSING_VALUE;
-		deltaPCO2 = FP_MISSING_VALUE;
-		deltaFCO2 = FP_MISSING_VALUE;
+		doubleValsMap.put(TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(TATM_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
-		xH2OEqu = FP_MISSING_VALUE;
-		relativeHumidity = FP_MISSING_VALUE;
-		specificHumidity = FP_MISSING_VALUE;
-		shipSpeed = FP_MISSING_VALUE; 
-		shipDirection = FP_MISSING_VALUE; 
-		windSpeedTrue = FP_MISSING_VALUE;
-		windSpeedRelative = FP_MISSING_VALUE;
-		windDirectionTrue = FP_MISSING_VALUE;
-		windDirectionRelative = FP_MISSING_VALUE;
+		doubleValsMap.put(PEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(PATM_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(NCEP_SLP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
-		woceCO2Water = WoceEvent.WOCE_NOT_CHECKED;
-		woceCO2Atm = WoceEvent.WOCE_NOT_CHECKED;
+		doubleValsMap.put(XCO2_WATER_TEQU_DRY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(XCO2_WATER_SST_DRY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(XCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(XCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(PCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(PCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
-		woaSss = FP_MISSING_VALUE;
-		ncepSlp = FP_MISSING_VALUE;
+		doubleValsMap.put(XCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(XCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(PCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(PCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
-		fCO2FromXCO2TEqu = FP_MISSING_VALUE;
-		fCO2FromXCO2Sst = FP_MISSING_VALUE;
-		fCO2FromPCO2TEqu = FP_MISSING_VALUE;
-		fCO2FromPCO2Sst = FP_MISSING_VALUE;
-		fCO2FromFCO2TEqu = FP_MISSING_VALUE;
-		fCO2FromFCO2Sst = FP_MISSING_VALUE;
-		fCO2FromPCO2TEquNcep = FP_MISSING_VALUE;
-		fCO2FromPCO2SstNcep = FP_MISSING_VALUE;
-		fCO2FromXCO2TEquWoa = FP_MISSING_VALUE;
-		fCO2FromXCO2SstWoa = FP_MISSING_VALUE;
-		fCO2FromXCO2TEquNcep = FP_MISSING_VALUE;
-		fCO2FromXCO2SstNcep = FP_MISSING_VALUE;
-		fCO2FromXCO2TEquNcepWoa = FP_MISSING_VALUE;
-		fCO2FromXCO2SstNcepWoa = FP_MISSING_VALUE;
+		doubleValsMap.put(DELTA_XCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(DELTA_PCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(DELTA_FCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
-		fCO2Rec = FP_MISSING_VALUE;
-		fCO2Source = INT_MISSING_VALUE;
-		deltaT = FP_MISSING_VALUE;
-		regionID = DataLocation.GLOBAL_REGION_ID;
-		calcSpeed = FP_MISSING_VALUE;
-		etopo2Depth = FP_MISSING_VALUE;
-		gvCO2 = FP_MISSING_VALUE;
-		distToLand = FP_MISSING_VALUE;
-		dayOfYear = FP_MISSING_VALUE;
+		doubleValsMap.put(XH2O_EQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(RELATIVE_HUMIDITY_VARNAME,  DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(SPECIFIC_HUMIDITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+		doubleValsMap.put(SHIP_SPEED_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(SHIP_DIRECTION_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(WIND_SPEED_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(WIND_SPEED_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(WIND_DIRECTION_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(WIND_DIRECTION_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+		doubleValsMap.put(FCO2_FROM_XCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_XCO2_SST_VARNMAE, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_PCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_PCO2_SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_FCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_FCO2_SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_PCO2_TEQU_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_PCO2_SST_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_XCO2_TEQU_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_XCO2_SST_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_XCO2_TEQU_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_XCO2_SST_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FOC2_FROM_XCO2_TEQU_NCEP_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(FCO2_FROM_XCO2_SST_NCEP_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+		doubleValsMap.put(FCO2_REC_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+		doubleValsMap.put(DELTA_TEMP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(CALC_SPEED_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(ETOPO2_DEPTH_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(GVCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(DIST_TO_LAND_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+		doubleValsMap.put(DAY_OF_YEAR_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+		charValsMap = new LinkedHashMap<String,Character>();
+
+		charValsMap.put(REGION_ID_VARNAME, DataLocation.GLOBAL_REGION_ID);
+		charValsMap.put(WOCE_CO2_WATER_VARNAME, WoceEvent.WOCE_NOT_CHECKED);
+		charValsMap.put(WOCE_CO2_ATM_VARNAME, WoceEvent.WOCE_NOT_CHECKED);
 	}
 
 	/**
