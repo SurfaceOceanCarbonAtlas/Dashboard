@@ -17,7 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SCMessageList extends HashSet<SCMessage> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7402339885946675181L;
+	private static final long serialVersionUID = 6434854348799673565L;
 
 	private String username;
 	private String expocode;
@@ -25,14 +25,15 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 
 	public SCMessageList() {
 		super();
-		username = "";
-		expocode = "";
+		username = DashboardUtils.STRING_MISSING_VALUE;
+		expocode = DashboardUtils.STRING_MISSING_VALUE;
 		summaries = new ArrayList<String>();
 	}
 
 	/**
 	 * @return 
-	 * 		the username; never null but may be empty
+	 * 		the username; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getUsername() {
 		return username;
@@ -41,18 +42,19 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 	/**
 	 * @param username 
 	 * 		the username to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setUsername(String username) {
 		if ( username == null )
-			this.username = "";
+			this.username = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.username = username;
 	}
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; never null but may be empty
+	 * 		the cruise expocode; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getExpocode() {
 		return expocode;
@@ -61,11 +63,11 @@ public class SCMessageList extends HashSet<SCMessage> implements Serializable, I
 	/**
 	 * @param expocode 
 	 * 		the expocode to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setExpocode(String expocode) {
 		if ( expocode == null )
-			this.expocode = "";
+			this.expocode = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.expocode = expocode;
 	}

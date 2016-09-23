@@ -107,100 +107,124 @@ public class SocatCruiseData {
 	private LinkedHashMap<String,Double> doubleValsMap;
 	private LinkedHashMap<String,Character> charValsMap;
 
+	/*
+	intValsMap.put(KnownDataTypes.SAMPLE_NUMBER.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+	intValsMap.put(KnownDataTypes.YEAR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+	intValsMap.put(KnownDataTypes.MONTH_OF_YEAR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+	intValsMap.put(KnownDataTypes.DAY_OF_MONTH.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+	intValsMap.put(KnownDataTypes.HOUR_OF_DAY.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+	intValsMap.put(KnownDataTypes.MINUTE_OF_HOUR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+	intValsMap.put(KnownDataTypes.SECOND_OF_MINUTE.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+
+	intValsMap.put(FCO2_SOURCE_VARNAME, DashboardUtils.INT_MISSING_VALUE);
+
+	doubleValsMap.put(KnownDataTypes.LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(KnownDataTypes.LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(KnownDataTypes.SAMPLE_DEPTH.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+	
+	doubleValsMap.put(SALINITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(WOA_SALINITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(TATM_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(PEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(PATM_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(NCEP_SLP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(XCO2_WATER_TEQU_DRY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(XCO2_WATER_SST_DRY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(XCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(XCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(PCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(PCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(XCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(XCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(PCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(PCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(DELTA_XCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(DELTA_PCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(DELTA_FCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(XH2O_EQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(RELATIVE_HUMIDITY_VARNAME,  DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(SPECIFIC_HUMIDITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(SHIP_SPEED_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(SHIP_DIRECTION_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(WIND_SPEED_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(WIND_SPEED_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(WIND_DIRECTION_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(WIND_DIRECTION_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(FCO2_FROM_XCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_XCO2_SST_VARNMAE, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_PCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_PCO2_SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_FCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_FCO2_SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_PCO2_TEQU_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_PCO2_SST_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_XCO2_TEQU_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_XCO2_SST_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_XCO2_TEQU_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_XCO2_SST_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FOC2_FROM_XCO2_TEQU_NCEP_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(FCO2_FROM_XCO2_SST_NCEP_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(FCO2_REC_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+	doubleValsMap.put(DELTA_TEMP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(CALC_SPEED_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(ETOPO2_DEPTH_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(GVCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(DIST_TO_LAND_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+	doubleValsMap.put(DAY_OF_YEAR_VARNAME, DashboardUtils.FP_MISSING_VALUE);
+
+
+	charValsMap.put(REGION_ID_VARNAME, DataLocation.GLOBAL_REGION_ID);
+	charValsMap.put(WOCE_CO2_WATER_VARNAME, WoceEvent.WOCE_NOT_CHECKED);
+	charValsMap.put(WOCE_CO2_ATM_VARNAME, WoceEvent.WOCE_NOT_CHECKED);
+*/
+
 	/**
 	 * Generates an empty SOCAT data record
+	 * Generates a SocatCruiseData object with the given known types.
+	 * Only the data class types "Integer", "Double", and "Character" 
+	 * are accepted at this time.  Sets the values to the default values
+	 * ({@link DashboardUtils#INT_MISSING_VALUE} Integer, 
+	 * {@link DashboardUtils#FP_MISSING_VALUE} Double,
+	 * {@link DashboardUtils#CHAR_MISSING_VALUE} Character).
 	 */
-	public SocatCruiseData() {
-		
+	public SocatCruiseData(KnownDataTypes knownTypes) {
 		intValsMap = new LinkedHashMap<String,Integer>();
-
-		intValsMap.put(KnownDataTypes.SAMPLE_NUMBER.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-		intValsMap.put(KnownDataTypes.YEAR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-		intValsMap.put(KnownDataTypes.MONTH_OF_YEAR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-		intValsMap.put(KnownDataTypes.DAY_OF_MONTH.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-		intValsMap.put(KnownDataTypes.HOUR_OF_DAY.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-		intValsMap.put(KnownDataTypes.MINUTE_OF_HOUR.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-		intValsMap.put(KnownDataTypes.SECOND_OF_MINUTE.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-
-		intValsMap.put(FCO2_SOURCE_VARNAME, DashboardUtils.INT_MISSING_VALUE);
-
-		doubleValsMap = new LinkedHashMap<String,Double>(64);
-
-		doubleValsMap.put(KnownDataTypes.LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(KnownDataTypes.LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(KnownDataTypes.SAMPLE_DEPTH.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-		
-		doubleValsMap.put(SALINITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(WOA_SALINITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(TATM_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(PEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(PATM_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(NCEP_SLP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(XCO2_WATER_TEQU_DRY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(XCO2_WATER_SST_DRY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(XCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(XCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(PCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(PCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_WATER_TEQU_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_WATER_SST_WET_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(XCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(XCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(PCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(PCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_ATM_DRY_ACTUAL_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_ATM_DRY_INTERP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(DELTA_XCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(DELTA_PCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(DELTA_FCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(XH2O_EQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(RELATIVE_HUMIDITY_VARNAME,  DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(SPECIFIC_HUMIDITY_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(SHIP_SPEED_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(SHIP_DIRECTION_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(WIND_SPEED_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(WIND_SPEED_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(WIND_DIRECTION_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(WIND_DIRECTION_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(FCO2_FROM_XCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_XCO2_SST_VARNMAE, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_PCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_PCO2_SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_FCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_FCO2_SST_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_PCO2_TEQU_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_PCO2_SST_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_XCO2_TEQU_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_XCO2_SST_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_XCO2_TEQU_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_XCO2_SST_NCEP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FOC2_FROM_XCO2_TEQU_NCEP_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(FCO2_FROM_XCO2_SST_NCEP_WOA_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(FCO2_REC_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
-		doubleValsMap.put(DELTA_TEMP_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(CALC_SPEED_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(ETOPO2_DEPTH_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(GVCO2_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(DIST_TO_LAND_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-		doubleValsMap.put(DAY_OF_YEAR_VARNAME, DashboardUtils.FP_MISSING_VALUE);
-
+		doubleValsMap = new LinkedHashMap<String,Double>(96);
 		charValsMap = new LinkedHashMap<String,Character>();
 
-		charValsMap.put(REGION_ID_VARNAME, DataLocation.GLOBAL_REGION_ID);
-		charValsMap.put(WOCE_CO2_WATER_VARNAME, WoceEvent.WOCE_NOT_CHECKED);
-		charValsMap.put(WOCE_CO2_ATM_VARNAME, WoceEvent.WOCE_NOT_CHECKED);
+		if ( knownTypes != null ) {
+			for ( DataColumnType dtype : knownTypes.getKnownTypesList() ) {
+				if ( "Integer".equals(dtype.getDataClassName()) ) {
+					intValsMap.put(dtype.getVarName(), DashboardUtils.INT_MISSING_VALUE);
+				}
+				else if ( "Double".equals(dtype.getDataClassName()) ) {
+					doubleValsMap.put(dtype.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+				}
+				else if ( "Character".equals(dtype.getDataClassName()) ) {
+					charValsMap.put(dtype.getVarName(), DashboardUtils.CHAR_MISSING_VALUE);
+				}
+				else {
+					throw new IllegalArgumentException("Unknown data class name '" + 
+							dtype.getDataClassName() + "' for type '" + dtype.getVarName() + "'");
+				}
+			}
+		}
 	}
 
 	/**

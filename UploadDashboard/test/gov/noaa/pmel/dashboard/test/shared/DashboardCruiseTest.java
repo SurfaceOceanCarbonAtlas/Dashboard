@@ -56,12 +56,12 @@ public class DashboardCruiseTest {
 	public void testSetGetOwner() {
 		String myOwner = "SocatUser";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		cruise.setOwner(myOwner);
 		assertEquals(myOwner, cruise.getOwner() );
 		assertFalse( cruise.isSelected() );
 		cruise.setOwner(null);
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 	}
 
 	/**
@@ -72,13 +72,13 @@ public class DashboardCruiseTest {
 	public void testSetGetExpocode() {
 		String myExpocode = "ABCD20050728";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode());
 		cruise.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setExpocode(null);
-		assertEquals("", cruise.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode());
 	}
 
 	/**
@@ -89,14 +89,14 @@ public class DashboardCruiseTest {
 	public void testSetGetDataCheckStatus() {
 		String myDataStatus = "Acceptable";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
 		cruise.setDataCheckStatus(myDataStatus);
 		assertEquals(myDataStatus, cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setDataCheckStatus(null);
-		assertEquals("", cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
 	}
 
 	/**
@@ -107,14 +107,14 @@ public class DashboardCruiseTest {
 	public void testSetGetOmeTimestamp() {
 		String myOmeFilename = "2014-02-21 9:22";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		cruise.setOmeTimestamp(myOmeFilename);
 		assertEquals(myOmeFilename, cruise.getOmeTimestamp());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setOmeTimestamp(null);
-		assertEquals("", cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 	}
 
 	/**
@@ -131,10 +131,10 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getAddlDocs().size());
 		cruise.setAddlDocs(myMetaNames);
 		assertEquals(myMetaNames, cruise.getAddlDocs());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setAddlDocs(null);
 		assertEquals(0, cruise.getAddlDocs().size());
@@ -148,17 +148,17 @@ public class DashboardCruiseTest {
 	public void testSetGetQCStatus() {
 		String myQCStatus = "Submitted";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		cruise.setQcStatus(myQCStatus);
 		assertEquals(myQCStatus, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setQcStatus(null);
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 	}
 
 	/**
@@ -169,18 +169,18 @@ public class DashboardCruiseTest {
 	public void testSetGetArchiveStatus() {
 		String myArchiveStatus = "Next SOCAT release";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getArchiveStatus());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
 		cruise.setArchiveStatus(myArchiveStatus);
 		assertEquals(myArchiveStatus, cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setArchiveStatus(null);
-		assertEquals("", cruise.getArchiveStatus());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
 	}
 
 	/**
@@ -191,19 +191,19 @@ public class DashboardCruiseTest {
 	public void testSetGetUploadFilename() {
 		String myFilename = "myUploadFilename.tsv";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		cruise.setUploadFilename(myFilename);
 		assertEquals(myFilename, cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setUploadFilename(null);
-		assertEquals("", cruise.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 	}
 
 	/**
@@ -217,14 +217,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		cruise.setNumDataRows(myNumDataRows);
 		assertEquals(myNumDataRows, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 	}
 
@@ -246,14 +246,14 @@ public class DashboardCruiseTest {
 		cruise.setDataColTypes(myDataColTypes);
 		assertEquals(myDataColTypes, cruise.getDataColTypes());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setDataColTypes(null);
 		assertEquals(0, cruise.getDataColTypes().size());
@@ -273,14 +273,14 @@ public class DashboardCruiseTest {
 		assertEquals(myUserColNames, cruise.getUserColNames());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setUserColNames(null);
 		assertEquals(0, cruise.getUserColNames().size());
@@ -300,14 +300,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 	}
 
@@ -326,14 +326,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 	}
 
@@ -353,14 +353,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setNoColumnWoceThreeRowIndices(null);
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
@@ -383,14 +383,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setNoColumnWoceFourRowIndices(null);
 		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
@@ -414,14 +414,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setUserWoceThreeRowIndices(null);
 		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
@@ -446,14 +446,14 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setUserWoceFourRowIndices(null);
 		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
@@ -467,7 +467,7 @@ public class DashboardCruiseTest {
 	public void testSetGetUploadTimestamp() {
 		String uploadTimestamp = "2015-10-20 13:14:15";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getUploadTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
 		cruise.setUploadTimestamp(uploadTimestamp);
 		assertEquals(uploadTimestamp, cruise.getUploadTimestamp());
 		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
@@ -479,17 +479,17 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setUploadTimestamp(null);
-		assertEquals("", cruise.getUploadTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
 	}
 
 	/**
@@ -500,10 +500,10 @@ public class DashboardCruiseTest {
 	public void testSetGetOrigDOI() {
 		String origDOI = "ORIGDOI12345";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getOrigDoi());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
 		cruise.setOrigDoi(origDOI);
 		assertEquals(origDOI, cruise.getOrigDoi());
-		assertEquals("", cruise.getUploadTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
 		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
 		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
@@ -513,17 +513,17 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setOrigDoi(null);
-		assertEquals("", cruise.getOrigDoi());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
 	}
 
 	/**
@@ -534,11 +534,11 @@ public class DashboardCruiseTest {
 	public void testSetGetSocatDOI() {
 		String socatDOI = "SOCATDOI12345";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals("", cruise.getSocatDoi());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getSocatDoi());
 		cruise.setSocatDoi(socatDOI);
 		assertEquals(socatDOI, cruise.getSocatDoi());
-		assertEquals("", cruise.getOrigDoi());
-		assertEquals("", cruise.getUploadTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
 		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
 		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
@@ -548,17 +548,17 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
+		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
+		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setSocatDoi(null);
-		assertEquals("", cruise.getSocatDoi());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getSocatDoi());
 	}
 
 	/**

@@ -90,13 +90,13 @@ public class WoceEventTest {
 	@Test
 	public void testGetSetExpocode() {
 		WoceEvent myflag = new WoceEvent();
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setExpocode(null);
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 	}
 
 	/**
@@ -106,14 +106,14 @@ public class WoceEventTest {
 	@Test
 	public void testGetSetSocatVersion() {
 		WoceEvent myflag = new WoceEvent();
-		assertEquals("", myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		myflag.setVersion(MY_SOCAT_VERSION);
 		assertEquals(MY_SOCAT_VERSION, myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setVersion(null);
-		assertEquals("", myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 	}
 
 	/**
@@ -123,15 +123,15 @@ public class WoceEventTest {
 	@Test
 	public void testGetSetColumnName() {
 		WoceEvent myflag = new WoceEvent();
-		assertEquals("", myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
 		myflag.setVarName(MY_DATA_VAR_NAME);
 		assertEquals(MY_DATA_VAR_NAME, myflag.getVarName());
-		assertEquals("", myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setVarName(null);
-		assertEquals("", myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
 	}
 
 	/**
@@ -144,9 +144,9 @@ public class WoceEventTest {
 		assertEquals(0, myflag.getLocations().size());
 		myflag.setLocations(MY_LOCATIONS);
 		assertEquals(MY_LOCATIONS, myflag.getLocations());
-		assertEquals("", myflag.getVarName());
-		assertEquals("", myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setLocations(null);
@@ -164,9 +164,9 @@ public class WoceEventTest {
 		myflag.setFlagDate(MY_FLAG_DATE);
 		assertEquals(MY_FLAG_DATE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getVarName());
-		assertEquals("", myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlagDate(null);
@@ -180,18 +180,18 @@ public class WoceEventTest {
 	@Test
 	public void testGetSetUsername() {
 		WoceEvent myflag = new WoceEvent();
-		assertEquals("", myflag.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
 		myflag.setUsername(MY_USERNAME);
 		assertEquals(MY_USERNAME, myflag.getUsername());
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getVarName());
-		assertEquals("", myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setUsername(null);
-		assertEquals("", myflag.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
 	}
 
 	/**
@@ -201,19 +201,19 @@ public class WoceEventTest {
 	@Test
 	public void testGetSetRealname() {
 		WoceEvent myflag = new WoceEvent();
-		assertEquals("", myflag.getRealname());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
 		myflag.setRealname(MY_REALNAME);
 		assertEquals(MY_REALNAME, myflag.getRealname());
-		assertEquals("", myflag.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getVarName());
-		assertEquals("", myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setRealname(null);
-		assertEquals("", myflag.getRealname());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
 	}
 
 	/**
@@ -223,20 +223,20 @@ public class WoceEventTest {
 	@Test
 	public void testGetSetComment() {
 		WoceEvent myflag = new WoceEvent();
-		assertEquals("", myflag.getComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getComment());
 		myflag.setComment(MY_COMMENT);
 		assertEquals(MY_COMMENT, myflag.getComment());
-		assertEquals("", myflag.getRealname());
-		assertEquals("", myflag.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
 		assertEquals(0, myflag.getLocations().size());
-		assertEquals("", myflag.getVarName());
-		assertEquals("", myflag.getVersion());
-		assertEquals("", myflag.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(WoceEvent.WOCE_NOT_CHECKED, myflag.getFlag());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setComment(null);
-		assertEquals("", myflag.getComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getComment());
 	}
 
 	/**

@@ -15,7 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Crossover implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 2025134071497874015L;
+	private static final long serialVersionUID = -2923552135378225987L;
 
 	/** Max "distance", in kilometers, still considered a crossover */
 	public static final double MAX_CROSSOVER_DIST = 80.0;

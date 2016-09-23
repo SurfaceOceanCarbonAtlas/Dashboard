@@ -76,17 +76,27 @@ public class DashboardUtils {
 	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
 	/**
-	 *  Missing value for floating-point variables - not NaN for Ferret
+	 *  Missing value for floating-point variables - not null or NaN
 	 */
 	public static final Double FP_MISSING_VALUE = -1.0E+34;
 
 	/**
-	 *  Missing value for integer variables
+	 *  Missing value for integer variables - not null
 	 */
 	public static final Integer INT_MISSING_VALUE = -1;
 
 	/**
-	 * Date used as a missing value; 
+	 * Missing value for String variables - not null
+	 */
+	public static final String STRING_MISSING_VALUE = "";
+
+	/**
+	 * Missing value for Character variables - not null
+	 */
+	public static final Character CHAR_MISSING_VALUE = ' ';
+
+	/**
+	 * Date used as a missing value - not null; 
 	 * corresponds to Jan 2, 3000 00:00:00 GMT
 	 */
 	public static final Date DATE_MISSING_VALUE = new Date(32503766400429L);
@@ -104,169 +114,6 @@ public class DashboardUtils {
 	 * Typically used for atol in {@link #closeTo(Double, Double, double, double)}
 	 */
 	public static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
-
-/*
-	public static final EnumMap<DataColumnType,String> STD_HEADER_NAMES = 
-			new EnumMap<DataColumnType,String>(DataColumnType.class);
-	static {
-		STD_HEADER_NAMES.put(DataColumnType.UNKNOWN, "(unknown)");
-		STD_HEADER_NAMES.put(DataColumnType.EXPOCODE, "expocode");
-		STD_HEADER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
-		STD_HEADER_NAMES.put(DataColumnType.SHIP_NAME, "ship_name");
-		STD_HEADER_NAMES.put(DataColumnType.GROUP_NAME, "group_name");
-		STD_HEADER_NAMES.put(DataColumnType.INVESTIGATOR_NAMES, "PI_names");
-
-		STD_HEADER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
-		STD_HEADER_NAMES.put(DataColumnType.DATE, "date");
-		STD_HEADER_NAMES.put(DataColumnType.YEAR, "year");
-		STD_HEADER_NAMES.put(DataColumnType.MONTH, "month");
-		STD_HEADER_NAMES.put(DataColumnType.DAY, "day");
-		STD_HEADER_NAMES.put(DataColumnType.TIME, "time");
-		STD_HEADER_NAMES.put(DataColumnType.HOUR, "hour");
-		STD_HEADER_NAMES.put(DataColumnType.MINUTE, "minute");
-		STD_HEADER_NAMES.put(DataColumnType.SECOND, "second");
-		STD_HEADER_NAMES.put(DataColumnType.DAY_OF_YEAR, "day_of_year");
-		STD_HEADER_NAMES.put(DataColumnType.SECOND_OF_DAY, "sec_of_day");
-
-		STD_HEADER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
-		STD_HEADER_NAMES.put(DataColumnType.LATITUDE, "latitude");
-		STD_HEADER_NAMES.put(DataColumnType.SAMPLE_DEPTH, "sample_depth");
-		STD_HEADER_NAMES.put(DataColumnType.SALINITY, "salinity");
-		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "T_equ");
-		STD_HEADER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
-		STD_HEADER_NAMES.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
-		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "P_equ");
-		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
-
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_DRY, "xCO2_water_Tequ_dry");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_DRY, "xCO2_water_SST_dry");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_WET, "xCO2_water_Tequ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_WET, "xCO2_water_SST_wet");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_WATER_TEQU_WET, "pCO2_water_Tequ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_WATER_SST_WET, "pCO2_water_SST_wet");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_TEQU_WET, "fCO2_water_Tequ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_SST_WET, "fCO2_water_SST_wet");
-
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, "xCO2_atm_dry_actual");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_INTERP, "xCO2_atm_dry_interp");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_ACTUAL, "pCO2_atm_wet_actual");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_INTERP, "pCO2_atm_wet_interp");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_ACTUAL, "fCO2_atm_wet_actual");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_INTERP, "fCO2_atm_wet_interp");
-
-		STD_HEADER_NAMES.put(DataColumnType.DELTA_XCO2, "delta_xCO2");
-		STD_HEADER_NAMES.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
-		STD_HEADER_NAMES.put(DataColumnType.DELTA_FCO2, "delta_fCO2");
-
-		STD_HEADER_NAMES.put(DataColumnType.XH2O_EQU, "xH2O_equ");
-		STD_HEADER_NAMES.put(DataColumnType.RELATIVE_HUMIDITY, "relative_humidity");
-		STD_HEADER_NAMES.put(DataColumnType.SPECIFIC_HUMIDITY, "specific_humidity");
-		STD_HEADER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
-		STD_HEADER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
-
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_CO2_WATER, "WOCE_CO2_water");
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_CO2_ATM, "WOCE_CO2_atm");
-		STD_HEADER_NAMES.put(DataColumnType.COMMENT_WOCE_CO2_WATER, "comment_WOCE_CO2_water");
-		STD_HEADER_NAMES.put(DataColumnType.COMMENT_WOCE_CO2_ATM, "comment_WOCE_CO2_atm");
-
-		STD_HEADER_NAMES.put(DataColumnType.OTHER, "other");
-	}
-
-	public static final ArrayList<String> SALINITY_UNITS = 
-			new ArrayList<String>(Arrays.asList("PSU"));
-	public static final ArrayList<String> TEMPERATURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.C"));
-	public static final ArrayList<String> PRESSURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
-	public static final ArrayList<String> XCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("umol/mol"));
-	public static final ArrayList<String> PCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-	public static final ArrayList<String> FCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-	public static final ArrayList<String> DIRECTION_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.clk.N"));
-	public static final ArrayList<String> SHIP_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
-	public static final ArrayList<String> WIND_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("m/s"));
-	public static final ArrayList<String> XH2O_UNITS = 
-			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
-
-	public static final EnumMap<DataColumnType,ArrayList<String>> STD_DATA_UNITS = 
-			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
-	static {
-		STD_DATA_UNITS.put(DataColumnType.UNKNOWN, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.EXPOCODE, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SHIP_NAME, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.GROUP_NAME, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.INVESTIGATOR_NAMES, NO_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, TIMESTAMP_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DATE, DATE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.YEAR, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.MONTH, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DAY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.TIME, TIME_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.HOUR, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.MINUTE, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SECOND, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DAY_OF_YEAR, DAY_OF_YEAR_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SECOND_OF_DAY, NO_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, LONGITUDE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.LATITUDE, LATITUDE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, DEPTH_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SALINITY, SALINITY_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, TEMPERATURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, TEMPERATURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, TEMPERATURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_DRY, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_DRY, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_WET, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_WET, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_WATER_TEQU_WET, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_WATER_SST_WET, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_TEQU_WET, FCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_SST_WET, FCO2_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_INTERP, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_ACTUAL, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_INTERP, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_ACTUAL, FCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_INTERP, FCO2_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.DELTA_XCO2, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DELTA_FCO2, FCO2_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XH2O_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, DIRECTION_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.WOCE_CO2_WATER, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WOCE_CO2_ATM, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.COMMENT_WOCE_CO2_WATER, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.COMMENT_WOCE_CO2_ATM, NO_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.OTHER, NO_UNITS);
-	}
-*/
 
 	/**
 	 * "Cleans" a username for use by substituting characters that are  
@@ -674,5 +521,168 @@ public class DashboardUtils {
 		double absAver = Math.abs((first + second) * 0.5);
 		return ( absDiff < absAver * rtol + atol );
 	}
+
+/*
+	public static final EnumMap<DataColumnType,String> STD_HEADER_NAMES = 
+			new EnumMap<DataColumnType,String>(DataColumnType.class);
+	static {
+		STD_HEADER_NAMES.put(DataColumnType.UNKNOWN, "(unknown)");
+		STD_HEADER_NAMES.put(DataColumnType.EXPOCODE, "expocode");
+		STD_HEADER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
+		STD_HEADER_NAMES.put(DataColumnType.SHIP_NAME, "ship_name");
+		STD_HEADER_NAMES.put(DataColumnType.GROUP_NAME, "group_name");
+		STD_HEADER_NAMES.put(DataColumnType.INVESTIGATOR_NAMES, "PI_names");
+
+		STD_HEADER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
+		STD_HEADER_NAMES.put(DataColumnType.DATE, "date");
+		STD_HEADER_NAMES.put(DataColumnType.YEAR, "year");
+		STD_HEADER_NAMES.put(DataColumnType.MONTH, "month");
+		STD_HEADER_NAMES.put(DataColumnType.DAY, "day");
+		STD_HEADER_NAMES.put(DataColumnType.TIME, "time");
+		STD_HEADER_NAMES.put(DataColumnType.HOUR, "hour");
+		STD_HEADER_NAMES.put(DataColumnType.MINUTE, "minute");
+		STD_HEADER_NAMES.put(DataColumnType.SECOND, "second");
+		STD_HEADER_NAMES.put(DataColumnType.DAY_OF_YEAR, "day_of_year");
+		STD_HEADER_NAMES.put(DataColumnType.SECOND_OF_DAY, "sec_of_day");
+
+		STD_HEADER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
+		STD_HEADER_NAMES.put(DataColumnType.LATITUDE, "latitude");
+		STD_HEADER_NAMES.put(DataColumnType.SAMPLE_DEPTH, "sample_depth");
+		STD_HEADER_NAMES.put(DataColumnType.SALINITY, "salinity");
+		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "T_equ");
+		STD_HEADER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
+		STD_HEADER_NAMES.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
+		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "P_equ");
+		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
+
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_DRY, "xCO2_water_Tequ_dry");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_DRY, "xCO2_water_SST_dry");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_WET, "xCO2_water_Tequ_wet");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_WET, "xCO2_water_SST_wet");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_WATER_TEQU_WET, "pCO2_water_Tequ_wet");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_WATER_SST_WET, "pCO2_water_SST_wet");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_TEQU_WET, "fCO2_water_Tequ_wet");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_SST_WET, "fCO2_water_SST_wet");
+
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, "xCO2_atm_dry_actual");
+		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_INTERP, "xCO2_atm_dry_interp");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_ACTUAL, "pCO2_atm_wet_actual");
+		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_INTERP, "pCO2_atm_wet_interp");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_ACTUAL, "fCO2_atm_wet_actual");
+		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_INTERP, "fCO2_atm_wet_interp");
+
+		STD_HEADER_NAMES.put(DataColumnType.DELTA_XCO2, "delta_xCO2");
+		STD_HEADER_NAMES.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
+		STD_HEADER_NAMES.put(DataColumnType.DELTA_FCO2, "delta_fCO2");
+
+		STD_HEADER_NAMES.put(DataColumnType.XH2O_EQU, "xH2O_equ");
+		STD_HEADER_NAMES.put(DataColumnType.RELATIVE_HUMIDITY, "relative_humidity");
+		STD_HEADER_NAMES.put(DataColumnType.SPECIFIC_HUMIDITY, "specific_humidity");
+		STD_HEADER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
+		STD_HEADER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
+		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
+
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_CO2_WATER, "WOCE_CO2_water");
+		STD_HEADER_NAMES.put(DataColumnType.WOCE_CO2_ATM, "WOCE_CO2_atm");
+		STD_HEADER_NAMES.put(DataColumnType.COMMENT_WOCE_CO2_WATER, "comment_WOCE_CO2_water");
+		STD_HEADER_NAMES.put(DataColumnType.COMMENT_WOCE_CO2_ATM, "comment_WOCE_CO2_atm");
+
+		STD_HEADER_NAMES.put(DataColumnType.OTHER, "other");
+	}
+
+	public static final ArrayList<String> SALINITY_UNITS = 
+			new ArrayList<String>(Arrays.asList("PSU"));
+	public static final ArrayList<String> TEMPERATURE_UNITS = 
+			new ArrayList<String>(Arrays.asList("deg.C"));
+	public static final ArrayList<String> PRESSURE_UNITS = 
+			new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
+	public static final ArrayList<String> XCO2_UNITS = 
+			new ArrayList<String>(Arrays.asList("umol/mol"));
+	public static final ArrayList<String> PCO2_UNITS = 
+			new ArrayList<String>(Arrays.asList("uatm"));
+	public static final ArrayList<String> FCO2_UNITS = 
+			new ArrayList<String>(Arrays.asList("uatm"));
+	public static final ArrayList<String> DIRECTION_UNITS = 
+			new ArrayList<String>(Arrays.asList("deg.clk.N"));
+	public static final ArrayList<String> SHIP_SPEED_UNITS = 
+			new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
+	public static final ArrayList<String> WIND_SPEED_UNITS = 
+			new ArrayList<String>(Arrays.asList("m/s"));
+	public static final ArrayList<String> XH2O_UNITS = 
+			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
+
+	public static final EnumMap<DataColumnType,ArrayList<String>> STD_DATA_UNITS = 
+			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
+	static {
+		STD_DATA_UNITS.put(DataColumnType.UNKNOWN, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.EXPOCODE, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SHIP_NAME, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.GROUP_NAME, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.INVESTIGATOR_NAMES, NO_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, TIMESTAMP_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.DATE, DATE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.YEAR, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.MONTH, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.DAY, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.TIME, TIME_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.HOUR, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.MINUTE, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SECOND, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.DAY_OF_YEAR, DAY_OF_YEAR_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SECOND_OF_DAY, NO_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, LONGITUDE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.LATITUDE, LATITUDE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, DEPTH_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SALINITY, SALINITY_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, TEMPERATURE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, TEMPERATURE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, TEMPERATURE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_DRY, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_DRY, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_WET, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_WET, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_WATER_TEQU_WET, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_WATER_SST_WET, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_TEQU_WET, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_SST_WET, FCO2_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_INTERP, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_ACTUAL, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_INTERP, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_ACTUAL, FCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_INTERP, FCO2_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.DELTA_XCO2, XCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.DELTA_FCO2, FCO2_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XH2O_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, DIRECTION_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.WOCE_CO2_WATER, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.WOCE_CO2_ATM, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.COMMENT_WOCE_CO2_WATER, NO_UNITS);
+		STD_DATA_UNITS.put(DataColumnType.COMMENT_WOCE_CO2_ATM, NO_UNITS);
+
+		STD_DATA_UNITS.put(DataColumnType.OTHER, NO_UNITS);
+	}
+*/
 
 }

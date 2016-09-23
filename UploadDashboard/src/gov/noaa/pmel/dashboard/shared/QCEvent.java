@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class QCEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1603174921370614877L;
+	private static final long serialVersionUID = 9043410927257592069L;
 
 	// All possible QC flags
 	public static final Character QC_A_FLAG = 'A';

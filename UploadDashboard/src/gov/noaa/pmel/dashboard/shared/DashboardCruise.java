@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -6765595664218624492L;
+	private static final long serialVersionUID = 4299268768779494106L;
 
 	boolean selected;
 	String version;
@@ -56,19 +56,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	public DashboardCruise() {
 		selected = false;
-		version = "";
-		owner = "";
-		expocode = "";
-		dataCheckStatus = "";
-		omeTimestamp = "";
+		version = DashboardUtils.STRING_MISSING_VALUE;
+		owner = DashboardUtils.STRING_MISSING_VALUE;
+		expocode = DashboardUtils.STRING_MISSING_VALUE;
+		dataCheckStatus = DashboardUtils.STRING_MISSING_VALUE;
+		omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
 		addlDocs = new TreeSet<String>();
-		qcStatus = "";
-		archiveStatus = "";
-		cdiacDate = "";
-		uploadFilename = "";
-		uploadTimestamp = "";
-		origDoi = "";
-		socatDoi = "";
+		qcStatus = QCEvent.QC_STATUS_NOT_SUBMITTED;
+		archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
+		cdiacDate = DashboardUtils.STRING_MISSING_VALUE;
+		uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
+		uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
+		origDoi = DashboardUtils.STRING_MISSING_VALUE;
+		socatDoi = DashboardUtils.STRING_MISSING_VALUE;
 		numDataRows = 0;
 		numErrorRows = 0;
 		numWarnRows = 0;
@@ -126,7 +126,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise version; never null, but may be empty
+	 * 		the cruise version; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVersion() {
 		return version;
@@ -135,18 +136,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param version 
 	 * 		the cruise version (after trimming) to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setVersion(String version) {
 		if ( version == null )
-			this.version = "";
+			this.version = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.version = version.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the owner for this cruise; never null but may be empty
+	 * 		the owner for this cruise; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getOwner() {
 		return owner;
@@ -155,18 +157,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param owner 
 	 * 		the cruise owner (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setOwner(String owner) {
 		if ( owner == null )
-			this.owner = "";
+			this.owner = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.owner = owner.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; never null but may be empty
+	 * 		the cruise expocode; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getExpocode() {
 		return expocode;
@@ -174,20 +177,20 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @param cruiseExpocode 
-	 * 		the cruise expocode to set (after trimming 
-	 * 		and converting to upper-case) to set;
-	 * 		if null, sets to an empty string
+	 * 		the cruise expocode (after trimming and converting to upper-case) to set;
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setExpocode(String expocode) {
 		if ( expocode == null )
-			this.expocode = "";
+			this.expocode = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.expocode = expocode.trim().toUpperCase();
 	}
 
 	/**
 	 * @return 
-	 * 		the data check status; never null but may be empty
+	 * 		the data check status; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getDataCheckStatus() {
 		return dataCheckStatus;
@@ -196,18 +199,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param dataCheckStatus 
 	 * 		the data check status to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setDataCheckStatus(String dataCheckStatus) {
 		if ( dataCheckStatus == null )
-			this.dataCheckStatus = "";
+			this.dataCheckStatus = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.dataCheckStatus = dataCheckStatus;
 	}
 
 	/**
 	 * @return 
-	 * 		the OME metadata timestamp; never null but may be empty
+	 * 		the OME metadata timestamp; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getOmeTimestamp() {
 		return omeTimestamp;
@@ -216,11 +220,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param omeTimestamp 
 	 * 		the OME metadata timestamp to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setOmeTimestamp(String omeTimestamp) {
 		if ( omeTimestamp == null )
-			this.omeTimestamp = "";
+			this.omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.omeTimestamp = omeTimestamp;
 	}
@@ -249,7 +253,8 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the QC submission status; never null but may be empty
+	 * 		the QC submission status; 
+	 * 		never null but may be {@link #QC_STATUS_NOT_SUBMITTED} if not assigned
 	 */
 	public String getQcStatus() {
 		return qcStatus;
@@ -258,18 +263,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param qcStatus 
 	 * 		the  QC submission status (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, {@link #QC_STATUS_NOT_SUBMITTED} is assigned
 	 */
 	public void setQcStatus(String qcStatus) {
 		if ( qcStatus == null )
-			this.qcStatus = "";
+			this.qcStatus = QCEvent.QC_STATUS_NOT_SUBMITTED;
 		else
 			this.qcStatus = qcStatus.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the archive submission status; never null but may be empty
+	 * 		the archive submission status; 
+	 * 		never null but may be {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED} if not assigned
 	 */
 	public String getArchiveStatus() {
 		return archiveStatus;
@@ -278,18 +284,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param submitStatus 
 	 * 		the archive submission status (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, {@link DashboardUtils#ARCHIVE_STATUS_NOT_SUBMITTED} is assigned
 	 */
 	public void setArchiveStatus(String archiveStatus) {
 		if ( archiveStatus == null )
-			this.archiveStatus = "";
+			this.archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
 		else
 			this.archiveStatus = archiveStatus.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the CDIAC submission date; never null but may be empty
+	 * 		the CDIAC submission date; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getCdiacDate() {
 		return cdiacDate;
@@ -298,18 +305,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param cdiacDate 
 	 * 		the CDIAC submission date (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setCdiacDate(String cdiacDate) {
 		if ( cdiacDate == null )
-			this.cdiacDate = "";
+			this.cdiacDate = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.cdiacDate = cdiacDate.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the uploaded data filename; never null but may be empty
+	 * 		the uploaded data filename; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getUploadFilename() {
 		return uploadFilename;
@@ -318,18 +326,19 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param uploadFilename 
 	 * 		the uploaded data filename (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setUploadFilename(String uploadFilename) {
 		if ( uploadFilename == null )
-			this.uploadFilename = "";
+			this.uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.uploadFilename = uploadFilename.trim();
 	}
 
 	/**
 	 * @return 
-	 * 		the uploaded data timestamp; never null but may be empty
+	 * 		the uploaded data timestamp; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getUploadTimestamp() {
 		return uploadTimestamp;
@@ -338,11 +347,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param uploadTimestamp 
 	 * 		the uploaded data timestamp (after trimming) to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setUploadTimestamp(String uploadTimestamp) {
 		if ( uploadTimestamp == null )
-			this.uploadTimestamp = "";
+			this.uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.uploadTimestamp = uploadTimestamp.trim();
 	}
@@ -350,7 +359,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the DOI of the original data document;
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getOrigDoi() {
 		return origDoi;
@@ -359,11 +368,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param socatDoi
 	 * 		the DOI (after trimming) of the original data document to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setOrigDoi(String origDoi) {
 		if ( origDoi == null )
-			this.origDoi = "";
+			this.origDoi = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.origDoi = origDoi.trim();
 	}
@@ -371,7 +380,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the DOI of the SOCAT-enhanced data document;
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getSocatDoi() {
 		return socatDoi;
@@ -380,11 +389,11 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	/**
 	 * @param socatDoi
 	 * 		the DOI (after trimming) of the SOCAT-enhanced data document to set;
-	 * 		if null, sets to an empty string
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setSocatDoi(String socatDoi) {
 		if ( socatDoi == null )
-			this.socatDoi = "";
+			this.socatDoi = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.socatDoi = socatDoi.trim();
 	}

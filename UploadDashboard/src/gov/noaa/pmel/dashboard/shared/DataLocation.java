@@ -18,7 +18,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -6320586997492783178L;
+	private static final long serialVersionUID = -4504865991728818424L;
 
 	public static final Character GLOBAL_REGION_ID = 'G';
 	public static final Character NORTH_PACIFIC_REGION_ID = 'N';

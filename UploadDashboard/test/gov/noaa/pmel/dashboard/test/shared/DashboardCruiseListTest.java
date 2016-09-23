@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import org.junit.Test;
 
@@ -24,12 +25,12 @@ public class DashboardCruiseListTest {
 	public void testGetSetUsername() {
 		String myUsername = "SocatUser";
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
-		assertEquals("", cruiseList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
 		cruiseList.setUsername(myUsername);
 		assertEquals(myUsername, cruiseList.getUsername());
 		assertEquals(0, cruiseList.size());
 		cruiseList.setUsername(null);
-		assertEquals("", cruiseList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
 	}
 
 	/**
@@ -40,13 +41,13 @@ public class DashboardCruiseListTest {
 	public void testGetSetSocatVersion() {
 		String mySocatVersion = "4";
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
-		assertEquals("", cruiseList.getSocatVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getSocatVersion());
 		cruiseList.setSocatVersion(mySocatVersion);
 		assertEquals(mySocatVersion, cruiseList.getSocatVersion());
-		assertEquals("", cruiseList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
 		assertEquals(0, cruiseList.size());
 		cruiseList.setSocatVersion(null);
-		assertEquals("", cruiseList.getSocatVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getSocatVersion());
 	}
 
 	/**
@@ -59,8 +60,8 @@ public class DashboardCruiseListTest {
 		assertFalse( cruiseList.isManager());
 		cruiseList.setManager(true);
 		assertTrue( cruiseList.isManager());
-		assertEquals("", cruiseList.getSocatVersion());
-		assertEquals("", cruiseList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getSocatVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseList.getUsername());
 		assertEquals(0, cruiseList.size());
 	}
 

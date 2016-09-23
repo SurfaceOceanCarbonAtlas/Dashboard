@@ -49,11 +49,11 @@ public class SocatMetadata {
 	/**
 	 * Generates a SocatMetadata object with the given known types.
 	 * Only the data class types "String", "Double", and "Date" are
-	 * accepted at this time.  Sets the values to the default values
-	 * (empty String, {@link DashboardUtils#FP_MISSING_VALUE} Double,
-	 * {@link DashboardUtils#DATE_MISSING_VALUE} Date).
-	 * The default value for QC_FLAG is a String with a single blank 
-	 * character.
+	 * accepted at this time.  Sets the values to the default values:
+	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE}.toString() for QC_FLAG,
+	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other String values, 
+	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for Double values, and
+	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for Date values.
 	 */
 	public SocatMetadata(KnownDataTypes knownTypes) {
 		stringValuesMap = new LinkedHashMap<String,String>();
@@ -65,10 +65,10 @@ public class SocatMetadata {
 				if ( "String".equals(dtype.getDataClassName()) ) {
 					if ( dtype.typeEquals(KnownDataTypes.QC_FLAG) ) {
 						// Single blank character for QC_FLAG
-						stringValuesMap.put(dtype.getVarName(), " ");
+						stringValuesMap.put(dtype.getVarName(), DashboardUtils.CHAR_MISSING_VALUE.toString());
 					}
 					else {
-						stringValuesMap.put(dtype.getVarName(), "");
+						stringValuesMap.put(dtype.getVarName(), DashboardUtils.STRING_MISSING_VALUE);
 					}
 				}
 				else if ( "Double".equals(dtype.getDataClassName()) ) {
@@ -115,130 +115,130 @@ public class SocatMetadata {
 	/**
 	 * @return
 	 * 		the expocode; 
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getExpocode() {
 		String value = stringValuesMap.get(KnownDataTypes.EXPOCODE.getVarName());
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param expocode 
 	 * 		the expocode to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setExpocode(String expocode) {
 		String value;
 		if ( expocode != null )
 			value = expocode;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(KnownDataTypes.EXPOCODE.getVarName(), value);
 	}
 
 	/**
 	 * @return
 	 * 		the dataset name; 
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getDatasetName() {
 		String value = stringValuesMap.get(KnownDataTypes.DATASET_NAME.getVarName());
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param datasetName
 	 * 		the dataset name to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setDatasetName(String datasetName) {
 		String value;
 		if ( datasetName != null )
 			value = datasetName;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(KnownDataTypes.DATASET_NAME.getVarName(), value);
 	}
 
 	/**
 	 * @return
 	 * 		the vessel name; 
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getVesselName() {
 		String value = stringValuesMap.get(KnownDataTypes.VESSEL_NAME.getVarName());
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param vesselName 
 	 * 		the vessel name to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setVesselName(String vesselName) {
 		String value;
 		if ( vesselName != null )
 			value = vesselName;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), value);
 	}
 
 	/**
 	 * @return
 	 * 		the name of the organization/institution;
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getOrganizationName() {
 		String value = stringValuesMap.get(KnownDataTypes.ORGANIZATION_NAME.getVarName());
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param organizationName 
 	 * 		the name of the organization/institution to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setOrganizationName(String organizationName) {
 		String value;
 		if ( organizationName != null )
 			value = organizationName;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(KnownDataTypes.ORGANIZATION_NAME.getVarName(), value);
 	}
 
 	/**
 	 * @return
 	 * 		the investigator names;
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getInvestigatorNames() {
 		String value = stringValuesMap.get(KnownDataTypes.INVESTIGATOR_NAMES.getVarName());
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param investigatorNames 
 	 * 		the investigator names to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setInvestigatorNames(String investigatorNames) {
 		String value;
 		if ( investigatorNames != null )
 			value = investigatorNames;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(KnownDataTypes.INVESTIGATOR_NAMES.getVarName(), value);
 	}
 
@@ -251,12 +251,12 @@ public class SocatMetadata {
 	 * 
 	 * @return
 	 * 		the SOCAT version associated with this instance; 
-	 * 		never null but could be empty if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatVersion() {
 		String value = stringValuesMap.get(SOCAT_VERSION_VARNAME);
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
@@ -269,78 +269,78 @@ public class SocatMetadata {
 	 * 
 	 * @param version 
 	 * 		the SOCAT version to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setSocatVersion(String socatVersion) {
 		String value;
 		if ( socatVersion != null )
 			value = socatVersion;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(SOCAT_VERSION_VARNAME, value);
 	}
 
 	/**
 	 * @return
 	 * 		the String of all region IDs;
-	 * 		never null but could be a empty string if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getAllRegionIDs() {
 		String value = stringValuesMap.get(ALL_REGION_IDS_VARNAME);
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param allRegionIDs
 	 * 		the String of all region IDs to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setAllRegionIDs(String allRegionIDs) {
 		String value;
 		if ( allRegionIDs != null )
 			value = allRegionIDs;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(ALL_REGION_IDS_VARNAME, value);
 	}
 
 	/**
 	 * @return
 	 * 		the SOCAT DOI for this dataset; 
-	 * 		never null but could be a empty string if not assigned
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatDOI() {
 		String value = stringValuesMap.get(SOCAT_DOI_VARNAME);
 		if ( value == null )
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
 	 * @param socatDOI
 	 * 		the SOCAT DOI for this dataset to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setSocatDOI(String socatDOI) {
 		String value;
 		if ( socatDOI != null )
 			value = socatDOI;
 		else
-			value = "";
+			value = DashboardUtils.STRING_MISSING_VALUE;
 		stringValuesMap.put(SOCAT_DOI_VARNAME, value);
 	}
 
 	/**
 	 * @return
 	 * 		the QC flag;
-	 * 		never null but could be a string with a single blank character if not assigned
+	 * 		never null but could be {@link DashboardUtils#CHAR_MISSING_VALUE}.toString() if not assigned
 	 */
 	public String getQcFlag() {
 		String value = stringValuesMap.get(KnownDataTypes.QC_FLAG.getVarName());
 		if ( value == null )
-			value = " ";
+			value = DashboardUtils.CHAR_MISSING_VALUE.toString();
 		return value;
 	}
 
@@ -354,7 +354,7 @@ public class SocatMetadata {
 		if ( qcFlag != null )
 			value = qcFlag;
 		else
-			value = " ";
+			value = DashboardUtils.CHAR_MISSING_VALUE.toString();
 		stringValuesMap.put(KnownDataTypes.QC_FLAG.getVarName(), value);
 	}
 
@@ -517,7 +517,8 @@ public class SocatMetadata {
 	/**
 	 * @return
 	 * 		the maximum length of String values given in the fields 
-	 * 		of this instance, rounded up to the nearest multiple of 16.
+	 * 		of this instance, rounded up to the nearest multiple of 16
+	 * 		(and never less than 16).
 	 */
 	public int getMaxStringLength() {
 		int maxLength = 16;

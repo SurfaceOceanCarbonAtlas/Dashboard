@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -6527780793453412746L;
+	private static final long serialVersionUID = -1199438291869861137L;
 
 	// Sanity Checker "username" and "realname" for flags
 	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
@@ -36,16 +36,17 @@ public class DashboardEvent implements Serializable, IsSerializable {
 	public DashboardEvent() {
 		id = 0L;
 		flagDate = DashboardUtils.DATE_MISSING_VALUE;
-		expocode = "";
-		version = "";
-		username = "";
-		realname = "";
-		comment = "";
+		expocode = DashboardUtils.STRING_MISSING_VALUE;
+		version = DashboardUtils.STRING_MISSING_VALUE;
+		username = DashboardUtils.STRING_MISSING_VALUE;
+		realname = DashboardUtils.STRING_MISSING_VALUE;
+		comment = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
-	 * 		the id; never null, but may be zero if missing
+	 * 		the id; never null, 
+	 * 		but may be zero if not assigned
 	 */
 	public Long getId() {
 		return id;
@@ -53,7 +54,8 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param id 
-	 * 		the id to set; if null, zero is assigned
+	 * 		the id to set; 
+	 * 		if null, zero is assigned
 	 */
 	public void setId(Long id) {
 		if ( id == null )
@@ -73,7 +75,8 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param flagDate 
-	 * 		the date of the flag to set; if null, {@link DashboardUtils#DATE_MISSING_VALUE}
+	 * 		the date of the flag to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setFlagDate(Date flagDate) {
 		if ( flagDate == null )
@@ -84,7 +87,8 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the expocode; never null but may be empty
+	 * 		the expocode; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getExpocode() {
 		return expocode;
@@ -92,18 +96,20 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param expocode 
-	 * 		the expocode to set; if null, a empty string is assigned
+	 * 		the expocode to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setExpocode(String expocode) {
 		if ( expocode == null )
-			this.expocode = "";
+			this.expocode = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.expocode = expocode;
 	}
 
 	/**
 	 * @return 
-	 * 		the data collection version; never null but may be empty
+	 * 		the data collection version; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVersion() {
 		return version;
@@ -111,18 +117,20 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param version 
-	 * 		the data collection version to set; if null, an empty string is assigned
+	 * 		the data collection version to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setVersion(String version) {
 		if ( version == null )
-			this.version = "";
+			this.version = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.version = version;
 	}
 
 	/**
 	 * @return 
-	 * 		the reviewer username; never null but may be empty
+	 * 		the reviewer username; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getUsername() {
 		return username;
@@ -130,18 +138,20 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param username 
-	 * 		the reviewer username to set; if null, an empty string is assigned
+	 * 		the reviewer username to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setUsername(String username) {
 		if ( username == null )
-			this.username = "";
+			this.username = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.username = username;
 	}
 
 	/**
 	 * @return 
-	 * 		the reviewer's actual name; never null but may be empty
+	 * 		the reviewer's actual name; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getRealname() {
 		return realname;
@@ -149,18 +159,20 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param realname 
-	 * 		the reviewer's actual name to set; if null, an empty string is assigned
+	 * 		the reviewer's actual name to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setRealname(String realname) {
 		if ( realname == null )
-			this.realname = "";
+			this.realname = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.realname = realname;
 	}
 
 	/**
 	 * @return 
-	 * 		the comment; never null but may be empty
+	 * 		the comment; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getComment() {
 		return comment;
@@ -168,11 +180,12 @@ public class DashboardEvent implements Serializable, IsSerializable {
 
 	/**
 	 * @param comment 
-	 * 		the comment to set; if null an empty string is assigned
+	 * 		the comment to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setComment(String comment) {
 		if ( comment == null )
-			this.comment = "";
+			this.comment = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.comment = comment;
 	}

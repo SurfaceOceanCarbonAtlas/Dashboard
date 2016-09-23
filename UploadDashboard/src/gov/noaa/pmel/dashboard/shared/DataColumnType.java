@@ -20,13 +20,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6941776365120214644L;
+	private static final long serialVersionUID = 8150134653894607400L;
 
 	/** For data without any specific units */
 	public static final ArrayList<String> NO_UNITS = new ArrayList<String>(Arrays.asList(""));
 
 	/**
-	 * UNKNOWN needs to be respecified as one of the (other) data column types.
+	 * UNKNOWN needs to be respecified as one of the (other)DashboardUtils.STRING_MISSING_VALUEata column types.
 	 */
 	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null, null, null, null, NO_UNITS);
 
@@ -49,72 +49,70 @@ public class DataColumnType implements Serializable, IsSerializable {
 
 	/**
 	 * Create an empty data column type: 
-	 * varName, dataClassName, description, standardName, and categoryName are empty strings,
-	 * units list only contains an empty string,
+	 * varName, dataClassName, description, standardName, and categoryName are {@link DashboardUtils#STRING_MISSING_VALUE},
+	 * units list is a copy of {@link #NO_UNITS},
 	 * index of the selected unit is zero,
-	 * selected missing value is an empty string (default missing values). 
+	 * selected missing value is {@link DashboardUtils#STRING_MISSING_VALUE} (interpreted as default missing values). 
 	 */
 	public DataColumnType() {
-		varName = "";
-		dataClassName = "";
-		description = "";
-		standardName = "";
-		categoryName = "";
-		// Use the default initial capacity since a name and units should be added
-		units = new ArrayList<String>();
-		units.add("");
+		varName = DashboardUtils.STRING_MISSING_VALUE;
+		dataClassName = DashboardUtils.STRING_MISSING_VALUE;
+		description = DashboardUtils.STRING_MISSING_VALUE;
+		standardName = DashboardUtils.STRING_MISSING_VALUE;
+		categoryName = DashboardUtils.STRING_MISSING_VALUE;
+		units = new ArrayList<String>(NO_UNITS);
 		selectedUnitIndex = Integer.valueOf(0);
-		selectedMissingValue = "";
+		selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * Create a data column type with the given values.  The index of the 
-	 * selected unit is zero and the selected missing value is an empty 
-	 * string (default missing values).
+	 * selected unit is zero and the selected missing value is
+	 * {@link DashboardUtils#STRING_MISSING_VALUE} (interpreted as default missing values).
 	 * 
 	 * @param varName
 	 * 		name for a variable of this type; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param dataClassName
 	 * 		name of the class for a variable of this type
 	 * 		(e.g., Character, Double, Integer, String);
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param description
 	 * 		description of a variable of this type;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param standardName
 	 * 		standard name for a variable of this type
 	 * 		(can duplicate standard names of other data column types);
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param categoryName
 	 * 		category name for a variable of this type;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @param units
 	 * 		unit strings associated with this type (copied);
-	 * 		if null or empty, a list with a single empty unit string is assigned
+	 * 		if null or empty, a list with only {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public DataColumnType(String varName, String dataClassName, String description,
 			String standardName, String categoryName, Collection<String> units) {
 		if ( varName != null )
 			this.varName = varName;
 		else
-			this.varName = "";
+			this.varName = DashboardUtils.STRING_MISSING_VALUE;
 		if ( dataClassName != null )
 			this.dataClassName = dataClassName;
 		else
-			this.dataClassName = "";
+			this.dataClassName = DashboardUtils.STRING_MISSING_VALUE;
 		if ( description != null )
 			this.description = description;
 		else
-			this.description = "";
+			this.description = DashboardUtils.STRING_MISSING_VALUE;
 		if ( standardName != null )
 			this.standardName = standardName;
 		else
-			this.standardName = "";
+			this.standardName = DashboardUtils.STRING_MISSING_VALUE;
 		if ( categoryName != null )
 			this.categoryName = categoryName;
 		else
-			this.categoryName = "";
+			this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
 		if ( (units != null) && (units.size() > 0) ) {
 			this.units = new ArrayList<String>(units);
 		}
@@ -123,7 +121,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 			this.units = new ArrayList<String>(NO_UNITS);
 		}
 		this.selectedUnitIndex = Integer.valueOf(0);
-		this.selectedMissingValue = "";
+		this.selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
@@ -138,14 +136,14 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param varName 
 	 * 		the variable name to set for this of this data column type;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setVarName(String varName) {
 		if ( varName != null ) {
 			this.varName = varName;
 		}
 		else {
-			this.varName = "";
+			this.varName = DashboardUtils.STRING_MISSING_VALUE;
 		}
 	}
 
@@ -153,7 +151,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * @return 
 	 * 		the data class name for this data column type
 	 * 		(e.g., Character, Double, Integer, String);
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getDataClassName() {
 		return dataClassName;
@@ -163,19 +161,19 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * @param dataClassName 
 	 * 		the data class name to set for this data column type
 	 * 		(e.g., Character, Double, Integer, String);
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setDataClassName(String dataClassName) {
 		if ( dataClassName != null )
 			this.dataClassName = dataClassName;
 		else
-			this.dataClassName = "";
+			this.dataClassName = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
 	 * 		description of a variable of this type;
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getDescription() {
 		return description;
@@ -184,19 +182,19 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param description 
 	 * 		description of a variable of this type to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setDescription(String description) {
 		if ( description != null )
 			this.description = description;
 		else
-			this.description = "";
+			this.description = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
 	 * 		standard name of a variable of this type;
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getStandardName() {
 		return standardName;
@@ -205,19 +203,19 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param standardName 
 	 * 		standard name of a variable of this type to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setStandardName(String standardName) {
 		if ( standardName != null )
 			this.standardName = standardName;
 		else
-			this.standardName = "";
+			this.standardName = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return
 	 * 		category name of a variable of this type;
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getCategoryName() {
 		return categoryName;
@@ -226,19 +224,20 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param categoryName 
 	 * 		category name of a variable of this type;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setCategoryName(String categoryName) {
 		if ( categoryName != null )
 			this.categoryName = categoryName;
 		else
-			this.categoryName = "";
+			this.categoryName = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
 	 * 		the units associated with this data column type;
-	 * 		never null or empty, but may have a single empty string.
+	 * 		never null or empty, but may only contain 
+	 * 		{@link DashboardUtils#STRING_MISSING_VALUE}.
 	 * 		The actual ArrayList in this object is returned.
 	 */
 	public ArrayList<String> getUnits() {
@@ -248,15 +247,14 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param units 
 	 * 		the list of units to associate with this data column type (copied); 
-	 * 		if null or empty, a single empty unit string is assigned
+	 * 		if null or empty, a copy of {@link #NO_UNITS} is assigned.
 	 */
 	public void setUnits(Collection<String> units) {
-		this.units.clear();
 		if ( (units != null) && (units.size() > 0) ) {
-			this.units.addAll(units);
+			this.units = new ArrayList<String>(units);
 		}
 		else {
-			this.units.add("");
+			this.units = new ArrayList<String>(NO_UNITS);
 		}
 	}
 
@@ -287,7 +285,8 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the selected missing value, as a string.
-	 * 		An empty string is to be interpreted as the default missing values.
+	 * 		A value of {@link DashboardUtils#STRING_MISSING_VALUE} 
+	 * 		is to be interpreted as the default missing values.
 	 */
 	public String getSelectedMissingValue() {
 		return selectedMissingValue;
@@ -296,14 +295,15 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param selectedMissingValue 
 	 * 		the selected missing value, as a string, to set;
-	 * 		if null, an empty string is assigned.
-	 * 		An empty string is to be interpreted as the default missing values.
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned.
+	 * 		{@link DashboardUtils#STRING_MISSING_VALUE} is to be interpreted 
+	 * 		as the default missing values.
 	 */
 	public void setSelectedMissingValue(String selectedMissingValue) {
 		if ( selectedMissingValue != null )
 			this.selectedMissingValue = selectedMissingValue;
 		else
-			this.selectedMissingValue = "";
+			this.selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**

@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,11 +38,11 @@ public class DashboardCruiseWithDataTest {
 	public void testSetGetOwner() {
 		String myUsername = "SocatUser";
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setOwner(myUsername);
 		assertEquals(myUsername, cruiseData.getOwner());
 		cruiseData.setOwner(null);
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 	}
 
 	/**
@@ -52,12 +53,12 @@ public class DashboardCruiseWithDataTest {
 	public void testSetGetFilename() {
 		String myFilename = "agsk20031205_revised.tsv";
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
 		cruiseData.setUploadFilename(myFilename);
 		assertEquals(myFilename, cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setUploadFilename(null);
-		assertEquals("", cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
 	}
 
 	/**
@@ -68,13 +69,13 @@ public class DashboardCruiseWithDataTest {
 	public void testSetGetVersion() {
 		String myVersion = "3.0";
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals("", cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
 		cruiseData.setVersion(myVersion);
 		assertEquals(myVersion, cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setVersion(null);
-		assertEquals("", cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
 	}
 
 	/**
@@ -85,14 +86,14 @@ public class DashboardCruiseWithDataTest {
 	public void testSetGetExpocode() {
 		String myExpocode = "AGSK20031205";
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals("", cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
 		cruiseData.setExpocode(myExpocode);
 		assertEquals(myExpocode, cruiseData.getExpocode());
-		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setExpocode(null);
-		assertEquals("", cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
 	}
 
 	/**
@@ -111,10 +112,10 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(0, cruiseData.getPreamble().size());
 		cruiseData.setPreamble(myPreamble);
 		assertEquals(myPreamble, cruiseData.getPreamble());
-		assertEquals("", cruiseData.getExpocode());
-		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setPreamble(null);
 		assertEquals(0, cruiseData.getPreamble().size());
 	}
@@ -147,10 +148,10 @@ public class DashboardCruiseWithDataTest {
 		cruiseData.setDataValues(dataValues);
 		assertEquals(dataValues, cruiseData.getDataValues());
 		assertEquals(0, cruiseData.getPreamble().size());
-		assertEquals("", cruiseData.getExpocode());
-		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setDataValues(null);
 		assertEquals(0, cruiseData.getDataValues().size());
 	}
@@ -179,10 +180,10 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(woceThreeRowSets, cruiseData.getWoceThreeRowIndices());
 		assertEquals(0, cruiseData.getDataValues().size());
 		assertEquals(0, cruiseData.getPreamble().size());
-		assertEquals("", cruiseData.getExpocode());
-		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setWoceThreeRowIndices(null);
 		assertEquals(0, cruiseData.getWoceThreeRowIndices().size());
 	}
@@ -212,10 +213,10 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(0, cruiseData.getWoceThreeRowIndices().size());
 		assertEquals(0, cruiseData.getDataValues().size());
 		assertEquals(0, cruiseData.getPreamble().size());
-		assertEquals("", cruiseData.getExpocode());
-		assertEquals("", cruiseData.getVersion());
-		assertEquals("", cruiseData.getUploadFilename());
-		assertEquals("", cruiseData.getOwner());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setWoceFourRowIndices(null);
 		assertEquals(0, cruiseData.getWoceFourRowIndices().size());
 	}

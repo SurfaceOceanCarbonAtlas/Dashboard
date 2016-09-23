@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SCMessage implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5266561940930742763L;
+	private static final long serialVersionUID = 9217504902833036782L;
 
 	/**
 	 * Enumerated type for the severity of the issue in the message
@@ -43,18 +43,19 @@ public class SCMessage implements Serializable, IsSerializable {
 	public SCMessage() {
 		severity = SCMsgSeverity.UNKNOWN;
 		rowNumber = -1;
-		timestamp = "";
+		timestamp = DashboardUtils.STRING_MISSING_VALUE;
 		longitude = Double.NaN;
 		latitude = Double.NaN;
 		colNumber = -1;
-		colName = "";
-		generalComment = "";
-		detailedComment = "";
+		colName = DashboardUtils.STRING_MISSING_VALUE;
+		generalComment = DashboardUtils.STRING_MISSING_VALUE;
+		detailedComment = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
-	 * 		the severity of the message; never null
+	 * 		the severity of the message; 
+	 * 		never null, but may be {@link SCMsgSeverity#UNKNOWN}
 	 */
 	public SCMsgSeverity getSeverity() {
 		return severity;
@@ -74,7 +75,8 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the data row number, or -1 for metadata messages
+	 * 		the data row number, or 
+	 * 		-1 for metadata messages
 	 */
 	public int getRowNumber() {
 		return rowNumber;
@@ -91,7 +93,8 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the timestamp; never null but may be empty
+	 * 		the timestamp; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getTimestamp() {
 		return timestamp;
@@ -100,18 +103,19 @@ public class SCMessage implements Serializable, IsSerializable {
 	/**
 	 * @param timestamp 
 	 * 		the timestamp to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setTimestamp(String timestamp) {
 		if ( timestamp == null )
-			this.timestamp = "";
+			this.timestamp = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.timestamp = timestamp;
 	}
 
 	/**
 	 * @return 
-	 * 		the longitude; may be {@link Double#NaN} if missing
+	 * 		the longitude; 
+	 * 		may be {@link Double#NaN} if missing
 	 */
 	public double getLongitude() {
 		return longitude;
@@ -119,7 +123,8 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	/**
 	 * @param longitude 
-	 * 		the longitude to set; if infinite, Double.NaN is assigned
+	 * 		the longitude to set; 
+	 * 		if infinite, Double.NaN is assigned
 	 */
 	public void setLongitude(double longitude) {
 		if ( Double.isInfinite(longitude) || Double.isNaN(longitude) )
@@ -130,7 +135,8 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the latitude; may be {@link Double#NaN} if missing
+	 * 		the latitude; 
+	 * 		may be {@link Double#NaN} if missing
 	 */
 	public double getLatitude() {
 		return latitude;
@@ -138,7 +144,8 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	/**
 	 * @param latitude 
-	 * 		the latitude to set; if infinite, Double.NaN is assigned
+	 * 		the latitude to set; 
+	 * 		if infinite, Double.NaN is assigned
 	 */
 	public void setLatitude(double latitude) {
 		if ( Double.isInfinite(latitude) || Double.isNaN(latitude) )
@@ -149,7 +156,8 @@ public class SCMessage implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the input data column number; or -1 if ambiguous
+	 * 		the input data column number;
+	 * 		 or -1 if ambiguous
 	 */
 	public int getColNumber() {
 		return colNumber;
@@ -167,7 +175,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the input data column name; 
-	 * 		never null, but may be empty if unknown or ambiguous
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE} if unknown or ambiguous
 	 */
 	public String getColName() {
 		return colName;
@@ -176,11 +184,11 @@ public class SCMessage implements Serializable, IsSerializable {
 	/**
 	 * @param colName 
 	 * 		the input data column name to set; 
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setColName(String colName) {
 		if ( colName == null )
-			this.colName = "";
+			this.colName = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.colName = colName;
 	}
@@ -197,11 +205,11 @@ public class SCMessage implements Serializable, IsSerializable {
 	/**
 	 * @param detailedComment 
 	 * 		the sanity checker general explanation of the issue to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setGeneralComment(String generalComment) {
 		if ( generalComment == null )
-			this.generalComment = "";
+			this.generalComment = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.generalComment = generalComment;
 	}
@@ -209,7 +217,7 @@ public class SCMessage implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the sanity checker detailed explanation of the issue;
-	 * 		never null but may be empty
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getDetailedComment() {
 		return detailedComment;
@@ -218,11 +226,11 @@ public class SCMessage implements Serializable, IsSerializable {
 	/**
 	 * @param detailedComment 
 	 * 		the sanity checker detailed explanation of the issue to set;
-	 * 		if null, an empty string is assigned
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setDetailedComment(String detailedComment) {
 		if ( detailedComment == null )
-			this.detailedComment = "";
+			this.detailedComment = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.detailedComment = detailedComment;
 	}

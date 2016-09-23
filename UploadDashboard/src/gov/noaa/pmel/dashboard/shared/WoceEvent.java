@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class WoceEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4562962135016168711L;
+	private static final long serialVersionUID = 8325545745794951530L;
 
 	public static final String PI_PROVIDED_WOCE_COMMENT_START = "PI provided WOCE-";
 
@@ -47,13 +47,14 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	public WoceEvent() {
 		super();
 		flag = WOCE_NOT_CHECKED;
-		varName = "";
+		varName = DashboardUtils.STRING_MISSING_VALUE;
 		locations = new ArrayList<DataLocation>();
 	}
 
 	/**
 	 * @return 
-	 * 		the flag; never null
+	 * 		the flag; 
+	 * 		never null
 	 */
 	public Character getFlag() {
 		return flag;
@@ -61,7 +62,8 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 
 	/**
 	 * @param flag
-	 * 		the flag to set; if null, {@link #WOCE_NOT_CHECKED} is assigned
+	 * 		the flag to set; 
+	 * 		if null, {@link #WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setFlag(Character flag) {
 		if ( flag == null )
@@ -73,7 +75,7 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	/**
 	 * @return 
 	 * 		the data variable name in the DSG file;
-	 * 		never null but may be empty
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVarName() {
 		return varName;
@@ -82,11 +84,11 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	/**
 	 * @param varName 
 	 * 		the data variable name in the DSG file to set;
-	 * 		if null, an empty string is assigned.
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setVarName(String varName) {
 		if ( varName == null )
-			this.varName = "";
+			this.varName = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.varName = varName;
 	}
@@ -94,8 +96,8 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	/**
 	 * @return 
 	 * 		the list of locations associated with this WOCE flag;
-	 * 		never null but may be empty.  The actual ArrayList 
-	 * 		in this object is returned.
+	 * 		never null, but may be empty.
+	 * 		The actual ArrayList in this object is returned.
 	 */
 	public ArrayList<DataLocation> getLocations() {
 		return locations;

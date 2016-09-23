@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardMetadata implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7086025255895299534L;
+	private static final long serialVersionUID = 3573465202404544348L;
 
 	/**
 	 * The "upload filename" for all OME metadata files.
@@ -63,13 +63,13 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	 */
 	public DashboardMetadata() {
 		selected = false;
-		expocode = "";
-		filename = "";
-		uploadTimestamp = "";
-		owner = "";
+		expocode = DashboardUtils.STRING_MISSING_VALUE;
+		filename = DashboardUtils.STRING_MISSING_VALUE;
+		uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
+		owner = DashboardUtils.STRING_MISSING_VALUE;
 		conflicted = false;
-		version = "";
-		doi = "";
+		version = DashboardUtils.STRING_MISSING_VALUE;
+		doi = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
@@ -80,9 +80,9 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	 * title is just the filename.
 	 */
 	public String getAddlDocsTitle() {
-		if ( filename.isEmpty() )
+		if ( DashboardUtils.STRING_MISSING_VALUE.equals(filename) )
 			return "";
-		if ( uploadTimestamp.isEmpty() )
+		if ( DashboardUtils.STRING_MISSING_VALUE.equals(uploadTimestamp) )
 			return filename;
 		return filename + TITLE_SEPARATOR + uploadTimestamp;
 	}
@@ -126,7 +126,8 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the cruise expocode; never null, but may be empty
+	 * 		the cruise expocode; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getExpocode() {
 		return expocode;
@@ -134,18 +135,20 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param expocode 
-	 * 		the cruise expocode to set; if null, an empty string is assigned
+	 * 		the cruise expocode to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setExpocode(String expocode) {
 		if ( expocode != null )
 			this.expocode = expocode;
 		else
-			this.expocode = "";
+			this.expocode = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
-	 * 		the filename; never null, but may be empty
+	 * 		the filename; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getFilename() {
 		return filename;
@@ -153,18 +156,20 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param filename 
-	 * 		the filename to set; if null, an empty string is assigned
+	 * 		the filename to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setFilename(String filename) {
 		if ( filename != null )
 			this.filename = filename;
 		else
-			this.filename = "";
+			this.filename = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
-	 * 		the upload timestamp; never null, but may be empty
+	 * 		the upload timestamp; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getUploadTimestamp() {
 		return uploadTimestamp;
@@ -172,18 +177,20 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param uploadTimestamp 
-	 * 		the upload timestamp to set; if null, an empty string is assigned
+	 * 		the upload timestamp to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setUploadTimestamp(String uploadTimestamp) {
 		if ( uploadTimestamp != null )
 			this.uploadTimestamp = uploadTimestamp;
 		else
-			this.uploadTimestamp = "";
+			this.uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;;
 	}
 
 	/**
 	 * @return 
-	 * 		the owner; never null, but may be empty
+	 * 		the owner; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getOwner() {
 		return owner;
@@ -191,13 +198,14 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param owner 
-	 * 		the owner to set; if null, an empty string is assigned
+	 * 		the owner to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setOwner(String owner) {
 		if ( owner != null )
 			this.owner = owner;
 		else
-			this.owner = "";
+			this.owner = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
@@ -217,7 +225,9 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * @return the SOCAT version; never null, but may be empty if not assigned
+	 * @return 
+	 * 		the SOCAT version; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVersion() {
 		return version;
@@ -225,18 +235,20 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param version 
-	 * 		the SOCAT version to set; if null, an empty string is assigned
+	 * 		the SOCAT version to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setVersion(String version) {
 		if ( version != null )
 			this.version = version;
 		else
-			this.version = "";
+			this.version = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * @return 
-	 * 		the DOI of this document; never null but may be empty if not assigned
+	 * 		the DOI of this document; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getDOI() {
 		return doi;
@@ -244,13 +256,14 @@ public class DashboardMetadata implements Serializable, IsSerializable {
 
 	/**
 	 * @param doi 
-	 * 		the DOI of this document to set; if null, an empty string is assigned
+	 * 		the DOI of this document to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
 	public void setDOI(String doi) {
 		if ( doi != null )
 			this.doi = doi;
 		else
-			this.doi = "";
+			this.doi = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	@Override

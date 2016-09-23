@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.test.shared;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
 
@@ -55,13 +56,13 @@ public class SCMessageTest {
 	public void testGetSetTimestamp() {
 		final String myTimestamp = "2014-02-06 11:35";
 		SCMessage msg = new SCMessage();
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		msg.setTimestamp(myTimestamp);
 		assertEquals(myTimestamp, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setTimestamp(null);
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 	}
 
 	/**
@@ -75,7 +76,7 @@ public class SCMessageTest {
 		assertTrue( Double.isNaN(msg.getLongitude()) );
 		msg.setLongitude(myLongitude);
 		assertEquals(myLongitude, msg.getLongitude(), 1.0E-6);
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setLongitude( Double.NEGATIVE_INFINITY );
@@ -94,7 +95,7 @@ public class SCMessageTest {
 		msg.setLatitude(myLatitude);
 		assertEquals(myLatitude, msg.getLatitude(), 1.0E-6);
 		assertTrue( Double.isNaN(msg.getLongitude()) );
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setLatitude( Double.POSITIVE_INFINITY );
@@ -114,7 +115,7 @@ public class SCMessageTest {
 		assertEquals(myColNum, msg.getColNumber());
 		assertTrue( Double.isNaN(msg.getLatitude()) );
 		assertTrue( Double.isNaN(msg.getLongitude()) );
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 	}
@@ -127,17 +128,17 @@ public class SCMessageTest {
 	public void testGetSetColName() {
 		final String myColName = "P_atm";
 		SCMessage msg = new SCMessage();
-		assertEquals("", msg.getColName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getColName());
 		msg.setColName(myColName);
 		assertEquals(myColName, msg.getColName());
 		assertEquals(-1, msg.getColNumber());
 		assertTrue( Double.isNaN(msg.getLatitude()) );
 		assertTrue( Double.isNaN(msg.getLongitude()) );
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setColName(null);
-		assertEquals("", msg.getColName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getColName());
 	}
 
 	/**
@@ -148,18 +149,18 @@ public class SCMessageTest {
 	public void testGetSetGeneralComment() {
 		final String myExplanation = "value exceeds the upper limit of questionable values";
 		SCMessage msg = new SCMessage();
-		assertEquals("", msg.getGeneralComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getGeneralComment());
 		msg.setGeneralComment(myExplanation);
 		assertEquals(myExplanation, msg.getGeneralComment());
-		assertEquals("", msg.getColName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getColName());
 		assertEquals(-1, msg.getColNumber());
 		assertTrue( Double.isNaN(msg.getLatitude()) );
 		assertTrue( Double.isNaN(msg.getLongitude()) );
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setGeneralComment(null);
-		assertEquals("", msg.getGeneralComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getGeneralComment());
 	}
 
 	/**
@@ -170,19 +171,19 @@ public class SCMessageTest {
 	public void testGetSetDetailedComment() {
 		final String myExplanation = "value exceeds the upper limit of questionable values";
 		SCMessage msg = new SCMessage();
-		assertEquals("", msg.getDetailedComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getDetailedComment());
 		msg.setDetailedComment(myExplanation);
 		assertEquals(myExplanation, msg.getDetailedComment());
-		assertEquals("", msg.getGeneralComment());
-		assertEquals("", msg.getColName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getGeneralComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getColName());
 		assertEquals(-1, msg.getColNumber());
 		assertTrue( Double.isNaN(msg.getLatitude()) );
 		assertTrue( Double.isNaN(msg.getLongitude()) );
-		assertEquals("", msg.getTimestamp());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getTimestamp());
 		assertEquals(-1, msg.getRowNumber());
 		assertEquals(SCMsgSeverity.UNKNOWN, msg.getSeverity());
 		msg.setDetailedComment(null);
-		assertEquals("", msg.getDetailedComment());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msg.getDetailedComment());
 	}
 
 	/**
@@ -302,8 +303,7 @@ public class SCMessageTest {
 		assertFalse( other.equals(msg) );
 		assertEquals(0, SCMessage.severityComparator.compare(msg, other));
 		assertEquals(0, SCMessage.rowNumComparator.compare(msg, other));
-		assertTrue( SCMessage.timestampComparator.compare(msg, other) > 0 );
-		assertTrue( SCMessage.timestampComparator.compare(other, msg) < 0 );
+		assertEquals(myTimestamp.compareTo(DashboardUtils.STRING_MISSING_VALUE), SCMessage.timestampComparator.compare(msg, other));
 		assertEquals(0, SCMessage.longitudeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.latitudeComparator.compare(msg, other));
 		assertEquals(0, SCMessage.colNumComparator.compare(msg, other));

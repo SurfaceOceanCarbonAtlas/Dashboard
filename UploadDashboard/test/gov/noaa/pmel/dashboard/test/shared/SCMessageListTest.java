@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
@@ -31,11 +32,11 @@ public class SCMessageListTest {
 	public void testGetSetUsername() {
 		final String myUsername = "SocatUser";
 		SCMessageList msgList = new SCMessageList();
-		assertEquals("", msgList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
 		msgList.setUsername(myUsername);
 		assertEquals(myUsername, msgList.getUsername());
 		msgList.setUsername(null);
-		assertEquals("", msgList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
 	}
 
 	/**
@@ -46,12 +47,12 @@ public class SCMessageListTest {
 	public void testGetSetExpocode() {
 		final String myExpocode = "XXXX20140204";
 		SCMessageList msgList = new SCMessageList();
-		assertEquals("", msgList.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getExpocode());
 		msgList.setExpocode(myExpocode);
 		assertEquals(myExpocode, msgList.getExpocode());
-		assertEquals("", msgList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
 		msgList.setExpocode(null);
-		assertEquals("", msgList.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getExpocode());
 	}
 
 	/**
@@ -68,8 +69,8 @@ public class SCMessageListTest {
 		assertEquals(0, msgList.getSummaries().size());
 		msgList.setSummaries(mySummaries);
 		assertEquals(mySummaries, msgList.getSummaries());
-		assertEquals("", msgList.getExpocode());
-		assertEquals("", msgList.getUsername());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, msgList.getUsername());
 		msgList.setSummaries(null);
 		assertEquals(0, msgList.getSummaries().size());
 	}

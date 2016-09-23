@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruiseList extends HashMap<String,DashboardCruise> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5319194803938768319L;
+	private static final long serialVersionUID = 8626036844211298574L;
 
 	String username;
 	String socatVersion;
@@ -29,14 +29,15 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 	 */
 	public DashboardCruiseList() {
 		super();
-		username = "";
-		socatVersion = "";
+		username = DashboardUtils.STRING_MISSING_VALUE;
+		socatVersion = DashboardUtils.STRING_MISSING_VALUE;
 		manager = false;
 	}
 
 	/**
 	 * @return 
-	 * 		the username; never null, but may be blank
+	 * 		the username; 
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getUsername() {
 		return username;
@@ -44,18 +45,20 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 
 	/**
 	 * @param username 
-	 * 		the username to set; if null, set to an empty string
+	 * 		the username to set; 
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setUsername(String username) {
 		if ( username == null )
-			this.username = "";
+			this.username = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.username = username;
 	}
 
 	/**
 	 * @return 
-	 * 		the SOCAT version; never null, but may be blank
+	 * 		the SOCAT version;
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getSocatVersion() {
 		return socatVersion;
@@ -63,11 +66,12 @@ public class DashboardCruiseList extends HashMap<String,DashboardCruise> impleme
 
 	/**
 	 * @param version 
-	 * 		the SOCAT version to set; if null, set to an empty string
+	 * 		the SOCAT version to set; 
+	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public void setSocatVersion(String socatVersion) {
 		if ( socatVersion == null )
-			this.socatVersion = "";
+			this.socatVersion = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.socatVersion = socatVersion;
 	}
