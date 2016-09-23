@@ -16,7 +16,7 @@ import org.junit.Test;
  * 
  * @author Karl Smith
  */
-public class SocatCrossoverTest {
+public class CrossoverTest {
 
 	private static final Double minDist = 23.56;
 	private static final String firstExpo = "AAAA19951201";

@@ -228,7 +228,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			// Anglicize investigator names for NetCDF/LAS
 			scienceGroup.append(anglicizeName(investigator));
 		}
-		scMData.setScienceGroup(scienceGroup.toString());
+		scMData.setInvestigatorNames(scienceGroup.toString());
 
 		HashSet<String> usedOrganizations = new HashSet<String>();
 		StringBuffer orgGroup = new StringBuffer();
@@ -240,7 +240,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 				orgGroup.append(anglicizeName(org));
 			}
 		}
-		scMData.setOrganization(orgGroup.toString());
+		scMData.setOrganizationName(orgGroup.toString());
 
 		return scMData;
 	}

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import gov.noaa.pmel.socat.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.socat.dashboard.shared.DashboardCruise;
@@ -235,13 +236,10 @@ public class DashboardCruiseTest {
 	public void testSetGetDataColTypes() {
 		ArrayList<DataColumnType> myDataColTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
-					DataColumnType.TIMESTAMP,
-					DataColumnType.LONGITUDE,
-					DataColumnType.LATITUDE,
-					DataColumnType.SALINITY,
-					DataColumnType.EQUILIBRATOR_TEMPERATURE,
-					DataColumnType.EQUILIBRATOR_PRESSURE,
-					DataColumnType.XCO2_WATER_TEQU_DRY
+					KnownDataTypes.TIMESTAMP,
+					KnownDataTypes.LONGITUDE,
+					KnownDataTypes.LATITUDE,
+					KnownDataTypes.SAMPLE_DEPTH
 				));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getDataColTypes().size());
@@ -289,63 +287,6 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getDataColUnits()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setDataColUnits(java.util.ArrayList)}.
-	 */
-	@Test
-	public void testSetGetDataColUnits() {
-		ArrayList<String> myDataColUnits = new ArrayList<String>(
-				Arrays.asList("UTC", "deg E", "deg N", "PSU", "deg C", "mm Hg", "umol/mol")); 
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getDataColUnits().size());
-		cruise.setDataColUnits(myDataColUnits);
-		assertEquals(myDataColUnits, cruise.getDataColUnits());
-		assertEquals(0, cruise.getUserColNames().size());
-		assertEquals(0, cruise.getDataColTypes().size());
-		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
-		assertFalse( cruise.isSelected() );
-		cruise.setDataColUnits(null);
-		assertEquals(0, cruise.getDataColUnits().size());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getMissingValues()}
-	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setMissingValues(java.util.ArrayList)}.
-	 */
-	@Test
-	public void testSetGetMissingValues() {
-		ArrayList<String> myMissingValues = new ArrayList<String>(
-				Arrays.asList("", "", "", "-9", "-999", "-999", "")); 
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getMissingValues().size());
-		cruise.setMissingValues(myMissingValues);
-		assertEquals(myMissingValues, cruise.getMissingValues());
-		assertEquals(0, cruise.getDataColUnits().size());
-		assertEquals(0, cruise.getUserColNames().size());
-		assertEquals(0, cruise.getDataColTypes().size());
-		assertEquals(0, cruise.getNumDataRows());
-		assertEquals("", cruise.getUploadFilename());
-		assertEquals("", cruise.getArchiveStatus());
-		assertEquals("", cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals("", cruise.getOmeTimestamp());
-		assertEquals("", cruise.getDataCheckStatus());
-		assertEquals("", cruise.getExpocode() );
-		assertEquals("", cruise.getOwner());
-		assertFalse( cruise.isSelected() );
-		cruise.setMissingValues(null);
-		assertEquals(0, cruise.getMissingValues().size());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#getNumErrorRows()}
 	 * and {@link gov.noaa.pmel.socat.dashboard.shared.DashboardCruise#setNumErrorRows(int)}.
 	 */
@@ -356,8 +297,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumErrorRows());
 		cruise.setNumErrorRows(myNumErrorMsgs);
 		assertEquals(myNumErrorMsgs, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -384,8 +323,6 @@ public class DashboardCruiseTest {
 		cruise.setNumWarnRows(myNumWarnMsgs);
 		assertEquals(myNumWarnMsgs, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -413,8 +350,6 @@ public class DashboardCruiseTest {
 		assertEquals(myWoceThrees, cruise.getNoColumnWoceThreeRowIndices());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -445,8 +380,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -478,8 +411,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -512,8 +443,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -547,8 +476,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -583,8 +510,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -620,8 +545,6 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getMissingValues().size());
-		assertEquals(0, cruise.getDataColUnits().size());
 		assertEquals(0, cruise.getUserColNames().size());
 		assertEquals(0, cruise.getDataColTypes().size());
 		assertEquals(0, cruise.getNumDataRows());
@@ -663,20 +586,13 @@ public class DashboardCruiseTest {
 		int myNumWarnMsgs = 14;
 		ArrayList<DataColumnType> myDataColTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
-					DataColumnType.TIMESTAMP,
-					DataColumnType.LONGITUDE,
-					DataColumnType.LATITUDE,
-					DataColumnType.SALINITY,
-					DataColumnType.EQUILIBRATOR_TEMPERATURE,
-					DataColumnType.EQUILIBRATOR_PRESSURE,
-					DataColumnType.XCO2_WATER_TEQU_DRY
+					KnownDataTypes.TIMESTAMP,
+					KnownDataTypes.LONGITUDE,
+					KnownDataTypes.LATITUDE,
+					KnownDataTypes.SAMPLE_DEPTH
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
-				Arrays.asList("time", "lon", "lat", "salinity", "temp", "pres", "xco2")); 
-		ArrayList<String> myDataColUnits = new ArrayList<String>(
-				Arrays.asList("UTC", "deg E", "deg N", "PSU", "deg C", "mm Hg", "umol/mol")); 
-		ArrayList<String> myMissingValues = new ArrayList<String>(
-				Arrays.asList("", "", "", "-9", "-999", "-999", "NaN")); 
+				Arrays.asList("time", "lon", "lat", "depth")); 
 		HashSet<Integer> myWoceThrees = new HashSet<Integer>(Arrays.asList(2, 12, 22));
 		HashSet<Integer> myWoceFours = new HashSet<Integer>(Arrays.asList(5, 15, 25));
 		HashSet<Integer> userWoceThrees = new HashSet<Integer>(Arrays.asList(31, 32, 35));
@@ -787,20 +703,6 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setDataColUnits(myDataColUnits);
-		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
-		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setDataColUnits(myDataColUnits);
-		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-		assertEquals(firstCruise, secondCruise);
-
-		firstCruise.setMissingValues(myMissingValues);
-		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
-		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setMissingValues(myMissingValues);
-		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-		assertEquals(firstCruise, secondCruise);
-
 		firstCruise.setNoColumnWoceThreeRowIndices(myWoceThrees);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
@@ -860,58 +762,68 @@ public class DashboardCruiseTest {
 		DashboardCruise cruise = new DashboardCruise();
 		assertTrue( cruise.isEditable() );
 
+
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_EXCLUDED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_SUSPENDED);
-		assertNotNull( cruise.isEditable() );
-		assertTrue( cruise.isEditable() );
-		cruise.setQcStatus(QCEvent.QC_STATUS_PREVIEW);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
 		cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_A);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_B);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_C);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_D);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_E);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
-		cruise.setQcStatus(QCEvent.QC_STATUS_UNACCEPTABLE);
-		assertNotNull( cruise.isEditable() );
-		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_CONFLICT);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_RENAMED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
+
 		cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
+
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
+
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );

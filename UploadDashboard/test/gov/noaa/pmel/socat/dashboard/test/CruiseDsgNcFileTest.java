@@ -102,7 +102,7 @@ public class CruiseDsgNcFileTest {
 		metadata.setExpocode(expocode);
 		metadata.setSocatVersion("3.0");
 		metadata.setDatasetName("GM0606");
-		metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
+		metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
 		metadata.setVesselName("Caribbean Cruiser");
 		metadata.setSouthmostLatitude(20.04);
 		metadata.setNorthmostLatitude(29.07);
@@ -187,7 +187,7 @@ public class CruiseDsgNcFileTest {
 			metadata.setExpocode(expocode);
 			metadata.setSocatVersion("3.0");
 			metadata.setDatasetName("GM0606");
-			metadata.setScienceGroup("Public, Nancy S.; Public, John Q.");
+			metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
 			metadata.setVesselName("Caribbean Cruiser");
 			metadata.setSouthmostLatitude(20.04);
 			metadata.setNorthmostLatitude(29.07);

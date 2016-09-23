@@ -4,10 +4,11 @@ package gov.noaa.pmel.socat.dashboard.server;
 
 import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Class for working with metadata values of interest from SOCAT,
@@ -21,76 +22,73 @@ public class SocatMetadata {
 	public static final String ALL_REGION_IDS_VARNAME = "all_region_ids";
 	public static final String SOCAT_DOI_VARNAME = "socat_doi";
 
-	// Set for the order of all the variable names
-	LinkedHashSet<String> varNamesSet;
 	// Maps of variable names to values
-	HashMap<String,String> stringValuesMap;
-	HashMap<String,Double> doubleValuesMap;
-	HashMap<String,Date> dateValuesMap;
+	LinkedHashMap<String,String> stringValuesMap;
+	LinkedHashMap<String,Double> doubleValuesMap;
+	LinkedHashMap<String,Date> dateValuesMap;
 
 	/**
 	 * Generates an empty SocatMetadata object.
 	 */
 	public SocatMetadata() {
-		String varName = KnownDataTypes.EXPOCODE.getVarName();
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
+		stringValuesMap = new LinkedHashMap<String,String>();
+		stringValuesMap.put(KnownDataTypes.EXPOCODE.getVarName(), "");
+		stringValuesMap.put(KnownDataTypes.DATASET_NAME.getVarName(), "");
+		stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), "");
+		stringValuesMap.put(KnownDataTypes.ORGANIZATION_NAME.getVarName(), "");
+		stringValuesMap.put(KnownDataTypes.INVESTIGATOR_NAMES.getVarName(), "");
+		stringValuesMap.put(SOCAT_VERSION_VARNAME, "");
+		stringValuesMap.put(ALL_REGION_IDS_VARNAME, "");
+		stringValuesMap.put(SOCAT_DOI_VARNAME, "");
 
-		varName = KnownDataTypes.DATASET_NAME.getVarName();
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
+		// QC Flag is usually converted to a character so do not leave it empty
+		stringValuesMap.put(KnownDataTypes.QC_FLAG.getVarName(), " ");
 
-		varName = KnownDataTypes.VESSEL_NAME.getVarName();
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
+		doubleValuesMap = new LinkedHashMap<String,Double>();
+		doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+		doubleValuesMap.put(KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+		doubleValuesMap.put(KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+		doubleValuesMap.put(KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
 
-		varName = KnownDataTypes.ORGANIZATION_NAME.getVarName();
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
+		dateValuesMap = new LinkedHashMap<String,Date>();
+		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_START.getVarName(), DashboardUtils.DATE_MISSING_VALUE);
+		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_END.getVarName(), DashboardUtils.DATE_MISSING_VALUE);
+	}
 
-		varName = KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName();
-		varNamesSet.add(varName);
-		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+	/**
+	 * @return
+	 * 		the map of variable names and values for String variables;
+	 * 		a read-only view of the internal map is returned.
+	 */
+	public Map<String,String> getStringVariables() {
+		return Collections.unmodifiableMap(stringValuesMap);
+	}
 
-		varName = KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName();
-		varNamesSet.add(varName);
-		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+	/**
+	 * @return
+	 * 		the map of variable names and values for String variables;
+	 * 		a read-only view of the internal map is returned.
+	 */
+	public Map<String,Double> getDoubleVariables() {
+		return Collections.unmodifiableMap(doubleValuesMap);
+	}
 
-		varName = KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName();
-		varNamesSet.add(varName);
-		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
+	/**
+	 * @return
+	 * 		the map of variable names and values for String variables;
+	 * 		a read-only view of the internal map is returned.
+	 */
+	public Map<String,Date> getDateVariables() {
+		return Collections.unmodifiableMap(dateValuesMap);
+	}
 
-		varName = KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName();
-		varNamesSet.add(varName);
-		doubleValuesMap.put(varName, DashboardUtils.FP_MISSING_VALUE);
-
-		varName = KnownDataTypes.TIME_COVERAGE_START.getVarName();
-		varNamesSet.add(varName);
-		dateValuesMap.put(varName, DashboardUtils.DATE_MISSING_VALUE);
-
-		varName = KnownDataTypes.TIME_COVERAGE_END.getVarName();
-		varNamesSet.add(varName);
-		dateValuesMap.put(varName, DashboardUtils.DATE_MISSING_VALUE);
-
-		varName = KnownDataTypes.INVESTIGATOR_NAMES.getVarName();
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
-
-		varName = SOCAT_VERSION_VARNAME;
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
-
-		varName = ALL_REGION_IDS_VARNAME;
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
-
-		varName = SOCAT_DOI_VARNAME;
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
-
-		varName = KnownDataTypes.QC_FLAG.getVarName();
-		varNamesSet.add(varName);
-		stringValuesMap.put(varName, "");
+	/**
+	 * @return
+	 * 		the expocode; 
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getExpocode() {
+		return stringValuesMap.get(KnownDataTypes.EXPOCODE.getVarName());
 	}
 
 	/**
@@ -108,6 +106,15 @@ public class SocatMetadata {
 	}
 
 	/**
+	 * @return
+	 * 		the dataset name; 
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getDatasetName() {
+		return stringValuesMap.get(KnownDataTypes.DATASET_NAME.getVarName());
+	}
+
+	/**
 	 * @param datasetName
 	 * 		the dataset name to set;
 	 * 		if null, an empty string is assigned
@@ -122,8 +129,17 @@ public class SocatMetadata {
 	}
 
 	/**
+	 * @return
+	 * 		the vessel name; 
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getVesselName() {
+		return stringValuesMap.get(KnownDataTypes.VESSEL_NAME.getVarName());
+	}
+
+	/**
 	 * @param vesselName 
-	 * 		the vesselName to set;
+	 * 		the vessel name to set;
 	 * 		if null, an empty string is assigned
 	 */
 	public void setVesselName(String vesselName) {
@@ -136,17 +152,153 @@ public class SocatMetadata {
 	}
 
 	/**
-	 * @param organization 
-	 * 		the organization/institution to set;
+	 * @return
+	 * 		the name of the organization/institution;
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getOrganizationName() {
+		return stringValuesMap.get(KnownDataTypes.ORGANIZATION_NAME.getVarName());
+	}
+
+	/**
+	 * @param organizationName 
+	 * 		the name of the organization/institution to set;
 	 * 		if null, an empty string is assigned
 	 */
-	public void setOrganization(String organization) {
+	public void setOrganizationName(String organizationName) {
 		String value;
-		if ( organization != null )
-			value = organization;
+		if ( organizationName != null )
+			value = organizationName;
 		else
 			value = "";
-		stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.ORGANIZATION_NAME.getVarName(), value);
+	}
+
+	/**
+	 * @return
+	 * 		the investigator names;
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getInvestigatorNames() {
+		return stringValuesMap.get(KnownDataTypes.INVESTIGATOR_NAMES.getVarName());
+	}
+
+	/**
+	 * @param investigatorNames 
+	 * 		the investigator names to set;
+	 * 		if null, an empty string is assigned
+	 */
+	public void setInvestigatorNames(String investigatorNames) {
+		String value;
+		if ( investigatorNames != null )
+			value = investigatorNames;
+		else
+			value = "";
+		stringValuesMap.put(KnownDataTypes.INVESTIGATOR_NAMES.getVarName(), value);
+	}
+
+	/**
+	 * Get the SOCAT version - the version number followed by an 'N', 
+	 * indicating the dataset is new in this SOCAT version, or a 'U', 
+	 * indicating the dataset is an update from a previous SOCAT 
+	 * version.  Updates within a SOCAT version do NOT change an 'N' 
+	 * to a 'U'.
+	 * 
+	 * @return
+	 * 		the SOCAT version associated with this instance; 
+	 * 		never null but could be empty if not assigned
+	 */
+	public String getSocatVersion() {
+		return stringValuesMap.get(SOCAT_VERSION_VARNAME);
+	}
+
+	/**
+	 * Set the SOCAT version - the version number followed by an 'N', 
+	 * indicating the dataset is new in this SOCAT version, or a 'U', 
+	 * indicating the dataset is an update from a previous SOCAT 
+	 * version.  Updates within a SOCAT version do NOT change an 'N' 
+	 * to a 'U'.
+	 * 
+	 * @param version 
+	 * 		the SOCAT version to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setSocatVersion(String socatVersion) {
+		String value;
+		if ( socatVersion != null )
+			value = socatVersion;
+		else
+			value = "";
+		stringValuesMap.put(SOCAT_VERSION_VARNAME, value);
+	}
+
+	/**
+	 * @return
+	 * 		the String of all region IDs;
+	 * 		never null but could be a empty string if not assigned
+	 */
+	public String getAllRegionIDs() {
+		return stringValuesMap.get(ALL_REGION_IDS_VARNAME);
+	}
+
+	/**
+	 * @param allRegionIDs
+	 * 		the String of all region IDs to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setAllRegionIDs(String allRegionIDs) {
+		String value;
+		if ( allRegionIDs != null )
+			value = allRegionIDs;
+		else
+			value = "";
+		stringValuesMap.put(ALL_REGION_IDS_VARNAME, value);
+	}
+
+	/**
+	 * @return
+	 * 		the SOCAT DOI for this dataset; 
+	 * 		never null but could be a empty string if not assigned
+	 */
+	public String getSocatDOI() {
+		return stringValuesMap.get(SOCAT_DOI_VARNAME);
+	}
+
+	/**
+	 * @param socatDOI
+	 * 		the SOCAT DOI for this dataset to set; 
+	 * 		if null, an empty string is assigned
+	 */
+	public void setSocatDOI(String socatDOI) {
+		String value;
+		if ( socatDOI != null )
+			value = socatDOI;
+		else
+			value = "";
+		stringValuesMap.put(SOCAT_DOI_VARNAME, value);
+	}
+
+	/**
+	 * @return
+	 * 		the QC flag;
+	 * 		never null but could be a string with a single blank character if not assigned
+	 */
+	public String getQcFlag() {
+		return stringValuesMap.get(KnownDataTypes.QC_FLAG.getVarName());
+	}
+
+	/**
+	 * @param qcFlag 
+	 * 		the QC flag to set; 
+	 * 		if null, a string with a single blank character is assigned
+	 */
+	public void setQcFlag(String qcFlag) {
+		String value;
+		if ( qcFlag != null )
+			value = qcFlag;
+		else
+			value = " ";
+		stringValuesMap.put(KnownDataTypes.QC_FLAG.getVarName(), value);
 	}
 
 	/**
@@ -192,7 +344,7 @@ public class SocatMetadata {
 			value = eastmostLongitude;
 		else
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(), value);
+		doubleValuesMap.put(KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName(), value);
 	}
 
 	/**
@@ -247,7 +399,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getBeginTime() {
-		return beginTime;
+		return dateValuesMap.get(KnownDataTypes.TIME_COVERAGE_START.getVarName());
 	}
 
 	/**
@@ -256,10 +408,12 @@ public class SocatMetadata {
 	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
 	 */
 	public void setBeginTime(Date beginTime) {
-		if ( beginTime == null )
-			this.beginTime = DashboardUtils.DATE_MISSING_VALUE;
-		else 
-			this.beginTime = beginTime;
+		Date value;
+		if ( beginTime != null )
+			value = beginTime;
+		else
+			value = DashboardUtils.DATE_MISSING_VALUE;
+		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_START.getVarName(), value);
 	}
 
 	/**
@@ -268,7 +422,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getEndTime() {
-		return endTime;
+		return dateValuesMap.get(KnownDataTypes.TIME_COVERAGE_END.getVarName());
 	}
 
 	/**
@@ -277,136 +431,26 @@ public class SocatMetadata {
 	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
 	 */
 	public void setEndTime(Date endTime) {
-		if ( endTime == null )
-			this.endTime = DashboardUtils.DATE_MISSING_VALUE;
-		else 
-			this.endTime = endTime;
-	}
-
-	/**
-	 * @param scienceGroup 
-	 * 		the science group to set;
-	 * 		if null, an empty string is assigned
-	 */
-	public void setScienceGroup(String scienceGroup) {
-		if ( scienceGroup == null )
-			this.scienceGroup = "";
+		Date value;
+		if ( endTime != null )
+			value = endTime;
 		else
-			this.scienceGroup = scienceGroup;
-	}
-
-	/**
-	 * The SOCAT version number and status is the SOCAT version number 
-	 * followed by an 'N', indicating the dataset is new in this
-	 * SOCAT version, or a 'U', indicating the dataset is an update
-	 * from a previous SOCAT version.  Updates within a SOCAT version
-	 * do NOT change an 'N' to a 'U'.
-	 * 
-	 * @return
-	 * 		the SOCAT version number and status associated with this instance;
-	 * 		never null but could be empty if not assigned
-	 */
-	public String getSocatVersion() {
-		return socatVersion;
-	}
-
-	/**
-	 * The SOCAT version number and status is the SOCAT version number 
-	 * followed by an 'N', indicating the dataset is new in this
-	 * SOCAT version, or a 'U', indicating the dataset is an update
-	 * from a previous SOCAT version.  Updates within a SOCAT version
-	 * do NOT change an 'N' to a 'U'.
-	 * 
-	 * @param version 
-	 * 		the SOCAT version number and status to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setSocatVersion(String socatVersion) {
-		if ( socatVersion == null )
-			this.socatVersion = "";
-		else
-			this.socatVersion = socatVersion;
-	}
-
-	/**
-	 * @return
-	 * 		the String of all region IDs;
-	 * 		never null but could be a empty string if not assigned
-	 */
-	public String getAllRegionIDs() {
-		return allRegionIDs;
-	}
-
-	/**
-	 * @param allRegionIDs
-	 * 		the String of all region IDs to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setAllRegionIDs(String allRegionIDs) {
-		if ( allRegionIDs == null )
-			this.allRegionIDs = "";
-		else
-			this.allRegionIDs = allRegionIDs;
-	}
-
-	/**
-	 * @param socatDOI
-	 * 		the SOCAT DOI for this dataset to set; 
-	 * 		if null, an empty string is assigned
-	 */
-	public void setSocatDOI(String socatDOI) {
-		if ( socatDOI == null )
-			this.socatDOI = "";
-		else
-			this.socatDOI = socatDOI;
-	}
-
-	/**
-	 * @return
-	 * 		the QC flag;
-	 * 		never null but could be a string with a single blank character if not assigned
-	 */
-	public String getQcFlag() {
-		return qcFlag;
-	}
-
-	/**
-	 * @param qcFlag 
-	 * 		the QC flag to set; 
-	 * 		if null, a string with a single blank character is assigned
-	 */
-	public void setQcFlag(String qcFlag) {
-		if ( qcFlag == null )
-			this.qcFlag = " ";
-		else
-			this.qcFlag = qcFlag;
+			value = DashboardUtils.DATE_MISSING_VALUE;
+		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_END.getVarName(), value);
 	}
 
 	/**
 	 * @return
 	 * 		the maximum length of String values given in the fields 
-	 * 		of this instance, or 16, whichever is larger.
+	 * 		of this instance, rounded up to the nearest multiple of 16.
 	 */
 	public int getMaxStringLength() {
 		int maxLength = 16;
-		if ( maxLength < expocode.length() )
-			maxLength = expocode.length();
-		if ( maxLength < cruiseName.length() ) 
-			maxLength = cruiseName.length();
-		if ( maxLength < vesselName.length() ) 
-			maxLength = vesselName.length();
-		if ( maxLength < organization.length() ) 
-			maxLength = organization.length();
-		if ( maxLength < scienceGroup.length() ) 
-			maxLength = scienceGroup.length();
-		if ( maxLength < socatVersion.length() )
-			maxLength = socatVersion.length();
-		if ( maxLength < allRegionIDs.length() )
-			maxLength = allRegionIDs.length();
-		if ( maxLength < socatDOI.length() )
-			maxLength = socatDOI.length();
-		if ( maxLength < qcFlag.length() )
-			maxLength = qcFlag.length();
+		for ( String value : stringValuesMap.values() ) {
+			if ( maxLength < value.length() )
+				maxLength = value.length();
+		}
+		maxLength += (maxLength % 16);
 		return maxLength;
 	}
 
@@ -415,17 +459,8 @@ public class SocatMetadata {
 		// Do not consider floating-point fields since they do not 
 		// have to be exactly the same for equals to return true.
 		final int prime = 37;
-		int result = expocode.hashCode();
-		result = result * prime + cruiseName.hashCode();
-		result = result * prime + vesselName.hashCode();
-		result = result * prime + organization.hashCode();
-		result = result * prime + beginTime.hashCode();
-		result = result * prime + endTime.hashCode();
-		result = result * prime + scienceGroup.hashCode();
-		result = result * prime + socatVersion.hashCode();
-		result = result * prime + allRegionIDs.hashCode();
-		result = result * prime + socatDOI.hashCode();
-		result = result * prime + qcFlag.hashCode();
+		int result = stringValuesMap.hashCode();
+		result = result * prime + dateValuesMap.hashCode();
 		return result;
 	}
 
@@ -441,68 +476,45 @@ public class SocatMetadata {
 		SocatMetadata other = (SocatMetadata) obj;
 
 		// Date comparisons
-		if ( ! beginTime.equals(other.beginTime) )
-			return false;
-		if ( ! endTime.equals(other.endTime) )
+		if ( ! dateValuesMap.equals(other.dateValuesMap) )
 			return false;
 
 		// String comparisons
-		if ( ! expocode.equals(other.expocode) )
-			return false;
-		if ( ! cruiseName.equals(other.cruiseName) )
-			return false;
-		if ( ! vesselName.equals(other.vesselName) )
-			return false;
-		if ( ! organization.equals(other.organization) )
-			return false;
-		if ( ! scienceGroup.equals(other.scienceGroup) )
-			return false;
-		if ( ! socatVersion.equals(other.socatVersion) )
-			return false;
-		if ( ! allRegionIDs.equals(other.allRegionIDs) )
-			return false;
-		if ( ! socatDOI.equals(other.socatDOI) )
-			return false;
-		if ( ! qcFlag.equals(other.qcFlag) )
+		if ( ! stringValuesMap.equals(other.stringValuesMap) )
 			return false;
 
-		// Floating-point comparisons
-		if ( ! DashboardUtils.closeTo(southmostLatitude, 
-				other.southmostLatitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+		// Floating-point comparisons - values don't have to be exactly the same
+		if ( doubleValuesMap.size() != other.doubleValuesMap.size() )
 			return false;
-		if ( ! DashboardUtils.closeTo(northmostLatitude, 
-				other.northmostLatitude, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-			return false;
-
-		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( ! DashboardUtils.longitudeCloseTo(westmostLongitude, other.westmostLongitude, 
-				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-			return false;
-		if ( ! DashboardUtils.longitudeCloseTo(eastmostLongitude, other.eastmostLongitude, 
-				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
-			return false;
+		for ( Entry<String,Double> entry : doubleValuesMap.entrySet() ) {
+			String key = entry.getKey();
+			Double thisval = entry.getValue();
+			Double otherval = other.doubleValuesMap.get(key);
+			if ( key.toUpperCase().contains("LONGITUDE") ) {
+				// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
+				if ( ! DashboardUtils.longitudeCloseTo(thisval, otherval, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+					return false;				
+			}
+			else {
+				if ( ! DashboardUtils.closeTo(thisval, otherval, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+					return false;
+			}
+		}
 
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "SocatMetadata[ expocode=" + expocode +
-				",\n    cruiseName=" + cruiseName +
-				",\n    vesselName=" + vesselName + 
-				",\n    organization=" + organization + 
-				",\n    westmostLongitude=" + westmostLongitude.toString() + 
-				",\n    eastmostLongitude=" + eastmostLongitude.toString() + 
-				",\n    southmostLatitude=" + southmostLatitude.toString() + 
-				",\n    northmostLatitude=" + northmostLatitude.toString() + 
-				",\n    startDate=" + beginTime.toString() + 
-				",\n    endDate=" + endTime.toString() + 
-				",\n    scienceGroup=" + scienceGroup + 
-				",\n    version=" + socatVersion + 
-				",\n    allRegionIDs=" + allRegionIDs + 
-				",\n    socatDOI=" + socatDOI + 
-				",\n    qcFlag=" + qcFlag + 
-				" ]";
+		String repr = "SocatMetadata[\n";
+		for ( Entry<String,String> entry : stringValuesMap.entrySet() )
+			repr += "    " + entry.getKey() + "=" + entry.getValue() + "\n";
+		for ( Entry<String,Double> entry : doubleValuesMap.entrySet() )
+			repr += "    " + entry.getKey() + "=" + entry.getKey().toString() + "\n";
+		for ( Entry<String,Date> entry : dateValuesMap.entrySet() )
+			repr += "    " + entry.getKey() + "=" + entry.getKey().toString() + "\n";
+		repr += "]";
+		return repr;
 	}
 
 }

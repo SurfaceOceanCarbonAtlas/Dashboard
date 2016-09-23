@@ -6,8 +6,7 @@ package gov.noaa.pmel.socat.dashboard.test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.socat.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.socat.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.socat.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.socat.dashboard.shared.DataLocation;
 import gov.noaa.pmel.socat.dashboard.shared.QCEvent;
 
@@ -50,12 +49,12 @@ public class DataLocationTest {
 	@Test
 	public void testGetSetRowNumber() {
 		DataLocation myflag = new DataLocation();
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
 		myflag.setRowNumber(MY_ROW_NUMBER);
 		assertEquals(MY_ROW_NUMBER, myflag.getRowNumber());
 		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		myflag.setRowNumber(null);
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
 	}
 
 	/**
@@ -65,13 +64,13 @@ public class DataLocationTest {
 	@Test
 	public void testGetSetDataDate() {
 		DataLocation myflag = new DataLocation();
-		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getDataDate());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
 		myflag.setDataDate(MY_DATA_DATE);
 		assertEquals(MY_DATA_DATE, myflag.getDataDate());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		myflag.setDataDate(null);
-		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getDataDate());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
 	}
 
 	/**
@@ -81,14 +80,14 @@ public class DataLocationTest {
 	@Test
 	public void testGetSetLongitude() {
 		DataLocation myflag = new DataLocation();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
 		myflag.setLongitude(MY_LONGITUDE);
 		assertEquals(MY_LONGITUDE, myflag.getLongitude());
-		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getDataDate());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		myflag.setLongitude(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
 	}
 
 	/**
@@ -98,15 +97,15 @@ public class DataLocationTest {
 	@Test
 	public void testGetSetLatitude() {
 		DataLocation myflag = new DataLocation();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLatitude());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLatitude());
 		myflag.setLatitude(MY_LATITUDE);
 		assertEquals(MY_LATITUDE, myflag.getLatitude());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
-		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getDataDate());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		myflag.setLatitude(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLatitude());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLatitude());
 	}
 
 	/**
@@ -116,16 +115,16 @@ public class DataLocationTest {
 	@Test
 	public void testGetSetDataValue() {
 		DataLocation myflag = new DataLocation();
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getDataValue());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getDataValue());
 		myflag.setDataValue(MY_DATA_VALUE);
 		assertEquals(MY_DATA_VALUE, myflag.getDataValue());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLatitude());
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getLongitude());
-		assertEquals(SocatMetadata.DATE_MISSING_VALUE, myflag.getDataDate());
-		assertEquals(SocatCruiseData.INT_MISSING_VALUE, myflag.getRowNumber());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLatitude());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getLongitude());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getDataDate());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, myflag.getRowNumber());
 		assertEquals(DataLocation.GLOBAL_REGION_ID, myflag.getRegionID());
 		myflag.setDataValue(null);
-		assertEquals(SocatCruiseData.FP_MISSING_VALUE, myflag.getDataValue());
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, myflag.getDataValue());
 	}
 
 	/**

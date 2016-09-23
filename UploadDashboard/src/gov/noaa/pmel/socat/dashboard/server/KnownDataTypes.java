@@ -317,7 +317,36 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Create additional known dataa types from values in a Properties file.
+	 * @return
+	 * 		the current list of known data types.  This is a shallow copy
+	 * 		of the known data types; the DataColumnType objects returned
+	 * 		in the list are those actually stored in this instance.
+	 */
+	public ArrayList<DataColumnType> getKnownTypesList() {
+		return new ArrayList<DataColumnType>(knownTypes.values());
+	}
+
+	/**
+	 * Returns a copy of the known data type whose variable 
+	 * name matches (comparing upper-cased) the given variable name.  
+	 * The selected unit will be zero and the select missing values 
+	 * will be an empty string (default missing values).
+	 * 
+	 * @param varName
+	 * 		data column type variable name to find
+	 * @return
+	 * 		copy of the known data column type that matches, or
+	 * 		null if the name does not match that of a known type
+	 */
+	public DataColumnType getDataColumnType(String varName) {
+		DataColumnType dtype = knownTypes.get(varName.toUpperCase());
+		if ( dtype == null )
+			return null;
+		return dtype.duplicate();
+	}
+
+	/**
+	 * Create additional known data types from values in a Properties file.
 	 * 
 	 * @param knownTypesFile
 	 * 		properties file of data types to add to the known list; 
@@ -409,35 +438,8 @@ public class KnownDataTypes {
 		}
 	}
 
-	/**
-	 * @return
-	 * 		the current list of known data types.  This is a shallow copy
-	 * 		of the known data types; the DataColumnType objects returned
-	 * 		in the list are those actually stored in this instance.
-	 */
-	public ArrayList<DataColumnType> getKnownTypesList() {
-		return new ArrayList<DataColumnType>(knownTypes.values());
-	}
-
-	/**
-	 * Returns a copy of the known data type whose variable 
-	 * name matches (comparing upper-cased) the given variable name.  
-	 * The selected unit will be zero and the select missing values 
-	 * will be an empty string (default missing values).
-	 * 
-	 * @param varName
-	 * 		data column type variable name to find
-	 * @return
-	 * 		copy of the known data column type that matches, or
-	 * 		null if the name does not match that of a known type
-	 */
-	public DataColumnType getDataColumnType(String varName) {
-		DataColumnType dtype = knownTypes.get(varName.toUpperCase());
-		if ( dtype == null )
-			return null;
-		return new DataColumnType(dtype.getVarName(), dtype.getDataClassName(), 
-				dtype.getDescription(), dtype.getStandardName(), 
-				dtype.getCategoryName(), dtype.getUnits());
+	public int size() {
+		return knownTypes.size();
 	}
 
 	@Override
