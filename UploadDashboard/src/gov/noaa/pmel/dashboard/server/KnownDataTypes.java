@@ -37,6 +37,12 @@ import com.google.gson.JsonParser;
  */
 public class KnownDataTypes {
 
+	public static final String CHAR_DATA_CLASS_NAME = "Character";
+	public static final String DATE_DATA_CLASS_NAME = "Date";
+	public static final String DOUBLE_DATA_CLASS_NAME = "Double";
+	public static final String INT_DATA_CLASS_NAME = "Integer";
+	public static final String STRING_DATA_CLASS_NAME = "String";
+
 	// IOOS categories
 	public static final String BATHYMETRY_CATEGORY = "Bathymetry";
 	public static final String IDENTIFIER_CATEGORY = "Identifier";
@@ -94,105 +100,105 @@ public class KnownDataTypes {
 	 * different vessels.  (metadata)
 	 */
 	public static final DataColumnType EXPOCODE = new DataColumnType("expocode", 
-			"String", "expocode", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "expocode", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 	
 	/**
 	 * User-provided name for the dataset (metadata)
 	 */
 	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
-			"String", "dataset name", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "dataset name", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType VESSEL_NAME = new DataColumnType("vessel_name", 
-			"String", "vessel name", "platform_name", IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "vessel name", "platform_name", IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization", 
-			"String", "organization", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "organization", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 	
 	public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("investigators", 
-			"String", "investigators", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "investigators", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_min",
-			"Double", "westernmost longitude", "geospatial_lon_min", LOCATION_CATEGORY, LONGITUDE_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType EASTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_max",
-			"Double", "easternmost longitude", "geospatial_lon_max", LOCATION_CATEGORY, LONGITUDE_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType SOUTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_min",
-			"Double", "southernmost latitude", "geospatial_lat_min", LOCATION_CATEGORY, LATITUDE_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType NORTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_max",
-			"Double", "northernmost latitude", "geospatial_lat_max", LOCATION_CATEGORY, LATITUDE_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType TIME_COVERAGE_START = new DataColumnType("time_coverage_start",
-			"Date", "beginning time", "time_coverage_start", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_converage_end",
-			"Date", "ending time", "time_converage_end", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
-			"String", "QC flag", null, QUALITY_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "QC flag", null, QUALITY_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample_number",
-			"Integer", "sample number", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "sample number", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	/**
 	 * Date and time or the measurement
 	 */
 	public static final DataColumnType TIMESTAMP = new DataColumnType("date_time", 
-			"String", "date and time", null, null, TIMESTAMP_UNITS);
+			STRING_DATA_CLASS_NAME, "date and time", null, null, TIMESTAMP_UNITS);
 
 	/**
 	 * Date of the measurement - no time.
 	 */
 	public static final DataColumnType DATE = new DataColumnType("date", 
-			"String", "date", null, null, DATE_UNITS);
+			STRING_DATA_CLASS_NAME, "date", null, null, DATE_UNITS);
 
 	public static final DataColumnType YEAR = new DataColumnType("year", 
-			"Integer", "year", "year", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "year", "year", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType MONTH_OF_YEAR = new DataColumnType("month", 
-			"Integer", "month of year", "month_of_year", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "month of year", "month_of_year", TIME_CATEGORY, DataColumnType.NO_UNITS);
 	
 	public static final DataColumnType DAY_OF_MONTH = new DataColumnType("day", 
-			"Integer", "day of month", "day_of_month", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "day of month", "day_of_month", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType TIME_OF_DAY = new DataColumnType("time_of_day", 
-			"String", "time of day", null, null, TIME_OF_DAY_UNITS);
+			STRING_DATA_CLASS_NAME, "time of day", null, null, TIME_OF_DAY_UNITS);
 
 	public static final DataColumnType HOUR_OF_DAY = new DataColumnType("hour", 
-			"Integer", "hour of day", "hour_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "hour of day", "hour_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType MINUTE_OF_HOUR = new DataColumnType("minute", 
-			"Integer", "minute of hour", "minute_if_hour", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "minute of hour", "minute_if_hour", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType SECOND_OF_MINUTE = new DataColumnType("second", 
-			"Double", "second of minute", "second_of_minute", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "second of minute", "second_of_minute", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	/**
 	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
 	 * may be used to specify the date and time of the measurement.
 	 */
 	public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day_of_year", 
-			"Double", "day of year", "day_of_year", TIME_CATEGORY, DAY_OF_YEAR_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "day of year", "day_of_year", TIME_CATEGORY, DAY_OF_YEAR_UNITS);
 
 	/**
 	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
 	 * be used to specify date and time of the measurement
 	 */
 	public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec_of_day", 
-			"Double", "second of day", "second_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "second of day", "second_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType LONGITUDE = new DataColumnType("longitude", 
-			"Double", "longitude", "longitude", LOCATION_CATEGORY, LONGITUDE_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "longitude", "longitude", LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType LATITUDE = new DataColumnType("latitude", 
-			"Double", "latitude", "latitude", LOCATION_CATEGORY, LATITUDE_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "latitude", "latitude", LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth", 
-			"Double", "sample depth", "depth", BATHYMETRY_CATEGORY, DEPTH_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "sample depth", "depth", BATHYMETRY_CATEGORY, DEPTH_UNITS);
 
 	public static final DataColumnType TIME = new DataColumnType("time", 
-			"Double", "time", "time", TIME_CATEGORY, TIME_UNITS);
+			DOUBLE_DATA_CLASS_NAME, "time", "time", TIME_CATEGORY, TIME_UNITS);
 
 
 	private LinkedHashMap<String,DataColumnType> knownTypes;
@@ -219,8 +225,11 @@ public class KnownDataTypes {
 	 * 		TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE,
 	 * 		DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, LATITUDE, SAMPLE_DEPTH
 	 * This should be called before adding any custom types.
+	 * 
+	 * @return
+	 * 		this instance (as a convenince for chaining)
 	 */
-	public void addStandardTypesForUsers() {
+	public KnownDataTypes addStandardTypesForUsers() {
 		addDataType(DataColumnType.UNKNOWN);
 		addDataType(DataColumnType.OTHER);
 		addDataType(EXPOCODE);
@@ -243,6 +252,7 @@ public class KnownDataTypes {
 		addDataType(LONGITUDE);
 		addDataType(LATITUDE);
 		addDataType(SAMPLE_DEPTH);
+		return this;
 	}
 
 	/**
@@ -253,8 +263,11 @@ public class KnownDataTypes {
 	 * 		SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, TIME_COVERAGE_START, 
 	 * 		TIME_COVERAGE_END, QC_FLAG
 	 * This should be called before adding any custom types.
+	 * 
+	 * @return
+	 * 		this instance (as a convenince for chaining)
 	 */
-	public void addStandardTypesForMetadataFiles() {
+	public KnownDataTypes addStandardTypesForMetadataFiles() {
 		addDataType(EXPOCODE);
 		addDataType(DATASET_NAME);
 		addDataType(VESSEL_NAME);
@@ -267,6 +280,7 @@ public class KnownDataTypes {
 		addDataType(TIME_COVERAGE_START);
 		addDataType(TIME_COVERAGE_END);
 		addDataType(QC_FLAG);
+		return this;
 	}
 
 	/**
@@ -276,8 +290,11 @@ public class KnownDataTypes {
 	 * 		MINUTE_OF_HOUR, SECOND_OF_MINUTE, TIME, LONGITUDE, LATITUDE, 
 	 * 		SAMPLE_DEPTH
 	 * This should be called before adding any custom types.
+	 * 
+	 * @return
+	 * 		this instance (as a convenince for chaining)
 	 */
-	public void addStandardTypesForDataFiles() {
+	public KnownDataTypes addStandardTypesForDataFiles() {
 		addDataType(SAMPLE_NUMBER);
 		addDataType(YEAR);
 		addDataType(MONTH_OF_YEAR);
@@ -289,6 +306,7 @@ public class KnownDataTypes {
 		addDataType(LONGITUDE);
 		addDataType(LATITUDE);
 		addDataType(SAMPLE_DEPTH);
+		return this;
 	}
 
 	/**

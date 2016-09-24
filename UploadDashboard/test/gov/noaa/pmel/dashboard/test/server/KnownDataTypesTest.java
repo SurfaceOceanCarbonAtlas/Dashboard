@@ -93,7 +93,7 @@ public class KnownDataTypesTest {
 	));
 
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { "xCO2_atm_dry_interp", "rank", "socat_doi" };
-	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { "Double", "Integer", "String" };
+	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { KnownDataTypes.DOUBLE_DATA_CLASS_NAME, KnownDataTypes.INT_DATA_CLASS_NAME, KnownDataTypes.STRING_DATA_CLASS_NAME };
 	static final String[] ADDN_TYPES_DESCRIPTIONS = new String[] { "mole fraction CO2 in sea level air", "personal ranking", "DOI of SOCAT-enhanced datafile" };
 	static final String[] ADDN_TYPES_STANDARD_NAMES = new String[] { "xCO2_atm", "", "DOI" };
 	static final String[] ADDN_TYPES_CATEGORY_NAMES = new String[] { "CO2", "", "Identifier" };
@@ -135,7 +135,8 @@ public class KnownDataTypesTest {
 	@Test
 	public void testAddStandardTypesForClient() {
 		KnownDataTypes types = new KnownDataTypes();
-		types.addStandardTypesForUsers();
+		KnownDataTypes other = types.addStandardTypesForUsers();
+		assertTrue( types == other );
 		assertEquals(USERS_VARNAMES.size(), types.size());
 		for ( String varName : USERS_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
@@ -149,7 +150,8 @@ public class KnownDataTypesTest {
 	@Test
 	public void testAddStandardTypesForMetadataFiles() {
 		KnownDataTypes types = new KnownDataTypes();
-		types.addStandardTypesForMetadataFiles();
+		KnownDataTypes other = types.addStandardTypesForMetadataFiles();
+		assertTrue( types == other );
 		assertEquals(METADATA_FILES_VARNAMES.size(), types.size());
 		for ( String varName : METADATA_FILES_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
@@ -165,7 +167,8 @@ public class KnownDataTypesTest {
 	@Test
 	public void testAddStandardTypesForDataFiles() {
 		KnownDataTypes types = new KnownDataTypes();
-		types.addStandardTypesForDataFiles();
+		KnownDataTypes other = types.addStandardTypesForDataFiles();
+		assertTrue( types == other );
 		assertEquals(DATA_FILES_VARNAMES.size(), types.size());
 		for ( String varName : DATA_FILES_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );

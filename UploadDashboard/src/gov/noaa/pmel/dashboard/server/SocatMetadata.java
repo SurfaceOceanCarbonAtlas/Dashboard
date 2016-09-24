@@ -48,12 +48,19 @@ public class SocatMetadata {
 
 	/**
 	 * Generates a SocatMetadata object with the given known types.
-	 * Only the data class types "String", "Double", and "Date" are
-	 * accepted at this time.  Sets the values to the default values:
+	 * Only the data class types 
+	 * 	{@link KnownDataTypes#STRING_DATA_CLASS_NAME}, 
+	 * 	{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME}, and 
+	 * 	{@link KnownDataTypes#DATE_DATA_CLASS_NAME} are
+	 * accepted at this time.
+	 * Sets the values to the default values:
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE}.toString() for QC_FLAG,
-	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other String values, 
-	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for Double values, and
-	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for Date values.
+	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other {@link KnownDataTypes#STRING_DATA_CLASS_NAME} values, 
+	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values, and
+	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for {@link KnownDataTypes#DATE_DATA_CLASS_NAME} values.
+	 * 
+	 * @param knownTypes
+	 * 		all known data types
 	 */
 	public SocatMetadata(KnownDataTypes knownTypes) {
 		stringValuesMap = new LinkedHashMap<String,String>();
@@ -62,7 +69,7 @@ public class SocatMetadata {
 
 		if ( knownTypes != null ) {
 			for ( DataColumnType dtype : knownTypes.getKnownTypesList() ) {
-				if ( "String".equals(dtype.getDataClassName()) ) {
+				if ( KnownDataTypes.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 					if ( dtype.typeEquals(KnownDataTypes.QC_FLAG) ) {
 						// Single blank character for QC_FLAG
 						stringValuesMap.put(dtype.getVarName(), DashboardUtils.CHAR_MISSING_VALUE.toString());
@@ -71,10 +78,10 @@ public class SocatMetadata {
 						stringValuesMap.put(dtype.getVarName(), DashboardUtils.STRING_MISSING_VALUE);
 					}
 				}
-				else if ( "Double".equals(dtype.getDataClassName()) ) {
+				else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 					doubleValuesMap.put(dtype.getVarName(), DashboardUtils.FP_MISSING_VALUE);
 				}
-				else if ( "Date".equals(dtype.getDataClassName()) ) {
+				else if ( KnownDataTypes.DATE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 					dateValuesMap.put(dtype.getVarName(), DashboardUtils.DATE_MISSING_VALUE);
 				}
 				else {

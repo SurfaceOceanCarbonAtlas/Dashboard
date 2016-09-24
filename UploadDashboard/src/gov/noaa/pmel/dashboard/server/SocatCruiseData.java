@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -164,6 +165,7 @@ public class SocatCruiseData {
 	doubleValsMap.put(WIND_DIRECTION_TRUE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 	doubleValsMap.put(WIND_DIRECTION_RELATIVE_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 
+// THE FOLLOWIG ARE ALL COMPUTED BY FERRET
 	doubleValsMap.put(FCO2_FROM_XCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
 	doubleValsMap.put(FCO2_FROM_XCO2_SST_VARNMAE, DashboardUtils.FP_MISSING_VALUE);
 	doubleValsMap.put(FCO2_FROM_PCO2_TEQU_VARNAME, DashboardUtils.FP_MISSING_VALUE);
@@ -195,13 +197,19 @@ public class SocatCruiseData {
 */
 
 	/**
-	 * Generates an empty SOCAT data record
 	 * Generates a SocatCruiseData object with the given known types.
-	 * Only the data class types "Integer", "Double", and "Character" 
-	 * are accepted at this time.  Sets the values to the default values
-	 * ({@link DashboardUtils#INT_MISSING_VALUE} Integer, 
-	 * {@link DashboardUtils#FP_MISSING_VALUE} Double,
-	 * {@link DashboardUtils#CHAR_MISSING_VALUE} Character).
+	 * Only the data class types 
+	 * 	{@link KnownDataTypes#INT_DATA_CLASS_NAME}, 
+	 * 	{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME}, and 
+	 * 	{@link KnownDataTypes#CHAR_DATA_CLASS_NAME} are
+	 * are accepted at this time.
+	 * Sets the values to the default values:
+	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link KnownDataTypes#INT_DATA_CLASS_NAME} values,
+	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values, and
+	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for {@link KnownDataTypes#CHAR_DATA_CLASS_NAME} values.
+	 * 
+	 * @param knownTypes
+	 * 		collection of all known types
 	 */
 	public SocatCruiseData(KnownDataTypes knownTypes) {
 		intValsMap = new LinkedHashMap<String,Integer>();
@@ -210,13 +218,13 @@ public class SocatCruiseData {
 
 		if ( knownTypes != null ) {
 			for ( DataColumnType dtype : knownTypes.getKnownTypesList() ) {
-				if ( "Integer".equals(dtype.getDataClassName()) ) {
+				if ( KnownDataTypes.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 					intValsMap.put(dtype.getVarName(), DashboardUtils.INT_MISSING_VALUE);
 				}
-				else if ( "Double".equals(dtype.getDataClassName()) ) {
+				else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 					doubleValsMap.put(dtype.getVarName(), DashboardUtils.FP_MISSING_VALUE);
 				}
-				else if ( "Character".equals(dtype.getDataClassName()) ) {
+				else if ( KnownDataTypes.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 					charValsMap.put(dtype.getVarName(), DashboardUtils.CHAR_MISSING_VALUE);
 				}
 				else {
@@ -228,32 +236,36 @@ public class SocatCruiseData {
 	}
 
 	/**
-	 * Generates a SOCAT cruise data objects from a list of data column 
-	 * types and matching data strings.  This assumes the data in the 
-	 * strings are in the standard units for each type, and the missing
-	 * value is "NaN", an empty string, or null.  The data column types 
-	 * {@link DataColumnType#TIMESTAMP}, {@link DataColumnType#DATE}, 
-	 * and {@link DataColumnType#TIME} are ignored; the date and time 
-	 * must be given using the {@link DataColumnType#YEAR}, 
-	 * {@link DataColumnType#MONTH}, {@link DataColumnType#DAY},
-	 * {@link DataColumnType#HOUR}, {@link DataColumnType#MINUTE},
-	 * and {@link DataColumnType#SECOND} data column types.
+	 * Generates a SOCAT cruise data objects from a list of 
+	 * data column types and corresponding data strings.
+	 * This assumes the data in the strings are in the standard 
+	 * units for each type, and the missing value is "NaN", an 
+	 * empty string, or null.
 	 * 
+	 * An exception is thrown if a data column with type 
+	 * {@link DataColumnType#UNKNOWN} is encountered; otherwise 
+	 * data columns with types not present in knownTypes are ignored.
+	 * The data types {@link DataColumnType#UNKNOWN}, 
+	 * {@link DataColumnType#OTHER}, and any metadata types
+	 * should not be in knownTypes.
+	 * 
+	 * @param knownTypes
+	 * 		complete list of known data types
 	 * @param columnTypes
-	 * 		types of the data values
-	 * @param rowNum
-	 * 		sequence number (starting with one) of this data point
-	 * 		in the data set
+	 * 		types of the data values - only the variable name and data class type is used
+	 * @param sampleNum
+	 * 		sequence number (starting with one) of this data point in the data set
 	 * @param dataValues
-	 * 		data values
+	 * 		data value strings
 	 * @throws IllegalArgumentException
-	 * 		if the number of data types and data values do not match, or
+	 * 		if the number of data types and data values do not match, 
+	 * 		if a data column has the type {@link DataColumnType#UNKNOWN}, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public SocatCruiseData(List<DataColumnType> columnTypes, int rowNum,
-			List<String> dataValues) throws IllegalArgumentException {
-		// Initialize to an empty data record
-		this();
+	public SocatCruiseData(KnownDataTypes knownTypes, List<DataColumnType> columnTypes, 
+			int sampleNum, List<String> dataValues) throws IllegalArgumentException {
+		// Initialize to an empty data record with the given known types
+		this(knownTypes);
 		// Verify the number of types and values match
 		int numColumns = columnTypes.size();
 		if ( dataValues.size() != numColumns )
@@ -261,15 +273,28 @@ public class SocatCruiseData {
 					numColumns + ") does not match the number of data values (" +
 					dataValues.size() + ")");
 		// Add values to the empty record
-		this.rowNum = rowNum;
+		String varName = KnownDataTypes.SAMPLE_NUMBER.getVarName();
+		if ( intValsMap.containsKey(varName) )
+			intValsMap.put(varName, Integer.valueOf(sampleNum));
 		for (int k = 0; k < numColumns; k++) {
+			DataColumnType dtype = columnTypes.get(k);
+			if ( DataColumnType.UNKNOWN.typeEquals(dtype) )
+				throw new IllegalArgumentException("Data column number " + Integer.toString(k+1) + " has type UNKNOWN");
 			// Skip over missing values since the empty data record
-			// is initialized to the missing value for that type.
+			// is initialized with the missing value for data type
 			String value = dataValues.get(k);
 			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
 				continue;
-			double secondOfDay = 0.0;
-			DataColumnType type = columnTypes.get(k);
+			// Check if this variable with the correct data class was in the known list
+			varName = dtype.getVarName();
+			DataColumnType stdType = knownTypes.getDataColumnType(varName);
+			if ( stdType == null )
+				continue;
+			if ( ! stdType.getDataClassName().equals(dtype.getDataClassName()) )
+				continue;
+			if ( intValsMap.containsKey(varName) ) {
+				
+			}
 			try {
 				if ( type.equals(DataColumnType.EXPOCODE) ||
 					 type.equals(DataColumnType.CRUISE_NAME) ||
@@ -302,12 +327,6 @@ public class SocatCruiseData {
 				}
 				else if ( type.equals(DataColumnType.SECOND) ) {
 					this.second = Double.valueOf(value);
-				}
-				else if ( type.equals(DataColumnType.DAY_OF_YEAR) ) {
-					this.dayOfYear = Double.valueOf(value);
-				}
-				else if ( type.equals(DataColumnType.SECOND_OF_DAY) ) {
-					secondOfDay = Double.valueOf(value);
 				}
 				else if ( type.equals(DataColumnType.LONGITUDE) ) {
 					this.longitude = Double.valueOf(value);
@@ -429,8 +448,6 @@ public class SocatCruiseData {
 						value + "' as a value of type " + type.name() + 
 						"\n    " + ex.getMessage());
 			}
-			// Add any second-of-day value to the day-of-year value
-			this.dayOfYear += secondOfDay / (24.0 * 60.0 * 60.0);
 		}
 	}
 
