@@ -177,19 +177,6 @@ public class KnownDataTypesTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesList()}.
-	 */
-	@Test
-	public void testGetKnownTypesList() {
-		KnownDataTypes types = new KnownDataTypes();
-		ArrayList<DataColumnType> knownList = types.getKnownTypesList();
-		assertEquals(0, knownList.size());
-		types.addStandardTypesForMetadataFiles();
-		knownList = types.getKnownTypesList();
-		assertEquals(METADATA_FILES_TYPES_LIST, knownList);
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getDataColumnType(java.lang.String)}.
 	 */
 	@Test
@@ -203,6 +190,19 @@ public class KnownDataTypesTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesList()}.
+	 */
+	@Test
+	public void testGetKnownTypesList() {
+		KnownDataTypes types = new KnownDataTypes();
+		ArrayList<DataColumnType> knownList = types.getKnownTypesList();
+		assertEquals(0, knownList.size());
+		types.addStandardTypesForMetadataFiles();
+		knownList = types.getKnownTypesList();
+		assertEquals(METADATA_FILES_TYPES_LIST, knownList);
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addTypesFromProperties(java.util.Properties)}.
 	 */
 	@Test
@@ -213,7 +213,8 @@ public class KnownDataTypesTest {
 		Properties props = new Properties();
 		props.load(reader);
 		assertEquals(new HashSet<String>(Arrays.asList(ADDN_TYPES_VAR_NAMES)), props.keySet());
-		clientTypes.addTypesFromProperties(props);
+		KnownDataTypes other = clientTypes.addTypesFromProperties(props);
+		assertTrue( clientTypes == other );
 		assertEquals(USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.size());
 		for (int k = 0; k < ADDN_TYPES_VAR_NAMES.length; k++) {
 			assertEquals(ADDN_TYPES_DATA_COLUMNS[k], clientTypes.getDataColumnType(ADDN_TYPES_VAR_NAMES[k]));

@@ -1139,25 +1139,25 @@ public class SocatCruiseReporter {
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
-		dblVal = dataVals.gettEqu();
+		dblVal = dataVals.getTEqu();
 		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
-		dblVal = dataVals.getSlp();
+		dblVal = dataVals.getPAtm();
 		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
-		dblVal = dataVals.getpEqu();
+		dblVal = dataVals.getPEqu();
 		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
 			fmtr.format("%#.3f\t", dblVal);
 
-		dblVal = dataVals.getWoaSss();
+		dblVal = dataVals.getWoaSalinity();
 		if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("NaN\t");
 		else
@@ -1188,37 +1188,37 @@ public class SocatCruiseReporter {
 			fmtr.format("%#.3f\t", dblVal);
 
 		if ( ! multicruise ) {
-			dblVal = dataVals.getxCO2WaterTEquDry();
+			dblVal = dataVals.getXCO2WaterTEquDry();
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
-			dblVal = dataVals.getxCO2WaterSstDry();
+			dblVal = dataVals.getXCO2WaterSstDry();
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
-			dblVal = dataVals.getpCO2WaterTEquWet();
+			dblVal = dataVals.getPCO2WaterTEquWet();
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
-			dblVal = dataVals.getpCO2WaterSstWet();
+			dblVal = dataVals.getPCO2WaterSstWet();
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
-			dblVal = dataVals.getfCO2WaterSstWet();
+			dblVal = dataVals.getFCO2WaterTEquWet();
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
 				fmtr.format("%#.3f\t", dblVal);
 
-			dblVal = dataVals.getfCO2WaterSstWet();
+			dblVal = dataVals.getFCO2WaterSstWet();
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 				fmtr.format("NaN\t");
 			else
@@ -1232,7 +1232,7 @@ public class SocatCruiseReporter {
 			fmtr.format("%#.3f\t", dblVal);
 
 		// if fCO2_rec not given, always set source to zero
-		intVal = dataVals.getfCO2Source();
+		intVal = dataVals.getFCO2Source();
 		if ( DashboardUtils.INT_MISSING_VALUE.equals(intVal) || 
 			 DashboardUtils.FP_MISSING_VALUE.equals(dblVal) )
 			fmtr.format("0\t");

@@ -31,7 +31,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = -2787310294282209759L;
+	private static final long serialVersionUID = 7018407686296151274L;
 
 	/**
 	 * String separating each PI listed in scienceGroup, each organization 
@@ -176,7 +176,9 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException("The Metadata contains conflicts");
 		}
 
-		SocatMetadata scMData = new SocatMetadata();
+		KnownDataTypes knownTypes = new KnownDataTypes();
+		knownTypes.addStandardTypesForMetadataFiles();
+		SocatMetadata scMData = new SocatMetadata(knownTypes);
 		
 		scMData.setExpocode(expocode);
 		scMData.setDatasetName(omeMData.getExperimentName());

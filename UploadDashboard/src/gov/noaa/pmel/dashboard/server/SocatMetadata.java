@@ -19,40 +19,25 @@ import java.util.Map.Entry;
  */
 public class SocatMetadata {
 
-	public static final String SOCAT_VERSION_VARNAME = "socat_version";
-	public static final String ALL_REGION_IDS_VARNAME = "all_region_ids";
-	public static final String SOCAT_DOI_VARNAME = "socat_doi";
+	public static final DataColumnType SOCAT_VERSION = new DataColumnType("socat_version", KnownDataTypes.STRING_DATA_CLASS_NAME, 
+			"SOCAT Version number with status", null, null, DataColumnType.NO_UNITS);
+	public static final DataColumnType ALL_REGION_IDS = new DataColumnType("all_region_ids", KnownDataTypes.STRING_DATA_CLASS_NAME, 
+			"Sorted unique region IDs", null, null, DataColumnType.NO_UNITS);
+	public static final DataColumnType SOCAT_DOI = new DataColumnType("socat_doi", KnownDataTypes.STRING_DATA_CLASS_NAME, 
+			"SOCAT DOI", null, null, DataColumnType.NO_UNITS);
 
 	// Maps of variable names to values
 	LinkedHashMap<String,String> stringValuesMap;
 	LinkedHashMap<String,Double> doubleValuesMap;
 	LinkedHashMap<String,Date> dateValuesMap;
 
-	/*
-	stringValuesMap.put(KnownDataTypes.EXPOCODE.getVarName(), "");
-	stringValuesMap.put(KnownDataTypes.DATASET_NAME.getVarName(), "");
-	stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), "");
-	stringValuesMap.put(KnownDataTypes.ORGANIZATION_NAME.getVarName(), "");
-	stringValuesMap.put(KnownDataTypes.INVESTIGATOR_NAMES.getVarName(), "");
-	stringValuesMap.put(SOCAT_VERSION_VARNAME, "");
-	stringValuesMap.put(ALL_REGION_IDS_VARNAME, "");
-	stringValuesMap.put(SOCAT_DOI_VARNAME, "");
-	stringValuesMap.put(KnownDataTypes.QC_FLAG.getVarName(), " ");
-	doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-	doubleValuesMap.put(KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-	doubleValuesMap.put(KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-	doubleValuesMap.put(KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-	dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_START.getVarName(), DashboardUtils.DATE_MISSING_VALUE);
-	dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_END.getVarName(), DashboardUtils.DATE_MISSING_VALUE);
-	*/
-
 	/**
 	 * Generates a SocatMetadata object with the given known types.
 	 * Only the data class types 
 	 * 	{@link KnownDataTypes#STRING_DATA_CLASS_NAME}, 
-	 * 	{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME}, and 
-	 * 	{@link KnownDataTypes#DATE_DATA_CLASS_NAME} are
-	 * accepted at this time.
+	 * 	{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME}, and
+	 * 	{@link KnownDataTypes#DATE_DATA_CLASS_NAME}
+	 * are accepted at this time.
 	 * Sets the values to the default values:
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE}.toString() for QC_FLAG,
 	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other {@link KnownDataTypes#STRING_DATA_CLASS_NAME} values, 
@@ -261,7 +246,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatVersion() {
-		String value = stringValuesMap.get(SOCAT_VERSION_VARNAME);
+		String value = stringValuesMap.get(SOCAT_VERSION.getVarName());
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -284,7 +269,7 @@ public class SocatMetadata {
 			value = socatVersion;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SOCAT_VERSION_VARNAME, value);
+		stringValuesMap.put(SOCAT_VERSION.getVarName(), value);
 	}
 
 	/**
@@ -293,7 +278,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getAllRegionIDs() {
-		String value = stringValuesMap.get(ALL_REGION_IDS_VARNAME);
+		String value = stringValuesMap.get(ALL_REGION_IDS.getVarName());
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -310,7 +295,7 @@ public class SocatMetadata {
 			value = allRegionIDs;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(ALL_REGION_IDS_VARNAME, value);
+		stringValuesMap.put(ALL_REGION_IDS.getVarName(), value);
 	}
 
 	/**
@@ -319,7 +304,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatDOI() {
-		String value = stringValuesMap.get(SOCAT_DOI_VARNAME);
+		String value = stringValuesMap.get(SOCAT_DOI.getVarName());
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -336,7 +321,7 @@ public class SocatMetadata {
 			value = socatDOI;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SOCAT_DOI_VARNAME, value);
+		stringValuesMap.put(SOCAT_DOI.getVarName(), value);
 	}
 
 	/**

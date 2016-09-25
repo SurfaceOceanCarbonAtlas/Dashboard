@@ -43,12 +43,19 @@ public class KnownDataTypes {
 	public static final String INT_DATA_CLASS_NAME = "Integer";
 	public static final String STRING_DATA_CLASS_NAME = "String";
 
-	// IOOS categories
+	// Some suggested categories
 	public static final String BATHYMETRY_CATEGORY = "Bathymetry";
+	public static final String CO2_CATEGORY = "CO2";
 	public static final String IDENTIFIER_CATEGORY = "Identifier";
 	public static final String LOCATION_CATEGORY = "Location";
-	public static final String TIME_CATEGORY = "Time";
+	public static final String PLATFORM_CATEGORY = "Platform";
+	public static final String PRESSURE_CATEGORY = "Pressure";
 	public static final String QUALITY_CATEGORY = "Quality";
+	public static final String SALINITY_CATEGORY = "Salinity";
+	public static final String TEMPERATURE_CATEGORY = "Temperature";
+	public static final String TIME_CATEGORY = "Time";
+	public static final String WATER_VAPOR_CATEGORY = "Water Vapor";
+	public static final String WIND_CATEGORY = "Wind";
 
 	/** Formats for date-time stamps */
 	public static final ArrayList<String> TIMESTAMP_UNITS = 
@@ -78,11 +85,11 @@ public class KnownDataTypes {
 
 	/** Units for longitude */
 	public static final ArrayList<String> LONGITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.E", "deg.W"));
+			new ArrayList<String>(Arrays.asList("degrees_east", "degrees_west"));
 
 	/** Units of latitude */
 	public static final ArrayList<String> LATITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.N", "deg.S"));
+			new ArrayList<String>(Arrays.asList("degrees_north", "degrees_south"));
 
 	/** Unit of depth */
 	public static final ArrayList<String> DEPTH_UNITS = 
@@ -91,6 +98,10 @@ public class KnownDataTypes {
 	/** Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z") */
 	public static final ArrayList<String> TIME_UNITS = 
 			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
+
+	/** Marker data type used to indicate an severe error in a time or position */
+	public static final DataColumnType TIME_LOCATION = new DataColumnType("time_location", 
+			null, null, null, null, DataColumnType.NO_UNITS);
 
 	/**
 	 * Unique identifier for the dataset.
@@ -109,7 +120,7 @@ public class KnownDataTypes {
 			STRING_DATA_CLASS_NAME, "dataset name", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType VESSEL_NAME = new DataColumnType("vessel_name", 
-			STRING_DATA_CLASS_NAME, "vessel name", "platform_name", IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			STRING_DATA_CLASS_NAME, "vessel name", "platform_name", PLATFORM_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization", 
 			STRING_DATA_CLASS_NAME, "organization", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
@@ -200,6 +211,20 @@ public class KnownDataTypes {
 	public static final DataColumnType TIME = new DataColumnType("time", 
 			DOUBLE_DATA_CLASS_NAME, "time", "time", TIME_CATEGORY, TIME_UNITS);
 
+/*
+	// Map WOCE on all time-related types to "time"; other variables not visible
+	typeToNameMap.put(DataColumnType.TIMESTAMP, "time");
+	typeToNameMap.put(DataColumnType.DATE, "time");
+	typeToNameMap.put(DataColumnType.TIME, "time");
+	typeToNameMap.put(DataColumnType.YEAR, "time");
+	typeToNameMap.put(DataColumnType.MONTH, "time");
+	typeToNameMap.put(DataColumnType.DAY, "time");
+	typeToNameMap.put(DataColumnType.HOUR, "time");
+	typeToNameMap.put(DataColumnType.MINUTE, "time");
+	typeToNameMap.put(DataColumnType.SECOND, "time");
+	typeToNameMap.put(DataColumnType.DAY_OF_YEAR, "time");
+	typeToNameMap.put(DataColumnType.SECOND_OF_DAY, "time");
+*/
 
 	private LinkedHashMap<String,DataColumnType> knownTypes;
 
@@ -210,6 +235,22 @@ public class KnownDataTypes {
 		// Give plenty of capacity;
 		// since this is a LinkedHashMap, extra capacity not really a problem
 		knownTypes = new LinkedHashMap<String,DataColumnType>(96);
+	}
+
+	/**
+	 * Adds the given data type to this collection of known data 
+	 * types.  Only the upper-cased varName is used to differentiate 
+	 * known data types.  The given instance of the DataColumnType is 
+	 * added to the internal collection of known data types.
+	 * 
+	 * @param dtype
+	 * 		new data type to add to the known list
+	 * @return
+	 * 		existing known data type that was replaced;
+	 * 		null if there was no existing known data type with matching name 
+	 */
+	private DataColumnType addDataType(DataColumnType dtype) {
+		return knownTypes.put(dtype.getVarName().toUpperCase(), dtype);
 	}
 
 	/**
@@ -227,7 +268,7 @@ public class KnownDataTypes {
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
-	 * 		this instance (as a convenince for chaining)
+	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForUsers() {
 		addDataType(DataColumnType.UNKNOWN);
@@ -265,7 +306,7 @@ public class KnownDataTypes {
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
-	 * 		this instance (as a convenince for chaining)
+	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForMetadataFiles() {
 		addDataType(EXPOCODE);
@@ -292,7 +333,7 @@ public class KnownDataTypes {
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
-	 * 		this instance (as a convenince for chaining)
+	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForDataFiles() {
 		addDataType(SAMPLE_NUMBER);
@@ -307,73 +348,6 @@ public class KnownDataTypes {
 		addDataType(LATITUDE);
 		addDataType(SAMPLE_DEPTH);
 		return this;
-	}
-
-	/**
-	 * Adds the given data type to this collection of known data 
-	 * types.  Only the upper-cased varName is used to differentiate 
-	 * known data types.  The given instance of the DataColumnType is 
-	 * added to the internal collection of known data types.
-	 * 
-	 * @param dtype
-	 * 		new data type to add to the known list
-	 * @return
-	 * 		existing known data type that was replaced;
-	 * 		null if there was no existing known data type with matching name 
-	 */
-	private DataColumnType addDataType(DataColumnType dtype) {
-		return knownTypes.put(dtype.getVarName().toUpperCase(), dtype);
-	}
-
-	/**
-	 * Determines is a given data type name exists in the list
-	 * of known data types.  This only compares the upper-cased 
-	 * varName values in each data type.
-	 * 
-	 * @param typeName
-	 * 		search for a data column type with this name 
-	 * @return
-	 * 		if the known data column types contains the given data column type name
-	 */
-	public boolean containsTypeName(String typeName) {
-		return knownTypes.containsKey(typeName.toUpperCase());
-	}
-
-	/**
-	 * @return
-	 * 		the current list of known data types.  This is a shallow copy
-	 * 		of the known data types; the DataColumnType objects returned
-	 * 		in the list are those actually stored in this instance.
-	 */
-	public ArrayList<DataColumnType> getKnownTypesList() {
-		return new ArrayList<DataColumnType>(knownTypes.values());
-	}
-
-	/**
-	 * Returns a copy of the known data type whose variable 
-	 * name matches (comparing upper-cased) the given variable name.  
-	 * The selected unit will be zero and the select missing values 
-	 * will be an empty string (default missing values).
-	 * 
-	 * @param varName
-	 * 		data column type variable name to find
-	 * @return
-	 * 		copy of the known data column type that matches, or
-	 * 		null if the name does not match that of a known type
-	 */
-	public DataColumnType getDataColumnType(String varName) {
-		DataColumnType dtype = knownTypes.get(varName.toUpperCase());
-		if ( dtype == null )
-			return null;
-		return dtype.duplicate();
-	}
-
-	/**
-	 * @return
-	 * 		the number of known data types in this instance
-	 */
-	public int size() {
-		return knownTypes.size();
 	}
 
 	/**
@@ -401,8 +375,11 @@ public class KnownDataTypes {
 	 * 			(using {@link #containsTypeName(String)},
 	 * 		if the JSON description cannot be parsed, or
 	 * 		if the dataClassName tag is not given in the JSON description.
+	 * 
+	 * @return
+	 * 		this instance (as a convenience for chaining)
 	 */
-	public void addTypesFromProperties(Properties typeProps) throws IllegalArgumentException {
+	public KnownDataTypes addTypesFromProperties(Properties typeProps) throws IllegalArgumentException {
 		JsonParser parser = new JsonParser();
 		for ( String name : typeProps.stringPropertyNames() ) {
 			String dataClassName = null;
@@ -455,6 +432,58 @@ public class KnownDataTypes {
 				throw new IllegalArgumentException("Duplicate user-known data type \"" + name + "\"");
 			addDataType( new DataColumnType(name, dataClassName, description, standardName, categoryName, units) );
 		}
+		return this;
+	}
+
+	/**
+	 * Determines is a given data type name exists in the list
+	 * of known data types.  This only compares the upper-cased 
+	 * varName values in each data type.
+	 * 
+	 * @param typeName
+	 * 		search for a data column type with this name 
+	 * @return
+	 * 		if the known data column types contains the given data column type name
+	 */
+	public boolean containsTypeName(String typeName) {
+		return knownTypes.containsKey(typeName.toUpperCase());
+	}
+
+	/**
+	 * Returns a copy of the known data type whose variable 
+	 * name matches (comparing upper-cased) the given variable name.  
+	 * The selected unit will be zero and the select missing values 
+	 * will be an empty string (default missing values).
+	 * 
+	 * @param varName
+	 * 		data column type variable name to find
+	 * @return
+	 * 		copy of the known data column type that matches, or
+	 * 		null if the name does not match that of a known type
+	 */
+	public DataColumnType getDataColumnType(String varName) {
+		DataColumnType dtype = knownTypes.get(varName.toUpperCase());
+		if ( dtype == null )
+			return null;
+		return dtype.duplicate();
+	}
+
+	/**
+	 * @return
+	 * 		the current list of known data types.  This is a shallow copy
+	 * 		of the known data types; the DataColumnType objects returned
+	 * 		in the list are those actually stored in this instance.
+	 */
+	public ArrayList<DataColumnType> getKnownTypesList() {
+		return new ArrayList<DataColumnType>(knownTypes.values());
+	}
+
+	/**
+	 * @return
+	 * 		the number of known data types in this instance
+	 */
+	public int size() {
+		return knownTypes.size();
 	}
 
 	@Override
