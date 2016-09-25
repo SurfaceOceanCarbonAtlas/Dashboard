@@ -22,7 +22,7 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  * 
  * @author Karl Smith
  */
-public class DataType {
+public class DashDataType {
 
 	private DataColumnType dataType;
 
@@ -50,7 +50,7 @@ public class DataType {
 	 * 		unit strings associated with this type (copied);
 	 * 		if null or empty, a list with only {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public DataType(String varName, String dataClassName, String description, 
+	public DashDataType(String varName, String dataClassName, String description, 
 			String standardName, String categoryName, Collection<String> units) {
 		String myVarName;
 		if ( varName != null )
@@ -69,7 +69,7 @@ public class DataType {
 	 * 		create with the variable name, data class type, description, standard name, 
 	 * 		category name, and units from this data column type
 	 */
-	public DataType(DataColumnType dtype) {
+	public DashDataType(DataColumnType dtype) {
 		this(dtype.getVarName(), dtype.getDataClassName(), dtype.getDescription(), 
 				dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits());
 	}
@@ -131,7 +131,7 @@ public class DataType {
 	}
 
 	/**
-	 * Checks if the upper-cased variable name of this DataType 
+	 * Checks if the upper-cased variable name of this DashDataType 
 	 * is equal to that of another.
 	 * 
 	 * @param other
@@ -139,7 +139,7 @@ public class DataType {
 	 * @return
 	 * 		whether the "types" match
 	 */
-	public boolean typeNameEquals(DataType other) {
+	public boolean typeNameEquals(DashDataType other) {
 		if ( this == other )
 			return true;
 		if ( other == null )
@@ -148,7 +148,7 @@ public class DataType {
 	}
 
 	/**
-	 * Checks if the upper-cased variable name of this DataType 
+	 * Checks if the upper-cased variable name of this DashDataType 
 	 * is equal to that of the given DataColumnType.
 	 * 
 	 * @param other
@@ -161,7 +161,7 @@ public class DataType {
 	}
 
 	/**
-	 * Checks if the variable name and data class name of this DataType 
+	 * Checks if the variable name and data class name of this DashDataType 
 	 * is equal to that of another.
 	 * 
 	 * @param other
@@ -169,7 +169,7 @@ public class DataType {
 	 * @return
 	 * 		whether the types names match
 	 */
-	public boolean typeEquals(DataType other) {
+	public boolean typeEquals(DashDataType other) {
 		if ( this == other )
 			return true;
 		if ( other == null )
@@ -178,7 +178,7 @@ public class DataType {
 	}
 
 	/**
-	 * Checks if the variable name and data class name of this DataType 
+	 * Checks if the variable name and data class name of this DashDataType 
 	 * is equal to that of the given DataColumnType.
 	 * 
 	 * @param other
@@ -192,7 +192,7 @@ public class DataType {
 
 	/**
 	 * @return
-	 * 		a DataColumnType constructed from the values in this DataType.
+	 * 		a DataColumnType constructed from the values in this DashDataType.
 	 * 		Any mutable values in the DataColumnType are deep copies of the values.
 	 */
 	public DataColumnType duplicate() {
@@ -227,7 +227,7 @@ public class DataType {
 	}
 
 	/**
-	 * Create a DataType with the given variable name (Property key)
+	 * Create a DashDataType with the given variable name (Property key)
 	 * using the given JSON description string (Property value)
 	 * given by jsonDesc where:
 	 * 		tag: "dataClassName" gives the data class name,
@@ -236,18 +236,18 @@ public class DataType {
 	 * 		tag: "categoryName" gives the category name, and
 	 * 		tag: "units" gives the units array.
 	 * The data class name must be given, but other tags may be omitted 
-	 * in which case the DataType default value is assigned.
+	 * in which case the DashDataType default value is assigned.
 	 * 
 	 * @param varName
-	 * 		the variable name for the DataType
+	 * 		the variable name for the DashDataType
 	 * @param jsonDesc
 	 * 		the JSON description string to parse
 	 * @return
-	 * 		the newly created DataType
+	 * 		the newly created DashDataType
 	 * @throws IllegalArgumentException
 	 * 		if the JSON description string cannot be parsed.
 	 */
-	static public DataType fromPropertyValue(String varName, String jsonDesc) {
+	static public DashDataType fromPropertyValue(String varName, String jsonDesc) {
 		JsonParser parser = new JsonParser();
 		String dataClassName = null;
 		String description = null;
@@ -291,7 +291,7 @@ public class DataType {
 			throw new IllegalArgumentException("Problems parsing the JSON description '" + 
 					jsonDesc + "' : " + ex.getMessage());
 		}
-		return new DataType(varName, dataClassName, description, standardName, categoryName, units);
+		return new DashDataType(varName, dataClassName, description, standardName, categoryName, units);
 	}
 
 	@Override
@@ -306,9 +306,9 @@ public class DataType {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof DataType) )
+		if ( ! (obj instanceof DashDataType) )
 			return false;
-		DataType other = (DataType) obj;
+		DashDataType other = (DashDataType) obj;
 		if ( ! dataType.equals(other.dataType) )
 			return false;
 		return true;
@@ -316,7 +316,7 @@ public class DataType {
 
 	@Override
 	public String toString() {
-		return "DataType[varName=" + dataType.getVarName() + 
+		return "DashDataType[varName=" + dataType.getVarName() + 
 				", dataClassName=" + dataType.getDataClassName() + 
 				", description=" + dataType.getDescription() + 
 				", standardName=" + dataType.getStandardName() + 

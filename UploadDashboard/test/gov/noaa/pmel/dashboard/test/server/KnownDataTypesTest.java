@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.server.DataType;
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -81,8 +81,8 @@ public class KnownDataTypesTest {
 			KnownDataTypes.SAMPLE_DEPTH.getVarName()
 	));
 
-	private static final LinkedHashSet<DataType> METADATA_FILES_TYPES_SET = 
-			new LinkedHashSet<DataType>( Arrays.asList(
+	private static final LinkedHashSet<DashDataType> METADATA_FILES_TYPES_SET = 
+			new LinkedHashSet<DashDataType>( Arrays.asList(
 					KnownDataTypes.EXPOCODE,
 					KnownDataTypes.DATASET_NAME,
 					KnownDataTypes.VESSEL_NAME,
@@ -115,14 +115,14 @@ public class KnownDataTypesTest {
 	static final ArrayList<String> MOL_FRACTION_UNITS = 
 			new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
-	static final DataType[] ADDN_DATA_TYPES = new DataType[] {
-		new DataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], 
+	static final DashDataType[] ADDN_DATA_TYPES = new DashDataType[] {
+		new DashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], 
 				ADDN_TYPES_DESCRIPTIONS[0], ADDN_TYPES_STANDARD_NAMES[0], 
 				ADDN_TYPES_CATEGORY_NAMES[0], MOL_FRACTION_UNITS),
-		new DataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], 
+		new DashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], 
 				ADDN_TYPES_DESCRIPTIONS[1], null, 
 				null, null),
-		new DataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], 
+		new DashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], 
 				ADDN_TYPES_DESCRIPTIONS[2], ADDN_TYPES_STANDARD_NAMES[2], 
 				ADDN_TYPES_CATEGORY_NAMES[2], null)
 	};
@@ -201,7 +201,7 @@ public class KnownDataTypesTest {
 		assertNull( expoType );
 		types.addStandardTypesForUsers();
 		expoType = types.getDataColumnType("EXPOCODE");
-		DataType other = new DataType(expoType);
+		DashDataType other = new DashDataType(expoType);
 		assertEquals(KnownDataTypes.EXPOCODE, other);
 	}
 
@@ -211,7 +211,7 @@ public class KnownDataTypesTest {
 	@Test
 	public void testGetKnownTypesList() {
 		KnownDataTypes types = new KnownDataTypes();
-		LinkedHashSet<DataType> knownSet = types.getKnownTypesSet();
+		LinkedHashSet<DashDataType> knownSet = types.getKnownTypesSet();
 		assertEquals(0, knownSet.size());
 		types.addStandardTypesForMetadataFiles();
 		knownSet = types.getKnownTypesSet();

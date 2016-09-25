@@ -51,201 +51,201 @@ public class SocatCruiseData {
 			new ArrayList<String>(Arrays.asList("days"));
 
 	// Integer types
-	public static final DataType FCO2_SOURCE = new DataType("fCO2_source", 
+	public static final DashDataType FCO2_SOURCE = new DashDataType("fCO2_source", 
 			KnownDataTypes.INT_DATA_CLASS_NAME, "Algorithm number for recommended fCO2", 
 			null, KnownDataTypes.IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	// Character types
-	public static final DataType REGION_ID = new DataType("region_id", 
+	public static final DashDataType REGION_ID = new DashDataType("region_id", 
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
 			null, KnownDataTypes.LOCATION_CATEGORY, DataColumnType.NO_UNITS);
-	public static final DataType WOCE_CO2_WATER = new DataType("WOCE_CO2_water", 
+	public static final DashDataType WOCE_CO2_WATER = new DashDataType("WOCE_CO2_water", 
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for water CO2", 
 			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
-	public static final DataType WOCE_CO2_ATM = new DataType("WOCE_CO2_atm", 
+	public static final DashDataType WOCE_CO2_ATM = new DashDataType("WOCE_CO2_atm", 
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for air CO2", 
 			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
 
 	// Double types
-	public static final DataType SALINITY = new DataType("sal", 
+	public static final DashDataType SALINITY = new DashDataType("sal", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "salinity", 
 			"sea_surface_salinity", KnownDataTypes.SALINITY_CATEGORY, SALINITY_UNITS);
-	public static final DataType WOA_SALINITY = new DataType("woa_sss", 
+	public static final DashDataType WOA_SALINITY = new DashDataType("woa_sss", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "salinity from World Ocean Atlas", 
 			"sea_surface_salinity", KnownDataTypes.SALINITY_CATEGORY, SALINITY_UNITS);
 
-	public static final DataType TEQU = new DataType("Temperature_equi", 
+	public static final DashDataType TEQU = new DashDataType("Temperature_equi", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber temperature", 
 			null, KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DataType SST = new DataType("temp", 
+	public static final DashDataType SST = new DashDataType("temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea surface temperature", 
 			"sea_surface_temperature", KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DataType TATM = new DataType("Temperature_atm", 
+	public static final DashDataType TATM = new DashDataType("Temperature_atm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea-level air temperature", 
 			"air_temperature_at_sea_level", KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
 
-	public static final DataType PEQU = new DataType("Pressure_equi", 
+	public static final DashDataType PEQU = new DashDataType("Pressure_equi", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber pressure", 
 			null, KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
-	public static final DataType PATM = new DataType("Pressure_atm", 
+	public static final DashDataType PATM = new DashDataType("Pressure_atm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea-level air pressure", 
 			"air_pressure_at_sea_level", KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
-	public static final DataType NCEP_SLP = new DataType("pressure_ncep_slp", 
+	public static final DashDataType NCEP_SLP = new DashDataType("pressure_ncep_slp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea level air pressure from NCEP/NCAR reanalysis", 
 			"air_pressure_at_sea_level", KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
 
-	public static final DataType XCO2_WATER_TEQU_DRY = new DataType("xCO2_water_equi_temp_dry_ppm", 
+	public static final DashDataType XCO2_WATER_TEQU_DRY = new DashDataType("xCO2_water_equi_temp_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using equi temp", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType XCO2_WATER_SST_DRY = new DataType("xCO2_water_sst_dry_ppm", 
+	public static final DashDataType XCO2_WATER_SST_DRY = new DashDataType("xCO2_water_sst_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using sst", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType XCO2_WATER_TEQU_WET = new DataType("xCO2_water_equi_temp_wet_ppm", 
+	public static final DashDataType XCO2_WATER_TEQU_WET = new DashDataType("xCO2_water_equi_temp_wet_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using equi temp", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType XCO2_WATER_SST_WET = new DataType("xCO2_water_sst_wet_ppm", 
+	public static final DashDataType XCO2_WATER_SST_WET = new DashDataType("xCO2_water_sst_wet_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using sst", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType PCO2_WATER_TEQU_WET = new DataType("pCO2_water_equi_temp", 
+	public static final DashDataType PCO2_WATER_TEQU_WET = new DashDataType("pCO2_water_equi_temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using equi temp", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataType PCO2_WATER_SST_WET = new DataType("pCO2_water_sst_100humidity_uatm", 
+	public static final DashDataType PCO2_WATER_SST_WET = new DashDataType("pCO2_water_sst_100humidity_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using sst", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataType FCO2_WATER_TEQU_WET = new DataType("fCO2_water_equi_uatm", 
+	public static final DashDataType FCO2_WATER_TEQU_WET = new DashDataType("fCO2_water_equi_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using equi temp", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_WATER_SST_WET = new DataType("fCO2_water_sst_100humidity_uatm", 
+	public static final DashDataType FCO2_WATER_SST_WET = new DashDataType("fCO2_water_sst_100humidity_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using sst", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataType XCO2_ATM_DRY_ACTUAL = new DataType("xCO2_atm_dry_actual", 
+	public static final DashDataType XCO2_ATM_DRY_ACTUAL = new DashDataType("xCO2_atm_dry_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air xCO2 dry", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType XCO2_ATM_DRY_INTERP = new DataType("xCO2_atm_dry_interp", 
+	public static final DashDataType XCO2_ATM_DRY_INTERP = new DashDataType("xCO2_atm_dry_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air xCO2 dry", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType PCO2_ATM_DRY_ACTUAL = new DataType("pCO2_atm_wet_actual", 
+	public static final DashDataType PCO2_ATM_DRY_ACTUAL = new DashDataType("pCO2_atm_wet_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air pCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataType PCO2_ATM_DRY_INTERP = new DataType("pCO2_atm_wet_interp", 
+	public static final DashDataType PCO2_ATM_DRY_INTERP = new DashDataType("pCO2_atm_wet_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air pCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataType FCO2_ATM_DRY_ACTUAL = new DataType("fCO2_atm_wet_actual", 
+	public static final DashDataType FCO2_ATM_DRY_ACTUAL = new DashDataType("fCO2_atm_wet_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air fCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_ATM_DRY_INTERP = new DataType("fCO2_atm_wet_interp", 
+	public static final DashDataType FCO2_ATM_DRY_INTERP = new DashDataType("fCO2_atm_wet_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air fCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataType DELTA_XCO2 = new DataType("delta_xCO2", 
+	public static final DashDataType DELTA_XCO2 = new DashDataType("delta_xCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 minus atmospheric xCO2", 
 			null, KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType DELTA_PCO2 = new DataType("delta_pCO2", 
+	public static final DashDataType DELTA_PCO2 = new DashDataType("delta_pCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 minus atmospheric pCO2", 
 			null, KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataType DELTA_FCO2 = new DataType("delta_fCO2", 
+	public static final DashDataType DELTA_FCO2 = new DashDataType("delta_fCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 minus atmospheric fCO2", 
 			null, KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataType XH2O_EQU = new DataType("xH2O_equi", 
+	public static final DashDataType XH2O_EQU = new DashDataType("xH2O_equi", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "xH2O in equil air sample", 
 			"mole_fraction_of_water_in_air", KnownDataTypes.WATER_VAPOR_CATEGORY, XH2O_UNITS);
-	public static final DataType RELATIVE_HUMIDITY = new DataType("relative_humidity", 
+	public static final DashDataType RELATIVE_HUMIDITY = new DashDataType("relative_humidity", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative humidity", 
 			"relative_humidity", KnownDataTypes.WATER_VAPOR_CATEGORY, DataColumnType.NO_UNITS);
-	public static final DataType SPECIFIC_HUMIDITY = new DataType("specific_humidity", 
+	public static final DashDataType SPECIFIC_HUMIDITY = new DashDataType("specific_humidity", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "specific humidity", 
 			"specific_humidity", KnownDataTypes.WATER_VAPOR_CATEGORY, DataColumnType.NO_UNITS);
 
-	public static final DataType SHIP_SPEED = new DataType("ship_speed", 
+	public static final DashDataType SHIP_SPEED = new DashDataType("ship_speed", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "measured ship speed", 
 			"platform_speed_wrt_ground", KnownDataTypes.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
-	public static final DataType SHIP_DIRECTION = new DataType("ship_dir", 
+	public static final DashDataType SHIP_DIRECTION = new DashDataType("ship_dir", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "ship direction", 
 			"platform_course", KnownDataTypes.PLATFORM_CATEGORY, DIRECTION_UNITS);
-	public static final DataType WIND_SPEED_TRUE = new DataType("wind_speed_true", 
+	public static final DashDataType WIND_SPEED_TRUE = new DashDataType("wind_speed_true", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "true wind speed", 
 			"wind_speed", KnownDataTypes.WIND_CATEGORY, WIND_SPEED_UNITS);
-	public static final DataType WIND_SPEED_RELATIVE = new DataType("wind_speed_rel", 
+	public static final DashDataType WIND_SPEED_RELATIVE = new DashDataType("wind_speed_rel", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative wind speed", 
 			"wind_speed", KnownDataTypes.WIND_CATEGORY, WIND_SPEED_UNITS);
-	public static final DataType WIND_DIRECTION_TRUE = new DataType("wind_dir_true", 
+	public static final DashDataType WIND_DIRECTION_TRUE = new DashDataType("wind_dir_true", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "true wind direction", 
 			"wind_from_direction", KnownDataTypes.WIND_CATEGORY, DIRECTION_UNITS);
-	public static final DataType WIND_DIRECTION_RELATIVE = new DataType("wind_dir_rel", 
+	public static final DashDataType WIND_DIRECTION_RELATIVE = new DashDataType("wind_dir_rel", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative wind direction", 
 			"wind_from_direction", KnownDataTypes.WIND_CATEGORY, DIRECTION_UNITS);
 
-	public static final DataType FCO2_FROM_XCO2_TEQU = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
+	public static final DashDataType FCO2_FROM_XCO2_TEQU = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_XCO2_SST_VARNMAE = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
+	public static final DashDataType FCO2_FROM_XCO2_SST_VARNMAE = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_PCO2_TEQU = new DataType("fCO2_from_pCO2_water_water_equi_temp", 
+	public static final DashDataType FCO2_FROM_PCO2_TEQU = new DashDataType("fCO2_from_pCO2_water_water_equi_temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_PCO2_SST = new DataType("fCO2_from_pCO2_water_sst_100humidity_uatm", 
+	public static final DashDataType FCO2_FROM_PCO2_SST = new DashDataType("fCO2_from_pCO2_water_sst_100humidity_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_FCO2_TEQU = new DataType("fCO2_insitu_from_fCO2_water_equi_uatm", 
+	public static final DashDataType FCO2_FROM_FCO2_TEQU = new DashDataType("fCO2_insitu_from_fCO2_water_equi_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_FCO2_SST = new DataType("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", 
+	public static final DashDataType FCO2_FROM_FCO2_SST = new DashDataType("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_PCO2_TEQU_NCEP = new DataType("fCO2_from_pCO2_water_water_equi_temp_ncep", 
+	public static final DashDataType FCO2_FROM_PCO2_TEQU_NCEP = new DashDataType("fCO2_from_pCO2_water_water_equi_temp_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_PCO2_SST_NCEP = new DataType("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", 
+	public static final DashDataType FCO2_FROM_PCO2_SST_NCEP = new DashDataType("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_XCO2_TEQU_WOA = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", 
+	public static final DashDataType FCO2_FROM_XCO2_TEQU_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_XCO2_SST_WOA = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", 
+	public static final DashDataType FCO2_FROM_XCO2_SST_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_XCO2_TEQU_NCEP = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", 
+	public static final DashDataType FCO2_FROM_XCO2_TEQU_NCEP = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_XCO2_SST_NCEP = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", 
+	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", 
+	public static final DashDataType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataType FCO2_FROM_XCO2_SST_NCEP_WOA = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", 
+	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataType FCO2_REC = new DataType("fCO2_recommended", 
+	public static final DashDataType FCO2_REC = new DashDataType("fCO2_recommended", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 recommended", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataType DELTA_TEMP = new DataType("delta_temp", 
+	public static final DashDataType DELTA_TEMP = new DashDataType("delta_temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "Equilibrator Temp - SST", 
 			null, KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DataType CALC_SPEED = new DataType("calc_speed", 
+	public static final DashDataType CALC_SPEED = new DashDataType("calc_speed", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "calculated ship speed", 
 			"platform_speed_wrt_ground", KnownDataTypes.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
-	public static final DataType ETOPO2_DEPTH = new DataType("etopo2", 
+	public static final DashDataType ETOPO2_DEPTH = new DashDataType("etopo2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "bathymetry from ETOPO2", 
 			"sea_floor_depth", KnownDataTypes.BATHYMETRY_CATEGORY, KnownDataTypes.DEPTH_UNITS);
-	public static final DataType GVCO2 = new DataType("gvCO2", 
+	public static final DashDataType GVCO2 = new DashDataType("gvCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "GlobalView xCO2", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataType DIST_TO_LAND = new DataType("dist_to_land", 
+	public static final DashDataType DIST_TO_LAND = new DashDataType("dist_to_land", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "distance to land", 
 			null, KnownDataTypes.LOCATION_CATEGORY, DISTANCE_UNITS);
-	public static final DataType DAY_OF_YEAR = new DataType("day_of_year", 
+	public static final DashDataType DAY_OF_YEAR = new DashDataType("day_of_year", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "day of the year", 
 			null, KnownDataTypes.TIME_CATEGORY, DAYS_UNITS);
 
-	private LinkedHashMap<DataType,Character> charValsMap;
-	private LinkedHashMap<DataType,Integer> intValsMap;
-	private LinkedHashMap<DataType,Double> doubleValsMap;
+	private LinkedHashMap<DashDataType,Character> charValsMap;
+	private LinkedHashMap<DashDataType,Integer> intValsMap;
+	private LinkedHashMap<DashDataType,Double> doubleValsMap;
 
 	/**
 	 * Generates a SocatCruiseData object with the given known types.
@@ -268,11 +268,11 @@ public class SocatCruiseData {
 	public SocatCruiseData(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || (knownTypes.size() < 1) )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
-		charValsMap = new LinkedHashMap<DataType,Character>();
-		intValsMap = new LinkedHashMap<DataType,Integer>();
-		doubleValsMap = new LinkedHashMap<DataType,Double>(96);
+		charValsMap = new LinkedHashMap<DashDataType,Character>();
+		intValsMap = new LinkedHashMap<DashDataType,Integer>();
+		doubleValsMap = new LinkedHashMap<DashDataType,Double>(96);
 
-		for ( DataType dtype : knownTypes.getKnownTypesSet() ) {
+		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
 			if ( KnownDataTypes.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				if ( dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
 					// WOCE flag
@@ -307,7 +307,7 @@ public class SocatCruiseData {
 	 * An exception is thrown if a data column with type 
 	 * {@link KnownDataTypes#UNKNOWN} is encountered; otherwise data columns
 	 * with types not present in knownTypes are ignored.  The data types
-	 * {@link DataType#UNKNOWN}, {@link DataType#OTHER}, and any
+	 * {@link DashDataType#UNKNOWN}, {@link DashDataType#OTHER}, and any
 	 * metadata types should not be in knownTypes.
 	 * 
 	 * @param knownTypes
@@ -321,12 +321,12 @@ public class SocatCruiseData {
 	 * 		data value strings
 	 * @throws IllegalArgumentException
 	 * 		if the number of data types and data values do not match, 
-	 * 		if a data column has the type {@link DataType#UNKNOWN}, 
+	 * 		if a data column has the type {@link DashDataType#UNKNOWN}, 
 	 * 		if a data column has a type matching a known data type but
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public SocatCruiseData(KnownDataTypes knownTypes, List<DataType> columnTypes, 
+	public SocatCruiseData(KnownDataTypes knownTypes, List<DashDataType> columnTypes, 
 			int sampleNum, List<String> dataValues) throws IllegalArgumentException {
 		// Initialize to an empty data record with the given known types
 		this(knownTypes);
@@ -341,7 +341,7 @@ public class SocatCruiseData {
 			intValsMap.put(KnownDataTypes.SAMPLE_NUMBER, Integer.valueOf(sampleNum));
 		for (int k = 0; k < numColumns; k++) {
 			// Make sure the data type is valid
-			DataType dtype = columnTypes.get(k);
+			DashDataType dtype = columnTypes.get(k);
 			if ( KnownDataTypes.UNKNOWN.typeNameEquals(dtype) )
 				throw new IllegalArgumentException("Data column number " + 
 						Integer.toString(k+1) + " has type UNKNOWN");
@@ -393,9 +393,9 @@ public class SocatCruiseData {
 	 * "NaN", and empty string, or null.
 	 * 
 	 * An exception is thrown if a data column with type 
-	 * {@link DataType#UNKNOWN} is encountered; otherwise data columns
+	 * {@link DashDataType#UNKNOWN} is encountered; otherwise data columns
 	 * with types not present in knownTypes are ignored.  The data types
-	 * {@link DataType#UNKNOWN}, {@link DataType#OTHER}, and any
+	 * {@link DashDataType#UNKNOWN}, {@link DashDataType#OTHER}, and any
 	 * metadata types should not be in knownTypes.
 	 * 
 	 * @param knownTypes
@@ -406,7 +406,7 @@ public class SocatCruiseData {
 	 * 		list of these data objects
 	 * @throws IllegalArgumentException
 	 * 		if a row of data values has an unexpected number of values,
-	 * 		if a data column has the type {@link DataType#UNKNOWN}, 
+	 * 		if a data column has the type {@link DashDataType#UNKNOWN}, 
 	 * 		if a data column has a type matching a known data type but
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
@@ -417,10 +417,10 @@ public class SocatCruiseData {
 		// Get the required data from the cruise
 		ArrayList<ArrayList<String>> dataValsTable = cruise.getDataValues();
 		ArrayList<DataColumnType> dataColTypes = cruise.getDataColTypes();
-		// Create the list of DataType objects - assumes data already standardized
-		ArrayList<DataType> dataTypes = new ArrayList<DataType>(dataColTypes.size());
+		// Create the list of DashDataType objects - assumes data already standardized
+		ArrayList<DashDataType> dataTypes = new ArrayList<DashDataType>(dataColTypes.size());
 		for ( DataColumnType dctype : dataColTypes )
-			dataTypes.add(new DataType(dctype) );
+			dataTypes.add(new DashDataType(dctype) );
 		// Create the list of SOCAT cruise data objects, and populate
 		// it with data from each row of the table
 		ArrayList<SocatCruiseData> socatDataList = 
@@ -437,7 +437,7 @@ public class SocatCruiseData {
 	 * 		the map of variable names and values for String variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DataType,Character> getCharacterVariables() {
+	public LinkedHashMap<DashDataType,Character> getCharacterVariables() {
 		return charValsMap;
 	}
 
@@ -446,7 +446,7 @@ public class SocatCruiseData {
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DataType,Double> getDoubleVariables() {
+	public LinkedHashMap<DashDataType,Double> getDoubleVariables() {
 		return doubleValsMap;
 	}
 
@@ -455,7 +455,7 @@ public class SocatCruiseData {
 	 * 		the map of variable names and values for Integer variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DataType,Integer> getIntegerVariables() {
+	public LinkedHashMap<DashDataType,Integer> getIntegerVariables() {
 		return intValsMap;
 	}
 
@@ -1184,9 +1184,9 @@ public class SocatCruiseData {
 		// Ignore WOCE flag differences.
 		// Do not use floating-point fields since they do not 
 		// have to be exactly the same for equals to return true.
-		LinkedHashMap<DataType,Character> nonWoceCharValsMap = 
-				new LinkedHashMap<DataType,Character>(charValsMap.size());
-		for ( Entry<DataType,Character> entry : charValsMap.entrySet() ) {
+		LinkedHashMap<DashDataType,Character> nonWoceCharValsMap = 
+				new LinkedHashMap<DashDataType,Character>(charValsMap.size());
+		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
 			if ( ! entry.getKey().getVarName().toUpperCase().startsWith("WOCE_") )
 				nonWoceCharValsMap.put(entry.getKey(), entry.getValue());
 		}
@@ -1214,8 +1214,8 @@ public class SocatCruiseData {
 		// Character comparisons - ignore WOCE flag differences
 		if ( ! charValsMap.keySet().equals(other.charValsMap.keySet()) )
 			return false;
-		for ( Entry<DataType,Character> entry : charValsMap.entrySet() ) {
-			DataType dtype = entry.getKey();
+		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
+			DashDataType dtype = entry.getKey();
 			if ( ! dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
 				if ( ! entry.getValue().equals(other.charValsMap.get(dtype)) )
 					return false;
@@ -1225,8 +1225,8 @@ public class SocatCruiseData {
 		// Floating-point comparisons - values don't have to be exactly the same
 		if ( ! doubleValsMap.keySet().equals(other.doubleValsMap.keySet()) )
 			return false;
-		for ( Entry<DataType,Double> entry : doubleValsMap.entrySet() ) {
-			DataType dtype = entry.getKey();
+		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() ) {
+			DashDataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
 			Double otherval = other.doubleValsMap.get(dtype);
 
@@ -1258,11 +1258,11 @@ public class SocatCruiseData {
 	@Override
 	public String toString() {
 		String repr = "SocatCruiseData[\n";
-		for ( Entry<DataType,Integer> entry : intValsMap.entrySet() )
+		for ( Entry<DashDataType,Integer> entry : intValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
-		for ( Entry<DataType,Double> entry : doubleValsMap.entrySet() )
+		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
-		for ( Entry<DataType,Character> entry : charValsMap.entrySet() )
+		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
 		repr += "]";
 		return repr;

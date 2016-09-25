@@ -4,7 +4,7 @@
 package gov.noaa.pmel.dashboard.test.server;
 
 import static org.junit.Assert.*;
-import gov.noaa.pmel.dashboard.server.DataType;
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author ksmith
  *
  */
-public class DataTypeTest {
+public class DashDataTypeTest {
 
 	private static final String VAR_NAME = "xCO2";
 	private static final String DATA_CLASS_NAME = "Double";
@@ -26,19 +26,19 @@ public class DataTypeTest {
 	private static final ArrayList<String> UNITS = new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#DataType(java.lang.String, 
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(java.lang.String, 
 	 * java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Collection)} 
 	 * as well as
-	 * @link gov.noaa.pmel.dashboard.server.DataType#getVarName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DataType#getDataClassName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DataType#getDescription()},
-	 * {@link gov.noaa.pmel.dashboard.server.DataType#getStandardName()},
-	 * {@link gov.noaa.pmel.dashboard.server.DataType#getCategoryName()}, and
-	 * {@link gov.noaa.pmel.dashboard.server.DataType#getUnits()}.
+	 * @link gov.noaa.pmel.dashboard.server.DashDataType#getVarName()},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDataClassName()},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDescription()},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getStandardName()},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getCategoryName()}, and
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getUnits()}.
 	 */
 	@Test
 	public void testStdDataColumnType() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( UNITS == stdtype.getUnits() );
 		assertEquals(UNITS, stdtype.getUnits());
@@ -50,17 +50,17 @@ public class DataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#typeNameEquals(gov.noaa.pmel.dashboard.server.DataType)}
-	 * and {@link gov.noaa.pmel.dashboard.server.DataType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.server.DashDataType)}
+	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
 	public void testTypeNameEquals() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
-		DataType other = new DataType(VAR_NAME.toLowerCase(), "Integer", 
+		DashDataType other = new DashDataType(VAR_NAME.toLowerCase(), "Integer", 
 				null, null, null, DataColumnType.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
-		other = new DataType("my_var", DATA_CLASS_NAME, 
+		other = new DashDataType("my_var", DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.typeNameEquals(other) );
 
@@ -72,20 +72,20 @@ public class DataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#typeEquals(gov.noaa.pmel.dashboard.server.DataType)}
-	 * and {@link gov.noaa.pmel.dashboard.server.DataType#typeEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#typeEquals(gov.noaa.pmel.dashboard.server.DashDataType)}
+	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#typeEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
 	public void testTypeEquals() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
-		DataType other = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				null, null, null, DataColumnType.NO_UNITS);
 		assertTrue( stdtype.typeEquals(other) );
-		other = new DataType(VAR_NAME.toLowerCase(), DATA_CLASS_NAME, 
+		other = new DashDataType(VAR_NAME.toLowerCase(), DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.typeEquals(other) );
-		other = new DataType(VAR_NAME, DATA_CLASS_NAME.toLowerCase(), 
+		other = new DashDataType(VAR_NAME, DATA_CLASS_NAME.toLowerCase(), 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.typeEquals(other) );
 
@@ -100,11 +100,11 @@ public class DataTypeTest {
 
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
 	public void testTypeEqualsDataColumnType() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DataColumnType other = new DataColumnType(VAR_NAME, "Integer", 
 				null, null, null, DataColumnType.NO_UNITS);
@@ -112,11 +112,11 @@ public class DataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#duplicate()}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#duplicate()}.
 	 */
 	@Test
 	public void testDuplicate() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DataColumnType dup = stdtype.duplicate();
 		DataColumnType other = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
@@ -126,12 +126,12 @@ public class DataTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#toPropertyValue()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DataType#fromPropertyValue(java.lang.String,java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#toPropertyValue()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#fromPropertyValue(java.lang.String,java.lang.String)}.
 	 */
 	@Test
 	public void testToFromPropertyValue() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		String jsonDesc = stdtype.toPropertyValue();
 		assertTrue( jsonDesc.contains("dataClassName") );
@@ -146,10 +146,10 @@ public class DataTypeTest {
 		for ( String val : UNITS )
 			assertTrue( jsonDesc.contains(val) );
 
-		DataType other = DataType.fromPropertyValue(VAR_NAME, jsonDesc);
+		DashDataType other = DashDataType.fromPropertyValue(VAR_NAME, jsonDesc);
 		assertEquals(stdtype, other);
 
-		stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, null, null, null, null);
+		stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, null, null, null, null);
 		jsonDesc = stdtype.toPropertyValue();
 		assertTrue( jsonDesc.contains("dataClassName") );
 		assertTrue( jsonDesc.contains(DATA_CLASS_NAME) );
@@ -158,49 +158,49 @@ public class DataTypeTest {
 		assertFalse( jsonDesc.contains("categoryName") );
 		assertFalse( jsonDesc.contains("units") );
 
-		other = DataType.fromPropertyValue(VAR_NAME, jsonDesc);
+		other = DashDataType.fromPropertyValue(VAR_NAME, jsonDesc);
 		assertEquals(stdtype, other);
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DataType#hashCode()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DataType#equals(java.lang.Object)}
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#hashCode()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#equals(java.lang.Object)}
 	 * as well as 
-	 * {@link gov.noaa.pmel.dashboard.server.DataType#DataType(gov.noaa.pmel.dashboard.shared.DataColumnType)},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(gov.noaa.pmel.dashboard.shared.DataColumnType)},
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		DataType stdtype = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.equals(null) );
 		assertFalse( stdtype.equals(VAR_NAME) );
 
-		DataType other = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		DashDataType other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertTrue( stdtype.hashCode() == other.hashCode() );
 		assertTrue( stdtype.equals(other) );
 
-		other = new DataType(VAR_NAME, "Integer", 
+		other = new DashDataType(VAR_NAME, "Integer", 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				null, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, null, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, null, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DataType(VAR_NAME, DATA_CLASS_NAME, 
+		other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, DataColumnType.NO_UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
@@ -209,7 +209,7 @@ public class DataTypeTest {
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.equals(another) );
 
-		other = new DataType(another);
+		other = new DashDataType(another);
 		assertTrue( stdtype.hashCode() == other.hashCode() );
 		assertEquals(stdtype, other);
 	}

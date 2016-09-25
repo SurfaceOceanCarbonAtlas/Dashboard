@@ -18,20 +18,20 @@ import java.util.Map.Entry;
  */
 public class SocatMetadata {
 
-	public static final DataType SOCAT_VERSION = new DataType("socat_version", 
+	public static final DashDataType SOCAT_VERSION = new DashDataType("socat_version", 
 			KnownDataTypes.STRING_DATA_CLASS_NAME, "SOCAT Version number with status", 
 			null, null, DataColumnType.NO_UNITS);
-	public static final DataType ALL_REGION_IDS = new DataType("all_region_ids", 
+	public static final DashDataType ALL_REGION_IDS = new DashDataType("all_region_ids", 
 			KnownDataTypes.STRING_DATA_CLASS_NAME, "Sorted unique region IDs", 
 			null, null, DataColumnType.NO_UNITS);
-	public static final DataType SOCAT_DOI = new DataType("socat_doi", 
+	public static final DashDataType SOCAT_DOI = new DashDataType("socat_doi", 
 			KnownDataTypes.STRING_DATA_CLASS_NAME, "SOCAT DOI", 
 			null, null, DataColumnType.NO_UNITS);
 
 	// Maps of variable names to values
-	LinkedHashMap<DataType,String> stringValuesMap;
-	LinkedHashMap<DataType,Double> doubleValuesMap;
-	LinkedHashMap<DataType,Date> dateValuesMap;
+	LinkedHashMap<DashDataType,String> stringValuesMap;
+	LinkedHashMap<DashDataType,Double> doubleValuesMap;
+	LinkedHashMap<DashDataType,Date> dateValuesMap;
 
 	/**
 	 * Generates a SocatMetadata object with the given known types.
@@ -56,11 +56,11 @@ public class SocatMetadata {
 	public SocatMetadata(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || (knownTypes.size() < 1) )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
-		stringValuesMap = new LinkedHashMap<DataType,String>();
-		doubleValuesMap = new LinkedHashMap<DataType,Double>();
-		dateValuesMap = new LinkedHashMap<DataType,Date>();
+		stringValuesMap = new LinkedHashMap<DashDataType,String>();
+		doubleValuesMap = new LinkedHashMap<DashDataType,Double>();
+		dateValuesMap = new LinkedHashMap<DashDataType,Date>();
 
-		for ( DataType dtype : knownTypes.getKnownTypesSet() ) {
+		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
 			if ( KnownDataTypes.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				if ( dtype.typeNameEquals(KnownDataTypes.QC_FLAG) ) {
 					// Single blank character for QC_FLAG
@@ -88,7 +88,7 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for String variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DataType,String> getStringVariables() {
+	public LinkedHashMap<DashDataType,String> getStringVariables() {
 		return stringValuesMap;
 	}
 
@@ -97,7 +97,7 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public Map<DataType,Double> getDoubleVariables() {
+	public Map<DashDataType,Double> getDoubleVariables() {
 		return doubleValuesMap;
 	}
 
@@ -106,7 +106,7 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for Date variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public Map<DataType,Date> getDateVariables() {
+	public Map<DashDataType,Date> getDateVariables() {
 		return dateValuesMap;
 	}
 
@@ -560,8 +560,8 @@ public class SocatMetadata {
 		// Floating-point comparisons - values don't have to be exactly the same
 		if ( ! doubleValuesMap.keySet().equals(other.doubleValuesMap.keySet()) )
 			return false;
-		for ( Entry<DataType,Double> entry : doubleValuesMap.entrySet() ) {
-			DataType dtype = entry.getKey();
+		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() ) {
+			DashDataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
 			Double otherval = other.doubleValuesMap.get(dtype);
 			if ( dtype.getVarName().toUpperCase().contains("LONGITUDE") ) {
@@ -581,11 +581,11 @@ public class SocatMetadata {
 	@Override
 	public String toString() {
 		String repr = "SocatMetadata[\n";
-		for ( Entry<DataType,String> entry : stringValuesMap.entrySet() )
+		for ( Entry<DashDataType,String> entry : stringValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue() + "\n";
-		for ( Entry<DataType,Double> entry : doubleValuesMap.entrySet() )
+		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
-		for ( Entry<DataType,Date> entry : dateValuesMap.entrySet() )
+		for ( Entry<DashDataType,Date> entry : dateValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
 		repr += "]";
 		return repr;

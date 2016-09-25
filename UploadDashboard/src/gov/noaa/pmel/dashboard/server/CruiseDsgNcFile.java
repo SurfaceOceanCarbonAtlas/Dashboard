@@ -137,8 +137,7 @@ public class CruiseDsgNcFile extends File {
 			ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
 
 			// Make netCDF variables of all the metadata.
-			Set<DataColumnType> metadataTypes = metadata.getKnownTypesSet();
-			for (  String varName : metadata.getStringVariables().keySet() ) {
+			for (  DataType dtype : metadata.getStringVariables().keySet() ) {
 				var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
 				DataColumnType dtype = metadataTypes.
 			}
