@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.server;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,17 +18,20 @@ import java.util.Map.Entry;
  */
 public class SocatMetadata {
 
-	public static final DataColumnType SOCAT_VERSION = new DataColumnType("socat_version", KnownDataTypes.STRING_DATA_CLASS_NAME, 
-			"SOCAT Version number with status", null, null, DataColumnType.NO_UNITS);
-	public static final DataColumnType ALL_REGION_IDS = new DataColumnType("all_region_ids", KnownDataTypes.STRING_DATA_CLASS_NAME, 
-			"Sorted unique region IDs", null, null, DataColumnType.NO_UNITS);
-	public static final DataColumnType SOCAT_DOI = new DataColumnType("socat_doi", KnownDataTypes.STRING_DATA_CLASS_NAME, 
-			"SOCAT DOI", null, null, DataColumnType.NO_UNITS);
+	public static final DataType SOCAT_VERSION = new DataType("socat_version", 
+			KnownDataTypes.STRING_DATA_CLASS_NAME, "SOCAT Version number with status", 
+			null, null, DataColumnType.NO_UNITS);
+	public static final DataType ALL_REGION_IDS = new DataType("all_region_ids", 
+			KnownDataTypes.STRING_DATA_CLASS_NAME, "Sorted unique region IDs", 
+			null, null, DataColumnType.NO_UNITS);
+	public static final DataType SOCAT_DOI = new DataType("socat_doi", 
+			KnownDataTypes.STRING_DATA_CLASS_NAME, "SOCAT DOI", 
+			null, null, DataColumnType.NO_UNITS);
 
 	// Maps of variable names to values
-	LinkedHashMap<String,String> stringValuesMap;
-	LinkedHashMap<String,Double> doubleValuesMap;
-	LinkedHashMap<String,Date> dateValuesMap;
+	LinkedHashMap<DataType,String> stringValuesMap;
+	LinkedHashMap<DataType,Double> doubleValuesMap;
+	LinkedHashMap<DataType,Date> dateValuesMap;
 
 	/**
 	 * Generates a SocatMetadata object with the given known types.
@@ -40,39 +42,43 @@ public class SocatMetadata {
 	 * are accepted at this time.
 	 * Sets the values to the default values:
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE}.toString() for QC_FLAG,
-	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other {@link KnownDataTypes#STRING_DATA_CLASS_NAME} values, 
-	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values, and
-	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for {@link KnownDataTypes#DATE_DATA_CLASS_NAME} values.
+	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other 
+	 * 		{@link KnownDataTypes#STRING_DATA_CLASS_NAME} values, 
+	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for 
+	 * 		{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values, and
+	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for 
+	 * 		{@link KnownDataTypes#DATE_DATA_CLASS_NAME} values.
 	 * 
 	 * @param knownTypes
-	 * 		all known data types
+	 * 		all known data types;
+	 * 		cannot be null or empty
 	 */
 	public SocatMetadata(KnownDataTypes knownTypes) {
-		stringValuesMap = new LinkedHashMap<String,String>();
-		doubleValuesMap = new LinkedHashMap<String,Double>();
-		dateValuesMap = new LinkedHashMap<String,Date>();
+		if ( (knownTypes == null) || (knownTypes.size() < 1) )
+			throw new IllegalArgumentException("known data types cannot be null or empty");
+		stringValuesMap = new LinkedHashMap<DataType,String>();
+		doubleValuesMap = new LinkedHashMap<DataType,Double>();
+		dateValuesMap = new LinkedHashMap<DataType,Date>();
 
-		if ( knownTypes != null ) {
-			for ( DataColumnType dtype : knownTypes.getKnownTypesList() ) {
-				if ( KnownDataTypes.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-					if ( dtype.typeEquals(KnownDataTypes.QC_FLAG) ) {
-						// Single blank character for QC_FLAG
-						stringValuesMap.put(dtype.getVarName(), DashboardUtils.CHAR_MISSING_VALUE.toString());
-					}
-					else {
-						stringValuesMap.put(dtype.getVarName(), DashboardUtils.STRING_MISSING_VALUE);
-					}
-				}
-				else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-					doubleValuesMap.put(dtype.getVarName(), DashboardUtils.FP_MISSING_VALUE);
-				}
-				else if ( KnownDataTypes.DATE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-					dateValuesMap.put(dtype.getVarName(), DashboardUtils.DATE_MISSING_VALUE);
+		for ( DataType dtype : knownTypes.getKnownTypesSet() ) {
+			if ( KnownDataTypes.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				if ( dtype.typeNameEquals(KnownDataTypes.QC_FLAG) ) {
+					// Single blank character for QC_FLAG
+					stringValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE.toString());
 				}
 				else {
-					throw new IllegalArgumentException("Unknown data class name '" + 
-							dtype.getDataClassName() + "' for type '" + dtype.getVarName() + "'");
+					stringValuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
 				}
+			}
+			else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				doubleValuesMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
+			}
+			else if ( KnownDataTypes.DATE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				dateValuesMap.put(dtype, DashboardUtils.DATE_MISSING_VALUE);
+			}
+			else {
+				throw new IllegalArgumentException("Unknown data class name '" + 
+						dtype.getDataClassName() + "' associated with type '" + dtype.getVarName() + "'");
 			}
 		}
 	}
@@ -80,28 +86,28 @@ public class SocatMetadata {
 	/**
 	 * @return
 	 * 		the map of variable names and values for String variables;
-	 * 		a read-only view of the internal map is returned.
+	 * 		the actual map in this instance is returned.
 	 */
-	public Map<String,String> getStringVariables() {
-		return Collections.unmodifiableMap(stringValuesMap);
+	public LinkedHashMap<DataType,String> getStringVariables() {
+		return stringValuesMap;
 	}
 
 	/**
 	 * @return
 	 * 		the map of variable names and values for Double variables;
-	 * 		a read-only view of the internal map is returned.
+	 * 		the actual map in this instance is returned.
 	 */
-	public Map<String,Double> getDoubleVariables() {
-		return Collections.unmodifiableMap(doubleValuesMap);
+	public Map<DataType,Double> getDoubleVariables() {
+		return doubleValuesMap;
 	}
 
 	/**
 	 * @return
 	 * 		the map of variable names and values for Date variables;
-	 * 		a read-only view of the internal map is returned.
+	 * 		the actual map in this instance is returned.
 	 */
-	public Map<String,Date> getDateVariables() {
-		return Collections.unmodifiableMap(dateValuesMap);
+	public Map<DataType,Date> getDateVariables() {
+		return dateValuesMap;
 	}
 
 	/**
@@ -110,7 +116,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getExpocode() {
-		String value = stringValuesMap.get(KnownDataTypes.EXPOCODE.getVarName());
+		String value = stringValuesMap.get(KnownDataTypes.EXPOCODE);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -127,7 +133,7 @@ public class SocatMetadata {
 			value = expocode;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(KnownDataTypes.EXPOCODE.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.EXPOCODE, value);
 	}
 
 	/**
@@ -136,7 +142,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getDatasetName() {
-		String value = stringValuesMap.get(KnownDataTypes.DATASET_NAME.getVarName());
+		String value = stringValuesMap.get(KnownDataTypes.DATASET_NAME);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -153,7 +159,7 @@ public class SocatMetadata {
 			value = datasetName;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(KnownDataTypes.DATASET_NAME.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.DATASET_NAME, value);
 	}
 
 	/**
@@ -162,7 +168,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getVesselName() {
-		String value = stringValuesMap.get(KnownDataTypes.VESSEL_NAME.getVarName());
+		String value = stringValuesMap.get(KnownDataTypes.VESSEL_NAME);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -179,7 +185,7 @@ public class SocatMetadata {
 			value = vesselName;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(KnownDataTypes.VESSEL_NAME.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.VESSEL_NAME, value);
 	}
 
 	/**
@@ -188,7 +194,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getOrganizationName() {
-		String value = stringValuesMap.get(KnownDataTypes.ORGANIZATION_NAME.getVarName());
+		String value = stringValuesMap.get(KnownDataTypes.ORGANIZATION_NAME);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -205,7 +211,7 @@ public class SocatMetadata {
 			value = organizationName;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(KnownDataTypes.ORGANIZATION_NAME.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.ORGANIZATION_NAME, value);
 	}
 
 	/**
@@ -214,7 +220,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getInvestigatorNames() {
-		String value = stringValuesMap.get(KnownDataTypes.INVESTIGATOR_NAMES.getVarName());
+		String value = stringValuesMap.get(KnownDataTypes.INVESTIGATOR_NAMES);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -231,7 +237,7 @@ public class SocatMetadata {
 			value = investigatorNames;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(KnownDataTypes.INVESTIGATOR_NAMES.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.INVESTIGATOR_NAMES, value);
 	}
 
 	/**
@@ -246,7 +252,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatVersion() {
-		String value = stringValuesMap.get(SOCAT_VERSION.getVarName());
+		String value = stringValuesMap.get(SOCAT_VERSION);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -269,7 +275,7 @@ public class SocatMetadata {
 			value = socatVersion;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SOCAT_VERSION.getVarName(), value);
+		stringValuesMap.put(SOCAT_VERSION, value);
 	}
 
 	/**
@@ -278,7 +284,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getAllRegionIDs() {
-		String value = stringValuesMap.get(ALL_REGION_IDS.getVarName());
+		String value = stringValuesMap.get(ALL_REGION_IDS);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -295,7 +301,7 @@ public class SocatMetadata {
 			value = allRegionIDs;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(ALL_REGION_IDS.getVarName(), value);
+		stringValuesMap.put(ALL_REGION_IDS, value);
 	}
 
 	/**
@@ -304,7 +310,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatDOI() {
-		String value = stringValuesMap.get(SOCAT_DOI.getVarName());
+		String value = stringValuesMap.get(SOCAT_DOI);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -321,7 +327,7 @@ public class SocatMetadata {
 			value = socatDOI;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SOCAT_DOI.getVarName(), value);
+		stringValuesMap.put(SOCAT_DOI, value);
 	}
 
 	/**
@@ -330,7 +336,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#CHAR_MISSING_VALUE}.toString() if not assigned
 	 */
 	public String getQcFlag() {
-		String value = stringValuesMap.get(KnownDataTypes.QC_FLAG.getVarName());
+		String value = stringValuesMap.get(KnownDataTypes.QC_FLAG);
 		if ( value == null )
 			value = DashboardUtils.CHAR_MISSING_VALUE.toString();
 		return value;
@@ -347,7 +353,7 @@ public class SocatMetadata {
 			value = qcFlag;
 		else
 			value = DashboardUtils.CHAR_MISSING_VALUE.toString();
-		stringValuesMap.put(KnownDataTypes.QC_FLAG.getVarName(), value);
+		stringValuesMap.put(KnownDataTypes.QC_FLAG, value);
 	}
 
 	/**
@@ -356,7 +362,7 @@ public class SocatMetadata {
 	 * 		never null could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getWestmostLongitude() {
-		Double value = doubleValuesMap.get(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName());
+		Double value = doubleValuesMap.get(KnownDataTypes.WESTERNMOST_LONGITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -373,7 +379,7 @@ public class SocatMetadata {
 			value = westmostLongitude;
 		else
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(), value);
+		doubleValuesMap.put(KnownDataTypes.WESTERNMOST_LONGITUDE, value);
 	}
 
 	/**
@@ -382,7 +388,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getEastmostLongitude() {
-		Double value = doubleValuesMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName());
+		Double value = doubleValuesMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -399,7 +405,7 @@ public class SocatMetadata {
 			value = eastmostLongitude;
 		else
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValuesMap.put(KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName(), value);
+		doubleValuesMap.put(KnownDataTypes.EASTERNMOST_LONGITUDE, value);
 	}
 
 	/**
@@ -408,7 +414,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getSouthmostLatitude() {
-		Double value = doubleValuesMap.get(KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName());
+		Double value = doubleValuesMap.get(KnownDataTypes.SOUTHERNMOST_LATITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -425,7 +431,7 @@ public class SocatMetadata {
 			value = southmostLatitude;
 		else
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValuesMap.put(KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName(), value);
+		doubleValuesMap.put(KnownDataTypes.SOUTHERNMOST_LATITUDE, value);
 	}
 
 	/**
@@ -434,7 +440,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned.
 	 */
 	public Double getNorthmostLatitude() {
-		Double value = doubleValuesMap.get(KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName());
+		Double value = doubleValuesMap.get(KnownDataTypes.NORTHERNMOST_LATITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -451,7 +457,7 @@ public class SocatMetadata {
 			value = northmostLatitude;
 		else
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValuesMap.put(KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName(), value);
+		doubleValuesMap.put(KnownDataTypes.NORTHERNMOST_LATITUDE, value);
 	}
 
 	/**
@@ -460,7 +466,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getBeginTime() {
-		Date value = dateValuesMap.get(KnownDataTypes.TIME_COVERAGE_START.getVarName());
+		Date value = dateValuesMap.get(KnownDataTypes.TIME_COVERAGE_START);
 		if ( value == null )
 			value = DashboardUtils.DATE_MISSING_VALUE;
 		return value;
@@ -477,7 +483,7 @@ public class SocatMetadata {
 			value = beginTime;
 		else
 			value = DashboardUtils.DATE_MISSING_VALUE;
-		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_START.getVarName(), value);
+		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_START, value);
 	}
 
 	/**
@@ -486,7 +492,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#DATE_MISSING_VALUE} if not assigned.
 	 */
 	public Date getEndTime() {
-		Date value = dateValuesMap.get(KnownDataTypes.TIME_COVERAGE_END.getVarName());
+		Date value = dateValuesMap.get(KnownDataTypes.TIME_COVERAGE_END);
 		if ( value == null )
 			value = DashboardUtils.DATE_MISSING_VALUE;
 		return value;
@@ -503,7 +509,7 @@ public class SocatMetadata {
 			value = endTime;
 		else
 			value = DashboardUtils.DATE_MISSING_VALUE;
-		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_END.getVarName(), value);
+		dateValuesMap.put(KnownDataTypes.TIME_COVERAGE_END, value);
 	}
 
 	/**
@@ -552,13 +558,13 @@ public class SocatMetadata {
 			return false;
 
 		// Floating-point comparisons - values don't have to be exactly the same
-		if ( doubleValuesMap.size() != other.doubleValuesMap.size() )
+		if ( ! doubleValuesMap.keySet().equals(other.doubleValuesMap.keySet()) )
 			return false;
-		for ( Entry<String,Double> entry : doubleValuesMap.entrySet() ) {
-			String key = entry.getKey();
+		for ( Entry<DataType,Double> entry : doubleValuesMap.entrySet() ) {
+			DataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
-			Double otherval = other.doubleValuesMap.get(key);
-			if ( key.toUpperCase().contains("LONGITUDE") ) {
+			Double otherval = other.doubleValuesMap.get(dtype);
+			if ( dtype.getVarName().toUpperCase().contains("LONGITUDE") ) {
 				// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
 				if ( ! DashboardUtils.longitudeCloseTo(thisval, otherval, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					return false;				
@@ -575,12 +581,12 @@ public class SocatMetadata {
 	@Override
 	public String toString() {
 		String repr = "SocatMetadata[\n";
-		for ( Entry<String,String> entry : stringValuesMap.entrySet() )
-			repr += "    " + entry.getKey() + "=" + entry.getValue() + "\n";
-		for ( Entry<String,Double> entry : doubleValuesMap.entrySet() )
-			repr += "    " + entry.getKey() + "=" + entry.getKey().toString() + "\n";
-		for ( Entry<String,Date> entry : dateValuesMap.entrySet() )
-			repr += "    " + entry.getKey() + "=" + entry.getKey().toString() + "\n";
+		for ( Entry<DataType,String> entry : stringValuesMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue() + "\n";
+		for ( Entry<DataType,Double> entry : doubleValuesMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
+		for ( Entry<DataType,Date> entry : dateValuesMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
 		repr += "]";
 		return repr;
 	}

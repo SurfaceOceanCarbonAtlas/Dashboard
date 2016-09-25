@@ -346,7 +346,8 @@ public class SocatMetadataTest {
 	 */
 	@Test
 	public void testGetSetEndTime() {
-		SocatMetadata mdata = new SocatMetadata(null);
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
 		mdata.setEndTime(END_TIME);
 		assertEquals(END_TIME, mdata.getEndTime());

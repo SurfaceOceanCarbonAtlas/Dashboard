@@ -72,7 +72,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * 
 	 * @param varName
 	 * 		name for a variable of this type; 
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * 		cannot be null or blank
 	 * @param dataClassName
 	 * 		name of the class for a variable of this type
 	 * 		(e.g., Character, Double, Integer, String);
@@ -94,9 +94,11 @@ public class DataColumnType implements Serializable, IsSerializable {
 	public DataColumnType(String varName, String dataClassName, String description,
 			String standardName, String categoryName, Collection<String> units) {
 		if ( varName != null )
-			this.varName = varName;
+			this.varName = varName.trim();
 		else
-			this.varName = DashboardUtils.STRING_MISSING_VALUE;
+			this.varName = "";
+		if ( this.varName.isEmpty() )
+			throw new IllegalArgumentException("varName is null or blank");
 		if ( dataClassName != null )
 			this.dataClassName = dataClassName;
 		else
@@ -127,7 +129,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @return 
 	 * 		the variable name for this data column type;
-	 * 		never null but may be empty
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
 	public String getVarName() {
 		return varName;
@@ -319,21 +321,41 @@ public class DataColumnType implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * Checks if the "type" of this DataColumnType matches that of another.
-	 * This only examines the varName fields of these objects, checking the 
-	 * upper-cased version of these fields.
+	 * Checks if the upper-cased variable name of this DataColumnType 
+	 * is equal to that of another.
 	 * 
 	 * @param other
 	 * 		data column type to compare to
 	 * @return
-	 * 		whether the "types" match
+	 * 		whether the types names match
+	 */
+	public boolean typeNameEquals(DataColumnType other) {
+		if ( this == other )
+			return true;
+		if ( other == null )
+			return false;
+		return varName.toUpperCase().equals(other.varName.toUpperCase());
+	}
+
+	/**
+	 * Checks if the variable name and data class name of this DataColumnType 
+	 * is equal to that of another.
+	 * 
+	 * @param other
+	 * 		data column type to compare to
+	 * @return
+	 * 		whether the types names match
 	 */
 	public boolean typeEquals(DataColumnType other) {
 		if ( this == other )
 			return true;
 		if ( other == null )
 			return false;
-		return this.varName.toUpperCase().equals(other.varName.toUpperCase());
+		if ( ! varName.equals(other.varName) )
+			return false;
+		if ( ! dataClassName.equals(other.dataClassName) )
+			return false;
+		return true;
 	}
 
 	@Override

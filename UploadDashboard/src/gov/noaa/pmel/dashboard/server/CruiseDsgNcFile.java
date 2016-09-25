@@ -1,9 +1,9 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
-import gov.noaa.pmel.dashboard.nc.Constants;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeSet;
 
 import ucar.ma2.ArrayChar;
@@ -34,18 +36,6 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 
 public class CruiseDsgNcFile extends File {
-
-
-	// Names of some of the variables in the DSG files
-	public static final String LONGITUDE_NCVAR_NAME = KnownDataTypes.LONGITUDE.getVarName();
-	public static final String LATITUDE_NCVAR_NAME = KnownDataTypes.LATITUDE.getVarName();
-	public static final String TIME_NCVAR_NAME = KnownDataTypes.TIME.getVarName();
-	public static final String SST_NCVAR_NAME = KnownDataTypes.SST.getVarName();
-	public static final String FCO2REC_NCVAR_NAME = KnownDataTypes.FCO2_REC.getVarName();
-	public static final String WOCECO2WATER_NCVAR_NAME = KnownDataTypes.WOCE_CO2_WATER.getVarName();
-	public static final String REGION_ID_NCVAR_NAME = KnownDataTypes.REGION_ID.getVarName();
-	public static final String ALL_REGION_IDS_NCVAR_NAME = KnownDataTypes.ALL_REGION_IDS.getVarName();
-	public static final String SOCAT_VERSION_NCVAR_NAME = KnownDataTypes.SOCAT_VERSION.getVarName();
 
 	private static final String VERSION = "CruiseDsgNcFile 1.5";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
@@ -105,22 +95,18 @@ public class CruiseDsgNcFile extends File {
 		if ( metadata == null )
 			throw new IllegalArgumentException("SocatMetadata given to create cannot be null");
 		if ( (dataList == null) || (dataList.size() < 1) )
-			throw new IllegalArgumentException("SocatCruiseData list given to create cannot be null");
+			throw new IllegalArgumentException("SocatCruiseData list given to create cannot be null or empty");
 
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 		try {
 			// According to the CF standard if a file only has one trajectory, 
 			// then the trajectory dimension is not necessary.
 			// However, who knows what would break downstream from this process without it...
-
 			Dimension traj = ncfile.addDimension(null, "trajectory", 1);
 
 			// There will be a number of trajectory variables of type character from the metadata.
 			// Which is the longest?
 			int maxchar = metadata.getMaxStringLength();
-			// Round up to the closest multiple of 64 greater that this value
-			// just to give good alignment and give some space for edits 
-			maxchar = (int) Math.round( 64.0 * Math.ceil((maxchar + 1) / 64.0) );
 			Dimension stringlen = ncfile.addDimension(null, "string_length", maxchar);
 			List<Dimension> trajStringDims = new ArrayList<Dimension>();
 			trajStringDims.add(traj);
@@ -138,13 +124,6 @@ public class CruiseDsgNcFile extends File {
 			charDataDims.add(obslen);
 			charDataDims.add(charlen);
 
-			Field[] metaFields = SocatMetadata.class.getDeclaredFields();
-			for ( Field f : metaFields )
-				f.setAccessible(true);
-			Field[] dataFields = SocatCruiseData.class.getDeclaredFields();
-			for ( Field f : dataFields )
-				f.setAccessible(true);
-
 			ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
 			ncfile.addGroupAttribute(null, new Attribute("Conventions", "CF-1.6"));
 			ncfile.addGroupAttribute(null, new Attribute("history", VERSION));
@@ -157,10 +136,12 @@ public class CruiseDsgNcFile extends File {
 			ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
 			ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
 
-			String name;
-			String varName;
-
 			// Make netCDF variables of all the metadata.
+			Set<DataColumnType> metadataTypes = metadata.getKnownTypesSet();
+			for (  String varName : metadata.getStringVariables().keySet() ) {
+				var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
+				DataColumnType dtype = metadataTypes.
+			}
 			for ( Field f : metaFields ) {
 				if ( ! Modifier.isStatic(f.getModifiers()) ) {
 					name = f.getName();

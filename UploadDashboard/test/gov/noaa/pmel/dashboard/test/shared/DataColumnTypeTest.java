@@ -218,6 +218,22 @@ public class DataColumnTypeTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 */
+	@Test
+	public void testTypeNameEquals() {
+		DataColumnType dtype = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
+				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		DataColumnType other = new DataColumnType();
+		other.setVarName(VAR_NAME.toUpperCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		other.setVarName(VAR_NAME.toLowerCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		other.setDataClassName("Blob");
+		assertTrue( dtype.typeNameEquals(other) );
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#typeEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
 	 */
 	@Test
@@ -225,12 +241,13 @@ public class DataColumnTypeTest {
 		DataColumnType dtype = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DataColumnType other = new DataColumnType();
-		other.setVarName(VAR_NAME.toUpperCase());
+		other.setVarName(VAR_NAME);
+		other.setDataClassName("Blob");
+		assertFalse( dtype.typeEquals(other) );
+		other.setDataClassName(DATA_CLASS_NAME);
 		assertTrue( dtype.typeEquals(other) );
 		other.setVarName(VAR_NAME.toLowerCase());
-		assertTrue( dtype.typeEquals(other) );
-		other.setDataClassName("Blob");
-		assertTrue( dtype.typeEquals(other) );
+		assertFalse( dtype.typeEquals(other) );
 	}
 
 	/**

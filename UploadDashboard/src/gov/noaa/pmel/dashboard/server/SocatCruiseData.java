@@ -51,202 +51,201 @@ public class SocatCruiseData {
 			new ArrayList<String>(Arrays.asList("days"));
 
 	// Integer types
-	public static final DataColumnType FCO2_SOURCE = new DataColumnType("fCO2_source", 
+	public static final DataType FCO2_SOURCE = new DataType("fCO2_source", 
 			KnownDataTypes.INT_DATA_CLASS_NAME, "Algorithm number for recommended fCO2", 
 			null, KnownDataTypes.IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
 
 	// Character types
-	public static final DataColumnType REGION_ID = new DataColumnType("region_id", 
+	public static final DataType REGION_ID = new DataType("region_id", 
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
 			null, KnownDataTypes.LOCATION_CATEGORY, DataColumnType.NO_UNITS);
-	public static final DataColumnType WOCE_CO2_WATER = new DataColumnType("WOCE_CO2_water", 
+	public static final DataType WOCE_CO2_WATER = new DataType("WOCE_CO2_water", 
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for water CO2", 
 			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
-	public static final DataColumnType WOCE_CO2_ATM = new DataColumnType("WOCE_CO2_atm", 
+	public static final DataType WOCE_CO2_ATM = new DataType("WOCE_CO2_atm", 
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for air CO2", 
 			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
 
 	// Double types
-	public static final DataColumnType SALINITY = new DataColumnType("sal", 
+	public static final DataType SALINITY = new DataType("sal", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "salinity", 
 			"sea_surface_salinity", KnownDataTypes.SALINITY_CATEGORY, SALINITY_UNITS);
-	public static final DataColumnType WOA_SALINITY = new DataColumnType("woa_sss", 
+	public static final DataType WOA_SALINITY = new DataType("woa_sss", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "salinity from World Ocean Atlas", 
 			"sea_surface_salinity", KnownDataTypes.SALINITY_CATEGORY, SALINITY_UNITS);
 
-	public static final DataColumnType TEQU = new DataColumnType("Temperature_equi", 
+	public static final DataType TEQU = new DataType("Temperature_equi", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber temperature", 
 			null, KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DataColumnType SST = new DataColumnType("temp", 
+	public static final DataType SST = new DataType("temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea surface temperature", 
 			"sea_surface_temperature", KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DataColumnType TATM = new DataColumnType("Temperature_atm", 
+	public static final DataType TATM = new DataType("Temperature_atm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea-level air temperature", 
 			"air_temperature_at_sea_level", KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
 
-	public static final DataColumnType PEQU = new DataColumnType("Pressure_equi", 
+	public static final DataType PEQU = new DataType("Pressure_equi", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber pressure", 
 			null, KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
-	public static final DataColumnType PATM = new DataColumnType("Pressure_atm", 
+	public static final DataType PATM = new DataType("Pressure_atm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea-level air pressure", 
 			"air_pressure_at_sea_level", KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
-	public static final DataColumnType NCEP_SLP = new DataColumnType("pressure_ncep_slp", 
+	public static final DataType NCEP_SLP = new DataType("pressure_ncep_slp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea level air pressure from NCEP/NCAR reanalysis", 
 			"air_pressure_at_sea_level", KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
 
-	public static final DataColumnType XCO2_WATER_TEQU_DRY = new DataColumnType("xCO2_water_equi_temp_dry_ppm", 
+	public static final DataType XCO2_WATER_TEQU_DRY = new DataType("xCO2_water_equi_temp_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using equi temp", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType XCO2_WATER_SST_DRY = new DataColumnType("xCO2_water_sst_dry_ppm", 
+	public static final DataType XCO2_WATER_SST_DRY = new DataType("xCO2_water_sst_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using sst", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType XCO2_WATER_TEQU_WET = new DataColumnType("xCO2_water_equi_temp_wet_ppm", 
+	public static final DataType XCO2_WATER_TEQU_WET = new DataType("xCO2_water_equi_temp_wet_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using equi temp", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType XCO2_WATER_SST_WET = new DataColumnType("xCO2_water_sst_wet_ppm", 
+	public static final DataType XCO2_WATER_SST_WET = new DataType("xCO2_water_sst_wet_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using sst", 
 			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType PCO2_WATER_TEQU_WET = new DataColumnType("pCO2_water_equi_temp", 
+	public static final DataType PCO2_WATER_TEQU_WET = new DataType("pCO2_water_equi_temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using equi temp", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataColumnType PCO2_WATER_SST_WET = new DataColumnType("pCO2_water_sst_100humidity_uatm", 
+	public static final DataType PCO2_WATER_SST_WET = new DataType("pCO2_water_sst_100humidity_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using sst", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataColumnType FCO2_WATER_TEQU_WET = new DataColumnType("fCO2_water_equi_uatm", 
+	public static final DataType FCO2_WATER_TEQU_WET = new DataType("fCO2_water_equi_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using equi temp", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_WATER_SST_WET = new DataColumnType("fCO2_water_sst_100humidity_uatm", 
+	public static final DataType FCO2_WATER_SST_WET = new DataType("fCO2_water_sst_100humidity_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using sst", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataColumnType XCO2_ATM_DRY_ACTUAL = new DataColumnType("xCO2_atm_dry_actual", 
+	public static final DataType XCO2_ATM_DRY_ACTUAL = new DataType("xCO2_atm_dry_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air xCO2 dry", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType XCO2_ATM_DRY_INTERP = new DataColumnType("xCO2_atm_dry_interp", 
+	public static final DataType XCO2_ATM_DRY_INTERP = new DataType("xCO2_atm_dry_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air xCO2 dry", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType PCO2_ATM_DRY_ACTUAL = new DataColumnType("pCO2_atm_wet_actual", 
+	public static final DataType PCO2_ATM_DRY_ACTUAL = new DataType("pCO2_atm_wet_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air pCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataColumnType PCO2_ATM_DRY_INTERP = new DataColumnType("pCO2_atm_wet_interp", 
+	public static final DataType PCO2_ATM_DRY_INTERP = new DataType("pCO2_atm_wet_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air pCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataColumnType FCO2_ATM_DRY_ACTUAL = new DataColumnType("fCO2_atm_wet_actual", 
+	public static final DataType FCO2_ATM_DRY_ACTUAL = new DataType("fCO2_atm_wet_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air fCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_ATM_DRY_INTERP = new DataColumnType("fCO2_atm_wet_interp", 
+	public static final DataType FCO2_ATM_DRY_INTERP = new DataType("fCO2_atm_wet_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air fCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataColumnType DELTA_XCO2 = new DataColumnType("delta_xCO2", 
+	public static final DataType DELTA_XCO2 = new DataType("delta_xCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 minus atmospheric xCO2", 
 			null, KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType DELTA_PCO2 = new DataColumnType("delta_pCO2", 
+	public static final DataType DELTA_PCO2 = new DataType("delta_pCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 minus atmospheric pCO2", 
 			null, KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DataColumnType DELTA_FCO2 = new DataColumnType("delta_fCO2", 
+	public static final DataType DELTA_FCO2 = new DataType("delta_fCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 minus atmospheric fCO2", 
 			null, KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataColumnType XH2O_EQU = new DataColumnType("xH2O_equi", 
+	public static final DataType XH2O_EQU = new DataType("xH2O_equi", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "xH2O in equil air sample", 
 			"mole_fraction_of_water_in_air", KnownDataTypes.WATER_VAPOR_CATEGORY, XH2O_UNITS);
-	public static final DataColumnType RELATIVE_HUMIDITY = new DataColumnType("relative_humidity", 
+	public static final DataType RELATIVE_HUMIDITY = new DataType("relative_humidity", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative humidity", 
 			"relative_humidity", KnownDataTypes.WATER_VAPOR_CATEGORY, DataColumnType.NO_UNITS);
-	public static final DataColumnType SPECIFIC_HUMIDITY = new DataColumnType("specific_humidity", 
+	public static final DataType SPECIFIC_HUMIDITY = new DataType("specific_humidity", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "specific humidity", 
 			"specific_humidity", KnownDataTypes.WATER_VAPOR_CATEGORY, DataColumnType.NO_UNITS);
 
-	public static final DataColumnType SHIP_SPEED = new DataColumnType("ship_speed", 
+	public static final DataType SHIP_SPEED = new DataType("ship_speed", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "measured ship speed", 
 			"platform_speed_wrt_ground", KnownDataTypes.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
-	public static final DataColumnType SHIP_DIRECTION = new DataColumnType("ship_dir", 
+	public static final DataType SHIP_DIRECTION = new DataType("ship_dir", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "ship direction", 
 			"platform_course", KnownDataTypes.PLATFORM_CATEGORY, DIRECTION_UNITS);
-	public static final DataColumnType WIND_SPEED_TRUE = new DataColumnType("wind_speed_true", 
+	public static final DataType WIND_SPEED_TRUE = new DataType("wind_speed_true", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "true wind speed", 
 			"wind_speed", KnownDataTypes.WIND_CATEGORY, WIND_SPEED_UNITS);
-	public static final DataColumnType WIND_SPEED_RELATIVE = new DataColumnType("wind_speed_rel", 
+	public static final DataType WIND_SPEED_RELATIVE = new DataType("wind_speed_rel", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative wind speed", 
 			"wind_speed", KnownDataTypes.WIND_CATEGORY, WIND_SPEED_UNITS);
-	public static final DataColumnType WIND_DIRECTION_TRUE = new DataColumnType("wind_dir_true", 
+	public static final DataType WIND_DIRECTION_TRUE = new DataType("wind_dir_true", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "true wind direction", 
 			"wind_from_direction", KnownDataTypes.WIND_CATEGORY, DIRECTION_UNITS);
-	public static final DataColumnType WIND_DIRECTION_RELATIVE = new DataColumnType("wind_dir_rel", 
+	public static final DataType WIND_DIRECTION_RELATIVE = new DataType("wind_dir_rel", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative wind direction", 
 			"wind_from_direction", KnownDataTypes.WIND_CATEGORY, DIRECTION_UNITS);
 
-	public static final DataColumnType FCO2_FROM_XCO2_TEQU = new DataColumnType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
+	public static final DataType FCO2_FROM_XCO2_TEQU = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_XCO2_SST_VARNMAE = new DataColumnType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
+	public static final DataType FCO2_FROM_XCO2_SST_VARNMAE = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_PCO2_TEQU = new DataColumnType("fCO2_from_pCO2_water_water_equi_temp", 
+	public static final DataType FCO2_FROM_PCO2_TEQU = new DataType("fCO2_from_pCO2_water_water_equi_temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_PCO2_SST = new DataColumnType("fCO2_from_pCO2_water_sst_100humidity_uatm", 
+	public static final DataType FCO2_FROM_PCO2_SST = new DataType("fCO2_from_pCO2_water_sst_100humidity_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_FCO2_TEQU = new DataColumnType("fCO2_insitu_from_fCO2_water_equi_uatm", 
+	public static final DataType FCO2_FROM_FCO2_TEQU = new DataType("fCO2_insitu_from_fCO2_water_equi_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_FCO2_SST = new DataColumnType("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", 
+	public static final DataType FCO2_FROM_FCO2_SST = new DataType("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_PCO2_TEQU_NCEP = new DataColumnType("fCO2_from_pCO2_water_water_equi_temp_ncep", 
+	public static final DataType FCO2_FROM_PCO2_TEQU_NCEP = new DataType("fCO2_from_pCO2_water_water_equi_temp_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_PCO2_SST_NCEP = new DataColumnType("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", 
+	public static final DataType FCO2_FROM_PCO2_SST_NCEP = new DataType("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_XCO2_TEQU_WOA = new DataColumnType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", 
+	public static final DataType FCO2_FROM_XCO2_TEQU_WOA = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_XCO2_SST_WOA = new DataColumnType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", 
+	public static final DataType FCO2_FROM_XCO2_SST_WOA = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_XCO2_TEQU_NCEP = new DataColumnType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", 
+	public static final DataType FCO2_FROM_XCO2_TEQU_NCEP = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_XCO2_SST_NCEP = new DataColumnType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", 
+	public static final DataType FCO2_FROM_XCO2_SST_NCEP = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DataColumnType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", 
+	public static final DataType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DataColumnType FCO2_FROM_XCO2_SST_NCEP_WOA = new DataColumnType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", 
+	public static final DataType FCO2_FROM_XCO2_SST_NCEP_WOA = new DataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataColumnType FCO2_REC = new DataColumnType("fCO2_recommended", 
+	public static final DataType FCO2_REC = new DataType("fCO2_recommended", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 recommended", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 
-	public static final DataColumnType DELTA_TEMP = new DataColumnType("delta_temp", 
+	public static final DataType DELTA_TEMP = new DataType("delta_temp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "Equilibrator Temp - SST", 
 			null, KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DataColumnType CALC_SPEED = new DataColumnType("calc_speed", 
+	public static final DataType CALC_SPEED = new DataType("calc_speed", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "calculated ship speed", 
 			"platform_speed_wrt_ground", KnownDataTypes.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
-	public static final DataColumnType ETOPO2_DEPTH = new DataColumnType("etopo2", 
+	public static final DataType ETOPO2_DEPTH = new DataType("etopo2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "bathymetry from ETOPO2", 
 			"sea_floor_depth", KnownDataTypes.BATHYMETRY_CATEGORY, KnownDataTypes.DEPTH_UNITS);
-	public static final DataColumnType GVCO2 = new DataColumnType("gvCO2", 
+	public static final DataType GVCO2 = new DataType("gvCO2", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "GlobalView xCO2", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DataColumnType DIST_TO_LAND = new DataColumnType("dist_to_land", 
+	public static final DataType DIST_TO_LAND = new DataType("dist_to_land", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "distance to land", 
 			null, KnownDataTypes.LOCATION_CATEGORY, DISTANCE_UNITS);
-	public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day_of_year", 
+	public static final DataType DAY_OF_YEAR = new DataType("day_of_year", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "day of the year", 
 			null, KnownDataTypes.TIME_CATEGORY, DAYS_UNITS);
 
-
-	private LinkedHashMap<String,Character> charValsMap;
-	private LinkedHashMap<String,Integer> intValsMap;
-	private LinkedHashMap<String,Double> doubleValsMap;
+	private LinkedHashMap<DataType,Character> charValsMap;
+	private LinkedHashMap<DataType,Integer> intValsMap;
+	private LinkedHashMap<DataType,Double> doubleValsMap;
 
 	/**
 	 * Generates a SocatCruiseData object with the given known types.
@@ -263,38 +262,39 @@ public class SocatCruiseData {
 	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values
 	 * 
 	 * @param knownTypes
-	 * 		collection of all known types
+	 * 		collection of all known types;
+	 * 		cannot be null or empty
 	 */
 	public SocatCruiseData(KnownDataTypes knownTypes) {
-		charValsMap = new LinkedHashMap<String,Character>();
-		intValsMap = new LinkedHashMap<String,Integer>();
-		doubleValsMap = new LinkedHashMap<String,Double>(96);
+		if ( (knownTypes == null) || (knownTypes.size() < 1) )
+			throw new IllegalArgumentException("known data types cannot be null or empty");
+		charValsMap = new LinkedHashMap<DataType,Character>();
+		intValsMap = new LinkedHashMap<DataType,Integer>();
+		doubleValsMap = new LinkedHashMap<DataType,Double>(96);
 
-		if ( knownTypes != null ) {
-			for ( DataColumnType dtype : knownTypes.getKnownTypesList() ) {
-				if ( KnownDataTypes.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-					if ( dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
-						// WOCE flag
-						charValsMap.put(dtype.getVarName(), WoceEvent.WOCE_NOT_CHECKED);
-					}
-					else if ( dtype.typeEquals(REGION_ID) ) {
-						// Region ID
-						charValsMap.put(dtype.getVarName(), DataLocation.GLOBAL_REGION_ID);
-					}
-					else {
-						charValsMap.put(dtype.getVarName(), DashboardUtils.CHAR_MISSING_VALUE);
-					}
+		for ( DataType dtype : knownTypes.getKnownTypesSet() ) {
+			if ( KnownDataTypes.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				if ( dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
+					// WOCE flag
+					charValsMap.put(dtype, WoceEvent.WOCE_NOT_CHECKED);
 				}
-				else if ( KnownDataTypes.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-					intValsMap.put(dtype.getVarName(), DashboardUtils.INT_MISSING_VALUE);
-				}
-				else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-					doubleValsMap.put(dtype.getVarName(), DashboardUtils.FP_MISSING_VALUE);
+				else if ( dtype.typeNameEquals(REGION_ID) ) {
+					// Region ID
+					charValsMap.put(dtype, DataLocation.GLOBAL_REGION_ID);
 				}
 				else {
-					throw new IllegalArgumentException("Unknown data class name '" + 
-							dtype.getDataClassName() + "' for type '" + dtype.getVarName() + "'");
+					charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
 				}
+			}
+			else if ( KnownDataTypes.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
+			}
+			else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
+			}
+			else {
+				throw new IllegalArgumentException("Unknown data class name '" + 
+						dtype.getDataClassName() + "' associated with type '" + dtype.getVarName() + "'");
 			}
 		}
 	}
@@ -305,9 +305,9 @@ public class SocatCruiseData {
 	 * type, and the missing value is "NaN", an empty string, or null.
 	 * 
 	 * An exception is thrown if a data column with type 
-	 * {@link DataColumnType#UNKNOWN} is encountered; otherwise data columns
+	 * {@link KnownDataTypes#UNKNOWN} is encountered; otherwise data columns
 	 * with types not present in knownTypes are ignored.  The data types
-	 * {@link DataColumnType#UNKNOWN}, {@link DataColumnType#OTHER}, and any
+	 * {@link DataType#UNKNOWN}, {@link DataType#OTHER}, and any
 	 * metadata types should not be in knownTypes.
 	 * 
 	 * @param knownTypes
@@ -321,12 +321,12 @@ public class SocatCruiseData {
 	 * 		data value strings
 	 * @throws IllegalArgumentException
 	 * 		if the number of data types and data values do not match, 
-	 * 		if a data column has the type {@link DataColumnType#UNKNOWN}, 
+	 * 		if a data column has the type {@link DataType#UNKNOWN}, 
 	 * 		if a data column has a type matching a known data type but
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public SocatCruiseData(KnownDataTypes knownTypes, List<DataColumnType> columnTypes, 
+	public SocatCruiseData(KnownDataTypes knownTypes, List<DataType> columnTypes, 
 			int sampleNum, List<String> dataValues) throws IllegalArgumentException {
 		// Initialize to an empty data record with the given known types
 		this(knownTypes);
@@ -337,13 +337,12 @@ public class SocatCruiseData {
 					numColumns + ") does not match the number of data values (" +
 					dataValues.size() + ")");
 		// Add values to the empty record
-		String varName = KnownDataTypes.SAMPLE_NUMBER.getVarName();
-		if ( intValsMap.containsKey(varName) )
-			intValsMap.put(varName, Integer.valueOf(sampleNum));
+		if ( intValsMap.containsKey(KnownDataTypes.SAMPLE_NUMBER) )
+			intValsMap.put(KnownDataTypes.SAMPLE_NUMBER, Integer.valueOf(sampleNum));
 		for (int k = 0; k < numColumns; k++) {
 			// Make sure the data type is valid
-			DataColumnType dtype = columnTypes.get(k);
-			if ( DataColumnType.UNKNOWN.typeEquals(dtype) )
+			DataType dtype = columnTypes.get(k);
+			if ( KnownDataTypes.UNKNOWN.typeNameEquals(dtype) )
 				throw new IllegalArgumentException("Data column number " + 
 						Integer.toString(k+1) + " has type UNKNOWN");
 			// Skip over missing values since the empty data record
@@ -352,35 +351,34 @@ public class SocatCruiseData {
 			if ( (value == null) || value.isEmpty() || value.equals("NaN") )
 				continue;
 			// Check if this data type is in the known list
-			varName = dtype.getVarName();
-			DataColumnType stdType = knownTypes.getDataColumnType(varName);
+			DataColumnType stdType = knownTypes.getDataColumnType(dtype.getVarName());
 			if ( stdType == null )
 				continue;
 			if ( ! stdType.getDataClassName().equals(dtype.getDataClassName()) )
-				throw new IllegalArgumentException("Data column type " + varName + 
+				throw new IllegalArgumentException("Data column type " + dtype.getVarName() + 
 						" has data class " + dtype.getDataClassName() + 
 						" instead of " + stdType.getDataClassName());
 			// Assign the value
-			if ( intValsMap.containsKey(varName) ) {
+			if ( intValsMap.containsKey(dtype) ) {
 				try {
-					intValsMap.put(varName, Integer.parseInt(value));
+					intValsMap.put(dtype, Integer.parseInt(value));
 				} catch ( Exception ex ) {
 					throw new IllegalArgumentException("Unable to parse '" + 
 							value + "' as an Integer: " + ex.getMessage());
 				}
 			}
-			else if ( doubleValsMap.containsKey(varName) ) {
+			else if ( doubleValsMap.containsKey(dtype) ) {
 				try {
-					doubleValsMap.put(varName, Double.parseDouble(value));
+					doubleValsMap.put(dtype, Double.parseDouble(value));
 				} catch ( Exception ex ) {
 					throw new IllegalArgumentException("Unable to parse '" + 
 							value + "' as a Double: " + ex.getMessage());
 				}
 			}
-			else if ( charValsMap.containsKey(varName) ) {
+			else if ( charValsMap.containsKey(dtype) ) {
 				if ( value.length() != 1 )
 					throw new IllegalArgumentException("More than one character in '" + value + "'");
-				charValsMap.put(varName, value.charAt(0));
+				charValsMap.put(dtype, value.charAt(0));
 			}
 			else {
 				throw new RuntimeException("Unexpected failure to place data type " + dtype.toString());
@@ -395,9 +393,9 @@ public class SocatCruiseData {
 	 * "NaN", and empty string, or null.
 	 * 
 	 * An exception is thrown if a data column with type 
-	 * {@link DataColumnType#UNKNOWN} is encountered; otherwise data columns
+	 * {@link DataType#UNKNOWN} is encountered; otherwise data columns
 	 * with types not present in knownTypes are ignored.  The data types
-	 * {@link DataColumnType#UNKNOWN}, {@link DataColumnType#OTHER}, and any
+	 * {@link DataType#UNKNOWN}, {@link DataType#OTHER}, and any
 	 * metadata types should not be in knownTypes.
 	 * 
 	 * @param knownTypes
@@ -408,7 +406,7 @@ public class SocatCruiseData {
 	 * 		list of these data objects
 	 * @throws IllegalArgumentException
 	 * 		if a row of data values has an unexpected number of values,
-	 * 		if a data column has the type {@link DataColumnType#UNKNOWN}, 
+	 * 		if a data column has the type {@link DataType#UNKNOWN}, 
 	 * 		if a data column has a type matching a known data type but
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
@@ -418,7 +416,11 @@ public class SocatCruiseData {
 					throws IllegalArgumentException {
 		// Get the required data from the cruise
 		ArrayList<ArrayList<String>> dataValsTable = cruise.getDataValues();
-		ArrayList<DataColumnType> dataTypes = cruise.getDataColTypes();
+		ArrayList<DataColumnType> dataColTypes = cruise.getDataColTypes();
+		// Create the list of DataType objects - assumes data already standardized
+		ArrayList<DataType> dataTypes = new ArrayList<DataType>(dataColTypes.size());
+		for ( DataColumnType dctype : dataColTypes )
+			dataTypes.add(new DataType(dctype) );
 		// Create the list of SOCAT cruise data objects, and populate
 		// it with data from each row of the table
 		ArrayList<SocatCruiseData> socatDataList = 
@@ -431,12 +433,39 @@ public class SocatCruiseData {
 	}
 
 	/**
+	 * @return
+	 * 		the map of variable names and values for String variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public LinkedHashMap<DataType,Character> getCharacterVariables() {
+		return charValsMap;
+	}
+
+	/**
+	 * @return
+	 * 		the map of variable names and values for Double variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public LinkedHashMap<DataType,Double> getDoubleVariables() {
+		return doubleValsMap;
+	}
+
+	/**
+	 * @return
+	 * 		the map of variable names and values for Integer variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public LinkedHashMap<DataType,Integer> getIntegerVariables() {
+		return intValsMap;
+	}
+
+	/**
 	 * @return 
 	 * 		the year of the data measurement; 
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getYear() {
-		Integer value = intValsMap.get(KnownDataTypes.YEAR.getVarName());
+		Integer value = intValsMap.get(KnownDataTypes.YEAR);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -451,7 +480,7 @@ public class SocatCruiseData {
 		Integer value = year;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.YEAR.getVarName(), value);
+		intValsMap.put(KnownDataTypes.YEAR, value);
 	}
 
 	/**
@@ -460,7 +489,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getMonth() {
-		Integer value = intValsMap.get(KnownDataTypes.MONTH_OF_YEAR.getVarName());
+		Integer value = intValsMap.get(KnownDataTypes.MONTH_OF_YEAR);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -475,7 +504,7 @@ public class SocatCruiseData {
 		Integer value = month;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.MONTH_OF_YEAR.getVarName(), value);
+		intValsMap.put(KnownDataTypes.MONTH_OF_YEAR, value);
 	}
 
 	/**
@@ -484,7 +513,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getDay() {
-		Integer value = intValsMap.get(KnownDataTypes.DAY_OF_MONTH.getVarName());
+		Integer value = intValsMap.get(KnownDataTypes.DAY_OF_MONTH);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -499,7 +528,7 @@ public class SocatCruiseData {
 		Integer value = day;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.DAY_OF_MONTH.getVarName(), value);
+		intValsMap.put(KnownDataTypes.DAY_OF_MONTH, value);
 	}
 
 	/**
@@ -508,7 +537,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getHour() {
-		Integer value = intValsMap.get(KnownDataTypes.HOUR_OF_DAY.getVarName());
+		Integer value = intValsMap.get(KnownDataTypes.HOUR_OF_DAY);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -523,7 +552,7 @@ public class SocatCruiseData {
 		Integer value = hour;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.HOUR_OF_DAY.getVarName(), value);
+		intValsMap.put(KnownDataTypes.HOUR_OF_DAY, value);
 	}
 
 	/**
@@ -532,7 +561,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getMinute() {
-		Integer value = intValsMap.get(KnownDataTypes.MINUTE_OF_HOUR.getVarName());
+		Integer value = intValsMap.get(KnownDataTypes.MINUTE_OF_HOUR);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -547,7 +576,7 @@ public class SocatCruiseData {
 		Integer value = minute;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.MINUTE_OF_HOUR.getVarName(), value);
+		intValsMap.put(KnownDataTypes.MINUTE_OF_HOUR, value);
 	}
 
 	/**
@@ -556,7 +585,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSecond() {
-		Double value = doubleValsMap.get(KnownDataTypes.SECOND_OF_MINUTE.getVarName());
+		Double value = doubleValsMap.get(KnownDataTypes.SECOND_OF_MINUTE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -571,7 +600,7 @@ public class SocatCruiseData {
 		Double value = second;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.SECOND_OF_MINUTE.getVarName(), value);
+		doubleValsMap.put(KnownDataTypes.SECOND_OF_MINUTE, value);
 	}
 
 	/**
@@ -580,7 +609,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLongitude() {
-		Double value = doubleValsMap.get(KnownDataTypes.LONGITUDE.getVarName());
+		Double value = doubleValsMap.get(KnownDataTypes.LONGITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -595,7 +624,7 @@ public class SocatCruiseData {
 		Double value = longitude;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.LONGITUDE.getVarName(), value);
+		doubleValsMap.put(KnownDataTypes.LONGITUDE, value);
 	}
 
 	/**
@@ -604,7 +633,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLatitude() {
-		Double value = doubleValsMap.get(KnownDataTypes.LATITUDE.getVarName());
+		Double value = doubleValsMap.get(KnownDataTypes.LATITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -619,7 +648,7 @@ public class SocatCruiseData {
 		Double value = latitude;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.LATITUDE.getVarName(), value);
+		doubleValsMap.put(KnownDataTypes.LATITUDE, value);
 	}
 
 	/**
@@ -628,7 +657,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSampleDepth() {
-		Double value = doubleValsMap.get(KnownDataTypes.SAMPLE_DEPTH.getVarName());
+		Double value = doubleValsMap.get(KnownDataTypes.SAMPLE_DEPTH);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -643,7 +672,7 @@ public class SocatCruiseData {
 		Double value = sampleDepth;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.SAMPLE_DEPTH.getVarName(), value);
+		doubleValsMap.put(KnownDataTypes.SAMPLE_DEPTH, value);
 	}
 
 	/**
@@ -652,7 +681,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link WoceEvent#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Water() {
-		Character value = charValsMap.get(WOCE_CO2_WATER.getVarName());
+		Character value = charValsMap.get(WOCE_CO2_WATER);
 		if ( value == null )
 			value = WoceEvent.WOCE_NOT_CHECKED;
 		return value;
@@ -667,7 +696,7 @@ public class SocatCruiseData {
 		Character value = woceCO2Water;
 		if ( value == null )
 			value = WoceEvent.WOCE_NOT_CHECKED;
-		charValsMap.put(WOCE_CO2_WATER.getVarName(), value);
+		charValsMap.put(WOCE_CO2_WATER, value);
 	}
 
 	/**
@@ -676,7 +705,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link WoceEvent#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Atm() {
-		Character value = charValsMap.get(WOCE_CO2_ATM.getVarName());
+		Character value = charValsMap.get(WOCE_CO2_ATM);
 		if ( value == null )
 			value = WoceEvent.WOCE_NOT_CHECKED;
 		return value;
@@ -691,7 +720,7 @@ public class SocatCruiseData {
 		Character value = woceCO2Atm;
 		if ( value == null )
 			value = WoceEvent.WOCE_NOT_CHECKED;
-		charValsMap.put(WOCE_CO2_ATM.getVarName(), value);
+		charValsMap.put(WOCE_CO2_ATM, value);
 	}
 
 	/**
@@ -700,7 +729,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DataLocation#GLOBAL_REGION_ID} if not assigned
 	 */
 	public Character getRegionID() {
-		Character value = charValsMap.get(REGION_ID.getVarName());
+		Character value = charValsMap.get(REGION_ID);
 		if ( value == null )
 			value = DataLocation.GLOBAL_REGION_ID;
 		return value;
@@ -715,7 +744,7 @@ public class SocatCruiseData {
 		Character value = regionID;
 		if ( value == null )
 			value = DataLocation.GLOBAL_REGION_ID;
-		charValsMap.put(REGION_ID.getVarName(), value);
+		charValsMap.put(REGION_ID, value);
 	}
 
 	/**
@@ -724,7 +753,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getFCO2Source() {
-		Integer value = intValsMap.get(FCO2_SOURCE.getVarName());
+		Integer value = intValsMap.get(FCO2_SOURCE);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -739,7 +768,7 @@ public class SocatCruiseData {
 		Integer value = fCO2Source;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(FCO2_SOURCE.getVarName(), value);
+		intValsMap.put(FCO2_SOURCE, value);
 	}
 
 	/**
@@ -748,7 +777,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSalinity() {
-		Double value = doubleValsMap.get(SALINITY.getVarName());
+		Double value = doubleValsMap.get(SALINITY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -763,7 +792,7 @@ public class SocatCruiseData {
 		Double value = salinity;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SALINITY.getVarName(), value);
+		doubleValsMap.put(SALINITY, value);
 	}
 
 	/**
@@ -772,7 +801,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getTEqu() {
-		Double value = doubleValsMap.get(TEQU.getVarName());
+		Double value = doubleValsMap.get(TEQU);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -787,7 +816,7 @@ public class SocatCruiseData {
 		Double value = tEqu;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(TEQU.getVarName(), value);
+		doubleValsMap.put(TEQU, value);
 	}
 
 	/**
@@ -796,7 +825,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSst() {
-		Double value = doubleValsMap.get(SST.getVarName());
+		Double value = doubleValsMap.get(SST);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -811,7 +840,7 @@ public class SocatCruiseData {
 		Double value = sst;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SST.getVarName(), value);
+		doubleValsMap.put(SST, value);
 	}
 
 	/**
@@ -820,7 +849,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPAtm() {
-		Double value = doubleValsMap.get(PATM.getVarName());
+		Double value = doubleValsMap.get(PATM);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -835,7 +864,7 @@ public class SocatCruiseData {
 		Double value = pAtm;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PATM.getVarName(), value);
+		doubleValsMap.put(PATM, value);
 	}
 
 	/**
@@ -844,7 +873,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPEqu() {
-		Double value = doubleValsMap.get(PEQU.getVarName());
+		Double value = doubleValsMap.get(PEQU);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -859,7 +888,7 @@ public class SocatCruiseData {
 		Double value = pEqu;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PEQU.getVarName(), value);
+		doubleValsMap.put(PEQU, value);
 	}
 
 	/**
@@ -868,7 +897,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterTEquDry() {
-		Double value = doubleValsMap.get(XCO2_WATER_TEQU_DRY.getVarName());
+		Double value = doubleValsMap.get(XCO2_WATER_TEQU_DRY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -883,7 +912,7 @@ public class SocatCruiseData {
 		Double value = xCO2WaterTEquDry;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(XCO2_WATER_TEQU_DRY.getVarName(), value);
+		doubleValsMap.put(XCO2_WATER_TEQU_DRY, value);
 	}
 
 	/**
@@ -892,7 +921,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterSstDry() {
-		Double value = doubleValsMap.get(XCO2_WATER_SST_DRY.getVarName());
+		Double value = doubleValsMap.get(XCO2_WATER_SST_DRY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -907,7 +936,7 @@ public class SocatCruiseData {
 		Double value = xCO2WaterSstDry;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(XCO2_WATER_SST_DRY.getVarName(), value);
+		doubleValsMap.put(XCO2_WATER_SST_DRY, value);
 	}
 
 	/**
@@ -916,7 +945,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterTEquWet() {
-		Double value = doubleValsMap.get(PCO2_WATER_TEQU_WET.getVarName());
+		Double value = doubleValsMap.get(PCO2_WATER_TEQU_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -931,7 +960,7 @@ public class SocatCruiseData {
 		Double value = pCO2WaterTEquWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PCO2_WATER_TEQU_WET.getVarName(), value);
+		doubleValsMap.put(PCO2_WATER_TEQU_WET, value);
 	}
 
 	/**
@@ -940,7 +969,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterSstWet() {
-		Double value = doubleValsMap.get(PCO2_WATER_SST_WET.getVarName());
+		Double value = doubleValsMap.get(PCO2_WATER_SST_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -955,7 +984,7 @@ public class SocatCruiseData {
 		Double value = pCO2WaterSstWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PCO2_WATER_SST_WET.getVarName(), value);
+		doubleValsMap.put(PCO2_WATER_SST_WET, value);
 	}
 
 	/**
@@ -964,7 +993,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterTEquWet() {
-		Double value = doubleValsMap.get(FCO2_WATER_TEQU_WET.getVarName());
+		Double value = doubleValsMap.get(FCO2_WATER_TEQU_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -979,7 +1008,7 @@ public class SocatCruiseData {
 		Double value = fCO2WaterTEquWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(FCO2_WATER_TEQU_WET.getVarName(), value);
+		doubleValsMap.put(FCO2_WATER_TEQU_WET, value);
 	}
 
 	/**
@@ -988,7 +1017,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterSstWet() {
-		Double value = doubleValsMap.get(FCO2_WATER_SST_WET.getVarName());
+		Double value = doubleValsMap.get(FCO2_WATER_SST_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1003,7 +1032,7 @@ public class SocatCruiseData {
 		Double value = fCO2WaterSstWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(FCO2_WATER_SST_WET.getVarName(), value);
+		doubleValsMap.put(FCO2_WATER_SST_WET, value);
 	}
 
 	/**
@@ -1012,7 +1041,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getWoaSalinity() {
-		Double value = doubleValsMap.get(WOA_SALINITY.getVarName());
+		Double value = doubleValsMap.get(WOA_SALINITY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1027,7 +1056,7 @@ public class SocatCruiseData {
 		Double value = woaSss;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(WOA_SALINITY.getVarName(), value);
+		doubleValsMap.put(WOA_SALINITY, value);
 	}
 
 	/**
@@ -1036,7 +1065,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getNcepSlp() {
-		Double value = doubleValsMap.get(NCEP_SLP.getVarName());
+		Double value = doubleValsMap.get(NCEP_SLP);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1051,7 +1080,7 @@ public class SocatCruiseData {
 		Double value = ncepSlp;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(NCEP_SLP.getVarName(), value);
+		doubleValsMap.put(NCEP_SLP, value);
 	}
 
 	/**
@@ -1060,7 +1089,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getfCO2Rec() {
-		Double value = doubleValsMap.get(FCO2_REC.getVarName());
+		Double value = doubleValsMap.get(FCO2_REC);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1075,7 +1104,7 @@ public class SocatCruiseData {
 		Double value = fCO2Rec;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(FCO2_REC.getVarName(), value);
+		doubleValsMap.put(FCO2_REC, value);
 	}
 
 	/**
@@ -1084,7 +1113,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getEtopo2Depth() {
-		Double value = doubleValsMap.get(ETOPO2_DEPTH.getVarName());
+		Double value = doubleValsMap.get(ETOPO2_DEPTH);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1099,7 +1128,7 @@ public class SocatCruiseData {
 		Double value = etopo2;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(ETOPO2_DEPTH.getVarName(), value);
+		doubleValsMap.put(ETOPO2_DEPTH, value);
 	}
 
 	/**
@@ -1108,7 +1137,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getGvCO2() {
-		Double value = doubleValsMap.get(GVCO2.getVarName());
+		Double value = doubleValsMap.get(GVCO2);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1123,7 +1152,7 @@ public class SocatCruiseData {
 		Double value = gvCO2;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(GVCO2.getVarName(), value);
+		doubleValsMap.put(GVCO2, value);
 	}
 
 	/**
@@ -1132,7 +1161,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDistToLand() {
-		Double value = doubleValsMap.get(DIST_TO_LAND.getVarName());
+		Double value = doubleValsMap.get(DIST_TO_LAND);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1147,7 +1176,7 @@ public class SocatCruiseData {
 		Double value = distToLand;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(DIST_TO_LAND.getVarName(), value);
+		doubleValsMap.put(DIST_TO_LAND, value);
 	}
 
 	@Override 
@@ -1155,10 +1184,10 @@ public class SocatCruiseData {
 		// Ignore WOCE flag differences.
 		// Do not use floating-point fields since they do not 
 		// have to be exactly the same for equals to return true.
-		LinkedHashMap<String,Character> nonWoceCharValsMap = 
-				new LinkedHashMap<String,Character>(charValsMap.size());
-		for ( Entry<String,Character> entry : charValsMap.entrySet() ) {
-			if ( ! entry.getKey().toUpperCase().startsWith("WOCE_") )
+		LinkedHashMap<DataType,Character> nonWoceCharValsMap = 
+				new LinkedHashMap<DataType,Character>(charValsMap.size());
+		for ( Entry<DataType,Character> entry : charValsMap.entrySet() ) {
+			if ( ! entry.getKey().getVarName().toUpperCase().startsWith("WOCE_") )
 				nonWoceCharValsMap.put(entry.getKey(), entry.getValue());
 		}
 		final int prime = 37;
@@ -1183,30 +1212,25 @@ public class SocatCruiseData {
 			return false;
 
 		// Character comparisons - ignore WOCE flag differences
-		for ( Entry<String,Character> entry : charValsMap.entrySet() ) {
-			String varName = entry.getKey();
-			if ( ! varName.toUpperCase().startsWith("WOCE_") ) {
-				if ( ! entry.getValue().equals(other.charValsMap.get(varName)) )
-					return false;
-			}
-		}
-		for ( String varName : other.charValsMap.keySet() ) {
-			if ( ! varName.toUpperCase().startsWith("WOCE_") ) {
-				// Already compared if it exists
-				if ( ! charValsMap.containsKey(varName) )
+		if ( ! charValsMap.keySet().equals(other.charValsMap.keySet()) )
+			return false;
+		for ( Entry<DataType,Character> entry : charValsMap.entrySet() ) {
+			DataType dtype = entry.getKey();
+			if ( ! dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
+				if ( ! entry.getValue().equals(other.charValsMap.get(dtype)) )
 					return false;
 			}
 		}
 
 		// Floating-point comparisons - values don't have to be exactly the same
-		if ( doubleValsMap.size() != other.doubleValsMap.size() )
+		if ( ! doubleValsMap.keySet().equals(other.doubleValsMap.keySet()) )
 			return false;
-		for ( Entry<String,Double> entry : doubleValsMap.entrySet() ) {
-			String varName = entry.getKey();
+		for ( Entry<DataType,Double> entry : doubleValsMap.entrySet() ) {
+			DataType dtype = entry.getKey();
 			Double thisval = entry.getValue();
-			Double otherval = other.doubleValsMap.get(varName);
+			Double otherval = other.doubleValsMap.get(dtype);
 
-			if ( varName.equals(KnownDataTypes.SECOND_OF_MINUTE.getVarName()) ) {
+			if ( dtype.typeNameEquals(KnownDataTypes.SECOND_OF_MINUTE) ) {
 				// Match seconds not given (FP_MISSING_VALUE) with zero seconds
 				if ( ! DashboardUtils.closeTo(thisval, otherval, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 					if ( ! ( thisval.equals(DashboardUtils.FP_MISSING_VALUE) && otherval.equals(Double.valueOf(0.0)) ) ) {
@@ -1216,7 +1240,7 @@ public class SocatCruiseData {
 					}
 				}
 			}
-			else if ( varName.toUpperCase().contains("LONGITUDE") ) {
+			else if ( dtype.getVarName().toUpperCase().contains("LONGITUDE") ) {
 				// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
 				if ( ! DashboardUtils.longitudeCloseTo(thisval, otherval, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 					return false;				
@@ -1234,12 +1258,12 @@ public class SocatCruiseData {
 	@Override
 	public String toString() {
 		String repr = "SocatCruiseData[\n";
-		for ( Entry<String,Integer> entry : intValsMap.entrySet() )
-			repr += "    " + entry.getKey() + "=" + entry.getValue().toString() + "\n";
-		for ( Entry<String,Double> entry : doubleValsMap.entrySet() )
-			repr += "    " + entry.getKey() + "=" + entry.getKey().toString() + "\n";
-		for ( Entry<String,Character> entry : charValsMap.entrySet() )
-			repr += "    " + entry.getKey() + "=" + entry.getKey().toString() + "\n";
+		for ( Entry<DataType,Integer> entry : intValsMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
+		for ( Entry<DataType,Double> entry : doubleValsMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
+		for ( Entry<DataType,Character> entry : charValsMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
 		repr += "]";
 		return repr;
 	}

@@ -33,31 +33,37 @@ public class SocatCruiseDataTest {
 		KNOWN_DATA_TYPES = new KnownDataTypes();
 		KNOWN_DATA_TYPES.addStandardTypesForDataFiles();
 		Properties addnTypeProps = new Properties();
-		addnTypeProps.setProperty(SocatCruiseData.SST.getVarName(), "{\"dataClassName\":\"Double\"}");
-		addnTypeProps.setProperty(SocatCruiseData.SALINITY.getVarName(), "{\"dataClassName\":\"Double\"}");
-		addnTypeProps.setProperty(SocatCruiseData.XCO2_WATER_SST_DRY.getVarName(), "{\"dataClassName\":\"Double\"}");
-		addnTypeProps.setProperty(SocatCruiseData.PCO2_WATER_TEQU_WET.getVarName(), "{\"dataClassName\":\"Double\"}");
-		addnTypeProps.setProperty(SocatCruiseData.PATM.getVarName(), "{\"dataClassName\":\"Double\"}");
-		addnTypeProps.setProperty(SocatCruiseData.SHIP_SPEED.getVarName(), "{\"dataClassName\":\"Double\"}");
+		addnTypeProps.setProperty(SocatCruiseData.SST.getVarName(), 
+				SocatCruiseData.SST.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.SALINITY.getVarName(), 
+				SocatCruiseData.SALINITY.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.XCO2_WATER_SST_DRY.getVarName(), 
+				SocatCruiseData.XCO2_WATER_SST_DRY.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.PCO2_WATER_TEQU_WET.getVarName(), 
+				SocatCruiseData.PCO2_WATER_TEQU_WET.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.PATM.getVarName(), 
+				SocatCruiseData.PATM.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.SHIP_SPEED.getVarName(), 
+				SocatCruiseData.SHIP_SPEED.toPropertyValue());
 		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
 	}
 
-	static final ArrayList<DataColumnType> TEST_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
-			KnownDataTypes.EXPOCODE,
-			KnownDataTypes.DATASET_NAME,
-			KnownDataTypes.MONTH_OF_YEAR, 
-			KnownDataTypes.DAY_OF_MONTH, 
-			KnownDataTypes.YEAR, 
-			KnownDataTypes.HOUR_OF_DAY, 
-			KnownDataTypes.MINUTE_OF_HOUR, 
-			KnownDataTypes.LATITUDE, 
-			KnownDataTypes.LONGITUDE, 
-			SocatCruiseData.SST,
-			SocatCruiseData.SALINITY,
-			SocatCruiseData.XCO2_WATER_SST_DRY,
-			SocatCruiseData.PCO2_WATER_TEQU_WET,
-			SocatCruiseData.PATM,
-			SocatCruiseData.SHIP_SPEED));
+	static final ArrayList<DataColumnType> TEST_USER_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
+			KnownDataTypes.EXPOCODE.duplicate(),
+			KnownDataTypes.DATASET_NAME.duplicate(),
+			KnownDataTypes.MONTH_OF_YEAR.duplicate(), 
+			KnownDataTypes.DAY_OF_MONTH.duplicate(), 
+			KnownDataTypes.YEAR.duplicate(), 
+			KnownDataTypes.HOUR_OF_DAY.duplicate(), 
+			KnownDataTypes.MINUTE_OF_HOUR.duplicate(), 
+			KnownDataTypes.LATITUDE.duplicate(), 
+			KnownDataTypes.LONGITUDE.duplicate(), 
+			SocatCruiseData.SST.duplicate(),
+			SocatCruiseData.SALINITY.duplicate(),
+			SocatCruiseData.XCO2_WATER_SST_DRY.duplicate(),
+			SocatCruiseData.PCO2_WATER_TEQU_WET.duplicate(),
+			SocatCruiseData.PATM.duplicate(),
+			SocatCruiseData.SHIP_SPEED.duplicate()));
 	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
 	static final ArrayList<Integer> EXPECTED_YEARS = new ArrayList<Integer>();
 	static final ArrayList<Integer> EXPECTED_MONTHS = new ArrayList<Integer>();
@@ -128,11 +134,11 @@ public class SocatCruiseDataTest {
 	@Test
 	public void testSocatCruiseDataList() {
 		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
-		cruise.setDataColTypes(TEST_TYPES);
+		cruise.setDataColTypes(TEST_USER_TYPES);
 		cruise.setDataValues(TEST_VALUES);
 		ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
 		ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
-		for (int k = 0; k < TEST_TYPES.size(); k++) {
+		for (int k = 0; k < TEST_USER_TYPES.size(); k++) {
 			woceThrees.add(new HashSet<Integer>());
 			woceFours.add(new HashSet<Integer>());
 		}

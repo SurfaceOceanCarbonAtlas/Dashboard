@@ -8,17 +8,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.TreeSet;
-
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.TreeSet;
 
 import org.junit.Test;
 
@@ -234,17 +233,17 @@ public class DashboardCruiseTest {
 	 */
 	@Test
 	public void testSetGetDataColTypes() {
-		ArrayList<DataColumnType> myDataColTypes = 
+		ArrayList<DataColumnType> myDataTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
-					KnownDataTypes.TIMESTAMP,
-					KnownDataTypes.LONGITUDE,
-					KnownDataTypes.LATITUDE,
-					KnownDataTypes.SAMPLE_DEPTH
+					KnownDataTypes.TIMESTAMP.duplicate(),
+					KnownDataTypes.LONGITUDE.duplicate(),
+					KnownDataTypes.LATITUDE.duplicate(),
+					KnownDataTypes.SAMPLE_DEPTH.duplicate()
 				));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getDataColTypes().size());
-		cruise.setDataColTypes(myDataColTypes);
-		assertEquals(myDataColTypes, cruise.getDataColTypes());
+		cruise.setDataColTypes(myDataTypes);
+		assertEquals(myDataTypes, cruise.getDataColTypes());
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
@@ -586,10 +585,10 @@ public class DashboardCruiseTest {
 		int myNumWarnMsgs = 14;
 		ArrayList<DataColumnType> myDataColTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
-					KnownDataTypes.TIMESTAMP,
-					KnownDataTypes.LONGITUDE,
-					KnownDataTypes.LATITUDE,
-					KnownDataTypes.SAMPLE_DEPTH
+					KnownDataTypes.TIMESTAMP.duplicate(),
+					KnownDataTypes.LONGITUDE.duplicate(),
+					KnownDataTypes.LATITUDE.duplicate(),
+					KnownDataTypes.SAMPLE_DEPTH.duplicate()
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "depth")); 

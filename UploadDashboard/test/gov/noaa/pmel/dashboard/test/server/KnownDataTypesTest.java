@@ -3,17 +3,21 @@
  */
 package gov.noaa.pmel.dashboard.test.server;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.server.DataType;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Properties;
-
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import org.junit.Test;
 
@@ -77,54 +81,56 @@ public class KnownDataTypesTest {
 			KnownDataTypes.SAMPLE_DEPTH.getVarName()
 	));
 
-	private static final ArrayList<DataColumnType> METADATA_FILES_TYPES_LIST = new ArrayList<DataColumnType>(Arrays.asList(
-			KnownDataTypes.EXPOCODE,
-			KnownDataTypes.DATASET_NAME,
-			KnownDataTypes.VESSEL_NAME,
-			KnownDataTypes.ORGANIZATION_NAME,
-			KnownDataTypes.INVESTIGATOR_NAMES,
-			KnownDataTypes.WESTERNMOST_LONGITUDE,
-			KnownDataTypes.EASTERNMOST_LONGITUDE,
-			KnownDataTypes.SOUTHERNMOST_LATITUDE,
-			KnownDataTypes.NORTHERNMOST_LATITUDE,
-			KnownDataTypes.TIME_COVERAGE_START,
-			KnownDataTypes.TIME_COVERAGE_END,
-			KnownDataTypes.QC_FLAG
-	));
+	private static final LinkedHashSet<DataType> METADATA_FILES_TYPES_SET = 
+			new LinkedHashSet<DataType>( Arrays.asList(
+					KnownDataTypes.EXPOCODE,
+					KnownDataTypes.DATASET_NAME,
+					KnownDataTypes.VESSEL_NAME,
+					KnownDataTypes.ORGANIZATION_NAME,
+					KnownDataTypes.INVESTIGATOR_NAMES,
+					KnownDataTypes.WESTERNMOST_LONGITUDE,
+					KnownDataTypes.EASTERNMOST_LONGITUDE,
+					KnownDataTypes.SOUTHERNMOST_LATITUDE,
+					KnownDataTypes.NORTHERNMOST_LATITUDE,
+					KnownDataTypes.TIME_COVERAGE_START,
+					KnownDataTypes.TIME_COVERAGE_END,
+					KnownDataTypes.QC_FLAG
+					) );
 
-	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { "xCO2_atm_dry_interp", "rank", "socat_doi" };
-	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { KnownDataTypes.DOUBLE_DATA_CLASS_NAME, KnownDataTypes.INT_DATA_CLASS_NAME, KnownDataTypes.STRING_DATA_CLASS_NAME };
-	static final String[] ADDN_TYPES_DESCRIPTIONS = new String[] { "mole fraction CO2 in sea level air", "personal ranking", "DOI of SOCAT-enhanced datafile" };
-	static final String[] ADDN_TYPES_STANDARD_NAMES = new String[] { "xCO2_atm", "", "DOI" };
-	static final String[] ADDN_TYPES_CATEGORY_NAMES = new String[] { "CO2", "", "Identifier" };
+	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
+		"xCO2_atm_dry_interp", "rank", "socat_doi" };
+	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { 
+		KnownDataTypes.DOUBLE_DATA_CLASS_NAME, 
+		KnownDataTypes.INT_DATA_CLASS_NAME, 
+		KnownDataTypes.STRING_DATA_CLASS_NAME };
+	static final String[] ADDN_TYPES_DESCRIPTIONS = new String[] { 
+		"mole fraction CO2 in sea level air", 
+		"personal ranking", 
+		"DOI of SOCAT-enhanced datafile" };
+	static final String[] ADDN_TYPES_STANDARD_NAMES = new String[] { 
+		"xCO2_atm", "", "DOI" };
+	static final String[] ADDN_TYPES_CATEGORY_NAMES = new String[] { 
+		"CO2", "", "Identifier" };
 
-	static final ArrayList<String> MOL_FRACTION_UNITS = new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
-	static final String MOL_FRACTION_UNITS_JSON_STRING = "[ \"umol/mol\", \"mmol/mol\" ]";
+	static final ArrayList<String> MOL_FRACTION_UNITS = 
+			new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
-	static final DataColumnType[] ADDN_TYPES_DATA_COLUMNS = new DataColumnType[] {
-		new DataColumnType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], ADDN_TYPES_DESCRIPTIONS[0], 
-				ADDN_TYPES_STANDARD_NAMES[0], ADDN_TYPES_CATEGORY_NAMES[0], MOL_FRACTION_UNITS),
-		new DataColumnType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], ADDN_TYPES_DESCRIPTIONS[1], 
-				null, null, null),
-		new DataColumnType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], ADDN_TYPES_DESCRIPTIONS[2], 
-				ADDN_TYPES_STANDARD_NAMES[2], ADDN_TYPES_CATEGORY_NAMES[2], null)
+	static final DataType[] ADDN_DATA_TYPES = new DataType[] {
+		new DataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], 
+				ADDN_TYPES_DESCRIPTIONS[0], ADDN_TYPES_STANDARD_NAMES[0], 
+				ADDN_TYPES_CATEGORY_NAMES[0], MOL_FRACTION_UNITS),
+		new DataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], 
+				ADDN_TYPES_DESCRIPTIONS[1], null, 
+				null, null),
+		new DataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], 
+				ADDN_TYPES_DESCRIPTIONS[2], ADDN_TYPES_STANDARD_NAMES[2], 
+				ADDN_TYPES_CATEGORY_NAMES[2], null)
 	};
 
 	static final String ADDN_TYPES_PROPERTIES_STRING = 
-			ADDN_TYPES_VAR_NAMES[0] + " = { " +
-					"\"dataClassName\": \"" + ADDN_TYPES_CLASS_NAMES[0] + "\", " +
-					"\"description\": \""+ ADDN_TYPES_DESCRIPTIONS[0] + "\", " +
-					"\"standardName\": \"" + ADDN_TYPES_STANDARD_NAMES[0] + "\", " +
-					"\"categoryName\": \"" + ADDN_TYPES_CATEGORY_NAMES[0] + "\", " +
-					"\"units\": " + MOL_FRACTION_UNITS_JSON_STRING + " }\n" +
-			ADDN_TYPES_VAR_NAMES[1] + " = { " +
-					"\"dataClassName\": \"" + ADDN_TYPES_CLASS_NAMES[1] + "\", " +
-					"\"description\": \""+ ADDN_TYPES_DESCRIPTIONS[1] + "\" }\n" +
-			ADDN_TYPES_VAR_NAMES[2] + " = { " +
-					"\"dataClassName\": \"" + ADDN_TYPES_CLASS_NAMES[2] + "\", " +
-					"\"description\": \""+ ADDN_TYPES_DESCRIPTIONS[2] + "\", " +
-					"\"standardName\": \"" + ADDN_TYPES_STANDARD_NAMES[2] + "\", " +
-					"\"categoryName\": \"" + ADDN_TYPES_CATEGORY_NAMES[2] + "\" }\n";
+			ADDN_TYPES_VAR_NAMES[0] + " = " + ADDN_DATA_TYPES[0].toPropertyValue() + "\n" +
+			ADDN_TYPES_VAR_NAMES[1] + " = " + ADDN_DATA_TYPES[1].toPropertyValue() + "\n" +
+			ADDN_TYPES_VAR_NAMES[2] + " = " + ADDN_DATA_TYPES[2].toPropertyValue() + "\n";
 			
 	/**
 	 * Test method for 
@@ -177,6 +183,15 @@ public class KnownDataTypesTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesSet()}.
+	 */
+	@Test
+	public void testGetKnownTypesSet() {
+		KnownDataTypes types = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		assertEquals(METADATA_FILES_TYPES_SET, types.getKnownTypesSet());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getDataColumnType(java.lang.String)}.
 	 */
 	@Test
@@ -186,20 +201,21 @@ public class KnownDataTypesTest {
 		assertNull( expoType );
 		types.addStandardTypesForUsers();
 		expoType = types.getDataColumnType("EXPOCODE");
-		assertEquals(KnownDataTypes.EXPOCODE, expoType);
+		DataType other = new DataType(expoType);
+		assertEquals(KnownDataTypes.EXPOCODE, other);
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesList()}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#getKnownTypesSet()}.
 	 */
 	@Test
 	public void testGetKnownTypesList() {
 		KnownDataTypes types = new KnownDataTypes();
-		ArrayList<DataColumnType> knownList = types.getKnownTypesList();
-		assertEquals(0, knownList.size());
+		LinkedHashSet<DataType> knownSet = types.getKnownTypesSet();
+		assertEquals(0, knownSet.size());
 		types.addStandardTypesForMetadataFiles();
-		knownList = types.getKnownTypesList();
-		assertEquals(METADATA_FILES_TYPES_LIST, knownList);
+		knownSet = types.getKnownTypesSet();
+		assertEquals(METADATA_FILES_TYPES_SET, knownSet);
 	}
 
 	/**
@@ -217,7 +233,7 @@ public class KnownDataTypesTest {
 		assertTrue( clientTypes == other );
 		assertEquals(USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.size());
 		for (int k = 0; k < ADDN_TYPES_VAR_NAMES.length; k++) {
-			assertEquals(ADDN_TYPES_DATA_COLUMNS[k], clientTypes.getDataColumnType(ADDN_TYPES_VAR_NAMES[k]));
+			assertEquals(ADDN_DATA_TYPES[k].duplicate(), clientTypes.getDataColumnType(ADDN_TYPES_VAR_NAMES[k]));
 		}
 	}
 
