@@ -83,7 +83,7 @@ public class DashboardUtils {
 	/**
 	 *  Missing value for integer variables - not null
 	 */
-	public static final Integer INT_MISSING_VALUE = -1;
+	public static final Integer INT_MISSING_VALUE = -99;
 
 	/**
 	 * Missing value for String variables - not null

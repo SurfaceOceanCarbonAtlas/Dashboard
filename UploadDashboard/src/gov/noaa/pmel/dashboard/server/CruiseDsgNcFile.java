@@ -67,6 +67,49 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
+	 * Adds the missing_value, _FillValue, long_name, standard_name, ioos_category, 
+	 * and units attributes to the given variables in the given NetCDF file.
+	 * 
+	 * @param ncfile
+	 * 		NetCDF file being written containing the variable
+	 * @param var
+	 * 		the variables to add attributes to
+	 * @param missVal
+	 * 		if not null, the value for the missing_value and _FillValue attributes
+	 * @param longName
+	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
+	 * 		long_name attribute; cannot be null
+	 * @param standardName
+	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
+	 * 		standard_name attribute; cannot be null
+	 * @param ioosCategory
+	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
+	 * 		ioos_category attribute; cannot be null
+	 * @param units
+	 * 		if not {@link DashboardUtils#STRING_MISSING_VALUE}, the value for the 
+	 * 		units attribute; cannot be null
+	 */
+	private void addAttributes(NetcdfFileWriter ncfile, Variable var, Number missVal, 
+			String longName, String standardName, String ioosCategory, String units) {
+		if ( missVal != null ) {
+			ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
+			ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
+		}
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(longName) ) {
+			ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
+		}
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(standardName) ) {
+			ncfile.addVariableAttribute(var, new Attribute("standard_name", standardName));
+		}
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(ioosCategory) ) {
+			ncfile.addVariableAttribute(var, new Attribute("ioos_category", ioosCategory));
+		}
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(units) ) {
+			ncfile.addVariableAttribute(var, new Attribute("units", units));
+		}
+	}
+
+	/**
 	 * Creates this NetCDF DSG file with the contents of the given 
 	 * SocatMetadata object and list of SocatCruiseData objects.
 	 * The internal metadata and data list references are set to 
@@ -132,135 +175,77 @@ public class CruiseDsgNcFile extends File {
 			Variable var = ncfile.addVariable(null, "num_obs", DataType.INT, trajDims);
 			ncfile.addVariableAttribute(var, new Attribute("sample_dimension", "obs"));
 			ncfile.addVariableAttribute(var, new Attribute("long_name", "Number of Observations"));
-			Number missVal = Integer.valueOf(-99);
-			ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
-			ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
+			ncfile.addVariableAttribute(var, new Attribute("missing_value", DashboardUtils.INT_MISSING_VALUE));
+			ncfile.addVariableAttribute(var, new Attribute("_FillValue", DashboardUtils.INT_MISSING_VALUE));
 
-			// Make netCDF variables of all the metadata.
-			for (  DataType dtype : metadata.getStringVariables().keySet() ) {
+			// Make netCDF variables of all the metadata and data variables
+			String varName;
+			for (  DashDataType dtype : metadata.getStringVariables().keySet() ) {
+				// Metadata Strings
+				varName = dtype.getVarName();
 				var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
-				DataColumnType dtype = metadataTypes.
-			}
-			for ( Field f : metaFields ) {
-				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					name = f.getName();
-					varName = Constants.SHORT_NAMES.get(name);
-					if ( varName == null )
-						throw new RuntimeException("Unexpected missing short name for " + name);
-					var = null;
-					missVal = null;
-					Class<?> type = f.getType();
-					if ( type.equals(String.class) ) {
-						var = ncfile.addVariable(null, varName, DataType.CHAR, trajStringDims);
-						missVal = null;
-					} 
-					else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-						var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
-						missVal = SocatCruiseData.FP_MISSING_VALUE;
-					} 
-					else if ( type.equals(Date.class) ) {
-						var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
-						missVal = Double.valueOf(SocatMetadata.DATE_MISSING_VALUE.getTime() / 1000.0);
-					}
-					else
-						throw new RuntimeException("Unexpected metadata field type " + 
-								type.getSimpleName() + " for variable " + name);
-					if ( var == null )
-						throw new RuntimeException("Unexpected failure to add the variable " + 
-								varName + " for metadata field " + name);
-
-					if ( missVal != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
-						ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
-					}
-					String units = Constants.UNITS.get(name);
-					if ( units != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("units", units));
-					}
-					String longName = Constants.LONG_NAMES.get(name);
-					if ( longName == null )
-						throw new RuntimeException("Unexpected missing long name for " + name);
-					ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
-					if ( name.equals("expocode")) {
-						ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
-					}
-					String stdName = Constants.STANDARD_NAMES.get(name);
-					if ( stdName != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("standard_name", stdName));
-					}
-					String category = Constants.IOOS_CATEGORIES.get(name);
-					if ( category != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("ioos_category", category));
-					}
+				// No missing_value, _FillValue, or units for strings
+				addAttributes(ncfile, var, null, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
+				if ( KnownDataTypes.EXPOCODE.typeNameEquals(dtype) ) {
+					ncfile.addVariableAttribute(var, new Attribute("cf_role", "trajectory_id"));
 				}
 			}
 
-			// Make netCDF variables of all the data.
-			for ( Field f : dataFields ) {
-				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					name = f.getName();
-					varName = Constants.SHORT_NAMES.get(name);
-					if ( varName == null )
-						throw new RuntimeException("Unexpected missing short name for " + name);
-					var = null;
-					missVal = null;
-					Class<?> type = f.getType();
-					if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-						var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
-						missVal = SocatCruiseData.FP_MISSING_VALUE;
-					} 
-					else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
-						var = ncfile.addVariable(null, varName, DataType.INT, dataDims);
-						missVal = SocatCruiseData.INT_MISSING_VALUE;
-					} 
-					else if ( type.equals(Character.class) || type.equals(Character.TYPE) ) {
-						var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
-						missVal = null;
-					} 
-					else
-						throw new RuntimeException("Unexpected data field type " + 
-								type.getSimpleName() + " for variable " + name);
-					if ( var == null )
-						throw new RuntimeException("Unexpected failure to add the variable " + 
-								varName + " for data field " + name);
+			for (  DashDataType dtype : metadata.getDoubleVariables().keySet() ) {
+				// Metadata Doubles
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
+				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+			}
 
-					if ( missVal != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("missing_value", missVal));
-						ncfile.addVariableAttribute(var, new Attribute("_FillValue", missVal));
-					}
-					String units = Constants.UNITS.get(name);
-					if ( units != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("units", units));
-					}
-					String longName = Constants.LONG_NAMES.get(name);
-					if ( longName == null )
-						throw new RuntimeException("Unexpected missing long name for " + name);
-					ncfile.addVariableAttribute(var, new Attribute("long_name", longName));
-					if ( name.endsWith("Depth") ) {
-						ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
-					}
-					String stdName = Constants.STANDARD_NAMES.get(name);
-					if ( stdName != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("standard_name", stdName));
-					}
-					String category = Constants.IOOS_CATEGORIES.get(name);
-					if ( category != null ) {
-						ncfile.addVariableAttribute(var, new Attribute("ioos_category", category));
-					}
+			for (  DashDataType dtype : metadata.getDateVariables().keySet() ) {
+				// Metadata Dates - recorded as seconds since 1970-01-01T00:00:00Z
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
+				// For consistency, use FP_MISSING_VALUE for the missing value
+				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), KnownDataTypes.TIME_UNITS.get(0));
+				// Additional attribute giving the time origin (although also mentioned in the units)
+				ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+			}
+
+			for (  DashDataType dtype : dataList.get(0).getIntegerVariables().keySet() ) {
+				// Data Integers
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.INT, dataDims);
+				addAttributes(ncfile, var, DashboardUtils.INT_MISSING_VALUE, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+			}
+
+			for (  DashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
+				// Data Doubles
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
+				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+				if ( dtype.getStandardName().endsWith("depth") ) {
+					ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
 				}
+			}
+
+			for (  DashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
+				// Data Characters
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
+				// No missing_value, _FillValue, or units for characters
+				addAttributes(ncfile, var, null, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
 			}
 
 			// Add the "time" variable which will be assigned using the year, month, day, hour, minute, 
 			// and (optionally) second values for each data point
-			name = Constants.time_VARNAME;
-			varName = Constants.SHORT_NAMES.get(name);
+			DashDataType timeType = KnownDataTypes.TIME;
+			varName = timeType.getVarName();
 			var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
-			ncfile.addVariableAttribute(var, new Attribute("missing_value", SocatCruiseData.FP_MISSING_VALUE));
-			ncfile.addVariableAttribute(var, new Attribute("_FillValue", SocatCruiseData.FP_MISSING_VALUE));
-			ncfile.addVariableAttribute(var, new Attribute("units", Constants.UNITS.get(name)));
-			ncfile.addVariableAttribute(var, new Attribute("long_name", Constants.LONG_NAMES.get(name)));
-			ncfile.addVariableAttribute(var, new Attribute("standard_name", Constants.STANDARD_NAMES.get(name)));
-			ncfile.addVariableAttribute(var, new Attribute("ioos_category", Constants.IOOS_CATEGORIES.get(name)));
+			addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, timeType.getDescription(), 
+					timeType.getStandardName(), timeType.getCategoryName(), timeType.getUnits().get(0));
 			// Additional attribute giving the time origin (although also mentioned in the units)
 			ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
 
@@ -275,106 +260,123 @@ public class CruiseDsgNcFile extends File {
 			obscount.set(0, dataList.size());
 			ncfile.write(var, obscount);
 
-			for ( Field f : metaFields ) {
-				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					varName = Constants.SHORT_NAMES.get(f.getName());
-					var = ncfile.findVariable(varName);
-					if ( var == null )
-						throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-					Class<?> type = f.getType();
-					if ( type.equals(String.class) ) {
-						ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
-						mvar.setString(0, (String) f.get(metadata));
-						ncfile.write(var, mvar);
-					}
-					else if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-						ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
-						Double dvalue = (Double) f.get(metadata);
-						if ( dvalue.isNaN() )
-							dvalue = SocatCruiseData.FP_MISSING_VALUE;
-						mvar.set(0, dvalue);
-						ncfile.write(var, mvar);
-					}
-					else if ( type.equals(Date.class) ) {
-						ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
-						Date dateVal = (Date) f.get(metadata);
-						mvar.set(0, Double.valueOf(dateVal.getTime() / 1000.0));
-						ncfile.write(var, mvar);
-					}
-					else
-						throw new RuntimeException("Unexpected metadata field type " + 
-								type.getSimpleName() + " for variable " + varName);
+			for (  Entry<DashDataType,String> entry : metadata.getStringVariables().entrySet() ) {
+				// Metadata Strings
+				varName = entry.getKey().getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				String dvalue = entry.getValue();
+				if ( dvalue == null )
+					dvalue = "";
+				ArrayChar.D2 mvar = new ArrayChar.D2(1, maxchar);
+				mvar.setString(0, dvalue);
+				ncfile.write(var, mvar);
+			}
+
+			for ( Entry<DashDataType,Double> entry : metadata.getDoubleVariables().entrySet() ) {
+				// Metadata Doubles
+				varName = entry.getKey().getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				Double dvalue = entry.getValue();
+				if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
+					dvalue = DashboardUtils.FP_MISSING_VALUE;
+				ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
+				mvar.set(0, dvalue);
+				ncfile.write(var, mvar);
+			}
+
+			for ( Entry<DashDataType,Date> entry : metadata.getDateVariables().entrySet() ) {
+				// Metadata Dates - recorded as seconds since 1970-01-01T00:00:00Z
+				varName = entry.getKey().getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				ArrayDouble.D1 mvar = new ArrayDouble.D1(1);
+				Date dateVal = entry.getValue();
+				double dvalue;
+				if ( (dateVal == null) || DashboardUtils.DATE_MISSING_VALUE.equals(dateVal) )
+					dvalue = DashboardUtils.FP_MISSING_VALUE;
+				else
+					dvalue = dateVal.getTime() / 1000.0;
+				mvar.set(0, dvalue);
+				ncfile.write(var, mvar);
+			}
+			
+			for (  DashDataType dtype : dataList.get(0).getIntegerVariables().keySet() ) {
+				// Data Integers
+				varName = dtype.getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				ArrayInt.D1 dvar = new ArrayInt.D1(dataList.size());
+				for (int index = 0; index < dataList.size(); index++) {
+					Integer dvalue = dataList.get(index).getIntegerVariables().get(dtype);
+					if ( dvalue == null )
+						dvalue = DashboardUtils.INT_MISSING_VALUE;
+					dvar.set(index, dvalue);
+				}
+				ncfile.write(var, dvar);
+			}
+
+			for (  DashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
+				// Data Doubles
+				varName = dtype.getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				ArrayDouble.D1 dvar = new ArrayDouble.D1(dataList.size());
+				for (int index = 0; index < dataList.size(); index++) {
+					Double dvalue = dataList.get(index).getDoubleVariables().get(dtype);
+					if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
+						dvalue = DashboardUtils.FP_MISSING_VALUE;
+					dvar.set(index, dvalue);
+				}
+				ncfile.write(var, dvar);
+			}
+
+			for (  DashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
+				// Data Characters
+				varName = dtype.getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				ArrayChar.D2 dvar = new ArrayChar.D2(dataList.size(), 1);
+				for (int index = 0; index < dataList.size(); index++) {
+					Character dvalue = dataList.get(index).getCharacterVariables().get(dtype);
+					if ( dvalue == null )
+						dvalue = ' ';
+					dvar.set(index, 0, dvalue);
 				}
 			}
 
-			for ( Field f : dataFields ) {
-				if ( ! Modifier.isStatic(f.getModifiers()) ) {
-					varName = Constants.SHORT_NAMES.get(f.getName());
-					var = ncfile.findVariable(varName);
-					if ( var == null )
-						throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-					Class<?> type = f.getType();
-					if ( type.equals(Double.class) || type.equals(Double.TYPE) ) {
-						ArrayDouble.D1 dvar = new ArrayDouble.D1(dataList.size());
-						for (int index = 0; index < dataList.size(); index++) {
-							SocatCruiseData datarow = (SocatCruiseData) dataList.get(index);
-							Double dvalue = (Double) f.get(datarow);
-							if ( dvalue.isNaN() )
-								dvalue = SocatCruiseData.FP_MISSING_VALUE;
-							dvar.set(index, dvalue);
-						}
-						ncfile.write(var, dvar);
-					}
-					else if ( type.equals(Integer.class) || type.equals(Integer.TYPE) ) {
-						ArrayInt.D1 dvar = new ArrayInt.D1(dataList.size());
-						for (int index = 0; index < dataList.size(); index++) {
-							SocatCruiseData datarow = (SocatCruiseData) dataList.get(index);
-							Integer dvalue = (Integer) f.get(datarow);
-							dvar.set(index, dvalue);
-						}
-						ncfile.write(var, dvar);
-					}
-					else if ( type.equals(Character.class) || type.equals(Character.TYPE) ) {
-						ArrayChar.D2 dvar = new ArrayChar.D2(dataList.size(), 1);
-						for (int index = 0; index < dataList.size(); index++) {
-							SocatCruiseData datarow = (SocatCruiseData) dataList.get(index);
-							Character dvalue = (Character) f.get(datarow);
-							dvar.set(index, 0, dvalue);
-						}
-						ncfile.write(var, dvar);
-					}
-					else
-						throw new RuntimeException("Unexpected data field type " + 
-								type.getSimpleName() + " for variable " + varName);
-				}
-			}
-
-			varName = Constants.SHORT_NAMES.get(Constants.time_VARNAME);
+			varName = timeType.getVarName();
 			var = ncfile.findVariable(varName);
 			if ( var == null )
-				throw new RuntimeException("Unexpected failure to find " +
-						"ncfile variable '" + varName + "'");
+				throw new RuntimeException("Unexpected failure to find ncfile variable '" + varName + "'");
 			ArrayDouble.D1 values = new ArrayDouble.D1(dataList.size());
 			for (int index = 0; index < dataList.size(); index++) {
 				SocatCruiseData datarow = dataList.get(index);
 				Integer year = datarow.getYear();
-				if ( year == SocatCruiseData.INT_MISSING_VALUE )
+				if ( year == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No year is given");
 				Integer month = datarow.getMonth();
-				if ( month == SocatCruiseData.INT_MISSING_VALUE )
+				if ( month == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No month is given");
 				Integer day = datarow.getDay();
-				if ( day == SocatCruiseData.INT_MISSING_VALUE )
+				if ( day == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No day is given");
 				Integer hour = datarow.getHour();
-				if ( hour == SocatCruiseData.INT_MISSING_VALUE )
+				if ( hour == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No hour is given");
 				Integer minute = datarow.getMinute();
-				if ( minute == SocatCruiseData.INT_MISSING_VALUE )
+				if ( minute == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No month is given");
 				Double second = datarow.getSecond();
 				Integer sec;
-				if ( second.isNaN() || (second == SocatCruiseData.FP_MISSING_VALUE) ) {
+				if ( second.isNaN() || (second == DashboardUtils.FP_MISSING_VALUE) ) {
 					sec = 0;
 				}
 				else {
@@ -402,18 +404,20 @@ public class CruiseDsgNcFile extends File {
 	 * Creates and assigns the internal metadata 
 	 * reference from the contents of this netCDF DSG file.
 	 * 
+	 * @param metadataTypes
+	 * 		known data types 
 	 * @return
 	 * 		names of the metadata fields not assigned from this 
 	 * 		netCDF file (will have its default/missing value)
 	 * @throws IOException
 	 * 		if there are problems opening or reading from the netCDF file
 	 */
-	public ArrayList<String> readMetadata() throws IOException {
+	public ArrayList<String> readMetadata(KnownDataTypes metadataTypes) throws IOException {
 		ArrayList<String> namesNotFound = new ArrayList<String>();
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
 			// Create the metadata with default (missing) values
-			metadata = new SocatMetadata();
+			metadata = new SocatMetadata(metadataTypes);
 
 			// Get all the metadata fields to be assigned
 			Field[] metaFields = SocatMetadata.class.getDeclaredFields();

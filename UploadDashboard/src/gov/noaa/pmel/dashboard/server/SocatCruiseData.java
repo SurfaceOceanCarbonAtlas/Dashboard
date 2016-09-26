@@ -180,7 +180,7 @@ public class SocatCruiseData {
 	public static final DashDataType FCO2_FROM_XCO2_TEQU = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_SST_VARNMAE = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
+	public static final DashDataType FCO2_FROM_XCO2_SST = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", 
 			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_PCO2_TEQU = new DashDataType("fCO2_from_pCO2_water_water_equi_temp", 
@@ -420,7 +420,7 @@ public class SocatCruiseData {
 		// Create the list of DashDataType objects - assumes data already standardized
 		ArrayList<DashDataType> dataTypes = new ArrayList<DashDataType>(dataColTypes.size());
 		for ( DataColumnType dctype : dataColTypes )
-			dataTypes.add(new DashDataType(dctype) );
+			dataTypes.add( new DashDataType(dctype) );
 		// Create the list of SOCAT cruise data objects, and populate
 		// it with data from each row of the table
 		ArrayList<SocatCruiseData> socatDataList = 
