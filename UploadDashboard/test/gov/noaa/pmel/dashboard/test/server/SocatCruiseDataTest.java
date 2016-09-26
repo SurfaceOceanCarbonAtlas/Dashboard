@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.test.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
@@ -16,7 +17,9 @@ import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -45,6 +48,8 @@ public class SocatCruiseDataTest {
 				SocatCruiseData.PATM.toPropertyValue());
 		addnTypeProps.setProperty(SocatCruiseData.SHIP_SPEED.getVarName(), 
 				SocatCruiseData.SHIP_SPEED.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.WOCE_CO2_WATER.getVarName(), 
+				SocatCruiseData.WOCE_CO2_WATER.toPropertyValue());
 		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
 	}
 
@@ -176,6 +181,75 @@ public class SocatCruiseDataTest {
 			assertEquals(WoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Water());
 			assertEquals(WoceEvent.WOCE_NOT_CHECKED, dataRow.getWoceCO2Atm());
 		}
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#getIntegerVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#setIntegerVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Integer)}.
+	 */
+	@Test
+	public void testGetSetIntegerVariableValue() {
+		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
+		Integer value = 123;
+		data.setIntegerVariableValue(KnownDataTypes.SAMPLE_NUMBER, value);
+		LinkedHashMap<DashDataType,Integer> intMap = data.getIntegerVariables();
+		assertEquals(value, intMap.get(KnownDataTypes.SAMPLE_NUMBER));
+		data.setIntegerVariableValue(KnownDataTypes.SAMPLE_NUMBER, null);
+		intMap = data.getIntegerVariables();
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, intMap.get(KnownDataTypes.SAMPLE_NUMBER));
+		boolean errCaught = false;
+		try {
+			data.setIntegerVariableValue(KnownDataTypes.TIME, value);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#getCharacterVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#setCharacterVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Character)}.
+	 */
+	@Test
+	public void testGetSetCharacterVariableValue() {
+		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
+		Character value = 'K';
+		data.setCharacterVariableValue(SocatCruiseData.WOCE_CO2_WATER, value);
+		LinkedHashMap<DashDataType,Character> charMap = data.getCharacterVariables();
+		assertEquals(value, charMap.get(SocatCruiseData.WOCE_CO2_WATER));
+		data.setCharacterVariableValue(SocatCruiseData.WOCE_CO2_WATER, null);
+		charMap = data.getCharacterVariables();
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(SocatCruiseData.WOCE_CO2_WATER));
+		boolean errCaught = false;
+		try {
+			data.setCharacterVariableValue(KnownDataTypes.TIME, value);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#getDoubleVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#setDoubleVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Double)}.
+	 */
+	@Test
+	public void testGetSetDoubleVariableValue() {
+		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
+		Double value = (new Date()).getTime() / 1000.0;
+		data.setDoubleVariableValue(KnownDataTypes.TIME, value);
+		LinkedHashMap<DashDataType,Double> doubleMap = data.getDoubleVariables();
+		assertEquals(value, doubleMap.get(KnownDataTypes.TIME));
+		data.setDoubleVariableValue(KnownDataTypes.TIME, null);
+		doubleMap = data.getDoubleVariables();
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(KnownDataTypes.TIME));
+		boolean errCaught = false;
+		try {
+			data.setDoubleVariableValue(KnownDataTypes.SAMPLE_NUMBER, value);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
 	}
 
 	static final Integer YEAR = 2014;

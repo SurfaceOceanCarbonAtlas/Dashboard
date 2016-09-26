@@ -442,6 +442,26 @@ public class SocatCruiseData {
 	}
 
 	/**
+	 * Updates the given Character type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#CHAR_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this data
+	 */
+	public void setCharacterVariableValue(DashDataType dtype, Character value) throws IllegalArgumentException {
+		if ( ! charValsMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown data character variable " + dtype.getVarName());
+		if ( value == null )
+			charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
+		else
+			charValsMap.put(dtype, value);
+	}
+
+	/**
 	 * @return
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
@@ -451,12 +471,52 @@ public class SocatCruiseData {
 	}
 
 	/**
+	 * Updates the given Double type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, NaN, or infinite, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this data
+	 */
+	public void setDoubleVariableValue(DashDataType dtype, Double value) throws IllegalArgumentException {
+		if ( ! doubleValsMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown data double variable " + dtype.getVarName());
+		if ( (value == null) || value.isNaN() || value.isInfinite() )
+			doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
+		else
+			doubleValsMap.put(dtype, value);
+	}
+
+	/**
 	 * @return
 	 * 		the map of variable names and values for Integer variables;
 	 * 		the actual map in this instance is returned.
 	 */
 	public LinkedHashMap<DashDataType,Integer> getIntegerVariables() {
 		return intValsMap;
+	}
+
+	/**
+	 * Updates the given Integer type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this data
+	 */
+	public void setIntegerVariableValue(DashDataType dtype, Integer value) throws IllegalArgumentException {
+		if ( ! intValsMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown data double variable " + dtype.getVarName());
+		if ( value == null )
+			intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
+		else
+			intValsMap.put(dtype, value);
 	}
 
 	/**

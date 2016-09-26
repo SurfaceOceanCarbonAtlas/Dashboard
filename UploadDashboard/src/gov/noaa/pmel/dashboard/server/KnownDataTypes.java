@@ -96,7 +96,7 @@ public class KnownDataTypes {
 			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
 
 	/** Marker data type used to indicate an severe error in a time or position */
-	public static final DataColumnType TIME_LOCATION = new DataColumnType("time_location", 
+	public static final DataColumnType GEOPOSITION = new DataColumnType("geoposition", 
 			null, null, null, null, DataColumnType.NO_UNITS);
 
 	/**

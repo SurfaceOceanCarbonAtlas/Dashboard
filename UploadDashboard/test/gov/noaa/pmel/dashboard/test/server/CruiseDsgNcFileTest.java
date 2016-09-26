@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test;
+package gov.noaa.pmel.dashboard.test.server;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Properties;
 
 import org.junit.Test;
 
@@ -27,28 +28,51 @@ import org.junit.Test;
 public class CruiseDsgNcFileTest {
     CruiseDsgNcFile dsgNcFile = null;
  
-    /**
+    static final KnownDataTypes KNOWN_METADATA_TYPES = new KnownDataTypes().addStandardTypesForMetadataFiles();
+	static final KnownDataTypes KNOWN_DATA_TYPES;
+	static {
+		KNOWN_DATA_TYPES = new KnownDataTypes();
+		KNOWN_DATA_TYPES.addStandardTypesForDataFiles();
+		Properties addnTypeProps = new Properties();
+		addnTypeProps.setProperty(SocatCruiseData.SST.getVarName(), 
+				SocatCruiseData.SST.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.SALINITY.getVarName(), 
+				SocatCruiseData.SALINITY.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.XCO2_WATER_SST_DRY.getVarName(), 
+				SocatCruiseData.XCO2_WATER_SST_DRY.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.PCO2_WATER_TEQU_WET.getVarName(), 
+				SocatCruiseData.PCO2_WATER_TEQU_WET.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.PATM.getVarName(), 
+				SocatCruiseData.PATM.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.SHIP_SPEED.getVarName(), 
+				SocatCruiseData.SHIP_SPEED.toPropertyValue());
+		addnTypeProps.setProperty(SocatCruiseData.WOCE_CO2_WATER.getVarName(), 
+				SocatCruiseData.WOCE_CO2_WATER.toPropertyValue());
+		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
+	}
+
+   /**
 	 * Test method for successfully creating a DSG file using 
 	 * {@link gov.noaa.pmel.dashboard.server.CruiseDsgNcFile#create}.
 	 */
 	@Test
 	public void testCreate() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				KnownDataTypes.EXPOCODE,
-				KnownDataTypes.CRUISE_NAME,
-				KnownDataTypes.MONTH, 
-				KnownDataTypes.DAY, 
-				KnownDataTypes.YEAR, 
-				KnownDataTypes.HOUR, 
-				KnownDataTypes.MINUTE, 
-				KnownDataTypes.LATITUDE, 
-				KnownDataTypes.LONGITUDE, 
-				KnownDataTypes.SEA_SURFACE_TEMPERATURE,
-				KnownDataTypes.SALINITY,
-				KnownDataTypes.XCO2_WATER_SST_DRY,
-				KnownDataTypes.PCO2_WATER_TEQU_WET,
-				KnownDataTypes.SEA_LEVEL_PRESSURE,
-				KnownDataTypes.SHIP_SPEED));
+				KnownDataTypes.EXPOCODE.duplicate(),
+				KnownDataTypes.DATASET_NAME.duplicate(),
+				KnownDataTypes.MONTH_OF_YEAR.duplicate(), 
+				KnownDataTypes.DAY_OF_MONTH.duplicate(), 
+				KnownDataTypes.YEAR.duplicate(), 
+				KnownDataTypes.HOUR_OF_DAY.duplicate(), 
+				KnownDataTypes.MINUTE_OF_HOUR.duplicate(), 
+				KnownDataTypes.LATITUDE.duplicate(), 
+				KnownDataTypes.LONGITUDE.duplicate(), 
+				SocatCruiseData.SST.duplicate(),
+				SocatCruiseData.SALINITY.duplicate(),
+				SocatCruiseData.XCO2_WATER_SST_DRY.duplicate(),
+				SocatCruiseData.PCO2_WATER_TEQU_WET.duplicate(),
+				SocatCruiseData.PATM.duplicate(),
+				SocatCruiseData.SHIP_SPEED.duplicate()));
 		String[] dataValueStrings = {
 				"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
 				"31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3", 
@@ -95,12 +119,11 @@ public class CruiseDsgNcFileTest {
 		}
 
 		// Create the list of SocatCruiseData from the DashboardCruiseWithData
-		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
+		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(KNOWN_DATA_TYPES, cruise);
 
 		// Create the SocatMetadata for this cruise
-		SocatMetadata metadata = new SocatMetadata();
+		SocatMetadata metadata = new SocatMetadata(KNOWN_METADATA_TYPES);
 		metadata.setExpocode(expocode);
-		metadata.setSocatVersion("3.0");
 		metadata.setDatasetName("GM0606");
 		metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
 		metadata.setVesselName("Caribbean Cruiser");
@@ -116,11 +139,7 @@ public class CruiseDsgNcFileTest {
 		if ( ! parentDir.exists() )
 			parentDir.mkdir();
 		dsgNcFile = new CruiseDsgNcFile(parentDir, expocode + ".nc");
-		try {
-			dsgNcFile.create(metadata, dataList);
-		} catch ( Exception ex ) {
-			dsgNcFile.delete();
-		}
+		dsgNcFile.create(metadata, dataList);
 		assertTrue( dsgNcFile.exists() );
 		assertEquals(expocode, dsgNcFile.getMetadata().getExpocode());
 		assertEquals(dataValueStrings.length, dsgNcFile.getDataList().size());
@@ -133,21 +152,21 @@ public class CruiseDsgNcFileTest {
 	@Test
 	public void testBadMissingValuesFail() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				KnownDataTypes.EXPOCODE,
-				KnownDataTypes.CRUISE_NAME,
-				KnownDataTypes.MONTH, 
-				KnownDataTypes.DAY, 
-				KnownDataTypes.YEAR, 
-				KnownDataTypes.HOUR, 
-				KnownDataTypes.MINUTE, 
-				KnownDataTypes.LATITUDE, 
-				KnownDataTypes.LONGITUDE, 
-				KnownDataTypes.SEA_SURFACE_TEMPERATURE,
-				KnownDataTypes.SALINITY,
-				KnownDataTypes.XCO2_WATER_SST_DRY,
-				KnownDataTypes.PCO2_WATER_TEQU_WET,
-				KnownDataTypes.SEA_LEVEL_PRESSURE,
-				KnownDataTypes.SHIP_SPEED));
+				KnownDataTypes.EXPOCODE.duplicate(),
+				KnownDataTypes.DATASET_NAME.duplicate(),
+				KnownDataTypes.MONTH_OF_YEAR.duplicate(),
+				KnownDataTypes.DAY_OF_MONTH.duplicate(),
+				KnownDataTypes.YEAR.duplicate(),
+				KnownDataTypes.HOUR_OF_DAY.duplicate(),
+				KnownDataTypes.MINUTE_OF_HOUR.duplicate(),
+				KnownDataTypes.LATITUDE.duplicate(),
+				KnownDataTypes.LONGITUDE.duplicate(),
+				SocatCruiseData.SST.duplicate(),
+				SocatCruiseData.SALINITY.duplicate(),
+				SocatCruiseData.XCO2_WATER_SST_DRY.duplicate(),
+				SocatCruiseData.PCO2_WATER_TEQU_WET.duplicate(),
+				SocatCruiseData.PATM.duplicate(),
+				SocatCruiseData.SHIP_SPEED.duplicate()));
 		String[][] badTimeDataValueStringsSets = {
 				{
 					"11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
@@ -180,12 +199,11 @@ public class CruiseDsgNcFileTest {
 			}
 
 			// Create the list of SocatCruiseData from the DashboardCruiseWithData
-			ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(cruise);
+			ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(KNOWN_DATA_TYPES, cruise);
 
 			// Create the SocatMetadata for this cruise
-			SocatMetadata metadata = new SocatMetadata();
+			SocatMetadata metadata = new SocatMetadata(KNOWN_METADATA_TYPES);
 			metadata.setExpocode(expocode);
-			metadata.setSocatVersion("3.0");
 			metadata.setDatasetName("GM0606");
 			metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
 			metadata.setVesselName("Caribbean Cruiser");

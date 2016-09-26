@@ -7,7 +7,6 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 
 /**
@@ -93,12 +92,52 @@ public class SocatMetadata {
 	}
 
 	/**
+	 * Updates the given String type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this metadata
+	 */
+	public void setStringVariableValue(DashDataType dtype, String value) throws IllegalArgumentException {
+		if ( ! stringValuesMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown metadata string variable " + dtype.getVarName());
+		if ( value == null )
+			stringValuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
+		else
+			stringValuesMap.put(dtype, value);
+	}
+
+	/**
 	 * @return
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public Map<DashDataType,Double> getDoubleVariables() {
+	public LinkedHashMap<DashDataType,Double> getDoubleVariables() {
 		return doubleValuesMap;
+	}
+
+	/**
+	 * Updates the given Double type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, NaN, or infinite, {@link DashboardUtils#FP_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this metadata
+	 */
+	public void setDoubleVariableValue(DashDataType dtype, Double value) throws IllegalArgumentException {
+		if ( ! doubleValuesMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown metadata double variable " + dtype.getVarName());
+		if ( (value == null) || value.isNaN() || value.isInfinite() )
+			doubleValuesMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
+		else
+			doubleValuesMap.put(dtype, value);
 	}
 
 	/**
@@ -106,8 +145,28 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for Date variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public Map<DashDataType,Date> getDateVariables() {
+	public LinkedHashMap<DashDataType,Date> getDateVariables() {
 		return dateValuesMap;
+	}
+
+	/**
+	 * Updates the given Date type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#DATE_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this metadata
+	 */
+	public void setDateVariableValue(DashDataType dtype, Date value) throws IllegalArgumentException {
+		if ( ! dateValuesMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown metadata Date variable " + dtype.getVarName());
+		if ( value == null )
+			dateValuesMap.put(dtype, DashboardUtils.DATE_MISSING_VALUE);
+		else
+			dateValuesMap.put(dtype, value);
 	}
 
 	/**

@@ -6,11 +6,13 @@ package gov.noaa.pmel.dashboard.test.server;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 
 import org.junit.Test;
 
@@ -38,6 +40,76 @@ public class SocatMetadataTest {
 	static final String ALL_REGION_IDS = "NT";
 	static final String SOCAT_DOI = "doi:pangaea012345";
 	static final String QC_FLAG = "C";
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getStringVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetStringVariableValue() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		mdata.setStringVariableValue(KnownDataTypes.EXPOCODE, EXPOCODE);
+		LinkedHashMap<DashDataType,String> stringMap = mdata.getStringVariables();
+		assertEquals(EXPOCODE, stringMap.get(KnownDataTypes.EXPOCODE));
+		mdata.setStringVariableValue(KnownDataTypes.EXPOCODE, null);
+		stringMap = mdata.getStringVariables();
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, stringMap.get(KnownDataTypes.EXPOCODE));
+		boolean errCaught = false;
+		try {
+			mdata.setStringVariableValue(KnownDataTypes.EASTERNMOST_LONGITUDE, EXPOCODE);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getDoubleVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setDoubleVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Double)}.
+	 */
+	@Test
+	public void testGetSetDoubleVariableValue() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		Double value = Double.valueOf(EASTMOST_LONGITUDE);
+		mdata.setDoubleVariableValue(KnownDataTypes.EASTERNMOST_LONGITUDE, value);
+		LinkedHashMap<DashDataType,Double> doubleMap = mdata.getDoubleVariables();
+		assertEquals(value, doubleMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE));
+		mdata.setDoubleVariableValue(KnownDataTypes.EASTERNMOST_LONGITUDE, null);
+		doubleMap = mdata.getDoubleVariables();
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE));
+		boolean errCaught = false;
+		try {
+			mdata.setDoubleVariableValue(KnownDataTypes.EXPOCODE, value);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getDateVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setDateVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.util.Date)}.
+	 */
+	@Test
+	public void testGetSetDateVariableValue() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		mdata.setDateVariableValue(KnownDataTypes.TIME_COVERAGE_START, BEGIN_TIME);
+		LinkedHashMap<DashDataType,Date> dateMap = mdata.getDateVariables();
+		assertEquals(BEGIN_TIME, dateMap.get(KnownDataTypes.TIME_COVERAGE_START));
+		mdata.setDateVariableValue(KnownDataTypes.TIME_COVERAGE_START, null);
+		dateMap = mdata.getDateVariables();
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, dateMap.get(KnownDataTypes.TIME_COVERAGE_START));
+		boolean errCaught = false;
+		try {
+			mdata.setDateVariableValue(KnownDataTypes.EXPOCODE, BEGIN_TIME);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		assertTrue( errCaught );
+	}
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getExpocode()}
