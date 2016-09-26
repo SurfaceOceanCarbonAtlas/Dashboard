@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.handlers;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -77,6 +78,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				Pattern.CASE_INSENSITIVE)
 	};
 
+	private KnownDataTypes userTypes;
+
 	/**
 	 * Handles storage and retrieval of cruise data in files 
 	 * under the given cruise files directory.
@@ -87,14 +90,17 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * 		username for SVN authentication
 	 * @param svnPassword
 	 * 		password for SVN authentication
+	 * @param userTypes
+	 * 		known user data column types
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist,
 	 * 		is not a directory, or is not under SVN 
 	 * 		version control
 	 */
 	public CruiseFileHandler(String cruiseFilesDirName, String svnUsername, 
-						String svnPassword) throws IllegalArgumentException {
+			String svnPassword, KnownDataTypes userTypes) throws IllegalArgumentException {
 		super(cruiseFilesDirName, svnUsername, svnPassword);
+		this.userTypes = userTypes;
 	}
 
 	/**
@@ -469,9 +475,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		// Check if there was an expocode column
 		String expocode = "";
-		int k = cruiseData.getDataColTypes().indexOf(DataColumnType.EXPOCODE);
-		if ( k >= 0 ) {
-			expocode = cruiseData.getDataValues().get(0).get(k).toUpperCase();
+		int k = 0;
+		for ( DataColumnType dctype : cruiseData.getDataColTypes() ) {
+			if ( KnownDataTypes.EXPOCODE.typeNameEquals(dctype) ) {
+				expocode = cruiseData.getDataValues().get(0).get(k).toUpperCase();
+				break;
+			}
+			k++;
 		}
 		if ( ! expocode.isEmpty() ) {
 			if ( assignCruiseInfo && ! expocodeFound ) {
@@ -584,22 +594,28 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Number of data rows with warning messages
 		cruiseProps.setProperty(NUM_WARN_ROWS_ID, 
 				Integer.toString(cruise.getNumWarnRows()));
-		// Data column types - encoded using the enumerated names
-		ArrayList<String> colTypeNames = 
-				new ArrayList<String>(cruise.getDataColTypes().size());
-		for ( DataColumnType colType : cruise.getDataColTypes() )
-			colTypeNames.add(colType.name());
-		cruiseProps.setProperty(DATA_COLUMN_TYPES_ID, 
-				DashboardUtils.encodeStringArrayList(colTypeNames));
 		// Data column name in the original upload data file
 		cruiseProps.setProperty(USER_COLUMN_NAMES_ID, 
 				DashboardUtils.encodeStringArrayList(cruise.getUserColNames()));
+		// Data column type information
+		int numCols = cruise.getDataColTypes().size();
+		ArrayList<String> colTypeNames = new ArrayList<String>(numCols);
+		ArrayList<String> colUnitNames = new ArrayList<String>(numCols);
+		ArrayList<String> colMissValues = new ArrayList<String>(numCols);
+		for ( DataColumnType colType : cruise.getDataColTypes() ) {
+			colTypeNames.add(colType.getVarName());
+			colUnitNames.add(colType.getUnits().get(colType.getSelectedUnitIndex()));
+			colMissValues.add(colType.getSelectedMissingValue());
+		}
+		// Data column type/variable name
+		cruiseProps.setProperty(DATA_COLUMN_TYPES_ID, 
+				DashboardUtils.encodeStringArrayList(colTypeNames));
 		// Unit for each data column
 		cruiseProps.setProperty(DATA_COLUMN_UNITS_ID, 
-				DashboardUtils.encodeStringArrayList(cruise.getDataColUnits()));
+				DashboardUtils.encodeStringArrayList(colUnitNames));
 		// Missing value for each data column
 		cruiseProps.setProperty(MISSING_VALUES_ID, 
-				DashboardUtils.encodeStringArrayList(cruise.getMissingValues()));
+				DashboardUtils.encodeStringArrayList(colMissValues));
 		// WOCE-3 row indices for each data column
 		cruiseProps.setProperty(WOCE_THREE_ROWS_ID, 
 				DashboardUtils.encodeSetsArrayList(cruise.getWoceThreeRowIndices()));
@@ -1014,7 +1030,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		boolean hasExpoColumn = false;
 		for ( DataColumnType type : cruiseData.getDataColTypes() ) {
 			k++;
-			if ( DataColumnType.EXPOCODE.equals(type) ) {
+			if ( KnownDataTypes.EXPOCODE.typeNameEquals(type) ) {
 				hasExpoColumn = true;
 				break;
 			}
@@ -1317,50 +1333,54 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IllegalArgumentException(ex);
 		}
 
-		// Data column types - encoded using the enumerated names
-		value = cruiseProps.getProperty(DATA_COLUMN_TYPES_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					DATA_COLUMN_TYPES_ID + " given in " + infoFile.getPath());
-		ArrayList<String> colTypeNames = DashboardUtils.decodeStringArrayList(value);
-		// Assign the column types directly to the array in the cruise 
-		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
-		colTypes.clear();
-		for ( String name : colTypeNames )
-			colTypes.add(DataColumnType.valueOf(name));
-
 		// Data column name in the original upload data file
 		value = cruiseProps.getProperty(USER_COLUMN_NAMES_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
 					USER_COLUMN_NAMES_ID + " given in " + infoFile.getPath());
 		cruise.setUserColNames(DashboardUtils.decodeStringArrayList(value));
-		if ( cruise.getUserColNames().size() != colTypes.size() )
-			throw new IllegalArgumentException(
-					"number of user column names different from " +
-					"number of data column types");
+		int numCols =  cruise.getUserColNames().size();
 
-		// Unit for each data column
+		// Get the data column type information
+		value = cruiseProps.getProperty(DATA_COLUMN_TYPES_ID);
+		if ( value == null )
+			throw new IllegalArgumentException("No property value for " + 
+					DATA_COLUMN_TYPES_ID + " given in " + infoFile.getPath());
+		ArrayList<String> colTypeNames = DashboardUtils.decodeStringArrayList(value);
+		if ( colTypeNames.size() != numCols )
+			throw new IllegalArgumentException("number of data column types " +
+					"different from number of user column names");
 		value = cruiseProps.getProperty(DATA_COLUMN_UNITS_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
 					DATA_COLUMN_UNITS_ID + " given in " + infoFile.getPath());
-		cruise.setDataColUnits(DashboardUtils.decodeStringArrayList(value));
-		if ( cruise.getDataColUnits().size() != colTypes.size() )
-			throw new IllegalArgumentException(
-					"number of data column units different from " +
-					"number of data column types");
-
-		// Missing values for each data column
+		ArrayList<String> colTypeUnits = DashboardUtils.decodeStringArrayList(value);
+		if ( colTypeUnits.size() != numCols )
+			throw new IllegalArgumentException("number of data column units " +
+					"different from number of user column names");
 		value = cruiseProps.getProperty(MISSING_VALUES_ID);
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
 					MISSING_VALUES_ID + " given in " + infoFile.getPath());
-		cruise.setMissingValues(DashboardUtils.decodeStringArrayList(value));
-		if ( cruise.getMissingValues().size() != colTypes.size() )
-			throw new IllegalArgumentException(
-					"number of data column missing-value values different from " +
-					"number of data column types");
+		ArrayList<String> colMissValues = DashboardUtils.decodeStringArrayList(value);
+		if ( colMissValues.size() != numCols )
+			throw new IllegalArgumentException("number of data column missing values " +
+					"different from number of user column names");
+
+		// Assign the data column types 
+		ArrayList<DataColumnType> dataColTypes = new ArrayList<DataColumnType>(numCols);
+		for (int k = 0; k < numCols; k++) {
+			DataColumnType dctype = userTypes.getDataColumnType(colTypeNames.get(k));
+			int index = dctype.getUnits().indexOf(colTypeUnits.get(k));
+			if ( index < 0 )
+				throw new IllegalArgumentException("unknown unit \"" + 
+						colTypeUnits.get(k) + "\" for varName \"" + 
+						dctype.getVarName() + "\"");
+			dctype.setSelectedUnitIndex(index);
+			dctype.setSelectedMissingValue(colMissValues.get(k));
+			dataColTypes.add(dctype);
+		}
+		cruise.setDataColTypes(dataColTypes);
 
 		// WOCE-3 row indices for each data column
 		value = cruiseProps.getProperty(WOCE_THREE_ROWS_ID);

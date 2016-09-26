@@ -144,7 +144,7 @@ public class DashboardConfigStore {
 	private OmePdfGenerator omePdfGenerator;
 	private KnownDataTypes knownUserDataTypes;
 	private KnownDataTypes knownMetadataTypes;
-	private KnownDataTypes knownDataTypes;
+	private KnownDataTypes knownDataFileTypes;
 
 	private HashSet<File> filesToWatch;
 	private Thread watcherThread;
@@ -288,13 +288,23 @@ public class DashboardConfigStore {
 		if ( propVal != null )
 			svnPassword = propVal.trim();
 
+		knownUserDataTypes = SocatTypes.KNOWN_SOCAT_USER_TYPES;
+		// TODO: read additional types from Properties files
+
+		knownMetadataTypes = SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES;
+		// TODO: read additional types from Properties files
+
+		knownDataFileTypes = SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES;
+		// TODO: read additional types from Properties files
+
 		// Read the user files directory name
 		try {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			userFileHandler = new UserFileHandler(propVal, svnUsername, svnPassword);
+			userFileHandler = new UserFileHandler(propVal, svnUsername, 
+					svnPassword, knownUserDataTypes);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -307,7 +317,8 @@ public class DashboardConfigStore {
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cruiseFileHandler = new CruiseFileHandler(propVal, svnUsername, svnPassword);
+			cruiseFileHandler = new CruiseFileHandler(propVal, svnUsername, 
+					svnPassword, knownUserDataTypes);
 			// Put SanityChecker message files in the same directory
 			checkerMsgHandler = new CheckerMessageHandler(propVal);
 		} catch ( Exception ex ) {
@@ -406,15 +417,6 @@ public class DashboardConfigStore {
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 
-		knownUserDataTypes = SocatTypes.KNOWN_SOCAT_USER_TYPES;
-		// TODO: read additional types from Properties files
-
-		knownMetadataTypes = SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES;
-		// TODO: read additional types from Properties files
-
-		knownDataTypes = SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES;
-		// TODO: read additional types from Properties files
-
 		// Read the Ferret configuration filename
 		try {
 			propVal = configProps.getProperty(FERRET_CONFIG_FILE_NAME_TAG);
@@ -491,7 +493,8 @@ public class DashboardConfigStore {
 		}
 		try {
 			dsgNcFileHandler = new DsgNcFileHandler(dsgFileDirName, decDsgFileDirName,
-					erddapDsgFlagFileName, erddapDecDsgFlagFileName, ferretConf);
+					erddapDsgFlagFileName, erddapDecDsgFlagFileName, ferretConf, 
+					knownMetadataTypes, knownDataFileTypes);
 		} catch ( Exception ex ) {
 			throw new IOException(ex);
 		}
@@ -867,18 +870,6 @@ public class DashboardConfigStore {
 		return omePdfGenerator;
 	}
 
-	public KnownDataTypes getKnownUserDataTypes() {
-		return knownUserDataTypes;
-	}
-
-	public KnownDataTypes getKnownMetadataTypes() {
-		return knownMetadataTypes;
-	}
-
-	public KnownDataTypes getKnownDataTypes() {
-		return knownDataTypes;
-	}
-	
 	/**
 	 * Validate a username from the user info map
 	 *  

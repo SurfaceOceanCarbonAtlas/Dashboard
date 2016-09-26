@@ -5,11 +5,11 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.nc.Constants;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
@@ -51,6 +51,8 @@ public class DsgNcFileHandler {
 	private File erddapDsgFlagFile;
 	private File erddapDecDsgFlagFile;
 	private FerretConfig ferretConfig;
+	private KnownDataTypes knownMetadataTypes;
+	private KnownDataTypes knownDataFileTypes;
 	private WatchService watcher;
 	private Thread watcherThread;
 	private Logger itsLogger;
@@ -78,7 +80,8 @@ public class DsgNcFileHandler {
 	 */
 	public DsgNcFileHandler(String dsgFilesDirName, String decDsgFilesDirName,
 			String erddapDsgFlagFileName, String erddapDecDsgFlagFileName, 
-			FerretConfig ferretConf) {
+			FerretConfig ferretConf, KnownDataTypes knownMetadataTypes, 
+			KnownDataTypes knownDataFileTypes) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
@@ -96,6 +99,8 @@ public class DsgNcFileHandler {
 			throw new IllegalArgumentException("parent directory of " + 
 					erddapDecDsgFlagFile.getPath() + " is not valid");
 		ferretConfig = ferretConf;
+		this.knownMetadataTypes = knownMetadataTypes;
+		this.knownDataFileTypes = knownDataFileTypes;
 		savingDsgFileLock = new Object();
 
 		try {
@@ -210,7 +215,8 @@ public class DsgNcFileHandler {
 		// The value of allRegionsIDs will be empty - needs IDs from Ferret
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<SocatCruiseData> socatDatalist = 
-				SocatCruiseData.dataListFromDashboardCruise(cruiseData);
+				SocatCruiseData.dataListFromDashboardCruise(
+						knownDataFileTypes, cruiseData);
 
 		// synchronize on savingDsgFileLock to block examination 
 		// of this DSG files until we finished creating it
@@ -246,8 +252,6 @@ public class DsgNcFileHandler {
 
 			// end of synchronized block
 		}
-
-		// TODO: ? archive ncdump of the NetCDF DSG file ?
 	}
 
 	/**
@@ -316,10 +320,10 @@ public class DsgNcFileHandler {
 		CruiseDsgNcFile oldDsgFile = getDsgNcFile(oldExpocode);
 		if ( oldDsgFile.exists() )  {
 			// Just re-create the DSG file with the updated metadata
-			ArrayList<String> missing = oldDsgFile.readMetadata();
+			ArrayList<String> missing = oldDsgFile.readMetadata(knownMetadataTypes);
 			if ( ! missing.isEmpty() )
 				throw new RuntimeException("Unexpected metadata fields missing from the DSG file: " + missing);
-			missing = oldDsgFile.readData();
+			missing = oldDsgFile.readData(knownDataFileTypes);
 			if ( ! missing.isEmpty() )
 				throw new RuntimeException("Unexpected data fields missing from the DSG file: " + missing);
 			try {
@@ -436,8 +440,7 @@ public class DsgNcFileHandler {
 		if ( ! dsgFile.exists() )
 			throw new FileNotFoundException("Full data DSG file for " + 
 					expocode + " does not exist");
-		char[] regions = dsgFile.readCharVarDataValues(
-				Constants.SHORT_NAMES.get(Constants.regionID_VARNAME));
+		char[] regions = dsgFile.readCharVarDataValues(SocatCruiseData.REGION_ID.getVarName());
 		TreeSet<Character> regionsSet = new TreeSet<Character>();
 		for ( char value : regions )
 			regionsSet.add(value);
