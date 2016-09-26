@@ -223,6 +223,10 @@ public class CruiseDsgNcFile extends File {
 				var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
 				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
 						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
+				if ( KnownDataTypes.TIME.typeNameEquals(dtype) ) {
+					// Additional attribute giving the time origin (although also mentioned in the units)
+					ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+				}
 				if ( dtype.getStandardName().endsWith("depth") ) {
 					ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
 				}
@@ -237,15 +241,9 @@ public class CruiseDsgNcFile extends File {
 						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
 			}
 
-			// Add the "time" variable which will be assigned using the year, month, day, hour, minute, 
-			// and (optionally) second values for each data point
-			DashDataType timeType = KnownDataTypes.TIME;
-			varName = timeType.getVarName();
-			var = ncfile.addVariable(null, varName, DataType.DOUBLE, dataDims);
-			addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, timeType.getDescription(), 
-					timeType.getStandardName(), timeType.getCategoryName(), timeType.getUnits().get(0));
-			// Additional attribute giving the time origin (although also mentioned in the units)
-			ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
+			// The "time" variable should have been one of the known data file variables,
+			// although it is probably all-missing.  It will be assigned below using the 
+			// year, month, day, hour, minute, and (optionally) second values for each data point
 
 			ncfile.create();
 
@@ -350,7 +348,9 @@ public class CruiseDsgNcFile extends File {
 				}
 			}
 
-			varName = timeType.getVarName();
+			// Reassign the time variable using the year, month, day, hour, 
+			// minute, and (optionally) second values for each data point
+			varName = KnownDataTypes.TIME.getVarName();
 			var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new RuntimeException("Unexpected failure to find ncfile variable '" + varName + "'");

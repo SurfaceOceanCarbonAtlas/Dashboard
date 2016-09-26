@@ -252,6 +252,21 @@ public class SocatCruiseDataTest {
 		assertTrue( errCaught );
 	}
 
+	static final Integer SAMPLE_NUMBER = 123;
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#getSampleNumber()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#setSampleNumber(java.lang.Integer)}.
+	 */
+	@Test
+	public void testGetSetSampleNumber() {
+		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
+		data.setSampleNumber(SAMPLE_NUMBER);
+		assertEquals(SAMPLE_NUMBER, data.getSampleNumber());
+		data.setSampleNumber(null);
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
+	}
+
 	static final Integer YEAR = 2014;
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatCruiseData#getYear()}
@@ -263,6 +278,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
 		data.setYear(YEAR);
 		assertEquals(YEAR, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setYear(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
 	}
@@ -279,6 +295,7 @@ public class SocatCruiseDataTest {
 		data.setMonth(MONTH);
 		assertEquals(MONTH, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setMonth(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 	}
@@ -296,6 +313,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DAY, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setDay(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 	}
@@ -314,6 +332,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setHour(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getHour());
 	}
@@ -333,6 +352,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setMinute(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMinute());
 	}
@@ -353,6 +373,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setSecond(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSecond());
 	}
@@ -374,6 +395,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setLongitude(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getLongitude());
 	}
@@ -396,6 +418,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setLatitude(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getLatitude());
 	}
@@ -419,6 +442,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setSampleDepth(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSampleDepth());
 	}
@@ -443,6 +467,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setSst(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSst());
 	}
@@ -468,6 +493,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setTEqu(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getTEqu());
 	}
@@ -494,6 +520,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setSalinity(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getSalinity());
 	}
@@ -521,6 +548,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setPAtm(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getPAtm());
 	}
@@ -549,6 +577,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setPEqu(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getPEqu());
 	}
@@ -578,6 +607,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setXCO2WaterSstDry(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getXCO2WaterSstDry());
 	}
@@ -608,6 +638,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setXCO2WaterTEquDry(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getXCO2WaterTEquDry());
 	}
@@ -639,6 +670,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setFCO2WaterSstWet(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getFCO2WaterSstWet());
 	}
@@ -671,6 +703,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setFCO2WaterTEquWet(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getFCO2WaterTEquWet());
 	}
@@ -704,6 +737,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setPCO2WaterSstWet(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getPCO2WaterSstWet());
 	}
@@ -738,6 +772,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setPCO2WaterTEquWet(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getPCO2WaterTEquWet());
 	}
@@ -773,6 +808,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setWoaSalinity(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getWoaSalinity());
 	}
@@ -809,6 +845,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setNcepSlp(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getNcepSlp());
 	}
@@ -846,6 +883,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setfCO2Rec(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getfCO2Rec());
 	}
@@ -884,6 +922,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setFCO2Source(null);
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getFCO2Source());
 	}
@@ -923,6 +962,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setRegionID(null);
 		assertEquals(DataLocation.GLOBAL_REGION_ID, data.getRegionID());
 	}
@@ -963,6 +1003,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setEtopo2Depth(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getEtopo2Depth());
 	}
@@ -1004,6 +1045,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setGvCO2(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getGvCO2());
 	}
@@ -1046,6 +1088,7 @@ public class SocatCruiseDataTest {
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getDay());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getMonth());
 		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getYear());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, data.getSampleNumber());
 		data.setDistToLand(null);
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, data.getDistToLand());
 	}
@@ -1061,6 +1104,13 @@ public class SocatCruiseDataTest {
 		assertFalse( data.equals(YEAR) );
 
 		SocatCruiseData other = new SocatCruiseData(KNOWN_DATA_TYPES);
+		assertTrue( data.hashCode() == other.hashCode() );
+		assertTrue( data.equals(other) );
+
+		data.setSampleNumber(SAMPLE_NUMBER);
+		assertFalse( data.hashCode() == other.hashCode() );
+		assertFalse( data.equals(other) );
+		other.setSampleNumber(SAMPLE_NUMBER);
 		assertTrue( data.hashCode() == other.hashCode() );
 		assertTrue( data.equals(other) );
 

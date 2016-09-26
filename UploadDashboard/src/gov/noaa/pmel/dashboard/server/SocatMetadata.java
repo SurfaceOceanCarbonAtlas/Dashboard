@@ -574,16 +574,16 @@ public class SocatMetadata {
 	/**
 	 * @return
 	 * 		the maximum length of String values given in the fields 
-	 * 		of this instance, rounded up to the nearest multiple of 16
-	 * 		(and never less than 16).
+	 * 		of this instance, rounded up to the nearest multiple of 32
+	 * 		(and never less than 32).
 	 */
 	public int getMaxStringLength() {
-		int maxLength = 16;
+		int maxLength = 32;
 		for ( String value : stringValuesMap.values() ) {
 			if ( maxLength < value.length() )
 				maxLength = value.length();
 		}
-		maxLength += (maxLength % 16);
+		maxLength = 32 * ((maxLength + 31) / 32);
 		return maxLength;
 	}
 
@@ -641,11 +641,11 @@ public class SocatMetadata {
 	public String toString() {
 		String repr = "SocatMetadata[\n";
 		for ( Entry<DashDataType,String> entry : stringValuesMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue() + "\n";
+			repr += "    " + entry.getKey().getVarName() + "=\"" + entry.getValue() + "\"\n";
 		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		for ( Entry<DashDataType,Date> entry : dateValuesMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		repr += "]";
 		return repr;
 	}

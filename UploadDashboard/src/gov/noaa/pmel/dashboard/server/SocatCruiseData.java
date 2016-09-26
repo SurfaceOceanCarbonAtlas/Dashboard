@@ -521,6 +521,30 @@ public class SocatCruiseData {
 
 	/**
 	 * @return 
+	 * 		the sample number; 
+	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned or not positive
+	 */
+	public Integer getSampleNumber() {
+		Integer value = intValsMap.get(KnownDataTypes.SAMPLE_NUMBER);
+		if ( (value == null) || (value < 1) )
+			value = DashboardUtils.INT_MISSING_VALUE;
+		return value;
+	}
+
+	/**
+	 * @param sampleNumber 
+	 * 		the sample number to set; 
+	 * 		if null or not positive, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+	 */
+	public void setSampleNumber(Integer sampleNumber) {
+		Integer value = sampleNumber;
+		if ( (value == null) || (value < 1) )
+			value = DashboardUtils.INT_MISSING_VALUE;
+		intValsMap.put(KnownDataTypes.SAMPLE_NUMBER, value);
+	}
+
+	/**
+	 * @return 
 	 * 		the year of the data measurement; 
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
@@ -1321,9 +1345,9 @@ public class SocatCruiseData {
 		for ( Entry<DashDataType,Integer> entry : intValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=" + entry.getKey().toString() + "\n";
+			repr += "    " + entry.getKey().getVarName() + "='" + entry.getValue().toString() + "'\n";
 		repr += "]";
 		return repr;
 	}

@@ -189,7 +189,7 @@ public class KnownDataTypes {
 			INT_DATA_CLASS_NAME, "hour of day", "hour_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DashDataType MINUTE_OF_HOUR = new DashDataType("minute", 
-			INT_DATA_CLASS_NAME, "minute of hour", "minute_if_hour", TIME_CATEGORY, DataColumnType.NO_UNITS);
+			INT_DATA_CLASS_NAME, "minute of hour", "minute_of_hour", TIME_CATEGORY, DataColumnType.NO_UNITS);
 
 	public static final DashDataType SECOND_OF_MINUTE = new DashDataType("second", 
 			DOUBLE_DATA_CLASS_NAME, "second of minute", "second_of_minute", TIME_CATEGORY, DataColumnType.NO_UNITS);

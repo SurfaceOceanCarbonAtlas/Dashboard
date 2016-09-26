@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -18,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Properties;
 
 import org.junit.Test;
 
@@ -28,29 +28,6 @@ import org.junit.Test;
 public class CruiseDsgNcFileTest {
     CruiseDsgNcFile dsgNcFile = null;
  
-    static final KnownDataTypes KNOWN_METADATA_TYPES = new KnownDataTypes().addStandardTypesForMetadataFiles();
-	static final KnownDataTypes KNOWN_DATA_TYPES;
-	static {
-		KNOWN_DATA_TYPES = new KnownDataTypes();
-		KNOWN_DATA_TYPES.addStandardTypesForDataFiles();
-		Properties addnTypeProps = new Properties();
-		addnTypeProps.setProperty(SocatCruiseData.SST.getVarName(), 
-				SocatCruiseData.SST.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.SALINITY.getVarName(), 
-				SocatCruiseData.SALINITY.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.XCO2_WATER_SST_DRY.getVarName(), 
-				SocatCruiseData.XCO2_WATER_SST_DRY.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.PCO2_WATER_TEQU_WET.getVarName(), 
-				SocatCruiseData.PCO2_WATER_TEQU_WET.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.PATM.getVarName(), 
-				SocatCruiseData.PATM.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.SHIP_SPEED.getVarName(), 
-				SocatCruiseData.SHIP_SPEED.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.WOCE_CO2_WATER.getVarName(), 
-				SocatCruiseData.WOCE_CO2_WATER.toPropertyValue());
-		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
-	}
-
    /**
 	 * Test method for successfully creating a DSG file using 
 	 * {@link gov.noaa.pmel.dashboard.server.CruiseDsgNcFile#create}.
@@ -119,10 +96,10 @@ public class CruiseDsgNcFileTest {
 		}
 
 		// Create the list of SocatCruiseData from the DashboardCruiseWithData
-		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(KNOWN_DATA_TYPES, cruise);
+		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
 
 		// Create the SocatMetadata for this cruise
-		SocatMetadata metadata = new SocatMetadata(KNOWN_METADATA_TYPES);
+		SocatMetadata metadata = new SocatMetadata(SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES);
 		metadata.setExpocode(expocode);
 		metadata.setDatasetName("GM0606");
 		metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
@@ -199,10 +176,10 @@ public class CruiseDsgNcFileTest {
 			}
 
 			// Create the list of SocatCruiseData from the DashboardCruiseWithData
-			ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(KNOWN_DATA_TYPES, cruise);
+			ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
 
 			// Create the SocatMetadata for this cruise
-			SocatMetadata metadata = new SocatMetadata(KNOWN_METADATA_TYPES);
+			SocatMetadata metadata = new SocatMetadata(SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES);
 			metadata.setExpocode(expocode);
 			metadata.setDatasetName("GM0606");
 			metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
