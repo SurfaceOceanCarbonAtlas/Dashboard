@@ -4,6 +4,7 @@
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -37,9 +38,8 @@ public class UserFileHandler extends VersionedFileHandler {
 	private static final String USER_DATA_COLUMNS_NAME_EXTENSION =
 			"_data_columns.properties";
 
+	private KnownDataTypes userTypes;
 	private HashMap<String,DataColumnType> defaultColNamesToTypes;
-	private HashMap<String,String> defaultColNamesToUnits;
-	private HashMap<String,String> defaultColNamesToMissVals;
 
 	/**
 	 * Handles storage and retrieval of user data in files under 
@@ -51,6 +51,8 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		username for SVN authentication
 	 * @param svnPassword
 	 * 		password for SVN authentication
+	 * @param userTypes
+	 * 		known user-provided data column types 
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a 
 	 * 		directory, or is not under SVN version control; 
@@ -58,17 +60,14 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		file does not exist or is invalid.
 	 */
 	public UserFileHandler(String userFilesDirName, String svnUsername,
-					String svnPassword) throws IllegalArgumentException {
+					String svnPassword, KnownDataTypes userTypes) 
+							throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
+		this.userTypes = userTypes;
 		// Generate the default data column name to type map
 		defaultColNamesToTypes = new HashMap<String,DataColumnType>();
-		defaultColNamesToUnits = new HashMap<String,String>();
-		defaultColNamesToMissVals = new HashMap<String,String>();
-		addDataColumnNames(
-				new File(userFilesDirName, DEFAULT_DATA_COLUMNS_FILENAME), 
-				defaultColNamesToTypes, 
-				defaultColNamesToUnits, 
-				defaultColNamesToMissVals);
+		addDataColumnNames(defaultColNamesToTypes,
+				new File(userFilesDirName, DEFAULT_DATA_COLUMNS_FILENAME));
 	}
 
 	/**
@@ -76,24 +75,18 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * types, units, and missing values, and adds these mappings to the 
 	 * provided maps.
 	 * 
-	 * @param propFile
-	 * 		properties file where each key is the name of a data column, 
-	 * 		and each value is the name of a DataColumnType, a comma, a 
-	 * 		unit string, a comma, and a missing value string
 	 * @param dataColNamesToTypes
-	 * 		add the mappings of column names to types to this map
-	 * @param dataColNamesToUnits
-	 * 		add the mappings of column names to units to this map
-	 * @param dataColNamesToMissVals
-	 * 		add the mappings of column names to missing values to this map
+	 * 		add the mappings of column name keys to types to this map
+	 * @param propFile
+	 * 		properties file where each key is the data column name key, 
+	 * 		and each value is the varName of a DataColumnType, a comma, 
+	 * 		a unit string, a comma, and a missing value string
 	 * @throws IllegalArgumentException
 	 * 		if the properties file does not exist or is invalid
 	 */
-	private void addDataColumnNames(File propFile, 
-			HashMap<String,DataColumnType> dataColNamesToTypes,
-			HashMap<String,String> dataColNamesToUnits,
-			HashMap<String,String> dataColNamesToMissVals) 
-										throws IllegalArgumentException {
+	private void addDataColumnNames(
+			HashMap<String,DataColumnType> dataColNamesToTypes, 
+			File propFile) throws IllegalArgumentException {
 		// Read the column name to type properties file
 		Properties colProps = new Properties();
 		try {
@@ -116,9 +109,17 @@ public class UserFileHandler extends VersionedFileHandler {
 				throw new IllegalArgumentException("invalid type,unit,missing value \"" + 
 						propVal + "\" for key \"" + colName + "\" given in " +
 						propFile.getPath());
-			dataColNamesToTypes.put(colName, DataColumnType.valueOf(vals[0]));
-			dataColNamesToUnits.put(colName, vals[1]);
-			dataColNamesToMissVals.put(colName, vals[2]);
+			DataColumnType dctype = userTypes.getDataColumnType(vals[0]);
+			if ( dctype == null )
+				throw new IllegalArgumentException("Unknown data type variable \"" + 
+						vals[0] + "\" for tag \"" + colName + "\"");
+			int index = dctype.getUnits().indexOf(vals[1]);
+			if ( index < 0 )
+				throw new IllegalArgumentException("Unknown data unit \"" + vals[1] + 
+						"\" for data type variable \"" + vals[0] + "\"");
+			dctype.setSelectedUnitIndex(index);
+			dctype.setSelectedMissingValue(vals[2]);
+			dataColNamesToTypes.put(colName, dctype);
 		}
 	}
 
@@ -437,27 +438,18 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		properties file for the cruise owner, if it exists, is invalid.
 	 */
 	public void assignDataColumnTypes(DashboardCruise cruise) 
-												throws IllegalArgumentException {
+											throws IllegalArgumentException {
 		// Copy the default maps of data column names to types and units
 		HashMap<String,DataColumnType> userColNamesToTypes = 
 				new HashMap<String,DataColumnType>(defaultColNamesToTypes);
-		HashMap<String,String> userColNamesToUnits =
-				new HashMap<String,String>(defaultColNamesToUnits);
-		HashMap<String,String> userColNamesToMissVals =
-				new HashMap<String,String>(defaultColNamesToMissVals);
 		// Add the user-customized map of column names to types
 		File propsFile = new File(filesDir, 
 				cruise.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
 		if ( propsFile.exists() ) 
-			addDataColumnNames(propsFile, userColNamesToTypes, 
-					userColNamesToUnits, userColNamesToMissVals);
+			addDataColumnNames(userColNamesToTypes, propsFile);
 		// Directly assign the lists contained in the cruise
 		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
 		colTypes.clear();
-		ArrayList<String> colUnits = cruise.getDataColUnits();
-		colUnits.clear();
-		ArrayList<String> missVals = cruise.getMissingValues();
-		missVals.clear();
 		// Go through the column names to assign these lists
 		for ( String colName : cruise.getUserColNames() ) {
 			// Convert the column name to the key
@@ -465,15 +457,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			DataColumnType thisColType = userColNamesToTypes.get(key);
 			if ( thisColType == null )
 				thisColType = DataColumnType.UNKNOWN;
-			String thisColUnit = userColNamesToUnits.get(key);
-			if ( thisColUnit == null )
-				thisColUnit = "";
-			String thisMissVal = userColNamesToMissVals.get(key);
-			if ( thisMissVal == null )
-				thisMissVal = "";
 			colTypes.add(thisColType);
-			colUnits.add(thisColUnit);
-			missVals.add(thisMissVal);
 		}
 	}
 
@@ -497,36 +481,21 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Copy the default maps of data column names to types and units
 		HashMap<String,DataColumnType> userColNamesToTypes = 
 				new HashMap<String,DataColumnType>(defaultColNamesToTypes);
-		HashMap<String,String> userColNamesToUnits =
-				new HashMap<String,String>(defaultColNamesToUnits);
-		HashMap<String,String> userColNamesToMissVals = 
-				new HashMap<String,String>(defaultColNamesToMissVals);
 		// Add the user-customized map of column names to types
 		File propsFile = new File(filesDir, 
 				cruise.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
 		if ( propsFile.exists() ) 
-			addDataColumnNames(propsFile, userColNamesToTypes, 
-								userColNamesToUnits, userColNamesToMissVals);
+			addDataColumnNames(userColNamesToTypes, propsFile);
 		// Add mappings of data columns names to types, units, 
 		// and missing values from this cruise
 		ArrayList<DataColumnType> colTypes = cruise.getDataColTypes();
-		ArrayList<String> colUnits = cruise.getDataColUnits();
-		ArrayList<String> missVals = cruise.getMissingValues();
 		boolean changed = false;
 		int k = 0;
 		for ( String colName : cruise.getUserColNames() ) {
 			String key = keyFromColumnName(colName);
 			DataColumnType thisColType = colTypes.get(k);
 			DataColumnType oldType = userColNamesToTypes.put(key, thisColType);
-			if ( thisColType != oldType )
-				changed = true;
-			String thisColUnit = colUnits.get(k);
-			String oldColUnit = userColNamesToUnits.put(key, thisColUnit);
-			if ( ! thisColUnit.equals(oldColUnit) )
-				changed = true;
-			String thisMissVal = missVals.get(k);
-			String oldMissVal = userColNamesToMissVals.put(key, thisMissVal);
-			if ( ! thisMissVal.equals(oldMissVal) )
+			if ( ! thisColType.equals(oldType) )
 				changed = true;
 			k++;
 		}
@@ -535,42 +504,21 @@ public class UserFileHandler extends VersionedFileHandler {
 		if ( ! changed ) 
 			return;
 
-		// Remove the default name to type mappings
+		// Remove the default name to type mappings (remove and put back if different)
 		for ( Entry<String,DataColumnType> defEntry : defaultColNamesToTypes.entrySet() ) {
 			DataColumnType thisColType = userColNamesToTypes.remove(defEntry.getKey());
-			if ( thisColType != defEntry.getValue() )
+			if ( ! defEntry.getValue().equals(thisColType) )
 				userColNamesToTypes.put(defEntry.getKey(), thisColType);
-		}
-		// Remove the default name to type mappings
-		for ( Entry<String,String> defEntry : defaultColNamesToUnits.entrySet() ) {
-			String thisColUnit = userColNamesToUnits.remove(defEntry.getKey());
-			if ( ! thisColUnit.equals(defEntry.getValue()) )
-				userColNamesToUnits.put(defEntry.getKey(), thisColUnit);
-		}
-		// Remove the default name to missing value mappings
-		for ( Entry<String,String> defEntry : defaultColNamesToMissVals.entrySet() ) {
-			String thisMissVal = userColNamesToMissVals.remove(defEntry.getKey());
-			if ( ! thisMissVal.equals(defEntry.getValue()) )
-				userColNamesToMissVals.put(defEntry.getKey(), thisMissVal);
 		}
 		// Create the Properties object for these mappings. 
 		Properties colProps = new Properties();
 		// Note that the keys for the maps could no longer be identical. 
 		HashSet<String> allKeys = new HashSet<String>(userColNamesToTypes.keySet());
-		allKeys.addAll(userColNamesToUnits.keySet());
-		allKeys.addAll(userColNamesToMissVals.keySet());
 		for ( String key : allKeys ) {
 			DataColumnType thisColType = userColNamesToTypes.get(key);
-			if ( thisColType == null )
-				thisColType = defaultColNamesToTypes.get(key);
-			String thisColUnit = userColNamesToUnits.get(key);
-			if ( thisColUnit == null )
-				thisColUnit = defaultColNamesToUnits.get(key);
-			String thisMissVal = userColNamesToMissVals.get(key);
-			if ( thisMissVal == null )
-				thisMissVal = defaultColNamesToMissVals.get(key);
-			colProps.setProperty(key, thisColType.name() + "," + 
-									thisColUnit + "," + thisMissVal);
+			colProps.setProperty(key, thisColType.getVarName() + "," + 
+					thisColType.getUnits().get(thisColType.getSelectedUnitIndex()) + 
+					"," + thisColType.getSelectedMissingValue());
 		}
 		// Save this Properties object to file
 		try {
