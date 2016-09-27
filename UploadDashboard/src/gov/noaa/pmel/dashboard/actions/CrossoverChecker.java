@@ -96,8 +96,8 @@ public class CrossoverChecker {
 		Long[] dataMaxTimes = new Long[2];
 		for (int q = 0; q < 2; q++) {
 			double[] minMaxVals = getMinMaxValidData(times[q]);
-			if ( (minMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
-				 (minMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) )
+			if ( (minMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+				 (minMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) )
 				throw new IOException("No valid times for " + expocodes[q]);
 			dataMinTimes[q] = Math.round(minMaxVals[0]);
 			dataMaxTimes[q] = Math.round(minMaxVals[1]);
@@ -111,8 +111,8 @@ public class CrossoverChecker {
 		double[] dataMaxLats = new double[2];
 		for (int q = 0; q < 2; q++) {
 			double[] minMaxVals = getMinMaxValidData(lats[q]);
-			if ( (minMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
-				 (minMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) )
+			if ( (minMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+				 (minMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) )
 				throw new IOException("No valid latitudes for " + expocodes[q]);
 			dataMinLats[q] = minMaxVals[0];
 			dataMaxLats[q] = minMaxVals[1];
@@ -295,28 +295,28 @@ public class CrossoverChecker {
 		Crossover crossover = null;
 		for (int j = 0; j < numRows[0]; j++) {
 			// Skip this point if any missing values
-			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, longitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 				continue;
-			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, latitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 				continue;
-			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, times[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 				continue;
-			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, ssts[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 				continue;
-			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, fco2s[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[0][j], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 				continue;
 
 			for (int k = 0; k < numRows[1]; k++) {
 				// Skip this point if any missing values
-				if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, longitudes[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, longitudes[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
-				if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, latitudes[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, latitudes[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
-				if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, times[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, times[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
-				if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, ssts[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, ssts[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
-				if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, fco2s[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
+				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
 
 				if ( times[1][k] > times[0][j] + Crossover.MAX_TIME_DIFF ) {
@@ -437,13 +437,13 @@ public class CrossoverChecker {
 	 * 		if all data is missing.
 	 */
 	public static double[] getMinMaxValidData(double[] data) {
-		double maxVal = SocatCruiseData.FP_MISSING_VALUE;
-		double minVal = SocatCruiseData.FP_MISSING_VALUE;
+		double maxVal = DashboardUtils.FP_MISSING_VALUE;
+		double minVal = DashboardUtils.FP_MISSING_VALUE;
 		for ( double val : data ) {
-			if ( DashboardUtils.closeTo(SocatCruiseData.FP_MISSING_VALUE, val, MISSVAL_RTOLER, MISSVAL_ATOLER) )
+			if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, val, MISSVAL_RTOLER, MISSVAL_ATOLER) )
 				continue;
-			if ( (maxVal == SocatCruiseData.FP_MISSING_VALUE) ||
-				 (minVal == SocatCruiseData.FP_MISSING_VALUE) ) {
+			if ( (maxVal == DashboardUtils.FP_MISSING_VALUE) ||
+				 (minVal == DashboardUtils.FP_MISSING_VALUE) ) {
 				maxVal = val;
 				minVal = val;
 			}

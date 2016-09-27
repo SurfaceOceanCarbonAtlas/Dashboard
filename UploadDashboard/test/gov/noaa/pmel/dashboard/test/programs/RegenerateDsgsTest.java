@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test;
+package gov.noaa.pmel.dashboard.test.programs;
 
 import static org.junit.Assert.*;
 
@@ -46,8 +46,8 @@ public class RegenerateDsgsTest {
 
 		// Read the original data and metadata
 		CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
-		fullDataDsg.readMetadata();
-		fullDataDsg.readData();
+		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
+		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		SocatMetadata origMeta = fullDataDsg.getMetadata();
 		ArrayList<SocatCruiseData> origData = fullDataDsg.getDataList();
 
@@ -58,8 +58,8 @@ public class RegenerateDsgsTest {
 		}
 
 		// Re-read the data and metadata
-		fullDataDsg.readMetadata();
-		fullDataDsg.readData();
+		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
+		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		SocatMetadata updatedMeta = fullDataDsg.getMetadata();
 		ArrayList<SocatCruiseData> updatedData = fullDataDsg.getDataList();
 

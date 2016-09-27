@@ -354,10 +354,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
 		// Assign the new cruise information needed by this page
 		cruise.setNumDataRows(cruiseSpecs.getNumDataRows());
-		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
-		cruise.setDataColUnits(cruiseSpecs.getDataColUnits());
-		cruise.setMissingValues(cruiseSpecs.getMissingValues());
+		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
 		cruise.setWoceThreeRowIndices(cruiseSpecs.getWoceThreeRowIndices());
 		cruise.setWoceFourRowIndices(cruiseSpecs.getWoceFourRowIndices());
 		cruise.setQcStatus(cruiseSpecs.getQcStatus());
@@ -545,10 +543,10 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		// Similarly with aqueous CO2 and fCO2 recomputations.
 		int k = 0;
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
-			if ( colType == DataColumnType.UNKNOWN ) {
+			if ( colType == KnownDataTypes.UNKNOWN ) {
 				unknownIndices.add(k);
 			}
-			else if ( colType == DataColumnType.TIMESTAMP ) {
+			else if ( colType == KnownDataTypes.TIMESTAMP ) {
 				hasYear = true;
 				hasMonth = true;
 				hasDay = true;
@@ -556,12 +554,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == DataColumnType.DATE ) {
+			else if ( colType == KnownDataTypes.DATE ) {
 				hasYear = true;
 				hasMonth = true;
 				hasDay = true;
 			}
-			else if ( colType == DataColumnType.DAY_OF_YEAR ) {
+			else if ( colType == KnownDataTypes.DAY_OF_YEAR ) {
 				hasMonth = true;
 				hasDay = true;
 				// Day of year could be floating point; verification needed?
@@ -569,48 +567,48 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == DataColumnType.SECOND_OF_DAY ) {
+			else if ( colType == KnownDataTypes.SECOND_OF_DAY ) {
 				hasHour = true;
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == DataColumnType.YEAR ) {
+			else if ( colType == KnownDataTypes.YEAR ) {
 				hasYear = true;
 			}
-			else if ( colType == DataColumnType.MONTH ) {
+			else if ( colType == KnownDataTypes.MONTH ) {
 				hasMonth = true;
 			}
-			else if ( colType == DataColumnType.DAY ) {
+			else if ( colType == KnownDataTypes.DAY ) {
 				hasDay = true;
 			}
-			else if ( colType == DataColumnType.TIME ) {
+			else if ( colType == KnownDataTypes.TIME ) {
 				hasHour = true;
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == DataColumnType.HOUR ) {
+			else if ( colType == KnownDataTypes.HOUR ) {
 				hasHour = true;
 			}
-			else if ( colType == DataColumnType.MINUTE ) {
+			else if ( colType == KnownDataTypes.MINUTE ) {
 				hasMinute = true;
 			}
-			else if ( colType == DataColumnType.SECOND ) {
+			else if ( colType == KnownDataTypes.SECOND ) {
 				hasSecond = true;
 			}
-			else if ( colType == DataColumnType.LONGITUDE ) {
+			else if ( colType == KnownDataTypes.LONGITUDE ) {
 				hasLongitude = true;
 			}
-			else if ( colType == DataColumnType.LATITUDE ) {
+			else if ( colType == KnownDataTypes.LATITUDE ) {
 				hasLatitude = true;
 			}
-			else if ( (colType == DataColumnType.XCO2_WATER_TEQU_DRY) ||
-					  (colType == DataColumnType.XCO2_WATER_SST_DRY) ||
-					  (colType == DataColumnType.XCO2_WATER_TEQU_WET) ||
-					  (colType == DataColumnType.XCO2_WATER_SST_WET) ||
-					  (colType == DataColumnType.PCO2_WATER_TEQU_WET) ||
-					  (colType == DataColumnType.PCO2_WATER_SST_WET) ||
-					  (colType == DataColumnType.FCO2_WATER_TEQU_WET) ||
-					  (colType == DataColumnType.FCO2_WATER_SST_WET) ) {
+			else if ( (colType == SocatCruiseData.XCO2_WATER_TEQU_DRY) ||
+					  (colType == SocatCruiseData.XCO2_WATER_SST_DRY) ||
+					  (colType == SocatCruiseData.XCO2_WATER_TEQU_WET) ||
+					  (colType == SocatCruiseData.XCO2_WATER_SST_WET) ||
+					  (colType == SocatCruiseData.PCO2_WATER_TEQU_WET) ||
+					  (colType == SocatCruiseData.PCO2_WATER_SST_WET) ||
+					  (colType == SocatCruiseData.FCO2_WATER_TEQU_WET) ||
+					  (colType == SocatCruiseData.FCO2_WATER_SST_WET) ) {
 				hasco2 = true;
 			}
 			k++;
@@ -675,27 +673,27 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		}
 
 		// Make sure there is no more than one of most column types
-		HashSet<DataColumnType> typeSet = new HashSet<DataColumnType>();
-		TreeSet<DataColumnType> duplicates = new TreeSet<DataColumnType>();
+		HashSet<String> typeSet = new HashSet<String>();
+		TreeSet<String> duplicates = new TreeSet<String>();
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
-			if ( colType.equals(DataColumnType.OTHER) ) {
+			if ( DataColumnType.OTHER.typeEquals(colType) ) {
 				// Multiple OTHER column types are allowed
 				;
 			}
-			else if ( ! typeSet.add(colType) ) {
-				duplicates.add(colType);
+			else if ( ! typeSet.add(colType.getVarName()) ) {
+				duplicates.add(colType.getVarName());
 			}
 		}
 		if ( duplicates.size() > 0 ) {
 			String errMsg = MULTIPLE_COLUMN_TYPES_ERROR_MSG;
 			int cnt = 0;
-			for ( DataColumnType colType : duplicates ) {
+			for ( String varName : duplicates ) {
 				cnt++;
 				if ( (cnt == 5) && (unknownIndices.size() > 5) ) {
 					errMsg += "<li> ... </li>";
 					break;
 				}
-				errMsg += "<li>" + DashboardUtils.STD_HEADER_NAMES.get(colType) + "</li>";
+				errMsg += "<li>" + varName + "</li>";
 			}
 			SocatUploadDashboard.showMessage(errMsg);
 			return;

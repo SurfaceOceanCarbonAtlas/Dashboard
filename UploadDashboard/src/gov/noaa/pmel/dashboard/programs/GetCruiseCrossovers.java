@@ -6,8 +6,8 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.actions.CrossoverChecker;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.Crossover;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
@@ -134,15 +134,15 @@ public class GetCruiseCrossovers {
 					System.exit(1);
 				}
 				double[] timeMinMaxVals = CrossoverChecker.getMinMaxValidData(dataVals[2]);
-				if ( (timeMinMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
-						(timeMinMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) ) {
+				if ( (timeMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+						(timeMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
 					System.err.println("No valid times for " + expo);
 					System.exit(1);
 				}
 				cruiseTimeMinMaxMap.put(expo, timeMinMaxVals);
 				double[] latMinMaxVals = CrossoverChecker.getMinMaxValidData(dataVals[1]);
-				if ( (latMinMaxVals[0] == SocatCruiseData.FP_MISSING_VALUE) ||
-						(latMinMaxVals[1] == SocatCruiseData.FP_MISSING_VALUE) ) {
+				if ( (latMinMaxVals[0] == DashboardUtils.FP_MISSING_VALUE) ||
+						(latMinMaxVals[1] == DashboardUtils.FP_MISSING_VALUE) ) {
 					System.err.println("No valid latitudes for " + expo);
 					System.exit(1);
 				}

@@ -3,8 +3,9 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.nc.Constants;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -314,8 +315,8 @@ public class CheckerMessageHandler {
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( ! ( colType.equals(DataColumnType.WOCE_CO2_WATER) ||
-					 colType.equals(DataColumnType.WOCE_CO2_ATM) ) )
+			if ( ! ( SocatCruiseData.WOCE_CO2_WATER.typeNameEquals(colType) ||
+					 SocatCruiseData.WOCE_CO2_ATM.typeNameEquals(colType) ) )
 				continue;
 			for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
 				try {
@@ -546,6 +547,8 @@ public class CheckerMessageHandler {
 	 * 		cruise. 
 	 * @param dsgHandler
 	 * 		DSG file handler to use to get the full-data DSG file for the cruise
+	 * @param knowndDataFileTypes
+	 * 		known types for data files
 	 * @return
 	 * 		the list of SocatWoceEvents for the cruise; never null but may be empty
 	 * @throws IllegalArgumentException
@@ -558,7 +561,7 @@ public class CheckerMessageHandler {
 	 * 		if there is a problem opening or reading the full-data DSG file for the cruise
 	 */
 	public ArrayList<WoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData, 
-			DsgNcFileHandler dsgHandler) 
+			DsgNcFileHandler dsgHandler, KnownDataTypes knownDataFileTypes) 
 					throws IllegalArgumentException, FileNotFoundException, IOException {
 		// Get the info needed from the DashboardCruise
 		String version = cruiseData.getVersion();
@@ -570,11 +573,11 @@ public class CheckerMessageHandler {
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType type = columnTypes.get(k);
 			// Want COMMENT_WOCE_CO2_WATER, but if not given accept COMMENT_WOCE_CO2_ATM
-			if ( type.equals(DataColumnType.COMMENT_WOCE_CO2_WATER) ) {
+			if ( SocatCruiseData.COMMENT_WOCE_CO2_WATER.typeNameEquals(type) ) {
 				userCommentsIndex = k;
 				break;
 			}
-			if ( type.equals(DataColumnType.COMMENT_WOCE_CO2_ATM) ) {
+			if ( SocatCruiseData.COMMENT_WOCE_CO2_ATM.typeNameEquals(type) ) {
 				userCommentsIndex = k;
 			}
 		}
@@ -665,14 +668,12 @@ public class CheckerMessageHandler {
 
 		// Get the longitudes, latitude, times, and regions IDs 
 		// from the full-data DSG file for this cruise
-		double[] longitudes = dsgHandler.readDoubleVarDataValues(expocode, 
-				Constants.SHORT_NAMES.get(Constants.longitude_VARNAME));
-		double[] latitudes = dsgHandler.readDoubleVarDataValues(expocode, 
-				Constants.SHORT_NAMES.get(Constants.latitude_VARNAME));
-		double[] times = dsgHandler.readDoubleVarDataValues(expocode, 
-				Constants.SHORT_NAMES.get(Constants.time_VARNAME));
+		double[][] lonlattime = dsgHandler.readLonLatTimeDataValues(expocode);
+		double[] longitudes = lonlattime[0];
+		double[] latitudes = lonlattime[1];
+		double[] times = lonlattime[2];
 		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, 
-				Constants.SHORT_NAMES.get(Constants.regionID_VARNAME));
+				SocatCruiseData.REGION_ID.getVarName());
 		Date now = new Date();
 
 		Character lastFlag = null;
@@ -680,6 +681,7 @@ public class CheckerMessageHandler {
 		String lastComment = null;
 		double[] dataValues = null;
 		String lastDataVarName = null;
+		String dataVarName = null;
 		ArrayList<DataLocation> locations = null;
 		for ( WoceInfo info : orderedWoceInfo ) {
 
@@ -693,7 +695,7 @@ public class CheckerMessageHandler {
 
 				WoceEvent woceEvent = new WoceEvent();
 				woceEvent.setExpocode(expocode);
-				woceEvent.setSocatVersion(version);
+				woceEvent.setVersion(version);
 				woceEvent.setFlag(info.flag);
 				woceEvent.setFlagDate(now);
 				woceEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
@@ -706,15 +708,47 @@ public class CheckerMessageHandler {
 
 				// If a column can be identified, assign its name and 
 				// get its values if we do not already have them 
+				dataVarName = null;
 				if ( info.columnIndex != Integer.MAX_VALUE ) {
 					DataColumnType dataType = columnTypes.get(info.columnIndex);
-					String dataVarName = Constants.TYPE_TO_VARNAME_MAP.get(dataType);
+					// Geoposition is a problem in the combination of lon/lat/time, so no data assignment
+					if ( KnownDataTypes.GEOPOSITION.typeNameEquals(dataType) ) {
+						dataVarName = null;
+					}
+					// Associate all time-related data columns with the time file variable
+					else if ( KnownDataTypes.TIMESTAMP.typeNameEquals(dataType) ||
+							  KnownDataTypes.DATE.typeNameEquals(dataType) ||
+							  KnownDataTypes.YEAR.typeNameEquals(dataType) ||
+							  KnownDataTypes.MONTH_OF_YEAR.typeNameEquals(dataType) ||
+							  KnownDataTypes.DAY_OF_MONTH.typeNameEquals(dataType) ||
+							  KnownDataTypes.TIME_OF_DAY.typeNameEquals(dataType) ||
+							  KnownDataTypes.HOUR_OF_DAY.typeNameEquals(dataType) ||
+							  KnownDataTypes.MINUTE_OF_HOUR.typeNameEquals(dataType) ||
+							  KnownDataTypes.SECOND_OF_MINUTE.typeNameEquals(dataType) ||
+							  KnownDataTypes.DAY_OF_YEAR.typeNameEquals(dataType) ||
+							  KnownDataTypes.SECOND_OF_DAY.typeNameEquals(dataType) ) {
+						dataVarName = KnownDataTypes.TIME.getVarName();
+					}
+					// Check if this type is known in the data file types
+					else if ( knownDataFileTypes.getDataColumnType(dataType.getVarName()) == null ) {
+						dataVarName = null;
+					}
+					else {
+						dataVarName = dataType.getVarName();
+					}
+					if ( dataVarName != null ) {
+						if ( ! dataVarName.equals(lastDataVarName) ) {
+							// This should always succeed; but just in case ....
+							try {
+								dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);
+								lastDataVarName = dataVarName;
+							} catch ( IllegalArgumentException ex ) {
+								dataVarName = null;
+							}
+						}
+					}
 					if ( dataVarName != null ) {
 						woceEvent.setVarName(dataVarName);
-						if ( ! dataVarName.equals(lastDataVarName) ) {
-							dataValues = dsgHandler.readDoubleVarDataValues(expocode, dataVarName);
-							lastDataVarName = dataVarName;
-						}
 					}
 				}
 
@@ -730,7 +764,7 @@ public class CheckerMessageHandler {
 			dataLoc.setLatitude(latitudes[info.rowIndex]);
 			dataLoc.setLongitude(longitudes[info.rowIndex]);
 			dataLoc.setRegionID(regionIDs[info.rowIndex]);
-			if ( (info.columnIndex != Integer.MAX_VALUE) && (dataValues != null) )
+			if ( dataVarName != null )
 				dataLoc.setDataValue(dataValues[info.rowIndex]);
 			locations.add(dataLoc);
 		}

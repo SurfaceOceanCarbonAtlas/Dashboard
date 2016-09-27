@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test;
+package gov.noaa.pmel.dashboard.test.actions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

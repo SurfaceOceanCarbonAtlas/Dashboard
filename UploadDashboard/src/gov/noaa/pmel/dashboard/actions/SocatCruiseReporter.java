@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
@@ -204,6 +205,8 @@ public class SocatCruiseReporter {
 	private CruiseFileHandler cruiseHandler;
 	private MetadataFileHandler metadataHandler;
 	private DsgNcFileHandler dsgFileHandler;
+	private KnownDataTypes knownMetadataTypes;
+	private KnownDataTypes knownDataFileTypes;
 	private DatabaseRequestHandler databaseHandler;
 
 	/**
@@ -218,6 +221,8 @@ public class SocatCruiseReporter {
 		cruiseHandler = configStore.getCruiseFileHandler();
 		metadataHandler = configStore.getMetadataFileHandler();
 		dsgFileHandler = configStore.getDsgNcFileHandler();
+		knownMetadataTypes = configStore.getKnownMetadataTypes();
+		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		databaseHandler = configStore.getDatabaseRequestHandler();
 	}
 
@@ -247,14 +252,14 @@ public class SocatCruiseReporter {
 
 		// Get the metadata and data from the DSG file
 		CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-		ArrayList<String> unknownVars = dsgFile.readMetadata();
+		ArrayList<String> unknownVars = dsgFile.readMetadata(knownMetadataTypes);
 		if ( unknownVars.size() > 0 ) {
 			String msg = "Unassigned metadata variables: ";
 			for (String var : unknownVars)
 				msg += var + "; ";
 			warnMsgs.add(msg);
 		}
-		unknownVars = dsgFile.readData();
+		unknownVars = dsgFile.readData(knownDataFileTypes);
 		if ( unknownVars.size() > 0 ) {
 			String msg = "Unassigned data variables: ";
 			for (String var : unknownVars)
@@ -291,7 +296,7 @@ public class SocatCruiseReporter {
 			socatDOI = SOCAT_ENHANCED_DOI_TAG;
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
-		double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
+		double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
 
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
@@ -354,7 +359,7 @@ public class SocatCruiseReporter {
 			// of the datasets to report (checking region IDs, if appropriate)
 			String upperExpo = DashboardServerUtils.checkExpocode(expo);
 			CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-			ArrayList<String> unknownVars = dsgFile.readMetadata();
+			ArrayList<String> unknownVars = dsgFile.readMetadata(knownMetadataTypes);
 			if ( unknownVars.size() > 0 ) {
 				String msg = upperExpo + " unknown metadata variables: ";
 				for (String var : unknownVars)
@@ -364,7 +369,7 @@ public class SocatCruiseReporter {
 			boolean inRegion;
 			if ( regionID != null ) {
 				inRegion = false;
-				dsgFile.readData();
+				dsgFile.readData(knownDataFileTypes);
 				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
 					if ( regionID.equals(dataVals.getRegionID()) ) {
 						Character woceFlag = dataVals.getWoceCO2Water();
@@ -440,7 +445,7 @@ public class SocatCruiseReporter {
 				if ( socatDOI.isEmpty() )
 					socatDOI = SOCAT_ENHANCED_DOI_TAG;
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.readData();
+				ArrayList<String> unknownVars = dsgFile.readData(knownDataFileTypes);
 				if ( unknownVars.size() > 0 ) {
 					String msg = upperExpo + " unknown data variables: ";
 					for (String var : unknownVars)
@@ -448,7 +453,7 @@ public class SocatCruiseReporter {
 					warnMsgs.add(msg);
 				}
 				// Get the computed values of time in seconds since 1970-01-01 00:00:00
-				double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
+				double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
 				// Create the set for holding previous lon/lat/time/fCO2_rec data
 				TreeSet<DataPoint> prevDatPts = new TreeSet<DataPoint>();
 				int j = -1;
@@ -1300,8 +1305,8 @@ public class SocatCruiseReporter {
 		if ( ! dsgFile.exists() )
 			throw new IllegalArgumentException("DSG file does not exist for " + upperExpo);
 		try {
-			dsgFile.readMetadata();
-			dsgFile.readData();
+			dsgFile.readMetadata(knownMetadataTypes);
+			dsgFile.readData(knownDataFileTypes);
 		} catch (IOException ex) {
 			throw new IllegalArgumentException("Problems reading the DSG file for " + 
 					upperExpo + ": " + ex.getMessage());
@@ -1477,7 +1482,7 @@ public class SocatCruiseReporter {
 				// Read the data for this cruise
 				String upperExpo = DashboardServerUtils.checkExpocode(expo);
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.readData();
+				ArrayList<String> unknownVars = dsgFile.readData(knownDataFileTypes);
 				if ( unknownVars.size() > 0 ) {
 					String msg = upperExpo + " unassigned data variables: ";
 					for (String var : unknownVars)
@@ -1485,7 +1490,7 @@ public class SocatCruiseReporter {
 					throw new IllegalArgumentException(msg);
 				}
 				// Get the computed values of time in seconds since 1970-01-01 00:00:00
-				double[] sectimes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
+				double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
 				// Collect and sort the acceptable data for this cruise
 				// Any duplicates are eliminated in this process
 				TreeSet<DataPoint> datSet = new TreeSet<DataPoint>();
@@ -1562,7 +1567,7 @@ public class SocatCruiseReporter {
 				if ( ( k % 5 ) == 0 )
 					report.println();
 				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.readMetadata();
+				ArrayList<String> unknownVars = dsgFile.readMetadata(knownMetadataTypes);
 				if ( unknownVars.size() > 0 ) {
 					String msg = upperExpo + " unknown metadata variables: ";
 					for (String var : unknownVars)
@@ -1572,7 +1577,7 @@ public class SocatCruiseReporter {
 				// QC flag part of the map key string
 				String qcFlag = "\t" + dsgFile.getMetadata().getQcFlag();
 
-				unknownVars = dsgFile.readData();
+				unknownVars = dsgFile.readData(knownDataFileTypes);
 				if ( unknownVars.size() > 0 ) {
 					String msg = upperExpo + " unknown data variables: ";
 					for (String var : unknownVars)

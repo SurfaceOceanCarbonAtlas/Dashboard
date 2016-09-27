@@ -6,6 +6,7 @@ import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
@@ -22,7 +23,8 @@ public class PreviewPlotsHandler {
 	File plotsDir;
 	CruiseFileHandler cruiseHandler;
 	CruiseChecker cruiseChecker;
-	MetadataFileHandler metadataHandler;
+	KnownDataTypes knownMetadataTypes;
+	KnownDataTypes knownDataFileTypes;
 	FerretConfig ferretConfig;
 
 	/**
@@ -36,7 +38,8 @@ public class PreviewPlotsHandler {
 	 * 		get the CruiseFileHandler, CruiseChecker, 
 	 * 		MetadataFileHandler, and FerretConfig from here
 	 */
-	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, DashboardConfigStore configStore) {
+	public PreviewPlotsHandler(String dsgFilesDirName, String plotsDirName, 
+			DashboardConfigStore configStore) {
 		dsgFilesDir = new File(dsgFilesDirName);
 		if ( ! dsgFilesDir.isDirectory() )
 			throw new IllegalArgumentException(dsgFilesDirName + " is not a directory");
@@ -45,7 +48,8 @@ public class PreviewPlotsHandler {
 			throw new IllegalArgumentException(plotsDirName + " is not a directory");
 		cruiseHandler = configStore.getCruiseFileHandler();
 		cruiseChecker = configStore.getDashboardCruiseChecker();
-		metadataHandler = configStore.getMetadataFileHandler();
+		knownMetadataTypes = configStore.getKnownMetadataTypes();
+		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		ferretConfig = configStore.getFerretConfig();
 	}
 
@@ -168,13 +172,15 @@ public class PreviewPlotsHandler {
 
 		// Do not use the metadata in the DSG file, and to avoid issues with the existing
 		// OME metadata, just use what we already know to create a SocatMetadata
-		SocatMetadata socatMData = new SocatMetadata();
+		SocatMetadata socatMData = new SocatMetadata(knownMetadataTypes);
 		socatMData.setExpocode(upperExpo);
 		socatMData.setSocatVersion(cruiseData.getVersion());
 		socatMData.setQcFlag(QCEvent.QC_NEW_FLAG.toString());
 
 		// Convert the cruise data strings into the appropriate list of data objects
-		ArrayList<SocatCruiseData> socatDatalist = SocatCruiseData.dataListFromDashboardCruise(cruiseData);
+		ArrayList<SocatCruiseData> socatDatalist = 
+				SocatCruiseData.dataListFromDashboardCruise(
+						knownDataFileTypes, cruiseData);
 
 		// Create the preview NetCDF DSG file
 		try {

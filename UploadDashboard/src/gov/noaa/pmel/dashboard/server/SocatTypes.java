@@ -41,10 +41,10 @@ public class SocatTypes {
 		typeProps.setProperty(SocatCruiseData.FCO2_WATER_SST_WET.getVarName(), SocatCruiseData.FCO2_WATER_SST_WET.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.XCO2_ATM_DRY_ACTUAL.getVarName(), SocatCruiseData.XCO2_ATM_DRY_ACTUAL.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.XCO2_ATM_DRY_INTERP.getVarName(), SocatCruiseData.XCO2_ATM_DRY_INTERP.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.PCO2_ATM_DRY_ACTUAL.getVarName(), SocatCruiseData.PCO2_ATM_DRY_ACTUAL.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.PCO2_ATM_DRY_INTERP.getVarName(), SocatCruiseData.PCO2_ATM_DRY_INTERP.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.FCO2_ATM_DRY_ACTUAL.getVarName(), SocatCruiseData.FCO2_ATM_DRY_ACTUAL.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.FCO2_ATM_DRY_INTERP.getVarName(), SocatCruiseData.FCO2_ATM_DRY_INTERP.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.PCO2_ATM_WET_ACTUAL.getVarName(), SocatCruiseData.PCO2_ATM_WET_ACTUAL.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.PCO2_ATM_WET_INTERP.getVarName(), SocatCruiseData.PCO2_ATM_WET_INTERP.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.FCO2_ATM_WET_ACTUAL.getVarName(), SocatCruiseData.FCO2_ATM_WET_ACTUAL.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.FCO2_ATM_WET_INTERP.getVarName(), SocatCruiseData.FCO2_ATM_WET_INTERP.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.DELTA_XCO2.getVarName(), SocatCruiseData.DELTA_XCO2.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.DELTA_PCO2.getVarName(), SocatCruiseData.DELTA_PCO2.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.DELTA_FCO2.getVarName(), SocatCruiseData.DELTA_FCO2.toPropertyValue());
@@ -59,6 +59,8 @@ public class SocatTypes {
 		typeProps.setProperty(SocatCruiseData.WIND_DIRECTION_RELATIVE.getVarName(), SocatCruiseData.WIND_DIRECTION_RELATIVE.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.WOCE_CO2_WATER.getVarName(), SocatCruiseData.WOCE_CO2_WATER.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.WOCE_CO2_ATM.getVarName(), SocatCruiseData.WOCE_CO2_ATM.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.COMMENT_WOCE_CO2_WATER.getVarName(), SocatCruiseData.COMMENT_WOCE_CO2_WATER.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.COMMENT_WOCE_CO2_ATM.getVarName(), SocatCruiseData.COMMENT_WOCE_CO2_ATM.toPropertyValue());
 		KNOWN_SOCAT_USER_TYPES.addTypesFromProperties(typeProps);
 
 		KNOWN_SOCAT_METADATA_FILE_TYPES = new KnownDataTypes();
@@ -88,10 +90,10 @@ public class SocatTypes {
 		typeProps.setProperty(SocatCruiseData.FCO2_WATER_SST_WET.getVarName(), SocatCruiseData.FCO2_WATER_SST_WET.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.XCO2_ATM_DRY_ACTUAL.getVarName(), SocatCruiseData.XCO2_ATM_DRY_ACTUAL.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.XCO2_ATM_DRY_INTERP.getVarName(), SocatCruiseData.XCO2_ATM_DRY_INTERP.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.PCO2_ATM_DRY_ACTUAL.getVarName(), SocatCruiseData.PCO2_ATM_DRY_ACTUAL.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.PCO2_ATM_DRY_INTERP.getVarName(), SocatCruiseData.PCO2_ATM_DRY_INTERP.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.FCO2_ATM_DRY_ACTUAL.getVarName(), SocatCruiseData.FCO2_ATM_DRY_ACTUAL.toPropertyValue());
-		typeProps.setProperty(SocatCruiseData.FCO2_ATM_DRY_INTERP.getVarName(), SocatCruiseData.FCO2_ATM_DRY_INTERP.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.PCO2_ATM_WET_ACTUAL.getVarName(), SocatCruiseData.PCO2_ATM_WET_ACTUAL.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.PCO2_ATM_WET_INTERP.getVarName(), SocatCruiseData.PCO2_ATM_WET_INTERP.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.FCO2_ATM_WET_ACTUAL.getVarName(), SocatCruiseData.FCO2_ATM_WET_ACTUAL.toPropertyValue());
+		typeProps.setProperty(SocatCruiseData.FCO2_ATM_WET_INTERP.getVarName(), SocatCruiseData.FCO2_ATM_WET_INTERP.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.DELTA_XCO2.getVarName(), SocatCruiseData.DELTA_XCO2.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.DELTA_PCO2.getVarName(), SocatCruiseData.DELTA_PCO2.toPropertyValue());
 		typeProps.setProperty(SocatCruiseData.DELTA_FCO2.getVarName(), SocatCruiseData.DELTA_FCO2.toPropertyValue());

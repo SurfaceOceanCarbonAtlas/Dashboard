@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.io.BufferedReader;
@@ -87,7 +88,7 @@ public class UpdateWOCEFlags {
 				char[] currentWoceFlags = null;
 				try {
 					dsgFile = dsgHandler.getDsgNcFile(expocode);
-					currentWoceFlags = dsgFile.readCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME);
+					currentWoceFlags = dsgFile.readCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName());
 				} catch (Exception ex) {
 					System.err.println("Error reading the WOCE flags from the full-data DSG file for " + 
 							expocode + " : " + ex.getMessage());
@@ -98,7 +99,7 @@ public class UpdateWOCEFlags {
 					currentWoceFlags[k] = WoceEvent.WOCE_NOT_CHECKED;
 				}
 				try {
-					dsgFile.writeCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME, currentWoceFlags);
+					dsgFile.writeCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName(), currentWoceFlags);
 				} catch (Exception ex) {
 					System.err.println("Error clearing all the WOCE flags in the full-data DSG file for " +
 							expocode + " : " + ex.getMessage());

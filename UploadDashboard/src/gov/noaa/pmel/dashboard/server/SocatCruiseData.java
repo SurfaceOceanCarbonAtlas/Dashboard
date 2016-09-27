@@ -24,6 +24,21 @@ import java.util.Map.Entry;
  */
 public class SocatCruiseData {
 
+	/** 
+	 * User-provided comment for WOCE_CO2_WATER;
+	 * user type only, used for generating WOCE events from user-provided data.
+	 */
+	public static final DashDataType COMMENT_WOCE_CO2_WATER = new DashDataType(
+			"comment_WOCE_CO2_water", KnownDataTypes.STRING_DATA_CLASS_NAME,
+			"comment about WOCE_CO2_water flag", null, null, DataColumnType.NO_UNITS);
+	/** 
+	 * User-provided comment for WOCE_CO2_ATM;
+	 * user type only, used for generating WOCE events from user-provided data.
+	 */
+	public static final DashDataType COMMENT_WOCE_CO2_ATM = new DashDataType(
+			"comment_WOCE_CO2_atm", KnownDataTypes.STRING_DATA_CLASS_NAME,
+			"comment about WOCE_CO2_atm flag", null, null, DataColumnType.NO_UNITS);
+
 	// Unit arrays for static types in this class
 	public static final ArrayList<String> SALINITY_UNITS = 
 			new ArrayList<String>(Arrays.asList("PSU"));
@@ -60,10 +75,10 @@ public class SocatCruiseData {
 			KnownDataTypes.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
 			null, KnownDataTypes.LOCATION_CATEGORY, DataColumnType.NO_UNITS);
 	public static final DashDataType WOCE_CO2_WATER = new DashDataType("WOCE_CO2_water", 
-			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for water CO2", 
+			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for aqueous CO2", 
 			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
 	public static final DashDataType WOCE_CO2_ATM = new DashDataType("WOCE_CO2_atm", 
-			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for air CO2", 
+			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for atmospheric CO2", 
 			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
 
 	// Double types
@@ -125,16 +140,16 @@ public class SocatCruiseData {
 	public static final DashDataType XCO2_ATM_DRY_INTERP = new DashDataType("xCO2_atm_dry_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air xCO2 dry", 
 			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType PCO2_ATM_DRY_ACTUAL = new DashDataType("pCO2_atm_wet_actual", 
+	public static final DashDataType PCO2_ATM_WET_ACTUAL = new DashDataType("pCO2_atm_wet_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air pCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType PCO2_ATM_DRY_INTERP = new DashDataType("pCO2_atm_wet_interp", 
+	public static final DashDataType PCO2_ATM_WET_INTERP = new DashDataType("pCO2_atm_wet_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air pCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType FCO2_ATM_DRY_ACTUAL = new DashDataType("fCO2_atm_wet_actual", 
+	public static final DashDataType FCO2_ATM_WET_ACTUAL = new DashDataType("fCO2_atm_wet_actual", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air fCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_ATM_DRY_INTERP = new DashDataType("fCO2_atm_wet_interp", 
+	public static final DashDataType FCO2_ATM_WET_INTERP = new DashDataType("fCO2_atm_wet_interp", 
 			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air fCO2 wet", 
 			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
 

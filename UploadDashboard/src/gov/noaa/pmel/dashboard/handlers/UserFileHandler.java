@@ -114,6 +114,12 @@ public class UserFileHandler extends VersionedFileHandler {
 				throw new IllegalArgumentException("Unknown data type variable \"" + 
 						vals[0] + "\" for tag \"" + colName + "\"");
 			int index = dctype.getUnits().indexOf(vals[1]);
+			if ( index < 0 ) {
+				// see if there is a modified version of this unit
+				String newName = KnownDataTypes.RENAMED_UNITS.get(vals[1]);
+				if ( newName != null )
+					index = dctype.getUnits().indexOf(newName);
+			}
 			if ( index < 0 )
 				throw new IllegalArgumentException("Unknown data unit \"" + vals[1] + 
 						"\" for data type variable \"" + vals[0] + "\"");

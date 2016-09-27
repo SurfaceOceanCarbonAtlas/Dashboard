@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.test;
+package gov.noaa.pmel.dashboard.test.handlers;
 
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.client.CruisePreviewPage;

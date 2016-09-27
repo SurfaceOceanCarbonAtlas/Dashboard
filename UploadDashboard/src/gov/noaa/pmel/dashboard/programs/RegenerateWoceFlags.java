@@ -117,7 +117,7 @@ public class RegenerateWoceFlags {
 				qcEvent.setFlag(QCEvent.QC_COMMENT);
 				qcEvent.setFlagDate(new Date());
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-				qcEvent.setSocatVersion(socatVersion);
+				qcEvent.setVersion(socatVersion);
 				qcEvent.setUsername(username);
 				qcEvent.setComment("non-automated WOCE flags regenerated for resubmitted data");
 				try {

@@ -167,6 +167,8 @@ public class DashboardConfigStore {
 	 */
 	private DashboardConfigStore(boolean startMonitors) throws IOException {
 		String baseDir = System.getenv("CATALINA_BASE");
+		if ( baseDir == null )
+			baseDir = System.getProperty("CATALINA_BASE");
 		if ( baseDir == null ) 
 			throw new IOException("CATALINA_BASE environment variable is not defined");
 		baseDir += File.separator;
@@ -868,6 +870,30 @@ public class DashboardConfigStore {
 	 */
 	public OmePdfGenerator getOmePdfGenerator() {
 		return omePdfGenerator;
+	}
+
+	/**
+	 * @return
+	 * 		the known user data column types
+	 */
+	public KnownDataTypes getKnownUserDataTypes() {
+		return this.knownUserDataTypes;
+	}
+
+	/**
+	 * @return
+	 * 		the known metadata types in DSG files
+	 */
+	public KnownDataTypes getKnownMetadataTypes() {
+		return this.knownMetadataTypes;
+	}
+
+	/**
+	 * @return
+	 * 		the known data types in DSG files
+	 */
+	public KnownDataTypes getKnownDataFileTypes() {
+		return this.knownDataFileTypes;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test;
+package gov.noaa.pmel.dashboard.test.actions;
 
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;

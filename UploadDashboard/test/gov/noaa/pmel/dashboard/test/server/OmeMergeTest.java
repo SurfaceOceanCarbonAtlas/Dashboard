@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test;
+package gov.noaa.pmel.dashboard.test.server;
 
 import java.io.IOException;
 
@@ -28,6 +28,8 @@ public class OmeMergeTest {
 		final String previousExpocode = "32HQ20110517";
 		final String activeExpocode = "Z2HQ20110517";
 
+		String home = System.getenv("HOME");
+		System.setProperty("CATALINA_BASE", home);
 		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		// Read the OME XML contents for previousExpocode 

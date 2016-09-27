@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardEvent;
@@ -40,6 +41,7 @@ public class CruiseSubmitter {
 	MetadataFileHandler metadataHandler;
 	CruiseChecker cruiseChecker;
 	DsgNcFileHandler dsgNcHandler;
+	KnownDataTypes knownDataFileTypes;
 	DatabaseRequestHandler databaseHandler;
 	SocatFilesBundler cdiacBundler;
 	String socatVersion;
@@ -54,6 +56,7 @@ public class CruiseSubmitter {
 		metadataHandler = configStore.getMetadataFileHandler();
 		cruiseChecker = configStore.getDashboardCruiseChecker();
 		dsgNcHandler = configStore.getDsgNcFileHandler();
+		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		databaseHandler = configStore.getDatabaseRequestHandler();
 		cdiacBundler = configStore.getCdiacFilesBundler();
 		socatVersion = configStore.getSocatUploadVersion();
@@ -206,7 +209,7 @@ public class CruiseSubmitter {
 				// Create the QCEvent for submitting the initial QC flags
 				QCEvent initQC = new QCEvent();
 				initQC.setExpocode(expocode);
-				initQC.setSocatVersion(socatVersion);
+				initQC.setVersion(socatVersion);
 				initQC.setFlagDate(new Date());
 				initQC.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
 				initQC.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
@@ -259,7 +262,8 @@ public class CruiseSubmitter {
 				// as well as the user-provided WOCE flags, to the database
 				ArrayList<WoceEvent> initWoceList;
 				try {
-					initWoceList = msgHandler.generateWoceEvents(cruiseData, dsgNcHandler);
+					initWoceList = msgHandler.generateWoceEvents(cruiseData, 
+							dsgNcHandler, knownDataFileTypes);
 				} catch (IOException ex) {
 					throw new IllegalArgumentException(ex);
 				}

@@ -89,7 +89,7 @@ public class ResubmitCruises {
 				qcEvent.setFlag(QCEvent.QC_SUSPEND_FLAG);
 				qcEvent.setFlagDate(new Date());
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-				qcEvent.setSocatVersion(socatVersion);
+				qcEvent.setVersion(socatVersion);
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Suspending cruise for pending update");
 				try {

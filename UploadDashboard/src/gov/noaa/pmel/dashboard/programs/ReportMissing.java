@@ -43,10 +43,11 @@ public class ReportMissing {
 	 */
 	private static void checkMissing(CruiseDsgNcFile dsgFile, String expocode, 
 			String typeName) throws IOException, IllegalArgumentException {
-		double[] longitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LONGITUDE_NCVAR_NAME);
-		double[] latitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LATITUDE_NCVAR_NAME);
-		double[] times = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
-		char[] regionIDs = dsgFile.readCharVarDataValues(CruiseDsgNcFile.REGION_ID_NCVAR_NAME);
+		double[][] lonlattimes = dsgFile.readLonLatTimeDataValues();
+		double[] longitudes = lonlattimes[0];
+		double[] latitudes = lonlattimes[1];
+		double[] times = lonlattimes[2];
+		char[] regionIDs = dsgFile.readCharVarDataValues(SocatCruiseData.REGION_ID.getVarName());
 		int numObs = longitudes.length;
 		if ( latitudes.length != numObs )
 			throw new IllegalArgumentException("number of latitudes (" + 
@@ -66,15 +67,15 @@ public class ReportMissing {
 
 		RowNumSet missingLons = new RowNumSet();
 		for (int k = 0; k < numObs; k++)
-			if ( DashboardUtils.closeTo(longitudes[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
+			if ( DashboardUtils.closeTo(longitudes[k], DashboardUtils.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
 				missingLons.add(k+1);
 		RowNumSet missingLats = new RowNumSet();
 		for (int k = 0; k < numObs; k++)
-			if ( DashboardUtils.closeTo(latitudes[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
+			if ( DashboardUtils.closeTo(latitudes[k], DashboardUtils.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
 				missingLats.add(k+1);
 		RowNumSet missingTimes = new RowNumSet();
 		for (int k = 0; k < numObs; k++)
-			if ( DashboardUtils.closeTo(times[k], SocatCruiseData.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
+			if ( DashboardUtils.closeTo(times[k], DashboardUtils.FP_MISSING_VALUE, REL_TOLER, ABS_TOLER) )
 				missingTimes.add(k+1);
 		RowNumSet missingRegionIDs = new RowNumSet();
 		for (int k = 0; k < numObs; k++)

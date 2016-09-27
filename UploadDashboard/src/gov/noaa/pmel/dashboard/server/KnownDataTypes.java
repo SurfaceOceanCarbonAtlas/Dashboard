@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Properties;
@@ -94,6 +95,18 @@ public class KnownDataTypes {
 	/** Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z") */
 	public static final ArrayList<String> TIME_UNITS = 
 			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
+
+	/** mapping from old unit names to new unit names */
+	public static final HashMap<String,String> RENAMED_UNITS;
+	static {
+		RENAMED_UNITS = new HashMap<String,String>();
+		RENAMED_UNITS.put("deg.E", "degrees_east");
+		RENAMED_UNITS.put("deg.W", "degrees_west");
+		RENAMED_UNITS.put("deg.N", "degrees_north");
+		RENAMED_UNITS.put("deg.S", "degrees_south");
+		RENAMED_UNITS.put("deg.C", "degrees C");
+		RENAMED_UNITS.put("deg.clk.N", "degrees");
+	}
 
 	/** Marker data type used to indicate an severe error in a time or position */
 	public static final DataColumnType GEOPOSITION = new DataColumnType("geoposition", 

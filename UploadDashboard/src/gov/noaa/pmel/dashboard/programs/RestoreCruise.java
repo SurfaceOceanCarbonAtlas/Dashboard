@@ -155,7 +155,7 @@ public class RestoreCruise {
 			qcEvent.setFlag(QCEvent.QC_COMMENT);
 			qcEvent.setFlagDate(new Date());
 			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-			qcEvent.setSocatVersion(removeSocatVersion);
+			qcEvent.setVersion(removeSocatVersion);
 			qcEvent.setUsername(username);
 			qcEvent.setComment("Cruise data and WOCE flags restored to SOCAT version " + 
 					restoredVersion + ".  QC and WOCE flags for SOCAT version " + 
@@ -195,7 +195,7 @@ public class RestoreCruise {
 				qcEvent.setFlag(qcFlag);
 				qcEvent.setFlagDate(oldQCTime);
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-				qcEvent.setSocatVersion("2.0");
+				qcEvent.setVersion("2.0");
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Adding global QC flag to that assigned in v2 to fix unresolved conflicts");
 				try {
@@ -214,7 +214,7 @@ public class RestoreCruise {
 				qcEvent.setFlag(qcFlag);
 				qcEvent.setFlagDate(new Date());
 				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
-				qcEvent.setSocatVersion(removeSocatVersion);
+				qcEvent.setVersion(removeSocatVersion);
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Metadata had been updated.  Restored data and WOCE flags were not changed.");
 				try {

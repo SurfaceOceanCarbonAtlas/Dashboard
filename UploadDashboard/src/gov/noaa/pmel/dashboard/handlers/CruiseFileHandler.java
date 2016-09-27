@@ -1372,6 +1372,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		for (int k = 0; k < numCols; k++) {
 			DataColumnType dctype = userTypes.getDataColumnType(colTypeNames.get(k));
 			int index = dctype.getUnits().indexOf(colTypeUnits.get(k));
+			if ( index < 0 ) {
+				// see if there is a modified version of this unit
+				String newName = KnownDataTypes.RENAMED_UNITS.get(colTypeUnits.get(k));
+				if ( newName != null )
+					index = dctype.getUnits().indexOf(newName);
+			}
 			if ( index < 0 )
 				throw new IllegalArgumentException("unknown unit \"" + 
 						colTypeUnits.get(k) + "\" for varName \"" + 

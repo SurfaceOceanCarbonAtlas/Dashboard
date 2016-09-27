@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
@@ -92,39 +93,28 @@ public class WoceManyData {
 			}
 			char[] regionIDs = null;
 			try {
-				regionIDs = dsgFile.readCharVarDataValues(CruiseDsgNcFile.REGION_ID_NCVAR_NAME);
+				regionIDs = dsgFile.readCharVarDataValues(SocatCruiseData.REGION_ID.getVarName());
 			} catch (Exception ex) {
 				System.err.println("Problem reading the region IDs from the DSG file");
 				ex.printStackTrace();
 				System.exit(1);
 			}
 			double[] longitudes = null;
-			try {
-				longitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LONGITUDE_NCVAR_NAME);
-			} catch (Exception ex) {
-				System.err.println("Problem reading longitudes from the DSG file");
-				ex.printStackTrace();
-				System.exit(1);
-			}
 			double[] latitudes = null;
-			try {
-				latitudes = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.LATITUDE_NCVAR_NAME);
-			} catch (Exception ex) {
-				System.err.println("Problem reading latitudes from the DSG file");
-				ex.printStackTrace();
-				System.exit(1);
-			}
 			double[] times = null;
 			try {
-				times = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.TIME_NCVAR_NAME);
+				double[][] lonlattimes = dsgFile.readLonLatTimeDataValues();
+				longitudes = lonlattimes[0];
+				latitudes = lonlattimes[1];
+				times = lonlattimes[2];
 			} catch (Exception ex) {
-				System.err.println("Problem reading times from the DSG file");
+				System.err.println("Problem reading longitudes/latitude/times from the DSG file");
 				ex.printStackTrace();
 				System.exit(1);
 			}
 			double[] fco2Rec = null;
 			try {
-				fco2Rec = dsgFile.readDoubleVarDataValues(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
+				fco2Rec = dsgFile.readDoubleVarDataValues(SocatCruiseData.FCO2_REC.getVarName());
 			} catch (Exception ex) {
 				System.err.println("Problem reading fco2_recommended values from the DSG file");
 				ex.printStackTrace();
@@ -132,7 +122,7 @@ public class WoceManyData {
 			}
 			char[] woceFlags = null;
 			try {
-				woceFlags = dsgFile.readCharVarDataValues(CruiseDsgNcFile.WOCECO2WATER_NCVAR_NAME);
+				woceFlags = dsgFile.readCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName());
 			} catch (Exception ex) {
 				System.err.println("Problem reading the WOCE flags from the DSG file");
 				ex.printStackTrace();
@@ -143,11 +133,11 @@ public class WoceManyData {
 			// Create the WOCE event
 			WoceEvent woceEvent = new WoceEvent();
 			woceEvent.setComment(woceComment);
-			woceEvent.setVarName(CruiseDsgNcFile.FCO2REC_NCVAR_NAME);
+			woceEvent.setVarName(SocatCruiseData.FCO2_REC.getVarName());
 			woceEvent.setExpocode(expocode);
 			woceEvent.setFlag(woceFlag);
 			woceEvent.setFlagDate(new Date());
-			woceEvent.setSocatVersion(configStore.getSocatQCVersion());
+			woceEvent.setVersion(configStore.getSocatQCVersion());
 			woceEvent.setUsername(username);
 
 			// Directly modify the data locations list in this event

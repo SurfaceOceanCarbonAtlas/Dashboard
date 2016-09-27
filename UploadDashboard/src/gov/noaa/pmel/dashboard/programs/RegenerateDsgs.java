@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
@@ -38,6 +39,8 @@ public class RegenerateDsgs {
 	CruiseFileHandler cruiseHandler;
 	DsgNcFileHandler dsgHandler;
 	MetadataFileHandler metaHandler;
+	KnownDataTypes knownMetadataTypes;
+	KnownDataTypes knownDataFileTypes;
 	DatabaseRequestHandler dbHandler;
 	FerretConfig ferretConfig;
 
@@ -51,6 +54,8 @@ public class RegenerateDsgs {
 		cruiseHandler = configStore.getCruiseFileHandler();
 		dsgHandler = configStore.getDsgNcFileHandler();
 		metaHandler = configStore.getMetadataFileHandler();
+		knownMetadataTypes = configStore.getKnownMetadataTypes();
+		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		dbHandler = configStore.getDatabaseRequestHandler();
 		ferretConfig = configStore.getFerretConfig();
 	}
@@ -80,13 +85,13 @@ public class RegenerateDsgs {
 
 			// Read the current metadata in the full-data DSG file
 			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
-			ArrayList<String> missing = fullDataDsg.readMetadata();
+			ArrayList<String> missing = fullDataDsg.readMetadata(knownMetadataTypes);
 			// At this time allow allRegionIDs and socatDOI to be missed
 			missing.remove("allRegionIDs");
 			missing.remove("socatDOI");
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected metadata fields missing from the DSG file: " + missing);
-			missing = fullDataDsg.readData();
+			missing = fullDataDsg.readData(knownDataFileTypes);
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected data fields missing from the DSG file: " + missing);
 			SocatMetadata fullDataMeta = fullDataDsg.getMetadata();

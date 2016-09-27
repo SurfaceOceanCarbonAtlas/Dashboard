@@ -211,7 +211,7 @@ public class AddOldNFlags {
 					}
 					CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
 					try {
-						ArrayList<String> missing = fullDataDsg.readMetadata();
+						ArrayList<String> missing = fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 						if ( ! missing.isEmpty() ) 
 							throw new IllegalArgumentException("unassigned fields: " + missing.toString());
 					} catch (Exception ex) {
@@ -224,7 +224,7 @@ public class AddOldNFlags {
 					String dsgVersionStatus = mdata.getSocatVersion();
 					if ( ! dsgVersionStatus.equals(dbVersionStatus) ) {
 						try {
-							fullDataDsg.updateStringVarValue(CruiseDsgNcFile.SOCAT_VERSION_NCVAR_NAME, dbVersionStatus);
+							fullDataDsg.updateStringVarValue(SocatMetadata.SOCAT_VERSION.getVarName(), dbVersionStatus);
 						} catch (Exception ex) {
 							System.err.println("Problems updating the SOCAT version status in the full-data DSG file for " + 
 									expocode + ": " + ex.getMessage());
@@ -233,7 +233,7 @@ public class AddOldNFlags {
 						}
 						CruiseDsgNcFile decDataDsg = dsgHandler.getDecDsgNcFile(expocode);
 						try {
-							decDataDsg.updateStringVarValue(CruiseDsgNcFile.SOCAT_VERSION_NCVAR_NAME, dbVersionStatus);
+							decDataDsg.updateStringVarValue(SocatMetadata.SOCAT_VERSION.getVarName(), dbVersionStatus);
 						} catch (Exception ex) {
 							System.err.println("Problems updating the SOCAT version status in the decimated-data DSG file for " + 
 									expocode + ": " + ex.getMessage());
