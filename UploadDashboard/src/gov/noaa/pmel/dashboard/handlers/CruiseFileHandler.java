@@ -12,7 +12,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -935,12 +934,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 		else {
 			String uploadFilename = addlDoc.getFilename();
-			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) )
+			if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) )
 				throw new IllegalArgumentException("Supplemental documents cannot " +
-						"have the upload filename of " + DashboardMetadata.OME_FILENAME);
-			if ( DashboardMetadata.PI_OME_FILENAME.equals(uploadFilename) )
+						"have the upload filename of " + DashboardUtils.OME_FILENAME);
+			if ( DashboardUtils.PI_OME_FILENAME.equals(uploadFilename) )
 				throw new IllegalArgumentException("Supplemental documents cannot " +
-						"have the upload filename of " + DashboardMetadata.PI_OME_FILENAME);
+						"have the upload filename of " + DashboardUtils.PI_OME_FILENAME);
 			// Work directly on the additional documents list in the cruise object
 			TreeSet<String> addlDocTitles = cruise.getAddlDocs();
 			String titleToDelete = null;
@@ -1167,13 +1166,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			// Delete the metadata and additional documents associated with this cruise
 			MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 			try {
-				metadataHandler.removeMetadata(username, expocode, DashboardMetadata.OME_FILENAME);
+				metadataHandler.removeMetadata(username, expocode, DashboardUtils.OME_FILENAME);
 			} catch (Exception ex) {
 				// Ignore - may not exist
 				;
 			}
 			try {
-				metadataHandler.removeMetadata(username, expocode, DashboardMetadata.PI_OME_FILENAME);
+				metadataHandler.removeMetadata(username, expocode, DashboardUtils.PI_OME_FILENAME);
 			} catch (Exception ex) {
 				// Ignore - may not exist
 				;
@@ -1427,10 +1426,10 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		String newStatus;
 		// Special check for null or blank QC flag == not submitted
 		if ( (qcFlag == null) || Character.isWhitespace(qcFlag) ) {
-			newStatus = QCEvent.QC_STATUS_NOT_SUBMITTED;
+			newStatus = DashboardUtils.QC_STATUS_NOT_SUBMITTED;
 		}
 		else {
-			newStatus = QCEvent.FLAG_STATUS_MAP.get(qcFlag);
+			newStatus = DashboardUtils.FLAG_STATUS_MAP.get(qcFlag);
 			if ( newStatus == null ) {
 				// QCEvent.QC_COMMENT or unknown flag
 				throw new IllegalArgumentException("Unexpected QC flag of '" + 

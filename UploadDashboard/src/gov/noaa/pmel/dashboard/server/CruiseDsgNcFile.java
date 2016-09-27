@@ -204,7 +204,7 @@ public class CruiseDsgNcFile extends File {
 				var = ncfile.addVariable(null, varName, DataType.DOUBLE, trajDims);
 				// For consistency, use FP_MISSING_VALUE for the missing value
 				addAttributes(ncfile, var, DashboardUtils.FP_MISSING_VALUE, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), KnownDataTypes.TIME_UNITS.get(0));
+						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.TIME_UNITS.get(0));
 				// Additional attribute giving the time origin (although also mentioned in the units)
 				ncfile.addVariableAttribute(var, new Attribute("time_origin", TIME_ORIGIN_ATTRIBUTE));
 			}
@@ -425,15 +425,15 @@ public class CruiseDsgNcFile extends File {
 					continue;
 				}
 				String dataClassName = dtype.getDataClassName();
-				if ( KnownDataTypes.STRING_DATA_CLASS_NAME.equals(dataClassName) ) {
+				if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayChar.D2 mvar = (ArrayChar.D2) var.read();
 					metadata.setStringVariableValue(dtype, mvar.getString(0));
 				}
-				else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
+				else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayDouble.D1 mvar = (ArrayDouble.D1) var.read();
 					metadata.setDoubleVariableValue(dtype, mvar.getDouble(0));
 				}
-				else if ( KnownDataTypes.DATE_DATA_CLASS_NAME.equals(dataClassName) ) {
+				else if ( DashboardUtils.DATE_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayDouble.D1 mvar = (ArrayDouble.D1) var.read();
 					double dvalue = mvar.getDouble(0);
 					Date dateVal;
@@ -499,17 +499,17 @@ public class CruiseDsgNcFile extends File {
 							"' (" + Integer.toString(var.getShape(0)) + ") does not match " +
 							"the number of values for 'time' (" + Integer.toString(numData) + ")");
 				String dataClassName = dtype.getDataClassName();
-				if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
+				if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
 					for (int k = 0; k < numData; k++)
 						dataList.get(k).setDoubleVariableValue(dtype, dvar.get(k));
 				}
-				else if ( KnownDataTypes.INT_DATA_CLASS_NAME.equals(dataClassName) ) {
+				else if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
 					for (int k = 0; k < numData; k++)
 						dataList.get(k).setIntegerVariableValue(dtype, dvar.get(k));
 				}
-				else if ( KnownDataTypes.CHAR_DATA_CLASS_NAME.equals(dataClassName) ) {
+				else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
 					for (int k = 0; k < numData; k++)
 						dataList.get(k).setCharacterVariableValue(dtype, dvar.get(k,0));

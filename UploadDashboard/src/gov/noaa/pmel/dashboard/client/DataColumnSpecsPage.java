@@ -676,7 +676,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		HashSet<String> typeSet = new HashSet<String>();
 		TreeSet<String> duplicates = new TreeSet<String>();
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
-			if ( DataColumnType.OTHER.typeEquals(colType) ) {
+			if ( DashboardUtils.OTHER.typeEquals(colType) ) {
 				// Multiple OTHER column types are allowed
 				;
 			}

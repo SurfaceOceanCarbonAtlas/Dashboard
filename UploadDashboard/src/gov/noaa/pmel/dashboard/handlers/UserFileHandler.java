@@ -462,7 +462,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			String key = keyFromColumnName(colName);
 			DataColumnType thisColType = userColNamesToTypes.get(key);
 			if ( thisColType == null )
-				thisColType = DataColumnType.UNKNOWN;
+				thisColType = DashboardUtils.UNKNOWN;
 			colTypes.add(thisColType);
 		}
 	}

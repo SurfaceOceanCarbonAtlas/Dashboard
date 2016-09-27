@@ -417,8 +417,8 @@ public class DatabaseRequestHandler {
 		try {
 			PreparedStatement removeCoastalPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
 					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_flag` IN ('" + 
-					QCEvent.QC_NEW_FLAG + "','" + QCEvent.QC_UPDATED_FLAG + 
-					"') AND `region_id` = '" + DataLocation.COASTAL_REGION_ID + 
+					DashboardUtils.QC_NEW_FLAG + "','" + DashboardUtils.QC_UPDATED_FLAG + 
+					"') AND `region_id` = '" + DashboardUtils.COASTAL_REGION_ID + 
 					"' AND `qc_comment` LIKE 'Initial%'");
 			removeCoastalPrepStmt.setString(1, expocode);
 			numDeleted = removeCoastalPrepStmt.executeUpdate();
@@ -432,7 +432,7 @@ public class DatabaseRequestHandler {
 	/**
 	 * Get "the" QC flag for a dataset.  If the latest QC flag for different 
 	 * regions are in conflict, and a global flag does not later resolve
-	 * this conflict, the {@link QCEvent#QC_CONFLICT_FLAG} flag is 
+	 * this conflict, the {@link DashboardUtils#QC_CONFLICT_FLAG} flag is 
 	 * returned.
 	 * 
 	 * @param expocode
@@ -462,12 +462,12 @@ public class DatabaseRequestHandler {
 					flagStr = flagStr.trim();
 					// Should not be blank, but might be from older code for a comment
 					if ( (flagStr.length() < 1) || 
-						 flagStr.equals(QCEvent.QC_COMMENT.toString()) ||
-						 flagStr.equals(QCEvent.QC_RENAMED_FLAG.toString()) )
+						 flagStr.equals(DashboardUtils.QC_COMMENT.toString()) ||
+						 flagStr.equals(DashboardUtils.QC_RENAMED_FLAG.toString()) )
 						continue;
 					Character flag = flagStr.charAt(0);
 					if ( (flagStr.length() > 1) ||
-						 (QCEvent.FLAG_STATUS_MAP.get(flag) == null) ) 
+						 (DashboardUtils.FLAG_STATUS_MAP.get(flag) == null) ) 
 						throw new SQLException("Unexpected QC flag of '" + flagStr + "'");
 					long time = rslts.getLong(2);
 					if ( time < MIN_FLAG_SEC_TIME )
@@ -482,11 +482,11 @@ public class DatabaseRequestHandler {
 						continue;
 					Character regionID = region.charAt(0);
 					if ( (region.length() > 1) ||
-						 (DataLocation.REGION_NAMES.get(regionID) == null) )
+						 (DashboardUtils.REGION_NAMES.get(regionID) == null) )
 						throw new SQLException("Unexpected region ID of '" + region + "'");
-					if ( DataLocation.GLOBAL_REGION_ID.equals(regionID) && 
-						 ( QCEvent.QC_NEW_FLAG.equals(flag) || 
-						   QCEvent.QC_UPDATED_FLAG.equals(flag) ) ) {
+					if ( DashboardUtils.GLOBAL_REGION_ID.equals(regionID) && 
+						 ( DashboardUtils.QC_NEW_FLAG.equals(flag) || 
+						   DashboardUtils.QC_UPDATED_FLAG.equals(flag) ) ) {
 						lastUpdateTime = time;
 					}
 					QCEvent qcFlag = new QCEvent();
@@ -504,12 +504,12 @@ public class DatabaseRequestHandler {
 		}
 
 		// Should always have a global 'N' flag; maybe also a 'U', and maybe an override flag
-		QCEvent globalEvent = regionFlags.get(DataLocation.GLOBAL_REGION_ID);
+		QCEvent globalEvent = regionFlags.get(DashboardUtils.GLOBAL_REGION_ID);
 		Character globalFlag;
 		long globalTime;
 		if ( globalEvent == null ) {
 			// Some v1 cruises do not have global flags
-			globalFlag = QCEvent.QC_NEW_FLAG;
+			globalFlag = DashboardUtils.QC_NEW_FLAG;
 			globalTime = lastUpdateTime;
 		}
 		else {
@@ -524,7 +524,7 @@ public class DatabaseRequestHandler {
 		Character latestFlag = null;
 		for ( Entry<Character,QCEvent> regionEntry : regionFlags.entrySet() ) {
 			// Just compare non-global entries
-			if ( DataLocation.GLOBAL_REGION_ID.equals(regionEntry.getKey()) )
+			if ( DashboardUtils.GLOBAL_REGION_ID.equals(regionEntry.getKey()) )
 				continue;
 			// Ignore regional flags assigned (more than 1 s) before the last update
 			QCEvent qcEvent = regionEntry.getValue();
@@ -544,7 +544,7 @@ public class DatabaseRequestHandler {
 				latestFlag = flag;
 			}
 			else if ( ! latestFlag.equals(flag) ) {
-				return QCEvent.QC_CONFLICT_FLAG;
+				return DashboardUtils.QC_CONFLICT_FLAG;
 			}
 		}
 		if ( latestFlag == null ) {
@@ -578,9 +578,9 @@ public class DatabaseRequestHandler {
 			// Get all the QC events for this data set, ordered so the latest are last
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
 					"SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME + 
-					"` WHERE `expocode` = ? AND `region_id` = '" + DataLocation.GLOBAL_REGION_ID +
-					"' AND `qc_flag` IN ('" + QCEvent.QC_NEW_FLAG + 
-					"', '" + QCEvent.QC_UPDATED_FLAG + "');");
+					"` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.GLOBAL_REGION_ID +
+					"' AND `qc_flag` IN ('" + DashboardUtils.QC_NEW_FLAG + 
+					"', '" + DashboardUtils.QC_UPDATED_FLAG + "');");
 			getPrepStmt.setString(1, expocode);
 			ResultSet rslts = getPrepStmt.executeQuery();
 			try {
@@ -946,24 +946,24 @@ public class DatabaseRequestHandler {
 					"WHERE `expocode` = ? AND `woce_flag` = ?;");
 			modifyWocePrepStmt.setString(2, expocode);
 
-			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_GOOD.toString());
-			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_GOOD.toString());
+			modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_GOOD.toString());
+			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_GOOD.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_NOT_CHECKED.toString());
-			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_NOT_CHECKED.toString());
+			modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_NOT_CHECKED.toString());
+			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_NOT_CHECKED.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_QUESTIONABLE.toString());
-			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_QUESTIONABLE.toString());
+			modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_QUESTIONABLE.toString());
+			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_QUESTIONABLE.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_BAD.toString());
-			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_BAD.toString());
+			modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_BAD.toString());
+			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_BAD.toString());
 			modifyWocePrepStmt.executeUpdate();
 
-			modifyWocePrepStmt.setString(1, WoceEvent.OLD_WOCE_NO_DATA.toString());
-			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_NO_DATA.toString());
+			modifyWocePrepStmt.setString(1, DashboardUtils.OLD_WOCE_NO_DATA.toString());
+			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_NO_DATA.toString());
 			modifyWocePrepStmt.executeUpdate();
 		} finally {
 			catConn.close();
@@ -993,20 +993,20 @@ public class DatabaseRequestHandler {
 
 		Character newFlag;
 		Character oldFlag = woceEvent.getFlag();
-		if ( oldFlag.equals(WoceEvent.OLD_WOCE_GOOD) ) {
-			newFlag = WoceEvent.WOCE_GOOD;
+		if ( oldFlag.equals(DashboardUtils.OLD_WOCE_GOOD) ) {
+			newFlag = DashboardUtils.WOCE_GOOD;
 		}
-		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_NOT_CHECKED) ) {
-			newFlag = WoceEvent.WOCE_NOT_CHECKED;
+		else if ( oldFlag.equals(DashboardUtils.OLD_WOCE_NOT_CHECKED) ) {
+			newFlag = DashboardUtils.WOCE_NOT_CHECKED;
 		}
-		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_QUESTIONABLE) ) {
-			newFlag = WoceEvent.WOCE_QUESTIONABLE;
+		else if ( oldFlag.equals(DashboardUtils.OLD_WOCE_QUESTIONABLE) ) {
+			newFlag = DashboardUtils.WOCE_QUESTIONABLE;
 		}
-		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_BAD) ) {
-			newFlag = WoceEvent.WOCE_BAD;
+		else if ( oldFlag.equals(DashboardUtils.OLD_WOCE_BAD) ) {
+			newFlag = DashboardUtils.WOCE_BAD;
 		}
-		else if ( oldFlag.equals(WoceEvent.OLD_WOCE_NO_DATA) ) {
-			newFlag = WoceEvent.WOCE_NO_DATA;
+		else if ( oldFlag.equals(DashboardUtils.OLD_WOCE_NO_DATA) ) {
+			newFlag = DashboardUtils.WOCE_NO_DATA;
 		}
 		else {
 			throw new IllegalArgumentException("Invalid \"old\" WOCE flag of '" + oldFlag + "'");
@@ -1066,7 +1066,7 @@ public class DatabaseRequestHandler {
 					"WHERE `expocode` = ? AND `qc_flag` <> ?;");
 			modifyQcPrepStmt.setString(1, newExpocode);
 			modifyQcPrepStmt.setString(2, oldExpocode);
-			modifyQcPrepStmt.setString(3, QCEvent.QC_RENAMED_FLAG.toString());
+			modifyQcPrepStmt.setString(3, DashboardUtils.QC_RENAMED_FLAG.toString());
 			modifyQcPrepStmt.executeUpdate();
 			int updateCount = modifyQcPrepStmt.getUpdateCount();
 			if ( updateCount < 0 )
@@ -1082,9 +1082,9 @@ public class DatabaseRequestHandler {
 					"INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
 					"`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
-			addQcPrepStmt.setString(1, QCEvent.QC_RENAMED_FLAG.toString());
-			addQcPrepStmt.setString(8, QCEvent.QC_RENAMED_FLAG.toString());
-			addQcPrepStmt.setString(15, QCEvent.QC_COMMENT.toString());
+			addQcPrepStmt.setString(1, DashboardUtils.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(8, DashboardUtils.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(15, DashboardUtils.QC_COMMENT.toString());
 			addQcPrepStmt.setLong(2, nowSec);
 			addQcPrepStmt.setLong(9, nowSec);
 			addQcPrepStmt.setLong(16, nowSec);
@@ -1094,9 +1094,9 @@ public class DatabaseRequestHandler {
 			addQcPrepStmt.setString(4, socatVersion);
 			addQcPrepStmt.setString(11, socatVersion);
 			addQcPrepStmt.setString(18, socatVersion);
-			addQcPrepStmt.setString(5, DataLocation.GLOBAL_REGION_ID.toString());
-			addQcPrepStmt.setString(12, DataLocation.GLOBAL_REGION_ID.toString());
-			addQcPrepStmt.setString(19, DataLocation.GLOBAL_REGION_ID.toString());
+			addQcPrepStmt.setString(5, DashboardUtils.GLOBAL_REGION_ID.toString());
+			addQcPrepStmt.setString(12, DashboardUtils.GLOBAL_REGION_ID.toString());
+			addQcPrepStmt.setString(19, DashboardUtils.GLOBAL_REGION_ID.toString());
 			addQcPrepStmt.setInt(6, reviewerId);
 			addQcPrepStmt.setInt(13, reviewerId);
 			addQcPrepStmt.setInt(20, reviewerId);
@@ -1111,7 +1111,7 @@ public class DatabaseRequestHandler {
 					"WHERE `expocode` = ? AND `woce_flag` <> ?;");
 			modifyWocePrepStmt.setString(1, newExpocode);
 			modifyWocePrepStmt.setString(2, oldExpocode);
-			modifyWocePrepStmt.setString(3, WoceEvent.WOCE_RENAME.toString());
+			modifyWocePrepStmt.setString(3, DashboardUtils.WOCE_RENAME.toString());
 			modifyWocePrepStmt.executeUpdate();
 
 			// Add two rename WOCE events; one for the old expocode and one for the new expocode
@@ -1119,8 +1119,8 @@ public class DatabaseRequestHandler {
 					WOCEEVENTS_TABLE_NAME + "` (`woce_flag`, `woce_time`, `expocode`, " +
 					"`socat_version`, `reviewer_id`, `woce_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);");
-			addWocePrepStmt.setString(1, WoceEvent.WOCE_RENAME.toString());
-			addWocePrepStmt.setString(7, WoceEvent.WOCE_RENAME.toString());
+			addWocePrepStmt.setString(1, DashboardUtils.WOCE_RENAME.toString());
+			addWocePrepStmt.setString(7, DashboardUtils.WOCE_RENAME.toString());
 			addWocePrepStmt.setLong(2, nowSec);
 			addWocePrepStmt.setLong(8, nowSec);
 			addWocePrepStmt.setString(3, oldExpocode);

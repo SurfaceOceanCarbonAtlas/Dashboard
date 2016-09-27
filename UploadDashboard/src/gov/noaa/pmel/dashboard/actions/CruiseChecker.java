@@ -11,7 +11,6 @@ import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
@@ -148,8 +147,8 @@ public class CruiseChecker {
 			new HashMap<DashDataType,ArrayList<String>>();
 	static {
 		final ArrayList<String> checkerTimestampDateUnits = 
-				new ArrayList<String>(KnownDataTypes.TIMESTAMP_UNITS.size());
-		for ( String fmt : KnownDataTypes.TIMESTAMP_UNITS ) 
+				new ArrayList<String>(DashboardUtils.TIMESTAMP_UNITS.size());
+		for ( String fmt : DashboardUtils.TIMESTAMP_UNITS ) 
 			checkerTimestampDateUnits.add(fmt.split(" ", 2)[0]);
 		final ArrayList<String> checkerLongitudeUnits = 
 				new ArrayList<String>(Arrays.asList("decimal_degrees_east", "decimal_degrees_west"));
@@ -166,27 +165,27 @@ public class CruiseChecker {
 
 		// UNKNOWN should not be processed by the sanity checker
 
-		CHECKER_DATA_UNITS.put(KnownDataTypes.EXPOCODE, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DATASET_NAME, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.VESSEL_NAME, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.ORGANIZATION_NAME, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.INVESTIGATOR_NAMES, DataColumnType.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.EXPOCODE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.DATASET_NAME, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.VESSEL_NAME, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.ORGANIZATION_NAME, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.INVESTIGATOR_NAMES, DashboardUtils.NO_UNITS);
 
 		CHECKER_DATA_UNITS.put(KnownDataTypes.TIMESTAMP, checkerTimestampDateUnits);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DATE, KnownDataTypes.DATE_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.YEAR, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.MONTH_OF_YEAR, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DAY_OF_MONTH, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.TIME_OF_DAY, KnownDataTypes.TIME_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.HOUR_OF_DAY, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.MINUTE_OF_HOUR, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.SECOND_OF_MINUTE, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DAY_OF_YEAR, KnownDataTypes.DAY_OF_YEAR_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.SECOND_OF_DAY, DataColumnType.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.DATE, DashboardUtils.DATE_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.YEAR, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.MONTH_OF_YEAR, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.DAY_OF_MONTH, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.TIME_OF_DAY, DashboardUtils.TIME_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.HOUR_OF_DAY, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.MINUTE_OF_HOUR, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.SECOND_OF_MINUTE, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.DAY_OF_YEAR, DashboardUtils.DAY_OF_YEAR_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.SECOND_OF_DAY, DashboardUtils.NO_UNITS);
 
 		CHECKER_DATA_UNITS.put(KnownDataTypes.LONGITUDE, checkerLongitudeUnits);
 		CHECKER_DATA_UNITS.put(KnownDataTypes.LATITUDE, checkerLatitudeUnits);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.SAMPLE_DEPTH, KnownDataTypes.DEPTH_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.SAMPLE_DEPTH, DashboardUtils.DEPTH_UNITS);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.SALINITY, checkerSalinityUnits);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.TEQU, checkerTemperatureUnits);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.SST, checkerTemperatureUnits);
@@ -215,8 +214,8 @@ public class CruiseChecker {
 		CHECKER_DATA_UNITS.put(SocatCruiseData.DELTA_PCO2, SocatCruiseData.PCO2_UNITS);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.DELTA_FCO2, SocatCruiseData.FCO2_UNITS);
 
-		CHECKER_DATA_UNITS.put(SocatCruiseData.RELATIVE_HUMIDITY, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.SPECIFIC_HUMIDITY, DataColumnType.NO_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.RELATIVE_HUMIDITY, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.SPECIFIC_HUMIDITY, DashboardUtils.NO_UNITS);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.SHIP_SPEED, SocatCruiseData.SHIP_SPEED_UNITS);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.SHIP_DIRECTION, checkerDirectionUnits);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_SPEED_TRUE, SocatCruiseData.WIND_SPEED_UNITS);
@@ -224,8 +223,8 @@ public class CruiseChecker {
 		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_DIRECTION_TRUE, checkerDirectionUnits);
 		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_DIRECTION_RELATIVE, checkerDirectionUnits);
 
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WOCE_CO2_WATER, DataColumnType.NO_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WOCE_CO2_ATM, DataColumnType.NO_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.WOCE_CO2_WATER, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.WOCE_CO2_ATM, DashboardUtils.NO_UNITS);
 
 		// COMMENT... and OTHER should not be processed by the sanity checker
 	}
@@ -365,7 +364,7 @@ public class CruiseChecker {
 		Element[] timestampElements = new Element[] { null, null, null, null, null, null };
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( colType.typeNameEquals(DataColumnType.UNKNOWN) ) {
+			if ( colType.typeNameEquals(DashboardUtils.UNKNOWN) ) {
 				// Might happen in multiple file upload
 				throw new IllegalArgumentException(
 						"Data type not defined for column " + Integer.toString(k+1) + 
@@ -636,7 +635,7 @@ public class CruiseChecker {
 			}
 			else if ( SocatCruiseData.COMMENT_WOCE_CO2_WATER.typeNameEquals(colType) ||
 					  SocatCruiseData.COMMENT_WOCE_CO2_ATM.typeNameEquals(colType) ||
-					  colType.typeNameEquals(DataColumnType.OTHER) ) {
+					  colType.typeNameEquals(DashboardUtils.OTHER) ) {
 				// Unchecked data 
 				;
 			}
@@ -677,7 +676,7 @@ public class CruiseChecker {
 		// Get the OME metadata for this cruise
 		Document oldOmeDoc;
 		OmeMetadata oldOmeMData;
-		File omeFile = metadataHandler.getMetadataFile(expocode, DashboardMetadata.OME_FILENAME);
+		File omeFile = metadataHandler.getMetadataFile(expocode, DashboardUtils.OME_FILENAME);
 		if ( omeFile.exists() ) {
 			try {
 				oldOmeDoc = (new SAXBuilder()).build(omeFile);
@@ -990,7 +989,7 @@ public class CruiseChecker {
 
 					 SocatCruiseData.COMMENT_WOCE_CO2_WATER.typeNameEquals(colType) ||
 					 SocatCruiseData.COMMENT_WOCE_CO2_ATM.typeNameEquals(colType) ||
-					 colType.typeNameEquals(DataColumnType.OTHER) ) {
+					 colType.typeNameEquals(DashboardUtils.OTHER) ) {
 					// Do not change
 					;
 				}

@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -181,7 +182,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			// Exclude the (expocode)/OME.xml document at this time;
 			// do include the (expocode)/PI_OME.xml 
 			String filename = mdata.getFilename();
-			if ( ! filename.equals(DashboardMetadata.OME_FILENAME) ) {
+			if ( ! filename.equals(DashboardUtils.OME_FILENAME) ) {
 				addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
 			}
 		}
@@ -250,7 +251,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 			// Exclude the (expocode)/OME.xml document at this time;
 			// do include the (expocode)/PI_OME.xml 
 			String filename = mdata.getFilename();
-			if ( ! filename.equals(DashboardMetadata.OME_FILENAME) ) {
+			if ( ! filename.equals(DashboardUtils.OME_FILENAME) ) {
 				addlDocs.add(metadataHandler.getMetadataFile(upperExpo, filename));
 			}
 		}

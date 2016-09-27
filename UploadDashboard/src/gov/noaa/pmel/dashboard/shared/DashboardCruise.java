@@ -62,7 +62,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		dataCheckStatus = DashboardUtils.STRING_MISSING_VALUE;
 		omeTimestamp = DashboardUtils.STRING_MISSING_VALUE;
 		addlDocs = new TreeSet<String>();
-		qcStatus = QCEvent.QC_STATUS_NOT_SUBMITTED;
+		qcStatus = DashboardUtils.QC_STATUS_NOT_SUBMITTED;
 		archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
 		cdiacDate = DashboardUtils.STRING_MISSING_VALUE;
 		uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
@@ -93,9 +93,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	public Boolean isEditable() {
 		// true for cruises that are not submitted, suspended, or excluded
 		String status = getQcStatus();
-		if ( status.equals(QCEvent.QC_STATUS_NOT_SUBMITTED) || 
-			 status.equals(QCEvent.QC_STATUS_SUSPENDED) ||
-			 status.equals(QCEvent.QC_STATUS_EXCLUDED)  ) 
+		if ( status.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) || 
+			 status.equals(DashboardUtils.QC_STATUS_SUSPENDED) ||
+			 status.equals(DashboardUtils.QC_STATUS_EXCLUDED)  ) 
 			return Boolean.TRUE;
 		// false for submitted or acceptable unpublished cruises
 		status = getArchiveStatus();
@@ -267,7 +267,7 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 */
 	public void setQcStatus(String qcStatus) {
 		if ( qcStatus == null )
-			this.qcStatus = QCEvent.QC_STATUS_NOT_SUBMITTED;
+			this.qcStatus = DashboardUtils.QC_STATUS_NOT_SUBMITTED;
 		else
 			this.qcStatus = qcStatus.trim();
 	}

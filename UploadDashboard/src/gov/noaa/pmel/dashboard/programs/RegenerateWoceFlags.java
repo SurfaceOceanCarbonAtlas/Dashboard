@@ -6,7 +6,7 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.actions.CruiseModifier;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.util.Date;
@@ -114,9 +114,9 @@ public class RegenerateWoceFlags {
 				// Add a QC comment regarding the restoration of WOCE flags
 				QCEvent qcEvent = new QCEvent();
 				qcEvent.setExpocode(expocode);
-				qcEvent.setFlag(QCEvent.QC_COMMENT);
+				qcEvent.setFlag(DashboardUtils.QC_COMMENT);
 				qcEvent.setFlagDate(new Date());
-				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 				qcEvent.setVersion(socatVersion);
 				qcEvent.setUsername(username);
 				qcEvent.setComment("non-automated WOCE flags regenerated for resubmitted data");

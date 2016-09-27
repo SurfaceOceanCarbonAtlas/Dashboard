@@ -73,8 +73,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 			"Please select a document to upload";
 
 	private static final String NO_OME_OVERWRITE_ERROR_MSG =
-			"Documents with the name " + DashboardMetadata.OME_FILENAME + 
-			" or " + DashboardMetadata.PI_OME_FILENAME + 
+			"Documents with the name " + DashboardUtils.OME_FILENAME + 
+			" or " + DashboardUtils.PI_OME_FILENAME + 
 			" cannot to uploaded as supplemental documents.  " +
 			"Please upload the file under a different name.";
 
@@ -301,8 +301,8 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		}
 
 		// Disallow any overwrite of an OME file
-		if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ||
-			 uploadFilename.equals(DashboardMetadata.PI_OME_FILENAME) ) {
+		if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
+			 uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ) {
 			SocatUploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
 			return;
 		}

@@ -9,9 +9,7 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
-import gov.noaa.pmel.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
@@ -121,8 +119,8 @@ public class AddOldNFlags {
 						hasV13QC = true;
 						Character flag = evnt.getFlag();
 						Character regionID = evnt.getRegionID();
-						if ( ( flag.equals(QCEvent.QC_NEW_FLAG) || flag.equals(QCEvent.QC_UPDATED_FLAG) ) 
-								&& regionID.equals(DataLocation.GLOBAL_REGION_ID) ) {
+						if ( ( flag.equals(DashboardUtils.QC_NEW_FLAG) || flag.equals(DashboardUtils.QC_UPDATED_FLAG) ) 
+								&& regionID.equals(DashboardUtils.GLOBAL_REGION_ID) ) {
 							hasV13NU = true;
 						}
 					}
@@ -130,8 +128,8 @@ public class AddOldNFlags {
 						hasV14QC = true;
 						Character flag = evnt.getFlag();
 						Character regionID = evnt.getRegionID();
-						if ( ( flag.equals(QCEvent.QC_NEW_FLAG) || flag.equals(QCEvent.QC_UPDATED_FLAG) ) 
-								&& regionID.equals(DataLocation.GLOBAL_REGION_ID) ) {
+						if ( ( flag.equals(DashboardUtils.QC_NEW_FLAG) || flag.equals(DashboardUtils.QC_UPDATED_FLAG) ) 
+								&& regionID.equals(DashboardUtils.GLOBAL_REGION_ID) ) {
 							hasV14NU = true;
 						}
 					}
@@ -143,11 +141,11 @@ public class AddOldNFlags {
 						// Add a old global v1.3 N flag
 						QCEvent qcEvent = new QCEvent();
 						qcEvent.setExpocode(expocode);
-						qcEvent.setFlag(QCEvent.QC_NEW_FLAG);
-						qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+						qcEvent.setFlag(DashboardUtils.QC_NEW_FLAG);
+						qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 						qcEvent.setVersion("1.3");
-						qcEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
-						qcEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
+						qcEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+						qcEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
 						Date oldDate = earliestQC.getFlagDate();
 						if ( oldDate.equals(DashboardUtils.DATE_MISSING_VALUE) ) {
 							System.err.println("No date for oldest QC flag of " + expocode);
@@ -172,11 +170,11 @@ public class AddOldNFlags {
 					// Add a old global v1.4 N flags - only if v1.4 QC but no v1.3 QC flags
 					QCEvent qcEvent = new QCEvent();
 					qcEvent.setExpocode(expocode);
-					qcEvent.setFlag(QCEvent.QC_NEW_FLAG);
-					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+					qcEvent.setFlag(DashboardUtils.QC_NEW_FLAG);
+					qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 					qcEvent.setVersion("1.4");
-					qcEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
-					qcEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
+					qcEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+					qcEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
 					Date oldDate = earliestQC.getFlagDate();
 					if ( oldDate.equals(DashboardUtils.DATE_MISSING_VALUE) ) {
 						System.err.println("No date for oldest QC flag of " + expocode);

@@ -165,7 +165,7 @@ public class CruiseDataColumn {
 				if ( idx < 0 ) {
 					// Not a recognized column type with units; set to unknown
 					idx = STD_TYPE_UNITS.indexOf(
-							new TypeUnits(DataColumnType.UNKNOWN, ""));
+							new TypeUnits(DashboardUtils.UNKNOWN, ""));
 					if ( idx < 0 )
 						throw new RuntimeException(
 								"Unexpected invalid index for DataColumnType.UNKNOWN");

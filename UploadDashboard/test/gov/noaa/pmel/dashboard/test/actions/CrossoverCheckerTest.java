@@ -67,12 +67,12 @@ public class CrossoverCheckerTest {
 	@Test
 	public void testDistanceBetween() {
 		double[] lons = { -5.0, 15.0 };
-		double lonDist = Crossover.EARTH_AUTHALIC_RADIUS * Math.abs(lons[1] - lons[0]) * Math.PI / 180.0;
+		double lonDist = DashboardUtils.EARTH_AUTHALIC_RADIUS * Math.abs(lons[1] - lons[0]) * Math.PI / 180.0;
 		double[] lats = { 60.0, 75.0 };
-		double latDist = Crossover.EARTH_AUTHALIC_RADIUS * Math.abs(lats[1] - lats[0]) * Math.PI / 180.0;
+		double latDist = DashboardUtils.EARTH_AUTHALIC_RADIUS * Math.abs(lats[1] - lats[0]) * Math.PI / 180.0;
 		double[] times = { System.currentTimeMillis() / 1000.0,
 				   2560 + (System.currentTimeMillis() / 1000.0) };
-		double timeDist = Crossover.SEAWATER_SPEED * Math.abs(times[1] - times[0]) / (60.0 * 60.0 * 24.0);
+		double timeDist = DashboardUtils.SEAWATER_SPEED * Math.abs(times[1] - times[0]) / (60.0 * 60.0 * 24.0);
 
 		double dist;
 		// Check longitude distance along the equator 
@@ -94,7 +94,7 @@ public class CrossoverCheckerTest {
 		double[] dallas = { -96.80667, 32.78306, austin[2] + (24.0 * 60.0 * 60.0) };
 		double austinDallasDist = 158.5 * 1.8537936;  // 200.0 miles on interstate a few hundred feet above sea level
 		double expected = Math.sqrt(austinDallasDist * austinDallasDist + 
-									Crossover.SEAWATER_SPEED * Crossover.SEAWATER_SPEED);
+									DashboardUtils.SEAWATER_SPEED * DashboardUtils.SEAWATER_SPEED);
 		dist = CrossoverChecker.distanceBetween(austin[0], austin[1], austin[2], dallas[0], dallas[1], dallas[2]);
 		assertEquals(expected, dist, 1.0);
 	}

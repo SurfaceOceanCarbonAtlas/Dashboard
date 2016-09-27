@@ -11,7 +11,6 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.File;
@@ -158,20 +157,20 @@ public class MetadataUploadService extends HttpServlet {
 		if ( isOme ) {
 			// Save under the PI_OME_FILENAME at this time.
 			// When CDIAC OME incorporated, change to OME_FILENAME
-			uploadFilename = DashboardMetadata.PI_OME_FILENAME;
+			uploadFilename = DashboardUtils.PI_OME_FILENAME;
 		}
 		else {
 			uploadFilename = DashboardUtils.baseName(metadataItem.getName());
-			if ( uploadFilename.equals(DashboardMetadata.OME_FILENAME) ||
-				 uploadFilename.equals(DashboardMetadata.OME_PDF_FILENAME) ||
-				 uploadFilename.equals(DashboardMetadata.PI_OME_FILENAME) ||
-				 uploadFilename.equals(DashboardMetadata.PI_OME_PDF_FILENAME) ) {
+			if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
+				 uploadFilename.equals(DashboardUtils.OME_PDF_FILENAME) ||
+				 uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ||
+				 uploadFilename.equals(DashboardUtils.PI_OME_PDF_FILENAME) ) {
 				metadataItem.delete();
 				sendErrMsg(response, "Name of the uploaded file cannot be " + 
-						DashboardMetadata.OME_FILENAME + 
-						" nor " + DashboardMetadata.OME_PDF_FILENAME + 
-						" nor " + DashboardMetadata.PI_OME_FILENAME + 
-						" nor " + DashboardMetadata.PI_OME_PDF_FILENAME + 
+						DashboardUtils.OME_FILENAME + 
+						" nor " + DashboardUtils.OME_PDF_FILENAME + 
+						" nor " + DashboardUtils.PI_OME_FILENAME + 
+						" nor " + DashboardUtils.PI_OME_PDF_FILENAME + 
 						"\nPlease rename the file and try again.");
 			}
 		}
@@ -214,9 +213,9 @@ public class MetadataUploadService extends HttpServlet {
 				if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
 					QCEvent qcEvent = new QCEvent();
 					qcEvent.setExpocode(expo);
-					qcEvent.setFlag(QCEvent.QC_UPDATED_FLAG);
+					qcEvent.setFlag(DashboardUtils.QC_UPDATED_FLAG);
 					qcEvent.setFlagDate(new Date());
-					qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+					qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 					qcEvent.setVersion(version);
 					qcEvent.setUsername(username);
 					String comment;
@@ -231,7 +230,7 @@ public class MetadataUploadService extends HttpServlet {
 						dbHandler.addQCEvent(qcEvent);
 						dsgFileHandler.updateQCFlag(qcEvent);
 						// Update the dashboard status for the 'U' QC flag
-						cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
+						cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 						// If archived, reset the archived status so the updated metadata will be archived
 						if ( cruise.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
 							cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);

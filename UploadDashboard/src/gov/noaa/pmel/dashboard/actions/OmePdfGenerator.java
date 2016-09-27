@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -100,13 +101,13 @@ public class OmePdfGenerator {
 	public void createPiOmePdf(String expocode) throws IllegalArgumentException, IOException {
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		// Get the full path filename for the PI_OME.xml file
-		File xmlFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_FILENAME);
+		File xmlFile = metadataHandler.getMetadataFile(upperExpo, DashboardUtils.PI_OME_FILENAME);
 		if ( ! xmlFile.exists() )
 			throw new IllegalArgumentException("PI-provided OME XML file does not exist for " + upperExpo);
 		// Get the information about this file
-		DashboardMetadata mdata = metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.PI_OME_FILENAME);
+		DashboardMetadata mdata = metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.PI_OME_FILENAME);
 		// Get the full path filename for the PI_OME.pdf file
-		File pdfFile = metadataHandler.getMetadataFile(upperExpo, DashboardMetadata.PI_OME_PDF_FILENAME);
+		File pdfFile = metadataHandler.getMetadataFile(upperExpo, DashboardUtils.PI_OME_PDF_FILENAME);
 		// Output stream for the PDF that will be generated
 		BufferedOutputStream pdfOut;
 		try {
@@ -155,7 +156,7 @@ public class OmePdfGenerator {
 			pdfOut.close();
 		}
 		// Add a properties file for the successfully generated PDF
-		mdata.setFilename(DashboardMetadata.PI_OME_PDF_FILENAME);
+		mdata.setFilename(DashboardUtils.PI_OME_PDF_FILENAME);
 		// Commit the PDF to version control and save/commit the properties file for the PDF
 		metadataHandler.saveMetadataInfo(mdata, upperExpo + 
 				": PI_OME.pdf generated from the PI_OME.xml file", true);

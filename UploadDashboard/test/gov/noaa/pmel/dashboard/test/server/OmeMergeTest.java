@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import org.junit.Test;
 
@@ -33,12 +34,12 @@ public class OmeMergeTest {
 		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		// Read the OME XML contents for previousExpocode 
-		DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardMetadata.OME_FILENAME);
+		DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardUtils.OME_FILENAME);
 		DashboardOmeMetadata updatedOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
 		// Reset the expocode and related fields to that for activeExpocode 
 		updatedOmeMData.changeExpocode(activeExpocode);
 		// Read the OME XML contents currently saved for activeExpocode
-		mdata = metadataHandler.getMetadataInfo(activeExpocode, DashboardMetadata.OME_FILENAME);
+		mdata = metadataHandler.getMetadataInfo(activeExpocode, DashboardUtils.OME_FILENAME);
 		DashboardOmeMetadata origOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
 		// Create the merged OME and save the results
 		DashboardOmeMetadata mergedOmeMData = origOmeMData.mergeModifiable(updatedOmeMData);

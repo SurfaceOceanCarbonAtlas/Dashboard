@@ -17,9 +17,7 @@ import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -99,7 +97,7 @@ public class RegenerateDsgs {
 
 			// Get the QC flag and SOCAT version from the database
 			Character qcFlag = dbHandler.getQCFlag(upperExpo);
-			String qcStatus = QCEvent.FLAG_STATUS_MAP.get(qcFlag);
+			String qcStatus = DashboardUtils.FLAG_STATUS_MAP.get(qcFlag);
 			String socatVersionStatus = dbHandler.getSocatVersionStatus(upperExpo);
 			if ( socatVersionStatus.isEmpty() )
 				throw new IllegalArgumentException("Unable to get the version and status from the database");
@@ -114,7 +112,7 @@ public class RegenerateDsgs {
 
 			// Get the metadata in the OME XML file
 			DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
-					metaHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME), metaHandler);
+					metaHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME), metaHandler);
 			// Update (but do not commit) the metadata info version number if not correct
 			if ( ! socatVersion.equals(omeMData.getVersion()) ) {
 				omeMData.setVersion(socatVersion);
@@ -145,7 +143,7 @@ public class RegenerateDsgs {
 							// 11-31 in 49K619871028
 							data.setMonth(12);
 							data.setDay(1);
-							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
 						}
 					}
 				}
@@ -155,7 +153,7 @@ public class RegenerateDsgs {
 							// 2-31 in 49NB19881228
 							data.setMonth(3);
 							data.setDay(1);
-							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
 						}
 					}
 				}
@@ -164,7 +162,7 @@ public class RegenerateDsgs {
 						if ( data.getMinute() > 59 ) {
 							// 12:99 in 74JC20061024
 							data.setMinute(59);
-							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
 						}
 					}
 				}
@@ -173,7 +171,7 @@ public class RegenerateDsgs {
 						if ( data.getSecond() >= 60.0 ) {
 							// 13:54:60 in 77FF20020226
 							data.setSecond(59.99);
-							data.setWoceCO2Water(WoceEvent.WOCE_BAD);
+							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
 						}
 					}
 				}

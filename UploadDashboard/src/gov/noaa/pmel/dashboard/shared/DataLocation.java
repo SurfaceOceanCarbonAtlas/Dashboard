@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -18,31 +17,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -4504865991728818424L;
-
-	public static final Character GLOBAL_REGION_ID = 'G';
-	public static final Character NORTH_PACIFIC_REGION_ID = 'N';
-	public static final Character TROPICAL_PACIFIC_REGION_ID = 'T';
-	public static final Character NORTH_ATLANTIC_REGION_ID = 'A';
-	public static final Character TROPICAL_ATLANTIC_REGION_ID = 'Z';
-	public static final Character INDIAN_REGION_ID = 'I';
-	public static final Character COASTAL_REGION_ID = 'C';
-	public static final Character SOUTHERN_OCEANS_REGION_ID = 'O';
-	public static final Character ARCTIC_REGION_ID = 'R';
-
-	public static final HashMap<Character,String> REGION_NAMES;
-	static {
-		REGION_NAMES = new HashMap<Character,String>();
-		REGION_NAMES.put(GLOBAL_REGION_ID, "Global");
-		REGION_NAMES.put(NORTH_PACIFIC_REGION_ID, "North Pacific");
-		REGION_NAMES.put(TROPICAL_PACIFIC_REGION_ID, "Tropical Pacific");
-		REGION_NAMES.put(NORTH_ATLANTIC_REGION_ID, "North Atlantic");
-		REGION_NAMES.put(TROPICAL_ATLANTIC_REGION_ID, "Tropical Atlantic");
-		REGION_NAMES.put(INDIAN_REGION_ID, "Indian");
-		REGION_NAMES.put(COASTAL_REGION_ID, "Coastal");
-		REGION_NAMES.put(SOUTHERN_OCEANS_REGION_ID, "Southern Oceans");
-		REGION_NAMES.put(ARCTIC_REGION_ID, "Artic");
-	}
+	private static final long serialVersionUID = 5917520266963969920L;
 
 	Character regionID;
 	Integer rowNumber;
@@ -55,7 +30,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	 * Creates an empty location with a global region ID
 	 */
 	public DataLocation() {
-		regionID = GLOBAL_REGION_ID;
+		regionID = DashboardUtils.GLOBAL_REGION_ID;
 		rowNumber = DashboardUtils.INT_MISSING_VALUE;
 		dataDate = DashboardUtils.DATE_MISSING_VALUE;
 		longitude = DashboardUtils.FP_MISSING_VALUE;
@@ -74,11 +49,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	/**
 	 * @param regionID 
 	 * 		the region ID to set for this WOCE flag; 
-	 * 		if null, {@link #GLOBAL_REGION_ID} is assigned
+	 * 		if null, {@link DashboardUtils#GLOBAL_REGION_ID} is assigned
 	 */
 	public void setRegionID(Character regionID) {
 		if ( regionID == null )
-			this.regionID = GLOBAL_REGION_ID;
+			this.regionID = DashboardUtils.GLOBAL_REGION_ID;
 		else
 			this.regionID = regionID;
 	}

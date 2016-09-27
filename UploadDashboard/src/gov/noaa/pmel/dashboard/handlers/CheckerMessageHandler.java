@@ -7,7 +7,6 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
@@ -605,14 +604,14 @@ public class CheckerMessageHandler {
 			WoceInfo info = new WoceInfo();
 
 			if ( severity.equals(SCMsgSeverity.ERROR) )
-				info.flag = WoceEvent.WOCE_BAD;
+				info.flag = DashboardUtils.WOCE_BAD;
 			else if ( severity.equals(SCMsgSeverity.WARNING) )
-				info.flag = WoceEvent.WOCE_QUESTIONABLE;
+				info.flag = DashboardUtils.WOCE_QUESTIONABLE;
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
 			// Only add SanityChecker WOCE-4 flags for now 
 			// (here and at the end of CruiseChecker.standardizeCruiseData)
-			if ( ! info.flag.equals(WoceEvent.WOCE_BAD) )
+			if ( ! info.flag.equals(DashboardUtils.WOCE_BAD) )
 				continue;
 
 			if ( colNum > 0 )
@@ -632,10 +631,10 @@ public class CheckerMessageHandler {
 		// Add any PI WOCE-3 flags 
 		for ( Integer rowIdx : userWoceThrees ) {
 			WoceInfo info = new WoceInfo();
-			info.flag = WoceEvent.WOCE_QUESTIONABLE;
+			info.flag = DashboardUtils.WOCE_QUESTIONABLE;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ " + WoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
+			info.comment = "ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
 			if ( userCommentsIndex >= 0 ) {
 				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
@@ -648,10 +647,10 @@ public class CheckerMessageHandler {
 		// Add any PI WOCE-4 flags 
 		for ( Integer rowIdx : userWoceFours ) {
 			WoceInfo info = new WoceInfo();
-			info.flag = WoceEvent.WOCE_BAD;
+			info.flag = DashboardUtils.WOCE_BAD;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ " + WoceEvent.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
+			info.comment = "ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
 			if ( userCommentsIndex >= 0 ) {
 				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
@@ -698,10 +697,10 @@ public class CheckerMessageHandler {
 				woceEvent.setVersion(version);
 				woceEvent.setFlag(info.flag);
 				woceEvent.setFlagDate(now);
-				woceEvent.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
-				woceEvent.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
+				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
 				// Remove the ZZZZ added to the PI-provided WOCE flag comment
-				if ( info.comment.startsWith("ZZZZ " + WoceEvent.PI_PROVIDED_WOCE_COMMENT_START) )
+				if ( info.comment.startsWith("ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START) )
 					woceEvent.setComment(info.comment.substring(5));
 				else
 					woceEvent.setComment(info.comment);

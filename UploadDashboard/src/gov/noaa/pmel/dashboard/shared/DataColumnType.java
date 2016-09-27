@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.shared;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
@@ -20,23 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8150134653894607400L;
-
-	/** For data without any specific units */
-	public static final ArrayList<String> NO_UNITS = new ArrayList<String>(Arrays.asList(""));
-
-	/**
-	 * UNKNOWN needs to be respecified as one of the (other)DashboardUtils.STRING_MISSING_VALUEata column types.
-	 */
-	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", null, null, null, null, NO_UNITS);
-
-	/**
-	 * OTHER is for supplementary data in the user's original data file but 
-	 * otherwise not used.  A description of each column with this type must 
-	 * be part of the metadata, but the values are not validated or used. 
-	 * Multiple columns may have this type.
-	 */
-	public static final DataColumnType OTHER = new DataColumnType("other", null, null, null, null, NO_UNITS);
+	private static final long serialVersionUID = -8624909472263989497L;
 
 	private String varName;
 	private String dataClassName;
@@ -50,7 +33,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * Create an empty data column type: 
 	 * varName, dataClassName, description, standardName, and categoryName are {@link DashboardUtils#STRING_MISSING_VALUE},
-	 * units list is a copy of {@link #NO_UNITS},
+	 * units list is a copy of {@link DashboardUtils#NO_UNITS},
 	 * index of the selected unit is zero,
 	 * selected missing value is {@link DashboardUtils#STRING_MISSING_VALUE} (interpreted as default missing values). 
 	 */
@@ -60,7 +43,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 		description = DashboardUtils.STRING_MISSING_VALUE;
 		standardName = DashboardUtils.STRING_MISSING_VALUE;
 		categoryName = DashboardUtils.STRING_MISSING_VALUE;
-		units = new ArrayList<String>(NO_UNITS);
+		units = new ArrayList<String>(DashboardUtils.NO_UNITS);
 		selectedUnitIndex = Integer.valueOf(0);
 		selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
 	}
@@ -120,7 +103,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 		}
 		else {
 			// Assume no units are going to be added
-			this.units = new ArrayList<String>(NO_UNITS);
+			this.units = new ArrayList<String>(DashboardUtils.NO_UNITS);
 		}
 		this.selectedUnitIndex = Integer.valueOf(0);
 		this.selectedMissingValue = DashboardUtils.STRING_MISSING_VALUE;
@@ -249,14 +232,14 @@ public class DataColumnType implements Serializable, IsSerializable {
 	/**
 	 * @param units 
 	 * 		the list of units to associate with this data column type (copied); 
-	 * 		if null or empty, a copy of {@link #NO_UNITS} is assigned.
+	 * 		if null or empty, a copy of {@link DashboardUtils#NO_UNITS} is assigned.
 	 */
 	public void setUnits(Collection<String> units) {
 		if ( (units != null) && (units.size() > 0) ) {
 			this.units = new ArrayList<String>(units);
 		}
 		else {
-			this.units = new ArrayList<String>(NO_UNITS);
+			this.units = new ArrayList<String>(DashboardUtils.NO_UNITS);
 		}
 	}
 

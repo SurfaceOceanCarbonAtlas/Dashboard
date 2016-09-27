@@ -9,7 +9,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -92,7 +92,7 @@ public class FixOmeMetadata {
 
 					// Fix the vessel and PI names
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
-							metaHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME), metaHandler);
+							metaHandler.getMetadataInfo(expocode, DashboardUtils.OME_FILENAME), metaHandler);
 					// Kludgey - working with the XML instead of OmeMetadata methods
 					Document omeXmlDoc = omeMData.createOmeXmlDoc();
 					boolean changed = false;

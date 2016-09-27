@@ -11,7 +11,7 @@ import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
@@ -77,18 +77,18 @@ public class ResubmitCruises {
 		DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 		String qcStatus = cruise.getQcStatus();
 
-		if ( qcStatus.equals(QCEvent.QC_STATUS_NOT_SUBMITTED) ) {
+		if ( qcStatus.equals(DashboardUtils.QC_STATUS_NOT_SUBMITTED) ) {
 			// Only check (do not submit) if the cruise in not submitted
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 			// If the DSG file exists, this is an unsubmitted update, so mark as suspended
 			if ( dsgHandler.getDsgNcFile(expocode).exists() ) {
-				cruiseData.setQcStatus(QCEvent.QC_STATUS_SUSPENDED);
+				cruiseData.setQcStatus(DashboardUtils.QC_STATUS_SUSPENDED);
 
 				QCEvent qcEvent = new QCEvent();
 				qcEvent.setExpocode(expocode);
-				qcEvent.setFlag(QCEvent.QC_SUSPEND_FLAG);
+				qcEvent.setFlag(DashboardUtils.QC_SUSPEND_FLAG);
 				qcEvent.setFlagDate(new Date());
-				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 				qcEvent.setVersion(socatVersion);
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Suspending cruise for pending update");
@@ -109,9 +109,9 @@ public class ResubmitCruises {
 		else {
 			// Un-submit the cruise but do not bother committing the change at this time
 			if ( dsgHandler.getDsgNcFile(expocode).exists() )
-				cruise.setQcStatus(QCEvent.QC_STATUS_SUSPENDED);
+				cruise.setQcStatus(DashboardUtils.QC_STATUS_SUSPENDED);
 			else
-				cruise.setQcStatus(QCEvent.QC_STATUS_NOT_SUBMITTED);
+				cruise.setQcStatus(DashboardUtils.QC_STATUS_NOT_SUBMITTED);
 			cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			// Submit the cruise for QC
 			HashSet<String> expocodeSet = new HashSet<String>(Arrays.asList(expocode));

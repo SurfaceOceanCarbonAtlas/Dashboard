@@ -15,23 +15,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Crossover implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2923552135378225987L;
-
-	/** Max "distance", in kilometers, still considered a crossover */
-	public static final double MAX_CROSSOVER_DIST = 80.0;
-	/** "Distance" contribution, in kilometers, for every 24h time difference */
-	public static final double SEAWATER_SPEED = 30.0;
-	/** Maximum difference in FCO2_rec for a high-quality crossover */
-	public static final double MAX_FCO2_DIFF = 5.0;
-	/** Maximum difference in SST for a high-quality crossover */
-	public static final double MAX_TEMP_DIFF = 0.3;
-
-	/** Authalic radius, in kilometers, of Earth */
-	public static final double EARTH_AUTHALIC_RADIUS = 6371.007;
-	/** Max allowable difference in time, in seconds, between two crossover data points */
-	public static final double MAX_TIME_DIFF = Math.ceil(24.0 * 60.0 * 60.0 * MAX_CROSSOVER_DIST / SEAWATER_SPEED);
-	/** Max allowable difference in latitude, in degrees, between two crossover data points */
-	public static final double MAX_LAT_DIFF = (MAX_CROSSOVER_DIST / EARTH_AUTHALIC_RADIUS) * (180.0 / Math.PI);
+	private static final long serialVersionUID = -2714312511541287156L;
 
 	String[] expocodes;
 	Double minDistance;

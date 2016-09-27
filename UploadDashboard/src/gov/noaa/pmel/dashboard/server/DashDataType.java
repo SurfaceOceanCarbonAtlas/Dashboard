@@ -217,7 +217,7 @@ public class DashDataType {
 		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
 			jsonObj.addProperty("categoryName", value);
 		ArrayList<String> units = dataType.getUnits();
-		if ( ! DataColumnType.NO_UNITS.equals(units) ) {
+		if ( ! DashboardUtils.NO_UNITS.equals(units) ) {
 			JsonArray jsonArr = new JsonArray();
 			for ( String val : dataType.getUnits() )
 				jsonArr.add(val);

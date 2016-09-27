@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.io.IOException;
@@ -28,8 +29,8 @@ import org.junit.Test;
 public class KnownDataTypesTest {
 
 	private static final ArrayList<String> USERS_VARNAMES = new ArrayList<String>(Arrays.asList(
-			DataColumnType.UNKNOWN.getVarName(),
-			DataColumnType.OTHER.getVarName(),
+			DashboardUtils.UNKNOWN.getVarName(),
+			DashboardUtils.OTHER.getVarName(),
 			KnownDataTypes.EXPOCODE.getVarName(),
 			KnownDataTypes.DATASET_NAME.getVarName(),
 			KnownDataTypes.VESSEL_NAME.getVarName(),
@@ -100,9 +101,9 @@ public class KnownDataTypesTest {
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
 		"xCO2_atm_dry_interp", "rank", "socat_doi" };
 	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { 
-		KnownDataTypes.DOUBLE_DATA_CLASS_NAME, 
-		KnownDataTypes.INT_DATA_CLASS_NAME, 
-		KnownDataTypes.STRING_DATA_CLASS_NAME };
+		DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
+		DashboardUtils.INT_DATA_CLASS_NAME, 
+		DashboardUtils.STRING_DATA_CLASS_NAME };
 	static final String[] ADDN_TYPES_DESCRIPTIONS = new String[] { 
 		"mole fraction CO2 in sea level air", 
 		"personal ranking", 
@@ -161,8 +162,8 @@ public class KnownDataTypesTest {
 		assertEquals(METADATA_FILES_VARNAMES.size(), types.size());
 		for ( String varName : METADATA_FILES_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
-		assertFalse( types.containsTypeName(DataColumnType.UNKNOWN.getVarName()) );
-		assertFalse( types.containsTypeName(DataColumnType.OTHER.getVarName()) );
+		assertFalse( types.containsTypeName(DashboardUtils.UNKNOWN.getVarName()) );
+		assertFalse( types.containsTypeName(DashboardUtils.OTHER.getVarName()) );
 	}
 
 	/**
@@ -178,8 +179,8 @@ public class KnownDataTypesTest {
 		assertEquals(DATA_FILES_VARNAMES.size(), types.size());
 		for ( String varName : DATA_FILES_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
-		assertFalse( types.containsTypeName(DataColumnType.UNKNOWN.getVarName()) );
-		assertFalse( types.containsTypeName(DataColumnType.OTHER.getVarName()) );
+		assertFalse( types.containsTypeName(DashboardUtils.UNKNOWN.getVarName()) );
+		assertFalse( types.containsTypeName(DashboardUtils.OTHER.getVarName()) );
 	}
 
 	/**

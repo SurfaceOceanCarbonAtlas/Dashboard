@@ -6,7 +6,7 @@ package gov.noaa.pmel.dashboard.test.actions;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class OmePdfGeneratorTest {
 		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILE);
 		MetadataFileHandler metaHandler = new MetadataFileHandler(METADATA_DOCS_DIR, SVN_USERNAME, null);
 		for ( String expo : EXPOCODE_ARRAY ) {
-			File pdfFile = metaHandler.getMetadataFile(expo, DashboardMetadata.PI_OME_PDF_FILENAME);
+			File pdfFile = metaHandler.getMetadataFile(expo, DashboardUtils.PI_OME_PDF_FILENAME);
 			// Make sure the PDF file does not exist, then generate it
 			pdfFile.delete();
 			OmePdfGenerator omePdfGenerator = new OmePdfGenerator(

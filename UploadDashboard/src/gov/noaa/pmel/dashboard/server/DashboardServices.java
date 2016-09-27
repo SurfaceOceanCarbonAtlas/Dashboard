@@ -14,7 +14,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
 
@@ -234,12 +233,12 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		// Get the current metadata documents for the cruise
 		MetadataFileHandler mdataHandler = configStore.getMetadataFileHandler();
-		if ( DashboardMetadata.OME_FILENAME.equals(deleteFilename) ) {
+		if ( DashboardUtils.OME_FILENAME.equals(deleteFilename) ) {
 			// Remove the OME XML stub file
 			if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) 
 				throw new IllegalArgumentException("Cannot delete the OME metadata for a submitted cruise");
 		}
-		else if ( DashboardMetadata.PI_OME_FILENAME.equals(deleteFilename) ) {
+		else if ( DashboardUtils.PI_OME_FILENAME.equals(deleteFilename) ) {
 			// No more PI-provided OME metadata for this cruise
 			cruise.setOmeTimestamp(null);
 		}
@@ -272,9 +271,9 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
 			QCEvent qcEvent = new QCEvent();
 			qcEvent.setExpocode(expocode);
-			qcEvent.setFlag(QCEvent.QC_UPDATED_FLAG);
+			qcEvent.setFlag(DashboardUtils.QC_UPDATED_FLAG);
 			qcEvent.setFlagDate(new Date());
-			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+			qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 			qcEvent.setVersion(configStore.getSocatUploadVersion());
 			qcEvent.setUsername(username);
 			String comment = "Deleted metadata file \"" + deleteFilename + 
@@ -285,7 +284,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 				configStore.getDatabaseRequestHandler().addQCEvent(qcEvent);
 				configStore.getDsgNcFileHandler().updateQCFlag(qcEvent);
 				// Update the dashboard status for the 'U' QC flag
-				cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
+				cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 				if ( cruise.isEditable() == null ) {
 					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 				}
@@ -473,12 +472,12 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		if ( ! previousExpocode.isEmpty() ) {
 			// Read the OME XML contents for previousExpocode 
-			DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardMetadata.OME_FILENAME);
+			DashboardMetadata mdata = metadataHandler.getMetadataInfo(previousExpocode, DashboardUtils.OME_FILENAME);
 			DashboardOmeMetadata updatedOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
 			// Reset the expocode and related fields to that for activeExpocode 
 			updatedOmeMData.changeExpocode(activeExpocode);
 			// Read the OME XML contents currently saved for activeExpocode
-			mdata = metadataHandler.getMetadataInfo(activeExpocode, DashboardMetadata.OME_FILENAME);
+			mdata = metadataHandler.getMetadataInfo(activeExpocode, DashboardUtils.OME_FILENAME);
 			DashboardOmeMetadata origOmeMData = new DashboardOmeMetadata(mdata, metadataHandler);
 			// Create the merged OME and save the results
 			DashboardOmeMetadata mergedOmeMData = origOmeMData.mergeModifiable(updatedOmeMData);
@@ -487,7 +486,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		}
 
 		// return the absolute path to the OME.xml for activeExpcode
-		File omeFile = metadataHandler.getMetadataFile(activeExpocode, DashboardMetadata.OME_FILENAME);
+		File omeFile = metadataHandler.getMetadataFile(activeExpocode, DashboardUtils.OME_FILENAME);
 		return omeFile.getAbsolutePath();
 	}
 

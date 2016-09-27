@@ -102,8 +102,8 @@ public class CrossoverChecker {
 			dataMinTimes[q] = Math.round(minMaxVals[0]);
 			dataMaxTimes[q] = Math.round(minMaxVals[1]);
 		}
-		if ( (dataMaxTimes[0] + Crossover.MAX_TIME_DIFF < dataMinTimes[1]) ||
-			 (dataMaxTimes[1] + Crossover.MAX_TIME_DIFF < dataMinTimes[0]) )
+		if ( (dataMaxTimes[0] + DashboardUtils.MAX_TIME_DIFF < dataMinTimes[1]) ||
+			 (dataMaxTimes[1] + DashboardUtils.MAX_TIME_DIFF < dataMinTimes[0]) )
 			return null;
 
 		// Check for any possibility of latitude overlap
@@ -117,8 +117,8 @@ public class CrossoverChecker {
 			dataMinLats[q] = minMaxVals[0];
 			dataMaxLats[q] = minMaxVals[1];
 		}
-		if ( (dataMaxLats[0] + Crossover.MAX_LAT_DIFF < dataMinLats[1]) ||
-			 (dataMaxLats[1] + Crossover.MAX_LAT_DIFF < dataMinLats[0]) )
+		if ( (dataMaxLats[0] + DashboardUtils.MAX_LAT_DIFF < dataMinLats[1]) ||
+			 (dataMaxLats[1] + DashboardUtils.MAX_LAT_DIFF < dataMinLats[0]) )
 			return null;
 
 		// Check for a crossover
@@ -291,7 +291,7 @@ public class CrossoverChecker {
 		if ( (fco2s[0].length != numRows[0]) || (fco2s[1].length != numRows[1]) )
 			throw new IllegalArgumentException("Sizes of longitudes and fco2s arrays do not match");
 
-		double minDistance = Crossover.MAX_CROSSOVER_DIST;
+		double minDistance = DashboardUtils.MAX_CROSSOVER_DIST;
 		Crossover crossover = null;
 		for (int j = 0; j < numRows[0]; j++) {
 			// Skip this point if any missing values
@@ -319,7 +319,7 @@ public class CrossoverChecker {
 				if ( DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, fco2s[1][k], MISSVAL_RTOLER, MISSVAL_ATOLER) )
 					continue;
 
-				if ( times[1][k] > times[0][j] + Crossover.MAX_TIME_DIFF ) {
+				if ( times[1][k] > times[0][j] + DashboardUtils.MAX_TIME_DIFF ) {
 					/* 
 					 * The rest of the second cruise occurred far 
 					 * later than the point of first cruise.  
@@ -327,7 +327,7 @@ public class CrossoverChecker {
 					 */
 					 break;
 				}
-				if ( times[1][k] < times[0][j] - Crossover.MAX_TIME_DIFF ) {
+				if ( times[1][k] < times[0][j] - DashboardUtils.MAX_TIME_DIFF ) {
 					/* 
 					 * This point of the second cruise occurred far 
 					 * earlier than the point of the first cruise.
@@ -335,17 +335,17 @@ public class CrossoverChecker {
 					 */
 					continue;
 				}
-				if ( Math.abs(ssts[1][k] - ssts[0][j]) > Crossover.MAX_TEMP_DIFF ) {
+				if ( Math.abs(ssts[1][k] - ssts[0][j]) > DashboardUtils.MAX_TEMP_DIFF ) {
 					// SST difference too large.  
 					// Go on to the next point of the second cruise.
 					continue;
 				}
-				if ( Math.abs(fco2s[1][k] - fco2s[0][j]) > Crossover.MAX_FCO2_DIFF ) {
+				if ( Math.abs(fco2s[1][k] - fco2s[0][j]) > DashboardUtils.MAX_FCO2_DIFF ) {
 					// fCO2 difference too large.
 					// Go on to the next point of the second cruise.
 					continue;
 				}
-				if ( Math.abs(latitudes[1][k] - latitudes[0][j]) > Crossover.MAX_LAT_DIFF ) {
+				if ( Math.abs(latitudes[1][k] - latitudes[0][j]) > DashboardUtils.MAX_LAT_DIFF ) {
 					/*
 					 * Differences in latitudes are too large.
 					 * Go on to the next point of the second cruise. 
@@ -373,9 +373,9 @@ public class CrossoverChecker {
 
 	/**
 	 * Returns the location-time "distance" between two location-time point.
-	 * Uses {@link Crossover#SEAWATER_SPEED} for converting differences 
+	 * Uses {@link DashboardUtils#SEAWATER_SPEED} for converting differences 
 	 * in time into distance.  Uses the haversine formula, and 
-	 * {@link Crossover#EARTH_AUTHALIC_RADIUS} for the radius of a 
+	 * {@link DashboardUtils#EARTH_AUTHALIC_RADIUS} for the radius of a 
 	 * spherical Earth, to compute the great circle distance from the 
 	 * longitudes and latitudes.
 	 * 
@@ -412,12 +412,12 @@ public class CrossoverChecker {
 		dellon *= dellon * Math.cos(lat1) * Math.cos(lat2);
 		double distance = 2.0 * Math.asin(Math.sqrt(dellon + dellat));
 		// Convert the great circle distance from radians to kilometers
-		distance *= Crossover.EARTH_AUTHALIC_RADIUS;
+		distance *= DashboardUtils.EARTH_AUTHALIC_RADIUS;
 
 		// Get the time difference in days (24 hours)
 		double deltime = (otherTime - time) / (24.0 * 60.0 * 60.0);
 		// Convert to the time difference to kilometers
-		deltime *= Crossover.SEAWATER_SPEED;
+		deltime *= DashboardUtils.SEAWATER_SPEED;
 		// Combine the time distance with the surface distance
 		distance = Math.sqrt(distance * distance + deltime * deltime);
 

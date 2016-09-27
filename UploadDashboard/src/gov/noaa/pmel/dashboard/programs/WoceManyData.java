@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
@@ -48,8 +49,8 @@ public class WoceManyData {
 			if ( args[4].length() != 1 )
 				throw new IllegalArgumentException("not a single character");
 			woceFlag = args[4].charAt(0);
-			if ( ! (woceFlag.equals(WoceEvent.WOCE_BAD) || 
-					woceFlag.equals(WoceEvent.WOCE_QUESTIONABLE)) )
+			if ( ! (woceFlag.equals(DashboardUtils.WOCE_BAD) || 
+					woceFlag.equals(DashboardUtils.WOCE_QUESTIONABLE)) )
 				throw new IllegalArgumentException("unrecognized flag");
 		} catch ( Exception ex ) {
 			System.err.println("Problems with WOCE flag '" + args[4] + "': " + ex.getMessage());

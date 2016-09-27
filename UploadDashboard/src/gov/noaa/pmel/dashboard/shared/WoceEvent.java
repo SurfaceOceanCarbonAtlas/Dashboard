@@ -16,37 +16,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class WoceEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8325545745794951530L;
-
-	public static final String PI_PROVIDED_WOCE_COMMENT_START = "PI provided WOCE-";
-
-	// flags for WOCE events of current cruises
-	public static final Character WOCE_GOOD = '2';
-	public static final Character WOCE_NOT_CHECKED = '2';
-	public static final Character WOCE_QUESTIONABLE = '3';
-	public static final Character WOCE_BAD = '4';
-	public static final Character WOCE_NO_DATA = '9';
-
-	// flags for WOCE events of cruises that has been updated
-	public static final Character OLD_WOCE_GOOD = 'G';
-	public static final Character OLD_WOCE_NOT_CHECKED = 'G';
-	public static final Character OLD_WOCE_QUESTIONABLE = 'Q';
-	public static final Character OLD_WOCE_BAD = 'B';
-	public static final Character OLD_WOCE_NO_DATA = 'M';
-
-	// flag for cruise rename WOCE events
-	public static final Character WOCE_RENAME = 'R';
+	private static final long serialVersionUID = 7730966055783003739L;
 
 	Character flag;
 	String varName;
 	ArrayList<DataLocation> locations;
 
 	/**
-	 * Creates an empty WOCE event with flag {@link #WOCE_NOT_CHECKED}
+	 * Creates an empty WOCE event with flag {@link DashboardUtils#WOCE_NOT_CHECKED}
 	 */
 	public WoceEvent() {
 		super();
-		flag = WOCE_NOT_CHECKED;
+		flag = DashboardUtils.WOCE_NOT_CHECKED;
 		varName = DashboardUtils.STRING_MISSING_VALUE;
 		locations = new ArrayList<DataLocation>();
 	}
@@ -63,11 +44,11 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	/**
 	 * @param flag
 	 * 		the flag to set; 
-	 * 		if null, {@link #WOCE_NOT_CHECKED} is assigned
+	 * 		if null, {@link DashboardUtils#WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setFlag(Character flag) {
 		if ( flag == null )
-			this.flag = WOCE_NOT_CHECKED;
+			this.flag = DashboardUtils.WOCE_NOT_CHECKED;
 		else
 			this.flag = flag;
 	}

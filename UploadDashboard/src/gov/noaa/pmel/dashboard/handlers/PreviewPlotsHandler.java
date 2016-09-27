@@ -10,7 +10,7 @@ import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -175,7 +175,7 @@ public class PreviewPlotsHandler {
 		SocatMetadata socatMData = new SocatMetadata(knownMetadataTypes);
 		socatMData.setExpocode(upperExpo);
 		socatMData.setSocatVersion(cruiseData.getVersion());
-		socatMData.setQcFlag(QCEvent.QC_NEW_FLAG.toString());
+		socatMData.setQcFlag(DashboardUtils.QC_NEW_FLAG.toString());
 
 		// Convert the cruise data strings into the appropriate list of data objects
 		ArrayList<SocatCruiseData> socatDatalist = 

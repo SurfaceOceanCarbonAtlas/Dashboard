@@ -9,7 +9,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.text.ParseException;
@@ -104,7 +104,7 @@ public class RestoreCruise {
 				System.err.println("========================================");
 				System.exit(1);
 			}
-			Character oldQCFlag = QCEvent.STATUS_FLAG_MAP.get(cruise.getQcStatus());
+			Character oldQCFlag = DashboardUtils.STATUS_FLAG_MAP.get(cruise.getQcStatus());
 			if ( oldQCFlag == null ) {
 				System.err.println(expo + ": problems interpreting the cruise qc status - " + cruise.getQcStatus());
 				System.err.println("========================================");
@@ -152,9 +152,9 @@ public class RestoreCruise {
 			// Add a QC comment regarding the restoring of old version data
 			QCEvent qcEvent = new QCEvent();
 			qcEvent.setExpocode(expo);
-			qcEvent.setFlag(QCEvent.QC_COMMENT);
+			qcEvent.setFlag(DashboardUtils.QC_COMMENT);
 			qcEvent.setFlagDate(new Date());
-			qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+			qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 			qcEvent.setVersion(removeSocatVersion);
 			qcEvent.setUsername(username);
 			qcEvent.setComment("Cruise data and WOCE flags restored to SOCAT version " + 
@@ -194,7 +194,7 @@ public class RestoreCruise {
 				qcEvent.setExpocode(expo);
 				qcEvent.setFlag(qcFlag);
 				qcEvent.setFlagDate(oldQCTime);
-				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 				qcEvent.setVersion("2.0");
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Adding global QC flag to that assigned in v2 to fix unresolved conflicts");
@@ -209,11 +209,11 @@ public class RestoreCruise {
 				}
 			}
 			if ( metadataUpdated ) {
-				qcFlag = QCEvent.QC_UPDATED_FLAG;
+				qcFlag = DashboardUtils.QC_UPDATED_FLAG;
 				qcEvent.setExpocode(expo);
 				qcEvent.setFlag(qcFlag);
 				qcEvent.setFlagDate(new Date());
-				qcEvent.setRegionID(DataLocation.GLOBAL_REGION_ID);
+				qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 				qcEvent.setVersion(removeSocatVersion);
 				qcEvent.setUsername(username);
 				qcEvent.setComment("Metadata had been updated.  Restored data and WOCE flags were not changed.");

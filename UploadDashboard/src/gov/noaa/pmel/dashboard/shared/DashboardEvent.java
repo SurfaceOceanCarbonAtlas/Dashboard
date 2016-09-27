@@ -16,11 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1199438291869861137L;
-
-	// Sanity Checker "username" and "realname" for flags
-	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
-	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
+	private static final long serialVersionUID = 7627175617050451698L;
 
 	Long id;
 	Date flagDate;

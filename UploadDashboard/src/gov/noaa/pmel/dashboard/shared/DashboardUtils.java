@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.shared;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -114,6 +115,354 @@ public class DashboardUtils {
 	 * Typically used for atol in {@link #closeTo(Double, Double, double, double)}
 	 */
 	public static final double MAX_ABSOLUTE_ERROR = 1.0E-6;
+
+	/** Max "distance", in kilometers, still considered a crossover */
+	public static final double MAX_CROSSOVER_DIST = 80.0;
+	/** "Distance" contribution, in kilometers, for every 24h time difference */
+	public static final double SEAWATER_SPEED = 30.0;
+	/** Maximum difference in FCO2_rec for a high-quality crossover */
+	public static final double MAX_FCO2_DIFF = 5.0;
+	/** Maximum difference in SST for a high-quality crossover */
+	public static final double MAX_TEMP_DIFF = 0.3;
+	/** Authalic radius, in kilometers, of Earth */
+	public static final double EARTH_AUTHALIC_RADIUS = 6371.007;
+	/** Max allowable difference in time, in seconds, between two crossover data points */
+	public static final double MAX_TIME_DIFF = Math.ceil(24.0 * 60.0 * 60.0 * MAX_CROSSOVER_DIST / SEAWATER_SPEED);
+	/** Max allowable difference in latitude, in degrees, between two crossover data points */
+	public static final double MAX_LAT_DIFF = (MAX_CROSSOVER_DIST / EARTH_AUTHALIC_RADIUS) * (180.0 / Math.PI);
+
+	/** Sanity Checker "username" for flags */
+	public static final String SANITY_CHECKER_USERNAME = "automated.data.checker";
+	/** Sanity Checker "realname" for flags */
+	public static final String SANITY_CHECKER_REALNAME = "automated data checker";
+
+	/**
+	 * The "upload filename" for all OME metadata files.
+	 */
+	public static final String OME_FILENAME = "OME.xml";
+
+	/**
+	 * THe PDF version of the OME XML files.
+	 */
+	public static final String OME_PDF_FILENAME = "OME.pdf";
+
+	/**
+	 * The "upload filename" for all PI-provided OME metadata files 
+	 * that are not used for anything other than generating a supplemental 
+	 * document.
+	 * 
+	 * The use of this name is just a temporary measure 
+	 * until the CDIAC OME brought into the dashboard.
+	 */
+	public static final String PI_OME_FILENAME = "PI_OME.xml";
+
+	/**
+	 * The PDF version of the PI OME XML file.
+	 */
+	public static final String PI_OME_PDF_FILENAME = "PI_OME.pdf";
+
+	public static final Character GLOBAL_REGION_ID = 'G';
+	public static final Character NORTH_PACIFIC_REGION_ID = 'N';
+	public static final Character TROPICAL_PACIFIC_REGION_ID = 'T';
+	public static final Character NORTH_ATLANTIC_REGION_ID = 'A';
+	public static final Character TROPICAL_ATLANTIC_REGION_ID = 'Z';
+	public static final Character INDIAN_REGION_ID = 'I';
+	public static final Character COASTAL_REGION_ID = 'C';
+	public static final Character SOUTHERN_OCEANS_REGION_ID = 'O';
+	public static final Character ARCTIC_REGION_ID = 'R';
+
+	public static final HashMap<Character,String> REGION_NAMES;
+	static {
+		REGION_NAMES = new HashMap<Character,String>();
+		REGION_NAMES.put(GLOBAL_REGION_ID, "Global");
+		REGION_NAMES.put(NORTH_PACIFIC_REGION_ID, "North Pacific");
+		REGION_NAMES.put(TROPICAL_PACIFIC_REGION_ID, "Tropical Pacific");
+		REGION_NAMES.put(NORTH_ATLANTIC_REGION_ID, "North Atlantic");
+		REGION_NAMES.put(TROPICAL_ATLANTIC_REGION_ID, "Tropical Atlantic");
+		REGION_NAMES.put(INDIAN_REGION_ID, "Indian");
+		REGION_NAMES.put(COASTAL_REGION_ID, "Coastal");
+		REGION_NAMES.put(SOUTHERN_OCEANS_REGION_ID, "Southern Oceans");
+		REGION_NAMES.put(ARCTIC_REGION_ID, "Artic");
+	}
+
+	// All possible QC flags
+	public static final Character QC_A_FLAG = 'A';
+	public static final Character QC_B_FLAG = 'B';
+	public static final Character QC_C_FLAG = 'C';
+	public static final Character QC_D_FLAG = 'D';
+	public static final Character QC_E_FLAG = 'E';
+	public static final Character QC_COMMENT = 'H';
+	public static final Character QC_NEW_FLAG = 'N';
+	public static final Character QC_CONFLICT_FLAG = 'Q';
+	public static final Character QC_RENAMED_FLAG = 'R';
+	public static final Character QC_SUSPEND_FLAG = 'S';
+	public static final Character QC_UPDATED_FLAG = 'U';
+	public static final Character QC_EXCLUDE_FLAG = 'X';
+
+	// Cruise QC strings - cruises that can be modified
+	public static final String QC_STATUS_NOT_SUBMITTED = "";
+	public static final String QC_STATUS_SUSPENDED = "Suspended";
+	public static final String QC_STATUS_EXCLUDED = "Excluded";
+	// Cruise QC strings - cruises that cannot be modified
+	public static final String QC_STATUS_SUBMITTED = "Submitted";
+	public static final String QC_STATUS_ACCEPTED_A = "Flag A";
+	public static final String QC_STATUS_ACCEPTED_B = "Flag B";
+	public static final String QC_STATUS_ACCEPTED_C = "Flag C";
+	public static final String QC_STATUS_ACCEPTED_D = "Flag D";
+	public static final String QC_STATUS_ACCEPTED_E = "Flag E";
+	public static final String QC_STATUS_CONFLICT = "Conflict";
+	public static final String QC_STATUS_RENAMED = "Renamed";
+
+	/**
+	 * Map of QC status flag characters to QC status strings
+	 */
+	public static final HashMap<Character,String> FLAG_STATUS_MAP;
+	static {
+		FLAG_STATUS_MAP = new HashMap<Character,String>();
+		FLAG_STATUS_MAP.put(QC_A_FLAG, QC_STATUS_ACCEPTED_A);
+		FLAG_STATUS_MAP.put(QC_B_FLAG, QC_STATUS_ACCEPTED_B);
+		FLAG_STATUS_MAP.put(QC_C_FLAG, QC_STATUS_ACCEPTED_C);
+		FLAG_STATUS_MAP.put(QC_D_FLAG, QC_STATUS_ACCEPTED_D);
+		FLAG_STATUS_MAP.put(QC_E_FLAG, QC_STATUS_ACCEPTED_E);
+		FLAG_STATUS_MAP.put(QC_NEW_FLAG, QC_STATUS_SUBMITTED);
+		FLAG_STATUS_MAP.put(QC_CONFLICT_FLAG, QC_STATUS_CONFLICT);
+		FLAG_STATUS_MAP.put(QC_RENAMED_FLAG, QC_STATUS_RENAMED);
+		FLAG_STATUS_MAP.put(QC_SUSPEND_FLAG, QC_STATUS_SUSPENDED);
+		FLAG_STATUS_MAP.put(QC_UPDATED_FLAG, QC_STATUS_SUBMITTED);
+		FLAG_STATUS_MAP.put(QC_EXCLUDE_FLAG, QC_STATUS_EXCLUDED);
+	}
+
+	/**
+	 * Map of QC status strings to QC status flag characters 
+	 * QC_STATUS_SUBMITTED is mapped to QC_UPDATED_FLAG
+	 */
+	public static final HashMap<String,Character> STATUS_FLAG_MAP;
+	static {
+		STATUS_FLAG_MAP = new HashMap<String,Character>();
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_A, QC_A_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_B, QC_B_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_C, QC_C_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_D, QC_D_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_ACCEPTED_E, QC_E_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_CONFLICT, QC_CONFLICT_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_RENAMED, QC_RENAMED_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_SUSPENDED, QC_SUSPEND_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_SUBMITTED, QC_UPDATED_FLAG);
+		STATUS_FLAG_MAP.put(QC_STATUS_EXCLUDED, QC_EXCLUDE_FLAG);
+	}
+
+	public static final String PI_PROVIDED_WOCE_COMMENT_START = "PI provided WOCE-";
+
+	// flags for WOCE events of current cruises
+	public static final Character WOCE_GOOD = '2';
+	public static final Character WOCE_NOT_CHECKED = '2';
+	public static final Character WOCE_QUESTIONABLE = '3';
+	public static final Character WOCE_BAD = '4';
+	public static final Character WOCE_NO_DATA = '9';
+
+	// flags for WOCE events of cruises that has been updated
+	public static final Character OLD_WOCE_GOOD = 'G';
+	public static final Character OLD_WOCE_NOT_CHECKED = 'G';
+	public static final Character OLD_WOCE_QUESTIONABLE = 'Q';
+	public static final Character OLD_WOCE_BAD = 'B';
+	public static final Character OLD_WOCE_NO_DATA = 'M';
+
+	// flag for cruise rename WOCE events
+	public static final Character WOCE_RENAME = 'R';
+
+	// Supported data class names
+	public static final String CHAR_DATA_CLASS_NAME = "Character";
+	public static final String DATE_DATA_CLASS_NAME = "Date";
+	public static final String DOUBLE_DATA_CLASS_NAME = "Double";
+	public static final String INT_DATA_CLASS_NAME = "Integer";
+	public static final String STRING_DATA_CLASS_NAME = "String";
+
+	// Some suggested categories
+	public static final String BATHYMETRY_CATEGORY = "Bathymetry";
+	public static final String CO2_CATEGORY = "CO2";
+	public static final String IDENTIFIER_CATEGORY = "Identifier";
+	public static final String LOCATION_CATEGORY = "Location";
+	public static final String PLATFORM_CATEGORY = "Platform";
+	public static final String PRESSURE_CATEGORY = "Pressure";
+	public static final String QUALITY_CATEGORY = "Quality";
+	public static final String SALINITY_CATEGORY = "Salinity";
+	public static final String TEMPERATURE_CATEGORY = "Temperature";
+	public static final String TIME_CATEGORY = "Time";
+	public static final String WATER_VAPOR_CATEGORY = "Water Vapor";
+	public static final String WIND_CATEGORY = "Wind";
+
+	/** For data without any specific units */
+	public static final ArrayList<String> NO_UNITS = 
+			new ArrayList<String>(Arrays.asList(""));
+
+	/** Formats for date-time stamps */
+	public static final ArrayList<String> TIMESTAMP_UNITS = 
+			new ArrayList<String>(Arrays.asList(
+					"yyyy-mm-dd hh:mm:ss", 
+					"mm-dd-yyyy hh:mm:ss", 
+					"dd-mm-yyyy hh:mm:ss", 
+					"mm-dd-yy hh:mm:ss", 
+					"dd-mm-yy hh:mm:ss"));
+
+	/** Formats for dates */
+	public static final ArrayList<String> DATE_UNITS = 
+			new ArrayList<String>(Arrays.asList(
+					"yyyy-mm-dd", 
+					"mm-dd-yyyy", 
+					"dd-mm-yyyy", 
+					"mm-dd-yy", 
+					"dd-mm-yy"));
+
+	/** Formats for time-of-day */
+	public static final ArrayList<String> TIME_OF_DAY_UNITS = 
+			new ArrayList<String>(Arrays.asList("hh:mm:ss"));
+
+	/** Units for day-of-year (value of the first day of the year) */
+	public static final ArrayList<String> DAY_OF_YEAR_UNITS = 
+			new ArrayList<String>(Arrays.asList("Jan1=1.0", "Jan1=0.0"));
+
+	/** Units for longitude */
+	public static final ArrayList<String> LONGITUDE_UNITS = 
+			new ArrayList<String>(Arrays.asList("degrees_east", "degrees_west"));
+
+	/** Units of latitude */
+	public static final ArrayList<String> LATITUDE_UNITS = 
+			new ArrayList<String>(Arrays.asList("degrees_north", "degrees_south"));
+
+	/** Unit of depth */
+	public static final ArrayList<String> DEPTH_UNITS = 
+			new ArrayList<String>(Arrays.asList("meters"));
+
+	/** Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z") */
+	public static final ArrayList<String> TIME_UNITS = 
+			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
+
+	/** Marker data type used to indicate an severe error in the combination of lon/lat/time */
+	public static final DataColumnType GEOPOSITION = new DataColumnType("geoposition", 
+			null, null, null, null, NO_UNITS);
+
+	/**
+	 * UNKNOWN needs to be respecified as one of the (other) data column types.
+	 */
+	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", 
+			null, null, null, null, NO_UNITS);
+
+	/**
+	 * OTHER is for supplementary data in the user's original data file but 
+	 * otherwise not used.  A description of each column with this type must 
+	 * be part of the metadata, but the values are not validated or used. 
+	 * Multiple columns may have this type.
+	 */
+	public static final DataColumnType OTHER = new DataColumnType("other", 
+			null, null, null, null, NO_UNITS);
+
+	/**
+	 * Unique identifier for the dataset.
+	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
+	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
+	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
+	 * different vessels.  (metadata)
+	 */
+	public static final DataColumnType EXPOCODE = new DataColumnType("expocode", 
+			STRING_DATA_CLASS_NAME, "expocode", null, IDENTIFIER_CATEGORY, NO_UNITS);
+	
+	/**
+	 * User-provided name for the dataset (metadata)
+	 */
+	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
+			STRING_DATA_CLASS_NAME, "dataset name", null, IDENTIFIER_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType VESSEL_NAME = new DataColumnType("vessel_name", 
+			STRING_DATA_CLASS_NAME, "vessel name", "platform_name", PLATFORM_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization", 
+			STRING_DATA_CLASS_NAME, "organization", null, IDENTIFIER_CATEGORY, NO_UNITS);
+	
+	public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("investigators", 
+			STRING_DATA_CLASS_NAME, "investigators", null, IDENTIFIER_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_min",
+			DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", LOCATION_CATEGORY, LONGITUDE_UNITS);
+
+	public static final DataColumnType EASTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_max",
+			DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", LOCATION_CATEGORY, LONGITUDE_UNITS);
+
+	public static final DataColumnType SOUTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_min",
+			DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", LOCATION_CATEGORY, LATITUDE_UNITS);
+
+	public static final DataColumnType NORTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_max",
+			DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", LOCATION_CATEGORY, LATITUDE_UNITS);
+
+	public static final DataColumnType TIME_COVERAGE_START = new DataColumnType("time_coverage_start",
+			DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_converage_end",
+			DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
+			STRING_DATA_CLASS_NAME, "QC flag", null, QUALITY_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample_number",
+			INT_DATA_CLASS_NAME, "sample number", null, IDENTIFIER_CATEGORY, NO_UNITS);
+
+	/**
+	 * Date and time or the measurement
+	 */
+	public static final DataColumnType TIMESTAMP = new DataColumnType("date_time", 
+			STRING_DATA_CLASS_NAME, "date and time", null, null, TIMESTAMP_UNITS);
+
+	/**
+	 * Date of the measurement - no time.
+	 */
+	public static final DataColumnType DATE = new DataColumnType("date", 
+			STRING_DATA_CLASS_NAME, "date", null, null, DATE_UNITS);
+
+	public static final DataColumnType YEAR = new DataColumnType("year", 
+			INT_DATA_CLASS_NAME, "year", "year", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType MONTH_OF_YEAR = new DataColumnType("month", 
+			INT_DATA_CLASS_NAME, "month of year", "month_of_year", TIME_CATEGORY, NO_UNITS);
+	
+	public static final DataColumnType DAY_OF_MONTH = new DataColumnType("day", 
+			INT_DATA_CLASS_NAME, "day of month", "day_of_month", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType TIME_OF_DAY = new DataColumnType("time_of_day", 
+			STRING_DATA_CLASS_NAME, "time of day", null, null, TIME_OF_DAY_UNITS);
+
+	public static final DataColumnType HOUR_OF_DAY = new DataColumnType("hour", 
+			INT_DATA_CLASS_NAME, "hour of day", "hour_of_day", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType MINUTE_OF_HOUR = new DataColumnType("minute", 
+			INT_DATA_CLASS_NAME, "minute of hour", "minute_of_hour", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType SECOND_OF_MINUTE = new DataColumnType("second", 
+			DOUBLE_DATA_CLASS_NAME, "second of minute", "second_of_minute", TIME_CATEGORY, NO_UNITS);
+
+	/**
+	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
+	 * may be used to specify the date and time of the measurement.
+	 */
+	public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day_of_year", 
+			DOUBLE_DATA_CLASS_NAME, "day of year", "day_of_year", TIME_CATEGORY, DAY_OF_YEAR_UNITS);
+
+	/**
+	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
+	 * be used to specify date and time of the measurement
+	 */
+	public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec_of_day", 
+			DOUBLE_DATA_CLASS_NAME, "second of day", "second_of_day", TIME_CATEGORY, NO_UNITS);
+
+	public static final DataColumnType LONGITUDE = new DataColumnType("longitude", 
+			DOUBLE_DATA_CLASS_NAME, "longitude", "longitude", LOCATION_CATEGORY, LONGITUDE_UNITS);
+
+	public static final DataColumnType LATITUDE = new DataColumnType("latitude", 
+			DOUBLE_DATA_CLASS_NAME, "latitude", "latitude", LOCATION_CATEGORY, LATITUDE_UNITS);
+
+	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth", 
+			DOUBLE_DATA_CLASS_NAME, "sample depth", "depth", BATHYMETRY_CATEGORY, DEPTH_UNITS);
+
+	public static final DataColumnType TIME = new DataColumnType("time", 
+			DOUBLE_DATA_CLASS_NAME, "time", "time", TIME_CATEGORY, TIME_UNITS);
 
 	/**
 	 * "Cleans" a username for use by substituting characters that are  
@@ -465,11 +814,11 @@ public class DashboardUtils {
 	public static boolean longitudeCloseTo(Double first, Double second, 
 										double rtol, double atol) {
 		// Longitudes have modulo 360.0, so 359.999999 is close to 0.0
-		if ( DashboardUtils.closeTo(first, second, rtol, atol) )
+		if ( closeTo(first, second, rtol, atol) )
 			return true;
-		if ( DashboardUtils.closeTo(first + 360.0, second, rtol, atol) )
+		if ( closeTo(first + 360.0, second, rtol, atol) )
 			return true;
-		if ( DashboardUtils.closeTo(first, second + 360.0, rtol, atol) )
+		if ( closeTo(first, second + 360.0, rtol, atol) )
 			return true;
 		return false;
 	}
@@ -521,168 +870,5 @@ public class DashboardUtils {
 		double absAver = Math.abs((first + second) * 0.5);
 		return ( absDiff < absAver * rtol + atol );
 	}
-
-/*
-	public static final EnumMap<DataColumnType,String> STD_HEADER_NAMES = 
-			new EnumMap<DataColumnType,String>(DataColumnType.class);
-	static {
-		STD_HEADER_NAMES.put(DataColumnType.UNKNOWN, "(unknown)");
-		STD_HEADER_NAMES.put(DataColumnType.EXPOCODE, "expocode");
-		STD_HEADER_NAMES.put(DataColumnType.CRUISE_NAME, "cruise_name");
-		STD_HEADER_NAMES.put(DataColumnType.SHIP_NAME, "ship_name");
-		STD_HEADER_NAMES.put(DataColumnType.GROUP_NAME, "group_name");
-		STD_HEADER_NAMES.put(DataColumnType.INVESTIGATOR_NAMES, "PI_names");
-
-		STD_HEADER_NAMES.put(DataColumnType.TIMESTAMP, "date_time");
-		STD_HEADER_NAMES.put(DataColumnType.DATE, "date");
-		STD_HEADER_NAMES.put(DataColumnType.YEAR, "year");
-		STD_HEADER_NAMES.put(DataColumnType.MONTH, "month");
-		STD_HEADER_NAMES.put(DataColumnType.DAY, "day");
-		STD_HEADER_NAMES.put(DataColumnType.TIME, "time");
-		STD_HEADER_NAMES.put(DataColumnType.HOUR, "hour");
-		STD_HEADER_NAMES.put(DataColumnType.MINUTE, "minute");
-		STD_HEADER_NAMES.put(DataColumnType.SECOND, "second");
-		STD_HEADER_NAMES.put(DataColumnType.DAY_OF_YEAR, "day_of_year");
-		STD_HEADER_NAMES.put(DataColumnType.SECOND_OF_DAY, "sec_of_day");
-
-		STD_HEADER_NAMES.put(DataColumnType.LONGITUDE, "longitude");
-		STD_HEADER_NAMES.put(DataColumnType.LATITUDE, "latitude");
-		STD_HEADER_NAMES.put(DataColumnType.SAMPLE_DEPTH, "sample_depth");
-		STD_HEADER_NAMES.put(DataColumnType.SALINITY, "salinity");
-		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, "T_equ");
-		STD_HEADER_NAMES.put(DataColumnType.SEA_SURFACE_TEMPERATURE, "SST");
-		STD_HEADER_NAMES.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, "Temperature_atm");
-		STD_HEADER_NAMES.put(DataColumnType.EQUILIBRATOR_PRESSURE, "P_equ");
-		STD_HEADER_NAMES.put(DataColumnType.SEA_LEVEL_PRESSURE, "Pressure_atm");
-
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_DRY, "xCO2_water_Tequ_dry");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_DRY, "xCO2_water_SST_dry");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_TEQU_WET, "xCO2_water_Tequ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_WATER_SST_WET, "xCO2_water_SST_wet");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_WATER_TEQU_WET, "pCO2_water_Tequ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_WATER_SST_WET, "pCO2_water_SST_wet");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_TEQU_WET, "fCO2_water_Tequ_wet");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_WATER_SST_WET, "fCO2_water_SST_wet");
-
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, "xCO2_atm_dry_actual");
-		STD_HEADER_NAMES.put(DataColumnType.XCO2_ATM_DRY_INTERP, "xCO2_atm_dry_interp");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_ACTUAL, "pCO2_atm_wet_actual");
-		STD_HEADER_NAMES.put(DataColumnType.PCO2_ATM_WET_INTERP, "pCO2_atm_wet_interp");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_ACTUAL, "fCO2_atm_wet_actual");
-		STD_HEADER_NAMES.put(DataColumnType.FCO2_ATM_WET_INTERP, "fCO2_atm_wet_interp");
-
-		STD_HEADER_NAMES.put(DataColumnType.DELTA_XCO2, "delta_xCO2");
-		STD_HEADER_NAMES.put(DataColumnType.DELTA_PCO2, "delta_pCO2");
-		STD_HEADER_NAMES.put(DataColumnType.DELTA_FCO2, "delta_fCO2");
-
-		STD_HEADER_NAMES.put(DataColumnType.XH2O_EQU, "xH2O_equ");
-		STD_HEADER_NAMES.put(DataColumnType.RELATIVE_HUMIDITY, "relative_humidity");
-		STD_HEADER_NAMES.put(DataColumnType.SPECIFIC_HUMIDITY, "specific_humidity");
-		STD_HEADER_NAMES.put(DataColumnType.SHIP_SPEED, "ship_speed");
-		STD_HEADER_NAMES.put(DataColumnType.SHIP_DIRECTION, "ship_dir");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_TRUE, "wind_speed_true");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_SPEED_RELATIVE, "wind_speed_rel");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_TRUE, "wind_dir_true");
-		STD_HEADER_NAMES.put(DataColumnType.WIND_DIRECTION_RELATIVE, "wind_dir_rel");
-
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_CO2_WATER, "WOCE_CO2_water");
-		STD_HEADER_NAMES.put(DataColumnType.WOCE_CO2_ATM, "WOCE_CO2_atm");
-		STD_HEADER_NAMES.put(DataColumnType.COMMENT_WOCE_CO2_WATER, "comment_WOCE_CO2_water");
-		STD_HEADER_NAMES.put(DataColumnType.COMMENT_WOCE_CO2_ATM, "comment_WOCE_CO2_atm");
-
-		STD_HEADER_NAMES.put(DataColumnType.OTHER, "other");
-	}
-
-	public static final ArrayList<String> SALINITY_UNITS = 
-			new ArrayList<String>(Arrays.asList("PSU"));
-	public static final ArrayList<String> TEMPERATURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.C"));
-	public static final ArrayList<String> PRESSURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
-	public static final ArrayList<String> XCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("umol/mol"));
-	public static final ArrayList<String> PCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-	public static final ArrayList<String> FCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-	public static final ArrayList<String> DIRECTION_UNITS = 
-			new ArrayList<String>(Arrays.asList("deg.clk.N"));
-	public static final ArrayList<String> SHIP_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
-	public static final ArrayList<String> WIND_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("m/s"));
-	public static final ArrayList<String> XH2O_UNITS = 
-			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
-
-	public static final EnumMap<DataColumnType,ArrayList<String>> STD_DATA_UNITS = 
-			new EnumMap<DataColumnType,ArrayList<String>>(DataColumnType.class);
-	static {
-		STD_DATA_UNITS.put(DataColumnType.UNKNOWN, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.EXPOCODE, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.CRUISE_NAME, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SHIP_NAME, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.GROUP_NAME, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.INVESTIGATOR_NAMES, NO_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.TIMESTAMP, TIMESTAMP_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DATE, DATE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.YEAR, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.MONTH, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DAY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.TIME, TIME_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.HOUR, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.MINUTE, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SECOND, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DAY_OF_YEAR, DAY_OF_YEAR_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SECOND_OF_DAY, NO_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.LONGITUDE, LONGITUDE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.LATITUDE, LATITUDE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SAMPLE_DEPTH, DEPTH_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SALINITY, SALINITY_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_TEMPERATURE, TEMPERATURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SEA_SURFACE_TEMPERATURE, TEMPERATURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.ATMOSPHERIC_TEMPERATURE, TEMPERATURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.EQUILIBRATOR_PRESSURE, PRESSURE_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SEA_LEVEL_PRESSURE, PRESSURE_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_DRY, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_DRY, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_TEQU_WET, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_WATER_SST_WET, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_WATER_TEQU_WET, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_WATER_SST_WET, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_TEQU_WET, FCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_WATER_SST_WET, FCO2_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_ACTUAL, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.XCO2_ATM_DRY_INTERP, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_ACTUAL, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.PCO2_ATM_WET_INTERP, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_ACTUAL, FCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.FCO2_ATM_WET_INTERP, FCO2_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.DELTA_XCO2, XCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DELTA_PCO2, PCO2_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.DELTA_FCO2, FCO2_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.XH2O_EQU, XH2O_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.RELATIVE_HUMIDITY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SPECIFIC_HUMIDITY, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SHIP_SPEED, SHIP_SPEED_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.SHIP_DIRECTION, DIRECTION_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_TRUE, WIND_SPEED_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_SPEED_RELATIVE, WIND_SPEED_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_TRUE, DIRECTION_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WIND_DIRECTION_RELATIVE, DIRECTION_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.WOCE_CO2_WATER, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.WOCE_CO2_ATM, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.COMMENT_WOCE_CO2_WATER, NO_UNITS);
-		STD_DATA_UNITS.put(DataColumnType.COMMENT_WOCE_CO2_ATM, NO_UNITS);
-
-		STD_DATA_UNITS.put(DataColumnType.OTHER, NO_UNITS);
-	}
-*/
 
 }

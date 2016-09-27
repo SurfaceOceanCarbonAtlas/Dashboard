@@ -3,7 +3,6 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -18,14 +17,14 @@ import java.util.Map.Entry;
 public class SocatMetadata {
 
 	public static final DashDataType SOCAT_VERSION = new DashDataType("socat_version", 
-			KnownDataTypes.STRING_DATA_CLASS_NAME, "SOCAT Version number with status", 
-			null, null, DataColumnType.NO_UNITS);
+			DashboardUtils.STRING_DATA_CLASS_NAME, "SOCAT Version number with status", 
+			null, null, DashboardUtils.NO_UNITS);
 	public static final DashDataType ALL_REGION_IDS = new DashDataType("all_region_ids", 
-			KnownDataTypes.STRING_DATA_CLASS_NAME, "Sorted unique region IDs", 
-			null, null, DataColumnType.NO_UNITS);
+			DashboardUtils.STRING_DATA_CLASS_NAME, "Sorted unique region IDs", 
+			null, null, DashboardUtils.NO_UNITS);
 	public static final DashDataType SOCAT_DOI = new DashDataType("socat_doi", 
-			KnownDataTypes.STRING_DATA_CLASS_NAME, "SOCAT DOI", 
-			null, null, DataColumnType.NO_UNITS);
+			DashboardUtils.STRING_DATA_CLASS_NAME, "SOCAT DOI", 
+			null, null, DashboardUtils.NO_UNITS);
 
 	// Maps of variable names to values
 	LinkedHashMap<DashDataType,String> stringValuesMap;
@@ -35,18 +34,18 @@ public class SocatMetadata {
 	/**
 	 * Generates a SocatMetadata object with the given known types.
 	 * Only the data class types 
-	 * 	{@link KnownDataTypes#STRING_DATA_CLASS_NAME}, 
-	 * 	{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME}, and
-	 * 	{@link KnownDataTypes#DATE_DATA_CLASS_NAME}
+	 * 	{@link DashboardUtils#STRING_DATA_CLASS_NAME}, 
+	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}, and
+	 * 	{@link DashboardUtils#DATE_DATA_CLASS_NAME}
 	 * are accepted at this time.
 	 * Sets the values to the default values:
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE}.toString() for QC_FLAG,
 	 * 	{@link DashboardUtils#STRING_MISSING_VALUE} for other 
-	 * 		{@link KnownDataTypes#STRING_DATA_CLASS_NAME} values, 
+	 * 		{@link DashboardUtils#STRING_DATA_CLASS_NAME} values, 
 	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for 
-	 * 		{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values, and
+	 * 		{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values, and
 	 * 	{@link DashboardUtils#DATE_MISSING_VALUE} for 
-	 * 		{@link KnownDataTypes#DATE_DATA_CLASS_NAME} values.
+	 * 		{@link DashboardUtils#DATE_DATA_CLASS_NAME} values.
 	 * 
 	 * @param knownTypes
 	 * 		all known data types;
@@ -60,7 +59,7 @@ public class SocatMetadata {
 		dateValuesMap = new LinkedHashMap<DashDataType,Date>();
 
 		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
-			if ( KnownDataTypes.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				if ( dtype.typeNameEquals(KnownDataTypes.QC_FLAG) ) {
 					// Single blank character for QC_FLAG
 					stringValuesMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE.toString());
@@ -69,10 +68,10 @@ public class SocatMetadata {
 					stringValuesMap.put(dtype, DashboardUtils.STRING_MISSING_VALUE);
 				}
 			}
-			else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				doubleValuesMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
 			}
-			else if ( KnownDataTypes.DATE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			else if ( DashboardUtils.DATE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				dateValuesMap.put(dtype, DashboardUtils.DATE_MISSING_VALUE);
 			}
 			else {

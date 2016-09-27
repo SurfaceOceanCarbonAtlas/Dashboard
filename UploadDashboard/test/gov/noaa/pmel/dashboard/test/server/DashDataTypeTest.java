@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.test.server;
 
 import static org.junit.Assert.*;
 import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
@@ -58,14 +59,14 @@ public class DashDataTypeTest {
 		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DashDataType other = new DashDataType(VAR_NAME.toLowerCase(), "Integer", 
-				null, null, null, DataColumnType.NO_UNITS);
+				null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		other = new DashDataType("my_var", DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.typeNameEquals(other) );
 
 		DataColumnType another = new DataColumnType(VAR_NAME.toLowerCase(), 
-				"Integer", null, null, null, DataColumnType.NO_UNITS);
+				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(another) );
 		another.setVarName("my_var");
 		assertFalse( stdtype.typeNameEquals(another) );
@@ -80,7 +81,7 @@ public class DashDataTypeTest {
 		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DashDataType other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
-				null, null, null, DataColumnType.NO_UNITS);
+				null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeEquals(other) );
 		other = new DashDataType(VAR_NAME.toLowerCase(), DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
@@ -90,7 +91,7 @@ public class DashDataTypeTest {
 		assertFalse( stdtype.typeEquals(other) );
 
 		DataColumnType another = new DataColumnType(VAR_NAME.toLowerCase(), 
-				DATA_CLASS_NAME, null, null, null, DataColumnType.NO_UNITS);
+				DATA_CLASS_NAME, null, null, null, DashboardUtils.NO_UNITS);
 		assertFalse( stdtype.typeEquals(another) );
 		another.setVarName(VAR_NAME);
 		assertTrue( stdtype.typeEquals(another) );
@@ -107,7 +108,7 @@ public class DashDataTypeTest {
 		DashDataType stdtype = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DataColumnType other = new DataColumnType(VAR_NAME, "Integer", 
-				null, null, null, DataColumnType.NO_UNITS);
+				null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 	}
 
@@ -201,7 +202,7 @@ public class DashDataTypeTest {
 		assertFalse( stdtype.equals(other) );
 
 		other = new DashDataType(VAR_NAME, DATA_CLASS_NAME, 
-				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, DataColumnType.NO_UNITS);
+				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, DashboardUtils.NO_UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 

@@ -14,10 +14,8 @@ import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardEvent;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
@@ -113,13 +111,13 @@ public class CruiseSubmitter {
 				// QC flag to assign with this cruise
 				Character flag;
 				String qcStatus = cruise.getQcStatus();
-				if ( QCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ) {
-					flag = QCEvent.QC_NEW_FLAG;
-					qcStatus = QCEvent.QC_STATUS_SUBMITTED;
+				if ( DashboardUtils.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) ) {
+					flag = DashboardUtils.QC_NEW_FLAG;
+					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 				}
 				else {
-					flag = QCEvent.QC_UPDATED_FLAG;
-					qcStatus = QCEvent.QC_STATUS_SUBMITTED;
+					flag = DashboardUtils.QC_UPDATED_FLAG;
+					qcStatus = DashboardUtils.QC_STATUS_SUBMITTED;
 				}
 
 				// Get the complete original cruise data
@@ -150,7 +148,7 @@ public class CruiseSubmitter {
 
 				try {
 					// Get the OME metadata for this cruise
-					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
+					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(expocode, DashboardUtils.OME_FILENAME);
 					if ( ! socatVersion.equals(omeInfo.getVersion()) ) {
 						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata SOCAT version number to " + 
 								socatVersion + " with submit for QC of " + expocode, false);
@@ -211,11 +209,11 @@ public class CruiseSubmitter {
 				initQC.setExpocode(expocode);
 				initQC.setVersion(socatVersion);
 				initQC.setFlagDate(new Date());
-				initQC.setUsername(DashboardEvent.SANITY_CHECKER_USERNAME);
-				initQC.setRealname(DashboardEvent.SANITY_CHECKER_REALNAME);
+				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
+				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
 				// Add the initial QC flag in each region only for new and updated cruises
 				initQC.setFlag(flag);
-				if ( QCEvent.QC_NEW_FLAG.equals(flag) )
+				if ( DashboardUtils.QC_NEW_FLAG.equals(flag) )
 					initQC.setComment("Initial QC flag for new dataset");
 				else
 					initQC.setComment("Initial QC flag for updated dataset");
@@ -231,7 +229,7 @@ public class CruiseSubmitter {
 				}
 				// Add the global and regional initial flags
 				try {
-					initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
+					initQC.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 					databaseHandler.addQCEvent(initQC);
 					for ( Character regionID : regionsSet ) {
 						initQC.setRegionID(regionID);
@@ -243,8 +241,8 @@ public class CruiseSubmitter {
 				}
 
 				// All cruises - remark on the number of data rows with error and warnings
-				initQC.setRegionID(DataLocation.GLOBAL_REGION_ID);
-				initQC.setFlag(QCEvent.QC_COMMENT);
+				initQC.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
+				initQC.setFlag(DashboardUtils.QC_COMMENT);
 				initQC.setComment("Automated data check found " + 
 						Integer.toString(cruiseData.getNumErrorRows()) + 
 						" data points with errors and " + 

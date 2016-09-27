@@ -6,8 +6,6 @@ package gov.noaa.pmel.dashboard.server;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,15 +27,15 @@ public class SocatCruiseData {
 	 * user type only, used for generating WOCE events from user-provided data.
 	 */
 	public static final DashDataType COMMENT_WOCE_CO2_WATER = new DashDataType(
-			"comment_WOCE_CO2_water", KnownDataTypes.STRING_DATA_CLASS_NAME,
-			"comment about WOCE_CO2_water flag", null, null, DataColumnType.NO_UNITS);
+			"comment_WOCE_CO2_water", DashboardUtils.STRING_DATA_CLASS_NAME,
+			"comment about WOCE_CO2_water flag", null, null, DashboardUtils.NO_UNITS);
 	/** 
 	 * User-provided comment for WOCE_CO2_ATM;
 	 * user type only, used for generating WOCE events from user-provided data.
 	 */
 	public static final DashDataType COMMENT_WOCE_CO2_ATM = new DashDataType(
-			"comment_WOCE_CO2_atm", KnownDataTypes.STRING_DATA_CLASS_NAME,
-			"comment about WOCE_CO2_atm flag", null, null, DataColumnType.NO_UNITS);
+			"comment_WOCE_CO2_atm", DashboardUtils.STRING_DATA_CLASS_NAME,
+			"comment about WOCE_CO2_atm flag", null, null, DashboardUtils.NO_UNITS);
 
 	// Unit arrays for static types in this class
 	public static final ArrayList<String> SALINITY_UNITS = 
@@ -67,196 +65,196 @@ public class SocatCruiseData {
 
 	// Integer types
 	public static final DashDataType FCO2_SOURCE = new DashDataType("fCO2_source", 
-			KnownDataTypes.INT_DATA_CLASS_NAME, "Algorithm number for recommended fCO2", 
-			null, KnownDataTypes.IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+			DashboardUtils.INT_DATA_CLASS_NAME, "Algorithm number for recommended fCO2", 
+			null, DashboardUtils.IDENTIFIER_CATEGORY, DashboardUtils.NO_UNITS);
 
 	// Character types
 	public static final DashDataType REGION_ID = new DashDataType("region_id", 
-			KnownDataTypes.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
-			null, KnownDataTypes.LOCATION_CATEGORY, DataColumnType.NO_UNITS);
+			DashboardUtils.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
+			null, DashboardUtils.LOCATION_CATEGORY, DashboardUtils.NO_UNITS);
 	public static final DashDataType WOCE_CO2_WATER = new DashDataType("WOCE_CO2_water", 
-			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for aqueous CO2", 
-			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
+			DashboardUtils.CHAR_DATA_CLASS_NAME, "WOCE flag for aqueous CO2", 
+			null, DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
 	public static final DashDataType WOCE_CO2_ATM = new DashDataType("WOCE_CO2_atm", 
-			KnownDataTypes.CHAR_DATA_CLASS_NAME, "WOCE flag for atmospheric CO2", 
-			null, KnownDataTypes.QUALITY_CATEGORY, DataColumnType.NO_UNITS);
+			DashboardUtils.CHAR_DATA_CLASS_NAME, "WOCE flag for atmospheric CO2", 
+			null, DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
 
 	// Double types
 	public static final DashDataType SALINITY = new DashDataType("sal", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "salinity", 
-			"sea_surface_salinity", KnownDataTypes.SALINITY_CATEGORY, SALINITY_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "salinity", 
+			"sea_surface_salinity", DashboardUtils.SALINITY_CATEGORY, SALINITY_UNITS);
 	public static final DashDataType WOA_SALINITY = new DashDataType("woa_sss", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "salinity from World Ocean Atlas", 
-			"sea_surface_salinity", KnownDataTypes.SALINITY_CATEGORY, SALINITY_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "salinity from World Ocean Atlas", 
+			"sea_surface_salinity", DashboardUtils.SALINITY_CATEGORY, SALINITY_UNITS);
 
 	public static final DashDataType TEQU = new DashDataType("Temperature_equi", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber temperature", 
-			null, KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber temperature", 
+			null, DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
 	public static final DashDataType SST = new DashDataType("temp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea surface temperature", 
-			"sea_surface_temperature", KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "sea surface temperature", 
+			"sea_surface_temperature", DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
 	public static final DashDataType TATM = new DashDataType("Temperature_atm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea-level air temperature", 
-			"air_temperature_at_sea_level", KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "sea-level air temperature", 
+			"air_temperature_at_sea_level", DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
 
 	public static final DashDataType PEQU = new DashDataType("Pressure_equi", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber pressure", 
-			null, KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "equilibrator chamber pressure", 
+			null, DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
 	public static final DashDataType PATM = new DashDataType("Pressure_atm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea-level air pressure", 
-			"air_pressure_at_sea_level", KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "sea-level air pressure", 
+			"air_pressure_at_sea_level", DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
 	public static final DashDataType NCEP_SLP = new DashDataType("pressure_ncep_slp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "sea level air pressure from NCEP/NCAR reanalysis", 
-			"air_pressure_at_sea_level", KnownDataTypes.PRESSURE_CATEGORY, PRESSURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "sea level air pressure from NCEP/NCAR reanalysis", 
+			"air_pressure_at_sea_level", DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
 
 	public static final DashDataType XCO2_WATER_TEQU_DRY = new DashDataType("xCO2_water_equi_temp_dry_ppm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using equi temp", 
-			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using equi temp", 
+			"mole_fraction_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType XCO2_WATER_SST_DRY = new DashDataType("xCO2_water_sst_dry_ppm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using sst", 
-			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water xCO2 dry using sst", 
+			"mole_fraction_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType XCO2_WATER_TEQU_WET = new DashDataType("xCO2_water_equi_temp_wet_ppm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using equi temp", 
-			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using equi temp", 
+			"mole_fraction_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType XCO2_WATER_SST_WET = new DashDataType("xCO2_water_sst_wet_ppm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using sst", 
-			"mole_fraction_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water xCO2 wet using sst", 
+			"mole_fraction_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType PCO2_WATER_TEQU_WET = new DashDataType("pCO2_water_equi_temp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using equi temp", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using equi temp", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
 	public static final DashDataType PCO2_WATER_SST_WET = new DashDataType("pCO2_water_sst_100humidity_uatm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using sst", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water pCO2 wet using sst", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
 	public static final DashDataType FCO2_WATER_TEQU_WET = new DashDataType("fCO2_water_equi_uatm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using equi temp", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using equi temp", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_WATER_SST_WET = new DashDataType("fCO2_water_sst_100humidity_uatm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using sst", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water fCO2 wet using sst", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 
 	public static final DashDataType XCO2_ATM_DRY_ACTUAL = new DashDataType("xCO2_atm_dry_actual", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air xCO2 dry", 
-			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "actual air xCO2 dry", 
+			"mole_fraction_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType XCO2_ATM_DRY_INTERP = new DashDataType("xCO2_atm_dry_interp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air xCO2 dry", 
-			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "interpolated air xCO2 dry", 
+			"mole_fraction_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType PCO2_ATM_WET_ACTUAL = new DashDataType("pCO2_atm_wet_actual", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air pCO2 wet", 
-			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "actual air pCO2 wet", 
+			"surface_partial_pressure_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
 	public static final DashDataType PCO2_ATM_WET_INTERP = new DashDataType("pCO2_atm_wet_interp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air pCO2 wet", 
-			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "interpolated air pCO2 wet", 
+			"surface_partial_pressure_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
 	public static final DashDataType FCO2_ATM_WET_ACTUAL = new DashDataType("fCO2_atm_wet_actual", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "actual air fCO2 wet", 
-			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "actual air fCO2 wet", 
+			"surface_partial_pressure_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_ATM_WET_INTERP = new DashDataType("fCO2_atm_wet_interp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "interpolated air fCO2 wet", 
-			"surface_partial_pressure_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "interpolated air fCO2 wet", 
+			"surface_partial_pressure_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 
 	public static final DashDataType DELTA_XCO2 = new DashDataType("delta_xCO2", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water xCO2 minus atmospheric xCO2", 
-			null, KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water xCO2 minus atmospheric xCO2", 
+			null, DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType DELTA_PCO2 = new DashDataType("delta_pCO2", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water pCO2 minus atmospheric pCO2", 
-			null, KnownDataTypes.CO2_CATEGORY, PCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water pCO2 minus atmospheric pCO2", 
+			null, DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
 	public static final DashDataType DELTA_FCO2 = new DashDataType("delta_fCO2", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "water fCO2 minus atmospheric fCO2", 
-			null, KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "water fCO2 minus atmospheric fCO2", 
+			null, DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 
 	public static final DashDataType XH2O_EQU = new DashDataType("xH2O_equi", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "xH2O in equil air sample", 
-			"mole_fraction_of_water_in_air", KnownDataTypes.WATER_VAPOR_CATEGORY, XH2O_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "xH2O in equil air sample", 
+			"mole_fraction_of_water_in_air", DashboardUtils.WATER_VAPOR_CATEGORY, XH2O_UNITS);
 	public static final DashDataType RELATIVE_HUMIDITY = new DashDataType("relative_humidity", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative humidity", 
-			"relative_humidity", KnownDataTypes.WATER_VAPOR_CATEGORY, DataColumnType.NO_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "relative humidity", 
+			"relative_humidity", DashboardUtils.WATER_VAPOR_CATEGORY, DashboardUtils.NO_UNITS);
 	public static final DashDataType SPECIFIC_HUMIDITY = new DashDataType("specific_humidity", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "specific humidity", 
-			"specific_humidity", KnownDataTypes.WATER_VAPOR_CATEGORY, DataColumnType.NO_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "specific humidity", 
+			"specific_humidity", DashboardUtils.WATER_VAPOR_CATEGORY, DashboardUtils.NO_UNITS);
 
 	public static final DashDataType SHIP_SPEED = new DashDataType("ship_speed", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "measured ship speed", 
-			"platform_speed_wrt_ground", KnownDataTypes.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "measured ship speed", 
+			"platform_speed_wrt_ground", DashboardUtils.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
 	public static final DashDataType SHIP_DIRECTION = new DashDataType("ship_dir", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "ship direction", 
-			"platform_course", KnownDataTypes.PLATFORM_CATEGORY, DIRECTION_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "ship direction", 
+			"platform_course", DashboardUtils.PLATFORM_CATEGORY, DIRECTION_UNITS);
 	public static final DashDataType WIND_SPEED_TRUE = new DashDataType("wind_speed_true", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "true wind speed", 
-			"wind_speed", KnownDataTypes.WIND_CATEGORY, WIND_SPEED_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "true wind speed", 
+			"wind_speed", DashboardUtils.WIND_CATEGORY, WIND_SPEED_UNITS);
 	public static final DashDataType WIND_SPEED_RELATIVE = new DashDataType("wind_speed_rel", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative wind speed", 
-			"wind_speed", KnownDataTypes.WIND_CATEGORY, WIND_SPEED_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "relative wind speed", 
+			"wind_speed", DashboardUtils.WIND_CATEGORY, WIND_SPEED_UNITS);
 	public static final DashDataType WIND_DIRECTION_TRUE = new DashDataType("wind_dir_true", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "true wind direction", 
-			"wind_from_direction", KnownDataTypes.WIND_CATEGORY, DIRECTION_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "true wind direction", 
+			"wind_from_direction", DashboardUtils.WIND_CATEGORY, DIRECTION_UNITS);
 	public static final DashDataType WIND_DIRECTION_RELATIVE = new DashDataType("wind_dir_rel", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "relative wind direction", 
-			"wind_from_direction", KnownDataTypes.WIND_CATEGORY, DIRECTION_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "relative wind direction", 
+			"wind_from_direction", DashboardUtils.WIND_CATEGORY, DIRECTION_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_TEQU = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_XCO2_SST = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_PCO2_TEQU = new DashDataType("fCO2_from_pCO2_water_water_equi_temp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, Pressure_equi, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_PCO2_SST = new DashDataType("fCO2_from_pCO2_water_sst_100humidity_uatm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_FCO2_TEQU = new DashDataType("fCO2_insitu_from_fCO2_water_equi_uatm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_equi_temp, Pressure_equi, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_FCO2_SST = new DashDataType("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_PCO2_TEQU_NCEP = new DashDataType("fCO2_from_pCO2_water_water_equi_temp_ncep", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_equi_temp, NCEP SLP, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_PCO2_SST_NCEP = new DashDataType("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_XCO2_TEQU_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_XCO2_SST_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_XCO2_TEQU_NCEP = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 
 	public static final DashDataType FCO2_REC = new DashDataType("fCO2_recommended", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "fCO2 recommended", 
-			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", KnownDataTypes.CO2_CATEGORY, FCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "fCO2 recommended", 
+			"surface_partial_pressure_of_carbon_dioxide_in_sea_water", DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
 
 	public static final DashDataType DELTA_TEMP = new DashDataType("delta_temp", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "Equilibrator Temp - SST", 
-			null, KnownDataTypes.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "Equilibrator Temp - SST", 
+			null, DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
 	public static final DashDataType CALC_SPEED = new DashDataType("calc_speed", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "calculated ship speed", 
-			"platform_speed_wrt_ground", KnownDataTypes.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "calculated ship speed", 
+			"platform_speed_wrt_ground", DashboardUtils.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
 	public static final DashDataType ETOPO2_DEPTH = new DashDataType("etopo2", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "bathymetry from ETOPO2", 
-			"sea_floor_depth", KnownDataTypes.BATHYMETRY_CATEGORY, KnownDataTypes.DEPTH_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "bathymetry from ETOPO2", 
+			"sea_floor_depth", DashboardUtils.BATHYMETRY_CATEGORY, DashboardUtils.DEPTH_UNITS);
 	public static final DashDataType GVCO2 = new DashDataType("gvCO2", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "GlobalView xCO2", 
-			"mole_fraction_of_carbon_dioxide_in_air", KnownDataTypes.CO2_CATEGORY, XCO2_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "GlobalView xCO2", 
+			"mole_fraction_of_carbon_dioxide_in_air", DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
 	public static final DashDataType DIST_TO_LAND = new DashDataType("dist_to_land", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "distance to land", 
-			null, KnownDataTypes.LOCATION_CATEGORY, DISTANCE_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "distance to land", 
+			null, DashboardUtils.LOCATION_CATEGORY, DISTANCE_UNITS);
 	public static final DashDataType DAY_OF_YEAR = new DashDataType("day_of_year", 
-			KnownDataTypes.DOUBLE_DATA_CLASS_NAME, "day of the year", 
-			null, KnownDataTypes.TIME_CATEGORY, DAYS_UNITS);
+			DashboardUtils.DOUBLE_DATA_CLASS_NAME, "day of the year", 
+			null, DashboardUtils.TIME_CATEGORY, DAYS_UNITS);
 
 	private LinkedHashMap<DashDataType,Character> charValsMap;
 	private LinkedHashMap<DashDataType,Integer> intValsMap;
@@ -265,16 +263,16 @@ public class SocatCruiseData {
 	/**
 	 * Generates a SocatCruiseData object with the given known types.
 	 * Only the data class types 
-	 * 	{@link KnownDataTypes#CHAR_DATA_CLASS_NAME},
-	 * 	{@link KnownDataTypes#INT_DATA_CLASS_NAME}, and 
-	 * 	{@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME}
+	 * 	{@link DashboardUtils#CHAR_DATA_CLASS_NAME},
+	 * 	{@link DashboardUtils#INT_DATA_CLASS_NAME}, and 
+	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}
 	 * are accepted at this time.
 	 * Sets the values to the default values:
-	 * 	{@link WoceEvent#WOCE_NOT_CHECKED} for WOCE flags (starts with "WOCE_"),
-	 * 	{@link DataLocation#GLOBAL_REGION_ID} for {@link #REGION_ID},
-	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other {@link KnownDataTypes#CHAR_DATA_CLASS_NAME} values.
-	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link KnownDataTypes#INT_DATA_CLASS_NAME} values, and
-	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link KnownDataTypes#DOUBLE_DATA_CLASS_NAME} values
+	 * 	{@link DashboardUtils#WOCE_NOT_CHECKED} for WOCE flags (starts with "WOCE_"),
+	 * 	{@link DashboardUtils#GLOBAL_REGION_ID} for {@link #REGION_ID},
+	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other {@link DashboardUtils#CHAR_DATA_CLASS_NAME} values.
+	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link DashboardUtils#INT_DATA_CLASS_NAME} values, and
+	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values
 	 * 
 	 * @param knownTypes
 	 * 		collection of all known types;
@@ -288,23 +286,23 @@ public class SocatCruiseData {
 		doubleValsMap = new LinkedHashMap<DashDataType,Double>(96);
 
 		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
-			if ( KnownDataTypes.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				if ( dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
 					// WOCE flag
-					charValsMap.put(dtype, WoceEvent.WOCE_NOT_CHECKED);
+					charValsMap.put(dtype, DashboardUtils.WOCE_NOT_CHECKED);
 				}
 				else if ( dtype.typeNameEquals(REGION_ID) ) {
 					// Region ID
-					charValsMap.put(dtype, DataLocation.GLOBAL_REGION_ID);
+					charValsMap.put(dtype, DashboardUtils.GLOBAL_REGION_ID);
 				}
 				else {
 					charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
 				}
 			}
-			else if ( KnownDataTypes.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			else if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
 			}
-			else if ( KnownDataTypes.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
 			}
 			else {
@@ -777,36 +775,36 @@ public class SocatCruiseData {
 	/**
 	 * @return 
 	 * 		the WOCE flags for aqueous CO2;
-	 * 		never null but could be {@link WoceEvent#WOCE_NOT_CHECKED} if not assigned
+	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Water() {
 		Character value = charValsMap.get(WOCE_CO2_WATER);
 		if ( value == null )
-			value = WoceEvent.WOCE_NOT_CHECKED;
+			value = DashboardUtils.WOCE_NOT_CHECKED;
 		return value;
 	}
 
 	/**
 	 * @param woceCO2Water 
 	 * 		the WOCE flags for aqueous CO2 to set;
-	 * 		if null, {@link WoceEvent#WOCE_NOT_CHECKED} is assigned
+	 * 		if null, {@link DashboardUtils#WOCE_NOT_CHECKED} is assigned
 	 */
 	public void setWoceCO2Water(Character woceCO2Water) {
 		Character value = woceCO2Water;
 		if ( value == null )
-			value = WoceEvent.WOCE_NOT_CHECKED;
+			value = DashboardUtils.WOCE_NOT_CHECKED;
 		charValsMap.put(WOCE_CO2_WATER, value);
 	}
 
 	/**
 	 * @return 
 	 * 		the WOCE flag for atmospheric CO2;
-	 * 		never null but could be {@link WoceEvent#WOCE_NOT_CHECKED} if not assigned
+	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Atm() {
 		Character value = charValsMap.get(WOCE_CO2_ATM);
 		if ( value == null )
-			value = WoceEvent.WOCE_NOT_CHECKED;
+			value = DashboardUtils.WOCE_NOT_CHECKED;
 		return value;
 	}
 
@@ -818,31 +816,31 @@ public class SocatCruiseData {
 	public void setWoceCO2Atm(Character woceCO2Atm) {
 		Character value = woceCO2Atm;
 		if ( value == null )
-			value = WoceEvent.WOCE_NOT_CHECKED;
+			value = DashboardUtils.WOCE_NOT_CHECKED;
 		charValsMap.put(WOCE_CO2_ATM, value);
 	}
 
 	/**
 	 * @return 
 	 * 		the region ID;
-	 * 		never null but could be {@link DataLocation#GLOBAL_REGION_ID} if not assigned
+	 * 		never null but could be {@link DashboardUtils#GLOBAL_REGION_ID} if not assigned
 	 */
 	public Character getRegionID() {
 		Character value = charValsMap.get(REGION_ID);
 		if ( value == null )
-			value = DataLocation.GLOBAL_REGION_ID;
+			value = DashboardUtils.GLOBAL_REGION_ID;
 		return value;
 	}
 
 	/**
 	 * @param regionID 
 	 * 		the region ID to set;
-	 * 		if null, {@link DataLocation#GLOBAL_REGION_ID} is assigned
+	 * 		if null, {@link DashboardUtils#GLOBAL_REGION_ID} is assigned
 	 */
 	public void setRegionID(Character regionID) {
 		Character value = regionID;
 		if ( value == null )
-			value = DataLocation.GLOBAL_REGION_ID;
+			value = DashboardUtils.GLOBAL_REGION_ID;
 		charValsMap.put(REGION_ID, value);
 	}
 

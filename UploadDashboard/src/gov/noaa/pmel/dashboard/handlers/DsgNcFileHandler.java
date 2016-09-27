@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
@@ -445,7 +446,7 @@ public class DsgNcFileHandler {
 		for ( char value : regions )
 			regionsSet.add(value);
 		for ( Character value : regionsSet )
-			if ( DataLocation.REGION_NAMES.get(value) == null )
+			if ( DashboardUtils.REGION_NAMES.get(value) == null )
 				throw new IllegalArgumentException("Unexpected region_id of '" + value + "'");
 		return regionsSet;
 	}

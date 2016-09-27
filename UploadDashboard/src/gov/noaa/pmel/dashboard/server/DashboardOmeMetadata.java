@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.text.ParseException;
@@ -68,7 +69,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			MetadataFileHandler mdataHandler) throws IllegalArgumentException {
 		// Initialize to an empty OME metadata document with the standard OME filename
 		super();
-		filename = OME_FILENAME;
+		filename = DashboardUtils.OME_FILENAME;
 
 		if ( mdata == null )
 			throw new IllegalArgumentException("No metadata file given");
@@ -120,7 +121,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	public DashboardOmeMetadata(String expo, String timestamp, Document omeDoc) 
 											throws IllegalArgumentException {
 		super();
-		filename = OME_FILENAME;
+		filename = DashboardUtils.OME_FILENAME;
 		expocode = DashboardServerUtils.checkExpocode(expo);
 		// Use the setter in case of null
 		setUploadTimestamp(timestamp);
@@ -151,7 +152,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	 */
 	public DashboardOmeMetadata(OmeMetadata omeMeta, String timestamp, String owner, String version) {
 		super();
-		filename = OME_FILENAME;
+		filename = DashboardUtils.OME_FILENAME;
 		expocode = DashboardServerUtils.checkExpocode(omeMeta.getExpocode());
 		setUploadTimestamp(timestamp);
 		setOwner(owner);

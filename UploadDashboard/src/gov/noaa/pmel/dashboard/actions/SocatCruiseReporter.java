@@ -17,9 +17,7 @@ import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
-import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -274,14 +272,14 @@ public class SocatCruiseReporter {
 
 		// Get the rest of the metadata info from the OME XML
 		DashboardMetadata metadata = 
-				metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME);
+				metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
 		DashboardOmeMetadata omeMeta = new DashboardOmeMetadata(metadata, metadataHandler);
 
 		// Get the list of additional document filenames associated with this cruise.
 		// Use what the QC-ers see - the directory listing.
 		TreeSet<String> addlDocs = new TreeSet<String>();
 		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo) ) {
-			if ( ! mdata.getFilename().equals(DashboardMetadata.OME_FILENAME) ) {
+			if ( ! mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
 				addlDocs.add(mdata.getFilename());
 			}
 		}
@@ -375,8 +373,8 @@ public class SocatCruiseReporter {
 						Character woceFlag = dataVals.getWoceCO2Water();
 						// Ignore WOCE-3 and WOCE-4 as they are not reported 
 						// and may be indicating invalid locations for this cruise
-						if ( WoceEvent.WOCE_GOOD.equals(woceFlag) || 
-							 WoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) {
+						if ( DashboardUtils.WOCE_GOOD.equals(woceFlag) || 
+							 DashboardUtils.WOCE_NOT_CHECKED.equals(woceFlag) ) {
 							inRegion = true;
 							break;
 						}
@@ -407,7 +405,7 @@ public class SocatCruiseReporter {
 		ArrayList<DashboardOmeMetadata> omeMetaList = new ArrayList<DashboardOmeMetadata>();
 		for ( String upperExpo : upperExpoList ) {
 			DashboardMetadata metadata = 
-					metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME);
+					metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME);
 			omeMetaList.add(new DashboardOmeMetadata(metadata, metadataHandler));
 		}
 
@@ -417,7 +415,7 @@ public class SocatCruiseReporter {
 		for ( String upperExpo : upperExpoList ) {
 			TreeSet<String> addlDocs = new TreeSet<String>();
 			for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(upperExpo) ) {
-				if ( ! mdata.getFilename().equals(DashboardMetadata.OME_FILENAME) ) {
+				if ( ! mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
 					addlDocs.add(mdata.getFilename());
 				}
 			}
@@ -426,7 +424,7 @@ public class SocatCruiseReporter {
 
 		String regionName;
 		if ( regionID != null )
-			regionName = DataLocation.REGION_NAMES.get(regionID);
+			regionName = DashboardUtils.REGION_NAMES.get(regionID);
 		else
 			regionName = null;
 
@@ -464,8 +462,8 @@ public class SocatCruiseReporter {
 					if ( DashboardUtils.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
 						continue;
 					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( woceFlag.equals(WoceEvent.WOCE_GOOD) || 
-						 woceFlag.equals(WoceEvent.WOCE_NOT_CHECKED) ) {
+					if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) || 
+						 woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
 						String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
 								socatVersion, socatDOI, qcFlag, true, prevDatPts);
 						if ( ! tsvdat.isEmpty() ) {
@@ -1293,11 +1291,11 @@ public class SocatCruiseReporter {
 		if ( cruiseInfo == null )
 			throw new IllegalArgumentException("No cruise data for " + upperExpo);
 		String qcStatus = cruiseInfo.getQcStatus();
-		if ( QCEvent.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) )
+		if ( DashboardUtils.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) )
 			throw new IllegalArgumentException(upperExpo + " has not been submitted for QC");
 
 		DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(
-				metadataHandler.getMetadataInfo(upperExpo, DashboardMetadata.OME_FILENAME), metadataHandler);
+				metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME), metadataHandler);
 		vesselName = omeMetadata.getVesselName();
 		pis = omeMetadata.getScienceGroup();
 
@@ -1324,22 +1322,22 @@ public class SocatCruiseReporter {
 			if ( DashboardUtils.FP_MISSING_VALUE.equals(data.getfCO2Rec()) ) {
 				numMissing++;
 			}
-			else if ( woceCO2Water.equals(WoceEvent.WOCE_BAD) ) {
+			else if ( woceCO2Water.equals(DashboardUtils.WOCE_BAD) ) {
 				numWoceBad++;
 			}
-			else if ( woceCO2Water.equals(WoceEvent.WOCE_QUESTIONABLE) ) {
+			else if ( woceCO2Water.equals(DashboardUtils.WOCE_QUESTIONABLE) ) {
 				numWoceWarn++;
 			}
 			else { 
 				numWoceOkay++;
 			}
-			regionNames.add(DataLocation.REGION_NAMES.get(data.getRegionID()));
+			regionNames.add(DashboardUtils.REGION_NAMES.get(data.getRegionID()));
 		}
 		numMissRows = Integer.toString(numMissing);
 		numErrRows = Integer.toString(numWoceBad);
 		numWarnRows = Integer.toString(numWoceWarn);
 		numOkayRows = Integer.toString(numWoceOkay);
-		regionNames.remove(DataLocation.REGION_NAMES.get(DataLocation.GLOBAL_REGION_ID));
+		regionNames.remove(DashboardUtils.REGION_NAMES.get(DashboardUtils.GLOBAL_REGION_ID));
 		regions = "";
 		for ( String name : regionNames )
 			regions += "; " + name;
@@ -1373,7 +1371,7 @@ public class SocatCruiseReporter {
 		}
 		oldExpocode = "-";
 		for ( QCEvent evt : qcEvents ) {
-			if ( QCEvent.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
+			if ( DashboardUtils.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
 				// Get the old expocode for this rename
 				String msg = evt.getComment();
 				String[] msgWords = msg.split("\\s+");
@@ -1501,8 +1499,8 @@ public class SocatCruiseReporter {
 					if ( DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) )
 						continue;
 					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( woceFlag.equals(WoceEvent.WOCE_GOOD) || 
-						 woceFlag.equals(WoceEvent.WOCE_NOT_CHECKED) ) {
+					if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) || 
+						 woceFlag.equals(DashboardUtils.WOCE_NOT_CHECKED) ) {
 						DataPoint datpt = new DataPoint(upperExpo, sectimes[j], 
 								dataVals.getLatitude(), dataVals.getLongitude(), fco2rec);
 						if ( ! datSet.add(datpt) ) {
@@ -1556,7 +1554,7 @@ public class SocatCruiseReporter {
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
 		try {
 			if ( regionID != null )
-				report.println(DataLocation.REGION_NAMES.get(regionID) + " region data point counts for data sets:");
+				report.println(DashboardUtils.REGION_NAMES.get(regionID) + " region data point counts for data sets:");
 			else
 				report.println("Global data point counts for data sets:");
 			int k = 0;
@@ -1590,8 +1588,8 @@ public class SocatCruiseReporter {
 						continue;
 					// Check WOCE flag for fCO2_rec
 					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( ! ( WoceEvent.WOCE_GOOD.equals(woceFlag) || 
-							WoceEvent.WOCE_NOT_CHECKED.equals(woceFlag) ) )
+					if ( ! ( DashboardUtils.WOCE_GOOD.equals(woceFlag) || 
+							DashboardUtils.WOCE_NOT_CHECKED.equals(woceFlag) ) )
 						continue;
 					// Check region, if appropriate
 					if ( (regionID != null) && 

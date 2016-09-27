@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.io.BufferedReader;
@@ -96,7 +97,7 @@ public class UpdateWOCEFlags {
 					continue;
 				}
 				for (int k = 0; k < currentWoceFlags.length; k++) {
-					currentWoceFlags[k] = WoceEvent.WOCE_NOT_CHECKED;
+					currentWoceFlags[k] = DashboardUtils.WOCE_NOT_CHECKED;
 				}
 				try {
 					dsgFile.writeCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName(), currentWoceFlags);
@@ -120,11 +121,11 @@ public class UpdateWOCEFlags {
 					for ( WoceEvent woce : woceList ) {
 						// Check if this is an applicable (not old) WOCE flag
 						Character flag = woce.getFlag();
-						if ( flag.equals(WoceEvent.WOCE_GOOD) ||
-							 flag.equals(WoceEvent.WOCE_NOT_CHECKED) ||
-							 flag.equals(WoceEvent.WOCE_QUESTIONABLE) ||
-							 flag.equals(WoceEvent.WOCE_BAD) ||
-							 flag.equals(WoceEvent.WOCE_NO_DATA) ) {
+						if ( flag.equals(DashboardUtils.WOCE_GOOD) ||
+							 flag.equals(DashboardUtils.WOCE_NOT_CHECKED) ||
+							 flag.equals(DashboardUtils.WOCE_QUESTIONABLE) ||
+							 flag.equals(DashboardUtils.WOCE_BAD) ||
+							 flag.equals(DashboardUtils.WOCE_NO_DATA) ) {
 							ArrayList<String> issues = dsgFile.assignWoceFlags(woce);
 							for ( String msg : issues )
 								System.err.println(msg);

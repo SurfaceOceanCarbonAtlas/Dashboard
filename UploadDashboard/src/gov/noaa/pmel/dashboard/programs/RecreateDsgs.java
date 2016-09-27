@@ -14,6 +14,7 @@ import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -72,7 +73,7 @@ public class RecreateDsgs {
 			throw new IllegalArgumentException("Problems standardizing cruise data for " + upperExpo);
 			
 		// Get the OME metadata for this cruise
-		DashboardMetadata omeInfo = metaHandler.getMetadataInfo(expocode, DashboardMetadata.OME_FILENAME);
+		DashboardMetadata omeInfo = metaHandler.getMetadataInfo(expocode, DashboardUtils.OME_FILENAME);
 		DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metaHandler);
 		String socatVersionStatus;
 		try {

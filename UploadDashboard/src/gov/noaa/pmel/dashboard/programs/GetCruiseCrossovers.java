@@ -8,7 +8,6 @@ import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -27,26 +26,26 @@ public class GetCruiseCrossovers {
 	/** QC flags of cruises to report any crossovers */
 	static final TreeSet<Character> reportFlagsSet = new TreeSet<Character>(
 			Arrays.asList(
-					QCEvent.QC_A_FLAG, 
-					QCEvent.QC_B_FLAG,
-					QCEvent.QC_C_FLAG,
-					QCEvent.QC_D_FLAG,
-					QCEvent.QC_E_FLAG,
-					QCEvent.QC_NEW_FLAG,
-					QCEvent.QC_CONFLICT_FLAG,
-					QCEvent.QC_UPDATED_FLAG ) );
+					DashboardUtils.QC_A_FLAG, 
+					DashboardUtils.QC_B_FLAG,
+					DashboardUtils.QC_C_FLAG,
+					DashboardUtils.QC_D_FLAG,
+					DashboardUtils.QC_E_FLAG,
+					DashboardUtils.QC_NEW_FLAG,
+					DashboardUtils.QC_CONFLICT_FLAG,
+					DashboardUtils.QC_UPDATED_FLAG ) );
 
 	/** QC flags of cruises that can be involved in crossovers */
 	static final TreeSet<Character> acceptableFlagsSet = new TreeSet<Character>(
 			Arrays.asList(
-					QCEvent.QC_A_FLAG, 
-					QCEvent.QC_B_FLAG,
-					QCEvent.QC_C_FLAG,
-					QCEvent.QC_D_FLAG,
-					QCEvent.QC_E_FLAG,
-					QCEvent.QC_NEW_FLAG,
-					QCEvent.QC_CONFLICT_FLAG,
-					QCEvent.QC_UPDATED_FLAG ) );
+					DashboardUtils.QC_A_FLAG, 
+					DashboardUtils.QC_B_FLAG,
+					DashboardUtils.QC_C_FLAG,
+					DashboardUtils.QC_D_FLAG,
+					DashboardUtils.QC_E_FLAG,
+					DashboardUtils.QC_NEW_FLAG,
+					DashboardUtils.QC_CONFLICT_FLAG,
+					DashboardUtils.QC_UPDATED_FLAG ) );
 
 	/**
 	 * @param args
@@ -169,13 +168,13 @@ public class GetCruiseCrossovers {
 						continue;
 					// Check that there is some overlap in time
 					double[] secondTimeMinMax = cruiseTimeMinMaxMap.get(secondExpo);
-					if ( (firstTimeMinMax[1] + Crossover.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
-							(secondTimeMinMax[1] + Crossover.MAX_TIME_DIFF < firstTimeMinMax[0]) )
+					if ( (firstTimeMinMax[1] + DashboardUtils.MAX_TIME_DIFF < secondTimeMinMax[0]) ||
+							(secondTimeMinMax[1] + DashboardUtils.MAX_TIME_DIFF < firstTimeMinMax[0]) )
 						continue;
 					// Check that there is some overlap in latitude
 					double[] secondLatMinMax = cruiseLatMinMaxMap.get(secondExpo);
-					if ( (firstLatMinMax[1] + Crossover.MAX_TIME_DIFF < secondLatMinMax[0]) ||
-							(secondLatMinMax[1] + Crossover.MAX_TIME_DIFF < firstLatMinMax[0]) )
+					if ( (firstLatMinMax[1] + DashboardUtils.MAX_TIME_DIFF < secondLatMinMax[0]) ||
+							(secondLatMinMax[1] + DashboardUtils.MAX_TIME_DIFF < firstLatMinMax[0]) )
 						continue;
 					checkExpos.add(secondExpo);
 				}
@@ -233,7 +232,7 @@ public class GetCruiseCrossovers {
 
 			// Check for 'A' cruises without high-quality crossovers
 			for ( String expo : cruiseFlagsMap.keySet() ) {
-				if ( ! QCEvent.QC_A_FLAG.equals( cruiseFlagsMap.get(expo) ) )
+				if ( ! DashboardUtils.QC_A_FLAG.equals( cruiseFlagsMap.get(expo) ) )
 					continue;
 				boolean found = false;
 				for ( String expocodePair : crossoversMap.keySet() ) {
@@ -248,7 +247,7 @@ public class GetCruiseCrossovers {
 				}
 			}
 			System.out.println(Integer.toString(reportStrings.size()) + 
-					" cruises with a QC flag of " + QCEvent.QC_A_FLAG + 
+					" cruises with a QC flag of " + DashboardUtils.QC_A_FLAG + 
 					" with no high-quality crossovers: ");
 			for ( String report : reportStrings )
 				System.out.println(report);

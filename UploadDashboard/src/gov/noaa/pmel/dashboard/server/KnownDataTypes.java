@@ -6,8 +6,6 @@ package gov.noaa.pmel.dashboard.server;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -34,68 +32,6 @@ import java.util.Properties;
  */
 public class KnownDataTypes {
 
-	public static final String CHAR_DATA_CLASS_NAME = "Character";
-	public static final String DATE_DATA_CLASS_NAME = "Date";
-	public static final String DOUBLE_DATA_CLASS_NAME = "Double";
-	public static final String INT_DATA_CLASS_NAME = "Integer";
-	public static final String STRING_DATA_CLASS_NAME = "String";
-
-	// Some suggested categories
-	public static final String BATHYMETRY_CATEGORY = "Bathymetry";
-	public static final String CO2_CATEGORY = "CO2";
-	public static final String IDENTIFIER_CATEGORY = "Identifier";
-	public static final String LOCATION_CATEGORY = "Location";
-	public static final String PLATFORM_CATEGORY = "Platform";
-	public static final String PRESSURE_CATEGORY = "Pressure";
-	public static final String QUALITY_CATEGORY = "Quality";
-	public static final String SALINITY_CATEGORY = "Salinity";
-	public static final String TEMPERATURE_CATEGORY = "Temperature";
-	public static final String TIME_CATEGORY = "Time";
-	public static final String WATER_VAPOR_CATEGORY = "Water Vapor";
-	public static final String WIND_CATEGORY = "Wind";
-
-	/** Formats for date-time stamps */
-	public static final ArrayList<String> TIMESTAMP_UNITS = 
-			new ArrayList<String>(Arrays.asList(
-					"yyyy-mm-dd hh:mm:ss", 
-					"mm-dd-yyyy hh:mm:ss", 
-					"dd-mm-yyyy hh:mm:ss", 
-					"mm-dd-yy hh:mm:ss", 
-					"dd-mm-yy hh:mm:ss"));
-
-	/** Formats for dates */
-	public static final ArrayList<String> DATE_UNITS = 
-			new ArrayList<String>(Arrays.asList(
-					"yyyy-mm-dd", 
-					"mm-dd-yyyy", 
-					"dd-mm-yyyy", 
-					"mm-dd-yy", 
-					"dd-mm-yy"));
-
-	/** Formats for time-of-day */
-	public static final ArrayList<String> TIME_OF_DAY_UNITS = 
-			new ArrayList<String>(Arrays.asList("hh:mm:ss"));
-
-	/** Units for day-of-year (value of the first day of the year) */
-	public static final ArrayList<String> DAY_OF_YEAR_UNITS = 
-			new ArrayList<String>(Arrays.asList("Jan1=1.0", "Jan1=0.0"));
-
-	/** Units for longitude */
-	public static final ArrayList<String> LONGITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees_east", "degrees_west"));
-
-	/** Units of latitude */
-	public static final ArrayList<String> LATITUDE_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees_north", "degrees_south"));
-
-	/** Unit of depth */
-	public static final ArrayList<String> DEPTH_UNITS = 
-			new ArrayList<String>(Arrays.asList("meters"));
-
-	/** Unit of completely specified time ("seconds since 1970-01-01T00:00:00Z") */
-	public static final ArrayList<String> TIME_UNITS = 
-			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
-
 	/** mapping from old unit names to new unit names */
 	public static final HashMap<String,String> RENAMED_UNITS;
 	static {
@@ -108,14 +44,13 @@ public class KnownDataTypes {
 		RENAMED_UNITS.put("deg.clk.N", "degrees");
 	}
 
-	/** Marker data type used to indicate an severe error in a time or position */
-	public static final DataColumnType GEOPOSITION = new DataColumnType("geoposition", 
-			null, null, null, null, DataColumnType.NO_UNITS);
+	/** Marker data type used to indicate an severe error in the combination of lon/lat/time */
+	public static final DashDataType GEOPOSITION = new DashDataType(DashboardUtils.GEOPOSITION);
 
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */
-	public static final DashDataType UNKNOWN = new DashDataType(DataColumnType.UNKNOWN);
+	public static final DashDataType UNKNOWN = new DashDataType(DashboardUtils.UNKNOWN);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -123,7 +58,7 @@ public class KnownDataTypes {
 	 * be part of the metadata, but the values are not validated or used. 
 	 * Multiple columns may have this type.
 	 */
-	public static final DashDataType OTHER = new DashDataType(DataColumnType.OTHER);
+	public static final DashDataType OTHER = new DashDataType(DashboardUtils.OTHER);
 
 	/**
 	 * Unique identifier for the dataset.
@@ -132,121 +67,60 @@ public class KnownDataTypes {
 	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
 	 * different vessels.  (metadata)
 	 */
-	public static final DashDataType EXPOCODE = new DashDataType("expocode", 
-			STRING_DATA_CLASS_NAME, "expocode", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+	public static final DashDataType EXPOCODE = new DashDataType(DashboardUtils.EXPOCODE);
 	
 	/**
 	 * User-provided name for the dataset (metadata)
 	 */
-	public static final DashDataType DATASET_NAME = new DashDataType("dataset_name", 
-			STRING_DATA_CLASS_NAME, "dataset name", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
 
-	public static final DashDataType VESSEL_NAME = new DashDataType("vessel_name", 
-			STRING_DATA_CLASS_NAME, "vessel name", "platform_name", PLATFORM_CATEGORY, DataColumnType.NO_UNITS);
+	public static final DashDataType VESSEL_NAME = new DashDataType(DashboardUtils.VESSEL_NAME);
+	public static final DashDataType ORGANIZATION_NAME = new DashDataType(DashboardUtils.ORGANIZATION_NAME);
+	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType(DashboardUtils.INVESTIGATOR_NAMES);
+	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.WESTERNMOST_LONGITUDE);
+	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.EASTERNMOST_LONGITUDE);
+	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE);
+	public static final DashDataType NORTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.NORTHERNMOST_LATITUDE);
+	public static final DashDataType TIME_COVERAGE_START = new DashDataType(DashboardUtils.TIME_COVERAGE_START);
+	public static final DashDataType TIME_COVERAGE_END = new DashDataType(DashboardUtils.TIME_COVERAGE_END);
+	public static final DashDataType QC_FLAG = new DashDataType(DashboardUtils.QC_FLAG);
 
-	public static final DashDataType ORGANIZATION_NAME = new DashDataType("organization", 
-			STRING_DATA_CLASS_NAME, "organization", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
-	
-	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType("investigators", 
-			STRING_DATA_CLASS_NAME, "investigators", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType("geospatial_lon_min",
-			DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", LOCATION_CATEGORY, LONGITUDE_UNITS);
-
-	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType("geospatial_lon_max",
-			DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", LOCATION_CATEGORY, LONGITUDE_UNITS);
-
-	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType("geospatial_lat_min",
-			DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", LOCATION_CATEGORY, LATITUDE_UNITS);
-
-	public static final DashDataType NORTHERNMOST_LATITUDE = new DashDataType("geospatial_lat_max",
-			DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", LOCATION_CATEGORY, LATITUDE_UNITS);
-
-	public static final DashDataType TIME_COVERAGE_START = new DashDataType("time_coverage_start",
-			DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", TIME_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType TIME_COVERAGE_END = new DashDataType("time_converage_end",
-			DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", TIME_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType QC_FLAG = new DashDataType("qc_flag", 
-			STRING_DATA_CLASS_NAME, "QC flag", null, QUALITY_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType SAMPLE_NUMBER = new DashDataType("sample_number",
-			INT_DATA_CLASS_NAME, "sample number", null, IDENTIFIER_CATEGORY, DataColumnType.NO_UNITS);
+	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
 
 	/**
 	 * Date and time or the measurement
 	 */
-	public static final DashDataType TIMESTAMP = new DashDataType("date_time", 
-			STRING_DATA_CLASS_NAME, "date and time", null, null, TIMESTAMP_UNITS);
+	public static final DashDataType TIMESTAMP = new DashDataType(DashboardUtils.TIMESTAMP);
 
 	/**
 	 * Date of the measurement - no time.
 	 */
-	public static final DashDataType DATE = new DashDataType("date", 
-			STRING_DATA_CLASS_NAME, "date", null, null, DATE_UNITS);
+	public static final DashDataType DATE = new DashDataType(DashboardUtils.DATE);
 
-	public static final DashDataType YEAR = new DashDataType("year", 
-			INT_DATA_CLASS_NAME, "year", "year", TIME_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType MONTH_OF_YEAR = new DashDataType("month", 
-			INT_DATA_CLASS_NAME, "month of year", "month_of_year", TIME_CATEGORY, DataColumnType.NO_UNITS);
-	
-	public static final DashDataType DAY_OF_MONTH = new DashDataType("day", 
-			INT_DATA_CLASS_NAME, "day of month", "day_of_month", TIME_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType TIME_OF_DAY = new DashDataType("time_of_day", 
-			STRING_DATA_CLASS_NAME, "time of day", null, null, TIME_OF_DAY_UNITS);
-
-	public static final DashDataType HOUR_OF_DAY = new DashDataType("hour", 
-			INT_DATA_CLASS_NAME, "hour of day", "hour_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType MINUTE_OF_HOUR = new DashDataType("minute", 
-			INT_DATA_CLASS_NAME, "minute of hour", "minute_of_hour", TIME_CATEGORY, DataColumnType.NO_UNITS);
-
-	public static final DashDataType SECOND_OF_MINUTE = new DashDataType("second", 
-			DOUBLE_DATA_CLASS_NAME, "second of minute", "second_of_minute", TIME_CATEGORY, DataColumnType.NO_UNITS);
+	public static final DashDataType YEAR = new DashDataType(DashboardUtils.YEAR);
+	public static final DashDataType MONTH_OF_YEAR = new DashDataType(DashboardUtils.MONTH_OF_YEAR);
+	public static final DashDataType DAY_OF_MONTH = new DashDataType(DashboardUtils.DAY_OF_MONTH);
+	public static final DashDataType TIME_OF_DAY = new DashDataType(DashboardUtils.TIME_OF_DAY);
+	public static final DashDataType HOUR_OF_DAY = new DashDataType(DashboardUtils.HOUR_OF_DAY);
+	public static final DashDataType MINUTE_OF_HOUR = new DashDataType(DashboardUtils.MINUTE_OF_HOUR);
+	public static final DashDataType SECOND_OF_MINUTE = new DashDataType(DashboardUtils.SECOND_OF_MINUTE);
 
 	/**
 	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
 	 * may be used to specify the date and time of the measurement.
 	 */
-	public static final DashDataType DAY_OF_YEAR = new DashDataType("day_of_year", 
-			DOUBLE_DATA_CLASS_NAME, "day of year", "day_of_year", TIME_CATEGORY, DAY_OF_YEAR_UNITS);
+	public static final DashDataType DAY_OF_YEAR = new DashDataType(DashboardUtils.DAY_OF_YEAR);
 
 	/**
 	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
 	 * be used to specify date and time of the measurement
 	 */
-	public static final DashDataType SECOND_OF_DAY = new DashDataType("sec_of_day", 
-			DOUBLE_DATA_CLASS_NAME, "second of day", "second_of_day", TIME_CATEGORY, DataColumnType.NO_UNITS);
+	public static final DashDataType SECOND_OF_DAY = new DashDataType(DashboardUtils.SECOND_OF_DAY);
 
-	public static final DashDataType LONGITUDE = new DashDataType("longitude", 
-			DOUBLE_DATA_CLASS_NAME, "longitude", "longitude", LOCATION_CATEGORY, LONGITUDE_UNITS);
-
-	public static final DashDataType LATITUDE = new DashDataType("latitude", 
-			DOUBLE_DATA_CLASS_NAME, "latitude", "latitude", LOCATION_CATEGORY, LATITUDE_UNITS);
-
-	public static final DashDataType SAMPLE_DEPTH = new DashDataType("sample_depth", 
-			DOUBLE_DATA_CLASS_NAME, "sample depth", "depth", BATHYMETRY_CATEGORY, DEPTH_UNITS);
-
-	public static final DashDataType TIME = new DashDataType("time", 
-			DOUBLE_DATA_CLASS_NAME, "time", "time", TIME_CATEGORY, TIME_UNITS);
-
-/*
-	// Map WOCE on all time-related types to "time"; other variables not visible
-	typeToNameMap.put(DataColumnType.TIMESTAMP, "time");
-	typeToNameMap.put(DataColumnType.DATE, "time");
-	typeToNameMap.put(DataColumnType.TIME, "time");
-	typeToNameMap.put(DataColumnType.YEAR, "time");
-	typeToNameMap.put(DataColumnType.MONTH, "time");
-	typeToNameMap.put(DataColumnType.DAY, "time");
-	typeToNameMap.put(DataColumnType.HOUR, "time");
-	typeToNameMap.put(DataColumnType.MINUTE, "time");
-	typeToNameMap.put(DataColumnType.SECOND, "time");
-	typeToNameMap.put(DataColumnType.DAY_OF_YEAR, "time");
-	typeToNameMap.put(DataColumnType.SECOND_OF_DAY, "time");
-*/
+	public static final DashDataType LONGITUDE = new DashDataType(DashboardUtils.LONGITUDE);
+	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
+	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
+	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
 
 	private LinkedHashMap<String,DashDataType> knownTypes;
 

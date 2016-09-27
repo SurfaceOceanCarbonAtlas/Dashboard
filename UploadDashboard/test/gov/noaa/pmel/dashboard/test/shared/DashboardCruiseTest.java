@@ -12,7 +12,6 @@ import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,7 +146,7 @@ public class DashboardCruiseTest {
 	public void testSetGetQCStatus() {
 		String myQCStatus = "Submitted";
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		cruise.setQcStatus(myQCStatus);
 		assertEquals(myQCStatus, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
@@ -157,7 +156,7 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
 		cruise.setQcStatus(null);
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 	}
 
 	/**
@@ -171,7 +170,7 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
 		cruise.setArchiveStatus(myArchiveStatus);
 		assertEquals(myArchiveStatus, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -194,7 +193,7 @@ public class DashboardCruiseTest {
 		cruise.setUploadFilename(myFilename);
 		assertEquals(myFilename, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -218,7 +217,7 @@ public class DashboardCruiseTest {
 		assertEquals(myNumDataRows, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -247,7 +246,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -274,7 +273,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -301,7 +300,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -327,7 +326,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -354,7 +353,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -384,7 +383,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -415,7 +414,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -447,7 +446,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -480,7 +479,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -514,7 +513,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -549,7 +548,7 @@ public class DashboardCruiseTest {
 		assertEquals(0, cruise.getNumDataRows());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
 		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(QCEvent.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
+		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
 		assertEquals(0, cruise.getAddlDocs().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
@@ -764,52 +763,52 @@ public class DashboardCruiseTest {
 
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_NOT_SUBMITTED);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_EXCLUDED);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_EXCLUDED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_SUSPENDED);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_SUSPENDED);
 		assertNotNull( cruise.isEditable() );
 		assertTrue( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_A);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_A);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_B);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_B);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_C);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_C);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_D);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_D);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_ACCEPTED_E);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_ACCEPTED_E);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_CONFLICT);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_CONFLICT);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_RENAMED);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_RENAMED);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
 
-		cruise.setQcStatus(QCEvent.QC_STATUS_SUBMITTED);
+		cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 
 		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );

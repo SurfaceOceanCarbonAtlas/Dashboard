@@ -8,6 +8,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -94,11 +95,11 @@ public class AddAllMetadata {
 					addlDocs.clear();
 					// And add all existing metadata documents
 					for ( DashboardMetadata mdata : metaHandler.getMetadataFiles(expocode) ) {
-						if ( mdata.getFilename().equals(DashboardMetadata.OME_FILENAME) ) {
+						if ( mdata.getFilename().equals(DashboardUtils.OME_FILENAME) ) {
 							// Ignore the OME.xml stub
 							;
 						}
-						else if ( mdata.getFilename().equals(DashboardMetadata.PI_OME_FILENAME) ) {
+						else if ( mdata.getFilename().equals(DashboardUtils.PI_OME_FILENAME) ) {
 							// PI-provided OME.xml file - set the OME upload timestamp
 							cruise.setOmeTimestamp(mdata.getUploadTimestamp());
 						}

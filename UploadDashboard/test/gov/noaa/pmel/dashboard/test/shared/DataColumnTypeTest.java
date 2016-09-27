@@ -117,7 +117,7 @@ public class DataColumnTypeTest {
 	@Test
 	public void testGetSetUnits() {
 		DataColumnType dtype = new DataColumnType();
-		assertEquals(DataColumnType.NO_UNITS, dtype.getUnits());
+		assertEquals(DashboardUtils.NO_UNITS, dtype.getUnits());
 		dtype.setUnits(UNITS);
 		assertEquals(UNITS, dtype.getUnits());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getCategoryName());
@@ -126,7 +126,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
 		dtype.setUnits(null);
-		assertEquals(DataColumnType.NO_UNITS, dtype.getUnits());
+		assertEquals(DashboardUtils.NO_UNITS, dtype.getUnits());
 	}
 
 	/**
@@ -173,7 +173,7 @@ public class DataColumnTypeTest {
 		dtype.setSelectedMissingValue(SELECTED_MISSING_VALUE);
 		assertEquals(SELECTED_MISSING_VALUE, dtype.getSelectedMissingValue());
 		assertEquals(DEFAULT_UNIT_INDEX, dtype.getSelectedUnitIndex());
-		assertEquals(DataColumnType.NO_UNITS, dtype.getUnits());
+		assertEquals(DashboardUtils.NO_UNITS, dtype.getUnits());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getCategoryName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getStandardName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());

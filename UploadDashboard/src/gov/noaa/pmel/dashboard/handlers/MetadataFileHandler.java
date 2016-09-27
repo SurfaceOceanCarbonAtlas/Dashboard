@@ -682,7 +682,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			String uploadFilename = metaDoc.getFilename();
 
 			// If this is the OME metadata file, read the contents 
-			if ( DashboardMetadata.OME_FILENAME.equals(uploadFilename) ) {
+			if ( DashboardUtils.OME_FILENAME.equals(uploadFilename) ) {
 				omeMData = new DashboardOmeMetadata(metaDoc, this);
 			}
 
