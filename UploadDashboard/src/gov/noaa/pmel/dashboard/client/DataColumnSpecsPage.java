@@ -107,6 +107,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	private static final String USE_DEFAULT_SECONDS_TEXT = "Yes";
 	private static final String NO_DEFAULT_SECONDS_TEXT = "No";
 
+	private static final String GET_KNOWN_TYPES_FAIL_MSG =
+			"Problems obtaining all known data column types";
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
 			"Problems obtaining the data column types";
 	private static final String SUBMIT_FAIL_MSG = 
@@ -166,6 +168,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
 	// Popup to confirm continue with default zero seconds
 	private DashboardAskPopup defaultSecondsPopup;
+	// List of all known user data column types
+	private ArrayList<DataColumnType> knownUserTypes;
 	// Cruise associated with and updated by this page
 	private DashboardCruise cruise;
 	// List of CruiseDataColumn objects associated with the column Headers
@@ -254,7 +258,27 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	static void showPage(String username, ArrayList<String> expocodes) {
 		if ( singleton == null ) {
 			singleton = new DataColumnSpecsPage();
+			singleton.setUsername(username);
+			singleton.expocodes.clear();
+			singleton.expocodes.addAll(expocodes);
+			SocatUploadDashboard.showWaitCursor();
+			// Get the list of all known user data column types and try again
+			service.getKnownUserDataColumnTypes(singleton.getUsername(),
+					new AsyncCallback<ArrayList<DataColumnType>>() {
+				@Override
+				public void onSuccess(ArrayList<DataColumnType> knownUserTypes) {
+					singleton.knownUserTypes = knownUserTypes;
+					showPage(singleton.getUsername(), singleton.expocodes);
+				}
+				@Override
+				public void onFailure(Throwable ex) {
+					SocatUploadDashboard.showFailureMessage(GET_KNOWN_TYPES_FAIL_MSG, ex);
+					SocatUploadDashboard.showAutoCursor();
+				}
+			});
+			return;
 		}
+
 		singleton.setUsername(username);
 		singleton.expocodes.clear();
 		singleton.expocodes.addAll(expocodes);
@@ -377,7 +401,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			// TextColumn for displaying the data strings for this column
 			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k);
 			// CruiseDataColumn for creating the Header cell for this column
-			CruiseDataColumn cruiseColumn = new CruiseDataColumn(cruise, k);
+			CruiseDataColumn cruiseColumn = new CruiseDataColumn(knownUserTypes, cruise, k);
 			// Maintain a reference to the CruiseDataColumn object
 			cruiseDataCols.add(cruiseColumn);
 			// Add this data column and the header to the grid
@@ -543,10 +567,10 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		// Similarly with aqueous CO2 and fCO2 recomputations.
 		int k = 0;
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
-			if ( colType == KnownDataTypes.UNKNOWN ) {
+			if ( DashboardUtils.UNKNOWN.typeNameEquals(colType) ) {
 				unknownIndices.add(k);
 			}
-			else if ( colType == KnownDataTypes.TIMESTAMP ) {
+			else if ( DashboardUtils.TIMESTAMP.typeNameEquals(colType) ) {
 				hasYear = true;
 				hasMonth = true;
 				hasDay = true;
@@ -554,12 +578,12 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == KnownDataTypes.DATE ) {
+			else if ( DashboardUtils.DATE.typeNameEquals(colType) ) {
 				hasYear = true;
 				hasMonth = true;
 				hasDay = true;
 			}
-			else if ( colType == KnownDataTypes.DAY_OF_YEAR ) {
+			else if ( DashboardUtils.DAY_OF_YEAR.typeNameEquals(colType) ) {
 				hasMonth = true;
 				hasDay = true;
 				// Day of year could be floating point; verification needed?
@@ -567,48 +591,43 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == KnownDataTypes.SECOND_OF_DAY ) {
+			else if ( DashboardUtils.SECOND_OF_DAY.typeNameEquals(colType) ) {
 				hasHour = true;
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == KnownDataTypes.YEAR ) {
+			else if ( DashboardUtils.YEAR.typeNameEquals(colType) ) {
 				hasYear = true;
 			}
-			else if ( colType == KnownDataTypes.MONTH ) {
+			else if ( DashboardUtils.MONTH_OF_YEAR.typeNameEquals(colType) ) {
 				hasMonth = true;
 			}
-			else if ( colType == KnownDataTypes.DAY ) {
+			else if ( DashboardUtils.DAY_OF_MONTH.typeNameEquals(colType) ) {
 				hasDay = true;
 			}
-			else if ( colType == KnownDataTypes.TIME ) {
+			else if ( DashboardUtils.TIME_OF_DAY.typeNameEquals(colType) ) {
 				hasHour = true;
 				hasMinute = true;
 				hasSecond = true;
 			}
-			else if ( colType == KnownDataTypes.HOUR ) {
+			else if ( DashboardUtils.HOUR_OF_DAY.typeNameEquals(colType) ) {
 				hasHour = true;
 			}
-			else if ( colType == KnownDataTypes.MINUTE ) {
+			else if ( DashboardUtils.MINUTE_OF_HOUR.typeNameEquals(colType) ) {
 				hasMinute = true;
 			}
-			else if ( colType == KnownDataTypes.SECOND ) {
+			else if ( DashboardUtils.SECOND_OF_MINUTE.typeNameEquals(colType) ) {
 				hasSecond = true;
 			}
-			else if ( colType == KnownDataTypes.LONGITUDE ) {
+			else if ( DashboardUtils.LONGITUDE.typeNameEquals(colType) ) {
 				hasLongitude = true;
 			}
-			else if ( colType == KnownDataTypes.LATITUDE ) {
+			else if ( DashboardUtils.LATITUDE.typeNameEquals(colType) ) {
 				hasLatitude = true;
 			}
-			else if ( (colType == SocatCruiseData.XCO2_WATER_TEQU_DRY) ||
-					  (colType == SocatCruiseData.XCO2_WATER_SST_DRY) ||
-					  (colType == SocatCruiseData.XCO2_WATER_TEQU_WET) ||
-					  (colType == SocatCruiseData.XCO2_WATER_SST_WET) ||
-					  (colType == SocatCruiseData.PCO2_WATER_TEQU_WET) ||
-					  (colType == SocatCruiseData.PCO2_WATER_SST_WET) ||
-					  (colType == SocatCruiseData.FCO2_WATER_TEQU_WET) ||
-					  (colType == SocatCruiseData.FCO2_WATER_SST_WET) ) {
+			else if ( colType.getVarName().startsWith("xCO2_water") ||
+					  colType.getVarName().startsWith("pCO2_water") ||
+					  colType.getVarName().startsWith("fCO2_water") ) {
 				hasco2 = true;
 			}
 			k++;
@@ -672,11 +691,11 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			return;
 		}
 
-		// Make sure there is no more than one of most column types
+		// Make sure there is no more than one of each column types - except OTHER
 		HashSet<String> typeSet = new HashSet<String>();
 		TreeSet<String> duplicates = new TreeSet<String>();
 		for ( DataColumnType colType : cruise.getDataColTypes() ) {
-			if ( DashboardUtils.OTHER.typeEquals(colType) ) {
+			if ( DashboardUtils.OTHER.typeNameEquals(colType) ) {
 				// Multiple OTHER column types are allowed
 				;
 			}

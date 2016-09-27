@@ -14,6 +14,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
 
@@ -22,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +40,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = 4238185873850896369L;
+	private static final long serialVersionUID = 6142295248552727436L;
 
 	private String username = null;
 	private DashboardConfigStore configStore = null;
@@ -308,6 +310,24 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		}
 		Logger.getLogger("DashboardServices").info("returned updated dataset information for " + username);
 		return cruiseList;
+	}
+
+	@Override
+	public ArrayList<DataColumnType> getKnownUserDataColumnTypes(String pageUsername) {
+		// Get the dashboard data store and current username, and validate that username
+		if ( ! validateRequest(pageUsername) ) 
+			throw new IllegalArgumentException("Invalid user request");
+
+		KnownDataTypes knownUserTypes = configStore.getKnownUserDataTypes();
+		if ( knownUserTypes == null )
+			throw new IllegalArgumentException("unexpected missing list of all known data column types");
+		LinkedHashSet<DashDataType> knownTypesSet = knownUserTypes.getKnownTypesSet();
+		if ( knownTypesSet.isEmpty() )
+			throw new IllegalArgumentException("unexpected empty list of all known data column types");
+		ArrayList<DataColumnType> knownTypesList = new ArrayList<DataColumnType>(knownTypesSet.size());
+		for ( DashDataType dtype : knownTypesSet )
+			knownTypesList.add(dtype.duplicate());
+		return knownTypesList;
 	}
 
 	@Override
