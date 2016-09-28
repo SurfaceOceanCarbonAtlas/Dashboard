@@ -1373,7 +1373,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			int index = dctype.getUnits().indexOf(colTypeUnits.get(k));
 			if ( index < 0 ) {
 				// see if there is a modified version of this unit
-				String newName = KnownDataTypes.RENAMED_UNITS.get(colTypeUnits.get(k));
+				String newName = DashboardServerUtils.RENAMED_UNITS.get(colTypeUnits.get(k));
 				if ( newName != null )
 					index = dctype.getUnits().indexOf(newName);
 			}

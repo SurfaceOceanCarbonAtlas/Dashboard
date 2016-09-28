@@ -21,7 +21,8 @@ import org.junit.Test;
  */
 public class DataColumnTypeTest {
 
-	private static final String VAR_NAME = "xCO2";
+	private static final String DISPLAY_NAME = "xCO2 air dry";
+	private static final String VAR_NAME = "xCO2_atm_dry";
 	private static final String DATA_CLASS_NAME = "Double";
 	private static final String DESCRIPTION = "mole fraction of carbon dioxide";
 	private static final String STANDARD_NAME = "mole_fraction_co2";
@@ -30,6 +31,21 @@ public class DataColumnTypeTest {
 	private static final Integer DEFAULT_UNIT_INDEX = Integer.valueOf(0);
 	private static final Integer SELECTED_UNIT_INDEX = Integer.valueOf(1);
 	private static final String SELECTED_MISSING_VALUE = "NaN";
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#getDisplayName()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DataColumnType#setDisplayName(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetDisplayName() {
+		DataColumnType dtype = new DataColumnType();
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
+		dtype.setDisplayName(DISPLAY_NAME);
+		assertEquals(DISPLAY_NAME, dtype.getDisplayName());
+		dtype.setDisplayName(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
+	}
+
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#getVarName()}
 	 * and {@link gov.noaa.pmel.dashboard.shared.DataColumnType#setVarName(java.lang.String)}.
@@ -40,6 +56,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
 		dtype.setVarName(VAR_NAME);
 		assertEquals(VAR_NAME, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setVarName(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
 	}
@@ -55,6 +72,7 @@ public class DataColumnTypeTest {
 		dtype.setDataClassName(DATA_CLASS_NAME);
 		assertEquals(DATA_CLASS_NAME, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setDataClassName(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 	}
@@ -71,6 +89,7 @@ public class DataColumnTypeTest {
 		assertEquals(DESCRIPTION, dtype.getDescription());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setDescription(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());
 	}
@@ -88,6 +107,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setStandardName(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getStandardName());
 	}
@@ -106,6 +126,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setCategoryName(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getCategoryName());
 	}
@@ -125,6 +146,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setUnits(null);
 		assertEquals(DashboardUtils.NO_UNITS, dtype.getUnits());
 	}
@@ -146,6 +168,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 
 		// Zero returned for null or invalid index
 		dtype.setSelectedUnitIndex(null);
@@ -179,6 +202,7 @@ public class DataColumnTypeTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDescription());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDataClassName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getVarName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getDisplayName());
 		dtype.setSelectedMissingValue(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getSelectedMissingValue());
 	}
@@ -190,8 +214,8 @@ public class DataColumnTypeTest {
 	 */
 	@Test
 	public void testDataColumnType() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
-				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		DataColumnType dtype = new DataColumnType(DISPLAY_NAME, VAR_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, dtype.getSelectedMissingValue());
 		assertEquals(DEFAULT_UNIT_INDEX, dtype.getSelectedUnitIndex());
 		assertEquals(UNITS, dtype.getUnits());
@@ -200,6 +224,7 @@ public class DataColumnTypeTest {
 		assertEquals(DESCRIPTION, dtype.getDescription());
 		assertEquals(DATA_CLASS_NAME, dtype.getDataClassName());
 		assertEquals(VAR_NAME, dtype.getVarName());
+		assertEquals(DISPLAY_NAME, dtype.getDisplayName());
 	}
 
 	/**
@@ -207,8 +232,8 @@ public class DataColumnTypeTest {
 	 */
 	@Test
 	public void testDuplicate() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
-				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		DataColumnType dtype = new DataColumnType(DISPLAY_NAME, VAR_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		dtype.setSelectedUnitIndex(SELECTED_UNIT_INDEX);
 		dtype.setSelectedMissingValue(SELECTED_MISSING_VALUE);
 		DataColumnType other = dtype.duplicate();
@@ -218,36 +243,60 @@ public class DataColumnTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#typeNameEquals(java.long.String)}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DataColumnType#typeNameEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}..
 	 */
 	@Test
 	public void testTypeNameEquals() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
-				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		DataColumnType dtype = new DataColumnType(DISPLAY_NAME, VAR_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+
+		assertTrue( dtype.typeNameEquals(DISPLAY_NAME.toUpperCase()) );
+		assertTrue( dtype.typeNameEquals(DISPLAY_NAME.toLowerCase()) );
+		assertTrue( dtype.typeNameEquals(DISPLAY_NAME.replaceAll(" ", "; ")) );
+		assertTrue( dtype.typeNameEquals(VAR_NAME.toUpperCase()) );
+		assertTrue( dtype.typeNameEquals(VAR_NAME.toLowerCase()) );
+		assertTrue( dtype.typeNameEquals(VAR_NAME.replaceAll("_", "==")) );
+		assertFalse( dtype.typeNameEquals(DATA_CLASS_NAME) );
+		assertFalse( dtype.typeNameEquals(DESCRIPTION) );
+		assertFalse( dtype.typeNameEquals(STANDARD_NAME) );
+		assertFalse( dtype.typeNameEquals(CATEGORY_NAME) );
+
 		DataColumnType other = new DataColumnType();
+		other.setDisplayName(DISPLAY_NAME.toUpperCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
+		other.setDisplayName(DISPLAY_NAME.toLowerCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
+
+		other = new DataColumnType();
 		other.setVarName(VAR_NAME.toUpperCase());
 		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
 		other.setVarName(VAR_NAME.toLowerCase());
 		assertTrue( dtype.typeNameEquals(other) );
-		other.setDataClassName("Blob");
-		assertTrue( dtype.typeNameEquals(other) );
-	}
+		assertTrue( other.typeNameEquals(dtype) );
 
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DataColumnType#typeEquals(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
-	 */
-	@Test
-	public void testTypeEquals() {
-		DataColumnType dtype = new DataColumnType(VAR_NAME, DATA_CLASS_NAME, 
-				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
-		DataColumnType other = new DataColumnType();
-		other.setVarName(VAR_NAME);
+		other = new DataColumnType();
+		other.setDisplayName(VAR_NAME.toUpperCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
+		other.setDisplayName(VAR_NAME.toLowerCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
+
+		other = new DataColumnType();
+		other.setVarName(DISPLAY_NAME.toUpperCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
+		other.setVarName(DISPLAY_NAME.toLowerCase());
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
+
 		other.setDataClassName("Blob");
-		assertFalse( dtype.typeEquals(other) );
-		other.setDataClassName(DATA_CLASS_NAME);
-		assertTrue( dtype.typeEquals(other) );
-		other.setVarName(VAR_NAME.toLowerCase());
-		assertFalse( dtype.typeEquals(other) );
+		assertTrue( dtype.typeNameEquals(other) );
+		assertTrue( other.typeNameEquals(dtype) );
 	}
 
 	/**
@@ -262,6 +311,13 @@ public class DataColumnTypeTest {
 
 		DataColumnType other = new DataColumnType();
 		assertFalse( dtype == other );
+		assertTrue( dtype.hashCode() == other.hashCode() );
+		assertTrue( dtype.equals(other) );
+
+		dtype.setDisplayName(DISPLAY_NAME);
+		assertFalse( dtype.hashCode() == other.hashCode() );
+		assertFalse( dtype.equals(other) );
+		other.setDisplayName(DISPLAY_NAME);
 		assertTrue( dtype.hashCode() == other.hashCode() );
 		assertTrue( dtype.equals(other) );
 

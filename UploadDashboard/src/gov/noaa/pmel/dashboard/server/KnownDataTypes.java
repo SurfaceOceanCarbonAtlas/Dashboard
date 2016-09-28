@@ -3,10 +3,10 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Properties;
@@ -31,18 +31,6 @@ import java.util.Properties;
  * @author Karl Smith
  */
 public class KnownDataTypes {
-
-	/** mapping from old unit names to new unit names */
-	public static final HashMap<String,String> RENAMED_UNITS;
-	static {
-		RENAMED_UNITS = new HashMap<String,String>();
-		RENAMED_UNITS.put("deg.E", "degrees_east");
-		RENAMED_UNITS.put("deg.W", "degrees_west");
-		RENAMED_UNITS.put("deg.N", "degrees_north");
-		RENAMED_UNITS.put("deg.S", "degrees_south");
-		RENAMED_UNITS.put("deg.C", "degrees C");
-		RENAMED_UNITS.put("deg.clk.N", "degrees");
-	}
 
 	/** Marker data type used to indicate an severe error in the combination of lon/lat/time */
 	public static final DashDataType GEOPOSITION = new DashDataType(DashboardUtils.GEOPOSITION);
@@ -135,18 +123,25 @@ public class KnownDataTypes {
 
 	/**
 	 * Adds the given data type to this collection of known data 
-	 * types.  Only the upper-cased varName is used to differentiate 
-	 * known data types.  The given instance of the DashDataType is 
-	 * added to the internal collection of known data types.
+	 * types.  The given instance of the DashDataType is added to 
+	 * the internal collection of known data types.
 	 * 
 	 * @param dtype
 	 * 		new data type to add to the known list
-	 * @return
-	 * 		existing known data type that was replaced;
-	 * 		null if there was no existing known data type with matching name 
+	 * @throws IllegalArgumentException
+	 * 		if the data type already is a known type
 	 */
-	private void addDataType(DashDataType dtype) {
-		knownTypes.put(dtype.getVarName().toUpperCase(), dtype);
+	private void addDataType(DashDataType dtype) throws IllegalArgumentException {
+		String varKey = DashboardServerUtils.getKeyForName(dtype.getVarName());
+		DashDataType oldVal = knownTypes.put(varKey, dtype);
+		if ( oldVal != null )
+			throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
+		String displayKey = DashboardServerUtils.getKeyForName(dtype.getDisplayName());
+		if ( ! displayKey.equals(varKey) ) {
+			oldVal = knownTypes.put(displayKey, dtype);
+			if ( oldVal != null )
+				throw new IllegalArgumentException(oldVal.toString() + " matches " + dtype.toString());
+		}
 	}
 
 	/**
@@ -250,16 +245,11 @@ public class KnownDataTypes {
 	 * 		properties file of data types to add to the known list; 
 	 * 		uses the simple line format:
 	 * 			varName={JSON description}
-	 * 		where {JSON description} is a JSON string giving:
-	 * 			the data class name (tag: "dataClassName"),
-	 * 			the description (tag: "description"),
-	 * 			the standard name (tag: "standardName"),
-	 * 			the category name (tag: "categoryName"), and
-	 * 			the units array (tag: "units").
-	 * 		Tags may be omitted in which case the DashDataType default value is assigned.
+	 * 		where varName is the variable name of the type and 
+	 * 		{JSON description} is a JSON string describing the type 
+	 * 		as documented by {@link DashDataType#fromPropertyValue(String, String)}
 	 * @throws IllegalArgumentException
-	 * 		if the variable name of a data type to add as already known
-	 * 			(using {@link #containsTypeName(String)},
+	 * 		if the data type to add is already known,
 	 * 		if the JSON description cannot be parsed.
 	 * 
 	 * @return
@@ -276,33 +266,66 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Determines is a given data type name exists in the list
-	 * of known data types.  This only compares the upper-cased 
-	 * varName values in each data type.
+	 * Determines if a given data type name exists in the list
+	 * of known data types.
 	 * 
 	 * @param typeName
-	 * 		search for a data column type with this name 
+	 * 		search for a data type with this name 
 	 * @return
-	 * 		if the known data column types contains the given data column type name
+	 * 		if the given data type name is known
 	 */
 	public boolean containsTypeName(String typeName) {
-		return knownTypes.containsKey(typeName.toUpperCase());
+		return knownTypes.containsKey(DashboardServerUtils.getKeyForName(typeName));
 	}
 
 	/**
-	 * Returns a new data column type based on the data type with a matching 
-	 * type (comparing only the upper-cased varName values.  The selected 
-	 * unit will be zero and the select missing value will be 
+	 * Determines if the type of a given data column type 
+	 * exists in the list of known data types.
+	 * 
+	 * @param dataColType
+	 * 		search for a type like this data column type 
+	 * @return
+	 * 		if the given type is known
+	 */
+	public boolean containsType(DataColumnType dctype) {
+		if ( containsTypeName(dctype.getVarName()) )
+			return true;
+		if ( containsTypeName(dctype.getDisplayName()) )
+			return true;
+		return false;
+	}
+
+	/**
+	 * Determines is a given data type exists 
+	 * in the list of known data types.
+	 * 
+	 * @param dtype
+	 * 		data type to search for 
+	 * @return
+	 * 		if the given data type is known
+	 */
+	public boolean containsType(DashDataType dtype) {
+		if ( containsTypeName(dtype.getVarName()) )
+			return true;
+		if ( containsTypeName(dtype.getDisplayName()) )
+			return true;
+		return false;
+	}
+
+	/**
+	 * Returns a new data column type based on the data type with a type
+	 * matching the given type name. 
+	 * The selected unit will be zero and the select missing value will be 
 	 * {@link DashboardUtils#STRING_MISSING_VALUE} (default missing values).
 	 * 
 	 * @param varName
-	 * 		data column type variable name to find
+	 * 		type name to find
 	 * @return
-	 * 		copy of the known data column type that matches, or
+	 * 		data column type matching the given type name, or
 	 * 		null if the name does not match that of a known type
 	 */
-	public DataColumnType getDataColumnType(String varName) {
-		DashDataType dtype = knownTypes.get(varName.toUpperCase());
+	public DataColumnType getDataColumnType(String typeName) {
+		DashDataType dtype = knownTypes.get(DashboardServerUtils.getKeyForName(typeName));
 		if ( dtype == null )
 			return null;
 		return dtype.duplicate();
@@ -318,16 +341,17 @@ public class KnownDataTypes {
 
 	/**
 	 * @return
-	 * 		the number of known data types in this instance
+	 * 		if there are no known data types
 	 */
-	public int size() {
-		return knownTypes.size();
+	public boolean isEmpty() {
+		return knownTypes.isEmpty();
 	}
 
 	@Override
 	public String toString() {
 		String strval = "KnownDataTypes[\n";
-		for ( DashDataType dtype : knownTypes.values() )
+		// Remove duplicated data types (with different keys) by first forming a set
+		for ( DashDataType dtype : new LinkedHashSet<DashDataType>(knownTypes.values()) )
 			strval += "    " + dtype.toString() + "\n";
 		strval += "]";
 		return strval;

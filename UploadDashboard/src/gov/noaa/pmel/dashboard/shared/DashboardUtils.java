@@ -338,14 +338,14 @@ public class DashboardUtils {
 			new ArrayList<String>(Arrays.asList("seconds since 1970-01-01T00:00:00Z"));
 
 	/** Marker data type used to indicate an severe error in the combination of lon/lat/time */
-	public static final DataColumnType GEOPOSITION = new DataColumnType("geoposition", 
-			null, null, null, null, NO_UNITS);
+	public static final DataColumnType GEOPOSITION = new DataColumnType("(geoposition)", 
+			"geoposition", null, null, null, null, NO_UNITS);
 
 	/**
 	 * UNKNOWN needs to be respecified as one of the (other) data column types.
 	 */
 	public static final DataColumnType UNKNOWN = new DataColumnType("(unknown)", 
-			null, null, null, null, NO_UNITS);
+			"unknown", null, null, null, null, NO_UNITS);
 
 	/**
 	 * OTHER is for supplementary data in the user's original data file but 
@@ -353,8 +353,8 @@ public class DashboardUtils {
 	 * be part of the metadata, but the values are not validated or used. 
 	 * Multiple columns may have this type.
 	 */
-	public static final DataColumnType OTHER = new DataColumnType("other", 
-			null, null, null, null, NO_UNITS);
+	public static final DataColumnType OTHER = new DataColumnType("other",
+			"other", null, null, null, null, NO_UNITS);
 
 	/**
 	 * Unique identifier for the dataset.
@@ -363,106 +363,134 @@ public class DashboardUtils {
 	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
 	 * different vessels.  (metadata)
 	 */
-	public static final DataColumnType EXPOCODE = new DataColumnType("expocode", 
-			STRING_DATA_CLASS_NAME, "expocode", null, IDENTIFIER_CATEGORY, NO_UNITS);
+	public static final DataColumnType EXPOCODE = new DataColumnType("Expocode", 
+			"expocode", STRING_DATA_CLASS_NAME, "expocode", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
 	
 	/**
 	 * User-provided name for the dataset (metadata)
 	 */
-	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset_name", 
-			STRING_DATA_CLASS_NAME, "dataset name", null, IDENTIFIER_CATEGORY, NO_UNITS);
+	public static final DataColumnType DATASET_NAME = new DataColumnType("dataset", 
+			"dataset_name", STRING_DATA_CLASS_NAME, "dataset name", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType VESSEL_NAME = new DataColumnType("vessel_name", 
-			STRING_DATA_CLASS_NAME, "vessel name", "platform_name", PLATFORM_CATEGORY, NO_UNITS);
+	public static final DataColumnType VESSEL_NAME = new DataColumnType("vessel", 
+			"vessel_name", STRING_DATA_CLASS_NAME, "vessel name", "platform_name",
+			PLATFORM_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization", 
-			STRING_DATA_CLASS_NAME, "organization", null, IDENTIFIER_CATEGORY, NO_UNITS);
+			"organization", STRING_DATA_CLASS_NAME, "organization", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
 	
-	public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("investigators", 
-			STRING_DATA_CLASS_NAME, "investigators", null, IDENTIFIER_CATEGORY, NO_UNITS);
+	public static final DataColumnType INVESTIGATOR_NAMES = new DataColumnType("PI names", 
+			"investigators", STRING_DATA_CLASS_NAME, "investigators", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_min",
-			DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", LOCATION_CATEGORY, LONGITUDE_UNITS);
+	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("westmost lon",
+			"geospatial_lon_min", DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", 
+			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
-	public static final DataColumnType EASTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_max",
-			DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", LOCATION_CATEGORY, LONGITUDE_UNITS);
+	public static final DataColumnType EASTERNMOST_LONGITUDE = new DataColumnType("eastmost lon",
+			"geospatial_lon_max", DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", 
+			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
-	public static final DataColumnType SOUTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_min",
-			DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", LOCATION_CATEGORY, LATITUDE_UNITS);
+	public static final DataColumnType SOUTHERNMOST_LATITUDE = new DataColumnType("southmost lat",
+			"geospatial_lat_min", DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", 
+			LOCATION_CATEGORY, LATITUDE_UNITS);
 
-	public static final DataColumnType NORTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_max",
-			DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", LOCATION_CATEGORY, LATITUDE_UNITS);
+	public static final DataColumnType NORTHERNMOST_LATITUDE = new DataColumnType("northmost lat",
+			"geospatial_lat_max", DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", 
+			LOCATION_CATEGORY, LATITUDE_UNITS);
 
-	public static final DataColumnType TIME_COVERAGE_START = new DataColumnType("time_coverage_start",
-			DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType TIME_COVERAGE_START = new DataColumnType("begin time",
+			"time_coverage_start", DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", 
+			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_converage_end",
-			DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("end time",
+			"time_converage_end", DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", 
+			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
-			STRING_DATA_CLASS_NAME, "QC flag", null, QUALITY_CATEGORY, NO_UNITS);
+	public static final DataColumnType QC_FLAG = new DataColumnType("QC flag", 
+			"qc_flag", STRING_DATA_CLASS_NAME, "QC flag", null, 
+			QUALITY_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample_number",
-			INT_DATA_CLASS_NAME, "sample number", null, IDENTIFIER_CATEGORY, NO_UNITS);
+	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample num",
+			"sample_number", INT_DATA_CLASS_NAME, "sample number", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
 
 	/**
 	 * Date and time or the measurement
 	 */
-	public static final DataColumnType TIMESTAMP = new DataColumnType("date_time", 
-			STRING_DATA_CLASS_NAME, "date and time", null, null, TIMESTAMP_UNITS);
+	public static final DataColumnType TIMESTAMP = new DataColumnType("date time", 
+			"date_time", STRING_DATA_CLASS_NAME, "date and time", null, 
+			null, TIMESTAMP_UNITS);
 
 	/**
 	 * Date of the measurement - no time.
 	 */
 	public static final DataColumnType DATE = new DataColumnType("date", 
-			STRING_DATA_CLASS_NAME, "date", null, null, DATE_UNITS);
+			"date", STRING_DATA_CLASS_NAME, "date", null, 
+			null, DATE_UNITS);
 
 	public static final DataColumnType YEAR = new DataColumnType("year", 
-			INT_DATA_CLASS_NAME, "year", "year", TIME_CATEGORY, NO_UNITS);
+			"year", INT_DATA_CLASS_NAME, "year", "year", 
+			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType MONTH_OF_YEAR = new DataColumnType("month", 
-			INT_DATA_CLASS_NAME, "month of year", "month_of_year", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType MONTH_OF_YEAR = new DataColumnType("month of year", 
+			"month", INT_DATA_CLASS_NAME, "month of year", "month_of_year",
+			TIME_CATEGORY, NO_UNITS);
 	
-	public static final DataColumnType DAY_OF_MONTH = new DataColumnType("day", 
-			INT_DATA_CLASS_NAME, "day of month", "day_of_month", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType DAY_OF_MONTH = new DataColumnType("day of month", 
+			"day", INT_DATA_CLASS_NAME, "day of month", "day_of_month", 
+			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType TIME_OF_DAY = new DataColumnType("time_of_day", 
-			STRING_DATA_CLASS_NAME, "time of day", null, null, TIME_OF_DAY_UNITS);
+	public static final DataColumnType TIME_OF_DAY = new DataColumnType("time of day", 
+			"time_of_day", STRING_DATA_CLASS_NAME, "time of day", null, 
+			null, TIME_OF_DAY_UNITS);
 
-	public static final DataColumnType HOUR_OF_DAY = new DataColumnType("hour", 
-			INT_DATA_CLASS_NAME, "hour of day", "hour_of_day", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType HOUR_OF_DAY = new DataColumnType("hour of day", 
+			"hour", INT_DATA_CLASS_NAME, "hour of day", "hour_of_day", 
+			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType MINUTE_OF_HOUR = new DataColumnType("minute", 
-			INT_DATA_CLASS_NAME, "minute of hour", "minute_of_hour", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType MINUTE_OF_HOUR = new DataColumnType("minute of hour",
+			"minute", INT_DATA_CLASS_NAME, "minute of hour", "minute_of_hour", 
+			TIME_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType SECOND_OF_MINUTE = new DataColumnType("second", 
-			DOUBLE_DATA_CLASS_NAME, "second of minute", "second_of_minute", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType SECOND_OF_MINUTE = new DataColumnType("sec of minute", 
+			"second", DOUBLE_DATA_CLASS_NAME, "second of minute", "second_of_minute", 
+			TIME_CATEGORY, NO_UNITS);
 
 	/**
 	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
 	 * may be used to specify the date and time of the measurement.
 	 */
-	public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day_of_year", 
-			DOUBLE_DATA_CLASS_NAME, "day of year", "day_of_year", TIME_CATEGORY, DAY_OF_YEAR_UNITS);
+	public static final DataColumnType DAY_OF_YEAR = new DataColumnType("day of year", 
+			"day_of_year", DOUBLE_DATA_CLASS_NAME, "day of year", "day_of_year", 
+			TIME_CATEGORY, DAY_OF_YEAR_UNITS);
 
 	/**
 	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
 	 * be used to specify date and time of the measurement
 	 */
-	public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec_of_day", 
-			DOUBLE_DATA_CLASS_NAME, "second of day", "second_of_day", TIME_CATEGORY, NO_UNITS);
+	public static final DataColumnType SECOND_OF_DAY = new DataColumnType("sec of day",
+			"sec_of_day", DOUBLE_DATA_CLASS_NAME, "second of day", "second_of_day", 
+			TIME_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType LONGITUDE = new DataColumnType("longitude", 
-			DOUBLE_DATA_CLASS_NAME, "longitude", "longitude", LOCATION_CATEGORY, LONGITUDE_UNITS);
+			"longitude", DOUBLE_DATA_CLASS_NAME, "longitude", "longitude", 
+			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType LATITUDE = new DataColumnType("latitude", 
-			DOUBLE_DATA_CLASS_NAME, "latitude", "latitude", LOCATION_CATEGORY, LATITUDE_UNITS);
+			"latitude", DOUBLE_DATA_CLASS_NAME, "latitude", "latitude", 
+			LOCATION_CATEGORY, LATITUDE_UNITS);
 
-	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample_depth", 
-			DOUBLE_DATA_CLASS_NAME, "sample depth", "depth", BATHYMETRY_CATEGORY, DEPTH_UNITS);
+	public static final DataColumnType SAMPLE_DEPTH = new DataColumnType("sample depth", 
+			"sample_depth", DOUBLE_DATA_CLASS_NAME, "sample depth", "depth", 
+			BATHYMETRY_CATEGORY, DEPTH_UNITS);
 
 	public static final DataColumnType TIME = new DataColumnType("time", 
-			DOUBLE_DATA_CLASS_NAME, "time", "time", TIME_CATEGORY, TIME_UNITS);
+			"time", DOUBLE_DATA_CLASS_NAME, "time", "time", 
+			TIME_CATEGORY, TIME_UNITS);
 
 	/**
 	 * "Cleans" a username for use by substituting characters that are  

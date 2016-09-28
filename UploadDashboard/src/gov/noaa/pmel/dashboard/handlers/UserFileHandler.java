@@ -4,6 +4,7 @@
 package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
@@ -116,7 +117,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			int index = dctype.getUnits().indexOf(vals[1]);
 			if ( index < 0 ) {
 				// see if there is a modified version of this unit
-				String newName = KnownDataTypes.RENAMED_UNITS.get(vals[1]);
+				String newName = DashboardServerUtils.RENAMED_UNITS.get(vals[1]);
 				if ( newName != null )
 					index = dctype.getUnits().indexOf(newName);
 			}
@@ -127,18 +128,6 @@ public class UserFileHandler extends VersionedFileHandler {
 			dctype.setSelectedMissingValue(vals[2]);
 			dataColNamesToTypes.put(colName, dctype);
 		}
-	}
-
-	/**
-	 * Returns the column name key from the given column name.
-	 *   
-	 * @param columnName
-	 * 		get the key for this column name
-	 * @return
-	 * 		the key for the given column name
-	 */
-	private String keyFromColumnName(String columnName) {
-		return columnName.toLowerCase().replaceAll("[^a-z0-9]", "");
 	}
 
 	/**
@@ -459,7 +448,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		// Go through the column names to assign these lists
 		for ( String colName : cruise.getUserColNames() ) {
 			// Convert the column name to the key
-			String key = keyFromColumnName(colName);
+			String key = DashboardServerUtils.getKeyForName(colName);
 			DataColumnType thisColType = userColNamesToTypes.get(key);
 			if ( thisColType == null )
 				thisColType = DashboardUtils.UNKNOWN;
@@ -498,7 +487,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		boolean changed = false;
 		int k = 0;
 		for ( String colName : cruise.getUserColNames() ) {
-			String key = keyFromColumnName(colName);
+			String key = DashboardServerUtils.getKeyForName(colName);
 			DataColumnType thisColType = colTypes.get(k);
 			DataColumnType oldType = userColNamesToTypes.put(key, thisColType);
 			if ( ! thisColType.equals(oldType) )

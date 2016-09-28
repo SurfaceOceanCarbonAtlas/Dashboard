@@ -5,14 +5,43 @@ package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author Karl Smith
- *
  */
 public class DashboardServerUtils {
+
+	/** mapping from old unit names to new unit names */
+	public static final HashMap<String,String> RENAMED_UNITS;
+	static {
+		RENAMED_UNITS = new HashMap<String,String>();
+		RENAMED_UNITS.put("deg.E", "degrees_east");
+		RENAMED_UNITS.put("deg.W", "degrees_west");
+		RENAMED_UNITS.put("deg.N", "degrees_north");
+		RENAMED_UNITS.put("deg.S", "degrees_south");
+		RENAMED_UNITS.put("deg.C", "degrees C");
+		RENAMED_UNITS.put("deg.clk.N", "degrees");
+	}
+
+	/** Pattern for getKeyForName */
+	private static final Pattern stripPattern = Pattern.compile("[^a-z0-9]+");
+
+	/**
+	 * Computes a key for the given name which is case-insensitive and ignores 
+	 * non-alphanumeric characters.  The value returned is equivalent to 
+	 * <pre>name.toLowerCase().replaceAll("[^a-z0-9]+", "")</pre>
+	 * 
+	 * @param name
+	 * 		name to use
+	 * @return
+	 * 		key for the name
+	 */
+	public static String getKeyForName(String name) {
+		return stripPattern.matcher(name.toLowerCase()).replaceAll("");
+	}
 
 	// Pattern for checking for invalid characters in the expocode
 	private static final Pattern invalidExpocodePattern = 

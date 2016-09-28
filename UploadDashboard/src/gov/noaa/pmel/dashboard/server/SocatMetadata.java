@@ -16,14 +16,14 @@ import java.util.Map.Entry;
  */
 public class SocatMetadata {
 
-	public static final DashDataType SOCAT_VERSION = new DashDataType("socat_version", 
-			DashboardUtils.STRING_DATA_CLASS_NAME, "SOCAT Version number with status", 
+	public static final DashDataType SOCAT_VERSION = new DashDataType("SOCAT version",
+			"socat_version", DashboardUtils.STRING_DATA_CLASS_NAME, "SOCAT Version number with status", 
 			null, null, DashboardUtils.NO_UNITS);
-	public static final DashDataType ALL_REGION_IDS = new DashDataType("all_region_ids", 
-			DashboardUtils.STRING_DATA_CLASS_NAME, "Sorted unique region IDs", 
+	public static final DashDataType ALL_REGION_IDS = new DashDataType("all Region IDs",
+			"all_region_ids", DashboardUtils.STRING_DATA_CLASS_NAME, "Sorted unique region IDs", 
 			null, null, DashboardUtils.NO_UNITS);
-	public static final DashDataType SOCAT_DOI = new DashDataType("socat_doi", 
-			DashboardUtils.STRING_DATA_CLASS_NAME, "SOCAT DOI", 
+	public static final DashDataType SOCAT_DOI = new DashDataType("SOCAT DOI",
+			"socat_doi", DashboardUtils.STRING_DATA_CLASS_NAME, "DOI of SOCAT-enhanced data", 
 			null, null, DashboardUtils.NO_UNITS);
 
 	// Maps of variable names to values
@@ -52,7 +52,7 @@ public class SocatMetadata {
 	 * 		cannot be null or empty
 	 */
 	public SocatMetadata(KnownDataTypes knownTypes) {
-		if ( (knownTypes == null) || (knownTypes.size() < 1) )
+		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
 		stringValuesMap = new LinkedHashMap<DashDataType,String>();
 		doubleValuesMap = new LinkedHashMap<DashDataType,Double>();

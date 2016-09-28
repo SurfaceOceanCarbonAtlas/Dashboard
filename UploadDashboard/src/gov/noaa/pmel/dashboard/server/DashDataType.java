@@ -24,11 +24,21 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  */
 public class DashDataType {
 
+	private static final String DISPLAY_NAME_TAG = "display_name";
+	private static final String DATA_CLASS_NAME_TAG = "data_class";
+	private static final String DESCRIPTION_TAG = "description";
+	private static final String STANDARD_NAME_TAG = "standard_name";
+	private static final String CATEGORY_NAME_TAG = "category_name";
+	private static final String UNITS_TAG = "units";
+	
 	private DataColumnType dataType;
 
 	/**
 	 * Create with (copies of) the given values.
 	 * 
+	 * @param displayName
+	 * 		displayed name for this column type;
+	 * 		if null or blank, varName is used
 	 * @param varName
 	 * 		name for a variable of this type; 
 	 * 		cannot be null or blank
@@ -49,29 +59,37 @@ public class DashDataType {
 	 * @param units
 	 * 		unit strings associated with this type (copied);
 	 * 		if null or empty, a list with only {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the variable name is null or blank
 	 */
-	public DashDataType(String varName, String dataClassName, String description, 
-			String standardName, String categoryName, Collection<String> units) {
-		String myVarName;
-		if ( varName != null )
-			myVarName = varName.trim();
-		else
-			myVarName = "";
-		if ( myVarName.isEmpty() )
-			throw new IllegalArgumentException("varName is null or blank");
-		dataType = new DataColumnType(myVarName, dataClassName, description, standardName, categoryName, units);
+	public DashDataType(String displayName, String varName, String dataClassName, 
+			String description, String standardName, String categoryName, 
+				Collection<String> units) throws IllegalArgumentException {
+		dataType = new DataColumnType(displayName, varName, dataClassName, 
+				description, standardName, categoryName, units);
 	}
 
 	/**
 	 * Creates with (copies of) the values from the given DataColumnType
 	 * 
 	 * @param dtype
-	 * 		create with the variable name, data class type, description, standard name, 
-	 * 		category name, and units from this data column type
+	 * 		create with the information from this data column type
+	 * @throws IllegalArgumentException
+	 * 		if the variable name is null or blank
 	 */
 	public DashDataType(DataColumnType dtype) {
-		this(dtype.getVarName(), dtype.getDataClassName(), dtype.getDescription(), 
-				dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits());
+		this(dtype.getDisplayName(), dtype.getVarName(), dtype.getDataClassName(), 
+				dtype.getDescription(), dtype.getStandardName(), 
+				dtype.getCategoryName(), dtype.getUnits());
+	}
+
+	/**
+	 * @return 
+	 * 		the displayed name for this data column type;
+	 * 		never null or blank
+	 */
+	public String getDisplayName() {
+		return dataType.getDisplayName();
 	}
 
 	/**
@@ -131,63 +149,62 @@ public class DashDataType {
 	}
 
 	/**
-	 * Checks if the upper-cased variable name of this DashDataType 
-	 * is equal to that of another.
+	 * Checks if the variable or displayed name of this data type 
+	 * is equal, ignoring case and non-alphanumeric characters, 
+	 * to the given name.
 	 * 
 	 * @param other
 	 * 		data column type to compare to
 	 * @return
-	 * 		whether the "types" match
+	 * 		whether the type names match
+	 */
+	public boolean typeNameEquals(String name) {
+		if ( name == null )
+			return false;
+		String otherKey = DashboardServerUtils.getKeyForName(name);
+		if ( DashboardServerUtils.getKeyForName(dataType.getVarName()).equals(otherKey) )
+			return true;
+		if ( DashboardServerUtils.getKeyForName(dataType.getDisplayName()).equals(otherKey) )
+			return true;
+		return false;
+	}
+
+	/**
+	 * Checks if the variable or displayed name of this data type
+	 * is equal, ignoring case and non-alphanumeric characters, 
+	 * to either of those of this given data column type.
+	 * 
+	 * @param other
+	 * 		data column type to compare to
+	 * @return
+	 * 		whether the type names match
+	 */
+	public boolean typeNameEquals(DataColumnType other) {
+		if ( other == null )
+			return false;
+		if ( typeNameEquals(other.getVarName()) )
+			return true;
+		if ( typeNameEquals(other.getDisplayName()) )
+			return true;
+		return false;
+	}
+
+	/**
+	 * Checks if the variable or displayed name of this data type
+	 * is equal, ignoring case and non-alphanumeric characters, 
+	 * to either of those of another data type.
+	 * 
+	 * @param other
+	 * 		data type to compare to
+	 * @return
+	 * 		whether the type names match
 	 */
 	public boolean typeNameEquals(DashDataType other) {
 		if ( this == other )
 			return true;
 		if ( other == null )
 			return false;
-		return dataType.typeNameEquals(other.dataType);
-	}
-
-	/**
-	 * Checks if the upper-cased variable name of this DashDataType 
-	 * is equal to that of the given DataColumnType.
-	 * 
-	 * @param other
-	 * 		data column type to compare to
-	 * @return
-	 * 		whether the "types" match
-	 */
-	public boolean typeNameEquals(DataColumnType other) {
-		return dataType.typeNameEquals(other);
-	}
-
-	/**
-	 * Checks if the variable name and data class name of this DashDataType 
-	 * is equal to that of another.
-	 * 
-	 * @param other
-	 * 		data column type to compare to
-	 * @return
-	 * 		whether the types names match
-	 */
-	public boolean typeEquals(DashDataType other) {
-		if ( this == other )
-			return true;
-		if ( other == null )
-			return false;
-		return dataType.typeEquals(other.dataType);
-	}
-
-	/**
-	 * Checks if the variable name and data class name of this DashDataType 
-	 * is equal to that of the given DataColumnType.
-	 * 
-	 * @param other
-	 * 		data column type to compare to
-	 * @return
-	 * 		whether the types names match
-	 */
-	public boolean typeEquals(DataColumnType other) {
-		return dataType.typeEquals(other);
+		return typeNameEquals(other.dataType);
 	}
 
 	/**
@@ -200,43 +217,56 @@ public class DashDataType {
 	}
 
 	/**
+	 * Creates a JSON description string of this data types that can be
+	 * used as a Property value with a key that is the variable name 
+	 * of this data type.  The data types can be regenerated from the
+	 * variable name and this JSON description string using 
+	 * {@link #fromPropertyValue(String, String)}
+	 * 
 	 * @return
-	 * 		a JSON description string that can be used as a Property values
-	 * 		with a key that is the variable name.
+	 * 		the JSON description string of this data type
 	 */
 	public String toPropertyValue() {
 		JsonObject jsonObj = new JsonObject();
-		jsonObj.addProperty("dataClassName", dataType.getDataClassName());
-		String value = dataType.getDescription();
+		String value = dataType.getDisplayName();
 		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
-			jsonObj.addProperty("description", value);
+			jsonObj.addProperty(DISPLAY_NAME_TAG, value);
+		value = dataType.getDataClassName();
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+			jsonObj.addProperty(DATA_CLASS_NAME_TAG, value);
+		value = dataType.getDescription();
+		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
+			jsonObj.addProperty(DESCRIPTION_TAG, value);
 		value = dataType.getStandardName();
 		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
-			jsonObj.addProperty("standardName", value);
+			jsonObj.addProperty(STANDARD_NAME_TAG, value);
 		value = dataType.getCategoryName();
 		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
-			jsonObj.addProperty("categoryName", value);
+			jsonObj.addProperty(CATEGORY_NAME_TAG, value);
 		ArrayList<String> units = dataType.getUnits();
 		if ( ! DashboardUtils.NO_UNITS.equals(units) ) {
 			JsonArray jsonArr = new JsonArray();
 			for ( String val : dataType.getUnits() )
 				jsonArr.add(val);
-			jsonObj.add("units", jsonArr);
+			jsonObj.add(UNITS_TAG, jsonArr);
 		}
 		return jsonObj.toString();
 	}
 
 	/**
 	 * Create a DashDataType with the given variable name (Property key)
-	 * using the given JSON description string (Property value)
-	 * given by jsonDesc where:
-	 * 		tag: "dataClassName" gives the data class name,
-	 * 		tag: "description" gives the data type description,
-	 * 		tag: "standardName" gives the standard name,
-	 * 		tag: "categoryName" gives the category name, and
-	 * 		tag: "units" gives the units array.
-	 * The data class name must be given, but other tags may be omitted 
-	 * in which case the DashDataType default value is assigned.
+	 * using the given JSON description string (Property value) where: 
+	 * <ul>
+	 * 		<li>tag {@value #DISPLAY_NAME_TAG} gives the data display name,</li>
+	 * 		<li>tag {@value #DATA_CLASS_NAME_TAG} gives the data class name,</li>
+	 * 		<li>tag {@value #DESCRIPTION_TAG} gives the data type description,</li>
+	 * 		<li>tag {@value #STANDARD_NAME_TAG} gives the standard name,</li>
+	 * 		<li>tag {@value #CATEGORY_NAME_TAG} gives the category name, and</li>
+	 * 		<li>tag {@value #UNITS_TAG} gives the units array.</li>
+	 * </ul>
+	 * Tags can be omitted, in which case the default values as described by
+	 * {@link #DashDataType(String, String, String, String, String, String, Collection)}
+	 * is used.
 	 * 
 	 * @param varName
 	 * 		the variable name for the DashDataType
@@ -245,10 +275,16 @@ public class DashDataType {
 	 * @return
 	 * 		the newly created DashDataType
 	 * @throws IllegalArgumentException
+	 * 		if the variable name is null or empty, or
 	 * 		if the JSON description string cannot be parsed.
 	 */
-	static public DashDataType fromPropertyValue(String varName, String jsonDesc) {
+	static public DashDataType fromPropertyValue(String varName, 
+			String jsonDesc) throws IllegalArgumentException {
+		if ( (varName == null) || varName.trim().isEmpty() ) 
+			throw new IllegalArgumentException("invalid variable name");
+
 		JsonParser parser = new JsonParser();
+		String displayName = null;
 		String dataClassName = null;
 		String description = null;
 		String standardName = null;
@@ -258,40 +294,53 @@ public class DashDataType {
 			JsonObject jsonObj = parser.parse(jsonDesc).getAsJsonObject();
 			for ( Entry<String, JsonElement> prop : jsonObj.entrySet() ) {
 				String tag = prop.getKey();
+				boolean identified = false;
 				try {
-					if ( "dataClassName".equals(tag) ) {
+					if ( DISPLAY_NAME_TAG.equals(tag) ) {
+						displayName = prop.getValue().getAsString();
+						identified = true;
+					}
+					if ( DATA_CLASS_NAME_TAG.equals(tag) ) {
 						dataClassName = prop.getValue().getAsString();
+						identified = true;
 					}
-					else if ( "description".equals(tag) ) {
+					else if ( DESCRIPTION_TAG.equals(tag) ) {
 						description = prop.getValue().getAsString();
+						identified = true;
 					}
-					else if ( "standardName".equals(tag) ) {
+					else if ( STANDARD_NAME_TAG.equals(tag) ) {
 						standardName = prop.getValue().getAsString();
+						identified = true;
 					}
-					else if ( "categoryName".equals(tag) ) {
+					else if ( CATEGORY_NAME_TAG.equals(tag) ) {
 						categoryName = prop.getValue().getAsString();
+						identified = true;
 					}
 				} catch ( Exception ex ) {
 					throw new IllegalArgumentException("value of \"" + tag + 
-							"\" is not a string");
+							"\" is not a string", ex);
 				}
-				try {
-					if ( "units".equals(tag) ) {
+				if ( ( ! identified ) && UNITS_TAG.equals(tag) ) {
+					try {
 						units = new LinkedHashSet<String>();
 						for ( JsonElement jsonElem : prop.getValue().getAsJsonArray() ) {
 							units.add(jsonElem.getAsString());
+							identified = true;
 						}
+					} catch ( Exception ex ) {
+						throw new IllegalArgumentException("value of \"" + tag + 
+								"\" is not an JSON string array of strings", ex);
 					}
-				} catch ( Exception ex ) {
-					throw new IllegalArgumentException("value of \"" + tag + 
-							"\" is not an JSON array of strings");
 				}
+				if ( ! identified )
+					throw new IllegalArgumentException("unrecognized tag \"" + tag + "\"");
 			}
 		} catch ( Exception ex ) {
-			throw new IllegalArgumentException("Problems parsing the JSON description '" + 
-					jsonDesc + "' : " + ex.getMessage());
+			throw new IllegalArgumentException("Invalid JSON description of \"" + 
+					varName + "\" : " + ex.getMessage(), ex);
 		}
-		return new DashDataType(varName, dataClassName, description, standardName, categoryName, units);
+		return new DashDataType(displayName, varName, dataClassName, 
+				description, standardName, categoryName, units);
 	}
 
 	@Override
@@ -316,13 +365,14 @@ public class DashDataType {
 
 	@Override
 	public String toString() {
-		return "DashDataType[varName=" + dataType.getVarName() + 
-				", dataClassName=" + dataType.getDataClassName() + 
-				", description=" + dataType.getDescription() + 
-				", standardName=" + dataType.getStandardName() + 
-				", categoryName=" + dataType.getCategoryName() + 
-				", units=" + dataType.getUnits().toString() + 
-				"]";
+		return "DashDataType[ " +
+				"displayName=\"" + dataType.getDisplayName() + "\", " +
+				"varName=\"" + dataType.getVarName() + "\", " +
+				"dataClassName=\"" + dataType.getDataClassName() + "\", " +
+				"description=\"" + dataType.getDescription() + "\", " +
+				"standardName=\"" + dataType.getStandardName() + "\", " +
+				"categoryName=\"" + dataType.getCategoryName() + "\", " +
+				"units=" + dataType.getUnits().toString() + " ]";
 	}
 
 }

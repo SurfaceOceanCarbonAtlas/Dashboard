@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -98,6 +99,8 @@ public class KnownDataTypesTest {
 					KnownDataTypes.QC_FLAG
 					) );
 
+	static final String[] ADDN_TYPES_DISPLAY_NAMES = new String[] {
+		"xCO2 atm dry", "ranking", "SOCAT DOI" };
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
 		"xCO2_atm_dry_interp", "rank", "socat_doi" };
 	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { 
@@ -117,15 +120,16 @@ public class KnownDataTypesTest {
 			new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
 	static final DashDataType[] ADDN_DATA_TYPES = new DashDataType[] {
-		new DashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], 
-				ADDN_TYPES_DESCRIPTIONS[0], ADDN_TYPES_STANDARD_NAMES[0], 
-				ADDN_TYPES_CATEGORY_NAMES[0], MOL_FRACTION_UNITS),
-		new DashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], 
-				ADDN_TYPES_DESCRIPTIONS[1], null, 
-				null, null),
-		new DashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], 
-				ADDN_TYPES_DESCRIPTIONS[2], ADDN_TYPES_STANDARD_NAMES[2], 
-				ADDN_TYPES_CATEGORY_NAMES[2], null)
+		new DashDataType(ADDN_TYPES_DISPLAY_NAMES[0], ADDN_TYPES_VAR_NAMES[0], 
+				ADDN_TYPES_CLASS_NAMES[0], ADDN_TYPES_DESCRIPTIONS[0], 
+				ADDN_TYPES_STANDARD_NAMES[0], ADDN_TYPES_CATEGORY_NAMES[0], 
+				MOL_FRACTION_UNITS),
+		new DashDataType(ADDN_TYPES_DISPLAY_NAMES[1], ADDN_TYPES_VAR_NAMES[1], 
+				ADDN_TYPES_CLASS_NAMES[1], ADDN_TYPES_DESCRIPTIONS[1], 
+				null, null, null),
+		new DashDataType(ADDN_TYPES_DISPLAY_NAMES[2], ADDN_TYPES_VAR_NAMES[2], 
+				ADDN_TYPES_CLASS_NAMES[2], ADDN_TYPES_DESCRIPTIONS[2], 
+				ADDN_TYPES_STANDARD_NAMES[2], ADDN_TYPES_CATEGORY_NAMES[2], null)
 	};
 
 	static final String ADDN_TYPES_PROPERTIES_STRING = 
@@ -135,23 +139,37 @@ public class KnownDataTypesTest {
 			
 	/**
 	 * Test method for 
+	 * {@link gov.noaa.pmel.dashboard.server.DashboardServerUtils#getKeyForName(java.lang.String)}
+	 */
+	@Test
+	public void testGetKeyForName() {
+		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2_atm_dry_interp"));
+		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2 Atm Dry Interp"));
+		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2; Atm; Dry; Interp"));
+		assertEquals("xco2atmdryinterp", DashboardServerUtils.getKeyForName("xCO2, Atm, Dry, Interp"));
+		assertEquals("other", DashboardServerUtils.getKeyForName("(other)"));
+	}
+
+	/**
+	 * Test method for 
 	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForUsers()},
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#size()}, and
+	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#isEmpty()}, and
 	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
 	public void testAddStandardTypesForClient() {
 		KnownDataTypes types = new KnownDataTypes();
+		assertTrue( types.isEmpty() );
 		KnownDataTypes other = types.addStandardTypesForUsers();
+		assertFalse( types.isEmpty() );
 		assertTrue( types == other );
-		assertEquals(USERS_VARNAMES.size(), types.size());
+		assertEquals(USERS_VARNAMES.size(), types.getKnownTypesSet().size());
 		for ( String varName : USERS_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
 	}
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForMetadataFiles()},
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#size()}, and
 	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
@@ -159,7 +177,6 @@ public class KnownDataTypesTest {
 		KnownDataTypes types = new KnownDataTypes();
 		KnownDataTypes other = types.addStandardTypesForMetadataFiles();
 		assertTrue( types == other );
-		assertEquals(METADATA_FILES_VARNAMES.size(), types.size());
 		for ( String varName : METADATA_FILES_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
 		assertFalse( types.containsTypeName(DashboardUtils.UNKNOWN.getVarName()) );
@@ -168,7 +185,6 @@ public class KnownDataTypesTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#addStandardTypesForDataFiles()},
-	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#size()}, and
 	 * {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#containsTypeName(java.lang.String)}.
 	 */
 	@Test
@@ -176,7 +192,6 @@ public class KnownDataTypesTest {
 		KnownDataTypes types = new KnownDataTypes();
 		KnownDataTypes other = types.addStandardTypesForDataFiles();
 		assertTrue( types == other );
-		assertEquals(DATA_FILES_VARNAMES.size(), types.size());
 		for ( String varName : DATA_FILES_VARNAMES )
 			assertTrue( types.containsTypeName(varName) );
 		assertFalse( types.containsTypeName(DashboardUtils.UNKNOWN.getVarName()) );
@@ -232,7 +247,7 @@ public class KnownDataTypesTest {
 		assertEquals(new HashSet<String>(Arrays.asList(ADDN_TYPES_VAR_NAMES)), props.keySet());
 		KnownDataTypes other = clientTypes.addTypesFromProperties(props);
 		assertTrue( clientTypes == other );
-		assertEquals(USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.size());
+		assertEquals(USERS_VARNAMES.size() + ADDN_TYPES_VAR_NAMES.length, clientTypes.getKnownTypesSet().size());
 		for (int k = 0; k < ADDN_TYPES_VAR_NAMES.length; k++) {
 			assertEquals(ADDN_DATA_TYPES[k].duplicate(), clientTypes.getDataColumnType(ADDN_TYPES_VAR_NAMES[k]));
 		}
