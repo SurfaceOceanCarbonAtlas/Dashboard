@@ -724,7 +724,7 @@ public class SanityCheckerTest {
 					colSpec, cruiseData, "MM-DD-YYYY");
 		Output output = checker.process();
 		assertTrue( output.processedOK() );
-		assertTrue( output.hasWarnings() );
+		assertFalse( output.hasWarnings() );
 		assertTrue( output.hasErrors() );
 		
 	}
