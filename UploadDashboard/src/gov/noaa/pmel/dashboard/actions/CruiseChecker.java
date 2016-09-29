@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
@@ -141,10 +140,11 @@ public class CruiseChecker {
 	}
 
 	/**
-	 * Data units used by the sanity checker corresponding to {@link #STD_DATA_UNITS}
+	 * Data units used by the sanity checker where they do not match
+	 * those already specified for the type.
 	 */
-	private static final HashMap<DashDataType,ArrayList<String>> CHECKER_DATA_UNITS = 
-			new HashMap<DashDataType,ArrayList<String>>();
+	private static final HashMap<String,ArrayList<String>> CHECKER_DATA_UNITS = 
+			new HashMap<String,ArrayList<String>>();
 	static {
 		final ArrayList<String> checkerTimestampDateUnits = 
 				new ArrayList<String>(DashboardUtils.TIMESTAMP_UNITS.size());
@@ -163,70 +163,29 @@ public class CruiseChecker {
 		final ArrayList<String> checkerDirectionUnits = 
 				new ArrayList<String>(Arrays.asList("decimal_degrees"));
 
-		// UNKNOWN should not be processed by the sanity checker
+		CHECKER_DATA_UNITS.put(KnownDataTypes.TIMESTAMP.getVarName(), checkerTimestampDateUnits);
 
-		CHECKER_DATA_UNITS.put(KnownDataTypes.EXPOCODE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DATASET_NAME, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.VESSEL_NAME, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.ORGANIZATION_NAME, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.INVESTIGATOR_NAMES, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.LONGITUDE.getVarName(), checkerLongitudeUnits);
 
-		CHECKER_DATA_UNITS.put(KnownDataTypes.TIMESTAMP, checkerTimestampDateUnits);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DATE, DashboardUtils.DATE_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.YEAR, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.MONTH_OF_YEAR, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DAY_OF_MONTH, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.TIME_OF_DAY, DashboardUtils.TIME_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.HOUR_OF_DAY, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.MINUTE_OF_HOUR, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.SECOND_OF_MINUTE, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.DAY_OF_YEAR, DashboardUtils.DAY_OF_YEAR_UNITS);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.SECOND_OF_DAY, DashboardUtils.NO_UNITS);
+		CHECKER_DATA_UNITS.put(KnownDataTypes.LATITUDE.getVarName(), checkerLatitudeUnits);
 
-		CHECKER_DATA_UNITS.put(KnownDataTypes.LONGITUDE, checkerLongitudeUnits);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.LATITUDE, checkerLatitudeUnits);
-		CHECKER_DATA_UNITS.put(KnownDataTypes.SAMPLE_DEPTH, DashboardUtils.DEPTH_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.SALINITY, checkerSalinityUnits);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.TEQU, checkerTemperatureUnits);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.SST, checkerTemperatureUnits);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.TATM, checkerTemperatureUnits);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.PEQU, SocatCruiseData.PRESSURE_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.PATM, SocatCruiseData.PRESSURE_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XH2O_EQU, SocatCruiseData.XH2O_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.SALINITY.getVarName(), checkerSalinityUnits);
 
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_TEQU_DRY, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_SST_DRY, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_TEQU_WET, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_SST_WET, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.PCO2_WATER_TEQU_WET, SocatCruiseData.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.PCO2_WATER_SST_WET, SocatCruiseData.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.FCO2_WATER_TEQU_WET, SocatCruiseData.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.FCO2_WATER_SST_WET, SocatCruiseData.PCO2_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.TEQU.getVarName(), checkerTemperatureUnits);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.SST.getVarName(), checkerTemperatureUnits);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.TATM.getVarName(), checkerTemperatureUnits);
 
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_ATM_DRY_ACTUAL, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_ATM_DRY_INTERP, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.PCO2_ATM_WET_ACTUAL, SocatCruiseData.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.PCO2_ATM_WET_INTERP, SocatCruiseData.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.FCO2_ATM_WET_ACTUAL, SocatCruiseData.FCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.FCO2_ATM_WET_INTERP, SocatCruiseData.FCO2_UNITS);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_TEQU_DRY.getVarName(), checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_SST_DRY.getVarName(), checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_TEQU_WET.getVarName(), checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_WATER_SST_WET.getVarName(), checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_ATM_DRY_ACTUAL.getVarName(), checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.XCO2_ATM_DRY_INTERP.getVarName(), checkerXCO2Units);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.DELTA_XCO2.getVarName(), checkerXCO2Units);
 
-		CHECKER_DATA_UNITS.put(SocatCruiseData.DELTA_XCO2, checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.DELTA_PCO2, SocatCruiseData.PCO2_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.DELTA_FCO2, SocatCruiseData.FCO2_UNITS);
-
-		CHECKER_DATA_UNITS.put(SocatCruiseData.RELATIVE_HUMIDITY, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.SPECIFIC_HUMIDITY, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.SHIP_SPEED, SocatCruiseData.SHIP_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.SHIP_DIRECTION, checkerDirectionUnits);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_SPEED_TRUE, SocatCruiseData.WIND_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_SPEED_RELATIVE, SocatCruiseData.WIND_SPEED_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_DIRECTION_TRUE, checkerDirectionUnits);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_DIRECTION_RELATIVE, checkerDirectionUnits);
-
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WOCE_CO2_WATER, DashboardUtils.NO_UNITS);
-		CHECKER_DATA_UNITS.put(SocatCruiseData.WOCE_CO2_ATM, DashboardUtils.NO_UNITS);
-
-		// COMMENT... and OTHER should not be processed by the sanity checker
+		CHECKER_DATA_UNITS.put(SocatCruiseData.SHIP_DIRECTION.getVarName(), checkerDirectionUnits);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_DIRECTION_TRUE.getVarName(), checkerDirectionUnits);
+		CHECKER_DATA_UNITS.put(SocatCruiseData.WIND_DIRECTION_RELATIVE.getVarName(), checkerDirectionUnits);
 	}
 
 	private CheckerMessageHandler msgHandler;
@@ -370,6 +329,12 @@ public class CruiseChecker {
 						"Data type not defined for column " + Integer.toString(k+1) + 
 						": " + cruiseData.getUserColNames().get(k));
 			}
+			else if ( SocatCruiseData.COMMENT_WOCE_CO2_WATER.typeNameEquals(colType) ||
+					  SocatCruiseData.COMMENT_WOCE_CO2_ATM.typeNameEquals(colType) ||
+					  colType.typeNameEquals(DashboardUtils.OTHER) ) {
+				// Unchecked data 
+				;
+			}
 			// DATETIME_TIMESTAMP
 			else if ( KnownDataTypes.TIMESTAMP.typeNameEquals(colType) && 
 					DateTimeType.DATETIME_TIMESTAMP.equals(timeSpec) ) {
@@ -379,7 +344,7 @@ public class CruiseChecker {
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 				int idx = colType.getSelectedUnitIndex();
-				dateFormat = CHECKER_DATA_UNITS.get(colType).get(idx);
+				dateFormat = CHECKER_DATA_UNITS.get(colType.getVarName()).get(idx);
 			}
 			// DATETIME_DATA_TIME
 			else if ( KnownDataTypes.DATE.typeNameEquals(colType) && 
@@ -390,7 +355,7 @@ public class CruiseChecker {
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				timestampElements[0] = userElement;
 				int idx = colType.getSelectedUnitIndex();
-				dateFormat = CHECKER_DATA_UNITS.get(colType).get(idx);
+				dateFormat = colType.getUnits().get(idx);
 			}
 			else if ( KnownDataTypes.TIME_OF_DAY.typeNameEquals(colType) && 
 					  DateTimeType.DATETIME_DATE_TIME.equals(timeSpec) ) {
@@ -547,79 +512,22 @@ public class CruiseChecker {
 				timestampElements[3] = userElement;
 			}
 			// Not involved with date/time specification
-			else if ( KnownDataTypes.EXPOCODE.typeNameEquals(colType) || 
-					  KnownDataTypes.DATASET_NAME.typeNameEquals(colType) || 
-					  KnownDataTypes.VESSEL_NAME.typeNameEquals(colType) || 
-					  KnownDataTypes.ORGANIZATION_NAME.typeNameEquals(colType) || 
-					  KnownDataTypes.INVESTIGATOR_NAMES.typeNameEquals(colType) || 
-
-					  KnownDataTypes.TIMESTAMP.typeNameEquals(colType) ||
-					  KnownDataTypes.DATE.typeNameEquals(colType) ||
-					  KnownDataTypes.YEAR.typeNameEquals(colType) ||
-					  KnownDataTypes.MONTH_OF_YEAR.typeNameEquals(colType) ||
-					  KnownDataTypes.DAY_OF_MONTH.typeNameEquals(colType) ||
-					  KnownDataTypes.TIME_OF_DAY.typeNameEquals(colType) ||
-					  KnownDataTypes.HOUR_OF_DAY.typeNameEquals(colType) ||
-					  KnownDataTypes.MINUTE_OF_HOUR.typeNameEquals(colType) ||
-					  KnownDataTypes.SECOND_OF_MINUTE.typeNameEquals(colType) ||
-					  KnownDataTypes.DAY_OF_YEAR.typeNameEquals(colType) ||
-					  KnownDataTypes.SECOND_OF_DAY.typeNameEquals(colType) ||
-
-					  KnownDataTypes.LONGITUDE.typeNameEquals(colType) || 
-					  KnownDataTypes.LATITUDE.typeNameEquals(colType) || 
-					  KnownDataTypes.SAMPLE_DEPTH.typeNameEquals(colType) || 
-					  SocatCruiseData.SALINITY.typeNameEquals(colType) || 
-					  SocatCruiseData.TEQU.typeNameEquals(colType) || 
-					  SocatCruiseData.SST.typeNameEquals(colType) || 
-					  SocatCruiseData.TATM.typeNameEquals(colType) || 
-					  SocatCruiseData.PEQU.typeNameEquals(colType) || 
-					  SocatCruiseData.PATM.typeNameEquals(colType) || 
-					  SocatCruiseData.XH2O_EQU.typeNameEquals(colType) || 
-
-					  SocatCruiseData.XCO2_WATER_TEQU_DRY.typeNameEquals(colType) ||
-					  SocatCruiseData.XCO2_WATER_SST_DRY.typeNameEquals(colType) ||
-					  SocatCruiseData.XCO2_WATER_TEQU_WET.typeNameEquals(colType) ||
-					  SocatCruiseData.XCO2_WATER_SST_WET.typeNameEquals(colType) ||
-					  SocatCruiseData.PCO2_WATER_TEQU_WET.typeNameEquals(colType) ||
-					  SocatCruiseData.PCO2_WATER_SST_WET.typeNameEquals(colType) ||
-					  SocatCruiseData.FCO2_WATER_TEQU_WET.typeNameEquals(colType) ||
-					  SocatCruiseData.FCO2_WATER_SST_WET.typeNameEquals(colType) || 
-
-					  SocatCruiseData.XCO2_ATM_DRY_ACTUAL.typeNameEquals(colType) || 
-					  SocatCruiseData.XCO2_ATM_DRY_INTERP.typeNameEquals(colType) || 
-					  SocatCruiseData.PCO2_ATM_WET_ACTUAL.typeNameEquals(colType) || 
-					  SocatCruiseData.PCO2_ATM_WET_INTERP.typeNameEquals(colType) || 
-					  SocatCruiseData.FCO2_ATM_WET_ACTUAL.typeNameEquals(colType) || 
-					  SocatCruiseData.FCO2_ATM_WET_INTERP.typeNameEquals(colType) || 
-
-					  SocatCruiseData.DELTA_XCO2.typeNameEquals(colType) || 
-					  SocatCruiseData.DELTA_PCO2.typeNameEquals(colType) || 
-					  SocatCruiseData.DELTA_FCO2.typeNameEquals(colType) || 
-
-					  SocatCruiseData.RELATIVE_HUMIDITY.typeNameEquals(colType) || 
-					  SocatCruiseData.SPECIFIC_HUMIDITY.typeNameEquals(colType) || 
-					  SocatCruiseData.SHIP_SPEED.typeNameEquals(colType) || 
-					  SocatCruiseData.SHIP_DIRECTION.typeNameEquals(colType) || 
-					  SocatCruiseData.WIND_SPEED_TRUE.typeNameEquals(colType) || 
-					  SocatCruiseData.WIND_SPEED_RELATIVE.typeNameEquals(colType) || 
-					  SocatCruiseData.WIND_DIRECTION_TRUE.typeNameEquals(colType) || 
-					  SocatCruiseData.WIND_DIRECTION_RELATIVE.typeNameEquals(colType) ||
-
-					  SocatCruiseData.WOCE_CO2_WATER.typeNameEquals(colType) ||
-					  SocatCruiseData.WOCE_CO2_ATM.typeNameEquals(colType) ) {
+			else {
 				// Element specifying the units of the column
 				Element unitsElement = new Element(ColumnSpec.INPUT_UNITS_ELEMENT_NAME);
 				int idx = colType.getSelectedUnitIndex();
-				unitsElement.setText(CHECKER_DATA_UNITS.get(colType).get(idx));
+				// See if there are alternate unit strings for the checker for this data type
+				ArrayList<String> checkerUnits = CHECKER_DATA_UNITS.get(colType.getVarName());
+				if ( checkerUnits == null )
+					checkerUnits = colType.getUnits();
+				unitsElement.setText(checkerUnits.get(idx));
 				// Element specifying the index and user name of the column
 				Element userElement = new Element(ColumnSpec.INPUT_COLUMN_ELEMENT_NAME);
-				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, 
-											Integer.toString(k+1));
+				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));
 				userElement.setText(cruiseData.getUserColNames().get(k));
 				// Standard column name for the checker
 				Element columnElement = new Element(ColumnSpec.SOCAT_COLUMN_ELEMENT); 
-				columnElement.setAttribute(ColumnSpec.SOCAT_COLUMN_NAME_ATTRIBUTE, 
-						colType.getVarName());
+				columnElement.setAttribute(ColumnSpec.SOCAT_COLUMN_NAME_ATTRIBUTE, colType.getVarName());
 				// Add the index and user name element, and the units element
 				columnElement.addContent(userElement);
 				columnElement.addContent(unitsElement);
@@ -632,19 +540,6 @@ public class CruiseChecker {
 				}
 				// Add this column description to the root element
 				rootElement.addContent(columnElement);
-			}
-			else if ( SocatCruiseData.COMMENT_WOCE_CO2_WATER.typeNameEquals(colType) ||
-					  SocatCruiseData.COMMENT_WOCE_CO2_ATM.typeNameEquals(colType) ||
-					  colType.typeNameEquals(DashboardUtils.OTHER) ) {
-				// Unchecked data 
-				;
-			}
-			else {
-				// Should never happen
-				throw new IllegalArgumentException(
-						"Unexpected data column of type " +	colType + "\n" +
-						"    for column " + Integer.toString(k+1) + ": " + 
-						cruiseData.getUserColNames().get(k));
 			}
 		}
 		// Add the ordered complete timestamp element to the root element
@@ -999,62 +894,14 @@ public class CruiseChecker {
 				else if ( KnownDataTypes.LATITUDE.typeNameEquals(colType) ) {
 					rowData.set(k, Double.toString(stdVals.getLatitude()));
 				}
-				else if ( KnownDataTypes.DAY_OF_YEAR.typeNameEquals(colType) || 
-						  KnownDataTypes.SECOND_OF_DAY.typeNameEquals(colType) || 
-						  KnownDataTypes.SAMPLE_DEPTH.typeNameEquals(colType) || 
-						  SocatCruiseData.SALINITY.typeNameEquals(colType) || 
-						  SocatCruiseData.TEQU.typeNameEquals(colType) || 
-						  SocatCruiseData.SST.typeNameEquals(colType) || 
-						  SocatCruiseData.TATM.typeNameEquals(colType) || 
-						  SocatCruiseData.PEQU.typeNameEquals(colType) || 
-						  SocatCruiseData.PATM.typeNameEquals(colType) || 
-
-						  SocatCruiseData.XCO2_WATER_TEQU_DRY.typeNameEquals(colType) || 
-						  SocatCruiseData.XCO2_WATER_SST_DRY.typeNameEquals(colType) || 
-						  SocatCruiseData.XCO2_WATER_TEQU_WET.typeNameEquals(colType) || 
-						  SocatCruiseData.XCO2_WATER_SST_WET.typeNameEquals(colType) || 
-						  SocatCruiseData.PCO2_WATER_TEQU_WET.typeNameEquals(colType) || 
-						  SocatCruiseData.PCO2_WATER_SST_WET.typeNameEquals(colType) || 
-						  SocatCruiseData.FCO2_WATER_TEQU_WET.typeNameEquals(colType) || 
-						  SocatCruiseData.FCO2_WATER_SST_WET.typeNameEquals(colType) || 
-
-						  SocatCruiseData.XCO2_ATM_DRY_ACTUAL.typeNameEquals(colType) || 
-						  SocatCruiseData.XCO2_ATM_DRY_INTERP.typeNameEquals(colType) || 
-						  SocatCruiseData.PCO2_ATM_WET_ACTUAL.typeNameEquals(colType) || 
-						  SocatCruiseData.PCO2_ATM_WET_INTERP.typeNameEquals(colType) || 
-						  SocatCruiseData.FCO2_ATM_WET_ACTUAL.typeNameEquals(colType) || 
-						  SocatCruiseData.FCO2_ATM_WET_INTERP.typeNameEquals(colType) || 
-
-						  SocatCruiseData.DELTA_XCO2.typeNameEquals(colType) || 
-						  SocatCruiseData.DELTA_PCO2.typeNameEquals(colType) || 
-						  SocatCruiseData.DELTA_FCO2.typeNameEquals(colType) || 
-
-						  SocatCruiseData.XH2O_EQU.typeNameEquals(colType) || 
-						  SocatCruiseData.RELATIVE_HUMIDITY.typeNameEquals(colType) || 
-						  SocatCruiseData.SPECIFIC_HUMIDITY.typeNameEquals(colType) || 
-						  SocatCruiseData.SHIP_SPEED.typeNameEquals(colType) || 
-						  SocatCruiseData.SHIP_DIRECTION.typeNameEquals(colType) || 
-						  SocatCruiseData.WIND_SPEED_TRUE.typeNameEquals(colType) || 
-						  SocatCruiseData.WIND_SPEED_RELATIVE.typeNameEquals(colType) || 
-						  SocatCruiseData.WIND_DIRECTION_TRUE.typeNameEquals(colType) || 
-						  SocatCruiseData.WIND_DIRECTION_RELATIVE.typeNameEquals(colType) ||
-
-						  SocatCruiseData.WOCE_CO2_WATER.typeNameEquals(colType) || 
-						  SocatCruiseData.WOCE_CO2_ATM.typeNameEquals(colType) ) {
+				else {
 					String chkName = colType.getVarName();
 					SocatDataColumn stdCol = stdVals.getColumn(chkName);
 					if ( stdCol == null )
-						throw new IllegalArgumentException("SocatDataColumn not found for " + 
+						throw new IllegalArgumentException("Checker data column not found for " + 
 								chkName + " (column type " + colType + ")");
 					String value = stdCol.getValue();
 					rowData.set(k, value);
-				}
-				else {
-					// Should never happen
-					throw new IllegalArgumentException(
-							"Unexpected data column of type " +	colType + "\n" +
-									"    for column " + Integer.toString(k+1) + ": " + 
-									cruiseData.getUserColNames().get(k));
 				}
 			}
 		}

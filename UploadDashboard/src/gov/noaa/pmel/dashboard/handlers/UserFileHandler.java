@@ -110,10 +110,18 @@ public class UserFileHandler extends VersionedFileHandler {
 				throw new IllegalArgumentException("invalid type,unit,missing value \"" + 
 						propVal + "\" for key \"" + colName + "\" given in " +
 						propFile.getPath());
+
 			DataColumnType dctype = userTypes.getDataColumnType(vals[0]);
+			if ( dctype == null ) {
+				// See if there is a modified version of this type name
+				String newName = DashboardServerUtils.RENAMED_DATA_TYPES.get(vals[0]);
+				if ( newName != null )
+					dctype = userTypes.getDataColumnType(newName);
+			}
 			if ( dctype == null )
-				throw new IllegalArgumentException("Unknown data type variable \"" + 
+				throw new IllegalArgumentException("Unknown data type \"" + 
 						vals[0] + "\" for tag \"" + colName + "\"");
+
 			int index = dctype.getUnits().indexOf(vals[1]);
 			if ( index < 0 ) {
 				// see if there is a modified version of this unit
@@ -123,7 +131,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			}
 			if ( index < 0 )
 				throw new IllegalArgumentException("Unknown data unit \"" + vals[1] + 
-						"\" for data type variable \"" + vals[0] + "\"");
+						"\" for data type \"" + vals[0] + "\"");
 			dctype.setSelectedUnitIndex(index);
 			dctype.setSelectedMissingValue(vals[2]);
 			dataColNamesToTypes.put(colName, dctype);

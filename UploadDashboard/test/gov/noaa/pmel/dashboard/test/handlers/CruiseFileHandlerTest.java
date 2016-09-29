@@ -21,6 +21,7 @@ import org.junit.Test;
 /**
  * Test of {@link gov.noaa.pmel.dashboard.handlers.CruiseFileHandler}.
  * Uses an existing SocatUploadDashboard installation
+ * 
  * @author Karl Smith
  *
  */
@@ -29,7 +30,7 @@ public class CruiseFileHandlerTest {
 	private static final String CSV_DATA = 
 			  "Expocode: 00KS20120419 , , , , , , , , , , , , , , , , , , ,\n"
 			+ "Ship: Atlantis         , , , , , , , , , , , , , , , , , , ,\n"
-			+ "PI: Wanninkhof, R.     , , , , , , , , , , , , , , , , , , ,\n"
+			+ "\"PI: Wanninkhof, R.\"     , , , , , , , , , , , , , , , , , , ,\n"
 			+ ", , , , , , , , , , , , , , , , , , ,\n" 
 			+ "Group_Ship,Cruise ID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,xCO2_EQU_ppm,xCO2_ATM_ppm,xCO2_ATM_interpolated_ppm,PRES_EQU_hPa,PRES_ATM@SSP_hPa,TEMP_EQU_C,SST_C,SAL_permil,fCO2_SW@SST_uatm,fCO2_ATM_interpolated_uatm,dfCO2_uatm,WOCE_QC_FLAG,QC_SUBFLAG\n"
 			+ "AOML_Atlantis,20-01B,110.79219,19042012,19:00:45,12.638,-59.239,394.227,-999,395.34,1009.3,1012.01,27.55,27.4844,35.17,376.43,379.65,-3.22,2,\n"
@@ -69,14 +70,27 @@ public class CruiseFileHandlerTest {
 	 */
 	@Test
 	public void testAssignCruiseDataFromInput() throws IOException {
+		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
 		CruiseFileHandler dataHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
 		BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA)); 
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
 		dataHandler.assignCruiseDataFromInput(cruiseData, DashboardUtils.CRUISE_FORMAT_COMMA, cruiseReader, 0, -1, true);
 		
-		assertEquals(META_PREAMBLE, cruiseData.getPreamble());
-		assertEquals(HEADERS, cruiseData.getUserColNames());
-		assertEquals(DATA_ARRAY, cruiseData.getDataValues());
+		assertEquals(META_PREAMBLE.size(), cruiseData.getPreamble().size());
+		for (int k = 0; k < META_PREAMBLE.size(); k++)
+			assertEquals(META_PREAMBLE.get(k), cruiseData.getPreamble().get(k));
+		assertEquals(HEADERS.size(), cruiseData.getUserColNames().size());
+		for (int k = 0; k < HEADERS.size(); k++)
+			assertEquals(HEADERS.get(k), cruiseData.getUserColNames().get(k));
+		assertEquals(DATA_ARRAY.size(), cruiseData.getDataValues().size());
+		for (int k = 0; k < DATA_ARRAY.size(); k++) {
+			ArrayList<String> expected = DATA_ARRAY.get(k);
+			ArrayList<String> found = cruiseData.getDataValues().get(k);
+			assertEquals(expected.size(), found.size());
+			for (int j = 0; j < expected.size(); j++)
+				assertEquals(expected.get(j), found.get(j));
+			
+		}
 	}
 
 }

@@ -14,9 +14,32 @@ import java.util.regex.Pattern;
  */
 public class DashboardServerUtils {
 
+	/** mapping of old user data type (enumerated variable) names to new data type names */
+	public static final HashMap<String,String> RENAMED_DATA_TYPES;
+
 	/** mapping from old unit names to new unit names */
 	public static final HashMap<String,String> RENAMED_UNITS;
+
 	static {
+		RENAMED_DATA_TYPES = new HashMap<String,String>();
+		RENAMED_DATA_TYPES.put("ATMOSPHERIC_TEMPERATURE", SocatCruiseData.TATM.getVarName());
+		RENAMED_DATA_TYPES.put("CRUISE_NAME", KnownDataTypes.DATASET_NAME.getVarName());
+		RENAMED_DATA_TYPES.put("GROUP_NAME", KnownDataTypes.ORGANIZATION_NAME.getVarName());
+		RENAMED_DATA_TYPES.put("EQUILIBRATOR_PRESSURE", SocatCruiseData.PEQU.getVarName());
+		RENAMED_DATA_TYPES.put("EQUILIBRATOR_TEMPERATURE", SocatCruiseData.TEQU.getVarName());
+		RENAMED_DATA_TYPES.put("INVESTIGATOR_NAMES", KnownDataTypes.INVESTIGATOR_NAMES.getVarName());
+		RENAMED_DATA_TYPES.put("SEA_LEVEL_PRESSURE", SocatCruiseData.PATM.getVarName());
+		RENAMED_DATA_TYPES.put("SEA_SURFACE_TEMPERATURE", SocatCruiseData.SST.getVarName());
+		RENAMED_DATA_TYPES.put("SECOND_OF_DAY", KnownDataTypes.SECOND_OF_DAY.getVarName());
+		RENAMED_DATA_TYPES.put("SHIP_DIRECTION", SocatCruiseData.SHIP_DIRECTION.getVarName());
+		RENAMED_DATA_TYPES.put("SHIP_NAME", KnownDataTypes.VESSEL_NAME.getVarName());
+		RENAMED_DATA_TYPES.put("TIME", KnownDataTypes.TIME_OF_DAY.getVarName());
+		RENAMED_DATA_TYPES.put("TIMESTAMP", KnownDataTypes.TIMESTAMP.getVarName());
+		RENAMED_DATA_TYPES.put("WIND_DIRECTION_TRUE", SocatCruiseData.WIND_DIRECTION_TRUE.getVarName());
+		RENAMED_DATA_TYPES.put("WIND_DIRECTION_RELATIVE", SocatCruiseData.WIND_DIRECTION_RELATIVE.getVarName());
+		RENAMED_DATA_TYPES.put("WIND_SPEED_RELATIVE", SocatCruiseData.WIND_SPEED_RELATIVE.getVarName());
+		RENAMED_DATA_TYPES.put("XH2O_EQU", SocatCruiseData.XH2O_EQU.getVarName());
+
 		RENAMED_UNITS = new HashMap<String,String>();
 		RENAMED_UNITS.put("deg.E", "degrees_east");
 		RENAMED_UNITS.put("deg.W", "degrees_west");

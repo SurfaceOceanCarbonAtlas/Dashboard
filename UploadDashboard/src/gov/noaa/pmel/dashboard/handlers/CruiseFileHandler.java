@@ -247,6 +247,8 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	 * data value strings, or data value strings matching "null", "NaN", 
 	 * "NA", "N/A" (all case insensitive), are set to 
 	 * {@value #MISSING_VALUE_STRING} to indicate a missing value.
+	 * Note: blank lines are not detected when skipping initial data lines
+	 * (when firstDataRow > 0).
 	 * 
 	 * @param cruiseData
 	 * 		assign cruise data here
@@ -452,13 +454,25 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				}
 
 				dataRowNum++;
+				// Blank lines are NOT detected when skipping lines,
+				// but lines are skipped only with already-processed data,
+				// so blank lines should already have been eliminated.
 				if ( dataRowNum > firstDataRow ) {
 					ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
-					for ( String val : record )
+					boolean allBlank = true;
+					for ( String val : record ) {
 						datavals.add(val);
-					dataValues.add(datavals);
-					if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
-						break;
+						if ( allBlank && ( ! val.trim().isEmpty() ) )
+							allBlank = false;
+					}
+					if ( ! allBlank ) {
+						dataValues.add(datavals);
+						if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
+							break;
+					}
+					else {
+						dataRowNum--;
+					}
 				}
 
 			}
@@ -1370,6 +1384,13 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		ArrayList<DataColumnType> dataColTypes = new ArrayList<DataColumnType>(numCols);
 		for (int k = 0; k < numCols; k++) {
 			DataColumnType dctype = userTypes.getDataColumnType(colTypeNames.get(k));
+			if ( dctype == null ) {
+				// See if there is a modified version of this type name
+				String newName = DashboardServerUtils.RENAMED_DATA_TYPES.get(colTypeNames.get(k));
+				dctype = userTypes.getDataColumnType(newName);
+			}
+			if ( dctype == null )
+				throw new IllegalArgumentException("unknown data type \"" + colTypeNames.get(k) + "\"");
 			int index = dctype.getUnits().indexOf(colTypeUnits.get(k));
 			if ( index < 0 ) {
 				// see if there is a modified version of this unit
@@ -1379,7 +1400,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			}
 			if ( index < 0 )
 				throw new IllegalArgumentException("unknown unit \"" + 
-						colTypeUnits.get(k) + "\" for varName \"" + 
+						colTypeUnits.get(k) + "\" for data type \"" + 
 						dctype.getVarName() + "\"");
 			dctype.setSelectedUnitIndex(index);
 			dctype.setSelectedMissingValue(colMissValues.get(k));
