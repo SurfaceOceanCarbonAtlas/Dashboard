@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -314,8 +314,8 @@ public class CheckerMessageHandler {
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( ! ( SocatCruiseData.WOCE_CO2_WATER.typeNameEquals(colType) ||
-					 SocatCruiseData.WOCE_CO2_ATM.typeNameEquals(colType) ) )
+			if ( ! ( SocatTypes.WOCE_CO2_WATER.typeNameEquals(colType) ||
+					 SocatTypes.WOCE_CO2_ATM.typeNameEquals(colType) ) )
 				continue;
 			for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
 				try {
@@ -572,11 +572,11 @@ public class CheckerMessageHandler {
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType type = columnTypes.get(k);
 			// Want COMMENT_WOCE_CO2_WATER, but if not given accept COMMENT_WOCE_CO2_ATM
-			if ( SocatCruiseData.COMMENT_WOCE_CO2_WATER.typeNameEquals(type) ) {
+			if ( SocatTypes.COMMENT_WOCE_CO2_WATER.typeNameEquals(type) ) {
 				userCommentsIndex = k;
 				break;
 			}
-			if ( SocatCruiseData.COMMENT_WOCE_CO2_ATM.typeNameEquals(type) ) {
+			if ( SocatTypes.COMMENT_WOCE_CO2_ATM.typeNameEquals(type) ) {
 				userCommentsIndex = k;
 			}
 		}
@@ -672,7 +672,7 @@ public class CheckerMessageHandler {
 		double[] latitudes = lonlattime[1];
 		double[] times = lonlattime[2];
 		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, 
-				SocatCruiseData.REGION_ID.getVarName());
+				SocatTypes.REGION_ID.getVarName());
 		Date now = new Date();
 
 		Character lastFlag = null;
@@ -711,22 +711,22 @@ public class CheckerMessageHandler {
 				if ( info.columnIndex != Integer.MAX_VALUE ) {
 					DataColumnType dataType = columnTypes.get(info.columnIndex);
 					// Geoposition is a problem in the combination of lon/lat/time, so no data assignment
-					if ( KnownDataTypes.GEOPOSITION.typeNameEquals(dataType) ) {
+					if ( DashboardServerUtils.GEOPOSITION.typeNameEquals(dataType) ) {
 						dataVarName = null;
 					}
 					// Associate all time-related data columns with the time file variable
-					else if ( KnownDataTypes.TIMESTAMP.typeNameEquals(dataType) ||
-							  KnownDataTypes.DATE.typeNameEquals(dataType) ||
-							  KnownDataTypes.YEAR.typeNameEquals(dataType) ||
-							  KnownDataTypes.MONTH_OF_YEAR.typeNameEquals(dataType) ||
-							  KnownDataTypes.DAY_OF_MONTH.typeNameEquals(dataType) ||
-							  KnownDataTypes.TIME_OF_DAY.typeNameEquals(dataType) ||
-							  KnownDataTypes.HOUR_OF_DAY.typeNameEquals(dataType) ||
-							  KnownDataTypes.MINUTE_OF_HOUR.typeNameEquals(dataType) ||
-							  KnownDataTypes.SECOND_OF_MINUTE.typeNameEquals(dataType) ||
-							  KnownDataTypes.DAY_OF_YEAR.typeNameEquals(dataType) ||
-							  KnownDataTypes.SECOND_OF_DAY.typeNameEquals(dataType) ) {
-						dataVarName = KnownDataTypes.TIME.getVarName();
+					else if ( DashboardServerUtils.TIMESTAMP.typeNameEquals(dataType) ||
+							  DashboardServerUtils.DATE.typeNameEquals(dataType) ||
+							  DashboardServerUtils.YEAR.typeNameEquals(dataType) ||
+							  DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(dataType) ||
+							  DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(dataType) ||
+							  DashboardServerUtils.TIME_OF_DAY.typeNameEquals(dataType) ||
+							  DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(dataType) ||
+							  DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(dataType) ||
+							  DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(dataType) ||
+							  DashboardServerUtils.DAY_OF_YEAR.typeNameEquals(dataType) ||
+							  DashboardServerUtils.SECOND_OF_DAY.typeNameEquals(dataType) ) {
+						dataVarName = DashboardServerUtils.TIME.getVarName();
 					}
 					// Check if this type is known in the data file types
 					else if ( knownDataFileTypes.getDataColumnType(dataType.getVarName()) == null ) {

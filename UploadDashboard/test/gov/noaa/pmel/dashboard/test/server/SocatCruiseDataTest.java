@@ -7,8 +7,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -34,39 +36,39 @@ public class SocatCruiseDataTest {
 		KNOWN_DATA_TYPES = new KnownDataTypes();
 		KNOWN_DATA_TYPES.addStandardTypesForDataFiles();
 		Properties addnTypeProps = new Properties();
-		addnTypeProps.setProperty(SocatCruiseData.SST.getVarName(), 
-				SocatCruiseData.SST.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.SALINITY.getVarName(), 
-				SocatCruiseData.SALINITY.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.XCO2_WATER_SST_DRY.getVarName(), 
-				SocatCruiseData.XCO2_WATER_SST_DRY.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.PCO2_WATER_TEQU_WET.getVarName(), 
-				SocatCruiseData.PCO2_WATER_TEQU_WET.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.PATM.getVarName(), 
-				SocatCruiseData.PATM.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.SHIP_SPEED.getVarName(), 
-				SocatCruiseData.SHIP_SPEED.toPropertyValue());
-		addnTypeProps.setProperty(SocatCruiseData.WOCE_CO2_WATER.getVarName(), 
-				SocatCruiseData.WOCE_CO2_WATER.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.SST.getVarName(), 
+				SocatTypes.SST.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.SALINITY.getVarName(), 
+				SocatTypes.SALINITY.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.XCO2_WATER_SST_DRY.getVarName(), 
+				SocatTypes.XCO2_WATER_SST_DRY.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(), 
+				SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.PATM.getVarName(), 
+				SocatTypes.PATM.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.SHIP_SPEED.getVarName(), 
+				SocatTypes.SHIP_SPEED.toPropertyValue());
+		addnTypeProps.setProperty(SocatTypes.WOCE_CO2_WATER.getVarName(), 
+				SocatTypes.WOCE_CO2_WATER.toPropertyValue());
 		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
 	}
 
 	static final ArrayList<DataColumnType> TEST_USER_TYPES = new ArrayList<DataColumnType>(Arrays.asList(
-			KnownDataTypes.EXPOCODE.duplicate(),
-			KnownDataTypes.DATASET_NAME.duplicate(),
-			KnownDataTypes.MONTH_OF_YEAR.duplicate(), 
-			KnownDataTypes.DAY_OF_MONTH.duplicate(), 
-			KnownDataTypes.YEAR.duplicate(), 
-			KnownDataTypes.HOUR_OF_DAY.duplicate(), 
-			KnownDataTypes.MINUTE_OF_HOUR.duplicate(), 
-			KnownDataTypes.LATITUDE.duplicate(), 
-			KnownDataTypes.LONGITUDE.duplicate(), 
-			SocatCruiseData.SST.duplicate(),
-			SocatCruiseData.SALINITY.duplicate(),
-			SocatCruiseData.XCO2_WATER_SST_DRY.duplicate(),
-			SocatCruiseData.PCO2_WATER_TEQU_WET.duplicate(),
-			SocatCruiseData.PATM.duplicate(),
-			SocatCruiseData.SHIP_SPEED.duplicate()));
+			DashboardServerUtils.EXPOCODE.duplicate(),
+			DashboardServerUtils.DATASET_NAME.duplicate(),
+			DashboardServerUtils.MONTH_OF_YEAR.duplicate(), 
+			DashboardServerUtils.DAY_OF_MONTH.duplicate(), 
+			DashboardServerUtils.YEAR.duplicate(), 
+			DashboardServerUtils.HOUR_OF_DAY.duplicate(), 
+			DashboardServerUtils.MINUTE_OF_HOUR.duplicate(), 
+			DashboardServerUtils.LATITUDE.duplicate(), 
+			DashboardServerUtils.LONGITUDE.duplicate(), 
+			SocatTypes.SST.duplicate(),
+			SocatTypes.SALINITY.duplicate(),
+			SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
+			SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
+			SocatTypes.PATM.duplicate(),
+			SocatTypes.SHIP_SPEED.duplicate()));
 	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
 	static final ArrayList<Integer> EXPECTED_YEARS = new ArrayList<Integer>();
 	static final ArrayList<Integer> EXPECTED_MONTHS = new ArrayList<Integer>();
@@ -189,15 +191,15 @@ public class SocatCruiseDataTest {
 	public void testGetSetIntegerVariableValue() {
 		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
 		Integer value = 123;
-		data.setIntegerVariableValue(KnownDataTypes.SAMPLE_NUMBER, value);
+		data.setIntegerVariableValue(DashboardServerUtils.SAMPLE_NUMBER, value);
 		LinkedHashMap<DashDataType,Integer> intMap = data.getIntegerVariables();
-		assertEquals(value, intMap.get(KnownDataTypes.SAMPLE_NUMBER));
-		data.setIntegerVariableValue(KnownDataTypes.SAMPLE_NUMBER, null);
+		assertEquals(value, intMap.get(DashboardServerUtils.SAMPLE_NUMBER));
+		data.setIntegerVariableValue(DashboardServerUtils.SAMPLE_NUMBER, null);
 		intMap = data.getIntegerVariables();
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, intMap.get(KnownDataTypes.SAMPLE_NUMBER));
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, intMap.get(DashboardServerUtils.SAMPLE_NUMBER));
 		boolean errCaught = false;
 		try {
-			data.setIntegerVariableValue(KnownDataTypes.TIME, value);
+			data.setIntegerVariableValue(DashboardServerUtils.TIME, value);
 		} catch ( IllegalArgumentException ex ) {
 			errCaught = true;
 		}
@@ -212,15 +214,15 @@ public class SocatCruiseDataTest {
 	public void testGetSetCharacterVariableValue() {
 		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
 		Character value = 'K';
-		data.setCharacterVariableValue(SocatCruiseData.WOCE_CO2_WATER, value);
+		data.setCharacterVariableValue(SocatTypes.WOCE_CO2_WATER, value);
 		LinkedHashMap<DashDataType,Character> charMap = data.getCharacterVariables();
-		assertEquals(value, charMap.get(SocatCruiseData.WOCE_CO2_WATER));
-		data.setCharacterVariableValue(SocatCruiseData.WOCE_CO2_WATER, null);
+		assertEquals(value, charMap.get(SocatTypes.WOCE_CO2_WATER));
+		data.setCharacterVariableValue(SocatTypes.WOCE_CO2_WATER, null);
 		charMap = data.getCharacterVariables();
-		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(SocatCruiseData.WOCE_CO2_WATER));
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(SocatTypes.WOCE_CO2_WATER));
 		boolean errCaught = false;
 		try {
-			data.setCharacterVariableValue(KnownDataTypes.TIME, value);
+			data.setCharacterVariableValue(DashboardServerUtils.TIME, value);
 		} catch ( IllegalArgumentException ex ) {
 			errCaught = true;
 		}
@@ -235,15 +237,15 @@ public class SocatCruiseDataTest {
 	public void testGetSetDoubleVariableValue() {
 		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
 		Double value = (new Date()).getTime() / 1000.0;
-		data.setDoubleVariableValue(KnownDataTypes.TIME, value);
+		data.setDoubleVariableValue(DashboardServerUtils.TIME, value);
 		LinkedHashMap<DashDataType,Double> doubleMap = data.getDoubleVariables();
-		assertEquals(value, doubleMap.get(KnownDataTypes.TIME));
-		data.setDoubleVariableValue(KnownDataTypes.TIME, null);
+		assertEquals(value, doubleMap.get(DashboardServerUtils.TIME));
+		data.setDoubleVariableValue(DashboardServerUtils.TIME, null);
 		doubleMap = data.getDoubleVariables();
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(KnownDataTypes.TIME));
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(DashboardServerUtils.TIME));
 		boolean errCaught = false;
 		try {
-			data.setDoubleVariableValue(KnownDataTypes.SAMPLE_NUMBER, value);
+			data.setDoubleVariableValue(DashboardServerUtils.SAMPLE_NUMBER, value);
 		} catch ( IllegalArgumentException ex ) {
 			errCaught = true;
 		}

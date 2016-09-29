@@ -42,7 +42,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class CruiseUploadService extends HttpServlet {
 
-	private static final long serialVersionUID = -739243103440408304L;
+	private static final long serialVersionUID = 9149494112661572713L;
 
 	// Patterns for getting the vessel name from the metadata preamble
 	private static final Pattern[] SHIP_NAME_PATTERNS = new Pattern[] {
@@ -343,7 +343,7 @@ public class CruiseUploadService extends HttpServlet {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
-					if ( KnownDataTypes.VESSEL_NAME.typeNameEquals(dtype) ) {
+					if ( DashboardServerUtils.VESSEL_NAME.typeNameEquals(dtype) ) {
 						colIdx = k;
 						break;
 					}
@@ -360,7 +360,7 @@ public class CruiseUploadService extends HttpServlet {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
-					if ( KnownDataTypes.INVESTIGATOR_NAMES.typeNameEquals(dtype) ) {
+					if ( DashboardServerUtils.INVESTIGATOR_NAMES.typeNameEquals(dtype) ) {
 						colIdx = k;
 						break;
 					}

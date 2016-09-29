@@ -3,15 +3,16 @@
  */
 package gov.noaa.pmel.dashboard.test.actions;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 
 /**
@@ -23,13 +24,6 @@ import org.junit.Test;
  */
 public class OmePdfGeneratorTest {
 
-	private static final String LOG4J_PROPERTIES_FILE = 
-			"/home/flat/ksmith/Socat/Tomcat/content/SocatUploadDashboard/log4j.properties";
-	private static final String METADATA_DOCS_DIR = 
-			"/home/flat/ksmith/Socat/Tomcat/content/SocatUploadDashboard/MetadataDocs";
-	private static final String OME_XML_PDF_RESOURCES = 
-			"/home/flat/ksmith/Socat/Tomcat/content/SocatUploadDashboard";
-	private static final String SVN_USERNAME = "ksmith";
 	private static final String[] EXPOCODE_ARRAY = {
 		"06AQ20151030",
 		"33GG20131126",
@@ -56,14 +50,15 @@ public class OmePdfGeneratorTest {
 
 	@Test
 	public void testCreatePiOmePdf() throws IOException {
-		PropertyConfigurator.configure(LOG4J_PROPERTIES_FILE);
-		MetadataFileHandler metaHandler = new MetadataFileHandler(METADATA_DOCS_DIR, SVN_USERNAME, null);
+		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+		DashboardConfigStore confStore = DashboardConfigStore.get(false);
+		MetadataFileHandler metaHandler = confStore.getMetadataFileHandler();
+		OmePdfGenerator omePdfGenerator = confStore.getOmePdfGenerator();
 		for ( String expo : EXPOCODE_ARRAY ) {
 			File pdfFile = metaHandler.getMetadataFile(expo, DashboardUtils.PI_OME_PDF_FILENAME);
+			assertNotNull( pdfFile );
 			// Make sure the PDF file does not exist, then generate it
 			pdfFile.delete();
-			OmePdfGenerator omePdfGenerator = new OmePdfGenerator(
-					new File(OME_XML_PDF_RESOURCES), metaHandler, null);
 			omePdfGenerator.createPiOmePdf(expo);
 			assertTrue( pdfFile.exists() );
 		}

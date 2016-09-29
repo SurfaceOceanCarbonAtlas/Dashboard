@@ -19,7 +19,7 @@ import java.util.StringTokenizer;
  * @author Roland Schweitzer
  * @author Joe W. from Cola for the Anagram Framework
  */
-public class RuntimeEnvironment implements Cloneable{
+public class RuntimeEnvironment implements Cloneable {
     
     protected String baseDir;
     protected Map<String, String> parameters;
@@ -158,8 +158,7 @@ public class RuntimeEnvironment implements Cloneable{
     
     /** Clones a copy of this environment
      */
-    protected Object clone() 
-    throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException {
         RuntimeEnvironment returnVal = new RuntimeEnvironment(new HashMap<String, String>());
         Iterator<String> it = this.parameters.keySet().iterator();
         while(it.hasNext()) {

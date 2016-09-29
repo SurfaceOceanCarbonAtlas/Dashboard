@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashDataType;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -49,15 +50,15 @@ public class SocatMetadataTest {
 	public void testGetSetStringVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
-		mdata.setStringVariableValue(KnownDataTypes.EXPOCODE, EXPOCODE);
+		mdata.setStringVariableValue(DashboardServerUtils.EXPOCODE, EXPOCODE);
 		LinkedHashMap<DashDataType,String> stringMap = mdata.getStringVariables();
-		assertEquals(EXPOCODE, stringMap.get(KnownDataTypes.EXPOCODE));
-		mdata.setStringVariableValue(KnownDataTypes.EXPOCODE, null);
+		assertEquals(EXPOCODE, stringMap.get(DashboardServerUtils.EXPOCODE));
+		mdata.setStringVariableValue(DashboardServerUtils.EXPOCODE, null);
 		stringMap = mdata.getStringVariables();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, stringMap.get(KnownDataTypes.EXPOCODE));
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, stringMap.get(DashboardServerUtils.EXPOCODE));
 		boolean errCaught = false;
 		try {
-			mdata.setStringVariableValue(KnownDataTypes.EASTERNMOST_LONGITUDE, EXPOCODE);
+			mdata.setStringVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, EXPOCODE);
 		} catch ( IllegalArgumentException ex ) {
 			errCaught = true;
 		}
@@ -73,15 +74,15 @@ public class SocatMetadataTest {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		Double value = Double.valueOf(EASTMOST_LONGITUDE);
-		mdata.setDoubleVariableValue(KnownDataTypes.EASTERNMOST_LONGITUDE, value);
+		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, value);
 		LinkedHashMap<DashDataType,Double> doubleMap = mdata.getDoubleVariables();
-		assertEquals(value, doubleMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE));
-		mdata.setDoubleVariableValue(KnownDataTypes.EASTERNMOST_LONGITUDE, null);
+		assertEquals(value, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
+		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, null);
 		doubleMap = mdata.getDoubleVariables();
-		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(KnownDataTypes.EASTERNMOST_LONGITUDE));
+		assertEquals(DashboardUtils.FP_MISSING_VALUE, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
 		boolean errCaught = false;
 		try {
-			mdata.setDoubleVariableValue(KnownDataTypes.EXPOCODE, value);
+			mdata.setDoubleVariableValue(DashboardServerUtils.EXPOCODE, value);
 		} catch ( IllegalArgumentException ex ) {
 			errCaught = true;
 		}
@@ -96,15 +97,15 @@ public class SocatMetadataTest {
 	public void testGetSetDateVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
-		mdata.setDateVariableValue(KnownDataTypes.TIME_COVERAGE_START, BEGIN_TIME);
+		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, BEGIN_TIME);
 		LinkedHashMap<DashDataType,Date> dateMap = mdata.getDateVariables();
-		assertEquals(BEGIN_TIME, dateMap.get(KnownDataTypes.TIME_COVERAGE_START));
-		mdata.setDateVariableValue(KnownDataTypes.TIME_COVERAGE_START, null);
+		assertEquals(BEGIN_TIME, dateMap.get(DashboardServerUtils.TIME_COVERAGE_START));
+		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, null);
 		dateMap = mdata.getDateVariables();
-		assertEquals(DashboardUtils.DATE_MISSING_VALUE, dateMap.get(KnownDataTypes.TIME_COVERAGE_START));
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, dateMap.get(DashboardServerUtils.TIME_COVERAGE_START));
 		boolean errCaught = false;
 		try {
-			mdata.setDateVariableValue(KnownDataTypes.EXPOCODE, BEGIN_TIME);
+			mdata.setDateVariableValue(DashboardServerUtils.EXPOCODE, BEGIN_TIME);
 		} catch ( IllegalArgumentException ex ) {
 			errCaught = true;
 		}

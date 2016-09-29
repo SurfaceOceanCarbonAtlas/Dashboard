@@ -13,102 +13,10 @@ import java.util.Properties;
 
 /**
  * Well-ordered set of known data types that can be extended as needed.
- * The well-known data types are
- * 
- * (metadata):
- * 		EXPOCODE, DATASET_NAME, VESSEL_NAME, ORGANIZATION_NAME,
- * 		INVESTIGATOR_NAMES, WESTMOST_LONGITUDE, EASTMOST_LONGITUDE,
- * 		SOUTHMOST_LATITUDE, NORTHMOST_LATITUDE, TIME_COVERAGE_START,
- * 		TIME_COVERAGE_END, QC_FLAG
- * 
- * (data):
- * 		SAMPLE_NUMBER, TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH, 
- * 		TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, 
- * 		DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, LATITUDE, SAMPLE_DEPTH, TIME
- * 
- * as well as UNKNOWN and OTHER defined in DataColumnType.
  *  
  * @author Karl Smith
  */
 public class KnownDataTypes {
-
-	/** Marker data type used to indicate an severe error in the combination of lon/lat/time */
-	public static final DashDataType GEOPOSITION = new DashDataType(DashboardUtils.GEOPOSITION);
-
-	/**
-	 * UNKNOWN needs to be respecified as one of the (other) data column types.
-	 */
-	public static final DashDataType UNKNOWN = new DashDataType(DashboardUtils.UNKNOWN);
-
-	/**
-	 * OTHER is for supplementary data in the user's original data file but 
-	 * otherwise not used.  A description of each column with this type must 
-	 * be part of the metadata, but the values are not validated or used. 
-	 * Multiple columns may have this type.
-	 */
-	public static final DashDataType OTHER = new DashDataType(DashboardUtils.OTHER);
-
-	/**
-	 * Unique identifier for the dataset.
-	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
-	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
-	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
-	 * different vessels.  (metadata)
-	 */
-	public static final DashDataType EXPOCODE = new DashDataType(DashboardUtils.EXPOCODE);
-	
-	/**
-	 * User-provided name for the dataset (metadata)
-	 */
-	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
-
-	public static final DashDataType VESSEL_NAME = new DashDataType(DashboardUtils.VESSEL_NAME);
-	public static final DashDataType ORGANIZATION_NAME = new DashDataType(DashboardUtils.ORGANIZATION_NAME);
-	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType(DashboardUtils.INVESTIGATOR_NAMES);
-	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.WESTERNMOST_LONGITUDE);
-	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.EASTERNMOST_LONGITUDE);
-	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE);
-	public static final DashDataType NORTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.NORTHERNMOST_LATITUDE);
-	public static final DashDataType TIME_COVERAGE_START = new DashDataType(DashboardUtils.TIME_COVERAGE_START);
-	public static final DashDataType TIME_COVERAGE_END = new DashDataType(DashboardUtils.TIME_COVERAGE_END);
-	public static final DashDataType QC_FLAG = new DashDataType(DashboardUtils.QC_FLAG);
-
-	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
-
-	/**
-	 * Date and time or the measurement
-	 */
-	public static final DashDataType TIMESTAMP = new DashDataType(DashboardUtils.TIMESTAMP);
-
-	/**
-	 * Date of the measurement - no time.
-	 */
-	public static final DashDataType DATE = new DashDataType(DashboardUtils.DATE);
-
-	public static final DashDataType YEAR = new DashDataType(DashboardUtils.YEAR);
-	public static final DashDataType MONTH_OF_YEAR = new DashDataType(DashboardUtils.MONTH_OF_YEAR);
-	public static final DashDataType DAY_OF_MONTH = new DashDataType(DashboardUtils.DAY_OF_MONTH);
-	public static final DashDataType TIME_OF_DAY = new DashDataType(DashboardUtils.TIME_OF_DAY);
-	public static final DashDataType HOUR_OF_DAY = new DashDataType(DashboardUtils.HOUR_OF_DAY);
-	public static final DashDataType MINUTE_OF_HOUR = new DashDataType(DashboardUtils.MINUTE_OF_HOUR);
-	public static final DashDataType SECOND_OF_MINUTE = new DashDataType(DashboardUtils.SECOND_OF_MINUTE);
-
-	/**
-	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
-	 * may be used to specify the date and time of the measurement.
-	 */
-	public static final DashDataType DAY_OF_YEAR = new DashDataType(DashboardUtils.DAY_OF_YEAR);
-
-	/**
-	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
-	 * be used to specify date and time of the measurement
-	 */
-	public static final DashDataType SECOND_OF_DAY = new DashDataType(DashboardUtils.SECOND_OF_DAY);
-
-	public static final DashDataType LONGITUDE = new DashDataType(DashboardUtils.LONGITUDE);
-	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
-	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
-	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
 
 	private LinkedHashMap<String,DashDataType> knownTypes;
 
@@ -159,28 +67,28 @@ public class KnownDataTypes {
 	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForUsers() {
-		addDataType(UNKNOWN);
-		addDataType(OTHER);
-		addDataType(EXPOCODE);
-		addDataType(DATASET_NAME);
-		addDataType(VESSEL_NAME);
-		addDataType(ORGANIZATION_NAME);
-		addDataType(INVESTIGATOR_NAMES);
-		addDataType(QC_FLAG);
-		addDataType(TIMESTAMP);
-		addDataType(DATE);
-		addDataType(YEAR);
-		addDataType(MONTH_OF_YEAR);
-		addDataType(DAY_OF_MONTH);
-		addDataType(TIME_OF_DAY);
-		addDataType(HOUR_OF_DAY);
-		addDataType(MINUTE_OF_HOUR);
-		addDataType(SECOND_OF_MINUTE);
-		addDataType(DAY_OF_YEAR);
-		addDataType(SECOND_OF_DAY);
-		addDataType(LONGITUDE);
-		addDataType(LATITUDE);
-		addDataType(SAMPLE_DEPTH);
+		addDataType(DashboardServerUtils.UNKNOWN);
+		addDataType(DashboardServerUtils.OTHER);
+		addDataType(DashboardServerUtils.EXPOCODE);
+		addDataType(DashboardServerUtils.DATASET_NAME);
+		addDataType(DashboardServerUtils.VESSEL_NAME);
+		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
+		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
+		addDataType(DashboardServerUtils.QC_FLAG);
+		addDataType(DashboardServerUtils.TIMESTAMP);
+		addDataType(DashboardServerUtils.DATE);
+		addDataType(DashboardServerUtils.YEAR);
+		addDataType(DashboardServerUtils.MONTH_OF_YEAR);
+		addDataType(DashboardServerUtils.DAY_OF_MONTH);
+		addDataType(DashboardServerUtils.TIME_OF_DAY);
+		addDataType(DashboardServerUtils.HOUR_OF_DAY);
+		addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
+		addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
+		addDataType(DashboardServerUtils.DAY_OF_YEAR);
+		addDataType(DashboardServerUtils.SECOND_OF_DAY);
+		addDataType(DashboardServerUtils.LONGITUDE);
+		addDataType(DashboardServerUtils.LATITUDE);
+		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
 		return this;
 	}
 
@@ -197,18 +105,18 @@ public class KnownDataTypes {
 	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForMetadataFiles() {
-		addDataType(EXPOCODE);
-		addDataType(DATASET_NAME);
-		addDataType(VESSEL_NAME);
-		addDataType(ORGANIZATION_NAME);
-		addDataType(INVESTIGATOR_NAMES);
-		addDataType(WESTERNMOST_LONGITUDE);
-		addDataType(EASTERNMOST_LONGITUDE);
-		addDataType(SOUTHERNMOST_LATITUDE);
-		addDataType(NORTHERNMOST_LATITUDE);
-		addDataType(TIME_COVERAGE_START);
-		addDataType(TIME_COVERAGE_END);
-		addDataType(QC_FLAG);
+		addDataType(DashboardServerUtils.EXPOCODE);
+		addDataType(DashboardServerUtils.DATASET_NAME);
+		addDataType(DashboardServerUtils.VESSEL_NAME);
+		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
+		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
+		addDataType(DashboardServerUtils.WESTERNMOST_LONGITUDE);
+		addDataType(DashboardServerUtils.EASTERNMOST_LONGITUDE);
+		addDataType(DashboardServerUtils.SOUTHERNMOST_LATITUDE);
+		addDataType(DashboardServerUtils.NORTHERNMOST_LATITUDE);
+		addDataType(DashboardServerUtils.TIME_COVERAGE_START);
+		addDataType(DashboardServerUtils.TIME_COVERAGE_END);
+		addDataType(DashboardServerUtils.QC_FLAG);
 		return this;
 	}
 
@@ -224,17 +132,17 @@ public class KnownDataTypes {
 	 * 		this instance (as a convenience for chaining)
 	 */
 	public KnownDataTypes addStandardTypesForDataFiles() {
-		addDataType(SAMPLE_NUMBER);
-		addDataType(YEAR);
-		addDataType(MONTH_OF_YEAR);
-		addDataType(DAY_OF_MONTH);
-		addDataType(HOUR_OF_DAY);
-		addDataType(MINUTE_OF_HOUR);
-		addDataType(SECOND_OF_MINUTE);
-		addDataType(TIME);
-		addDataType(LONGITUDE);
-		addDataType(LATITUDE);
-		addDataType(SAMPLE_DEPTH);
+		addDataType(DashboardServerUtils.SAMPLE_NUMBER);
+		addDataType(DashboardServerUtils.YEAR);
+		addDataType(DashboardServerUtils.MONTH_OF_YEAR);
+		addDataType(DashboardServerUtils.DAY_OF_MONTH);
+		addDataType(DashboardServerUtils.HOUR_OF_DAY);
+		addDataType(DashboardServerUtils.MINUTE_OF_HOUR);
+		addDataType(DashboardServerUtils.SECOND_OF_MINUTE);
+		addDataType(DashboardServerUtils.TIME);
+		addDataType(DashboardServerUtils.LONGITUDE);
+		addDataType(DashboardServerUtils.LATITUDE);
+		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
 		return this;
 	}
 

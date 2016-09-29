@@ -35,7 +35,7 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
  */
 public class MetadataUploadService extends HttpServlet {
 
-	private static final long serialVersionUID = 6620559111563840485L;
+	private static final long serialVersionUID = -1458504704372812166L;
 
 	private ServletFileUpload metadataUpload;
 

@@ -6,26 +6,21 @@ import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
+import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatTypes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.junit.Test;
 
 public class DerivedVariablesTest {
 
-	public static final String CONFIG_FILENAME = 
-			"/home/flat/ksmith/content/SocatUploadDashboard/FerretConfig.xml";
-
 	@Test
 	public void derivedVariablesTest() throws Exception {
+		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+		DashboardConfigStore confStore = DashboardConfigStore.get(false);
+		FerretConfig ferret = confStore.getFerretConfig();
 		CruiseDsgNcFileTest fileTest = new CruiseDsgNcFileTest();
 		fileTest.testCreate();
 		CruiseDsgNcFile dsgFile = fileTest.dsgNcFile;
@@ -43,16 +38,6 @@ public class DerivedVariablesTest {
 			minutes.add(dataVals.getMinute());
 		}
 
-		FerretConfig ferret;
-		InputStream stream = new FileInputStream(new File(CONFIG_FILENAME));
-		try {
-			SAXBuilder sb = new SAXBuilder();
-			Document jdom = sb.build(stream);
-			ferret = new FerretConfig();
-			ferret.setRootElement((Element)jdom.getRootElement().clone());
-		} finally {
-			stream.close();
-		}
 		SocatTool tool = new SocatTool(ferret);
 		String fullDataFilename = dsgFile.getPath();
 		ArrayList<String> scriptArgs = new ArrayList<String>(1);

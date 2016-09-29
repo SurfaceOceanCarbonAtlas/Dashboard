@@ -6,6 +6,7 @@ package gov.noaa.pmel.dashboard.handlers;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -114,7 +115,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			DataColumnType dctype = userTypes.getDataColumnType(vals[0]);
 			if ( dctype == null ) {
 				// See if there is a modified version of this type name
-				String newName = DashboardServerUtils.RENAMED_DATA_TYPES.get(vals[0]);
+				String newName = SocatTypes.RENAMED_DATA_TYPES.get(vals[0]);
 				if ( newName != null )
 					dctype = userTypes.getDataColumnType(newName);
 			}
@@ -125,7 +126,7 @@ public class UserFileHandler extends VersionedFileHandler {
 			int index = dctype.getUnits().indexOf(vals[1]);
 			if ( index < 0 ) {
 				// see if there is a modified version of this unit
-				String newName = DashboardServerUtils.RENAMED_UNITS.get(vals[1]);
+				String newName = SocatTypes.RENAMED_UNITS.get(vals[1]);
 				if ( newName != null )
 					index = dctype.getUnits().indexOf(newName);
 			}

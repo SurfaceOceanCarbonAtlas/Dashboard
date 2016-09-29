@@ -10,8 +10,8 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import java.util.ArrayList;
 
 /**
- * @author ksmith
- *
+ * WOCE out any duplicates of lon/lat/time/fCO2_rec in a dataset
+ * @author Karl Smith
  */
 public class WoceDuplicates {
 

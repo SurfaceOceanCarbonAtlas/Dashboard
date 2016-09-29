@@ -4,8 +4,8 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
 
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,40 +14,82 @@ import java.util.regex.Pattern;
  */
 public class DashboardServerUtils {
 
-	/** mapping of old user data type (enumerated variable) names to new data type names */
-	public static final HashMap<String,String> RENAMED_DATA_TYPES;
+	/** Marker data type used to indicate an severe error in the combination of lon/lat/time */
+	public static final DashDataType GEOPOSITION = new DashDataType(DashboardUtils.GEOPOSITION);
 
-	/** mapping from old unit names to new unit names */
-	public static final HashMap<String,String> RENAMED_UNITS;
+	/**
+	 * UNKNOWN needs to be respecified as one of the (other) data column types.
+	 */
+	public static final DashDataType UNKNOWN = new DashDataType(DashboardUtils.UNKNOWN);
 
-	static {
-		RENAMED_DATA_TYPES = new HashMap<String,String>();
-		RENAMED_DATA_TYPES.put("ATMOSPHERIC_TEMPERATURE", SocatCruiseData.TATM.getVarName());
-		RENAMED_DATA_TYPES.put("CRUISE_NAME", KnownDataTypes.DATASET_NAME.getVarName());
-		RENAMED_DATA_TYPES.put("GROUP_NAME", KnownDataTypes.ORGANIZATION_NAME.getVarName());
-		RENAMED_DATA_TYPES.put("EQUILIBRATOR_PRESSURE", SocatCruiseData.PEQU.getVarName());
-		RENAMED_DATA_TYPES.put("EQUILIBRATOR_TEMPERATURE", SocatCruiseData.TEQU.getVarName());
-		RENAMED_DATA_TYPES.put("INVESTIGATOR_NAMES", KnownDataTypes.INVESTIGATOR_NAMES.getVarName());
-		RENAMED_DATA_TYPES.put("SEA_LEVEL_PRESSURE", SocatCruiseData.PATM.getVarName());
-		RENAMED_DATA_TYPES.put("SEA_SURFACE_TEMPERATURE", SocatCruiseData.SST.getVarName());
-		RENAMED_DATA_TYPES.put("SECOND_OF_DAY", KnownDataTypes.SECOND_OF_DAY.getVarName());
-		RENAMED_DATA_TYPES.put("SHIP_DIRECTION", SocatCruiseData.SHIP_DIRECTION.getVarName());
-		RENAMED_DATA_TYPES.put("SHIP_NAME", KnownDataTypes.VESSEL_NAME.getVarName());
-		RENAMED_DATA_TYPES.put("TIME", KnownDataTypes.TIME_OF_DAY.getVarName());
-		RENAMED_DATA_TYPES.put("TIMESTAMP", KnownDataTypes.TIMESTAMP.getVarName());
-		RENAMED_DATA_TYPES.put("WIND_DIRECTION_TRUE", SocatCruiseData.WIND_DIRECTION_TRUE.getVarName());
-		RENAMED_DATA_TYPES.put("WIND_DIRECTION_RELATIVE", SocatCruiseData.WIND_DIRECTION_RELATIVE.getVarName());
-		RENAMED_DATA_TYPES.put("WIND_SPEED_RELATIVE", SocatCruiseData.WIND_SPEED_RELATIVE.getVarName());
-		RENAMED_DATA_TYPES.put("XH2O_EQU", SocatCruiseData.XH2O_EQU.getVarName());
+	/**
+	 * OTHER is for supplementary data in the user's original data file but 
+	 * otherwise not used.  A description of each column with this type must 
+	 * be part of the metadata, but the values are not validated or used. 
+	 * Multiple columns may have this type.
+	 */
+	public static final DashDataType OTHER = new DashDataType(DashboardUtils.OTHER);
 
-		RENAMED_UNITS = new HashMap<String,String>();
-		RENAMED_UNITS.put("deg.E", "degrees_east");
-		RENAMED_UNITS.put("deg.W", "degrees_west");
-		RENAMED_UNITS.put("deg.N", "degrees_north");
-		RENAMED_UNITS.put("deg.S", "degrees_south");
-		RENAMED_UNITS.put("deg.C", "degrees C");
-		RENAMED_UNITS.put("deg.clk.N", "degrees");
-	}
+	/**
+	 * Unique identifier for the dataset.
+	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
+	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
+	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
+	 * different vessels.  (metadata)
+	 */
+	public static final DashDataType EXPOCODE = new DashDataType(DashboardUtils.EXPOCODE);
+
+	/**
+	 * User-provided name for the dataset (metadata)
+	 */
+	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
+
+	public static final DashDataType VESSEL_NAME = new DashDataType(DashboardUtils.VESSEL_NAME);
+	public static final DashDataType ORGANIZATION_NAME = new DashDataType(DashboardUtils.ORGANIZATION_NAME);
+	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType(DashboardUtils.INVESTIGATOR_NAMES);
+	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.WESTERNMOST_LONGITUDE);
+	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.EASTERNMOST_LONGITUDE);
+	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE);
+	public static final DashDataType NORTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.NORTHERNMOST_LATITUDE);
+	public static final DashDataType TIME_COVERAGE_START = new DashDataType(DashboardUtils.TIME_COVERAGE_START);
+	public static final DashDataType TIME_COVERAGE_END = new DashDataType(DashboardUtils.TIME_COVERAGE_END);
+	public static final DashDataType QC_FLAG = new DashDataType(DashboardUtils.QC_FLAG);
+	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
+
+	/**
+	 * Date and time or the measurement
+	 */
+	public static final DashDataType TIMESTAMP = new DashDataType(DashboardUtils.TIMESTAMP);
+
+	/**
+	 * Date of the measurement - no time.
+	 */
+	public static final DashDataType DATE = new DashDataType(DashboardUtils.DATE);
+
+	public static final DashDataType YEAR = new DashDataType(DashboardUtils.YEAR);
+	public static final DashDataType MONTH_OF_YEAR = new DashDataType(DashboardUtils.MONTH_OF_YEAR);
+	public static final DashDataType DAY_OF_MONTH = new DashDataType(DashboardUtils.DAY_OF_MONTH);
+	public static final DashDataType TIME_OF_DAY = new DashDataType(DashboardUtils.TIME_OF_DAY);
+	public static final DashDataType HOUR_OF_DAY = new DashDataType(DashboardUtils.HOUR_OF_DAY);
+	public static final DashDataType MINUTE_OF_HOUR = new DashDataType(DashboardUtils.MINUTE_OF_HOUR);
+	public static final DashDataType SECOND_OF_MINUTE = new DashDataType(DashboardUtils.SECOND_OF_MINUTE);
+
+	/**
+	 * DAY_OF_YEAR, along with YEAR, and possibly SECOND_OF_DAY,
+	 * may be used to specify the date and time of the measurement.
+	 */
+	public static final DashDataType DAY_OF_YEAR = new DashDataType(DashboardUtils.DAY_OF_YEAR);
+
+	/**
+	 * SECOND_OF_DAY, along with YEAR and DAY_OF_YEAR may
+	 * be used to specify date and time of the measurement
+	 */
+	public static final DashDataType SECOND_OF_DAY = new DashDataType(DashboardUtils.SECOND_OF_DAY);
+
+	public static final DashDataType LONGITUDE = new DashDataType(DashboardUtils.LONGITUDE);
+	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
+	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
+	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
 
 	/** Pattern for getKeyForName */
 	private static final Pattern stripPattern = Pattern.compile("[^a-z0-9]+");
@@ -118,5 +160,17 @@ public class DashboardServerUtils {
 			return false;
 		return true;
 	}
+
+	/** 
+	 * Value of userRealName to use to skip sending the email request in 
+	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	 */
+	public static final String NOMAIL_USER_REAL_NAME = "nobody";
+
+	/** 
+	 * Value of userEmail to use to skip sending the email request in 
+	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	 */
+	public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
 
 }

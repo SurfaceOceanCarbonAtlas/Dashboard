@@ -30,10 +30,13 @@ import uk.ac.uea.socat.sanitychecker.data.ColumnSpec;
  * @author Karl Smith
  */
 public class SanityCheckerTest {
-	private static final String CONFIG_FILENAME = 
-			"/home/flat/ksmith/content/SocatUploadDashboard/SocatUploadDashboard.properties";
-	private static final String LOG4J_PROPERTIES_FILENAME = 
-			"/home/flat/ksmith/content/SocatUploadDashboard/log4j.properties";
+	private static final String CONFIG_FILENAME;
+	private static final String LOG4J_PROPERTIES_FILENAME;
+	static {
+		String home = System.getenv("HOME");
+		CONFIG_FILENAME = home + "/content/SocatUploadDashboard/SocatUploadDashboard.properties";
+		LOG4J_PROPERTIES_FILENAME = home + "/content/SocatUploadDashboard/log4j.properties";
+	}
 
 	@Test
 	public void testSanityChecker() throws Exception {

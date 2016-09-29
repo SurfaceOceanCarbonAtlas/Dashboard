@@ -294,7 +294,7 @@ public class SocatCruiseReporter {
 			socatDOI = SOCAT_ENHANCED_DOI_TAG;
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
-		double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
+		double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
 
 		// Generate the report
 		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
@@ -451,7 +451,7 @@ public class SocatCruiseReporter {
 					warnMsgs.add(msg);
 				}
 				// Get the computed values of time in seconds since 1970-01-01 00:00:00
-				double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
+				double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
 				// Create the set for holding previous lon/lat/time/fCO2_rec data
 				TreeSet<DataPoint> prevDatPts = new TreeSet<DataPoint>();
 				int j = -1;
@@ -1488,7 +1488,7 @@ public class SocatCruiseReporter {
 					throw new IllegalArgumentException(msg);
 				}
 				// Get the computed values of time in seconds since 1970-01-01 00:00:00
-				double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
+				double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
 				// Collect and sort the acceptable data for this cruise
 				// Any duplicates are eliminated in this process
 				TreeSet<DataPoint> datSet = new TreeSet<DataPoint>();

@@ -32,71 +32,71 @@ public class KnownDataTypesTest {
 	private static final ArrayList<String> USERS_VARNAMES = new ArrayList<String>(Arrays.asList(
 			DashboardUtils.UNKNOWN.getVarName(),
 			DashboardUtils.OTHER.getVarName(),
-			KnownDataTypes.EXPOCODE.getVarName(),
-			KnownDataTypes.DATASET_NAME.getVarName(),
-			KnownDataTypes.VESSEL_NAME.getVarName(),
-			KnownDataTypes.ORGANIZATION_NAME.getVarName(),
-			KnownDataTypes.INVESTIGATOR_NAMES.getVarName(),
-			KnownDataTypes.QC_FLAG.getVarName(),
-			KnownDataTypes.TIMESTAMP.getVarName(),
-			KnownDataTypes.DATE.getVarName(),
-			KnownDataTypes.YEAR.getVarName(),
-			KnownDataTypes.MONTH_OF_YEAR.getVarName(),
-			KnownDataTypes.DAY_OF_MONTH.getVarName(),
-			KnownDataTypes.TIME_OF_DAY.getVarName(),
-			KnownDataTypes.HOUR_OF_DAY.getVarName(),
-			KnownDataTypes.MINUTE_OF_HOUR.getVarName(),
-			KnownDataTypes.SECOND_OF_MINUTE.getVarName(),
-			KnownDataTypes.DAY_OF_YEAR.getVarName(),
-			KnownDataTypes.SECOND_OF_DAY.getVarName(),
-			KnownDataTypes.LONGITUDE.getVarName(),
-			KnownDataTypes.LATITUDE.getVarName(),
-			KnownDataTypes.SAMPLE_DEPTH.getVarName()
+			DashboardServerUtils.EXPOCODE.getVarName(),
+			DashboardServerUtils.DATASET_NAME.getVarName(),
+			DashboardServerUtils.VESSEL_NAME.getVarName(),
+			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
+			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
+			DashboardServerUtils.QC_FLAG.getVarName(),
+			DashboardServerUtils.TIMESTAMP.getVarName(),
+			DashboardServerUtils.DATE.getVarName(),
+			DashboardServerUtils.YEAR.getVarName(),
+			DashboardServerUtils.MONTH_OF_YEAR.getVarName(),
+			DashboardServerUtils.DAY_OF_MONTH.getVarName(),
+			DashboardServerUtils.TIME_OF_DAY.getVarName(),
+			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
+			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
+			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
+			DashboardServerUtils.DAY_OF_YEAR.getVarName(),
+			DashboardServerUtils.SECOND_OF_DAY.getVarName(),
+			DashboardServerUtils.LONGITUDE.getVarName(),
+			DashboardServerUtils.LATITUDE.getVarName(),
+			DashboardServerUtils.SAMPLE_DEPTH.getVarName()
 	));
 
 	private static final ArrayList<String> METADATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
-			KnownDataTypes.EXPOCODE.getVarName(),
-			KnownDataTypes.DATASET_NAME.getVarName(),
-			KnownDataTypes.VESSEL_NAME.getVarName(),
-			KnownDataTypes.ORGANIZATION_NAME.getVarName(),
-			KnownDataTypes.INVESTIGATOR_NAMES.getVarName(),
-			KnownDataTypes.WESTERNMOST_LONGITUDE.getVarName(),
-			KnownDataTypes.EASTERNMOST_LONGITUDE.getVarName(),
-			KnownDataTypes.SOUTHERNMOST_LATITUDE.getVarName(),
-			KnownDataTypes.NORTHERNMOST_LATITUDE.getVarName(),
-			KnownDataTypes.TIME_COVERAGE_START.getVarName(),
-			KnownDataTypes.TIME_COVERAGE_END.getVarName(),
-			KnownDataTypes.QC_FLAG.getVarName()
+			DashboardServerUtils.EXPOCODE.getVarName(),
+			DashboardServerUtils.DATASET_NAME.getVarName(),
+			DashboardServerUtils.VESSEL_NAME.getVarName(),
+			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
+			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
+			DashboardServerUtils.WESTERNMOST_LONGITUDE.getVarName(),
+			DashboardServerUtils.EASTERNMOST_LONGITUDE.getVarName(),
+			DashboardServerUtils.SOUTHERNMOST_LATITUDE.getVarName(),
+			DashboardServerUtils.NORTHERNMOST_LATITUDE.getVarName(),
+			DashboardServerUtils.TIME_COVERAGE_START.getVarName(),
+			DashboardServerUtils.TIME_COVERAGE_END.getVarName(),
+			DashboardServerUtils.QC_FLAG.getVarName()
 	));
 
 	private static final ArrayList<String> DATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
-			KnownDataTypes.SAMPLE_NUMBER.getVarName(),
-			KnownDataTypes.YEAR.getVarName(),
-			KnownDataTypes.MONTH_OF_YEAR.getVarName(),
-			KnownDataTypes.DAY_OF_MONTH.getVarName(),
-			KnownDataTypes.HOUR_OF_DAY.getVarName(),
-			KnownDataTypes.MINUTE_OF_HOUR.getVarName(),
-			KnownDataTypes.SECOND_OF_MINUTE.getVarName(),
-			KnownDataTypes.TIME.getVarName(),
-			KnownDataTypes.LONGITUDE.getVarName(),
-			KnownDataTypes.LATITUDE.getVarName(),
-			KnownDataTypes.SAMPLE_DEPTH.getVarName()
+			DashboardServerUtils.SAMPLE_NUMBER.getVarName(),
+			DashboardServerUtils.YEAR.getVarName(),
+			DashboardServerUtils.MONTH_OF_YEAR.getVarName(),
+			DashboardServerUtils.DAY_OF_MONTH.getVarName(),
+			DashboardServerUtils.HOUR_OF_DAY.getVarName(),
+			DashboardServerUtils.MINUTE_OF_HOUR.getVarName(),
+			DashboardServerUtils.SECOND_OF_MINUTE.getVarName(),
+			DashboardServerUtils.TIME.getVarName(),
+			DashboardServerUtils.LONGITUDE.getVarName(),
+			DashboardServerUtils.LATITUDE.getVarName(),
+			DashboardServerUtils.SAMPLE_DEPTH.getVarName()
 	));
 
 	private static final LinkedHashSet<DashDataType> METADATA_FILES_TYPES_SET = 
 			new LinkedHashSet<DashDataType>( Arrays.asList(
-					KnownDataTypes.EXPOCODE,
-					KnownDataTypes.DATASET_NAME,
-					KnownDataTypes.VESSEL_NAME,
-					KnownDataTypes.ORGANIZATION_NAME,
-					KnownDataTypes.INVESTIGATOR_NAMES,
-					KnownDataTypes.WESTERNMOST_LONGITUDE,
-					KnownDataTypes.EASTERNMOST_LONGITUDE,
-					KnownDataTypes.SOUTHERNMOST_LATITUDE,
-					KnownDataTypes.NORTHERNMOST_LATITUDE,
-					KnownDataTypes.TIME_COVERAGE_START,
-					KnownDataTypes.TIME_COVERAGE_END,
-					KnownDataTypes.QC_FLAG
+					DashboardServerUtils.EXPOCODE,
+					DashboardServerUtils.DATASET_NAME,
+					DashboardServerUtils.VESSEL_NAME,
+					DashboardServerUtils.ORGANIZATION_NAME,
+					DashboardServerUtils.INVESTIGATOR_NAMES,
+					DashboardServerUtils.WESTERNMOST_LONGITUDE,
+					DashboardServerUtils.EASTERNMOST_LONGITUDE,
+					DashboardServerUtils.SOUTHERNMOST_LATITUDE,
+					DashboardServerUtils.NORTHERNMOST_LATITUDE,
+					DashboardServerUtils.TIME_COVERAGE_START,
+					DashboardServerUtils.TIME_COVERAGE_END,
+					DashboardServerUtils.QC_FLAG
 					) );
 
 	static final String[] ADDN_TYPES_DISPLAY_NAMES = new String[] {
@@ -218,7 +218,7 @@ public class KnownDataTypesTest {
 		types.addStandardTypesForUsers();
 		expoType = types.getDataColumnType("EXPOCODE");
 		DashDataType other = new DashDataType(expoType);
-		assertEquals(KnownDataTypes.EXPOCODE, other);
+		assertEquals(DashboardServerUtils.EXPOCODE, other);
 	}
 
 	/**

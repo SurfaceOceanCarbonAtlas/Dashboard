@@ -14,8 +14,9 @@ import java.util.Arrays;
 import org.junit.Test;
 
 /**
- * @author ksmith
- *
+ * Tests for {@link gov.noaa.pmel.dashboard.server.DashDataType}
+ * 
+ * @author Karl Smith
  */
 public class DashDataTypeTest {
 

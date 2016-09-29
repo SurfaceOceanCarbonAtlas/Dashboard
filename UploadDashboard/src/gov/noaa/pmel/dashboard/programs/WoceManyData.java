@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
@@ -94,7 +94,7 @@ public class WoceManyData {
 			}
 			char[] regionIDs = null;
 			try {
-				regionIDs = dsgFile.readCharVarDataValues(SocatCruiseData.REGION_ID.getVarName());
+				regionIDs = dsgFile.readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
 			} catch (Exception ex) {
 				System.err.println("Problem reading the region IDs from the DSG file");
 				ex.printStackTrace();
@@ -115,7 +115,7 @@ public class WoceManyData {
 			}
 			double[] fco2Rec = null;
 			try {
-				fco2Rec = dsgFile.readDoubleVarDataValues(SocatCruiseData.FCO2_REC.getVarName());
+				fco2Rec = dsgFile.readDoubleVarDataValues(SocatTypes.FCO2_REC.getVarName());
 			} catch (Exception ex) {
 				System.err.println("Problem reading fco2_recommended values from the DSG file");
 				ex.printStackTrace();
@@ -123,7 +123,7 @@ public class WoceManyData {
 			}
 			char[] woceFlags = null;
 			try {
-				woceFlags = dsgFile.readCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName());
+				woceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
 			} catch (Exception ex) {
 				System.err.println("Problem reading the WOCE flags from the DSG file");
 				ex.printStackTrace();
@@ -134,7 +134,7 @@ public class WoceManyData {
 			// Create the WOCE event
 			WoceEvent woceEvent = new WoceEvent();
 			woceEvent.setComment(woceComment);
-			woceEvent.setVarName(SocatCruiseData.FCO2_REC.getVarName());
+			woceEvent.setVarName(SocatTypes.FCO2_REC.getVarName());
 			woceEvent.setExpocode(expocode);
 			woceEvent.setFlag(woceFlag);
 			woceEvent.setFlagDate(new Date());

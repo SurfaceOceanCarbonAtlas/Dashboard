@@ -26,7 +26,7 @@ import org.jdom2.Element;
 
 public class FerretConfig extends Document {
 
-	private static final long serialVersionUID = -1491908105223114494L;
+	private static final long serialVersionUID = 2688268720506176162L;
 
 	public enum Action {
 		/**

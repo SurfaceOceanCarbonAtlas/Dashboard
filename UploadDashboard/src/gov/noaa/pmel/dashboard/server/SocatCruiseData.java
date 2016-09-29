@@ -8,7 +8,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -21,298 +20,6 @@ import java.util.Map.Entry;
  * @author Karl Smith
  */
 public class SocatCruiseData {
-
-	/** 
-	 * User-provided comment for WOCE_CO2_WATER;
-	 * user type only, used for generating WOCE events from user-provided data.
-	 */
-	public static final DashDataType COMMENT_WOCE_CO2_WATER = new DashDataType(
-			"comment WOCE CO2_water", "comment_WOCE_CO2_water", 
-			DashboardUtils.STRING_DATA_CLASS_NAME, "comment about WOCE_CO2_water flag", 
-			null, null, DashboardUtils.NO_UNITS);
-	/** 
-	 * User-provided comment for WOCE_CO2_ATM;
-	 * user type only, used for generating WOCE events from user-provided data.
-	 */
-	public static final DashDataType COMMENT_WOCE_CO2_ATM = new DashDataType(
-			"comment WOCE CO2_atm", "comment_WOCE_CO2_atm", 
-			DashboardUtils.STRING_DATA_CLASS_NAME, "comment about WOCE_CO2_atm flag", 
-			null, null, DashboardUtils.NO_UNITS);
-
-	// Unit arrays for static types in this class
-	public static final ArrayList<String> SALINITY_UNITS = 
-			new ArrayList<String>(Arrays.asList("PSU"));
-	public static final ArrayList<String> TEMPERATURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees C"));
-	public static final ArrayList<String> PRESSURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
-	public static final ArrayList<String> XCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("umol/mol"));
-	public static final ArrayList<String> PCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-	public static final ArrayList<String> FCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-	public static final ArrayList<String> DIRECTION_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees"));
-	public static final ArrayList<String> SHIP_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("knots", "km/h", "m/s", "mph"));
-	public static final ArrayList<String> WIND_SPEED_UNITS = 
-			new ArrayList<String>(Arrays.asList("m/s"));
-	public static final ArrayList<String> XH2O_UNITS = 
-			new ArrayList<String>(Arrays.asList("mmol/mol", "umol/mol"));
-	public static final ArrayList<String> DISTANCE_UNITS = 
-			new ArrayList<String>(Arrays.asList("km"));
-	public static final ArrayList<String> DAYS_UNITS = 
-			new ArrayList<String>(Arrays.asList("days"));
-
-	// Integer types
-	public static final DashDataType FCO2_SOURCE = new DashDataType("fCO2 src", 
-			"fCO2_source", DashboardUtils.INT_DATA_CLASS_NAME, 
-			"Algorithm number for recommended fCO2", null, 
-			DashboardUtils.IDENTIFIER_CATEGORY, DashboardUtils.NO_UNITS);
-
-	// Character types
-	public static final DashDataType REGION_ID = new DashDataType("Region ID",
-			"region_id", DashboardUtils.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
-			null, DashboardUtils.LOCATION_CATEGORY, DashboardUtils.NO_UNITS);
-	public static final DashDataType WOCE_CO2_WATER = new DashDataType("WOCE CO2_water",
-			"WOCE_CO2_water", DashboardUtils.CHAR_DATA_CLASS_NAME, 
-			"WOCE flag for aqueous CO2", null, 
-			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
-	public static final DashDataType WOCE_CO2_ATM = new DashDataType("WOCE_CO2_atm", 
-			"WOCE_CO2_atm", DashboardUtils.CHAR_DATA_CLASS_NAME, 
-			"WOCE flag for atmospheric CO2", null, 
-			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
-
-	// Double types
-	public static final DashDataType SALINITY = new DashDataType("salinity", 
-			"sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"salinity", "sea_surface_salinity", 
-			DashboardUtils.SALINITY_CATEGORY, SALINITY_UNITS);
-	public static final DashDataType WOA_SALINITY = new DashDataType("WOA SSS", 
-			"woa_sss", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"salinity from World Ocean Atlas", "sea_surface_salinity", 
-			DashboardUtils.SALINITY_CATEGORY, SALINITY_UNITS);
-
-	public static final DashDataType TEQU = new DashDataType("T_equ", 
-			"Temperature_equi", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"equilibrator chamber temperature", null, 
-			DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DashDataType SST = new DashDataType("SST", 
-			"temp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea surface temperature", "sea_surface_temperature", 
-			DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DashDataType TATM = new DashDataType("T_atm", 
-			"Temperature_atm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea-level air temperature", "air_temperature_at_sea_level", 
-			DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-
-	public static final DashDataType PEQU = new DashDataType("P_equ", 
-			"Pressure_equi", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"equilibrator chamber pressure", null, 
-			DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
-	public static final DashDataType PATM = new DashDataType("P_atm", 
-			"Pressure_atm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea-level air pressure", "air_pressure_at_sea_level", 
-			DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
-	public static final DashDataType NCEP_SLP = new DashDataType("NCEP SLP", 
-			"pressure_ncep_slp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea level air pressure from NCEP/NCAR reanalysis", "air_pressure_at_sea_level", 
-			DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
-
-	public static final DashDataType XCO2_WATER_TEQU_DRY = new DashDataType("xCO2_water_Tequ_dry", 
-			"xCO2_water_equi_temp_dry_ppm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 dry using equi temp", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType XCO2_WATER_SST_DRY = new DashDataType("xCO2_water_SST_dry", 
-			"xCO2_water_sst_dry_ppm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 dry using sst", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType XCO2_WATER_TEQU_WET = new DashDataType("xCO2_water_Tequ_wet", 
-			"xCO2_water_equi_temp_wet_ppm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 wet using equi temp", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType XCO2_WATER_SST_WET = new DashDataType("xCO2_water_SST_wet", 
-			"xCO2_water_sst_wet_ppm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 wet using sst", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType PCO2_WATER_TEQU_WET = new DashDataType("pCO2_water_Tequ_wet", 
-			"pCO2_water_equi_temp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water pCO2 wet using equi temp", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType PCO2_WATER_SST_WET = new DashDataType("pCO2_water_SST_wet", 
-			"pCO2_water_sst_100humidity_uatm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water pCO2 wet using sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType FCO2_WATER_TEQU_WET = new DashDataType("fCO2_water_Tequ_wet", 
-			"fCO2_water_equi_uatm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water fCO2 wet using equi temp", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_WATER_SST_WET = new DashDataType("fCO2_water_SST_wet", 
-			"fCO2_water_sst_100humidity_uatm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water fCO2 wet using sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType XCO2_ATM_DRY_ACTUAL = new DashDataType("xCO2_atm_dry_actual", 
-			"xCO2_atm_dry_actual", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"actual air xCO2 dry", "mole_fraction_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType XCO2_ATM_DRY_INTERP = new DashDataType("xCO2_atm_dry_interp", 
-			"xCO2_atm_dry_interp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"interpolated air xCO2 dry", "mole_fraction_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType PCO2_ATM_WET_ACTUAL = new DashDataType("pCO2_atm_wet_actual", 
-			"pCO2_atm_wet_actual", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"actual air pCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType PCO2_ATM_WET_INTERP = new DashDataType("pCO2_atm_wet_interp", 
-			"pCO2_atm_wet_interp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"interpolated air pCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType FCO2_ATM_WET_ACTUAL = new DashDataType("fCO2_atm_wet_actual", 
-			"fCO2_atm_wet_actual", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"actual air fCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_ATM_WET_INTERP = new DashDataType("fCO2_atm_wet_interp", 
-			"fCO2_atm_wet_interp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"interpolated air fCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType DELTA_XCO2 = new DashDataType("delta_xCO2", 
-			"delta_xCO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 minus atmospheric xCO2", null, 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType DELTA_PCO2 = new DashDataType("delta_pCO2", 
-			"delta_pCO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water pCO2 minus atmospheric pCO2", null, 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-	public static final DashDataType DELTA_FCO2 = new DashDataType("delta_fCO2", 
-			"delta_fCO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water fCO2 minus atmospheric fCO2", null, 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType XH2O_EQU = new DashDataType("xH2O_equi", 
-			"xH2O_equi", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"xH2O in equil air sample", "mole_fraction_of_water_in_air", 
-			DashboardUtils.WATER_VAPOR_CATEGORY, XH2O_UNITS);
-	public static final DashDataType RELATIVE_HUMIDITY = new DashDataType("rel humidity", 
-			"relative_humidity", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"relative humidity", "relative_humidity", 
-			DashboardUtils.WATER_VAPOR_CATEGORY, DashboardUtils.NO_UNITS);
-	public static final DashDataType SPECIFIC_HUMIDITY = new DashDataType("spec humidity", 
-			"specific_humidity", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"specific humidity", "specific_humidity", 
-			DashboardUtils.WATER_VAPOR_CATEGORY, DashboardUtils.NO_UNITS);
-
-	public static final DashDataType SHIP_SPEED = new DashDataType("ship speed",
-			"ship_speed", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"measured ship speed", "platform_speed_wrt_ground", 
-			DashboardUtils.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
-	public static final DashDataType SHIP_DIRECTION = new DashDataType("ship dir",
-			"ship_dir", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"ship direction", "platform_course", 
-			DashboardUtils.PLATFORM_CATEGORY, DIRECTION_UNITS);
-	public static final DashDataType WIND_SPEED_TRUE = new DashDataType("true wind speed", 
-			"wind_speed_true", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"true wind speed", "wind_speed", 
-			DashboardUtils.WIND_CATEGORY, WIND_SPEED_UNITS);
-	public static final DashDataType WIND_SPEED_RELATIVE = new DashDataType("rel wind speed", 
-			"wind_speed_rel", DashboardUtils.DOUBLE_DATA_CLASS_NAME, "relative wind speed", 
-			"wind_speed", DashboardUtils.WIND_CATEGORY, WIND_SPEED_UNITS);
-	public static final DashDataType WIND_DIRECTION_TRUE = new DashDataType("true wind dir", 
-			"wind_dir_true", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"true wind direction", "wind_from_direction", 
-			DashboardUtils.WIND_CATEGORY, DIRECTION_UNITS);
-	public static final DashDataType WIND_DIRECTION_RELATIVE = new DashDataType("rel wind dir", 
-			"wind_dir_rel", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"relative wind direction", "wind_from_direction", 
-			DashboardUtils.WIND_CATEGORY, DIRECTION_UNITS);
-
-	public static final DashDataType FCO2_FROM_XCO2_TEQU = new DashDataType("fCO2 from xCO2_water_Tequ_dry, Pequ, sal", 
-			"fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_SST = new DashDataType("fCO2 from xCO2_water_SST_dry, Pequ, sal", 
-			"fCO2_insitu_from_xCO2_water_sst_dry_ppm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_PCO2_TEQU = new DashDataType("fCO2 from pCO2_water_Tequ_wet, Pequ, sal", 
-			"fCO2_from_pCO2_water_water_equi_temp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from pCO2_water_equi_temp, Pressure_equi, sal","surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_PCO2_SST = new DashDataType("fCO2 from pCO2_water_SST_dry, Pequ, sal", 
-			"fCO2_from_pCO2_water_sst_100humidity_uatm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_FCO2_TEQU = new DashDataType("fCO2 from fCO2_water_Tequ_wet, Pequ, sal", 
-			"fCO2_insitu_from_fCO2_water_equi_uatm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from fCO2_water_equi_temp, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_FCO2_SST = new DashDataType("fCO2 from fCO2_water_SST_dry, Pequ, sal", 
-			"fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_PCO2_TEQU_NCEP = new DashDataType("fCO2 from pCO2_water_Tequ_wet, NCEP SLP, sal", 
-			"fCO2_from_pCO2_water_water_equi_temp_ncep", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from pCO2_water_equi_temp, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_PCO2_SST_NCEP = new DashDataType("fCO2 from pCO2_water_SST_wet, NCEP SLP, sal", 
-			"fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_TEQU_WOA = new DashDataType("fCO2 from xCO2_water_Tequ_dry, Pequ, WOA SSS", 
-			"fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_SST_WOA = new DashDataType("fCO2 from xCO2_water_SST_dry, Pequ, WOA SSS",
-			"fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_TEQU_NCEP = new DashDataType("fCO2 from xCO2_water_Tequ_dry, NCEP SLP, sal", 
-			"fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP = new DashDataType("fCO2 from xCO2_water_SST_dry, NCEP SLP, sal", 
-			"fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DashDataType("fCO2 from xCO2_water_Tequ_dry, NCEP SLP, WOA SSS", 
-			"fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP_WOA = new DashDataType("fCO2 from xCO2_water_SST_dry, NCEP SLP, WOA SSS",
-			"fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType FCO2_REC = new DashDataType("fCO2_rec", 
-			"fCO2_recommended", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 recommended", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType DELTA_TEMP = new DashDataType("delta_temp", 
-			"delta_temp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"Equilibrator Temp - SST", null, 
-			DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-	public static final DashDataType CALC_SPEED = new DashDataType("calc ship speed",
-			"calc_speed", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"calculated ship speed", "platform_speed_wrt_ground", 
-			DashboardUtils.PLATFORM_CATEGORY, SHIP_SPEED_UNITS);
-	public static final DashDataType ETOPO2_DEPTH = new DashDataType("ETOPO2 depth",
-			"etopo2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"bathymetry from ETOPO2", "sea_floor_depth", 
-			DashboardUtils.BATHYMETRY_CATEGORY, DashboardUtils.DEPTH_UNITS);
-	public static final DashDataType GVCO2 = new DashDataType("GlobalView CO2", 
-			"gvCO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"GlobalView xCO2", "mole_fraction_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-	public static final DashDataType DIST_TO_LAND = new DashDataType("dist to land",
-			"dist_to_land", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"distance to major land mass", null, 
-			DashboardUtils.LOCATION_CATEGORY, DISTANCE_UNITS);
-	public static final DashDataType DAY_OF_YEAR = new DashDataType("day of year",
-			"day_of_year", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"day of the year", null, DashboardUtils.TIME_CATEGORY, DAYS_UNITS);
 
 	private LinkedHashMap<DashDataType,Character> charValsMap;
 	private LinkedHashMap<DashDataType,Integer> intValsMap;
@@ -327,7 +34,7 @@ public class SocatCruiseData {
 	 * are accepted at this time.
 	 * Sets the values to the default values:
 	 * 	{@link DashboardUtils#WOCE_NOT_CHECKED} for WOCE flags (starts with "WOCE_"),
-	 * 	{@link DashboardUtils#GLOBAL_REGION_ID} for {@link #REGION_ID},
+	 * 	{@link DashboardUtils#GLOBAL_REGION_ID} for {@link SocatTypes#REGION_ID},
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other {@link DashboardUtils#CHAR_DATA_CLASS_NAME} values.
 	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link DashboardUtils#INT_DATA_CLASS_NAME} values, and
 	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values
@@ -349,7 +56,7 @@ public class SocatCruiseData {
 					// WOCE flag
 					charValsMap.put(dtype, DashboardUtils.WOCE_NOT_CHECKED);
 				}
-				else if ( dtype.typeNameEquals(REGION_ID) ) {
+				else if ( dtype.typeNameEquals(SocatTypes.REGION_ID) ) {
 					// Region ID
 					charValsMap.put(dtype, DashboardUtils.GLOBAL_REGION_ID);
 				}
@@ -376,7 +83,7 @@ public class SocatCruiseData {
 	 * type, and the missing value is "NaN", an empty string, or null.
 	 * 
 	 * An exception is thrown if a data column with type 
-	 * {@link KnownDataTypes#UNKNOWN} is encountered; otherwise data columns
+	 * {@link DashboardServerUtils#UNKNOWN} is encountered; otherwise data columns
 	 * with types not present in knownTypes are ignored.  The data types
 	 * {@link DashDataType#UNKNOWN}, {@link DashDataType#OTHER}, and any
 	 * metadata types should not be in knownTypes.
@@ -408,12 +115,12 @@ public class SocatCruiseData {
 					numColumns + ") does not match the number of data values (" +
 					dataValues.size() + ")");
 		// Add values to the empty record
-		if ( intValsMap.containsKey(KnownDataTypes.SAMPLE_NUMBER) )
-			intValsMap.put(KnownDataTypes.SAMPLE_NUMBER, Integer.valueOf(sampleNum));
+		if ( intValsMap.containsKey(DashboardServerUtils.SAMPLE_NUMBER) )
+			intValsMap.put(DashboardServerUtils.SAMPLE_NUMBER, Integer.valueOf(sampleNum));
 		for (int k = 0; k < numColumns; k++) {
 			// Make sure the data type is valid
 			DashDataType dtype = columnTypes.get(k);
-			if ( KnownDataTypes.UNKNOWN.typeNameEquals(dtype) )
+			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(dtype) )
 				throw new IllegalArgumentException("Data column number " + 
 						Integer.toString(k+1) + " has type UNKNOWN");
 			// Skip over missing values since the empty data record
@@ -596,7 +303,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned or not positive
 	 */
 	public Integer getSampleNumber() {
-		Integer value = intValsMap.get(KnownDataTypes.SAMPLE_NUMBER);
+		Integer value = intValsMap.get(DashboardServerUtils.SAMPLE_NUMBER);
 		if ( (value == null) || (value < 1) )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -611,7 +318,7 @@ public class SocatCruiseData {
 		Integer value = sampleNumber;
 		if ( (value == null) || (value < 1) )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.SAMPLE_NUMBER, value);
+		intValsMap.put(DashboardServerUtils.SAMPLE_NUMBER, value);
 	}
 
 	/**
@@ -620,7 +327,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getYear() {
-		Integer value = intValsMap.get(KnownDataTypes.YEAR);
+		Integer value = intValsMap.get(DashboardServerUtils.YEAR);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -635,7 +342,7 @@ public class SocatCruiseData {
 		Integer value = year;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.YEAR, value);
+		intValsMap.put(DashboardServerUtils.YEAR, value);
 	}
 
 	/**
@@ -644,7 +351,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getMonth() {
-		Integer value = intValsMap.get(KnownDataTypes.MONTH_OF_YEAR);
+		Integer value = intValsMap.get(DashboardServerUtils.MONTH_OF_YEAR);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -659,7 +366,7 @@ public class SocatCruiseData {
 		Integer value = month;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.MONTH_OF_YEAR, value);
+		intValsMap.put(DashboardServerUtils.MONTH_OF_YEAR, value);
 	}
 
 	/**
@@ -668,7 +375,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getDay() {
-		Integer value = intValsMap.get(KnownDataTypes.DAY_OF_MONTH);
+		Integer value = intValsMap.get(DashboardServerUtils.DAY_OF_MONTH);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -683,7 +390,7 @@ public class SocatCruiseData {
 		Integer value = day;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.DAY_OF_MONTH, value);
+		intValsMap.put(DashboardServerUtils.DAY_OF_MONTH, value);
 	}
 
 	/**
@@ -692,7 +399,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getHour() {
-		Integer value = intValsMap.get(KnownDataTypes.HOUR_OF_DAY);
+		Integer value = intValsMap.get(DashboardServerUtils.HOUR_OF_DAY);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -707,7 +414,7 @@ public class SocatCruiseData {
 		Integer value = hour;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.HOUR_OF_DAY, value);
+		intValsMap.put(DashboardServerUtils.HOUR_OF_DAY, value);
 	}
 
 	/**
@@ -716,7 +423,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getMinute() {
-		Integer value = intValsMap.get(KnownDataTypes.MINUTE_OF_HOUR);
+		Integer value = intValsMap.get(DashboardServerUtils.MINUTE_OF_HOUR);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -731,7 +438,7 @@ public class SocatCruiseData {
 		Integer value = minute;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(KnownDataTypes.MINUTE_OF_HOUR, value);
+		intValsMap.put(DashboardServerUtils.MINUTE_OF_HOUR, value);
 	}
 
 	/**
@@ -740,7 +447,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSecond() {
-		Double value = doubleValsMap.get(KnownDataTypes.SECOND_OF_MINUTE);
+		Double value = doubleValsMap.get(DashboardServerUtils.SECOND_OF_MINUTE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -755,7 +462,7 @@ public class SocatCruiseData {
 		Double value = second;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.SECOND_OF_MINUTE, value);
+		doubleValsMap.put(DashboardServerUtils.SECOND_OF_MINUTE, value);
 	}
 
 	/**
@@ -764,7 +471,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLongitude() {
-		Double value = doubleValsMap.get(KnownDataTypes.LONGITUDE);
+		Double value = doubleValsMap.get(DashboardServerUtils.LONGITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -779,7 +486,7 @@ public class SocatCruiseData {
 		Double value = longitude;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.LONGITUDE, value);
+		doubleValsMap.put(DashboardServerUtils.LONGITUDE, value);
 	}
 
 	/**
@@ -788,7 +495,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getLatitude() {
-		Double value = doubleValsMap.get(KnownDataTypes.LATITUDE);
+		Double value = doubleValsMap.get(DashboardServerUtils.LATITUDE);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -803,7 +510,7 @@ public class SocatCruiseData {
 		Double value = latitude;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.LATITUDE, value);
+		doubleValsMap.put(DashboardServerUtils.LATITUDE, value);
 	}
 
 	/**
@@ -812,7 +519,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSampleDepth() {
-		Double value = doubleValsMap.get(KnownDataTypes.SAMPLE_DEPTH);
+		Double value = doubleValsMap.get(DashboardServerUtils.SAMPLE_DEPTH);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -827,7 +534,7 @@ public class SocatCruiseData {
 		Double value = sampleDepth;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(KnownDataTypes.SAMPLE_DEPTH, value);
+		doubleValsMap.put(DashboardServerUtils.SAMPLE_DEPTH, value);
 	}
 
 	/**
@@ -836,7 +543,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Water() {
-		Character value = charValsMap.get(WOCE_CO2_WATER);
+		Character value = charValsMap.get(SocatTypes.WOCE_CO2_WATER);
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
 		return value;
@@ -851,7 +558,7 @@ public class SocatCruiseData {
 		Character value = woceCO2Water;
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
-		charValsMap.put(WOCE_CO2_WATER, value);
+		charValsMap.put(SocatTypes.WOCE_CO2_WATER, value);
 	}
 
 	/**
@@ -860,7 +567,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Atm() {
-		Character value = charValsMap.get(WOCE_CO2_ATM);
+		Character value = charValsMap.get(SocatTypes.WOCE_CO2_ATM);
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
 		return value;
@@ -875,7 +582,7 @@ public class SocatCruiseData {
 		Character value = woceCO2Atm;
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
-		charValsMap.put(WOCE_CO2_ATM, value);
+		charValsMap.put(SocatTypes.WOCE_CO2_ATM, value);
 	}
 
 	/**
@@ -884,7 +591,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#GLOBAL_REGION_ID} if not assigned
 	 */
 	public Character getRegionID() {
-		Character value = charValsMap.get(REGION_ID);
+		Character value = charValsMap.get(SocatTypes.REGION_ID);
 		if ( value == null )
 			value = DashboardUtils.GLOBAL_REGION_ID;
 		return value;
@@ -899,7 +606,7 @@ public class SocatCruiseData {
 		Character value = regionID;
 		if ( value == null )
 			value = DashboardUtils.GLOBAL_REGION_ID;
-		charValsMap.put(REGION_ID, value);
+		charValsMap.put(SocatTypes.REGION_ID, value);
 	}
 
 	/**
@@ -908,7 +615,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getFCO2Source() {
-		Integer value = intValsMap.get(FCO2_SOURCE);
+		Integer value = intValsMap.get(SocatTypes.FCO2_SOURCE);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -923,7 +630,7 @@ public class SocatCruiseData {
 		Integer value = fCO2Source;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(FCO2_SOURCE, value);
+		intValsMap.put(SocatTypes.FCO2_SOURCE, value);
 	}
 
 	/**
@@ -932,7 +639,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSalinity() {
-		Double value = doubleValsMap.get(SALINITY);
+		Double value = doubleValsMap.get(SocatTypes.SALINITY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -947,7 +654,7 @@ public class SocatCruiseData {
 		Double value = salinity;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SALINITY, value);
+		doubleValsMap.put(SocatTypes.SALINITY, value);
 	}
 
 	/**
@@ -956,7 +663,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getTEqu() {
-		Double value = doubleValsMap.get(TEQU);
+		Double value = doubleValsMap.get(SocatTypes.TEQU);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -971,7 +678,7 @@ public class SocatCruiseData {
 		Double value = tEqu;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(TEQU, value);
+		doubleValsMap.put(SocatTypes.TEQU, value);
 	}
 
 	/**
@@ -980,7 +687,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSst() {
-		Double value = doubleValsMap.get(SST);
+		Double value = doubleValsMap.get(SocatTypes.SST);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -995,7 +702,7 @@ public class SocatCruiseData {
 		Double value = sst;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SST, value);
+		doubleValsMap.put(SocatTypes.SST, value);
 	}
 
 	/**
@@ -1004,7 +711,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPAtm() {
-		Double value = doubleValsMap.get(PATM);
+		Double value = doubleValsMap.get(SocatTypes.PATM);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1019,7 +726,7 @@ public class SocatCruiseData {
 		Double value = pAtm;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PATM, value);
+		doubleValsMap.put(SocatTypes.PATM, value);
 	}
 
 	/**
@@ -1028,7 +735,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPEqu() {
-		Double value = doubleValsMap.get(PEQU);
+		Double value = doubleValsMap.get(SocatTypes.PEQU);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1043,7 +750,7 @@ public class SocatCruiseData {
 		Double value = pEqu;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PEQU, value);
+		doubleValsMap.put(SocatTypes.PEQU, value);
 	}
 
 	/**
@@ -1052,7 +759,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterTEquDry() {
-		Double value = doubleValsMap.get(XCO2_WATER_TEQU_DRY);
+		Double value = doubleValsMap.get(SocatTypes.XCO2_WATER_TEQU_DRY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1067,7 +774,7 @@ public class SocatCruiseData {
 		Double value = xCO2WaterTEquDry;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(XCO2_WATER_TEQU_DRY, value);
+		doubleValsMap.put(SocatTypes.XCO2_WATER_TEQU_DRY, value);
 	}
 
 	/**
@@ -1076,7 +783,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterSstDry() {
-		Double value = doubleValsMap.get(XCO2_WATER_SST_DRY);
+		Double value = doubleValsMap.get(SocatTypes.XCO2_WATER_SST_DRY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1091,7 +798,7 @@ public class SocatCruiseData {
 		Double value = xCO2WaterSstDry;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(XCO2_WATER_SST_DRY, value);
+		doubleValsMap.put(SocatTypes.XCO2_WATER_SST_DRY, value);
 	}
 
 	/**
@@ -1100,7 +807,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterTEquWet() {
-		Double value = doubleValsMap.get(PCO2_WATER_TEQU_WET);
+		Double value = doubleValsMap.get(SocatTypes.PCO2_WATER_TEQU_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1115,7 +822,7 @@ public class SocatCruiseData {
 		Double value = pCO2WaterTEquWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PCO2_WATER_TEQU_WET, value);
+		doubleValsMap.put(SocatTypes.PCO2_WATER_TEQU_WET, value);
 	}
 
 	/**
@@ -1124,7 +831,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterSstWet() {
-		Double value = doubleValsMap.get(PCO2_WATER_SST_WET);
+		Double value = doubleValsMap.get(SocatTypes.PCO2_WATER_SST_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1139,7 +846,7 @@ public class SocatCruiseData {
 		Double value = pCO2WaterSstWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(PCO2_WATER_SST_WET, value);
+		doubleValsMap.put(SocatTypes.PCO2_WATER_SST_WET, value);
 	}
 
 	/**
@@ -1148,7 +855,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterTEquWet() {
-		Double value = doubleValsMap.get(FCO2_WATER_TEQU_WET);
+		Double value = doubleValsMap.get(SocatTypes.FCO2_WATER_TEQU_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1163,7 +870,7 @@ public class SocatCruiseData {
 		Double value = fCO2WaterTEquWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(FCO2_WATER_TEQU_WET, value);
+		doubleValsMap.put(SocatTypes.FCO2_WATER_TEQU_WET, value);
 	}
 
 	/**
@@ -1172,7 +879,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterSstWet() {
-		Double value = doubleValsMap.get(FCO2_WATER_SST_WET);
+		Double value = doubleValsMap.get(SocatTypes.FCO2_WATER_SST_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1187,7 +894,7 @@ public class SocatCruiseData {
 		Double value = fCO2WaterSstWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(FCO2_WATER_SST_WET, value);
+		doubleValsMap.put(SocatTypes.FCO2_WATER_SST_WET, value);
 	}
 
 	/**
@@ -1196,7 +903,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getWoaSalinity() {
-		Double value = doubleValsMap.get(WOA_SALINITY);
+		Double value = doubleValsMap.get(SocatTypes.WOA_SALINITY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1211,7 +918,7 @@ public class SocatCruiseData {
 		Double value = woaSss;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(WOA_SALINITY, value);
+		doubleValsMap.put(SocatTypes.WOA_SALINITY, value);
 	}
 
 	/**
@@ -1220,7 +927,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getNcepSlp() {
-		Double value = doubleValsMap.get(NCEP_SLP);
+		Double value = doubleValsMap.get(SocatTypes.NCEP_SLP);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1235,7 +942,7 @@ public class SocatCruiseData {
 		Double value = ncepSlp;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(NCEP_SLP, value);
+		doubleValsMap.put(SocatTypes.NCEP_SLP, value);
 	}
 
 	/**
@@ -1244,7 +951,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getfCO2Rec() {
-		Double value = doubleValsMap.get(FCO2_REC);
+		Double value = doubleValsMap.get(SocatTypes.FCO2_REC);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1259,7 +966,7 @@ public class SocatCruiseData {
 		Double value = fCO2Rec;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(FCO2_REC, value);
+		doubleValsMap.put(SocatTypes.FCO2_REC, value);
 	}
 
 	/**
@@ -1268,7 +975,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getEtopo2Depth() {
-		Double value = doubleValsMap.get(ETOPO2_DEPTH);
+		Double value = doubleValsMap.get(SocatTypes.ETOPO2_DEPTH);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1283,7 +990,7 @@ public class SocatCruiseData {
 		Double value = etopo2;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(ETOPO2_DEPTH, value);
+		doubleValsMap.put(SocatTypes.ETOPO2_DEPTH, value);
 	}
 
 	/**
@@ -1292,7 +999,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getGvCO2() {
-		Double value = doubleValsMap.get(GVCO2);
+		Double value = doubleValsMap.get(SocatTypes.GVCO2);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1307,7 +1014,7 @@ public class SocatCruiseData {
 		Double value = gvCO2;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(GVCO2, value);
+		doubleValsMap.put(SocatTypes.GVCO2, value);
 	}
 
 	/**
@@ -1316,7 +1023,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDistToLand() {
-		Double value = doubleValsMap.get(DIST_TO_LAND);
+		Double value = doubleValsMap.get(SocatTypes.DIST_TO_LAND);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1331,7 +1038,7 @@ public class SocatCruiseData {
 		Double value = distToLand;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(DIST_TO_LAND, value);
+		doubleValsMap.put(SocatTypes.DIST_TO_LAND, value);
 	}
 
 	@Override 
@@ -1385,7 +1092,7 @@ public class SocatCruiseData {
 			Double thisval = entry.getValue();
 			Double otherval = other.doubleValsMap.get(dtype);
 
-			if ( dtype.typeNameEquals(KnownDataTypes.SECOND_OF_MINUTE) ) {
+			if ( dtype.typeNameEquals(DashboardServerUtils.SECOND_OF_MINUTE) ) {
 				// Match seconds not given (FP_MISSING_VALUE) with zero seconds
 				if ( ! DashboardUtils.closeTo(thisval, otherval, 0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) ) {
 					if ( ! ( thisval.equals(DashboardUtils.FP_MISSING_VALUE) && otherval.equals(Double.valueOf(0.0)) ) ) {

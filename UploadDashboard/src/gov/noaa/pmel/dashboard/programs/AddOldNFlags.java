@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 
@@ -222,7 +223,7 @@ public class AddOldNFlags {
 					String dsgVersionStatus = mdata.getSocatVersion();
 					if ( ! dsgVersionStatus.equals(dbVersionStatus) ) {
 						try {
-							fullDataDsg.updateStringVarValue(SocatMetadata.SOCAT_VERSION.getVarName(), dbVersionStatus);
+							fullDataDsg.updateStringVarValue(SocatTypes.SOCAT_VERSION.getVarName(), dbVersionStatus);
 						} catch (Exception ex) {
 							System.err.println("Problems updating the SOCAT version status in the full-data DSG file for " + 
 									expocode + ": " + ex.getMessage());
@@ -231,7 +232,7 @@ public class AddOldNFlags {
 						}
 						CruiseDsgNcFile decDataDsg = dsgHandler.getDecDsgNcFile(expocode);
 						try {
-							decDataDsg.updateStringVarValue(SocatMetadata.SOCAT_VERSION.getVarName(), dbVersionStatus);
+							decDataDsg.updateStringVarValue(SocatTypes.SOCAT_VERSION.getVarName(), dbVersionStatus);
 						} catch (Exception ex) {
 							System.err.println("Problems updating the SOCAT version status in the decimated-data DSG file for " + 
 									expocode + ": " + ex.getMessage());

@@ -11,9 +11,9 @@ import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -338,7 +338,7 @@ public class CruiseModifier {
 		double[] latitudes = lonlattimes[1];
 		double[] times = lonlattimes[2];
 		int numData = times.length;
-		char[] currentWoceFlags = dsgFile.readCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName());
+		char[] currentWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
@@ -362,7 +362,7 @@ public class CruiseModifier {
 				// Get the data associated with this WOCE event
 				String dataName = woceEvent.getVarName();
 				double[] dataVals;
-				if ( dataName.isEmpty() || dataName.equals(KnownDataTypes.GEOPOSITION.getVarName()) )
+				if ( dataName.isEmpty() || dataName.equals(DashboardServerUtils.GEOPOSITION.getVarName()) )
 					dataVals = null;
 				else
 					dataVals = dsgFile.readDoubleVarDataValues(dataName);
@@ -424,7 +424,7 @@ public class CruiseModifier {
 		if ( ! Arrays.equals(revisedWoceFlags, currentWoceFlags) ) {
 			changed = true;
 			// Update the full-data DSG file with the reassigned WOCE flags
-			dsgFile.writeCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
+			dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
 			// Generate the decimated DSG file from the updated full-data DSG file
 			dsgHandler.decimateCruise(expocode);
 			System.out.println("WOCE flags updated in the DSG files for " + expocode);
@@ -475,8 +475,8 @@ public class CruiseModifier {
 		double[] latitudes = lonlattime[1];
 		double[] times = lonlattime[2];
 		int numData = times.length;
-		char[] regionIDs = dsgFile.readCharVarDataValues(SocatCruiseData.REGION_ID.getVarName());
-		char[] currentWoceFlags = dsgFile.readCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName());
+		char[] regionIDs = dsgFile.readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
+		char[] currentWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
@@ -498,7 +498,7 @@ public class CruiseModifier {
 				// Get the data associated with this WOCE event
 				String dataName = woceEvent.getVarName();
 				double[] dataVals;
-				if ( dataName.isEmpty() || dataName.equals(KnownDataTypes.GEOPOSITION.getVarName()) )
+				if ( dataName.isEmpty() || dataName.equals(DashboardServerUtils.GEOPOSITION.getVarName()) )
 					dataVals = null;
 				else
 					dataVals = dsgFile.readDoubleVarDataValues(dataName);
@@ -615,7 +615,7 @@ public class CruiseModifier {
 		if ( ! Arrays.equals(revisedWoceFlags, currentWoceFlags) ) {
 			changed = true;
 			// Update the full-data DSG file with the reassigned WOCE flags
-			dsgFile.writeCharVarDataValues(SocatCruiseData.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
+			dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
 			// Generate the decimated DSG file from the updated full-data DSG file
 			dsgHandler.decimateCruise(expocode);
 			System.out.println("WOCE flags updated in the DSG files for " + expocode);
@@ -668,7 +668,7 @@ public class CruiseModifier {
 		String socatVersion = socatMeta.getSocatVersion();
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
-		double[] sectimes = dsgFile.readDoubleVarDataValues(KnownDataTypes.TIME.getVarName());
+		double[] sectimes = dsgFile.readDoubleVarDataValues(DashboardServerUtils.TIME.getVarName());
 
 		// Create the set for holding previous lon/lat/time/fCO2_rec data
 		TreeSet<DataInfo> prevDatInf = new TreeSet<DataInfo>();
@@ -713,7 +713,7 @@ public class CruiseModifier {
 			woceEvent.setComment("duplicate lon/lat/time/fCO2_rec data points detected by automation");
 			woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 			woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-			woceEvent.setVarName(SocatCruiseData.FCO2_REC.getVarName());
+			woceEvent.setVarName(SocatTypes.FCO2_REC.getVarName());
 			woceEvent.setLocations(locations);
 			// Add the WOCE event to the database
 			try {

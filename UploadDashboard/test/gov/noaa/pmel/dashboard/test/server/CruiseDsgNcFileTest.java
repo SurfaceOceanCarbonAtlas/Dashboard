@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.server.SocatTypes;
@@ -35,21 +35,21 @@ public class CruiseDsgNcFileTest {
 	@Test
 	public void testCreate() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				KnownDataTypes.EXPOCODE.duplicate(),
-				KnownDataTypes.DATASET_NAME.duplicate(),
-				KnownDataTypes.MONTH_OF_YEAR.duplicate(), 
-				KnownDataTypes.DAY_OF_MONTH.duplicate(), 
-				KnownDataTypes.YEAR.duplicate(), 
-				KnownDataTypes.HOUR_OF_DAY.duplicate(), 
-				KnownDataTypes.MINUTE_OF_HOUR.duplicate(), 
-				KnownDataTypes.LATITUDE.duplicate(), 
-				KnownDataTypes.LONGITUDE.duplicate(), 
-				SocatCruiseData.SST.duplicate(),
-				SocatCruiseData.SALINITY.duplicate(),
-				SocatCruiseData.XCO2_WATER_SST_DRY.duplicate(),
-				SocatCruiseData.PCO2_WATER_TEQU_WET.duplicate(),
-				SocatCruiseData.PATM.duplicate(),
-				SocatCruiseData.SHIP_SPEED.duplicate()));
+				DashboardServerUtils.EXPOCODE.duplicate(),
+				DashboardServerUtils.DATASET_NAME.duplicate(),
+				DashboardServerUtils.MONTH_OF_YEAR.duplicate(), 
+				DashboardServerUtils.DAY_OF_MONTH.duplicate(), 
+				DashboardServerUtils.YEAR.duplicate(), 
+				DashboardServerUtils.HOUR_OF_DAY.duplicate(), 
+				DashboardServerUtils.MINUTE_OF_HOUR.duplicate(), 
+				DashboardServerUtils.LATITUDE.duplicate(), 
+				DashboardServerUtils.LONGITUDE.duplicate(), 
+				SocatTypes.SST.duplicate(),
+				SocatTypes.SALINITY.duplicate(),
+				SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
+				SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
+				SocatTypes.PATM.duplicate(),
+				SocatTypes.SHIP_SPEED.duplicate()));
 		String[] dataValueStrings = {
 				"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
 				"31B520060606,GM0606,6,10,2006,23,49,29.0513,-92.759,28.9,33.56,405.5,388.3,1009.298,0.3", 
@@ -129,21 +129,21 @@ public class CruiseDsgNcFileTest {
 	@Test
 	public void testBadMissingValuesFail() throws Exception {
 		ArrayList<DataColumnType> testTypes = new ArrayList<DataColumnType>(Arrays.asList(
-				KnownDataTypes.EXPOCODE.duplicate(),
-				KnownDataTypes.DATASET_NAME.duplicate(),
-				KnownDataTypes.MONTH_OF_YEAR.duplicate(),
-				KnownDataTypes.DAY_OF_MONTH.duplicate(),
-				KnownDataTypes.YEAR.duplicate(),
-				KnownDataTypes.HOUR_OF_DAY.duplicate(),
-				KnownDataTypes.MINUTE_OF_HOUR.duplicate(),
-				KnownDataTypes.LATITUDE.duplicate(),
-				KnownDataTypes.LONGITUDE.duplicate(),
-				SocatCruiseData.SST.duplicate(),
-				SocatCruiseData.SALINITY.duplicate(),
-				SocatCruiseData.XCO2_WATER_SST_DRY.duplicate(),
-				SocatCruiseData.PCO2_WATER_TEQU_WET.duplicate(),
-				SocatCruiseData.PATM.duplicate(),
-				SocatCruiseData.SHIP_SPEED.duplicate()));
+				DashboardServerUtils.EXPOCODE.duplicate(),
+				DashboardServerUtils.DATASET_NAME.duplicate(),
+				DashboardServerUtils.MONTH_OF_YEAR.duplicate(),
+				DashboardServerUtils.DAY_OF_MONTH.duplicate(),
+				DashboardServerUtils.YEAR.duplicate(),
+				DashboardServerUtils.HOUR_OF_DAY.duplicate(),
+				DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
+				DashboardServerUtils.LATITUDE.duplicate(),
+				DashboardServerUtils.LONGITUDE.duplicate(),
+				SocatTypes.SST.duplicate(),
+				SocatTypes.SALINITY.duplicate(),
+				SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
+				SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
+				SocatTypes.PATM.duplicate(),
+				SocatTypes.SHIP_SPEED.duplicate()));
 		String[][] badTimeDataValueStringsSets = {
 				{
 					"11B520060606,GM0606,2,28,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 

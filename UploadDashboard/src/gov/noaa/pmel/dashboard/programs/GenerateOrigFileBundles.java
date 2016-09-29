@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -80,7 +81,7 @@ public class GenerateOrigFileBundles {
 				String commitMsg = "Automated generation of the original data files bundle for " + expo;
 				try {
 					String resultMsg = filesBundler.sendOrigFilesBundle(expo, commitMsg, 
-							SocatFilesBundler.NOMAIL_USER_REAL_NAME, SocatFilesBundler.NOMAIL_USER_EMAIL);
+							DashboardServerUtils.NOMAIL_USER_REAL_NAME, DashboardServerUtils.NOMAIL_USER_EMAIL);
 					System.out.println(expo + " : " + resultMsg); 
 				} catch ( IllegalArgumentException | IOException ex ) {
 					System.out.println(expo + " : " + "failed - " + ex.getMessage());

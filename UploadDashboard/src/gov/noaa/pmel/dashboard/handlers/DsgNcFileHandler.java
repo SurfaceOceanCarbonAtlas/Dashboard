@@ -12,6 +12,7 @@ import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
@@ -441,7 +442,7 @@ public class DsgNcFileHandler {
 		if ( ! dsgFile.exists() )
 			throw new FileNotFoundException("Full data DSG file for " + 
 					expocode + " does not exist");
-		char[] regions = dsgFile.readCharVarDataValues(SocatCruiseData.REGION_ID.getVarName());
+		char[] regions = dsgFile.readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
 		TreeSet<Character> regionsSet = new TreeSet<Character>();
 		for ( char value : regions )
 			regionsSet.add(value);

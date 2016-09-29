@@ -7,6 +7,7 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -490,7 +491,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		String expocode = "";
 		int k = 0;
 		for ( DataColumnType dctype : cruiseData.getDataColTypes() ) {
-			if ( KnownDataTypes.EXPOCODE.typeNameEquals(dctype) ) {
+			if ( DashboardServerUtils.EXPOCODE.typeNameEquals(dctype) ) {
 				expocode = cruiseData.getDataValues().get(0).get(k).toUpperCase();
 				break;
 			}
@@ -1043,7 +1044,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		boolean hasExpoColumn = false;
 		for ( DataColumnType type : cruiseData.getDataColTypes() ) {
 			k++;
-			if ( KnownDataTypes.EXPOCODE.typeNameEquals(type) ) {
+			if ( DashboardServerUtils.EXPOCODE.typeNameEquals(type) ) {
 				hasExpoColumn = true;
 				break;
 			}
@@ -1386,7 +1387,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			DataColumnType dctype = userTypes.getDataColumnType(colTypeNames.get(k));
 			if ( dctype == null ) {
 				// See if there is a modified version of this type name
-				String newName = DashboardServerUtils.RENAMED_DATA_TYPES.get(colTypeNames.get(k));
+				String newName = SocatTypes.RENAMED_DATA_TYPES.get(colTypeNames.get(k));
 				dctype = userTypes.getDataColumnType(newName);
 			}
 			if ( dctype == null )
@@ -1394,7 +1395,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			int index = dctype.getUnits().indexOf(colTypeUnits.get(k));
 			if ( index < 0 ) {
 				// see if there is a modified version of this unit
-				String newName = DashboardServerUtils.RENAMED_UNITS.get(colTypeUnits.get(k));
+				String newName = SocatTypes.RENAMED_UNITS.get(colTypeUnits.get(k));
 				if ( newName != null )
 					index = dctype.getUnits().indexOf(newName);
 			}

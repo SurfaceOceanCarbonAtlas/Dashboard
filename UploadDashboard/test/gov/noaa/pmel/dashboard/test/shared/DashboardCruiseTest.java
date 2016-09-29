@@ -8,7 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -234,10 +234,10 @@ public class DashboardCruiseTest {
 	public void testSetGetDataColTypes() {
 		ArrayList<DataColumnType> myDataTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
-					KnownDataTypes.TIMESTAMP.duplicate(),
-					KnownDataTypes.LONGITUDE.duplicate(),
-					KnownDataTypes.LATITUDE.duplicate(),
-					KnownDataTypes.SAMPLE_DEPTH.duplicate()
+					DashboardServerUtils.TIMESTAMP.duplicate(),
+					DashboardServerUtils.LONGITUDE.duplicate(),
+					DashboardServerUtils.LATITUDE.duplicate(),
+					DashboardServerUtils.SAMPLE_DEPTH.duplicate()
 				));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getDataColTypes().size());
@@ -584,10 +584,10 @@ public class DashboardCruiseTest {
 		int myNumWarnMsgs = 14;
 		ArrayList<DataColumnType> myDataColTypes = 
 				new ArrayList<DataColumnType>(Arrays.asList(
-					KnownDataTypes.TIMESTAMP.duplicate(),
-					KnownDataTypes.LONGITUDE.duplicate(),
-					KnownDataTypes.LATITUDE.duplicate(),
-					KnownDataTypes.SAMPLE_DEPTH.duplicate()
+					DashboardServerUtils.TIMESTAMP.duplicate(),
+					DashboardServerUtils.LONGITUDE.duplicate(),
+					DashboardServerUtils.LATITUDE.duplicate(),
+					DashboardServerUtils.SAMPLE_DEPTH.duplicate()
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "depth")); 
