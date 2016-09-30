@@ -330,7 +330,7 @@ public class CruiseChecker {
 						": " + cruiseData.getUserColNames().get(k));
 			}
 			else if ( DashboardServerUtils.OTHER.typeNameEquals(colType) ||
-					  colType.getVarName().startsWith("comment") ) {
+					  colType.getVarName().toLowerCase().startsWith("comment") ) {
 				// Unchecked data 
 				;
 			}
@@ -789,7 +789,7 @@ public class CruiseChecker {
 		}
 		if ( woceCO2WaterColumnIndex < 0 ) {
 			dataColTypes.add(SocatTypes.WOCE_CO2_WATER.duplicate());
-			userColNames.add("WOCE FLag");
+			userColNames.add("WOCE flag");
 			woceThreeRowIndices.add(new HashSet<Integer>());
 			woceFourRowIndices.add(new HashSet<Integer>());
 		}
@@ -882,7 +882,8 @@ public class CruiseChecker {
 					 DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(colType) ||
 
 					 DashboardServerUtils.OTHER.typeNameEquals(colType) ||
-					 colType.getVarName().startsWith("comment") ) {
+					 colType.getVarName().toLowerCase().startsWith("comment") ||
+					 colType.getVarName().toLowerCase().startsWith("woce_") ) {
 					// Do not change
 					;
 				}
