@@ -57,7 +57,7 @@ public class KnownDataTypes {
 	 * to select from.
 	 * 		UNKNOWN, OTHER,
 	 * 		EXPOCODE, DATASET_NAME, VESSEL_NAME, ORGANIZATION_NAME, 
-	 * 		INVESTIGATOR_NAMES, QC_FLAG,
+	 * 		INVESTIGATOR_NAMES,
 	 * 		TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH,
 	 * 		TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE,
 	 * 		DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, LATITUDE, SAMPLE_DEPTH
@@ -74,7 +74,6 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.VESSEL_NAME);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
-		addDataType(DashboardServerUtils.QC_FLAG);
 		addDataType(DashboardServerUtils.TIMESTAMP);
 		addDataType(DashboardServerUtils.DATE);
 		addDataType(DashboardServerUtils.YEAR);

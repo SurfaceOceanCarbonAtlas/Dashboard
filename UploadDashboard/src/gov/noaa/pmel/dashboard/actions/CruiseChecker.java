@@ -323,14 +323,14 @@ public class CruiseChecker {
 		Element[] timestampElements = new Element[] { null, null, null, null, null, null };
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( colType.typeNameEquals(DashboardUtils.UNKNOWN) ) {
+			if ( DashboardServerUtils.UNKNOWN.typeNameEquals(colType) ) {
 				// Might happen in multiple file upload
 				throw new IllegalArgumentException(
 						"Data type not defined for column " + Integer.toString(k+1) + 
 						": " + cruiseData.getUserColNames().get(k));
 			}
-			else if ( colType.typeNameEquals(DashboardUtils.OTHER) ||
-					  colType.getVarName().startsWith("comment_") ) {
+			else if ( DashboardServerUtils.OTHER.typeNameEquals(colType) ||
+					  colType.getVarName().startsWith("comment") ) {
 				// Unchecked data 
 				;
 			}
@@ -881,9 +881,8 @@ public class CruiseChecker {
 					 DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(colType) || 
 					 DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(colType) ||
 
-					 SocatTypes.COMMENT_WOCE_CO2_WATER.typeNameEquals(colType) ||
-					 SocatTypes.COMMENT_WOCE_CO2_ATM.typeNameEquals(colType) ||
-					 colType.typeNameEquals(DashboardUtils.OTHER) ) {
+					 DashboardServerUtils.OTHER.typeNameEquals(colType) ||
+					 colType.getVarName().startsWith("comment") ) {
 					// Do not change
 					;
 				}

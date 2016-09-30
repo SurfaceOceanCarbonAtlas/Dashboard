@@ -37,7 +37,6 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.VESSEL_NAME.getVarName(),
 			DashboardServerUtils.ORGANIZATION_NAME.getVarName(),
 			DashboardServerUtils.INVESTIGATOR_NAMES.getVarName(),
-			DashboardServerUtils.QC_FLAG.getVarName(),
 			DashboardServerUtils.TIMESTAMP.getVarName(),
 			DashboardServerUtils.DATE.getVarName(),
 			DashboardServerUtils.YEAR.getVarName(),
