@@ -625,9 +625,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			else if ( DashboardUtils.LATITUDE.typeNameEquals(colType) ) {
 				hasLatitude = true;
 			}
-			else if ( colType.getVarName().startsWith("xCO2_water") ||
-					  colType.getVarName().startsWith("pCO2_water") ||
-					  colType.getVarName().startsWith("fCO2_water") ) {
+			else if ( colType.getDisplayName().startsWith("xCO2_water") ||
+					  colType.getDisplayName().startsWith("pCO2_water") ||
+					  colType.getDisplayName().startsWith("fCO2_water") ) {
 				hasco2 = true;
 			}
 			k++;
@@ -699,20 +699,20 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				// Multiple OTHER column types are allowed
 				;
 			}
-			else if ( ! typeSet.add(colType.getVarName()) ) {
-				duplicates.add(colType.getVarName());
+			else if ( ! typeSet.add(colType.getDisplayName()) ) {
+				duplicates.add(colType.getDisplayName());
 			}
 		}
 		if ( duplicates.size() > 0 ) {
 			String errMsg = MULTIPLE_COLUMN_TYPES_ERROR_MSG;
 			int cnt = 0;
-			for ( String varName : duplicates ) {
+			for ( String displayName : duplicates ) {
 				cnt++;
 				if ( (cnt == 5) && (unknownIndices.size() > 5) ) {
 					errMsg += "<li> ... </li>";
 					break;
 				}
-				errMsg += "<li>" + varName + "</li>";
+				errMsg += "<li>" + displayName + "</li>";
 			}
 			SocatUploadDashboard.showMessage(errMsg);
 			return;

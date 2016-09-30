@@ -65,13 +65,13 @@ public class CruiseDataColumn {
 		}
 		typeUnitStringList = new ArrayList<String>(knownTypeUnitList.size());
 		for ( DataColumnType dctype : knownTypeUnitList ) {
-			String varName = dctype.getVarName();
+			String displayName = dctype.getDisplayName();
 			String unit = dctype.getUnits().get(dctype.getSelectedUnitIndex());
 			if ( DashboardUtils.STRING_MISSING_VALUE.equals(unit) ) {
-				typeUnitStringList.add(varName);
+				typeUnitStringList.add(displayName);
 			}
 			else {
-				typeUnitStringList.add(varName + " [ " + unit + " ]");
+				typeUnitStringList.add(displayName + " [ " + unit + " ]");
 			}
 		}
 		this.cruise = cruise;
