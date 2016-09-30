@@ -186,40 +186,6 @@ public class KnownDataTypes {
 	}
 
 	/**
-	 * Determines if the type of a given data column type 
-	 * exists in the list of known data types.
-	 * 
-	 * @param dataColType
-	 * 		search for a type like this data column type 
-	 * @return
-	 * 		if the given type is known
-	 */
-	public boolean containsType(DataColumnType dctype) {
-		if ( containsTypeName(dctype.getVarName()) )
-			return true;
-		if ( containsTypeName(dctype.getDisplayName()) )
-			return true;
-		return false;
-	}
-
-	/**
-	 * Determines is a given data type exists 
-	 * in the list of known data types.
-	 * 
-	 * @param dtype
-	 * 		data type to search for 
-	 * @return
-	 * 		if the given data type is known
-	 */
-	public boolean containsType(DashDataType dtype) {
-		if ( containsTypeName(dtype.getVarName()) )
-			return true;
-		if ( containsTypeName(dtype.getDisplayName()) )
-			return true;
-		return false;
-	}
-
-	/**
 	 * Returns a new data column type based on the data type with a type
 	 * matching the given type name. 
 	 * The selected unit will be zero and the select missing value will be 
