@@ -865,26 +865,19 @@ public class CruiseChecker {
 			k = -1;
 			for ( DataColumnType colType : dataColTypes ) {
 				k++;
-				if ( DashboardServerUtils.EXPOCODE.typeNameEquals(colType) || 
-					 DashboardServerUtils.DATASET_NAME.typeNameEquals(colType) || 
-					 DashboardServerUtils.VESSEL_NAME.typeNameEquals(colType) || 
-					 DashboardServerUtils.ORGANIZATION_NAME.typeNameEquals(colType) || 
-					 DashboardServerUtils.INVESTIGATOR_NAMES.typeNameEquals(colType) || 
-
-					 DashboardServerUtils.TIMESTAMP.typeNameEquals(colType) || 
-					 DashboardServerUtils.DATE.typeNameEquals(colType) || 
+				if ( colType.getDataClassName().equals(DashboardUtils.STRING_DATA_CLASS_NAME) ||
+					 colType.getDataClassName().equals(DashboardUtils.CHAR_DATA_CLASS_NAME) ||
+					 DashboardServerUtils.OTHER.typeNameEquals(colType) ||
+					 DashboardServerUtils.TIMESTAMP.typeNameEquals(colType) ||   // just in case it changes away from String 
+					 DashboardServerUtils.DATE.typeNameEquals(colType) ||   // just in case it changes away from String
 					 DashboardServerUtils.YEAR.typeNameEquals(colType) || 
 					 DashboardServerUtils.MONTH_OF_YEAR.typeNameEquals(colType) || 
 					 DashboardServerUtils.DAY_OF_MONTH.typeNameEquals(colType) || 
-					 DashboardServerUtils.TIME_OF_DAY.typeNameEquals(colType) ||  
+					 DashboardServerUtils.TIME_OF_DAY.typeNameEquals(colType) ||   //just in case it changes away from String
 					 DashboardServerUtils.HOUR_OF_DAY.typeNameEquals(colType) || 
 					 DashboardServerUtils.MINUTE_OF_HOUR.typeNameEquals(colType) || 
-					 DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(colType) ||
-
-					 DashboardServerUtils.OTHER.typeNameEquals(colType) ||
-					 colType.getVarName().toLowerCase().startsWith("comment") ||
-					 colType.getVarName().toLowerCase().startsWith("woce_") ) {
-					// Do not change
+					 DashboardServerUtils.SECOND_OF_MINUTE.typeNameEquals(colType) ) {
+					 // Do not change
 					;
 				}
 				else if ( DashboardServerUtils.LONGITUDE.typeNameEquals(colType) ) {
