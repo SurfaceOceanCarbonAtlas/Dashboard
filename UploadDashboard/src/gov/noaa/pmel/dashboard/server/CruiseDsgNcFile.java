@@ -346,6 +346,7 @@ public class CruiseDsgNcFile extends File {
 						dvalue = ' ';
 					dvar.set(index, 0, dvalue);
 				}
+				ncfile.write(var, dvar);
 			}
 
 			// Reassign the time variable using the year, month, day, hour, 
