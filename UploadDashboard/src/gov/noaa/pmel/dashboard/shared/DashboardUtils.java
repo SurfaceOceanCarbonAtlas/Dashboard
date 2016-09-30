@@ -15,7 +15,7 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
 /**
  * Static dashboard utility functions and constants
  * for use on both the client and server side.
- *  
+ * 
  * @author Karl Smith
  */
 public class DashboardUtils {
@@ -363,7 +363,7 @@ public class DashboardUtils {
 	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
 	 * different vessels.  (metadata)
 	 */
-	public static final DataColumnType EXPOCODE = new DataColumnType("Expocode", 
+	public static final DataColumnType EXPOCODE = new DataColumnType("expocode", 
 			"expocode", STRING_DATA_CLASS_NAME, "expocode", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 	
