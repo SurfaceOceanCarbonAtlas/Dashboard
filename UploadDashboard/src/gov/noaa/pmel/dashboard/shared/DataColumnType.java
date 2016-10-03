@@ -17,12 +17,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class DataColumnType implements Serializable, IsSerializable {
+public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4420314982749217618L;
+	private static final long serialVersionUID = 7655703582585602369L;
 
-	private String displayName;
 	private String varName;
+	private Double sortOrder;
+	private String displayName;
 	private String dataClassName;
 	private String description;
 	private String standardName;
@@ -32,14 +33,17 @@ public class DataColumnType implements Serializable, IsSerializable {
 	private String selectedMissingValue;
 
 	/**
-	 * Create an empty data column type; the units list is a copy of 
-	 * {@link DashboardUtils#NO_UNITS}, the index of the selected unit 
-	 * is zero, and all remaining String values are set to 
+	 * Create an empty data column type; 
+	 * the sort order is set to {@link DashboardUtils#FP_MISSING_VALUE},
+	 * the units list is a copy of {@link DashboardUtils#NO_UNITS}, 
+	 * the index of the selected unit is zero, 
+	 * and all remaining String values are set to 
 	 * {@link DashboardUtils#STRING_MISSING_VALUE},
 	 */
 	public DataColumnType() {
-		displayName = DashboardUtils.STRING_MISSING_VALUE;
 		varName = DashboardUtils.STRING_MISSING_VALUE;
+		sortOrder = DashboardUtils.FP_MISSING_VALUE;
+		displayName = DashboardUtils.STRING_MISSING_VALUE;
 		dataClassName = DashboardUtils.STRING_MISSING_VALUE;
 		description = DashboardUtils.STRING_MISSING_VALUE;
 		standardName = DashboardUtils.STRING_MISSING_VALUE;
@@ -50,16 +54,21 @@ public class DataColumnType implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * Create a data column type with the given values.  The index of the 
-	 * selected unit is zero and the selected missing value is
-	 * {@link DashboardUtils#STRING_MISSING_VALUE} (interpreted as default missing values).
+	 * Create a data column type with the given values.  The index 
+	 * of the selected unit is zero and the selected missing value 
+	 * is {@link DashboardUtils#STRING_MISSING_VALUE}
+	 * (interpreted as default missing values).
 	 * 
-	 * @param displayName
-	 * 		displayed name for this types;
-	 * 		if null or blank, varName is used
 	 * @param varName
 	 * 		name for a variable of this type; 
 	 * 		cannot be null or blank
+	 * @param sortOrder
+	 * 		value giving the sort order for this type;
+	 * 		if null, NaN, or infinite, 
+	 * 		{@link DashboardUtils#FP_MISSING_VALUE} is assigned
+	 * @param displayName
+	 * 		displayed name for this types;
+	 * 		if null or blank, varName is used
 	 * @param dataClassName
 	 * 		name of the class for a variable of this type
 	 * 		(e.g., Character, Double, Integer, String);
@@ -80,12 +89,16 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * @throws IllegalArgumentException
 	 * 		if the variable name is null or blank
 	 */
-	public DataColumnType(String displayName, String varName, String dataClassName, 
-			String description, String standardName, String categoryName, 
-			Collection<String> units) throws IllegalArgumentException {
+	public DataColumnType(String varName, Double sortOrder, String displayName, 
+			String dataClassName, String description, String standardName, 
+			String categoryName, Collection<String> units) throws IllegalArgumentException {
 		if ( (varName == null) || varName.trim().isEmpty() )
 			throw new IllegalArgumentException("variable name is null or blank");
 		this.varName = varName;
+		if ( (sortOrder == null) || sortOrder.isNaN() || sortOrder.isInfinite() )
+			this.sortOrder = DashboardUtils.FP_MISSING_VALUE;
+		else
+			this.sortOrder = sortOrder;
 		if ( (displayName == null) || displayName.trim().isEmpty() )
 			this.displayName = varName;
 		else
@@ -118,29 +131,6 @@ public class DataColumnType implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the displayed name for this data column type;
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public String getDisplayName() {
-		return displayName;
-	}
-
-	/**
-	 * @param displayName 
-	 * 		the displayed name to set for this of this data column type;
-	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
-	 */
-	public void setDisplayName(String displayName) {
-		if ( displayName != null ) {
-			this.displayName = displayName;
-		}
-		else {
-			this.displayName = DashboardUtils.STRING_MISSING_VALUE;
-		}
-	}
-
-	/**
-	 * @return 
 	 * 		the variable name for this data column type;
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
@@ -159,6 +149,52 @@ public class DataColumnType implements Serializable, IsSerializable {
 		}
 		else {
 			this.varName = DashboardUtils.STRING_MISSING_VALUE;
+		}
+	}
+
+	/**
+	 * @return 
+	 * 		the sort order value for this data column type;
+	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+	 */
+	public Double getSortOrder() {
+		return sortOrder;
+	}
+
+	/**
+	 * @param varName 
+	 * 		the variable name to set for this of this data column type;
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 */
+	public void setSortOrder(Double sortOrder) {
+		if ( sortOrder != null ) {
+			this.sortOrder = sortOrder;
+		}
+		else {
+			this.sortOrder = DashboardUtils.FP_MISSING_VALUE;
+		}
+	}
+
+	/**
+	 * @return 
+	 * 		the displayed name for this data column type;
+	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+	 */
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	/**
+	 * @param displayName 
+	 * 		the displayed name to set for this of this data column type;
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 */
+	public void setDisplayName(String displayName) {
+		if ( displayName != null ) {
+			this.displayName = displayName;
+		}
+		else {
+			this.displayName = DashboardUtils.STRING_MISSING_VALUE;
 		}
 	}
 
@@ -327,7 +363,7 @@ public class DataColumnType implements Serializable, IsSerializable {
 	 * 		made of any mutable data (namely, the list of units).
 	 */
 	public DataColumnType duplicate() {
-		DataColumnType dup = new DataColumnType(displayName, varName, 
+		DataColumnType dup = new DataColumnType(varName, sortOrder, displayName, 
 				dataClassName, description, standardName, categoryName, units);
 		dup.selectedUnitIndex = selectedUnitIndex;
 		dup.selectedMissingValue = selectedMissingValue;
@@ -379,10 +415,52 @@ public class DataColumnType implements Serializable, IsSerializable {
 	}
 
 	@Override
+	public int compareTo(DataColumnType other) {
+		int result;
+		result = sortOrder.compareTo(other.sortOrder);
+		if ( result != 0 )
+			return result;
+		result = varName.compareTo(other.varName);
+		if ( result != 0 )
+			return result;
+		result = displayName.compareTo(other.displayName);
+		if ( result != 0 )
+			return result;
+		result = dataClassName.compareTo(other.dataClassName);
+		if ( result != 0 )
+			return result;
+		result = description.compareTo(other.description);
+		if ( result != 0 )
+			return result;
+		result = standardName.compareTo(other.standardName);
+		if ( result != 0 )
+			return result;
+		result = categoryName.compareTo(other.categoryName);
+		if ( result != 0 )
+			return result;
+		result = selectedMissingValue.compareTo(other.selectedMissingValue);
+		if ( result != 0 )
+			return result;
+		result = selectedUnitIndex.compareTo(other.selectedUnitIndex);
+		if ( result != 0 )
+			return result;
+		result = Integer.compare(units.size(), other.units.size());
+		if ( result != 0 )
+			return result;
+		for (int k = 0; k < units.size(); k++) {
+			result = units.get(k).compareTo(other.units.get(k));
+			if ( result != 0 )
+				return result;
+		}
+		return 0;
+	}
+
+	@Override
 	public int hashCode() {
+		// Ignore floating-point as they do not have to be exactly equal
 		final int prime = 37;
-		int result = displayName.hashCode();
-		result = result * prime + varName.hashCode();
+		int result = varName.hashCode();
+		result = result * prime + displayName.hashCode();
 		result = result * prime + dataClassName.hashCode();
 		result = result * prime + description.hashCode();
 		result = result * prime + standardName.hashCode();
@@ -404,9 +482,9 @@ public class DataColumnType implements Serializable, IsSerializable {
 			return false;
 
 		DataColumnType other = (DataColumnType) obj;
-		if ( ! displayName.equals(other.displayName) )
-			return false;
 		if ( ! varName.equals(other.varName) )
+			return false;
+		if ( ! displayName.equals(other.displayName) )
 			return false;
 		if ( ! dataClassName.equals(other.dataClassName) )
 			return false;
@@ -422,14 +500,19 @@ public class DataColumnType implements Serializable, IsSerializable {
 			return false;
 		if ( ! units.equals(other.units) )
 			return false;
+		// Floating point only needs to be insignificantly different
+		if ( ! DashboardUtils.closeTo(sortOrder, other.sortOrder, 
+				DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		return "DataColumnType[ " +
-				"displayName=\"" + displayName + "\", " +
 				"varName=\"" + varName + "\", " +
+				"sortOrder=" + sortOrder.toString() +
+				"displayName=\"" + displayName + "\", " +
 				"dataClassName=\"" + dataClassName + "\", " +
 				"description=\"" + description + "\", " +
 				"standardName=\"" + standardName + "\", " +

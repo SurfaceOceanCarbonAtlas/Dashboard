@@ -217,6 +217,15 @@ public class CruiseDsgNcFile extends File {
 						dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits().get(0));
 			}
 
+			for (  DashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
+				// Data Characters
+				varName = dtype.getVarName();
+				var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
+				// No missing_value, _FillValue, or units for characters
+				addAttributes(ncfile, var, null, dtype.getDescription(), 
+						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
+			}
+
 			for (  DashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
 				// Data Doubles
 				varName = dtype.getVarName();
@@ -230,15 +239,6 @@ public class CruiseDsgNcFile extends File {
 				if ( dtype.getStandardName().endsWith("depth") ) {
 					ncfile.addVariableAttribute(var, new Attribute("positive", "down"));
 				}
-			}
-
-			for (  DashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
-				// Data Characters
-				varName = dtype.getVarName();
-				var = ncfile.addVariable(null, varName, DataType.CHAR, charDataDims);
-				// No missing_value, _FillValue, or units for characters
-				addAttributes(ncfile, var, null, dtype.getDescription(), 
-						dtype.getStandardName(), dtype.getCategoryName(), DashboardUtils.STRING_MISSING_VALUE);
 			}
 
 			// The "time" variable should have been one of the known data file variables,
@@ -317,22 +317,6 @@ public class CruiseDsgNcFile extends File {
 				ncfile.write(var, dvar);
 			}
 
-			for (  DashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
-				// Data Doubles
-				varName = dtype.getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
-				ArrayDouble.D1 dvar = new ArrayDouble.D1(dataList.size());
-				for (int index = 0; index < dataList.size(); index++) {
-					Double dvalue = dataList.get(index).getDoubleVariables().get(dtype);
-					if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
-						dvalue = DashboardUtils.FP_MISSING_VALUE;
-					dvar.set(index, dvalue);
-				}
-				ncfile.write(var, dvar);
-			}
-
 			for (  DashDataType dtype : dataList.get(0).getCharacterVariables().keySet() ) {
 				// Data Characters
 				varName = dtype.getVarName();
@@ -345,6 +329,22 @@ public class CruiseDsgNcFile extends File {
 					if ( dvalue == null )
 						dvalue = ' ';
 					dvar.set(index, 0, dvalue);
+				}
+				ncfile.write(var, dvar);
+			}
+
+			for (  DashDataType dtype : dataList.get(0).getDoubleVariables().keySet() ) {
+				// Data Doubles
+				varName = dtype.getVarName();
+				var = ncfile.findVariable(varName);
+				if ( var == null )
+					throw new RuntimeException("Unexpected failure to find ncfile variable " + varName);
+				ArrayDouble.D1 dvar = new ArrayDouble.D1(dataList.size());
+				for (int index = 0; index < dataList.size(); index++) {
+					Double dvalue = dataList.get(index).getDoubleVariables().get(dtype);
+					if ( (dvalue == null) || dvalue.isNaN() || dvalue.isInfinite() )
+						dvalue = DashboardUtils.FP_MISSING_VALUE;
+					dvar.set(index, dvalue);
 				}
 				ncfile.write(var, dvar);
 			}
@@ -500,12 +500,7 @@ public class CruiseDsgNcFile extends File {
 							"' (" + Integer.toString(var.getShape(0)) + ") does not match " +
 							"the number of values for 'time' (" + Integer.toString(numData) + ")");
 				String dataClassName = dtype.getDataClassName();
-				if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
-					ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
-					for (int k = 0; k < numData; k++)
-						dataList.get(k).setDoubleVariableValue(dtype, dvar.get(k));
-				}
-				else if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dataClassName) ) {
+				if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dataClassName) ) {
 					ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
 					for (int k = 0; k < numData; k++)
 						dataList.get(k).setIntegerVariableValue(dtype, dvar.get(k));
@@ -514,6 +509,11 @@ public class CruiseDsgNcFile extends File {
 					ArrayChar.D2 dvar = (ArrayChar.D2) var.read();
 					for (int k = 0; k < numData; k++)
 						dataList.get(k).setCharacterVariableValue(dtype, dvar.get(k,0));
+				}
+				else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dataClassName) ) {
+					ArrayDouble.D1 dvar = (ArrayDouble.D1) var.read();
+					for (int k = 0; k < numData; k++)
+						dataList.get(k).setDoubleVariableValue(dtype, dvar.get(k));
 				}
 				else {
 					throw new RuntimeException("Unexpected data class name '" + 
@@ -589,6 +589,44 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
+	 * Reads and returns the array of data values for the specified variable
+	 * contained in this DSG file.  The variable must be saved in the DSG file
+	 * as integers.  For some variables, this DSG file must have been processed 
+	 * by Ferret, such as when saved using 
+	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
+	 * for the data values to be meaningful.
+	 * 
+	 * @param varName
+	 * 		name of the variable to read
+	 * @return
+	 * 		array of values for the specified variable
+	 * @throws IOException
+	 * 		if there is a problem opening or reading from this DSG file
+	 * @throws IllegalArgumentException
+	 * 		if the variable name is invalid
+	 */
+	public int[] readIntVarDataValues(String varName) 
+								throws IOException, IllegalArgumentException {
+		int[] dataVals;
+		NetcdfFile ncfile = NetcdfFile.open(getPath());
+		try {
+			Variable var = ncfile.findVariable(varName);
+			if ( var == null )
+				throw new IllegalArgumentException("Unable to find variable '" + 
+						varName + "' in " + getName());
+			ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
+			int numVals = var.getShape(0);
+			dataVals = new int[numVals];
+			for (int k = 0; k < numVals; k++) {
+				dataVals[k] = dvar.get(k);
+			}
+		} finally {
+			ncfile.close();
+		}
+		return dataVals;
+	}
+
+	/**
 	 * Writes the given array of characters as the values 
 	 * for the given character data variable.
 	 * 
@@ -630,44 +668,6 @@ public class CruiseDsgNcFile extends File {
 		} finally {
 			ncfile.close();
 		}
-	}
-
-	/**
-	 * Reads and returns the array of data values for the specified variable
-	 * contained in this DSG file.  The variable must be saved in the DSG file
-	 * as integers.  For some variables, this DSG file must have been processed 
-	 * by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
-	 * for the data values to be meaningful.
-	 * 
-	 * @param varName
-	 * 		name of the variable to read
-	 * @return
-	 * 		array of values for the specified variable
-	 * @throws IOException
-	 * 		if there is a problem opening or reading from this DSG file
-	 * @throws IllegalArgumentException
-	 * 		if the variable name is invalid
-	 */
-	public int[] readIntVarDataValues(String varName) 
-								throws IOException, IllegalArgumentException {
-		int[] dataVals;
-		NetcdfFile ncfile = NetcdfFile.open(getPath());
-		try {
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null )
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			ArrayInt.D1 dvar = (ArrayInt.D1) var.read();
-			int numVals = var.getShape(0);
-			dataVals = new int[numVals];
-			for (int k = 0; k < numVals; k++) {
-				dataVals[k] = dvar.get(k);
-			}
-		} finally {
-			ncfile.close();
-		}
-		return dataVals;
 	}
 
 	/**

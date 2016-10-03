@@ -22,8 +22,9 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
  * 
  * @author Karl Smith
  */
-public class DashDataType {
+public class DashDataType implements Comparable<DashDataType> {
 
+	private static final String SORT_ORDER_TAG = "sort_order";
 	private static final String DISPLAY_NAME_TAG = "display_name";
 	private static final String DATA_CLASS_NAME_TAG = "data_class";
 	private static final String DESCRIPTION_TAG = "description";
@@ -36,11 +37,14 @@ public class DashDataType {
 	/**
 	 * Create with (copies of) the given values.
 	 * 
-	 * @param displayName
-	 * 		displayed name for this column type;
-	 * 		if null or blank, varName is used
 	 * @param varName
 	 * 		name for a variable of this type; 
+	 * 		cannot be null or blank
+	 * @param sortOrder
+	 * 		value giving the sort order for this type;
+	 * 		cannot be null, NaN, or infinite 
+	 * @param displayName
+	 * 		displayed name for this column type;
 	 * 		cannot be null or blank
 	 * @param dataClassName
 	 * 		name of the class for a variable of this type
@@ -60,13 +64,19 @@ public class DashDataType {
 	 * 		unit strings associated with this type (copied);
 	 * 		if null or empty, a list with only {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 * @throws IllegalArgumentException
-	 * 		if the variable name is null or blank
+	 * 		if the variable name, sort order, or display name is invalid
 	 */
-	public DashDataType(String displayName, String varName, String dataClassName, 
-			String description, String standardName, String categoryName, 
-				Collection<String> units) throws IllegalArgumentException {
-		dataType = new DataColumnType(displayName, varName, dataClassName, 
-				description, standardName, categoryName, units);
+	public DashDataType(String varName, Double sortOrder, String displayName, 
+			String dataClassName, String description, String standardName, 
+			String categoryName, Collection<String> units) throws IllegalArgumentException {
+		if ( (varName == null) || varName.trim().isEmpty() )
+			throw new IllegalArgumentException("variable name is null or blank");
+		if ( (sortOrder == null) || sortOrder.isNaN() || sortOrder.isInfinite() )
+			throw new IllegalArgumentException("sorting order is null or blank");
+		if ( (displayName == null) || displayName.trim().isEmpty() )
+			throw new IllegalArgumentException("display name is null or blank");
+		dataType = new DataColumnType(varName, sortOrder, displayName, 
+				dataClassName, description, standardName, categoryName, units);
 	}
 
 	/**
@@ -78,23 +88,14 @@ public class DashDataType {
 	 * 		if the variable name is null or blank
 	 */
 	public DashDataType(DataColumnType dtype) {
-		this(dtype.getDisplayName(), dtype.getVarName(), dtype.getDataClassName(), 
-				dtype.getDescription(), dtype.getStandardName(), 
-				dtype.getCategoryName(), dtype.getUnits());
+		this(dtype.getVarName(), dtype.getSortOrder(), dtype.getDisplayName(), 
+			 dtype.getDataClassName(), dtype.getDescription(), 
+			 dtype.getStandardName(), dtype.getCategoryName(), dtype.getUnits());
 	}
 
 	/**
 	 * @return 
-	 * 		the displayed name for this data column type;
-	 * 		never null or blank
-	 */
-	public String getDisplayName() {
-		return dataType.getDisplayName();
-	}
-
-	/**
-	 * @return 
-	 * 		the variable name for this data column type;
+	 * 		the variable name for this data type;
 	 * 		never null or blank
 	 */
 	public String getVarName() {
@@ -103,7 +104,25 @@ public class DashDataType {
 
 	/**
 	 * @return 
-	 * 		the data class name for this data column type
+	 * 		the sorting order for this data type;
+	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+	 */
+	public Double getSortOrder() {
+		return dataType.getSortOrder();
+	}
+
+	/**
+	 * @return 
+	 * 		the displayed name for this data type;
+	 * 		never null or blank
+	 */
+	public String getDisplayName() {
+		return dataType.getDisplayName();
+	}
+
+	/**
+	 * @return 
+	 * 		the data class name for this data type
 	 * 		(e.g., Character, Double, Integer, String);
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
@@ -140,7 +159,7 @@ public class DashDataType {
 
 	/**
 	 * @return 
-	 * 		a copy of the units associated with this data column type;
+	 * 		a copy of the units associated with this data type;
 	 * 		never null or empty, but may only contain 
 	 * 		{@link DashboardUtils#STRING_MISSING_VALUE}.
 	 */
@@ -154,7 +173,7 @@ public class DashDataType {
 	 * to the given name.
 	 * 
 	 * @param other
-	 * 		data column type to compare to
+	 * 		data type to compare to
 	 * @return
 	 * 		whether the type names match
 	 */
@@ -172,7 +191,7 @@ public class DashDataType {
 	/**
 	 * Checks if the variable or displayed name of this data type
 	 * is equal, ignoring case and non-alphanumeric characters, 
-	 * to either of those of this given data column type.
+	 * to either of those of the given data column type.
 	 * 
 	 * @param other
 	 * 		data column type to compare to
@@ -228,6 +247,10 @@ public class DashDataType {
 	 */
 	public String toPropertyValue() {
 		JsonObject jsonObj = new JsonObject();
+		Double dval = dataType.getSortOrder();
+		if ( ! DashboardUtils.closeTo(DashboardUtils.FP_MISSING_VALUE, dval,  
+				DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+			jsonObj.addProperty(SORT_ORDER_TAG, dval.toString());
 		String value = dataType.getDisplayName();
 		if ( ! DashboardUtils.STRING_MISSING_VALUE.equals(value) )
 			jsonObj.addProperty(DISPLAY_NAME_TAG, value);
@@ -257,16 +280,19 @@ public class DashDataType {
 	 * Create a DashDataType with the given variable name (Property key)
 	 * using the given JSON description string (Property value) where: 
 	 * <ul>
-	 * 		<li>tag {@value #DISPLAY_NAME_TAG} gives the data display name,</li>
-	 * 		<li>tag {@value #DATA_CLASS_NAME_TAG} gives the data class name,</li>
-	 * 		<li>tag {@value #DESCRIPTION_TAG} gives the data type description,</li>
-	 * 		<li>tag {@value #STANDARD_NAME_TAG} gives the standard name,</li>
-	 * 		<li>tag {@value #CATEGORY_NAME_TAG} gives the category name, and</li>
-	 * 		<li>tag {@value #UNITS_TAG} gives the units array.</li>
+	 * 		<li>tag {@link #SORT_ORDER_TAG} gives the sort order value, </li>
+	 * 		<li>tag {@link #DISPLAY_NAME_TAG} gives the data display name,</li>
+	 * 		<li>tag {@link #DATA_CLASS_NAME_TAG} gives the data class name,</li>
+	 * 		<li>tag {@link #DESCRIPTION_TAG} gives the data type description,</li>
+	 * 		<li>tag {@link #STANDARD_NAME_TAG} gives the standard name,</li>
+	 * 		<li>tag {@link #CATEGORY_NAME_TAG} gives the category name, and</li>
+	 * 		<li>tag {@link #UNITS_TAG} gives the units array.</li>
 	 * </ul>
-	 * Tags can be omitted, in which case the default values as described by
-	 * {@link #DashDataType(String, String, String, String, String, String, Collection)}
-	 * is used.
+	 * The sort order tag must be given and given a valid value.  
+	 * The display name can be omitted in which case the variable name 
+	 * is used.  Other tags can be omitted, in which case the default 
+	 * values as described by {@link #DashDataType(String, Double, String, 
+	 * String, String, String, String, Collection)} is used.  
 	 * 
 	 * @param varName
 	 * 		the variable name for the DashDataType
@@ -284,6 +310,7 @@ public class DashDataType {
 			throw new IllegalArgumentException("invalid variable name");
 
 		JsonParser parser = new JsonParser();
+		Double sortOrder = null;
 		String displayName = null;
 		String dataClassName = null;
 		String description = null;
@@ -291,16 +318,21 @@ public class DashDataType {
 		String categoryName = null;
 		LinkedHashSet<String> units = null;
 		try {
+			String sortOrderStr = null;
 			JsonObject jsonObj = parser.parse(jsonDesc).getAsJsonObject();
 			for ( Entry<String, JsonElement> prop : jsonObj.entrySet() ) {
 				String tag = prop.getKey();
 				boolean identified = false;
 				try {
-					if ( DISPLAY_NAME_TAG.equals(tag) ) {
+					if ( SORT_ORDER_TAG.equals(tag) ) {
+						sortOrderStr = prop.getValue().getAsString();
+						identified = true;
+					}
+					else if ( DISPLAY_NAME_TAG.equals(tag) ) {
 						displayName = prop.getValue().getAsString();
 						identified = true;
 					}
-					if ( DATA_CLASS_NAME_TAG.equals(tag) ) {
+					else if ( DATA_CLASS_NAME_TAG.equals(tag) ) {
 						dataClassName = prop.getValue().getAsString();
 						identified = true;
 					}
@@ -335,12 +367,27 @@ public class DashDataType {
 				if ( ! identified )
 					throw new IllegalArgumentException("unrecognized tag \"" + tag + "\"");
 			}
+			if ( sortOrderStr == null )
+				throw new IllegalArgumentException("sort order tag \"" + SORT_ORDER_TAG + "\" is not given");
+			try {
+				sortOrder = Double.valueOf(sortOrderStr);
+			}
+			catch ( NumberFormatException ex ) {
+				throw new IllegalArgumentException("invalid value for sort order tag: " + ex.getMessage());
+			}
 		} catch ( Exception ex ) {
 			throw new IllegalArgumentException("Invalid JSON description of \"" + 
 					varName + "\" : " + ex.getMessage(), ex);
 		}
-		return new DashDataType(displayName, varName, dataClassName, 
-				description, standardName, categoryName, units);
+		if ( displayName == null )
+			displayName = varName;
+		return new DashDataType(varName, sortOrder, displayName, 
+				dataClassName, description, standardName, categoryName, units);
+	}
+
+	@Override
+	public int compareTo(DashDataType other) {
+		return dataType.compareTo(other.dataType);
 	}
 
 	@Override
@@ -366,8 +413,9 @@ public class DashDataType {
 	@Override
 	public String toString() {
 		return "DashDataType[ " +
-				"displayName=\"" + dataType.getDisplayName() + "\", " +
 				"varName=\"" + dataType.getVarName() + "\", " +
+				"sortOrder=" + dataType.getSortOrder().toString() +
+				"displayName=\"" + dataType.getDisplayName() + "\", " +
 				"dataClassName=\"" + dataType.getDataClassName() + "\", " +
 				"description=\"" + dataType.getDescription() + "\", " +
 				"standardName=\"" + dataType.getStandardName() + "\", " +

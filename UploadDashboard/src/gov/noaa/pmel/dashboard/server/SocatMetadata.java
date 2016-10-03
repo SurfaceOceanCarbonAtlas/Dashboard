@@ -5,8 +5,8 @@ package gov.noaa.pmel.dashboard.server;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Class for working with metadata values of interest from SOCAT,
@@ -17,9 +17,9 @@ import java.util.Map.Entry;
 public class SocatMetadata {
 
 	// Maps of variable names to values
-	LinkedHashMap<DashDataType,String> stringValuesMap;
-	LinkedHashMap<DashDataType,Double> doubleValuesMap;
-	LinkedHashMap<DashDataType,Date> dateValuesMap;
+	TreeMap<DashDataType,String> stringValuesMap;
+	TreeMap<DashDataType,Double> doubleValuesMap;
+	TreeMap<DashDataType,Date> dateValuesMap;
 
 	/**
 	 * Generates a SocatMetadata object with the given known types.
@@ -44,9 +44,9 @@ public class SocatMetadata {
 	public SocatMetadata(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
-		stringValuesMap = new LinkedHashMap<DashDataType,String>();
-		doubleValuesMap = new LinkedHashMap<DashDataType,Double>();
-		dateValuesMap = new LinkedHashMap<DashDataType,Date>();
+		stringValuesMap = new TreeMap<DashDataType,String>();
+		doubleValuesMap = new TreeMap<DashDataType,Double>();
+		dateValuesMap = new TreeMap<DashDataType,Date>();
 
 		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
 			if ( DashboardUtils.STRING_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
@@ -76,7 +76,7 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for String variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DashDataType,String> getStringVariables() {
+	public TreeMap<DashDataType,String> getStringVariables() {
 		return stringValuesMap;
 	}
 
@@ -105,7 +105,7 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DashDataType,Double> getDoubleVariables() {
+	public TreeMap<DashDataType,Double> getDoubleVariables() {
 		return doubleValuesMap;
 	}
 
@@ -134,7 +134,7 @@ public class SocatMetadata {
 	 * 		the map of variable names and values for Date variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DashDataType,Date> getDateVariables() {
+	public TreeMap<DashDataType,Date> getDateVariables() {
 		return dateValuesMap;
 	}
 

@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -192,7 +192,7 @@ public class SocatCruiseDataTest {
 		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
 		Integer value = 123;
 		data.setIntegerVariableValue(DashboardServerUtils.SAMPLE_NUMBER, value);
-		LinkedHashMap<DashDataType,Integer> intMap = data.getIntegerVariables();
+		TreeMap<DashDataType,Integer> intMap = data.getIntegerVariables();
 		assertEquals(value, intMap.get(DashboardServerUtils.SAMPLE_NUMBER));
 		data.setIntegerVariableValue(DashboardServerUtils.SAMPLE_NUMBER, null);
 		intMap = data.getIntegerVariables();
@@ -215,7 +215,7 @@ public class SocatCruiseDataTest {
 		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
 		Character value = 'K';
 		data.setCharacterVariableValue(SocatTypes.WOCE_CO2_WATER, value);
-		LinkedHashMap<DashDataType,Character> charMap = data.getCharacterVariables();
+		TreeMap<DashDataType,Character> charMap = data.getCharacterVariables();
 		assertEquals(value, charMap.get(SocatTypes.WOCE_CO2_WATER));
 		data.setCharacterVariableValue(SocatTypes.WOCE_CO2_WATER, null);
 		charMap = data.getCharacterVariables();
@@ -238,7 +238,7 @@ public class SocatCruiseDataTest {
 		SocatCruiseData data = new SocatCruiseData(KNOWN_DATA_TYPES);
 		Double value = (new Date()).getTime() / 1000.0;
 		data.setDoubleVariableValue(DashboardServerUtils.TIME, value);
-		LinkedHashMap<DashDataType,Double> doubleMap = data.getDoubleVariables();
+		TreeMap<DashDataType,Double> doubleMap = data.getDoubleVariables();
 		assertEquals(value, doubleMap.get(DashboardServerUtils.TIME));
 		data.setDoubleVariableValue(DashboardServerUtils.TIME, null);
 		doubleMap = data.getDoubleVariables();

@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -321,7 +320,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		KnownDataTypes knownUserTypes = configStore.getKnownUserDataTypes();
 		if ( knownUserTypes == null )
 			throw new IllegalArgumentException("unexpected missing list of all known data column types");
-		LinkedHashSet<DashDataType> knownTypesSet = knownUserTypes.getKnownTypesSet();
+		TreeSet<DashDataType> knownTypesSet = knownUserTypes.getKnownTypesSet();
 		if ( knownTypesSet.isEmpty() )
 			throw new IllegalArgumentException("unexpected empty list of all known data column types");
 		ArrayList<DataColumnType> knownTypesList = new ArrayList<DataColumnType>(knownTypesSet.size());

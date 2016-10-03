@@ -8,9 +8,9 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 /**
  * Class for working with data values of interest, both PI-provided
@@ -21,9 +21,9 @@ import java.util.Map.Entry;
  */
 public class SocatCruiseData {
 
-	private LinkedHashMap<DashDataType,Character> charValsMap;
-	private LinkedHashMap<DashDataType,Integer> intValsMap;
-	private LinkedHashMap<DashDataType,Double> doubleValsMap;
+	private TreeMap<DashDataType,Integer> intValsMap;
+	private TreeMap<DashDataType,Character> charValsMap;
+	private TreeMap<DashDataType,Double> doubleValsMap;
 
 	/**
 	 * Generates a SocatCruiseData object with the given known types.
@@ -46,12 +46,15 @@ public class SocatCruiseData {
 	public SocatCruiseData(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
-		charValsMap = new LinkedHashMap<DashDataType,Character>();
-		intValsMap = new LinkedHashMap<DashDataType,Integer>();
-		doubleValsMap = new LinkedHashMap<DashDataType,Double>(96);
+		intValsMap = new TreeMap<DashDataType,Integer>();
+		charValsMap = new TreeMap<DashDataType,Character>();
+		doubleValsMap = new TreeMap<DashDataType,Double>();
 
 		for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
-			if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+			if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
+				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
+			}
+			else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				if ( dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
 					// WOCE flag
 					charValsMap.put(dtype, DashboardUtils.WOCE_NOT_CHECKED);
@@ -63,9 +66,6 @@ public class SocatCruiseData {
 				else {
 					charValsMap.put(dtype, DashboardUtils.CHAR_MISSING_VALUE);
 				}
-			}
-			else if ( DashboardUtils.INT_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
 			}
 			else if ( DashboardUtils.DOUBLE_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
 				doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
@@ -145,6 +145,11 @@ public class SocatCruiseData {
 							value + "' as an Integer: " + ex.getMessage());
 				}
 			}
+			else if ( charValsMap.containsKey(dtype) ) {
+				if ( value.length() != 1 )
+					throw new IllegalArgumentException("More than one character in '" + value + "'");
+				charValsMap.put(dtype, value.charAt(0));
+			}
 			else if ( doubleValsMap.containsKey(dtype) ) {
 				try {
 					doubleValsMap.put(dtype, Double.parseDouble(value));
@@ -152,11 +157,6 @@ public class SocatCruiseData {
 					throw new IllegalArgumentException("Unable to parse '" + 
 							value + "' as a Double: " + ex.getMessage());
 				}
-			}
-			else if ( charValsMap.containsKey(dtype) ) {
-				if ( value.length() != 1 )
-					throw new IllegalArgumentException("More than one character in '" + value + "'");
-				charValsMap.put(dtype, value.charAt(0));
 			}
 			else {
 				throw new RuntimeException("Unexpected failure to place data type " + dtype.toString());
@@ -212,10 +212,39 @@ public class SocatCruiseData {
 
 	/**
 	 * @return
+	 * 		the map of variable names and values for Integer variables;
+	 * 		the actual map in this instance is returned.
+	 */
+	public TreeMap<DashDataType,Integer> getIntegerVariables() {
+		return intValsMap;
+	}
+
+	/**
+	 * Updates the given Integer type variable with the given value.
+	 * 
+	 * @param dtype
+	 * 		the data type of the value
+	 * @param value
+	 * 		the value to assign; 
+	 * 		if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
+	 * @throws IllegalArgumentException
+	 * 		if the data type variable is not a known data type in this data
+	 */
+	public void setIntegerVariableValue(DashDataType dtype, Integer value) throws IllegalArgumentException {
+		if ( ! intValsMap.containsKey(dtype) )
+			throw new IllegalArgumentException("Unknown data double variable " + dtype.getVarName());
+		if ( value == null )
+			intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
+		else
+			intValsMap.put(dtype, value);
+	}
+
+	/**
+	 * @return
 	 * 		the map of variable names and values for String variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DashDataType,Character> getCharacterVariables() {
+	public TreeMap<DashDataType,Character> getCharacterVariables() {
 		return charValsMap;
 	}
 
@@ -244,7 +273,7 @@ public class SocatCruiseData {
 	 * 		the map of variable names and values for Double variables;
 	 * 		the actual map in this instance is returned.
 	 */
-	public LinkedHashMap<DashDataType,Double> getDoubleVariables() {
+	public TreeMap<DashDataType,Double> getDoubleVariables() {
 		return doubleValsMap;
 	}
 
@@ -266,35 +295,6 @@ public class SocatCruiseData {
 			doubleValsMap.put(dtype, DashboardUtils.FP_MISSING_VALUE);
 		else
 			doubleValsMap.put(dtype, value);
-	}
-
-	/**
-	 * @return
-	 * 		the map of variable names and values for Integer variables;
-	 * 		the actual map in this instance is returned.
-	 */
-	public LinkedHashMap<DashDataType,Integer> getIntegerVariables() {
-		return intValsMap;
-	}
-
-	/**
-	 * Updates the given Integer type variable with the given value.
-	 * 
-	 * @param dtype
-	 * 		the data type of the value
-	 * @param value
-	 * 		the value to assign; 
-	 * 		if null, {@link DashboardUtils#INT_MISSING_VALUE} is assigned
-	 * @throws IllegalArgumentException
-	 * 		if the data type variable is not a known data type in this data
-	 */
-	public void setIntegerVariableValue(DashDataType dtype, Integer value) throws IllegalArgumentException {
-		if ( ! intValsMap.containsKey(dtype) )
-			throw new IllegalArgumentException("Unknown data double variable " + dtype.getVarName());
-		if ( value == null )
-			intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
-		else
-			intValsMap.put(dtype, value);
 	}
 
 	/**
@@ -1043,18 +1043,18 @@ public class SocatCruiseData {
 
 	@Override 
 	public int hashCode() {
+		final int prime = 37;
+		int result = intValsMap.hashCode();
 		// Ignore WOCE flag differences.
-		// Do not use floating-point fields since they do not 
-		// have to be exactly the same for equals to return true.
-		LinkedHashMap<DashDataType,Character> nonWoceCharValsMap = 
-				new LinkedHashMap<DashDataType,Character>(charValsMap.size());
+		TreeMap<DashDataType,Character> nonWoceCharValsMap = 
+				new TreeMap<DashDataType,Character>();
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
 			if ( ! entry.getKey().getVarName().toUpperCase().startsWith("WOCE_") )
 				nonWoceCharValsMap.put(entry.getKey(), entry.getValue());
 		}
-		final int prime = 37;
-		int result = nonWoceCharValsMap.hashCode();
-		result = result * prime + intValsMap.hashCode();
+		result = result * prime + nonWoceCharValsMap.hashCode();
+		// Do not use floating-point fields since they do not 
+		// have to be exactly the same for equals to return true.
 		return result;
 	}
 
@@ -1122,10 +1122,10 @@ public class SocatCruiseData {
 		String repr = "SocatCruiseData[\n";
 		for ( Entry<DashDataType,Integer> entry : intValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
-		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() )
-			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "='" + entry.getValue().toString() + "'\n";
+		for ( Entry<DashDataType,Double> entry : doubleValsMap.entrySet() )
+			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		repr += "]";
 		return repr;
 	}

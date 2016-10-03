@@ -18,8 +18,8 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import org.junit.Test;
 
@@ -82,8 +82,8 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.SAMPLE_DEPTH.getVarName()
 	));
 
-	private static final LinkedHashSet<DashDataType> METADATA_FILES_TYPES_SET = 
-			new LinkedHashSet<DashDataType>( Arrays.asList(
+	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = 
+			new TreeSet<DashDataType>( Arrays.asList(
 					DashboardServerUtils.EXPOCODE,
 					DashboardServerUtils.DATASET_NAME,
 					DashboardServerUtils.VESSEL_NAME,
@@ -98,10 +98,13 @@ public class KnownDataTypesTest {
 					DashboardServerUtils.QC_FLAG
 					) );
 
-	static final String[] ADDN_TYPES_DISPLAY_NAMES = new String[] {
-		"xCO2 atm dry", "ranking", "SOCAT DOI" };
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
 		"xCO2_atm_dry_interp", "rank", "socat_doi" };
+	static final Double[] ADDN_TYPES_SORT_ORDERS = new Double[] {
+		34.0, 56.0, 78.0
+	};
+	static final String[] ADDN_TYPES_DISPLAY_NAMES = new String[] {
+		"xCO2 atm dry", "ranking", "SOCAT DOI" };
 	static final String[] ADDN_TYPES_CLASS_NAMES = new String[] { 
 		DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 		DashboardUtils.INT_DATA_CLASS_NAME, 
@@ -119,16 +122,17 @@ public class KnownDataTypesTest {
 			new ArrayList<String>(Arrays.asList("umol/mol", "mmol/mol"));
 
 	static final DashDataType[] ADDN_DATA_TYPES = new DashDataType[] {
-		new DashDataType(ADDN_TYPES_DISPLAY_NAMES[0], ADDN_TYPES_VAR_NAMES[0], 
-				ADDN_TYPES_CLASS_NAMES[0], ADDN_TYPES_DESCRIPTIONS[0], 
-				ADDN_TYPES_STANDARD_NAMES[0], ADDN_TYPES_CATEGORY_NAMES[0], 
-				MOL_FRACTION_UNITS),
-		new DashDataType(ADDN_TYPES_DISPLAY_NAMES[1], ADDN_TYPES_VAR_NAMES[1], 
-				ADDN_TYPES_CLASS_NAMES[1], ADDN_TYPES_DESCRIPTIONS[1], 
-				null, null, null),
-		new DashDataType(ADDN_TYPES_DISPLAY_NAMES[2], ADDN_TYPES_VAR_NAMES[2], 
-				ADDN_TYPES_CLASS_NAMES[2], ADDN_TYPES_DESCRIPTIONS[2], 
-				ADDN_TYPES_STANDARD_NAMES[2], ADDN_TYPES_CATEGORY_NAMES[2], null)
+		new DashDataType(ADDN_TYPES_VAR_NAMES[0], ADDN_TYPES_SORT_ORDERS[0], 
+				ADDN_TYPES_DISPLAY_NAMES[0], ADDN_TYPES_CLASS_NAMES[0], 
+				ADDN_TYPES_DESCRIPTIONS[0], ADDN_TYPES_STANDARD_NAMES[0], 
+				ADDN_TYPES_CATEGORY_NAMES[0], MOL_FRACTION_UNITS),
+		new DashDataType(ADDN_TYPES_VAR_NAMES[1], ADDN_TYPES_SORT_ORDERS[0], 
+				ADDN_TYPES_DISPLAY_NAMES[1], ADDN_TYPES_CLASS_NAMES[1], 
+				ADDN_TYPES_DESCRIPTIONS[1], null, null, null),
+		new DashDataType(ADDN_TYPES_VAR_NAMES[2], ADDN_TYPES_SORT_ORDERS[0], 
+				ADDN_TYPES_DISPLAY_NAMES[2], ADDN_TYPES_CLASS_NAMES[2], 
+				ADDN_TYPES_DESCRIPTIONS[2], ADDN_TYPES_STANDARD_NAMES[2], 
+				ADDN_TYPES_CATEGORY_NAMES[2], null)
 	};
 
 	static final String ADDN_TYPES_PROPERTIES_STRING = 
@@ -226,7 +230,7 @@ public class KnownDataTypesTest {
 	@Test
 	public void testGetKnownTypesList() {
 		KnownDataTypes types = new KnownDataTypes();
-		LinkedHashSet<DashDataType> knownSet = types.getKnownTypesSet();
+		TreeSet<DashDataType> knownSet = types.getKnownTypesSet();
 		assertEquals(0, knownSet.size());
 		types.addStandardTypesForMetadataFiles();
 		knownSet = types.getKnownTypesSet();

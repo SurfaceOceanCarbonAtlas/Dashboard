@@ -20,8 +20,9 @@ import org.junit.Test;
  */
 public class DashDataTypeTest {
 
-	private static final String DISPLAY_NAME = "xCO2 atm dry";
 	private static final String VAR_NAME = "xCO2_atm_dry";
+	private static final Double SORT_ORDER = 3.14159;
+	private static final String DISPLAY_NAME = "xCO2 atm dry";
 	private static final String DATA_CLASS_NAME = "Double";
 	private static final String DESCRIPTION = "mole fraction of carbon dioxide";
 	private static final String STANDARD_NAME = "mole_fraction_co2";
@@ -30,9 +31,11 @@ public class DashDataTypeTest {
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#DataType(java.lang.String, 
-	 * java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.util.Collection)} 
-	 * as well as
-	 * @link gov.noaa.pmel.dashboard.server.DashDataType#getVarName()},
+	 * java.lang.Double, java.lang.String, java.lang.String, java.lang.String, java.lang.String, 
+	 * java.util.Collection)} as well as
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getVarName()},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getSortOrder()},
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDisplayName()},
 	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDataClassName()},
 	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getDescription()},
 	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getStandardName()},
@@ -40,8 +43,8 @@ public class DashDataTypeTest {
 	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#getUnits()}.
 	 */
 	@Test
-	public void testStdDataColumnType() {
-		DashDataType stdtype = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+	public void testDashDataType() {
+		DashDataType stdtype = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( UNITS == stdtype.getUnits() );
 		assertEquals(UNITS, stdtype.getUnits());
@@ -49,8 +52,9 @@ public class DashDataTypeTest {
 		assertEquals(STANDARD_NAME, stdtype.getStandardName());
 		assertEquals(DESCRIPTION, stdtype.getDescription());
 		assertEquals(DATA_CLASS_NAME, stdtype.getDataClassName());
-		assertEquals(VAR_NAME, stdtype.getVarName());
 		assertEquals(DISPLAY_NAME, stdtype.getDisplayName());
+		assertEquals(SORT_ORDER, stdtype.getSortOrder());
+		assertEquals(VAR_NAME, stdtype.getVarName());
 	}
 
 	/**
@@ -60,7 +64,7 @@ public class DashDataTypeTest {
 	 */
 	@Test
 	public void testTypeNameEquals() {
-		DashDataType stdtype = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 
 		assertTrue( stdtype.typeNameEquals(DISPLAY_NAME.toUpperCase()) );
@@ -73,70 +77,70 @@ public class DashDataTypeTest {
 		assertFalse( stdtype.typeNameEquals(CATEGORY_NAME) );
 
 		DashDataType other;
-		other = new DashDataType("Blob", VAR_NAME.toLowerCase(), 
+		other = new DashDataType(VAR_NAME.toLowerCase(), SORT_ORDER-1.0, "Blob", 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType("Blob", VAR_NAME.toUpperCase(), 
+		other = new DashDataType(VAR_NAME.toUpperCase(), SORT_ORDER+1.0, "Blob", 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType(DISPLAY_NAME.toLowerCase(), "Blob", 
+		other = new DashDataType("Blob", SORT_ORDER-2.0, DISPLAY_NAME.toLowerCase(), 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType(DISPLAY_NAME.toUpperCase(), "Blob", 
+		other = new DashDataType("Blob", SORT_ORDER+2.0, DISPLAY_NAME.toUpperCase(), 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType("Blob", DISPLAY_NAME.toLowerCase(), 
+		other = new DashDataType(DISPLAY_NAME.toLowerCase(), SORT_ORDER-3.0, "Blob", 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType("Blob", DISPLAY_NAME.toUpperCase(), 
+		other = new DashDataType(DISPLAY_NAME.toUpperCase(), SORT_ORDER+3.0, "Blob", 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType(VAR_NAME.toLowerCase(), "Blob", 
+		other = new DashDataType("Blob", SORT_ORDER-4.0, VAR_NAME.toLowerCase(), 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType(VAR_NAME.toUpperCase(), "Blob", 
+		other = new DashDataType("Blob", SORT_ORDER+4.0, VAR_NAME.toUpperCase(), 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(other) );
 		assertTrue( other.typeNameEquals(stdtype) );
 
-		other = new DashDataType(null, "Blob", DATA_CLASS_NAME, 
+		other = new DashDataType("Blob", SORT_ORDER, "Blob", DATA_CLASS_NAME, 
 				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.typeNameEquals(other) );
 		assertFalse( other.typeNameEquals(stdtype) );
 
 		DataColumnType another;
-		another = new DataColumnType(DISPLAY_NAME.toLowerCase(), "Blob",
+		another = new DataColumnType("Blob", SORT_ORDER-5.0, DISPLAY_NAME.toLowerCase(), 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(another) );
 
-		another = new DataColumnType("Blob", VAR_NAME.toUpperCase(),
+		another = new DataColumnType(VAR_NAME.toUpperCase(), SORT_ORDER+5.0, "Blob", 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(another) );
 
-		another = new DataColumnType("Blob", DISPLAY_NAME.toUpperCase(),
+		another = new DataColumnType(DISPLAY_NAME.toUpperCase(), SORT_ORDER-6.0, "Blob", 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(another) );
 
-		another = new DataColumnType(VAR_NAME.toLowerCase(), "Blob", 
+		another = new DataColumnType("Blob", SORT_ORDER+6.0, VAR_NAME.toLowerCase(), 
 				"Integer", null, null, null, DashboardUtils.NO_UNITS);
 		assertTrue( stdtype.typeNameEquals(another) );
 
-		another = new DataColumnType(null, "Blob", 
-				"Integer", null, null, null, DashboardUtils.NO_UNITS);
+		another = new DataColumnType("Blob", SORT_ORDER, "Blob", DATA_CLASS_NAME, 
+				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.typeNameEquals(another) );
 	}
 
@@ -145,10 +149,10 @@ public class DashDataTypeTest {
 	 */
 	@Test
 	public void testDuplicate() {
-		DashDataType stdtype = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		DataColumnType dup = stdtype.duplicate();
-		DataColumnType other = new DataColumnType(DISPLAY_NAME, VAR_NAME, 
+		DataColumnType other = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertEquals(other, dup);
 		assertFalse( dup.getUnits() == stdtype.getUnits() );
@@ -160,10 +164,12 @@ public class DashDataTypeTest {
 	 */
 	@Test
 	public void testToFromPropertyValue() {
-		DashDataType stdtype = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		String jsonDesc = stdtype.toPropertyValue();
 		assertFalse( jsonDesc.contains(VAR_NAME) );
+		assertTrue( jsonDesc.contains("sort_order") );
+		assertTrue( jsonDesc.contains(SORT_ORDER.toString()) );
 		assertTrue( jsonDesc.contains("display_name") );
 		assertTrue( jsonDesc.contains(DISPLAY_NAME) );
 		assertTrue( jsonDesc.contains("data_class") );
@@ -181,10 +187,12 @@ public class DashDataTypeTest {
 		DashDataType other = DashDataType.fromPropertyValue(VAR_NAME, jsonDesc);
 		assertEquals(stdtype, other);
 
-		stdtype = new DashDataType(DISPLAY_NAME, VAR_NAME, DATA_CLASS_NAME, 
-				null, null, null, null);
+		stdtype = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
+				DATA_CLASS_NAME, null, null, null, null);
 		jsonDesc = stdtype.toPropertyValue();
 		assertFalse( jsonDesc.contains(VAR_NAME) );
+		assertTrue( jsonDesc.contains("sort_order") );
+		assertTrue( jsonDesc.contains(SORT_ORDER.toString()) );
 		assertTrue( jsonDesc.contains("display_name") );
 		assertTrue( jsonDesc.contains(DISPLAY_NAME) );
 		assertTrue( jsonDesc.contains("data_class") );
@@ -206,42 +214,58 @@ public class DashDataTypeTest {
 	 */
 	@Test
 	public void testHashCodeEquals() {
-		DashDataType stdtype = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		DashDataType stdtype = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.equals(null) );
 		assertFalse( stdtype.equals(VAR_NAME) );
 
-		DashDataType other = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		DashDataType other = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertTrue( stdtype.hashCode() == other.hashCode() );
 		assertTrue( stdtype.equals(other) );
 
-		other = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		other = new DashDataType("blob", SORT_ORDER, DISPLAY_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		assertFalse( stdtype.hashCode() == other.hashCode() );
+		assertFalse( stdtype.equals(other) );
+
+		other = new DashDataType(VAR_NAME, SORT_ORDER + 1.0, DISPLAY_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		// hash code ignores floating point values
+		assertTrue( stdtype.hashCode() == other.hashCode() );
+		assertFalse( stdtype.equals(other) );
+
+		other = new DashDataType(VAR_NAME, SORT_ORDER, "Blob", 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		assertFalse( stdtype.hashCode() == other.hashCode() );
+		assertFalse( stdtype.equals(other) );
+
+		other = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				"Integer", DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		other = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, null, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		other = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, null, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DashDataType(DISPLAY_NAME, VAR_NAME, 
+		other = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, null, UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		other = new DashDataType(DISPLAY_NAME, VAR_NAME, DATA_CLASS_NAME, 
-				DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, DashboardUtils.NO_UNITS);
+		other = new DashDataType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, DashboardUtils.NO_UNITS);
 		assertFalse( stdtype.hashCode() == other.hashCode() );
 		assertFalse( stdtype.equals(other) );
 
-		DataColumnType another = new DataColumnType(DISPLAY_NAME, VAR_NAME, 
+		DataColumnType another = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
 				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
 		assertFalse( stdtype.equals(another) );
 

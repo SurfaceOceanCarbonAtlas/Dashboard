@@ -13,7 +13,7 @@ import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -51,7 +51,7 @@ public class SocatMetadataTest {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		mdata.setStringVariableValue(DashboardServerUtils.EXPOCODE, EXPOCODE);
-		LinkedHashMap<DashDataType,String> stringMap = mdata.getStringVariables();
+		TreeMap<DashDataType,String> stringMap = mdata.getStringVariables();
 		assertEquals(EXPOCODE, stringMap.get(DashboardServerUtils.EXPOCODE));
 		mdata.setStringVariableValue(DashboardServerUtils.EXPOCODE, null);
 		stringMap = mdata.getStringVariables();
@@ -75,7 +75,7 @@ public class SocatMetadataTest {
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		Double value = Double.valueOf(EASTMOST_LONGITUDE);
 		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, value);
-		LinkedHashMap<DashDataType,Double> doubleMap = mdata.getDoubleVariables();
+		TreeMap<DashDataType,Double> doubleMap = mdata.getDoubleVariables();
 		assertEquals(value, doubleMap.get(DashboardServerUtils.EASTERNMOST_LONGITUDE));
 		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, null);
 		doubleMap = mdata.getDoubleVariables();
@@ -98,7 +98,7 @@ public class SocatMetadataTest {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
 		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, BEGIN_TIME);
-		LinkedHashMap<DashDataType,Date> dateMap = mdata.getDateVariables();
+		TreeMap<DashDataType,Date> dateMap = mdata.getDateVariables();
 		assertEquals(BEGIN_TIME, dateMap.get(DashboardServerUtils.TIME_COVERAGE_START));
 		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, null);
 		dateMap = mdata.getDateVariables();

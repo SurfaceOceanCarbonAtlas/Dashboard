@@ -3,17 +3,21 @@
  */
 package gov.noaa.pmel.dashboard.test.programs;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
 import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.junit.Test;
 
@@ -54,9 +58,8 @@ public class RegenerateDsgsTest {
 
 		// Regenerate the DSG files
 		RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
-		if ( ! regenerator.regenerateDsgFiles(expocode, true) ) {
-			fail("regenerateDsgFiles returned false when 'always' set to true");
-		}
+		assertTrue( "regenerateDsgFiles returned false when 'always' set to true",
+				regenerator.regenerateDsgFiles(expocode, true) );
 
 		// Re-read the data and metadata
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
@@ -67,8 +70,59 @@ public class RegenerateDsgsTest {
 		// Test that nothing has changed
 		assertEquals(origMeta, updatedMeta);
 		assertEquals(origData.size(), updatedData.size());
+
 		for (int k = 0; k < origData.size(); k++) {
-			assertEquals(origData.get(k), updatedData.get(k));
+			SocatCruiseData origVals = origData.get(k);
+			SocatCruiseData updatedVals = updatedData.get(k);
+
+			if ( ! origVals.equals(updatedVals) ) {
+				// Report all problems for the measurement, not just the first problem
+
+				TreeMap<DashDataType,Integer> origIntVals = origVals.getIntegerVariables();
+				TreeMap<DashDataType,Integer> updatedIntVals = updatedVals.getIntegerVariables();
+				if ( origIntVals.size() != updatedIntVals.size() )
+					System.err.println("Number of integer values: expected = " + 
+							origIntVals.size() + "; found = " + updatedIntVals.size() );
+				for ( Entry<DashDataType,Integer> entry : origIntVals.entrySet() ) {
+					DashDataType key = entry.getKey();
+					Integer original = entry.getValue();
+					Integer updated = updatedIntVals.get(key);
+					if ( ! original.equals(updated) )
+						System.err.println("Value of " + key.getVarName() + ": expected = " + 
+								original + "; found = " + updated );
+				}
+
+				TreeMap<DashDataType,Character> origCharVals = origVals.getCharacterVariables();
+				TreeMap<DashDataType,Character> updatedCharVals = updatedVals.getCharacterVariables();
+				if ( origCharVals.size() != updatedCharVals.size() )
+					System.err.println("Number of character values: expected = " + 
+							origCharVals.size() + "; found = " + updatedCharVals.size() );
+				for ( Entry<DashDataType,Character> entry : origCharVals.entrySet() ) {
+					DashDataType key = entry.getKey();
+					Character original = entry.getValue();
+					Character updated = updatedCharVals.get(key);
+					if ( ! original.equals(updated) )
+						System.err.println("Value of " + key.getVarName() + ": expected = " + 
+								original + "; found = " + updated );
+				}
+
+				TreeMap<DashDataType,Double> origDoubleVals = origVals.getDoubleVariables();
+				TreeMap<DashDataType,Double> updatedDoubleVals = updatedVals.getDoubleVariables();
+				if ( origDoubleVals.size() != updatedDoubleVals.size() )
+					System.err.println("Number of character values: expected = " + 
+							origDoubleVals.size() + "; found = " + updatedDoubleVals.size() );
+				for ( Entry<DashDataType,Double> entry : origDoubleVals.entrySet() ) {
+					DashDataType key = entry.getKey();
+					Double original = entry.getValue();
+					Double updated = updatedDoubleVals.get(key);
+					if ( ! DashboardUtils.closeTo(original, updated, 
+							DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+						System.err.println("Value of " + key.getVarName() + ": expected = " + 
+								original + "; found = " + updated );
+				}
+			}
+
+			assertEquals(origVals, updatedVals);
 		}
 
 	}

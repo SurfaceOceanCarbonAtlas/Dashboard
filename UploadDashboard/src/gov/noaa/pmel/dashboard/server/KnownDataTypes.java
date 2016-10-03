@@ -3,30 +3,29 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /**
- * Well-ordered set of known data types that can be extended as needed.
+ * Known data types that can be extended as needed.
+ * Provides an ordered set of known types.
  *  
  * @author Karl Smith
  */
 public class KnownDataTypes {
 
-	private LinkedHashMap<String,DashDataType> knownTypes;
+	private HashMap<String,DashDataType> knownTypes;
 
 	/**
 	 * Creates with no well-know data types.
 	 */
 	public KnownDataTypes() {
-		// Give plenty of capacity;
-		// since this is a LinkedHashMap, extra capacity not really a problem
-		knownTypes = new LinkedHashMap<String,DashDataType>(96);
+		// Give extra capacity for added types
+		knownTypes = new HashMap<String,DashDataType>(96);
 	}
 
 	/**
@@ -206,10 +205,10 @@ public class KnownDataTypes {
 
 	/**
 	 * @return
-	 * 		the current set of known data types.
+	 * 		the sorted current set of known data types.
 	 */
-	public LinkedHashSet<DashDataType> getKnownTypesSet() {
-		return new LinkedHashSet<DashDataType>(knownTypes.values());
+	public TreeSet<DashDataType> getKnownTypesSet() {
+		return new TreeSet<DashDataType>(knownTypes.values());
 	}
 
 	/**
@@ -223,8 +222,8 @@ public class KnownDataTypes {
 	@Override
 	public String toString() {
 		String strval = "KnownDataTypes[\n";
-		// Remove duplicated data types (with different keys) by first forming a set
-		for ( DashDataType dtype : new LinkedHashSet<DashDataType>(knownTypes.values()) )
+		// Do not show the keys, only the unique data types
+		for ( DashDataType dtype : getKnownTypesSet() )
 			strval += "    " + dtype.toString() + "\n";
 		strval += "]";
 		return strval;
