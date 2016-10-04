@@ -129,19 +129,6 @@ public interface DashboardServicesInterfaceAsync {
 			AsyncCallback<DashboardCruiseList> callback);
 
 	/**
-	 * Returns the list of all known user data column types.
-	 * 
-	 * @param username
-	 * 		username for validation
-	 * @param callback
-	 * 		callback to make with the list of data column types 
-	 * 		The fail method is invoked if authentication fails or
-	 * 		if there are problems obtaining the list of types
-	 */
-	void getKnownUserDataColumnTypes(String username,
-			AsyncCallback<ArrayList<DataColumnType>> callback);
-
-	/**
 	 * Reads the saved cruise file and returns the current data
 	 * column specifications as well as some initial cruise data
 	 * to assist in identifying cruise data columns.
@@ -158,7 +145,7 @@ public interface DashboardServicesInterfaceAsync {
 	 * 		or if there are problems obtaining the data for the cruise
 	 */
 	void getCruiseDataColumnSpecs(String username, String expocode, 
-			AsyncCallback<DashboardCruiseWithData> callback);
+			AsyncCallback<DashboardCruiseTypes> callback);
 
 	/**
 	 * Reads the saved cruise file and returns the specified

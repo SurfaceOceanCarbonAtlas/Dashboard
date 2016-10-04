@@ -10,6 +10,7 @@ import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
+import gov.noaa.pmel.dashboard.shared.DashboardCruiseTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
@@ -39,7 +40,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = 6142295248552727436L;
+	private static final long serialVersionUID = 4195162397031324989L;
 
 	private String username = null;
 	private DashboardConfigStore configStore = null;
@@ -312,11 +313,13 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 	}
 
 	@Override
-	public ArrayList<DataColumnType> getKnownUserDataColumnTypes(String pageUsername) {
+	public DashboardCruiseTypes getCruiseDataColumnSpecs(String pageUsername,
+			String expocode) throws IllegalArgumentException {
 		// Get the dashboard data store and current username, and validate that username
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
+		// Get the list of known user-provided data column types
 		KnownDataTypes knownUserTypes = configStore.getKnownUserDataTypes();
 		if ( knownUserTypes == null )
 			throw new IllegalArgumentException("unexpected missing list of all known data column types");
@@ -326,15 +329,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		ArrayList<DataColumnType> knownTypesList = new ArrayList<DataColumnType>(knownTypesSet.size());
 		for ( DashDataType dtype : knownTypesSet )
 			knownTypesList.add(dtype.duplicate());
-		return knownTypesList;
-	}
-
-	@Override
-	public DashboardCruiseWithData getCruiseDataColumnSpecs(String pageUsername,
-			String expocode) throws IllegalArgumentException {
-		// Get the dashboard data store and current username, and validate that username
-		if ( ! validateRequest(pageUsername) ) 
-			throw new IllegalArgumentException("Invalid user request");
 
 		// Get the cruise with the first maximum-needed number of rows
 		DashboardCruiseWithData cruiseData = configStore.getCruiseFileHandler()
@@ -342,14 +336,17 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 						DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 		if ( cruiseData == null )
 			throw new IllegalArgumentException(expocode + " does not exist");
-
 		// Remove any metadata preamble to reduced data transmitted
 		cruiseData.getPreamble().clear();
+
+		DashboardCruiseTypes cruiseTypes = new DashboardCruiseTypes();
+		cruiseTypes.setAllKnownTypes(knownTypesList);
+		cruiseTypes.setCruiseData(cruiseData);
 
 		Logger.getLogger("DashboardServices").info("data columns specs returned for " + 
 				expocode + " for " + username);
 		// Return the cruise with the partial data
-		return cruiseData;
+		return cruiseTypes;
 	}
 
 	@Override

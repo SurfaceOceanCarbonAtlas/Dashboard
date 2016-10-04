@@ -135,20 +135,6 @@ public interface DashboardServicesInterface extends RemoteService {
 			String expocode, TreeSet<String> allExpocodes) throws IllegalArgumentException;
 
 	/**
-	 * Get the list of all known user data column types.
-	 * 
-	 * @param username
-	 * 		username for validation
-	 * @param return
-	 * 		the list of all known user data column types 
-	 * @throws IllegalArgumentException
-	 * 		if authentication fails or 
-	 * 		if there are problems obtaining the list of types
-	 */
-	ArrayList<DataColumnType> getKnownUserDataColumnTypes(String username)
-		throws IllegalArgumentException;
-
-	/**
 	 * Reads the saved cruise file and returns the current data
 	 * column specifications as well as some initial cruise data
 	 * to assist in identifying cruise data columns.
@@ -165,7 +151,7 @@ public interface DashboardServicesInterface extends RemoteService {
 	 * 		if the cruise does not exist, or if there are 
 	 * 		problems obtaining the data for the cruise
 	 */
-	DashboardCruiseWithData getCruiseDataColumnSpecs(String username, 
+	DashboardCruiseTypes getCruiseDataColumnSpecs(String username, 
 			String expocode) throws IllegalArgumentException;
 
 	/**

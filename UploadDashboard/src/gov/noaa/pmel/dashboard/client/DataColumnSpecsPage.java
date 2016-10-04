@@ -5,6 +5,7 @@ package gov.noaa.pmel.dashboard.client;
 
 import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
+import gov.noaa.pmel.dashboard.shared.DashboardCruiseTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
@@ -107,8 +108,6 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	private static final String USE_DEFAULT_SECONDS_TEXT = "Yes";
 	private static final String NO_DEFAULT_SECONDS_TEXT = "No";
 
-	private static final String GET_KNOWN_TYPES_FAIL_MSG =
-			"Problems obtaining all known data column types";
 	private static final String GET_COLUMN_SPECS_FAIL_MSG = 
 			"Problems obtaining the data column types";
 	private static final String SUBMIT_FAIL_MSG = 
@@ -210,6 +209,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		submitButton.setText(SUBMIT_TEXT);
 		cancelButton.setText(CANCEL_TEXT);
 
+		knownUserTypes = new ArrayList<DataColumnType>();
 		cruise = new DashboardCruise();
 		cruiseDataCols = new ArrayList<CruiseDataColumn>();
 		expocodes = new ArrayList<String>();
@@ -256,40 +256,23 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	 * 		show the specifications for this cruise
 	 */
 	static void showPage(String username, ArrayList<String> expocodes) {
-		if ( singleton == null ) {
+		if ( singleton == null )
 			singleton = new DataColumnSpecsPage();
-			singleton.setUsername(username);
-			singleton.expocodes.clear();
-			singleton.expocodes.addAll(expocodes);
-			SocatUploadDashboard.showWaitCursor();
-			// Get the list of all known user data column types and try again
-			service.getKnownUserDataColumnTypes(singleton.getUsername(),
-					new AsyncCallback<ArrayList<DataColumnType>>() {
-				@Override
-				public void onSuccess(ArrayList<DataColumnType> knownUserTypes) {
-					singleton.knownUserTypes = knownUserTypes;
-					showPage(singleton.getUsername(), singleton.expocodes);
-				}
-				@Override
-				public void onFailure(Throwable ex) {
-					SocatUploadDashboard.showFailureMessage(GET_KNOWN_TYPES_FAIL_MSG, ex);
-					SocatUploadDashboard.showAutoCursor();
-				}
-			});
-			return;
-		}
 
 		singleton.setUsername(username);
 		singleton.expocodes.clear();
 		singleton.expocodes.addAll(expocodes);
 		SocatUploadDashboard.showWaitCursor();
 		service.getCruiseDataColumnSpecs(singleton.getUsername(), expocodes.get(0), 
-								new AsyncCallback<DashboardCruiseWithData>() {
+								new AsyncCallback<DashboardCruiseTypes>() {
 			@Override
-			public void onSuccess(DashboardCruiseWithData cruiseSpecs) {
+			public void onSuccess(DashboardCruiseTypes cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
 					SocatUploadDashboard.updateCurrentPage(singleton);
-					singleton.updateCruiseColumnSpecs(cruiseSpecs);
+					singleton.knownUserTypes.clear();
+					if ( cruiseSpecs.getAllKnownTypes() != null )
+						singleton.knownUserTypes.addAll(cruiseSpecs.getAllKnownTypes());
+					singleton.updateCruiseColumnSpecs(cruiseSpecs.getCruiseData());
 					History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 				}
 				else {
