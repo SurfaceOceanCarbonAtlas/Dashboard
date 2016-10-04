@@ -47,15 +47,10 @@ public class SocatCruiseReporter {
 	// SOCAT main DOI, DOI HRef, and publication citation
 	private static final String SOCAT_MAIN_DOI = "SOCATMAINDOI";
 	private static final String[] SOCAT_MAIN_CITATION = {
-		"  SOCATMAINHREF",
-		"Also see: ",
-		"  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade record ",
-		"of high quality fCO2 data in version 3 of the Surface Ocean CO2 Atlas ",
-		"(SOCAT)\"  Under review in Earth System Science Data Discussions, 2016, ",
-		"55 pp.  doi:10.5194/essd-2016-15; ",
-		"  D.C.E. Bakker, B. Pfeil, K. Smith, et. al.  \"An update to the Surface ",
-		"Ocean CO2 Atlas (SOCAT version 2)\" Earth Syst. Sci. Data, 6, 69-90, 2014 ",
-		"doi:10.5194/essd-6-69-2014  http://www.earth-syst-sci-data.net/6/69/2014/ ",
+		"  D.C.E. Bakker, B. Pfeil, C.S. Landa, et. al.  \"A multi-decade ",
+		"record of high quality fCO2 data in version 3 of the Surface Ocean ",
+		"CO2 Atlas (SOCAT)\"  Earth System Science Data, 8, 383-413, 2016 ",
+		"doi:10.5194/essd-8-383-2106"
 	};
 
     // Expocodes for cruises missing hours and minutes (hour:minute time is 00:00)
