@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 /**
  * Submits Dashboard cruise for SOCAT QC
  * 
@@ -43,6 +45,7 @@ public class CruiseSubmitter {
 	DatabaseRequestHandler databaseHandler;
 	SocatFilesBundler cdiacBundler;
 	String socatVersion;
+	Logger logger;
 
 	/**
 	 * @param configStore
@@ -58,6 +61,7 @@ public class CruiseSubmitter {
 		databaseHandler = configStore.getDatabaseRequestHandler();
 		cdiacBundler = configStore.getCdiacFilesBundler();
 		socatVersion = configStore.getSocatUploadVersion();
+		logger = Logger.getLogger(getClass());
 	}
 
 	/**
@@ -184,13 +188,14 @@ public class CruiseSubmitter {
 							}
 						}
 						socatVersionStatus = socatVersion + status;
-						
 					}
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data
+					logger.debug("Generating the full-data DSG file for " + expocode);
 					dsgNcHandler.saveCruise(omeMData, cruiseData, socatVersionStatus, flag.toString());
 
 					// Generate the decimated-data DSG file from the full-data DSG file
+					logger.debug("Generating the decimated-data DSG file for " + expocode);
 					dsgNcHandler.decimateCruise(expocode);
 				} catch (Exception ex) {
 					errorMsgs.add(expocode + ": unacceptable; " + ex.getMessage());
