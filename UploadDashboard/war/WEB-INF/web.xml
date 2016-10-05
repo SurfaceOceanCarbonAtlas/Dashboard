@@ -12,7 +12,7 @@
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>DashboardServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.DashboardServices</servlet-class>
+		<servlet-class>gov.noaa.pmel.dashboard.server.DashboardServices</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardServlet</servlet-name>
@@ -21,7 +21,7 @@
 
 	<servlet>
 		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.CruiseUploadService</servlet-class>
+		<servlet-class>gov.noaa.pmel.dashboard.server.CruiseUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
@@ -30,7 +30,7 @@
 
 	<servlet>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
-		<servlet-class>gov.noaa.pmel.socat.dashboard.server.MetadataUploadService</servlet-class>
+		<servlet-class>gov.noaa.pmel.dashboard.server.MetadataUploadService</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
@@ -39,7 +39,7 @@
 
 	<filter>
 		<filter-name>AuthenticateFilter</filter-name>
-		<filter-class>gov.noaa.pmel.socat.dashboard.server.AuthenticateFilter</filter-class>
+		<filter-class>gov.noaa.pmel.dashboard.server.AuthenticateFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>AuthenticateFilter</filter-name>

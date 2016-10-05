@@ -12,6 +12,7 @@
 ! WOCE flags are not used in the decimated datasets, as they may change in the
 ! full data. Keep them in the file for a consistent set of variables, but mark 
 ! them with the unused flag "M".
+! 7/2016, change to missing-value when inheriting attributes.
 
 ! arguments: 
 !  input_file single dsg file
@@ -193,6 +194,7 @@ IF ($vtype"0|CHAR>1|*>0") THEN CAN SYM qual;\
 LET ($vname) = ($vname)_in[ge=traj@asn];\
 SET ATT/LIKE=($vname)_in ($vname);\
 SET ATT/OUTPUT=all ($vname);\
+IF `STRINDEX("($vtype)", "INT") GT 0` THEN SET VAR/BAD=`($vname)_in,RETURN=bad` ($vname);\
 SAVE/QUIET/FILE="($outfile)"/APPEND($qual) ($vname))
 
 ! add nobs_deci on the same axis

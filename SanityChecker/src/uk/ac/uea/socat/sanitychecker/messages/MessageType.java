@@ -1,5 +1,7 @@
 package uk.ac.uea.socat.sanitychecker.messages;
 
+import java.util.regex.Matcher;
+
 /**
  * Stores the details of a particular message type.
  * Message types are typically associated with a specific error,
@@ -103,9 +105,9 @@ public class MessageType implements Comparable<MessageType> {
 			validReplaceValue = validValue.trim();
 		}
 
-		String result = itsFullMessage.replaceAll(COLUMN_NAME_IDENTIFIER, columnReplaceValue);
-		result = result.replaceAll(FIELD_VALUE_IDENTIFIER, fieldReplaceValue);
-		result = result.replaceAll(VALID_VALUE_IDENTIFIER, validReplaceValue);
+		String result = itsFullMessage.replaceAll(COLUMN_NAME_IDENTIFIER, Matcher.quoteReplacement(columnReplaceValue));
+		result = result.replaceAll(FIELD_VALUE_IDENTIFIER, Matcher.quoteReplacement(fieldReplaceValue));
+		result = result.replaceAll(VALID_VALUE_IDENTIFIER, Matcher.quoteReplacement(validReplaceValue));
 
 		return result;
 	}
@@ -128,7 +130,7 @@ public class MessageType implements Comparable<MessageType> {
 			columnReplaceValue = columnName.trim();
 		}
 
-		return itsSummaryMessage.replaceAll(COLUMN_NAME_IDENTIFIER, columnReplaceValue);
+		return itsSummaryMessage.replaceAll(COLUMN_NAME_IDENTIFIER, Matcher.quoteReplacement(columnReplaceValue));
 	}
 	
 	@Override

@@ -4,6 +4,9 @@
 ! If the data being added is a partial year, see ncep_slp_blank_end_year.jnl to 
 ! fill it out to the end of the current year.
 
+! Note that as long as the time origins are year 1800 as they are in the datasets above,
+! we do not need to worry about Ferret introducing a 2-day time shift.
+
 set mem/siz=300
 def sym offst = 119765
 def sym newbad = `32766+($offst)`
