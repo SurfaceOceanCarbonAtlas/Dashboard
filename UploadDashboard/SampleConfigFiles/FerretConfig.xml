@@ -11,8 +11,8 @@
                     environment below or by passing the script a fully qualified path.
     -->
     <invoker
-        base_dir="/home/ksmith/Ferret/"
-        executable="/home/ksmith/Ferret/bin/ferret"
+        base_dir="/home/users/ksmith/"
+        executable="/home/users/ksmith/Ferret/bin/ferret"
         time_limit="10000"
         temp_dir="/var/tmp/socat/"
         compute_driver="calcSOCAT3"
@@ -29,7 +29,7 @@
     <environment>
         <variable>
             <name>FER_DIR</name>
-            <value>.</value>
+            <value>Ferret</value>
         </variable>
         <variable>
             <name>FER_DESCR</name>
@@ -39,9 +39,9 @@
             <name>FER_DATA</name>
             <value>Socat/datasets</value>
             <value>Datasets/data</value>
-            <value>contrib</value>
-            <value>go</value>
-            <value>examples</value>
+            <value>Ferret/contrib</value>
+            <value>Ferret/go</value>
+            <value>Ferret/examples</value>
         </variable>
         <variable>
             <name>FER_GRIDS</name>
@@ -49,22 +49,22 @@
         </variable>
         <variable>
             <name>FER_PALETTE</name>
-            <value>ppl</value>
+            <value>Ferret/ppl</value>
         </variable>
         <variable>
             <name>FER_GO</name>
             <value>Socat/scripts</value>
-            <value>go</value>
-            <value>contrib</value>
-            <value>examples</value>
+            <value>Ferret/go</value>
+            <value>Ferret/contrib</value>
+            <value>Ferret/examples</value>
         </variable>
         <variable>
             <name>PLOTFONTS</name>
-            <value>ppl/fonts</value>
+            <value>Ferret/ppl/fonts</value>
         </variable>
         <variable>
             <name>FER_EXTERNAL_FUNCTIONS</name>
-            <value>ext_func/libs</value>
+            <value>Ferret/ext_func/libs</value>
         </variable>
     </environment>
     <!-- The remainder of this should not need any modifications -->
