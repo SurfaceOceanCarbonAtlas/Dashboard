@@ -177,9 +177,13 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException("The Metadata contains conflicts");
 		}
 
-		KnownDataTypes knownTypes = new KnownDataTypes();
-		knownTypes.addStandardTypesForMetadataFiles();
-		SocatMetadata scMData = new SocatMetadata(knownTypes);
+		DashboardConfigStore confStore;
+		try {
+			confStore = DashboardConfigStore.get(false);
+		} catch ( Exception ex ) {
+			throw new RuntimeException("Unexpected failure to get the configuration information");
+		}
+		SocatMetadata scMData = new SocatMetadata(confStore.getKnownMetadataTypes());
 		
 		scMData.setExpocode(expocode);
 		scMData.setDatasetName(omeMData.getExperimentName());
