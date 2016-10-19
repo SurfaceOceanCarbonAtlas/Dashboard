@@ -36,8 +36,8 @@ public class SanityCheckerTest {
 	private static final String LOG4J_PROPERTIES_FILENAME;
 	static {
 		String home = System.getenv("HOME");
-		CONFIG_FILENAME = home + "/content/SocatUploadDashboard/SocatUploadDashboard.properties";
-		LOG4J_PROPERTIES_FILENAME = home + "/content/SocatUploadDashboard/log4j.properties";
+		CONFIG_FILENAME = home + "/content/SocatUploadDashboard/config/SocatUploadDashboard.properties";
+		LOG4J_PROPERTIES_FILENAME = home + "/content/SocatUploadDashboard/config/log4j.properties";
 	}
 
 	@Test

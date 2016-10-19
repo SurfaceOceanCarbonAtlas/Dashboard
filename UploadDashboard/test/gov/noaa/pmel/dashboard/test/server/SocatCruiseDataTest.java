@@ -46,8 +46,8 @@ public class SocatCruiseDataTest {
 				SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
 		addnTypeProps.setProperty(SocatTypes.PATM.getVarName(), 
 				SocatTypes.PATM.toPropertyValue());
-		addnTypeProps.setProperty(SocatTypes.SHIP_SPEED.getVarName(), 
-				SocatTypes.SHIP_SPEED.toPropertyValue());
+		addnTypeProps.setProperty(CruiseDsgNcFileTest.SHIP_SPEED.getVarName(), 
+				CruiseDsgNcFileTest.SHIP_SPEED.toPropertyValue());
 		addnTypeProps.setProperty(SocatTypes.WOCE_CO2_WATER.getVarName(), 
 				SocatTypes.WOCE_CO2_WATER.toPropertyValue());
 		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
@@ -68,7 +68,7 @@ public class SocatCruiseDataTest {
 			SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
 			SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
 			SocatTypes.PATM.duplicate(),
-			SocatTypes.SHIP_SPEED.duplicate()));
+			CruiseDsgNcFileTest.SHIP_SPEED.duplicate()));
 	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
 	static final ArrayList<Integer> EXPECTED_YEARS = new ArrayList<Integer>();
 	static final ArrayList<Integer> EXPECTED_MONTHS = new ArrayList<Integer>();

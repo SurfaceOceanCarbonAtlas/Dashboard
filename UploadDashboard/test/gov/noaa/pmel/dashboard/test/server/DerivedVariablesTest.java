@@ -8,7 +8,6 @@ import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
 
 import java.util.ArrayList;
 
@@ -48,9 +47,9 @@ public class DerivedVariablesTest {
 
 		dsgFile.updateAllRegionIDs();
 
-		ArrayList<String> unknownNames = dsgFile.readMetadata(SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES);
+		ArrayList<String> unknownNames = dsgFile.readMetadata(CruiseDsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
-		unknownNames = dsgFile.readData(SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES);
+		unknownNames = dsgFile.readData(CruiseDsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		assertEquals(numData, dsgFile.getDataList().size());
@@ -71,9 +70,9 @@ public class DerivedVariablesTest {
 		assertFalse(tool.hasError());
 
 		CruiseDsgNcFile decDsgFile = new CruiseDsgNcFile(decDataFilename);
-		unknownNames = decDsgFile.readMetadata(SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES);
+		unknownNames = decDsgFile.readMetadata(CruiseDsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
-		unknownNames = decDsgFile.readData(SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES);
+		unknownNames = decDsgFile.readData(CruiseDsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		int lastRowNum = 0;

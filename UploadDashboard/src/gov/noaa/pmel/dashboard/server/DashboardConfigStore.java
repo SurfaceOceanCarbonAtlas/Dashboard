@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -61,6 +62,9 @@ public class DashboardConfigStore {
 	private static final String SOCAT_QC_VERSION_NAME_TAG = "SocatQCVersion";
 	private static final String SVN_USER_NAME_TAG = "SVNUsername";
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
+	private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
+	private static final String METADATA_TYPES_PROPS_FILE_TAG = "MetadataTypesFile";
+	private static final String DATA_TYPES_PROPS_FILE_TAG = "DataTypesFile";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
@@ -91,6 +95,9 @@ public class DashboardConfigStore {
 			SOCAT_QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
 			SVN_USER_NAME_TAG + "=SVNUsername \n" +
 			SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
+			USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
+			METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
+			DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
@@ -177,12 +184,12 @@ public class DashboardConfigStore {
 		String serverAppName = System.getenv("UPLOAD_DASHBOARD_SERVER_NAME");
 		if ( serverAppName == null )
 			serverAppName = DEFAULT_SERVER_APP_NAME;
-		String contentAppDir = baseDir + "content" + File.separator + serverAppName + File.separator;
+		String configAppDir = baseDir + "content" + File.separator + serverAppName + File.separator + "config" + File.separator;
 		String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator + 
 				"preview" + File.separator;
 
 		// Configure the log4j logger
-		PropertyConfigurator.configure(contentAppDir + "log4j.properties");
+		PropertyConfigurator.configure(configAppDir + "log4j.properties");
 		itsLogger = Logger.getLogger(serverAppName);
 
 		// Record configuration files that should be monitored for changes 
@@ -190,7 +197,7 @@ public class DashboardConfigStore {
 
 		// Read the properties from the standard configuration file
 		Properties configProps = new Properties();
-		File configFile = new File(contentAppDir + serverAppName + ".properties");
+		File configFile = new File(configAppDir + serverAppName + ".properties");
 		filesToWatch.add(configFile);
 		FileReader reader;
 		try {
@@ -290,14 +297,86 @@ public class DashboardConfigStore {
 		if ( propVal != null )
 			svnPassword = propVal.trim();
 
-		knownUserDataTypes = SocatTypes.KNOWN_SOCAT_USER_TYPES;
-		// TODO: read additional types from Properties files
+		try {
+			propVal = configProps.getProperty(USER_TYPES_PROPS_FILE_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			Properties typeProps = new Properties();
+			FileReader propsReader = new FileReader(propVal);
+			try {
+				typeProps.load(propsReader);
+			} finally {
+				propsReader.close();
+			}
+			knownUserDataTypes = new KnownDataTypes();
+			knownUserDataTypes.addStandardTypesForUsers();
+			knownUserDataTypes.addTypesFromProperties(typeProps);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + USER_TYPES_PROPS_FILE_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		if ( itsLogger.isInfoEnabled() ) {
+			itsLogger.info("Known user-provided data types: ");
+			TreeSet<DashDataType> knownTypes = knownUserDataTypes.getKnownTypesSet();
+			for ( DashDataType dtype : knownTypes )
+				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
+		}
 
-		knownMetadataTypes = SocatTypes.KNOWN_SOCAT_METADATA_FILE_TYPES;
-		// TODO: read additional types from Properties files
+		try {
+			propVal = configProps.getProperty(METADATA_TYPES_PROPS_FILE_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			Properties typeProps = new Properties();
+			FileReader propsReader = new FileReader(propVal);
+			try {
+				typeProps.load(propsReader);
+			} finally {
+				propsReader.close();
+			}
+			knownMetadataTypes = new KnownDataTypes();
+			knownMetadataTypes.addStandardTypesForMetadataFiles();
+			knownMetadataTypes.addTypesFromProperties(typeProps);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + METADATA_TYPES_PROPS_FILE_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		if ( itsLogger.isInfoEnabled() ) {
+			itsLogger.info("Known file metadata types: ");
+			TreeSet<DashDataType> knownTypes = knownMetadataTypes.getKnownTypesSet();
+			for ( DashDataType dtype : knownTypes )
+				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
+		}
 
-		knownDataFileTypes = SocatTypes.KNOWN_SOCAT_DATA_FILE_TYPES;
-		// TODO: read additional types from Properties files
+		try {
+			propVal = configProps.getProperty(DATA_TYPES_PROPS_FILE_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			propVal = propVal.trim();
+			Properties typeProps = new Properties();
+			FileReader propsReader = new FileReader(propVal);
+			try {
+				typeProps.load(propsReader);
+			} finally {
+				propsReader.close();
+			}
+			knownDataFileTypes = new KnownDataTypes();
+			knownDataFileTypes.addStandardTypesForDataFiles();
+			knownDataFileTypes.addTypesFromProperties(typeProps);
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + DATA_TYPES_PROPS_FILE_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+		if ( itsLogger.isInfoEnabled() ) {
+			itsLogger.info("Known file data types: ");
+			TreeSet<DashDataType> knownTypes = knownDataFileTypes.getKnownTypesSet();
+			for ( DashDataType dtype : knownTypes )
+				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
+		}
 
 		// Read the user files directory name
 		try {
@@ -556,7 +635,7 @@ public class DashboardConfigStore {
 				previewDirname + "plots", this);
 
 		// Create the OME XML to PDF generator
-		omePdfGenerator = new OmePdfGenerator(new File(contentAppDir), 
+		omePdfGenerator = new OmePdfGenerator(new File(configAppDir), 
 				metadataFileHandler, cruiseFileHandler);
 
 		// The CruiseSubmitter uses the various handlers just created
