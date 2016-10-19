@@ -154,38 +154,10 @@ public class CruiseChecker {
 				new ArrayList<String>(Arrays.asList("decimal_degrees_east", "decimal_degrees_west"));
 		final ArrayList<String> checkerLatitudeUnits = 
 				new ArrayList<String>(Arrays.asList("decimal_degrees_north", "decimal_degrees_south"));
-		final ArrayList<String> checkerSalinityUnits = 
-				new ArrayList<String>(Arrays.asList("psu"));
-		final ArrayList<String> checkerTemperatureUnits = 
-				new ArrayList<String>(Arrays.asList("degC"));
-		final ArrayList<String> checkerXCO2Units = 
-				new ArrayList<String>(Arrays.asList("ppm"));
-		final ArrayList<String> checkerDirectionUnits = 
-				new ArrayList<String>(Arrays.asList("decimal_degrees"));
 
 		CHECKER_DATA_UNITS.put(DashboardServerUtils.TIMESTAMP.getVarName(), checkerTimestampDateUnits);
-
 		CHECKER_DATA_UNITS.put(DashboardServerUtils.LONGITUDE.getVarName(), checkerLongitudeUnits);
-
 		CHECKER_DATA_UNITS.put(DashboardServerUtils.LATITUDE.getVarName(), checkerLatitudeUnits);
-
-		CHECKER_DATA_UNITS.put(SocatTypes.SALINITY.getVarName(), checkerSalinityUnits);
-
-		CHECKER_DATA_UNITS.put(SocatTypes.TEQU.getVarName(), checkerTemperatureUnits);
-		CHECKER_DATA_UNITS.put(SocatTypes.SST.getVarName(), checkerTemperatureUnits);
-		CHECKER_DATA_UNITS.put(SocatTypes.TATM.getVarName(), checkerTemperatureUnits);
-
-		CHECKER_DATA_UNITS.put(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(), checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatTypes.XCO2_WATER_SST_DRY.getVarName(), checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatTypes.XCO2_WATER_TEQU_WET.getVarName(), checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatTypes.XCO2_WATER_SST_WET.getVarName(), checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatTypes.XCO2_ATM_DRY_ACTUAL.getVarName(), checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatTypes.XCO2_ATM_DRY_INTERP.getVarName(), checkerXCO2Units);
-		CHECKER_DATA_UNITS.put(SocatTypes.DELTA_XCO2.getVarName(), checkerXCO2Units);
-
-		CHECKER_DATA_UNITS.put(SocatTypes.SHIP_DIRECTION.getVarName(), checkerDirectionUnits);
-		CHECKER_DATA_UNITS.put(SocatTypes.WIND_DIRECTION_TRUE.getVarName(), checkerDirectionUnits);
-		CHECKER_DATA_UNITS.put(SocatTypes.WIND_DIRECTION_RELATIVE.getVarName(), checkerDirectionUnits);
 	}
 
 	private CheckerMessageHandler msgHandler;
@@ -516,9 +488,32 @@ public class CruiseChecker {
 				int idx = colType.getSelectedUnitIndex();
 				// See if there are alternate unit strings for the checker for this data type
 				ArrayList<String> checkerUnits = CHECKER_DATA_UNITS.get(colType.getVarName());
-				if ( checkerUnits == null )
-					checkerUnits = colType.getUnits();
-				unitsElement.setText(checkerUnits.get(idx));
+				String chkUnit;
+				if ( checkerUnits == null ) {
+					chkUnit = colType.getUnits().get(idx);
+					// Some hacks to avoid specific SOCAT types; ideally the sanity checker 
+					// should be reconfigured to accept the units used
+					if ( "PSU".equals(chkUnit) ) {
+						// salinity
+						chkUnit = "psu";
+					}
+					else if ( "degrees C".equals(chkUnit) ) {
+						// temperature
+						chkUnit = "degC";
+					}
+					else if ( "degrees".equals(chkUnit) ) {
+						// direction
+						chkUnit = "decimal_degrees";
+					}
+					else if ( (idx == 0) && "umol/mol".equals(chkUnit) ) {
+						// xCO2 (but NOT xH2O which has umol/mol as second unit option)
+						chkUnit = "ppm";
+					}
+				}	
+				else {
+					chkUnit = checkerUnits.get(idx);
+				}
+				unitsElement.setText(chkUnit);
 				// Element specifying the index and user name of the column
 				Element userElement = new Element(ColumnSpec.INPUT_COLUMN_ELEMENT_NAME);
 				userElement.setAttribute(ColumnSpec.INPUT_COLUMN_INDEX_ATTRIBUTE, Integer.toString(k+1));

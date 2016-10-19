@@ -11,18 +11,13 @@
                     environment below or by passing the script a fully qualified path.
     -->
     <invoker
-        base_dir="/home/users/ksmith/"
-        executable="/home/users/ksmith/Ferret/bin/ferret"
-        time_limit="10000"
+        base_dir="/home/users/socat/"
+        executable="/home/users/socat/Ferret/bin/ferret"
+        time_limit="60000"
         temp_dir="/var/tmp/socat/"
         compute_driver="calcSOCAT3"
         decimate_driver="ddsg_socat3"
-        plots_driver="run_preview">
-        <!--
-            For PyFerret use:
-                executable="/usr/bin/python2.7"
-                <arg>-c import sys; import pyferret; (errval, errmsg) = pyferret.init(sys.argv[1:], True)</arg>
-        -->
+        plots_driver="run_preview" >
         <arg>-gif</arg>
         <arg>-script</arg>
     </invoker>
@@ -37,11 +32,10 @@
         </variable>
         <variable>
             <name>FER_DATA</name>
-            <value>Socat/datasets</value>
             <value>Datasets/data</value>
-            <value>Ferret/contrib</value>
             <value>Ferret/go</value>
             <value>Ferret/examples</value>
+            <value>Ferret/contrib</value>
         </variable>
         <variable>
             <name>FER_GRIDS</name>
@@ -53,10 +47,10 @@
         </variable>
         <variable>
             <name>FER_GO</name>
-            <value>Socat/scripts</value>
+            <value>SocatFerretScripts</value>
             <value>Ferret/go</value>
-            <value>Ferret/contrib</value>
             <value>Ferret/examples</value>
+            <value>Ferret/contrib</value>
         </variable>
         <variable>
             <name>PLOTFONTS</name>
