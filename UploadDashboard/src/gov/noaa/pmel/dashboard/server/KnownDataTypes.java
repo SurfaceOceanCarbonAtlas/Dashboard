@@ -73,6 +73,7 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.VESSEL_NAME);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
+		addDataType(DashboardServerUtils.VESSEL_TYPE);
 		addDataType(DashboardServerUtils.TIMESTAMP);
 		addDataType(DashboardServerUtils.DATE);
 		addDataType(DashboardServerUtils.YEAR);
@@ -108,6 +109,7 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.VESSEL_NAME);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
+		addDataType(DashboardServerUtils.VESSEL_TYPE);
 		addDataType(DashboardServerUtils.WESTERNMOST_LONGITUDE);
 		addDataType(DashboardServerUtils.EASTERNMOST_LONGITUDE);
 		addDataType(DashboardServerUtils.SOUTHERNMOST_LATITUDE);

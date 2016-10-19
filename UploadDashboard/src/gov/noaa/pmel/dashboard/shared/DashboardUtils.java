@@ -393,32 +393,37 @@ public class DashboardUtils {
 			104.0, "PI names", STRING_DATA_CLASS_NAME, "investigators", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
+	public static final DataColumnType VESSEL_TYPE = new DataColumnType("vessel_type", 
+			105.0, "vessel type", STRING_DATA_CLASS_NAME, "vessel type", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
+
+
 	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_min", 
-			105.0, "westmost lon", DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", 
+			110.0, "westmost lon", DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", 
 			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType EASTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_max", 
-			106.0, "eastmost lon", DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", 
+			111.0, "eastmost lon", DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", 
 			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType SOUTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_min", 
-			107.0, "southmost lat", DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", 
+			112.0, "southmost lat", DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", 
 			LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType NORTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_max", 
-			108.0, "northmost lat", DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", 
+			113.0, "northmost lat", DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", 
 			LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType TIME_COVERAGE_START = new DataColumnType("time_coverage_start", 
-			109.0, "begin time", DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", 
+			114.0, "begin time", DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", 
 			TIME_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_converage_end", 
-			110.0, "end time", DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", 
+			115.0, "end time", DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", 
 			TIME_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
-			111.0, "QC flag", STRING_DATA_CLASS_NAME, "QC flag", null, 
+			120.0, "QC flag", STRING_DATA_CLASS_NAME, "QC flag", null, 
 			QUALITY_CATEGORY, NO_UNITS);
 
 

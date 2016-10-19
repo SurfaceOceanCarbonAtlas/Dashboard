@@ -6,6 +6,8 @@ package gov.noaa.pmel.dashboard.server;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,6 +49,7 @@ public class DashboardServerUtils {
 	public static final DashDataType VESSEL_NAME = new DashDataType(DashboardUtils.VESSEL_NAME);
 	public static final DashDataType ORGANIZATION_NAME = new DashDataType(DashboardUtils.ORGANIZATION_NAME);
 	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType(DashboardUtils.INVESTIGATOR_NAMES);
+	public static final DashDataType VESSEL_TYPE = new DashDataType(DashboardUtils.VESSEL_TYPE);
 	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.WESTERNMOST_LONGITUDE);
 	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.EASTERNMOST_LONGITUDE);
 	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE);
@@ -90,6 +93,33 @@ public class DashboardServerUtils {
 	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
 	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
 	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
+
+	/** 
+	 * Value of userRealName to use to skip sending the email request in 
+	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	 */
+	public static final String NOMAIL_USER_REAL_NAME = "nobody";
+
+	/** 
+	 * Value of userEmail to use to skip sending the email request in 
+	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	 */
+	public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
+
+	/**
+	 * NODC codes (all upper-case) for Moorings and Fixed Buoys 
+	 */
+	private static final HashSet<String> FIXED_PLATFORM_NODC_CODES = 
+			new HashSet<String>(Arrays.asList("067F", "147F", "187F", "247F", 
+					"267F", "297F", "3119", "3164", "317F", "33GO", "33TT", 
+					"357F", "48MB", "497F", "747F", "767F", "907F", "GH7F"));
+
+	/**
+	 * NODC codes (all upper-case) for Drifting Buoys 
+	 */
+	private static final HashSet<String> DRIFTING_BUOY_NODC_CODES = 
+			new HashSet<String>(Arrays.asList("09DB", "18DZ", "35DR", "49DZ", 
+					"61DB", "74DZ", "91DB", "99DB"));
 
 	/** Pattern for getKeyForName */
 	private static final Pattern stripPattern = Pattern.compile("[^a-z0-9]+");
@@ -161,16 +191,34 @@ public class DashboardServerUtils {
 		return true;
 	}
 
-	/** 
-	 * Value of userRealName to use to skip sending the email request in 
-	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	/**
+	 * Guesses the vessel type from the vessel name or the expocode.
+	 * If the vessel name or NODC code from the expocode is that of
+	 * a mooring or drifting buoy, the that type is returned; 
+	 * otherwise it is assumed to be a ship.
+	 * 
+	 * @param expocode
+	 * 		expocode of the dataset
+	 * @param vesselName
+	 * 		vessel name for the dataset
+	 * @return
+	 * 		one of "Mooring", "Drifting Buoy", or "Ship"
 	 */
-	public static final String NOMAIL_USER_REAL_NAME = "nobody";
+	public static String guessVesselType(String expocode, String vesselName) {
+		if ( "Mooring".equalsIgnoreCase(vesselName) )
+			return "Mooring";
+		if ( "Drifting Buoy".equalsIgnoreCase(vesselName) )
+			return "Drifting Buoy";
+		if ( "Bouy".equalsIgnoreCase(vesselName) )
+			return "Mooring";
 
-	/** 
-	 * Value of userEmail to use to skip sending the email request in 
-	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
-	 */
-	public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
+		String nodc = expocode.substring(0, 4).toUpperCase();
+		if ( DashboardServerUtils.FIXED_PLATFORM_NODC_CODES.contains(nodc) )
+			return "Mooring";
+		if ( DashboardServerUtils.DRIFTING_BUOY_NODC_CODES.contains(nodc) )
+			return "Drifting Buoy";
+
+		return "Ship";
+	}
 
 }
