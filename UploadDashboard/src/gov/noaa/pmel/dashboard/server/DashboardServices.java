@@ -401,6 +401,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 				cruiseData.getExpocode() + " updated by " + username);
 		// Update the user-specific data column names to types, units, and missing values 
 		configStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, username);
+		if ( ! username.equals(cruiseData.getOwner()) )
+			configStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, cruiseData.getOwner());
 		
 		// Remove all but the first maximum-needed number of rows of cruise data 
 		// to minimize the payload of the returned cruise data
@@ -433,7 +435,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			// Retrieve all the current cruise data
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 			if ( ! cruiseData.isEditable() )
-				throw new IllegalArgumentException("Dataset " + expocode + " has been submitted for QC; data column types cannot be modified.");
+				throw new IllegalArgumentException("Dataset " + expocode + 
+						" has been submitted for QC; data column types cannot be modified.");
 
 			try {
 				// Identify the columns from stored names-to-types for this user
