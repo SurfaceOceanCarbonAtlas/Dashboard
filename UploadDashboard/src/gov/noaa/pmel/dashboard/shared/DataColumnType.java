@@ -511,7 +511,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	public String toString() {
 		return "DataColumnType[ " +
 				"varName=\"" + varName + "\", " +
-				"sortOrder=" + sortOrder.toString() +
+				"sortOrder=" + sortOrder.toString() + ", " +
 				"displayName=\"" + displayName + "\", " +
 				"dataClassName=\"" + dataClassName + "\", " +
 				"description=\"" + description + "\", " +
