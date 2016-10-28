@@ -133,8 +133,12 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
-				";\n    woceThreeRowIndices = " + woceThreeRowIndices.toString() +
-				";\n    woceFourRowIndices = " + woceFourRowIndices.toString() +
+				";\n    colWoceThrees = " + colWoceThrees.toString() +
+				";\n    colWoceFours = " + colWoceFours.toString() +
+				";\n    noColWoceThrees = " + noColWoceThrees.toString() +
+				";\n    noColWoceFours = " + noColWoceFours.toString() +
+				";\n    userWoceThreeRowIndices = " + userWoceThrees.toString() +
+				";\n    userWoceFourRowIndices = " + userWoceFours.toString() +
 				";\n    preamble = " + preamble.toString() +
 				";\n    dataValues = " + dataValues.toString() +
 				" ]";

@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.UserWoce;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -335,16 +336,20 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNoColumnWoceThreeRowIndices()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNoColumnWoceThreeRowIndices(java.util.HashSet)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNoColWoceThrees()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNoColWoceThrees(java.util.HashSet)}.
 	 */
 	@Test
-	public void testSetGetNoColumnWoceThreeRowIndices() {
-		HashSet<Integer> myWoceThrees = new HashSet<Integer>(Arrays.asList(2, 12, 22));
+	public void testSetGetNoColWoceThrees() {
+		HashSet<UserWoce> myWoceThrees = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(2, "WOCE_CO2_water"), 
+				new UserWoce(12, "WOCE_CO2_water"),
+				new UserWoce(22, "WOCE_CO2_water")
+		));
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
-		cruise.setNoColumnWoceThreeRowIndices(myWoceThrees);
-		assertEquals(myWoceThrees, cruise.getNoColumnWoceThreeRowIndices());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
+		cruise.setNoColWoceThrees(myWoceThrees);
+		assertEquals(myWoceThrees, cruise.getNoColWoceThrees());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -359,22 +364,26 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setNoColumnWoceThreeRowIndices(null);
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		cruise.setNoColWoceThrees(null);
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNoColumnWoceFourRowIndices()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNoColumnWoceFourRowIndices(java.util.HashSet)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getNoColWoceFours()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setNoColWoceFours(java.util.HashSet)}.
 	 */
 	@Test
-	public void testSetGetNoColumnWoceFourRowIndices() {
-		HashSet<Integer> myWoceFours = new HashSet<Integer>(Arrays.asList(5, 15, 25));
+	public void testSetGetNoColWoceFours() {
+		HashSet<UserWoce> myWoceFours = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(5, "WOCE_CO2_water"),
+				new UserWoce(15, "WOCE_CO2_water"),
+				new UserWoce(25, "WOCE_CO2_water")
+		));
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
-		cruise.setNoColumnWoceFourRowIndices(myWoceFours);
-		assertEquals(myWoceFours, cruise.getNoColumnWoceFourRowIndices());
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getNoColWoceFours().size());
+		cruise.setNoColWoceFours(myWoceFours);
+		assertEquals(myWoceFours, cruise.getNoColWoceFours());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -389,23 +398,27 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setNoColumnWoceFourRowIndices(null);
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
+		cruise.setNoColWoceFours(null);
+		assertEquals(0, cruise.getNoColWoceFours().size());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserWoceThreeRowIndices()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserWoceThreeRowIndices(java.util.HashSet)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserWoceThrees()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserWoceThrees(java.util.HashSet)}.
 	 */
 	@Test
-	public void testSetGetUserWoceThreeRowIndices() {
-		HashSet<Integer> userWoceThrees = new HashSet<Integer>(Arrays.asList(31, 32, 35));
+	public void testSetGetUserWoceThrees() {
+		HashSet<UserWoce> userWoceThrees = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(31, "WOCE_CO2_water"),
+				new UserWoce(35, "WOCE_CO2_water"),
+				new UserWoce(35, "WOCE_CO2_atm")
+		));
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
-		cruise.setUserWoceThreeRowIndices(userWoceThrees);
-		assertEquals(userWoceThrees, cruise.getUserWoceThreeRowIndices());
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getUserWoceThrees().size());
+		cruise.setUserWoceThrees(userWoceThrees);
+		assertEquals(userWoceThrees, cruise.getUserWoceThrees());
+		assertEquals(0, cruise.getNoColWoceFours().size());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -420,24 +433,28 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setUserWoceThreeRowIndices(null);
-		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
+		cruise.setUserWoceThrees(null);
+		assertEquals(0, cruise.getUserWoceThrees().size());
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserWoceFourRowIndices()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserWoceFourRowIndices(java.util.HashSet)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getUserWoceFours()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setUserWoceFours(java.util.HashSet)}.
 	 */
 	@Test
-	public void testSetGetUserWoceFourRowIndices() {
-		HashSet<Integer> userWoceFours = new HashSet<Integer>(Arrays.asList(43, 44, 45));
+	public void testSetGetUserWoceFours() {
+		HashSet<UserWoce> userWoceFours = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(43, "WOCE_CO2_water"),
+				new UserWoce(44, "WOCE_CO2_atm"),
+				new UserWoce(45, "WOCE_CO2_water") 
+		));
 		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
-		cruise.setUserWoceFourRowIndices(userWoceFours);
-		assertEquals(userWoceFours, cruise.getUserWoceFourRowIndices());
-		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getUserWoceFours().size());
+		cruise.setUserWoceFours(userWoceFours);
+		assertEquals(userWoceFours, cruise.getUserWoceFours());
+		assertEquals(0, cruise.getUserWoceThrees().size());
+		assertEquals(0, cruise.getNoColWoceFours().size());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -452,8 +469,8 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
 		assertFalse( cruise.isSelected() );
-		cruise.setUserWoceFourRowIndices(null);
-		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
+		cruise.setUserWoceFours(null);
+		assertEquals(0, cruise.getUserWoceFours().size());
 	}
 
 	/**
@@ -467,10 +484,10 @@ public class DashboardCruiseTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
 		cruise.setUploadTimestamp(uploadTimestamp);
 		assertEquals(uploadTimestamp, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
-		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getUserWoceFours().size());
+		assertEquals(0, cruise.getUserWoceThrees().size());
+		assertEquals(0, cruise.getNoColWoceFours().size());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -501,10 +518,10 @@ public class DashboardCruiseTest {
 		cruise.setOrigDoi(origDOI);
 		assertEquals(origDOI, cruise.getOrigDoi());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
-		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getUserWoceFours().size());
+		assertEquals(0, cruise.getUserWoceThrees().size());
+		assertEquals(0, cruise.getNoColWoceFours().size());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -536,10 +553,10 @@ public class DashboardCruiseTest {
 		assertEquals(socatDOI, cruise.getSocatDoi());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFourRowIndices().size());
-		assertEquals(0, cruise.getUserWoceThreeRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceFourRowIndices().size());
-		assertEquals(0, cruise.getNoColumnWoceThreeRowIndices().size());
+		assertEquals(0, cruise.getUserWoceFours().size());
+		assertEquals(0, cruise.getUserWoceThrees().size());
+		assertEquals(0, cruise.getNoColWoceFours().size());
+		assertEquals(0, cruise.getNoColWoceThrees().size());
 		assertEquals(0, cruise.getNumWarnRows());
 		assertEquals(0, cruise.getNumErrorRows());
 		assertEquals(0, cruise.getUserColNames().size());
@@ -590,10 +607,26 @@ public class DashboardCruiseTest {
 				));
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "depth")); 
-		HashSet<Integer> myWoceThrees = new HashSet<Integer>(Arrays.asList(2, 12, 22));
-		HashSet<Integer> myWoceFours = new HashSet<Integer>(Arrays.asList(5, 15, 25));
-		HashSet<Integer> userWoceThrees = new HashSet<Integer>(Arrays.asList(31, 32, 35));
-		HashSet<Integer> userWoceFours = new HashSet<Integer>(Arrays.asList(43, 44, 45));
+		HashSet<UserWoce> myWoceThrees = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(2, "WOCE_CO2_water"), 
+				new UserWoce(12, "WOCE_CO2_water"),
+				new UserWoce(22, "WOCE_CO2_water")
+		));
+		HashSet<UserWoce> myWoceFours = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(5, "WOCE_CO2_water"),
+				new UserWoce(15, "WOCE_CO2_water"),
+				new UserWoce(25, "WOCE_CO2_water")
+		));
+		HashSet<UserWoce> userWoceThrees = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(31, "WOCE_CO2_water"),
+				new UserWoce(35, "WOCE_CO2_water"),
+				new UserWoce(35, "WOCE_CO2_atm")
+		));
+		HashSet<UserWoce> userWoceFours = new HashSet<UserWoce>(Arrays.asList(
+				new UserWoce(43, "WOCE_CO2_water"),
+				new UserWoce(44, "WOCE_CO2_atm"),
+				new UserWoce(45, "WOCE_CO2_water") 
+		));
 
 		DashboardCruise firstCruise = new DashboardCruise();
 		assertFalse( firstCruise.equals(null) );
@@ -700,31 +733,31 @@ public class DashboardCruiseTest {
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setNoColumnWoceThreeRowIndices(myWoceThrees);
+		firstCruise.setNoColWoceThrees(myWoceThrees);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setNoColumnWoceThreeRowIndices(myWoceThrees);
+		secondCruise.setNoColWoceThrees(myWoceThrees);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setNoColumnWoceFourRowIndices(myWoceFours);
+		firstCruise.setNoColWoceFours(myWoceFours);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setNoColumnWoceFourRowIndices(myWoceFours);
+		secondCruise.setNoColWoceFours(myWoceFours);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setUserWoceThreeRowIndices(userWoceThrees);
+		firstCruise.setUserWoceThrees(userWoceThrees);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setUserWoceThreeRowIndices(userWoceThrees);
+		secondCruise.setUserWoceThrees(userWoceThrees);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 
-		firstCruise.setUserWoceFourRowIndices(userWoceFours);
+		firstCruise.setUserWoceFours(userWoceFours);
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setUserWoceFourRowIndices(userWoceFours);
+		secondCruise.setUserWoceFours(userWoceFours);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 

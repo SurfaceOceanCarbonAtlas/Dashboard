@@ -693,6 +693,7 @@ public class CheckerMessageHandler {
 				lastComment = info.comment;
 
 				WoceEvent woceEvent = new WoceEvent();
+				woceEvent.setWoceName(SocatTypes.WOCE_CO2_WATER.getVarName());
 				woceEvent.setExpocode(expocode);
 				woceEvent.setVersion(version);
 				woceEvent.setFlag(info.flag);

@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4299268768779494106L;
+	private static final long serialVersionUID = -4347291349891722447L;
 
 	boolean selected;
 	String version;
@@ -41,18 +41,18 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	ArrayList<String> userColNames;
 	// For each data column, a DataColumnType with type, unit, and missing value
 	ArrayList<DataColumnType> dataColTypes;
-	// For each data column, a set of row indices with questionable data
-	ArrayList<HashSet<Integer>> woceThreeRowIndices;
-	// For each data column, a set of row indices with bad data
-	ArrayList<HashSet<Integer>> woceFourRowIndices;
-	// Row indices with questionable data not specific to a column
-	HashSet<Integer> noColumnWoceThreeRowIndices;
-	// Row indices with bad data not specific to a column
-	HashSet<Integer> noColumnWoceFourRowIndices;
-	// Row indices designated by the PI as questionable
-	HashSet<Integer> userWoceThreeRowIndices;
-	// Row indices designated by the PI as bad
-	HashSet<Integer> userWoceFourRowIndices;
+	// For each data column, a set of row with questionable data
+	ArrayList<HashSet<UserWoce>> colWoceThrees;
+	// For each data column, a set of row with bad data
+	ArrayList<HashSet<UserWoce>> colWoceFours;
+	// Rows with questionable data not specific to a column
+	HashSet<UserWoce> noColWoceThrees;
+	// Rows with bad data not specific to a column
+	HashSet<UserWoce> noColWoceFours;
+	// Rows designated by the PI as questionable
+	HashSet<UserWoce> userWoceThrees;
+	// Rows designated by the PI as bad
+	HashSet<UserWoce> userWoceFours;
 
 	public DashboardCruise() {
 		selected = false;
@@ -74,12 +74,12 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		numWarnRows = 0;
 		userColNames = new ArrayList<String>();
 		dataColTypes = new ArrayList<DataColumnType>();
-		woceThreeRowIndices = new ArrayList<HashSet<Integer>>();
-		woceFourRowIndices = new ArrayList<HashSet<Integer>>();
-		noColumnWoceThreeRowIndices = new HashSet<Integer>();
-		noColumnWoceFourRowIndices = new HashSet<Integer>();
-		userWoceThreeRowIndices = new HashSet<Integer>();
-		userWoceFourRowIndices = new HashSet<Integer>();
+		colWoceThrees = new ArrayList<HashSet<UserWoce>>();
+		colWoceFours = new ArrayList<HashSet<UserWoce>>();
+		noColWoceThrees = new HashSet<UserWoce>();
+		noColWoceFours = new HashSet<UserWoce>();
+		userWoceThrees = new HashSet<UserWoce>();
+		userWoceFours = new HashSet<UserWoce>();
 	}
 
 	/**
@@ -494,55 +494,55 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	}
 
 	/**
-	 * The list of sets of WOCE-3 data row indices iterates over the 
-	 * columns of the data table.  A set in this list specifies the 
-	 * row indices where the data of the column has a WOCE-3 
+	 * The list over the columns of the data table giving the sets of 
+	 * WOCE-3 flags.  A set in this list specifies the row indices 
+	 * and WOCE variable name where the data of the column has a WOCE-3 
 	 * (questionable) flag.  Presumably these sets will be small and 
 	 * could be empty. 
 	 * 
 	 * @return 
-	 * 		the list of sets of WOCE-3 data row indices; 
+	 * 		the list of sets of WOCE-3's; 
 	 * 		may be empty but never null.
 	 * 		The actual list in this object is returned.
 	 */
-	public ArrayList<HashSet<Integer>> getWoceThreeRowIndices() {
-		return woceThreeRowIndices;
+	public ArrayList<HashSet<UserWoce>> getColWoceThrees() {
+		return colWoceThrees;
 	}
 
 	/**
-	 * The list of sets of WOCE-3 data row indices iterates over the 
-	 * columns of the data table.  A set in this list specifies the 
-	 * row indices where the data of the column has a WOCE-3 
+	 * The list over the columns of the data table giving the sets of 
+	 * WOCE-3 flags.  A set in this list specifies the row indices 
+	 * and WOCE variable name where the data of the column has a WOCE-3 
 	 * (questionable) flag.  Presumably these sets will be small and 
 	 * could be empty. 
 	 * 
 	 * @param woceThreeRowIndices 
-	 * 		the list of sets of WOCE-3 data row indices to assign. 
+	 * 		the list of sets of WOCE-3's to assign. 
 	 * 		The list in this object is cleared and all the contents 
 	 * 		of the given list, if not null, are added.  Note that 
 	 * 		this is a shallow copy; the sets in the given list are 
 	 * 		not copied but used directly.
 	 */
-	public void setWoceThreeRowIndices(
-					ArrayList<HashSet<Integer>> woceThreeRowIndices) {
-		this.woceThreeRowIndices.clear();
-		if ( woceThreeRowIndices != null )
-			this.woceThreeRowIndices.addAll(woceThreeRowIndices);
+	public void setColWoceThrees(ArrayList<HashSet<UserWoce>> colWoceThrees) {
+		this.colWoceThrees.clear();
+		if ( colWoceThrees != null )
+			this.colWoceThrees.addAll(colWoceThrees);
 	}
 
 	/**
-	 * The list of sets of WOCE-4 data row indices iterates over the 
-	 * columns of the data table.  A set in this list specifies the 
-	 * row indices where the data of the column has a WOCE-4 (bad)  
-	 * flag.  Presumably these sets will be small and could be empty. 
+	 * The list over the columns of the data table giving the sets of 
+	 * WOCE-4 flags.  A set in this list specifies the row indices 
+	 * and WOCE variable name where the data of the column has a WOCE-4 
+	 * (bad) flag.  Presumably these sets will be small and 
+	 * could be empty. 
 	 * 
 	 * @return 
-	 * 		the list of sets of WOCE-4 data row indices; 
+	 * 		the list of sets of WOCE-4's; 
 	 * 		may be empty but never null.
 	 * 		The actual list in this object is returned.
 	 */
-	public ArrayList<HashSet<Integer>> getWoceFourRowIndices() {
-		return woceFourRowIndices;
+	public ArrayList<HashSet<UserWoce>> getColWoceFours() {
+		return colWoceFours;
 	}
 
 	/**
@@ -552,107 +552,102 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	 * flag.  Presumably these sets will be small and could be empty. 
 	 * 
 	 * @param woceFourRowIndices 
-	 * 		the list of sets of WOCE-4 data row indices to assign. 
+	 * 		the list of sets of WOCE-4's to assign. 
 	 * 		The list in this object is cleared and all the contents 
 	 * 		of the given list, if not null, are added.  Note that 
 	 * 		this is a shallow copy; the sets in the given list are 
 	 * 		not copied but used directly.
 	 */
-	public void setWoceFourRowIndices(
-					ArrayList<HashSet<Integer>> woceFourRowIndices) {
-		this.woceFourRowIndices.clear();
-		if ( woceFourRowIndices != null )
-			this.woceFourRowIndices.addAll(woceFourRowIndices);
+	public void setColWoceFours(ArrayList<HashSet<UserWoce>> colWoceFours) {
+		this.colWoceFours.clear();
+		if ( colWoceFours != null )
+			this.colWoceFours.addAll(colWoceFours);
 	}
 
 	/**
 	 * @return
-	 * 		The set of row indices with questionable (WOCE-3) data that
-	 * 		cannot be directly attributed to a specific data column.
+	 * 		The set of WOCE-3's that cannot be directly 
+	 * 		attributed to a specific data column.
 	 * 		The actual set in this object is returned.
 	 */
-	public HashSet<Integer> getNoColumnWoceThreeRowIndices() {
-		return noColumnWoceThreeRowIndices;
+	public HashSet<UserWoce> getNoColWoceThrees() {
+		return noColWoceThrees;
 	}
 
 	/**
-	 * @param noColumnWoceThreeRowIndices
-	 * 		The set to assign of row indices with questionable (WOCE-3) 
-	 * 		data that cannot be directly attributed to a specific data 
-	 * 		column.  The set in this object is cleared and all the 
-	 * 		contents of the given set, if not null, are added.
+	 * @param noColWoceThrees
+	 * 		The set to assign of WOCE-3's that cannot be directly attributed 
+	 * 		to a specific data column.  The set in this object is cleared and 
+	 * 		all the contents of the given set, if not null, are added.
 	 */
-	public void setNoColumnWoceThreeRowIndices(
-			HashSet<Integer> noColumnWoceThreeRowIndices) {
-		this.noColumnWoceThreeRowIndices.clear();
-		if ( noColumnWoceThreeRowIndices != null )
-			this.noColumnWoceThreeRowIndices.addAll(noColumnWoceThreeRowIndices);
+	public void setNoColWoceThrees(HashSet<UserWoce> noColWoceThrees) {
+		this.noColWoceThrees.clear();
+		if ( noColWoceThrees != null )
+			this.noColWoceThrees.addAll(noColWoceThrees);
 	}
 
 	/**
 	 * @return
-	 * 		The set of row indices with bad (WOCE-4) data that 
-	 * 		cannot be directly attributed to a specific data column.
+	 * 		The set of WOCE-4's that cannot be directly 
+	 * 		attributed to a specific data column.
 	 * 		The actual set in this object is returned.
 	 */
-	public HashSet<Integer> getNoColumnWoceFourRowIndices() {
-		return noColumnWoceFourRowIndices;
+	public HashSet<UserWoce> getNoColWoceFours() {
+		return noColWoceFours;
 	}
 
 	/**
-	 * @param noColumnWoceFourRowIndices 
-	 * 		The set to assign of row indices with bad (WOCE-4) 
-	 * 		data that cannot be directly attributed to a specific data 
-	 * 		column.  The set in this object is cleared and all the 
-	 * 		contents of the given set, if not null, are added.
+	 * @param noColWoceFours 
+	 * 		The set to assign of WOCE-4's that cannot be directly attributed 
+	 * 		to a specific data column.  The set in this object is cleared and 
+	 * 		all the contents of the given set, if not null, are added.
 	 */
-	public void setNoColumnWoceFourRowIndices(
-			HashSet<Integer> noColumnWoceFourRowIndices) {
-		this.noColumnWoceFourRowIndices.clear();
-		if ( noColumnWoceFourRowIndices != null )
-			this.noColumnWoceFourRowIndices.addAll(noColumnWoceFourRowIndices);
+	public void setNoColWoceFours(HashSet<UserWoce> noColWoceFours) {
+		this.noColWoceFours.clear();
+		if ( noColWoceFours != null )
+			this.noColWoceFours.addAll(noColWoceFours);
 	}
 
 	/**
-	 * @return the userWoceThreeRowIndices
-	 * 		The set of row indices designated as questionable (WOCE-3) 
-	 * 		data by the PI.  The actual set in this object is returned.
+	 * @return
+	 * 		The set of user-provided WOCE-3 flags.  
+	 * 		The actual set in this object is returned.
 	 */
-	public HashSet<Integer> getUserWoceThreeRowIndices() {
-		return userWoceThreeRowIndices;
+	public HashSet<UserWoce> getUserWoceThrees() {
+		return userWoceThrees;
 	}
 
 	/**
-	 * @param userWoceThreeRowIndices
-	 * 		The set to assign of row indices designated as questionable 
-	 * 		(WOCE-3) data by the PI.  The set in this object is cleared 
-	 * 		and all the contents of the given set, if not null, are added.
+	 * @param userWoceThrees
+	 * 		The set user-provided WOCE-3 flags to assign.  
+	 * 		The set in this object is cleared and all the contents 
+	 * 		of the given set, if not null, are added.
 	 */
-	public void setUserWoceThreeRowIndices(HashSet<Integer> userWoceThreeRowIndices) {
-		this.userWoceThreeRowIndices.clear();
-		if ( userWoceThreeRowIndices != null )
-			this.userWoceThreeRowIndices.addAll(userWoceThreeRowIndices);
+	public void setUserWoceThrees(HashSet<UserWoce> userWoceThrees) {
+		this.userWoceThrees.clear();
+		if ( userWoceThrees != null )
+			this.userWoceThrees.addAll(userWoceThrees);
 	}
 
 	/**
 	 * @return 
-	 * 		The set of row indices designated as bad (WOCE-4) 
-	 * 		data by the PI.  The actual set in this object is returned.
+	 * 		The set of user-provided WOCE-4 flags.  
+	 * 		The actual set in this object is returned.
 	 */
-	public HashSet<Integer> getUserWoceFourRowIndices() {
-		return userWoceFourRowIndices;
+	public HashSet<UserWoce> getUserWoceFours() {
+		return userWoceFours;
 	}
 
 	/**
-	 * @param userWoceFourRowIndices
-	 * 		The set to assign of row indices designated as bad 
-	 * 		(WOCE-4) data by the PI.  The set in this object is cleared 
-	 * 		and all the contents of the given set, if not null, are added.
+	 * @param userWoceFours
+	 * 		The set user-provided WOCE-4 flags to assign.  
+	 * 		The set in this object is cleared and all the contents 
+	 * 		of the given set, if not null, are added.
 	 */
-	public void setUserWoceFourRowIndices(HashSet<Integer> userWoceFourRowIndices) {
-		this.userWoceFourRowIndices.clear();
-		if ( userWoceFourRowIndices != null )
-			this.userWoceFourRowIndices.addAll(userWoceFourRowIndices);
+	public void setUserWoceFours(HashSet<UserWoce> userWoceFours) {
+		this.userWoceFours.clear();
+		if ( userWoceFours != null )
+			this.userWoceFours.addAll(userWoceFours);
 	}
 
 	@Override
@@ -677,12 +672,12 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + numWarnRows;
 		result = result * prime + userColNames.hashCode();
 		result = result * prime + dataColTypes.hashCode();
-		result = result * prime + woceThreeRowIndices.hashCode();
-		result = result * prime + woceFourRowIndices.hashCode();
-		result = result * prime + noColumnWoceThreeRowIndices.hashCode();
-		result = result * prime + noColumnWoceFourRowIndices.hashCode();
-		result = result * prime + userWoceThreeRowIndices.hashCode();
-		result = result * prime + userWoceFourRowIndices.hashCode();
+		result = result * prime + colWoceThrees.hashCode();
+		result = result * prime + colWoceFours.hashCode();
+		result = result * prime + noColWoceThrees.hashCode();
+		result = result * prime + noColWoceFours.hashCode();
+		result = result * prime + userWoceThrees.hashCode();
+		result = result * prime + userWoceFours.hashCode();
 		return result;
 	}
 
@@ -735,17 +730,17 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! dataColTypes.equals(other.dataColTypes) )
 			return false;
-		if ( ! woceThreeRowIndices.equals(other.woceThreeRowIndices) ) 
+		if ( ! colWoceThrees.equals(other.colWoceThrees) ) 
 			return false;
-		if ( ! woceFourRowIndices.equals(other.woceFourRowIndices) ) 
+		if ( ! colWoceFours.equals(other.colWoceFours) ) 
 			return false;
-		if ( ! noColumnWoceThreeRowIndices.equals(other.noColumnWoceThreeRowIndices) ) 
+		if ( ! noColWoceThrees.equals(other.noColWoceThrees) ) 
 			return false;
-		if ( ! noColumnWoceFourRowIndices.equals(other.noColumnWoceFourRowIndices) ) 
+		if ( ! noColWoceFours.equals(other.noColWoceFours) ) 
 			return false;
-		if ( ! userWoceThreeRowIndices.equals(other.userWoceThreeRowIndices) ) 
+		if ( ! userWoceThrees.equals(other.userWoceThrees) ) 
 			return false;
-		if ( ! userWoceFourRowIndices.equals(other.userWoceFourRowIndices) ) 
+		if ( ! userWoceFours.equals(other.userWoceFours) ) 
 			return false;
 		return true;
 	}
@@ -772,12 +767,12 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
 				",\n    userColNames=" + userColNames.toString() +
 				",\n    dataColTypes=" + dataColTypes.toString() +
-				";\n    woceThreeRowIndices = " + woceThreeRowIndices.toString() +
-				";\n    woceFourRowIndices = " + woceFourRowIndices.toString() +
-				";\n    noColumnWoceThreeRowIndices = " + noColumnWoceThreeRowIndices.toString() +
-				";\n    noColumnWoceFourRowIndices = " + noColumnWoceFourRowIndices.toString() +
-				";\n    userWoceThreeRowIndices = " + userWoceThreeRowIndices.toString() +
-				";\n    userWoceFourRowIndices = " + userWoceFourRowIndices.toString() +
+				";\n    colWoceThrees = " + colWoceThrees.toString() +
+				";\n    colWoceFours = " + colWoceFours.toString() +
+				";\n    noColWoceThrees = " + noColWoceThrees.toString() +
+				";\n    noColWoceFours = " + noColWoceFours.toString() +
+				";\n    userWoceThreeRowIndices = " + userWoceThrees.toString() +
+				";\n    userWoceFourRowIndices = " + userWoceFours.toString() +
 				" ]";
 	}
 
