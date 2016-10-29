@@ -12,6 +12,7 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
 
@@ -165,17 +166,17 @@ public class CheckerMessageHandler {
 	public void saveCruiseMessages(DashboardCruiseWithData cruiseData, Output output) 
 											throws IllegalArgumentException {
 		// Directly modify the sets in the cruise data
-		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
-		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
-		HashSet<Integer> noColumnWoceFourSet = cruiseData.getNoColumnWoceFourRowIndices();
-		HashSet<Integer> noColumnWoceThreeSet = cruiseData.getNoColumnWoceThreeRowIndices();
-		HashSet<Integer> userWoceFourSet = cruiseData.getUserWoceFourRowIndices();
-		HashSet<Integer> userWoceThreeSet = cruiseData.getUserWoceThreeRowIndices();
+		ArrayList<HashSet<WoceType>> woceFourSets = cruiseData.getColWoceFours();
+		ArrayList<HashSet<WoceType>> woceThreeSets = cruiseData.getColWoceThrees();
+		HashSet<WoceType> noColumnWoceFourSet = cruiseData.getNoColWoceFours();
+		HashSet<WoceType> noColumnWoceThreeSet = cruiseData.getNoColWoceThrees();
+		HashSet<WoceType> userWoceFourSet = cruiseData.getUserWoceFours();
+		HashSet<WoceType> userWoceThreeSet = cruiseData.getUserWoceThrees();
 
 		// Clear all WOCE flag sets
-		for ( HashSet<Integer> rowIdxSet : woceFourSets )
+		for ( HashSet<WoceType> rowIdxSet : woceFourSets )
 			rowIdxSet.clear();
-		for ( HashSet<Integer> rowIdxSet : woceThreeSets )
+		for ( HashSet<WoceType> rowIdxSet : woceThreeSets )
 			rowIdxSet.clear();
 		noColumnWoceFourSet.clear();
 		noColumnWoceThreeSet.clear();
@@ -283,21 +284,22 @@ public class CheckerMessageHandler {
 					msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
 
 					// Assign the WOCE flag
+					// TODO: Assign correct WOCE name
 					if ( rowNum > 0 ) {
 						if ( msg.isError() ) {
 							if ( colNum > 0 ) {
-								woceFourSets.get(colNum - 1).add(rowNum - 1);
+								woceFourSets.get(colNum - 1).add(new WoceType(rowNum - 1, SocatTypes.WOCE_CO2_WATER.getVarName()));
 							}
 							else {
-								noColumnWoceFourSet.add(rowNum - 1);
+								noColumnWoceFourSet.add(new WoceType(rowNum - 1, SocatTypes.WOCE_CO2_WATER.getVarName()));
 							}
 						}
 						else if ( msg.isWarning() ) {
 							if ( colNum > 0 ) {
-								woceThreeSets.get(colNum - 1).add(rowNum - 1);
+								woceThreeSets.get(colNum - 1).add(new WoceType(rowNum - 1, SocatTypes.WOCE_CO2_WATER.getVarName()));
 							}
 							else {
-								noColumnWoceThreeSet.add(rowNum - 1);
+								noColumnWoceThreeSet.add(new WoceType(rowNum - 1, SocatTypes.WOCE_CO2_WATER.getVarName()));
 							}
 						}
 					}
@@ -314,16 +316,15 @@ public class CheckerMessageHandler {
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( ! ( SocatTypes.WOCE_CO2_WATER.typeNameEquals(colType) ||
-					 SocatTypes.WOCE_CO2_ATM.typeNameEquals(colType) ) )
+			if ( ! colType.getVarName().startsWith("WOCE") )
 				continue;
 			for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
 				try {
 					int value = Integer.parseInt(cruiseData.getDataValues().get(rowIdx).get(k));
 					if ( value == 4 )
-						userWoceFourSet.add(rowIdx);
+						userWoceFourSet.add(new WoceType(rowIdx, colType.getVarName()));
 					else if ( value == 3 )
-						userWoceThreeSet.add(rowIdx);
+						userWoceThreeSet.add(new WoceType(rowIdx, colType.getVarName()));
 					// Only handle 3 and 4
 				} catch (NumberFormatException ex) {
 					// Assuming a missing value
@@ -566,8 +567,8 @@ public class CheckerMessageHandler {
 		String version = cruiseData.getVersion();
 		String expocode = cruiseData.getExpocode();
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
-		HashSet<Integer> userWoceThrees = cruiseData.getUserWoceThreeRowIndices();
-		HashSet<Integer> userWoceFours = cruiseData.getUserWoceFourRowIndices();
+		HashSet<WoceType> userWoceThrees = cruiseData.getUserWoceThrees();
+		HashSet<WoceType> userWoceFours = cruiseData.getUserWoceFours();
 		int userCommentsIndex = -1;
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType type = columnTypes.get(k);
@@ -629,34 +630,36 @@ public class CheckerMessageHandler {
 		}
 
 		// Add any PI WOCE-3 flags 
-		for ( Integer rowIdx : userWoceThrees ) {
+		// TODO: add correct WOCE name
+		for ( WoceType rowIdx : userWoceThrees ) {
 			WoceInfo info = new WoceInfo();
 			info.flag = DashboardUtils.WOCE_QUESTIONABLE;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
 			info.comment = "ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
 			if ( userCommentsIndex >= 0 ) {
-				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
+				String addnMsg = dataVals.get(rowIdx.getRowIndex()).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
 					info.comment += " with comment/subflag: " + addnMsg;
 			}
-			info.rowIndex = rowIdx;
+			info.rowIndex = rowIdx.getRowIndex();
 			orderedWoceInfo.add(info);
 		}
 
 		// Add any PI WOCE-4 flags 
-		for ( Integer rowIdx : userWoceFours ) {
+		// TODO: add correct WOCE name
+		for ( WoceType rowIdx : userWoceFours ) {
 			WoceInfo info = new WoceInfo();
 			info.flag = DashboardUtils.WOCE_BAD;
 			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
 			// add ZZZZ to make these the last comments for the flag/column
 			info.comment = "ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
 			if ( userCommentsIndex >= 0 ) {
-				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
+				String addnMsg = dataVals.get(rowIdx.getRowIndex()).get(userCommentsIndex);
 				if ( ! addnMsg.isEmpty() )
 					info.comment += " with comment/subflag: " + addnMsg;
 			}
-			info.rowIndex = rowIdx;
+			info.rowIndex = rowIdx.getRowIndex();
 			orderedWoceInfo.add(info);
 		}
 

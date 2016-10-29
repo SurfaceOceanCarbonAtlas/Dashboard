@@ -12,31 +12,57 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * 
  * @author Karl Smith
  */
-public class UserWoce implements Serializable, IsSerializable, Comparable<UserWoce> {
+public class WoceType implements Serializable, IsSerializable, Comparable<WoceType> {
 
-	private static final long serialVersionUID = 3885130943241122491L;
+	private static final long serialVersionUID = 267650346106336479L;
 
+	private Integer columnIndex;
 	private Integer rowIndex;
 	private String woceName;
 
 	/**
 	 * Create with a 
+	 * 		columnIndex of {@link DashboardUtils#INT_MISSING_VALUE}
 	 * 		rowIndex of {@link DashboardUtils#INT_MISSING_VALUE}
 	 * 		woceName of {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public UserWoce() {
+	public WoceType() {
+		columnIndex = DashboardUtils.INT_MISSING_VALUE;
 		rowIndex = DashboardUtils.INT_MISSING_VALUE;
 		woceName = DashboardUtils.STRING_MISSING_VALUE;
 	}
 
 	/**
 	 * Create with given rowIndex and woceName.  Equivalent to calling
+	 * 		{@link #setRColumnIndex(Integer)} with columnIndex and 
 	 * 		{@link #setRowIndex(Integer)} with rowIndex and 
 	 * 		{@link #setWoceName(String)} with woceName.
 	 */
-	public UserWoce(Integer rowIndex, String woceName) {
+	public WoceType(Integer columnIndex, Integer rowIndex, String woceName) {
+		setColumnIndex(columnIndex);
 		setRowIndex(rowIndex);
 		setWoceName(woceName);
+	}
+
+	/**
+	 * @return 
+	 * 		the index of the row for this WOCE flag;
+	 * 		never null, but may be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
+	 */
+	public Integer getColumnIndex() {
+		return columnIndex;
+	}
+
+	/**
+	 * @param columnIndex 
+	 * 		the index of the column to set for this WOCE flag;
+	 * 		if null {@link DashboardUtils#INT_MISSING_VALUE} will be assigned
+	 */
+	public void setColumnIndex(Integer columnIndex) {
+		if ( columnIndex != null )
+			this.columnIndex = columnIndex;
+		else
+			this.columnIndex = DashboardUtils.INT_MISSING_VALUE;
 	}
 
 	/**
@@ -82,8 +108,11 @@ public class UserWoce implements Serializable, IsSerializable, Comparable<UserWo
 	}
 
 	@Override
-	public int compareTo(UserWoce other) {
-		int result = this.rowIndex.compareTo(other.rowIndex);
+	public int compareTo(WoceType other) {
+		int result = this.columnIndex.compareTo(other.columnIndex);
+		if ( result != 0 )
+			return result;
+		result = this.rowIndex.compareTo(other.rowIndex);
 		if ( result != 0 )
 			return result;
 		result = this.woceName.compareTo(other.woceName);
@@ -95,7 +124,8 @@ public class UserWoce implements Serializable, IsSerializable, Comparable<UserWo
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = rowIndex.hashCode();
+		int result = columnIndex.hashCode();
+		result = prime * result + rowIndex.hashCode();
 		result = prime * result + woceName.hashCode();
 		return result;
 	}
@@ -106,10 +136,12 @@ public class UserWoce implements Serializable, IsSerializable, Comparable<UserWo
 			return true;
 		if ( obj == null )
 			return false;
-		if ( ! (obj instanceof UserWoce) )
+		if ( ! (obj instanceof WoceType) )
 			return false;
 
-		UserWoce other = (UserWoce) obj;
+		WoceType other = (WoceType) obj;
+		if ( ! columnIndex.equals(other.columnIndex) )
+			return false;
 		if ( ! rowIndex.equals(other.rowIndex) )
 			return false;
 		if ( ! woceName.equals(other.woceName) )
@@ -119,7 +151,10 @@ public class UserWoce implements Serializable, IsSerializable, Comparable<UserWo
 
 	@Override
 	public String toString() {
-		return "UserWoce[rowIndex=" + rowIndex.toString() + ", woceName=" + woceName + "]";
+		return "WoceType[" +
+				"columnIndex = " + columnIndex.toString() + ", " + 
+				"rowIndex=" + rowIndex.toString() + ", " + 
+				"woceName=" + woceName + "]";
 	}
 
 }

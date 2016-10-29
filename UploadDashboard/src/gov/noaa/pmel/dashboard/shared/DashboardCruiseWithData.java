@@ -15,9 +15,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruiseWithData extends DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5528443149193777708L;
+	private static final long serialVersionUID = 4765221280751620841L;
 
 	ArrayList<String> preamble;
+	ArrayList<Integer> rowNums;
 	ArrayList<ArrayList<String>> dataValues;
 
 	/**
@@ -25,6 +26,7 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 	 */
 	public DashboardCruiseWithData() {
 		preamble = new ArrayList<String>();
+		rowNums = new ArrayList<Integer>();
 		dataValues = new ArrayList<ArrayList<String>>();
 	}
 
@@ -48,6 +50,28 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 		this.preamble.clear();
 		if ( preamble != null )
 			this.preamble.addAll(preamble);
+	}
+
+	/**
+	 * @return 
+	 * 		the list of row numbers;
+	 * 		may be empty, but never null.
+	 * 		The actual list in this object is returned.
+	 */
+	public ArrayList<Integer> getRowNums() {
+		return rowNums;
+	}
+
+	/**
+	 * @param rowNums 
+	 * 		the row numbers to assign.  The list in 
+	 * 		this object is cleared and all the contents of the
+	 * 		given list, if not null, are added. 
+	 */
+	public void setRowNums(ArrayList<Integer> rowNums) {
+		this.rowNums.clear();
+		if ( rowNums != null )
+			this.rowNums.addAll(rowNums);
 	}
 
 	/**
@@ -89,6 +113,7 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 		int result = super.hashCode();
 		result = result * prime + preamble.hashCode();
 		result = result * prime + dataValues.hashCode();
+		result = result * prime + rowNums.hashCode();
 		return result;
 	}
 
@@ -107,6 +132,8 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 			return false;
 		if ( ! preamble.equals(other.preamble) ) 
 			return false;
+		if ( ! rowNums.equals(other.rowNums) )
+			return false;
 		if ( ! dataValues.equals(other.dataValues) ) 
 			return false;
 
@@ -115,33 +142,36 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 
 	@Override
 	public String toString() {
-		return "DashboardCruiseWithData" +
-				"[ selected=" + Boolean.toString(selected) + 
-				",\n    version = " + version +
-				",\n    owner=" + owner + 
-				",\n    expocode=" + expocode + 
-				",\n    dataCheckStatus=" + dataCheckStatus +
-				",\n    omeTimestamp=" + omeTimestamp + 
-				",\n    addlDocs=" + addlDocs.toString() +
-				",\n    qcStatus=" + qcStatus + 
-				",\n    archiveStatus=" + archiveStatus + 
-				",\n    cdiacDate=" + cdiacDate + 
-				",\n    uploadFilename=" + uploadFilename +
-				",\n    uploadTimestamp=" + uploadTimestamp +
-				",\n    numDataRows=" + Integer.toString(numDataRows) +
-				",\n    numErrorRows=" + Integer.toString(numErrorRows) +
-				",\n    numWarnRows=" + Integer.toString(numWarnRows) +
-				",\n    userColNames=" + userColNames.toString() +
-				",\n    dataColTypes=" + dataColTypes.toString() +
-				";\n    colWoceThrees = " + colWoceThrees.toString() +
-				";\n    colWoceFours = " + colWoceFours.toString() +
-				";\n    noColWoceThrees = " + noColWoceThrees.toString() +
-				";\n    noColWoceFours = " + noColWoceFours.toString() +
-				";\n    userWoceThreeRowIndices = " + userWoceThrees.toString() +
-				";\n    userWoceFourRowIndices = " + userWoceFours.toString() +
-				";\n    preamble = " + preamble.toString() +
-				";\n    dataValues = " + dataValues.toString() +
-				" ]";
+		String repr = 
+				"DashboardCruiseWithData[\n" +
+				"    selected=" + Boolean.toString(selected) + ";\n" + 
+				"    version = " + version + ";\n" + 
+				"    owner=" + owner +  ";\n" + 
+				"    expocode=" + expocode +  ";\n" + 
+				"    dataCheckStatus=" + dataCheckStatus + ";\n" + 
+				"    omeTimestamp=" + omeTimestamp + ";\n" + 
+				"    addlDocs=" + addlDocs.toString() + ";\n" + 
+				"    qcStatus=" + qcStatus + ";\n" + 
+				"    archiveStatus=" + archiveStatus + ";\n" + 
+				"    cdiacDate=" + cdiacDate + ";\n" + 
+				"    uploadFilename=" + uploadFilename + ";\n" + 
+				"    uploadTimestamp=" + uploadTimestamp + ";\n" + 
+				"    numDataRows=" + Integer.toString(numDataRows) + ";\n" + 
+				"    numErrorRows=" + Integer.toString(numErrorRows) + ";\n" + 
+				"    numWarnRows=" + Integer.toString(numWarnRows) + ";\n" + 
+				"    userColNames=" + userColNames.toString() + ";\n" + 
+				"    dataColTypes=" + dataColTypes.toString() + ";\n" + 
+				"    checkerWoceThrees = " + checkerWoceThrees.toString() + ";\n" + 
+				"    checkerWoceFours = " + checkerWoceFours.toString() + ";\n" + 
+				"    userWoceThreeRowIndices = " + userWoceThrees.toString() + ";\n" + 
+				"    userWoceFourRowIndices = " + userWoceFours.toString() + ";\n" + 
+				"    preamble = " + preamble.toString() + ";\n" + 
+				"    dataValues = [\n";
+		for (int k = 0; k < rowNums.size(); k++)
+			repr += "         " + rowNums.get(k).toString() + ": " + dataValues.get(k).toString() + ",\n";
+		repr += "     ]\n";
+		repr += "]";
+		return repr;
 	}
 
 }

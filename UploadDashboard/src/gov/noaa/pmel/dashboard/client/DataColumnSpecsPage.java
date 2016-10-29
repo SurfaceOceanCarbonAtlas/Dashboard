@@ -11,6 +11,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -363,8 +364,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		cruise.setNumDataRows(cruiseSpecs.getNumDataRows());
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
 		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
-		cruise.setWoceThreeRowIndices(cruiseSpecs.getWoceThreeRowIndices());
-		cruise.setWoceFourRowIndices(cruiseSpecs.getWoceFourRowIndices());
+		cruise.setColWoceThrees(cruiseSpecs.getColWoceThrees());
+		cruise.setColWoceFours(cruiseSpecs.getColWoceFours());
 		cruise.setQcStatus(cruiseSpecs.getQcStatus());
 		cruise.setArchiveStatus(cruiseSpecs.getArchiveStatus());
 
@@ -802,13 +803,14 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		@Override
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
-			if ( cruise.getWoceFourRowIndices().get(colNum).contains(rowIdx) ) {
+			// TODO: compare with any WOCE name
+			if ( cruise.getColWoceFours().get(colNum).contains(new WoceType(rowIdx, "WOCE_CO2_water")) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						SocatUploadDashboard.ERROR_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}
-			else if ( cruise.getWoceThreeRowIndices().get(colNum).contains(rowIdx) ) {
+			else if ( cruise.getColWoceThrees().get(colNum).contains(new WoceType(rowIdx, "WOCE_CO2_water")) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						SocatUploadDashboard.WARNING_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));

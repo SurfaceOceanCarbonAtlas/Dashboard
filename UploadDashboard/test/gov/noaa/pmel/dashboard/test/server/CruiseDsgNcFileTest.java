@@ -21,7 +21,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Properties;
 
 import org.junit.Test;
@@ -373,12 +372,10 @@ public class CruiseDsgNcFileTest {
 		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
 		cruise.setDataColTypes(testTypes);
 		cruise.setDataValues(testValues);
-		ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
-		ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
-		for (int k = 0; k < testTypes.size(); k++) {
-			woceThrees.add(new HashSet<Integer>());
-			woceFours.add(new HashSet<Integer>());
-		}
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(testTypes.size());
+		for (int k = 1; k <= testTypes.size(); k++)
+			rowNums.add(k);
+		cruise.setRowNums(rowNums);
 
 		// Create the list of SocatCruiseData from the DashboardCruiseWithData
 		ArrayList<SocatCruiseData> dataList = 
@@ -455,12 +452,10 @@ public class CruiseDsgNcFileTest {
 			DashboardCruiseWithData cruise = new DashboardCruiseWithData();
 			cruise.setDataColTypes(testTypes);
 			cruise.setDataValues(testValues);
-			ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
-			ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
-			for (int k = 0; k < testTypes.size(); k++) {
-				woceThrees.add(new HashSet<Integer>());
-				woceFours.add(new HashSet<Integer>());
-			}
+			ArrayList<Integer> rowNums = new ArrayList<Integer>(testTypes.size());
+			for (int k = 1; k <= testTypes.size(); k++)
+				rowNums.add(k);
+			cruise.setRowNums(rowNums);
 
 			// Create the list of SocatCruiseData from the DashboardCruiseWithData
 			ArrayList<SocatCruiseData> dataList = 
