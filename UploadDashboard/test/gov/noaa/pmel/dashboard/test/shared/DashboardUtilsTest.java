@@ -10,11 +10,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
-
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import java.util.TreeSet;
 
 import org.junit.Test;
+
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 
 /**
  * @author Karl Smith
@@ -121,8 +122,10 @@ public class DashboardUtilsTest {
 		ArrayList<Integer> decodedList = 
 				DashboardUtils.decodeIntegerArrayList(encoded);
 		assertEquals(myList, decodedList);
-		decodedList = DashboardUtils.decodeIntegerArrayList("[ ]");
-		assertEquals(new ArrayList<Integer>(), decodedList);
+		decodedList = DashboardUtils.decodeIntegerArrayList("[]");
+		assertEquals(0, decodedList.size());
+		decodedList = DashboardUtils.decodeIntegerArrayList("[  ]");
+		assertEquals(0, decodedList.size());
 	}
 
 	/**
@@ -137,31 +140,29 @@ public class DashboardUtilsTest {
 		ArrayList<String> decodedList = 
 				DashboardUtils.decodeStringArrayList(encoded);
 		assertEquals(myList, decodedList);
-		decodedList = DashboardUtils.decodeStringArrayList("[ ]");
-		assertEquals(new ArrayList<String>(), decodedList);
-		decodedList = DashboardUtils.decodeStringArrayList("[ \"\" ]");
+		decodedList = DashboardUtils.decodeStringArrayList("[]");
+		assertEquals(0, decodedList.size());
+		decodedList = DashboardUtils.decodeStringArrayList("[  ]");
+		assertEquals(0, decodedList.size());
+		decodedList = DashboardUtils.decodeStringArrayList("[\"\"]");
 		assertEquals(new ArrayList<String>(Arrays.asList("")), decodedList);
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeSetsArrayList(java.lang.String)}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeSetsArrayList(java.util.ArrayList)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#decodeWoceTypeSet(java.lang.String)}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardUtils#encodeWoceTypeSet(java.util.TreeSet)}.
 	 */
 	@Test
-	public void testEncodeDecodeSetsArrayList() {
-		ArrayList<HashSet<Integer>> myList = new ArrayList<HashSet<Integer>>();
-		myList.add(new HashSet<Integer>(Arrays.asList(1,5,9,12)));
-		myList.add(new HashSet<Integer>(Arrays.asList(6,9,12,21)));
-		String encoded = DashboardUtils.encodeSetsArrayList(myList);
-		ArrayList<HashSet<Integer>> decodedList = 
-				DashboardUtils.decodeSetsArrayList(encoded);
-		assertEquals(myList, decodedList);
-		decodedList = DashboardUtils.decodeSetsArrayList("[ ]");
-		assertEquals(new ArrayList<HashSet<Integer>>(), decodedList);
-		myList = new ArrayList<HashSet<Integer>>();
-		myList.add(new HashSet<Integer>());
-		decodedList = DashboardUtils.decodeSetsArrayList("[ [ ] ]");
-		assertEquals(myList, decodedList);
+	public void testEncodeDecodeWoceTypeSet() {
+		TreeSet<WoceType> mySet = new TreeSet<WoceType>(
+				Arrays.asList(new WoceType(3, 7, "WOCE_CO2_water"), new WoceType(9,2, "WOCE_CO2_atm")));
+		String encoded = DashboardUtils.encodeWoceTypeSet(mySet);
+		TreeSet<WoceType> decodedSet = DashboardUtils.decodeWoceTypeSet(encoded);
+		assertEquals(mySet, decodedSet);
+		decodedSet = DashboardUtils.decodeWoceTypeSet("[]");
+		assertEquals(0, decodedSet.size());
+		decodedSet = DashboardUtils.decodeWoceTypeSet("[  ]");
+		assertEquals(0, decodedSet.size());
 	}
 
 }

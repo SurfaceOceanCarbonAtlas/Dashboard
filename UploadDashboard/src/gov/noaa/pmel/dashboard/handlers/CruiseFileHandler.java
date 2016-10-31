@@ -313,7 +313,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		// metadata strings in cruise data
 		ArrayList<String> preamble = new ArrayList<String>();
-		// Directly add the data column values to the list in cruiseData
+		// data row numbers
+		ArrayList<Integer> rowNums = new ArrayList<Integer>();
+		// data values in cruise data
 		ArrayList<ArrayList<String>> dataValues = new ArrayList<ArrayList<String>>();
 
 		boolean expocodeFound = false;
@@ -398,7 +400,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				if ( record.size() != numDataColumns )
 					throw new IOException("Inconsistent number of data columns (" + 
 							record.size() + " instead of " + numDataColumns + 
-							") for record " + dataParser.getRecordNumber() + ":\n    " +
+							") for measurement " + dataParser.getRecordNumber() + ":\n    " +
 							rebuildDataline(record, spacer));
 
 				// Checking for second header with units?
@@ -418,11 +420,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						if ( isUnits ) {
 							// Add the units to the column header names 
 							ArrayList<String> colNames = cruiseData.getUserColNames();
+							ArrayList<String> colNamesWithUnits = new ArrayList<String>(colNames.size());
 							for (int k = 0; k < colNames.size(); k++) {
 								String units = record.get(k);
 								if ( ! units.isEmpty() )
-									colNames.set(k, colNames.get(k) + " [" + units + "]");
+									colNamesWithUnits.add(colNames.get(k) + " [" + units + "]");
+								else
+									colNamesWithUnits.add(colNames.get(k));
 							}
+							cruiseData.setUserColNames(colNamesWithUnits);
 						}
 						// Assign the data column types, units, and missing values 
 						// from the data column names, possibly with user-provided units
@@ -435,16 +441,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						}
 						configStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
 						cruiseData.setVersion(configStore.getSocatUploadVersion());
-						// Set all WOCE-3 row index sets to empty
-						ArrayList<HashSet<WoceType>> woceFlags = cruiseData.getColWoceThrees();
-						woceFlags.clear();
-						for (int k = 0; k < numDataColumns; k++)
-							woceFlags.add(new HashSet<WoceType>());
-						// Set all WOCE-4 row index sets to empty
-						woceFlags = cruiseData.getColWoceFours();
-						woceFlags.clear();
-						for (int k = 0; k < numDataColumns; k++)
-							woceFlags.add(new HashSet<WoceType>());
 					}
 					// Rest of the records must be data
 					checkForUnits = false;
@@ -457,6 +453,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				if ( numDataRows == 0 ) {
 					// No reading of the data requested - done
 					cruiseData.setPreamble(preamble);
+					cruiseData.setRowNums(null);
 					cruiseData.setDataValues(null);
 					if ( assignCruiseInfo )
 						cruiseData.setNumDataRows(0);
@@ -464,9 +461,9 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				}
 
 				dataRowNum++;
-				// Blank lines are NOT detected when skipping lines,
+				// "No-data" lines are NOT detected when skipping lines,
 				// but lines are skipped only with already-processed data,
-				// so blank lines should already have been eliminated.
+				// so "no-data" lines should already have been eliminated.
 				if ( dataRowNum > firstDataRow ) {
 					ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
 					boolean allBlank = true;
@@ -476,6 +473,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 							allBlank = false;
 					}
 					if ( ! allBlank ) {
+						rowNums.add(dataRowNum);
 						dataValues.add(datavals);
 						if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
 							break;
@@ -494,6 +492,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 			throw new IOException("No data columns found, possibly due to incorrect format");
 
 		cruiseData.setPreamble(preamble);
+		cruiseData.setRowNums(rowNums);
 		cruiseData.setDataValues(dataValues);
 
 		if ( assignCruiseInfo )
@@ -642,6 +641,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Missing value for each data column
 		cruiseProps.setProperty(MISSING_VALUES_ID, 
 				DashboardUtils.encodeStringArrayList(colMissValues));
+
 		// WOCE-3 row indices for each data column
 		// TODO: revise to include WOCE name
 		ArrayList<HashSet<Integer>> woceThreeRows = new ArrayList<HashSet<Integer>>(numCols);
@@ -651,7 +651,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				wocerows.add(uwoce.getRowIndex());
 			woceThreeRows.add(wocerows);
 		}
-		cruiseProps.setProperty(WOCE_THREE_ROWS_ID, DashboardUtils.encodeSetsArrayList(woceThreeRows));
+		cruiseProps.setProperty(WOCE_THREE_ROWS_ID, CruiseFileHandler.encodeSetsArrayList(woceThreeRows));
 		// WOCE-4 row indices for each data column
 		// TODO: revise to include WOCE name
 		ArrayList<HashSet<Integer>> woceFourRows = new ArrayList<HashSet<Integer>>(numCols);
@@ -661,7 +661,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				wocerows.add(uwoce.getRowIndex());
 			woceFourRows.add(wocerows);
 		}
-		cruiseProps.setProperty(WOCE_FOUR_ROWS_ID, DashboardUtils.encodeSetsArrayList(woceFourRows));
+		cruiseProps.setProperty(WOCE_FOUR_ROWS_ID, CruiseFileHandler.encodeSetsArrayList(woceFourRows));
 		// Save the properties to the cruise information file
 		try {
 			PrintWriter cruiseWriter = new PrintWriter(infoFile);
@@ -1441,7 +1441,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
 					WOCE_THREE_ROWS_ID + " given in " + infoFile.getPath());
-		ArrayList<HashSet<Integer>> woceThreeRows = DashboardUtils.decodeSetsArrayList(value);
+		ArrayList<HashSet<Integer>> woceThreeRows = CruiseFileHandler.decodeSetsArrayList(value);
 		ArrayList<HashSet<WoceType>> woceThrees = new ArrayList<HashSet<WoceType>>(numCols);
 		for (int k = 0; k < numCols; k++) {
 			HashSet<WoceType> wocerows = new HashSet<WoceType>();
@@ -1457,7 +1457,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
 					WOCE_FOUR_ROWS_ID + " given in " + infoFile.getPath());
-		ArrayList<HashSet<Integer>> woceFourRows = DashboardUtils.decodeSetsArrayList(value);
+		ArrayList<HashSet<Integer>> woceFourRows = CruiseFileHandler.decodeSetsArrayList(value);
 		ArrayList<HashSet<WoceType>> woceFours = new ArrayList<HashSet<WoceType>>(numCols);
 		for (int k = 0; k < numCols; k++) {
 			HashSet<WoceType> wocerows = new HashSet<WoceType>();
@@ -1470,7 +1470,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 	/**
 	 * Updates the UploadDashboard status of the cruise based on the QC flag
-	 * provided for the cruise.
+	 * provided for the cruise.  Only used for legacy encoding of WOCE flags.
 	 * 
 	 * @param expocode
 	 * 		Update the status of the cruise with this expocode.
@@ -1508,6 +1508,58 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		saveCruiseInfoToFile(cruise, "Update cruise dashboard status for " + 
 				expocode + " from '" + oldStatus + "' to '" + newStatus + "'");
 		return true;
+	}
+
+	/**
+	 * Decodes a (somewhat-JSON-like) encoded array of sets of integers, 
+	 * like that produced by {@link encodeSetsArrayList}, 
+	 * into an ArrayList of HashSets of Integers.  Each set must be 
+	 * comma-separated integer values enclosed in brackets (like that 
+	 * produced {@link DashboardUtils#encodeIntegerArrayList(ArrayList)}, 
+	 * and each set must be by separated by a comma.  Whitespace around 
+	 * brackets and commas is allowed.  Only used for decoding legacy 
+	 * encoding of WOCE flags.
+	 * 
+	 * @param arrayStr
+	 * 		the encoded sets of integers array
+	 * @return
+	 * 		the decoded ArrayList of HashSets of Integers; never null, 
+	 * 		but may be empty (if the encoded array contains no sets)
+	 * @throws IllegalArgumentException
+	 * 		if arrayStr does not start with '[', does not end with ']', 
+	 * 		or contains sets not enclosed within '[' and ']'.
+	 */
+	private static ArrayList<HashSet<Integer>> decodeSetsArrayList(String arrayStr) 
+												throws IllegalArgumentException {
+		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+			throw new IllegalArgumentException(
+					"Encoded string array not enclosed in brackets");
+		// Locate the opening bracket of the first set
+		int firstIndex = arrayStr.indexOf("[", 1);
+		// Locate the closing bracket of the last set
+		int lastIndex = arrayStr.lastIndexOf("]", arrayStr.length() - 2);
+		if ( (firstIndex < 0) || (lastIndex < 0) ) {
+			if ( (firstIndex < 0) && (lastIndex < 0) &&
+				 arrayStr.substring(1, arrayStr.length() - 1).trim().isEmpty() ) {
+				// no sets; return an empty list
+				return new ArrayList<HashSet<Integer>>(0);
+			}
+			// Not empty, but 
+			throw new IllegalArgumentException(
+					"Sets in encoded sets array not enclosed in brackets");
+		}
+		// Split the string into each of the sets
+		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
+								  .split("\\]\\s*,\\s*\\[", -1);
+		// Create the list to return
+		ArrayList<HashSet<Integer>> setsList = 
+				new ArrayList<HashSet<Integer>>(pieces.length);
+		// Convert each of the set strings and add to the list
+		for ( String setStr : pieces ) {
+			setsList.add(new HashSet<Integer>(
+					DashboardUtils.decodeIntegerArrayList("[" + setStr + "]")));
+		}
+		return setsList;
 	}
 
 }
