@@ -155,7 +155,7 @@ public class DashboardUtilsTest {
 	@Test
 	public void testEncodeDecodeWoceTypeSet() {
 		TreeSet<WoceType> mySet = new TreeSet<WoceType>(
-				Arrays.asList(new WoceType(3, 7, "WOCE_CO2_water"), new WoceType(9,2, "WOCE_CO2_atm")));
+				Arrays.asList(new WoceType("WOCE_CO2_water", 3, 7), new WoceType("WOCE_CO2_atm", 9,2)));
 		String encoded = DashboardUtils.encodeWoceTypeSet(mySet);
 		TreeSet<WoceType> decodedSet = DashboardUtils.decodeWoceTypeSet(encoded);
 		assertEquals(mySet, decodedSet);

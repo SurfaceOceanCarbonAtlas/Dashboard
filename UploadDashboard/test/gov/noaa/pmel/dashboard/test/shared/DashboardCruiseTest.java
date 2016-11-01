@@ -343,9 +343,9 @@ public class DashboardCruiseTest {
 	@Test
 	public void testSetGetCheckerWoceThrees() {
 		TreeSet<WoceType> myWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(5, 2, "WOCE_CO2_water"), 
-				new WoceType(8, 12, "WOCE_CO2_water"),
-				new WoceType(3, 22, "WOCE_CO2_water")
+				new WoceType("WOCE_CO2_water", 5, 2), 
+				new WoceType("WOCE_CO2_water", 8, 12),
+				new WoceType("WOCE_CO2_water", 3, 22)
 		));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getCheckerWoceThrees().size());
@@ -376,9 +376,9 @@ public class DashboardCruiseTest {
 	@Test
 	public void testSetGetCheckerWoceFours() {
 		TreeSet<WoceType> myWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(7, 5, "WOCE_CO2_water"),
-				new WoceType(3, 15, "WOCE_CO2_water"),
-				new WoceType(3, 25, "WOCE_CO2_water")
+				new WoceType("WOCE_CO2_water", 7, 5),
+				new WoceType("WOCE_CO2_water", 3, 15),
+				new WoceType("WOCE_CO2_water", 3, 25)
 		));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getCheckerWoceFours().size());
@@ -410,9 +410,9 @@ public class DashboardCruiseTest {
 	@Test
 	public void testSetGetUserWoceThrees() {
 		TreeSet<WoceType> userWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(4, 31, "WOCE_CO2_water"),
-				new WoceType(5, 35, "WOCE_CO2_water"),
-				new WoceType(12, 35, "WOCE_CO2_atm")
+				new WoceType("WOCE_CO2_water", 4, 31),
+				new WoceType("WOCE_CO2_water", 5, 35),
+				new WoceType("WOCE_CO2_atm", 12, 35)
 		));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getUserWoceThrees().size());
@@ -445,9 +445,9 @@ public class DashboardCruiseTest {
 	@Test
 	public void testSetGetUserWoceFours() {
 		TreeSet<WoceType> userWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(13, 43, "WOCE_CO2_water"),
-				new WoceType(13, 44, "WOCE_CO2_atm"),
-				new WoceType(8, 45, "WOCE_CO2_water") 
+				new WoceType("WOCE_CO2_water", 13, 43),
+				new WoceType("WOCE_CO2_atm", 13, 44),
+				new WoceType("WOCE_CO2_water", 8, 45) 
 		));
 		DashboardCruise cruise = new DashboardCruise();
 		assertEquals(0, cruise.getUserWoceFours().size());
@@ -609,24 +609,24 @@ public class DashboardCruiseTest {
 		ArrayList<String> myUserColNames = new ArrayList<String>(
 				Arrays.asList("time", "lon", "lat", "depth")); 
 		TreeSet<WoceType> myWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(5, 2, "WOCE_CO2_water"), 
-				new WoceType(8, 12, "WOCE_CO2_water"),
-				new WoceType(3, 22, "WOCE_CO2_water")
+				new WoceType("WOCE_CO2_water", 5, 2), 
+				new WoceType("WOCE_CO2_water", 8, 12),
+				new WoceType("WOCE_CO2_water", 3, 22)
 		));
 		TreeSet<WoceType> myWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(7, 5, "WOCE_CO2_water"),
-				new WoceType(3, 15, "WOCE_CO2_water"),
-				new WoceType(3, 25, "WOCE_CO2_water")
+				new WoceType("WOCE_CO2_water", 7, 5),
+				new WoceType("WOCE_CO2_water", 3, 15),
+				new WoceType("WOCE_CO2_water", 3, 25)
 		));
 		TreeSet<WoceType> userWoceThrees = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(4, 31, "WOCE_CO2_water"),
-				new WoceType(5, 35, "WOCE_CO2_water"),
-				new WoceType(12, 35, "WOCE_CO2_atm")
+				new WoceType("WOCE_CO2_water", 4, 31),
+				new WoceType("WOCE_CO2_water", 5, 35),
+				new WoceType("WOCE_CO2_atm", 12, 35)
 		));
 		TreeSet<WoceType> userWoceFours = new TreeSet<WoceType>(Arrays.asList(
-				new WoceType(13, 43, "WOCE_CO2_water"),
-				new WoceType(13, 44, "WOCE_CO2_atm"),
-				new WoceType(8, 45, "WOCE_CO2_water") 
+				new WoceType("WOCE_CO2_water", 13, 43),
+				new WoceType("WOCE_CO2_atm", 13, 44),
+				new WoceType("WOCE_CO2_water", 8, 45) 
 		));
 
 		DashboardCruise firstCruise = new DashboardCruise();

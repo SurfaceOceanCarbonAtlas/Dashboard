@@ -364,11 +364,29 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		cruise.setNumDataRows(cruiseSpecs.getNumDataRows());
 		cruise.setUserColNames(cruiseSpecs.getUserColNames());
 		cruise.setDataColTypes(cruiseSpecs.getDataColTypes());
-		cruise.setColWoceThrees(cruiseSpecs.getColWoceThrees());
-		cruise.setColWoceFours(cruiseSpecs.getColWoceFours());
+
+		TreeSet<WoceType> woceSet = new TreeSet<WoceType>();
+		for ( WoceType chkwoce : cruiseSpecs.getCheckerWoceThrees() )
+			woceSet.add(new WoceType(null, chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
+		cruise.setCheckerWoceThrees(woceSet);
+
+		woceSet.clear();
+		for ( WoceType chkwoce : cruiseSpecs.getCheckerWoceFours() )
+			woceSet.add(new WoceType(null, chkwoce.getColumnIndex(), chkwoce.getRowIndex()));
+		cruise.setCheckerWoceFours(woceSet);
+
+		woceSet.clear();
+		for ( WoceType uwoce : cruiseSpecs.getUserWoceThrees() )
+			woceSet.add(new WoceType(null, null, uwoce.getRowIndex()));
+		cruise.setUserWoceThrees(woceSet);
+
+		woceSet.clear();
+		for ( WoceType uwoce : cruiseSpecs.getUserWoceFours() )
+			woceSet.add(new WoceType(null, null, uwoce.getRowIndex()));
+		cruise.setUserWoceFours(woceSet);
+
 		cruise.setQcStatus(cruiseSpecs.getQcStatus());
 		cruise.setArchiveStatus(cruiseSpecs.getArchiveStatus());
-
 		cruise.setExpocode(cruiseSpecs.getExpocode());
 
 		introHtml.setHTML(INTRO_HTML_PROLOGUE +  
@@ -803,14 +821,13 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		@Override
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
-			// TODO: compare with any WOCE name
-			if ( cruise.getColWoceFours().get(colNum).contains(new WoceType(rowIdx, "WOCE_CO2_water")) ) {
+			if ( cruise.getCheckerWoceFours().contains(new WoceType(null, colNum, rowIdx)) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						SocatUploadDashboard.ERROR_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}
-			else if ( cruise.getColWoceThrees().get(colNum).contains(new WoceType(rowIdx, "WOCE_CO2_water")) ) {
+			else if ( cruise.getCheckerWoceThrees().contains(new WoceType(null, colNum, rowIdx)) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
 						SocatUploadDashboard.WARNING_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));

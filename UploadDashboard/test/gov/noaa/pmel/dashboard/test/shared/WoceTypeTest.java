@@ -17,6 +17,23 @@ import org.junit.Test;
 public class WoceTypeTest {
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceType#getWoceName()} and
+	 * {@link gov.noaa.pmel.dashboard.shared.WoceType#setWoceName(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetWoceName() {
+		final String myWoceName = "WOCE_CO2_atm";
+		WoceType uwoce = new WoceType();
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, uwoce.getWoceName());
+		uwoce.setWoceName(myWoceName);
+		assertEquals(myWoceName, uwoce.getWoceName());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, uwoce.getRowIndex());
+		assertEquals(DashboardUtils.INT_MISSING_VALUE, uwoce.getColumnIndex());
+		uwoce.setWoceName(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, uwoce.getWoceName());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceType#getColumnIndex()} and
 	 * {@link gov.noaa.pmel.dashboard.shared.WoceType#setColumnIndex(java.lang.Integer)}.
 	 */
@@ -48,34 +65,17 @@ public class WoceTypeTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceType#getWoceName()} and
-	 * {@link gov.noaa.pmel.dashboard.shared.WoceType#setWoceName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceType#WoceType(java.lang.String, java.lang.Integer, java.lang.Integer)}.
 	 */
 	@Test
-	public void testGetSetWoceName() {
+	public void testWoceTypeStringIntegerInteger() {
 		final String myWoceName = "WOCE_CO2_atm";
-		WoceType uwoce = new WoceType();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, uwoce.getWoceName());
-		uwoce.setWoceName(myWoceName);
-		assertEquals(myWoceName, uwoce.getWoceName());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, uwoce.getRowIndex());
-		assertEquals(DashboardUtils.INT_MISSING_VALUE, uwoce.getColumnIndex());
-		uwoce.setWoceName(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, uwoce.getWoceName());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceType#UserWoce(java.lang.Integer, java.lang.Integer, java.lang.String)}.
-	 */
-	@Test
-	public void testUserWoceIntegerString() {
 		final Integer myColumnIndex = 5;
 		final Integer myRowIndex = 25;
-		final String myWoceName = "WOCE_CO2_atm";
-		WoceType uwoce = new WoceType(myColumnIndex, myRowIndex, myWoceName);
+		WoceType uwoce = new WoceType(myWoceName, myColumnIndex, myRowIndex);
+		assertEquals(myWoceName, uwoce.getWoceName());
 		assertEquals(myColumnIndex, uwoce.getColumnIndex());
 		assertEquals(myRowIndex, uwoce.getRowIndex());
-		assertEquals(myWoceName, uwoce.getWoceName());
 	}
 
 	/**
@@ -83,30 +83,27 @@ public class WoceTypeTest {
 	 */
 	@Test
 	public void testCompareTo() {
-		WoceType first = new WoceType(5, 25, "WOCE_CO2_atm");
-		WoceType second = new WoceType(5, 25, "WOCE_CO2_atm");
+		WoceType first = new WoceType("WOCE_CO2_atm", 5, 25);
+		WoceType second = new WoceType("WOCE_CO2_atm", 5, 25);
 		assertTrue( first.compareTo(second) == 0 );
 		assertTrue( second.compareTo(first) == 0 );
 		assertFalse( first == second );
 
-		second = new WoceType(6, 25, "WOCE_CO2_atm");
+		second = new WoceType("WOCE_CO2_water", 5, 25);
 		assertTrue( first.compareTo(second) < 0 );
 		assertTrue( second.compareTo(first) > 0 );
-		second = new WoceType(5, 35, "WOCE_CO2_atm");
+		second = new WoceType("WOCE_CO2_atm", 6, 25);
 		assertTrue( first.compareTo(second) < 0 );
 		assertTrue( second.compareTo(first) > 0 );
-		second = new WoceType(5, 25, "WOCE_CO2_water");
+		second = new WoceType("WOCE_CO2_atm", 5, 35);
 		assertTrue( first.compareTo(second) < 0 );
 		assertTrue( second.compareTo(first) > 0 );
-		second = new WoceType(4, 35, "WOCE_CO2_water");
-		assertTrue( first.compareTo(second) > 0 );
-		assertTrue( second.compareTo(first) < 0 );
-		second = new WoceType(5, 15, "WOCE_CO2_water");
-		assertTrue( first.compareTo(second) > 0 );
-		assertTrue( second.compareTo(first) < 0 );
-		second = new WoceType(4, 25, "WOCE_CO2_water");
-		assertTrue( first.compareTo(second) > 0 );
-		assertTrue( second.compareTo(first) < 0 );
+		second = new WoceType("WOCE_CO2_water", 4, 15);
+		assertTrue( first.compareTo(second) < 0 );
+		assertTrue( second.compareTo(first) > 0 );
+		second = new WoceType("WOCE_CO2_atm", 6, 15);
+		assertTrue( first.compareTo(second) < 0 );
+		assertTrue( second.compareTo(first) > 0 );
 	}
 
 	/**
@@ -125,6 +122,13 @@ public class WoceTypeTest {
 		assertTrue( first.equals(second) );
 		assertFalse( first == second );
 
+		first.setWoceName("WOCE_CO2_water");
+		assertFalse( first.hashCode() == second.hashCode() );
+		assertFalse( first.equals(second) );
+		second.setWoceName("WOCE_CO2_water");
+		assertTrue( first.hashCode() == second.hashCode() );
+		assertTrue( first.equals(second) );
+
 		first.setColumnIndex(5);
 		assertFalse( first.hashCode() == second.hashCode() );
 		assertFalse( first.equals(second) );
@@ -136,13 +140,6 @@ public class WoceTypeTest {
 		assertFalse( first.hashCode() == second.hashCode() );
 		assertFalse( first.equals(second) );
 		second.setRowIndex(25);
-		assertTrue( first.hashCode() == second.hashCode() );
-		assertTrue( first.equals(second) );
-
-		first.setWoceName("WOCE_CO2_water");
-		assertFalse( first.hashCode() == second.hashCode() );
-		assertFalse( first.equals(second) );
-		second.setWoceName("WOCE_CO2_water");
 		assertTrue( first.hashCode() == second.hashCode() );
 		assertTrue( first.equals(second) );
 	}

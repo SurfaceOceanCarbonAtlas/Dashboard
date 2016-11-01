@@ -788,7 +788,7 @@ public class DashboardUtils {
 					 ( ! woceParts[2].substring(lastIndex+1).trim().isEmpty() ) )
 					throw new IllegalArgumentException("WOCE name not enclosed in double quotes");
 				String woceName = woceParts[2].substring(firstIndex+1, lastIndex);
-				woceSet.add(new WoceType(colIndex, rowIndex, woceName));
+				woceSet.add(new WoceType(woceName, colIndex, rowIndex));
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Invalid encoding of a set of WoceTypes: " + 
 						ex.getMessage(), ex);

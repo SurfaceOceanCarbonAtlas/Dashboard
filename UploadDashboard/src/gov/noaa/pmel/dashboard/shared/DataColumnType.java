@@ -19,18 +19,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7655703582585602369L;
+	private static final long serialVersionUID = 7661480735610583324L;
 
-	private String varName;
-	private Double sortOrder;
-	private String displayName;
-	private String dataClassName;
-	private String description;
-	private String standardName;
-	private String categoryName;
-	private ArrayList<String> units;
-	private Integer selectedUnitIndex;
-	private String selectedMissingValue;
+	protected String varName;
+	protected Double sortOrder;
+	protected String displayName;
+	protected String dataClassName;
+	protected String description;
+	protected String standardName;
+	protected String categoryName;
+	protected ArrayList<String> units;
+	protected Integer selectedUnitIndex;
+	protected String selectedMissingValue;
 
 	/**
 	 * Create an empty data column type; 

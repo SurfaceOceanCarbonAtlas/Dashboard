@@ -19,36 +19,36 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 349095150750039378L;
+	private static final long serialVersionUID = 6556169857563201207L;
 
-	boolean selected;
-	String version;
-	String owner;
-	String expocode;
-	String dataCheckStatus;
-	String omeTimestamp;
-	TreeSet<String> addlDocs;
-	String qcStatus;
-	String archiveStatus;
-	String cdiacDate;
-	String uploadFilename;
-	String uploadTimestamp;
-	String origDoi;
-	String socatDoi;
-	int numDataRows;
-	int numErrorRows;
-	int numWarnRows;
-	ArrayList<String> userColNames;
+	protected boolean selected;
+	protected String version;
+	protected String owner;
+	protected String expocode;
+	protected String dataCheckStatus;
+	protected String omeTimestamp;
+	protected TreeSet<String> addlDocs;
+	protected String qcStatus;
+	protected String archiveStatus;
+	protected String cdiacDate;
+	protected String uploadFilename;
+	protected String uploadTimestamp;
+	protected String origDoi;
+	protected String socatDoi;
+	protected int numDataRows;
+	protected int numErrorRows;
+	protected int numWarnRows;
+	protected ArrayList<String> userColNames;
 	// For each data column, a DataColumnType with type, unit, and missing value
-	ArrayList<DataColumnType> dataColTypes;
+	protected ArrayList<DataColumnType> dataColTypes;
 	// Rows with checker questionable data
-	TreeSet<WoceType> checkerWoceThrees;
+	protected TreeSet<WoceType> checkerWoceThrees;
 	// Rows with checker bad data
-	TreeSet<WoceType> checkerWoceFours;
+	protected TreeSet<WoceType> checkerWoceFours;
 	// Rows designated by the PI as questionable
-	TreeSet<WoceType> userWoceThrees;
+	protected TreeSet<WoceType> userWoceThrees;
 	// Rows designated by the PI as bad
-	TreeSet<WoceType> userWoceFours;
+	protected TreeSet<WoceType> userWoceFours;
 
 	public DashboardCruise() {
 		selected = false;

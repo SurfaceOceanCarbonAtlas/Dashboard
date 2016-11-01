@@ -16,10 +16,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruiseTypes implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1244727600959023579L;
+	private static final long serialVersionUID = 8578550732667367014L;
 
-	ArrayList<DataColumnType> allKnownTypes;
-	DashboardCruiseWithData cruiseData;
+	protected ArrayList<DataColumnType> allKnownTypes;
+	protected DashboardCruiseWithData cruiseData;
 
 	public DashboardCruiseTypes() {
 		allKnownTypes = null;

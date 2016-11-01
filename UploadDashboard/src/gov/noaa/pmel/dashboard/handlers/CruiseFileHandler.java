@@ -642,26 +642,16 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruiseProps.setProperty(MISSING_VALUES_ID, 
 				DashboardUtils.encodeStringArrayList(colMissValues));
 
-		// WOCE-3 row indices for each data column
-		// TODO: revise to include WOCE name
-		ArrayList<HashSet<Integer>> woceThreeRows = new ArrayList<HashSet<Integer>>(numCols);
-		for (int k = 0; k < numCols; k++) {
-			HashSet<Integer> wocerows = new HashSet<Integer>();
-			for ( WoceType uwoce : cruise.getColWoceThrees().get(k) )
-				wocerows.add(uwoce.getRowIndex());
-			woceThreeRows.add(wocerows);
-		}
-		cruiseProps.setProperty(WOCE_THREE_ROWS_ID, CruiseFileHandler.encodeSetsArrayList(woceThreeRows));
-		// WOCE-4 row indices for each data column
-		// TODO: revise to include WOCE name
-		ArrayList<HashSet<Integer>> woceFourRows = new ArrayList<HashSet<Integer>>(numCols);
-		for (int k = 0; k < numCols; k++) {
-			HashSet<Integer> wocerows = new HashSet<Integer>();
-			for ( WoceType uwoce : cruise.getColWoceFours().get(k) )
-				wocerows.add(uwoce.getRowIndex());
-			woceFourRows.add(wocerows);
-		}
-		cruiseProps.setProperty(WOCE_FOUR_ROWS_ID, CruiseFileHandler.encodeSetsArrayList(woceFourRows));
+		// WOCE flags
+		cruiseProps.setProperty(CHECKER_WOCE_THREES, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getCheckerWoceThrees()));
+		cruiseProps.setProperty(CHECKER_WOCE_FOURS, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getCheckerWoceFours()));
+		cruiseProps.setProperty(USER_WOCE_THREES, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getUserWoceThrees()));
+		cruiseProps.setProperty(USER_WOCE_FOURS, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getUserWoceFours()));
+
 		// Save the properties to the cruise information file
 		try {
 			PrintWriter cruiseWriter = new PrintWriter(infoFile);
@@ -1435,42 +1425,74 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 		cruise.setDataColTypes(dataColTypes);
 
-		// WOCE-3 row indices for each data column
-		// TODO: Use correct WOCE name
-		value = cruiseProps.getProperty(WOCE_THREE_ROWS_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					WOCE_THREE_ROWS_ID + " given in " + infoFile.getPath());
-		ArrayList<HashSet<Integer>> woceThreeRows = CruiseFileHandler.decodeSetsArrayList(value);
-		ArrayList<HashSet<WoceType>> woceThrees = new ArrayList<HashSet<WoceType>>(numCols);
-		for (int k = 0; k < numCols; k++) {
-			HashSet<WoceType> wocerows = new HashSet<WoceType>();
-			for ( Integer idx : woceThreeRows.get(k) )
-				wocerows.add(new WoceType(idx, SocatTypes.WOCE_CO2_WATER.getVarName()));
-			woceThrees.add(wocerows);
+		// WOCE-3 flags
+		value = cruiseProps.getProperty(CHECKER_WOCE_THREES);
+		if ( value != null ) {
+			// Must be new-style WOCE-3 flags
+			TreeSet<WoceType> woceThrees = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setCheckerWoceThrees(woceThrees);
+			// Should also have user-provided WOCE-3 flags
+			value = cruiseProps.getProperty(USER_WOCE_THREES);
+			if ( value == null ) 
+				throw new IllegalArgumentException("No property value for " + 
+						USER_WOCE_THREES + " given in " + infoFile.getPath());
+			woceThrees = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setUserWoceThrees(woceThrees);
 		}
-		cruise.setColWoceThrees(woceThrees);
+		else {
+			// Check for old-style WOCE-3 flags
+			value = cruiseProps.getProperty(WOCE_THREE_ROWS_ID);
+			if ( value == null )
+				throw new IllegalArgumentException("No property value for " + 
+						CHECKER_WOCE_THREES + " given in " + infoFile.getPath());
+			ArrayList<HashSet<Integer>> woceThreeRows = CruiseFileHandler.decodeSetsArrayList(value);
+			TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
+			for (int k = 0; k < numCols; k++) {
+				for ( Integer idx : woceThreeRows.get(k) ) {
+					woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), k, idx));
+				}
+			}
+			cruise.setCheckerWoceThrees(woceThrees);
+			// User-provided WOCE-3 flags were not saved in the old-style properties file
+			cruise.setUserWoceThrees(null);
+		}
 
-		// WOCE-4 row indices for each data column
-		// TODO: Use correct WOCE name
-		value = cruiseProps.getProperty(WOCE_FOUR_ROWS_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					WOCE_FOUR_ROWS_ID + " given in " + infoFile.getPath());
-		ArrayList<HashSet<Integer>> woceFourRows = CruiseFileHandler.decodeSetsArrayList(value);
-		ArrayList<HashSet<WoceType>> woceFours = new ArrayList<HashSet<WoceType>>(numCols);
-		for (int k = 0; k < numCols; k++) {
-			HashSet<WoceType> wocerows = new HashSet<WoceType>();
-			for ( Integer idx : woceFourRows.get(k) )
-				wocerows.add(new WoceType(idx, SocatTypes.WOCE_CO2_WATER.getVarName()));
-			woceFours.add(wocerows);
+		// WOCE-4 flags
+		value = cruiseProps.getProperty(CHECKER_WOCE_FOURS);
+		if ( value != null ) {
+			// Must be new-style WOCE-4 flags
+			TreeSet<WoceType> woceFours = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setCheckerWoceFours(woceFours);
+			// Should also have user-provided WOCE-4 flags
+			value = cruiseProps.getProperty(USER_WOCE_FOURS);
+			if ( value == null ) 
+				throw new IllegalArgumentException("No property value for " + 
+						USER_WOCE_FOURS + " given in " + infoFile.getPath());
+			woceFours = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setUserWoceFours(woceFours);
 		}
-		cruise.setColWoceFours(woceFours);
+		else {
+			// Check for old-style WOCE-4 flags
+			value = cruiseProps.getProperty(WOCE_FOUR_ROWS_ID);
+			if ( value == null )
+				throw new IllegalArgumentException("No property value for " + 
+						CHECKER_WOCE_FOURS + " given in " + infoFile.getPath());
+			ArrayList<HashSet<Integer>> woceFourRows = CruiseFileHandler.decodeSetsArrayList(value);
+			TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
+			for (int k = 0; k < numCols; k++) {
+				for ( Integer idx : woceFourRows.get(k) ) {
+					woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), k, idx));
+				}
+			}
+			cruise.setCheckerWoceFours(woceFours);
+			// User-provided WOCE-4 flags were not saved in the old-style properties file
+			cruise.setUserWoceFours(null);
+		}
 	}
 
 	/**
 	 * Updates the UploadDashboard status of the cruise based on the QC flag
-	 * provided for the cruise.  Only used for legacy encoding of WOCE flags.
+	 * provided for the cruise.
 	 * 
 	 * @param expocode
 	 * 		Update the status of the cruise with this expocode.
@@ -1511,8 +1533,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Decodes a (somewhat-JSON-like) encoded array of sets of integers, 
-	 * like that produced by {@link encodeSetsArrayList}, 
+	 * Decodes a (somewhat-JSON-like) encoded array of sets of integers 
 	 * into an ArrayList of HashSets of Integers.  Each set must be 
 	 * comma-separated integer values enclosed in brackets (like that 
 	 * produced {@link DashboardUtils#encodeIntegerArrayList(ArrayList)}, 

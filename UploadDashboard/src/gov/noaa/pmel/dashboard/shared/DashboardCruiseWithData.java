@@ -15,11 +15,11 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruiseWithData extends DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 4765221280751620841L;
+	private static final long serialVersionUID = -3091386913235608854L;
 
-	ArrayList<String> preamble;
-	ArrayList<Integer> rowNums;
-	ArrayList<ArrayList<String>> dataValues;
+	protected ArrayList<String> preamble;
+	protected ArrayList<Integer> rowNums;
+	protected ArrayList<ArrayList<String>> dataValues;
 
 	/**
 	 * Creates with no cruise data

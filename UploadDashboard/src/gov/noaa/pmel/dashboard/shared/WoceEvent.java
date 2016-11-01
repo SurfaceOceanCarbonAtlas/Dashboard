@@ -16,12 +16,12 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class WoceEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 1117234481601617913L;
+	private static final long serialVersionUID = 8020489025485344257L;
 
-	String woceName;
-	Character flag;
-	String varName;
-	ArrayList<DataLocation> locations;
+	protected String woceName;
+	protected Character flag;
+	protected String varName;
+	protected ArrayList<DataLocation> locations;
 
 	/**
 	 * Creates an empty WOCE event with flag {@link DashboardUtils#WOCE_NOT_CHECKED}
