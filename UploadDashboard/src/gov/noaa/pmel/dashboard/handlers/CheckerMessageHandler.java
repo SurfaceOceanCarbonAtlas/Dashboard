@@ -271,6 +271,7 @@ public class CheckerMessageHandler {
 
 					// Assign the WOCE flag
 					// TODO: Assign correct WOCE name
+					// TODO: Use rowNums to account for any PI-WOCE-4 deleted rows
 					if ( rowNum > 0 ) {
 						if ( msg.isError() ) {
 							if ( colNum > 0 ) {
