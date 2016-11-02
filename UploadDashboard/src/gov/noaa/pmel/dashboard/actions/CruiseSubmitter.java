@@ -139,7 +139,7 @@ public class CruiseSubmitter {
 				 */
 				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 					if ( cruiseData.getNumDataRows() < 1 )
-						errorMsgs.add(expocode + ": unacceptable; all data points marked bad");
+						errorMsgs.add(expocode + ": unacceptable; no valid data points");
 					else if (  ! cruiseChecker.checkProcessedOkay() )
 						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
 					else if ( cruiseChecker.hadGeopositionErrors() )

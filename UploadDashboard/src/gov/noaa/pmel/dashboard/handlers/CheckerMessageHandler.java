@@ -107,8 +107,7 @@ public class CheckerMessageHandler {
 	 * 		if a messages file for the new expocode already exists, or
 	 * 		if unable to rename the messages file
 	 */
-	public void renameMsgsFile(String oldExpocode, String newExpocode) 
-											throws IllegalArgumentException {
+	public void renameMsgsFile(String oldExpocode, String newExpocode) throws IllegalArgumentException {
 		File oldMsgsFile = cruiseMsgsFile(oldExpocode);
 		if ( ! oldMsgsFile.exists() ) 
 			return;
@@ -151,46 +150,46 @@ public class CheckerMessageHandler {
 	}
 
 	/**
-	 * Saves the list of messages produced by the SanityChecker to file.
-	 * Clears and assigns the WOCE-3 or WOCE-4 flags for the given cruise from 
-	 * the given SanityChecker output for the cruise as well as any user-provided 
-	 * WOCE flags in the cruise data.
+	 * Processes the list of messages produced by the SanityChecker.
+	 * Saves the messages to the appropriate messages file.
+	 * Clears and assigns the WOCE-3 or WOCE-4 flags for the given cruise 
+	 * from the given SanityChecker output for the cruise as well as any 
+	 * user-provided WOCE flags in the cruise data.
 	 * 
 	 * @param cruiseData
-	 * 		save messages for this cruise, and assign WOCE flags to this cruise
+	 * 		process messages for this cruise
 	 * @param output
-	 * 		SanityChecker output for this cruise  
+	 * 		SanityChecker output for this cruise
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 */
-	public void saveCruiseMessages(DashboardCruiseWithData cruiseData, Output output) 
-											throws IllegalArgumentException {
+	public void processCruiseMessages(DashboardCruiseWithData cruiseData, 
+			Output output) throws IllegalArgumentException {
 
 		TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
 		TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
 
 		// Get the cruise messages file to be written
 		File msgsFile = cruiseMsgsFile(cruiseData.getExpocode());
-
-		// Create the NODC subdirectory if it does not exist
+		// Create the parent subdirectories if they do not exist
 		File parentFile = msgsFile.getParentFile();
 		if ( ! parentFile.exists() )
 			parentFile.mkdirs();
-
 		// Write the messages to file and save WOCE flags from these messages
 		PrintWriter msgsWriter;
 		try {
 			msgsWriter = new PrintWriter(msgsFile);
 		} catch (FileNotFoundException ex) {
-			throw new RuntimeException(
-					"Unexpected error opening messages file " + 
+			throw new RuntimeException("Unexpected error opening messages file " + 
 					msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
 		}
+
 		try {
 
 			List<SocatDataRecord> dataRecs = output.getRecords();
 			int numRecs = dataRecs.size();
 			try {
+
 				for ( MessageSummary summary : output.getMessages().getMessageSummaries() ) {
 					String msg = summary.getSummaryString();
 					int count = summary.getErrorCount();
@@ -204,7 +203,11 @@ public class CheckerMessageHandler {
 								Integer.toString(count) + " warnings of type: " + msg);
 					}
 				}
+
 				for ( Message msg : output.getMessages().getMessages() ) {
+					int rowNum = msg.getLineNumber();
+					int colNum = msg.getColumnIndex();
+
 					// Generate a list of key-value strings describing this message
 					ArrayList<String> mappings = new ArrayList<String>();
 
@@ -217,7 +220,6 @@ public class CheckerMessageHandler {
 								SCMsgSeverity.WARNING.name());
 					}
 
-					int rowNum = msg.getLineNumber();
 					if ( (rowNum > 0) && (rowNum <= numRecs) ) {
 						mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 								Integer.toString(rowNum));
@@ -249,7 +251,6 @@ public class CheckerMessageHandler {
 						}
 					}
 
-					int colNum = msg.getColumnIndex();
 					if ( colNum > 0 )
 						mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 								Integer.toString(colNum));
@@ -269,9 +270,8 @@ public class CheckerMessageHandler {
 					// Write this array list of key-value strings to file
 					msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
 
-					// Assign the WOCE flag
-					// TODO: Assign correct WOCE name
-					// TODO: Use rowNums to account for any PI-WOCE-4 deleted rows
+					// Create the WOCE flag for this message.
+					// TODO: Assign the correct WOCE name
 					if ( rowNum > 0 ) {
 						if ( msg.isError() ) {
 							if ( colNum > 0 ) {
@@ -291,6 +291,7 @@ public class CheckerMessageHandler {
 						}
 					}
 				}
+
 			} catch ( MessageException ex ) {
 				throw new RuntimeException(ex);
 			}
@@ -309,7 +310,7 @@ public class CheckerMessageHandler {
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( ! colType.getVarName().startsWith("WOCE") )
+			if ( ! colType.isWoceType() )
 				continue;
 			for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
 				try {
@@ -334,7 +335,7 @@ public class CheckerMessageHandler {
 
 	/**
 	 * Reads the list of messages produced by the SanityChecker from the messages 
-	 * file written by {@link #saveCruiseMessages(DashboardCruiseWithData, Output)}.
+	 * file written by {@link #processCruiseMessages(DashboardCruiseWithData, Output)}.
 	 * 
 	 * @param expocode
 	 * 		get messages for the cruise with this expocode
@@ -351,7 +352,7 @@ public class CheckerMessageHandler {
 	 * 		if there is no messages file for the cruise
 	 */
 	public SCMessageList getCruiseMessages(String expocode) 
-					throws IllegalArgumentException, FileNotFoundException {
+			throws IllegalArgumentException, FileNotFoundException {
 		// Create the list of messages to be returned
 		SCMessageList msgList = new SCMessageList();
 		msgList.setExpocode(expocode);
@@ -534,7 +535,6 @@ public class CheckerMessageHandler {
 			info.setComment(comment);
 
 			// Only add SanityChecker WOCE-4 flags for now 
-			// (here and at the end of CruiseChecker.standardizeCruiseData)
 			if ( DashboardUtils.WOCE_BAD.equals(info.getFlag()) )
 				woceFlagSet.add(info);
 		}
@@ -547,12 +547,10 @@ public class CheckerMessageHandler {
 
 			HashMap<String,Integer> woceCommentIndex = new HashMap<String,Integer>();
 			for ( DataColumnType colType : columnTypes ) {
-				if ( colType.getVarName().startsWith("WOCE") ) {
-					String woceName = colType.getVarName();
-					String commentWoceName = "comment_" + woceName;
+				if ( colType.isWoceType() ) {
 					for (int k = 0; k < columnTypes.size(); k++) {
-						if ( commentWoceName.equals(columnTypes.get(k).getVarName()) ) {
-							woceCommentIndex.put(woceName, Integer.valueOf(k));
+						if ( columnTypes.get(k).isWoceCommentFor(colType) ) {
+							woceCommentIndex.put(colType.getVarName(), Integer.valueOf(k));
 						}
 					}
 				}

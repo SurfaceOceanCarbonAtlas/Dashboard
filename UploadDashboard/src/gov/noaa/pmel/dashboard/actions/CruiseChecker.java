@@ -7,7 +7,6 @@ import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -223,8 +222,9 @@ public class CruiseChecker {
 	}
 
 	/**
-	 * Runs the SanityChecker on the given cruise.  Saves the SanityChecker
-	 * messages, and assigns the data check status and the WOCE-3 and WOCE-4 
+	 * Runs the SanityChecker on the given cruise.  
+	 * Saves the SanityChecker messages to the messages file.
+	 * Assigns the data check status and the WOCE-3 and WOCE-4 
 	 * data flags from the SanityChecker output.
 	 * 
 	 * @param cruiseData
@@ -297,7 +297,7 @@ public class CruiseChecker {
 						": " + cruiseData.getUserColNames().get(k));
 			}
 			else if ( DashboardServerUtils.OTHER.typeNameEquals(colType) ||
-					  colType.getVarName().toLowerCase().startsWith("comment") ) {
+					  colType.isWoceCommentFor(null) ) {
 				// Unchecked data 
 				;
 			}
@@ -642,8 +642,8 @@ public class CruiseChecker {
 			metadataHandler.saveAsOmeXmlDoc(dashOmeMData, message);
 		}
 
-		// Save the SanityChecker messages and assign WOCE flags in cruiseData
-		msgHandler.saveCruiseMessages(cruiseData, output);
+		// Process the SanityChecker messages and assign WOCE flags in cruiseData
+		msgHandler.processCruiseMessages(cruiseData, output);
 
 		// Count the rows of data with errors and only warnings, check if there 
 		// were lon/lat/date/time problems and assign the data check status
@@ -653,23 +653,18 @@ public class CruiseChecker {
 	}
 
 	/**
-	 * Sanity-checks and standardizes the units in the data values,
-	 * stored as strings, in the given cruise after removing any data
-	 * rows known problems (ones which the PI has marked with a WOCE-4 
-	 * flag).  The year, month, day, hour, minute, and second data 
-	 * columns are appended to each data measurement (row, outer array) 
-	 * if not already present.
+	 * Sanity-checks and standardizes the units in the data values, stored 
+	 * as strings, in the given cruise.  The year, month, day, hour, minute, 
+	 * and second data columns are appended to each data measurement (row, 
+	 * outer array) if not already present.
 	 *  
 	 * @param cruiseData
 	 * 		cruise data to be standardized
 	 * @return
-	 * 		true if the SanityChecker ran successfully and data had no geoposition errors.
-	 * 		If no valid data after removing rows with known problems (PI WOCE-4), 
-	 * 		false is returned and cruiseData.getNumDataRows will be zero.
+	 * 		true if the SanityChecker ran successfully and 
+	 * 		data had no geoposition errors.
 	 */
 	public boolean standardizeCruiseData(DashboardCruiseWithData cruiseData) {
-		removeKnownProblemRows(cruiseData);
-		// If all data removed, return false
 		if ( cruiseData.getNumDataRows() < 1 )
 			return false;
 
@@ -839,77 +834,7 @@ public class CruiseChecker {
 			}
 		}
 
-		// Get SanityChecker WOCE flags
-		HashSet<WoceType> errRows = new HashSet<WoceType>();
-		HashSet<WoceType> warnRows = new HashSet<WoceType>();
-		getErrorAndWarnRows(errRows, warnRows, cruiseData);
-
-		// Only add SanityChecker WOCE-4 flags for now 
-		// (here and in the middle of CheckerMessageHandler.generateWoceEvents)
-		// TODO: set correct WOCE name
-		for ( WoceType rowIdx : errRows ) {
-			dataVals.get(rowIdx.getRowIndex()).set(woceCO2WaterColumnIndex, "4");
-		}
-
 		return true;
-	}
-
-	/**
-	 * Removes rows of data which have known problems 
-	 * (those with a WOCE-4 flag assigned by the PI).
-	 * 
-	 * @param cruiseData
-	 * 		cruise data to modify
-	 */
-	private void removeKnownProblemRows(DashboardCruiseWithData cruiseData) {
-		// Get the indices of all user-provided WOCE flags
-		ArrayList<Integer> woceIndcs = new ArrayList<Integer>();
-		int k = 0;
-		for ( DataColumnType colType : cruiseData.getDataColTypes() ) {
-			if ( colType.getVarName().startsWith("WOCE") ) {
-				woceIndcs.add(k);
-			}
-			k++;
-		}
-		if ( woceIndcs.isEmpty() )
-			return;
-
-		// Directly modify the lists of row numbers and data values in cruiseData
-		ArrayList<Integer> rowNums = cruiseData.getRowNums();
-		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
-
-		k = 0;
-		int numRows = cruiseData.getNumDataRows();
-		while ( k < numRows ) {
-			ArrayList<String> dataRow = dataVals.get(k);
-			// Remove the row if the PI has marked it as bad
-			boolean removeRow = false;
-			for ( int colIdx : woceIndcs ) {
-				try {
-					int woceFlag = Integer.parseInt(dataRow.get(colIdx));
-					if ( woceFlag == 4 ) {
-						removeRow = true;
-						break;
-					}
-				} catch (Exception ex) {
-					// Assume a missing value
-				}
-			}
-
-			if ( removeRow ) {
-				// Row marked as bad, so remove it
-				rowNums.remove(k);
-				dataVals.remove(k);
-				numRows--;
-			}
-			else {
-				// Row looks fine, so move on to the next row
-				k++;
-			}
-		}
-
-		// Reset the record number of data rows
-		cruiseData.setNumDataRows(numRows);
 	}
 
 	/**
@@ -928,33 +853,59 @@ public class CruiseChecker {
 								ColumnIndices colIndcs, Output output) {
 		lastCheckProcessedOkay = output.processedOK();
 		lastCheckHadGeopositionErrors = false;
-		ArrayList<HashSet<WoceType>> woceFourSets = cruise.getColWoceFours();
-		if ( (colIndcs.longitudeIndex < 0) ||
-			 (colIndcs.latitudeIndex < 0) ||
-			 ( ! woceFourSets.get(colIndcs.longitudeIndex).isEmpty() ) ||
-			 ( ! woceFourSets.get(colIndcs.latitudeIndex).isEmpty() ) ||
-			 ( (colIndcs.timestampIndex >= 0) && 
-				! woceFourSets.get(colIndcs.timestampIndex).isEmpty() ) ||
-			 ( (colIndcs.dateIndex >= 0) && 
-				! woceFourSets.get(colIndcs.dateIndex).isEmpty() ) ||
-			 ( (colIndcs.yearIndex >= 0) &&
-				! woceFourSets.get(colIndcs.yearIndex).isEmpty() ) ||
-			 ( (colIndcs.monthIndex >= 0) &&
-				! woceFourSets.get(colIndcs.monthIndex).isEmpty() ) ||
-			 ( (colIndcs.dayIndex >= 0) &&
-				! woceFourSets.get(colIndcs.dayIndex).isEmpty() ) ||
-			 ( (colIndcs.timeIndex >= 0) &&
-				! woceFourSets.get(colIndcs.timeIndex).isEmpty() ) ||
-			 ( (colIndcs.hourIndex >= 0) &&
-				! woceFourSets.get(colIndcs.hourIndex).isEmpty() ) ||
-			 ( (colIndcs.minuteIndex >= 0) &&
-				! woceFourSets.get(colIndcs.minuteIndex).isEmpty() ) ||
-			 ( (colIndcs.secondIndex >= 0) &&
-				! woceFourSets.get(colIndcs.secondIndex).isEmpty() ) ||
-			 ( (colIndcs.dayOfYearIndex >= 0) &&
-				! woceFourSets.get(colIndcs.dayOfYearIndex).isEmpty() ) ||
-			 ( (colIndcs.secondOfDayIndex >= 0) &&
-				! woceFourSets.get(colIndcs.secondOfDayIndex).isEmpty() ) ) {
+
+		// Get the indices of data rows the PI marked as bad in some WOCE flag.
+		HashSet<Integer> userErrRows = new HashSet<Integer>();
+		for ( WoceType wtype : cruise.getUserWoceFours() ) {
+			userErrRows.add(wtype.getRowIndex());
+		}
+		// Get the indices of data rows the PI marked as questionable is
+		// some WOCE flag, but did not mark as bad in any WOCE flag.
+		HashSet<Integer> userWarnRows = new HashSet<Integer>();
+		for ( WoceType wtype : cruise.getUserWoceThrees() ) {
+			Integer rowIdx = wtype.getRowIndex();
+			if ( ! userErrRows.contains(rowIdx) )
+				userWarnRows.add(rowIdx);
+		}
+		// Get the indices of data rows the SanityChecker found having 
+		// errors but not marked as bad by the PI.
+		HashSet<Integer> errRows = new HashSet<Integer>();
+		for ( WoceType wtype : cruise.getCheckerWoceFours() ) {
+			Integer rowIdx = wtype.getRowIndex();
+			if ( ! userErrRows.contains(rowIdx) )
+				errRows.add(rowIdx);
+		}
+		// Get the indices of data rows the SanityChecker found having  
+		// only warnings but not marked as bad or questionable by the PI.
+		HashSet<Integer> warnRows = new HashSet<Integer>();
+		for ( WoceType wtype : cruise.getCheckerWoceThrees() ) {
+			Integer rowIdx = wtype.getRowIndex();
+			if ( ! ( userErrRows.contains(rowIdx) ||
+					 userWarnRows.contains(rowIdx) ||
+					 errRows.contains(rowIdx) ) )
+				warnRows.add(rowIdx);
+		}
+		// Get the indices of data column that the SanityChecker found errors 
+		// in rows not marked as bad by the PI
+		HashSet<Integer> errCols = new HashSet<Integer>();
+		for ( WoceType wtype : cruise.getCheckerWoceFours() ) {
+			if ( ! userErrRows.contains(wtype.getRowIndex()) )
+				errCols.add(wtype.getColumnIndex());
+		}
+
+		if ( (colIndcs.longitudeIndex < 0) || errCols.contains(colIndcs.longitudeIndex) ||
+			 (colIndcs.latitudeIndex < 0) || errCols.contains(colIndcs.latitudeIndex) ||
+			 ( (colIndcs.timestampIndex >= 0) && errCols.contains(colIndcs.timestampIndex) ) ||
+			 ( (colIndcs.dateIndex >= 0) && errCols.contains(colIndcs.dateIndex) ) ||
+			 ( (colIndcs.yearIndex >= 0) && errCols.contains(colIndcs.yearIndex) ) ||
+			 ( (colIndcs.monthIndex >= 0) && errCols.contains(colIndcs.monthIndex) ) ||
+			 ( (colIndcs.dayIndex >= 0) && errCols.contains(colIndcs.dayIndex) ) ||
+			 ( (colIndcs.timeIndex >= 0) && errCols.contains(colIndcs.timeIndex) ) ||
+			 ( (colIndcs.hourIndex >= 0) && errCols.contains(colIndcs.hourIndex) ) ||
+			 ( (colIndcs.minuteIndex >= 0) && errCols.contains(colIndcs.minuteIndex) ) ||
+			 ( (colIndcs.secondIndex >= 0) && errCols.contains(colIndcs.secondIndex) ) ||
+			 ( (colIndcs.dayOfYearIndex >= 0) && errCols.contains(colIndcs.dayOfYearIndex) ) ||
+			 ( (colIndcs.secondOfDayIndex >= 0) && errCols.contains(colIndcs.secondOfDayIndex) ) ) {
 			lastCheckHadGeopositionErrors = true;
 		}
 		if ( ! lastCheckHadGeopositionErrors ) {
@@ -974,16 +925,9 @@ public class CruiseChecker {
 			}
 		}
 
-		// Assign the number of data rows the SanityChecker found having 
-		// errors but not marked as bad by the PI.
-		// Assign the number of data rows the SanityChecker found having  
-		// only warnings but not marked as bad or questionable by the PI
-		HashSet<WoceType> errRows = new HashSet<WoceType>();
-		HashSet<WoceType> warnRows = new HashSet<WoceType>();
-		getErrorAndWarnRows(errRows, warnRows, cruise);
-		// TODO: rows can be duplicated under different WOCE names
 		int numErrorRows = errRows.size();
 		int numWarnRows = warnRows.size();
+
 		cruise.setNumErrorRows(numErrorRows);
 		cruise.setNumWarnRows(numWarnRows);
 
@@ -1006,41 +950,6 @@ public class CruiseChecker {
 		else {
 			cruise.setDataCheckStatus(DashboardUtils.CHECK_STATUS_ACCEPTABLE);
 		}
-	}
-
-	/**
-	 * Assigns the indices of rows with SanityChecker errors not marked as
-	 * bad by the PI, and the indices of rows with SanityChecker warnings, 
-	 * but not errors, and not marked as bad or questionable by the PI.
-	 * 
-	 * @param errRows
-	 * 		set to assign with indices of rows with SanityChecker errors 
-	 * 		and not marked as bad by the PI
-	 * @param warnRows
-	 * 		set to assign with indices of rows with SanityChecker warnings 
-	 * 		but not errors, and not marked as bad or questionable by the PI
-	 * @param cruise
-	 * 		SanityChecked cruise data to examine
-	 */
-	private void getErrorAndWarnRows(HashSet<WoceType> errRows, 
-			HashSet<WoceType> warnRows, DashboardCruise cruise) {
-		// Assign the number of data rows the SanityChecker found having 
-		// errors but not marked as bad by the PI
-		errRows.clear();
-		for ( HashSet<WoceType> rowIdxSet : cruise.getColWoceFours() )
-			errRows.addAll(rowIdxSet);
-		errRows.addAll(cruise.getNoColWoceFours());
-		errRows.removeAll(cruise.getUserWoceFours());
-
-		// Assign the number of data rows the SanityChecker found having  
-		// only warnings but not marked as bad or questionable by the PI
-		warnRows.clear();
-		for ( HashSet<WoceType> rowIdxSet : cruise.getColWoceThrees() )
-			warnRows.addAll(rowIdxSet);
-		warnRows.addAll(cruise.getNoColWoceThrees());
-		warnRows.removeAll(errRows);
-		warnRows.removeAll(cruise.getUserWoceFours());
-		warnRows.removeAll(cruise.getUserWoceThrees());
 	}
 
 	/**
