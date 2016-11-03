@@ -821,15 +821,31 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		@Override
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
-			if ( cruise.getCheckerWoceFours().contains(new WoceType(null, colNum, rowIdx)) ) {
+			WoceType cellWoce = new WoceType(null, colNum, rowIdx);
+			WoceType rowWoce = new WoceType(null, null, rowIdx);
+			if ( cruise.getCheckerWoceFours().contains(cellWoce) ||
+				 cruise.getCheckerWoceFours().contains(rowWoce) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						SocatUploadDashboard.ERROR_COLOR + ";\">");
+						SocatUploadDashboard.CHECKER_ERROR_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}
-			else if ( cruise.getCheckerWoceThrees().contains(new WoceType(null, colNum, rowIdx)) ) {
+			else if ( cruise.getCheckerWoceThrees().contains(cellWoce) ||
+					  cruise.getCheckerWoceThrees().contains(rowWoce) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						SocatUploadDashboard.WARNING_COLOR + ";\">");
+						SocatUploadDashboard.CHECKER_WARNING_COLOR + ";\">");
+				sb.appendEscaped(getValue(obj));
+				sb.appendHtmlConstant("</div>");
+			}
+			else if ( cruise.getUserWoceFours().contains(rowWoce) ) {
+				sb.appendHtmlConstant("<div style=\"background-color:" + 
+						SocatUploadDashboard.USER_ERROR_COLOR + ";\">");
+				sb.appendEscaped(getValue(obj));
+				sb.appendHtmlConstant("</div>");
+			}
+			else if ( cruise.getUserWoceThrees().contains(rowWoce) ) {
+				sb.appendHtmlConstant("<div style=\"background-color:" + 
+						SocatUploadDashboard.USER_WARNING_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}

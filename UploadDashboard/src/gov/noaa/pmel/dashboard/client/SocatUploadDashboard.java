@@ -48,8 +48,10 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	static final double FILENAME_COLUMN_WIDTH = 16.0;
 
 	// Data background colors
-	static final String WARNING_COLOR = "#FFCC33";
-	static final String ERROR_COLOR = "#FF8888";
+	static final String CHECKER_WARNING_COLOR = "#FFCC33";
+	static final String CHECKER_ERROR_COLOR = "#FF8888";
+	static final String USER_WARNING_COLOR = "#CC9900";
+	static final String USER_ERROR_COLOR = "#CC5555";
 
 	// Color for row numbers
 	static final String ROW_NUMBER_COLOR = "#666666";

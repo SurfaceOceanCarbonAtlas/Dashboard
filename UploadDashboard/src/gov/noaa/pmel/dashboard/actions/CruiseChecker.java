@@ -695,8 +695,8 @@ public class CruiseChecker {
 		boolean hasMinuteColumn = ( colIndcs.minuteIndex >= 0 );
 		boolean hasSecondColumn = ( colIndcs.secondIndex >= 0 );
 
-		// Add any missing time columns; 
-		// directly modify the lists in the cruise data object
+		// Add any missing time columns.
+		// !! Directly modify the lists in the cruise data object !!
 		ArrayList<String> userColNames = cruiseData.getUserColNames();
 		if ( ! hasYearColumn ) {
 			DataColumnType dctype = DashboardServerUtils.YEAR.duplicate();

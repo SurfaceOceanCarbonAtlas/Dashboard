@@ -534,7 +534,8 @@ public class CheckerMessageHandler {
 				comment = msg.getDetailedComment();
 			info.setComment(comment);
 
-			// Only add SanityChecker WOCE-4 flags for now 
+			// Only add SanityChecker WOCE-4 flags; the SanityChecker marks all 
+			// questionable data regardless of whether it is of consequence.
 			if ( DashboardUtils.WOCE_BAD.equals(info.getFlag()) )
 				woceFlagSet.add(info);
 		}

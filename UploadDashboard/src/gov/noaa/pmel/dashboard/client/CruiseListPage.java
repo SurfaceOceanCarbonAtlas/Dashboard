@@ -1239,14 +1239,14 @@ public class CruiseListPage extends CompositeWithUsername {
 						    ( cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS ) ) ) {
 					// Only warnings or a few minor errors - use warning background color
 					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
+							SocatUploadDashboard.CHECKER_WARNING_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else {
 					// Many errors, unacceptable, or not checked - use error background color
 					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
+							SocatUploadDashboard.CHECKER_ERROR_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
