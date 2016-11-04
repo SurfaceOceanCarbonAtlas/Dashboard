@@ -13,7 +13,7 @@ import org.junit.Test;
 /**
  * Test of generating the preview plots, which also tests the 
  * complete process of generating the DSG files.  Uses an 
- * existing SocatUploadDashboard installation with user-provided
+ * existing UploadDashboard installation with user-provided
  * data and metadata for the cruise given in EXPOCODE.
  * 
  * @author Karl Smith

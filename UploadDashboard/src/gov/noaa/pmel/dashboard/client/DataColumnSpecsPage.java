@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.WoceType;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.TreeSet;
@@ -23,6 +24,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.text.client.IntegerParser;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -222,21 +224,29 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				// Ignore the call if there is no expocode assigned
 				if ( cruise.getExpocode().isEmpty() )
 					return;
-				SocatUploadDashboard.showWaitCursor();
+				UploadDashboard.showWaitCursor();
 				// Get the data for the cruise from the server
 				final Range range = display.getVisibleRange();
-				service.getCruiseData(getUsername(), cruise.getExpocode(), 
+				service.getCruiseDataWithRowNum(getUsername(), cruise.getExpocode(), 
 						range.getStart(), range.getLength(), 
 						new AsyncCallback<ArrayList<ArrayList<String>>>() {
 					@Override
 					public void onSuccess(ArrayList<ArrayList<String>> newData) {
-						updateRowData(range.getStart(), newData);
-						SocatUploadDashboard.showAutoCursor();
+						int actualStart;
+						try {
+							actualStart = IntegerParser.instance().parse(newData.get(0).get(0).trim()) - 1;
+						} catch (ParseException e) {
+							actualStart = -1;
+						}
+						if ( actualStart < 0 )
+							actualStart = range.getStart();
+						updateRowData(actualStart, newData);
+						UploadDashboard.showAutoCursor();
 					}
 					@Override
 					public void onFailure(Throwable ex) {
-						SocatUploadDashboard.showFailureMessage(MORE_DATA_FAIL_MSG, ex);
-						SocatUploadDashboard.showAutoCursor();
+						UploadDashboard.showFailureMessage(MORE_DATA_FAIL_MSG, ex);
+						UploadDashboard.showAutoCursor();
 					}
 				});
 			}
@@ -263,13 +273,13 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		singleton.setUsername(username);
 		singleton.expocodes.clear();
 		singleton.expocodes.addAll(expocodes);
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.getCruiseDataColumnSpecs(singleton.getUsername(), expocodes.get(0), 
 								new AsyncCallback<DashboardCruiseTypes>() {
 			@Override
 			public void onSuccess(DashboardCruiseTypes cruiseSpecs) {
 				if ( cruiseSpecs != null ) {
-					SocatUploadDashboard.updateCurrentPage(singleton);
+					UploadDashboard.updateCurrentPage(singleton);
 					singleton.knownUserTypes.clear();
 					if ( cruiseSpecs.getAllKnownTypes() != null )
 						singleton.knownUserTypes.addAll(cruiseSpecs.getAllKnownTypes());
@@ -277,15 +287,15 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 					History.newItem(PagesEnum.IDENTIFY_COLUMNS.name(), false);
 				}
 				else {
-					SocatUploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
+					UploadDashboard.showMessage(GET_COLUMN_SPECS_FAIL_MSG + 
 						" (unexpected null cruise column specificiations)");
 				}
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(GET_COLUMN_SPECS_FAIL_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(GET_COLUMN_SPECS_FAIL_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -300,13 +310,15 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
 	/**
 	 * Updates the data column specification page with the given
-	 * column types and data.
+	 * column types and data.  Modifies cruiseSpecs in that the
+	 * dashboard-generated sample number is inserted at the beginning
+	 * of each row of data. 
 	 * 
 	 * @param cruiseSpecs
 	 * 		current cruise data column type specifications and
@@ -399,9 +411,15 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 					"Unexpected small number of data columns: " + 
 					cruise.getDataColTypes().size());
 		int minTableWidth = 2;
+		// First column is the dashboard-generated sample number (no header)
+		ArrayListTextColumn rowNumColumn = new ArrayListTextColumn(0);
+		dataGrid.addColumn(rowNumColumn);
+		dataGrid.setColumnWidth(rowNumColumn, UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
+		// Rest of the columns are actual data columns
 		for (k = 0; k < cruise.getDataColTypes().size(); k++) {
 			// TextColumn for displaying the data strings for this column
-			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k);
+			ArrayListTextColumn dataColumn = new ArrayListTextColumn(k+1);
 			// CruiseDataColumn for creating the Header cell for this column
 			CruiseDataColumn cruiseColumn = new CruiseDataColumn(knownUserTypes, cruise, k);
 			// Maintain a reference to the CruiseDataColumn object
@@ -417,6 +435,16 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		dataGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
 		// Update the data provider with the data in the CruiseDataColumnSpecs
 		dataProvider.updateRowCount(cruise.getNumDataRows(), true);
+		// Just insert the row numbers into each data row (modifying cruiseSpecs)
+		ArrayList<ArrayList<String>> dataWithRowNums = cruiseSpecs.getDataValues();
+		ArrayList<Integer> rowNums = cruiseSpecs.getRowNums();
+		k = 0;
+		for ( ArrayList<String> dataRow : dataWithRowNums ) {
+			String rowNumStr = rowNums.get(k).toString();
+			dataRow.add(0, rowNumStr);
+			k++;
+		}
+		
 		dataProvider.updateRowData(0, cruiseSpecs.getDataValues());
 		// Reset shown rows to the start of the data
 		dataGrid.setPageStart(0);
@@ -480,21 +508,21 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				return;
 			}
 			// Put up the wait cursor and send the rest of the cruises through the sanity checker
-			SocatUploadDashboard.showWaitCursor();
+			UploadDashboard.showWaitCursor();
 			expocodes.remove(0);
 			service.updateCruiseDataColumns(getUsername(), expocodes, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
 					// Go to the list of cruises without comment; return to the normal cursor
 					CruiseListPage.showPage();
-					SocatUploadDashboard.showAutoCursor();
+					UploadDashboard.showAutoCursor();
 					return;
 				}
 				@Override
 				public void onFailure(Throwable caught) {
 					// Go to the list of cruises without comment; return to the normal cursor
 					CruiseListPage.showPage();
-					SocatUploadDashboard.showAutoCursor();
+					UploadDashboard.showAutoCursor();
 					return;
 				}
 			});
@@ -542,7 +570,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 	void submitOnClick(ClickEvent event) {
 		if ( ! Boolean.TRUE.equals(cruise.isEditable()) ) {
 			// Should never get here, but just in case
-			SocatUploadDashboard.showMessage(DISABLED_SUBMIT_HOVER_HELP);
+			UploadDashboard.showMessage(DISABLED_SUBMIT_HOVER_HELP);
 			return;
 		}
 
@@ -649,47 +677,47 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				errMsg += "<li>" + SafeHtmlUtils.htmlEscape(colNames.get(idx)) + "</li>";
 			}
 			errMsg += UNKNOWN_COLUMN_TYPE_EPILOGUE;
-			SocatUploadDashboard.showMessage(errMsg);
+			UploadDashboard.showMessage(errMsg);
 			return;
 		}
 		if ( ! hasLongitude ) {
 			// no longitude - error
-			SocatUploadDashboard.showMessage(NO_LONGITUDE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_LONGITUDE_ERROR_MSG);
 			return;
 		}
 		if ( ! hasLatitude ) {
 			// no latitude - error
-			SocatUploadDashboard.showMessage(NO_LATITUDE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_LATITUDE_ERROR_MSG);
 			return;
 		}
 		if ( ! hasco2 ) {
 			// no aqueous CO2 - error
-			SocatUploadDashboard.showMessage(NO_CO2_ERROR_MSG);
+			UploadDashboard.showMessage(NO_CO2_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasYear || hasMonth || hasDay || hasHour || hasMinute) ) {
 			// timestamp completely missing - error
-			SocatUploadDashboard.showMessage(NO_TIMESTAMP_ERROR_MSG);
+			UploadDashboard.showMessage(NO_TIMESTAMP_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasYear || hasMonth || hasDay) ) {
 			// date completely missing - error
-			SocatUploadDashboard.showMessage(NO_DATE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_DATE_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasHour || hasMinute) ) {
 			// time completely missing - error
-			SocatUploadDashboard.showMessage(NO_TIME_ERROR_MSG);
+			UploadDashboard.showMessage(NO_TIME_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasYear && hasMonth && hasDay) ) {
 			// incomplete date given - error
-			SocatUploadDashboard.showMessage(MISSING_DATE_PIECE_ERROR_MSG);
+			UploadDashboard.showMessage(MISSING_DATE_PIECE_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasHour && hasMinute) ) {
 			// incomplete time given - error
-			SocatUploadDashboard.showMessage(MISSING_TIME_PIECE_ERROR_MSG);
+			UploadDashboard.showMessage(MISSING_TIME_PIECE_ERROR_MSG);
 			return;
 		}
 
@@ -716,7 +744,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				}
 				errMsg += "<li>" + displayName + "</li>";
 			}
-			SocatUploadDashboard.showMessage(errMsg);
+			UploadDashboard.showMessage(errMsg);
 			return;
 		}
 
@@ -749,7 +777,7 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 
 	private void doSubmit() {
 		// Show the wait cursor
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		// Submit the updated data column types to the server.
 		// This update invokes the SanityChecker on the data and
 		// the results are then reported back to this page.
@@ -758,10 +786,10 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			@Override
 			public void onSuccess(DashboardCruiseWithData specs) {
 				if ( specs == null ) {
-					SocatUploadDashboard.showMessage(SUBMIT_FAIL_MSG + 
+					UploadDashboard.showMessage(SUBMIT_FAIL_MSG + 
 							" (unexpected null cruise information returned)");
 					// Show the normal cursor
-					SocatUploadDashboard.showAutoCursor();
+					UploadDashboard.showAutoCursor();
 					return;
 				}
 				updateCruiseColumnSpecs(specs);
@@ -769,28 +797,28 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 				if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ||
 					 status.equals(DashboardUtils.CHECK_STATUS_UNACCEPTABLE) ) {
 					// the sanity checker had serious problems
-					SocatUploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
+					UploadDashboard.showMessage(SANITY_CHECK_FAIL_MSG);
 				}
 				else if ( status.startsWith(DashboardUtils.CHECK_STATUS_ERRORS_PREFIX) ) {
 					// errors issued
-					SocatUploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
+					UploadDashboard.showMessage(SANITY_CHECK_ERROR_MSG);
 				}
 				else if ( status.startsWith(DashboardUtils.CHECK_STATUS_WARNINGS_PREFIX) ) {
 					// warnings issued
-					SocatUploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
+					UploadDashboard.showMessage(SANITY_CHECK_WARNING_MSG);
 				}
 				else {
 					// no problems
-					SocatUploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
+					UploadDashboard.showMessage(SANITY_CHECK_SUCCESS_MSG);
 				}
 				// Show the normal cursor
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
+				UploadDashboard.showFailureMessage(SUBMIT_FAIL_MSG, ex);
 				// Show the normal cursor
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -813,39 +841,44 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		}
 		@Override
 		public String getValue(ArrayList<String> dataRow) {
-			if ( (dataRow != null) && (dataRow.size() > colNum) )
+			if ( (dataRow != null) && (0 <= colNum) && (colNum < dataRow.size()) )
 				return dataRow.get(colNum);
-			else
-				return "";
+			return "";
 		}
 		@Override
 		public void render(Cell.Context ctx, ArrayList<String> obj, SafeHtmlBuilder sb) {
 			Integer rowIdx = ctx.getIndex();
-			WoceType cellWoce = new WoceType(null, colNum, rowIdx);
+			WoceType cellWoce = new WoceType(null, colNum-1, rowIdx);
 			WoceType rowWoce = new WoceType(null, null, rowIdx);
-			if ( cruise.getCheckerWoceFours().contains(cellWoce) ||
+			if ( colNum == 0 ) {
+				sb.appendHtmlConstant("<div style=\"color:" + 
+						UploadDashboard.ROW_NUMBER_COLOR + ";text-align:right\">");
+				sb.appendEscaped(getValue(obj));
+				sb.appendHtmlConstant("</div>");
+			}
+			else if ( cruise.getCheckerWoceFours().contains(cellWoce) ||
 				 cruise.getCheckerWoceFours().contains(rowWoce) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						SocatUploadDashboard.CHECKER_ERROR_COLOR + ";\">");
+						UploadDashboard.CHECKER_ERROR_COLOR + ";font-weight:bold;\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}
 			else if ( cruise.getCheckerWoceThrees().contains(cellWoce) ||
 					  cruise.getCheckerWoceThrees().contains(rowWoce) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						SocatUploadDashboard.CHECKER_WARNING_COLOR + ";\">");
+						UploadDashboard.CHECKER_WARNING_COLOR + ";font-weight:bold;\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}
 			else if ( cruise.getUserWoceFours().contains(rowWoce) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						SocatUploadDashboard.USER_ERROR_COLOR + ";\">");
+						UploadDashboard.USER_ERROR_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}
 			else if ( cruise.getUserWoceThrees().contains(rowWoce) ) {
 				sb.appendHtmlConstant("<div style=\"background-color:" + 
-						SocatUploadDashboard.USER_WARNING_COLOR + ";\">");
+						UploadDashboard.USER_WARNING_COLOR + ";\">");
 				sb.appendEscaped(getValue(obj));
 				sb.appendHtmlConstant("</div>");
 			}

@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 
@@ -65,21 +65,21 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 	static void showPage() {
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.LOGOUT.name(), false);
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.logoutUser(new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void nada) {
 				Cookies.removeCookie("JSESSIONID");
-				SocatUploadDashboard.stopHistoryHandling();
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.stopHistoryHandling();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				Cookies.removeCookie("JSESSIONID");
-				SocatUploadDashboard.stopHistoryHandling();
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.stopHistoryHandling();
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -92,7 +92,7 @@ public class DashboardLogoutPage extends CompositeWithUsername {
 		// Allow this succeed even if never called before
 		if ( singleton == null )
 			singleton = new DashboardLogoutPage();
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 	}
 
 }

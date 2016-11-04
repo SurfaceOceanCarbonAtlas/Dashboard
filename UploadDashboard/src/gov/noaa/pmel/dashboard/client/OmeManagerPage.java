@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -127,7 +127,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 		if ( singleton == null )
 			singleton = new OmeManagerPage();
 		singleton.updateCruise(cruises);
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.EDIT_METADATA.name(), false);
 	}
 
@@ -141,7 +141,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 		// Make sure a file was selected
 		String uploadFilename = DashboardUtils.baseName(omeUpload.getFilename());
 		if ( uploadFilename.isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 
@@ -238,7 +238,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
@@ -246,7 +246,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 		clearTokens();
 		processResultMsg(event.getResults());
 		// Restore the usual cursor
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 	 */
 	private void processResultMsg(String resultMsg) {
 		if ( resultMsg == null ) {
-			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
+			UploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
 			return;
 		}
 		resultMsg = resultMsg.trim();
@@ -268,7 +268,7 @@ public class OmeManagerPage extends CompositeWithUsername {
 		}
 		else {
 			// Unknown response, just display the entire message
-			SocatUploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START + 
+			UploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START + 
 					SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
 		}
 	}

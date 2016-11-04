@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
@@ -223,7 +223,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	static void showPage(DashboardCruiseList cruises) {
 		if ( singleton == null )
 			singleton = new SubmitForQCPage();
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		singleton.updateCruises(cruises);
 		History.newItem(PagesEnum.SUBMIT_FOR_QC.name(), false);
 	}
@@ -238,7 +238,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -351,7 +351,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	void radioOnClick(ClickEvent event) {
 		// If there is a cruise sent to CDIAC, warn if another selection is made
 		if ( hasSentCruise ) {
-			SocatUploadDashboard.showMessage(ALREADY_SENT_CDIAC_HTML);
+			UploadDashboard.showMessage(ALREADY_SENT_CDIAC_HTML);
 		}
 	}
 
@@ -408,7 +408,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiHandler("submitButton")
 	void submitOnClick(ClickEvent event) {
 		if ( ! agreeShareCheckBox.getValue() ) {
-			SocatUploadDashboard.showMessageAt(AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
+			UploadDashboard.showMessageAt(AGREE_SHARE_REQUIRED_MSG, agreeShareCheckBox);
 			return;
 		}
 		if ( hasSentCruise && cdiacRadio.getValue() ) {
@@ -460,28 +460,28 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		}
 		else {
 			// Archive option not selected - fail
-			SocatUploadDashboard.showMessageAt(ARCHIVE_PLAN_REQUIRED_MSG, archivePlanHtml);
+			UploadDashboard.showMessageAt(ARCHIVE_PLAN_REQUIRED_MSG, archivePlanHtml);
 			return;
 		}
 
 		boolean repeatSend = true;
 		// Add the cruises to SOCAT
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.submitCruiseForQC(getUsername(), expocodes, archiveStatus, 
 				localTimestamp, repeatSend, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				// Success - go back to the cruise list page
 				CruiseListPage.showPage();
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
 				// Failure, so show fail message
 				// But still go back to the cruise list page since some may have succeeded
-				SocatUploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
+				UploadDashboard.showFailureMessage(SUBMIT_FAILURE_MSG, ex);
 				CruiseListPage.showPage();
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}

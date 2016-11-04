@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
@@ -380,7 +380,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
 		singleton.encodingListBox.setSelectedIndex(2);
 		singleton.advancedPanel.setOpen(false);
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
 	}
 
@@ -394,7 +394,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -435,7 +435,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
 		// Make sure the normal cursor is shown
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	@UiHandler("moreHelpAnchor")
@@ -477,7 +477,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	void previewButtonOnClick(ClickEvent event) {
 		String namesString = getInputFileNames(uploadElement).trim();
 		if (  namesString.isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 		assignTokens(DashboardUtils.REQUEST_PREVIEW_TAG);
@@ -488,7 +488,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	void createButtonOnClick(ClickEvent event) {
 		String namesString = getInputFileNames(uploadElement).trim();
 		if (  namesString.isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 		if ( overwriteRadio.getValue() )
@@ -503,19 +503,19 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		// Return to the cruise list page after updating the cruise list
 		CruiseListPage.showPage();
 		// Make sure the normal cursor is shown
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
 		clearTokens();
 		processResultMsg(event.getResults());
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	/**
@@ -527,7 +527,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private void processResultMsg(String resultMsg) {
 		// Check the returned results
 		if ( resultMsg == null ) {
-			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
+			UploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
 			return;
 		}
 		String[] splitMsgs = resultMsg.trim().split("\n");
@@ -645,7 +645,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			String errors = "";
 			for ( String msg : errMsgs ) 
 				errors += msg;
-			SocatUploadDashboard.showMessage(errors);
+			UploadDashboard.showMessage(errors);
 		}
 
 		// Process any successes

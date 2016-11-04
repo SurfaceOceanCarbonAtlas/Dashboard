@@ -12,7 +12,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.UIObject;
 
-public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<String> {
+public class UploadDashboard implements EntryPoint, ValueChangeHandler<String> {
 
 	public static final DashboardResources resources = 
 			GWT.create(DashboardResources.class);
@@ -49,15 +49,15 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 
 	// Data background colors
 	static final String CHECKER_WARNING_COLOR = "#FFCC33";
-	static final String CHECKER_ERROR_COLOR = "#FF8888";
-	static final String USER_WARNING_COLOR = "#CC9900";
-	static final String USER_ERROR_COLOR = "#CC5555";
+	static final String CHECKER_ERROR_COLOR = "#FF6666";
+	static final String USER_WARNING_COLOR = "#FFEE99";
+	static final String USER_ERROR_COLOR = "#FFCCCC";
 
 	// Color for row numbers
 	static final String ROW_NUMBER_COLOR = "#666666";
 
 	// Singleton instance of this object
-	private static SocatUploadDashboard singleton = null;
+	private static UploadDashboard singleton = null;
 
 	// History change handler registration
 	private HandlerRegistration historyHandlerReg = null;
@@ -69,11 +69,11 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	private DashboardInfoPopup msgPopup;
 
 	/**
-	 * Create the manager for the SocatUploadDashboard pages.
+	 * Create the manager for the UploadDashboard pages.
 	 * Do not use this constructor; instead use the static
 	 * methods provided to display pages and messages.
 	 */
-	SocatUploadDashboard() {
+	UploadDashboard() {
 		// Just in case this gets called more than once, 
 		// remove any recorded page in the previous instantiation
 		if ( (singleton != null) && (singleton.currentPage != null) ) {
@@ -95,7 +95,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	 */
 	public static void showMessage(String htmlMsg) {
 		if ( singleton == null )
-			singleton = new SocatUploadDashboard();
+			singleton = new UploadDashboard();
 		if ( singleton.msgPopup == null )
 			singleton.msgPopup = new DashboardInfoPopup();
 		singleton.msgPopup.setInfoMessage(htmlMsg);
@@ -114,7 +114,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	 */
 	public static void showMessageAt(String htmlMsg, UIObject obj) {
 		if ( singleton == null )
-			singleton = new SocatUploadDashboard();
+			singleton = new UploadDashboard();
 		if ( singleton.msgPopup == null )
 			singleton.msgPopup = new DashboardInfoPopup();
 		singleton.msgPopup.setInfoMessage(htmlMsg);
@@ -137,7 +137,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 		else
 			exceptMsg = htmlMsg + "<br /><pre>" + 
 					SafeHtmlUtils.htmlEscape(exceptMsg) + "</pre>";
-		SocatUploadDashboard.showMessage(exceptMsg);
+		UploadDashboard.showMessage(exceptMsg);
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	 */
 	public static void updateCurrentPage(CompositeWithUsername newPage) {
 		if ( singleton == null )
-			singleton = new SocatUploadDashboard();
+			singleton = new UploadDashboard();
 		if ( singleton.currentPage != null )
 			RootLayoutPanel.get().remove(singleton.currentPage);
 		singleton.currentPage = newPage;
@@ -168,7 +168,7 @@ public class SocatUploadDashboard implements EntryPoint, ValueChangeHandler<Stri
 	 */
 	public static boolean isCurrentPage(CompositeWithUsername page) {
 		if ( singleton == null )
-			singleton = new SocatUploadDashboard();
+			singleton = new UploadDashboard();
 		return (page == singleton.currentPage);
 	}
 
