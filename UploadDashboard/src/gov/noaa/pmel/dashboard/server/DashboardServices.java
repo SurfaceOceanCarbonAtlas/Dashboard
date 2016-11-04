@@ -40,7 +40,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  */
 public class DashboardServices extends RemoteServiceServlet implements DashboardServicesInterface {
 
-	private static final long serialVersionUID = 4195162397031324989L;
+	private static final long serialVersionUID = 6488138362158650929L;
 
 	private String username = null;
 	private DashboardConfigStore configStore = null;
@@ -332,8 +332,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 
 		// Get the cruise with the first maximum-needed number of rows
 		DashboardCruiseWithData cruiseData = configStore.getCruiseFileHandler()
-				.getCruiseDataFromFiles(expocode, 0, 
-						DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
+				.getCruiseDataFromFiles(expocode, 0, DashboardUtils.MAX_ROWS_PER_GRID_PAGE);
 		if ( cruiseData == null )
 			throw new IllegalArgumentException(expocode + " does not exist");
 		// Remove any metadata preamble to reduced data transmitted
@@ -350,25 +349,38 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 	}
 
 	@Override
-	public ArrayList<ArrayList<String>> getCruiseData(String pageUsername, String expocode, 
-			int firstRow, int numRows) throws IllegalArgumentException {
+	public ArrayList<ArrayList<String>> getCruiseDataWithRowNum(String pageUsername, 
+			String expocode, int firstRow, int numRows) throws IllegalArgumentException {
 		// Get the dashboard data store and current username, and validate that username
 		if ( ! validateRequest(pageUsername) ) 
 			throw new IllegalArgumentException("Invalid user request");
 
-		// Get the cruise data with exactly the data rows desired
+		int myFirstRow = firstRow;
+		if ( myFirstRow < 0 )
+			myFirstRow = 0;
+		// Get only the desired cruise data
 		DashboardCruiseWithData cruiseWithData = configStore.getCruiseFileHandler()
-									.getCruiseDataFromFiles(expocode, firstRow, numRows);
+									.getCruiseDataFromFiles(expocode, myFirstRow, numRows);
 		if ( cruiseWithData == null )
 			throw new IllegalArgumentException(expocode + " does not exist");
-		ArrayList<ArrayList<String>> cruiseDataRows = cruiseWithData.getDataValues();
-		if ( cruiseDataRows.size() != numRows )
-			throw new IllegalArgumentException("invalid requested row numbers: " + 
-					firstRow + " - " + (firstRow+numRows-1));
-		Logger.getLogger("DashboardServices").info("cruise data " + Integer.toString(firstRow) + 
-				" - " + Integer.toString(firstRow+numRows-1) + " returned for " + 
-				expocode + " for " + username);
-		return cruiseDataRows;
+		ArrayList<ArrayList<String>> cruiseDataWithRowNums = cruiseWithData.getDataValues();
+		ArrayList<Integer> rowNums = cruiseWithData.getRowNums();
+		// Modify the list in this DashboardCruiseWithData since it is then thrown away
+		int k = 0;
+		for ( ArrayList<String> rowData : cruiseDataWithRowNums ) {
+			rowData.add(0, rowNums.get(k).toString());
+			k++;
+		}
+		int myLastRow = myFirstRow + cruiseDataWithRowNums.size() - 1;
+		Logger myLogger = Logger.getLogger("DashboardServices");
+		myLogger.info(expocode + " cruise data [" + Integer.toString(myFirstRow) + 
+				" - " + Integer.toString(myLastRow) + "] returned for " + username);
+		if ( myLogger.isDebugEnabled() ) {
+			for (k = 0; k < cruiseDataWithRowNums.size(); k++) {
+				myLogger.debug("  data[" + Integer.toString(k) + "]=" + cruiseDataWithRowNums.get(k).toString());
+			}
+		}
+		return cruiseDataWithRowNums;
 	}
 
 	@Override
@@ -382,7 +394,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		DashboardCruiseWithData cruiseData = configStore.getCruiseFileHandler()
 						.getCruiseDataFromFiles(newSpecs.getExpocode(), 0, -1);
 		if ( ! cruiseData.isEditable() )
-			throw new IllegalArgumentException(newSpecs.getExpocode() + " has been submitted for QC; data column types cannot be modified.");
+			throw new IllegalArgumentException(newSpecs.getExpocode() + 
+					" has been submitted for QC; data column types cannot be modified.");
 
 		// Revise the cruise data column types and units 
 		if ( newSpecs.getDataColTypes().size() != cruiseData.getDataColTypes().size() )
@@ -401,14 +414,20 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 				cruiseData.getExpocode() + " updated by " + username);
 		// Update the user-specific data column names to types, units, and missing values 
 		configStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, username);
+		if ( ! username.equals(cruiseData.getOwner()) )
+			configStore.getUserFileHandler().updateUserDataColumnTypes(cruiseData, cruiseData.getOwner());
 		
 		// Remove all but the first maximum-needed number of rows of cruise data 
 		// to minimize the payload of the returned cruise data
 		int numRows = cruiseData.getNumDataRows();
-		if ( numRows > DashboardUtils.MAX_ROWS_PER_GRID_PAGE )
+		if ( numRows > DashboardUtils.MAX_ROWS_PER_GRID_PAGE ) {
 			cruiseData.getDataValues()
 					  .subList(DashboardUtils.MAX_ROWS_PER_GRID_PAGE, numRows)
 					  .clear();
+			cruiseData.getRowNums()
+					  .subList(DashboardUtils.MAX_ROWS_PER_GRID_PAGE, numRows)
+					  .clear();
+		}
 
 		Logger.getLogger("DashboardServices").info("cruise data columns specs updated for " + 
 				cruiseData.getExpocode() + " by " + username);
@@ -433,7 +452,8 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			// Retrieve all the current cruise data
 			DashboardCruiseWithData cruiseData = cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 			if ( ! cruiseData.isEditable() )
-				throw new IllegalArgumentException("Dataset " + expocode + " has been submitted for QC; data column types cannot be modified.");
+				throw new IllegalArgumentException("Dataset " + expocode + 
+						" has been submitted for QC; data column types cannot be modified.");
 
 			try {
 				// Identify the columns from stored names-to-types for this user

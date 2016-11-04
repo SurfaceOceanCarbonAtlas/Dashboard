@@ -159,6 +159,94 @@ public class DashDataTypeTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#isWoceType()}, 
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isWoceCommentFor(gov.noaa.pmel.dashboard.server.DashDataType)}, and
+	 * {@link gov.noaa.pmel.dashboard.server.DashDataType#isWoceCommentFor(gov.noaa.pmel.dashboard.shared.DataColumnType)}.
+	 */
+	@Test
+	public void testWoceTypeWoceComment() {
+		DashDataType dtype1 = new DashDataType("WOCE_flag", 100.0, "WOCE flag", 
+				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
+				DashboardUtils.QUALITY_CATEGORY, null);
+		assertTrue( dtype1.isWoceType() );
+		assertFalse( dtype1.isWoceCommentFor((DashDataType) null) );
+		assertFalse( dtype1.isWoceCommentFor((DataColumnType) null) );
+
+		DashDataType dtype2 = new DashDataType("wOCe_of_nothing", 100.0, "Unused WOCE flag", 
+				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
+				DashboardUtils.QUALITY_CATEGORY, null);
+		assertTrue( dtype2.isWoceType() );
+
+		DashDataType ctype = new DashDataType("Comment_WOCE_flag", 101.0, "WOCE flag comment",
+				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
+		assertTrue( ctype.isWoceCommentFor(dtype1) );
+		assertFalse( ctype.isWoceCommentFor(dtype2) );
+		assertTrue( ctype.isWoceCommentFor(dtype1.duplicate()) );
+		assertFalse( ctype.isWoceCommentFor(dtype2.duplicate()) );
+		assertTrue( ctype.isWoceCommentFor((DashDataType) null) );
+		assertTrue( ctype.isWoceCommentFor((DataColumnType) null) );
+
+		ctype = new DashDataType("Comment_WOCE_of_Nothing", 101.0, "WOCE flag comment",
+				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
+		assertFalse( ctype.isWoceCommentFor(dtype1) );
+		assertTrue( ctype.isWoceCommentFor(dtype2) );
+		assertFalse( ctype.isWoceCommentFor(dtype1.duplicate()) );
+		assertTrue( ctype.isWoceCommentFor(dtype2.duplicate()) );
+		assertTrue( ctype.isWoceCommentFor((DashDataType) null) );
+		assertTrue( ctype.isWoceCommentFor((DataColumnType) null) );
+
+		ctype = new DashDataType("Comment_WOCE_of_Nothing", 101.0, "WOCE flag comment",
+				DashboardUtils.INT_DATA_CLASS_NAME, null, null, null, null);
+		assertFalse( ctype.isWoceCommentFor(dtype1) );
+		assertFalse( ctype.isWoceCommentFor(dtype2) );
+		assertFalse( ctype.isWoceCommentFor(dtype1.duplicate()) );
+		assertFalse( ctype.isWoceCommentFor(dtype2.duplicate()) );
+		assertFalse( ctype.isWoceCommentFor((DashDataType) null) );
+		assertFalse( ctype.isWoceCommentFor((DataColumnType) null) );
+
+		dtype2 = new DashDataType("WOCE", 100.0, "WOCE flag", 
+				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
+				DashboardUtils.QUALITY_CATEGORY, null);
+		assertFalse( dtype2.isWoceType() );
+
+		ctype = new DashDataType("Comment_WOCE", 101.0, "WOCE flag comment",
+				DashboardUtils.STRING_DATA_CLASS_NAME, null, null, null, null);
+		assertFalse( ctype.isWoceCommentFor(dtype1) );
+		assertFalse( ctype.isWoceCommentFor(dtype1.duplicate()) );
+		boolean errCaught = false;
+		try {
+			ctype.isWoceCommentFor(dtype2);
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		if ( ! errCaught )
+			fail("Did not detect type passed to isWoceCommentFor was not a WOCE type");
+		errCaught = false;
+		try {
+			ctype.isWoceCommentFor(dtype2.duplicate());
+		} catch ( IllegalArgumentException ex ) {
+			errCaught = true;
+		}
+		if ( ! errCaught )
+			fail("Did not detect type passed to isWoceCommentFor was not a WOCE type");
+
+		dtype2 = new DashDataType("tWOCE_flag", 100.0, "WOCE flag invalid name", 
+				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
+				DashboardUtils.QUALITY_CATEGORY, null);
+		assertFalse( dtype2.isWoceType() );
+
+		dtype2 = new DashDataType("WOCE_flag", 100.0, "WOCE flag invalid class name", 
+				DashboardUtils.INT_DATA_CLASS_NAME, null, null, 
+				DashboardUtils.QUALITY_CATEGORY, null);
+		assertFalse( dtype2.isWoceType() );
+
+		dtype2 = new DashDataType("WOCE_flag", 100.0, "WOCE flag invalid category", 
+				DashboardUtils.CHAR_DATA_CLASS_NAME, null, null, 
+				DashboardUtils.IDENTIFIER_CATEGORY, null);
+		assertFalse( dtype2.isWoceType() );
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DashDataType#toPropertyValue()}
 	 * and {@link gov.noaa.pmel.dashboard.server.DashDataType#fromPropertyValue(java.lang.String,java.lang.String)}.
 	 */

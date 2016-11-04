@@ -17,14 +17,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 5917520266963969920L;
+	private static final long serialVersionUID = -7681017338055075589L;
 
-	Character regionID;
-	Integer rowNumber;
-	Date dataDate;
-	Double longitude;
-	Double latitude;
-	Double dataValue;
+	protected Character regionID;
+	protected Integer rowNumber;
+	protected Date dataDate;
+	protected Double longitude;
+	protected Double latitude;
+	protected Double dataValue;
 
 	/**
 	 * Creates an empty location with a global region ID

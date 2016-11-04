@@ -148,12 +148,12 @@ public interface DashboardServicesInterfaceAsync {
 			AsyncCallback<DashboardCruiseTypes> callback);
 
 	/**
-	 * Reads the saved cruise file and returns the specified
-	 * rows of cruise data.  The outer list contains the rows 
-	 * of cruise data; the inner list contains the columns of
-	 * cruise data for that row.  (Thus, each row is all data 
-	 * measured for a given sample, and each column is data 
-	 * of a given type measured for all samples.)
+	 * Reads the saved cruise file and returns the specified rows of cruise 
+	 * data.  The outer list contains the rows of cruise data; the inner list 
+	 * contains the columns of cruise data for that row.  (Thus, each row is 
+	 * all data measured for a given sample, and each column is data of a 
+	 * given type measured for all samples.)
+	 * The dashboard-generated row number is added as the first data column.
 	 * 
 	 * @param username
 	 * 		username for validation
@@ -170,7 +170,8 @@ public interface DashboardServicesInterfaceAsync {
 	 * 		or if there are problems obtaining the specified data 
 	 * 		for the cruise
 	 */
-	void getCruiseData(String username, String expocode, int firstRow, int numRows, 
+	void getCruiseDataWithRowNum(String username, String expocode, 
+			int firstRow, int numRows, 
 			AsyncCallback<ArrayList<ArrayList<String>>> callback);
 
 	/**

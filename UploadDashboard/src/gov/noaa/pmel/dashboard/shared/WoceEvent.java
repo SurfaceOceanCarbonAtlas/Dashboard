@@ -16,20 +16,43 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class WoceEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7730966055783003739L;
+	private static final long serialVersionUID = 8020489025485344257L;
 
-	Character flag;
-	String varName;
-	ArrayList<DataLocation> locations;
+	protected String woceName;
+	protected Character flag;
+	protected String varName;
+	protected ArrayList<DataLocation> locations;
 
 	/**
 	 * Creates an empty WOCE event with flag {@link DashboardUtils#WOCE_NOT_CHECKED}
 	 */
 	public WoceEvent() {
 		super();
+		woceName = DashboardUtils.STRING_MISSING_VALUE;
 		flag = DashboardUtils.WOCE_NOT_CHECKED;
 		varName = DashboardUtils.STRING_MISSING_VALUE;
 		locations = new ArrayList<DataLocation>();
+	}
+
+	/**
+	 * @return 
+	 * 		the WOCE name; 
+	 * 		never null, but may be {@link DashboardUtils#STRING_MISSING_VALUE}
+	 */
+	public String getWoceName() {
+		return woceName;
+	}
+
+	/**
+	 * @param woceName
+	 * 		the WOCE name to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 */
+	public void setWoceName(String woceName) {
+		if ( woceName == null )
+			this.woceName = DashboardUtils.STRING_MISSING_VALUE;
+		else
+			this.woceName = woceName;
 	}
 
 	/**
@@ -100,6 +123,7 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
+		result = result * prime + woceName.hashCode();
 		result = result * prime + flag.hashCode();
 		result = result * prime + varName.hashCode();
 		result = result * prime + locations.hashCode();
@@ -119,6 +143,8 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 
 		if ( ! super.equals(other) )
 			return false;
+		if ( ! woceName.equals(other.woceName) )
+			return false;
 		if ( ! flag.equals(other.flag) )
 			return false;
 		if ( ! varName.equals(other.varName) )
@@ -133,6 +159,7 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	public String toString() {
 		return "WoceEvent" +
 				"[\n    id=" + id.toString() +
+				",\n    woceName=" + woceName +
 				",\n    flag='" + flag.toString() + "'" +
 				",\n    flagDate=" + flagDate.toString() + 
 				",\n    expocode=" + expocode + 

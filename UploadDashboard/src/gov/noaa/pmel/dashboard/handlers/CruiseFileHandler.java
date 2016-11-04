@@ -13,6 +13,7 @@ import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -63,8 +64,16 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String USER_COLUMN_NAMES_ID = "usercolumnnames";
 	private static final String DATA_COLUMN_UNITS_ID = "datacolumnunits";
 	private static final String MISSING_VALUES_ID = "missingvalues";
+
+	// Old tags for WOCE flags
 	private static final String WOCE_THREE_ROWS_ID = "wocethreerows";
 	private static final String WOCE_FOUR_ROWS_ID = "wocefourrows";
+
+	// New tags for WOCE flags
+	private static final String CHECKER_WOCE_THREES = "checkerwocethrees";
+	private static final String CHECKER_WOCE_FOURS = "checkerwocefours";
+	private static final String USER_WOCE_THREES = "userwocethrees";
+	private static final String USER_WOCE_FOURS = "userwocefours";
 
 	private static final int MIN_NUM_DATA_COLUMNS = 6;
 
@@ -302,12 +311,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		else
 			throw new IOException("Unexpected invalid data format '" + dataFormat + "'");
 
-		// Directly add the metadata strings to the list in cruiseData
-		ArrayList<String> preamble = cruiseData.getPreamble();
-		preamble.clear();
-		// Directly add the data column values to the list in cruiseData
-		ArrayList<ArrayList<String>> dataValues = cruiseData.getDataValues();
-		dataValues.clear();
+		// metadata strings in cruise data
+		ArrayList<String> preamble = new ArrayList<String>();
+		// data row numbers
+		ArrayList<Integer> rowNums = new ArrayList<Integer>();
+		// data values in cruise data
+		ArrayList<ArrayList<String>> dataValues = new ArrayList<ArrayList<String>>();
 
 		boolean expocodeFound = false;
 		int numDataColumns = 0;
@@ -342,12 +351,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 					if ( isHeader ) {
 						// These indeed are the column headers
 						if ( assignCruiseInfo ) {
-							// Just directly add the column names to the list in cruiseData
-							ArrayList<String> colNames = cruiseData.getUserColNames();
-							colNames.clear();
+							// column names in cruise data
+							ArrayList<String> colNames = new ArrayList<String>();
 							for ( String val : record ) {
 								colNames.add(val);
 							}
+							cruiseData.setUserColNames(colNames);
 						}
 						numDataColumns = record.size();
 						// Check for units in the next record
@@ -391,7 +400,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 				if ( record.size() != numDataColumns )
 					throw new IOException("Inconsistent number of data columns (" + 
 							record.size() + " instead of " + numDataColumns + 
-							") for record " + dataParser.getRecordNumber() + ":\n    " +
+							") for measurement " + dataParser.getRecordNumber() + ":\n    " +
 							rebuildDataline(record, spacer));
 
 				// Checking for second header with units?
@@ -411,11 +420,15 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						if ( isUnits ) {
 							// Add the units to the column header names 
 							ArrayList<String> colNames = cruiseData.getUserColNames();
+							ArrayList<String> colNamesWithUnits = new ArrayList<String>(colNames.size());
 							for (int k = 0; k < colNames.size(); k++) {
 								String units = record.get(k);
 								if ( ! units.isEmpty() )
-									colNames.set(k, colNames.get(k) + " [" + units + "]");
+									colNamesWithUnits.add(colNames.get(k) + " [" + units + "]");
+								else
+									colNamesWithUnits.add(colNames.get(k));
 							}
+							cruiseData.setUserColNames(colNamesWithUnits);
 						}
 						// Assign the data column types, units, and missing values 
 						// from the data column names, possibly with user-provided units
@@ -428,16 +441,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 						}
 						configStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
 						cruiseData.setVersion(configStore.getSocatUploadVersion());
-						// Set all WOCE-3 row index sets to empty
-						ArrayList<HashSet<Integer>> woceFlags = cruiseData.getWoceThreeRowIndices();
-						woceFlags.clear();
-						for (int k = 0; k < numDataColumns; k++)
-							woceFlags.add(new HashSet<Integer>());
-						// Set all WOCE-4 row index sets to empty
-						woceFlags = cruiseData.getWoceFourRowIndices();
-						woceFlags.clear();
-						for (int k = 0; k < numDataColumns; k++)
-							woceFlags.add(new HashSet<Integer>());
 					}
 					// Rest of the records must be data
 					checkForUnits = false;
@@ -449,15 +452,18 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 				if ( numDataRows == 0 ) {
 					// No reading of the data requested - done
+					cruiseData.setPreamble(preamble);
+					cruiseData.setRowNums(null);
+					cruiseData.setDataValues(null);
 					if ( assignCruiseInfo )
 						cruiseData.setNumDataRows(0);
 					return;
 				}
 
 				dataRowNum++;
-				// Blank lines are NOT detected when skipping lines,
+				// "No-data" lines are NOT detected when skipping lines,
 				// but lines are skipped only with already-processed data,
-				// so blank lines should already have been eliminated.
+				// so "no-data" lines should already have been eliminated.
 				if ( dataRowNum > firstDataRow ) {
 					ArrayList<String> datavals = new ArrayList<String>(numDataColumns);
 					boolean allBlank = true;
@@ -467,6 +473,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 							allBlank = false;
 					}
 					if ( ! allBlank ) {
+						rowNums.add(dataRowNum);
 						dataValues.add(datavals);
 						if ( (numDataRows > 0) && (dataValues.size() == numDataRows) )
 							break;
@@ -483,6 +490,10 @@ public class CruiseFileHandler extends VersionedFileHandler {
 
 		if ( numDataColumns < MIN_NUM_DATA_COLUMNS )
 			throw new IOException("No data columns found, possibly due to incorrect format");
+
+		cruiseData.setPreamble(preamble);
+		cruiseData.setRowNums(rowNums);
+		cruiseData.setDataValues(dataValues);
 
 		if ( assignCruiseInfo )
 			cruiseData.setNumDataRows(dataValues.size());
@@ -630,12 +641,17 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Missing value for each data column
 		cruiseProps.setProperty(MISSING_VALUES_ID, 
 				DashboardUtils.encodeStringArrayList(colMissValues));
-		// WOCE-3 row indices for each data column
-		cruiseProps.setProperty(WOCE_THREE_ROWS_ID, 
-				DashboardUtils.encodeSetsArrayList(cruise.getWoceThreeRowIndices()));
-		// WOCE-4 row indices for each data column
-		cruiseProps.setProperty(WOCE_FOUR_ROWS_ID, 
-				DashboardUtils.encodeSetsArrayList(cruise.getWoceFourRowIndices()));
+
+		// WOCE flags
+		cruiseProps.setProperty(CHECKER_WOCE_THREES, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getCheckerWoceThrees()));
+		cruiseProps.setProperty(CHECKER_WOCE_FOURS, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getCheckerWoceFours()));
+		cruiseProps.setProperty(USER_WOCE_THREES, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getUserWoceThrees()));
+		cruiseProps.setProperty(USER_WOCE_FOURS, 
+				DashboardUtils.encodeWoceTypeSet(cruise.getUserWoceFours()));
+
 		// Save the properties to the cruise information file
 		try {
 			PrintWriter cruiseWriter = new PrintWriter(infoFile);
@@ -1409,19 +1425,69 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		}
 		cruise.setDataColTypes(dataColTypes);
 
-		// WOCE-3 row indices for each data column
-		value = cruiseProps.getProperty(WOCE_THREE_ROWS_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					WOCE_THREE_ROWS_ID + " given in " + infoFile.getPath());
-		cruise.setWoceThreeRowIndices(DashboardUtils.decodeSetsArrayList(value));
+		// WOCE-3 flags
+		value = cruiseProps.getProperty(CHECKER_WOCE_THREES);
+		if ( value != null ) {
+			// Must be new-style WOCE-3 flags
+			TreeSet<WoceType> woceThrees = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setCheckerWoceThrees(woceThrees);
+			// Should also have user-provided WOCE-3 flags
+			value = cruiseProps.getProperty(USER_WOCE_THREES);
+			if ( value == null ) 
+				throw new IllegalArgumentException("No property value for " + 
+						USER_WOCE_THREES + " given in " + infoFile.getPath());
+			woceThrees = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setUserWoceThrees(woceThrees);
+		}
+		else {
+			// Check for old-style WOCE-3 flags
+			value = cruiseProps.getProperty(WOCE_THREE_ROWS_ID);
+			if ( value == null )
+				throw new IllegalArgumentException("No property value for " + 
+						CHECKER_WOCE_THREES + " given in " + infoFile.getPath());
+			ArrayList<HashSet<Integer>> woceThreeRows = CruiseFileHandler.decodeSetsArrayList(value);
+			TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
+			for (int k = 0; k < numCols; k++) {
+				for ( Integer idx : woceThreeRows.get(k) ) {
+					woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), k, idx));
+				}
+			}
+			cruise.setCheckerWoceThrees(woceThrees);
+			// User-provided WOCE-3 flags were not saved in the old-style properties file
+			cruise.setUserWoceThrees(null);
+		}
 
-		// WOCE-4 row indices for each data column
-		value = cruiseProps.getProperty(WOCE_FOUR_ROWS_ID);
-		if ( value == null )
-			throw new IllegalArgumentException("No property value for " + 
-					WOCE_FOUR_ROWS_ID + " given in " + infoFile.getPath());
-		cruise.setWoceFourRowIndices(DashboardUtils.decodeSetsArrayList(value));
+		// WOCE-4 flags
+		value = cruiseProps.getProperty(CHECKER_WOCE_FOURS);
+		if ( value != null ) {
+			// Must be new-style WOCE-4 flags
+			TreeSet<WoceType> woceFours = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setCheckerWoceFours(woceFours);
+			// Should also have user-provided WOCE-4 flags
+			value = cruiseProps.getProperty(USER_WOCE_FOURS);
+			if ( value == null ) 
+				throw new IllegalArgumentException("No property value for " + 
+						USER_WOCE_FOURS + " given in " + infoFile.getPath());
+			woceFours = DashboardUtils.decodeWoceTypeSet(value);
+			cruise.setUserWoceFours(woceFours);
+		}
+		else {
+			// Check for old-style WOCE-4 flags
+			value = cruiseProps.getProperty(WOCE_FOUR_ROWS_ID);
+			if ( value == null )
+				throw new IllegalArgumentException("No property value for " + 
+						CHECKER_WOCE_FOURS + " given in " + infoFile.getPath());
+			ArrayList<HashSet<Integer>> woceFourRows = CruiseFileHandler.decodeSetsArrayList(value);
+			TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
+			for (int k = 0; k < numCols; k++) {
+				for ( Integer idx : woceFourRows.get(k) ) {
+					woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), k, idx));
+				}
+			}
+			cruise.setCheckerWoceFours(woceFours);
+			// User-provided WOCE-4 flags were not saved in the old-style properties file
+			cruise.setUserWoceFours(null);
+		}
 	}
 
 	/**
@@ -1464,6 +1530,57 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		saveCruiseInfoToFile(cruise, "Update cruise dashboard status for " + 
 				expocode + " from '" + oldStatus + "' to '" + newStatus + "'");
 		return true;
+	}
+
+	/**
+	 * Decodes a (somewhat-JSON-like) encoded array of sets of integers 
+	 * into an ArrayList of HashSets of Integers.  Each set must be 
+	 * comma-separated integer values enclosed in brackets (like that 
+	 * produced {@link DashboardUtils#encodeIntegerArrayList(ArrayList)}, 
+	 * and each set must be by separated by a comma.  Whitespace around 
+	 * brackets and commas is allowed.  Only used for decoding legacy 
+	 * encoding of WOCE flags.
+	 * 
+	 * @param arrayStr
+	 * 		the encoded sets of integers array
+	 * @return
+	 * 		the decoded ArrayList of HashSets of Integers; never null, 
+	 * 		but may be empty (if the encoded array contains no sets)
+	 * @throws IllegalArgumentException
+	 * 		if arrayStr does not start with '[', does not end with ']', 
+	 * 		or contains sets not enclosed within '[' and ']'.
+	 */
+	private static ArrayList<HashSet<Integer>> decodeSetsArrayList(String arrayStr) 
+												throws IllegalArgumentException {
+		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+			throw new IllegalArgumentException(
+					"Encoded string array not enclosed in brackets");
+		// Locate the opening bracket of the first set
+		int firstIndex = arrayStr.indexOf("[", 1);
+		// Locate the closing bracket of the last set
+		int lastIndex = arrayStr.lastIndexOf("]", arrayStr.length() - 2);
+		if ( (firstIndex < 0) || (lastIndex < 0) ) {
+			if ( (firstIndex < 0) && (lastIndex < 0) &&
+				 arrayStr.substring(1, arrayStr.length() - 1).trim().isEmpty() ) {
+				// no sets; return an empty list
+				return new ArrayList<HashSet<Integer>>(0);
+			}
+			// Not empty, but 
+			throw new IllegalArgumentException(
+					"Sets in encoded sets array not enclosed in brackets");
+		}
+		// Split the string into each of the sets
+		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
+								  .split("\\]\\s*,\\s*\\[", -1);
+		// Create the list to return
+		ArrayList<HashSet<Integer>> setsList = 
+				new ArrayList<HashSet<Integer>>(pieces.length);
+		// Convert each of the set strings and add to the list
+		for ( String setStr : pieces ) {
+			setsList.add(new HashSet<Integer>(
+					DashboardUtils.decodeIntegerArrayList("[" + setStr + "]")));
+		}
+		return setsList;
 	}
 
 }

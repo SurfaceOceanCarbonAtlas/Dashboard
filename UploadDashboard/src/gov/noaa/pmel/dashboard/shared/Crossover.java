@@ -15,16 +15,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class Crossover implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -2714312511541287156L;
+	private static final long serialVersionUID = -1068460517910734247L;
 
-	String[] expocodes;
-	Double minDistance;
-	Integer[] rowNumsAtMin;
-	Double[] lonsAtMin;
-	Double[] latsAtMin;
-	Long[] timesAtMin;
-	Long[] cruiseMinTimes;
-	Long[] cruiseMaxTimes;
+	protected  String[] expocodes;
+	protected Double minDistance;
+	protected Integer[] rowNumsAtMin;
+	protected Double[] lonsAtMin;
+	protected Double[] latsAtMin;
+	protected Long[] timesAtMin;
+	protected Long[] cruiseMinTimes;
+	protected Long[] cruiseMaxTimes;
 
 	/**
 	 * Creates an crossover with no information (all null).

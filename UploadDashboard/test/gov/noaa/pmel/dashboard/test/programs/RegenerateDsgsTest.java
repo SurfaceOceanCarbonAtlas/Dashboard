@@ -34,7 +34,7 @@ public class RegenerateDsgsTest {
 	 */
 	@Test
 	public void testRegenerateDsgFiles() throws IllegalArgumentException, IOException {
-		final String expocode = "06AQ19911114";
+		final String expocode = "33WA20160713";
 
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
 		// Get the default dashboard configuration

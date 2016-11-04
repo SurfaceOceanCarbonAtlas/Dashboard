@@ -1089,8 +1089,8 @@ public class CruiseDsgNcFile extends File {
 				datavalues = (ArrayDouble.D1) var.read(); 
 			}
 
-			// WOCE flags - currently only WOCE_CO2_water
-			varName = SocatTypes.WOCE_CO2_WATER.getVarName();
+			// WOCE flags
+			varName = woceEvent.getWoceName();
 			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 
@@ -1207,8 +1207,8 @@ public class CruiseDsgNcFile extends File {
 				datavalues = (ArrayDouble.D1) var.read(); 
 			}
 
-			// WOCE flags - currently only WOCE_CO2_water
-			varName = SocatTypes.WOCE_CO2_WATER.getVarName();
+			// WOCE flags
+			varName = woceEvent.getWoceName();
 			Variable wocevar = ncfile.findVariable(varName);
 			if ( wocevar == null )
 				throw new IllegalArgumentException("Unable to find variable '" + 

@@ -289,6 +289,32 @@ public class SocatMetadata {
 	}
 
 	/**
+	 * @return
+	 * 		the vessel type; 
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+	 */
+	public String getVesselType() {
+		String value = stringValuesMap.get(DashboardServerUtils.VESSEL_TYPE);
+		if ( value == null )
+			value = DashboardUtils.STRING_MISSING_VALUE;
+		return value;
+	}
+
+	/**
+	 * @param vesselType 
+	 * 		the vessel name to set;
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 */
+	public void setVesselType(String vesselType) {
+		String value;
+		if ( vesselType != null )
+			value = vesselType;
+		else
+			value = DashboardUtils.STRING_MISSING_VALUE;
+		stringValuesMap.put(DashboardServerUtils.VESSEL_TYPE, value);
+	}
+
+	/**
 	 * Get the SOCAT version - the version number followed by an 'N', 
 	 * indicating the dataset is new in this SOCAT version, or a 'U', 
 	 * indicating the dataset is an update from a previous SOCAT 

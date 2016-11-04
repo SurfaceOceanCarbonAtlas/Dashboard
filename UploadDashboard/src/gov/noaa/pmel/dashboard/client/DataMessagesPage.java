@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -109,27 +109,27 @@ public class DataMessagesPage extends CompositeWithUsername {
 	 * Adds this page to the page history.
 	 */
 	static void showPage(String username, String cruiseExpocode) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.getDataMessages(username, cruiseExpocode, new AsyncCallback<SCMessageList>() {
 			@Override
 			public void onSuccess(SCMessageList msgList) {
 				if ( msgList == null ) {
-					SocatUploadDashboard.showMessage("Unexpected list of data problems returned");
-					SocatUploadDashboard.showAutoCursor();
+					UploadDashboard.showMessage("Unexpected list of data problems returned");
+					UploadDashboard.showAutoCursor();
 					return;
 				}
 				if ( singleton == null )
 					singleton = new DataMessagesPage();
-				SocatUploadDashboard.updateCurrentPage(singleton);
+				UploadDashboard.updateCurrentPage(singleton);
 				singleton.updateMessages(msgList);
 				History.newItem(PagesEnum.SHOW_DATA_MESSAGES.name(), false);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(
+				UploadDashboard.showFailureMessage(
 						"Unexpected failure obtaining the list of data problems", ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 		});
 
@@ -145,7 +145,7 @@ public class DataMessagesPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -204,29 +204,29 @@ public class DataMessagesPage extends CompositeWithUsername {
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
 		messagesGrid.setColumnWidth(severityColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(colNumColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(colNameColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(rowNumColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(timestampColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(longitudeColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(latitudeColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		messagesGrid.setColumnWidth(explanationColumn, 
-				2 * SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += 2 * SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+				2 * UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += 2 * UploadDashboard.FILENAME_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		messagesGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
