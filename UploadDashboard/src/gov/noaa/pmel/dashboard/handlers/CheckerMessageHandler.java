@@ -11,9 +11,11 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.SCMessage;
+import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
 import gov.noaa.pmel.dashboard.shared.SCMessageList;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
-import gov.noaa.pmel.dashboard.shared.SCMessage.SCMsgSeverity;
+import gov.noaa.pmel.dashboard.shared.WoceFlag;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeSet;
@@ -105,8 +107,7 @@ public class CheckerMessageHandler {
 	 * 		if a messages file for the new expocode already exists, or
 	 * 		if unable to rename the messages file
 	 */
-	public void renameMsgsFile(String oldExpocode, String newExpocode) 
-											throws IllegalArgumentException {
+	public void renameMsgsFile(String oldExpocode, String newExpocode) throws IllegalArgumentException {
 		File oldMsgsFile = cruiseMsgsFile(oldExpocode);
 		if ( ! oldMsgsFile.exists() ) 
 			return;
@@ -149,61 +150,46 @@ public class CheckerMessageHandler {
 	}
 
 	/**
-	 * Saves the list of messages produced by the SanityChecker to file.
-	 * Clears and assigns the WOCE-3 or WOCE-4 flags for the given cruise from 
-	 * the given SanityChecker output for the cruise as well as any user-provided 
-	 * WOCE flags in the cruise data.  A row index may appear in multiple WOCE 
-	 * sets, including both WOCE-3 and WOCE-4 sets.
+	 * Processes the list of messages produced by the SanityChecker.
+	 * Saves the messages to the appropriate messages file.
+	 * Clears and assigns the WOCE-3 or WOCE-4 flags for the given cruise 
+	 * from the given SanityChecker output for the cruise as well as any 
+	 * user-provided WOCE flags in the cruise data.
 	 * 
 	 * @param cruiseData
-	 * 		save messages for this cruise, and assign WOCE flags to this cruise
+	 * 		process messages for this cruise
 	 * @param output
-	 * 		SanityChecker output for this cruise  
+	 * 		SanityChecker output for this cruise
 	 * @throws IllegalArgumentException
 	 * 		if the expocode is invalid
 	 */
-	public void saveCruiseMessages(DashboardCruiseWithData cruiseData, Output output) 
-											throws IllegalArgumentException {
-		// Directly modify the sets in the cruise data
-		ArrayList<HashSet<Integer>> woceFourSets = cruiseData.getWoceFourRowIndices();
-		ArrayList<HashSet<Integer>> woceThreeSets = cruiseData.getWoceThreeRowIndices();
-		HashSet<Integer> noColumnWoceFourSet = cruiseData.getNoColumnWoceFourRowIndices();
-		HashSet<Integer> noColumnWoceThreeSet = cruiseData.getNoColumnWoceThreeRowIndices();
-		HashSet<Integer> userWoceFourSet = cruiseData.getUserWoceFourRowIndices();
-		HashSet<Integer> userWoceThreeSet = cruiseData.getUserWoceThreeRowIndices();
+	public void processCruiseMessages(DashboardCruiseWithData cruiseData, 
+			Output output) throws IllegalArgumentException {
 
-		// Clear all WOCE flag sets
-		for ( HashSet<Integer> rowIdxSet : woceFourSets )
-			rowIdxSet.clear();
-		for ( HashSet<Integer> rowIdxSet : woceThreeSets )
-			rowIdxSet.clear();
-		noColumnWoceFourSet.clear();
-		noColumnWoceThreeSet.clear();
-		userWoceFourSet.clear();
-		userWoceThreeSet.clear();
+		TreeSet<WoceType> woceFours = new TreeSet<WoceType>();
+		TreeSet<WoceType> woceThrees = new TreeSet<WoceType>();
 
 		// Get the cruise messages file to be written
 		File msgsFile = cruiseMsgsFile(cruiseData.getExpocode());
-
-		// Create the NODC subdirectory if it does not exist
+		// Create the parent subdirectories if they do not exist
 		File parentFile = msgsFile.getParentFile();
 		if ( ! parentFile.exists() )
 			parentFile.mkdirs();
-
 		// Write the messages to file and save WOCE flags from these messages
 		PrintWriter msgsWriter;
 		try {
 			msgsWriter = new PrintWriter(msgsFile);
 		} catch (FileNotFoundException ex) {
-			throw new IllegalArgumentException(
-					"Unexpected error opening messages file " + 
+			throw new RuntimeException("Unexpected error opening messages file " + 
 					msgsFile.getPath() + "\n    " + ex.getMessage(), ex);
 		}
+
 		try {
 
 			List<SocatDataRecord> dataRecs = output.getRecords();
 			int numRecs = dataRecs.size();
 			try {
+
 				for ( MessageSummary summary : output.getMessages().getMessageSummaries() ) {
 					String msg = summary.getSummaryString();
 					int count = summary.getErrorCount();
@@ -217,7 +203,11 @@ public class CheckerMessageHandler {
 								Integer.toString(count) + " warnings of type: " + msg);
 					}
 				}
+
 				for ( Message msg : output.getMessages().getMessages() ) {
+					int rowNum = msg.getLineNumber();
+					int colNum = msg.getColumnIndex();
+
 					// Generate a list of key-value strings describing this message
 					ArrayList<String> mappings = new ArrayList<String>();
 
@@ -230,7 +220,6 @@ public class CheckerMessageHandler {
 								SCMsgSeverity.WARNING.name());
 					}
 
-					int rowNum = msg.getLineNumber();
 					if ( (rowNum > 0) && (rowNum <= numRecs) ) {
 						mappings.add(SCMSG_ROW_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 								Integer.toString(rowNum));
@@ -262,7 +251,6 @@ public class CheckerMessageHandler {
 						}
 					}
 
-					int colNum = msg.getColumnIndex();
 					if ( colNum > 0 )
 						mappings.add(SCMSG_COLUMN_NUMBER_KEY + SCMSG_KEY_VALUE_SEP + 
 								Integer.toString(colNum));
@@ -282,26 +270,28 @@ public class CheckerMessageHandler {
 					// Write this array list of key-value strings to file
 					msgsWriter.println(DashboardUtils.encodeStringArrayList(mappings));
 
-					// Assign the WOCE flag
+					// Create the WOCE flag for this message.
+					// TODO: Assign the correct WOCE name
 					if ( rowNum > 0 ) {
 						if ( msg.isError() ) {
 							if ( colNum > 0 ) {
-								woceFourSets.get(colNum - 1).add(rowNum - 1);
+								woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
 							}
 							else {
-								noColumnWoceFourSet.add(rowNum - 1);
+								woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
 							}
 						}
 						else if ( msg.isWarning() ) {
 							if ( colNum > 0 ) {
-								woceThreeSets.get(colNum - 1).add(rowNum - 1);
+								woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
 							}
 							else {
-								noColumnWoceThreeSet.add(rowNum - 1);
+								woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
 							}
 						}
 					}
 				}
+
 			} catch ( MessageException ex ) {
 				throw new RuntimeException(ex);
 			}
@@ -310,20 +300,25 @@ public class CheckerMessageHandler {
 			msgsWriter.close();
 		}
 
+		cruiseData.setCheckerWoceFours(woceFours);
+		cruiseData.setCheckerWoceThrees(woceThrees);
+
+		woceFours.clear();
+		woceThrees.clear();
+
 		// Assign any user-provided WOCE-3 and WOCE-4 flags
 		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 		for (int k = 0; k < columnTypes.size(); k++) {
 			DataColumnType colType = columnTypes.get(k);
-			if ( ! ( SocatTypes.WOCE_CO2_WATER.typeNameEquals(colType) ||
-					 SocatTypes.WOCE_CO2_ATM.typeNameEquals(colType) ) )
+			if ( ! colType.isWoceType() )
 				continue;
 			for (int rowIdx = 0; rowIdx < cruiseData.getNumDataRows(); rowIdx++) {
 				try {
 					int value = Integer.parseInt(cruiseData.getDataValues().get(rowIdx).get(k));
 					if ( value == 4 )
-						userWoceFourSet.add(rowIdx);
+						woceFours.add(new WoceType(colType.getVarName(), null, rowIdx));
 					else if ( value == 3 )
-						userWoceThreeSet.add(rowIdx);
+						woceThrees.add(new WoceType(colType.getVarName(), null, rowIdx));
 					// Only handle 3 and 4
 				} catch (NumberFormatException ex) {
 					// Assuming a missing value
@@ -331,11 +326,16 @@ public class CheckerMessageHandler {
 			}
 		}
 
+		cruiseData.setUserWoceFours(woceFours);
+		cruiseData.setUserWoceThrees(woceThrees);
+
+		woceFours.clear();
+		woceThrees.clear();
 	}
 
 	/**
 	 * Reads the list of messages produced by the SanityChecker from the messages 
-	 * file written by {@link #saveCruiseMessages(DashboardCruiseWithData, Output)}.
+	 * file written by {@link #processCruiseMessages(DashboardCruiseWithData, Output)}.
 	 * 
 	 * @param expocode
 	 * 		get messages for the cruise with this expocode
@@ -352,7 +352,7 @@ public class CheckerMessageHandler {
 	 * 		if there is no messages file for the cruise
 	 */
 	public SCMessageList getCruiseMessages(String expocode) 
-					throws IllegalArgumentException, FileNotFoundException {
+			throws IllegalArgumentException, FileNotFoundException {
 		// Create the list of messages to be returned
 		SCMessageList msgList = new SCMessageList();
 		msgList.setExpocode(expocode);
@@ -470,71 +470,6 @@ public class CheckerMessageHandler {
 	}
 
 	/**
-	 *  For combining and ordering all WOCE flags 
-	 */
-	private class WoceInfo implements Comparable<WoceInfo> {
-		Character flag;
-		Integer columnIndex;
-		String comment;
-		Integer rowIndex;
-
-		public WoceInfo() {
-			flag = ' ';
-			columnIndex = Integer.MAX_VALUE;
-			comment = "";
-			rowIndex = -1;
-		}
-
-		@Override
-		public int compareTo(WoceInfo other) {
-			int result = flag.compareTo(other.flag);
-			if ( result != 0 )
-				return result;
-			result = columnIndex.compareTo(other.columnIndex);
-			if ( result != 0 )
-				return result;
-			result = comment.toUpperCase().compareTo(other.comment.toUpperCase());
-			if ( result != 0 )
-				return result;
-			result = rowIndex.compareTo(other.rowIndex);
-			return result;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 37;
-			int result = flag.hashCode();
-			result = result * prime + columnIndex.hashCode();
-			result = result * prime + comment.toUpperCase().hashCode();
-			result = prime * result + rowIndex.hashCode();
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if ( this == obj )
-				return true;
-			if ( obj == null )
-				return false;
-
-			if ( ! ( obj instanceof WoceInfo ) )
-				return false;
-			WoceInfo other = (WoceInfo) obj;
-
-			if ( ! flag.equals(other.flag) )
-				return false;
-			if ( ! columnIndex.equals(other.columnIndex) )
-				return false;
-			if ( ! comment.equalsIgnoreCase(other.comment) )
-				return false;
-			if ( ! rowIndex.equals(other.rowIndex) )
-				return false;
-
-			return true;
-		}
-	}
-
-	/**
 	 * Generates a list of SocatWoceEvents to to be submitted from the saved cruise
 	 * messages as well as PI-provided WOCE flags.
 	 * 
@@ -562,31 +497,12 @@ public class CheckerMessageHandler {
 	public ArrayList<WoceEvent> generateWoceEvents(DashboardCruiseWithData cruiseData, 
 			DsgNcFileHandler dsgHandler, KnownDataTypes knownDataFileTypes) 
 					throws IllegalArgumentException, FileNotFoundException, IOException {
-		// Get the info needed from the DashboardCruise
-		String version = cruiseData.getVersion();
+		// Ordered set of all WOCE flags for this dataset
+		TreeSet<WoceFlag> woceFlagSet = new TreeSet<WoceFlag>();
+
+		// Create the flags from the SanityChecker messages
 		String expocode = cruiseData.getExpocode();
-		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
-		HashSet<Integer> userWoceThrees = cruiseData.getUserWoceThreeRowIndices();
-		HashSet<Integer> userWoceFours = cruiseData.getUserWoceFourRowIndices();
-		int userCommentsIndex = -1;
-		for (int k = 0; k < columnTypes.size(); k++) {
-			DataColumnType type = columnTypes.get(k);
-			// Want COMMENT_WOCE_CO2_WATER, but if not given accept COMMENT_WOCE_CO2_ATM
-			if ( SocatTypes.COMMENT_WOCE_CO2_WATER.typeNameEquals(type) ) {
-				userCommentsIndex = k;
-				break;
-			}
-			if ( SocatTypes.COMMENT_WOCE_CO2_ATM.typeNameEquals(type) ) {
-				userCommentsIndex = k;
-			}
-		}
-		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
-
-		// Get the SanityChecker messages
-		SCMessageList msgList = getCruiseMessages(expocode);
-
-		TreeSet<WoceInfo> orderedWoceInfo = new TreeSet<WoceInfo>();
-		for ( SCMessage msg : msgList ) {
+		for ( SCMessage msg : getCruiseMessages(expocode) ) {
 
 			SCMsgSeverity severity = msg.getSeverity();
 			if ( severity.equals(SCMsgSeverity.UNKNOWN) )
@@ -601,69 +517,86 @@ public class CheckerMessageHandler {
 			if ( colNum == 0 )
 				continue;
 
-			WoceInfo info = new WoceInfo();
+			// TODO: get the correct WOCE flag name
+			WoceFlag info = new WoceFlag(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum-1);
+			if ( colNum > 0 )
+				info.setColumnIndex(colNum-1);
 
 			if ( severity.equals(SCMsgSeverity.ERROR) )
-				info.flag = DashboardUtils.WOCE_BAD;
+				info.setFlag(DashboardUtils.WOCE_BAD);
 			else if ( severity.equals(SCMsgSeverity.WARNING) )
-				info.flag = DashboardUtils.WOCE_QUESTIONABLE;
+				info.setFlag(DashboardUtils.WOCE_QUESTIONABLE);
 			else
 				throw new RuntimeException("Unexpected message severity of " + severity.toString());
-			// Only add SanityChecker WOCE-4 flags for now 
-			// (here and at the end of CruiseChecker.standardizeCruiseData)
-			if ( ! info.flag.equals(DashboardUtils.WOCE_BAD) )
-				continue;
 
-			if ( colNum > 0 )
-				info.columnIndex = colNum - 1;
-			// if no column index, leave as Integer.MAX_VALUE to put them last for this flag
+			String comment = msg.getGeneralComment();
+			if ( comment.isEmpty() )
+				comment = msg.getDetailedComment();
+			info.setComment(comment);
 
-			// Get the general explanation for the WOCE flag
-			info.comment = msg.getGeneralComment();
-			if ( info.comment.isEmpty() )
-				info.comment = msg.getDetailedComment();
-
-			info.rowIndex = rowNum - 1;
-
-			orderedWoceInfo.add(info);
+			// Only add SanityChecker WOCE-4 flags; the SanityChecker marks all 
+			// questionable data regardless of whether it is of consequence.
+			if ( DashboardUtils.WOCE_BAD.equals(info.getFlag()) )
+				woceFlagSet.add(info);
 		}
 
-		// Add any PI WOCE-3 flags 
-		for ( Integer rowIdx : userWoceThrees ) {
-			WoceInfo info = new WoceInfo();
-			info.flag = DashboardUtils.WOCE_QUESTIONABLE;
-			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
-			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
-			if ( userCommentsIndex >= 0 ) {
-				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
-				if ( ! addnMsg.isEmpty() )
-					info.comment += " with comment/subflag: " + addnMsg;
-			}
-			info.rowIndex = rowIdx;
-			orderedWoceInfo.add(info);
-		}
+		ArrayList<DataColumnType> columnTypes = cruiseData.getDataColTypes();
 
-		// Add any PI WOCE-4 flags 
-		for ( Integer rowIdx : userWoceFours ) {
-			WoceInfo info = new WoceInfo();
-			info.flag = DashboardUtils.WOCE_BAD;
-			// leave columnIndex as Integer.MAX_VALUE to put them last for this flag
-			// add ZZZZ to make these the last comments for the flag/column
-			info.comment = "ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
-			if ( userCommentsIndex >= 0 ) {
-				String addnMsg = dataVals.get(rowIdx).get(userCommentsIndex);
-				if ( ! addnMsg.isEmpty() )
-					info.comment += " with comment/subflag: " + addnMsg;
+		TreeSet<WoceType> userWoceThrees = cruiseData.getUserWoceThrees();
+		TreeSet<WoceType> userWoceFours = cruiseData.getUserWoceFours();
+		if ( (userWoceThrees.size() > 0) || (userWoceFours.size() > 0) ) {
+
+			HashMap<String,Integer> woceCommentIndex = new HashMap<String,Integer>();
+			for ( DataColumnType colType : columnTypes ) {
+				if ( colType.isWoceType() ) {
+					for (int k = 0; k < columnTypes.size(); k++) {
+						if ( columnTypes.get(k).isWoceCommentFor(colType) ) {
+							woceCommentIndex.put(colType.getVarName(), Integer.valueOf(k));
+						}
+					}
+				}
 			}
-			info.rowIndex = rowIdx;
-			orderedWoceInfo.add(info);
+
+			// Need the data values for any WOCE comments 
+			ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
+
+			// Add any PI WOCE-3 flags 
+			for ( WoceType uwoce : userWoceThrees ) {
+				String woceName = uwoce.getWoceName();
+				// Use Integer.MAX_VALUE as the column index to put these at the end
+				WoceFlag info = new WoceFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
+				info.setFlag(DashboardUtils.WOCE_QUESTIONABLE);
+				String comment = DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "3 flag";
+				Integer idx = woceCommentIndex.get(woceName);
+				if ( idx != null ) {
+					comment += " with comment/subflag: " + dataVals.get(uwoce.getRowIndex()).get(idx);
+				}
+				info.setComment(comment);
+				woceFlagSet.add(info);
+			}
+
+			// Add any PI WOCE-4 flags 
+			for ( WoceType uwoce : userWoceFours ) {
+				String woceName = uwoce.getWoceName();
+				// Use Integer.MAX_VALUE as the column index to put these at the end
+				WoceFlag info = new WoceFlag(woceName, Integer.MAX_VALUE, uwoce.getRowIndex());
+				info.setFlag(DashboardUtils.WOCE_BAD);
+				String comment = DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START + "4 flag";
+				Integer idx = woceCommentIndex.get(woceName);
+				if ( idx != null ) {
+					comment += " with comment/subflag: " + dataVals.get(uwoce.getRowIndex()).get(idx);
+				}
+				info.setComment(comment);
+				woceFlagSet.add(info);
+			}
 		}
 
 		ArrayList<WoceEvent> woceList = new ArrayList<WoceEvent>();
 		// If no WOCE flags, return now before we read data from the DSG file
-		if ( orderedWoceInfo.isEmpty() )
+		if ( woceFlagSet.isEmpty() )
 			return woceList;
+
+		String version = cruiseData.getVersion();
 
 		// Get the longitudes, latitude, times, and regions IDs 
 		// from the full-data DSG file for this cruise
@@ -671,45 +604,48 @@ public class CheckerMessageHandler {
 		double[] longitudes = lonlattime[0];
 		double[] latitudes = lonlattime[1];
 		double[] times = lonlattime[2];
-		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, 
-				SocatTypes.REGION_ID.getVarName());
+		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, SocatTypes.REGION_ID.getVarName());
 		Date now = new Date();
 
+		String lastWoceName = null;
 		Character lastFlag = null;
-		Integer lastColumnIndex = null;
+		Integer lastColIdx = null;
 		String lastComment = null;
 		double[] dataValues = null;
 		String lastDataVarName = null;
 		String dataVarName = null;
 		ArrayList<DataLocation> locations = null;
-		for ( WoceInfo info : orderedWoceInfo ) {
+		for ( WoceFlag info : woceFlagSet ) {
 
 			// Check if a new WOCE event is needed
-			if ( ( ! info.flag.equals(lastFlag) ) ||
-				 ( ! info.columnIndex.equals(lastColumnIndex) ) ||
-				 ( ! info.comment.equals(lastComment) ) ) {
-				lastFlag = info.flag;
-				lastColumnIndex = info.columnIndex;
-				lastComment = info.comment;
+			String woceName = info.getWoceName();
+			Character flag = info.getFlag();
+			Integer colIdx = info.getColumnIndex();
+			String comment = info.getComment();
+			if ( ( ! woceName.equals(lastWoceName) ) ||
+				 ( ! flag.equals(lastFlag) ) ||
+				 ( ! colIdx.equals(lastColIdx) ) ||
+				 ( ! comment.equals(lastComment) ) ) {
+				lastWoceName = woceName;
+				lastFlag = flag;
+				lastColIdx = colIdx;
+				lastComment = comment;
 
 				WoceEvent woceEvent = new WoceEvent();
+				woceEvent.setWoceName(woceName);
 				woceEvent.setExpocode(expocode);
 				woceEvent.setVersion(version);
-				woceEvent.setFlag(info.flag);
+				woceEvent.setFlag(flag);
 				woceEvent.setFlagDate(now);
 				woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-				// Remove the ZZZZ added to the PI-provided WOCE flag comment
-				if ( info.comment.startsWith("ZZZZ " + DashboardUtils.PI_PROVIDED_WOCE_COMMENT_START) )
-					woceEvent.setComment(info.comment.substring(5));
-				else
-					woceEvent.setComment(info.comment);
+				woceEvent.setComment(comment);
 
 				// If a column can be identified, assign its name and 
 				// get its values if we do not already have them 
 				dataVarName = null;
-				if ( info.columnIndex != Integer.MAX_VALUE ) {
-					DataColumnType dataType = columnTypes.get(info.columnIndex);
+				if ( (colIdx >= 0) && (colIdx != Integer.MAX_VALUE) ) {
+					DataColumnType dataType = columnTypes.get(colIdx);
 					// Geoposition is a problem in the combination of lon/lat/time, so no data assignment
 					if ( DashboardServerUtils.GEOPOSITION.typeNameEquals(dataType) ) {
 						dataVarName = null;
@@ -758,13 +694,14 @@ public class CheckerMessageHandler {
 
 			// Add a location for the current WOCE event
 			DataLocation dataLoc = new DataLocation();
-			dataLoc.setRowNumber(info.rowIndex + 1);
-			dataLoc.setDataDate(new Date(Math.round(times[info.rowIndex] * 1000.0)));
-			dataLoc.setLatitude(latitudes[info.rowIndex]);
-			dataLoc.setLongitude(longitudes[info.rowIndex]);
-			dataLoc.setRegionID(regionIDs[info.rowIndex]);
+			int rowIdx = info.getRowIndex();
+			dataLoc.setRowNumber(rowIdx + 1);
+			dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
+			dataLoc.setLatitude(latitudes[rowIdx]);
+			dataLoc.setLongitude(longitudes[rowIdx]);
+			dataLoc.setRegionID(regionIDs[rowIdx]);
 			if ( dataVarName != null )
-				dataLoc.setDataValue(dataValues[info.rowIndex]);
+				dataLoc.setDataValue(dataValues[rowIdx]);
 			locations.add(dataLoc);
 		}
 

@@ -17,7 +17,7 @@ import org.junit.Test;
 
 /**
  * Test of generating a PDF from an OME XML file.  Uses an 
- * existing SocatUploadDashboard installation with user-provided
+ * existing UploadDashboard installation with user-provided
  * PI_OME.xml for the cruise given in EXPOCODE.
  * 
  * @author Karl Smith

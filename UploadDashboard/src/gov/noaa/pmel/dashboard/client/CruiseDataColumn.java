@@ -175,7 +175,11 @@ public class CruiseDataColumn {
 			public String getValue(CruiseDataColumn dataCol) {
 				// Find this column type with units
 				DataColumnType dctype = dataCol.cruise.getDataColTypes().get(dataCol.columnIndex);
+				// Ignore the missing value for this comparison
+				String missVal = dctype.getSelectedMissingValue();
+				dctype.setSelectedMissingValue(null);
 				int idx = knownTypeUnitList.indexOf(dctype);
+				dctype.setSelectedMissingValue(missVal);
 				if ( idx < 0 ) {
 					// Not a recognized column type with units; set to unknown
 					idx = knownTypeUnitList.indexOf(DashboardUtils.UNKNOWN);

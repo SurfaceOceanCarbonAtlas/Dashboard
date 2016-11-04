@@ -23,6 +23,8 @@ import java.util.TimeZone;
  * any old WOCE flags applicable to the current data.  Adds a QC comment that the 
  * cruise data and WOCE flags were restored.
  * 
+ * TODO: only restores WOCE_CO2_water; need to update to restore WOCE_CO2_atm if needed.
+ * 
  * @author Karl Smith
  */
 public class RestoreCruise {

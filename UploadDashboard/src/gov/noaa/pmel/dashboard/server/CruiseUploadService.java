@@ -60,6 +60,13 @@ public class CruiseUploadService extends HttpServlet {
 		Pattern.compile("PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
 	};
 
+	// Patterns for getting the vessel type from the metadata preamble
+	private static final Pattern[] VESSEL_TYPE_PATTERNS = new Pattern[] {
+		Pattern.compile("Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Platform\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+	};
+
 	private ServletFileUpload cruiseUpload;
 
 	public CruiseUploadService() {
@@ -301,21 +308,22 @@ public class CruiseUploadService extends HttpServlet {
 				}
 			}
 
-			String shipName = null;
+			String vesselName = null;
 			ArrayList<String> piNames = null;
+			String vesselType = null;
 			// Get the ship name and PI names from the metadata preamble
 			for ( String metaline : cruiseData.getPreamble() ) {
 				boolean lineMatched = false;
-				if ( shipName == null ) {
+				if ( vesselName == null ) {
 					for ( Pattern pat : SHIP_NAME_PATTERNS ) {
 						Matcher mat = pat.matcher(metaline);
 						if ( ! mat.matches() )
 							continue;
 						lineMatched = true;
-						shipName = mat.group(1);
-						if ( (shipName != null) && ! shipName.isEmpty() ) 
+						vesselName = mat.group(1);
+						if ( (vesselName != null) && ! vesselName.isEmpty() ) 
 							break;
-						shipName = null;
+						vesselName = null;
 					}
 				}
 				if ( (piNames == null) && ! lineMatched ) {
@@ -323,6 +331,7 @@ public class CruiseUploadService extends HttpServlet {
 						Matcher mat = pat.matcher(metaline);
 						if ( ! mat.matches() )
 							continue;
+						lineMatched = true;
 						String allNames = mat.group(1);
 						if ( allNames != null ) {
 							piNames = new ArrayList<String>();
@@ -337,9 +346,21 @@ public class CruiseUploadService extends HttpServlet {
 						}
 					}
 				}
+				if ( (vesselType == null) && ! lineMatched ) {
+					for ( Pattern pat : VESSEL_TYPE_PATTERNS ) {
+						Matcher mat = pat.matcher(metaline);
+						if ( ! mat.matches() )
+							continue;
+						lineMatched = true;
+						vesselType = mat.group(1);
+						if ( (vesselType != null) && ! vesselType.isEmpty() ) 
+							break;
+						vesselType = null;
+					}
+				}
 			}
-			// If ship name not found in preamble, check if there is a matching column type
-			if ( shipName == null ) {
+			// If vessel name not found in preamble, check if there is a matching column type
+			if ( vesselName == null ) {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
@@ -350,9 +371,9 @@ public class CruiseUploadService extends HttpServlet {
 					k++;
 				}
 				if ( colIdx >= 0 ) {
-					shipName = cruiseData.getDataValues().get(0).get(colIdx);
-					if ( shipName.isEmpty() )
-						shipName = null;
+					vesselName = cruiseData.getDataValues().get(0).get(colIdx);
+					if ( vesselName.isEmpty() )
+						vesselName = null;
 				}
 			}
 			// If PI names not found in preamble, check if there is a matching column type
@@ -377,9 +398,26 @@ public class CruiseUploadService extends HttpServlet {
 						piNames = null;
 				}
 			}
+			// If vessel type not found in preamble, check if there is a matching column type
+			if ( vesselType == null ) {
+				int colIdx = -1;
+				int k = 0;
+				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
+					if ( DashboardServerUtils.VESSEL_TYPE.typeNameEquals(dtype) ) {
+						colIdx = k;
+						break;
+					}
+					k++;
+				}
+				if ( colIdx >= 0 ) {
+					vesselType = cruiseData.getDataValues().get(0).get(colIdx);
+					if ( vesselType.isEmpty() )
+						vesselType = null;
+				}
+			}
 
 			// Verify there is a ship name and at least one PI name
-			if ( shipName == null ) {
+			if ( vesselName == null ) {
 				messages.add(DashboardUtils.NO_SHIPNAME_HEADER_TAG + " " + filename);
 				continue;
 			}
@@ -387,16 +425,21 @@ public class CruiseUploadService extends HttpServlet {
 				messages.add(DashboardUtils.NO_PINAMES_HEADER_TAG + " " + filename);
 				continue;
 			}
+			// If the vessel type is not given, make an educated guess
+			if ( vesselType == null ) {
+				vesselType = DashboardServerUtils.guessVesselType(expocode, vesselName);
+			}
 
 			// Create the OME XML stub file from the expocode, ship name, and PI names
 			try {
 				OmeMetadata omeMData = new OmeMetadata(expocode);
-				omeMData.storeValue(OmeMetadata.VESSEL_NAME_STRING, shipName, -1);
+				omeMData.storeValue(OmeMetadata.VESSEL_NAME_STRING, vesselName, -1);
 				for ( String name : piNames ) {
 					Properties props = new Properties();
 					props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, name);
 					omeMData.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
 				}
+				omeMData.storeValue(OmeMetadata.PLATFORM_TYPE_STRING, vesselType, -1);
 				DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
 						timestamp, username, cruiseData.getVersion());
 				String msg = "New OME XML document from data file for " + expocode + " uploaded by " + username;

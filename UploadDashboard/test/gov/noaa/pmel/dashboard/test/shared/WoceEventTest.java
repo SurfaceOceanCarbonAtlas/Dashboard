@@ -25,6 +25,7 @@ public class WoceEventTest {
 
 	private static final Long DEFAULT_QC_ID = 0L;
 	private static final Long MY_QC_ID = 123L;
+	private static final String MY_WOCE_NAME = "WOCE_PO4_water";
 	private static final Character MY_WOCE_FLAG = '3';
 	private static final String MY_EXPOCODE = "26NA20140427";
 	private static final String MY_SOCAT_VERSION = "3.0";
@@ -69,8 +70,23 @@ public class WoceEventTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceEvent#getWoceName()} 
+	 * and {@link gov.noaa.pmel.dashboard.shared.WoceEvent#setWoceName(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetWoceName() {
+		WoceEvent myflag = new WoceEvent();
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
+		myflag.setWoceName(MY_WOCE_NAME);
+		assertEquals(MY_WOCE_NAME, myflag.getWoceName());
+		assertEquals(DEFAULT_QC_ID, myflag.getId());
+		myflag.setWoceName(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.WoceEvent#getFlag()} 
-	 * and {@link gov.noaa.pmel.dashboard.shared.WoceEvent#setFlag(java.lang.String)}.
+	 * and {@link gov.noaa.pmel.dashboard.shared.WoceEvent#setFlag(java.lang.Character)}.
 	 */
 	@Test
 	public void testGetSetFlag() {
@@ -78,6 +94,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
 		myflag.setFlag(MY_WOCE_FLAG);
 		assertEquals(MY_WOCE_FLAG, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlag(null);
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
@@ -94,6 +111,7 @@ public class WoceEventTest {
 		myflag.setExpocode(MY_EXPOCODE);
 		assertEquals(MY_EXPOCODE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setExpocode(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
@@ -111,6 +129,7 @@ public class WoceEventTest {
 		assertEquals(MY_SOCAT_VERSION, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setVersion(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
@@ -129,6 +148,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setVarName(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVarName());
@@ -148,6 +168,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setLocations(null);
 		assertEquals(0, myflag.getLocations().size());
@@ -168,6 +189,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setFlagDate(null);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, myflag.getFlagDate());
@@ -189,6 +211,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setUsername(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getUsername());
@@ -211,6 +234,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setRealname(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getRealname());
@@ -234,6 +258,7 @@ public class WoceEventTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getVersion());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getExpocode());
 		assertEquals(DashboardUtils.WOCE_NOT_CHECKED, myflag.getFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getWoceName());
 		assertEquals(DEFAULT_QC_ID, myflag.getId());
 		myflag.setComment(null);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, myflag.getComment());
@@ -256,6 +281,13 @@ public class WoceEventTest {
 		// ID ignored for hashCode and equals
 		myflag.setId(MY_QC_ID);
 		assertFalse( myflag.getId().equals(otherflag.getId()) );
+		assertTrue( myflag.hashCode() == otherflag.hashCode() );
+		assertTrue( myflag.equals(otherflag) );
+
+		myflag.setWoceName(MY_WOCE_NAME);
+		assertFalse( myflag.hashCode() == otherflag.hashCode() );
+		assertFalse( myflag.equals(otherflag) );
+		otherflag.setWoceName(MY_WOCE_NAME);
 		assertTrue( myflag.hashCode() == otherflag.hashCode() );
 		assertTrue( myflag.equals(otherflag) );
 
