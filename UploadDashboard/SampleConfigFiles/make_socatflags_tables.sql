@@ -54,6 +54,7 @@ CREATE TABLE `QCEvents` (
 
 CREATE TABLE `WOCEEvents` (
   `woce_id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `woce_name` varchar(64) NOT NULL DEFAULT 'WOCE_CO2_water',
   `woce_flag` CHAR(1) NOT NULL DEFAULT ' ',
   `woce_time` BIGINT DEFAULT NULL,
   `expocode` VARCHAR(16) NOT NULL DEFAULT '',
@@ -62,6 +63,7 @@ CREATE TABLE `WOCEEvents` (
   `reviewer_id` INT(4) UNSIGNED NOT NULL DEFAULT 0,
   `woce_comment` VARCHAR(1024) NOT NULL DEFAULT '',
   PRIMARY KEY (`woce_id`),
+  KEY `woce_name` (`woce_name`),
   KEY `woce_flag` (`woce_flag`),
   KEY `woce_time` (`woce_time`),
   KEY `expocode` (`expocode`),

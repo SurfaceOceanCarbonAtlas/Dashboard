@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -305,7 +305,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		expocodeSet = new TreeSet<String>();
 
 		titleLabel.setText(TITLE_TEXT);
-		titleImage.setResource(SocatUploadDashboard.resources.getSocatCatPng());
+		titleImage.setResource(UploadDashboard.resources.getSocatCatPng());
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadButton.setText(UPLOAD_TEXT);
@@ -351,22 +351,22 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * Adds this page to the page history.
 	 */
 	static void showPage() {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		// Request the latest cruise list
 		service.getCruiseList(new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruises) {
 				if ( singleton == null )
 					singleton = new CruiseListPage();
-				SocatUploadDashboard.updateCurrentPage(singleton);
+				UploadDashboard.updateCurrentPage(singleton);
 				singleton.updateCruises(cruises);
 				History.newItem(PagesEnum.SHOW_DATASETS.name(), false);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(GET_DATASET_LIST_ERROR_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(GET_DATASET_LIST_ERROR_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -380,7 +380,7 @@ public class CruiseListPage extends CompositeWithUsername {
 			 (singleton == null) || ! singleton.getUsername().equals(username) )
 			CruiseListPage.showPage();
 		else
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 	}
 
 	/**
@@ -641,12 +641,12 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiHandler("viewDataButton")
 	void dataCheckOnClick(ClickEvent event) {
 		if ( ! getSelectedCruises(true) ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() < 1 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_REVIEWING_ERR_END);
 			return;
 		}
@@ -657,13 +657,13 @@ public class CruiseListPage extends CompositeWithUsername {
 	void omeOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( cruiseSet.size() < 1 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
 		// Until the OME is in place, only accept one cruise
 		if ( cruiseSet.size() > 1 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					MANY_DATASETS_SELECTED_ERR_START + FOR_OME_ERR_END);
 			return;
 		}
@@ -674,7 +674,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	void addlDocsOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( cruiseSet.size() < 1 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_ADDL_DOCS_ERR_END);
 			return;
 		}
@@ -685,23 +685,23 @@ public class CruiseListPage extends CompositeWithUsername {
 	void reviewOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( cruiseSet.size() < 1 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() > 1 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					MANY_DATASETS_SELECTED_ERR_START + FOR_PREVIEW_ERR_END);
 			return;
 		}
 		for ( DashboardCruise cruise : cruiseSet.values() ) {
 			String status = cruise.getDataCheckStatus();
 			if ( status.equals(DashboardUtils.CHECK_STATUS_NOT_CHECKED) ) {
-				SocatUploadDashboard.showMessage(CANNOT_PREVIEW_UNCHECKED_ERRMSG);
+				UploadDashboard.showMessage(CANNOT_PREVIEW_UNCHECKED_ERRMSG);
 				return;
 			}
 			else if ( status.contains(DashboardUtils.GEOPOSITION_ERRORS_MSG) ) {
-				SocatUploadDashboard.showMessage(CANNOT_PREVIEW_WITH_SERIOUS_ERRORS_ERRMSG);
+				UploadDashboard.showMessage(CANNOT_PREVIEW_WITH_SERIOUS_ERRORS_ERRMSG);
 				return;				
 			}
 		}
@@ -712,12 +712,12 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiHandler("qcSubmitButton")
 	void qcSubmitOnClick(ClickEvent event) {
 		if ( ! getSelectedCruises(false) ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					ARCHIVED_DATASETS_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
 		if ( cruiseSet.size() == 0 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_QC_SUBMIT_ERR_END);
 			return;
 		}
@@ -730,12 +730,12 @@ public class CruiseListPage extends CompositeWithUsername {
 	@UiHandler("deleteButton")
 	void deleteCruiseOnClick(ClickEvent event) {
 		if ( ! getSelectedCruises(true) ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					SUBMITTED_DATASETS_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
 		}
 		if ( expocodeSet.size() == 0 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_DELETE_ERR_END);
 			return;
 		}
@@ -770,7 +770,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * and processes the results.
 	 */
 	private void continueDeleteCruises(Boolean deleteMetadata) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.deleteCruises(getUsername(), expocodeSet, deleteMetadata, 
 				new AsyncCallback<DashboardCruiseList>() {
 			@Override
@@ -779,15 +779,15 @@ public class CruiseListPage extends CompositeWithUsername {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
-					SocatUploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
+					UploadDashboard.showMessage(DELETE_DATASET_FAIL_MSG + 
 							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(DELETE_DATASET_FAIL_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(DELETE_DATASET_FAIL_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -796,7 +796,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	void addToListOnClick(ClickEvent event) {
 		String wildExpocode = Window.prompt(EXPOCODE_TO_SHOW_MSG, "");
 		if ( (wildExpocode != null) && ! wildExpocode.trim().isEmpty() ) {
-			SocatUploadDashboard.showWaitCursor();
+			UploadDashboard.showWaitCursor();
 			// Save the currently selected cruises
 			getSelectedCruises(null);
 			service.addCruisesToList(getUsername(), wildExpocode, 
@@ -807,15 +807,15 @@ public class CruiseListPage extends CompositeWithUsername {
 						CruiseListPage.this.updateCruises(cruises);
 					}
 					else {
-						SocatUploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG + 
+						UploadDashboard.showMessage(SHOW_DATASET_FAIL_MSG + 
 								UNEXPECTED_INVALID_DATESET_LIST_MSG);
 					}
-					SocatUploadDashboard.showAutoCursor();
+					UploadDashboard.showAutoCursor();
 				}
 				@Override
 				public void onFailure(Throwable ex) {
-					SocatUploadDashboard.showFailureMessage(SHOW_DATASET_FAIL_MSG, ex);
-					SocatUploadDashboard.showAutoCursor();
+					UploadDashboard.showFailureMessage(SHOW_DATASET_FAIL_MSG, ex);
+					UploadDashboard.showAutoCursor();
 				}
 			});
 		}
@@ -825,7 +825,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	void removeFromListOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( expocodeSet.size() == 0 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_HIDE_ERR_END);
 			return;
 		}
@@ -858,7 +858,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * and processes the results.
 	 */
 	private void continueRemoveCruisesFromList() {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.removeCruisesFromList(getUsername(), expocodeSet, 
 				new AsyncCallback<DashboardCruiseList>() {
 			@Override
@@ -867,15 +867,15 @@ public class CruiseListPage extends CompositeWithUsername {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
-					SocatUploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG + 
+					UploadDashboard.showMessage(HIDE_DATASET_FAIL_MSG + 
 							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(HIDE_DATASET_FAIL_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(HIDE_DATASET_FAIL_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -884,7 +884,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	void changeOwnerOnClick(ClickEvent event) {
 		getSelectedCruises(null);
 		if ( expocodeSet.size() == 0 ) {
-			SocatUploadDashboard.showMessage(
+			UploadDashboard.showMessage(
 					NO_DATASET_SELECTED_ERR_START + FOR_CHANGE_OWNER_ERR_END);
 			return;
 		}
@@ -917,7 +917,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	 * and processes the results.
 	 */
 	private void continueChangeOwner(String newOwner) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.changeCruiseOwner(getUsername(), expocodeSet, newOwner, 
 				new AsyncCallback<DashboardCruiseList>() {
 			@Override
@@ -926,15 +926,15 @@ public class CruiseListPage extends CompositeWithUsername {
 					CruiseListPage.this.updateCruises(cruises);
 				}
 				else {
-					SocatUploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG + 
+					UploadDashboard.showMessage(CHANGE_OWNER_FAIL_MSG + 
 							UNEXPECTED_INVALID_DATESET_LIST_MSG);
 				}
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(CHANGE_OWNER_FAIL_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(CHANGE_OWNER_FAIL_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -987,41 +987,41 @@ public class CruiseListPage extends CompositeWithUsername {
 		// Set the minimum widths of the columns
 		double minTableWidth = 0.0;
 		datasetsGrid.setColumnWidth(rowNumColumn, 
-				SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.CHECKBOX_COLUMN_WIDTH;
+				UploadDashboard.CHECKBOX_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.CHECKBOX_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(selectedColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(expocodeColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(timestampColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(dataCheckColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(omeMetadataColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(addlDocsColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+				UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.FILENAME_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(socatVersionColumn,
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(qcStatusColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(archiveStatusColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(filenameColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+				UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.FILENAME_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(ownerColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		minTableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		minTableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		datasetsGrid.setMinimumTableWidth(minTableWidth, Style.Unit.EM);
@@ -1102,7 +1102,7 @@ public class CruiseListPage extends CompositeWithUsername {
 													SafeHtmlBuilder sb) {
 				String msg = getValue(cruise);
 				sb.appendHtmlConstant("<div style=\"color: " + 
-						SocatUploadDashboard.ROW_NUMBER_COLOR + ";\">");
+						UploadDashboard.ROW_NUMBER_COLOR + ";\">");
 				for (int k = msg.length(); k < 4; k++)
 					sb.appendHtmlConstant("&nbsp;");
 				sb.appendEscaped(msg);
@@ -1239,14 +1239,14 @@ public class CruiseListPage extends CompositeWithUsername {
 						    ( cruise.getNumErrorRows() <= DashboardUtils.MAX_ACCEPTABLE_ERRORS ) ) ) {
 					// Only warnings or a few minor errors - use warning background color
 					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-							SocatUploadDashboard.WARNING_COLOR + ";\"><u><em>");
+							UploadDashboard.CHECKER_WARNING_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
 				else {
 					// Many errors, unacceptable, or not checked - use error background color
 					sb.appendHtmlConstant("<div style=\"cursor:pointer; background-color:" +
-							SocatUploadDashboard.ERROR_COLOR + ";\"><u><em>");
+							UploadDashboard.CHECKER_ERROR_COLOR + ";\"><u><em>");
 					sb.appendEscaped(msg);
 					sb.appendHtmlConstant("</em></u></div>");
 				}
@@ -1527,7 +1527,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		// If no metadata documents, cannot submit
 		if ( cannotSubmit ) {
 			errMsg += NO_METADATA_HTML_EPILOGUE;
-			SocatUploadDashboard.showMessage(errMsg);
+			UploadDashboard.showMessage(errMsg);
 			return;
 		}
 
@@ -1561,7 +1561,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		// If unchecked or very serious data issues, put up error message and stop
 		if ( cannotSubmit ) {
 			errMsg += CANNOT_SUBMIT_HTML_EPILOGUE;
-			SocatUploadDashboard.showMessage(errMsg);
+			UploadDashboard.showMessage(errMsg);
 			return;
 		}
 

@@ -16,13 +16,13 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruiseList extends HashMap<String,DashboardCruise> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 8626036844211298574L;
+	private static final long serialVersionUID = 1395081680566539392L;
 
-	String username;
-	String socatVersion;
+	protected String username;
+	protected String socatVersion;
 	// The following indicates whether or not the above user 
 	// has manager or admin privileges; a bit of a kludge.
-	boolean manager;
+	protected boolean manager;
 
 	/**
 	 * Creates without a user or any cruises

@@ -86,21 +86,27 @@ public class UpdateWOCEFlags {
 
 				CruiseDsgNcFile dsgFile = null;
 				// Clear all the WOCE flags in the DSG file
-				char[] currentWoceFlags = null;
+				char[] currentWaterWoceFlags = null;
+				char[] currentAtmWoceFlags = null;
 				try {
 					dsgFile = dsgHandler.getDsgNcFile(expocode);
-					currentWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
+					currentWaterWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
+					currentAtmWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName());
 				} catch (Exception ex) {
 					System.err.println("Error reading the WOCE flags from the full-data DSG file for " + 
 							expocode + " : " + ex.getMessage());
 					success = false;
 					continue;
 				}
-				for (int k = 0; k < currentWoceFlags.length; k++) {
-					currentWoceFlags[k] = DashboardUtils.WOCE_NOT_CHECKED;
+				for (int k = 0; k < currentWaterWoceFlags.length; k++) {
+					currentWaterWoceFlags[k] = DashboardUtils.WOCE_NOT_CHECKED;
+				}
+				for (int k = 0; k < currentAtmWoceFlags.length; k++) {
+					currentAtmWoceFlags[k] = DashboardUtils.WOCE_NOT_CHECKED;
 				}
 				try {
-					dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), currentWoceFlags);
+					dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), currentWaterWoceFlags);
+					dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_ATM.getVarName(), currentWaterWoceFlags);
 				} catch (Exception ex) {
 					System.err.println("Error clearing all the WOCE flags in the full-data DSG file for " +
 							expocode + " : " + ex.getMessage());

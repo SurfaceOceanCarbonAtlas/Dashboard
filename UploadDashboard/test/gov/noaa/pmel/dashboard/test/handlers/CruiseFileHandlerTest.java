@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * Test of {@link gov.noaa.pmel.dashboard.handlers.CruiseFileHandler}.
- * Uses an existing SocatUploadDashboard installation
+ * Uses an existing UploadDashboard installation
  * 
  * @author Karl Smith
  *

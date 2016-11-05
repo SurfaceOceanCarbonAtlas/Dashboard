@@ -22,7 +22,7 @@
 	<inherits name='com.googlecode.gwt.crypto.Crypto' />
 
 	<!-- Specify the app entry point class. -->
-	<entry-point class='gov.noaa.pmel.dashboard.client.SocatUploadDashboard' />
+	<entry-point class='gov.noaa.pmel.dashboard.client.UploadDashboard' />
 
 	<!-- Specify the paths for translatable code -->
 	<source path='client' />

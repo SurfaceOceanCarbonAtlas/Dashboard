@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -193,7 +193,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	static void showPage(DashboardCruiseList cruiseList) {
 		if ( singleton == null )
 			singleton = new AddlDocsManagerPage();
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		singleton.updateAddlDocs(cruiseList);
 		History.newItem(PagesEnum.MANAGE_DOCUMENTS.name(), false);
 	}
@@ -208,7 +208,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -296,14 +296,14 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		// Make sure a file was selected
 		String uploadFilename = DashboardUtils.baseName(docUpload.getFilename());
 		if ( uploadFilename.isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 
 		// Disallow any overwrite of an OME file
 		if ( uploadFilename.equals(DashboardUtils.OME_FILENAME) ||
 			 uploadFilename.equals(DashboardUtils.PI_OME_FILENAME) ) {
-			SocatUploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_OME_OVERWRITE_ERROR_MSG);
 			return;
 		}
 
@@ -354,7 +354,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
@@ -370,12 +370,12 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 			public void onSuccess(DashboardCruiseList cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(ADDL_DOCS_LIST_FAIL_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(ADDL_DOCS_LIST_FAIL_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}
@@ -388,7 +388,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	 */
 	private void processResultMsg(String resultMsg) {
 		if ( resultMsg == null ) {
-			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
+			UploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
 			return;
 		}
 		resultMsg = resultMsg.trim();
@@ -399,7 +399,7 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		}
 		else {
 			// Unknown response, just display the entire message
-			SocatUploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START + 
+			UploadDashboard.showMessage(EXPLAINED_FAIL_MSG_START + 
 					SafeHtmlUtils.htmlEscape(resultMsg) + EXPLAINED_FAIL_MSG_END);
 		}
 	}
@@ -423,17 +423,17 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 		// Set the minimum widths of the columns
 		double tableWidth = 0.0;
 		addlDocsGrid.setColumnWidth(deleteColumn, 
-				SocatUploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NARROW_COLUMN_WIDTH;
+				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		addlDocsGrid.setColumnWidth(filenameColumn, 
-				SocatUploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.FILENAME_COLUMN_WIDTH;
+				UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.FILENAME_COLUMN_WIDTH;
 		addlDocsGrid.setColumnWidth(uploadTimeColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 		addlDocsGrid.setColumnWidth(expocodeColumn, 
-				SocatUploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
-		tableWidth += SocatUploadDashboard.NORMAL_COLUMN_WIDTH;
+				UploadDashboard.NORMAL_COLUMN_WIDTH, Style.Unit.EM);
+		tableWidth += UploadDashboard.NORMAL_COLUMN_WIDTH;
 
 		// Set the minimum width of the full table
 		addlDocsGrid.setMinimumTableWidth(tableWidth, Style.Unit.EM);
@@ -568,19 +568,19 @@ public class AddlDocsManagerPage extends CompositeWithUsername {
 	 */
 	private void continueDelete(String deleteFilename, String deleteExpocode) {
 		// Send the request to the server
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 		service.deleteAddlDoc(getUsername(), deleteFilename, deleteExpocode, 
 				expocodes, new AsyncCallback<DashboardCruiseList>() {
 			@Override
 			public void onSuccess(DashboardCruiseList cruiseList) {
 				// Update the list shown in this page
 				updateAddlDocs(cruiseList);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showAutoCursor();
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				SocatUploadDashboard.showFailureMessage(DELETE_DOCS_FAIL_MSG, ex);
-				SocatUploadDashboard.showAutoCursor();
+				UploadDashboard.showFailureMessage(DELETE_DOCS_FAIL_MSG, ex);
+				UploadDashboard.showAutoCursor();
 			}
 		});
 	}

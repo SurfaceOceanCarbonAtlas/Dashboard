@@ -19,18 +19,18 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7655703582585602369L;
+	private static final long serialVersionUID = -1072054235415230028L;
 
-	private String varName;
-	private Double sortOrder;
-	private String displayName;
-	private String dataClassName;
-	private String description;
-	private String standardName;
-	private String categoryName;
-	private ArrayList<String> units;
-	private Integer selectedUnitIndex;
-	private String selectedMissingValue;
+	protected String varName;
+	protected Double sortOrder;
+	protected String displayName;
+	protected String dataClassName;
+	protected String description;
+	protected String standardName;
+	protected String categoryName;
+	protected ArrayList<String> units;
+	protected Integer selectedUnitIndex;
+	protected String selectedMissingValue;
 
 	/**
 	 * Create an empty data column type; 
@@ -414,6 +414,47 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 		return false;
 	}
 
+	/**
+	 * @return
+	 * 		if this is a WOCE flag type
+	 */
+	public boolean isWoceType() {
+		if ( ! categoryName.equals(DashboardUtils.QUALITY_CATEGORY) )
+			return false;
+		if ( ! dataClassName.equals(DashboardUtils.CHAR_DATA_CLASS_NAME) )
+			return false;
+		if ( ! varName.toUpperCase().startsWith("WOCE_") )
+			return false;
+		return true;
+	}
+
+	/**
+	 * Determines if this type is a WOCE comment for the given WOCE flag type.
+	 * 
+	 * @param woceType
+	 * 		WOCE flag type to use; 
+	 * 		if null, checks if this a comment for any possible WOCE flag type. 
+	 * @return
+	 * 		if this type is a WOCE comment for the given WOCE flag type
+	 * @throws IllegalArgumentException
+	 * 		if woceType is not null and not a WOCE flag type
+	 */
+	public boolean isWoceCommentFor(DataColumnType woceType) throws IllegalArgumentException {
+		if ( woceType != null ) {
+			if ( ! woceType.isWoceType() )
+				throw new IllegalArgumentException("Argument to isWoceCommentFor is not a WOCE flag type: " + woceType.varName);
+			if ( ! varName.toUpperCase().equals("COMMENT_" + woceType.varName.toUpperCase()) )
+				return false;
+		}
+		else {
+			if ( ! varName.toUpperCase().startsWith("COMMENT_WOCE_") )
+				return false;
+		}
+		if ( ! dataClassName.equals(DashboardUtils.STRING_DATA_CLASS_NAME) )
+			return false;
+		return true;
+	}
+
 	@Override
 	public int compareTo(DataColumnType other) {
 		int result;
@@ -511,7 +552,7 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 	public String toString() {
 		return "DataColumnType[ " +
 				"varName=\"" + varName + "\", " +
-				"sortOrder=" + sortOrder.toString() +
+				"sortOrder=" + sortOrder.toString() + ", " +
 				"displayName=\"" + displayName + "\", " +
 				"dataClassName=\"" + dataClassName + "\", " +
 				"description=\"" + description + "\", " +

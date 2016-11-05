@@ -4,7 +4,6 @@
 package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
-import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
@@ -17,22 +16,17 @@ import gov.noaa.pmel.dashboard.server.SocatMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.shared.QCEvent;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Formatter;
-import java.util.Map.Entry;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -200,7 +194,6 @@ public class SocatCruiseReporter {
 	private DsgNcFileHandler dsgFileHandler;
 	private KnownDataTypes knownMetadataTypes;
 	private KnownDataTypes knownDataFileTypes;
-	private DatabaseRequestHandler databaseHandler;
 
 	/**
 	 * For generating cruise reports from the data provided 
@@ -216,7 +209,6 @@ public class SocatCruiseReporter {
 		dsgFileHandler = configStore.getDsgNcFileHandler();
 		knownMetadataTypes = configStore.getKnownMetadataTypes();
 		knownDataFileTypes = configStore.getKnownDataFileTypes();
-		databaseHandler = configStore.getDatabaseRequestHandler();
 	}
 
 	/**
@@ -1254,187 +1246,6 @@ public class SocatCruiseReporter {
 	}
 
 	/**
-	 * Print the summary line for a cruise.  The line contains tab-separated 
-	 * values in the order corresponding to the tab-separated titles in the 
-	 * header line printed by {@link #printSummaryHeader(PrintStream)}.
-	 * 
-	 * @param expocode
-	 * 		print the summary for the cruise with this expocode
-	 * @param out
-	 * 		print the summary to here
-	 * @throws IllegalArgumentException
-	 * 		if there are problems generating the summary for the cruise
-	 */
-	public void printCruiseSummary(String expocode, PrintWriter out) 
-											throws IllegalArgumentException {
-		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
-
-		String dsgQCFlag;
-		// String databaseQCFlag;
-		String socatVersionStatus;
-		String oldExpocode;
-		String regions;
-		String numRows;
-		String numMissRows;
-		String numErrRows;
-		String numWarnRows;
-		String numOkayRows;
-		String vesselName;
-		String pis;
-
-		DashboardCruise cruiseInfo = cruiseHandler.getCruiseFromInfoFile(upperExpo);
-		if ( cruiseInfo == null )
-			throw new IllegalArgumentException("No cruise data for " + upperExpo);
-		String qcStatus = cruiseInfo.getQcStatus();
-		if ( DashboardUtils.QC_STATUS_NOT_SUBMITTED.equals(qcStatus) )
-			throw new IllegalArgumentException(upperExpo + " has not been submitted for QC");
-
-		DashboardOmeMetadata omeMetadata = new DashboardOmeMetadata(
-				metadataHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME), metadataHandler);
-		vesselName = omeMetadata.getVesselName();
-		pis = omeMetadata.getScienceGroup();
-
-		CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-		if ( ! dsgFile.exists() )
-			throw new IllegalArgumentException("DSG file does not exist for " + upperExpo);
-		try {
-			dsgFile.readMetadata(knownMetadataTypes);
-			dsgFile.readData(knownDataFileTypes);
-		} catch (IOException ex) {
-			throw new IllegalArgumentException("Problems reading the DSG file for " + 
-					upperExpo + ": " + ex.getMessage());
-		}
-
-		ArrayList<SocatCruiseData> dataList = dsgFile.getDataList();
-		numRows = Integer.toString(dataList.size());
-		int numMissing = 0;
-		int numWoceOkay = 0;
-		int numWoceBad = 0;
-		int numWoceWarn = 0;
-		TreeSet<String> regionNames = new TreeSet<String>();
-		for ( SocatCruiseData data : dataList ) {
-			Character woceCO2Water = data.getWoceCO2Water();
-			if ( DashboardUtils.FP_MISSING_VALUE.equals(data.getfCO2Rec()) ) {
-				numMissing++;
-			}
-			else if ( woceCO2Water.equals(DashboardUtils.WOCE_BAD) ) {
-				numWoceBad++;
-			}
-			else if ( woceCO2Water.equals(DashboardUtils.WOCE_QUESTIONABLE) ) {
-				numWoceWarn++;
-			}
-			else { 
-				numWoceOkay++;
-			}
-			regionNames.add(DashboardUtils.REGION_NAMES.get(data.getRegionID()));
-		}
-		numMissRows = Integer.toString(numMissing);
-		numErrRows = Integer.toString(numWoceBad);
-		numWarnRows = Integer.toString(numWoceWarn);
-		numOkayRows = Integer.toString(numWoceOkay);
-		regionNames.remove(DashboardUtils.REGION_NAMES.get(DashboardUtils.GLOBAL_REGION_ID));
-		regions = "";
-		for ( String name : regionNames )
-			regions += "; " + name;
-		regions = regions.substring(2);
-
-		SocatMetadata socatMetadata = dsgFile.getMetadata();
-		socatVersionStatus = socatMetadata.getSocatVersion();
-		dsgQCFlag = socatMetadata.getQcFlag();
-		String westmost = String.format("%#.2f", socatMetadata.getWestmostLongitude());
-		String eastmost = String.format("%#.2f", socatMetadata.getEastmostLongitude());
-		String southmost = String.format("%#.2f", socatMetadata.getSouthmostLatitude());
-		String northmost = String.format("%#.2f", socatMetadata.getNorthmostLatitude());
-		String firsttime = String.format("%1$tF %1$tR", socatMetadata.getBeginTime());
-		String lasttime = String.format("%1$tF %1$tR", socatMetadata.getEndTime());
-
-		/*
-		 * try {
-		 * 	databaseQCFlag = databaseHandler.getQCFlag(upperExpo).toString();
-		 * } catch (SQLException ex) {
-		 * 	throw new IllegalArgumentException("Problems generating \"the\" database QC flag for " +
-		 * 			upperExpo + ": " + ex.getMessage());
-		 * }
-		 */
-
-		ArrayList<QCEvent> qcEvents;
-		try {
-			qcEvents = databaseHandler.getQCEvents(upperExpo);
-		} catch (SQLException ex) {
-			throw new IllegalArgumentException("Problems reading database QC events for " +
-					upperExpo + ": " + ex.getMessage());
-		}
-		oldExpocode = "-";
-		for ( QCEvent evt : qcEvents ) {
-			if ( DashboardUtils.QC_RENAMED_FLAG.equals(evt.getFlag()) ) {
-				// Get the old expocode for this rename
-				String msg = evt.getComment();
-				String[] msgWords = msg.split("\\s+");
-				if ( ! ( (msgWords.length >= 5) &&
-						"Rename".equalsIgnoreCase(msgWords[0]) &&
-						"from".equalsIgnoreCase(msgWords[1]) &&
-						"to".equalsIgnoreCase(msgWords[3]) ) )
-					throw new IllegalArgumentException("Unexpected comment for rename: " + msg);
-				if ( upperExpo.equals(msgWords[4]) )
-					oldExpocode = msgWords[2];
-			}
-		}
-
-		out.println(
-			upperExpo + "\t" +
-			dsgQCFlag + "\t" +
-			socatVersionStatus + "\t" +
-			oldExpocode + "\t" +
-			numRows + "\t" +
-			numOkayRows + "\t" +
-			numWarnRows + "\t" +
-			numErrRows + "\t" +
-			numMissRows + "\t" +
-			regions + "\t" +
-			westmost + "\t" +
-			eastmost + "\t" +
-			southmost + "\t" + 
-			northmost + "\t" +
-			firsttime + "\t" +
-			lasttime + "\t" +
-			vesselName + "\t" +
-			pis);
-	}
-
-	/**
-	 * Tab-separated data column names used by {@link #printSummaryHeader(PrintWriter)}
-	 * for the data Strings printed by {@link #printCruiseSummary(String, PrintWriter)}.
-	 */
-	private static final String CRUISE_SUMMARY_HEADER = 
-			"Expocode\t" +
-			"QC_Flag\t" +
-			"SOCAT_Version\t" +
-			"Renamed_From\t" +
-			"Num_Observations\t" +
-			"Num_WOCE-2_fCO2Rec\t" +
-			"Num_WOCE-3_fCO2Rec\t" +
-			"Num_WOCE-4_fCO2Rec\t" +
-			"Num_Missing_fCO2Rec\t" +
-			"Regions\t" +
-			"Westmost\t" +
-			"Eastmost\t" +
-			"Southmost\t" + 
-			"Northmost\t" +
-			"Firsttime\t" + 
-			"Lasttime\t" + 
-			"Vessel\t" +
-			"Investigators";
-
-	/**
-	 * Prints the summary header to the given PrintStream
-	 * @param out
-	 * 		print the summary to here
-	 */
-	public void printSummaryHeader(PrintWriter out) {
-		out.println(CRUISE_SUMMARY_HEADER);
-	}
-
-	/**
 	 * Tab-separated data column names for the data printed by 
 	 * {@link #generateDataFileForGrids(TreeSet, File)}
 	 */
@@ -1515,109 +1326,6 @@ public class SocatCruiseReporter {
 		} finally {
 			report.close();
 		}
-	}
-
-	/**
-	 * Print a count of valid fCO2_rec data points in a collection 
-	 * of data sets.  Data points with a WOCE-3 or WOCE-4 flag, 
-	 * as well as data points without fCO2_rec are ignored.
-	 * Data point counts reported are grouped by year and QC flag.
-	 * 
-	 * @param expocodes
-	 * 		print a summary of the data for data sets with these expocodes
-	 * @param regionID
-	 * 		consider only data in the region with this ID; 
-	 * 		if null, no region restriction is made on the data
-	 * @param reportFile
-	 * 		print the report to this file
-	 * @return
-	 * 		list of warnings about the generated report;
-	 * 		never null but may be empty
-	 * @throws IllegalArgumentException
-	 * 		if an expocode is invalid,
-	 * @throws IOException 
-	 * 		if unable to read a DSG NC file, or
-	 * 		if unable to create the cruise report file
-	 */
-	public ArrayList<String> printDataCounts(TreeSet<String> expocodes, Character regionID, 
-			File reportFile) throws IllegalArgumentException, IOException {
-		// Map with Year + QC Flag as the keys, and number of data points as the values. 
-		TreeMap<String,Integer> counts = new TreeMap<String,Integer>();
-		// List of warning messages to return
-		ArrayList<String> warnMsgs = new ArrayList<String>();
-
-		PrintWriter report = new PrintWriter(reportFile, "ISO-8859-1");
-		try {
-			if ( regionID != null )
-				report.println(DashboardUtils.REGION_NAMES.get(regionID) + " region data point counts for data sets:");
-			else
-				report.println("Global data point counts for data sets:");
-			int k = 0;
-			for ( String expo : expocodes ) {
-				String upperExpo = DashboardServerUtils.checkExpocode(expo);
-				report.print("\t" + expo);
-				k++;
-				if ( ( k % 5 ) == 0 )
-					report.println();
-				CruiseDsgNcFile dsgFile = dsgFileHandler.getDsgNcFile(upperExpo);
-				ArrayList<String> unknownVars = dsgFile.readMetadata(knownMetadataTypes);
-				if ( unknownVars.size() > 0 ) {
-					String msg = upperExpo + " unknown metadata variables: ";
-					for (String var : unknownVars)
-						msg += var + "; ";
-					warnMsgs.add(msg);
-				}
-				// QC flag part of the map key string
-				String qcFlag = "\t" + dsgFile.getMetadata().getQcFlag();
-
-				unknownVars = dsgFile.readData(knownDataFileTypes);
-				if ( unknownVars.size() > 0 ) {
-					String msg = upperExpo + " unknown data variables: ";
-					for (String var : unknownVars)
-						msg += var + "; ";
-					warnMsgs.add(msg);
-				}
-				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
-					// Check that fCO2_rec is given
-					if ( DashboardUtils.FP_MISSING_VALUE.equals(dataVals.getfCO2Rec()) )
-						continue;
-					// Check WOCE flag for fCO2_rec
-					Character woceFlag = dataVals.getWoceCO2Water();
-					if ( ! ( DashboardUtils.WOCE_GOOD.equals(woceFlag) || 
-							DashboardUtils.WOCE_NOT_CHECKED.equals(woceFlag) ) )
-						continue;
-					// Check region, if appropriate
-					if ( (regionID != null) && 
-							( ! regionID.equals(dataVals.getRegionID()) ) )
-						continue;
-					// Increment the count for this year + QC flag.  This could be made 
-					// much more efficient since year is monotonically increasing, but 
-					// since this method is rarely called, it is not worth the effort.
-					String key = dataVals.getYear().toString() + qcFlag;
-					Integer value = counts.get(key);
-					if ( value == null ) {
-						value = 1;
-					}
-					else {
-						value++;
-					}
-					counts.put(key, value);
-				}
-			}
-
-			if ( ( k % 5 ) != 0 )
-				report.println();
-			report.println();
-
-			// Print out all the counts in the map (ordered by year then QC flag)
-			for ( Entry<String,Integer> entry : counts.entrySet() ) {
-				report.println(entry.getKey() + "\t" + entry.getValue().toString());
-			}
-		} finally {
-			report.close();
-		}
-
-		return warnMsgs;
 	}
 
 }

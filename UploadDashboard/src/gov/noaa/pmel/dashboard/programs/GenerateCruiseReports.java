@@ -18,9 +18,11 @@ import java.util.TreeSet;
  * 
  * @author Karl Smith
  */
-public class GenerateFullCruiseReports {
+public class GenerateCruiseReports {
 
 	/**
+	 * Generates full cruise reports for public consumption.
+	 * 
 	 * @param args
 	 * 		ExpocodesFile  Destination  [ RegionID ]
 	 * 

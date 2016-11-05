@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
@@ -53,11 +53,13 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"<li>a line of data values for each data sample</li>" +
 			"</ul></p>" +
 			"<p>The expocode, vessel (ship) name, and investigators " +
-			"names must be given in either the metadata lines: " +
+			"names must be given (vessel type is optional) in either " +
+			"the metadata lines: " +
 			"<ul style=\"list-style-type: none\">" +
 			"<li>expocode: ZZZZ20051231</li>" +
-			"<li>ship: Pacific Minnow</li>" +
+			"<li>vessel name: Pacific Minnow</li>" +
 			"<li>PIs: Smith, K.; Doe, J.</li>" +
+			"<li>vessel type: Ship</li>" +
 			"</ul> " +
 			"or they can be in columns with appropriate names.  </p>";
 	private static final String MORE_HELP_HTML = 
@@ -67,8 +69,9 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"lines were truncated to make it easier to see the format" +
 			"</p><p>" +
 			"Expocode: 33AT20120417<br />" +
-			"Ship: Atlantis<br />" +
+			"Vessel Name: Atlantis<br />" +
 			"PI: Wanninkhof, R.<br />" +
+			"Vessel Type: Ship<br />" +
 			"<br />" +
 			"CruiseID,JD_GMT,DATE_UTC__ddmmyyyy,TIME_UTC_hh:mm:ss,LAT_dec_degree,LONG_dec_degree,...<br />" +
 			"20-01B,110.79219,19042012,19:00:45,12.638,-59.239,...<br />" +
@@ -93,6 +96,9 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"'investigators', 'investigator name', 'investigator names', 'PI', PIs', " +
 			"'PI name', and PI names'.  For datasets with multiple investigators, " +
 			"put all names on one metadata line and separate the names with semicolons.  " +
+			"Tags for the vessel type are 'vessel type', 'platform type', or just 'type'.  " +
+			"If the vessel type is not specified, an intelligent guess is made based " +
+			"on the vessel name and/or the NODC code part of the expocode.  " +
 			"</p><p>" +
 			"Units for the columns can be given on a second column header line, " +
 			"such as the following:" +
@@ -100,6 +106,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"Expocode = 33AT20120417<br />" +
 			"Vessel Name = Atlantis<br />" +
 			"Investigator = Wanninkhof, R.<br />" +
+			"Vessel Type = Ship<br />" +
 			"<br />" +
 			"CruiseID,JD_GMT,DATE_UTC,TIME_UTC,LAT,LONG,...<br />" +
 			",Jan1=1,ddmmyyyy,hh:mm:ss,dec.deg.,dec.deg.,...<br />" +
@@ -373,7 +380,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		singleton.previewHtml.setHTML(NO_PREVIEW_HTML_MSG);
 		singleton.encodingListBox.setSelectedIndex(2);
 		singleton.advancedPanel.setOpen(false);
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		History.newItem(PagesEnum.UPLOAD_DATASETS.name(), false);
 	}
 
@@ -387,7 +394,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -428,7 +435,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	void logoutOnClick(ClickEvent event) {
 		DashboardLogoutPage.showPage();
 		// Make sure the normal cursor is shown
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	@UiHandler("moreHelpAnchor")
@@ -470,7 +477,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	void previewButtonOnClick(ClickEvent event) {
 		String namesString = getInputFileNames(uploadElement).trim();
 		if (  namesString.isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 		assignTokens(DashboardUtils.REQUEST_PREVIEW_TAG);
@@ -481,7 +488,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	void createButtonOnClick(ClickEvent event) {
 		String namesString = getInputFileNames(uploadElement).trim();
 		if (  namesString.isEmpty() ) {
-			SocatUploadDashboard.showMessage(NO_FILE_ERROR_MSG);
+			UploadDashboard.showMessage(NO_FILE_ERROR_MSG);
 			return;
 		}
 		if ( overwriteRadio.getValue() )
@@ -496,19 +503,19 @@ public class CruiseUploadPage extends CompositeWithUsername {
 		// Return to the cruise list page after updating the cruise list
 		CruiseListPage.showPage();
 		// Make sure the normal cursor is shown
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmit(SubmitEvent event) {
-		SocatUploadDashboard.showWaitCursor();
+		UploadDashboard.showWaitCursor();
 	}
 
 	@UiHandler("uploadForm")
 	void uploadFormOnSubmitComplete(SubmitCompleteEvent event) {
 		clearTokens();
 		processResultMsg(event.getResults());
-		SocatUploadDashboard.showAutoCursor();
+		UploadDashboard.showAutoCursor();
 	}
 
 	/**
@@ -520,7 +527,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private void processResultMsg(String resultMsg) {
 		// Check the returned results
 		if ( resultMsg == null ) {
-			SocatUploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
+			UploadDashboard.showMessage(UNEXPLAINED_FAIL_MSG);
 			return;
 		}
 		String[] splitMsgs = resultMsg.trim().split("\n");
@@ -638,7 +645,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			String errors = "";
 			for ( String msg : errMsgs ) 
 				errors += msg;
-			SocatUploadDashboard.showMessage(errors);
+			UploadDashboard.showMessage(errors);
 		}
 
 		// Process any successes

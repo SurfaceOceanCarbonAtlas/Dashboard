@@ -18,7 +18,6 @@ import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Properties;
 import java.util.TreeMap;
 
@@ -141,14 +140,13 @@ public class SocatCruiseDataTest {
 		DashboardCruiseWithData cruise = new DashboardCruiseWithData();
 		cruise.setDataColTypes(TEST_USER_TYPES);
 		cruise.setDataValues(TEST_VALUES);
-		ArrayList<HashSet<Integer>> woceThrees = cruise.getWoceThreeRowIndices();
-		ArrayList<HashSet<Integer>> woceFours = cruise.getWoceFourRowIndices();
-		for (int k = 0; k < TEST_USER_TYPES.size(); k++) {
-			woceThrees.add(new HashSet<Integer>());
-			woceFours.add(new HashSet<Integer>());
-		}
+		ArrayList<Integer> rowNums = new ArrayList<Integer>(TEST_USER_TYPES.size());
+		for (int k = 1; k <= TEST_USER_TYPES.size(); k++)
+			rowNums.add(k);
+		cruise.setRowNums(rowNums);
 		ArrayList<SocatCruiseData> dataList = SocatCruiseData.dataListFromDashboardCruise(KNOWN_DATA_TYPES, cruise);
 		for (int k = 0; k < dataList.size(); k++) {
+			rowNums.add(k+1);
 			SocatCruiseData dataRow = dataList.get(k);
 			assertEquals(EXPECTED_YEARS.get(k), dataRow.getYear());
 			assertEquals(EXPECTED_MONTHS.get(k), dataRow.getMonth());

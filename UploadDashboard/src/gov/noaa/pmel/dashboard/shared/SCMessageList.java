@@ -17,11 +17,11 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SCMessageList extends HashSet<SCMessage> implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6434854348799673565L;
+	private static final long serialVersionUID = 2963465761569124080L;
 
-	private String username;
-	private String expocode;
-	private ArrayList<String> summaries;
+	protected String username;
+	protected String expocode;
+	protected ArrayList<String> summaries;
 
 	public SCMessageList() {
 		super();

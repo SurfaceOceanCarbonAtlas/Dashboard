@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.client;
 
-import gov.noaa.pmel.dashboard.client.SocatUploadDashboard.PagesEnum;
+import gov.noaa.pmel.dashboard.client.UploadDashboard.PagesEnum;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterface;
 import gov.noaa.pmel.dashboard.shared.DashboardServicesInterfaceAsync;
@@ -165,9 +165,9 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		checkStatusCallback = new AsyncCallback<Boolean>() {
 			@Override
 			public void onSuccess(Boolean isDone) {
-				if ( SocatUploadDashboard.isCurrentPage(singleton) ) {
+				if ( UploadDashboard.isCurrentPage(singleton) ) {
 					if ( isDone ) {
-						SocatUploadDashboard.showAutoCursor();
+						UploadDashboard.showAutoCursor();
 					}
 					// Refresh this page to get the new image(s)
 					singleton.resetImageUrls();
@@ -180,10 +180,10 @@ public class CruisePreviewPage extends CompositeWithUsername {
 			}
 			@Override
 			public void onFailure(Throwable ex) {
-				if ( SocatUploadDashboard.isCurrentPage(singleton) ) {
-					SocatUploadDashboard.showAutoCursor();
+				if ( UploadDashboard.isCurrentPage(singleton) ) {
+					UploadDashboard.showAutoCursor();
 					singleton.resetImageUrls();
-					SocatUploadDashboard.showFailureMessage(PLOT_GENERATION_FAILURE_HTML, ex);
+					UploadDashboard.showFailureMessage(PLOT_GENERATION_FAILURE_HTML, ex);
 				}
 			}
 		};
@@ -272,7 +272,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 	static void showPage(DashboardCruiseList cruiseList) {
 		if ( singleton == null )
 			singleton = new CruisePreviewPage();
-		SocatUploadDashboard.updateCurrentPage(singleton);
+		UploadDashboard.updateCurrentPage(singleton);
 		singleton.updatePreviewPlots(cruiseList.keySet().iterator().next(), 
 									 cruiseList.getUsername());
 		History.newItem(PagesEnum.PREVIEW_CRUISE.name(), false);
@@ -288,7 +288,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 			CruiseListPage.showPage();
 		}
 		else {
-			SocatUploadDashboard.updateCurrentPage(singleton);
+			UploadDashboard.updateCurrentPage(singleton);
 		}
 	}
 
@@ -312,7 +312,7 @@ public class CruisePreviewPage extends CompositeWithUsername {
 		introHtml.setHTML(INTRO_HTML_PROLOGUE + SafeHtmlUtils.htmlEscape(this.expocode));
 		if ( this.expocode.length() > 11 ) {
 			// Tell the server to generate the preview plots
-			SocatUploadDashboard.showWaitCursor();
+			UploadDashboard.showWaitCursor();
 			DateTimeFormat formatter = DateTimeFormat.getFormat("MMddHHmmss");
 			this.timetag = formatter.format(new Date(), TimeZone.createTimeZone(0));
 			service.buildPreviewImages(getUsername(), this.expocode, 

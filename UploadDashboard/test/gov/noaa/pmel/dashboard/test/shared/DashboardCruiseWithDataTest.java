@@ -12,7 +12,6 @@ import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 
 import org.junit.Test;
 
@@ -121,6 +120,26 @@ public class DashboardCruiseWithDataTest {
 	}
 
 	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData#getRowNums()}
+	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData#setRowNums(java.util.ArrayList)}.
+	 */
+	@Test
+	public void testSetGetRowNums() {
+		ArrayList<Integer> myRowNums = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 5, 6));
+		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
+		assertEquals(0, cruiseData.getRowNums().size());
+		cruiseData.setRowNums(myRowNums);
+		assertEquals(myRowNums, cruiseData.getRowNums());
+		assertEquals(0, cruiseData.getPreamble().size());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
+		cruiseData.setRowNums(null);
+		assertEquals(0, cruiseData.getRowNums().size());
+	}
+
+	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData#getDataValues()}
 	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData#setDataValues(java.util.ArrayList)}.
 	 */
@@ -147,6 +166,7 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(0, cruiseData.getDataValues().size());
 		cruiseData.setDataValues(dataValues);
 		assertEquals(dataValues, cruiseData.getDataValues());
+		assertEquals(0, cruiseData.getRowNums().size());
 		assertEquals(0, cruiseData.getPreamble().size());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
@@ -154,71 +174,6 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
 		cruiseData.setDataValues(null);
 		assertEquals(0, cruiseData.getDataValues().size());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getWoceThreeRowIndices()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setWoceThreeRowIndices(java.util.ArrayList)}.
-	 */
-	@Test
-	public void testSetGetWoceThreeRowIndices() {
-		Integer[][] woceThreeIndices = {
-				{ 2, 6 },
-				{ },
-				{ 6 },
-				{ 3, 0, 6 },
-				{ }
-		};
-		ArrayList<HashSet<Integer>> woceThreeRowSets = 
-				new ArrayList<HashSet<Integer>>(woceThreeIndices.length);
-		for (int k = 0; k < woceThreeIndices.length; k++)
-			woceThreeRowSets.add(new HashSet<Integer>(Arrays.asList(woceThreeIndices[k])));
-
-		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals(0, cruiseData.getWoceThreeRowIndices().size());
-		cruiseData.setWoceThreeRowIndices(woceThreeRowSets);
-		assertEquals(woceThreeRowSets, cruiseData.getWoceThreeRowIndices());
-		assertEquals(0, cruiseData.getDataValues().size());
-		assertEquals(0, cruiseData.getPreamble().size());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
-		cruiseData.setWoceThreeRowIndices(null);
-		assertEquals(0, cruiseData.getWoceThreeRowIndices().size());
-	}
-
-	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getWoceFourRowIndices()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setWoceFourRowIndices(java.util.ArrayList)}.
-	 */
-	@Test
-	public void testSetGetWoceFourRowIndices() {
-		Integer[][] woceFourIndices = {
-				{ },
-				{ 1, 4 },
-				{ 5, 2, 8 },
-				{ 3 },
-				{ }
-		};
-		ArrayList<HashSet<Integer>> woceFourRowSets = 
-				new ArrayList<HashSet<Integer>>(woceFourIndices.length);
-		for (int k = 0; k < woceFourIndices.length; k++)
-			woceFourRowSets.add(new HashSet<Integer>(Arrays.asList(woceFourIndices[k])));
-
-		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
-		assertEquals(0, cruiseData.getWoceFourRowIndices().size());
-		cruiseData.setWoceFourRowIndices(woceFourRowSets);
-		assertEquals(woceFourRowSets, cruiseData.getWoceFourRowIndices());
-		assertEquals(0, cruiseData.getWoceThreeRowIndices().size());
-		assertEquals(0, cruiseData.getDataValues().size());
-		assertEquals(0, cruiseData.getPreamble().size());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getExpocode());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getUploadFilename());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruiseData.getOwner());
-		cruiseData.setWoceFourRowIndices(null);
-		assertEquals(0, cruiseData.getWoceFourRowIndices().size());
 	}
 
 	/**
@@ -237,6 +192,7 @@ public class DashboardCruiseWithDataTest {
 				"Ship/Vessel Name: Skogafoss",
 				"Principal Investigator(s): Rik Wanninkhof"
 		));
+		ArrayList<Integer> myRowNums = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 5, 6));
 		String[][] observations = {
 				{ "2003-12-05 22:12", "337.28101", "64.10700", "26.910", 
 					"5.410", "5.700", null, "1026.500", "373.740" },
@@ -253,28 +209,6 @@ public class DashboardCruiseWithDataTest {
 				new ArrayList<ArrayList<String>>(observations.length);
 		for (int k = 0; k < observations.length; k++)
 			dataValues.add(new ArrayList<String>(Arrays.asList(observations[k])));
-		Integer[][] woceThreeIndices = {
-				{ 2, 6 },
-				{ },
-				{ 6 },
-				{ 3, 0, 6 },
-				{ }
-		};
-		ArrayList<HashSet<Integer>> woceThreeRowSets = 
-				new ArrayList<HashSet<Integer>>(woceThreeIndices.length);
-		for (int k = 0; k < woceThreeIndices.length; k++)
-			woceThreeRowSets.add(new HashSet<Integer>(Arrays.asList(woceThreeIndices[k])));
-		Integer[][] woceFourIndices = {
-				{ },
-				{ 1, 4 },
-				{ 5, 2, 8 },
-				{ 3 },
-				{ }
-		};
-		ArrayList<HashSet<Integer>> woceFourRowSets = 
-				new ArrayList<HashSet<Integer>>(woceFourIndices.length);
-		for (int k = 0; k < woceFourIndices.length; k++)
-			woceFourRowSets.add(new HashSet<Integer>(Arrays.asList(woceFourIndices[k])));
 
 		DashboardCruiseWithData firstData = new DashboardCruiseWithData();
 		assertFalse( firstData.equals(null) );
@@ -318,24 +252,17 @@ public class DashboardCruiseWithDataTest {
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 
+		firstData.setRowNums(myRowNums);
+		assertTrue( firstData.hashCode() != secondData.hashCode() );
+		assertFalse( firstData.equals(secondData) );
+		secondData.setRowNums(myRowNums);
+		assertEquals(firstData.hashCode(), secondData.hashCode());
+		assertEquals(firstData, secondData);
+
 		firstData.setDataValues(dataValues);
 		assertTrue( firstData.hashCode() != secondData.hashCode() );
 		assertFalse( firstData.equals(secondData) );
 		secondData.setDataValues(dataValues);
-		assertEquals(firstData.hashCode(), secondData.hashCode());
-		assertEquals(firstData, secondData);
-
-		firstData.setWoceThreeRowIndices(woceThreeRowSets);
-		assertTrue( firstData.hashCode() != secondData.hashCode() );
-		assertFalse( firstData.equals(secondData) );
-		secondData.setWoceThreeRowIndices(woceThreeRowSets);
-		assertEquals(firstData.hashCode(), secondData.hashCode());
-		assertEquals(firstData, secondData);
-
-		firstData.setWoceFourRowIndices(woceFourRowSets);
-		assertTrue( firstData.hashCode() != secondData.hashCode() );
-		assertFalse( firstData.equals(secondData) );
-		secondData.setWoceFourRowIndices(woceFourRowSets);
 		assertEquals(firstData.hashCode(), secondData.hashCode());
 		assertEquals(firstData, secondData);
 	}
