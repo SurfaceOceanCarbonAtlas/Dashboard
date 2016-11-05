@@ -15,10 +15,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class QCEvent extends DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -5162051521920318473L;
+	private static final long serialVersionUID = -2316178075422407095L;
 
-	Character flag;
-	Character regionID;
+	protected Character flag;
+	protected Character regionID;
 
 	/**
 	 * Creates an empty QC flag as a comment in the global region 

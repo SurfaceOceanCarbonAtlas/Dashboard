@@ -236,6 +236,46 @@ public class DashDataType implements Comparable<DashDataType> {
 	}
 
 	/**
+	 * @return
+	 * 		if this is a WOCE flag type
+	 */
+	public boolean isWoceType() {
+		return dataType.isWoceType();
+	}
+
+	/**
+	 * Determines if this type is a WOCE comment for the given WOCE flag type.
+	 * 
+	 * @param woceType
+	 * 		WOCE flag type to use;
+	 * 		if null, checks if this a comment for any possible WOCE flag type. 
+	 * @return
+	 * 		if this type is a WOCE comment for the given WOCE flag type
+	 * @throws IllegalArgumentException
+	 * 		if woceType is not null and not a WOCE flag type
+	 */
+	public boolean isWoceCommentFor(DataColumnType woceType) throws IllegalArgumentException {
+		return dataType.isWoceCommentFor(woceType);
+	}
+
+	/**
+	 * Determines if this type is a WOCE comment for the given WOCE flag type.
+	 * 
+	 * @param woceType
+	 * 		WOCE flag type to use;
+	 * 		if null, checks if this a comment for any possible WOCE flag type. 
+	 * @return
+	 * 		if this type is a WOCE comment for the given WOCE flag type
+	 * @throws IllegalArgumentException
+	 * 		if woceType is not null and not a WOCE flag type
+	 */
+	public boolean isWoceCommentFor(DashDataType woceType) throws IllegalArgumentException {
+		if ( woceType == null )
+			return dataType.isWoceCommentFor(null);
+		return dataType.isWoceCommentFor(woceType.dataType);
+	}
+
+	/**
 	 * Creates a JSON description string of this data types that can be
 	 * used as a Property value with a key that is the variable name 
 	 * of this data type.  The data types can be regenerated from the

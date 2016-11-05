@@ -3,6 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
+import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
@@ -719,20 +720,21 @@ public class DatabaseRequestHandler {
 					woceEvent.getUsername(), woceEvent.getRealname());
 			// Add the WOCE event
 			PreparedStatement prepStmt = catConn.prepareStatement("INSERT INTO `" + 
-					WOCEEVENTS_TABLE_NAME + "` (`woce_flag`, `woce_time`, `expocode`, " +
-					"`socat_version`, `data_name`, `reviewer_id`, `woce_comment`) " +
-					"VALUES(?, ?, ?, ?, ?, ?, ?);");
-			prepStmt.setString(1, woceEvent.getFlag().toString());
+					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
+					"`expocode`, `socat_version`, `data_name`, `reviewer_id`, " +
+					"`woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
+			prepStmt.setString(1, woceEvent.getWoceName());
+			prepStmt.setString(2, woceEvent.getFlag().toString());
 			Date flagDate = woceEvent.getFlagDate();
 			if ( flagDate.equals(DashboardUtils.DATE_MISSING_VALUE) )
-				prepStmt.setLong(2, Math.round(System.currentTimeMillis() / 1000.0));
+				prepStmt.setLong(3, Math.round(System.currentTimeMillis() / 1000.0));
 			else
-				prepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
-			prepStmt.setString(3, woceEvent.getExpocode());
-			prepStmt.setString(4, woceEvent.getVersion());
-			prepStmt.setString(5, woceEvent.getVarName());
-			prepStmt.setInt(6, reviewerId);
-			prepStmt.setString(7, woceEvent.getComment());
+				prepStmt.setLong(3, Math.round(flagDate.getTime() / 1000.0));
+			prepStmt.setString(4, woceEvent.getExpocode());
+			prepStmt.setString(5, woceEvent.getVersion());
+			prepStmt.setString(6, woceEvent.getVarName());
+			prepStmt.setInt(7, reviewerId);
+			prepStmt.setString(8, woceEvent.getComment());
 			if ( prepStmt.executeUpdate() != 1 )
 				throw new SQLException("Adding the WOCE event was unsuccessful");
 			// Get the woce_id for the added WOCE event
@@ -809,6 +811,7 @@ public class DatabaseRequestHandler {
 		if ( id < 1 )
 			throw new SQLException("Unexpected invalid woce_id");
 		woceEvent.setId(id);
+		woceEvent.setWoceName(results.getString("woce_name"));
 		try {
 			woceEvent.setFlag(results.getString("woce_flag").charAt(0));
 		} catch (NullPointerException ex) {
@@ -821,8 +824,6 @@ public class DatabaseRequestHandler {
 			woceEvent.setFlagDate(null);
 		woceEvent.setExpocode(results.getString("expocode"));
 		woceEvent.setVersion(results.getString("socat_version"));
-		if ( results.wasNull() )
-			woceEvent.setVersion(null);
 		woceEvent.setVarName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
 		woceEvent.setRealname(results.getString("realname"));
@@ -1116,21 +1117,23 @@ public class DatabaseRequestHandler {
 
 			// Add two rename WOCE events; one for the old expocode and one for the new expocode
 			PreparedStatement addWocePrepStmt = catConn.prepareStatement("INSERT INTO `" + 
-					WOCEEVENTS_TABLE_NAME + "` (`woce_flag`, `woce_time`, `expocode`, " +
-					"`socat_version`, `reviewer_id`, `woce_comment`) " +
-					"VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);");
-			addWocePrepStmt.setString(1, DashboardUtils.WOCE_RENAME.toString());
-			addWocePrepStmt.setString(7, DashboardUtils.WOCE_RENAME.toString());
-			addWocePrepStmt.setLong(2, nowSec);
-			addWocePrepStmt.setLong(8, nowSec);
-			addWocePrepStmt.setString(3, oldExpocode);
-			addWocePrepStmt.setString(9, newExpocode);
-			addWocePrepStmt.setString(4, socatVersion);
-			addWocePrepStmt.setString(10, socatVersion);
-			addWocePrepStmt.setInt(5, reviewerId);
-			addWocePrepStmt.setInt(11, reviewerId);
-			addWocePrepStmt.setString(6, renameComment);
-			addWocePrepStmt.setString(12, renameComment);
+					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
+					"`expocode`, `socat_version`, `reviewer_id`, `woce_comment`) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
+			addWocePrepStmt.setString(1, SocatTypes.WOCE_CO2_WATER.getVarName());
+			addWocePrepStmt.setString(8, SocatTypes.WOCE_CO2_WATER.getVarName());
+			addWocePrepStmt.setString(2, DashboardUtils.WOCE_RENAME.toString());
+			addWocePrepStmt.setString(9, DashboardUtils.WOCE_RENAME.toString());
+			addWocePrepStmt.setLong(3, nowSec);
+			addWocePrepStmt.setLong(10, nowSec);
+			addWocePrepStmt.setString(4, oldExpocode);
+			addWocePrepStmt.setString(11, newExpocode);
+			addWocePrepStmt.setString(5, socatVersion);
+			addWocePrepStmt.setString(12, socatVersion);
+			addWocePrepStmt.setInt(6, reviewerId);
+			addWocePrepStmt.setInt(13, reviewerId);
+			addWocePrepStmt.setString(7, renameComment);
+			addWocePrepStmt.setString(14, renameComment);
 			addWocePrepStmt.executeUpdate();
 		} finally {
 			catConn.close();

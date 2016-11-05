@@ -466,19 +466,17 @@ public class UserFileHandler extends VersionedFileHandler {
 	}
 
 	/**
-	 * Updates and saves the data column names to types, units, and missing
-	 * values properties file for a cruise owner from the currently assigned 
-	 * column names, types, units, and missing values given in a cruise.
+	 * Updates and saves the data column names to types for a user from 
+	 * the currently assigned column names, types, units, and missing values 
+	 * given in a cruise.
 	 * 
 	 * @param cruise
-	 * 		update the data column names to types, units, and missing values
-	 * 		from this cruise
+	 * 		update the data column names to types from this cruise
 	 * @param username
-	 * 		user making this update (for the version control commit message)
+	 * 		update data column names to types for this user
 	 * @throws IllegalArgumentException
-	 * 		if the data column names to types, units, and missing values 
-	 * 		properties file for the cruise owner, if it exists, is invalid, 
-	 * 		or if unable to save or commit the updated version of this file 
+	 * 		if the data column names to types file is invalid (if it exists), or 
+	 * 		if unable to save or commit the updated version of this file 
 	 */
 	public void updateUserDataColumnTypes(DashboardCruise cruise, String username) 
 											throws IllegalArgumentException {
@@ -486,8 +484,7 @@ public class UserFileHandler extends VersionedFileHandler {
 		HashMap<String,DataColumnType> userColNamesToTypes = 
 				new HashMap<String,DataColumnType>(defaultColNamesToTypes);
 		// Add the user-customized map of column names to types
-		File propsFile = new File(filesDir, 
-				cruise.getOwner() + USER_DATA_COLUMNS_NAME_EXTENSION);
+		File propsFile = new File(filesDir, username + USER_DATA_COLUMNS_NAME_EXTENSION);
 		if ( propsFile.exists() ) 
 			addDataColumnNames(userColNamesToTypes, propsFile);
 		// Add mappings of data columns names to types, units, 
@@ -535,19 +532,18 @@ public class UserFileHandler extends VersionedFileHandler {
 		} catch (IOException ex) {
 			throw new IllegalArgumentException(
 					"Problems saving the data column names to types, units, " +
-					"and missing values file for " + cruise.getOwner() + "\n" + 
+					"and missing values file for " + username + "\n" + 
 					ex.getMessage());
 		}
 		// Commit the update version of this file
 		try {
 			commitVersion(propsFile, 
 					"Data column names to types, units, and missing values " +
-					"properties file for " + cruise.getOwner() + 
-					" updated by " + username);
+					"properties file for " + username);
 		} catch (Exception ex) {
 			throw new IllegalArgumentException(
 					"Problems committing the data column names to types, units, " +
-					"and missing values file for " + cruise.getOwner() + "\n" + 
+					"and missing values file for " + username + "\n" + 
 					ex.getMessage());
 		}
 	}

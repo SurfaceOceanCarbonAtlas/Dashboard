@@ -16,6 +16,8 @@ import java.util.Date;
  * This is intended for cruises that are suspended and resubmitted with 
  * the same data but updated metadata.
  * 
+ * TODO: only restore WOCE_CO2_water; need to update if need to restore WOCE_CO2_atm
+ * 
  * @author Karl Smith
  */
 public class RestoreWoceFlags {

@@ -9,6 +9,7 @@ import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
 import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
+import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
@@ -16,13 +17,16 @@ import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
+import gov.noaa.pmel.dashboard.shared.DataColumnType;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
+import gov.noaa.pmel.dashboard.shared.WoceType;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -129,17 +133,12 @@ public class CruiseSubmitter {
 						cruiseHandler.getCruiseDataFromFiles(expocode, 0, -1);
 
 				/*
-				 *  Convert the cruise data into standard units and setting to null
-				 *  those data lines which the PI has marked as bad.  
-				 *  Also adds and assigns year, month, day, hour, minute, second, 
-				 *  and WOCE columns if not present.  SanityChecker WOCE-4 flags
-				 *  are added to the WOCE column.
-				 *  Note: this saves messages and assigns WOCE flags with row 
-				 *  numbers of the trimmed data.
+				 *  Convert the cruise data into standard units.  Adds and assigns 
+				 *  year, month, day, hour, minute, and seconds columns if not present.
 				 */
 				if ( ! cruiseChecker.standardizeCruiseData(cruiseData) ) {
 					if ( cruiseData.getNumDataRows() < 1 )
-						errorMsgs.add(expocode + ": unacceptable; all data points marked bad");
+						errorMsgs.add(expocode + ": unacceptable; no valid data points");
 					else if (  ! cruiseChecker.checkProcessedOkay() )
 						errorMsgs.add(expocode + ": unacceptable; automated checking of data failed");
 					else if ( cruiseChecker.hadGeopositionErrors() )
@@ -149,6 +148,48 @@ public class CruiseSubmitter {
 						errorMsgs.add(expocode + ": unacceptable for unknown reason - unexpected");
 					continue;
 				}
+
+				// Make sure a column exists for each known WOCE type
+				int numRows = cruiseData.getNumDataRows();
+				ArrayList<String> colNames = cruiseData.getUserColNames();
+				ArrayList<DataColumnType> cruiseTypes = cruiseData.getDataColTypes();
+				ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
+				HashMap<String,Integer> woceTypeIndices = new HashMap<String,Integer>();
+				for ( DashDataType dtype : knownDataFileTypes.getKnownTypesSet() ) {
+					if ( dtype.isWoceType() ) {
+						Integer woceIdx = -1;
+						for (int k = 0; k < cruiseTypes.size(); k++) {
+							if ( dtype.typeNameEquals(cruiseTypes.get(k)) ) {
+								woceIdx = k;
+								break;
+							}
+						}
+						if ( woceIdx < 0 ) {
+							woceIdx = cruiseTypes.size();
+							// Add a column for this WOCE type
+							// !! Directly modifying the lists in cruiseData !!
+							colNames.add(dtype.getDisplayName());
+							cruiseTypes.add(dtype.duplicate());
+							for (int k = 0; k < numRows; k++)
+								dataVals.get(k).add(DashboardUtils.WOCE_NOT_CHECKED.toString());
+						}
+						woceTypeIndices.put(dtype.getVarName(), woceIdx);
+					}
+				}
+
+				// Only add SanityChecker WOCE-4 flags; the SanityChecker marks all 
+				// questionable data regardless of whether it is of consequence.
+				// Fine if these WOCE-4 flags overwrite a PI-provided WOCE flag.
+				for ( WoceType wtype : cruise.getCheckerWoceFours() ) {
+					Integer colIdx = woceTypeIndices.get(wtype.getWoceName());
+					if ( colIdx == null )
+						throw new RuntimeException("Unexpected unknown WOCE name: " + wtype.getWoceName());
+					Integer rowIdx = wtype.getRowIndex();
+					if ( (rowIdx < 0) || (rowIdx >= numRows) )
+						throw new RuntimeException("Unexpected WOCE row index: " + rowIdx.toString());
+					dataVals.get(rowIdx).set(colIdx, DashboardUtils.WOCE_BAD.toString());
+				}
+				// PI-provided WOCE flags are already in the data (that is where they came from)
 
 				try {
 					// Get the OME metadata for this cruise

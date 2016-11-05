@@ -155,12 +155,12 @@ public interface DashboardServicesInterface extends RemoteService {
 			String expocode) throws IllegalArgumentException;
 
 	/**
-	 * Reads the saved cruise file and returns the specified
-	 * rows of cruise data.  The outer list contains the rows 
-	 * of cruise data; the inner list contains the columns of
-	 * cruise data for that row.  (Thus, each row is all data 
-	 * measured for a given sample, and each column is data 
-	 * of a given type measured for all samples.)
+	 * Reads the saved cruise file and returns the specified rows of cruise 
+	 * data.  The outer list contains the rows of cruise data; the inner list 
+	 * contains the columns of cruise data for that row.  (Thus, each row is 
+	 * all data measured for a given sample, and each column is data of a 
+	 * given type measured for all samples.) 
+	 * The dashboard-generated row number is added as the first data column.
 	 * 
 	 * @param username
 	 * 		username for validation
@@ -177,7 +177,7 @@ public interface DashboardServicesInterface extends RemoteService {
 	 * 		if the cruise does not exist, or if there are 
 	 * 		problems obtaining the specified data for the cruise
 	 */
-	ArrayList<ArrayList<String>> getCruiseData(String username,
+	ArrayList<ArrayList<String>> getCruiseDataWithRowNum(String username,
 			String expocode, int firstRow, int numRows)
 					throws IllegalArgumentException;
 

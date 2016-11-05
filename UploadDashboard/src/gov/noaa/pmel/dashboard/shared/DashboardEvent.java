@@ -16,15 +16,15 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardEvent implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 7627175617050451698L;
+	private static final long serialVersionUID = 9074748769500742371L;
 
-	Long id;
-	Date flagDate;
-	String expocode;
-	String version;
-	String username;
-	String realname;
-	String comment;
+	protected Long id;
+	protected Date flagDate;
+	protected String expocode;
+	protected String version;
+	protected String username;
+	protected String realname;
+	protected String comment;
 
 	/**
 	 * Creates an empty flag

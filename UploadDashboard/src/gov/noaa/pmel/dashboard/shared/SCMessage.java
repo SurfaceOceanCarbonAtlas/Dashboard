@@ -16,7 +16,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class SCMessage implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 9217504902833036782L;
+	private static final long serialVersionUID = -4005618105121260450L;
 
 	/**
 	 * Enumerated type for the severity of the issue in the message
@@ -27,15 +27,15 @@ public class SCMessage implements Serializable, IsSerializable {
 		WARNING,
 	}
 
-	SCMsgSeverity severity;
-	int rowNumber;
-	String timestamp;
-	double longitude;
-	double latitude;
-	int colNumber;
-	String colName;
-	String generalComment;
-	String detailedComment;
+	protected SCMsgSeverity severity;
+	protected int rowNumber;
+	protected String timestamp;
+	protected double longitude;
+	protected double latitude;
+	protected int colNumber;
+	protected String colName;
+	protected String generalComment;
+	protected String detailedComment;
 
 	/**
 	 * Create an empty message of unknown severity

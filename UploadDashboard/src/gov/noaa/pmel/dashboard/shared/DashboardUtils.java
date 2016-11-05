@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 import com.googlecode.gwt.crypto.client.TripleDesCipher;
@@ -230,6 +229,8 @@ public class DashboardUtils {
 		FLAG_STATUS_MAP.put(QC_SUSPEND_FLAG, QC_STATUS_SUSPENDED);
 		FLAG_STATUS_MAP.put(QC_UPDATED_FLAG, QC_STATUS_SUBMITTED);
 		FLAG_STATUS_MAP.put(QC_EXCLUDE_FLAG, QC_STATUS_EXCLUDED);
+		// Map old 'F' flag to suspended
+		FLAG_STATUS_MAP.put('F', QC_STATUS_SUSPENDED);
 	}
 
 	/**
@@ -393,32 +394,37 @@ public class DashboardUtils {
 			104.0, "PI names", STRING_DATA_CLASS_NAME, "investigators", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
+	public static final DataColumnType VESSEL_TYPE = new DataColumnType("vessel_type", 
+			105.0, "vessel type", STRING_DATA_CLASS_NAME, "vessel type", null, 
+			IDENTIFIER_CATEGORY, NO_UNITS);
+
+
 	public static final DataColumnType WESTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_min", 
-			105.0, "westmost lon", DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", 
+			110.0, "westmost lon", DOUBLE_DATA_CLASS_NAME, "westernmost longitude", "geospatial_lon_min", 
 			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType EASTERNMOST_LONGITUDE = new DataColumnType("geospatial_lon_max", 
-			106.0, "eastmost lon", DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", 
+			111.0, "eastmost lon", DOUBLE_DATA_CLASS_NAME, "easternmost longitude", "geospatial_lon_max", 
 			LOCATION_CATEGORY, LONGITUDE_UNITS);
 
 	public static final DataColumnType SOUTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_min", 
-			107.0, "southmost lat", DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", 
+			112.0, "southmost lat", DOUBLE_DATA_CLASS_NAME, "southernmost latitude", "geospatial_lat_min", 
 			LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType NORTHERNMOST_LATITUDE = new DataColumnType("geospatial_lat_max", 
-			108.0, "northmost lat", DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", 
+			113.0, "northmost lat", DOUBLE_DATA_CLASS_NAME, "northernmost latitude", "geospatial_lat_max", 
 			LOCATION_CATEGORY, LATITUDE_UNITS);
 
 	public static final DataColumnType TIME_COVERAGE_START = new DataColumnType("time_coverage_start", 
-			109.0, "begin time", DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", 
+			114.0, "begin time", DATE_DATA_CLASS_NAME, "beginning time", "time_coverage_start", 
 			TIME_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType TIME_COVERAGE_END = new DataColumnType("time_converage_end", 
-			110.0, "end time", DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", 
+			115.0, "end time", DATE_DATA_CLASS_NAME, "ending time", "time_converage_end", 
 			TIME_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType QC_FLAG = new DataColumnType("qc_flag", 
-			111.0, "QC flag", STRING_DATA_CLASS_NAME, "QC flag", null, 
+			120.0, "QC flag", STRING_DATA_CLASS_NAME, "QC flag", null, 
 			QUALITY_CATEGORY, NO_UNITS);
 
 
@@ -589,7 +595,7 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * JSON-encodes an ArrayList of Integers suitable for decoding 
+	 * Encodes an ArrayList of Integers suitable for decoding 
 	 * with {@link #decodeIntegerArrayList(String)}
 	 * 
 	 * @param intList
@@ -613,12 +619,12 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * Decodes a (JSON-like) encoded array of numbers into an ArrayList of 
-	 * Integers.  Will decode an encoded string produced by 
-	 * {@link #encodeIntegerArrayList(ArrayList)}  
+	 * Decodes a encoded array of numbers produced by 
+	 * {@link #encodeIntegerArrayList(ArrayList)}
+	 * into an ArrayList of Integers.
 	 * 
 	 * @param arrayStr
-	 * 		JSON-encoded array of integer values to use
+	 * 		encoded array of integer values to use
 	 * @return
 	 * 		the decoded ArrayList of Integers; never null but may be empty
 	 * @throws NumberFormatException
@@ -634,10 +640,10 @@ public class DashboardUtils {
 								  .split("\\s*,\\s*", -1);
 		if ( (pieces.length == 1) && pieces[0].trim().isEmpty() )
 			return new ArrayList<Integer>(0);
-		Integer[] intArray = new Integer[pieces.length];
-		for (int k = 0; k < pieces.length; k++)
-			intArray[k] = Integer.parseInt(pieces[k].trim());
-		return new ArrayList<Integer>(Arrays.asList(intArray));
+		ArrayList<Integer> intList = new ArrayList<Integer>(pieces.length);
+		for ( String strVal : pieces )
+			intList.add(Integer.parseInt(strVal.trim()));
+		return intList;
 	}
 
 	/**
@@ -671,8 +677,8 @@ public class DashboardUtils {
 	}
 
 	/**
-	 * Decodes a (somewhat-JSON-like) encoded string array, like that 
-	 * produced by {@link #encodeStringArrayList(ArrayList)}, into an 
+	 * Decodes an encoded string array produced by 
+	 * {@link #encodeStringArrayList(ArrayList)}, into an 
 	 * ArrayList of strings.  Each string must be enclosed in double 
 	 * quotes; escaped characters within a string are not recognized 
 	 * or modified.  Strings must be separated by commas.  Whitespace 
@@ -692,108 +698,103 @@ public class DashboardUtils {
 		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
 			throw new IllegalArgumentException(
 					"Encoded string array not enclosed in brackets");
-		// Locate the double quote at the start of the first string 
-		// and at the end of the last string
-		int firstIndex = arrayStr.indexOf("\"");
-		int lastIndex = arrayStr.lastIndexOf("\"");
-		// Check for values not in double quotes within the brackets
-		if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
-			 ( (firstIndex > 1) && 
-				! arrayStr.substring(1, firstIndex).trim().isEmpty() ) ||
-			 ( (lastIndex > 1) && (lastIndex < arrayStr.length() - 2) && 
-				! arrayStr.substring(lastIndex+1, 
-								arrayStr.length()-1).trim().isEmpty() ) ) {
-			// Check for an empty array
-			if ( (firstIndex < 1) && 
-				 arrayStr.substring(1, arrayStr.length()-1).trim().isEmpty() )
-				return new ArrayList<String>(0);
+		String contents = arrayStr.substring(1, arrayStr.length() - 1);
+		if ( contents.trim().isEmpty() )
+			return new ArrayList<String>(0);
+		int firstIndex = contents.indexOf("\"");
+		int lastIndex = contents.lastIndexOf("\"");
+		if ( (firstIndex < 0) || (lastIndex == firstIndex) ||
+			 ( ! contents.substring(0, firstIndex).trim().isEmpty() ) ||
+			 ( ! contents.substring(lastIndex+1).trim().isEmpty() ) )
 			throw new IllegalArgumentException("Strings in encoded " +
 					"string array are not enclosed in double quotes");
-		}
-		// Split up the substring between the first and last double quote
-		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
+		String[] pieces = contents.substring(firstIndex+1, lastIndex)
 								  .split("\"\\s*,\\s*\"", -1);
-		// Return an ArrayList<String> generated from the array of Strings
 		return new ArrayList<String>(Arrays.asList(pieces));
 	}
 
 	/**
-	 * Encodes an ArrayList of HashSets of Integers suitable for decoding 
-	 * with {@link #decodeSetsArrayList(String)}
+	 * Encodes a set of WoceType objects suitable for decoding 
+	 * with {@link #decodeWoceTypeSet(String)}
 	 * 
-	 * @param setsList
-	 * 		list of sets of integer values to encode
+	 * @param intList
+	 * 		list of integer values to encode
 	 * @return
-	 * 		the encoded list of sets of integer values
+	 * 		the encoded list of integer values
 	 */
-	public static String encodeSetsArrayList(ArrayList<HashSet<Integer>> setsList) 
-											throws IllegalArgumentException {
+	public static String encodeWoceTypeSet(TreeSet<WoceType> woceSet) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("[ ");
 		boolean firstValue = true;
-		for ( HashSet<Integer> setVal : setsList ) {
+		for ( WoceType woce : woceSet ) {
 			if ( firstValue )
 				firstValue = false;
 			else
 				sb.append(", ");
-			// Go to the trouble of sorting the list before creating the string
-			// in order to simplify human reading and detecting real differences
-			sb.append(encodeIntegerArrayList(
-					new ArrayList<Integer>(new TreeSet<Integer>(setVal))));
+			sb.append("[ ");
+			sb.append(woce.getColumnIndex().toString());
+			sb.append(", ");
+			sb.append(woce.getRowIndex().toString());
+			sb.append(", \"");
+			sb.append(woce.getWoceName());
+			sb.append("\" ]");
 		}
 		sb.append(" ]");
 		return sb.toString();
 	}
 
 	/**
-	 * Decodes a (somewhat-JSON-like) encoded array of sets of integers, 
-	 * like that produced by {@link #encodeSetsArrayList(ArrayList)}, 
-	 * into an ArrayList of HashSets of Integers.  Each set must be 
-	 * comma-separated integer values enclosed in brackets (like that 
-	 * produced {@link #encodeIntegerArrayList(ArrayList)}, and each set 
-	 * must be by separated by a comma.  Whitespace around brackets and 
-	 * commas is allowed.
+	 * Decodes an encoded set of WoceType's produced by 
+	 * {@link #encodeStringArrayList(ArrayList)}, into a 
+	 * TreeSet of WoceTypes.
 	 * 
-	 * @param arrayStr
-	 * 		the encoded sets of integers array
+	 * @param woceSetStr
+	 * 		the encoded set of WoceType's
 	 * @return
-	 * 		the decoded ArrayList of HashSets of Integers; never null, 
-	 * 		but may be empty (if the encoded array contains no sets)
+	 * 		the decoded TreeSet of WoceType's; never null, but may
+	 * 		be empty (if the encoded set does not contain any WoceType's)
 	 * @throws IllegalArgumentException
-	 * 		if arrayStr does not start with '[', does not end with ']', 
-	 * 		or contains sets not enclosed within '[' and ']'.
+	 * 		if woceSetStr does not start with '[', does not end with ']', 
+	 * 		or contains an invalid encoded WoceType.
 	 */
-	public static ArrayList<HashSet<Integer>> decodeSetsArrayList(String arrayStr) 
-											throws IllegalArgumentException {
-		if ( ! ( arrayStr.startsWith("[") && arrayStr.endsWith("]") ) )
+	public static TreeSet<WoceType> decodeWoceTypeSet(String woceSetStr) {
+		if ( ! ( woceSetStr.startsWith("[") && woceSetStr.endsWith("]") ) )
 			throw new IllegalArgumentException(
-					"Encoded string array not enclosed in brackets");
-		// Locate the opening bracket of the first set
-		int firstIndex = arrayStr.indexOf("[", 1);
-		// Locate the closing bracket of the last set
-		int lastIndex = arrayStr.lastIndexOf("]", arrayStr.length() - 2);
-		if ( (firstIndex < 0) || (lastIndex < 0) ) {
-			if ( (firstIndex < 0) && (lastIndex < 0) &&
-				 arrayStr.substring(1, arrayStr.length() - 1).trim().isEmpty() ) {
-				// no sets; return an empty list
-				return new ArrayList<HashSet<Integer>>(0);
-			}
-			// Not empty, but 
-			throw new IllegalArgumentException(
-					"Sets in encoded sets array not enclosed in brackets");
-		}
-		// Split the string into each of the sets
-		String[] pieces = arrayStr.substring(firstIndex+1, lastIndex)
+					"Encoded WoceType set not enclosed in brackets");
+		String contents = woceSetStr.substring(1, woceSetStr.length() - 1);
+		if ( contents.trim().isEmpty() )
+			return new TreeSet<WoceType>();
+		int firstIndex = contents.indexOf("[");
+		int lastIndex = contents.lastIndexOf("]");
+		if ( (firstIndex < 0) || (lastIndex < 0) || 
+			 ( ! contents.substring(0, firstIndex).trim().isEmpty() ) ||
+			 ( ! contents.substring(lastIndex+1).trim().isEmpty() ) )
+			throw new IllegalArgumentException("Invalid encoding of a set of WoceTypes: " +
+					"a WoceType not enclosed in brackets");
+		String[] pieces = contents.substring(firstIndex+1, lastIndex)
 								  .split("\\]\\s*,\\s*\\[", -1);
-		// Create the list to return
-		ArrayList<HashSet<Integer>> setsList = 
-				new ArrayList<HashSet<Integer>>(pieces.length);
-		// Convert each of the set strings and add to the list
-		for ( String setStr : pieces ) {
-			setsList.add(new HashSet<Integer>(
-					decodeIntegerArrayList("[" + setStr + "]")));
+		TreeSet<WoceType> woceSet = new TreeSet<WoceType>();
+		for ( String encWoce : pieces ) {
+			String[] woceParts = encWoce.split(",", 3);
+			try {
+				if ( woceParts.length != 3 )
+					throw new IllegalArgumentException("incomplete WoceType description");
+				Integer colIndex = Integer.parseInt(woceParts[0].trim());
+				Integer rowIndex = Integer.parseInt(woceParts[1].trim());
+				firstIndex = woceParts[2].indexOf("\"");
+				lastIndex = woceParts[2].lastIndexOf("\"");
+				if ( (firstIndex < 1) || (lastIndex == firstIndex) ||
+					 ( ! woceParts[2].substring(0, firstIndex).trim().isEmpty() ) ||
+					 ( ! woceParts[2].substring(lastIndex+1).trim().isEmpty() ) )
+					throw new IllegalArgumentException("WOCE name not enclosed in double quotes");
+				String woceName = woceParts[2].substring(firstIndex+1, lastIndex);
+				woceSet.add(new WoceType(woceName, colIndex, rowIndex));
+			} catch ( Exception ex ) {
+				throw new IllegalArgumentException("Invalid encoding of a set of WoceTypes: " + 
+						ex.getMessage(), ex);
+			}
 		}
-		return setsList;
+		return woceSet;
 	}
 
 	/**

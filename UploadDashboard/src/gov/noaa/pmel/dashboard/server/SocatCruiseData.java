@@ -55,7 +55,7 @@ public class SocatCruiseData {
 				intValsMap.put(dtype, DashboardUtils.INT_MISSING_VALUE);
 			}
 			else if ( DashboardUtils.CHAR_DATA_CLASS_NAME.equals(dtype.getDataClassName()) ) {
-				if ( dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
+				if ( dtype.isWoceType() ) {
 					// WOCE flag
 					charValsMap.put(dtype, DashboardUtils.WOCE_NOT_CHECKED);
 				}
@@ -1049,8 +1049,9 @@ public class SocatCruiseData {
 		TreeMap<DashDataType,Character> nonWoceCharValsMap = 
 				new TreeMap<DashDataType,Character>();
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
-			if ( ! entry.getKey().getVarName().toUpperCase().startsWith("WOCE_") )
+			if ( ! entry.getKey().isWoceType() ) {
 				nonWoceCharValsMap.put(entry.getKey(), entry.getValue());
+			}
 		}
 		result = result * prime + nonWoceCharValsMap.hashCode();
 		// Do not use floating-point fields since they do not 
@@ -1078,7 +1079,7 @@ public class SocatCruiseData {
 			return false;
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() ) {
 			DashDataType dtype = entry.getKey();
-			if ( ! dtype.getVarName().toUpperCase().startsWith("WOCE_") ) {
+			if ( ! dtype.isWoceType() ) {
 				if ( ! entry.getValue().equals(other.charValsMap.get(dtype)) )
 					return false;
 			}
