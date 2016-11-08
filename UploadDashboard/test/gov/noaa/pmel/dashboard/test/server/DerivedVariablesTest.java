@@ -18,7 +18,7 @@ public class DerivedVariablesTest {
 	@Test
 	public void derivedVariablesTest() throws Exception {
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
-		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
+		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
 		DashboardConfigStore confStore = DashboardConfigStore.get(false);
 		FerretConfig ferret = confStore.getFerretConfig();
 		CruiseDsgNcFileTest fileTest = new CruiseDsgNcFileTest();
