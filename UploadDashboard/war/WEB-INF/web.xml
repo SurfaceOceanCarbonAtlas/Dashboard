@@ -4,7 +4,7 @@
 						http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
 
-	<display-name>Socat Upload Dashboard</display-name>
+	<display-name>OAP Upload Dashboard</display-name>
 	<session-config>
 		<session-timeout>180</session-timeout>
 	</session-config>
@@ -16,7 +16,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/DashboardServices</url-pattern>
+		<url-pattern>/OAPUploadDashboard/DashboardServices</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -25,7 +25,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardCruiseUploadServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/CruiseUploadService</url-pattern>
+		<url-pattern>/OAPUploadDashboard/CruiseUploadService</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -34,7 +34,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>DashboardMetadataUploadServlet</servlet-name>
-		<url-pattern>/SocatUploadDashboard/MetadataUploadService</url-pattern>
+		<url-pattern>/OAPUploadDashboard/MetadataUploadService</url-pattern>
 	</servlet-mapping>
 
 	<filter>
@@ -48,7 +48,7 @@
 
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>SOCAT Dashboard</web-resource-name>
+			<web-resource-name>OAP Dashboard</web-resource-name>
 			<url-pattern>/*</url-pattern>
 			<http-method>DELETE</http-method>
 			<http-method>GET</http-method>
@@ -56,27 +56,27 @@
 			<http-method>PUT</http-method>
 		</web-resource-collection>
 		<auth-constraint>
-			<role-name>socatdashboarduser</role-name>
+			<role-name>oapdashboarduser</role-name>
 		</auth-constraint>
 	</security-constraint>
 
 	<login-config>
 		<auth-method>FORM</auth-method>
-		<realm-name>socatdashboarduser</realm-name>
+		<realm-name>oapdashboarduser</realm-name>
 		<form-login-config>
-			<form-login-page>/socatlogin.html</form-login-page>
-			<form-error-page>/socatloginerror.html</form-error-page>
+			<form-login-page>/oaplogin.html</form-login-page>
+			<form-error-page>/oaploginerror.html</form-error-page>
 		</form-login-config>
 	</login-config>
 
 	<security-role>
-		<description>SOCAT Dashboard User</description>
-		<role-name>socatdashboarduser</role-name>
+		<description>OAP Dashboard User</description>
+		<role-name>oapdashboarduser</role-name>
 	</security-role>
 
 	<!-- Default page to serve -->
 	<welcome-file-list>
-		<welcome-file>SocatUploadDashboard.html</welcome-file>
+		<welcome-file>OAPUploadDashboard.html</welcome-file>
 	</welcome-file-list>
 
 </web-app>

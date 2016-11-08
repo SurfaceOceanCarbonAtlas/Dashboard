@@ -55,11 +55,11 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  */
 public class DashboardConfigStore {
 
-	private static final String DEFAULT_SERVER_APP_NAME = "SocatUploadDashboard";
+	private static final String DEFAULT_SERVER_APP_NAME = "OAPUploadDashboard";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
-	private static final String SOCAT_UPLOAD_VERSION_NAME_TAG = "SocatUploadVersion";
-	private static final String SOCAT_QC_VERSION_NAME_TAG = "SocatQCVersion";
+	private static final String UPLOAD_VERSION_NAME_TAG = "OAPUploadVersion";
+	private static final String QC_VERSION_NAME_TAG = "OAPQCVersion";
 	private static final String SVN_USER_NAME_TAG = "SVNUsername";
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
@@ -91,8 +91,8 @@ public class DashboardConfigStore {
 			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, " +
 					"13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
-			SOCAT_UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
-			SOCAT_QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
 			SVN_USER_NAME_TAG + "=SVNUsername \n" +
 			SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
 			USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
@@ -249,7 +249,7 @@ public class DashboardConfigStore {
 
 		// Read the SOCAT versions
 		try {
-			propVal = configProps.getProperty(SOCAT_UPLOAD_VERSION_NAME_TAG);
+			propVal = configProps.getProperty(UPLOAD_VERSION_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
@@ -257,12 +257,12 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("blank value");
 			socatUploadVersion = propVal;
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + SOCAT_UPLOAD_VERSION_NAME_TAG + 
+			throw new IOException("Invalid " + UPLOAD_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		try {
-			propVal = configProps.getProperty(SOCAT_QC_VERSION_NAME_TAG);
+			propVal = configProps.getProperty(QC_VERSION_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
@@ -270,7 +270,7 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("blank value");
 			socatQCVersion = propVal;
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + SOCAT_QC_VERSION_NAME_TAG + 
+			throw new IOException("Invalid " + QC_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
