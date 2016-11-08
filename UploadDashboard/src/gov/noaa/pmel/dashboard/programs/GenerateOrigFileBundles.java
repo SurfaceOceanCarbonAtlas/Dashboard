@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.programs;
 
-import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 
@@ -76,7 +76,7 @@ public class GenerateOrigFileBundles {
 		}
 		boolean success = true;
 		try {
-			SocatFilesBundler filesBundler = configStore.getCdiacFilesBundler();
+			ArchiveFilesBundler filesBundler = configStore.getArchiveFilesBundler();
 			for ( String expo : expocodes ) {
 				String commitMsg = "Automated generation of the original data files bundle for " + expo;
 				try {

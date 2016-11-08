@@ -51,6 +51,7 @@ public class OmePdfGeneratorTest {
 	@Test
 	public void testCreatePiOmePdf() throws IOException {
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
 		DashboardConfigStore confStore = DashboardConfigStore.get(false);
 		MetadataFileHandler metaHandler = confStore.getMetadataFileHandler();
 		OmePdfGenerator omePdfGenerator = confStore.getOmePdfGenerator();

@@ -294,7 +294,7 @@ public class CruiseModifier {
 		configStore.getDsgNcFileHandler().renameDsgFiles(oldExpo, newExpo);
 		// generate a rename QC comment and modify expocodes for the flags
 		configStore.getDatabaseRequestHandler().renameCruiseFlags(
-				oldExpo, newExpo, configStore.getSocatUploadVersion(), username);
+				oldExpo, newExpo, configStore.getUploadVersion(), username);
 	}
 
 	/**

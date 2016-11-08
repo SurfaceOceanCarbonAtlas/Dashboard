@@ -64,8 +64,8 @@
 		<auth-method>FORM</auth-method>
 		<realm-name>socatdashboarduser</realm-name>
 		<form-login-config>
-			<form-login-page>/socatlogin.html</form-login-page>
-			<form-error-page>/socatloginerror.html</form-error-page>
+			<form-login-page>/dashboardlogin.html</form-login-page>
+			<form-error-page>/dashboardloginerror.html</form-error-page>
 		</form-login-config>
 	</login-config>
 
