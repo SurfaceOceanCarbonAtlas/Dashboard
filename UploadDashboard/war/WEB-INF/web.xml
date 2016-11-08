@@ -64,8 +64,8 @@
 		<auth-method>FORM</auth-method>
 		<realm-name>oapdashboarduser</realm-name>
 		<form-login-config>
-			<form-login-page>/oaplogin.html</form-login-page>
-			<form-error-page>/oaploginerror.html</form-error-page>
+			<form-login-page>/dashboardlogin.html</form-login-page>
+			<form-error-page>/dashboardloginerror.html</form-error-page>
 		</form-login-config>
 	</login-config>
 

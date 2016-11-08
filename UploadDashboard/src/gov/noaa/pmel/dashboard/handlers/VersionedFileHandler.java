@@ -62,7 +62,7 @@ public class VersionedFileHandler {
 			throw new IllegalArgumentException(
 					filesDirName + " is not a directory");
 		if ( svnUsername == null ) {
-			// Ordinary directory - not actually version-controlled - for SocatFilesBundler
+			// Ordinary directory - not actually version-controlled - for ArchiveFilesBundler
 			svnManager = null;
 			filesToCommit = null;
 			parentToUpdate = null;

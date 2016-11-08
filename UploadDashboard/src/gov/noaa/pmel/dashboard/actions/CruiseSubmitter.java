@@ -8,7 +8,7 @@ import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
@@ -47,7 +47,7 @@ public class CruiseSubmitter {
 	DsgNcFileHandler dsgNcHandler;
 	KnownDataTypes knownDataFileTypes;
 	DatabaseRequestHandler databaseHandler;
-	SocatFilesBundler cdiacBundler;
+	ArchiveFilesBundler cdiacBundler;
 	String socatVersion;
 	Logger logger;
 
@@ -63,8 +63,8 @@ public class CruiseSubmitter {
 		dsgNcHandler = configStore.getDsgNcFileHandler();
 		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		databaseHandler = configStore.getDatabaseRequestHandler();
-		cdiacBundler = configStore.getCdiacFilesBundler();
-		socatVersion = configStore.getSocatUploadVersion();
+		cdiacBundler = configStore.getArchiveFilesBundler();
+		socatVersion = configStore.getUploadVersion();
 		logger = Logger.getLogger(getClass());
 	}
 

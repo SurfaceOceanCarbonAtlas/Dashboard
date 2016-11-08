@@ -41,7 +41,7 @@ public class AuthenticateFilter implements Filter {
 		}
 		if ( session.isNew() ) {
 			// New session - temporary redirect to the login page
-			response.sendRedirect("socatlogin.html");
+			response.sendRedirect("dashboardlogin.html");
 			return;
 		}
 

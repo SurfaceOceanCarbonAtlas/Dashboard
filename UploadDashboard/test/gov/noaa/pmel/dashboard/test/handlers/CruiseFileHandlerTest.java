@@ -71,6 +71,7 @@ public class CruiseFileHandlerTest {
 	@Test
 	public void testAssignCruiseDataFromInput() throws IOException {
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
 		CruiseFileHandler dataHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
 		BufferedReader cruiseReader = new BufferedReader(new StringReader(CSV_DATA)); 
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();

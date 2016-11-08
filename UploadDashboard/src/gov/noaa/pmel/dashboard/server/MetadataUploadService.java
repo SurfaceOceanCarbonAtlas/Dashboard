@@ -146,7 +146,7 @@ public class MetadataUploadService extends HttpServlet {
 		}
 
 		boolean isOme = omeIndicator.equals("true");
-		String version = configStore.getSocatUploadVersion();
+		String version = configStore.getUploadVersion();
 
 		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();

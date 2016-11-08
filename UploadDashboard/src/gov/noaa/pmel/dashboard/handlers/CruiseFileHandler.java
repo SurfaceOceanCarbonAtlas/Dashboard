@@ -440,7 +440,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 									"Unexpected failure to get the dashboard configuration");
 						}
 						configStore.getUserFileHandler().assignDataColumnTypes(cruiseData);
-						cruiseData.setVersion(configStore.getSocatUploadVersion());
+						cruiseData.setVersion(configStore.getUploadVersion());
 					}
 					// Rest of the records must be data
 					checkForUnits = false;

@@ -4,7 +4,7 @@
 package gov.noaa.pmel.dashboard.programs;
 
 import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
-import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 
 import java.io.BufferedReader;
@@ -120,8 +120,8 @@ public class GenerateCruiseReports {
 				}
 			}
 			else {
-				SocatFilesBundler bundler = 
-						new SocatFilesBundler(destName, null, null, null, null, null, null, null, null, false);
+				ArchiveFilesBundler bundler = 
+						new ArchiveFilesBundler(destName, null, null, null, null, null, null, null, null, false);
 				for ( String expo : expocodes ) {
 					try {
 						ArrayList<String> warnMsgs = bundler.createSocatEnhancedFilesBundle(expo);

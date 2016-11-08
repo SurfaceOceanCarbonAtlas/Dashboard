@@ -2,7 +2,7 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="SanityChecker_ColumnInfo"
 	elementFormDefault="qualified" xmlns:SanityCheckercolinfo="SanityChecker_ColumnInfo">
 
-	<!-- This is the XML definition for the output of the SanityChecker for SOCAT. 
+	<!-- This is the XML definition for the output of the SanityChecker. 
 		 The output contains details of all the warnings, errors and other messages 
 		 produced by the Sanity Checker while processing an input data file. Any 
 		 program calling the SanityChecker must expect an XML document of this 

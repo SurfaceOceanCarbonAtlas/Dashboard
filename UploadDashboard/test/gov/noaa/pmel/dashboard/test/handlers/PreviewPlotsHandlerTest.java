@@ -25,6 +25,7 @@ public class PreviewPlotsHandlerTest {
 	@Test
 	public void testCreatePreviewPlots() throws IOException {
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
 		final String timetag = "testing";
 		DashboardConfigStore configStore = DashboardConfigStore.get(false);
 		PreviewPlotsHandler plotsHandler = configStore.getPreviewPlotsHandler();

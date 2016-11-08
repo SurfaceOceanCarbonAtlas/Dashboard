@@ -52,7 +52,7 @@ public class ResubmitCruises {
 		cruiseSubmitter = configStore.getDashboardCruiseSubmitter();
 		dsgHandler = configStore.getDsgNcFileHandler();
 		databaseHandler = configStore.getDatabaseRequestHandler();
-		socatVersion = configStore.getSocatUploadVersion();
+		socatVersion = configStore.getUploadVersion();
 	}
 
 	/**

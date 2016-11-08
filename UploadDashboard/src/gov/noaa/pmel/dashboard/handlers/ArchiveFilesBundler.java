@@ -36,7 +36,7 @@ import javax.mail.internet.MimeMultipart;
  * 
  * @author Karl Smith
  */
-public class SocatFilesBundler extends VersionedFileHandler {
+public class ArchiveFilesBundler extends VersionedFileHandler {
 
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
 	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
@@ -93,7 +93,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 	 * 		if the outputDirname directory does not exist, 
 	 * 		is not a directory, or is not under version control
 	 */
-	public SocatFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
+	public ArchiveFilesBundler(String outputDirname, String svnUsername, String svnPassword, 
 			String archivalEmailAddress, String socatEmailAddress, String smtpHostAddress,
 			String smtpHostPort, String smtpUsername, String smtpPassword, boolean setDebug) 
 					throws IllegalArgumentException {
@@ -337,7 +337,7 @@ public class SocatFilesBundler extends VersionedFileHandler {
 		// Create the email message with the renamed zip attachment
 		MimeMessage msg = new MimeMessage(sessn);
 		try {
-			msg.setHeader("X-Mailer", "SocatFilesBundler");
+			msg.setHeader("X-Mailer", "ArchiveFilesBundler");
 			msg.setSubject(EMAIL_SUBJECT_MSG + userRealName);
 			msg.setSentDate(new Date());
 			// Set the addresses

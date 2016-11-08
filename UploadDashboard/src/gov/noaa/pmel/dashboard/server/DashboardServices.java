@@ -214,7 +214,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
-		cruiseList.setSocatVersion(configStore.getSocatUploadVersion());
+		cruiseList.setSocatVersion(configStore.getUploadVersion());
 		cruiseList.setManager(configStore.isManager(username));
 		for ( String cruiseExpocode : expocodeSet ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
@@ -276,7 +276,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			qcEvent.setFlag(DashboardUtils.QC_UPDATED_FLAG);
 			qcEvent.setFlagDate(new Date());
 			qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
-			qcEvent.setVersion(configStore.getSocatUploadVersion());
+			qcEvent.setVersion(configStore.getUploadVersion());
 			qcEvent.setUsername(username);
 			String comment = "Deleted metadata file \"" + deleteFilename + 
 					"\".  Data and WOCE flags were not changed.";
@@ -303,7 +303,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 		// Create the set of updated cruise information to return
 		DashboardCruiseList cruiseList = new DashboardCruiseList();
 		cruiseList.setUsername(username);
-		cruiseList.setSocatVersion(configStore.getSocatUploadVersion());
+		cruiseList.setSocatVersion(configStore.getUploadVersion());
 		cruiseList.setManager(configStore.isManager(username));
 		for ( String cruiseExpocode : allExpocodes ) {
 			cruiseList.put(cruiseExpocode, cruiseHandler.getCruiseFromInfoFile(cruiseExpocode));
