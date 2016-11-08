@@ -83,7 +83,7 @@ public class RestoreCruise {
 		}
 
 		CruiseFileHandler cruiseHandler = configStore.getCruiseFileHandler();
-		String removeSocatVersion = configStore.getSocatUploadVersion();
+		String removeSocatVersion = configStore.getUploadVersion();
 		ResubmitCruises resubmitter = new ResubmitCruises(configStore);
 		DatabaseRequestHandler dbHandler = configStore.getDatabaseRequestHandler();
 		CruiseModifier restorer = new CruiseModifier(configStore);

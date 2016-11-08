@@ -4,7 +4,7 @@
 package gov.noaa.pmel.dashboard.server;
 
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
-import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -96,13 +96,13 @@ public class DashboardServerUtils {
 
 	/** 
 	 * Value of userRealName to use to skip sending the email request in 
-	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	 * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
 	 */
 	public static final String NOMAIL_USER_REAL_NAME = "nobody";
 
 	/** 
 	 * Value of userEmail to use to skip sending the email request in 
-	 * {@link SocatFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
+	 * {@link ArchiveFilesBundler#sendOrigFilesBundle(String, String, String, String)} 
 	 */
 	public static final String NOMAIL_USER_EMAIL = "nobody@nowhere";
 

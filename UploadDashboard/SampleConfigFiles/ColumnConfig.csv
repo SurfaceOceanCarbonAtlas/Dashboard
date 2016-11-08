@@ -1,9 +1,9 @@
-# This file contains details of all the columns in SOCAT-formatted files.
+# This file contains details of all the columns in data files provided to the sanity checker.
 #
 # The fields are:
 #
 # Field:
-#    The name of the SOCAT field.
+#    The name of the field.
 #
 # Required:
 #    Whether or not this field is required. It may be part of a Required Group

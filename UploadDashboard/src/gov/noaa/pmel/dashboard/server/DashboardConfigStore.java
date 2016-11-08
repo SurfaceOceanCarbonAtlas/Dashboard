@@ -7,14 +7,13 @@ import gov.noaa.pmel.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.dashboard.actions.CruiseSubmitter;
 import gov.noaa.pmel.dashboard.actions.OmePdfGenerator;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.OmeFileHandler;
 import gov.noaa.pmel.dashboard.handlers.PreviewPlotsHandler;
-import gov.noaa.pmel.dashboard.handlers.SocatFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -55,11 +54,10 @@ import com.googlecode.gwt.crypto.client.TripleDesCipher;
  */
 public class DashboardConfigStore {
 
-	private static final String DEFAULT_SERVER_APP_NAME = "SocatUploadDashboard";
 	private static final String ENCRYPTION_KEY_NAME_TAG = "EncryptionKey";
 	private static final String ENCRYPTION_SALT_NAME_TAG = "EncryptionSalt";
-	private static final String SOCAT_UPLOAD_VERSION_NAME_TAG = "SocatUploadVersion";
-	private static final String SOCAT_QC_VERSION_NAME_TAG = "SocatQCVersion";
+	private static final String UPLOAD_VERSION_NAME_TAG = "UploadVersion";
+	private static final String QC_VERSION_NAME_TAG = "QCVersion";
 	private static final String SVN_USER_NAME_TAG = "SVNUsername";
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
 	private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
@@ -68,21 +66,19 @@ public class DashboardConfigStore {
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
 	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
-	private static final String OME_SERVER_OUTPUT_DIR_NAME_TAG = "OmeServerOutputDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
 	private static final String ERDDAP_DSG_FLAG_FILE_NAME_TAG = "ErddapDsgFlagFile";
 	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
 	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
 	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
-	private static final String CDIAC_BUNDLES_DIR_NAME_TAG = "CDIACBundlesDir";
-	private static final String CDIAC_BUNDLES_EMAIL_ADDRESS_TAG = "CDIACBundlesEmailAddress";
-	private static final String SOCAT_BUNDLES_EMAIL_ADDRESS_TAG = "SocatBundlesEmailAddress";
-	private static final String SOCAT_SMTP_HOST_ADDRESS_TAG = "SocatSMTPHostAddress";
-	private static final String SOCAT_SMTP_HOST_PORT_TAG = "SocatSMTPHostPort";
-	private static final String SOCAT_SMTP_USERNAME_TAG = "SocatSMTPUsername";
-	private static final String SOCAT_SMTP_PASSWORD_TAG = "SocatSMTPPassword";
-	private static final String SOCAT_SMTP_DEBUG_TAG = "SocatSMTPDebug";
+	private static final String ARCHIVE_BUNDLES_DIR_NAME_TAG = "ArchiveBundlesDir";
+	private static final String ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG = "ArchiveBundlesEmailAddress";
+	private static final String CC_BUNDLES_EMAIL_ADDRESS_TAG = "CCBundlesEmailAddress";
+	private static final String SMTP_HOST_ADDRESS_TAG = "SMTPHostAddress";
+	private static final String SMTP_HOST_PORT_TAG = "SMTPHostPort";
+	private static final String SMTP_USERNAME_TAG = "SMTPUsername";
+	private static final String SMTP_PASSWORD_TAG = "SMTPPassword";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -91,8 +87,8 @@ public class DashboardConfigStore {
 			ENCRYPTION_KEY_NAME_TAG + "=[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, " +
 					"13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 ] \n" +
 			ENCRYPTION_SALT_NAME_TAG + "=SomeArbitraryStringOfCharacters \n" +
-			SOCAT_UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
-			SOCAT_QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			UPLOAD_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
+			QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
 			SVN_USER_NAME_TAG + "=SVNUsername \n" +
 			SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
 			USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
@@ -101,18 +97,17 @@ public class DashboardConfigStore {
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
 			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
-			OME_SERVER_OUTPUT_DIR_NAME_TAG + "=/Path/To/SocatOME/Guest/Output/Dir \n" +
-			CDIAC_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/CDIAC/Bundles \n" + 
-			CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + "=cdiac.archiver@bundles.for.cdiac \n" +
-			SOCAT_BUNDLES_EMAIL_ADDRESS_TAG + "=socat.support@bundles.from.socat \n" +
-			SOCAT_SMTP_HOST_ADDRESS_TAG + "=smtp.server.for.socat \n" +
-			SOCAT_SMTP_HOST_PORT_TAG + "=smtp.server.port.number \n" +
-			SOCAT_SMTP_USERNAME_TAG + "=username.for.smtp \n" +
-			SOCAT_SMTP_PASSWORD_TAG + "=password.for.smtp \n" +
+			ARCHIVE_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Archive/Bundles \n" + 
+			ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + "=archiver@gdac.org \n" +
+			CC_BUNDLES_EMAIL_ADDRESS_TAG + "=support@my.group.org \n" +
+			SMTP_HOST_ADDRESS_TAG + "=smtp.server.for.dashboard \n" +
+			SMTP_HOST_PORT_TAG + "=smtp.server.port.number \n" +
+			SMTP_USERNAME_TAG + "=username.for.smtp \n" +
+			SMTP_PASSWORD_TAG + "=password.for.smtp \n" +
 			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
 			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
-			ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/Decimated/DSG/Update \n" +
+			ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DecDSG/Update \n" +
 			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
 			DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" + 
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
@@ -134,14 +129,13 @@ public class DashboardConfigStore {
 	private String encryptionSalt;
 	// Map of username to user info
 	private HashMap<String,DashboardUserInfo> userInfoMap;
-	private String socatUploadVersion;
-	private String socatQCVersion;
+	private String uploadVersion;
+	private String qcVersion;
 	private UserFileHandler userFileHandler;
 	private CruiseFileHandler cruiseFileHandler;
 	private CheckerMessageHandler checkerMsgHandler;
 	private MetadataFileHandler metadataFileHandler;
-	private OmeFileHandler omeFileHandler;
-	private SocatFilesBundler cdiacFilesBundler;
+	private ArchiveFilesBundler archiveFilesBundler;
 	private DsgNcFileHandler dsgNcFileHandler;
 	private FerretConfig ferretConf;
 	private CruiseChecker cruiseChecker;
@@ -180,11 +174,30 @@ public class DashboardConfigStore {
 			throw new IOException("CATALINA_BASE environment variable is not defined");
 		baseDir += File.separator;
 
-		// The following is just for running the dashboard.programs.* apps with a different configuration
+		// First check is UPLOAD_DASHBOARD_SERVER_NAME is defined for alternate configurations 
+		// when running the dashboard.program.* applications
 		String serverAppName = System.getenv("UPLOAD_DASHBOARD_SERVER_NAME");
 		if ( serverAppName == null )
-			serverAppName = DEFAULT_SERVER_APP_NAME;
-		String configAppDir = baseDir + "content" + File.separator + serverAppName + File.separator + "config" + File.separator;
+			serverAppName = System.getProperty("UPLOAD_DASHBOARD_SERVER_NAME");
+		if ( serverAppName == null ) {
+			// Get the app name from the location of this class source in tomcat;
+			// e.g., "/home/users/tomcat/webapps/SocatUploadDashboard/WEB-INF/classes/gov/noaa/pmel/dashboard/server/DashboardConfigStore.class"
+			try {
+				File webAppSubDir = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getPath());
+				do {
+					webAppSubDir = webAppSubDir.getParentFile();
+					serverAppName = webAppSubDir.getName();
+				} while ( ! serverAppName.equals("WEB-INF") );
+				webAppSubDir = webAppSubDir.getParentFile();
+				serverAppName = webAppSubDir.getName();
+			} catch ( Exception ex ) {
+				serverAppName = "";
+			}
+			if ( serverAppName.isEmpty() )
+				throw new IOException("Unable to obtain the upload dashboard server name");
+		}
+		String configAppDir = baseDir + "content" + File.separator + serverAppName + File.separator + 
+				"config" + File.separator;
 		String previewDirname = baseDir + "webapps" + File.separator + serverAppName + File.separator + 
 				"preview" + File.separator;
 
@@ -249,28 +262,28 @@ public class DashboardConfigStore {
 
 		// Read the SOCAT versions
 		try {
-			propVal = configProps.getProperty(SOCAT_UPLOAD_VERSION_NAME_TAG);
+			propVal = configProps.getProperty(UPLOAD_VERSION_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			if ( propVal.isEmpty() )
 				throw new IllegalArgumentException("blank value");
-			socatUploadVersion = propVal;
+			uploadVersion = propVal;
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + SOCAT_UPLOAD_VERSION_NAME_TAG + 
+			throw new IOException("Invalid " + UPLOAD_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
 		try {
-			propVal = configProps.getProperty(SOCAT_QC_VERSION_NAME_TAG);
+			propVal = configProps.getProperty(QC_VERSION_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			if ( propVal.isEmpty() )
 				throw new IllegalArgumentException("blank value");
-			socatQCVersion = propVal;
+			qcVersion = propVal;
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + SOCAT_QC_VERSION_NAME_TAG + 
+			throw new IOException("Invalid " + QC_VERSION_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -422,55 +435,53 @@ public class DashboardConfigStore {
 		}
 
 		// Read the CDIAC email address to send archival bundles
-		propVal = configProps.getProperty(CDIAC_BUNDLES_EMAIL_ADDRESS_TAG);
+		propVal = configProps.getProperty(ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + CDIAC_BUNDLES_EMAIL_ADDRESS_TAG + 
+			throw new IOException("Invalid " + ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
 		String cdiacEmailAddress = propVal.trim();
 		// Read the SOCAT email address for the from address for archival bundles
-		propVal = configProps.getProperty(SOCAT_BUNDLES_EMAIL_ADDRESS_TAG);
+		propVal = configProps.getProperty(CC_BUNDLES_EMAIL_ADDRESS_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + SOCAT_BUNDLES_EMAIL_ADDRESS_TAG + 
+			throw new IOException("Invalid " + CC_BUNDLES_EMAIL_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
 		String socatEmailAddress = propVal.trim();
 		// Read the SMTP server information
-		propVal = configProps.getProperty(SOCAT_SMTP_HOST_ADDRESS_TAG);
+		propVal = configProps.getProperty(SMTP_HOST_ADDRESS_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + SOCAT_SMTP_HOST_ADDRESS_TAG + 
+			throw new IOException("Invalid " + SMTP_HOST_ADDRESS_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
 		String smtpHostAddress = propVal.trim();
-		propVal = configProps.getProperty(SOCAT_SMTP_HOST_PORT_TAG);
+		propVal = configProps.getProperty(SMTP_HOST_PORT_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + SOCAT_SMTP_HOST_PORT_TAG + 
+			throw new IOException("Invalid " + SMTP_HOST_PORT_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
 		String smtpHostPort = propVal.trim();
-		propVal = configProps.getProperty(SOCAT_SMTP_USERNAME_TAG);
+		propVal = configProps.getProperty(SMTP_USERNAME_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + SOCAT_SMTP_USERNAME_TAG + 
+			throw new IOException("Invalid " + SMTP_USERNAME_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
 		String smtpUsername = propVal.trim();
-		propVal = configProps.getProperty(SOCAT_SMTP_PASSWORD_TAG);
+		propVal = configProps.getProperty(SMTP_PASSWORD_TAG);
 		if ( propVal == null )
-			throw new IOException("Invalid " + SOCAT_SMTP_PASSWORD_TAG + 
+			throw new IOException("Invalid " + SMTP_PASSWORD_TAG + 
 					" value specified in " + configFile.getPath() + 
 					"\nvalue not defined\n" + CONFIG_FILE_INFO_MSG);
 		String smtpPassword = propVal.trim();
-		boolean debugSmtp = Boolean.parseBoolean(configProps.getProperty(SOCAT_SMTP_DEBUG_TAG));
 		// Read the CDIAC bundles directory name and create the CDIAC archival bundler
 		try {
-			propVal = configProps.getProperty(CDIAC_BUNDLES_DIR_NAME_TAG);
+			propVal = configProps.getProperty(ARCHIVE_BUNDLES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
-			cdiacFilesBundler = new SocatFilesBundler(propVal, svnUsername, 
+			archiveFilesBundler = new ArchiveFilesBundler(propVal, svnUsername, 
 					svnPassword, cdiacEmailAddress, socatEmailAddress, 
-					smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, 
-					debugSmtp);
+					smtpHostAddress, smtpHostPort, smtpUsername, smtpPassword, false);
 			itsLogger.info("CDIAC files bundler and mailer using:");
 			itsLogger.info("    bundles directory: " + propVal);
 			itsLogger.info("    CDIAC email address: " + cdiacEmailAddress);
@@ -479,21 +490,7 @@ public class DashboardConfigStore {
 			itsLogger.info("    SMTP port: " + smtpHostPort);
 			itsLogger.info("    SMTP username: " + smtpUsername);
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + CDIAC_BUNDLES_DIR_NAME_TAG + 
-					" value specified in " + configFile.getPath() + "\n" + 
-					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
-		}
-
-		// Read the OME server guest output directory name
-		try {
-			propVal = configProps.getProperty(OME_SERVER_OUTPUT_DIR_NAME_TAG);
-			if ( propVal == null )
-				throw new IllegalArgumentException("value not defined");
-			propVal = propVal.trim();
-			omeFileHandler = new OmeFileHandler(propVal, metadataFileHandler, 
-										cruiseFileHandler, socatUploadVersion);
-		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + OME_SERVER_OUTPUT_DIR_NAME_TAG + 
+			throw new IOException("Invalid " + ARCHIVE_BUNDLES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
@@ -677,8 +674,6 @@ public class DashboardConfigStore {
 		if ( startMonitors ) {
 			// Watch for changes to the configuration file
 			watchConfigFiles();
-			// Watch for OME server XML output files
-			omeFileHandler.watchForOmeOutput();
 			// Watch for changes in the full-data DSG files
 			dsgNcFileHandler.watchForDsgFileUpdates();
 		}
@@ -727,13 +722,11 @@ public class DashboardConfigStore {
 	private void stopMonitors() {
 		// Stop the watch for changes in the full-data DSG files
 		dsgNcFileHandler.cancelWatch();
-		// Stop the watch for the OME server XML output files
-		omeFileHandler.cancelWatch();
 		// Shutdown all the VersionsedFileHandlers
 		userFileHandler.shutdown();
 		cruiseFileHandler.shutdown();
 		metadataFileHandler.shutdown();
-		cdiacFilesBundler.shutdown();
+		archiveFilesBundler.shutdown();
 		// Stop the configuration watcher
 		cancelWatch();
 	}
@@ -841,18 +834,18 @@ public class DashboardConfigStore {
 
 	/**
 	 * @return
-	 * 		the SOCAT version for uploaded data; never null
+	 * 		the version for uploaded data; never null
 	 */
-	public String getSocatUploadVersion() {
-		return socatUploadVersion;
+	public String getUploadVersion() {
+		return uploadVersion;
 	}
 
 	/**
 	 * @return
-	 * 		the SOCAT version for QC flagging; never null
+	 * 		the version for QC flagging; never null
 	 */
-	public String getSocatQCVersion() {
-		return socatQCVersion;
+	public String getQCVersion() {
+		return qcVersion;
 	}
 
 	/**
@@ -939,8 +932,8 @@ public class DashboardConfigStore {
 	 * @return
 	 * 		the files bundler for "send to CDIAC" datasets
 	 */
-	public SocatFilesBundler getCdiacFilesBundler() {
-		return cdiacFilesBundler;
+	public ArchiveFilesBundler getArchiveFilesBundler() {
+		return archiveFilesBundler;
 	}
 
 	/**

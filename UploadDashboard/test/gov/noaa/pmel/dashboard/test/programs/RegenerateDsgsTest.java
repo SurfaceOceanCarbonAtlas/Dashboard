@@ -37,6 +37,7 @@ public class RegenerateDsgsTest {
 		final String expocode = "33WA20160713";
 
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
+		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "SocatUploadDashboard");
 		// Get the default dashboard configuration
 		DashboardConfigStore configStore = null;		
 		try {
