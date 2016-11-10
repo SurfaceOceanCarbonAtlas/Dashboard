@@ -100,7 +100,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException("Problem with " + mdataFile.getPath() +
 					"\n    " + ex.getMessage(), ex);
 		}
-		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata
+		// If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
 		setConflicted( ! omeMData.isAcceptable() );
 	}
 
@@ -134,7 +134,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 			throw new IllegalArgumentException("Problems with the provided XML document:" +
 					"\n    " + ex.getMessage(), ex);
 		}
-		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata
+		// If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
 		setConflicted( ! omeMData.isAcceptable() );
 	}
 
@@ -158,21 +158,21 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		setOwner(owner);
 		setVersion(version);
 		omeMData = omeMeta;
-		// If conflicted or incomplete for DSG files, set the conflicted flags in SocatMetadata
+		// If conflicted or incomplete for DSG files, set the conflicted flags in DsgMetadata
 		setConflicted( ! omeMData.isAcceptable() );
 	}
 
 	/**
-	 * Create a SocatMetadata object from the data in this object.
+	 * Create a DsgMetadata object from the data in this object.
 	 * Any PI or vessel names will be anglicized.  
 	 * The SOCAT version status and QC flag are not assigned.
 	 * 
 	 * @return
-	 *		created SocatMetadata object 
+	 *		created DsgMetadata object 
 	 */
-	public SocatMetadata createSocatMetadata() throws IllegalArgumentException {
+	public DsgMetadata createSocatMetadata() throws IllegalArgumentException {
 
-		// We cannot create a SocatMetadata object if there are conflicts
+		// We cannot create a DsgMetadata object if there are conflicts
 		if ( isConflicted() ) {
 			throw new IllegalArgumentException("The Metadata contains conflicts");
 		}
@@ -183,7 +183,7 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		} catch ( Exception ex ) {
 			throw new RuntimeException("Unexpected failure to get the configuration information");
 		}
-		SocatMetadata scMData = new SocatMetadata(confStore.getKnownMetadataTypes());
+		DsgMetadata scMData = new DsgMetadata(confStore.getKnownMetadataTypes());
 		
 		scMData.setExpocode(expocode);
 		scMData.setDatasetName(omeMData.getExperimentName());

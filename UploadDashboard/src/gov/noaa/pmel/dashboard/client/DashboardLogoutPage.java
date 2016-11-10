@@ -18,16 +18,15 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Logout page with buttons to login again and to go to socat.info
+ * Logout page with a button to go back to the login again
  * 
  * @author Karl Smith
  */
 public class DashboardLogoutPage extends CompositeWithUsername {
 
-	private static final String GOODBYE_TITLE = 
-			"Thank you for contributing data to SOCAT.";
+	private static final String GOODBYE_TITLE = "Thank you for contributing.";
 	private static final String RELOGIN_TEXT = "Log in again";
-	private static final String RELOGIN_HREF = "SocatUploadDashboard.html";
+	private static final String RELOGIN_HREF = "OAPUploadDashboard.html";
 
 	interface DashboardLogoutPageUiBinder extends UiBinder<Widget, DashboardLogoutPage> {
 	}

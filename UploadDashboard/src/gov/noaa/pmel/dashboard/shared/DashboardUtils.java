@@ -70,9 +70,9 @@ public class DashboardUtils {
 
 	// Archival options
 	public static final String ARCHIVE_STATUS_NOT_SUBMITTED = "";
-	public static final String ARCHIVE_STATUS_WITH_SOCAT = "With next SOCAT";
-	public static final String ARCHIVE_STATUS_SENT_CDIAC = "Sent to CDIAC";
-	public static final String ARCHIVE_STATUS_OWNER_ARCHIVE = "Owner to archive";
+	public static final String ARCHIVE_STATUS_WITH_NEXT_RELEASE = "With next release";
+	public static final String ARCHIVE_STATUS_SENT_FOR_ARHCIVAL = "Sent for archival";
+	public static final String ARCHIVE_STATUS_OWNER_TO_ARCHIVE = "Owner to archive";
 	public static final String ARCHIVE_STATUS_ARCHIVED = "Archived";
 
 	/**

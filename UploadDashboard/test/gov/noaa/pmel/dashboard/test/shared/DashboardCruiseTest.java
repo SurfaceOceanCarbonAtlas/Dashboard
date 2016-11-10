@@ -794,7 +794,7 @@ public class DashboardCruiseTest {
 		assertTrue( cruise.isEditable() );
 
 
-		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 
 		cruise.setQcStatus(DashboardUtils.QC_STATUS_NOT_SUBMITTED);
 		assertNotNull( cruise.isEditable() );
@@ -847,15 +847,15 @@ public class DashboardCruiseTest {
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC);
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 
-		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE);
+		cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE);
 		assertNotNull( cruise.isEditable() );
 		assertFalse( cruise.isEditable() );
 

@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Page for submitting cruises to be incorporated into the SOCAT collection.
+ * Page for submitting cruises for QC.
  * 
  * @author Karl Smith
  */
@@ -61,16 +61,16 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"Archival plan for the uploaded files for these datasets: <br />" +
 			"<small><em>(this option can be modified on submitted datasets without affecting QC)</em></small>";
 
-	private static final String SOCAT_ARCHIVE_TEXT = 
+	private static final String DELAY_ARCHIVE_TEXT = 
 			"delay archiving at this time";
-	private static final String SOCAT_ARCHIVE_ADDN_HTML = 
-			"<em>(if not archived before the next SOCAT public release, archive at CDIAC)</em>";
-	private static final String SOCAT_ARCHIVE_INFO_HTML = 
+	private static final String DELAY_ARCHIVE_ADDN_HTML = 
+			"<em>(if not archived before the next public release, archive at CDIAC)</em>";
+	private static final String DELAY_ARCHIVE_INFO_HTML = 
 			"By selecting this option I wish to delay archival at this time.  " +
-			"If another archive option has not been selected before the next SOCAT " +
+			"If another archive option has not been selected before the next " +
 			"public release, I am giving permission for my uploaded files for these " +
 			"datasets, if deemed acceptable, to be archived at CDIAC at the time " +
-			"of the next SOCAT public release, after which the files will be made " +
+			"of the next public release, after which the files will be made " +
 			"accessible to the public through the CDIAC Web site.";
 
 	private static final String CDIAC_ARCHIVE_TEXT = 
@@ -81,19 +81,18 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			"By selecting this option I am requesting that my uploaded files for " +
 			"these datasets be archived at CDIAC as soon as possible.  When CDIAC " +
 			"provides a DOI, or other reference, for these archived files, please " +
-			"verify these references are in the metadata in SOCAT for these datasets.";
+			"verify these references are in the submitted metadata for these datasets.";
 
 	private static final String OWNER_ARCHIVE_TEXT =
 			"already archived or I will manage archival";
 	private static final String OWNER_ARCHIVE_ADDN_HTML =
-			"<em>(and I understand it is my responsibility to include DOIs in SOCAT metadata)</em>";
+			"<em>(and I understand it is my responsibility to include DOIs in the submitted metadata)</em>";
 	private static final String OWNER_ARCHIVE_INFO_HTML = 
 			"By selecting this option I am agreeing the uploaded files for these " +
 			"datasets are archived or will be archived at a data center of my choice " +
-			"before the SOCAT public release containing these datasets.  If I am " +
-			"provided a DOI or other reference for these archived files, I will " +
-			"include these references in the metadata supplied to SOCAT for these " +
-			"datasets.";
+			"before the public release containing these datasets.  If a DOI or other " +
+			"reference for these archived files is provided, I will include these " + 
+			"references in the metadata supplied for these datasets.";
 
 	private static final String ALREADY_SENT_CDIAC_HTML =
 			"<h3>WARNING</h3>" +
@@ -136,11 +135,11 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	private static final String SUBMIT_TEXT = "OK";
 	private static final String CANCEL_TEXT = "Cancel";
 
-	interface AddCruiseToSocatPageUiBinder extends UiBinder<Widget, SubmitForQCPage> {
+	interface SubmitForQCPageUIBinder extends UiBinder<Widget, SubmitForQCPage> {
 	}
 
-	private static AddCruiseToSocatPageUiBinder uiBinder = 
-			GWT.create(AddCruiseToSocatPageUiBinder.class);
+	private static SubmitForQCPageUIBinder uiBinder = 
+			GWT.create(SubmitForQCPageUIBinder.class);
 
 	private static DashboardServicesInterfaceAsync service = 
 			GWT.create(DashboardServicesInterface.class);
@@ -150,9 +149,9 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	@UiField Button logoutButton;
 	@UiField HTML introHtml;
 	@UiField HTML archivePlanHtml;
-	@UiField RadioButton socatRadio;
-	@UiField Anchor socatInfoAnchor;
-	@UiField HTML socatAddnHtml;
+	@UiField RadioButton delayRadio;
+	@UiField Anchor delayInfoAnchor;
+	@UiField HTML delayAddnHtml;
 	@UiField RadioButton cdiacRadio;
 	@UiField Anchor cdiacInfoAnchor;
 	@UiField HTML cdiacAddnHtml;
@@ -166,7 +165,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 	private HashSet<String> expocodes;
 	private boolean hasSentCruise;
-	private DashboardInfoPopup socatArchivePopup;
+	private DashboardInfoPopup delayArchivePopup;
 	private DashboardInfoPopup cdiacInfoPopup;
 	private DashboardInfoPopup ownerArchivePopup;
 	private DashboardInfoPopup agreeSharePopup;
@@ -176,7 +175,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	private static SubmitForQCPage singleton;
 
 	/**
-	 * Creates an empty AddToSocat page.  Do not use this constructor;
+	 * Creates an empty SubmitForQC page.  Do not use this constructor;
 	 * instead use the static showPage or redisplayPage method.
 	 */
 	SubmitForQCPage() {
@@ -192,10 +191,10 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 		archivePlanHtml.setHTML(ARCHIVE_PLAN_INTRO);
 
-		socatRadio.setText(SOCAT_ARCHIVE_TEXT);
-		socatInfoAnchor.setText(MORE_INFO_TEXT);
-		socatAddnHtml.setHTML(SOCAT_ARCHIVE_ADDN_HTML);
-		socatArchivePopup = null;
+		delayRadio.setText(DELAY_ARCHIVE_TEXT);
+		delayInfoAnchor.setText(MORE_INFO_TEXT);
+		delayAddnHtml.setHTML(DELAY_ARCHIVE_ADDN_HTML);
+		delayArchivePopup = null;
 
 		cdiacRadio.setText(CDIAC_ARCHIVE_TEXT);
 		cdiacInfoAnchor.setText(MORE_INFO_TEXT);
@@ -257,7 +256,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 		expocodes.clear();
 		hasSentCruise = false;
-		int numSocat = 0;
+		int numDelay = 0;
 		int numOwner = 0;
 		int numCdiac = 0;
 		TreeSet<String> cruiseIntros = new TreeSet<String>();
@@ -265,15 +264,15 @@ public class SubmitForQCPage extends CompositeWithUsername {
 			String expo = cruise.getExpocode();
 			// Add the status of this cruise to the counts 
 			String archiveStatus = cruise.getArchiveStatus();
-			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ) {
-				// Archive with next SOCAT release
-				numSocat++;
+			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ) {
+				// Archive with next release
+				numDelay++;
 			}
-			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ) {
+			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) ) {
 				// Archive at CDIAC now
 				numCdiac++;
 			}
-			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) {
+			else if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ) {
 				// Owner will archive
 				numOwner++;
 			}
@@ -316,9 +315,9 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 		// Check the appropriate radio button
 		int numCruises = cruises.size();
-		if ( numSocat == numCruises ) {
-			// All "with next SOCAT", so keep that setting
-			socatRadio.setValue(true, true);
+		if ( numDelay == numCruises ) {
+			// All "with next release", so keep that setting
+			delayRadio.setValue(true, true);
 		}
 		else if ( numCdiac == numCruises ) {
 			// All "sent to CDIAC", so keep that setting
@@ -330,7 +329,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		}
 		else {
 			// A mix, so unset all and make the user decide
-			socatRadio.setValue(false, true);
+			delayRadio.setValue(false, true);
 			cdiacRadio.setValue(false, true);
 			ownerRadio.setValue(false, true);
 		}
@@ -347,7 +346,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		DashboardLogoutPage.showPage();
 	}
 
-	@UiHandler({"socatRadio","ownerRadio"})
+	@UiHandler({"delayRadio","ownerRadio"})
 	void radioOnClick(ClickEvent event) {
 		// If there is a cruise sent to CDIAC, warn if another selection is made
 		if ( hasSentCruise ) {
@@ -355,15 +354,15 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		}
 	}
 
-	@UiHandler("socatInfoAnchor")
-	void socatInfoOnClick(ClickEvent event) {
+	@UiHandler("delayInfoAnchor")
+	void delayInfoOnClick(ClickEvent event) {
 		// Create the popup only when needed and if it does not exist
-		if ( socatArchivePopup == null ) {
-			socatArchivePopup = new DashboardInfoPopup();
-			socatArchivePopup.setInfoMessage(SOCAT_ARCHIVE_INFO_HTML);
+		if ( delayArchivePopup == null ) {
+			delayArchivePopup = new DashboardInfoPopup();
+			delayArchivePopup.setInfoMessage(DELAY_ARCHIVE_INFO_HTML);
 		}
 		// Show the popup over the info anchor
-		socatArchivePopup.showRelativeTo(socatInfoAnchor);
+		delayArchivePopup.showRelativeTo(delayInfoAnchor);
 	}
 
 	@UiHandler("cdiacInfoAnchor")
@@ -441,22 +440,22 @@ public class SubmitForQCPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * Submits cruises and updated archival selection to SOCAT.
+	 * Submits cruises and updated archival selection
 	 */
 	void continueSubmit() {
 		String localTimestamp = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm Z").format(new Date());
 		String archiveStatus;
-		if ( socatRadio.getValue() ) {
-			// Archive with the next release of SOCAT
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT;
+		if ( delayRadio.getValue() ) {
+			// Archive with the next release
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE;
 		}
 		else if ( cdiacRadio.getValue() ) {
 			// Tell CDIAC to archive now
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC;
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL;
 		}
 		else if ( ownerRadio.getValue() ) {
 			// Owner will archive
-			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE;
+			archiveStatus = DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE;
 		}
 		else {
 			// Archive option not selected - fail
@@ -465,7 +464,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 		}
 
 		boolean repeatSend = true;
-		// Add the cruises to SOCAT
+		// Submit the dataset
 		UploadDashboard.showWaitCursor();
 		service.submitCruiseForQC(getUsername(), expocodes, archiveStatus, 
 				localTimestamp, repeatSend, new AsyncCallback<Void>() {

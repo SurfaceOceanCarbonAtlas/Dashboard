@@ -7,8 +7,8 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -171,15 +171,15 @@ public class PreviewPlotsHandler {
 		log.debug("generating preview DSG file " + dsgFile.getPath());
 
 		// Do not use the metadata in the DSG file, and to avoid issues with the existing
-		// OME metadata, just use what we already know to create a SocatMetadata
-		SocatMetadata socatMData = new SocatMetadata(knownMetadataTypes);
+		// OME metadata, just use what we already know to create a DsgMetadata
+		DsgMetadata socatMData = new DsgMetadata(knownMetadataTypes);
 		socatMData.setExpocode(upperExpo);
 		socatMData.setSocatVersion(cruiseData.getVersion());
 		socatMData.setQcFlag(DashboardUtils.QC_NEW_FLAG.toString());
 
 		// Convert the cruise data strings into the appropriate list of data objects
-		ArrayList<SocatCruiseData> socatDatalist = 
-				SocatCruiseData.dataListFromDashboardCruise(
+		ArrayList<DsgCruiseData> socatDatalist = 
+				DsgCruiseData.dataListFromDashboardCruise(
 						knownDataFileTypes, cruiseData);
 
 		// Create the preview NetCDF DSG file

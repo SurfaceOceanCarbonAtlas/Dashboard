@@ -77,7 +77,7 @@ public class CruiseSubmitter {
 	 * {@link DashboardUtils#QC_STATUS_EXCLUDED}.
 	 * For all cruises, the archive status is updated to that given.
 	 * 
-	 * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_CDIAC},
+	 * If the archive status is {@link DashboardUtils#ARCHIVE_STATUS_SENT_FOR_ARHCIVAL},
 	 * the archive request is sent to CDIAC for dataset which have not been sent,
 	 * or for all datasets if repeatSend is true.
 	 * 
@@ -327,7 +327,7 @@ public class CruiseSubmitter {
 				ingestExpos.add(expocode);
 			}
 
-			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) && 
+			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) && 
 				 ( repeatSend || cruise.getCdiacDate().isEmpty() ) ) {
 				// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
 				cdiacExpos.add(expocode);

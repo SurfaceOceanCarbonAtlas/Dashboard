@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -59,31 +58,31 @@ public class SanityCheckerTest {
 						"<input_column index=\"12\">sample_depth [m]</input_column>" +
 						"<input_units>meters</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.SALINITY.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.SALINITY.getVarName() + "\">" +
 						"<input_column index=\"13\">salinity</input_column>" +
 						"<input_units>psu</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.SST.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.SST.getVarName() + "\">" +
 						"<input_column index=\"14\">SST [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.TEQU.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.TEQU.getVarName() + "\">" +
 						"<input_column index=\"15\">Tequ [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.PATM.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.PATM.getVarName() + "\">" +
 						"<input_column index=\"16\">PPPP [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.PEQU.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.PEQU.getVarName() + "\">" +
 						"<input_column index=\"17\">Pequ [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.XCO2_WATER_TEQU_DRY.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.XCO2_WATER_TEQU_DRY.getVarName() + "\">" +
 						"<input_column index=\"23\">xCO2_water_Tequ_dry [umol/mol]</input_column>" +
 						"<input_units>ppm</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.FCO2_WATER_SST_WET.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.FCO2_WATER_SST_WET.getVarName() + "\">" +
 						"<input_column index=\"28\">fCO2_water_SST_wet [uatm]</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +
@@ -272,15 +271,15 @@ public class SanityCheckerTest {
 						"<input_column index=\"7\">" + DashboardServerUtils.LONGITUDE.getVarName() + "</input_column>" +
 						"<input_units>decimal_degrees_east</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.PCO2_WATER_SST_WET.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.PCO2_WATER_SST_WET.getVarName() + "\">" +
 						"<input_column index=\"8\">CO2</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.SST.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.SST.getVarName() + "\">" +
 						"<input_column index=\"9\">Temp_C</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + SocatTypes.SALINITY.getVarName() + "\">" +
+					"<socat_column name=\"" + DashboardServerUtils.SALINITY.getVarName() + "\">" +
 						"<input_column index=\"10\">Ship_Sal_PSU</input_column>" +
 						"<input_units>psu</input_units>" +
 					"</socat_column>" +

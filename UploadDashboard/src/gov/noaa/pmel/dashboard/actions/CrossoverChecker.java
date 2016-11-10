@@ -5,7 +5,7 @@ package gov.noaa.pmel.dashboard.actions;
 
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
 import gov.noaa.pmel.dashboard.shared.Crossover;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -426,14 +426,14 @@ public class CrossoverChecker {
 
 	/**
 	 * Returns the minimum and maximum valid values from the given data array.
-	 * Missing values (those very close to {@link SocatCruiseData#FP_MISSING_VALUE})
+	 * Missing values (those very close to {@link DsgCruiseData#FP_MISSING_VALUE})
 	 * are ignored.
 	 * 
 	 * @param data
 	 * 		find the minimum and maximum valid values of this data
 	 * @return
 	 * 		(minVal, maxVal) where minVal is the minimum, maxVal is the maximum, or
-	 * 		({@link SocatCruiseData#FP_MISSING_VALUE}, {@link SocatCruiseData#FP_MISSING_VALUE})
+	 * 		({@link DsgCruiseData#FP_MISSING_VALUE}, {@link DsgCruiseData#FP_MISSING_VALUE})
 	 * 		if all data is missing.
 	 */
 	public static double[] getMinMaxValidData(double[] data) {

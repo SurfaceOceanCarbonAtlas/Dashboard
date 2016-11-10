@@ -11,9 +11,8 @@ import gov.noaa.pmel.dashboard.handlers.UserFileHandler;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseList;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -334,7 +333,7 @@ public class CruiseModifier {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
 		dsgFile.readMetadata(configStore.getKnownMetadataTypes());
-		SocatMetadata metaData = dsgFile.getMetadata();
+		DsgMetadata metaData = dsgFile.getMetadata();
 		restoredSocatVersion = metaData.getSocatVersion();
 		// Remove the terminal 'N' or 'U'
 		restoredSocatVersion = restoredSocatVersion.substring(0, restoredSocatVersion.length()-1);
@@ -345,7 +344,7 @@ public class CruiseModifier {
 		double[] latitudes = lonlattimes[1];
 		double[] times = lonlattimes[2];
 		int numData = times.length;
-		char[] currentWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
+		char[] currentWoceFlags = dsgFile.readCharVarDataValues(DashboardServerUtils.WOCE_CO2_WATER.getVarName());
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
@@ -360,7 +359,7 @@ public class CruiseModifier {
 				continue;
 			// Only restore WOCE events not for WOCE_CO2_water
 			// TODO: need to do WOCE_CO2_atm as well if this is needed for v5 or later
-			if ( ! woceEvent.getWoceName().equals(SocatTypes.WOCE_CO2_WATER.getVarName()) )
+			if ( ! woceEvent.getWoceName().equals(DashboardServerUtils.WOCE_CO2_WATER.getVarName()) )
 				continue;
 			// Find "old" WOCE events and check if it should be restored
 			Character woceFlag = woceEvent.getFlag();
@@ -435,7 +434,7 @@ public class CruiseModifier {
 		if ( ! Arrays.equals(revisedWoceFlags, currentWoceFlags) ) {
 			changed = true;
 			// Update the full-data DSG file with the reassigned WOCE flags
-			dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
+			dsgFile.writeCharVarDataValues(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
 			// Generate the decimated DSG file from the updated full-data DSG file
 			dsgHandler.decimateCruise(expocode);
 			System.out.println("WOCE flags updated in the DSG files for " + expocode);
@@ -478,7 +477,7 @@ public class CruiseModifier {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 		CruiseDsgNcFile dsgFile = dsgHandler.getDsgNcFile(expocode);
 		dsgFile.readMetadata(configStore.getKnownMetadataTypes());
-		SocatMetadata metaData = dsgFile.getMetadata();
+		DsgMetadata metaData = dsgFile.getMetadata();
 		restoredSocatVersion = metaData.getSocatVersion();
 		// Remove the terminal 'N' or 'U'
 		restoredSocatVersion = restoredSocatVersion.substring(0, restoredSocatVersion.length()-1);
@@ -489,8 +488,8 @@ public class CruiseModifier {
 		double[] latitudes = lonlattime[1];
 		double[] times = lonlattime[2];
 		int numData = times.length;
-		char[] regionIDs = dsgFile.readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
-		char[] currentWoceFlags = dsgFile.readCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName());
+		char[] regionIDs = dsgFile.readCharVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
+		char[] currentWoceFlags = dsgFile.readCharVarDataValues(DashboardServerUtils.WOCE_CO2_WATER.getVarName());
 		char[] revisedWoceFlags = Arrays.copyOf(currentWoceFlags, currentWoceFlags.length);
 
 		// Get all WOCE events for this expocode, order so the latest are last
@@ -502,7 +501,7 @@ public class CruiseModifier {
 				continue;
 			// Only restore WOCE events not for WOCE_CO2_water
 			// TODO: need to do WOCE_CO2_atm as well if this is needed for v5 or later
-			if ( ! woceEvent.getWoceName().equals(SocatTypes.WOCE_CO2_WATER.getVarName()) )
+			if ( ! woceEvent.getWoceName().equals(DashboardServerUtils.WOCE_CO2_WATER.getVarName()) )
 				continue;
 
 			// Find "old" WOCE events and check if it should be regenerated
@@ -634,7 +633,7 @@ public class CruiseModifier {
 		if ( ! Arrays.equals(revisedWoceFlags, currentWoceFlags) ) {
 			changed = true;
 			// Update the full-data DSG file with the reassigned WOCE flags
-			dsgFile.writeCharVarDataValues(SocatTypes.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
+			dsgFile.writeCharVarDataValues(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), revisedWoceFlags);
 			// Generate the decimated DSG file from the updated full-data DSG file
 			dsgHandler.decimateCruise(expocode);
 			System.out.println("WOCE flags updated in the DSG files for " + expocode);
@@ -683,7 +682,7 @@ public class CruiseModifier {
 		}
 
 		// Get the SOCAT version from the DSG metadata
-		SocatMetadata socatMeta = dsgFile.getMetadata();
+		DsgMetadata socatMeta = dsgFile.getMetadata();
 		String socatVersion = socatMeta.getSocatVersion();
 
 		// Get the computed values of time in seconds since 1970-01-01 00:00:00
@@ -696,7 +695,7 @@ public class CruiseModifier {
 		// Process all the data points that are not already WOCE-4, 
 		// looking for duplicate lon/lat/time/fCO2_rec
 		int j = -1;
-		for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+		for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
 			j++;
 			Character woceFlag = dataVals.getWoceCO2Water();
 			if ( woceFlag.equals(DashboardUtils.WOCE_GOOD) || 
@@ -727,13 +726,13 @@ public class CruiseModifier {
 			WoceEvent woceEvent = new WoceEvent();
 			woceEvent.setExpocode(upperExpo);
 			woceEvent.setVersion(socatVersion);
-			woceEvent.setWoceName(SocatTypes.WOCE_CO2_WATER.getVarName());
+			woceEvent.setWoceName(DashboardServerUtils.WOCE_CO2_WATER.getVarName());
 			woceEvent.setFlag(DashboardUtils.WOCE_BAD);
 			woceEvent.setFlagDate(new Date());
 			woceEvent.setComment("duplicate lon/lat/time/fCO2_rec data points detected by automation");
 			woceEvent.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 			woceEvent.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);
-			woceEvent.setVarName(SocatTypes.FCO2_REC.getVarName());
+			woceEvent.setVarName(DashboardServerUtils.FCO2_REC.getVarName());
 			woceEvent.setLocations(locations);
 			// Add the WOCE event to the database
 			try {

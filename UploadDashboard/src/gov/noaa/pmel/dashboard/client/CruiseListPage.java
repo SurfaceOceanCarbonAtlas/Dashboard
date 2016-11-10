@@ -42,23 +42,22 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 
 /**
- * Main SOCAT upload dashboard page.  Shows uploaded cruise files
+ * Main upload dashboard page.  Shows uploaded cruise files
  * and their status.  Provides connections to upload data files,
  * describe the contents of these data files, and submit the data
- * for inclusion into SOCAT.
+ * for QC.
  * 
  * @author Karl Smith
  */
 public class CruiseListPage extends CompositeWithUsername {
 
-	private static final String TITLE_TEXT = "My SOCAT Datasets";
+	private static final String TITLE_TEXT = "My OA Datasets";
 	private static final String WELCOME_INTRO = "Logged in as ";
 	private static final String LOGOUT_TEXT = "Logout";
 
@@ -226,7 +225,7 @@ public class CruiseListPage extends CompositeWithUsername {
 	private static final String DATA_CHECK_COLUMN_NAME = "Data Status";
 	private static final String OME_METADATA_COLUMN_NAME = "OME Metadata";
 	private static final String ADDL_DOCS_COLUMN_NAME = "Supplemental<br />Documents";
-	private static final String SOCAT_VERSION_COLUMN_NAME = "SOCAT<br />Version";
+	private static final String VERSION_COLUMN_NAME = "Version";
 	private static final String SUBMITTED_COLUMN_NAME = "QC Status";
 	private static final String ARCHIVED_COLUMN_NAME = "Archival";
 	private static final String FILENAME_COLUMN_NAME = "Filename";
@@ -254,7 +253,6 @@ public class CruiseListPage extends CompositeWithUsername {
 			GWT.create(DashboardServicesInterface.class);
 
 	@UiField Label titleLabel;
-	@UiField Image titleImage;
 	@UiField InlineLabel userInfoLabel;
 	@UiField Button logoutButton;
 	@UiField Button uploadButton;
@@ -305,7 +303,6 @@ public class CruiseListPage extends CompositeWithUsername {
 		expocodeSet = new TreeSet<String>();
 
 		titleLabel.setText(TITLE_TEXT);
-		titleImage.setResource(UploadDashboard.resources.getSocatCatPng());
 		logoutButton.setText(LOGOUT_TEXT);
 
 		uploadButton.setText(UPLOAD_TEXT);
@@ -610,7 +607,7 @@ public class CruiseListPage extends CompositeWithUsername {
 			if ( cruise.isSelected() ) {
 				if ( onlyEditable != null ) {
 					Boolean editable = cruise.isEditable();
-					// check if from a previous SOCAT version
+					// check if from a previous version
 					if ( editable == null )
 						return false;
 					// check if editable, if requested
@@ -724,7 +721,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		checkSet.clear();
 		checkSet.putAll(cruiseSet);
 		checkSet.setUsername(getUsername());
-		checkCruisesForSocat();
+		checkCruisesForSubmitting();
 	}
 
 	@UiHandler("deleteButton")
@@ -954,7 +951,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		Column<DashboardCruise,String> dataCheckColumn = buildDataCheckColumn();
 		Column<DashboardCruise,String> omeMetadataColumn = buildOmeMetadataColumn();
 		Column<DashboardCruise,String> addlDocsColumn = buildAddnDocsColumn();
-		TextColumn<DashboardCruise> socatVersionColumn = buildSocatVersionColumn();
+		TextColumn<DashboardCruise> versionColumn = buildVersionColumn();
 		Column<DashboardCruise,String> qcStatusColumn = buildQCStatusColumn();
 		Column<DashboardCruise,String> archiveStatusColumn = buildArchiveStatusColumn();
 		TextColumn<DashboardCruise> filenameColumn = buildFilenameColumn();
@@ -973,8 +970,8 @@ public class CruiseListPage extends CompositeWithUsername {
 				SafeHtmlUtils.fromSafeConstant(OME_METADATA_COLUMN_NAME));
 		datasetsGrid.addColumn(addlDocsColumn, 
 				SafeHtmlUtils.fromSafeConstant(ADDL_DOCS_COLUMN_NAME));
-		datasetsGrid.addColumn(socatVersionColumn,
-				SafeHtmlUtils.fromSafeConstant(SOCAT_VERSION_COLUMN_NAME));
+		datasetsGrid.addColumn(versionColumn,
+				SafeHtmlUtils.fromSafeConstant(VERSION_COLUMN_NAME));
 		datasetsGrid.addColumn(qcStatusColumn, 
 				SafeHtmlUtils.fromSafeConstant(SUBMITTED_COLUMN_NAME));
 		datasetsGrid.addColumn(archiveStatusColumn, 
@@ -1007,7 +1004,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		datasetsGrid.setColumnWidth(addlDocsColumn, 
 				UploadDashboard.FILENAME_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += UploadDashboard.FILENAME_COLUMN_WIDTH;
-		datasetsGrid.setColumnWidth(socatVersionColumn,
+		datasetsGrid.setColumnWidth(versionColumn,
 				UploadDashboard.NARROW_COLUMN_WIDTH, Style.Unit.EM);
 		minTableWidth += UploadDashboard.NARROW_COLUMN_WIDTH;
 		datasetsGrid.setColumnWidth(qcStatusColumn, 
@@ -1036,7 +1033,7 @@ public class CruiseListPage extends CompositeWithUsername {
 		dataCheckColumn.setSortable(true);
 		omeMetadataColumn.setSortable(true);
 		addlDocsColumn.setSortable(true);
-		socatVersionColumn.setSortable(true);
+		versionColumn.setSortable(true);
 		qcStatusColumn.setSortable(true);
 		archiveStatusColumn.setSortable(true);
 		filenameColumn.setSortable(true);
@@ -1055,7 +1052,7 @@ public class CruiseListPage extends CompositeWithUsername {
 				DashboardCruise.omeTimestampComparator);
 		columnSortHandler.setComparator(addlDocsColumn, 
 				DashboardCruise.addlDocsComparator);
-		columnSortHandler.setComparator(socatVersionColumn, 
+		columnSortHandler.setComparator(versionColumn, 
 				DashboardCruise.versionComparator);
 		columnSortHandler.setComparator(qcStatusColumn, 
 				DashboardCruise.qcStatusComparator);
@@ -1353,17 +1350,17 @@ public class CruiseListPage extends CompositeWithUsername {
 	}
 
 	/**
-	 * @return the cruise SOCAT version number column for the table 
+	 * @return the version number column for the table 
 	 */
-	private TextColumn<DashboardCruise> buildSocatVersionColumn() {
-		TextColumn<DashboardCruise> socatVersionColumn = 
+	private TextColumn<DashboardCruise> buildVersionColumn() {
+		TextColumn<DashboardCruise> versionColumn = 
 				new TextColumn<DashboardCruise> () {
 			@Override
 			public String getValue(DashboardCruise cruise) {
 				return cruise.getVersion();
 			}
 		};
-		return socatVersionColumn;
+		return versionColumn;
 	}
 
 	/**
@@ -1407,7 +1404,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					checkSet.clear();
 					checkSet.setUsername(getUsername());
 					checkSet.put(cruise.getExpocode(), cruise);
-					checkCruisesForSocat();
+					checkCruisesForSubmitting();
 				}
 			}
 		});
@@ -1455,7 +1452,7 @@ public class CruiseListPage extends CompositeWithUsername {
 					checkSet.clear();
 					checkSet.setUsername(getUsername());
 					checkSet.put(cruise.getExpocode(), cruise);
-					checkCruisesForSocat();
+					checkCruisesForSubmitting();
 				}
 			}
 		});
@@ -1498,18 +1495,18 @@ public class CruiseListPage extends CompositeWithUsername {
 
 	/**
 	 * Checks the cruises given in checkSet in this instance for metadata 
-	 * compatibility for adding to SOCAT.  At this time this only checks 
+	 * compatibility for submitting for QC.  At this time this only checks 
 	 * that an OME metadata document is associated with each cruise.
 	 * 
 	 * Then checks the cruises given in checkSet in this instance for data 
-	 * compatibility for adding to SOCAT.  If the data has not been checked 
+	 * compatibility for submitting for QC.  If the data has not been checked 
 	 * or is unacceptable, this method presents an error message and returns.  
 	 * If the data has serious issues to cause an automatic F flag, asks the 
 	 * user if the submit should be continued.  If the answer is yes, or if 
-	 * there were no serious data issues, continues the submission to SOCAT 
-	 * by calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
+	 * there were no serious data issues, continues submitting for QC by 
+	 * calling {@link SubmitForQCPage#showPage(java.util.HashSet)}.
 	 */
-	private void checkCruisesForSocat() {
+	private void checkCruisesForSubmitting() {
 		// Check if the cruises have metadata documents
 		String errMsg = NO_METADATA_HTML_PROLOGUE;
 		boolean cannotSubmit = false;

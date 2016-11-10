@@ -14,8 +14,8 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
@@ -75,8 +75,8 @@ public class RegenerateDsgs {
 		boolean updateIt = forceIt;
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
 		CruiseDsgNcFile fullDataDsg;
-		ArrayList<SocatCruiseData> dataVals;
-		SocatMetadata updatedMeta;
+		ArrayList<DsgCruiseData> dataVals;
+		DsgMetadata updatedMeta;
 		try {
 			// Get just the filenames from the set of addition document
 			DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
@@ -91,7 +91,7 @@ public class RegenerateDsgs {
 			missing = fullDataDsg.readData(knownDataFileTypes);
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected data fields missing from the DSG file: " + missing);
-			SocatMetadata fullDataMeta = fullDataDsg.getMetadata();
+			DsgMetadata fullDataMeta = fullDataDsg.getMetadata();
 			dataVals = fullDataDsg.getDataList();
 
 			// Get the QC flag and SOCAT version from the database
@@ -137,7 +137,7 @@ public class RegenerateDsgs {
 			try {
 				// Change date/time of old dataset problem points to something valid, but WOCE them as bad
 				if ( "49K619871028".equals(upperExpo) ) {
-					for ( SocatCruiseData data : dataVals ) {
+					for ( DsgCruiseData data : dataVals ) {
 						if ( (data.getMonth() == 11) && (data.getDay() > 30) ) {
 							// 11-31 in 49K619871028
 							data.setMonth(12);
@@ -147,7 +147,7 @@ public class RegenerateDsgs {
 					}
 				}
 				else if ( "49NB19881228".equals(upperExpo) ) {
-					for ( SocatCruiseData data : dataVals ) {
+					for ( DsgCruiseData data : dataVals ) {
 						if ( (data.getMonth() == 2) && (data.getDay() > 29) ) {
 							// 2-31 in 49NB19881228
 							data.setMonth(3);
@@ -157,7 +157,7 @@ public class RegenerateDsgs {
 					}
 				}
 				else if ( "74JC20061024".equals(upperExpo) ) {
-					for ( SocatCruiseData data : dataVals ) {
+					for ( DsgCruiseData data : dataVals ) {
 						if ( data.getMinute() > 59 ) {
 							// 12:99 in 74JC20061024
 							data.setMinute(59);
@@ -166,7 +166,7 @@ public class RegenerateDsgs {
 					}
 				}
 				else if ( "77FF20020226".equals(upperExpo) ) {
-					for ( SocatCruiseData data : dataVals ) {
+					for ( DsgCruiseData data : dataVals ) {
 						if ( data.getSecond() >= 60.0 ) {
 							// 13:54:60 in 77FF20020226
 							data.setSecond(59.99);

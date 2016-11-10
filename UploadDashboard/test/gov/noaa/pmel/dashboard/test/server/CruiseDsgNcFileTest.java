@@ -10,9 +10,8 @@ import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -46,63 +45,63 @@ public class CruiseDsgNcFileTest {
 	public static final DashDataType TATM = new DashDataType("Temperature_atm", 
 			612.0, "T_atm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"sea-level air temperature", "air_temperature_at_sea_level", 
-			DashboardUtils.TEMPERATURE_CATEGORY, SocatTypes.TEMPERATURE_UNITS);
+			DashboardUtils.TEMPERATURE_CATEGORY, DashboardServerUtils.TEMPERATURE_UNITS);
 
 	public static final DashDataType XCO2_WATER_TEQU_WET = new DashDataType("xCO2_water_equi_temp_wet_ppm", 
 			636.0, "xCO2_water_Tequ_wet", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"water xCO2 wet using equi temp", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.XCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.XCO2_UNITS);
 
 	public static final DashDataType XCO2_WATER_SST_WET = new DashDataType("xCO2_water_sst_wet_ppm", 
 			637.0, "xCO2_water_SST_wet", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"water xCO2 wet using sst", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.XCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.XCO2_UNITS);
 
 	public static final DashDataType XCO2_ATM_DRY_ACTUAL = new DashDataType("xCO2_atm_dry_actual", 
 			640.0, "xCO2_atm_dry_actual", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"actual air xCO2 dry", "mole_fraction_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.XCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.XCO2_UNITS);
 
 	public static final DashDataType PCO2_ATM_WET_ACTUAL = new DashDataType("pCO2_atm_wet_actual", 
 			641.0, "pCO2_atm_wet_actual", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"actual air pCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.PCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.PCO2_UNITS);
 
 	public static final DashDataType FCO2_ATM_WET_ACTUAL = new DashDataType("fCO2_atm_wet_actual", 
 			642.0, "fCO2_atm_wet_actual", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"actual air fCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType XCO2_ATM_DRY_INTERP = new DashDataType("xCO2_atm_dry_interp", 
 			643.0, "xCO2_atm_dry_interp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"interpolated air xCO2 dry", "mole_fraction_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.XCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.XCO2_UNITS);
 
 	public static final DashDataType PCO2_ATM_WET_INTERP = new DashDataType("pCO2_atm_wet_interp", 
 			644.0, "pCO2_atm_wet_interp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"interpolated air pCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.PCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.PCO2_UNITS);
 
 	public static final DashDataType FCO2_ATM_WET_INTERP = new DashDataType("fCO2_atm_wet_interp", 
 			645.0, "fCO2_atm_wet_interp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"interpolated air fCO2 wet", "surface_partial_pressure_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType DELTA_XCO2 = new DashDataType("delta_xCO2", 
 			646.0, "delta_xCO2", 
 			DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"water xCO2 minus atmospheric xCO2", null, 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.XCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.XCO2_UNITS);
 
 	public static final DashDataType DELTA_PCO2 = new DashDataType("delta_pCO2", 
 			647.0, "delta_pCO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"water pCO2 minus atmospheric pCO2", null, 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.PCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.PCO2_UNITS);
 
 	public static final DashDataType DELTA_FCO2 = new DashDataType("delta_fCO2", 
 			648.0, "delta_fCO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"water fCO2 minus atmospheric fCO2", null, 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 
 	public static final DashDataType XH2O_EQU = new DashDataType("xH2O_equi", 
@@ -155,7 +154,7 @@ public class CruiseDsgNcFileTest {
 	public static final DashDataType DELTA_TEMP = new DashDataType("delta_temp", 
 			703.0, "delta_temp", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"Equilibrator Temp - SST", null, 
-			DashboardUtils.TEMPERATURE_CATEGORY, SocatTypes.TEMPERATURE_UNITS);
+			DashboardUtils.TEMPERATURE_CATEGORY, DashboardServerUtils.TEMPERATURE_UNITS);
 
 	public static final DashDataType CALC_SPEED = new DashDataType("calc_speed", 
 			704.0, "calc ship speed", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
@@ -165,72 +164,72 @@ public class CruiseDsgNcFileTest {
 	public static final DashDataType FCO2_FROM_XCO2_TEQU = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm", 
 			720.0, "fCO2 from xCO2_water_Tequ_dry, Pequ, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_SST = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm", 
 			721.0, "fCO2 from xCO2_water_SST_dry, Pequ, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_PCO2_TEQU = new DashDataType("fCO2_from_pCO2_water_water_equi_temp", 
 			722.0, "fCO2 from pCO2_water_Tequ_wet, Pequ, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from pCO2_water_equi_temp, Pressure_equi, sal","surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_PCO2_SST = new DashDataType("fCO2_from_pCO2_water_sst_100humidity_uatm", 
 			723.0, "fCO2 from pCO2_water_SST_wet, Pequ, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from pCO2_water_sst_100humidity_uatm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_FCO2_TEQU = new DashDataType("fCO2_insitu_from_fCO2_water_equi_uatm", 
 			724.0, "fCO2 from fCO2_water_Tequ_wet, Pequ, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from fCO2_water_equi_temp, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_FCO2_SST = new DashDataType("fCO2_insitu_from_fCO2_water_sst_100humidty_uatm", 
 			725.0, "fCO2 from fCO2_water_SST_wet, Pequ, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from fCO2_water_sst_100humidity_uatm, Pressure_equi, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_PCO2_TEQU_NCEP = new DashDataType("fCO2_from_pCO2_water_water_equi_temp_ncep", 
 			726.0, "fCO2 from pCO2_water_Tequ_wet, NCEP SLP, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from pCO2_water_equi_temp, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_PCO2_SST_NCEP = new DashDataType("fCO2_from_pCO2_water_sst_100humidity_uatm_ncep", 
 			727.0, "fCO2 from pCO2_water_SST_wet, NCEP SLP, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from pCO2_water_sst_100humidity_uatm, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_TEQU_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_woa", 
 			728.0, "fCO2 from xCO2_water_Tequ_dry, Pequ, WOA SSS", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_equi_temp_dry_ppm, Pressure_equi, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_SST_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_woa", 
 			729.0, "fCO2 from xCO2_water_SST_dry, Pequ, WOA SSS", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_sst_dry_ppm, Pressure_equi, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_TEQU_NCEP = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep", 
 			730.0, "fCO2 from xCO2_water_Tequ_dry, NCEP SLP, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep", 
 			731.0, "fCO2 from xCO2_water_SST_dry, NCEP SLP, sal", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, sal", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FOC2_FROM_XCO2_TEQU_NCEP_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_equi_temp_dry_ppm_ncep_woa", 
 			732.0, "fCO2 from xCO2_water_Tequ_dry, NCEP SLP, WOA SSS", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_equi_temp_dry_ppm, NCEP SLP, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 	public static final DashDataType FCO2_FROM_XCO2_SST_NCEP_WOA = new DashDataType("fCO2_insitu_from_xCO2_water_sst_dry_ppm_ncep_woa", 
 			733.0, "fCO2 from xCO2_water_SST_dry, NCEP SLP, WOA SSS", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
 			"fCO2 from xCO2_water_sst_dry_ppm, NCEP SLP, WOA SSS", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, SocatTypes.FCO2_UNITS);
+			DashboardUtils.CO2_CATEGORY, DashboardServerUtils.FCO2_UNITS);
 
 
 	/** Known SOCAT metadata types for files */
@@ -243,28 +242,28 @@ public class CruiseDsgNcFileTest {
 		KNOWN_SOCAT_METADATA_FILE_TYPES = new KnownDataTypes();
 		KNOWN_SOCAT_METADATA_FILE_TYPES.addStandardTypesForMetadataFiles();
 		Properties typeProps = new Properties();
-		typeProps.setProperty(SocatTypes.SOCAT_VERSION.getVarName(), SocatTypes.SOCAT_VERSION.toPropertyValue());
-		typeProps.setProperty(SocatTypes.ALL_REGION_IDS.getVarName(), SocatTypes.ALL_REGION_IDS.toPropertyValue());
-		typeProps.setProperty(SocatTypes.SOCAT_DOI.getVarName(), SocatTypes.SOCAT_DOI.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.VERSION.getVarName(), DashboardServerUtils.VERSION.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.ALL_REGION_IDS.getVarName(), DashboardServerUtils.ALL_REGION_IDS.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.ENHANCED_DOI.getVarName(), DashboardServerUtils.ENHANCED_DOI.toPropertyValue());
 		KNOWN_SOCAT_METADATA_FILE_TYPES.addTypesFromProperties(typeProps);
 
 		KNOWN_SOCAT_DATA_FILE_TYPES = new KnownDataTypes();
 		KNOWN_SOCAT_DATA_FILE_TYPES.addStandardTypesForDataFiles();
 		typeProps = new Properties();
-		typeProps.setProperty(SocatTypes.SALINITY.getVarName(), SocatTypes.SALINITY.toPropertyValue());
-		typeProps.setProperty(SocatTypes.TEQU.getVarName(), SocatTypes.TEQU.toPropertyValue());
-		typeProps.setProperty(SocatTypes.SST.getVarName(), SocatTypes.SST.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.SALINITY.getVarName(), DashboardServerUtils.SALINITY.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.TEQU.getVarName(), DashboardServerUtils.TEQU.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.SST.getVarName(), DashboardServerUtils.SST.toPropertyValue());
 		typeProps.setProperty(TATM.getVarName(), TATM.toPropertyValue());
-		typeProps.setProperty(SocatTypes.PEQU.getVarName(), SocatTypes.PEQU.toPropertyValue());
-		typeProps.setProperty(SocatTypes.PATM.getVarName(), SocatTypes.PATM.toPropertyValue());
-		typeProps.setProperty(SocatTypes.XCO2_WATER_TEQU_DRY.getVarName(), SocatTypes.XCO2_WATER_TEQU_DRY.toPropertyValue());
-		typeProps.setProperty(SocatTypes.XCO2_WATER_SST_DRY.getVarName(), SocatTypes.XCO2_WATER_SST_DRY.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.PEQU.getVarName(), DashboardServerUtils.PEQU.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.PATM.getVarName(), DashboardServerUtils.PATM.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.XCO2_WATER_TEQU_DRY.getVarName(), DashboardServerUtils.XCO2_WATER_TEQU_DRY.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.XCO2_WATER_SST_DRY.getVarName(), DashboardServerUtils.XCO2_WATER_SST_DRY.toPropertyValue());
 		typeProps.setProperty(XCO2_WATER_TEQU_WET.getVarName(), XCO2_WATER_TEQU_WET.toPropertyValue());
 		typeProps.setProperty(XCO2_WATER_SST_WET.getVarName(), XCO2_WATER_SST_WET.toPropertyValue());
-		typeProps.setProperty(SocatTypes.PCO2_WATER_TEQU_WET.getVarName(), SocatTypes.PCO2_WATER_TEQU_WET.toPropertyValue());
-		typeProps.setProperty(SocatTypes.PCO2_WATER_SST_WET.getVarName(), SocatTypes.PCO2_WATER_SST_WET.toPropertyValue());
-		typeProps.setProperty(SocatTypes.FCO2_WATER_TEQU_WET.getVarName(), SocatTypes.FCO2_WATER_TEQU_WET.toPropertyValue());
-		typeProps.setProperty(SocatTypes.FCO2_WATER_SST_WET.getVarName(), SocatTypes.FCO2_WATER_SST_WET.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.PCO2_WATER_TEQU_WET.getVarName(), DashboardServerUtils.PCO2_WATER_TEQU_WET.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.PCO2_WATER_SST_WET.getVarName(), DashboardServerUtils.PCO2_WATER_SST_WET.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.FCO2_WATER_TEQU_WET.getVarName(), DashboardServerUtils.FCO2_WATER_TEQU_WET.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.FCO2_WATER_SST_WET.getVarName(), DashboardServerUtils.FCO2_WATER_SST_WET.toPropertyValue());
 		typeProps.setProperty(XCO2_ATM_DRY_ACTUAL.getVarName(), XCO2_ATM_DRY_ACTUAL.toPropertyValue());
 		typeProps.setProperty(PCO2_ATM_WET_ACTUAL.getVarName(), PCO2_ATM_WET_ACTUAL.toPropertyValue());
 		typeProps.setProperty(FCO2_ATM_WET_ACTUAL.getVarName(), FCO2_ATM_WET_ACTUAL.toPropertyValue());
@@ -274,8 +273,8 @@ public class CruiseDsgNcFileTest {
 		typeProps.setProperty(DELTA_XCO2.getVarName(), DELTA_XCO2.toPropertyValue());
 		typeProps.setProperty(DELTA_PCO2.getVarName(), DELTA_PCO2.toPropertyValue());
 		typeProps.setProperty(DELTA_FCO2.getVarName(), DELTA_FCO2.toPropertyValue());
-		typeProps.setProperty(SocatTypes.WOCE_CO2_WATER.getVarName(), SocatTypes.WOCE_CO2_WATER.toPropertyValue());
-		typeProps.setProperty(SocatTypes.WOCE_CO2_ATM.getVarName(), SocatTypes.WOCE_CO2_ATM.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), DashboardServerUtils.WOCE_CO2_WATER.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.WOCE_CO2_ATM.getVarName(), DashboardServerUtils.WOCE_CO2_ATM.toPropertyValue());
 		typeProps.setProperty(XH2O_EQU.getVarName(), XH2O_EQU.toPropertyValue());
 		typeProps.setProperty(RELATIVE_HUMIDITY.getVarName(), RELATIVE_HUMIDITY.toPropertyValue());
 		typeProps.setProperty(SPECIFIC_HUMIDITY.getVarName(), SPECIFIC_HUMIDITY.toPropertyValue());
@@ -285,16 +284,16 @@ public class CruiseDsgNcFileTest {
 		typeProps.setProperty(WIND_DIRECTION_TRUE.getVarName(), WIND_DIRECTION_TRUE.toPropertyValue());
 		typeProps.setProperty(WIND_SPEED_RELATIVE.getVarName(), WIND_SPEED_RELATIVE.toPropertyValue());
 		typeProps.setProperty(WIND_DIRECTION_RELATIVE.getVarName(), WIND_DIRECTION_RELATIVE.toPropertyValue());
-		typeProps.setProperty(SocatTypes.WOA_SALINITY.getVarName(), SocatTypes.WOA_SALINITY.toPropertyValue());
-		typeProps.setProperty(SocatTypes.NCEP_SLP.getVarName(), SocatTypes.NCEP_SLP.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.WOA_SALINITY.getVarName(), DashboardServerUtils.WOA_SALINITY.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.NCEP_SLP.getVarName(), DashboardServerUtils.NCEP_SLP.toPropertyValue());
 		typeProps.setProperty(DELTA_TEMP.getVarName(), DELTA_TEMP.toPropertyValue());
 		typeProps.setProperty(CALC_SPEED.getVarName(), CALC_SPEED.toPropertyValue());
-		typeProps.setProperty(SocatTypes.ETOPO2_DEPTH.getVarName(), SocatTypes.ETOPO2_DEPTH.toPropertyValue());
-		typeProps.setProperty(SocatTypes.GVCO2.getVarName(), SocatTypes.GVCO2.toPropertyValue());
-		typeProps.setProperty(SocatTypes.REGION_ID.getVarName(), SocatTypes.REGION_ID.toPropertyValue());
-		typeProps.setProperty(SocatTypes.DIST_TO_LAND.getVarName(), SocatTypes.DIST_TO_LAND.toPropertyValue());
-		typeProps.setProperty(SocatTypes.FCO2_REC.getVarName(), SocatTypes.FCO2_REC.toPropertyValue());
-		typeProps.setProperty(SocatTypes.FCO2_SOURCE.getVarName(), SocatTypes.FCO2_SOURCE.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.ETOPO2_DEPTH.getVarName(), DashboardServerUtils.ETOPO2_DEPTH.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.GVCO2.getVarName(), DashboardServerUtils.GVCO2.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.REGION_ID.getVarName(), DashboardServerUtils.REGION_ID.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.DIST_TO_LAND.getVarName(), DashboardServerUtils.DIST_TO_LAND.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.FCO2_REC.getVarName(), DashboardServerUtils.FCO2_REC.toPropertyValue());
+		typeProps.setProperty(DashboardServerUtils.FCO2_SOURCE.getVarName(), DashboardServerUtils.FCO2_SOURCE.toPropertyValue());
 		typeProps.setProperty(FCO2_FROM_XCO2_TEQU.getVarName(), FCO2_FROM_XCO2_TEQU.toPropertyValue());
 		typeProps.setProperty(FCO2_FROM_XCO2_SST.getVarName(), FCO2_FROM_XCO2_SST.toPropertyValue());
 		typeProps.setProperty(FCO2_FROM_PCO2_TEQU.getVarName(), FCO2_FROM_PCO2_TEQU.toPropertyValue());
@@ -328,11 +327,11 @@ public class CruiseDsgNcFileTest {
 				DashboardServerUtils.MINUTE_OF_HOUR.duplicate(), 
 				DashboardServerUtils.LATITUDE.duplicate(), 
 				DashboardServerUtils.LONGITUDE.duplicate(), 
-				SocatTypes.SST.duplicate(),
-				SocatTypes.SALINITY.duplicate(),
-				SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
-				SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
-				SocatTypes.PATM.duplicate(),
+				DashboardServerUtils.SST.duplicate(),
+				DashboardServerUtils.SALINITY.duplicate(),
+				DashboardServerUtils.XCO2_WATER_SST_DRY.duplicate(),
+				DashboardServerUtils.PCO2_WATER_TEQU_WET.duplicate(),
+				DashboardServerUtils.PATM.duplicate(),
 				SHIP_SPEED.duplicate()));
 		String[] dataValueStrings = {
 				"31B520060606,GM0606,6,10,2006,23,48,29.0514,-92.759,28.78,33.68,409.7,392.5,1009.281,0.3", 
@@ -377,12 +376,12 @@ public class CruiseDsgNcFileTest {
 			rowNums.add(k);
 		cruise.setRowNums(rowNums);
 
-		// Create the list of SocatCruiseData from the DashboardCruiseWithData
-		ArrayList<SocatCruiseData> dataList = 
-				SocatCruiseData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
+		// Create the list of DsgCruiseData from the DashboardCruiseWithData
+		ArrayList<DsgCruiseData> dataList = 
+				DsgCruiseData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
 
-		// Create the SocatMetadata for this cruise
-		SocatMetadata metadata = new SocatMetadata(KNOWN_SOCAT_METADATA_FILE_TYPES);
+		// Create the DsgMetadata for this cruise
+		DsgMetadata metadata = new DsgMetadata(KNOWN_SOCAT_METADATA_FILE_TYPES);
 		metadata.setExpocode(expocode);
 		metadata.setDatasetName("GM0606");
 		metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
@@ -422,11 +421,11 @@ public class CruiseDsgNcFileTest {
 				DashboardServerUtils.MINUTE_OF_HOUR.duplicate(),
 				DashboardServerUtils.LATITUDE.duplicate(),
 				DashboardServerUtils.LONGITUDE.duplicate(),
-				SocatTypes.SST.duplicate(),
-				SocatTypes.SALINITY.duplicate(),
-				SocatTypes.XCO2_WATER_SST_DRY.duplicate(),
-				SocatTypes.PCO2_WATER_TEQU_WET.duplicate(),
-				SocatTypes.PATM.duplicate(),
+				DashboardServerUtils.SST.duplicate(),
+				DashboardServerUtils.SALINITY.duplicate(),
+				DashboardServerUtils.XCO2_WATER_SST_DRY.duplicate(),
+				DashboardServerUtils.PCO2_WATER_TEQU_WET.duplicate(),
+				DashboardServerUtils.PATM.duplicate(),
 				SHIP_SPEED.duplicate()));
 		String[][] badTimeDataValueStringsSets = {
 				{
@@ -457,12 +456,12 @@ public class CruiseDsgNcFileTest {
 				rowNums.add(k);
 			cruise.setRowNums(rowNums);
 
-			// Create the list of SocatCruiseData from the DashboardCruiseWithData
-			ArrayList<SocatCruiseData> dataList = 
-					SocatCruiseData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
+			// Create the list of DsgCruiseData from the DashboardCruiseWithData
+			ArrayList<DsgCruiseData> dataList = 
+					DsgCruiseData.dataListFromDashboardCruise(KNOWN_SOCAT_DATA_FILE_TYPES, cruise);
 
-			// Create the SocatMetadata for this cruise
-			SocatMetadata metadata = new SocatMetadata(KNOWN_SOCAT_METADATA_FILE_TYPES);
+			// Create the DsgMetadata for this cruise
+			DsgMetadata metadata = new DsgMetadata(KNOWN_SOCAT_METADATA_FILE_TYPES);
 			metadata.setExpocode(expocode);
 			metadata.setDatasetName("GM0606");
 			metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");

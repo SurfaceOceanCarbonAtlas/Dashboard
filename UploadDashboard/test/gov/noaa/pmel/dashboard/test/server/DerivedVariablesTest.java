@@ -7,7 +7,7 @@ import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
 
 import java.util.ArrayList;
 
@@ -31,7 +31,7 @@ public class DerivedVariablesTest {
 		ArrayList<Integer> hours = new ArrayList<Integer>(numData);
 		ArrayList<Integer> minutes = new ArrayList<Integer>(numData);
 		for (int k = 0; k < numData; k++) {
-			SocatCruiseData dataVals = dsgFile.getDataList().get(k);
+			DsgCruiseData dataVals = dsgFile.getDataList().get(k);
 			longitudes.add(dataVals.getLongitude());
 			latitudes.add(dataVals.getLatitude());
 			hours.add(dataVals.getHour());
@@ -55,7 +55,7 @@ public class DerivedVariablesTest {
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		assertEquals(numData, dsgFile.getDataList().size());
 		for (int k = 0; k < numData; k++) {
-			SocatCruiseData dataVals = dsgFile.getDataList().get(k);
+			DsgCruiseData dataVals = dsgFile.getDataList().get(k);
 			assertEquals(Integer.valueOf(k+1), dataVals.getSampleNumber());
 			assertEquals(longitudes.get(k), dataVals.getLongitude(), 1.0E-6);
 			assertEquals(latitudes.get(k), dataVals.getLatitude(), 1.0E-6);
@@ -77,7 +77,7 @@ public class DerivedVariablesTest {
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		int lastRowNum = 0;
-		for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+		for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
 			int thisRowNum = dataVals.getSampleNumber();
 			assertTrue( lastRowNum < thisRowNum );
 			assertTrue( thisRowNum <= numData );

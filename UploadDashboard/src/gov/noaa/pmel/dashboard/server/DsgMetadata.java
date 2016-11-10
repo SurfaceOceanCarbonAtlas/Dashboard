@@ -14,7 +14,7 @@ import java.util.TreeMap;
  * 
  * @author Karl Smith
  */
-public class SocatMetadata {
+public class DsgMetadata {
 
 	// Maps of variable names to values
 	TreeMap<DashDataType,String> stringValuesMap;
@@ -22,7 +22,7 @@ public class SocatMetadata {
 	TreeMap<DashDataType,Date> dateValuesMap;
 
 	/**
-	 * Generates a SocatMetadata object with the given known types.
+	 * Generates a DsgMetadata object with the given known types.
 	 * Only the data class types 
 	 * 	{@link DashboardUtils#STRING_DATA_CLASS_NAME}, 
 	 * 	{@link DashboardUtils#DOUBLE_DATA_CLASS_NAME}, and
@@ -41,7 +41,7 @@ public class SocatMetadata {
 	 * 		all known data types;
 	 * 		cannot be null or empty
 	 */
-	public SocatMetadata(KnownDataTypes knownTypes) {
+	public DsgMetadata(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
 		stringValuesMap = new TreeMap<DashDataType,String>();
@@ -326,7 +326,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatVersion() {
-		String value = stringValuesMap.get(SocatTypes.SOCAT_VERSION);
+		String value = stringValuesMap.get(DashboardServerUtils.VERSION);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -349,7 +349,7 @@ public class SocatMetadata {
 			value = socatVersion;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SocatTypes.SOCAT_VERSION, value);
+		stringValuesMap.put(DashboardServerUtils.VERSION, value);
 	}
 
 	/**
@@ -358,7 +358,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getAllRegionIDs() {
-		String value = stringValuesMap.get(SocatTypes.ALL_REGION_IDS);
+		String value = stringValuesMap.get(DashboardServerUtils.ALL_REGION_IDS);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -375,7 +375,7 @@ public class SocatMetadata {
 			value = allRegionIDs;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SocatTypes.ALL_REGION_IDS, value);
+		stringValuesMap.put(DashboardServerUtils.ALL_REGION_IDS, value);
 	}
 
 	/**
@@ -384,7 +384,7 @@ public class SocatMetadata {
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
 	public String getSocatDOI() {
-		String value = stringValuesMap.get(SocatTypes.SOCAT_DOI);
+		String value = stringValuesMap.get(DashboardServerUtils.ENHANCED_DOI);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
@@ -401,7 +401,7 @@ public class SocatMetadata {
 			value = socatDOI;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(SocatTypes.SOCAT_DOI, value);
+		stringValuesMap.put(DashboardServerUtils.ENHANCED_DOI, value);
 	}
 
 	/**
@@ -619,9 +619,9 @@ public class SocatMetadata {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatMetadata) )
+		if ( ! (obj instanceof DsgMetadata) )
 			return false;
-		SocatMetadata other = (SocatMetadata) obj;
+		DsgMetadata other = (DsgMetadata) obj;
 
 		// Date comparisons
 		if ( ! dateValuesMap.equals(other.dateValuesMap) )
@@ -654,7 +654,7 @@ public class SocatMetadata {
 
 	@Override
 	public String toString() {
-		String repr = "SocatMetadata[\n";
+		String repr = "DsgMetadata[\n";
 		for ( Entry<DashDataType,String> entry : stringValuesMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=\"" + entry.getValue() + "\"\n";
 		for ( Entry<DashDataType,Double> entry : doubleValuesMap.entrySet() )

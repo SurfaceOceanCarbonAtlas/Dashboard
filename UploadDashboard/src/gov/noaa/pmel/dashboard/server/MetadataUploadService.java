@@ -233,7 +233,7 @@ public class MetadataUploadService extends HttpServlet {
 						cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 						// If archived, reset the archived status so the updated metadata will be archived
 						if ( cruise.getArchiveStatus().equals(DashboardUtils.ARCHIVE_STATUS_ARCHIVED) )
-							cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+							cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 						cruiseHandler.saveCruiseInfoToFile(cruise, comment);
 					} catch (Exception ex) {
 						// Should not fail.  

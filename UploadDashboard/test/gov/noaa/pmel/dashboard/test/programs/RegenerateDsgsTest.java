@@ -10,8 +10,8 @@ import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.IOException;
@@ -54,8 +54,8 @@ public class RegenerateDsgsTest {
 		CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
-		SocatMetadata origMeta = fullDataDsg.getMetadata();
-		ArrayList<SocatCruiseData> origData = fullDataDsg.getDataList();
+		DsgMetadata origMeta = fullDataDsg.getMetadata();
+		ArrayList<DsgCruiseData> origData = fullDataDsg.getDataList();
 
 		// Regenerate the DSG files
 		RegenerateDsgs regenerator = new RegenerateDsgs(configStore);
@@ -65,16 +65,16 @@ public class RegenerateDsgsTest {
 		// Re-read the data and metadata
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
-		SocatMetadata updatedMeta = fullDataDsg.getMetadata();
-		ArrayList<SocatCruiseData> updatedData = fullDataDsg.getDataList();
+		DsgMetadata updatedMeta = fullDataDsg.getMetadata();
+		ArrayList<DsgCruiseData> updatedData = fullDataDsg.getDataList();
 
 		// Test that nothing has changed
 		assertEquals(origMeta, updatedMeta);
 		assertEquals(origData.size(), updatedData.size());
 
 		for (int k = 0; k < origData.size(); k++) {
-			SocatCruiseData origVals = origData.get(k);
-			SocatCruiseData updatedVals = updatedData.get(k);
+			DsgCruiseData origVals = origData.get(k);
+			DsgCruiseData updatedVals = updatedData.get(k);
 
 			if ( ! origVals.equals(updatedVals) ) {
 				// Report all problems for the measurement, not just the first problem

@@ -10,9 +10,8 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
@@ -209,15 +208,15 @@ public class DsgNcFileHandler {
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
 		// Get the metadata needed for creating the DSG file
-		SocatMetadata socatMData = omeMData.createSocatMetadata();
+		DsgMetadata socatMData = omeMData.createSocatMetadata();
 		// Add SOCAT version number and status string, QC flag, and SOCAT DOI
 		socatMData.setSocatVersion(socatVersionStatus);
 		socatMData.setQcFlag(qcFlag);
 		socatMData.setSocatDOI(cruiseData.getSocatDoi());
 		// The value of allRegionsIDs will be empty - needs IDs from Ferret
 		// Convert the cruise data strings into the appropriate type
-		ArrayList<SocatCruiseData> socatDatalist = 
-				SocatCruiseData.dataListFromDashboardCruise(
+		ArrayList<DsgCruiseData> socatDatalist = 
+				DsgCruiseData.dataListFromDashboardCruise(
 						knownDataFileTypes, cruiseData);
 
 		// synchronize on savingDsgFileLock to block examination 
@@ -329,8 +328,8 @@ public class DsgNcFileHandler {
 			if ( ! missing.isEmpty() )
 				throw new RuntimeException("Unexpected data fields missing from the DSG file: " + missing);
 			try {
-				ArrayList<SocatCruiseData> dataVals = oldDsgFile.getDataList();
-				SocatMetadata updatedMeta = oldDsgFile.getMetadata();
+				ArrayList<DsgCruiseData> dataVals = oldDsgFile.getDataList();
+				DsgMetadata updatedMeta = oldDsgFile.getMetadata();
 				updatedMeta.setExpocode(newExpocode);
 				newDsgFile.create(updatedMeta, dataVals);
 				// Call Ferret to add lon360 and tmonth (calculated data should be the same)
@@ -442,7 +441,7 @@ public class DsgNcFileHandler {
 		if ( ! dsgFile.exists() )
 			throw new FileNotFoundException("Full data DSG file for " + 
 					expocode + " does not exist");
-		char[] regions = dsgFile.readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
+		char[] regions = dsgFile.readCharVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
 		TreeSet<Character> regionsSet = new TreeSet<Character>();
 		for ( char value : regions )
 			regionsSet.add(value);
@@ -456,7 +455,7 @@ public class DsgNcFileHandler {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the DSG file for the specified cruise.  The variable must 
 	 * be saved in the DSG file as characters.  Empty strings are changed to 
-	 * {@link SocatCruiseData#CHAR_MISSING_VALUE}.  For some variables, the  
+	 * {@link DsgCruiseData#CHAR_MISSING_VALUE}.  For some variables, the  
 	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
@@ -518,7 +517,7 @@ public class DsgNcFileHandler {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the full-data DSG file for the specified cruise.  The 
 	 * variable must be saved in the DSG file as doubles.  NaN and infinite 
-	 * values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.  For 
+	 * values are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.  For 
 	 * some variables, the DSG file must have been processed by Ferret, such 
 	 * as when saved using {@link DsgNcFileHandler#saveCruise(OmeMetadata, 
 	 * DashboardCruiseWithData, String)} for the data values to be meaningful.
@@ -548,7 +547,7 @@ public class DsgNcFileHandler {
 	/**
 	 * Reads and returns the longitudes, latitudes, and times contained in the 
 	 * full-data DSG file for the specified cruise.  NaN and infinite values 
-	 * are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.
+	 * are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.
 	 * 
 	 * @param expocode
 	 * 		get the data values for the cruise with this expocode
@@ -577,7 +576,7 @@ public class DsgNcFileHandler {
 	 * Reads and returns the longitudes, latitudes, times, SST values, and 
 	 * fCO2_recommended values contained in the full-data DSG file for the
 	 * specified cruise.  NaN and infinite values are changed to 
-	 * {@link SocatCruiseData#FP_MISSING_VALUE}.  The full-data DSG file must 
+	 * {@link DsgCruiseData#FP_MISSING_VALUE}.  The full-data DSG file must 
 	 * have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the fCO2_recommended values to be meaningful.

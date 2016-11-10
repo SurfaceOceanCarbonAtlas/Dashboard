@@ -9,7 +9,7 @@ import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.Date;
@@ -44,13 +44,13 @@ public class SocatMetadataTest {
 	static final String QC_FLAG = "C";
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getStringVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getStringVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setStringVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetStringVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		mdata.setStringVariableValue(DashboardServerUtils.EXPOCODE, EXPOCODE);
 		TreeMap<DashDataType,String> stringMap = mdata.getStringVariables();
 		assertEquals(EXPOCODE, stringMap.get(DashboardServerUtils.EXPOCODE));
@@ -67,13 +67,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getDoubleVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setDoubleVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDoubleVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDoubleVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetDoubleVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		Double value = Double.valueOf(EASTMOST_LONGITUDE);
 		mdata.setDoubleVariableValue(DashboardServerUtils.EASTERNMOST_LONGITUDE, value);
 		TreeMap<DashDataType,Double> doubleMap = mdata.getDoubleVariables();
@@ -91,13 +91,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getDateVariables()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setDateVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDateVariables()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDateVariableValue(gov.noaa.pmel.dashboard.server.DashDataType,java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetDateVariableValue() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		mdata.setDateVariableValue(DashboardServerUtils.TIME_COVERAGE_START, BEGIN_TIME);
 		TreeMap<DashDataType,Date> dateMap = mdata.getDateVariables();
 		assertEquals(BEGIN_TIME, dateMap.get(DashboardServerUtils.TIME_COVERAGE_START));
@@ -114,13 +114,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getExpocode()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setExpocode(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getExpocode()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setExpocode(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetExpocode() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setExpocode(EXPOCODE);
 		assertEquals(EXPOCODE, mdata.getExpocode());
@@ -129,13 +129,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getDatasetName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setDatasetName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getDatasetName()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setDatasetName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetDatasetName() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		mdata.setDatasetName(CRUISE_NAME);
 		assertEquals(CRUISE_NAME, mdata.getDatasetName());
@@ -145,13 +145,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getVesselName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setVesselName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getVesselName()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setVesselName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetVesselName() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
 		mdata.setVesselName(VESSEL_NAME);
 		assertEquals(VESSEL_NAME, mdata.getVesselName());
@@ -162,13 +162,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getOrganizationName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setOrganizationName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getOrganizationName()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setOrganizationName(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetOrganization() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
 		mdata.setOrganizationName(ORGANIZATION_NAME);
 		assertEquals(ORGANIZATION_NAME, mdata.getOrganizationName());
@@ -180,13 +180,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getInvestigatorNames()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setInvestigatorNames(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getInvestigatorNames()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setInvestigatorNames(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetInvestigatorNames() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		mdata.setInvestigatorNames(INVESTIGATOR_NAMES);
 		assertEquals(INVESTIGATOR_NAMES, mdata.getInvestigatorNames());
@@ -199,13 +199,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getVesselType()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setVesselType(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getVesselType()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setVesselType(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetVesselType() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
 		mdata.setVesselType(VESSEL_TYPE);
 		assertEquals(VESSEL_TYPE, mdata.getVesselType());
@@ -219,13 +219,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getSocatVersion()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setSocatVersion(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getSocatVersion()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setSocatVersion(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetSocatVersion() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
 		mdata.setSocatVersion(SOCAT_VERSION);
 		assertEquals(SOCAT_VERSION, mdata.getSocatVersion());
@@ -240,13 +240,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getAllRegionIDs()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setAllRegionIDs(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getAllRegionIDs()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setAllRegionIDs(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetAllRegionIDs() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		mdata.setAllRegionIDs(ALL_REGION_IDS);
 		assertEquals(ALL_REGION_IDS, mdata.getAllRegionIDs());
@@ -262,13 +262,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getSocatDOI()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setSocatDOI(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getSocatDOI()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setSocatDOI(java.lang.String)}.
 	 */
 	@Test
 	public void testGetSetSocatDOI() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		mdata.setSocatDOI(SOCAT_DOI);
 		assertEquals(SOCAT_DOI, mdata.getSocatDOI());
@@ -285,13 +285,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getQcFlag()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setQcFlag(java.lang.Character)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getQcFlag()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setQcFlag(java.lang.Character)}.
 	 */
 	@Test
 	public void testGetSetQCFlag() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.CHAR_MISSING_VALUE.toString(), mdata.getQcFlag());
 		mdata.setQcFlag(QC_FLAG);
 		assertEquals(QC_FLAG, mdata.getQcFlag());
@@ -309,13 +309,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getWestmostLongitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setWestmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getWestmostLongitude()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setWestmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetWestmostLongitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		mdata.setWestmostLongitude(WESTMOST_LONGITUDE);
 		assertTrue( WESTMOST_LONGITUDE.equals(mdata.getWestmostLongitude()) );
@@ -334,13 +334,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getEastmostLongitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setEastmostLongitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getEastmostLongitude()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setEastmostLongitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetEastmostLongitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		mdata.setEastmostLongitude(EASTMOST_LONGITUDE);
 		assertTrue( EASTMOST_LONGITUDE.equals(mdata.getEastmostLongitude()) );
@@ -360,13 +360,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getSouthmostLatitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setSouthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getSouthmostLatitude()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setSouthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetSouthmostLatitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		mdata.setSouthmostLatitude(SOUTHMOST_LATITUDE);
 		assertTrue( SOUTHMOST_LATITUDE.equals(mdata.getSouthmostLatitude()) );
@@ -387,13 +387,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getNorthmostLatitude()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setNorthmostLatitude(java.lang.Double)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getNorthmostLatitude()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setNorthmostLatitude(java.lang.Double)}.
 	 */
 	@Test
 	public void testGetSetNorthmostLatitude() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
 		mdata.setNorthmostLatitude(NORTHMOST_LATITUDE);
 		assertTrue( NORTHMOST_LATITUDE.equals(mdata.getNorthmostLatitude()) );
@@ -415,13 +415,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getBeginTime()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setBeginTime(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getBeginTime()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setBeginTime(java.util.Date)}.
 	 */
 	@Test
 	public void testSetBeginTime() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
 		mdata.setBeginTime(BEGIN_TIME);
 		assertEquals(BEGIN_TIME, mdata.getBeginTime());
@@ -444,13 +444,13 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getEndTime()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setEndTime(java.util.Date)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getEndTime()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setEndTime(java.util.Date)}.
 	 */
 	@Test
 	public void testGetSetEndTime() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
 		mdata.setEndTime(END_TIME);
 		assertEquals(END_TIME, mdata.getEndTime());
@@ -475,18 +475,18 @@ public class SocatMetadataTest {
 
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#hashCode()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#equals(java.lang.Object)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#hashCode()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#equals(java.lang.Object)}.
 	 */
 	@Test
 	public void testHashCodeEqualsObject() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 
-		SocatMetadata mdata = new SocatMetadata(knownTypes);
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
 		assertFalse( mdata.equals(null) );
 		assertFalse( mdata.equals(EXPOCODE) );
 
-		SocatMetadata other = new SocatMetadata(knownTypes);
+		DsgMetadata other = new DsgMetadata(knownTypes);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 

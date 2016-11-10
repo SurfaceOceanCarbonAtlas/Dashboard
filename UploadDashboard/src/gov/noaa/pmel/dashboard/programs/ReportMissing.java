@@ -6,8 +6,8 @@ package gov.noaa.pmel.dashboard.programs;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.RowNumSet;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.BufferedReader;
@@ -47,7 +47,7 @@ public class ReportMissing {
 		double[] longitudes = lonlattimes[0];
 		double[] latitudes = lonlattimes[1];
 		double[] times = lonlattimes[2];
-		char[] regionIDs = dsgFile.readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
+		char[] regionIDs = dsgFile.readCharVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
 		int numObs = longitudes.length;
 		if ( latitudes.length != numObs )
 			throw new IllegalArgumentException("number of latitudes (" + 

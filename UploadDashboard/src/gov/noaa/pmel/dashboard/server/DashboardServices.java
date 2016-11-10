@@ -288,7 +288,7 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 				// Update the dashboard status for the 'U' QC flag
 				cruise.setQcStatus(DashboardUtils.QC_STATUS_SUBMITTED);
 				if ( cruise.isEditable() == null ) {
-					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT);
+					cruise.setArchiveStatus(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE);
 				}
 				cruiseHandler.saveCruiseInfoToFile(cruise, comment);
 				Logger.getLogger("DashboardServices").info("updated QC status for " + expocode);

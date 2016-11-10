@@ -3,7 +3,7 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.server.SocatTypes;
+import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
@@ -375,7 +375,7 @@ public class DatabaseRequestHandler {
 					qcEvent.getUsername(), qcEvent.getRealname());
 			PreparedStatement addPrepStmt = catConn.prepareStatement("INSERT INTO `" + 
 					QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, `expocode`, " +
-					"`socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
+					"`qc_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES(?, ?, ?, ?, ?, ?, ?);");
 			addPrepStmt.setString(1, qcEvent.getFlag().toString());
 			Date flagDate = qcEvent.getFlagDate();
@@ -556,20 +556,20 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Returns the SOCAT version number String for a dataset appended with
+	 * Returns the version number String for a dataset appended with
 	 * and 'N', indicating the dataset is new to this version, or a 'U',
 	 * indicating the dataset is an update to a dataset from a previous 
-	 * SOCAT version.  Updates within a SOCAT version do NOT change an 'N' 
-	 * to a 'U'.  The SOCAT version number used is the largest SOCAT version 
+	 * version.  Updates within a version do NOT change an 'N' 
+	 * to a 'U'.  The version number used is the largest version 
 	 * number of global new and update QC flags for this dataset in the database.
 	 * 
 	 * @param expocode
-	 * 		get the SOCAT version status String for the dataset with this expocode 
+	 * 		get the version status String for the dataset with this expocode 
 	 * @return
-	 * 		the SOCAT version number status String; never null but may be empty
+	 * 		the version number status String; never null but may be empty
 	 * 		if no global new or update QC flags exist.
 	 * @throws SQLException
-	 * 		if an error occurs retrieving the SOCAT version numbers
+	 * 		if an error occurs retrieving the version numbers
 	 */
 	public String getSocatVersionStatus(String expocode) throws SQLException {
 		Double versionNum = null;
@@ -578,7 +578,7 @@ public class DatabaseRequestHandler {
 		try {
 			// Get all the QC events for this data set, ordered so the latest are last
 			PreparedStatement getPrepStmt = catConn.prepareStatement(
-					"SELECT `socat_version` FROM `" + QCEVENTS_TABLE_NAME + 
+					"SELECT `qc_version` FROM `" + QCEVENTS_TABLE_NAME + 
 					"` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.GLOBAL_REGION_ID +
 					"' AND `qc_flag` IN ('" + DashboardUtils.QC_NEW_FLAG + 
 					"', '" + DashboardUtils.QC_UPDATED_FLAG + "');");
@@ -588,7 +588,7 @@ public class DatabaseRequestHandler {
 				while ( rslts.next() ) {
 					String versionStr = rslts.getString(1);
 					if ( (versionStr == null) || versionStr.trim().isEmpty() ) {
-						throw new SQLException("Unexpected missing SOCAT version");
+						throw new SQLException("Unexpected missing version");
 					}
 					try {
 						Double version = Math.floor(Double.valueOf(versionStr) * 10.0) / 10.0;
@@ -604,7 +604,7 @@ public class DatabaseRequestHandler {
 							status = 'U';
 						}
 					} catch (NumberFormatException ex) {
-						throw new SQLException("Unexpected non-numeric SOCAT version '" + versionStr + "'");
+						throw new SQLException("Unexpected non-numeric version '" + versionStr + "'");
 					}
 				}
 			} finally {
@@ -626,7 +626,7 @@ public class DatabaseRequestHandler {
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
 	 * 		include columns with names qc_flag, qc_time, expocode, 
-	 * 		socat_version, region_id, username, realname, and qc_comment.
+	 * 		qc_version, region_id, username, realname, and qc_comment.
 	 * @returns
 	 * 		the created QC flag
 	 * @throws SQLException
@@ -649,7 +649,7 @@ public class DatabaseRequestHandler {
 		if ( results.wasNull() )
 			qcEvent.setFlagDate(null);
 		qcEvent.setExpocode(results.getString("expocode"));
-		qcEvent.setVersion(results.getString("socat_version"));
+		qcEvent.setVersion(results.getString("qc_version"));
 		if ( results.wasNull() )
 			qcEvent.setVersion(null);
 		try {
@@ -721,7 +721,7 @@ public class DatabaseRequestHandler {
 			// Add the WOCE event
 			PreparedStatement prepStmt = catConn.prepareStatement("INSERT INTO `" + 
 					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
-					"`expocode`, `socat_version`, `data_name`, `reviewer_id`, " +
+					"`expocode`, `qc_version`, `data_name`, `reviewer_id`, " +
 					"`woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
 			prepStmt.setString(1, woceEvent.getWoceName());
 			prepStmt.setString(2, woceEvent.getFlag().toString());
@@ -798,7 +798,7 @@ public class DatabaseRequestHandler {
 	 * @param results
 	 * 		assign values from the current row of this ResultSet; must 
 	 * 		include columns with names woce_flag, woce_time, expocode, 
-	 * 		socat_version, data_name, username, realname, 
+	 * 		qc_version, data_name, username, realname, 
 	 * 		and woce_comment.
 	 * @returns
 	 * 		the created WOCE event
@@ -823,7 +823,7 @@ public class DatabaseRequestHandler {
 		if ( results.wasNull() )
 			woceEvent.setFlagDate(null);
 		woceEvent.setExpocode(results.getString("expocode"));
-		woceEvent.setVersion(results.getString("socat_version"));
+		woceEvent.setVersion(results.getString("qc_version"));
 		woceEvent.setVarName(results.getString("data_name"));
 		woceEvent.setUsername(results.getString("username"));
 		woceEvent.setRealname(results.getString("realname"));
@@ -1046,7 +1046,7 @@ public class DatabaseRequestHandler {
 	 * @param newExpocode
 	 * 		standardized new expocode
 	 * @param version
-	 * 		SOCAT version to associate with the rename QC and WOCE events
+	 * 		version to associate with the rename QC and WOCE events
 	 * @param username
 	 * 		name of the user to associate with the rename QC and WOCE events 
 	 * @throws SQLException
@@ -1081,7 +1081,7 @@ public class DatabaseRequestHandler {
 			// Add two rename QC events; one for the old expocode and one for the new expocode
 			PreparedStatement addQcPrepStmt = catConn.prepareStatement(
 					"INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
-					"`expocode`, `socat_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
+					"`expocode`, `qc_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
 			addQcPrepStmt.setString(1, DashboardUtils.QC_RENAMED_FLAG.toString());
 			addQcPrepStmt.setString(8, DashboardUtils.QC_RENAMED_FLAG.toString());
@@ -1118,10 +1118,10 @@ public class DatabaseRequestHandler {
 			// Add two rename WOCE events; one for the old expocode and one for the new expocode
 			PreparedStatement addWocePrepStmt = catConn.prepareStatement("INSERT INTO `" + 
 					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
-					"`expocode`, `socat_version`, `reviewer_id`, `woce_comment`) " +
+					"`expocode`, `qc_version`, `reviewer_id`, `woce_comment`) " +
 					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
-			addWocePrepStmt.setString(1, SocatTypes.WOCE_CO2_WATER.getVarName());
-			addWocePrepStmt.setString(8, SocatTypes.WOCE_CO2_WATER.getVarName());
+			addWocePrepStmt.setString(1, DashboardServerUtils.WOCE_CO2_WATER.getVarName());
+			addWocePrepStmt.setString(8, DashboardServerUtils.WOCE_CO2_WATER.getVarName());
 			addWocePrepStmt.setString(2, DashboardUtils.WOCE_RENAME.toString());
 			addWocePrepStmt.setString(9, DashboardUtils.WOCE_RENAME.toString());
 			addWocePrepStmt.setLong(3, nowSec);
@@ -1141,12 +1141,12 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
-	 * Removes all QC and WOCE flags that have the given expocode and socat version.
+	 * Removes all QC and WOCE flags that have the given expocode and version.
 	 * 
 	 * @param expocode
 	 * 		expocode to use
 	 * @param version
-	 * 		socat version to use
+	 * 		version to use
 	 * @throws SQLException
 	 * 		if generating the prepared statements or deleting the flags throws one
 	 */
@@ -1155,7 +1155,7 @@ public class DatabaseRequestHandler {
 		try {
 			// Remove any QC events for this cruise version
 			PreparedStatement deleteQcPrepStmt = catConn.prepareStatement("DELETE FROM `" + 
-					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `socat_version` = ?;");
+					QCEVENTS_TABLE_NAME + "` WHERE `expocode` = ? AND `qc_version` = ?;");
 			deleteQcPrepStmt.setString(1, expocode);
 			deleteQcPrepStmt.setString(2, socatVersion);
 			deleteQcPrepStmt.executeUpdate();
@@ -1166,7 +1166,7 @@ public class DatabaseRequestHandler {
 					WOCEEVENTS_TABLE_NAME + "` JOIN `" + WOCELOCATIONS_TABLE_NAME + "` ON " + 
 					WOCEEVENTS_TABLE_NAME + ".woce_id = " + WOCELOCATIONS_TABLE_NAME + ".woce_id WHERE " + 
 					WOCEEVENTS_TABLE_NAME + ".expocode = ? AND " + 
-					WOCEEVENTS_TABLE_NAME + ".socat_version = ?;");
+					WOCEEVENTS_TABLE_NAME + ".qc_version = ?;");
 			deleteWoceLocPrepStmt.setString(1, expocode);
 			deleteWoceLocPrepStmt.setString(2, socatVersion);
 			deleteWoceLocPrepStmt.executeUpdate();

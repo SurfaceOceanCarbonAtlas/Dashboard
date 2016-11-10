@@ -686,7 +686,7 @@ public class CruiseChecker {
 		ArrayList<DataColumnType> dataColTypes = cruiseData.getDataColTypes();
 		ArrayList<ArrayList<String>> dataVals = cruiseData.getDataValues();
 
-		// Standardized data for generating a SocatCruiseData object must have 
+		// Standardized data for generating a DsgCruiseData object must have 
 		// separate year, month, day, hour, minute, and second columns
 		boolean hasYearColumn = ( colIndcs.yearIndex >= 0 );
 		boolean hasMonthColumn = ( colIndcs.monthIndex >= 0 );

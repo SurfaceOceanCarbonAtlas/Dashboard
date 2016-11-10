@@ -41,8 +41,8 @@ public class CruiseDsgNcFile extends File {
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
 	private static final String TIME_ORIGIN_ATTRIBUTE = "01-JAN-1970 00:00:00";
 
-	private SocatMetadata metadata;
-	private ArrayList<SocatCruiseData> dataList;
+	private DsgMetadata metadata;
+	private ArrayList<DsgCruiseData> dataList;
 
 	/**
 	 * See {@link java.io.File#File(java.lang.String)}
@@ -109,7 +109,7 @@ public class CruiseDsgNcFile extends File {
 
 	/**
 	 * Creates this NetCDF DSG file with the contents of the given 
-	 * SocatMetadata object and list of SocatCruiseData objects.
+	 * DsgMetadata object and list of DsgCruiseData objects.
 	 * The internal metadata and data list references are set to 
 	 * the given arguments. 
 	 * 
@@ -119,7 +119,7 @@ public class CruiseDsgNcFile extends File {
 	 * 		list of data for the cruise
 	 * @throws IllegalArgumentException
 	 * 		if either argument is null,
-	 * 		if the list of SocatCruiseData objects is empty, or
+	 * 		if the list of DsgCruiseData objects is empty, or
 	 * 		if a date/time in the data is missing or invalid
 	 * @throws IOException
 	 * 		if creating the NetCDF file throws one
@@ -128,15 +128,15 @@ public class CruiseDsgNcFile extends File {
 	 * @throws IllegalAccessException
 	 * 		if creating the NetCDF file throws one
 	 */
-	public void create(SocatMetadata mdata, ArrayList<SocatCruiseData> data) 
+	public void create(DsgMetadata mdata, ArrayList<DsgCruiseData> data) 
 			throws IllegalArgumentException, IOException, InvalidRangeException, IllegalAccessException {
 		metadata = mdata;
 		dataList = data;
 
 		if ( metadata == null )
-			throw new IllegalArgumentException("SocatMetadata given to create cannot be null");
+			throw new IllegalArgumentException("DsgMetadata given to create cannot be null");
 		if ( (dataList == null) || (dataList.size() < 1) )
-			throw new IllegalArgumentException("SocatCruiseData list given to create cannot be null or empty");
+			throw new IllegalArgumentException("DsgCruiseData list given to create cannot be null or empty");
 
 		NetcdfFileWriter ncfile = NetcdfFileWriter.createNew(Version.netcdf3, getPath());
 		try {
@@ -357,7 +357,7 @@ public class CruiseDsgNcFile extends File {
 				throw new RuntimeException("Unexpected failure to find ncfile variable '" + varName + "'");
 			ArrayDouble.D1 values = new ArrayDouble.D1(dataList.size());
 			for (int index = 0; index < dataList.size(); index++) {
-				SocatCruiseData datarow = dataList.get(index);
+				DsgCruiseData datarow = dataList.get(index);
 				Integer year = datarow.getYear();
 				if ( year == DashboardUtils.INT_MISSING_VALUE )
 					throw new IllegalArgumentException("No year is given");
@@ -416,7 +416,7 @@ public class CruiseDsgNcFile extends File {
 		NetcdfFile ncfile = NetcdfFile.open(getPath());
 		try {
 			// Create the metadata with default (missing) values
-			metadata = new SocatMetadata(metadataTypes);
+			metadata = new DsgMetadata(metadataTypes);
 
 			for ( DashDataType dtype : metadataTypes.getKnownTypesSet() ) {
 				String varName = dtype.getVarName();
@@ -484,9 +484,9 @@ public class CruiseDsgNcFile extends File {
 			int numData = var.getShape(0);
 
 			// Create the list of data values, all with default (missing) values
-			dataList = new ArrayList<SocatCruiseData>(numData);
+			dataList = new ArrayList<DsgCruiseData>(numData);
 			for (int k = 0; k < numData; k++)
-				dataList.add(new SocatCruiseData(knownTypes));
+				dataList.add(new DsgCruiseData(knownTypes));
 
 			for ( DashDataType dtype : knownTypes.getKnownTypesSet() ) {
 				varName = dtype.getVarName();
@@ -530,7 +530,7 @@ public class CruiseDsgNcFile extends File {
 	 * @return
 	 * 		the internal metadata reference; may be null
 	 */
-	public SocatMetadata getMetadata() {
+	public DsgMetadata getMetadata() {
 		return metadata;
 	}
 
@@ -538,7 +538,7 @@ public class CruiseDsgNcFile extends File {
 	 * @return
 	 * 		the internal data list reference; may be null
 	 */
-	public ArrayList<SocatCruiseData> getDataList() {
+	public ArrayList<DsgCruiseData> getDataList() {
 		return dataList;
 	}
 
@@ -674,7 +674,7 @@ public class CruiseDsgNcFile extends File {
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in this DSG file.  The variable must be saved in the DSG file
 	 * as doubles.  NaN and infinite values are changed to 
-	 * {@link SocatCruiseData#FP_MISSING_VALUE}.  For some variables, this 
+	 * {@link DsgCruiseData#FP_MISSING_VALUE}.  For some variables, this 
 	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the data values to be meaningful.
@@ -714,7 +714,7 @@ public class CruiseDsgNcFile extends File {
 
 	/**
 	 * Reads and returns the longitudes, latitudes, and times contained in this 
-	 * DSG file.  NaN and infinite values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.  
+	 * DSG file.  NaN and infinite values are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.  
 	 * 
 	 * @return
 	 * 		the array { lons, lats, times } for this cruise, where
@@ -785,7 +785,7 @@ public class CruiseDsgNcFile extends File {
 	/**
 	 * Reads and returns the longitudes, latitudes, times, SST values, and 
 	 * fCO2_recommended values contained in this DSG file.  NaN and infinite 
-	 * values are changed to {@link SocatCruiseData#FP_MISSING_VALUE}.  This 
+	 * values are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.  This 
 	 * DSG file must have been processed by Ferret, such as when saved using 
 	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
 	 * for the fCO2_recommended values to be meaningful.
@@ -825,13 +825,13 @@ public class CruiseDsgNcFile extends File {
 			if ( timeVar.getShape(0) != numVals ) 
 				throw new IOException("Unexpected number of time values in " + getName());
 
-			Variable sstVar = ncfile.findVariable(SocatTypes.SST.getVarName());
+			Variable sstVar = ncfile.findVariable(DashboardServerUtils.SST.getVarName());
 			if ( sstVar == null )
 				throw new IOException("Unable to find SST in " + getName());
 			if ( sstVar.getShape(0) != numVals ) 
 				throw new IOException("Unexpected number of SST values in " + getName());
 
-			Variable fco2Var = ncfile.findVariable(SocatTypes.FCO2_REC.getVarName());
+			Variable fco2Var = ncfile.findVariable(DashboardServerUtils.FCO2_REC.getVarName());
 			if ( fco2Var == null )
 				throw new IOException("Unable to find fCO2_recommended in " + getName());
 			if ( fco2Var.getShape(0) != numVals ) 
@@ -993,7 +993,7 @@ public class CruiseDsgNcFile extends File {
 	public void updateAllRegionIDs() 
 			throws IllegalArgumentException, IOException, InvalidRangeException {
 		// Read the region IDs assigned by Ferret
-		char[] regionIDs = readCharVarDataValues(SocatTypes.REGION_ID.getVarName());
+		char[] regionIDs = readCharVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
 		// Generate the String of sorted unique IDs
 		TreeSet<Character> allRegionIDsSet = new TreeSet<Character>();
 		for ( char id : regionIDs ) {
@@ -1006,7 +1006,7 @@ public class CruiseDsgNcFile extends File {
 		// Write this String of all region IDs to the NetCDF file
 		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
 		try {
-			String varName = SocatTypes.ALL_REGION_IDS.getVarName();
+			String varName = DashboardServerUtils.ALL_REGION_IDS.getVarName();
 			Variable var = ncfile.findVariable(varName);
 			if ( var == null ) 
 				throw new IllegalArgumentException("Unable to find variable '" + 
@@ -1068,7 +1068,7 @@ public class CruiseDsgNcFile extends File {
 						varName + "' in " + getName());
 			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
 
-			varName = SocatTypes.REGION_ID.getVarName();
+			varName = DashboardServerUtils.REGION_ID.getVarName();
 			var = ncfile.findVariable(varName);
 			if ( var == null )
 				throw new IllegalArgumentException("Unable to find variable '" +
@@ -1182,7 +1182,7 @@ public class CruiseDsgNcFile extends File {
 
 			ArrayChar.D2 regionIDs;
 			if ( updateWoceEvent ) {
-				varName = SocatTypes.REGION_ID.getVarName();
+				varName = DashboardServerUtils.REGION_ID.getVarName();
 				var = ncfile.findVariable(varName);
 				if ( var == null )
 					throw new IllegalArgumentException("Unable to find variable '" +

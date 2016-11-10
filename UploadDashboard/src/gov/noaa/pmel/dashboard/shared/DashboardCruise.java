@@ -94,9 +94,9 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		// false for submitted or acceptable unpublished cruises
 		status = getArchiveStatus();
 		if ( status.equals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED) ||
-			 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_SOCAT) ||
-			 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_CDIAC) ||
-			 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_ARCHIVE) ) 
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_WITH_NEXT_RELEASE) ||
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) ||
+			 status.equals(DashboardUtils.ARCHIVE_STATUS_OWNER_TO_ARCHIVE) ) 
 			return Boolean.FALSE;
 		// null for acceptable published cruises
 		return null;

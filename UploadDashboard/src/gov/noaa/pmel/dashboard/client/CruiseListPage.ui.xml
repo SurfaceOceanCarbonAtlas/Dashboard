@@ -8,7 +8,6 @@
 	<g:ScrollPanel addStyleNames="{style.fullpagecontainer}">
 		<g:FlowPanel>
 			<g:FlowPanel addStyleNames="{style.titlemainpanel}">
-				<g:Image addStyleNames="{style.titleimage}" ui:field="titleImage" />
 				<g:Button addStyleNames="{style.titlelogoutbutton}" ui:field="logoutButton" />
 				<g:InlineLabel addStyleNames="{style.titleuserlabel}" ui:field="userInfoLabel" />
 				<g:InlineLabel addStyleNames="{style.titlepagelabel}" ui:field="titleLabel" />

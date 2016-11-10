@@ -11,8 +11,8 @@ import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatCruiseData;
-import gov.noaa.pmel.dashboard.server.SocatMetadata;
+import gov.noaa.pmel.dashboard.server.DsgCruiseData;
+import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardCruise;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
@@ -253,7 +253,7 @@ public class SocatCruiseReporter {
 		}
 
 		// Get the SOCAT version and QC flag from the DSG metadata
-		SocatMetadata socatMeta = dsgFile.getMetadata();
+		DsgMetadata socatMeta = dsgFile.getMetadata();
 		String socatVersion = socatMeta.getSocatVersion();
 		String qcFlag = socatMeta.getQcFlag();
 
@@ -291,7 +291,7 @@ public class SocatCruiseReporter {
 			warnMsgs.addAll(msgs);
 			printDataTableHeader(report, false);
 			int j = -1;
-			for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+			for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
 				j++;
 				// Reported WOCE-4 might be duplicates, so do not check for duplicates
 				String tsvdat = dataReportString(dataVals, sectimes[j], upperExpo, 
@@ -355,7 +355,7 @@ public class SocatCruiseReporter {
 			if ( regionID != null ) {
 				inRegion = false;
 				dsgFile.readData(knownDataFileTypes);
-				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+				for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
 					if ( regionID.equals(dataVals.getRegionID()) ) {
 						Character woceFlag = dataVals.getWoceCO2Water();
 						// Ignore WOCE-3 and WOCE-4 as they are not reported 
@@ -372,7 +372,7 @@ public class SocatCruiseReporter {
 				inRegion = true;
 			}
 			if ( inRegion ) {
-				SocatMetadata socatMeta = dsgFile.getMetadata();
+				DsgMetadata socatMeta = dsgFile.getMetadata();
 				socatVersionList.add(socatMeta.getSocatVersion());
 				qcFlagList.add(socatMeta.getQcFlag());
 				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(upperExpo);
@@ -442,7 +442,7 @@ public class SocatCruiseReporter {
 				// Create the set for holding previous lon/lat/time/fCO2_rec data
 				TreeSet<DataPoint> prevDatPts = new TreeSet<DataPoint>();
 				int j = -1;
-				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+				for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
 					j++;
 					if ( (regionID != null) && ! regionID.equals(dataVals.getRegionID()) )
 						continue;
@@ -861,7 +861,7 @@ public class SocatCruiseReporter {
 	private static final String[] SINGLE_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the data set from which this data was obtained",
 		"version: version of SOCAT where this enhanced data first appears",
-		"SOCAT_DOI: DOI for this SOCAT-enhanced data",
+		"ENHANCED_DOI: DOI for this SOCAT-enhanced data",
 		"QC_Flag: Data set QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
@@ -906,7 +906,7 @@ public class SocatCruiseReporter {
 	private static final String SINGLE_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" +
 			"version\t" +
-			"SOCAT_DOI\t" +
+			"ENHANCED_DOI\t" +
 			"QC_Flag\t" +
 			"yr\t" +
 			"mon\t" +
@@ -946,7 +946,7 @@ public class SocatCruiseReporter {
 	private static final String[] MULTI_CRUISE_DATA_REPORT_EXPLANATIONS = {
 		"Expocode: unique identifier for the data set from which this data was obtained",
 		"version: version of SOCAT where this enhanced data first appears",
-		"SOCAT_DOI: DOI for this SOCAT-enhanced data",
+		"ENHANCED_DOI: DOI for this SOCAT-enhanced data",
 		"QC_Flag: Data set QC flag",
 		"yr: 4-digit year of the time (UTC) of the measurement",
 		"mon: month of the time (UTC) of the measurement",
@@ -985,7 +985,7 @@ public class SocatCruiseReporter {
 	private static final String MULTI_CRUISE_DATA_REPORT_HEADER = 
 			"Expocode\t" + 
 			"version\t" +
-			"SOCAT_DOI\t" +
+			"ENHANCED_DOI\t" +
 			"QC_Flag\t" +
 			"yr\t" +
 			"mon\t" +
@@ -1035,7 +1035,7 @@ public class SocatCruiseReporter {
 	 * 		an empty string if this lon/lat/time/fCO2_rec duplicates
 	 * 		that for a previous datapoint.
 	 */
-	private static String dataReportString(SocatCruiseData dataVals, 
+	private static String dataReportString(DsgCruiseData dataVals, 
 			Double sectime, String expocode, String socatVersion, 
 			String socatDOI, String cruiseQCFlag, boolean multicruise, 
 			TreeSet<DataPoint> prevDatPts) throws IllegalArgumentException {
@@ -1299,7 +1299,7 @@ public class SocatCruiseReporter {
 				// Any duplicates are eliminated in this process
 				TreeSet<DataPoint> datSet = new TreeSet<DataPoint>();
 				int j = -1;
-				for ( SocatCruiseData dataVals : dsgFile.getDataList() ) {
+				for ( DsgCruiseData dataVals : dsgFile.getDataList() ) {
 					j++;
 					Double fco2rec = dataVals.getfCO2Rec();
 					if ( DashboardUtils.FP_MISSING_VALUE.equals(fco2rec) )

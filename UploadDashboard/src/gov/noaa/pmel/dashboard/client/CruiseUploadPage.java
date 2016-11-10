@@ -147,7 +147,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"<li>Use the Window encoding only for files produced by older " +
 			"Window programs. </li>" +
 			"<li>The preview button will show the beginning of the file as it will " +
-			"be seen by SOCAT using the given encoding.</li>" +
+			"be seen by the dashboard using the given encoding.</li>" +
 			"</ul>";
 	private static final String ENCODING_TEXT = "File encoding:";
 	private static final String[] KNOWN_ENCODINGS = {
@@ -156,12 +156,12 @@ public class CruiseUploadPage extends CompositeWithUsername {
 	private static final String PREVIEW_TEXT = "Preview Data File";
 	private static final String NO_PREVIEW_HTML_MSG = "<p>(No file previewed)</p>";
 
-	private static final String CREATE_TEXT = "file contains a new SOCAT dataset";
+	private static final String CREATE_TEXT = "file contains new dataset(s)";
 	private static final String CREATE_HOVER_HELP = 
-			"the data uploaded must create a new SOCAT dataset to be successful";
-	private static final String OVERWRITE_TEXT = "file replaces an existing SOCAT dataset";
+			"the data uploaded must create new dataset(s) to be successful";
+	private static final String OVERWRITE_TEXT = "file replaces existing dataset(s)";
 	private static final String OVERWRITE_HOVER_HELP = 
-			"the data uploaded must replace an existing SOCAT dataset to be successful";
+			"the data uploaded must replace existing dataset(s) to be successful";
 
 	private static final String SUBMIT_TEXT = "Upload";
 	private static final String CANCEL_TEXT = "Cancel";
@@ -258,7 +258,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			"<p>You specified that this file should update an existing " +
 			"dataset; however, no dataset exists with this expocode</p>";
 
-	// Remove javascript added by the SOCAT firewall
+	// Remove javascript added by the firewall
 	private static final String JAVASCRIPT_START = "<script language=\"javascript\">";
 	private static final String JAVASCRIPT_CLOSE = "</script>";
 
@@ -537,7 +537,7 @@ public class CruiseUploadPage extends CompositeWithUsername {
 			// show partial file contents in the preview
 			String previewMsg = "<pre>\n";
 			for (int k = 0; k < splitMsgs.length; k++) {
-				// Some clean-up: remove the javascript that is added by the socat firewall
+				// Some clean-up: remove the javascript that is added by the firewall
 				if ( splitMsgs[k].trim().startsWith(JAVASCRIPT_START) ) {
 					do {
 						k++;

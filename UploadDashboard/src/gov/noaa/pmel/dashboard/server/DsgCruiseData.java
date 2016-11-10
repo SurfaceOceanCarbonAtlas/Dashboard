@@ -19,14 +19,14 @@ import java.util.TreeMap;
  * 
  * @author Karl Smith
  */
-public class SocatCruiseData {
+public class DsgCruiseData {
 
 	private TreeMap<DashDataType,Integer> intValsMap;
 	private TreeMap<DashDataType,Character> charValsMap;
 	private TreeMap<DashDataType,Double> doubleValsMap;
 
 	/**
-	 * Generates a SocatCruiseData object with the given known types.
+	 * Generates a DsgCruiseData object with the given known types.
 	 * Only the data class types 
 	 * 	{@link DashboardUtils#CHAR_DATA_CLASS_NAME},
 	 * 	{@link DashboardUtils#INT_DATA_CLASS_NAME}, and 
@@ -34,7 +34,7 @@ public class SocatCruiseData {
 	 * are accepted at this time.
 	 * Sets the values to the default values:
 	 * 	{@link DashboardUtils#WOCE_NOT_CHECKED} for WOCE flags (starts with "WOCE_"),
-	 * 	{@link DashboardUtils#GLOBAL_REGION_ID} for {@link SocatTypes#REGION_ID},
+	 * 	{@link DashboardUtils#GLOBAL_REGION_ID} for {@link DashboardServerUtils#REGION_ID},
 	 * 	{@link DashboardUtils#CHAR_MISSING_VALUE} for other {@link DashboardUtils#CHAR_DATA_CLASS_NAME} values.
 	 * 	{@link DashboardUtils#INT_MISSING_VALUE} for {@link DashboardUtils#INT_DATA_CLASS_NAME} values, and
 	 * 	{@link DashboardUtils#FP_MISSING_VALUE} for {@link DashboardUtils#DOUBLE_DATA_CLASS_NAME} values
@@ -43,7 +43,7 @@ public class SocatCruiseData {
 	 * 		collection of all known types;
 	 * 		cannot be null or empty
 	 */
-	public SocatCruiseData(KnownDataTypes knownTypes) {
+	public DsgCruiseData(KnownDataTypes knownTypes) {
 		if ( (knownTypes == null) || knownTypes.isEmpty() )
 			throw new IllegalArgumentException("known data types cannot be null or empty");
 		intValsMap = new TreeMap<DashDataType,Integer>();
@@ -59,7 +59,7 @@ public class SocatCruiseData {
 					// WOCE flag
 					charValsMap.put(dtype, DashboardUtils.WOCE_NOT_CHECKED);
 				}
-				else if ( dtype.typeNameEquals(SocatTypes.REGION_ID) ) {
+				else if ( dtype.typeNameEquals(DashboardServerUtils.REGION_ID) ) {
 					// Region ID
 					charValsMap.put(dtype, DashboardUtils.GLOBAL_REGION_ID);
 				}
@@ -104,7 +104,7 @@ public class SocatCruiseData {
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public SocatCruiseData(KnownDataTypes knownTypes, List<DashDataType> columnTypes, 
+	public DsgCruiseData(KnownDataTypes knownTypes, List<DashDataType> columnTypes, 
 			int sampleNum, List<String> dataValues) throws IllegalArgumentException {
 		// Initialize to an empty data record with the given known types
 		this(knownTypes);
@@ -189,7 +189,7 @@ public class SocatCruiseData {
 	 * 			with a different data class type, or
 	 * 		if a data value string cannot be parsed for the expected type 
 	 */
-	public static ArrayList<SocatCruiseData> dataListFromDashboardCruise(
+	public static ArrayList<DsgCruiseData> dataListFromDashboardCruise(
 			KnownDataTypes knownTypes, DashboardCruiseWithData cruise) 
 					throws IllegalArgumentException {
 		// Get the required data from the cruise
@@ -201,10 +201,10 @@ public class SocatCruiseData {
 			dataTypes.add( new DashDataType(dctype) );
 		// Create the list of SOCAT cruise data objects, and populate
 		// it with data from each row of the table
-		ArrayList<SocatCruiseData> socatDataList = 
-				new ArrayList<SocatCruiseData>(dataValsTable.size());
+		ArrayList<DsgCruiseData> socatDataList = 
+				new ArrayList<DsgCruiseData>(dataValsTable.size());
 		for (int k = 0; k < dataValsTable.size(); k++) {
-			socatDataList.add( new SocatCruiseData(knownTypes, 
+			socatDataList.add( new DsgCruiseData(knownTypes, 
 					dataTypes, k+1, dataValsTable.get(k)) );
 		}
 		return socatDataList;
@@ -543,7 +543,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Water() {
-		Character value = charValsMap.get(SocatTypes.WOCE_CO2_WATER);
+		Character value = charValsMap.get(DashboardServerUtils.WOCE_CO2_WATER);
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
 		return value;
@@ -558,7 +558,7 @@ public class SocatCruiseData {
 		Character value = woceCO2Water;
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
-		charValsMap.put(SocatTypes.WOCE_CO2_WATER, value);
+		charValsMap.put(DashboardServerUtils.WOCE_CO2_WATER, value);
 	}
 
 	/**
@@ -567,7 +567,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
 	 */
 	public Character getWoceCO2Atm() {
-		Character value = charValsMap.get(SocatTypes.WOCE_CO2_ATM);
+		Character value = charValsMap.get(DashboardServerUtils.WOCE_CO2_ATM);
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
 		return value;
@@ -582,7 +582,7 @@ public class SocatCruiseData {
 		Character value = woceCO2Atm;
 		if ( value == null )
 			value = DashboardUtils.WOCE_NOT_CHECKED;
-		charValsMap.put(SocatTypes.WOCE_CO2_ATM, value);
+		charValsMap.put(DashboardServerUtils.WOCE_CO2_ATM, value);
 	}
 
 	/**
@@ -591,7 +591,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#GLOBAL_REGION_ID} if not assigned
 	 */
 	public Character getRegionID() {
-		Character value = charValsMap.get(SocatTypes.REGION_ID);
+		Character value = charValsMap.get(DashboardServerUtils.REGION_ID);
 		if ( value == null )
 			value = DashboardUtils.GLOBAL_REGION_ID;
 		return value;
@@ -606,7 +606,7 @@ public class SocatCruiseData {
 		Character value = regionID;
 		if ( value == null )
 			value = DashboardUtils.GLOBAL_REGION_ID;
-		charValsMap.put(SocatTypes.REGION_ID, value);
+		charValsMap.put(DashboardServerUtils.REGION_ID, value);
 	}
 
 	/**
@@ -615,7 +615,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#INT_MISSING_VALUE} if not assigned
 	 */
 	public Integer getFCO2Source() {
-		Integer value = intValsMap.get(SocatTypes.FCO2_SOURCE);
+		Integer value = intValsMap.get(DashboardServerUtils.FCO2_SOURCE);
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
 		return value;
@@ -630,7 +630,7 @@ public class SocatCruiseData {
 		Integer value = fCO2Source;
 		if ( value == null )
 			value = DashboardUtils.INT_MISSING_VALUE;
-		intValsMap.put(SocatTypes.FCO2_SOURCE, value);
+		intValsMap.put(DashboardServerUtils.FCO2_SOURCE, value);
 	}
 
 	/**
@@ -639,7 +639,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSalinity() {
-		Double value = doubleValsMap.get(SocatTypes.SALINITY);
+		Double value = doubleValsMap.get(DashboardServerUtils.SALINITY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -654,7 +654,7 @@ public class SocatCruiseData {
 		Double value = salinity;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.SALINITY, value);
+		doubleValsMap.put(DashboardServerUtils.SALINITY, value);
 	}
 
 	/**
@@ -663,7 +663,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getTEqu() {
-		Double value = doubleValsMap.get(SocatTypes.TEQU);
+		Double value = doubleValsMap.get(DashboardServerUtils.TEQU);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -678,7 +678,7 @@ public class SocatCruiseData {
 		Double value = tEqu;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.TEQU, value);
+		doubleValsMap.put(DashboardServerUtils.TEQU, value);
 	}
 
 	/**
@@ -687,7 +687,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getSst() {
-		Double value = doubleValsMap.get(SocatTypes.SST);
+		Double value = doubleValsMap.get(DashboardServerUtils.SST);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -702,7 +702,7 @@ public class SocatCruiseData {
 		Double value = sst;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.SST, value);
+		doubleValsMap.put(DashboardServerUtils.SST, value);
 	}
 
 	/**
@@ -711,7 +711,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPAtm() {
-		Double value = doubleValsMap.get(SocatTypes.PATM);
+		Double value = doubleValsMap.get(DashboardServerUtils.PATM);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -726,7 +726,7 @@ public class SocatCruiseData {
 		Double value = pAtm;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.PATM, value);
+		doubleValsMap.put(DashboardServerUtils.PATM, value);
 	}
 
 	/**
@@ -735,7 +735,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPEqu() {
-		Double value = doubleValsMap.get(SocatTypes.PEQU);
+		Double value = doubleValsMap.get(DashboardServerUtils.PEQU);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -750,7 +750,7 @@ public class SocatCruiseData {
 		Double value = pEqu;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.PEQU, value);
+		doubleValsMap.put(DashboardServerUtils.PEQU, value);
 	}
 
 	/**
@@ -759,7 +759,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterTEquDry() {
-		Double value = doubleValsMap.get(SocatTypes.XCO2_WATER_TEQU_DRY);
+		Double value = doubleValsMap.get(DashboardServerUtils.XCO2_WATER_TEQU_DRY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -774,7 +774,7 @@ public class SocatCruiseData {
 		Double value = xCO2WaterTEquDry;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.XCO2_WATER_TEQU_DRY, value);
+		doubleValsMap.put(DashboardServerUtils.XCO2_WATER_TEQU_DRY, value);
 	}
 
 	/**
@@ -783,7 +783,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getXCO2WaterSstDry() {
-		Double value = doubleValsMap.get(SocatTypes.XCO2_WATER_SST_DRY);
+		Double value = doubleValsMap.get(DashboardServerUtils.XCO2_WATER_SST_DRY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -798,7 +798,7 @@ public class SocatCruiseData {
 		Double value = xCO2WaterSstDry;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.XCO2_WATER_SST_DRY, value);
+		doubleValsMap.put(DashboardServerUtils.XCO2_WATER_SST_DRY, value);
 	}
 
 	/**
@@ -807,7 +807,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterTEquWet() {
-		Double value = doubleValsMap.get(SocatTypes.PCO2_WATER_TEQU_WET);
+		Double value = doubleValsMap.get(DashboardServerUtils.PCO2_WATER_TEQU_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -822,7 +822,7 @@ public class SocatCruiseData {
 		Double value = pCO2WaterTEquWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.PCO2_WATER_TEQU_WET, value);
+		doubleValsMap.put(DashboardServerUtils.PCO2_WATER_TEQU_WET, value);
 	}
 
 	/**
@@ -831,7 +831,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getPCO2WaterSstWet() {
-		Double value = doubleValsMap.get(SocatTypes.PCO2_WATER_SST_WET);
+		Double value = doubleValsMap.get(DashboardServerUtils.PCO2_WATER_SST_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -846,7 +846,7 @@ public class SocatCruiseData {
 		Double value = pCO2WaterSstWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.PCO2_WATER_SST_WET, value);
+		doubleValsMap.put(DashboardServerUtils.PCO2_WATER_SST_WET, value);
 	}
 
 	/**
@@ -855,7 +855,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterTEquWet() {
-		Double value = doubleValsMap.get(SocatTypes.FCO2_WATER_TEQU_WET);
+		Double value = doubleValsMap.get(DashboardServerUtils.FCO2_WATER_TEQU_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -870,7 +870,7 @@ public class SocatCruiseData {
 		Double value = fCO2WaterTEquWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.FCO2_WATER_TEQU_WET, value);
+		doubleValsMap.put(DashboardServerUtils.FCO2_WATER_TEQU_WET, value);
 	}
 
 	/**
@@ -879,7 +879,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getFCO2WaterSstWet() {
-		Double value = doubleValsMap.get(SocatTypes.FCO2_WATER_SST_WET);
+		Double value = doubleValsMap.get(DashboardServerUtils.FCO2_WATER_SST_WET);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -894,7 +894,7 @@ public class SocatCruiseData {
 		Double value = fCO2WaterSstWet;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.FCO2_WATER_SST_WET, value);
+		doubleValsMap.put(DashboardServerUtils.FCO2_WATER_SST_WET, value);
 	}
 
 	/**
@@ -903,7 +903,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getWoaSalinity() {
-		Double value = doubleValsMap.get(SocatTypes.WOA_SALINITY);
+		Double value = doubleValsMap.get(DashboardServerUtils.WOA_SALINITY);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -918,7 +918,7 @@ public class SocatCruiseData {
 		Double value = woaSss;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.WOA_SALINITY, value);
+		doubleValsMap.put(DashboardServerUtils.WOA_SALINITY, value);
 	}
 
 	/**
@@ -927,7 +927,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getNcepSlp() {
-		Double value = doubleValsMap.get(SocatTypes.NCEP_SLP);
+		Double value = doubleValsMap.get(DashboardServerUtils.NCEP_SLP);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -942,7 +942,7 @@ public class SocatCruiseData {
 		Double value = ncepSlp;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.NCEP_SLP, value);
+		doubleValsMap.put(DashboardServerUtils.NCEP_SLP, value);
 	}
 
 	/**
@@ -951,7 +951,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getfCO2Rec() {
-		Double value = doubleValsMap.get(SocatTypes.FCO2_REC);
+		Double value = doubleValsMap.get(DashboardServerUtils.FCO2_REC);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -966,7 +966,7 @@ public class SocatCruiseData {
 		Double value = fCO2Rec;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.FCO2_REC, value);
+		doubleValsMap.put(DashboardServerUtils.FCO2_REC, value);
 	}
 
 	/**
@@ -975,7 +975,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getEtopo2Depth() {
-		Double value = doubleValsMap.get(SocatTypes.ETOPO2_DEPTH);
+		Double value = doubleValsMap.get(DashboardServerUtils.ETOPO2_DEPTH);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -990,7 +990,7 @@ public class SocatCruiseData {
 		Double value = etopo2;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.ETOPO2_DEPTH, value);
+		doubleValsMap.put(DashboardServerUtils.ETOPO2_DEPTH, value);
 	}
 
 	/**
@@ -999,7 +999,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getGvCO2() {
-		Double value = doubleValsMap.get(SocatTypes.GVCO2);
+		Double value = doubleValsMap.get(DashboardServerUtils.GVCO2);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1014,7 +1014,7 @@ public class SocatCruiseData {
 		Double value = gvCO2;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.GVCO2, value);
+		doubleValsMap.put(DashboardServerUtils.GVCO2, value);
 	}
 
 	/**
@@ -1023,7 +1023,7 @@ public class SocatCruiseData {
 	 * 		never null but could be {@link DashboardUtils#FP_MISSING_VALUE} if not assigned
 	 */
 	public Double getDistToLand() {
-		Double value = doubleValsMap.get(SocatTypes.DIST_TO_LAND);
+		Double value = doubleValsMap.get(DashboardServerUtils.DIST_TO_LAND);
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
 		return value;
@@ -1038,7 +1038,7 @@ public class SocatCruiseData {
 		Double value = distToLand;
 		if ( value == null )
 			value = DashboardUtils.FP_MISSING_VALUE;
-		doubleValsMap.put(SocatTypes.DIST_TO_LAND, value);
+		doubleValsMap.put(DashboardServerUtils.DIST_TO_LAND, value);
 	}
 
 	@Override 
@@ -1066,9 +1066,9 @@ public class SocatCruiseData {
 		if ( obj == null )
 			return false;
 
-		if ( ! (obj instanceof SocatCruiseData) )
+		if ( ! (obj instanceof DsgCruiseData) )
 			return false;
-		SocatCruiseData other = (SocatCruiseData) obj;
+		DsgCruiseData other = (DsgCruiseData) obj;
 
 		// Integer comparisons
 		if ( ! intValsMap.equals(other.intValsMap) )
@@ -1120,7 +1120,7 @@ public class SocatCruiseData {
 
 	@Override
 	public String toString() {
-		String repr = "SocatCruiseData[\n";
+		String repr = "DsgCruiseData[\n";
 		for ( Entry<DashDataType,Integer> entry : intValsMap.entrySet() )
 			repr += "    " + entry.getKey().getVarName() + "=" + entry.getValue().toString() + "\n";
 		for ( Entry<DashDataType,Character> entry : charValsMap.entrySet() )

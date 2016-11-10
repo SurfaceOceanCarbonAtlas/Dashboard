@@ -5,7 +5,6 @@ package gov.noaa.pmel.dashboard.handlers;
 
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
-import gov.noaa.pmel.dashboard.server.SocatTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataColumnType;
@@ -275,18 +274,18 @@ public class CheckerMessageHandler {
 					if ( rowNum > 0 ) {
 						if ( msg.isError() ) {
 							if ( colNum > 0 ) {
-								woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
+								woceFours.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
 							}
 							else {
-								woceFours.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
+								woceFours.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
 							}
 						}
 						else if ( msg.isWarning() ) {
 							if ( colNum > 0 ) {
-								woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
+								woceThrees.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
 							}
 							else {
-								woceThrees.add(new WoceType(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
+								woceThrees.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
 							}
 						}
 					}
@@ -518,7 +517,7 @@ public class CheckerMessageHandler {
 				continue;
 
 			// TODO: get the correct WOCE flag name
-			WoceFlag info = new WoceFlag(SocatTypes.WOCE_CO2_WATER.getVarName(), null, rowNum-1);
+			WoceFlag info = new WoceFlag(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), null, rowNum-1);
 			if ( colNum > 0 )
 				info.setColumnIndex(colNum-1);
 
@@ -604,7 +603,7 @@ public class CheckerMessageHandler {
 		double[] longitudes = lonlattime[0];
 		double[] latitudes = lonlattime[1];
 		double[] times = lonlattime[2];
-		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, SocatTypes.REGION_ID.getVarName());
+		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, DashboardServerUtils.REGION_ID.getVarName());
 		Date now = new Date();
 
 		String lastWoceName = null;
