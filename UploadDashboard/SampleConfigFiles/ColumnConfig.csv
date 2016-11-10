@@ -3,7 +3,7 @@
 # The fields are:
 #
 # Field:
-#    The name of the field.
+#    The name of the data column.
 #
 # Required:
 #    Whether or not this field is required. It may be part of a Required Group
@@ -31,8 +31,8 @@
 # Calc_Method
 #    If the Source (above) is C, this gives the name of the class that
 #    contains the method for calculating this field value. The class must
-#    be in the package socat.sanitychecker.data.calculate, and implement the
-#    interface socat.sanitychecker.data.calculate.DataCalculator.
+#    be in the package sanitychecker.data.calculate, and implement the
+#    interface sanitychecker.data.calculate.DataCalculator.
 #
 # Numeric
 #    Does the column contain a numeric value?

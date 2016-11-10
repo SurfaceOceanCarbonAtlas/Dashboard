@@ -252,7 +252,7 @@ public class DashboardServerUtils {
 
 	public static final DashDataType ALL_REGION_IDS = new DashDataType("all_region_ids", 
 			201.0, "all region IDs", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"Sorted unique region IDs", null, 
+			"sorted unique region IDs", null, 
 			null, DashboardUtils.NO_UNITS);
 
 	public static final DashDataType ENHANCED_DOI = new DashDataType("enhanced_data_doi", 

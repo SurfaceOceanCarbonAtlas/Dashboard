@@ -11,13 +11,13 @@
                     environment below or by passing the script a fully qualified path.
     -->
     <invoker
-        base_dir="/home/users/socat/"
-        executable="/home/users/socat/Ferret/bin/ferret"
+        base_dir="/home/users/tomcat"
+        executable="/home/users/tomcat/Ferret/bin/ferret"
         time_limit="60000"
-        temp_dir="/var/tmp/socat/"
-        compute_driver="calcSOCAT3"
-        decimate_driver="ddsg_socat3"
-        plots_driver="run_preview" >
+        temp_dir="/var/tmp/oap/"
+        compute_driver="OAPCalculate"
+        decimate_driver="OAPDecimate"
+        plots_driver="OAPPreview" >
         <arg>-gif</arg>
         <arg>-script</arg>
     </invoker>
