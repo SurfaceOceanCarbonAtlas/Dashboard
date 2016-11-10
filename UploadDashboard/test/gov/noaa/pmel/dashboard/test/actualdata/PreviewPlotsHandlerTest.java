@@ -1,4 +1,4 @@
-package gov.noaa.pmel.dashboard.test.handlers;
+package gov.noaa.pmel.dashboard.test.actualdata;
 
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.client.CruisePreviewPage;
@@ -20,7 +20,7 @@ import org.junit.Test;
  */
 public class PreviewPlotsHandlerTest {
 
-	private static final String EXPOCODE = "09AR20130113";
+	private static final String EXPOCODE = "33RO20150822";
 
 	@Test
 	public void testCreatePreviewPlots() throws IOException {

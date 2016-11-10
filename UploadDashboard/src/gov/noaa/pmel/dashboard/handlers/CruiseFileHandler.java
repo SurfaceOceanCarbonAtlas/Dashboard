@@ -1394,25 +1394,12 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		ArrayList<DataColumnType> dataColTypes = new ArrayList<DataColumnType>(numCols);
 		for (int k = 0; k < numCols; k++) {
 			DataColumnType dctype = userTypes.getDataColumnType(colTypeNames.get(k));
-			if ( dctype == null ) {
-				// See if there is a modified version of this type name
-				String newName = DashboardServerUtils.RENAMED_DATA_TYPES.get(colTypeNames.get(k));
-				dctype = userTypes.getDataColumnType(newName);
-			}
 			if ( dctype == null )
 				throw new IllegalArgumentException("unknown data type \"" + colTypeNames.get(k) + "\"");
-			int index = dctype.getUnits().indexOf(colTypeUnits.get(k));
-			if ( index < 0 ) {
-				// see if there is a modified version of this unit
-				String newName = DashboardServerUtils.RENAMED_UNITS.get(colTypeUnits.get(k));
-				if ( newName != null )
-					index = dctype.getUnits().indexOf(newName);
-			}
-			if ( index < 0 )
+			if ( ! dctype.setSelectedUnit(colTypeUnits.get(k)) )
 				throw new IllegalArgumentException("unknown unit \"" + 
 						colTypeUnits.get(k) + "\" for data type \"" + 
 						dctype.getVarName() + "\"");
-			dctype.setSelectedUnitIndex(index);
 			dctype.setSelectedMissingValue(colMissValues.get(k));
 			dataColTypes.add(dctype);
 		}

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.actions;
+package gov.noaa.pmel.dashboard.test.actualdata;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -25,17 +25,7 @@ import org.junit.Test;
 public class OmePdfGeneratorTest {
 
 	private static final String[] EXPOCODE_ARRAY = {
-		"06AQ20151030",
-		"33GG20131126",
-		"33HH20151027",
-		"33LG20150621",
 		"33RO20150822",
-		"61TG20150905",
-		"642B20150808",
-		"74EQ20140320",
-		"77OG20050601",
-		"MLCE20150602",
-		"PANC20150826",
 		"PAT520151021"
 	};
 

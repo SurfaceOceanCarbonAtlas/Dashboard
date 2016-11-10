@@ -1,7 +1,7 @@
 /**
  * 
  */
-package gov.noaa.pmel.dashboard.test.programs;
+package gov.noaa.pmel.dashboard.test.actualdata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +34,7 @@ public class RegenerateDsgsTest {
 	 */
 	@Test
 	public void testRegenerateDsgFiles() throws IllegalArgumentException, IOException {
-		final String expocode = "33WA20160713";
+		final String expocode = "PAT520151021";
 
 		System.setProperty("CATALINA_BASE", System.getenv("HOME"));
 		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");

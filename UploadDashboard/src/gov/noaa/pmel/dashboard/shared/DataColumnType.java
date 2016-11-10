@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataColumnType implements Comparable<DataColumnType>, Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -1072054235415230028L;
+	private static final long serialVersionUID = 8975368913536083085L;
 
 	protected String varName;
 	protected Double sortOrder;
@@ -331,6 +331,30 @@ public class DataColumnType implements Comparable<DataColumnType>, Serializable,
 			this.selectedUnitIndex = selectedUnitIndex;
 		else
 			this.selectedUnitIndex = Integer.valueOf(0);
+	}
+
+	/**
+	 * Assigns the selected unit using the given unit name.
+	 * Name comparisons are case-insensitively.
+	 * 
+	 * @param unitName
+	 * 		name of the selected unit
+	 * @return
+	 * 		true if the unit name was found and the 
+	 * 		selected unit index was assigned; 
+	 * 		otherwise false
+	 */
+	public boolean setSelectedUnit(String unitName) {
+		if ( unitName == null )
+			return false;
+		String upperName = unitName.toUpperCase();
+		for (int k = 0; k < units.size(); k++) {
+			if ( units.get(k).toUpperCase().equals(upperName) ) {
+				selectedUnitIndex = k;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

@@ -53,7 +53,7 @@ public class DataColumnTypeTest {
 	 * and {@link gov.noaa.pmel.dashboard.shared.DataColumnType#setSortOrder(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetSOrtOrder() {
+	public void testGetSetSortOrder() {
 		DataColumnType dtype = new DataColumnType();
 		assertEquals(DashboardUtils.FP_MISSING_VALUE, dtype.getSortOrder());
 		dtype.setSortOrder(SORT_ORDER);
@@ -251,6 +251,26 @@ public class DataColumnTypeTest {
 		assertEquals(DISPLAY_NAME, dtype.getDisplayName());
 		assertEquals(SORT_ORDER, dtype.getSortOrder());
 		assertEquals(VAR_NAME, dtype.getVarName());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.KnownDataTypes#assignDataUnit(
+	 * gov.noaa.pmel.dashboard.shared.DataColumnType, java.lang.String)}.
+	 */
+	@Test
+	public void testAssignDataUnit() {
+		DataColumnType dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, null);
+		assertTrue( dtype.setSelectedUnit("") );
+		assertEquals(Integer.valueOf(0), dtype.getSelectedUnitIndex());
+		assertFalse( dtype.setSelectedUnit(null) );
+		dtype = new DataColumnType(VAR_NAME, SORT_ORDER, DISPLAY_NAME, 
+				DATA_CLASS_NAME, DESCRIPTION, STANDARD_NAME, CATEGORY_NAME, UNITS);
+		assertTrue( dtype.setSelectedUnit(UNITS.get(1).toUpperCase()) );
+		assertEquals(Integer.valueOf(1), dtype.getSelectedUnitIndex());
+		assertTrue( dtype.setSelectedUnit(UNITS.get(1).toLowerCase()) );
+		assertEquals(Integer.valueOf(1), dtype.getSelectedUnitIndex());
+		assertFalse(dtype.setSelectedUnit("") );
 	}
 
 	/**

@@ -395,7 +395,7 @@ public class CruiseDsgNcFileTest {
 		metadata.setBeginTime(dateFmt.parse("2006-06-10 23:48 UTC"));
 		metadata.setEndTime(dateFmt.parse("2006-06-11 00:12 UTC"));
 
-		File parentDir = new File("/var/tmp/socat");
+		File parentDir = new File("/var/tmp/junit");
 		if ( ! parentDir.exists() )
 			parentDir.mkdir();
 		dsgNcFile = new CruiseDsgNcFile(parentDir, expocode + ".nc");

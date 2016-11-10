@@ -3,12 +3,11 @@
  */
 package gov.noaa.pmel.dashboard.server;
 
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -385,40 +384,5 @@ public class DashboardServerUtils {
 			711.0, "fCO2 src", DashboardUtils.INT_DATA_CLASS_NAME, 
 			"Algorithm number for recommended fCO2", null, 
 			DashboardUtils.IDENTIFIER_CATEGORY, DashboardUtils.NO_UNITS);
-
-	/** mapping of old user data type (enumerated variable) names to new data type names */
-	public static final HashMap<String,String> RENAMED_DATA_TYPES;
-
-	/** mapping from old unit names to new unit names */
-	public static final HashMap<String,String> RENAMED_UNITS;
-
-	static {
-		RENAMED_DATA_TYPES = new HashMap<String,String>();
-		RENAMED_DATA_TYPES.put("ATMOSPHERIC_TEMPERATURE", "Temperature_atm");
-		RENAMED_DATA_TYPES.put("CRUISE_NAME", "dataset_name");
-		RENAMED_DATA_TYPES.put("GROUP_NAME", "organization");
-		RENAMED_DATA_TYPES.put("EQUILIBRATOR_PRESSURE", "Pressure_equi");
-		RENAMED_DATA_TYPES.put("EQUILIBRATOR_TEMPERATURE", "Temperature_equi");
-		RENAMED_DATA_TYPES.put("INVESTIGATOR_NAMES", "investigators");
-		RENAMED_DATA_TYPES.put("SEA_LEVEL_PRESSURE", "Pressure_atm");
-		RENAMED_DATA_TYPES.put("SEA_SURFACE_TEMPERATURE", "temp");
-		RENAMED_DATA_TYPES.put("SECOND_OF_DAY", "sec_of_day");
-		RENAMED_DATA_TYPES.put("SHIP_DIRECTION", "ship_dir");
-		RENAMED_DATA_TYPES.put("SHIP_NAME", "vessel_name");
-		RENAMED_DATA_TYPES.put("TIME", "time_of_day");
-		RENAMED_DATA_TYPES.put("TIMESTAMP", "date_time");
-		RENAMED_DATA_TYPES.put("WIND_DIRECTION_TRUE", "wind_dir_true");
-		RENAMED_DATA_TYPES.put("WIND_DIRECTION_RELATIVE", "wind_dir_rel");
-		RENAMED_DATA_TYPES.put("WIND_SPEED_RELATIVE", "wind_speed_rel");
-		RENAMED_DATA_TYPES.put("XH2O_EQU", "xH2O_equi");
-
-		RENAMED_UNITS = new HashMap<String,String>();
-		RENAMED_UNITS.put("deg.E", "degrees_east");
-		RENAMED_UNITS.put("deg.W", "degrees_west");
-		RENAMED_UNITS.put("deg.N", "degrees_north");
-		RENAMED_UNITS.put("deg.S", "degrees_south");
-		RENAMED_UNITS.put("deg.C", "degrees C");
-		RENAMED_UNITS.put("deg.clk.N", "degrees");
-	}
 
 }

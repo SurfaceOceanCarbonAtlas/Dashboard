@@ -112,27 +112,12 @@ public class UserFileHandler extends VersionedFileHandler {
 						propFile.getPath());
 
 			DataColumnType dctype = userTypes.getDataColumnType(vals[0]);
-			if ( dctype == null ) {
-				// See if there is a modified version of this type name
-				String newName = DashboardServerUtils.RENAMED_DATA_TYPES.get(vals[0]);
-				if ( newName != null )
-					dctype = userTypes.getDataColumnType(newName);
-			}
 			if ( dctype == null )
 				throw new IllegalArgumentException("Unknown data type \"" + 
 						vals[0] + "\" for tag \"" + colName + "\"");
-
-			int index = dctype.getUnits().indexOf(vals[1]);
-			if ( index < 0 ) {
-				// see if there is a modified version of this unit
-				String newName = DashboardServerUtils.RENAMED_UNITS.get(vals[1]);
-				if ( newName != null )
-					index = dctype.getUnits().indexOf(newName);
-			}
-			if ( index < 0 )
+			if ( ! dctype.setSelectedUnit(vals[1]) )
 				throw new IllegalArgumentException("Unknown data unit \"" + vals[1] + 
 						"\" for data type \"" + vals[0] + "\"");
-			dctype.setSelectedUnitIndex(index);
 			dctype.setSelectedMissingValue(vals[2]);
 			dataColNamesToTypes.put(colName, dctype);
 		}
