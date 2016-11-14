@@ -80,9 +80,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			"No data column has been identified as the longitude";
 	private static final String NO_LATITUDE_ERROR_MSG =
 			"No data column has been identified as the latitude";
-	private static final String NO_CO2_ERROR_MSG = 
-			"No data columns have been identified which provide " +
-			"a seawater CO<sub>2</sub> value";
+	private static final String NO_DEPTH_ERROR_MSG =
+			"No data column has been identified as the sample depth";
 	private static final String NO_TIMESTAMP_ERROR_MSG =
 			"No data columns have been identified which provide " +
 			"the date and time of each measurement";
@@ -578,8 +577,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 		boolean hasLongitude = false;
 		// latitude given?
 		boolean hasLatitude = false;
-		// sea water CO2 value given?
-		boolean hasco2 = false;
+		// sample depth given?
+		boolean hasDepth = false;
 		// date/time given?
 		boolean hasYear = false;
 		boolean hasMonth = false;
@@ -655,10 +654,8 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			else if ( DashboardUtils.LATITUDE.typeNameEquals(colType) ) {
 				hasLatitude = true;
 			}
-			else if ( colType.getDisplayName().startsWith("xCO2_water") ||
-					  colType.getDisplayName().startsWith("pCO2_water") ||
-					  colType.getDisplayName().startsWith("fCO2_water") ) {
-				hasco2 = true;
+			else if ( DashboardUtils.SAMPLE_DEPTH.typeNameEquals(colType) ) {
+				hasDepth = true;
 			}
 			k++;
 		}
@@ -690,9 +687,9 @@ public class DataColumnSpecsPage extends CompositeWithUsername {
 			UploadDashboard.showMessage(NO_LATITUDE_ERROR_MSG);
 			return;
 		}
-		if ( ! hasco2 ) {
-			// no aqueous CO2 - error
-			UploadDashboard.showMessage(NO_CO2_ERROR_MSG);
+		if ( ! hasDepth ) {
+			// no sample depth - error
+			UploadDashboard.showMessage(NO_DEPTH_ERROR_MSG);
 			return;
 		}
 		if ( ! (hasYear || hasMonth || hasDay || hasHour || hasMinute) ) {
