@@ -95,7 +95,7 @@ day_of_year,N,,D,,,Y,,,1,368,F,G
 sec_of_day,N,,D,,,Y,,,0,86400,F,G
 longitude,Y,,D,,,Y,,,-360,360,C,B
 latitude,Y,,D,,,Y,,,-90,90,C,B
-sample_depth,N,,D,,,Y,-10,10,-20,20,F,G
+sample_depth,Y,,D,,,Y,0,2000,-20,12000,F,B
 sal,N,,D,,,Y,0,42,-0.1,50,F,G
 Temperature_equi,N,,D,,,Y,-5,40,-10,50,F,G
 temp,N,,D,,,Y,-5,40,-10,50,F,G
