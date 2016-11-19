@@ -542,41 +542,6 @@ public class DashboardCruiseTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#getSocatDOI()}
-	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#setSocatDOI(java.lang.String)}.
-	 */
-	@Test
-	public void testSetGetSocatDOI() {
-		String socatDOI = "SOCATDOI12345";
-		DashboardCruise cruise = new DashboardCruise();
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getSocatDoi());
-		cruise.setSocatDoi(socatDOI);
-		assertEquals(socatDOI, cruise.getSocatDoi());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOrigDoi());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadTimestamp());
-		assertEquals(0, cruise.getUserWoceFours().size());
-		assertEquals(0, cruise.getUserWoceThrees().size());
-		assertEquals(0, cruise.getCheckerWoceFours().size());
-		assertEquals(0, cruise.getCheckerWoceThrees().size());
-		assertEquals(0, cruise.getNumWarnRows());
-		assertEquals(0, cruise.getNumErrorRows());
-		assertEquals(0, cruise.getUserColNames().size());
-		assertEquals(0, cruise.getDataColTypes().size());
-		assertEquals(0, cruise.getNumDataRows());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getUploadFilename());
-		assertEquals(DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED, cruise.getArchiveStatus());
-		assertEquals(DashboardUtils.QC_STATUS_NOT_SUBMITTED, cruise.getQcStatus());
-		assertEquals(0, cruise.getAddlDocs().size());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOmeTimestamp());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getDataCheckStatus());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getExpocode() );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getOwner());
-		assertFalse( cruise.isSelected() );
-		cruise.setSocatDoi(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, cruise.getSocatDoi());
-	}
-
-	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#hashCode()}
 	 * and {@link gov.noaa.pmel.dashboard.shared.DashboardCruise#equals(java.lang.Object)}.
 	 */
@@ -595,7 +560,6 @@ public class DashboardCruiseTest {
 		String myFilename = "myUploadFilename.tsv";
 		String myUploadTimestamp = "2015-10-20 13:14:15";
 		String myOrigDOI = "OrigDOI12345";
-		String mySocatDOI = "SOCATDOI12345";
 		int myNumDataRows = 2581;
 		int myNumErrorMsgs = 4;
 		int myNumWarnMsgs = 14;
@@ -773,13 +737,6 @@ public class DashboardCruiseTest {
 		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
 		assertFalse( firstCruise.equals(secondCruise) );
 		secondCruise.setOrigDoi(myOrigDOI);
-		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
-		assertEquals(firstCruise, secondCruise);
-
-		firstCruise.setSocatDoi(mySocatDOI);
-		assertTrue( firstCruise.hashCode() != secondCruise.hashCode() );
-		assertFalse( firstCruise.equals(secondCruise) );
-		secondCruise.setSocatDoi(mySocatDOI);
 		assertEquals(firstCruise.hashCode(), secondCruise.hashCode());
 		assertEquals(firstCruise, secondCruise);
 	}

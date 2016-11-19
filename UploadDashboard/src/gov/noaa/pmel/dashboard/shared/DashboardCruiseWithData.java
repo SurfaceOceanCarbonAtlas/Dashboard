@@ -153,7 +153,7 @@ public class DashboardCruiseWithData extends DashboardCruise implements Serializ
 				"    addlDocs=" + addlDocs.toString() + ";\n" + 
 				"    qcStatus=" + qcStatus + ";\n" + 
 				"    archiveStatus=" + archiveStatus + ";\n" + 
-				"    cdiacDate=" + cdiacDate + ";\n" + 
+				"    archiveDate=" + archiveDate + ";\n" + 
 				"    uploadFilename=" + uploadFilename + ";\n" + 
 				"    uploadTimestamp=" + uploadTimestamp + ";\n" + 
 				"    numDataRows=" + Integer.toString(numDataRows) + ";\n" + 

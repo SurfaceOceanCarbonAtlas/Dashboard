@@ -674,8 +674,6 @@ public class DashboardConfigStore {
 		if ( startMonitors ) {
 			// Watch for changes to the configuration file
 			watchConfigFiles();
-			// Watch for changes in the full-data DSG files
-			dsgNcFileHandler.watchForDsgFileUpdates();
 		}
 	}
 
@@ -720,8 +718,6 @@ public class DashboardConfigStore {
 	 * Shuts down the handlers and monitors associated with this data store.
 	 */
 	private void stopMonitors() {
-		// Stop the watch for changes in the full-data DSG files
-		dsgNcFileHandler.cancelWatch();
 		// Shutdown all the VersionsedFileHandlers
 		userFileHandler.shutdown();
 		cruiseFileHandler.shutdown();

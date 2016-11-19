@@ -3,12 +3,12 @@
  */
 package gov.noaa.pmel.dashboard.actions;
 
+import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.handlers.CheckerMessageHandler;
 import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
@@ -200,40 +199,10 @@ public class CruiseSubmitter {
 					}
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 
-					String socatVersionStatus = databaseHandler.getSocatVersionStatus(expocode);
-					if ( socatVersionStatus.isEmpty() ) {
-						// New dataset to the database
-						socatVersionStatus = socatVersion + "N";
-					}
-					else {
-						String status = socatVersionStatus.substring(socatVersionStatus.length() - 1);
-						if ( ! "U".equals(status) ) {
-							double newVers;
-							try {
-								newVers = Math.floor(Double.parseDouble(socatVersion) * 10.0) / 10.0;
-							} catch (NumberFormatException ex) {
-								throw new RuntimeException("Unexpected new SOCAT version of '" + socatVersion + "'");
-							}
-							String oldVersion = socatVersionStatus.substring(0, socatVersionStatus.length() - 1);
-							double oldVers;
-							try {
-								oldVers = Math.floor(Double.parseDouble(oldVersion) * 10.0) / 10.0;
-							} catch (NumberFormatException ex) {
-								throw new RuntimeException("Unexpected old SOCAT version of '" + oldVersion + "'");
-							}
-							if ( newVers > oldVers ) {
-								status = "U";
-							}
-							else {
-								status = "N";
-							}
-						}
-						socatVersionStatus = socatVersion + status;
-					}
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data
 					logger.debug("Generating the full-data DSG file for " + expocode);
-					dsgNcHandler.saveCruise(omeMData, cruiseData, socatVersionStatus, flag.toString());
+					dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
 
 					// Generate the decimated-data DSG file from the full-data DSG file
 					logger.debug("Generating the decimated-data DSG file for " + expocode);
@@ -264,30 +233,15 @@ public class CruiseSubmitter {
 				else
 					initQC.setComment("Initial QC flag for updated dataset");
 
-				// Get the regions in which the cruise reports 
-				TreeSet<Character> regionsSet;
+				// Add the initial QC flag
 				try {
-					regionsSet = dsgNcHandler.getDataRegionsSet(expocode);
-				} catch (Exception ex) {
-					throw new IllegalArgumentException("Unable to read region IDs " +
-							"from the newly created full-data DSG file for " + 
-							expocode + ": " + ex.getMessage());
-				}
-				// Add the global and regional initial flags
-				try {
-					initQC.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 					databaseHandler.addQCEvent(initQC);
-					for ( Character regionID : regionsSet ) {
-						initQC.setRegionID(regionID);
-						databaseHandler.addQCEvent(initQC);
-					}
 				} catch (SQLException ex) {
 					throw new IllegalArgumentException(
 							"Unable to add an initial QC flag:\n    " + ex.getMessage());
 				}
 
 				// All cruises - remark on the number of data rows with error and warnings
-				initQC.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 				initQC.setFlag(DashboardUtils.QC_COMMENT);
 				initQC.setComment("Automated data check found " + 
 						Integer.toString(cruiseData.getNumErrorRows()) + 
@@ -306,8 +260,7 @@ public class CruiseSubmitter {
 				// as well as the user-provided WOCE flags, to the database
 				ArrayList<WoceEvent> initWoceList;
 				try {
-					initWoceList = msgHandler.generateWoceEvents(cruiseData, 
-							dsgNcHandler, knownDataFileTypes);
+					initWoceList = msgHandler.generateWoceEvents(cruiseData, dsgNcHandler, knownDataFileTypes);
 				} catch (IOException ex) {
 					throw new IllegalArgumentException(ex);
 				}
@@ -328,7 +281,7 @@ public class CruiseSubmitter {
 			}
 
 			if ( archiveStatus.equals(DashboardUtils.ARCHIVE_STATUS_SENT_FOR_ARHCIVAL) && 
-				 ( repeatSend || cruise.getCdiacDate().isEmpty() ) ) {
+				 ( repeatSend || cruise.getArchiveDate().isEmpty() ) ) {
 				// Queue the request to send (or re-send) the original cruise data and metadata to CDIAC
 				cdiacExpos.add(expocode);
 			}
@@ -380,8 +333,8 @@ public class CruiseSubmitter {
 				throw new IllegalArgumentException("Unknown e-mail address for user " + submitter);
 
 			for ( String expocode : cdiacExpos ) {
-				String commitMsg = "Immediate archival of dataset " + expocode + 
-						" requested by " + userRealName + " (" + userEmail + ") at " + localTimestamp;
+				String commitMsg = "Immediate archival of dataset " + expocode + " requested by " + 
+						userRealName + " (" + userEmail + ") at " + localTimestamp;
 				try {
 					cdiacBundler.sendOrigFilesBundle(expocode, commitMsg, userRealName, userEmail);
 				} catch (Exception ex) {
@@ -392,7 +345,7 @@ public class CruiseSubmitter {
 				// When successful, update the "sent to CDIAC" timestamp
 				DashboardCruise cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
 				cruise.setArchiveStatus(archiveStatus);
-				cruise.setCdiacDate(localTimestamp);
+				cruise.setArchiveDate(localTimestamp);
 				cruiseHandler.saveCruiseInfoToFile(cruise, commitMsg);
 			}
 		}

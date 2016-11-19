@@ -602,7 +602,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// Archive status string
 		cruiseProps.setProperty(ARCHIVE_STATUS_ID, cruise.getArchiveStatus());
 		// Date of request to archive original data and metadata files with CDIAC
-		cruiseProps.setProperty(ARCHIVAL_DATE_ID, cruise.getCdiacDate());
+		cruiseProps.setProperty(ARCHIVAL_DATE_ID, cruise.getArchiveDate());
 		// Total number of data measurements (rows of data)
 		cruiseProps.setProperty(NUM_DATA_ROWS_ID, 
 				Integer.toString(cruise.getNumDataRows()));
@@ -1321,7 +1321,7 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		if ( value == null )
 			throw new IllegalArgumentException("No property value for " + 
 					ARCHIVAL_DATE_ID + " given in " + infoFile.getPath());			
-		cruise.setCdiacDate(value);
+		cruise.setArchiveDate(value);
 
 		// Number of rows of data (number of samples)
 		value = cruiseProps.getProperty(NUM_DATA_ROWS_ID);

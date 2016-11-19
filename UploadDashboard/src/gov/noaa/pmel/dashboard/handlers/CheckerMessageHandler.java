@@ -274,18 +274,18 @@ public class CheckerMessageHandler {
 					if ( rowNum > 0 ) {
 						if ( msg.isError() ) {
 							if ( colNum > 0 ) {
-								woceFours.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
+								woceFours.add(new WoceType(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), colNum-1, rowNum-1));
 							}
 							else {
-								woceFours.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
+								woceFours.add(new WoceType(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), null, rowNum-1));
 							}
 						}
 						else if ( msg.isWarning() ) {
 							if ( colNum > 0 ) {
-								woceThrees.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), colNum-1, rowNum-1));
+								woceThrees.add(new WoceType(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), colNum-1, rowNum-1));
 							}
 							else {
-								woceThrees.add(new WoceType(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), null, rowNum-1));
+								woceThrees.add(new WoceType(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), null, rowNum-1));
 							}
 						}
 					}
@@ -517,7 +517,7 @@ public class CheckerMessageHandler {
 				continue;
 
 			// TODO: get the correct WOCE flag name
-			WoceFlag info = new WoceFlag(DashboardServerUtils.WOCE_CO2_WATER.getVarName(), null, rowNum-1);
+			WoceFlag info = new WoceFlag(DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(), null, rowNum-1);
 			if ( colNum > 0 )
 				info.setColumnIndex(colNum-1);
 
@@ -597,13 +597,12 @@ public class CheckerMessageHandler {
 
 		String version = cruiseData.getVersion();
 
-		// Get the longitudes, latitude, times, and regions IDs 
+		// Get the longitudes, latitudes, depths, and times 
 		// from the full-data DSG file for this cruise
 		double[][] lonlattime = dsgHandler.readLonLatTimeDataValues(expocode);
 		double[] longitudes = lonlattime[0];
 		double[] latitudes = lonlattime[1];
 		double[] times = lonlattime[2];
-		char[] regionIDs = dsgHandler.readCharVarDataValues(expocode, DashboardServerUtils.REGION_ID.getVarName());
 		Date now = new Date();
 
 		String lastWoceName = null;
@@ -698,7 +697,6 @@ public class CheckerMessageHandler {
 			dataLoc.setDataDate(new Date(Math.round(times[rowIdx] * 1000.0)));
 			dataLoc.setLatitude(latitudes[rowIdx]);
 			dataLoc.setLongitude(longitudes[rowIdx]);
-			dataLoc.setRegionID(regionIDs[rowIdx]);
 			if ( dataVarName != null )
 				dataLoc.setDataValue(dataValues[rowIdx]);
 			locations.add(dataLoc);

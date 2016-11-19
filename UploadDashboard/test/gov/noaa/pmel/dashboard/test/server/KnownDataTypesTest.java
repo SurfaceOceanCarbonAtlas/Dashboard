@@ -30,8 +30,8 @@ import org.junit.Test;
 public class KnownDataTypesTest {
 
 	private static final ArrayList<String> USERS_VARNAMES = new ArrayList<String>(Arrays.asList(
-			DashboardUtils.UNKNOWN.getVarName(),
-			DashboardUtils.OTHER.getVarName(),
+			DashboardServerUtils.UNKNOWN.getVarName(),
+			DashboardServerUtils.OTHER.getVarName(),
 			DashboardServerUtils.EXPOCODE.getVarName(),
 			DashboardServerUtils.DATASET_NAME.getVarName(),
 			DashboardServerUtils.VESSEL_NAME.getVarName(),
@@ -65,8 +65,7 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.SOUTHERNMOST_LATITUDE.getVarName(),
 			DashboardServerUtils.NORTHERNMOST_LATITUDE.getVarName(),
 			DashboardServerUtils.TIME_COVERAGE_START.getVarName(),
-			DashboardServerUtils.TIME_COVERAGE_END.getVarName(),
-			DashboardServerUtils.QC_FLAG.getVarName()
+			DashboardServerUtils.TIME_COVERAGE_END.getVarName()
 	));
 
 	private static final ArrayList<String> DATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
@@ -96,9 +95,8 @@ public class KnownDataTypesTest {
 					DashboardServerUtils.SOUTHERNMOST_LATITUDE,
 					DashboardServerUtils.NORTHERNMOST_LATITUDE,
 					DashboardServerUtils.TIME_COVERAGE_START,
-					DashboardServerUtils.TIME_COVERAGE_END,
-					DashboardServerUtils.QC_FLAG
-					) );
+					DashboardServerUtils.TIME_COVERAGE_END
+	) );
 
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
 		"xCO2_atm_dry_interp", "rank", "socat_doi" };

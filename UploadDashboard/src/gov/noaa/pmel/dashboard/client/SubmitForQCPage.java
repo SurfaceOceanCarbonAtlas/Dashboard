@@ -280,7 +280,7 @@ public class SubmitForQCPage extends CompositeWithUsername {
 
 			// Add this cruise to the intro list
 			String submitStatus = cruise.getQcStatus();
-			String cdiacDate = cruise.getCdiacDate();
+			String cdiacDate = cruise.getArchiveDate();
 			if ( submitStatus.isEmpty() && cdiacDate.isEmpty() ) {
 				cruiseIntros.add("<li>" + SafeHtmlUtils.htmlEscape(expo) + 
 						"</li>");				

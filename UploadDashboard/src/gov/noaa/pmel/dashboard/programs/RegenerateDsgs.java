@@ -97,14 +97,9 @@ public class RegenerateDsgs {
 			// Get the QC flag and SOCAT version from the database
 			Character qcFlag = dbHandler.getQCFlag(upperExpo);
 			String qcStatus = DashboardUtils.FLAG_STATUS_MAP.get(qcFlag);
-			String socatVersionStatus = dbHandler.getSocatVersionStatus(upperExpo);
-			if ( socatVersionStatus.isEmpty() )
-				throw new IllegalArgumentException("Unable to get the version and status from the database");
-			String socatVersion = socatVersionStatus.substring(0, socatVersionStatus.length() - 1);
 
-			// Update (but do not commit) the cruise info version number and QC status if not correct 
-			if ( ! ( socatVersion.equals(cruise.getVersion()) && qcStatus.equals(cruise.getQcStatus()) ) ) {
-				cruise.setVersion(socatVersion);
+			// Update (but do not commit) the cruise info if not correct 
+			if ( ! qcStatus.equals(cruise.getQcStatus() ) ) {
 				cruise.setQcStatus(qcStatus);
 				cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			}
@@ -112,20 +107,12 @@ public class RegenerateDsgs {
 			// Get the metadata in the OME XML file
 			DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
 					metaHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME), metaHandler);
-			// Update (but do not commit) the metadata info version number if not correct
+			// Update (but do not commit) the metadata info if not correct
 			if ( ! socatVersion.equals(omeMData.getVersion()) ) {
 				omeMData.setVersion(socatVersion);
 				metaHandler.saveMetadataInfo(omeMData, null, false);
 			}
 			updatedMeta = omeMData.createSocatMetadata();
-			// Add SOCAT version number and status string, QC flag, and SOCAT DOI
-			updatedMeta.setSocatVersion(socatVersionStatus);
-			updatedMeta.setQcFlag(qcFlag.toString());
-			updatedMeta.setSocatDOI(cruise.getSocatDoi());
-
-			// allRegionIDs should still be the same since the data has not changed;
-			// must force if not the case
-			updatedMeta.setAllRegionIDs(fullDataMeta.getAllRegionIDs());
 
 			if ( ! fullDataMeta.equals(updatedMeta) )
 				updateIt = true;
@@ -135,45 +122,6 @@ public class RegenerateDsgs {
 
 		if ( updateIt ) {
 			try {
-				// Change date/time of old dataset problem points to something valid, but WOCE them as bad
-				if ( "49K619871028".equals(upperExpo) ) {
-					for ( DsgCruiseData data : dataVals ) {
-						if ( (data.getMonth() == 11) && (data.getDay() > 30) ) {
-							// 11-31 in 49K619871028
-							data.setMonth(12);
-							data.setDay(1);
-							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
-						}
-					}
-				}
-				else if ( "49NB19881228".equals(upperExpo) ) {
-					for ( DsgCruiseData data : dataVals ) {
-						if ( (data.getMonth() == 2) && (data.getDay() > 29) ) {
-							// 2-31 in 49NB19881228
-							data.setMonth(3);
-							data.setDay(1);
-							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
-						}
-					}
-				}
-				else if ( "74JC20061024".equals(upperExpo) ) {
-					for ( DsgCruiseData data : dataVals ) {
-						if ( data.getMinute() > 59 ) {
-							// 12:99 in 74JC20061024
-							data.setMinute(59);
-							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
-						}
-					}
-				}
-				else if ( "77FF20020226".equals(upperExpo) ) {
-					for ( DsgCruiseData data : dataVals ) {
-						if ( data.getSecond() >= 60.0 ) {
-							// 13:54:60 in 77FF20020226
-							data.setSecond(59.99);
-							data.setWoceCO2Water(DashboardUtils.WOCE_BAD);
-						}
-					}
-				}
 				// Regenerate the DSG file with the updated metadata
 				fullDataDsg.create(updatedMeta, dataVals);
 				// Call Ferret to add lon360 and tmonth (calculated data should be the same)
@@ -185,13 +133,6 @@ public class RegenerateDsgs {
 				if ( tool.hasError() )
 					throw new IllegalArgumentException("Failure in adding computed variables: " + 
 							tool.getErrorMessage());
-
-				// Assign the metadata String of all region IDs from the region IDs from Ferret
-				try {
-					fullDataDsg.updateAllRegionIDs();
-				} catch (Exception ex) {
-					throw new IllegalArgumentException("Failure to update the String of all region IDs: " + ex.getMessage());
-				}
 
 			} catch ( Exception ex ) {
 				throw new IllegalArgumentException("Problems regenerating the full-data DSG files for " + 

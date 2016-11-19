@@ -46,8 +46,6 @@ public class DerivedVariablesTest {
 		tool.run();
 		assertFalse(tool.hasError());
 
-		dsgFile.updateAllRegionIDs();
-
 		ArrayList<String> unknownNames = dsgFile.readMetadata(CruiseDsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
 		unknownNames = dsgFile.readData(CruiseDsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);

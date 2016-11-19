@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.TreeSet;
 
 import ucar.ma2.ArrayChar;
 import ucar.ma2.ArrayDouble;
@@ -33,9 +32,9 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 public class CruiseDsgNcFile extends File {
 
-	private static final long serialVersionUID = 1127637224009404358L;
+	private static final long serialVersionUID = 8291908351201533511L;
 
-	private static final String VERSION = "CruiseDsgNcFile 1.5";
+	private static final String DSG_VERSION = "DsgNcFile 2.0";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
@@ -167,7 +166,7 @@ public class CruiseDsgNcFile extends File {
 
 			ncfile.addGroupAttribute(null, new Attribute("featureType", "Trajectory"));
 			ncfile.addGroupAttribute(null, new Attribute("Conventions", "CF-1.6"));
-			ncfile.addGroupAttribute(null, new Attribute("history", VERSION));
+			ncfile.addGroupAttribute(null, new Attribute("history", DSG_VERSION));
 
 			// Add the "num_obs" variable which will be assigned using the number of data points
 			Variable var = ncfile.addVariable(null, "num_obs", DataType.INT, trajDims);
@@ -783,113 +782,6 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Reads and returns the longitudes, latitudes, times, SST values, and 
-	 * fCO2_recommended values contained in this DSG file.  NaN and infinite 
-	 * values are changed to {@link DsgCruiseData#FP_MISSING_VALUE}.  This 
-	 * DSG file must have been processed by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
-	 * for the fCO2_recommended values to be meaningful.
-	 * 
-	 * @return
-	 * 		the array { lons, lats, times, ssts, fco2s } for this cruise, where
-	 * 		lons are the array of longitudes, lats are the array of latitudes, 
-	 * 		times are the array of times, ssts are the array of SST values, and 
-	 * 		fco2s are the array of fCO2_recommended values.
-	 * @throws IOException
-	 * 		if problems opening or reading from this DSG file, or 
-	 * 		if any of the data arrays are not given in this DSG file
-	 */
-	public double[][] readLonLatTimeSstFco2DataValues() throws IOException {
-		double[] lons;
-		double[] lats;
-		double[] times;
-		double[] ssts;
-		double[] fco2s;
-
-		NetcdfFile ncfile = NetcdfFile.open(getPath());
-		try {
-			Variable lonVar = ncfile.findVariable(DashboardServerUtils.LONGITUDE.getVarName());
-			if ( lonVar == null )
-				throw new IOException("Unable to find longitudes in " + getName());
-			int numVals = lonVar.getShape(0);
-
-			Variable latVar = ncfile.findVariable(DashboardServerUtils.LATITUDE.getVarName());
-			if ( latVar == null )
-				throw new IOException("Unable to find latitudes in " + getName());
-			if ( latVar.getShape(0) != numVals ) 
-				throw new IOException("Unexpected number of latitudes in " + getName());
-
-			Variable timeVar = ncfile.findVariable(DashboardServerUtils.TIME.getVarName());
-			if ( timeVar == null )
-				throw new IOException("Unable to find times in " + getName());
-			if ( timeVar.getShape(0) != numVals ) 
-				throw new IOException("Unexpected number of time values in " + getName());
-
-			Variable sstVar = ncfile.findVariable(DashboardServerUtils.SST.getVarName());
-			if ( sstVar == null )
-				throw new IOException("Unable to find SST in " + getName());
-			if ( sstVar.getShape(0) != numVals ) 
-				throw new IOException("Unexpected number of SST values in " + getName());
-
-			Variable fco2Var = ncfile.findVariable(DashboardServerUtils.FCO2_REC.getVarName());
-			if ( fco2Var == null )
-				throw new IOException("Unable to find fCO2_recommended in " + getName());
-			if ( fco2Var.getShape(0) != numVals ) 
-				throw new IOException("Unexpected number of fCO2_recommeded values in " + getName());
-
-			lons = new double[numVals];
-			lats = new double[numVals];
-			times = new double[numVals];
-			ssts = new double[numVals];
-			fco2s = new double[numVals];
-
-			ArrayDouble.D1 dvar = (ArrayDouble.D1) lonVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				lons[k] = value;
-			}
-
-			dvar = (ArrayDouble.D1) latVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				lats[k] = value;
-			}
-
-			dvar = (ArrayDouble.D1) timeVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				times[k] = value;
-			}
-
-			dvar = (ArrayDouble.D1) sstVar.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				ssts[k] = value;
-			}
-
-			dvar = (ArrayDouble.D1) fco2Var.read();
-			for (int k = 0; k < numVals; k++) {
-				double value = dvar.get(k);
-				if ( Double.isNaN(value) || Double.isInfinite(value) )
-					value = DashboardUtils.FP_MISSING_VALUE;
-				fco2s[k] = value;
-			}
-		} finally {
-			ncfile.close();
-		}
-
-		return new double[][] { lons, lats, times, ssts, fco2s }; 
-	}
-
-	/**
 	 * Updates the string recorded for the given variable in this DSG file.
 	 * 
 	 * @param varName
@@ -980,50 +872,6 @@ public class CruiseDsgNcFile extends File {
 	}
 
 	/**
-	 * Updates the all_region_ids metadata variable in this DSG file 
-	 * from the values in the region_id data variable in this DSG file.
-	 * 
-	 * @throws IllegalArgumentException
-	 * 		if this DSG file is not valid
-	 * @throws IOException
-	 * 		if opening or writing to the DSG file throws one
-	 * @throws InvalidRangeException 
-	 * 		if writing the updated QC flag to the DSG file throws one 
-	 */
-	public void updateAllRegionIDs() 
-			throws IllegalArgumentException, IOException, InvalidRangeException {
-		// Read the region IDs assigned by Ferret
-		char[] regionIDs = readCharVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
-		// Generate the String of sorted unique IDs
-		TreeSet<Character> allRegionIDsSet = new TreeSet<Character>();
-		for ( char id : regionIDs ) {
-			allRegionIDsSet.add(id);
-		}
-		String allRegionIDs = "";
-		for ( Character id : allRegionIDsSet ) {
-			allRegionIDs += id.toString();
-		}
-		// Write this String of all region IDs to the NetCDF file
-		NetcdfFileWriter ncfile = NetcdfFileWriter.openExisting(getPath());
-		try {
-			String varName = DashboardServerUtils.ALL_REGION_IDS.getVarName();
-			Variable var = ncfile.findVariable(varName);
-			if ( var == null ) 
-				throw new IllegalArgumentException("Unable to find variable '" + 
-						varName + "' in " + getName());
-			if ( var.getShape(1) < allRegionIDs.length() )
-				throw new IllegalArgumentException("Not enough space (max " + 
-						Integer.toString(var.getShape(1)) + 
-						") for the string of all region IDs (" + allRegionIDs + ")");
-			ArrayChar.D2 allRegionIDsArray = new ArrayChar.D2(1, var.getShape(1));
-			allRegionIDsArray.setString(0, allRegionIDs);
-			ncfile.write(var, allRegionIDsArray);
-		} finally {
-			ncfile.close();
-		}
-	}
-
-	/**
 	 * Assigns the given complete WOCE flags in this DSG file.  In particular, 
 	 * the row numbers in the WOCE flag locations are used to identify the row 
 	 * for the WOCE flag; however, the latitude, longitude, and timestamp in 
@@ -1068,13 +916,6 @@ public class CruiseDsgNcFile extends File {
 						varName + "' in " + getName());
 			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
 
-			varName = DashboardServerUtils.REGION_ID.getVarName();
-			var = ncfile.findVariable(varName);
-			if ( var == null )
-				throw new IllegalArgumentException("Unable to find variable '" +
-						varName + "' in " + getName());
-			ArrayChar.D2 regionIDs = (ArrayChar.D2) var.read(); 
-
 			String dataname = woceEvent.getVarName();
 			ArrayDouble.D1 datavalues;
 			if ( dataname.isEmpty() || DashboardServerUtils.GEOPOSITION.getVarName().equals(dataname) ) {
@@ -1109,7 +950,6 @@ public class CruiseDsgNcFile extends File {
 				else {
 					DataLocation dsgLoc = new DataLocation();
 					dsgLoc.setRowNumber(idx + 1);
-					dsgLoc.setRegionID(regionIDs.get(idx, 0));
 					dsgLoc.setLongitude(longitudes.get(idx));
 					dsgLoc.setLatitude(latitudes.get(idx));
 					dsgLoc.setDataDate(new Date(Math.round(times.get(idx) * 1000.0)));
@@ -1135,8 +975,7 @@ public class CruiseDsgNcFile extends File {
 
 	/**
 	 * Updates this DSG file with the given WOCE flags.  Optionally will 
-	 * also update the region ID and row number in the WOCE flags from 
-	 * the data in this DSG file. 
+	 * also update the row number in the WOCE flags from the data in this DSG file. 
 	 * 
 	 * @param woceEvent
 	 * 		WOCE flags to set
@@ -1179,19 +1018,6 @@ public class CruiseDsgNcFile extends File {
 				throw new IllegalArgumentException("Unable to find variable '" +
 						varName + "' in " + getName());
 			ArrayDouble.D1 times = (ArrayDouble.D1) var.read();
-
-			ArrayChar.D2 regionIDs;
-			if ( updateWoceEvent ) {
-				varName = DashboardServerUtils.REGION_ID.getVarName();
-				var = ncfile.findVariable(varName);
-				if ( var == null )
-					throw new IllegalArgumentException("Unable to find variable '" +
-							varName + "' in " + getName());
-				regionIDs = (ArrayChar.D2) var.read(); 
-			}
-			else {
-				regionIDs = null;
-			}
 
 			String dataname = woceEvent.getVarName();
 			ArrayDouble.D1 datavalues;
@@ -1249,7 +1075,6 @@ public class CruiseDsgNcFile extends File {
 					wocevalues.set(idx, 0, newFlag);
 					if ( updateWoceEvent ) {
 						dataloc.setRowNumber(idx + 1);
-						dataloc.setRegionID(regionIDs.get(idx, 0));
 					}
 					// Start the next search from the next data point
 					startIdx = idx + 1;

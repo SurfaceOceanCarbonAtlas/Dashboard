@@ -75,6 +75,7 @@ public class CruiseChecker {
 		int secondOfDayIndex = -1;
 		int longitudeIndex = -1;
 		int latitudeIndex = -1;
+		int sampleDepthIndex = -1;
 	}
 
 	/**
@@ -119,6 +120,8 @@ public class CruiseChecker {
 				colIndcs.longitudeIndex = k;
 			else if ( DashboardServerUtils.LATITUDE.typeNameEquals(colType) )
 				colIndcs.latitudeIndex = k;
+			else if ( DashboardServerUtils.SAMPLE_DEPTH.typeNameEquals(colType) )
+				colIndcs.sampleDepthIndex = k;
 		}
 		return colIndcs;
 	}
@@ -895,6 +898,7 @@ public class CruiseChecker {
 
 		if ( (colIndcs.longitudeIndex < 0) || errCols.contains(colIndcs.longitudeIndex) ||
 			 (colIndcs.latitudeIndex < 0) || errCols.contains(colIndcs.latitudeIndex) ||
+			 (colIndcs.sampleDepthIndex < 0) || errCols.contains(colIndcs.sampleDepthIndex) ||
 			 ( (colIndcs.timestampIndex >= 0) && errCols.contains(colIndcs.timestampIndex) ) ||
 			 ( (colIndcs.dateIndex >= 0) && errCols.contains(colIndcs.dateIndex) ) ||
 			 ( (colIndcs.yearIndex >= 0) && errCols.contains(colIndcs.yearIndex) ) ||

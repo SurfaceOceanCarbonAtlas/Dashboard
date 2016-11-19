@@ -6,7 +6,6 @@ package gov.noaa.pmel.dashboard.server;
 import gov.noaa.pmel.dashboard.handlers.ArchiveFilesBundler;
 import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Matcher;
@@ -58,7 +57,13 @@ public class DashboardServerUtils {
 	public static final DashDataType TIME_COVERAGE_START = new DashDataType(DashboardUtils.TIME_COVERAGE_START);
 	public static final DashDataType TIME_COVERAGE_END = new DashDataType(DashboardUtils.TIME_COVERAGE_END);
 	public static final DashDataType QC_FLAG = new DashDataType(DashboardUtils.QC_FLAG);
+	public static final DashDataType VERSION = new DashDataType(DashboardUtils.VERSION);
+
 	public static final DashDataType SAMPLE_NUMBER = new DashDataType(DashboardUtils.SAMPLE_NUMBER);
+	public static final DashDataType LONGITUDE = new DashDataType(DashboardUtils.LONGITUDE);
+	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
+	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
+	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
 
 	/**
 	 * Date and time or the measurement
@@ -90,10 +95,17 @@ public class DashboardServerUtils {
 	 */
 	public static final DashDataType SECOND_OF_DAY = new DashDataType(DashboardUtils.SECOND_OF_DAY);
 
-	public static final DashDataType LONGITUDE = new DashDataType(DashboardUtils.LONGITUDE);
-	public static final DashDataType LATITUDE = new DashDataType(DashboardUtils.LATITUDE);
-	public static final DashDataType SAMPLE_DEPTH = new DashDataType(DashboardUtils.SAMPLE_DEPTH);
-	public static final DashDataType TIME = new DashDataType(DashboardUtils.TIME);
+	/**
+	 * Non-specific WOCE flag for a sample.  
+	 * Used for range checking results when no other WOCE flag is applicable.
+	 */
+	public static final DashDataType GENERIC_WOCE_FLAG = new DashDataType(DashboardUtils.GENERIC_WOCE_FLAG); 
+
+	/**
+	 * Non-specific WOCE flag for a sample.  
+	 * Used for range checking results when no other WOCE flag is applicable.
+	 */
+	public static final DashDataType GENERIC_WOCE_COMMENT = new DashDataType(DashboardUtils.GENERIC_WOCE_COMMENT); 
 
 	/** 
 	 * Value of userRealName to use to skip sending the email request in 
@@ -221,168 +233,5 @@ public class DashboardServerUtils {
 
 		return "Ship";
 	}
-
-	// Unit arrays for static types in this class
-	public static final ArrayList<String> SALINITY_UNITS = 
-			new ArrayList<String>(Arrays.asList("PSU"));
-
-	public static final ArrayList<String> TEMPERATURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("degrees C"));
-
-	public static final ArrayList<String> PRESSURE_UNITS = 
-			new ArrayList<String>(Arrays.asList("hPa", "kPa", "mmHg"));
-
-	public static final ArrayList<String> XCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("umol/mol"));
-
-	public static final ArrayList<String> PCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-
-	public static final ArrayList<String> FCO2_UNITS = 
-			new ArrayList<String>(Arrays.asList("uatm"));
-
-	public static final ArrayList<String> DISTANCE_UNITS = 
-			new ArrayList<String>(Arrays.asList("km"));
-
-	// Additional metadata
-	public static final DashDataType VERSION = new DashDataType("version", 
-			200.0, "version", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"version number with status", null, 
-			null, DashboardUtils.NO_UNITS);
-
-	public static final DashDataType ALL_REGION_IDS = new DashDataType("all_region_ids", 
-			201.0, "all region IDs", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"sorted unique region IDs", null, 
-			null, DashboardUtils.NO_UNITS);
-
-	public static final DashDataType ENHANCED_DOI = new DashDataType("enhanced_data_doi", 
-			202.0, "enhanced-data DOI", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"DOI of enhanced data", null, 
-			null, DashboardUtils.NO_UNITS);
-
-	// Additional data provided by the user
-	public static final DashDataType SALINITY = new DashDataType("sal", 
-			600.0, "salinity", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"salinity", "sea_surface_salinity", 
-			DashboardUtils.SALINITY_CATEGORY, SALINITY_UNITS);
-
-	public static final DashDataType TEQU = new DashDataType("Temperature_equi", 
-			610.0, "T_equ", 
-			DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"equilibrator chamber temperature", null, 
-			DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-
-	public static final DashDataType SST = new DashDataType("temp", 
-			611.0, "SST", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea surface temperature", "sea_surface_temperature", 
-			DashboardUtils.TEMPERATURE_CATEGORY, TEMPERATURE_UNITS);
-
-	public static final DashDataType PEQU = new DashDataType("Pressure_equi", 
-			620.0, "P_equ", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"equilibrator chamber pressure", null, 
-			DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
-
-	public static final DashDataType PATM = new DashDataType("Pressure_atm", 
-			621.0, "P_atm", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea-level air pressure", "air_pressure_at_sea_level", 
-			DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
-
-	public static final DashDataType XCO2_WATER_TEQU_DRY = new DashDataType("xCO2_water_equi_temp_dry_ppm", 
-			630.0, "xCO2_water_Tequ_dry", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 dry using equi temp", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-
-	public static final DashDataType XCO2_WATER_SST_DRY = new DashDataType("xCO2_water_sst_dry_ppm", 
-			631.0, "xCO2_water_SST_dry", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water xCO2 dry using sst", "mole_fraction_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-
-	public static final DashDataType PCO2_WATER_TEQU_WET = new DashDataType("pCO2_water_equi_temp", 
-			632.0, "pCO2_water_Tequ_wet", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water pCO2 wet using equi temp", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-
-	public static final DashDataType PCO2_WATER_SST_WET = new DashDataType("pCO2_water_sst_100humidity_uatm", 
-			633.0, "pCO2_water_SST_wet", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water pCO2 wet using sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, PCO2_UNITS);
-
-	public static final DashDataType FCO2_WATER_TEQU_WET = new DashDataType("fCO2_water_equi_uatm", 
-			634.0, "fCO2_water_Tequ_wet", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water fCO2 wet using equi temp", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType FCO2_WATER_SST_WET = new DashDataType("fCO2_water_sst_100humidity_uatm", 
-			635.0, "fCO2_water_SST_wet", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"water fCO2 wet using sst", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType WOCE_CO2_WATER = new DashDataType("WOCE_CO2_water", 
-			650.0, "WOCE CO2_water", DashboardUtils.CHAR_DATA_CLASS_NAME, 
-			"WOCE flag for aqueous CO2", null, 
-			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
-
-	/** 
-	 * User-provided comment for WOCE_CO2_WATER;
-	 * user type only, used for generating WOCE events from user-provided data.
-	 */
-	public static final DashDataType COMMENT_WOCE_CO2_WATER = new DashDataType("comment_WOCE_CO2_water",
-			651.0, "comment WOCE CO2_water", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"comment about WOCE_CO2_water flag", null, 
-			null, DashboardUtils.NO_UNITS);
-
-	public static final DashDataType WOCE_CO2_ATM = new DashDataType("WOCE_CO2_atm", 
-			652.0, "WOCE_CO2_atm", DashboardUtils.CHAR_DATA_CLASS_NAME, 
-			"WOCE flag for atmospheric CO2", null, 
-			DashboardUtils.QUALITY_CATEGORY, DashboardUtils.NO_UNITS);
-
-	/** 
-	 * User-provided comment for WOCE_CO2_ATM;
-	 * user type only, used for generating WOCE events from user-provided data.
-	 */
-	public static final DashDataType COMMENT_WOCE_CO2_ATM = new DashDataType("comment_WOCE_CO2_atm", 
-			653.0, "comment WOCE CO2_atm", DashboardUtils.STRING_DATA_CLASS_NAME, 
-			"comment about WOCE_CO2_atm flag", null, 
-			null, DashboardUtils.NO_UNITS);
-
-	// Computed or looked-up values
-	public static final DashDataType WOA_SALINITY = new DashDataType("woa_sss", 
-			700.0, "WOA SSS", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"salinity from World Ocean Atlas", "sea_surface_salinity", 
-			DashboardUtils.SALINITY_CATEGORY, SALINITY_UNITS);
-
-	public static final DashDataType NCEP_SLP = new DashDataType("pressure_ncep_slp", 
-			701.0, "NCEP SLP", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"sea level air pressure from NCEP/NCAR reanalysis", "air_pressure_at_sea_level", 
-			DashboardUtils.PRESSURE_CATEGORY, PRESSURE_UNITS);
-
-	public static final DashDataType REGION_ID = new DashDataType("region_id", 
-			702.0, "Region ID", DashboardUtils.CHAR_DATA_CLASS_NAME, "SOCAT region ID", 
-			null, DashboardUtils.LOCATION_CATEGORY, DashboardUtils.NO_UNITS);
-
-	public static final DashDataType ETOPO2_DEPTH = new DashDataType("etopo2", 
-			705.0, "ETOPO2 depth", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"bathymetry from ETOPO2", "sea_floor_depth", 
-			DashboardUtils.BATHYMETRY_CATEGORY, DashboardUtils.DEPTH_UNITS);
-
-	public static final DashDataType GVCO2 = new DashDataType("gvCO2", 
-			706.0, "GlobalView CO2", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"GlobalView xCO2", "mole_fraction_of_carbon_dioxide_in_air", 
-			DashboardUtils.CO2_CATEGORY, XCO2_UNITS);
-
-	public static final DashDataType DIST_TO_LAND = new DashDataType("dist_to_land", 
-			707.0, "dist to land", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"distance to major land mass", null, 
-			DashboardUtils.LOCATION_CATEGORY, DISTANCE_UNITS);
-
-	public static final DashDataType FCO2_REC = new DashDataType("fCO2_recommended", 
-			710.0, "fCO2_rec", DashboardUtils.DOUBLE_DATA_CLASS_NAME, 
-			"fCO2 recommended", "surface_partial_pressure_of_carbon_dioxide_in_sea_water", 
-			DashboardUtils.CO2_CATEGORY, FCO2_UNITS);
-
-	public static final DashDataType FCO2_SOURCE = new DashDataType("fCO2_source", 
-			711.0, "fCO2 src", DashboardUtils.INT_DATA_CLASS_NAME, 
-			"Algorithm number for recommended fCO2", null, 
-			DashboardUtils.IDENTIFIER_CATEGORY, DashboardUtils.NO_UNITS);
 
 }

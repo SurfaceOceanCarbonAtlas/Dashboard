@@ -270,6 +270,7 @@ public class DashboardUtils {
 
 	// flag for cruise rename WOCE events
 	public static final Character WOCE_RENAME = 'R';
+	public static final String WOCE_RENAME_VARNAME = "WOCE_Rename";
 
 	// Supported data class names
 	public static final String CHAR_DATA_CLASS_NAME = "Character";
@@ -342,7 +343,7 @@ public class DashboardUtils {
 
 	/** 
 	 * GEOPOSITION is a marker data type used in automated data checking
-	 * to indicate an severe error in the combination of lon/lat/time. 
+	 * to indicate an severe error in the combination of lon/lat/depth/time. 
 	 */
 	public static final DataColumnType GEOPOSITION = new DataColumnType("geoposition", 
 			-1.0, "(geoposition)", null, null, null, null, NO_UNITS);
@@ -427,6 +428,9 @@ public class DashboardUtils {
 			120.0, "QC flag", STRING_DATA_CLASS_NAME, "QC flag", null, 
 			QUALITY_CATEGORY, NO_UNITS);
 
+	public static final DataColumnType VERSION = new DataColumnType("version",
+			121.0, "version", STRING_DATA_CLASS_NAME, "version", null,
+			IDENTIFIER_CATEGORY, NO_UNITS);
 
 
 	public static final DataColumnType SAMPLE_NUMBER = new DataColumnType("sample_number", 
@@ -511,6 +515,19 @@ public class DashboardUtils {
 			515.0, "sec of day", DOUBLE_DATA_CLASS_NAME, "second of day", "second_of_day", 
 			TIME_CATEGORY, NO_UNITS);
 
+	/**
+	 * Non-specific WOCE flag for a sample.  
+	 */
+	public static final DataColumnType GENERIC_WOCE_FLAG = new DataColumnType("WOCE_flag", 
+			520.0, "WOCE flag", CHAR_DATA_CLASS_NAME, "overall WOCE flag", null, 
+			QUALITY_CATEGORY, NO_UNITS);
+
+	/**
+	 * Comment on the non-specific WOCE flag for a sample.
+	 */
+	public static final DataColumnType GENERIC_WOCE_COMMENT = new DataColumnType("Comment_WOCE_flag", 
+			521.0, "WOCE comment", CHAR_DATA_CLASS_NAME, "comment for the overall WOCE flag", null, 
+			null, NO_UNITS);
 
 
 	/**

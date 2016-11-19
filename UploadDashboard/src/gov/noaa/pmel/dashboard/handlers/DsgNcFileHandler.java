@@ -6,34 +6,25 @@ package gov.noaa.pmel.dashboard.handlers;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
 import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
-import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.server.DsgCruiseData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
+import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
-import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 import gov.noaa.pmel.dashboard.shared.DataLocation;
 import gov.noaa.pmel.dashboard.shared.QCEvent;
 import gov.noaa.pmel.dashboard.shared.WoceEvent;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchEvent.Kind;
-import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.ArrayList;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
 
 import ucar.ma2.InvalidRangeException;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
@@ -55,9 +46,6 @@ public class DsgNcFileHandler {
 	private KnownDataTypes knownMetadataTypes;
 	private KnownDataTypes knownDataFileTypes;
 	private WatchService watcher;
-	private Thread watcherThread;
-	private Logger itsLogger;
-	private static Object savingDsgFileLock;
 
 	/**
 	 * Handles storage and retrieval of full and decimated NetCDF DSG files 
@@ -102,7 +90,6 @@ public class DsgNcFileHandler {
 		ferretConfig = ferretConf;
 		this.knownMetadataTypes = knownMetadataTypes;
 		this.knownDataFileTypes = knownDataFileTypes;
-		savingDsgFileLock = new Object();
 
 		try {
 			Path dsgFilesDirPath = dsgFilesDir.toPath();
@@ -111,13 +98,10 @@ public class DsgNcFileHandler {
 			dsgFilesDirPath.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY).cancel();
 			watcher.close();
 			watcher = null;
-			watcherThread = null;
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Problems creating a watcher for the DSG files directory: " + 
 					ex.getMessage(), ex);
 		}
-
-		itsLogger = Logger.getLogger("DsgNcFileHandler");
 	}
 
 	/**
@@ -193,9 +177,6 @@ public class DsgNcFileHandler {
 	 * 		metadata for the cruise
 	 * @param cruiseData
 	 * 		data for the cruise
-	 * @param socatVersionStatus
-	 * 		SOCAT version number and status to assign
-	 * 		(see: {@link DatabaseRequestHandler#getSocatVersionStatus(String)}) 
 	 * @param qcFlag
 	 * 		cruise QC flag to assign
 	 * @throws IllegalArgumentException
@@ -203,56 +184,37 @@ public class DsgNcFileHandler {
 	 * 		if there are problems creating or writing the full-data DSG file
 	 */
 	public void saveCruise(DashboardOmeMetadata omeMData, DashboardCruiseWithData cruiseData, 
-			String socatVersionStatus, String qcFlag) throws IllegalArgumentException {
+			String qcFlag) throws IllegalArgumentException {
 		// Get the location and name for the NetCDF DSG file
 		CruiseDsgNcFile dsgFile = getDsgNcFile(omeMData.getExpocode());
 
 		// Get the metadata needed for creating the DSG file
 		DsgMetadata socatMData = omeMData.createSocatMetadata();
-		// Add SOCAT version number and status string, QC flag, and SOCAT DOI
-		socatMData.setSocatVersion(socatVersionStatus);
 		socatMData.setQcFlag(qcFlag);
-		socatMData.setSocatDOI(cruiseData.getSocatDoi());
-		// The value of allRegionsIDs will be empty - needs IDs from Ferret
+
 		// Convert the cruise data strings into the appropriate type
 		ArrayList<DsgCruiseData> socatDatalist = 
-				DsgCruiseData.dataListFromDashboardCruise(
-						knownDataFileTypes, cruiseData);
+				DsgCruiseData.dataListFromDashboardCruise(knownDataFileTypes, cruiseData);
 
-		// synchronize on savingDsgFileLock to block examination 
-		// of this DSG files until we finished creating it
-		synchronized(savingDsgFileLock) {
-
-			// Create the NetCDF DSG file
-			try {
-				dsgFile.create(socatMData, socatDatalist);
-			} catch (Exception ex) {
-				dsgFile.delete();
-				throw new IllegalArgumentException(
-						"Problems creating the SOCAT DSG file " + dsgFile.getName() +
-						"\n    " + ex.getMessage(), ex);
-			}
-
-			// Call Ferret to add the computed variables to the NetCDF DSG file
-			SocatTool tool = new SocatTool(ferretConfig);
-			ArrayList<String> scriptArgs = new ArrayList<String>(1);
-			scriptArgs.add(dsgFile.getPath());
-			tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
-			tool.run();
-			if ( tool.hasError() )
-				throw new IllegalArgumentException("Failure adding computed variables: " + 
-						tool.getErrorMessage());
-
-			// Assign the metadata String of all region IDs from the region IDs from Ferret
-			try {
-				dsgFile.updateAllRegionIDs();
-			} catch (Exception ex) {
-				dsgFile.delete();
-				throw new IllegalArgumentException("Failure to update the String of all region IDs: " + ex.getMessage());
-			}
-
-			// end of synchronized block
+		// Create the NetCDF DSG file
+		try {
+			dsgFile.create(socatMData, socatDatalist);
+		} catch (Exception ex) {
+			dsgFile.delete();
+			throw new IllegalArgumentException("Problems creating the SOCAT DSG file " + 
+					dsgFile.getName() + "\n    " + ex.getMessage(), ex);
 		}
+
+		// Call Ferret to add the computed variables to the NetCDF DSG file
+		SocatTool tool = new SocatTool(ferretConfig);
+		ArrayList<String> scriptArgs = new ArrayList<String>(1);
+		scriptArgs.add(dsgFile.getPath());
+		tool.init(scriptArgs, cruiseData.getExpocode(), FerretConfig.Action.COMPUTE);
+		tool.run();
+		if ( tool.hasError() )
+			throw new IllegalArgumentException("Failure adding computed variables: " + 
+					tool.getErrorMessage());
+
 	}
 
 	/**
@@ -417,41 +379,6 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Reads and returns the set of region IDs from the DSG file for the given 
-	 * cruise.  This DSG file must have regions IDs assigned by Ferret, such as 
-	 * when saved using 
-	 * {@link #saveCruise(OmeMetadata, DashboardCruiseWithData, String)},
-	 * for the set of region IDs to be meaningful.
-	 * 
-	 * @param expocode
-	 * 		get the region IDs for the cruise with this expocode
-	 * @return
-	 * 		set of region IDs for the indicated cruise
-	 * @throws FileNotFoundException
-	 * 		if the full-data DSG file does not exist
-	 * @throws IOException
-	 * 		if there are problems opening or reading from the DSG file
-	 * @throws IllegalArgumentException
-	 * 		if the DSG file does not have a 'region_id' variable, or
-	 * 		if a region ID is not recognized.
-	 */
-	public TreeSet<Character> getDataRegionsSet(String expocode) 
-			throws IllegalArgumentException, FileNotFoundException, IOException {
-		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
-		if ( ! dsgFile.exists() )
-			throw new FileNotFoundException("Full data DSG file for " + 
-					expocode + " does not exist");
-		char[] regions = dsgFile.readCharVarDataValues(DashboardServerUtils.REGION_ID.getVarName());
-		TreeSet<Character> regionsSet = new TreeSet<Character>();
-		for ( char value : regions )
-			regionsSet.add(value);
-		for ( Character value : regionsSet )
-			if ( DashboardUtils.REGION_NAMES.get(value) == null )
-				throw new IllegalArgumentException("Unexpected region_id of '" + value + "'");
-		return regionsSet;
-	}
-
-	/**
 	 * Reads and returns the array of data values for the specified variable
 	 * contained in the DSG file for the specified cruise.  The variable must 
 	 * be saved in the DSG file as characters.  Empty strings are changed to 
@@ -573,39 +500,6 @@ public class DsgNcFileHandler {
 	}
 
 	/**
-	 * Reads and returns the longitudes, latitudes, times, SST values, and 
-	 * fCO2_recommended values contained in the full-data DSG file for the
-	 * specified cruise.  NaN and infinite values are changed to 
-	 * {@link DsgCruiseData#FP_MISSING_VALUE}.  The full-data DSG file must 
-	 * have been processed by Ferret, such as when saved using 
-	 * {@link DsgNcFileHandler#saveCruise(OmeMetadata, DashboardCruiseWithData, String)}
-	 * for the fCO2_recommended values to be meaningful.
-	 * 
-	 * @param expocode
-	 * 		get the data values for the cruise with this expocode
-	 * @return
-	 * 		the array { lons, lats, times, ssts, fco2s } from the full-data DSG file, 
-	 * 		where lons are the array of longitudes, lats are the array of latitudes, 
-	 * 		times are the array of times, ssts are the array of SST values, and 
-	 * 		fco2s are the array of fCO2_recommended values.
-	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
-	 * @throws FileNotFoundException
-	 * 		if the full-data DSG file does not exist
-	 * @throws IOException
-	 * 		if problems opening or reading from the DSG file, or 
-	 * 		if any of the data arrays are not given in the DSG file
-	 */
-	public double[][] readLonLatTimeSstFco2DataValues(String expocode) 
-			throws IllegalArgumentException, FileNotFoundException, IOException {
-		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
-		if ( ! dsgFile.exists() )
-			throw new FileNotFoundException("Full data DSG file for " + 
-					expocode + " does not exist");
-		return dsgFile.readLonLatTimeSstFco2DataValues();
-	}
-
-	/**
 	 * Read and returns the QC flag contained in the DSG file 
 	 * for the cruise with the indicated expocode.
 	 * 
@@ -686,11 +580,9 @@ public class DsgNcFileHandler {
 		// Assign the WOCE flags in the full-data DSG file, and get missing data
 		CruiseDsgNcFile dsgFile = getDsgNcFile(expocode);
 		if ( ! dsgFile.canRead() )
-			throw new IllegalArgumentException(
-					"DSG file for " + expocode + " does not exist");
+			throw new IllegalArgumentException("DSG file for " + expocode + " does not exist");
 		try {
-			ArrayList<DataLocation> unidentified = 
-					dsgFile.updateWoceFlags(woceEvent, true);
+			ArrayList<DataLocation> unidentified = dsgFile.updateWoceFlags(woceEvent, true);
 			if ( unidentified.size() > 0 ) {
 				String msg  = "Unable to find data location(s): \n    ";
 				for ( DataLocation dataloc : unidentified )
@@ -729,196 +621,6 @@ public class DsgNcFileHandler {
 			dsgFile.updateWoceFlags(woceEvent, false);
 		} catch (InvalidRangeException ex) {
 			throw new IOException(ex);
-		}
-	}
-
-	/**
-	 * Starts a new Thread monitoring the full-data DSG directory.
-	 * If a Thread is currently monitoring the directory, this call does nothing.
-	 */
-	public void watchForDsgFileUpdates() {
-		// Make sure the watcher is not already running
-		if ( watcherThread != null )
-			return;
-		watcherThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// Create a new watch service for the DSG file directories
-				try {
-					watcher = FileSystems.getDefault().newWatchService();
-				} catch (Exception ex) {
-					itsLogger.error("Unexpected error starting a watcher for the default file system", ex);
-					return;
-				}
-				// Watch for directory creation in the root DSG directory
-				WatchKey rootReg;
-				try {
-					itsLogger.info("Start watching full-data DSG directory " + dsgFilesDir.getPath());
-					rootReg = dsgFilesDir.toPath().register(watcher, StandardWatchEventKinds.ENTRY_CREATE);
-				} catch (Exception ex) {
-					itsLogger.error("Unexpected error registering the root full-data DSG directory " +
-							"for watching", ex);
-					try {
-						watcher.close();
-					} catch (Exception e) {
-						;
-					}
-					watcher = null;
-					return;
-				}
-				// Watch for file modification in each of the DSG subdirectories
-				File[] subdirs = dsgFilesDir.listFiles(new FileFilter() {
-					@Override
-					public boolean accept(File subfile) {
-						if ( subfile.isDirectory() )
-							return true;
-						return false;
-					}
-				});
-				ArrayList<WatchKey> subRegs = new ArrayList<WatchKey>(subdirs.length + 4);
-				for ( File dsgSubDir : subdirs ) {
-					try {
-						handleDsgDirChange(subRegs, StandardWatchEventKinds.ENTRY_CREATE, dsgSubDir);
-					} catch (Exception ex) {
-						itsLogger.error("Unexpected error registering the full-data DSG subdirectory " + 
-								dsgSubDir.getName() + " for watching", ex);
-						for ( WatchKey reg : subRegs) {
-							reg.cancel();
-							reg.pollEvents();
-						}
-						rootReg.cancel();
-						rootReg.pollEvents();
-						try {
-							watcher.close();
-						} catch (Exception e) {
-							;
-						}
-						watcher = null;
-						return;
-					}
-				}
-				subdirs = null;
-				// Start watching and handle changes
-				for (;;) {
-					try {
-						WatchKey key = watcher.take();
-						Path parentPath = (Path) key.watchable();
-						File lastFile = null;
-						Kind<?> lastKind = null;
-						for ( WatchEvent<?> event : key.pollEvents() ) {
-							Path relPath = (Path) event.context();
-							File thisFile = parentPath.resolve(relPath).toFile();
-							Kind<?> thisKind = event.kind();
-							// Ignore repeated events of what was just handled
-							if ( thisFile.equals(lastFile) && thisKind.equals(lastKind) )
-								continue;
-							// If a DSG file is being saved, block until done saving
-							synchronized(savingDsgFileLock) {
-								handleDsgDirChange(subRegs, thisKind, thisFile);
-							}
-							lastFile = thisFile;
-							lastKind = thisKind;
-						}
-						if ( ! key.reset() )
-							break;
-						// Sleep a moment to allow multiple updates to coalesce
-						Thread.sleep(100);
-					} catch (Exception ex) {
-						// Probably the watcher was closed
-						break;
-					}
-				}
-				for ( WatchKey reg : subRegs) {
-					reg.cancel();
-					reg.pollEvents();
-				}
-				rootReg.cancel();
-				rootReg.pollEvents();
-				try {
-					watcher.close();
-				} catch (Exception ex) {
-					;
-				}
-				watcher = null;
-				return;
-			}
-		});
-		itsLogger.info("Starting new thread monitoring the full-data DSG directory: " + dsgFilesDir.getPath()); 
-		watcherThread.start();
-	}
-
-	/**
-	 * Handles changes detected by the monitor of the DSG directory.  If the change is the creation of
-	 * an appropriately named directory, this will start watching for modifications of files in that 
-	 * directory.  If the change is the a modification of an appropriately named DSG file, the QC flag
-	 * is checked for possible updates to the dashboard status.
-	 *   
-	 * @param subRegs
-	 * 		add the WatchKey returned from registering a directory to be monitored to this list 
-	 * @param changeKind
-	 * 		kind of change to be handled
-	 * @param changedFile
-	 * 		file or directory to be handled 
-	 * @throws IOException
-	 * 		if registering a directory to be watched throws one
-	 */
-	private void handleDsgDirChange(ArrayList<WatchKey> subRegs, Kind<?> changeKind, File changedFile) throws IOException {
-		if ( changedFile.isDirectory() ) {
-			if ( StandardWatchEventKinds.ENTRY_CREATE.equals(changeKind) &&
-				 DashboardServerUtils.isLikeNODCCode(changedFile.getName()) ) {
-				// new DSG file subdirectory to start watching for modifications to DSG files
-				itsLogger.info("Start watching full-data DSG subdirectory " + changedFile.getName());
-				subRegs.add(changedFile.toPath().register(watcher, StandardWatchEventKinds.ENTRY_MODIFY));
-			}
-		}
-		else if ( StandardWatchEventKinds.ENTRY_MODIFY.equals(changeKind) ) {
-			String filename = changedFile.getName();
-			if ( ! filename.endsWith(DSG_FILE_SUFFIX) ) {
-				// Not a DSG file - ignore this call
-				return;
-			}
-			String expocode = filename.substring(0, filename.length() - DSG_FILE_SUFFIX.length());
-			try {
-				String upperExpocode = DashboardServerUtils.checkExpocode(expocode);
-				if ( ! expocode.equals(upperExpocode) )
-					throw new IllegalArgumentException();
-			} catch (Exception ex) {
-				// Not a DSG file used by this system - ignore this call
-				return;
-			}
-			itsLogger.info("Checking QC flag given in " + changedFile.getPath());
-			try {
-				CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(changedFile.getPath());
-				char qcFlag = dsgFile.getQCFlag();
-				CruiseFileHandler fileHandler = DashboardConfigStore.get(false).getCruiseFileHandler();
-				if ( fileHandler.updateCruiseDashboardStatus(expocode, qcFlag) )
-					itsLogger.info("Updated dashboard status for " + expocode + " to that for QC flag '" + qcFlag + "'");
-			} catch (Exception ex) {
-				// Caught mid-update?  Another update call should occur, so log only as info
-				itsLogger.info("Error updating the dashboard status for " + expocode + " : " + ex.getMessage());
-			}
-		}
-	}
-
-	/**
-	 * Stops the monitoring the full-data DSG directory.  
-	 * If the full-data DSG directory is not being monitored, this call does nothing. 
-	 */
-	public void cancelWatch() {
-		try {
-			watcher.close();
-			// Only the thread modifies the value of watcher
-		} catch (Exception ex) {
-			// Might be NullPointerException
-		}
-		if ( watcherThread != null ) {
-			try {
-				watcherThread.join();
-			} catch (Exception ex) {
-				;
-			}
-			watcherThread = null;
-			itsLogger.info("End of thread monitoring the the full-data DSG directory: " + dsgFilesDir.getPath());
 		}
 	}
 

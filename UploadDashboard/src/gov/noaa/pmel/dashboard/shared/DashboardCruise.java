@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DashboardCruise implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = 6556169857563201207L;
+	private static final long serialVersionUID = -4004730799628292824L;
 
 	protected boolean selected;
 	protected String version;
@@ -30,11 +30,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 	protected TreeSet<String> addlDocs;
 	protected String qcStatus;
 	protected String archiveStatus;
-	protected String cdiacDate;
+	protected String archiveDate;
 	protected String uploadFilename;
 	protected String uploadTimestamp;
 	protected String origDoi;
-	protected String socatDoi;
 	protected int numDataRows;
 	protected int numErrorRows;
 	protected int numWarnRows;
@@ -60,11 +59,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		addlDocs = new TreeSet<String>();
 		qcStatus = DashboardUtils.QC_STATUS_NOT_SUBMITTED;
 		archiveStatus = DashboardUtils.ARCHIVE_STATUS_NOT_SUBMITTED;
-		cdiacDate = DashboardUtils.STRING_MISSING_VALUE;
+		archiveDate = DashboardUtils.STRING_MISSING_VALUE;
 		uploadFilename = DashboardUtils.STRING_MISSING_VALUE;
 		uploadTimestamp = DashboardUtils.STRING_MISSING_VALUE;
 		origDoi = DashboardUtils.STRING_MISSING_VALUE;
-		socatDoi = DashboardUtils.STRING_MISSING_VALUE;
 		numDataRows = 0;
 		numErrorRows = 0;
 		numWarnRows = 0;
@@ -289,23 +287,23 @@ public class DashboardCruise implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
-	 * 		the CDIAC submission date; 
+	 * 		the archive submission date; 
 	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public String getCdiacDate() {
-		return cdiacDate;
+	public String getArchiveDate() {
+		return archiveDate;
 	}
 
 	/**
-	 * @param cdiacDate 
-	 * 		the CDIAC submission date (after trimming) to set;
+	 * @param archiveDate 
+	 * 		the archive submission date (after trimming) to set;
 	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
 	 */
-	public void setCdiacDate(String cdiacDate) {
-		if ( cdiacDate == null )
-			this.cdiacDate = DashboardUtils.STRING_MISSING_VALUE;
+	public void setArchiveDate(String archiveDate) {
+		if ( archiveDate == null )
+			this.archiveDate = DashboardUtils.STRING_MISSING_VALUE;
 		else
-			this.cdiacDate = cdiacDate.trim();
+			this.archiveDate = archiveDate.trim();
 	}
 
 	/**
@@ -369,27 +367,6 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			this.origDoi = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.origDoi = origDoi.trim();
-	}
-
-	/**
-	 * @return 
-	 * 		the DOI of the SOCAT-enhanced data document;
-	 * 		never null but may be {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public String getSocatDoi() {
-		return socatDoi;
-	}
-
-	/**
-	 * @param socatDoi
-	 * 		the DOI (after trimming) of the SOCAT-enhanced data document to set;
-	 * 		if null, sets to {@link DashboardUtils#STRING_MISSING_VALUE}
-	 */
-	public void setSocatDoi(String socatDoi) {
-		if ( socatDoi == null )
-			this.socatDoi = DashboardUtils.STRING_MISSING_VALUE;
-		else
-			this.socatDoi = socatDoi.trim();
 	}
 
 	/**
@@ -591,11 +568,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 		result = result * prime + addlDocs.hashCode();
 		result = result * prime + qcStatus.hashCode();
 		result = result * prime + archiveStatus.hashCode();
-		result = result * prime + cdiacDate.hashCode();
+		result = result * prime + archiveDate.hashCode();
 		result = result * prime + uploadFilename.hashCode();
 		result = result * prime + uploadTimestamp.hashCode();
 		result = result * prime + origDoi.hashCode();
-		result = result * prime + socatDoi.hashCode();
 		result = result * prime + numDataRows;
 		result = result * prime + numErrorRows;
 		result = result * prime + numWarnRows;
@@ -637,15 +613,13 @@ public class DashboardCruise implements Serializable, IsSerializable {
 			return false;
 		if ( ! archiveStatus.equals(other.archiveStatus) )
 			return false;
-		if ( ! cdiacDate.equals(other.cdiacDate) )
+		if ( ! archiveDate.equals(other.archiveDate) )
 			return false;
 		if ( ! uploadFilename.equals(other.uploadFilename) )
 			return false;
 		if ( ! uploadTimestamp.equals(other.uploadTimestamp) )
 			return false;
 		if ( ! origDoi.equals(other.origDoi) )
-			return false;
-		if ( ! socatDoi.equals(other.socatDoi) )
 			return false;
 		if ( numDataRows != other.numDataRows )
 			return false;
@@ -680,11 +654,10 @@ public class DashboardCruise implements Serializable, IsSerializable {
 				",\n    addlDocs=" + addlDocs.toString() +
 				",\n    qcStatus=" + qcStatus + 
 				",\n    archiveStatus=" + archiveStatus + 
-				",\n    cdiacDate=" + cdiacDate + 
+				",\n    archiveDate=" + archiveDate + 
 				",\n    uploadFilename=" + uploadFilename +
 				",\n    uploadTimestamp=" + uploadTimestamp +
 				",\n    origDoi=" + origDoi +
-				",\n    socatDoi=" + socatDoi +
 				",\n    numDataRows=" + Integer.toString(numDataRows) +
 				",\n    numErrorRows=" + Integer.toString(numErrorRows) +
 				",\n    numWarnRows=" + Integer.toString(numWarnRows) +

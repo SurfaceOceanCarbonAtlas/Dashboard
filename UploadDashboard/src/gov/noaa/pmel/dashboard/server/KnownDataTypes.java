@@ -88,6 +88,8 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.LONGITUDE);
 		addDataType(DashboardServerUtils.LATITUDE);
 		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
+		addDataType(DashboardServerUtils.GENERIC_WOCE_FLAG);
+		addDataType(DashboardServerUtils.GENERIC_WOCE_COMMENT);
 		return this;
 	}
 
@@ -117,6 +119,7 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.TIME_COVERAGE_START);
 		addDataType(DashboardServerUtils.TIME_COVERAGE_END);
 		addDataType(DashboardServerUtils.QC_FLAG);
+		addDataType(DashboardServerUtils.VERSION);
 		return this;
 	}
 
@@ -143,6 +146,7 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.LONGITUDE);
 		addDataType(DashboardServerUtils.LATITUDE);
 		addDataType(DashboardServerUtils.SAMPLE_DEPTH);
+		addDataType(DashboardServerUtils.GENERIC_WOCE_FLAG);
 		return this;
 	}
 

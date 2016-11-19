@@ -3,7 +3,6 @@
  */
 package gov.noaa.pmel.dashboard.handlers;
 
-import gov.noaa.pmel.dashboard.actions.SocatCruiseReporter;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.shared.DashboardMetadata;
@@ -40,7 +39,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
 	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
-	private static final String ENHANCED_REPORT_NAME_EXTENSION = "_SOCAT_enhanced.tsv";
 
 	private static final String EMAIL_SUBJECT_MSG = 
 			"Request for immediate archival from SOCAT dashboard user ";
@@ -140,59 +138,6 @@ public class ArchiveFilesBundler extends VersionedFileHandler {
 		// Generate the full path filename for this cruise metadata
 		File bundleFile = new File(parentFile, upperExpo + BUNDLE_NAME_EXTENSION);
 		return bundleFile;
-	}
-
-	/**
-	 * Generates a single-cruise SOCAT-enhanced data file, then bundles 
-	 * that report with all the metadata documents for that cruise.
-	 * Use {@link #getBundleFile(String)} to get the virtual File of
-	 * the created bundle.
-	 * 
-	 * @param expocode
-	 * 		create the bundle for the cruise with this expocode
-	 * @return
-	 * 		the warning messages from generating the single-cruise 
-	 * 		SOCAT-enhanced data file
-	 * @throws IllegalArgumentException
-	 * 		if the expocode is invalid
-	 * @throws IOException
-	 * 		if unable to read the default DashboardConfigStore,
-	 * 		if unable to create the SOCAT-enhanced data file, or
-	 * 		if unable to create the bundle file
-	 */
-	public ArrayList<String> createSocatEnhancedFilesBundle(String expocode) 
-			throws IllegalArgumentException, IOException {
-		File bundleFile = getBundleFile(expocode);
-		DashboardConfigStore configStore = DashboardConfigStore.get(false);
-
-		// Generate the single-cruise SOCAT-enhanced data file
-		SocatCruiseReporter reporter = new SocatCruiseReporter(configStore);
-		File reportFile = new File(bundleFile.getParent(), expocode + ENHANCED_REPORT_NAME_EXTENSION);
-		ArrayList<String> warnings = reporter.generateReport(expocode, reportFile);
-
-		// Get the list of metadata documents to be bundled with this data file
-		ArrayList<File> addlDocs = new ArrayList<File>();
-		MetadataFileHandler metadataHandler = configStore.getMetadataFileHandler();
-		for ( DashboardMetadata mdata : metadataHandler.getMetadataFiles(expocode) ) {
-			// Exclude the (expocode)/OME.xml document at this time;
-			// do include the (expocode)/PI_OME.xml 
-			String filename = mdata.getFilename();
-			if ( ! filename.equals(DashboardUtils.OME_FILENAME) ) {
-				addlDocs.add(metadataHandler.getMetadataFile(expocode, filename));
-			}
-		}
-
-		// Generate the bundle as a zip file
-		ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(bundleFile));
-		try {
-			copyFileToBundle(zipOut, reportFile);
-			for ( File metaFile : addlDocs )
-				copyFileToBundle(zipOut, metaFile);
-		} finally {
-			zipOut.close();
-		}
-
-		return warnings;
 	}
 
 	/**
