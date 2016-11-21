@@ -315,6 +315,44 @@ public class DsgMetadata {
 	}
 
 	/**
+	 * Get the version status - the version number followed by an 'N', 
+	 * indicating the dataset is new in this version, or a 'U', 
+	 * indicating the dataset is an update from a previous 
+	 * version.  Updates within a version do NOT change an 'N' 
+	 * to a 'U'.
+	 * 
+	 * @return
+	 * 		the version associated with this instance; 
+	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
+	 */
+	public String getVersion() {
+		String value = stringValuesMap.get(DashboardServerUtils.VERSION);
+		if ( value == null )
+			value = DashboardUtils.STRING_MISSING_VALUE;
+		return value;
+	}
+
+	/**
+	 * Set the version status - the version number followed by an 'N', 
+	 * indicating the dataset is new in this version, or a 'U', 
+	 * indicating the dataset is an update from a previous 
+	 * version.  Updates within a version do NOT change an 'N' 
+	 * to a 'U'.
+	 * 
+	 * @param version 
+	 * 		the version to set; 
+	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
+	 */
+	public void setVersion(String version) {
+		String value;
+		if ( version != null )
+			value = version;
+		else
+			value = DashboardUtils.STRING_MISSING_VALUE;
+		stringValuesMap.put(DashboardServerUtils.VERSION, value);
+	}
+
+	/**
 	 * @return
 	 * 		the QC flag;
 	 * 		never null but could be {@link DashboardUtils#CHAR_MISSING_VALUE}.toString() if not assigned

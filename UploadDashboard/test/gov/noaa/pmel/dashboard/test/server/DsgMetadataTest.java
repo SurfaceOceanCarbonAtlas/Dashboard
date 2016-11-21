@@ -30,6 +30,7 @@ public class DsgMetadataTest {
 	static final String CRUISE_NAME = "My Cruise";
 	static final String VESSEL_NAME = "My Vessel";
 	static final String ORGANIZATION_NAME = "PMEL/NOAA";
+	static final String INVESTIGATOR_NAMES = "Smith, K. : Doe, J.";
 	static final String VESSEL_TYPE = "Battleship";
 	static final Double WESTMOST_LONGITUDE = -160.0;
 	static final Double EASTMOST_LONGITUDE = -135.0;
@@ -37,7 +38,7 @@ public class DsgMetadataTest {
 	static final Double NORTHMOST_LATITUDE = 50.0;
 	static final Date BEGIN_TIME = new Date();
 	static final Date END_TIME = new Date(BEGIN_TIME.getTime() + 1000000L);
-	static final String INVESTIGATOR_NAMES = "Smith, K. : Doe, J.";
+	static final String VERSION_STATUS = "2.5N";
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getStringVariables()}
@@ -355,6 +356,32 @@ public class DsgMetadataTest {
 		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
 	}
 
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getVersion()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setVersion(java.lang.String)}.
+	 */
+	@Test
+	public void testGetSetVersion() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
+		mdata.setVersion(VERSION_STATUS);
+		assertEquals(VERSION_STATUS, mdata.getVersion());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getEndTime());
+		assertEquals(DashboardUtils.DATE_MISSING_VALUE, mdata.getBeginTime());
+		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getNorthmostLatitude()) );
+		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
+		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
+		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
+		mdata.setVersion(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVersion());
+	}
 
 	/**
 	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#hashCode()}
@@ -457,6 +484,13 @@ public class DsgMetadataTest {
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
 		other.setEndTime(END_TIME);
+		assertEquals(mdata.hashCode(), other.hashCode());
+		assertTrue( mdata.equals(other) );
+
+		mdata.setVersion(VERSION_STATUS);
+		assertFalse( mdata.hashCode() == other.hashCode());
+		assertFalse( mdata.equals(other) );
+		other.setVersion(VERSION_STATUS);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 	}

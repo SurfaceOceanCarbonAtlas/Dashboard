@@ -47,7 +47,7 @@ public class CruiseSubmitter {
 	KnownDataTypes knownDataFileTypes;
 	DatabaseRequestHandler databaseHandler;
 	ArchiveFilesBundler cdiacBundler;
-	String socatVersion;
+	String version;
 	Logger logger;
 
 	/**
@@ -63,7 +63,7 @@ public class CruiseSubmitter {
 		knownDataFileTypes = configStore.getKnownDataFileTypes();
 		databaseHandler = configStore.getDatabaseRequestHandler();
 		cdiacBundler = configStore.getArchiveFilesBundler();
-		socatVersion = configStore.getUploadVersion();
+		version = configStore.getUploadVersion();
 		logger = Logger.getLogger(getClass());
 	}
 
@@ -193,16 +193,46 @@ public class CruiseSubmitter {
 				try {
 					// Get the OME metadata for this cruise
 					DashboardMetadata omeInfo = metadataHandler.getMetadataInfo(expocode, DashboardUtils.OME_FILENAME);
-					if ( ! socatVersion.equals(omeInfo.getVersion()) ) {
-						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata SOCAT version number to " + 
-								socatVersion + " with submit for QC of " + expocode, false);
+					if ( ! version.equals(omeInfo.getVersion()) ) {
+						metadataHandler.saveMetadataInfo(omeInfo, "Update metadata version number to " + 
+								version + " with submit for QC of " + expocode, false);
 					}
 					DashboardOmeMetadata omeMData = new DashboardOmeMetadata(omeInfo, metadataHandler);
 
+					String socatVersionStatus = databaseHandler.getVersionStatus(expocode);
+					if ( socatVersionStatus.isEmpty() ) {
+						// New dataset to the database
+						socatVersionStatus = version + "N";
+					}
+					else {
+						String status = socatVersionStatus.substring(socatVersionStatus.length() - 1);
+						if ( ! "U".equals(status) ) {
+							double newVers;
+							try {
+								newVers = Math.floor(Double.parseDouble(version) * 10.0) / 10.0;
+							} catch (NumberFormatException ex) {
+								throw new RuntimeException("Unexpected new version of '" + version + "'");
+							}
+							String oldVersion = socatVersionStatus.substring(0, socatVersionStatus.length() - 1);
+							double oldVers;
+							try {
+								oldVers = Math.floor(Double.parseDouble(oldVersion) * 10.0) / 10.0;
+							} catch (NumberFormatException ex) {
+								throw new RuntimeException("Unexpected old version of '" + oldVersion + "'");
+							}
+							if ( newVers > oldVers ) {
+								status = "U";
+							}
+							else {
+								status = "N";
+							}
+						}
+						socatVersionStatus = version + status;
+					}
 					// Generate the NetCDF DSG file, enhanced by Ferret, for this 
 					// possibly modified and WOCEd cruise data
 					logger.debug("Generating the full-data DSG file for " + expocode);
-					dsgNcHandler.saveCruise(omeMData, cruiseData, flag.toString());
+					dsgNcHandler.saveCruise(omeMData, cruiseData, socatVersionStatus, flag.toString());
 
 					// Generate the decimated-data DSG file from the full-data DSG file
 					logger.debug("Generating the decimated-data DSG file for " + expocode);
@@ -214,7 +244,7 @@ public class CruiseSubmitter {
 
 				// Update cruise info with status values from cruiseData
 				cruise.setQcStatus(qcStatus);
-				cruise.setVersion(socatVersion);
+				cruise.setVersion(version);
 				cruise.setDataCheckStatus(cruiseData.getDataCheckStatus());
 				cruise.setNumErrorRows(cruiseData.getNumErrorRows());
 				cruise.setNumWarnRows(cruiseData.getNumWarnRows());
@@ -222,7 +252,7 @@ public class CruiseSubmitter {
 				// Create the QCEvent for submitting the initial QC flags
 				QCEvent initQC = new QCEvent();
 				initQC.setExpocode(expocode);
-				initQC.setVersion(socatVersion);
+				initQC.setVersion(version);
 				initQC.setFlagDate(new Date());
 				initQC.setUsername(DashboardUtils.SANITY_CHECKER_USERNAME);
 				initQC.setRealname(DashboardUtils.SANITY_CHECKER_REALNAME);

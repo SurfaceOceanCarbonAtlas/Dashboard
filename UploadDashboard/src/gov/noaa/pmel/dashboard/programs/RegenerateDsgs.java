@@ -9,7 +9,7 @@ import gov.noaa.pmel.dashboard.handlers.CruiseFileHandler;
 import gov.noaa.pmel.dashboard.handlers.DatabaseRequestHandler;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.handlers.MetadataFileHandler;
-import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardOmeMetadata;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
@@ -74,7 +74,7 @@ public class RegenerateDsgs {
 	public boolean regenerateDsgFiles(String expocode, boolean forceIt) throws IllegalArgumentException {
 		boolean updateIt = forceIt;
 		String upperExpo = DashboardServerUtils.checkExpocode(expocode);
-		CruiseDsgNcFile fullDataDsg;
+		DsgNcFile fullDataDsg;
 		ArrayList<DsgCruiseData> dataVals;
 		DsgMetadata updatedMeta;
 		try {
@@ -97,9 +97,14 @@ public class RegenerateDsgs {
 			// Get the QC flag and SOCAT version from the database
 			Character qcFlag = dbHandler.getQCFlag(upperExpo);
 			String qcStatus = DashboardUtils.FLAG_STATUS_MAP.get(qcFlag);
+			String versionStatus = dbHandler.getVersionStatus(upperExpo);
+			if ( versionStatus.isEmpty() )
+				throw new IllegalArgumentException("Unable to get the version and status from the database");
+			String version = versionStatus.substring(0, versionStatus.length() - 1);
 
-			// Update (but do not commit) the cruise info if not correct 
-			if ( ! qcStatus.equals(cruise.getQcStatus() ) ) {
+			// Update (but do not commit) the cruise info version number and QC status if not correct 
+			if ( ! ( version.equals(cruise.getVersion()) && qcStatus.equals(cruise.getQcStatus()) ) ) {
+				cruise.setVersion(version);
 				cruise.setQcStatus(qcStatus);
 				cruiseHandler.saveCruiseInfoToFile(cruise, null);
 			}
@@ -108,8 +113,8 @@ public class RegenerateDsgs {
 			DashboardOmeMetadata omeMData = new DashboardOmeMetadata(
 					metaHandler.getMetadataInfo(upperExpo, DashboardUtils.OME_FILENAME), metaHandler);
 			// Update (but do not commit) the metadata info if not correct
-			if ( ! socatVersion.equals(omeMData.getVersion()) ) {
-				omeMData.setVersion(socatVersion);
+			if ( ! version.equals(omeMData.getVersion()) ) {
+				omeMData.setVersion(version);
 				metaHandler.saveMetadataInfo(omeMData, null, false);
 			}
 			updatedMeta = omeMData.createSocatMetadata();

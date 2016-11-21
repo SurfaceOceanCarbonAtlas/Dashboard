@@ -194,13 +194,13 @@ public class DsgCruiseData {
 		ArrayList<DashDataType> dataTypes = new ArrayList<DashDataType>(dataColTypes.size());
 		for ( DataColumnType dctype : dataColTypes )
 			dataTypes.add( new DashDataType(dctype) );
-		// Create the list of SOCAT cruise data objects, 
+		// Create the list of DSG cruise data objects, 
 		// and populate it with data from each row of the table
-		ArrayList<DsgCruiseData> socatDataList = new ArrayList<DsgCruiseData>(dataValsTable.size());
+		ArrayList<DsgCruiseData> dsgDataList = new ArrayList<DsgCruiseData>(dataValsTable.size());
 		for (int k = 0; k < dataValsTable.size(); k++) {
-			socatDataList.add( new DsgCruiseData(knownTypes, dataTypes, k+1, dataValsTable.get(k)) );
+			dsgDataList.add( new DsgCruiseData(knownTypes, dataTypes, k+1, dataValsTable.get(k)) );
 		}
-		return socatDataList;
+		return dsgDataList;
 	}
 
 	/**

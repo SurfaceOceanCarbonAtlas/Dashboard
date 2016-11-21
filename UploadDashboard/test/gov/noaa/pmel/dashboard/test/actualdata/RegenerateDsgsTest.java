@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.handlers.DsgNcFileHandler;
 import gov.noaa.pmel.dashboard.programs.RegenerateDsgs;
-import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashDataType;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DsgCruiseData;
@@ -51,7 +51,7 @@ public class RegenerateDsgsTest {
 		DsgNcFileHandler dsgHandler = configStore.getDsgNcFileHandler();
 
 		// Read the original data and metadata
-		CruiseDsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
+		DsgNcFile fullDataDsg = dsgHandler.getDsgNcFile(expocode);
 		fullDataDsg.readMetadata(configStore.getKnownMetadataTypes());
 		fullDataDsg.readData(configStore.getKnownDataFileTypes());
 		DsgMetadata origMeta = fullDataDsg.getMetadata();

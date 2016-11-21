@@ -555,6 +555,70 @@ public class DatabaseRequestHandler {
 	}
 
 	/**
+	 * Returns the version number String for a dataset appended with
+	 * and 'N', indicating the dataset is new to this version, or a 'U',
+	 * indicating the dataset is an update to a dataset from a previous 
+	 * version.  Updates within a version do NOT change an 'N' 
+	 * to a 'U'.  The version number used is the largest version 
+	 * number of global new and update QC flags for this dataset in the database.
+	 * 
+	 * @param expocode
+	 * 		get the version status String for the dataset with this expocode 
+	 * @return
+	 * 		the version number status String; never null but may be empty
+	 * 		if no global new or update QC flags exist.
+	 * @throws SQLException
+	 * 		if an error occurs retrieving the version numbers
+	 */
+	public String getVersionStatus(String expocode) throws SQLException {
+		Double versionNum = null;
+		Character status = null;
+		Connection catConn = makeConnection(false);
+		try {
+			// Get all the QC events for this data set, ordered so the latest are last
+			PreparedStatement getPrepStmt = catConn.prepareStatement(
+					"SELECT `qc_version` FROM `" + QCEVENTS_TABLE_NAME + 
+					"` WHERE `expocode` = ? AND `region_id` = '" + DashboardUtils.GLOBAL_REGION_ID +
+					"' AND `qc_flag` IN ('" + DashboardUtils.QC_NEW_FLAG + 
+					"', '" + DashboardUtils.QC_UPDATED_FLAG + "');");
+			getPrepStmt.setString(1, expocode);
+			ResultSet rslts = getPrepStmt.executeQuery();
+			try {
+				while ( rslts.next() ) {
+					String versionStr = rslts.getString(1);
+					if ( (versionStr == null) || versionStr.trim().isEmpty() ) {
+						throw new SQLException("Unexpected missing version");
+					}
+					try {
+						Double version = Math.floor(Double.valueOf(versionStr) * 10.0) / 10.0;
+						if ( versionNum == null ) {
+							versionNum = version;
+							status = 'N';
+						}
+						else if ( versionNum < version ) {
+							versionNum = version;
+							status = 'U';
+						}
+						else if ( versionNum > version ) {
+							status = 'U';
+						}
+					} catch (NumberFormatException ex) {
+						throw new SQLException("Unexpected non-numeric version '" + versionStr + "'");
+					}
+				}
+			} finally {
+				rslts.close();
+			}
+
+		} finally {
+			catConn.close();
+		}
+		if ( (versionNum == null) || (status == null) )
+			return "";
+		return String.format("%.1f%c", versionNum, status);
+	}
+
+	/**
 	 * Creates a QCEvent object from the values in the current row 
 	 * of a ResultSet.
 	 * 

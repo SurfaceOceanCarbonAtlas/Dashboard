@@ -49,7 +49,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 	private static final String UPLOAD_FILENAME_ID = "uploadfilename";
 	private static final String UPLOAD_TIMESTAMP_ID = "uploadtimestamp";
 	private static final String ORIG_DOI_ID = "origdatadoi";
-	private static final String ENHANCED_DOI_ID = "enhanceddatadoi";
 	private static final String DATA_CHECK_STATUS_ID = "datacheckstatus";
 	private static final String OME_TIMESTAMP_ID = "ometimestamp";
 	private static final String ADDL_DOC_TITLES_ID = "addldoctitles";
@@ -586,17 +585,14 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		cruiseProps.setProperty(UPLOAD_TIMESTAMP_ID, cruise.getUploadTimestamp());
 		// DOI of the original version of this data document
 		cruiseProps.setProperty(ORIG_DOI_ID, cruise.getOrigDoi());
-		// DOI of the SOCAT-enhanced version of this data document
-		cruiseProps.setProperty(ENHANCED_DOI_ID, cruise.getSocatDoi());
 		// Data-check status string
 		cruiseProps.setProperty(DATA_CHECK_STATUS_ID, cruise.getDataCheckStatus());
 		// OME metadata filename
 		cruiseProps.setProperty(OME_TIMESTAMP_ID, cruise.getOmeTimestamp());
 		// Metadata documents
 		// a little arguably-unnecessary overhead going through an ArrayList<String>
-		cruiseProps.setProperty(ADDL_DOC_TITLES_ID, 
-				DashboardUtils.encodeStringArrayList(new ArrayList<String>(
-						cruise.getAddlDocs())));
+		cruiseProps.setProperty(ADDL_DOC_TITLES_ID, DashboardUtils.encodeStringArrayList(
+				new ArrayList<String>(cruise.getAddlDocs())));
 		// QC-submission status string
 		cruiseProps.setProperty(QC_STATUS_ID, cruise.getQcStatus());
 		// Archive status string
@@ -1274,10 +1270,6 @@ public class CruiseFileHandler extends VersionedFileHandler {
 		// original data DOI - allow it to be missing
 		value = cruiseProps.getProperty(ORIG_DOI_ID);
 		cruise.setOrigDoi(value);
-
-		// SOCAT enhanced data DOI - allow it to be missing
-		value = cruiseProps.getProperty(ENHANCED_DOI_ID);
-		cruise.setSocatDoi(value);
 
 		// Data check status
 		value = cruiseProps.getProperty(DATA_CHECK_STATUS_ID);

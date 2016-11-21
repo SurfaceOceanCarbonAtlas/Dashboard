@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DsgCruiseData;
 
@@ -21,9 +21,9 @@ public class DerivedVariablesTest {
 		System.setProperty("UPLOAD_DASHBOARD_SERVER_NAME", "OAPUploadDashboard");
 		DashboardConfigStore confStore = DashboardConfigStore.get(false);
 		FerretConfig ferret = confStore.getFerretConfig();
-		CruiseDsgNcFileTest fileTest = new CruiseDsgNcFileTest();
+		DsgNcFileTest fileTest = new DsgNcFileTest();
 		fileTest.testCreate();
-		CruiseDsgNcFile dsgFile = fileTest.dsgNcFile;
+		DsgNcFile dsgFile = fileTest.dsgNcFile;
 		String expocode = dsgFile.getMetadata().getExpocode();
 		int numData = dsgFile.getDataList().size();
 		ArrayList<Double> longitudes = new ArrayList<Double>(numData);
@@ -46,9 +46,9 @@ public class DerivedVariablesTest {
 		tool.run();
 		assertFalse(tool.hasError());
 
-		ArrayList<String> unknownNames = dsgFile.readMetadata(CruiseDsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
+		ArrayList<String> unknownNames = dsgFile.readMetadata(DsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
-		unknownNames = dsgFile.readData(CruiseDsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
+		unknownNames = dsgFile.readData(DsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		assertEquals(numData, dsgFile.getDataList().size());
@@ -68,10 +68,10 @@ public class DerivedVariablesTest {
 		tool.run();
 		assertFalse(tool.hasError());
 
-		CruiseDsgNcFile decDsgFile = new CruiseDsgNcFile(decDataFilename);
-		unknownNames = decDsgFile.readMetadata(CruiseDsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
+		DsgNcFile decDsgFile = new DsgNcFile(decDataFilename);
+		unknownNames = decDsgFile.readMetadata(DsgNcFileTest.KNOWN_SOCAT_METADATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
-		unknownNames = decDsgFile.readData(CruiseDsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
+		unknownNames = decDsgFile.readData(DsgNcFileTest.KNOWN_SOCAT_DATA_FILE_TYPES);
 		assertEquals(0, unknownNames.size());
 		assertEquals(expocode, dsgFile.getMetadata().getExpocode());
 		int lastRowNum = 0;

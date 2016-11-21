@@ -3,13 +3,14 @@ package gov.noaa.pmel.dashboard.handlers;
 import gov.noaa.pmel.dashboard.actions.CruiseChecker;
 import gov.noaa.pmel.dashboard.ferret.FerretConfig;
 import gov.noaa.pmel.dashboard.ferret.SocatTool;
-import gov.noaa.pmel.dashboard.server.CruiseDsgNcFile;
+import gov.noaa.pmel.dashboard.server.DsgNcFile;
 import gov.noaa.pmel.dashboard.server.DashboardConfigStore;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
 import gov.noaa.pmel.dashboard.server.DsgCruiseData;
 import gov.noaa.pmel.dashboard.server.DsgMetadata;
 import gov.noaa.pmel.dashboard.server.KnownDataTypes;
 import gov.noaa.pmel.dashboard.shared.DashboardCruiseWithData;
+import gov.noaa.pmel.dashboard.shared.DashboardUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -164,7 +165,7 @@ public class PreviewPlotsHandler {
 		}
 
 		// Get the preview DSG filename, creating the parent directory if it does not exist
-		CruiseDsgNcFile dsgFile = new CruiseDsgNcFile(
+		DsgNcFile dsgFile = new DsgNcFile(
 				getCruisePreviewDsgDir(upperExpo), upperExpo + "_" + timetag + ".nc");
 
 		log.debug("generating preview DSG file " + dsgFile.getPath());
@@ -173,6 +174,8 @@ public class PreviewPlotsHandler {
 		// OME metadata, just use what we already know to create a DsgMetadata
 		DsgMetadata socatMData = new DsgMetadata(knownMetadataTypes);
 		socatMData.setExpocode(upperExpo);
+		socatMData.setVersion(cruiseData.getVersion());
+		socatMData.setQcFlag(DashboardUtils.QC_NEW_FLAG.toString());
 
 		// Convert the cruise data strings into the appropriate list of data objects
 		ArrayList<DsgCruiseData> socatDatalist = 

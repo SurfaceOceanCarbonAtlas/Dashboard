@@ -51,7 +51,9 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.SECOND_OF_DAY.getVarName(),
 			DashboardServerUtils.LONGITUDE.getVarName(),
 			DashboardServerUtils.LATITUDE.getVarName(),
-			DashboardServerUtils.SAMPLE_DEPTH.getVarName()
+			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
+			DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName(),
+			DashboardServerUtils.GENERIC_WOCE_COMMENT.getVarName()
 	));
 
 	private static final ArrayList<String> METADATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
@@ -65,7 +67,9 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.SOUTHERNMOST_LATITUDE.getVarName(),
 			DashboardServerUtils.NORTHERNMOST_LATITUDE.getVarName(),
 			DashboardServerUtils.TIME_COVERAGE_START.getVarName(),
-			DashboardServerUtils.TIME_COVERAGE_END.getVarName()
+			DashboardServerUtils.TIME_COVERAGE_END.getVarName(),
+			DashboardServerUtils.QC_FLAG.getVarName(),
+			DashboardServerUtils.VERSION.getVarName()
 	));
 
 	private static final ArrayList<String> DATA_FILES_VARNAMES = new ArrayList<String>(Arrays.asList(
@@ -79,7 +83,8 @@ public class KnownDataTypesTest {
 			DashboardServerUtils.TIME.getVarName(),
 			DashboardServerUtils.LONGITUDE.getVarName(),
 			DashboardServerUtils.LATITUDE.getVarName(),
-			DashboardServerUtils.SAMPLE_DEPTH.getVarName()
+			DashboardServerUtils.SAMPLE_DEPTH.getVarName(),
+			DashboardServerUtils.GENERIC_WOCE_FLAG.getVarName()
 	));
 
 	private static final TreeSet<DashDataType> METADATA_FILES_TYPES_SET = 
@@ -95,8 +100,10 @@ public class KnownDataTypesTest {
 					DashboardServerUtils.SOUTHERNMOST_LATITUDE,
 					DashboardServerUtils.NORTHERNMOST_LATITUDE,
 					DashboardServerUtils.TIME_COVERAGE_START,
-					DashboardServerUtils.TIME_COVERAGE_END
-	) );
+					DashboardServerUtils.TIME_COVERAGE_END,
+					DashboardServerUtils.QC_FLAG,
+					DashboardServerUtils.VERSION
+					) );
 
 	static final String[] ADDN_TYPES_VAR_NAMES = new String[] { 
 		"xCO2_atm_dry_interp", "rank", "socat_doi" };

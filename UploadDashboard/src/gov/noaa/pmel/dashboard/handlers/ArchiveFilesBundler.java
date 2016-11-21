@@ -38,7 +38,7 @@ import javax.mail.internet.MimeMultipart;
 public class ArchiveFilesBundler extends VersionedFileHandler {
 
 	private static final String BUNDLE_NAME_EXTENSION = "_bundle.zip";
-	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_from_SOCAT";
+	private static final String MAILED_BUNDLE_NAME_ADDENDUM = "_for_archival";
 
 	private static final String EMAIL_SUBJECT_MSG = 
 			"Request for immediate archival from SOCAT dashboard user ";

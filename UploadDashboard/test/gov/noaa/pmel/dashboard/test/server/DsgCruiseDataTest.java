@@ -34,20 +34,20 @@ public class DsgCruiseDataTest {
 		KNOWN_DATA_TYPES = new KnownDataTypes();
 		KNOWN_DATA_TYPES.addStandardTypesForDataFiles();
 		Properties addnTypeProps = new Properties();
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.SST.getVarName(), 
-				CruiseDsgNcFileTest.SST.toPropertyValue());
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.SALINITY.getVarName(), 
-				CruiseDsgNcFileTest.SALINITY.toPropertyValue());
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.XCO2_WATER_SST_DRY.getVarName(), 
-				CruiseDsgNcFileTest.XCO2_WATER_SST_DRY.toPropertyValue());
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.PCO2_WATER_TEQU_WET.getVarName(), 
-				CruiseDsgNcFileTest.PCO2_WATER_TEQU_WET.toPropertyValue());
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.PATM.getVarName(), 
-				CruiseDsgNcFileTest.PATM.toPropertyValue());
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.SHIP_SPEED.getVarName(), 
-				CruiseDsgNcFileTest.SHIP_SPEED.toPropertyValue());
-		addnTypeProps.setProperty(CruiseDsgNcFileTest.WOCE_CO2_WATER.getVarName(), 
-				CruiseDsgNcFileTest.WOCE_CO2_WATER.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.SST.getVarName(), 
+				DsgNcFileTest.SST.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.SALINITY.getVarName(), 
+				DsgNcFileTest.SALINITY.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.XCO2_WATER_SST_DRY.getVarName(), 
+				DsgNcFileTest.XCO2_WATER_SST_DRY.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.PCO2_WATER_TEQU_WET.getVarName(), 
+				DsgNcFileTest.PCO2_WATER_TEQU_WET.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.PATM.getVarName(), 
+				DsgNcFileTest.PATM.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.SHIP_SPEED.getVarName(), 
+				DsgNcFileTest.SHIP_SPEED.toPropertyValue());
+		addnTypeProps.setProperty(DsgNcFileTest.WOCE_CO2_WATER.getVarName(), 
+				DsgNcFileTest.WOCE_CO2_WATER.toPropertyValue());
 		KNOWN_DATA_TYPES.addTypesFromProperties(addnTypeProps);
 	}
 
@@ -61,12 +61,12 @@ public class DsgCruiseDataTest {
 			DashboardServerUtils.MINUTE_OF_HOUR.duplicate(), 
 			DashboardServerUtils.LATITUDE.duplicate(), 
 			DashboardServerUtils.LONGITUDE.duplicate(), 
-			CruiseDsgNcFileTest.SST.duplicate(),
-			CruiseDsgNcFileTest.SALINITY.duplicate(),
-			CruiseDsgNcFileTest.XCO2_WATER_SST_DRY.duplicate(),
-			CruiseDsgNcFileTest.PCO2_WATER_TEQU_WET.duplicate(),
-			CruiseDsgNcFileTest.PATM.duplicate(),
-			CruiseDsgNcFileTest.SHIP_SPEED.duplicate()));
+			DsgNcFileTest.SST.duplicate(),
+			DsgNcFileTest.SALINITY.duplicate(),
+			DsgNcFileTest.XCO2_WATER_SST_DRY.duplicate(),
+			DsgNcFileTest.PCO2_WATER_TEQU_WET.duplicate(),
+			DsgNcFileTest.PATM.duplicate(),
+			DsgNcFileTest.SHIP_SPEED.duplicate()));
 	static final ArrayList<ArrayList<String>> TEST_VALUES = new ArrayList<ArrayList<String>>();
 	static final ArrayList<Integer> EXPECTED_YEARS = new ArrayList<Integer>();
 	static final ArrayList<Integer> EXPECTED_MONTHS = new ArrayList<Integer>();
@@ -155,11 +155,11 @@ public class DsgCruiseDataTest {
 			assertEquals(EXPECTED_MINUTES.get(k), dataRow.getMinute());
 			assertEquals(EXPECTED_LATITUDES.get(k), dataRow.getLatitude());
 			assertEquals(EXPECTED_LONGITUDES.get(k), dataRow.getLongitude());
-			assertEquals(EXPECTED_SSTS.get(k), doubleValues.get(CruiseDsgNcFileTest.SST));
-			assertEquals(EXPECTED_SALS.get(k), doubleValues.get(CruiseDsgNcFileTest.SALINITY));
-			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), doubleValues.get(CruiseDsgNcFileTest.XCO2_WATER_SST_DRY));
-			assertEquals(EXPECTED_PCO2WATER_TEQUS.get(k), doubleValues.get(CruiseDsgNcFileTest.PCO2_WATER_TEQU_WET));
-			assertEquals(EXPECTED_SLPS.get(k), doubleValues.get(CruiseDsgNcFileTest.PATM));
+			assertEquals(EXPECTED_SSTS.get(k), doubleValues.get(DsgNcFileTest.SST));
+			assertEquals(EXPECTED_SALS.get(k), doubleValues.get(DsgNcFileTest.SALINITY));
+			assertEquals(EXPECTED_XCO2WATER_SSTS.get(k), doubleValues.get(DsgNcFileTest.XCO2_WATER_SST_DRY));
+			assertEquals(EXPECTED_PCO2WATER_TEQUS.get(k), doubleValues.get(DsgNcFileTest.PCO2_WATER_TEQU_WET));
+			assertEquals(EXPECTED_SLPS.get(k), doubleValues.get(DsgNcFileTest.PATM));
 			assertEquals(DashboardUtils.FP_MISSING_VALUE, dataRow.getSecond());
 			assertEquals(DashboardUtils.FP_MISSING_VALUE, dataRow.getSampleDepth());
 		}
@@ -196,12 +196,12 @@ public class DsgCruiseDataTest {
 	public void testGetSetCharacterVariableValue() {
 		DsgCruiseData data = new DsgCruiseData(KNOWN_DATA_TYPES);
 		Character value = 'K';
-		data.setCharacterVariableValue(CruiseDsgNcFileTest.WOCE_CO2_WATER, value);
+		data.setCharacterVariableValue(DsgNcFileTest.WOCE_CO2_WATER, value);
 		TreeMap<DashDataType,Character> charMap = data.getCharacterVariables();
-		assertEquals(value, charMap.get(CruiseDsgNcFileTest.WOCE_CO2_WATER));
-		data.setCharacterVariableValue(CruiseDsgNcFileTest.WOCE_CO2_WATER, null);
+		assertEquals(value, charMap.get(DsgNcFileTest.WOCE_CO2_WATER));
+		data.setCharacterVariableValue(DsgNcFileTest.WOCE_CO2_WATER, null);
 		charMap = data.getCharacterVariables();
-		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(CruiseDsgNcFileTest.WOCE_CO2_WATER));
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE, charMap.get(DsgNcFileTest.WOCE_CO2_WATER));
 		boolean errCaught = false;
 		try {
 			data.setCharacterVariableValue(DashboardServerUtils.TIME, value);
@@ -544,9 +544,6 @@ public class DsgCruiseDataTest {
 
 		// hashCode and equals ignores WOCE flags, as long as the type is present in both
 		data.setGenericWoceFlag(WOCE_FLAG);
-		assertTrue( data.hashCode() == other.hashCode() );
-		assertFalse( data.equals(other) );
-		data.setGenericWoceFlag(null);
 		assertTrue( data.hashCode() == other.hashCode() );
 		assertTrue( data.equals(other) );
 		other.setGenericWoceFlag(WOCE_FLAG);

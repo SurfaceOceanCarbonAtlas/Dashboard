@@ -30,7 +30,7 @@ import ucar.nc2.time.CalendarDate;
 import uk.ac.uea.socat.omemetadata.OmeMetadata;
 
 
-public class CruiseDsgNcFile extends File {
+public class DsgNcFile extends File {
 
 	private static final long serialVersionUID = 8291908351201533511L;
 
@@ -47,7 +47,7 @@ public class CruiseDsgNcFile extends File {
 	 * See {@link java.io.File#File(java.lang.String)}
 	 * The internal metadata and data list references are set null.
 	 */
-	public CruiseDsgNcFile(String filename) {
+	public DsgNcFile(String filename) {
 		super(filename);
 		metadata = null;
 		dataList = null;
@@ -57,7 +57,7 @@ public class CruiseDsgNcFile extends File {
 	 * See {@link java.io.File#File(java.io.File,java.lang.String)}
 	 * The internal metadata and data list references are set null.
 	 */
-	public CruiseDsgNcFile(File parent, String child) {
+	public DsgNcFile(File parent, String child) {
 		super(parent, child);
 		metadata = null;
 		dataList = null;

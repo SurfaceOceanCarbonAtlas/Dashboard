@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import gov.noaa.pmel.dashboard.server.DashboardServerUtils;
-import gov.noaa.pmel.dashboard.test.server.CruiseDsgNcFileTest;
+import gov.noaa.pmel.dashboard.test.server.DsgNcFileTest;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -36,8 +36,8 @@ public class SanityCheckerTest {
 	private static final String LOG4J_PROPERTIES_FILENAME;
 	static {
 		String home = System.getenv("HOME");
-		CONFIG_FILENAME = home + "/content/SocatUploadDashboard/config/SocatUploadDashboard.properties";
-		LOG4J_PROPERTIES_FILENAME = home + "/content/SocatUploadDashboard/config/log4j.properties";
+		CONFIG_FILENAME = home + "/content/OAPUploadDashboard/config/OAPUploadDashboard.properties";
+		LOG4J_PROPERTIES_FILENAME = home + "/content/OAPßUploadDashboard/config/log4j.properties";
 	}
 
 	@Test
@@ -59,31 +59,31 @@ public class SanityCheckerTest {
 						"<input_column index=\"12\">sample_depth [m]</input_column>" +
 						"<input_units>meters</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.SALINITY.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.SALINITY.getVarName() + "\">" +
 						"<input_column index=\"13\">salinity</input_column>" +
 						"<input_units>psu</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.SST.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.SST.getVarName() + "\">" +
 						"<input_column index=\"14\">SST [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.TEQU.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.TEQU.getVarName() + "\">" +
 						"<input_column index=\"15\">Tequ [deg.C]</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.PATM.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.PATM.getVarName() + "\">" +
 						"<input_column index=\"16\">PPPP [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.PEQU.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.PEQU.getVarName() + "\">" +
 						"<input_column index=\"17\">Pequ [hPa]</input_column>" +
 						"<input_units>hPa</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.XCO2_WATER_TEQU_DRY.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.XCO2_WATER_TEQU_DRY.getVarName() + "\">" +
 						"<input_column index=\"23\">xCO2_water_Tequ_dry [umol/mol]</input_column>" +
 						"<input_units>ppm</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.FCO2_WATER_SST_WET.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.FCO2_WATER_SST_WET.getVarName() + "\">" +
 						"<input_column index=\"28\">fCO2_water_SST_wet [uatm]</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +
@@ -272,15 +272,15 @@ public class SanityCheckerTest {
 						"<input_column index=\"7\">" + DashboardServerUtils.LONGITUDE.getVarName() + "</input_column>" +
 						"<input_units>decimal_degrees_east</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.PCO2_WATER_SST_WET.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.PCO2_WATER_SST_WET.getVarName() + "\">" +
 						"<input_column index=\"8\">CO2</input_column>" +
 						"<input_units>uatm</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.SST.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.SST.getVarName() + "\">" +
 						"<input_column index=\"9\">Temp_C</input_column>" +
 						"<input_units>degC</input_units>" +
 					"</socat_column>" +
-					"<socat_column name=\"" + CruiseDsgNcFileTest.SALINITY.getVarName() + "\">" +
+					"<socat_column name=\"" + DsgNcFileTest.SALINITY.getVarName() + "\">" +
 						"<input_column index=\"10\">Ship_Sal_PSU</input_column>" +
 						"<input_units>psu</input_units>" +
 					"</socat_column>" +
