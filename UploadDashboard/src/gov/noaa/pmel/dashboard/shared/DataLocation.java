@@ -17,45 +17,25 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 public class DataLocation implements Serializable, IsSerializable {
 
-	private static final long serialVersionUID = -7681017338055075589L;
+	private static final long serialVersionUID = -4270820025798046106L;
 
-	protected Character regionID;
 	protected Integer rowNumber;
 	protected Date dataDate;
 	protected Double longitude;
 	protected Double latitude;
+	protected Double depth;
 	protected Double dataValue;
 
 	/**
 	 * Creates an empty location with a global region ID
 	 */
 	public DataLocation() {
-		regionID = DashboardUtils.GLOBAL_REGION_ID;
 		rowNumber = DashboardUtils.INT_MISSING_VALUE;
 		dataDate = DashboardUtils.DATE_MISSING_VALUE;
 		longitude = DashboardUtils.FP_MISSING_VALUE;
 		latitude = DashboardUtils.FP_MISSING_VALUE;
+		depth = DashboardUtils.FP_MISSING_VALUE;
 		dataValue = DashboardUtils.FP_MISSING_VALUE;
-	}
-
-	/**
-	 * @return 
-	 * 		the region ID for this WOCE flag; never null
-	 */
-	public Character getRegionID() {
-		return regionID;
-	}
-
-	/**
-	 * @param regionID 
-	 * 		the region ID to set for this WOCE flag; 
-	 * 		if null, {@link DashboardUtils#GLOBAL_REGION_ID} is assigned
-	 */
-	public void setRegionID(Character regionID) {
-		if ( regionID == null )
-			this.regionID = DashboardUtils.GLOBAL_REGION_ID;
-		else
-			this.regionID = regionID;
 	}
 
 	/**
@@ -150,6 +130,27 @@ public class DataLocation implements Serializable, IsSerializable {
 
 	/**
 	 * @return 
+	 * 		the sample depth;
+	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
+	 */
+	public Double getDepth() {
+		return depth;
+	}
+
+	/**
+	 * @param depth 
+	 * 		the sample depth to set;
+	 * 		if null, {@link DashboardUtils#FP_MISSING_VALUE} is assigned.
+	 */
+	public void setDepth(Double depth) {
+		if ( depth == null )
+			this.depth = DashboardUtils.FP_MISSING_VALUE;
+		else
+			this.depth = depth;
+	}
+
+	/**
+	 * @return 
 	 * 		the data value;
 	 * 		never null but may be {@link DashboardUtils#FP_MISSING_VALUE}
 	 */
@@ -172,8 +173,7 @@ public class DataLocation implements Serializable, IsSerializable {
 	@Override
 	public int hashCode() {
 		final int prime = 37;
-		int result = regionID.hashCode();
-		result = result * prime + rowNumber.hashCode();
+		int result = rowNumber.hashCode();
 		result = result * prime + dataDate.hashCode();
 		// Ignore floating point values as they do not have to be exactly the same for equals
 		return result;
@@ -190,8 +190,6 @@ public class DataLocation implements Serializable, IsSerializable {
 			return false;
 		DataLocation other = (DataLocation) obj;
 
-		if ( ! regionID.equals(other.regionID) )
-			return false;
 		if ( ! rowNumber.equals(other.rowNumber) )
 			return false;
 		if ( ! dataDate.equals(other.dataDate) )
@@ -199,6 +197,9 @@ public class DataLocation implements Serializable, IsSerializable {
 
 		if ( ! DashboardUtils.closeTo(dataValue, other.dataValue, 
 				DashboardUtils.MAX_RELATIVE_ERROR, DashboardUtils.MAX_ABSOLUTE_ERROR) )
+			return false;
+		if ( ! DashboardUtils.closeTo(depth, other.depth, 
+				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
 			return false;
 		if ( ! DashboardUtils.closeTo(latitude, other.latitude, 
 				0.0, DashboardUtils.MAX_ABSOLUTE_ERROR) )
@@ -213,11 +214,11 @@ public class DataLocation implements Serializable, IsSerializable {
 	@Override
 	public String toString() {
 		return "DataLocation" +
-				"[ regionID='" + regionID.toString() + "'" + 
-				", rowNumber=" + rowNumber.toString() + 
+				"[ rowNumber=" + rowNumber.toString() + 
 				", dataTime=" + Long.toString(Math.round((dataDate.getTime()/1000.0))) + 
 				", longitude=" + longitude.toString() + 
 				", latitude=" + latitude.toString() + 
+				", depth=" + depth.toString() + 
 				", dataValue=" + dataValue.toString() + 
 				"]";
 	}

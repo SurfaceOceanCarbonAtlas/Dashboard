@@ -384,7 +384,6 @@ public class DatabaseRequestHandler {
 				addPrepStmt.setLong(2, Math.round(flagDate.getTime() / 1000.0));
 			addPrepStmt.setString(3, qcEvent.getExpocode());
 			addPrepStmt.setString(4, qcEvent.getVersion());
-			addPrepStmt.setString(5, qcEvent.getRegionID().toString());
 			addPrepStmt.setInt(6, reviewerId);
 			addPrepStmt.setString(7, qcEvent.getComment());
 			addPrepStmt.executeUpdate();
@@ -492,7 +491,6 @@ public class DatabaseRequestHandler {
 					QCEvent qcFlag = new QCEvent();
 					qcFlag.setFlag(flag);
 					qcFlag.setFlagDate(new Date(time));
-					qcFlag.setRegionID(regionID);
 					// last are latest, so no need to check the return value
 					regionFlags.put(regionID, qcFlag);
 				}
@@ -651,13 +649,6 @@ public class DatabaseRequestHandler {
 		qcEvent.setVersion(results.getString("qc_version"));
 		if ( results.wasNull() )
 			qcEvent.setVersion(null);
-		try {
-			qcEvent.setRegionID(results.getString("region_id").charAt(0));
-		} catch (NullPointerException ex) {
-			throw new SQLException("Unexpected NULL region_id");
-		} catch (IndexOutOfBoundsException ex) {
-			throw new SQLException("Unexpected empty region_id");
-		}
 		qcEvent.setUsername(results.getString("username"));
 		qcEvent.setRealname(results.getString("realname"));
 		qcEvent.setComment(results.getString("qc_comment"));
@@ -719,9 +710,9 @@ public class DatabaseRequestHandler {
 					woceEvent.getUsername(), woceEvent.getRealname());
 			// Add the WOCE event
 			PreparedStatement prepStmt = catConn.prepareStatement("INSERT INTO `" + 
-					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, `woce_time`, " +
-					"`expocode`, `qc_version`, `data_name`, `reviewer_id`, " +
-					"`woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
+					WOCEEVENTS_TABLE_NAME + "` (`woce_name`, `woce_flag`, " +
+					"`woce_time`, `expocode`, `qc_version`, `data_name`, " + 
+					"`reviewer_id`, `woce_comment`) VALUES(?, ?, ?, ?, ?, ?, ?, ?);");
 			prepStmt.setString(1, woceEvent.getWoceName());
 			prepStmt.setString(2, woceEvent.getFlag().toString());
 			Date flagDate = woceEvent.getFlagDate();
@@ -751,22 +742,26 @@ public class DatabaseRequestHandler {
 			woceEvent.setId(woceId);
 			// Add the DataLocations to the WOCELocations table
 			prepStmt = catConn.prepareStatement("INSERT INTO `" + WOCELOCATIONS_TABLE_NAME + 
-					"` (`woce_id`, `region_id`, `row_num`, `longitude`, `latitude`, " +
+					"` (`woce_id`, `row_num`, `longitude`, `latitude`, `depth`, " +
 					"`data_time`, `data_value`) VALUES (?, ?, ?, ?, ?, ?, ?);");
 			for (DataLocation location : woceEvent.getLocations() ) {
 				prepStmt.setLong(1, woceId);
-				prepStmt.setString(2, location.getRegionID().toString());
 				Integer intVal = location.getRowNumber();
 				if ( intVal.equals(DashboardUtils.INT_MISSING_VALUE) )
-					prepStmt.setNull(3, java.sql.Types.INTEGER);
+					prepStmt.setNull(2, java.sql.Types.INTEGER);
 				else
-					prepStmt.setInt(3, intVal);
+					prepStmt.setInt(2, intVal);
 				Double dblVal = location.getLongitude();
+				if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
+					prepStmt.setNull(3, java.sql.Types.DOUBLE);
+				else
+					prepStmt.setDouble(3, dblVal);
+				dblVal = location.getLatitude();
 				if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
 					prepStmt.setNull(4, java.sql.Types.DOUBLE);
 				else
 					prepStmt.setDouble(4, dblVal);
-				dblVal = location.getLatitude();
+				dblVal = location.getDepth();
 				if ( dblVal.equals(DashboardUtils.FP_MISSING_VALUE) )
 					prepStmt.setNull(5, java.sql.Types.DOUBLE);
 				else
@@ -843,13 +838,6 @@ public class DatabaseRequestHandler {
 	 */
 	private DataLocation createWoceLocation(ResultSet results) throws SQLException {
 		DataLocation location = new DataLocation();
-		try {
-			location.setRegionID(results.getString("region_id").charAt(0));
-		} catch (NullPointerException ex) {
-			throw new SQLException("Unexpected NULL region_id");
-		} catch (IndexOutOfBoundsException ex) {
-			throw new SQLException("Unexpected empty region_id");
-		}
 		location.setRowNumber(results.getInt("row_num"));
 		if ( results.wasNull() )
 			location.setRowNumber(null);
@@ -859,6 +847,9 @@ public class DatabaseRequestHandler {
 		location.setLatitude(results.getDouble("latitude"));
 		if ( results.wasNull() ) 
 			location.setLatitude(null);
+		location.setDepth(results.getDouble("depth"));
+		if ( results.wasNull() ) 
+			location.setDepth(null);
 		location.setDataDate(new Date(results.getLong("data_time") * 1000L));
 		if ( results.wasNull() )
 			location.setDataDate(null);
@@ -1053,7 +1044,7 @@ public class DatabaseRequestHandler {
 	 * 		if accessing or updating the database throws one
 	 */
 	public void renameCruiseFlags(String oldExpocode, String newExpocode, 
-			String socatVersion, String username) throws SQLException {
+			String version, String username) throws SQLException {
 		Connection catConn = makeConnection(true);
 		try {
 			long nowSec = Math.round(System.currentTimeMillis() / 1000.0);
@@ -1080,29 +1071,26 @@ public class DatabaseRequestHandler {
 			// Add two rename QC events; one for the old expocode and one for the new expocode
 			PreparedStatement addQcPrepStmt = catConn.prepareStatement(
 					"INSERT INTO `" + QCEVENTS_TABLE_NAME + "` (`qc_flag`, `qc_time`, " +
-					"`expocode`, `qc_version`, `region_id`, `reviewer_id`, `qc_comment`) " +
-					"VALUES (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?, ?);");
+					"`expocode`, `qc_version`, `reviewer_id`, `qc_comment`) " +
+					"VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);");
 			addQcPrepStmt.setString(1, DashboardUtils.QC_RENAMED_FLAG.toString());
-			addQcPrepStmt.setString(8, DashboardUtils.QC_RENAMED_FLAG.toString());
-			addQcPrepStmt.setString(15, DashboardUtils.QC_COMMENT.toString());
+			addQcPrepStmt.setString(7, DashboardUtils.QC_RENAMED_FLAG.toString());
+			addQcPrepStmt.setString(13, DashboardUtils.QC_COMMENT.toString());
 			addQcPrepStmt.setLong(2, nowSec);
-			addQcPrepStmt.setLong(9, nowSec);
-			addQcPrepStmt.setLong(16, nowSec);
+			addQcPrepStmt.setLong(8, nowSec);
+			addQcPrepStmt.setLong(14, nowSec);
 			addQcPrepStmt.setString(3, oldExpocode);
-			addQcPrepStmt.setString(10, newExpocode);
-			addQcPrepStmt.setString(17, newExpocode);
-			addQcPrepStmt.setString(4, socatVersion);
-			addQcPrepStmt.setString(11, socatVersion);
-			addQcPrepStmt.setString(18, socatVersion);
-			addQcPrepStmt.setString(5, DashboardUtils.GLOBAL_REGION_ID.toString());
-			addQcPrepStmt.setString(12, DashboardUtils.GLOBAL_REGION_ID.toString());
-			addQcPrepStmt.setString(19, DashboardUtils.GLOBAL_REGION_ID.toString());
-			addQcPrepStmt.setInt(6, reviewerId);
-			addQcPrepStmt.setInt(13, reviewerId);
-			addQcPrepStmt.setInt(20, reviewerId);
-			addQcPrepStmt.setString(7, renameComment);
-			addQcPrepStmt.setString(14, renameComment);
-			addQcPrepStmt.setString(21, renameComment);
+			addQcPrepStmt.setString(9, newExpocode);
+			addQcPrepStmt.setString(15, newExpocode);
+			addQcPrepStmt.setString(4, version);
+			addQcPrepStmt.setString(10, version);
+			addQcPrepStmt.setString(16, version);
+			addQcPrepStmt.setInt(5, reviewerId);
+			addQcPrepStmt.setInt(11, reviewerId);
+			addQcPrepStmt.setInt(17, reviewerId);
+			addQcPrepStmt.setString(6, renameComment);
+			addQcPrepStmt.setString(12, renameComment);
+			addQcPrepStmt.setString(18, renameComment);
 			addQcPrepStmt.executeUpdate();
 
 			// Update the old expocode to the new expocode in the appropriate WOCE events
@@ -1127,8 +1115,8 @@ public class DatabaseRequestHandler {
 			addWocePrepStmt.setLong(10, nowSec);
 			addWocePrepStmt.setString(4, oldExpocode);
 			addWocePrepStmt.setString(11, newExpocode);
-			addWocePrepStmt.setString(5, socatVersion);
-			addWocePrepStmt.setString(12, socatVersion);
+			addWocePrepStmt.setString(5, version);
+			addWocePrepStmt.setString(12, version);
 			addWocePrepStmt.setInt(6, reviewerId);
 			addWocePrepStmt.setInt(13, reviewerId);
 			addWocePrepStmt.setString(7, renameComment);

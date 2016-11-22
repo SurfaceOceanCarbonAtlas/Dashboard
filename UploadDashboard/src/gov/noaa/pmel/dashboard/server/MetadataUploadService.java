@@ -215,7 +215,6 @@ public class MetadataUploadService extends HttpServlet {
 					qcEvent.setExpocode(expo);
 					qcEvent.setFlag(DashboardUtils.QC_UPDATED_FLAG);
 					qcEvent.setFlagDate(new Date());
-					qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 					qcEvent.setVersion(version);
 					qcEvent.setUsername(username);
 					String comment;

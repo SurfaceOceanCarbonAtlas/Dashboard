@@ -275,7 +275,6 @@ public class DashboardServices extends RemoteServiceServlet implements Dashboard
 			qcEvent.setExpocode(expocode);
 			qcEvent.setFlag(DashboardUtils.QC_UPDATED_FLAG);
 			qcEvent.setFlagDate(new Date());
-			qcEvent.setRegionID(DashboardUtils.GLOBAL_REGION_ID);
 			qcEvent.setVersion(configStore.getUploadVersion());
 			qcEvent.setUsername(username);
 			String comment = "Deleted metadata file \"" + deleteFilename + 

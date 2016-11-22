@@ -34,19 +34,19 @@ public class WoceEventTest {
 	static {
 		MY_LOCATIONS = new ArrayList<DataLocation>(2);
 		DataLocation loc = new DataLocation();
-		loc.setRegionID('T');
 		loc.setRowNumber(345);
 		loc.setDataDate(new Date(3458139048000L));
 		loc.setLongitude(-179.5);
 		loc.setLatitude(3.5);
+		loc.setDepth(15.0);
 		loc.setDataValue(1105.450);
 		MY_LOCATIONS.add(loc);
 		loc = new DataLocation();
-		loc.setRegionID('T');
 		loc.setRowNumber(346);
 		loc.setDataDate(new Date(3458139203000L));
 		loc.setLongitude(-179.6);
 		loc.setLatitude(3.4);
+		loc.setDepth(25.0);
 		loc.setDataValue(1105.453);
 		MY_LOCATIONS.add(loc);
 	}

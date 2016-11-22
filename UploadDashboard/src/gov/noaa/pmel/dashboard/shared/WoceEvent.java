@@ -18,8 +18,8 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 
 	private static final long serialVersionUID = 8020489025485344257L;
 
-	protected String woceName;
 	protected Character flag;
+	protected String woceName;
 	protected String varName;
 	protected ArrayList<DataLocation> locations;
 
@@ -28,10 +28,31 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	 */
 	public WoceEvent() {
 		super();
-		woceName = DashboardUtils.STRING_MISSING_VALUE;
 		flag = DashboardUtils.WOCE_NOT_CHECKED;
+		woceName = DashboardUtils.STRING_MISSING_VALUE;
 		varName = DashboardUtils.STRING_MISSING_VALUE;
 		locations = new ArrayList<DataLocation>();
+	}
+
+	/**
+	 * @return 
+	 * 		the flag; 
+	 * 		never null, but may be {@link DashboardUtils#WOCE_NOT_CHECKED} if not assigned
+	 */
+	public Character getFlag() {
+		return flag;
+	}
+
+	/**
+	 * @param flag
+	 * 		the flag to set; 
+	 * 		if null, {@link DashboardUtils#WOCE_NOT_CHECKED} is assigned
+	 */
+	public void setFlag(Character flag) {
+		if ( flag == null )
+			this.flag = DashboardUtils.WOCE_NOT_CHECKED;
+		else
+			this.flag = flag;
 	}
 
 	/**
@@ -53,27 +74,6 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 			this.woceName = DashboardUtils.STRING_MISSING_VALUE;
 		else
 			this.woceName = woceName;
-	}
-
-	/**
-	 * @return 
-	 * 		the flag; 
-	 * 		never null
-	 */
-	public Character getFlag() {
-		return flag;
-	}
-
-	/**
-	 * @param flag
-	 * 		the flag to set; 
-	 * 		if null, {@link DashboardUtils#WOCE_NOT_CHECKED} is assigned
-	 */
-	public void setFlag(Character flag) {
-		if ( flag == null )
-			this.flag = DashboardUtils.WOCE_NOT_CHECKED;
-		else
-			this.flag = flag;
 	}
 
 	/**
@@ -123,8 +123,8 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 	public int hashCode() {
 		final int prime = 37;
 		int result = super.hashCode();
-		result = result * prime + woceName.hashCode();
 		result = result * prime + flag.hashCode();
+		result = result * prime + woceName.hashCode();
 		result = result * prime + varName.hashCode();
 		result = result * prime + locations.hashCode();
 		return result;
@@ -143,9 +143,9 @@ public class WoceEvent extends DashboardEvent implements Serializable, IsSeriali
 
 		if ( ! super.equals(other) )
 			return false;
-		if ( ! woceName.equals(other.woceName) )
-			return false;
 		if ( ! flag.equals(other.flag) )
+			return false;
+		if ( ! woceName.equals(other.woceName) )
 			return false;
 		if ( ! varName.equals(other.varName) )
 			return false;
