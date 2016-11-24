@@ -1,4 +1,4 @@
-MySQL Connector/J 5.1.38
+MySQL Connector/J 5.1.40
 
 This is a release of MySQL Connector/J, Oracle's dual-
 license JDBC Driver for MySQL. For the avoidance of
@@ -6,7 +6,7 @@ doubt, this particular copy of the software is released
 under the version 2 of the GNU General Public License.
 MySQL Connector/J is brought to you by Oracle.
 
-Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
 
 License information can be found in the COPYING file.
 

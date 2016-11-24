@@ -171,4 +171,14 @@ public class DashboardUserInfo {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "DashboardUserInfo" +
+				"[ username=" + username + 
+				", memberNums=" + memberNums.toString() + 
+				", managerNums=" + managerNums.toString() +
+				", admin=" + Boolean.toString(admin) + 
+				"]";
+	}
+
 }

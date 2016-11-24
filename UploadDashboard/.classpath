@@ -21,7 +21,7 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/jdom-2.0.6.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/joda-time-2.9.2.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/log4j-1.2.17.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/mysql-connector-java-5.1.38-bin.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/mysql-connector-java-5.1.40-bin.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/netcdfAll-4.6.6.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/omemetadata.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/sanitychecker.jar"/>

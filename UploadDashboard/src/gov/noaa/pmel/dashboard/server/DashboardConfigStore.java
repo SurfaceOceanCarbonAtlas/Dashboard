@@ -667,6 +667,9 @@ public class DashboardConfigStore {
 			}
 			userInfoMap.put(username, userInfo);
 		}
+		for ( DashboardUserInfo info : userInfoMap.values() ) {
+			itsLogger.info("    user info: " + info.toString());
+		}
 		itsLogger.info("read configuration file " + configFile.getPath());
 		watcher = null;
 		watcherThread = null;
