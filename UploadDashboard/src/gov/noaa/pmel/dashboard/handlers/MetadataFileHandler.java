@@ -850,7 +850,7 @@ public class MetadataFileHandler extends VersionedFileHandler {
 			msgsWriter.println("Expocode: " + expocode);
 			msgsWriter.println("WOCE-3 and WOCE-4 flags as of: " + 
 					(new SimpleDateFormat("yyyy-MM-dd HH:mm Z")).format(new Date()));
-			msgsWriter.println("Flag\tCol.Type\tNum.Rows\tMessage\tRows");
+			msgsWriter.println("WOCE Name\tWOCE Flag\tData Name\tNum Rows\tMessage\tRows");
 			ArrayList<WoceEvent> woceEventsList = dbHandler.getWoceEvents(expocode, true);
 			for ( WoceEvent woceEvent : woceEventsList ) {
 				// Only report '3' and '4' - skip 'Q' and 'B' which are for old versions
@@ -860,6 +860,8 @@ public class MetadataFileHandler extends VersionedFileHandler {
 				rowNums.clear();
 				for ( DataLocation dloc : woceEvent.getLocations() )
 					rowNums.add(dloc.getRowNumber());
+				msgsWriter.print(woceEvent.getWoceName());
+				msgsWriter.print('\t');
 				msgsWriter.print(woceFlag);
 				msgsWriter.print('\t');
 				String dataColName = woceEvent.getVarName();
