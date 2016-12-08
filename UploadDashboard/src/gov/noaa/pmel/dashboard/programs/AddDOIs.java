@@ -123,6 +123,8 @@ public class AddDOIs {
 				DashboardCruise cruise = null;
 				try {
 					cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+					if ( cruise == null )
+						throw new NullPointerException("no such dataset");
 				} catch (Exception ex) {
 					System.err.println("Problems reading the cruise data properties for " + expocode + ": " + ex.getMessage());
 					success = false;
