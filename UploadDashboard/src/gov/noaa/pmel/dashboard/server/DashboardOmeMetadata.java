@@ -188,20 +188,20 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		scMData.setExpocode(expocode);
 		scMData.setDatasetName(omeMData.getExperimentName());
 
-		// Anglicize the vessel name for NetCDF/LAS
-		String vesselName = omeMData.getVesselName();
-		scMData.setVesselName(anglicizeName(vesselName));
+		// Anglicize the platform name for NetCDF/LAS
+		String platformName = omeMData.getVesselName();
+		scMData.setPlatformName(anglicizeName(platformName));
 
-		// Set the vessel type - could be missing
-		String vesselType;
+		// Set the platform type - could be missing
+		String platformType;
 		try {
-			vesselType = omeMData.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
+			platformType = omeMData.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
 		} catch ( Exception ex ) {
-			vesselType = null;
+			platformType = null;
 		}
-		if ( (vesselType == null) || vesselType.trim().isEmpty() )
-			vesselType = DashboardServerUtils.guessVesselType(expocode, vesselName);
-		scMData.setVesselType(vesselType);
+		if ( (platformType == null) || platformType.trim().isEmpty() )
+			platformType = DashboardServerUtils.guessPlatformType(expocode, platformName);
+		scMData.setPlatformType(platformType);
 
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(omeMData.getWestmostLongitude()));

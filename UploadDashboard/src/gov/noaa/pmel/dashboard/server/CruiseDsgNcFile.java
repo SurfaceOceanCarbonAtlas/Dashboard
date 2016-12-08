@@ -35,7 +35,7 @@ public class CruiseDsgNcFile extends File {
 
 	private static final long serialVersionUID = 1127637224009404358L;
 
-	private static final String VERSION = "CruiseDsgNcFile 1.5";
+	private static final String VERSION = "CruiseDsgNcFile 1.6";
 	private static final Calendar BASE_CALENDAR = Calendar.proleptic_gregorian;
 	/** 1970-01-01 00:00:00 */
 	private static final CalendarDate BASE_DATE = CalendarDate.of(BASE_CALENDAR, 1970, 1, 1, 0, 0, 0);
@@ -421,6 +421,13 @@ public class CruiseDsgNcFile extends File {
 			for ( DashDataType dtype : metadataTypes.getKnownTypesSet() ) {
 				String varName = dtype.getVarName();
 				Variable var = ncfile.findVariable(varName);
+				if ( var == null ) {
+					// A couple of name modifications
+					if ( "platform_name".equals(varName) )
+						var = ncfile.findVariable("vessel_name");
+					else if ( "platform_type".equals(varName) )
+						var = ncfile.findVariable("vessel_type");
+				}
 				if ( var == null ) {
 					namesNotFound.add(varName);
 					continue;

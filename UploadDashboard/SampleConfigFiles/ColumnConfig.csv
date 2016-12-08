@@ -80,7 +80,7 @@
 #Field,Required,RequiredGroup,Source,Metadata_Name,Calc_Class,Numeric,Questionable_Range_Min,Questionable_Range_Max,Bad_Range_Min,Bad_Range_Max,Flag,MissingFlag
 expocode,N,,D,,,N,,,,,F,G
 dataset_name,N,,D,,,N,,,,,F,G
-vessel_name,N,,D,,,N,,,,,F,G
+platform_name,N,,D,,,N,,,,,F,G
 organization,N,,D,,,N,,,,,F,G
 investigators,N,,D,,,N,,,,,F,G
 sample_number,N,,D,,,Y,,,1,99999,F,G

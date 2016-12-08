@@ -28,9 +28,9 @@ public class SocatMetadataTest {
 
 	static final String EXPOCODE = "XXXX20140113";
 	static final String CRUISE_NAME = "My Cruise";
-	static final String VESSEL_NAME = "My Vessel";
+	static final String PLATFORM_NAME = "My Vessel";
 	static final String ORGANIZATION_NAME = "PMEL/NOAA";
-	static final String VESSEL_TYPE = "Battleship";
+	static final String PLATFORM_TYPE = "Battleship";
 	static final Double WESTMOST_LONGITUDE = -160.0;
 	static final Double EASTMOST_LONGITUDE = -135.0;
 	static final Double SOUTHMOST_LATITUDE = 15.0;
@@ -145,20 +145,20 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getVesselName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setVesselName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getPlatformName()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setPlatformName(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetVesselName() {
+	public void testGetSetPlatformName() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
-		mdata.setVesselName(VESSEL_NAME);
-		assertEquals(VESSEL_NAME, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
+		mdata.setPlatformName(PLATFORM_NAME);
+		assertEquals(PLATFORM_NAME, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
-		mdata.setVesselName(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		mdata.setPlatformName(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 	}
 
 	/**
@@ -172,7 +172,7 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
 		mdata.setOrganizationName(ORGANIZATION_NAME);
 		assertEquals(ORGANIZATION_NAME, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setOrganizationName(null);
@@ -191,7 +191,7 @@ public class SocatMetadataTest {
 		mdata.setInvestigatorNames(INVESTIGATOR_NAMES);
 		assertEquals(INVESTIGATOR_NAMES, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setInvestigatorNames(null);
@@ -199,23 +199,23 @@ public class SocatMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getVesselType()}
-	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setVesselType(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.SocatMetadata#getPlatformType()}
+	 * and {@link gov.noaa.pmel.dashboard.server.SocatMetadata#setPlatformType(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetVesselType() {
+	public void testGetSetPlatformType() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		SocatMetadata mdata = new SocatMetadata(knownTypes);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
-		mdata.setVesselType(VESSEL_TYPE);
-		assertEquals(VESSEL_TYPE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
+		mdata.setPlatformType(PLATFORM_TYPE);
+		assertEquals(PLATFORM_TYPE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
-		mdata.setVesselType(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		mdata.setPlatformType(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 	}
 
 	/**
@@ -229,10 +229,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
 		mdata.setSocatVersion(SOCAT_VERSION);
 		assertEquals(SOCAT_VERSION, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setSocatVersion(null);
@@ -251,10 +251,10 @@ public class SocatMetadataTest {
 		mdata.setAllRegionIDs(ALL_REGION_IDS);
 		assertEquals(ALL_REGION_IDS, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setAllRegionIDs(null);
@@ -274,10 +274,10 @@ public class SocatMetadataTest {
 		assertEquals(SOCAT_DOI, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setSocatDOI(null);
@@ -298,10 +298,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setQcFlag(null);
@@ -323,10 +323,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setWestmostLongitude(null);
@@ -349,10 +349,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setEastmostLongitude(null);
@@ -376,10 +376,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setSouthmostLatitude(null);
@@ -404,10 +404,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setNorthmostLatitude(null);
@@ -433,10 +433,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setBeginTime(null);
@@ -463,10 +463,10 @@ public class SocatMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatDOI());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getAllRegionIDs());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getSocatVersion());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setEndTime(null);
@@ -504,10 +504,10 @@ public class SocatMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setVesselName(VESSEL_NAME);
+		mdata.setPlatformName(PLATFORM_NAME);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setVesselName(VESSEL_NAME);
+		other.setPlatformName(PLATFORM_NAME);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
@@ -525,10 +525,10 @@ public class SocatMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setVesselType(VESSEL_TYPE);
+		mdata.setPlatformType(PLATFORM_TYPE);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setVesselType(VESSEL_TYPE);
+		other.setPlatformType(PLATFORM_TYPE);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 

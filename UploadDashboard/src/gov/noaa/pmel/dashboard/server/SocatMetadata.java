@@ -212,28 +212,28 @@ public class SocatMetadata {
 
 	/**
 	 * @return
-	 * 		the vessel name; 
+	 * 		the platform name; 
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
-	public String getVesselName() {
-		String value = stringValuesMap.get(DashboardServerUtils.VESSEL_NAME);
+	public String getPlatformName() {
+		String value = stringValuesMap.get(DashboardServerUtils.PLATFORM_NAME);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
-	 * @param vesselName 
-	 * 		the vessel name to set;
+	 * @param platformName 
+	 * 		the platform name to set;
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public void setVesselName(String vesselName) {
+	public void setPlatformName(String platformName) {
 		String value;
-		if ( vesselName != null )
-			value = vesselName;
+		if ( platformName != null )
+			value = platformName;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(DashboardServerUtils.VESSEL_NAME, value);
+		stringValuesMap.put(DashboardServerUtils.PLATFORM_NAME, value);
 	}
 
 	/**
@@ -290,28 +290,28 @@ public class SocatMetadata {
 
 	/**
 	 * @return
-	 * 		the vessel type; 
+	 * 		the platform type; 
 	 * 		never null but could be {@link DashboardUtils#STRING_MISSING_VALUE} if not assigned
 	 */
-	public String getVesselType() {
-		String value = stringValuesMap.get(DashboardServerUtils.VESSEL_TYPE);
+	public String getPlatformType() {
+		String value = stringValuesMap.get(DashboardServerUtils.PLATFORM_TYPE);
 		if ( value == null )
 			value = DashboardUtils.STRING_MISSING_VALUE;
 		return value;
 	}
 
 	/**
-	 * @param vesselType 
-	 * 		the vessel name to set;
+	 * @param platformType 
+	 * 		the platform type to set;
 	 * 		if null, {@link DashboardUtils#STRING_MISSING_VALUE} is assigned
 	 */
-	public void setVesselType(String vesselType) {
+	public void setPlatformType(String platformType) {
 		String value;
-		if ( vesselType != null )
-			value = vesselType;
+		if ( platformType != null )
+			value = platformType;
 		else
 			value = DashboardUtils.STRING_MISSING_VALUE;
-		stringValuesMap.put(DashboardServerUtils.VESSEL_TYPE, value);
+		stringValuesMap.put(DashboardServerUtils.PLATFORM_TYPE, value);
 	}
 
 	/**
