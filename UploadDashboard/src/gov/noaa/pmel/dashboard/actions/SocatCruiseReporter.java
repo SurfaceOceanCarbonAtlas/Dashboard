@@ -498,8 +498,8 @@ public class SocatCruiseReporter {
 		report.println("SOCAT data report created: " + TIMESTAMPER.format(new Date()));
 		report.println("Expocode: " + upperExpo);
 		report.println("version: " + socatVersion);
-		report.println("Cruise/Dataset Name: " + omeMeta.getCruiseName());
-		report.println("Ship/Vessel Name: " + omeMeta.getVesselName());
+		report.println("Dataset Name: " + omeMeta.getCruiseName());
+		report.println("Platform Name: " + omeMeta.getPlatformName());
 		report.println("Principal Investigator(s): " + omeMeta.getScienceGroup());
 		report.println("DOI for the original data: " + origDOI);
 		report.println("    or see: " + omeMeta.getOrigDataRef());
@@ -621,8 +621,8 @@ public class SocatCruiseReporter {
 					regionName + "\" for the following data sets:");
 		report.println("Expocode\t" +
 					   "version\t" +
-					   "Cruise/Dataset Name\t" +
-					   "Ship/Vessel Name\t" +
+					   "Dataset Name\t" +
+					   "Platform Name\t" +
 					   "PI(s)\t" +
 					   "Original Data DOI\t" +
 					   "Original Data Reference\t" +
@@ -662,7 +662,7 @@ public class SocatCruiseReporter {
 			report.print(cruiseName);
 			report.print("\t");
 
-			report.print(omeMeta.getVesselName());
+			report.print(omeMeta.getPlatformName());
 			report.print("\t");
 
 			report.print(omeMeta.getScienceGroup());

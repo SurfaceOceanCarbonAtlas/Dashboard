@@ -368,8 +368,8 @@ public class DashboardUtils {
 	 * Unique identifier for the dataset.
 	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
 	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
-	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
-	 * different vessels.
+	 * by -1 or -2 for non-ship platforms - where NODC is does not distinguish
+	 * different platform names.
 	 */
 	public static final DataColumnType EXPOCODE = new DataColumnType("expocode", 
 			100.0, "expocode", STRING_DATA_CLASS_NAME, "expocode", null, 

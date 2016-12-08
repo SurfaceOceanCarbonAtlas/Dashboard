@@ -1,3 +1,5 @@
+! run_preview.jnl
+
 DEFINE SYMBOL infile_dsg = ($1)
 DEFINE SYMBOL result_directory = ($2)
 DEFINE SYMBOL result_time_tag = ($3%.%)

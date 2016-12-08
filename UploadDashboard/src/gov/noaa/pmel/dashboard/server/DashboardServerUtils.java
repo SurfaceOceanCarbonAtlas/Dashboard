@@ -36,8 +36,8 @@ public class DashboardServerUtils {
 	 * Unique identifier for the dataset.
 	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
 	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
-	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
-	 * different vessels.  (metadata)
+	 * by -1 or -2 for non-ship platforms - where NODC is does not distinguish
+	 * different platform names.  (metadata)
 	 */
 	public static final DashDataType EXPOCODE = new DashDataType(DashboardUtils.EXPOCODE);
 

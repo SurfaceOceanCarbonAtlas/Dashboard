@@ -104,7 +104,7 @@ public class DashboardCruiseWithDataTest {
 		ArrayList<String> myPreamble = new ArrayList<String>(Arrays.asList(
 				"Cruise Expocode: AGSK20031205",
 				"Cruise Name: SKO313",
-				"Ship/Vessel Name: Skogafoss",
+				"Ship Name: Skogafoss",
 				"Principal Investigator(s): Rik Wanninkhof"
 		));
 		DashboardCruiseWithData cruiseData = new DashboardCruiseWithData();
@@ -189,7 +189,7 @@ public class DashboardCruiseWithDataTest {
 		ArrayList<String> myPreamble = new ArrayList<String>(Arrays.asList(
 				"Cruise Expocode: AGSK20031205",
 				"Cruise Name: SKO313",
-				"Ship/Vessel Name: Skogafoss",
+				"Ship Name: Skogafoss",
 				"Principal Investigator(s): Rik Wanninkhof"
 		));
 		ArrayList<Integer> myRowNums = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 5, 6));

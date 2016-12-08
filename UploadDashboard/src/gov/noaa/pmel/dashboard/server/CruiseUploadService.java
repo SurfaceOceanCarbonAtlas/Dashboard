@@ -44,7 +44,7 @@ public class CruiseUploadService extends HttpServlet {
 
 	private static final long serialVersionUID = 9149494112661572713L;
 
-	// Patterns for getting the vessel name from the metadata preamble
+	// Patterns for getting the PI name(s) from the metadata preamble
 	private static final Pattern[] PI_NAMES_PATTERNS = new Pattern[] {
 		Pattern.compile("Investigator\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
 		Pattern.compile("Investigators?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
@@ -361,7 +361,7 @@ public class CruiseUploadService extends HttpServlet {
 					}
 				}
 			}
-			// If vessel name not found in preamble, check if there is a matching column type
+			// If platform name not found in preamble, check if there is a matching column type
 			if ( platformName == null ) {
 				int colIdx = -1;
 				int k = 0;
@@ -400,7 +400,7 @@ public class CruiseUploadService extends HttpServlet {
 						piNames = null;
 				}
 			}
-			// If vessel type not found in preamble, check if there is a matching column type
+			// If platform type not found in preamble, check if there is a matching column type
 			if ( platformType == null ) {
 				int colIdx = -1;
 				int k = 0;
@@ -418,7 +418,7 @@ public class CruiseUploadService extends HttpServlet {
 				}
 			}
 
-			// Verify there is a ship name and at least one PI name
+			// Verify there is a platform name and a PI name
 			if ( platformName == null ) {
 				messages.add(DashboardUtils.NO_SHIPNAME_HEADER_TAG + " " + filename);
 				continue;
@@ -427,12 +427,12 @@ public class CruiseUploadService extends HttpServlet {
 				messages.add(DashboardUtils.NO_PINAMES_HEADER_TAG + " " + filename);
 				continue;
 			}
-			// If the vessel type is not given, make an educated guess
+			// If the platform type is not given, make an educated guess
 			if ( platformType == null ) {
 				platformType = DashboardServerUtils.guessPlatformType(expocode, platformName);
 			}
 
-			// Create the OME XML stub file from the expocode, ship name, and PI names
+			// Create the OME XML stub file from the expocode, platform name, PI name(s), and platform type
 			try {
 				OmeMetadata omeMData = new OmeMetadata(expocode);
 				omeMData.storeValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
@@ -458,8 +458,7 @@ public class CruiseUploadService extends HttpServlet {
 			}
 
 			// Add any existing documents for this cruise
-			ArrayList<DashboardMetadata> mdataList = 
-					configStore.getMetadataFileHandler().getMetadataFiles(expocode);
+			ArrayList<DashboardMetadata> mdataList = configStore.getMetadataFileHandler().getMetadataFiles(expocode);
 			TreeSet<String> addlDocs = new TreeSet<String>();
 			for ( DashboardMetadata mdata : mdataList ) {
 				if ( DashboardUtils.OME_FILENAME.equals(mdata.getFilename())) {

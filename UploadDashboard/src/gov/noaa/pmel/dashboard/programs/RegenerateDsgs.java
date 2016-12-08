@@ -84,8 +84,6 @@ public class RegenerateDsgs {
 			// Read the current metadata in the full-data DSG file
 			fullDataDsg = dsgHandler.getDsgNcFile(upperExpo);
 			ArrayList<String> missing = fullDataDsg.readMetadata(knownMetadataTypes);
-			// At this time allow vessel_type to be missing
-			missing.remove("vessel_type");
 			if ( ! missing.isEmpty() )
 				throw new IllegalArgumentException("Unexpected metadata fields missing from the DSG file: " + missing);
 			missing = fullDataDsg.readData(knownDataFileTypes);
