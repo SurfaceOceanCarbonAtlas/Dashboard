@@ -93,7 +93,7 @@ public class AddDOIs {
 		try {
 			origDOIMap = readExpoDOIFile(origDOIsFilename);
 		} catch (Exception ex) {
-			System.err.println("Error reading " + socatDOIsFilename + ": " + ex.getMessage());
+			System.err.println("Error reading " + origDOIsFilename+ ": " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
@@ -123,6 +123,8 @@ public class AddDOIs {
 				DashboardCruise cruise = null;
 				try {
 					cruise = cruiseHandler.getCruiseFromInfoFile(expocode);
+					if ( cruise == null )
+						throw new NullPointerException("no such dataset");
 				} catch (Exception ex) {
 					System.err.println("Problems reading the cruise data properties for " + expocode + ": " + ex.getMessage());
 					success = false;

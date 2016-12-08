@@ -44,15 +44,7 @@ public class CruiseUploadService extends HttpServlet {
 
 	private static final long serialVersionUID = 9149494112661572713L;
 
-	// Patterns for getting the vessel name from the metadata preamble
-	private static final Pattern[] SHIP_NAME_PATTERNS = new Pattern[] {
-		Pattern.compile("Ship\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-		Pattern.compile("Ship\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-		Pattern.compile("Vessel\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
-		Pattern.compile("Vessel\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
-	};
-
-	// Patterns for getting the vessel name from the metadata preamble
+	// Patterns for getting the PI name(s) from the metadata preamble
 	private static final Pattern[] PI_NAMES_PATTERNS = new Pattern[] {
 		Pattern.compile("Investigator\\s*Names?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
 		Pattern.compile("Investigators?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
@@ -60,10 +52,20 @@ public class CruiseUploadService extends HttpServlet {
 		Pattern.compile("PIs?\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
 	};
 
-	// Patterns for getting the vessel type from the metadata preamble
-	private static final Pattern[] VESSEL_TYPE_PATTERNS = new Pattern[] {
-		Pattern.compile("Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+	// Patterns for getting the platform name from the metadata preamble
+	private static final Pattern[] PLATFORM_NAME_PATTERNS = new Pattern[] {
+		Pattern.compile("Platform\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Platform\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Vessel\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Vessel\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Ship\\s*Name\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Ship\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
+	};
+
+	// Patterns for getting the platform type from the metadata preamble
+	private static final Pattern[] PLATFORM_TYPE_PATTERNS = new Pattern[] {
 		Pattern.compile("Platform\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
+		Pattern.compile("Vessel\\s*Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE),
 		Pattern.compile("Type\\s*[=:]\\s*(.+)", Pattern.CASE_INSENSITIVE)
 	};
 
@@ -308,22 +310,22 @@ public class CruiseUploadService extends HttpServlet {
 				}
 			}
 
-			String vesselName = null;
+			String platformName = null;
 			ArrayList<String> piNames = null;
-			String vesselType = null;
+			String platformType = null;
 			// Get the ship name and PI names from the metadata preamble
 			for ( String metaline : cruiseData.getPreamble() ) {
 				boolean lineMatched = false;
-				if ( vesselName == null ) {
-					for ( Pattern pat : SHIP_NAME_PATTERNS ) {
+				if ( platformName == null ) {
+					for ( Pattern pat : PLATFORM_NAME_PATTERNS ) {
 						Matcher mat = pat.matcher(metaline);
 						if ( ! mat.matches() )
 							continue;
 						lineMatched = true;
-						vesselName = mat.group(1);
-						if ( (vesselName != null) && ! vesselName.isEmpty() ) 
+						platformName = mat.group(1);
+						if ( (platformName != null) && ! platformName.isEmpty() ) 
 							break;
-						vesselName = null;
+						platformName = null;
 					}
 				}
 				if ( (piNames == null) && ! lineMatched ) {
@@ -346,34 +348,34 @@ public class CruiseUploadService extends HttpServlet {
 						}
 					}
 				}
-				if ( (vesselType == null) && ! lineMatched ) {
-					for ( Pattern pat : VESSEL_TYPE_PATTERNS ) {
+				if ( (platformType == null) && ! lineMatched ) {
+					for ( Pattern pat : PLATFORM_TYPE_PATTERNS ) {
 						Matcher mat = pat.matcher(metaline);
 						if ( ! mat.matches() )
 							continue;
 						lineMatched = true;
-						vesselType = mat.group(1);
-						if ( (vesselType != null) && ! vesselType.isEmpty() ) 
+						platformType = mat.group(1);
+						if ( (platformType != null) && ! platformType.isEmpty() ) 
 							break;
-						vesselType = null;
+						platformType = null;
 					}
 				}
 			}
-			// If vessel name not found in preamble, check if there is a matching column type
-			if ( vesselName == null ) {
+			// If platform name not found in preamble, check if there is a matching column type
+			if ( platformName == null ) {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
-					if ( DashboardServerUtils.VESSEL_NAME.typeNameEquals(dtype) ) {
+					if ( DashboardServerUtils.PLATFORM_NAME.typeNameEquals(dtype) ) {
 						colIdx = k;
 						break;
 					}
 					k++;
 				}
 				if ( colIdx >= 0 ) {
-					vesselName = cruiseData.getDataValues().get(0).get(colIdx);
-					if ( vesselName.isEmpty() )
-						vesselName = null;
+					platformName = cruiseData.getDataValues().get(0).get(colIdx);
+					if ( platformName.isEmpty() )
+						platformName = null;
 				}
 			}
 			// If PI names not found in preamble, check if there is a matching column type
@@ -398,26 +400,26 @@ public class CruiseUploadService extends HttpServlet {
 						piNames = null;
 				}
 			}
-			// If vessel type not found in preamble, check if there is a matching column type
-			if ( vesselType == null ) {
+			// If platform type not found in preamble, check if there is a matching column type
+			if ( platformType == null ) {
 				int colIdx = -1;
 				int k = 0;
 				for ( DataColumnType dtype : cruiseData.getDataColTypes() ) {
-					if ( DashboardServerUtils.VESSEL_TYPE.typeNameEquals(dtype) ) {
+					if ( DashboardServerUtils.PLATFORM_TYPE.typeNameEquals(dtype) ) {
 						colIdx = k;
 						break;
 					}
 					k++;
 				}
 				if ( colIdx >= 0 ) {
-					vesselType = cruiseData.getDataValues().get(0).get(colIdx);
-					if ( vesselType.isEmpty() )
-						vesselType = null;
+					platformType = cruiseData.getDataValues().get(0).get(colIdx);
+					if ( platformType.isEmpty() )
+						platformType = null;
 				}
 			}
 
-			// Verify there is a ship name and at least one PI name
-			if ( vesselName == null ) {
+			// Verify there is a platform name and a PI name
+			if ( platformName == null ) {
 				messages.add(DashboardUtils.NO_SHIPNAME_HEADER_TAG + " " + filename);
 				continue;
 			}
@@ -425,21 +427,21 @@ public class CruiseUploadService extends HttpServlet {
 				messages.add(DashboardUtils.NO_PINAMES_HEADER_TAG + " " + filename);
 				continue;
 			}
-			// If the vessel type is not given, make an educated guess
-			if ( vesselType == null ) {
-				vesselType = DashboardServerUtils.guessVesselType(expocode, vesselName);
+			// If the platform type is not given, make an educated guess
+			if ( platformType == null ) {
+				platformType = DashboardServerUtils.guessPlatformType(expocode, platformName);
 			}
 
-			// Create the OME XML stub file from the expocode, ship name, and PI names
+			// Create the OME XML stub file from the expocode, platform name, PI name(s), and platform type
 			try {
 				OmeMetadata omeMData = new OmeMetadata(expocode);
-				omeMData.storeValue(OmeMetadata.VESSEL_NAME_STRING, vesselName, -1);
+				omeMData.storeValue(OmeMetadata.VESSEL_NAME_STRING, platformName, -1);
 				for ( String name : piNames ) {
 					Properties props = new Properties();
 					props.setProperty(OmeMetadata.NAME_ELEMENT_NAME, name);
 					omeMData.storeCompositeValue(OmeMetadata.INVESTIGATOR_COMP_NAME, props, -1);
 				}
-				omeMData.storeValue(OmeMetadata.PLATFORM_TYPE_STRING, vesselType, -1);
+				omeMData.storeValue(OmeMetadata.PLATFORM_TYPE_STRING, platformType, -1);
 				DashboardOmeMetadata mdata = new DashboardOmeMetadata(omeMData,
 						timestamp, username, cruiseData.getVersion());
 				String msg = "New OME XML document from data file for " + expocode + " uploaded by " + username;
@@ -456,8 +458,7 @@ public class CruiseUploadService extends HttpServlet {
 			}
 
 			// Add any existing documents for this cruise
-			ArrayList<DashboardMetadata> mdataList = 
-					configStore.getMetadataFileHandler().getMetadataFiles(expocode);
+			ArrayList<DashboardMetadata> mdataList = configStore.getMetadataFileHandler().getMetadataFiles(expocode);
 			TreeSet<String> addlDocs = new TreeSet<String>();
 			for ( DashboardMetadata mdata : mdataList ) {
 				if ( DashboardUtils.OME_FILENAME.equals(mdata.getFilename())) {

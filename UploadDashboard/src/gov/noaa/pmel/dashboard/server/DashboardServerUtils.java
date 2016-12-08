@@ -36,8 +36,8 @@ public class DashboardServerUtils {
 	 * Unique identifier for the dataset.
 	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
 	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
-	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
-	 * different vessels.  (metadata)
+	 * by -1 or -2 for non-ship platforms - where NODC is does not distinguish
+	 * different platform names.  (metadata)
 	 */
 	public static final DashDataType EXPOCODE = new DashDataType(DashboardUtils.EXPOCODE);
 
@@ -46,10 +46,10 @@ public class DashboardServerUtils {
 	 */
 	public static final DashDataType DATASET_NAME = new DashDataType(DashboardUtils.DATASET_NAME);
 
-	public static final DashDataType VESSEL_NAME = new DashDataType(DashboardUtils.VESSEL_NAME);
+	public static final DashDataType PLATFORM_NAME = new DashDataType(DashboardUtils.PLATFORM_NAME);
 	public static final DashDataType ORGANIZATION_NAME = new DashDataType(DashboardUtils.ORGANIZATION_NAME);
 	public static final DashDataType INVESTIGATOR_NAMES = new DashDataType(DashboardUtils.INVESTIGATOR_NAMES);
-	public static final DashDataType VESSEL_TYPE = new DashDataType(DashboardUtils.VESSEL_TYPE);
+	public static final DashDataType PLATFORM_TYPE = new DashDataType(DashboardUtils.PLATFORM_TYPE);
 	public static final DashDataType WESTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.WESTERNMOST_LONGITUDE);
 	public static final DashDataType EASTERNMOST_LONGITUDE = new DashDataType(DashboardUtils.EASTERNMOST_LONGITUDE);
 	public static final DashDataType SOUTHERNMOST_LATITUDE = new DashDataType(DashboardUtils.SOUTHERNMOST_LATITUDE);
@@ -192,24 +192,24 @@ public class DashboardServerUtils {
 	}
 
 	/**
-	 * Guesses the vessel type from the vessel name or the expocode.
-	 * If the vessel name or NODC code from the expocode is that of
-	 * a mooring or drifting buoy, the that type is returned; 
+	 * Guesses the platform type from the platform name or the expocode.
+	 * If the platform name or NODC code from the expocode is that of
+	 * a mooring or drifting buoy, that type is returned; 
 	 * otherwise it is assumed to be a ship.
 	 * 
 	 * @param expocode
 	 * 		expocode of the dataset
-	 * @param vesselName
-	 * 		vessel name for the dataset
+	 * @param platformName
+	 * 		platform name for the dataset
 	 * @return
 	 * 		one of "Mooring", "Drifting Buoy", or "Ship"
 	 */
-	public static String guessVesselType(String expocode, String vesselName) {
-		if ( "Mooring".equalsIgnoreCase(vesselName) )
+	public static String guessPlatformType(String expocode, String platformName) {
+		if ( "Mooring".equalsIgnoreCase(platformName) )
 			return "Mooring";
-		if ( "Drifting Buoy".equalsIgnoreCase(vesselName) )
+		if ( "Drifting Buoy".equalsIgnoreCase(platformName) )
 			return "Drifting Buoy";
-		if ( "Bouy".equalsIgnoreCase(vesselName) )
+		if ( "Bouy".equalsIgnoreCase(platformName) )
 			return "Mooring";
 
 		String nodc = expocode.substring(0, 4).toUpperCase();

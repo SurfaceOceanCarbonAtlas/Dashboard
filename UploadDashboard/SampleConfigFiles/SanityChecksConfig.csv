@@ -2,7 +2,7 @@
 Speed,150,750
 FixedValue,expocode,Y
 FixedValue,dataset_name,Y
-FixedValue,vessel_name,Y
+FixedValue,platform_name,Y
 FixedValue,organization,Y
 FixedValue,investigators,Y
 TimeGap,28

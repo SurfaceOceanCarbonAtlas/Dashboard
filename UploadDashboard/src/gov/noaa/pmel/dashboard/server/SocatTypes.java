@@ -207,7 +207,9 @@ public class SocatTypes {
 		RENAMED_DATA_TYPES.put("SEA_SURFACE_TEMPERATURE", "temp");
 		RENAMED_DATA_TYPES.put("SECOND_OF_DAY", "sec_of_day");
 		RENAMED_DATA_TYPES.put("SHIP_DIRECTION", "ship_dir");
-		RENAMED_DATA_TYPES.put("SHIP_NAME", "vessel_name");
+		RENAMED_DATA_TYPES.put("SHIP_NAME", "platform_name");
+		RENAMED_DATA_TYPES.put("vessel_name", "platform_name");
+		RENAMED_DATA_TYPES.put("vessel_type", "platform_type");
 		RENAMED_DATA_TYPES.put("TIME", "time_of_day");
 		RENAMED_DATA_TYPES.put("TIMESTAMP", "date_time");
 		RENAMED_DATA_TYPES.put("WIND_DIRECTION_TRUE", "wind_dir_true");
