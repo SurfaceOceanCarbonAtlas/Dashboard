@@ -93,7 +93,7 @@ public class AddDOIs {
 		try {
 			origDOIMap = readExpoDOIFile(origDOIsFilename);
 		} catch (Exception ex) {
-			System.err.println("Error reading " + socatDOIsFilename + ": " + ex.getMessage());
+			System.err.println("Error reading " + origDOIsFilename+ ": " + ex.getMessage());
 			ex.printStackTrace();
 			System.exit(1);
 		}
