@@ -55,8 +55,8 @@ public class KnownDataTypes {
 	 * Adds the default well-known data column types for the users
 	 * to select from.
 	 * 		UNKNOWN, OTHER,
-	 * 		EXPOCODE, DATASET_NAME, VESSEL_NAME, ORGANIZATION_NAME, 
-	 * 		INVESTIGATOR_NAMES,
+	 * 		EXPOCODE, DATASET_NAME, PLATFORM_NAME, ORGANIZATION_NAME, 
+	 * 		INVESTIGATOR_NAMES, PLATFORM_TYPE, 
 	 * 		TIMESTAMP, DATE, YEAR, MONTH_OF_YEAR, DAY_OF_MONTH,
 	 * 		TIME_OF_DAY, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE,
 	 * 		DAY_OF_YEAR, SECOND_OF_DAY, LONGITUDE, LATITUDE, SAMPLE_DEPTH
@@ -70,10 +70,10 @@ public class KnownDataTypes {
 		addDataType(DashboardServerUtils.OTHER);
 		addDataType(DashboardServerUtils.EXPOCODE);
 		addDataType(DashboardServerUtils.DATASET_NAME);
-		addDataType(DashboardServerUtils.VESSEL_NAME);
+		addDataType(DashboardServerUtils.PLATFORM_NAME);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
-		addDataType(DashboardServerUtils.VESSEL_TYPE);
+		addDataType(DashboardServerUtils.PLATFORM_TYPE);
 		addDataType(DashboardServerUtils.TIMESTAMP);
 		addDataType(DashboardServerUtils.DATE);
 		addDataType(DashboardServerUtils.YEAR);
@@ -96,10 +96,11 @@ public class KnownDataTypes {
 	/**
 	 * Adds the default well-known metadata column types for the generating 
 	 * the NetCDF DSG files.
-	 * 		EXPOCODE, DATASET_NAME, VESSEL_NAME, ORGANIZATION_NAME, 
-	 * 		INVESTIGATOR_NAMES, WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, 
-	 * 		SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, TIME_COVERAGE_START, 
-	 * 		TIME_COVERAGE_END, QC_FLAG
+	 * 		EXPOCODE, DATASET_NAME, PLATFORM_NAME, 
+	 * 		ORGANIZATION_NAME, INVESTIGATOR_NAMES, PLATFORM_TYPE, 
+	 * 		WESTERNMOST_LONGITUDE, EASTERNMOST_LONGITUDE, 
+	 * 		SOUTHERNMOST_LATITUDE, NORTHERNMOST_LATITUDE, 
+	 * 		TIME_COVERAGE_START, TIME_COVERAGE_END, QC_FLAG
 	 * This should be called before adding any custom types.
 	 * 
 	 * @return
@@ -108,10 +109,10 @@ public class KnownDataTypes {
 	public KnownDataTypes addStandardTypesForMetadataFiles() {
 		addDataType(DashboardServerUtils.EXPOCODE);
 		addDataType(DashboardServerUtils.DATASET_NAME);
-		addDataType(DashboardServerUtils.VESSEL_NAME);
+		addDataType(DashboardServerUtils.PLATFORM_NAME);
 		addDataType(DashboardServerUtils.ORGANIZATION_NAME);
 		addDataType(DashboardServerUtils.INVESTIGATOR_NAMES);
-		addDataType(DashboardServerUtils.VESSEL_TYPE);
+		addDataType(DashboardServerUtils.PLATFORM_TYPE);
 		addDataType(DashboardServerUtils.WESTERNMOST_LONGITUDE);
 		addDataType(DashboardServerUtils.EASTERNMOST_LONGITUDE);
 		addDataType(DashboardServerUtils.SOUTHERNMOST_LATITUDE);

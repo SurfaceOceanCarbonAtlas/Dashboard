@@ -32,7 +32,7 @@ import uk.ac.uea.socat.omemetadata.OmeMetadata;
  */
 public class DashboardOmeMetadata extends DashboardMetadata {
 
-	private static final long serialVersionUID = 7018407686296151274L;
+	private static final long serialVersionUID = -6561611158540029135L;
 
 	/**
 	 * String separating each PI listed in scienceGroup, each organization 
@@ -164,8 +164,8 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 	/**
 	 * Create a DsgMetadata object from the data in this object.
-	 * Any PI or vessel names will be anglicized.  
-	 * The SOCAT version status and QC flag are not assigned.
+	 * Any PI or platform names will be anglicized.  
+	 * The version status and QC flag are not assigned.
 	 * 
 	 * @return
 	 *		created DsgMetadata object 
@@ -188,20 +188,20 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 		scMData.setExpocode(expocode);
 		scMData.setDatasetName(omeMData.getExperimentName());
 
-		// Anglicize the vessel name for NetCDF/LAS
-		String vesselName = omeMData.getVesselName();
-		scMData.setVesselName(anglicizeName(vesselName));
+		// Anglicize the platform name for NetCDF/LAS
+		String platformName = omeMData.getVesselName();
+		scMData.setPlatformName(anglicizeName(platformName));
 
-		// Set the vessel type - could be missing
-		String vesselType;
+		// Set the platform type - could be missing
+		String platformType;
 		try {
-			vesselType = omeMData.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
+			platformType = omeMData.getValue(OmeMetadata.PLATFORM_TYPE_STRING);
 		} catch ( Exception ex ) {
-			vesselType = null;
+			platformType = null;
 		}
-		if ( (vesselType == null) || vesselType.trim().isEmpty() )
-			vesselType = DashboardServerUtils.guessVesselType(expocode, vesselName);
-		scMData.setVesselType(vesselType);
+		if ( (platformType == null) || platformType.trim().isEmpty() )
+			platformType = DashboardServerUtils.guessPlatformType(expocode, platformName);
+		scMData.setPlatformType(platformType);
 
 		try {
 			scMData.setWestmostLongitude(Double.parseDouble(omeMData.getWestmostLongitude()));
@@ -478,14 +478,14 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 
 	/**
 	 * @return
-	 * 		the vessel name for this dataset; 
+	 * 		the platform name for this dataset; 
 	 * 		never null but may be empty
 	 */
-	public String getVesselName() {
-		String vesselName = omeMData.getVesselName();
-		if ( vesselName == null )
+	public String getPlatformName() {
+		String platformName = omeMData.getVesselName();
+		if ( platformName == null )
 			return "";
-		return vesselName;
+		return platformName;
 	}
 
 	/**
@@ -732,31 +732,31 @@ public class DashboardOmeMetadata extends DashboardMetadata {
 	}
 
 	/**
-	 * Correctly spelled "anglicized" vessel names (that are currently known). 
+	 * Correctly spelled "anglicized" platform names (that are currently known). 
 	 */
-	private static final HashMap<String,String> VESSEL_NAME_CORRECTIONS = 
+	private static final HashMap<String,String> PLATFORM_NAME_CORRECTIONS = 
 			new HashMap<String,String>();
 	static {
-		VESSEL_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
-		VESSEL_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
-		VESSEL_NAME_CORRECTIONS.put("Ka imimoana", "Ka'imimoana");
-		VESSEL_NAME_CORRECTIONS.put("L Astrolabe", "L'Astrolabe");
-		VESSEL_NAME_CORRECTIONS.put("L Atalante", "L'Atalante");
+		PLATFORM_NAME_CORRECTIONS.put("Haakon Mosby", "H" + aRing + "kon Mosby");
+		PLATFORM_NAME_CORRECTIONS.put("Hesperides", "Hesp" + eAcute + "rides");
+		PLATFORM_NAME_CORRECTIONS.put("Ka imimoana", "Ka'imimoana");
+		PLATFORM_NAME_CORRECTIONS.put("L Astrolabe", "L'Astrolabe");
+		PLATFORM_NAME_CORRECTIONS.put("L Atalante", "L'Atalante");
 	}
 
 	/**
-	 * Corrects the spelling of "anglicized" vessel names where known corrections exist.
+	 * Corrects the spelling of "anglicized" platform names where known corrections exist.
 	 * If the name is not recognized, the given string is returned.
 	 * 
 	 * @param anglicizedName
-	 * 		anglicized vessel name to be corrected; can be null
+	 * 		anglicized platform name to be corrected; can be null
 	 * @return
-	 * 		correctly spelled vessel name, or null if the given String was null
+	 * 		correctly spelled platform name, or null if the given String was null
 	 */
-	public static String correctVesselName(String anglicizedName) {
+	public static String correctPlatformName(String anglicizedName) {
 		if ( anglicizedName == null )
 			return null;
-		String name = VESSEL_NAME_CORRECTIONS.get(anglicizedName);
+		String name = PLATFORM_NAME_CORRECTIONS.get(anglicizedName);
 		if ( name == null )
 			return anglicizedName;
 		return name;

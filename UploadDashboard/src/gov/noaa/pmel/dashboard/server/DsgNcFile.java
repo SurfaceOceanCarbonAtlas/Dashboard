@@ -421,6 +421,13 @@ public class DsgNcFile extends File {
 				String varName = dtype.getVarName();
 				Variable var = ncfile.findVariable(varName);
 				if ( var == null ) {
+					// A couple of name modifications
+					if ( "platform_name".equals(varName) )
+						var = ncfile.findVariable("vessel_name");
+					else if ( "platform_type".equals(varName) )
+						var = ncfile.findVariable("vessel_type");
+				}
+				if ( var == null ) {
 					namesNotFound.add(varName);
 					continue;
 				}

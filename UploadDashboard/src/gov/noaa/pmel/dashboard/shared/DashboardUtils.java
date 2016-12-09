@@ -369,8 +369,8 @@ public class DashboardUtils {
 	 * Unique identifier for the dataset.
 	 * For SOCAT, the expocode is NODCYYYYMMDD where NODC is the ship code 
 	 * and YYYY-MM-DD is the start date for the cruise; and possibly followed
-	 * by -1 or -2 for non-ship vessels - where NODC is does not distinguish
-	 * different vessels.
+	 * by -1 or -2 for non-ship platforms - where NODC is does not distinguish
+	 * different platform names.
 	 */
 	public static final DataColumnType EXPOCODE = new DataColumnType("expocode", 
 			100.0, "expocode", STRING_DATA_CLASS_NAME, "expocode", null, 
@@ -383,8 +383,8 @@ public class DashboardUtils {
 			101.0, "dataset", STRING_DATA_CLASS_NAME, "dataset name", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType VESSEL_NAME = new DataColumnType("vessel_name", 
-			102.0, "vessel", STRING_DATA_CLASS_NAME, "vessel name", "platform_name",
+	public static final DataColumnType PLATFORM_NAME = new DataColumnType("platform_name", 
+			102.0, "platform name", STRING_DATA_CLASS_NAME, "platform name", "platform_name",
 			PLATFORM_CATEGORY, NO_UNITS);
 
 	public static final DataColumnType ORGANIZATION_NAME = new DataColumnType("organization", 
@@ -395,8 +395,8 @@ public class DashboardUtils {
 			104.0, "PI names", STRING_DATA_CLASS_NAME, "investigators", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
-	public static final DataColumnType VESSEL_TYPE = new DataColumnType("vessel_type", 
-			105.0, "vessel type", STRING_DATA_CLASS_NAME, "vessel type", null, 
+	public static final DataColumnType PLATFORM_TYPE = new DataColumnType("platform_type", 
+			105.0, "platform type", STRING_DATA_CLASS_NAME, "platform type", null, 
 			IDENTIFIER_CATEGORY, NO_UNITS);
 
 

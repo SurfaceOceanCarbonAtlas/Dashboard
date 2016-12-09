@@ -18,7 +18,7 @@ import java.util.TreeMap;
 import org.junit.Test;
 
 /**
- * Unit test for methods in gov.noaa.pmel.dashboard.shared.SocatMetadata.
+ * Unit test for methods in gov.noaa.pmel.dashboard.shared.DsgMetadata.
  * The convenience getters and setters still work properly when their type 
  * is not part of the known types.
  * 
@@ -28,10 +28,11 @@ public class DsgMetadataTest {
 
 	static final String EXPOCODE = "XXXX20140113";
 	static final String CRUISE_NAME = "My Cruise";
-	static final String VESSEL_NAME = "My Vessel";
+	static final String PLATFORM_NAME = "My Vessel";
 	static final String ORGANIZATION_NAME = "PMEL/NOAA";
 	static final String INVESTIGATOR_NAMES = "Smith, K. : Doe, J.";
-	static final String VESSEL_TYPE = "Battleship";
+	static final String PLATFORM_TYPE = "Battleship";
+	static final String QC_FLAG = "C";
 	static final Double WESTMOST_LONGITUDE = -160.0;
 	static final Double EASTMOST_LONGITUDE = -135.0;
 	static final Double SOUTHMOST_LATITUDE = 15.0;
@@ -142,20 +143,20 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getVesselName()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setVesselName(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getPlatformName()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setPlatformName(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetVesselName() {
+	public void testGetSetPlatformName() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
-		mdata.setVesselName(VESSEL_NAME);
-		assertEquals(VESSEL_NAME, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
+		mdata.setPlatformName(PLATFORM_NAME);
+		assertEquals(PLATFORM_NAME, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
-		mdata.setVesselName(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		mdata.setPlatformName(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 	}
 
 	/**
@@ -169,7 +170,7 @@ public class DsgMetadataTest {
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
 		mdata.setOrganizationName(ORGANIZATION_NAME);
 		assertEquals(ORGANIZATION_NAME, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setOrganizationName(null);
@@ -188,7 +189,7 @@ public class DsgMetadataTest {
 		mdata.setInvestigatorNames(INVESTIGATOR_NAMES);
 		assertEquals(INVESTIGATOR_NAMES, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setInvestigatorNames(null);
@@ -196,23 +197,44 @@ public class DsgMetadataTest {
 	}
 
 	/**
-	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getVesselType()}
-	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setVesselType(java.lang.String)}.
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getPlatformType()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setPlatformType(java.lang.String)}.
 	 */
 	@Test
-	public void testGetSetVesselType() {
+	public void testGetSetPlatformType() {
 		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
 		DsgMetadata mdata = new DsgMetadata(knownTypes);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
-		mdata.setVesselType(VESSEL_TYPE);
-		assertEquals(VESSEL_TYPE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
+		mdata.setPlatformType(PLATFORM_TYPE);
+		assertEquals(PLATFORM_TYPE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
-		mdata.setVesselType(null);
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		mdata.setPlatformType(null);
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
+	}
+
+	/**
+	 * Test method for {@link gov.noaa.pmel.dashboard.server.DsgMetadata#getQcFlag()}
+	 * and {@link gov.noaa.pmel.dashboard.server.DsgMetadata#setQcFlag(java.lang.Character)}.
+	 */
+	@Test
+	public void testGetSetQCFlag() {
+		KnownDataTypes knownTypes = new KnownDataTypes().addStandardTypesForMetadataFiles();
+		DsgMetadata mdata = new DsgMetadata(knownTypes);
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE.toString(), mdata.getQcFlag());
+		mdata.setQcFlag(QC_FLAG);
+		assertEquals(QC_FLAG, mdata.getQcFlag());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
+		mdata.setQcFlag(null);
+		assertEquals(DashboardUtils.CHAR_MISSING_VALUE.toString(), mdata.getQcFlag());
 	}
 
 	/**
@@ -226,10 +248,10 @@ public class DsgMetadataTest {
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
 		mdata.setWestmostLongitude(WESTMOST_LONGITUDE);
 		assertTrue( WESTMOST_LONGITUDE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setWestmostLongitude(null);
@@ -248,10 +270,10 @@ public class DsgMetadataTest {
 		mdata.setEastmostLongitude(EASTMOST_LONGITUDE);
 		assertTrue( EASTMOST_LONGITUDE.equals(mdata.getEastmostLongitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setEastmostLongitude(null);
@@ -271,10 +293,10 @@ public class DsgMetadataTest {
 		assertTrue( SOUTHMOST_LATITUDE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setSouthmostLatitude(null);
@@ -295,10 +317,10 @@ public class DsgMetadataTest {
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setNorthmostLatitude(null);
@@ -320,10 +342,10 @@ public class DsgMetadataTest {
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setBeginTime(null);
@@ -346,10 +368,10 @@ public class DsgMetadataTest {
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setEndTime(null);
@@ -373,10 +395,10 @@ public class DsgMetadataTest {
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getSouthmostLatitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getEastmostLongitude()) );
 		assertTrue( DashboardUtils.FP_MISSING_VALUE.equals(mdata.getWestmostLongitude()) );
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselType());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformType());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getInvestigatorNames());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getOrganizationName());
-		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getVesselName());
+		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getPlatformName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getDatasetName());
 		assertEquals(DashboardUtils.STRING_MISSING_VALUE, mdata.getExpocode());
 		mdata.setVersion(null);
@@ -413,10 +435,10 @@ public class DsgMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setVesselName(VESSEL_NAME);
+		mdata.setPlatformName(PLATFORM_NAME);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setVesselName(VESSEL_NAME);
+		other.setPlatformName(PLATFORM_NAME);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
@@ -434,10 +456,10 @@ public class DsgMetadataTest {
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 
-		mdata.setVesselType(VESSEL_TYPE);
+		mdata.setPlatformType(PLATFORM_TYPE);
 		assertFalse( mdata.hashCode() == other.hashCode());
 		assertFalse( mdata.equals(other) );
-		other.setVesselType(VESSEL_TYPE);
+		other.setPlatformType(PLATFORM_TYPE);
 		assertEquals(mdata.hashCode(), other.hashCode());
 		assertTrue( mdata.equals(other) );
 

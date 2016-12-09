@@ -540,8 +540,8 @@ public class DsgNcFileTest {
 		metadata.setExpocode(expocode);
 		metadata.setDatasetName("GM0606");
 		metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
-		metadata.setVesselName("Caribbean Cruiser");
-		metadata.setVesselType("Battleship");
+		metadata.setPlatformName("Caribbean Cruiser");
+		metadata.setPlatformType("Battleship");
 		metadata.setSouthmostLatitude(20.04);
 		metadata.setNorthmostLatitude(29.07);
 		metadata.setWestmostLongitude(-92.77);
@@ -620,8 +620,8 @@ public class DsgNcFileTest {
 			metadata.setExpocode(expocode);
 			metadata.setDatasetName("GM0606");
 			metadata.setInvestigatorNames("Public, Nancy S.; Public, John Q.");
-			metadata.setVesselName("Caribbean Cruiser");
-			metadata.setVesselType("Battleship");
+			metadata.setPlatformName("Caribbean Cruiser");
+			metadata.setPlatformType("Battleship");
 			metadata.setSouthmostLatitude(20.04);
 			metadata.setNorthmostLatitude(29.07);
 			metadata.setWestmostLongitude(-92.77);
