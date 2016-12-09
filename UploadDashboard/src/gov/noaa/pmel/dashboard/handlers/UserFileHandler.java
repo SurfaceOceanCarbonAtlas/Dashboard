@@ -34,8 +34,6 @@ public class UserFileHandler extends VersionedFileHandler {
 
 	private static final String USER_CRUISE_LIST_NAME_EXTENSION = 
 			"_cruise_list.txt";
-	private static final String DEFAULT_DATA_COLUMNS_FILENAME = 
-			"data_column_defaults.properties";
 	private static final String USER_DATA_COLUMNS_NAME_EXTENSION =
 			"_data_columns.properties";
 
@@ -52,23 +50,25 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * 		username for SVN authentication
 	 * @param svnPassword
 	 * 		password for SVN authentication
+	 * @param colNamesToTypesFilename
+	 * 		name of properties file giving the default mapping 
+	 * 		of column name keys to column types with units
 	 * @param userTypes
 	 * 		known user-provided data column types 
 	 * @throws IllegalArgumentException
 	 * 		if the specified directory does not exist, is not a 
 	 * 		directory, or is not under SVN version control; 
-	 * 		also, if the default column name to type properties
+	 * 		if the default column name to type properties
 	 * 		file does not exist or is invalid.
 	 */
-	public UserFileHandler(String userFilesDirName, String svnUsername,
-					String svnPassword, KnownDataTypes userTypes) 
-							throws IllegalArgumentException {
+	public UserFileHandler(String userFilesDirName, String svnUsername, 
+			String svnPassword, String colNamesToTypesFilename, 
+			KnownDataTypes userTypes) throws IllegalArgumentException {
 		super(userFilesDirName, svnUsername, svnPassword);
 		this.userTypes = userTypes;
 		// Generate the default data column name to type map
 		defaultColNamesToTypes = new HashMap<String,DataColumnType>();
-		addDataColumnNames(defaultColNamesToTypes,
-				new File(userFilesDirName, DEFAULT_DATA_COLUMNS_FILENAME));
+		addDataColumnNames(defaultColNamesToTypes, new File(colNamesToTypesFilename));
 	}
 
 	/**
@@ -85,8 +85,7 @@ public class UserFileHandler extends VersionedFileHandler {
 	 * @throws IllegalArgumentException
 	 * 		if the properties file does not exist or is invalid
 	 */
-	private void addDataColumnNames(
-			HashMap<String,DataColumnType> dataColNamesToTypes, 
+	private void addDataColumnNames(HashMap<String,DataColumnType> dataColNamesToTypes, 
 			File propFile) throws IllegalArgumentException {
 		// Read the column name to type properties file
 		Properties colProps = new Properties();

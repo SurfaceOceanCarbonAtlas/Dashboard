@@ -60,18 +60,11 @@ public class DashboardConfigStore {
 	private static final String QC_VERSION_NAME_TAG = "QCVersion";
 	private static final String SVN_USER_NAME_TAG = "SVNUsername";
 	private static final String SVN_PASSWORD_NAME_TAG = "SVNPassword";
-	private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
-	private static final String METADATA_TYPES_PROPS_FILE_TAG = "MetadataTypesFile";
-	private static final String DATA_TYPES_PROPS_FILE_TAG = "DataTypesFile";
 	private static final String USER_FILES_DIR_NAME_TAG = "UserFilesDir";
-	private static final String CRUISE_FILES_DIR_NAME_TAG = "CruiseFilesDir";
+	private static final String DATA_FILES_DIR_NAME_TAG = "DataFilesDir";
 	private static final String METADATA_FILES_DIR_NAME_TAG = "MetadataFilesDir";
 	private static final String DSG_NC_FILES_DIR_NAME_TAG = "DsgNcFilesDir";
 	private static final String DEC_DSG_NC_FILES_DIR_NAME_TAG = "DecDsgNcFilesDir";
-	private static final String ERDDAP_DSG_FLAG_FILE_NAME_TAG = "ErddapDsgFlagFile";
-	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
-	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
-	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
 	private static final String ARCHIVE_BUNDLES_DIR_NAME_TAG = "ArchiveBundlesDir";
 	private static final String ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG = "ArchiveBundlesEmailAddress";
 	private static final String CC_BUNDLES_EMAIL_ADDRESS_TAG = "CCBundlesEmailAddress";
@@ -79,6 +72,14 @@ public class DashboardConfigStore {
 	private static final String SMTP_HOST_PORT_TAG = "SMTPHostPort";
 	private static final String SMTP_USERNAME_TAG = "SMTPUsername";
 	private static final String SMTP_PASSWORD_TAG = "SMTPPassword";
+	private static final String ERDDAP_DSG_FLAG_FILE_NAME_TAG = "ErddapDsgFlagFile";
+	private static final String ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG = "ErddapDecDsgFlagFile"; 
+	private static final String USER_TYPES_PROPS_FILE_TAG = "UserTypesFile";
+	private static final String METADATA_TYPES_PROPS_FILE_TAG = "MetadataTypesFile";
+	private static final String DATA_TYPES_PROPS_FILE_TAG = "DataTypesFile";
+	private static final String COLUMN_NAME_TYPE_FILE_TAG = "ColumnNameTypeFile";
+	private static final String FERRET_CONFIG_FILE_NAME_TAG = "FerretConfigFile";
+	private static final String DATABASE_CONFIG_FILE_NAME_TAG = "DatabaseConfigFile";
 	private static final String USER_ROLE_NAME_TAG_PREFIX = "RoleFor_";
 
 	private static final String CONFIG_FILE_INFO_MSG = 
@@ -91,12 +92,11 @@ public class DashboardConfigStore {
 			QC_VERSION_NAME_TAG + "=SomeVersionNumber \n" +
 			SVN_USER_NAME_TAG + "=SVNUsername \n" +
 			SVN_PASSWORD_NAME_TAG + "=SVNPasswork \n" +
-			USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
-			METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
-			DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
 			USER_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/User/Data \n" +
-			CRUISE_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Cruise/Data \n" +
+			DATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Data/Files \n" +
 			METADATA_FILES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Metadata/Docs \n" +
+			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
+			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ARCHIVE_BUNDLES_DIR_NAME_TAG + "=/Some/SVN/Work/Dir/For/Archive/Bundles \n" + 
 			ARCHIVE_BUNDLES_EMAIL_ADDRESS_TAG + "=archiver@gdac.org \n" +
 			CC_BUNDLES_EMAIL_ADDRESS_TAG + "=support@my.group.org \n" +
@@ -104,10 +104,12 @@ public class DashboardConfigStore {
 			SMTP_HOST_PORT_TAG + "=smtp.server.port.number \n" +
 			SMTP_USERNAME_TAG + "=username.for.smtp \n" +
 			SMTP_PASSWORD_TAG + "=password.for.smtp \n" +
-			DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/DSG/Files \n" +
-			DEC_DSG_NC_FILES_DIR_NAME_TAG + "=/Some/Plain/Dir/For/NetCDF/Decimated/DSG/Files \n" +
 			ERDDAP_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DSG/Update \n" +
 			ERDDAP_DEC_DSG_FLAG_FILE_NAME_TAG + "=/Some/ERDDAP/Flag/Filename/For/DecDSG/Update \n" +
+			USER_TYPES_PROPS_FILE_TAG + "=/Path/To/User/Uploaded/Data/Types/PropsFile \n" +
+			METADATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Metadata/Types/PropsFile \n" +
+			DATA_TYPES_PROPS_FILE_TAG + "=/Path/To/File/Data/Types/PropsFile \n" +
+			COLUMN_NAME_TYPE_FILE_TAG + "=/Path/To/Column/Name/To/Type/PropsFile \n" +
 			FERRET_CONFIG_FILE_NAME_TAG + "=/Path/To/FerretConfig/XMLFile \n" +
 			DATABASE_CONFIG_FILE_NAME_TAG + "=/Path/To/DatabaseConfig/PropsFile \n" + 
 			BaseConfig.METADATA_CONFIG_FILE + "=/Path/To/MetadataConfig/CSVFile \n" + 
@@ -391,6 +393,19 @@ public class DashboardConfigStore {
 				itsLogger.info("    " + dtype.getVarName() + "=" + dtype.toPropertyValue());			
 		}
 
+		// Read the default column names to types with units properties file
+		String colNamesToTypesFilename;
+		try {
+			propVal = configProps.getProperty(COLUMN_NAME_TYPE_FILE_TAG);
+			if ( propVal == null )
+				throw new IllegalArgumentException("value not defined");
+			colNamesToTypesFilename = propVal.trim();
+		} catch ( Exception ex ) {
+			throw new IOException("Invalid " + COLUMN_NAME_TYPE_FILE_TAG + 
+					" value specified in " + configFile.getPath() + "\n" + 
+					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
+		}
+
 		// Read the user files directory name
 		try {
 			propVal = configProps.getProperty(USER_FILES_DIR_NAME_TAG);
@@ -398,7 +413,7 @@ public class DashboardConfigStore {
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
 			userFileHandler = new UserFileHandler(propVal, svnUsername, 
-					svnPassword, knownUserDataTypes);
+					svnPassword, colNamesToTypesFilename, knownUserDataTypes);
 		} catch ( Exception ex ) {
 			throw new IOException("Invalid " + USER_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
@@ -407,7 +422,7 @@ public class DashboardConfigStore {
 
 		// Read the cruise files directory name
 		try {
-			propVal = configProps.getProperty(CRUISE_FILES_DIR_NAME_TAG);
+			propVal = configProps.getProperty(DATA_FILES_DIR_NAME_TAG);
 			if ( propVal == null )
 				throw new IllegalArgumentException("value not defined");
 			propVal = propVal.trim();
@@ -416,7 +431,7 @@ public class DashboardConfigStore {
 			// Put SanityChecker message files in the same directory
 			checkerMsgHandler = new CheckerMessageHandler(propVal);
 		} catch ( Exception ex ) {
-			throw new IOException("Invalid " + CRUISE_FILES_DIR_NAME_TAG + 
+			throw new IOException("Invalid " + DATA_FILES_DIR_NAME_TAG + 
 					" value specified in " + configFile.getPath() + "\n" + 
 					ex.getMessage() + "\n" + CONFIG_FILE_INFO_MSG);
 		}
